@@ -608,10 +608,10 @@ class TestContentApi(object):
         workspace_api = workspace_api_factory.get(current_user=user)
         workspace = workspace_api.get_one(wid)
         api = ContentApi(current_user=user, session=session, config=app_config)
-        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
+        items = api.get_all(None, content_type_list.ANY.value, [workspace])
         eq_(2, len(items))
 
-        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
+        items = api.get_all(None, content_type_list.ANY.value, [workspace])
         with new_revision(session=session, tm=transaction.manager, content=items[0]):
             api.delete(items[0])
         transaction.commit()
@@ -621,7 +621,7 @@ class TestContentApi(object):
         workspace_api = workspace_api_factory.get(current_user=user)
         workspace = workspace_api.get_one(wid)
         api = ContentApi(current_user=user, session=session, config=app_config)
-        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
+        items = api.get_all(None, content_type_list.ANY.value, [workspace])
         eq_(1, len(items))
         transaction.commit()
 
@@ -630,7 +630,7 @@ class TestContentApi(object):
         user = uapi.get_one(uid)
         workspace_api = workspace_api_factory.get(current_user=user)
         api = ContentApi(current_user=user, session=session, config=app_config, show_deleted=True)
-        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
+        items = api.get_all(None, content_type_list.ANY.value, [workspace])
         eq_(2, len(items))
 
     def test_unit__delete__ok__do_not_change_file_extension(
@@ -748,10 +748,10 @@ class TestContentApi(object):
         workspace_api = workspace_api_factory.get(current_user=user)
         api = ContentApi(session=session, current_user=user, config=app_config)
 
-        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
+        items = api.get_all(None, content_type_list.ANY.value, [workspace])
         eq_(2, len(items))
 
-        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
+        items = api.get_all(None, content_type_list.ANY.value, [workspace])
         with new_revision(session=session, tm=transaction.manager, content=items[0]):
             api.archive(items[0])
         transaction.commit()
@@ -762,7 +762,7 @@ class TestContentApi(object):
         workspace = workspace_api.get_one(wid)
         api = ContentApi(current_user=user, session=session, config=app_config)
 
-        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
+        items = api.get_all(None, content_type_list.ANY.value, [workspace])
         eq_(1, len(items))
         transaction.commit()
 
@@ -774,7 +774,7 @@ class TestContentApi(object):
 
         # Test that the item is still available if "show deleted" is activated
         api = ContentApi(current_user=None, session=session, config=app_config, show_archived=True)
-        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
+        items = api.get_all(None, content_type_list.ANY.value, [workspace])
         eq_(2, len(items))
 
     def test_get_all_with_filter(
@@ -812,7 +812,7 @@ class TestContentApi(object):
         workspace = workspace_api.get_one(wid)
         api = ContentApi(current_user=user, session=session, config=app_config)
 
-        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
+        items = api.get_all(None, content_type_list.ANY.value, [workspace])
         eq_(2, len(items))
 
         items2 = api.get_all(None, content_type_list.File.slug, [workspace])
@@ -866,7 +866,7 @@ class TestContentApi(object):
         workspace = workspace_api.get_one(wid)
         api = ContentApi(current_user=user, session=session, config=app_config)
 
-        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
+        items = api.get_all(None, content_type_list.ANY.value, [workspace])
         eq_(3, len(items))
 
         items2 = api.get_all([parent_id], content_type_list.File.slug, [workspace])
@@ -2045,13 +2045,13 @@ class TestContentApi(object):
         workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
         api = ContentApi(current_user=user1, session=session, config=app_config)
 
-        content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content = api.get_one(pcid, content_type_list.ANY.value, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
         u2 = uapi.get_one(u2id)
         api2 = ContentApi(current_user=u2, session=session, config=app_config)
-        content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content2 = api2.get_one(pcid, content_type_list.ANY.value, workspace)
         with new_revision(session=session, tm=transaction.manager, content=content2):
             api2.update_content(content2, "this is an updated page", new_raw_content="new content")
         api2.save(content2)
@@ -2062,7 +2062,7 @@ class TestContentApi(object):
         workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
         api = ContentApi(current_user=user1, session=session, config=app_config)
 
-        updated = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        updated = api.get_one(pcid, content_type_list.ANY.value, workspace)
         assert u2id == updated.owner_id, "the owner id should be {} (found {})".format(
             u2id, updated.owner_id
         )
@@ -2126,18 +2126,18 @@ class TestContentApi(object):
         workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
         api = ContentApi(current_user=user1, session=session, config=app_config)
 
-        content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content = api.get_one(pcid, content_type_list.ANY.value, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
         u2 = uapi.get_one(u2id)
         api2 = ContentApi(current_user=u2, session=session, config=app_config)
-        content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content2 = api2.get_one(pcid, content_type_list.ANY.value, workspace)
         content2_nb_rev = len(content2.revisions)
         with pytest.raises(ContentInNotEditableState):
             with new_revision(session=session, tm=transaction.manager, content=content2):
                 api2.update_content(content2, "this is an updated page", "new content")
-        content3 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content3 = api2.get_one(pcid, content_type_list.ANY.value, workspace)
         assert content3.label == "this_is_a_page"
         assert content2_nb_rev == len(content3.revisions)
 
@@ -2202,19 +2202,19 @@ class TestContentApi(object):
         workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
         api = ContentApi(current_user=user1, session=session, config=app_config)
 
-        content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content = api.get_one(pcid, content_type_list.ANY.value, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
         u2 = uapi.get_one(u2id)
         api2 = ContentApi(current_user=u2, session=session, config=app_config)
-        content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content2 = api2.get_one(pcid, content_type_list.ANY.value, workspace)
         content2_nb_rev = len(content2.revisions)
         with pytest.raises(ContentFilenameAlreadyUsedInFolder):
             with new_revision(session=session, tm=transaction.manager, content=content2):
                 api2.update_content(content2, "this_is_a_page2", "new content")
             api2.save(content2)
-        content3 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content3 = api2.get_one(pcid, content_type_list.ANY.value, workspace)
         assert content3.label == "this_is_a_page"
         assert content2_nb_rev == len(content3.revisions)
 
@@ -2279,19 +2279,19 @@ class TestContentApi(object):
         workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
         api = ContentApi(current_user=user1, session=session, config=app_config)
 
-        content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content = api.get_one(pcid, content_type_list.ANY.value, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
         u2 = uapi.get_one(u2id)
         api2 = ContentApi(current_user=u2, session=session, config=app_config)
-        content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content2 = api2.get_one(pcid, content_type_list.ANY.value, workspace)
         content2_nb_rev = len(content2.revisions)
         with pytest.raises(SameValueError):
             with new_revision(session=session, tm=transaction.manager, content=content2):
                 api2.update_content(content2, "this_is_a_page", "")
         api2.save(content2)
-        content3 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content3 = api2.get_one(pcid, content_type_list.ANY.value, workspace)
         assert content3.label == "this_is_a_page"
         assert content2_nb_rev == len(content3.revisions)
 
@@ -2349,13 +2349,13 @@ class TestContentApi(object):
         workspace = workspace_api2.get_one(wid)
         api = ContentApi(current_user=user1, session=session, config=app_config)
 
-        content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content = api.get_one(pcid, content_type_list.ANY.value, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
         u2 = uapi.get_one(u2id)
         api2 = ContentApi(current_user=u2, session=session, config=app_config)
-        content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content2 = api2.get_one(pcid, content_type_list.ANY.value, workspace)
         with new_revision(session=session, tm=transaction.manager, content=content2):
             api2.update_file_data(content2, "index.html", "text/html", b"<html>hello world</html>")
         api2.save(content2)
@@ -2365,7 +2365,7 @@ class TestContentApi(object):
         user1 = uapi.get_one(u1id)
         workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
 
-        updated = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        updated = api.get_one(pcid, content_type_list.ANY.value, workspace)
         eq_(
             u2id,
             updated.owner_id,
@@ -2432,20 +2432,20 @@ class TestContentApi(object):
         workspace = workspace_api2.get_one(wid)
         api = ContentApi(current_user=user1, session=session, config=app_config)
 
-        content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content = api.get_one(pcid, content_type_list.ANY.value, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
         u2 = uapi.get_one(u2id)
         api2 = ContentApi(current_user=u2, session=session, config=app_config)
-        content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content2 = api2.get_one(pcid, content_type_list.ANY.value, workspace)
         content2_nb_rev = len(content2.revisions)
         with pytest.raises(ContentInNotEditableState):
             with new_revision(session=session, tm=transaction.manager, content=content2):
                 api2.update_file_data(
                     content2, "index.html", "text/html", b"<html>hello world</html>"
                 )
-        content3 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content3 = api2.get_one(pcid, content_type_list.ANY.value, workspace)
         assert content3.label == "this_is_a_page"
         assert content2_nb_rev == len(content3.revisions)
 
@@ -2505,20 +2505,20 @@ class TestContentApi(object):
         workspace = workspace_api2.get_one(wid)
         api = ContentApi(current_user=user1, session=session, config=app_config, show_archived=True)
 
-        content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content = api.get_one(pcid, content_type_list.ANY.value, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
         u2 = uapi.get_one(u2id)
         api2 = ContentApi(current_user=u2, session=session, config=app_config, show_archived=True)
-        content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content2 = api2.get_one(pcid, content_type_list.ANY.value, workspace)
         content2_nb_rev = len(content2.revisions)
         with pytest.raises(ContentInNotEditableState):
             with new_revision(session=session, tm=transaction.manager, content=content2):
                 api2.update_file_data(
                     content2, "index.html", "text/html", b"<html>hello world</html>"
                 )
-        content3 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content3 = api2.get_one(pcid, content_type_list.ANY.value, workspace)
         assert content3.label == "this_is_a_page"
         assert content2_nb_rev == len(content3.revisions)
 
@@ -2577,20 +2577,20 @@ class TestContentApi(object):
         workspace = workspace_api2.get_one(wid)
         api = ContentApi(current_user=user1, session=session, config=app_config, show_deleted=True)
 
-        content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content = api.get_one(pcid, content_type_list.ANY.value, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
         u2 = uapi.get_one(u2id)
         api2 = ContentApi(current_user=u2, session=session, config=app_config, show_deleted=True)
-        content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content2 = api2.get_one(pcid, content_type_list.ANY.value, workspace)
         content2_nb_rev = len(content2.revisions)
         with pytest.raises(ContentInNotEditableState):
             with new_revision(session=session, tm=transaction.manager, content=content2):
                 api2.update_file_data(
                     content2, "index.html", "text/html", b"<html>hello world</html>"
                 )
-        content3 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content3 = api2.get_one(pcid, content_type_list.ANY.value, workspace)
         assert content3.label == "this_is_a_page"
         assert content2_nb_rev == len(content3.revisions)
 
@@ -2636,7 +2636,7 @@ class TestContentApi(object):
         transaction.commit()
 
         api2 = ContentApi(current_user=user2, session=session, config=app_config)
-        content2 = api2.get_one(page.content_id, content_type_list.Any_SLUG, workspace)
+        content2 = api2.get_one(page.content_id, content_type_list.ANY.value, workspace)
         content2_nb_rev = len(content2.revisions)
         with new_revision(session=session, tm=transaction.manager, content=content2):
             with pytest.raises(SameValueError):
@@ -2645,7 +2645,7 @@ class TestContentApi(object):
                 )
         api2.save(content2)
         transaction.commit()
-        content3 = api2.get_one(page.content_id, content_type_list.Any_SLUG, workspace)
+        content3 = api2.get_one(page.content_id, content_type_list.ANY.value, workspace)
         assert content3.label == "index"
         assert content2_nb_rev == len(content3.revisions)
 
@@ -2703,14 +2703,14 @@ class TestContentApi(object):
         user1 = uapi.get_one(u1id)
         workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
 
-        content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content = api.get_one(pcid, content_type_list.ANY.value, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
         u2api = user_api_factory.get()
         u2 = u2api.get_one(u2id)
         api2 = ContentApi(current_user=u2, session=session, config=app_config, show_archived=True)
-        content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content2 = api2.get_one(pcid, content_type_list.ANY.value, workspace)
         with new_revision(session=session, tm=transaction.manager, content=content2):
             api2.archive(content2)
         api2.save(content2)
@@ -2723,7 +2723,7 @@ class TestContentApi(object):
         api = ContentApi(current_user=user1, session=session, config=app_config, show_archived=True)
         api2 = ContentApi(current_user=u2, session=session, config=app_config, show_archived=True)
 
-        updated = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        updated = api2.get_one(pcid, content_type_list.ANY.value, workspace)
         eq_(
             u2id,
             updated.owner_id,
@@ -2734,7 +2734,7 @@ class TestContentApi(object):
 
         ####
 
-        updated2 = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        updated2 = api.get_one(pcid, content_type_list.ANY.value, workspace)
         with new_revision(session=session, tm=transaction.manager, content=updated):
             api.unarchive(updated)
         api.save(updated2)
@@ -2794,13 +2794,13 @@ class TestContentApi(object):
         user1 = uapi.get_one(u1id)
         workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
 
-        content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content = api.get_one(pcid, content_type_list.ANY.value, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
         u2 = uapi.get_one(u2id)
         api2 = ContentApi(current_user=u2, session=session, config=app_config, show_deleted=True)
-        content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content2 = api2.get_one(pcid, content_type_list.ANY.value, workspace)
         with new_revision(session=session, tm=transaction.manager, content=content2):
             api2.delete(content2)
         api2.save(content2)
@@ -2815,7 +2815,7 @@ class TestContentApi(object):
         u2 = uapi.get_one(u2id)
         api2 = ContentApi(current_user=u2, session=session, config=app_config, show_deleted=True)
 
-        updated = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        updated = api2.get_one(pcid, content_type_list.ANY.value, workspace)
         eq_(
             u2id,
             updated.owner_id,
@@ -2826,7 +2826,7 @@ class TestContentApi(object):
 
         ####
 
-        updated2 = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        updated2 = api.get_one(pcid, content_type_list.ANY.value, workspace)
         with new_revision(tm=transaction.manager, session=session, content=updated2):
             api.undelete(updated2)
         api.save(updated2)

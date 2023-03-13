@@ -165,7 +165,9 @@ class TestWOPI(object):
         # FIXME - H.D. - 2019/07/04 - MySQL has trouble finding the newly created revision
         #  without reinstancing the database session
         content_api = content_api_factory.get()
-        content = content_api.get_one(test_file.content_id, content_type=content_type_list.Any_SLUG)
+        content = content_api.get_one(
+            test_file.content_id, content_type=content_type_list.ANY.value
+        )
         response = res.json_body
         file_ = DepotManager.get(app_config.UPLOADED_FILES__STORAGE__STORAGE_NAME).get(
             content.depot_file
@@ -231,7 +233,9 @@ class TestWOPI(object):
         # FIXME - H.D. - 2019/07/04 - MySQL has trouble finding the newly created revision
         #  without reinstancing the database session
         content_api = content_api_factory.get()
-        content = content_api.get_one(test_file.content_id, content_type=content_type_list.Any_SLUG)
+        content = content_api.get_one(
+            test_file.content_id, content_type=content_type_list.ANY.value
+        )
         response = res.json_body
         file_ = DepotManager.get(app_config.UPLOADED_FILES__STORAGE__STORAGE_NAME).get(
             content.depot_file

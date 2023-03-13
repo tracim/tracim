@@ -1653,7 +1653,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -1742,7 +1742,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=KANBAN_TYPE,
             workspace=business_workspace,
@@ -1771,7 +1771,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=KANBAN_TYPE,
             workspace=business_workspace,
@@ -1801,7 +1801,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -1854,7 +1854,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -1997,7 +1997,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -2035,7 +2035,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         with session.no_autoflush:
             test_file = content_api.create(
                 content_type_slug=content_type_list.File.slug,
@@ -2125,7 +2125,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         with session.no_autoflush:
             test_file = content_api.create(
                 content_type_slug=content_type_list.File.slug,
@@ -2164,7 +2164,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get(show_deleted=True)
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         with session.no_autoflush:
             test_file = content_api.create(
                 content_type_slug=content_type_list.File.slug,
@@ -2203,7 +2203,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get(show_deleted=True)
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         with session.no_autoflush:
             test_file = content_api.create(
                 content_type_slug=content_type_list.File.slug,
@@ -2242,7 +2242,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -2337,7 +2337,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -2395,7 +2395,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -2454,7 +2454,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -2504,7 +2504,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -2549,7 +2549,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -2590,7 +2590,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -3037,7 +3037,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -3105,7 +3105,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -3133,7 +3133,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -3180,7 +3180,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -3216,7 +3216,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -3259,7 +3259,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -3294,7 +3294,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -3331,7 +3331,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -3375,7 +3375,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -3413,7 +3413,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -3451,7 +3451,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -3491,7 +3491,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -3535,7 +3535,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -3579,7 +3579,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -3623,7 +3623,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -3661,7 +3661,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -3713,7 +3713,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -3772,7 +3772,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -3811,7 +3811,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -3866,7 +3866,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -3903,7 +3903,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -3942,7 +3942,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -3983,7 +3983,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -4021,7 +4021,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -4066,7 +4066,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -4106,7 +4106,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -4156,7 +4156,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -4203,7 +4203,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -4257,7 +4257,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -4307,7 +4307,7 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_file = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -4411,7 +4411,7 @@ class TestThreads(object):
         workspace_api = workspace_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         content_api = content_api_factory.get()
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_thread = content_api.create(
             content_type_slug=content_type_list.Thread.slug,
             workspace=business_workspace,
@@ -4449,7 +4449,7 @@ class TestThreads(object):
         workspace_api = workspace_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         content_api = content_api_factory.get()
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_thread = content_api.create(
             content_type_slug=content_type_list.Thread.slug,
             workspace=business_workspace,
@@ -4761,7 +4761,7 @@ class TestThreads(object):
         workspace_api = workspace_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         content_api = content_api_factory.get()
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
         test_thread = content_api.create(
             content_type_slug=content_type_list.Thread.slug,
             workspace=business_workspace,
