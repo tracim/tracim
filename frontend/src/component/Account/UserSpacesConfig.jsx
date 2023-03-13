@@ -87,7 +87,7 @@ export const UserSpacesConfig = (props) => {
 
     const filteredSpaceList = filterSpaceList(sortedList)
 
-    const entrieList = filteredSpaceList.map(space => {
+    const entryList = filteredSpaceList.map(space => {
       return (
         <UserSpacesConfigLine
           space={space}
@@ -102,7 +102,7 @@ export const UserSpacesConfig = (props) => {
         />
       )
     })
-    setEntries(entrieList)
+    setEntries(entryList)
   }, [spaceList, sortOrder, selectedSortCriterion, userFilter])
 
   const filterSpaceList = (list) => {

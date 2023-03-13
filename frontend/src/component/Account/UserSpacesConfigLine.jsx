@@ -33,9 +33,10 @@ class UserSpacesConfigLine extends React.Component {
           <td>
             <EmailNotificationTypeButton
               currentEmailNotificationType={props.space.member.emailNotificationType}
-              onClickChangeEmailNotificationType={props.onChangeEmailNotificationType}
+              displayLabel={false}
               flexJustifyRadio='flex-start'
               formName={`notificationType_${props.space.id}`}
+              onClickChangeEmailNotificationType={props.onChangeEmailNotificationType}
             />
           </td>
         )}
