@@ -158,13 +158,14 @@ export const HtmlDocument = props => {
             <>
               <TinyEditor
                 apiUrl={props.apiUrl}
-                codeLanguageList={[]}
+                setContent={updateTextToEdit}
+                // End of required props ///////////////////////////////////////////////
+                codeLanguageList={props.codeLanguageList}
                 content={textToEdit}
-                onCtrlEnterEvent={props.onClickValidateBtn}
                 height='100%'
                 isAdvancedEdition
+                onCtrlEnterEvent={props.onClickValidateBtn}
                 roleList={DEFAULT_ROLE_LIST}
-                setContent={updateTextToEdit}
                 spaceId={props.workspaceId}
                 userList={props.memberList}
               />
@@ -175,7 +176,7 @@ export const HtmlDocument = props => {
                   customClass={`${props.customClass}__cancel editionmode__button__cancel`}
                   icon='fas fa-times'
                   intent='secondary'
-                  key='TextAreaApp__cancel'
+                  key='TinyEditor__cancel'
                   onClick={props.onClickCloseEditMode}
                   tabIndex='1'
                   text={props.t('Cancel')}
@@ -188,7 +189,7 @@ export const HtmlDocument = props => {
                   disabled={props.disableValidateBtn(textToEdit)}
                   icon='fas fa-check'
                   intent='primary'
-                  key='TextAreaApp__validate'
+                  key='TinyEditor__validate'
                   mode='light'
                   onClick={() => props.onClickValidateBtn(textToEdit)}
                   text={props.t('Validate')}
@@ -207,6 +208,7 @@ export default translate()(HtmlDocument)
 HtmlDocument.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   workspaceId: PropTypes.number.isRequired,
+  codeLanguageList: PropTypes.array,
   contentId: PropTypes.number,
   contentType: PropTypes.string,
   customColor: PropTypes.string,

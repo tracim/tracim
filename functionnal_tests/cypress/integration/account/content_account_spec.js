@@ -20,7 +20,7 @@ describe('Account page', () => {
 
   const validateButton = 'Validate'
 
-  // describe('Account header', () => {
+  describe('Account header', () => {
     it('should have the title and user preferences visible', () => {
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
         .find('.account__title')
@@ -55,9 +55,9 @@ describe('Account page', () => {
         .contains(`@${baseUser.username}`)
         .should('be.visible')
     })
-  // })
+  })
 
-  // describe('Account Preferences', () => {
+  describe('Account Preferences', () => {
     it('should have Menu visible', () => {
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
         .find('.menusubcomponent__list')
@@ -149,9 +149,9 @@ describe('Account page', () => {
         .find('.webdavInfo__content__link__url')
         .click()
     })
-  // })
-  // describe('Changing account preferences', () => {
-    // describe('Change full name', () => {
+  })
+  describe('Changing account preferences', () => {
+    describe('Change full name', () => {
       it('should update the header with the new full name', () => {
         const newFullName = 'newRandomFullName'
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
@@ -167,8 +167,8 @@ describe('Account page', () => {
           .find('[data-cy=userinfo__name]')
           .contains(newFullName)
       })
-    // })
-    // describe('Change email', () => {
+    })
+    describe('Change email', () => {
       it('should update the header with the new email', () => {
         const newRandomEmail = 'newrandomemail@random.fr'
         cy.getTag({ selectorName: s.TRACIM_CONTENT })
@@ -190,8 +190,8 @@ describe('Account page', () => {
           .find('[data-cy=userinfo__email]')
           .contains(newRandomEmail)
       })
-    // })
-    // describe('Change username', () => {
+    })
+    describe('Change username', () => {
       const newUserName = 'newRandomUsername'
       const longNewUsername = 'a'.repeat(256)
 
@@ -256,7 +256,7 @@ describe('Account page', () => {
           .find('.personaldata__form__button')
           .should('not.be.enabled')
       })
-    // })
+    })
 
     // TODO - MP - 2022-07-04 - Unstable test
     // see: https://github.com/tracim/tracim/issues/5344
@@ -281,23 +281,23 @@ describe('Account page', () => {
         cy.contains('.account__userpreference__setting__spacename', 'You are not a member of any space yet')
       })
     })
-  // })
-  // it("should redirect to user's public profile", () => {
-  //   cy.visitPage({ pageName: PAGES.ACCOUNT })
-  //   cy.get('.userinfo__profile_button').click()
-  //   cy.url().should('include', URLS[PAGES.PROFILE]({ userId: defaultAdmin.user_id }));
-  // })
+  })
 })
 
-// describe('Profile link button', () => {
-//   beforeEach(() => {
-//     cy.resetDB()
-//     cy.setupBaseDB()
-//     cy.loginAs('administrators')
-//   })
+describe('Profile link button', () => {
+  beforeEach(() => {
+    cy.resetDB()
+    cy.setupBaseDB()
+    cy.loginAs('administrators')
+  })
 
-//   afterEach(() => {
-//     cy.cancelXHR()
-//   })
+  afterEach(() => {
+    cy.cancelXHR()
+  })
 
-// })
+  it("should redirect to user's public profile", () => {
+    cy.visitPage({ pageName: PAGES.ACCOUNT })
+    cy.get('.userinfo__profile_button').click()
+    cy.url().should('include', URLS[PAGES.PROFILE]({ userId: defaultAdmin.user_id }));
+  })
+})

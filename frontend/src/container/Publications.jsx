@@ -537,11 +537,7 @@ export class Publications extends React.Component {
             apiUrl={FETCH_CONFIG.apiUrl}
             codeLanguageList={props.system.config.code_languages}
             comment={replaceHTMLElementWithMention(
-              [{
-                id: 0,
-                label: props.t('All'),
-                slug: props.t('all')
-              }],
+              DEFAULT_ROLE_LIST,
               props.currentWorkspace.memberList,
               state.commentToEdit.raw_content
             )}

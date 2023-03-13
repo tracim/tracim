@@ -9,7 +9,6 @@ const fakePreview = {
 }
 const exampleText = 'This is an example'
 
-const publicationInput = '#wysiwygTimelineCommentPublication'
 const publishButton = '.commentArea__submit__btn'
 
 describe('Publications', () => {

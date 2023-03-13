@@ -154,26 +154,17 @@ describe('appContentFactory.js', () => {
   })
 
   describe('function appContentCustomEventHandlerHideApp', () => {
-    const fakeTinymceRemove = sinon.spy()
-
     before(() => {
-      global.tinymce.remove = fakeTinymceRemove
       wrapper.instance().appContentCustomEventHandlerHideApp(fakeSetState)
     })
 
     after(() => {
-      fakeTinymceRemove.resetHistory()
       fakeSetState.resetHistory()
-    })
-
-    it('should reset the tinymce comment field', () => {
-      sinon.assert.calledWith(fakeTinymceRemove, '#wysiwygTimelineComment')
     })
 
     it('should call setState to hide the app and set back the comment textarea to normal', () => {
       sinon.assert.calledWith(fakeSetState, {
-        isVisible: false,
-        timelineWysiwyg: false
+        isVisible: false
       })
     })
   })
@@ -197,10 +188,6 @@ describe('appContentFactory.js', () => {
       fakeTinymceRemove.resetHistory()
       global.localStorage.getItem.resetHistory()
       fakeSetState.resetHistory()
-    })
-
-    it('should remove the tinymce comment field', () => {
-      sinon.assert.calledWith(fakeTinymceRemove, '#wysiwygTimelineComment')
     })
 
     it('should get the localStorage value', () => {
@@ -239,13 +226,12 @@ describe('appContentFactory.js', () => {
       changeLanguage: fakeI18nChangeLanguage
     }
     const newLang = 'en'
-    const dummyChangeNewCommentHandler = () => {}
     const fakeWysiwygConstructor = sinon.spy()
 
     before(() => {
       global.tinymce.remove = fakeTinymceRemove
       global.wysiwyg = fakeWysiwygConstructor
-      wrapper.instance().appContentCustomEventHandlerAllAppChangeLanguage(newLang, fakeSetState, fakeI18n, false)
+      wrapper.instance().appContentCustomEventHandlerAllAppChangeLanguage(newLang, fakeSetState, fakeI18n)
     })
 
     after(() => {
@@ -260,30 +246,6 @@ describe('appContentFactory.js', () => {
 
     it('should call the function changeLanguage of i18n object', () => {
       sinon.assert.calledWith(fakeI18nChangeLanguage, newLang)
-    })
-
-    describe('with isTimelineWysiwyg to true', () => {
-      const fakeWysiwygConstructor = sinon.spy()
-      before(() => {
-        global.tinymce.remove = fakeTinymceRemove
-        global.wysiwyg = fakeWysiwygConstructor
-        wrapper.instance().appContentCustomEventHandlerAllAppChangeLanguage(newLang, fakeSetState, fakeI18n, true, dummyChangeNewCommentHandler)
-      })
-
-      after(() => {
-        fakeTinymceRemove.resetHistory()
-        fakeWysiwygConstructor.resetHistory()
-        fakeSetState.resetHistory()
-        fakeI18nChangeLanguage.resetHistory()
-      })
-
-      it('should remove the tinymce comment field', () => {
-        sinon.assert.calledWith(fakeTinymceRemove, '#wysiwygTimelineComment')
-      })
-
-      it('should call the tinymce constructor', () => {
-        sinon.assert.calledWith(fakeWysiwygConstructor, '#wysiwygTimelineComment', newLang, dummyChangeNewCommentHandler)
-      })
     })
   })
 

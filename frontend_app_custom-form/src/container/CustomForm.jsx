@@ -145,18 +145,18 @@ class CustomForm extends React.Component {
       await this.loadContent()
       buildContentPathBreadcrumbs(state.config.apiUrl, state.content, props)
       // tinymce.remove('#wysiwygNewVersion')
-      wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
+      // wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
     }
 
     if (state.mode === MODE.EDIT && prevState.mode !== MODE.EDIT) {
       // tinymce.remove('#wysiwygNewVersion')
-      wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
+      // wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
     }
   }
 
   componentWillUnmount () {
     console.log('%c<CustomForm> will Unmount', `color: ${this.state.config.hexcolor}`)
-    tinymce.remove('#wysiwygTimelineComment')
+    // tinymce.remove('#wysiwygTimelineComment')
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 

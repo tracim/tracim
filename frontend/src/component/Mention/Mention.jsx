@@ -20,7 +20,7 @@ const MentionWrapped = props => {
 const calculateUserMention = (props) => {
   const mention = {
     isToMe: false, // true: mention to me, false: mention to someone else
-    text: undefined // Text to display in the mention
+    text: 'UndefinedUser' // Text to display in the mention
   }
   const userId = Number(props.userid) // User id of the mention
 
@@ -39,13 +39,13 @@ const calculateUserMention = (props) => {
   }
 
   // Fetch from other spaces
-  for (const space in props.workspaceList) {
+  props.workspaceList.forEach(space => {
     const user = space.memberList.find(m => m.id === userId)
     if (user) {
       mention.text = user.username
       return mention
     }
-  }
+  })
 
   // Fetch from API (can't use async since it's used to render)
   props.dispatch(getUser(userId)).then(

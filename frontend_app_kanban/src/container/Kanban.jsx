@@ -128,9 +128,7 @@ export class Kanban extends React.Component {
   handleAllAppChangeLanguage = data => {
     const { props } = this
     console.log('%c<Kanban> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
-    props.appContentCustomEventHandlerAllAppChangeLanguage(
-      data, this.setState.bind(this), i18n, this.state.timelineWysiwyg, this.handleChangeNewComment
-    )
+    props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n)
   }
 
   handleChangeMarkedTemplate = (isTemplate) => {
@@ -490,6 +488,7 @@ export class Kanban extends React.Component {
     props.appContentChangeTitle(state.content, newTitle, FILE_APP_SLUG)
   }
 
+  // TODO: Check this
   handleChangeNewComment = e => {
     const { props, state } = this
     props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)

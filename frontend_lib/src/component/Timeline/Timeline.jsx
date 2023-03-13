@@ -16,6 +16,7 @@ import {
   formatAbsoluteDate
 } from '../../helper.js'
 import {
+  DEFAULT_ROLE_LIST,
   replaceHTMLElementWithMention
 } from '../../mentionOrLink.js'
 import { TRANSLATION_STATE } from '../../translation.js'
@@ -196,11 +197,7 @@ export class Timeline extends React.Component {
             apiUrl={props.apiUrl}
             codeLanguageList={props.codeLanguageList}
             comment={replaceHTMLElementWithMention(
-              [{
-                id: 0,
-                label: props.t('All'),
-                slug: props.t('all')
-              }],
+              DEFAULT_ROLE_LIST,
               props.memberList,
               state.newComment.raw_content
             )}
