@@ -97,6 +97,7 @@ export const AdminUserSpacesConfig = (props) => {
       const hasFilterMatchOnSpaceId = space.id && includesFilter(space.id.toString())
 
       return (
+        filterList === '' ||
         hasFilterMatchOnUserRole ||
         hasFilterMatchOnSpaceLabel ||
         hasFilterMatchOnSpaceId
