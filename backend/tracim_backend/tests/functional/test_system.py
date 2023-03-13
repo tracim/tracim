@@ -1,4 +1,5 @@
 # coding=utf-8
+from unittest import mock
 from urllib.parse import quote
 
 from mock import patch
@@ -7,6 +8,7 @@ import transaction
 
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.utils.utils import get_timezones_list
+from tracim_backend.models.mention import TRANSLATED_GROUP_MENTIONS
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
@@ -180,6 +182,9 @@ class TestUsernameEndpoints(object):
      - /api/system/reserved-usernames
     """
 
+    @mock.patch(
+        "tracim_backend.lib.core.user.UserApi.get_reserved_usernames", return_value=tuple(["all"])
+    )
     @pytest.mark.parametrize(
         "username,is_available",
         [
@@ -188,14 +193,10 @@ class TestUsernameEndpoints(object):
             ("Cloclo", True),
             ("anotherOne", True),
             ("all", False),
-            ("tous", False),
-            ("todos", False),
-            ("alle", False),
-            ("الكل", False),
         ],
     )
     def test_api__get_username_availability__ok_200__nominal_case(
-        self, web_testapp, username: str, is_available: bool
+        self, get_reserved_usernames_mock, web_testapp, username: str, is_available: bool
     ) -> None:
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
@@ -206,7 +207,11 @@ class TestUsernameEndpoints(object):
     def test_api__get_reserved_usernames__ok_200__nominal_case(self, web_testapp) -> None:
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/system/reserved-usernames", status=200)
-        assert set(res.json["items"]) == set(("all", "tous", "todos", "alle", "الكل"))
+        assert TRANSLATED_GROUP_MENTIONS["all"] in res.json["items"]
+        assert TRANSLATED_GROUP_MENTIONS["reader"] in res.json["items"]
+        assert TRANSLATED_GROUP_MENTIONS["contributor"] in res.json["items"]
+        assert TRANSLATED_GROUP_MENTIONS["content-manager"] in res.json["items"]
+        assert TRANSLATED_GROUP_MENTIONS["space-manager"] in res.json["items"]
 
 
 @pytest.mark.usefixtures("test_fixture")

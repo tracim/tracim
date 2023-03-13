@@ -5,6 +5,7 @@
 ## How to migrate your Calendar/Agenda
 
 ### Reminder
+
 - data/file about all calendar (Tracim v1) are in this folder `radicale_data/` in your instance server.
 Files is in format of radicale 1.1.1
 - data/file about all agenda (Tracim v2.2) are in this folder `radicale_storage/` in path `/tracim/backend/` by default.
@@ -13,7 +14,6 @@ Files is in format of radicale 2.0.0
 ### Step by Step Migration
 
 **:warning:** The current user must have read/write access on the Tracim v1 folder and read/write access to the migration output folder.
-
 
 Create folder in your system to make migration of files. For instance:
 
@@ -37,10 +37,8 @@ Copy folder `radicale_data/` from Tracim v1 to folder `/<your>/<migration>/<fold
 
 Create a configuration file (e.g. `conf.ini`) for the migration in `/<your>/<migration>/<folder>/<path>/` with this parameter:
 
-
     [storage]
     filesystem_folder = /<your>/<migration>/<folder>/<path>/radicale_data
-
 
 Convert the file:
 
@@ -57,16 +55,16 @@ After migration, the file can be found in `/<your>/<migration>/<folder>/<path>/e
 Copy folder `collection-root/agenda/` in `radicale_storage/`:
 
     cp -r export/collection-root /<your>/<tracimv2>/<path>/backend/radicale_storage/
-    
+
 Make sure that file `.Radicale.props` does not exist in the following folders (otherwise delete them):
-  
+
 - `/<your>/<tracimv2>/<path>/backend/radicale_storage/collection-root/agenda/user/`
 - `/<your>/<tracimv2>/<path>/backend/radicale_storage/collection-root/agenda/workspace/`
 
 After starting the CalDAV server, you need to synchronize Tracim with radicale:
 
     tracimcli caldav sync
-    
+
 Now all of your agendas are visible in Tracim.
 
 ## Parameter changed from v2.1 to v2.2
@@ -103,7 +101,6 @@ This is not a new parameter but it is not visible in the configuration file in 2
 `preview.jpg.allowed_dims = 256x256,512x512,1024x1024`
 `preview.jpg.restricted_dims = True`
 
-
 # Migration from Tracim v1 to Tracim v2.1
 
 **:warning:** version 2.0 of Tracim doesn't support folder and LDAP. If you want to migrate from Tracim v1, you should use version 2.1 or later.
@@ -122,25 +119,27 @@ This is the tag for the latest version `release_01.xx.xx_end_of_life`.
 If you want to update from v1 to v2, you make sure to backup your data from Tracim v1.
 
 Relevant data:
- - **config file**: .ini file used by process running Tracim, by default, `development.ini`.
- - **SGBD database** (sqlite, postgresql, mysql, ...): database connection is configured in config file of Tracim v1 ini in `sqlalchemy.url` field,
- - **Depot folder** : folder path is configured in config file of Tracim v1 ini in `depot_storage_dir` field.
+
+- **config file**: .ini file used by process running Tracim, by default, `development.ini`.
+- **SGBD database** (sqlite, postgresql, mysql, ...): database connection is configured in config file of Tracim v1 ini in `sqlalchemy.url` field,
+- **Depot folder** : folder path is configured in config file of Tracim v1 ini in `depot_storage_dir` field.
 
 ## 3. Setup Tracim v2
 
 There is many way to set up Tracim v2, easiest is to use shell script, see [README](../../README.md).
 
 One easy way to migrate from Tracim v1 to Tracim v2 with shell script is :
- - running shell automatic install with default sqlite database
- - active virtual environment (in `/backend` folder) `source env/bin/activate`
- - check that Tracim v2 is running correctly by launching `pserve development.ini`
- - do `pip install -e .[mysql]` or `pip install -e .[postgresql] `to install proper package for your 
-SGDB.
- - modify default config file (`development.ini` name here but you can change it) with `basic_setup.sqlalchemy_url` linking to your own database with Tracim v1 data and `basic_setup.depot_storage_dir` with path giving access to your old Tracim v1 depot dir content.
- - force migration of database with `alembic -c developement.ini upgrade head` (see also [here](migration.md) for more info)
- - run Tracim with these parameters and check that content from Tracim v1 is correctly added. (If you used LDAP for auth, check that you have one Tracim administrator user or create one with INTERNAL auth)
 
-## 4. Migrate the configuration from Tracim v1.
+- running shell automatic install with default sqlite database
+- active virtual environment (in `/backend` folder) `source env/bin/activate`
+- check that Tracim v2 is running correctly by launching `pserve development.ini`
+- do `pip install -e .[mysql]` or `pip install -e .[postgresql]`to install proper package for your
+SGDB.
+- modify default config file (`development.ini` name here but you can change it) with `basic_setup.sqlalchemy_url` linking to your own database with Tracim v1 data and `basic_setup.depot_storage_dir` with path giving access to your old Tracim v1 depot dir content.
+- force migration of database with `alembic -c developement.ini upgrade head` (see also [here](migration.md) for more info)
+- run Tracim with these parameters and check that content from Tracim v1 is correctly added. (If you used LDAP for auth, check that you have one Tracim administrator user or create one with INTERNAL auth)
+
+## 4. Migrate the configuration from Tracim v1
 
 You now have a running Tracim v2 instance with a working database, you can now check [developement.ini.sample](../development.ini.sample)
 and check which Tracim v1 parameters already exist and add them to your configuration file.
@@ -222,10 +221,11 @@ edit parameters, which are mostly in section `[DEFAULT]`.
 --------------------------------
 
 Other changes to the configuration file include:
-* reordering file with `pipeline` and `app`
-* added `[alembic]` section for migration
-* new logger for `alembic` and `hapic` (`auth` logger has been removed)
-* old personnalization file from Tracim v1 like  `assets/img/home_illustration.jpg`
+
+- reordering file with `pipeline` and `app`
+- added `[alembic]` section for migration
+- new logger for `alembic` and `hapic` (`auth` logger has been removed)
+- old personnalization file from Tracim v1 like  `assets/img/home_illustration.jpg`
  or `/assets/img/bg.jpg` are not anymore used.
 
 # About Backward Migrations

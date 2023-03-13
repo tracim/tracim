@@ -76,7 +76,6 @@ describe('appContentFactory.js', () => {
         'appContentDeleteComment',
         'appContentEditComment',
         'appContentNotifyAll',
-        'appContentSaveNewComment',
         'appContentChangeStatus',
         'appContentArchive',
         'appContentDelete',
@@ -342,7 +341,7 @@ describe('appContentFactory.js', () => {
     })
   })
 
-  describe('function saveCommentAsText', () => {
+  describe('function appContentSaveNewCommentText', () => {
     describe('on comment save success', async () => {
       let response
       const newComment = 'Edited comment'
@@ -362,14 +361,15 @@ describe('appContentFactory.js', () => {
 
       before(async () => {
         wrapper.instance().checkApiUrl = fakeCheckApiUrl
-        const loggedUser = {
-          username: 'foo',
-          lang: 'en'
-        }
-        const isCommentWysiwyg = true
-        mockPostContentComment200(fakeApiUrl, fakeContent.workspace_id, fakeContent.content_id, newComment, fakeContent.content_namespace)
-        response = await wrapper.instance().saveCommentAsText(
-          fakeContent, isCommentWysiwyg, newComment, fakeSetState, appContentSlug, loggedUser, 'foo'
+        mockPostContentComment200(
+          fakeApiUrl,
+          fakeContent.workspace_id,
+          fakeContent.content_id,
+          newComment,
+          fakeContent.content_namespace
+        )
+        response = await wrapper.instance().appContentSaveNewCommentText(
+          fakeContent, newComment, appContentSlug
         )
       })
 
@@ -380,47 +380,11 @@ describe('appContentFactory.js', () => {
         global.GLOBAL_dispatchEvent.resetHistory()
       })
 
-      it('should reset the tinymce comment field since we set param isCommentWysiwyg to true', () => {
-        sinon.assert.calledWith(fakeTinymceSetContent, '')
-      })
-
-      it('should remove the localStorage value', () => {
-        sinon.assert.calledWith(
-          global.localStorage.removeItem,
-          generateLocalStorageContentId(appContentSlug, fakeContent.content_id, fakeContent.workspace_id, 'comment')
-        )
-      })
-
       it('should return the response from api with handleFetchResponse called on it', () => {
         expect(response)
           .to.have.property('apiResponse')
           .and.have.property('body')
       })
-    })
-  })
-
-  describe('function appContentSaveNewComment', () => {
-    const newComment = 'Edited comment'
-
-    before(() => {
-      wrapper.instance().checkApiUrl = fakeCheckApiUrl
-      const loggedUser = {
-        username: 'foo',
-        lang: 'en'
-      }
-      const fileChildContentList = []
-      const isCommentWysiwyg = true
-      wrapper.instance().appContentSaveNewComment(
-        fakeContent, isCommentWysiwyg, newComment, fileChildContentList, fakeSetState, appContentSlug, loggedUser, 'foo'
-      )
-    })
-
-    after(() => {
-      fakeCheckApiUrl.resetHistory()
-    })
-
-    it('should call the function checkApiUrl', () => {
-      expect(fakeCheckApiUrl.called).to.equal(true)
     })
   })
 

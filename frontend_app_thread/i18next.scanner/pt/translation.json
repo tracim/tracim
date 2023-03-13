@@ -6,12 +6,14 @@
   "Start a topic": "Começar uma discussão",
   "A content with the same name already exists": "Um conteúdo com o mesmo nome já existe",
   "Error while creating thread": "Erro ao criar a discussão",
-  "Error while saving the comment": "Erro ao guardar o comentário",
   "Thread": "Discussão",
   "thread": "discussão",
   "threads": "discussões",
   "The content has been modified by {{author}}": "O conteúdo foi modificado por {{author}}",
   "Delete": "Eliminar",
   "The link has been copied to clipboard": "Ligação copiada para a área de transferência",
-  "Copy content link": "Copiar ligação do conteúdo"
+  "Copy content link": "Copiar ligação do conteúdo",
+  "Every members of the space": "",
+  "All": "",
+  "all": ""
 }

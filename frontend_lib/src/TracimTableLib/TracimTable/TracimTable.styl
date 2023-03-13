@@ -1,0 +1,62 @@
+@import '../../css/Variable.styl'
+
+.tracimTable
+  &__header
+    display flex
+    flex-direction column
+    &__icon
+      position absolute
+      // INFO - ML - 2023-01-11 - The 8px corresponds to the half of the sort icon's height
+      top calc(50% - 8px)
+      color darkGrey1
+      &:hover
+        & .tracimTable__header__icon
+          color fontColor
+    &__btn
+      padding 10px 0
+      width 100%
+      text-align inherit
+      white-space break-spaces
+    &__row
+      display flex
+      flex-direction row
+      align-items center
+      padding standardSpacing 0
+      margin standardSpacing 0
+      &__cell
+        display flex
+        position relative
+        overflow hidden
+        text-overflow ellipsis
+        padding buttonShadowOutline
+        margin-inline-start "calc(%s - %s)" % (standardSpacing buttonShadowOutline)
+        margin-inline-end standardSpacing
+      &__cell *
+        overflow hidden
+        text-overflow ellipsis
+  &__body
+    display flex
+    flex-direction column
+    &__row
+      display flex
+      flex-direction row
+      white-space nowrap
+      padding standardSpacing 0
+      &__cell
+        display flex
+        overflow hidden
+        text-overflow ellipsis
+        margin-inline-start standardSpacing
+        margin-inline-end standardSpacing
+      &__cell *
+        overflow hidden
+        text-overflow ellipsis
+
+.tracimTable__body__colored .tracimTable__body__row:nth-child(even)
+  background-color lightGrey2
+
+[dir=ltr] .tracimTable__header__icon
+  right buttonShadowOutline
+
+[dir=rtl] .tracimTable__header__icon
+  left buttonShadowOutline

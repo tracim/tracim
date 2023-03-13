@@ -1,5 +1,4 @@
 {
-  "Error while saving the comment": "Fehler beim Speichern des Kommentars",
   "Delete": "Löschen",
   "A content with the same name already exists": "Ein Inhalt mit demselben Namen existiert bereits",
   "Error while creating kanban": "Fehler beim Erstellen von Kanban",
@@ -46,5 +45,8 @@
   "You have reached your storage limit, you cannot add new files": "Sie haben Ihr Speicherlimit erreicht, Sie können keine neuen Dateien hinzufügen",
   "Tasks": "",
   "The link has been copied to clipboard": "Der Link wurde in die Clipboard kopiert",
-  "Copy content link": "Link zum Inhalt kopieren"
+  "Copy content link": "Link zum Inhalt kopieren",
+  "Every members of the space": "",
+  "All": "",
+  "all": ""
 }

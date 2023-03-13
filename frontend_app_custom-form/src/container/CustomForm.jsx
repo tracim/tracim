@@ -3,6 +3,7 @@ import CustomFormComponent from '../component/CustomFormComponent.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
+  DEFAULT_ROLE_LIST,
   buildContentPathBreadcrumbs,
   handleFetchResult,
   PopinFixed,
@@ -14,7 +15,6 @@ import {
   ArchiveDeleteContent,
   SelectStatus,
   displayDistanceDate,
-  convertBackslashNToBr,
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
   removeLocalStorageItem,
@@ -354,6 +354,8 @@ class CustomForm extends React.Component {
     // setLocalStorageItem(this.state.appName, this.state.content, LOCAL_STORAGE_FIELD.RAW_CONTENT, e.formData)
   }
 
+  convertBackslashNToBr = msg => msg.replace(/\n/g, '<br />')
+
   handleClickValidateNewCommentBtn = async (comment) => {
     const { props, state } = this
 
@@ -361,7 +363,7 @@ class CustomForm extends React.Component {
     // see https://github.com/tracim/tracim/issues/1101
     const newCommentForApi = state.timelineWysiwyg
       ? comment
-      : `<p>${convertBackslashNToBr(comment)}</p>`
+      : `<p>${this.convertBackslashNToBr(comment)}</p>`
 
     const fetchResultSaveNewComment = await handleFetchResult(await postCustomFormNewComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newCommentForApi))
     switch (fetchResultSaveNewComment.apiResponse.status) {
@@ -611,10 +613,14 @@ class CustomForm extends React.Component {
 
           {this.state.config.apiUrl ? (
             <Timeline
+              apiUrl={this.state.config.apiUrl}
+              contentId={this.state.content.content_id}
+              contentType={this.state.content.content_type}
+              workspaceId={this.state.content.workspace_id}
+              onClickSubmit={() => {}}
               customClass={`${config.slug}__contentpage`}
               customColor={this.state.hexcolor}
               loggedUser={loggedUser}
-              apiUrl={this.state.config.apiUrl}
               timelineData={timeline}
               showHeader
               newComment={newComment}
@@ -624,6 +630,7 @@ class CustomForm extends React.Component {
               onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
               onClickWysiwygBtn={this.handleToggleWysiwyg}
               onClickRevisionBtn={this.handleClickShowRevision}
+              roleList={DEFAULT_ROLE_LIST}
               shouldScrollToBottom={mode !== MODE.REVISION}
             />
           ) : null}

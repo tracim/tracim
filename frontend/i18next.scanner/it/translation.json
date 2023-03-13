@@ -6,5 +6,8 @@
   "Space": "Spazio",
   "My Spaces": "",
   "My Password": "",
-  "My Configuration links": ""
+  "My Configuration links": "",
+  "Cancel": "Annulla",
+  "{{user}}'s profile": "Profilo di {{user}}",
+  "{{label}}: ": "{{label}}: "
 }

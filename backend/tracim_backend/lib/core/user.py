@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import datetime
+import hashlib
 import io
 import os
+import re
 from smtplib import SMTPException
 from smtplib import SMTPRecipientsRefused
 import typing as typing
@@ -87,7 +89,7 @@ from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
-from tracim_backend.models.mention import ALL__GROUP_MENTIONS
+from tracim_backend.models.mention import TRANSLATED_GROUP_MENTIONS
 from tracim_backend.models.social import UserFollower
 from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.models.user_custom_properties import UserCustomProperties
@@ -99,6 +101,7 @@ AVATAR_RATIO = ImageRatio(1, 1)
 COVER_RATIO = ImageRatio(35, 4)
 DEFAULT_AVATAR_SIZE = ImageSize(100, 100)
 DEFAULT_COVER_SIZE = ImageSize(1300, 150)
+SVG_MIMETYPE = "image/svg+xml"
 
 
 class UserApi(object):
@@ -187,6 +190,7 @@ class UserApi(object):
             raise UserDoesNotExist(
                 'User for username "{}" not found in database'.format(username)
             ) from exc
+            # TODO - MP - 2022-11-25 - Return a dummy fixed user
         return user
 
     def get_current_user(self) -> User:
@@ -268,11 +272,11 @@ class UserApi(object):
         elif include_workspace_ids:
             include_user_ids = set(self.get_members_of_workspaces(include_workspace_ids))
 
+        # TODO - MP - 2022-12-06 - Theses are two separates errors.
         if not user_in_every_included_workspaces and len(acp) < 2:
             raise TooShortAutocompleteString(
-                'String "{acp}" is too short, the acp string needs to have more than one character, or you need to be in every workspace you include.'.format(
-                    acp=acp
-                )
+                f"The acp {acp} is too short. The acp needs to have at least 2 characters, or you\
+need to be in every workspace you include."
             )
 
         if exclude_workspace_ids:
@@ -287,9 +291,9 @@ class UserApi(object):
         query = self.base_query().order_by(User.display_name)
         query = query.filter(
             or_(
-                User.display_name.ilike("%{}%".format(acp)),
-                User.email.ilike("%{}%".format(acp)),
-                User.username.ilike("%{}%".format(acp)),
+                User.display_name.ilike(f"%{acp}%"),
+                User.email.ilike(f"%{acp}%"),
+                User.username.ilike(f"%{acp}%"),
             )
         )
 
@@ -372,7 +376,11 @@ class UserApi(object):
         return [content_api.get_content_in_context(content) for content in contents]
 
     def get_reserved_usernames(self) -> typing.Tuple[str, ...]:
-        return ALL__GROUP_MENTIONS
+        reserved_usernames = ["all", "reader", "contributor", "content-manager", "space-manager"]
+        for key in TRANSLATED_GROUP_MENTIONS.keys():
+            for lang in self._config.TRANSLATIONS["GLOBAL"].keys():
+                reserved_usernames += [self._config.TRANSLATIONS["GLOBAL"][lang][key]]
+        return tuple(reserved_usernames)
 
     def get_user_workspaces_query(self, user_id: int) -> Query:
         return self._session.query(UserRoleInWorkspace.workspace_id).filter(
@@ -869,6 +877,17 @@ class UserApi(object):
 
         if name is not None:
             user.display_name = name
+            if user.is_avatar_default:
+                # Update with default avatar if the user didn't set one explicitely
+                self.set_avatar(
+                    user.user_id,
+                    "avatar.svg",
+                    SVG_MIMETYPE,
+                    self._get_default_avatar(user),
+                    user=user,
+                    is_default=True,
+                    do_save=False,
+                )
 
         if auth_type is not None:
             if (
@@ -1036,6 +1055,16 @@ class UserApi(object):
         if not profile:
             profile = Profile.get_profile_from_slug(self._config.USER__DEFAULT_PROFILE)
         user.profile = profile
+
+        self.set_avatar(
+            user.user_id,
+            "avatar.svg",
+            SVG_MIMETYPE,
+            self._get_default_avatar(user),
+            user=user,
+            is_default=True,
+            do_save=False,
+        )
 
         if save_now:
             self.save(user)
@@ -1263,7 +1292,14 @@ class UserApi(object):
     ) -> HapicFile:
         user = self.get_one(user_id)
         if not user.avatar:
-            raise UserImageNotFound("avatar of user {} not found".format(user_id))
+            self.set_avatar(
+                user_id,
+                filename,
+                SVG_MIMETYPE,
+                self._get_default_avatar(user),
+                is_default=True,
+                do_save=True,
+            )
         return StorageLib(self._config).get_raw_file(
             depot_file=user.avatar,
             filename=filename,
@@ -1282,7 +1318,14 @@ class UserApi(object):
     ) -> HapicFile:
         user = self.get_one(user_id)
         if not user.cropped_avatar:
-            raise UserImageNotFound("cropped version of user {} avatar not found".format(user_id))
+            self.set_avatar(
+                user_id,
+                filename,
+                SVG_MIMETYPE,
+                self._get_default_avatar(user),
+                is_default=True,
+                do_save=True,
+            )
         _, original_file_extension = os.path.splitext(user.cropped_avatar.filename)
         return StorageLib(self._config).get_jpeg_preview(
             depot_file=user.cropped_avatar,
@@ -1296,15 +1339,24 @@ class UserApi(object):
         )
 
     def set_avatar(
-        self, user_id: int, new_filename: str, new_mimetype: str, new_content: typing.BinaryIO
+        self,
+        user_id: int,
+        new_filename: str,
+        new_mimetype: str,
+        new_content: typing.BinaryIO,
+        user: typing.Optional[User] = None,
+        is_default: bool = False,
+        do_save: bool = False,
     ) -> None:
-        user = self.get_one(user_id)
+        user = user or self.get_one(user_id)
+        user.is_avatar_default = is_default
 
-        self._session.add(user)
         (user.avatar, user.cropped_avatar) = self._crop_and_prepare_depot_storage(
             new_filename, new_mimetype, new_content.read(), "avatar", AVATAR_RATIO
         )
-        self._session.flush()
+        if do_save:
+            self._session.add(user)
+            self._session.flush()
 
     def get_cover(
         self, user_id: int, filename: str, default_filename: str, force_download: bool = False,
@@ -1400,3 +1452,27 @@ class UserApi(object):
                     online_user_count, self._config.LIMITATION__MAXIMUM_ONLINE_USERS
                 )
             )
+
+    def _get_default_avatar(self, user: User) -> io.BytesIO:
+        """Create a SVG image with a colored circle and initials based on the user's display name.
+
+        If the user doesn't have a display name, a "?" is used instead.
+        """
+        name = user.display_name
+        if name is None:
+            color_string = "#f3f3f3"
+            avatar_name = "?"
+        else:
+            color_string = "#" + hashlib.blake2b(name.encode(), digest_size=3).hexdigest()
+            parts = [p for p in re.split("[ -.]", name) if p != ""]
+            avatar_name = f"{parts[0][0]}{parts[1][0]}" if len(parts) >= 2 else name[0:2]
+            avatar_name = avatar_name.upper()
+
+        # INFO - SGD - 2023-01-25 - Create the avatar as an SVG file as this will allow proper resizing.
+        width = DEFAULT_AVATAR_SIZE.width
+        height = DEFAULT_AVATAR_SIZE.height
+        svg_string = f"""<svg viewBox="0 0 {width} {height}" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50%" cy="50%" r="50%" fill="{color_string}" style="filter: saturate(90%)" />
+        <text fill="#fdfdfd" font-family="Nunito" font-weight="bold" font-size="50" x="50" y="65" text-anchor="middle">{avatar_name}</text>
+</svg>"""
+        return io.BytesIO(svg_string.encode())

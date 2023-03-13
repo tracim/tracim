@@ -1,0 +1,11 @@
+@import '~tracim_frontend_lib/src/css/Variable.styl'
+
+.favoriteTable__row
+  color fontColor
+  &:hover
+    color fontColor
+  &__link
+    z-index 1
+    position absolute
+    width 'calc(100% - %s)' % listIconWidth
+    height 100%

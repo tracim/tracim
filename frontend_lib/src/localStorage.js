@@ -4,7 +4,9 @@ export const LOCAL_STORAGE_FIELD = {
   TODO: 'todo'
 }
 
-export const generateLocalStorageContentId = (contentType, contentId, workspaceId, field) => `${workspaceId}/${contentId}/${contentType}_${field}`
+export function generateLocalStorageContentId (contentType, contentId, workspaceId, field) {
+  return `${workspaceId}/${contentId}/${contentType}_${field}`
+}
 
 export function getLocalStorageItem (contentType, contentId, workspaceId, field) {
   return localStorage.getItem(

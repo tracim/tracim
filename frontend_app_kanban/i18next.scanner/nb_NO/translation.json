@@ -27,7 +27,6 @@
   "Delete this column": "Slett denne kolonnen",
   "Exit fullscreen mode": "Avslutt fullskjermsvisning",
   "See less": "Vis mindre",
-  "Error while saving the comment": "Kunne ikke lagre kommentaren",
   "A content with the same name already exists": "Innhold med samme navn finnes allerede",
   "This content is deleted": "Dette innholdet er slettet",
   "The content has been modified by {{author}}": "Innholdet har blitt endret av {{author}}",
@@ -46,5 +45,8 @@
   "Board's name": "Tavlenavn",
   "The file is larger than the maximum file size allowed": "Filen er større enn det som er tillatt",
   "Error, the space exceed its maximum size": "Rommet er nå større enn det som tillates",
-  "Title:": "Navn:"
+  "Title:": "Navn:",
+  "Every members of the space": "",
+  "All": "",
+  "all": ""
 }

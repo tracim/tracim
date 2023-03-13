@@ -151,7 +151,6 @@
   "Error while archiving content": "خطأ أثناء أرشفة المحتوى",
   "Error while deleting content": "خطأ أثناء حذف المحتوى",
   "Error while restoring content": "خطأ أثناء استعادة المحتوى",
-  "@all Please notice that I did an important update on this content.": "@الكل أشير انتباهكم بكل لطف إلى التحديث الهام الذي أدخلته على هذا المحتوى.",
   "Error while adding content to favorites": "خطأ أثناء اضافة المحتوى الى المفضلات",
   "Error while removing content from favorites": "خطأ أثناء حذف المحتوى من المفضلات",
   "Error while getting favorites": "خطأ أثناء فتح المفضلات",
@@ -263,5 +262,12 @@
   "modified": "تم التعديل",
   "Unexpected error, please inform an administrator": "",
   "of": "",
-  "Download": ""
+  "Download": "",
+  "Every members of the space": "",
+  "All": "",
+  "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?": "",
+  "Insert": "",
+  "Image": "",
+  "Fullscreen": "",
+  "Please notice that I did an important update on this content.": ""
 }

@@ -256,7 +256,7 @@ Each entry in fields is a subset of the corresponding HTTP API structure.
     "user_id": 42,
     "public_name": "Another user",
     "username": "another-user",
-    "has_avatar": false,
+    "has_avatar": true,
     "has_cover":
     false
   },
