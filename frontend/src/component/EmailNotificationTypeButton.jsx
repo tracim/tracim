@@ -11,9 +11,11 @@ require('./EmailNotificationTypeButton.styl')
 export const EmailNotificationTypeButton = props => {
   return (
     <div className='EmailNotificationTypeButton' style={{ justifyContent: props.flexJustifyRadio }}>
-      <div className='EmailNotificationTypeButton__title'>
-        {props.t('Email notification:')}
-      </div>
+      {props.displayLabel &&
+        <div className='EmailNotificationTypeButton__title'>
+          {props.t('Email notification:')}
+        </div>
+      }
 
       <div
         className='EmailNotificationTypeButton__form'
@@ -107,18 +109,20 @@ export const EmailNotificationTypeButton = props => {
 export default translate()(EmailNotificationTypeButton)
 
 EmailNotificationTypeButton.propTypes = {
-  onClickChangeEmailNotificationType: PropTypes.func,
   currentEmailNotificationType: PropTypes.string,
+  displayLabel: PropTypes.bool,
   flexJustifyRadio: PropTypes.string,
   formName: PropTypes.string,
+  onClickChangeEmailNotificationType: PropTypes.func,
   style: PropTypes.object
 }
 
 EmailNotificationTypeButton.defaultProps = {
-  onClickChangeEmailNotificationType: () => {},
   currentEmailNotificationType: EMAIL_NOTIFICATION_TYPE.NONE,
+  displayLabel: true,
   flexJustifyRadio: 'space-evenly',
   formName: 'notificationType',
+  onClickChangeEmailNotificationType: () => {},
   style: {}
 }
 

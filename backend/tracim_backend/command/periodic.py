@@ -58,19 +58,9 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
             subject=_("[{website_title}] Your daily summary").replace(
                 EST.WEBSITE_TITLE, config.WEBSITE__TITLE.__str__()
             ),
-            from_header=EmailAddress(
-                _("Administrator (through {website_title})").replace(
-                    EST.WEBSITE_TITLE, config.WEBSITE__TITLE.__str__()
-                ),
-                reply_to_address,
-            ),
+            from_header=EmailAddress(config.WEBSITE__TITLE, reply_to_address),
             to_header=EmailAddress("", user_mail),
-            reply_to=EmailAddress(
-                _("Administrator (through {website_title})").replace(
-                    EST.WEBSITE_TITLE, config.WEBSITE__TITLE.__str__()
-                ),
-                reply_to_address,
-            ),
+            reply_to=EmailAddress(config.WEBSITE__TITLE, reply_to_address),
             lang=user_lang,
             body_html=body,
         )
