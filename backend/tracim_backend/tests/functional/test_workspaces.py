@@ -10,6 +10,7 @@ from freezegun import freeze_time
 import pytest
 import transaction
 
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.error import ErrorCode
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import EmailNotificationType
@@ -4139,7 +4140,7 @@ class TestWorkspaceContentsWithFixture(object):
         workspace_api = workspace_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         content_api = content_api_factory.get()
-        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
+        tool_folder = content_api.get_one(1, content_type=ContentTypeSlug.ANY)
         test_thread = content_api.create(
             content_type_slug=content_type_list.Thread.slug,
             workspace=business_workspace,
@@ -4224,7 +4225,7 @@ class TestWorkspaceContentsWithFixture(object):
         workspace_api = workspace_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         content_api = content_api_factory.get()
-        tool_folder = content_api.get_one(1, content_type=content_type_list.ANY.value)
+        tool_folder = content_api.get_one(1, content_type=ContentTypeSlug.ANY)
         test_thread = content_api.create(
             content_type_slug=content_type_list.Thread.slug,
             workspace=business_workspace,

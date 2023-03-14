@@ -1,5 +1,4 @@
-"""Following mention development, we had to do a maintenance on build_099 that had database
-modification. This migration is only necessary so we correct every divergence.
+"""Correct every divergence.
 
 Revision ID: 27e6c43ac6e4
 Revises: ('bc87010bdaa1', '5f1f169c3098')

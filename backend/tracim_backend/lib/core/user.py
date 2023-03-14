@@ -378,8 +378,10 @@ need to be in every workspace you include."
     def get_reserved_usernames(self) -> typing.Tuple[str, ...]:
         reserved_usernames = ["all", "reader", "contributor", "content-manager", "space-manager"]
         for key in TRANSLATED_GROUP_MENTIONS.keys():
-            for lang in self._config.TRANSLATIONS["GLOBAL"].keys():
-                reserved_usernames += [self._config.TRANSLATIONS["GLOBAL"][lang][key]]
+            translation_lang_dict = self._config.TRANSLATIONS["GLOBAL"]
+            for lang in translation_lang_dict.keys():
+                if key in translation_lang_dict[lang]:
+                    reserved_usernames += [translation_lang_dict[lang][key]]
         return tuple(reserved_usernames)
 
     def get_user_workspaces_query(self, user_id: int) -> Query:

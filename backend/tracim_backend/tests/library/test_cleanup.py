@@ -6,6 +6,7 @@ from sqlalchemy.orm.exc import NoResultFound
 import transaction
 
 from tracim_backend import ContentNotFound
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.applications.share.models import ContentShare
 from tracim_backend.applications.upload_permissions.models import UploadPermission
 from tracim_backend.lib.cleanup.cleanup import CleanupLib
@@ -113,9 +114,9 @@ class TestCleanupLib(object):
         share_id = shares[0].share_id
         session.flush()
         transaction.commit()
-        assert content_api.get_one(folder_id, content_type=content_type_list.ANY.value)
-        assert content_api.get_one(file_id, content_type=content_type_list.ANY.value)
-        assert content_api.get_one(comment_id, content_type=content_type_list.ANY.value)
+        assert content_api.get_one(folder_id, content_type=ContentTypeSlug.ANY)
+        assert content_api.get_one(file_id, content_type=ContentTypeSlug.ANY)
+        assert content_api.get_one(comment_id, content_type=ContentTypeSlug.ANY)
         assert session.query(ContentShare).filter(ContentShare.share_id == share_id).one()
 
         with unprotected_content_revision(session) as unprotected_session:
@@ -124,11 +125,11 @@ class TestCleanupLib(object):
             session.flush()
         transaction.commit()
         with pytest.raises(ContentNotFound):
-            content_api.get_one(folder_id, content_type=content_type_list.ANY.value)
+            content_api.get_one(folder_id, content_type=ContentTypeSlug.ANY)
         with pytest.raises(ContentNotFound):
-            content_api.get_one(file_id, content_type=content_type_list.ANY.value)
+            content_api.get_one(file_id, content_type=ContentTypeSlug.ANY)
         with pytest.raises(ContentNotFound):
-            content_api.get_one(comment_id, content_type=content_type_list.ANY.value)
+            content_api.get_one(comment_id, content_type=ContentTypeSlug.ANY)
         with pytest.raises(NoResultFound):
             session.query(ContentShare).filter(ContentShare.share_id == share_id).one()
 
@@ -189,9 +190,9 @@ class TestCleanupLib(object):
         upload_permission_id = upload_permissions[0].upload_permission_id
         session.flush()
         transaction.commit()
-        assert content_api.get_one(folder_id, content_type=content_type_list.ANY.value)
-        assert content_api.get_one(file_id, content_type=content_type_list.ANY.value)
-        assert content_api.get_one(comment_id, content_type=content_type_list.ANY.value)
+        assert content_api.get_one(folder_id, content_type=ContentTypeSlug.ANY)
+        assert content_api.get_one(file_id, content_type=ContentTypeSlug.ANY)
+        assert content_api.get_one(comment_id, content_type=ContentTypeSlug.ANY)
         assert session.query(ContentShare).filter(ContentShare.share_id == share_id).one()
         assert (
             session.query(UploadPermission)
@@ -214,13 +215,13 @@ class TestCleanupLib(object):
                 UploadPermission.workspace_id == workspace_id
             ).one()
         with pytest.raises(ContentNotFound):
-            content_api.get_one(folder2_id, content_type=content_type_list.ANY.value)
+            content_api.get_one(folder2_id, content_type=ContentTypeSlug.ANY)
         with pytest.raises(ContentNotFound):
-            content_api.get_one(folder_id, content_type=content_type_list.ANY.value)
+            content_api.get_one(folder_id, content_type=ContentTypeSlug.ANY)
         with pytest.raises(ContentNotFound):
-            content_api.get_one(file_id, content_type=content_type_list.ANY.value)
+            content_api.get_one(file_id, content_type=ContentTypeSlug.ANY)
         with pytest.raises(ContentNotFound):
-            content_api.get_one(comment_id, content_type=content_type_list.ANY.value)
+            content_api.get_one(comment_id, content_type=ContentTypeSlug.ANY)
         with pytest.raises(NoResultFound):
             session.query(ContentShare).filter(ContentShare.share_id == share_id).one()
         with pytest.raises(NoResultFound):
@@ -288,9 +289,9 @@ class TestCleanupLib(object):
         upload_permission_id = upload_permissions[0].upload_permission_id
         session.flush()
         transaction.commit()
-        assert content_api.get_one(folder_id, content_type=content_type_list.ANY.value)
-        assert content_api.get_one(file_id, content_type=content_type_list.ANY.value)
-        assert content_api.get_one(comment_id, content_type=content_type_list.ANY.value)
+        assert content_api.get_one(folder_id, content_type=ContentTypeSlug.ANY)
+        assert content_api.get_one(file_id, content_type=ContentTypeSlug.ANY)
+        assert content_api.get_one(comment_id, content_type=ContentTypeSlug.ANY)
         assert session.query(ContentShare).filter(ContentShare.share_id == share_id).one()
         assert (
             session.query(UploadPermission)
@@ -315,13 +316,13 @@ class TestCleanupLib(object):
                 UploadPermission.workspace_id == workspace_id
             ).one()
         with pytest.raises(ContentNotFound):
-            content_api.get_one(folder2_id, content_type=content_type_list.ANY.value)
+            content_api.get_one(folder2_id, content_type=ContentTypeSlug.ANY)
         with pytest.raises(ContentNotFound):
-            content_api.get_one(folder_id, content_type=content_type_list.ANY.value)
+            content_api.get_one(folder_id, content_type=ContentTypeSlug.ANY)
         with pytest.raises(ContentNotFound):
-            content_api.get_one(file_id, content_type=content_type_list.ANY.value)
+            content_api.get_one(file_id, content_type=ContentTypeSlug.ANY)
         with pytest.raises(ContentNotFound):
-            content_api.get_one(comment_id, content_type=content_type_list.ANY.value)
+            content_api.get_one(comment_id, content_type=ContentTypeSlug.ANY)
         with pytest.raises(NoResultFound):
             session.query(ContentShare).filter(ContentShare.share_id == share_id).one()
         with pytest.raises(NoResultFound):
@@ -378,7 +379,7 @@ class TestCleanupLib(object):
         assert len(revisions) == 2
         first_revision_id = revisions[0].revision_id
         second_revision_id = revisions[1].revision_id
-        content = content_api.get_one(file_id, content_type=content_type_list.ANY.value)
+        content = content_api.get_one(file_id, content_type=ContentTypeSlug.ANY)
         assert content
         assert content.revision.revision_id == second_revision_id
         assert (
@@ -477,7 +478,7 @@ class TestCleanupLib(object):
         assert len(revisions) == 2
         first_revision_id = revisions[0].revision_id
         second_revision_id = revisions[1].revision_id
-        content = content_api.get_one(file_id, content_type=content_type_list.ANY.value)
+        content = content_api.get_one(file_id, content_type=ContentTypeSlug.ANY)
         assert content
         assert content.revision.revision_id == second_revision_id
         assert (
