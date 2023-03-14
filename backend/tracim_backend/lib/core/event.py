@@ -51,9 +51,9 @@ from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.call import UserCall
 from tracim_backend.models.data import ActionDescription
-from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceAccessType
@@ -395,11 +395,20 @@ class EventApi:
         query = query.filter(Message.receiver_id == user_id)
         query = query.filter(Message.read == None)  # noqa: E711
         query = query.filter(Event.created >= created_after)
-        query = (
-            query.filter(UserRoleInWorkspace.workspace_id == Event.workspace_id)
-            .filter(UserRoleInWorkspace.user_id == user_id)
-            .filter(UserRoleInWorkspace.email_notification_type == EmailNotificationType.SUMMARY)
+        query = query.filter(UserRoleInWorkspace.workspace_id == Event.workspace_id)
+        query = query.filter(UserRoleInWorkspace.user_id == user_id)
+        query = query.filter(
+            UserRoleInWorkspace.email_notification_type == EmailNotificationType.SUMMARY
         )
+
+        # INFO - MP - 2023-03-14 - Filtering entity type WORKSPACE_MEMBER.MODIFIED because we want
+        # to display an equivalent result as the notification wall.
+        query = query.filter(
+            or_(
+                Event.entity_type != EntityType.WORKSPACE_MEMBER,
+                Event.operation != OperationType.MODIFIED,
+            )
+        )  # noqa: E711
         query = query.group_by(Workspace.workspace_id)
         return query.all()
 
