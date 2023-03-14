@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 1.9.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-03-14 15:53+0100\n"
+"POT-Creation-Date: 2023-03-14 16:36+0100\n"
 "PO-Revision-Date: 2022-06-23 08:24+0000\n"
 "Last-Translator: Perrier Mathis <mathis.perrier73@gmail.com>\n"
 "Language: fr\n"
@@ -252,7 +252,7 @@ msgstr "Suricate, votre assistant numérique"
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:21
 #: tracim_backend/templates/mail/reset_password_body_html.mak:25
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:21
-#: tracim_backend/templates/mail/summary_body_html.mak:56
+#: tracim_backend/templates/mail/summary_body_html.mak:57
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:21
 msgid "Suricat', the bot"
 msgstr "Suricate, le robot"
@@ -262,7 +262,7 @@ msgstr "Suricate, le robot"
 #: tracim_backend/templates/mail/reset_password_body_html.mak:28
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:24
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:32
-#: tracim_backend/templates/mail/summary_body_html.mak:59
+#: tracim_backend/templates/mail/summary_body_html.mak:60
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:24
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:26
 msgid "powered by tracim software"
@@ -394,28 +394,35 @@ msgstr "{author} vous a mentionné dans"
 msgid "Here is the summary of your unread notifications in the last 24h:"
 msgstr "Voici le résumé de vos notifications non lues pendant les dernières 24h :"
 
+# | msgid "{event_count} events in the space"
 #: tracim_backend/templates/mail/summary_body_html.mak:36
 #, fuzzy
-#| msgid "{event_count} events in the space"
 msgid "{event_count} activity in the space"
 msgstr "{event_count} activité(s) dans l'espace"
 
+# | msgid "You're receiving this email because of your account on
+# | {website_title}."
 #: tracim_backend/templates/mail/summary_body_html.mak:47
 #, fuzzy
-#| msgid "You're receiving this email because of your account on
-#| {website_title}."
 msgid ""
 "You are receiving this email because you have at least one space set with"
 " the daily email."
-msgstr "Vous recevez cet email du fait de votre compte sur {website_title}."
+msgstr ""
+"Vous recevez cet email par ce que vous avez au moins un espace configuré "
+"pour le mail quotidien."
 
 #: tracim_backend/templates/mail/summary_body_html.mak:48
+#, fuzzy
+#| msgid "" "You can change this setting by going to the \"My Spaces\" menu
+#| through " "this <a href=\"https://algoo.tracim.fr/ui/account\">link</a>"
 msgid ""
 "You can change this setting by going to the \"My Spaces\" menu through "
-"this <a href=\"https://algoo.tracim.fr/ui/account\">link</a>"
-msgstr "Vous pouvez changer ce paramètre en allant sur \"Mes Espaces\" depuis "
-"ce lien <a href=\"https://algoo.tracim.fr/ui/account\">link</a>"
-#: tracim_backend/templates/mail/summary_body_html.mak:52
+"this link:"
+msgstr ""
+"Vous pouvez changer ce paramètre en allant sur \"Mes Espaces\" depuis ce "
+"lien :"
+
+#: tracim_backend/templates/mail/summary_body_html.mak:53
 msgid "This email is automatically created, please do not reply."
 msgstr "Cet email a été créé automatiquement, ne pas répondre."
 

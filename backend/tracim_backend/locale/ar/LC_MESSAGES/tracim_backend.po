@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 4.1.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-03-14 15:53+0100\n"
+"POT-Creation-Date: 2023-03-14 16:36+0100\n"
 "PO-Revision-Date: 2022-06-25 11:18+0000\n"
 "Last-Translator: Yassine Mouhli <ymouhli@asf.be>\n"
 "Language: ar\n"
@@ -297,7 +297,7 @@ msgstr "سوريكات، مساعدك الرقمي"
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:21
 #: tracim_backend/templates/mail/reset_password_body_html.mak:25
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:21
-#: tracim_backend/templates/mail/summary_body_html.mak:56
+#: tracim_backend/templates/mail/summary_body_html.mak:57
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:21
 msgid "Suricat', the bot"
 msgstr "سوريكات، البوت"
@@ -307,7 +307,7 @@ msgstr "سوريكات، البوت"
 #: tracim_backend/templates/mail/reset_password_body_html.mak:28
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:24
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:32
-#: tracim_backend/templates/mail/summary_body_html.mak:59
+#: tracim_backend/templates/mail/summary_body_html.mak:60
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:24
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:26
 msgid "powered by tracim software"
@@ -436,10 +436,10 @@ msgstr ""
 msgid "{event_count} activity in the space"
 msgstr ""
 
+# | msgid "You're receiving this email because of your account on
+# | {website_title}."
 #: tracim_backend/templates/mail/summary_body_html.mak:47
 #, fuzzy
-#| msgid "You're receiving this email because of your account on
-#| {website_title}."
 msgid ""
 "You are receiving this email because you have at least one space set with"
 " the daily email."
@@ -448,10 +448,10 @@ msgstr "يصلك هذا البريد الإلكتروني نظرا لإمتلا�
 #: tracim_backend/templates/mail/summary_body_html.mak:48
 msgid ""
 "You can change this setting by going to the \"My Spaces\" menu through "
-"this <a href=\"https://algoo.tracim.fr/ui/account\">link</a>"
+"this link:"
 msgstr ""
 
-#: tracim_backend/templates/mail/summary_body_html.mak:52
+#: tracim_backend/templates/mail/summary_body_html.mak:53
 msgid "This email is automatically created, please do not reply."
 msgstr ""
 
@@ -508,5 +508,12 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "{event_count} events in the space"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "You can change this setting by "
+#~ "going to the \"My Spaces\" menu "
+#~ "through this <a "
+#~ "href=\"https://algoo.tracim.fr/ui/account\">link</a>"
 #~ msgstr ""
 
