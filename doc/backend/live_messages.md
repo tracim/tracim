@@ -192,7 +192,7 @@ Each entry in fields is a subset of the corresponding HTTP API structure.
 ```json
 {
   "role": "reader",
-  "do_notify": false
+  "email_notification_type": "summary"
 }
 ```
 

@@ -1415,7 +1415,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user"]["username"] == "TheAdmin"
         assert user_role["user"]["user_id"] == 1
         assert user_role["is_active"] is True
-        assert user_role["do_notify"] is True
+        assert user_role["email_notification_type"] == "summary"
         # TODO - G.M - 24-05-2018 - [Avatar] Replace
         # by correct value when avatar feature will be enabled
         assert user_role["user"]["has_avatar"] is True
@@ -1457,7 +1457,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user_id"] == user_id
         assert user_role["workspace_id"] == workspace_id
         assert user_role["is_active"] is False
-        assert user_role["do_notify"] is False
+        assert user_role["email_notification_type"] == "none"
 
     def test_api__get_workspace_members__ok_200_show_only_enabled_users(
         self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
@@ -1494,7 +1494,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user_id"] == admin_user.user_id
         assert user_role["workspace_id"] == workspace_id
         assert user_role["is_active"] is True
-        assert user_role["do_notify"] is True
+        assert user_role["email_notification_type"] == "summary"
 
     def test_api__get_workspace_members__ok_200__as_admin(
         self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
@@ -1537,7 +1537,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user_id"] == user_id
         assert user_role["workspace_id"] == workspace_id
         assert user_role["is_active"] is True
-        assert user_role["do_notify"] is False
+        assert user_role["email_notification_type"] == "none"
 
     def test_api__get_workspace_members__err_400__unallowed_user(self, web_testapp):
         """
@@ -1581,7 +1581,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user"]["username"] == "TheAdmin"
         assert user_role["user"]["user_id"] == 1
         assert user_role["is_active"] is True
-        assert user_role["do_notify"] is True
+        assert user_role["email_notification_type"] == "summary"
         # TODO - G.M - 24-05-2018 - [Avatar] Replace
         # by correct value when avatar feature will be enabled
         assert user_role["user"]["has_avatar"] is True
@@ -1626,7 +1626,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user_id"] == user_id
         assert user_role["workspace_id"] == workspace_id
         assert user_role["is_active"] is True
-        assert user_role["do_notify"] is False
+        assert user_role["email_notification_type"] == "none"
 
     def test_api__get_workspace_member__ok_200__other_user(
         self, user_api_factory, workspace_api_factory, role_api_factory, admin_user, web_testapp
@@ -1665,7 +1665,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user_id"] == user_id
         assert user_role["workspace_id"] == workspace_id
         assert user_role["is_active"] is True
-        assert user_role["do_notify"] is False
+        assert user_role["email_notification_type"] == "none"
 
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         res = web_testapp.get(
@@ -1676,7 +1676,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user_id"] == admin_id
         assert user_role["workspace_id"] == workspace_id
         assert user_role["is_active"] is True
-        assert user_role["do_notify"] is True
+        assert user_role["email_notification_type"] == "summary"
 
     def test_api__get_workspace_member__err_400__unallowed_user(self, web_testapp):
         """
@@ -1735,13 +1735,12 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role_found["user_id"] == 2
         assert user_role_found["workspace_id"] == 1
         assert user_role_found["newly_created"] is False
-        assert user_role_found["email_sent"] is False
-        assert user_role_found["do_notify"] is False
+        assert user_role_found["email_notification_type"] == "summary"
         last_event = event_helper.last_event
         assert last_event.event_type == "workspace_member.created"
         assert last_event.member == {
             "role": user_role_found["role"],
-            "do_notify": user_role_found["do_notify"],
+            "email_notification_type": user_role_found["email_notification_type"],
         }
         workspace = web_testapp.get("/api/workspaces/1", status=200).json_body
         assert last_event.workspace == {k: v for k, v in workspace.items() if k != "description"}
@@ -1794,8 +1793,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role_found["user_id"]
         assert user_role_found["workspace_id"] == workspace_id
         assert user_role_found["newly_created"] is False
-        assert user_role_found["email_sent"] is False
-        assert user_role_found["do_notify"] is False
+        assert user_role_found["email_notification_type"] == "summary"
 
         res = web_testapp.get(
             "/api/workspaces/{}/members".format(workspace_id), status=200
@@ -1856,8 +1854,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role_found["user_id"]
         assert user_role_found["workspace_id"] == workspace_id
         assert user_role_found["newly_created"] is False
-        assert user_role_found["email_sent"] is False
-        assert user_role_found["do_notify"] is False
+        assert user_role_found["email_notification_type"] == "summary"
 
         res = web_testapp.get(
             "/api/workspaces/{}/members".format(workspace_id), status=200
@@ -1890,8 +1887,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role_found["user_id"] == 2
         assert user_role_found["workspace_id"] == 1
         assert user_role_found["newly_created"] is False
-        assert user_role_found["email_sent"] is False
-        assert user_role_found["do_notify"] is False
+        assert user_role_found["email_notification_type"] == "summary"
 
         res = web_testapp.get("/api/workspaces/1/members", status=200).json_body
         assert len(res) == 2
@@ -1970,8 +1966,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role_found["user_id"] == 3
         assert user_role_found["workspace_id"] == 1
         assert user_role_found["newly_created"] is False
-        assert user_role_found["email_sent"] is False
-        assert user_role_found["do_notify"] is False
+        assert user_role_found["email_notification_type"] == "summary"
 
         res = web_testapp.get("/api/workspaces/1/members", status=200).json_body
         assert len(res) == 2
@@ -2120,7 +2115,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert last_event.event_type == "workspace_member.modified"
         assert last_event.member == {
             "role": user_role["role"],
-            "do_notify": user_role["do_notify"],
+            "email_notification_type": user_role["email_notification_type"],
         }
         workspace_dict = web_testapp.get(
             "/api/workspaces/{}".format(workspace.workspace_id), status=200
@@ -2144,7 +2139,7 @@ class TestWorkspaceMembersEndpoint(object):
         ).json_body
         user_role = res
         assert user_role["role"] == "content-manager"
-        assert user_role["do_notify"] is False
+        assert user_role["email_notification_type"] == "none"
         assert user_role["user_id"] == user2.user_id
         assert user_role["workspace_id"] == workspace.workspace_id
 
@@ -2317,7 +2312,7 @@ class TestWorkspaceMembersEndpoint(object):
         )
         user_role = res.json_body
         assert user_role["role"] == "content-manager"
-        assert user_role["do_notify"] is True
+        assert user_role["email_notification_type"] == "summary"
         assert user_role["user_id"] == admin2.user_id
         assert user_role["workspace_id"] == workspace.workspace_id
 
@@ -2397,7 +2392,7 @@ class TestWorkspaceMembersEndpoint(object):
         ).json_body
         user_role = res
         assert user_role["role"] == "content-manager"
-        assert user_role["do_notify"] is False
+        assert user_role["email_notification_type"] == "none"
         assert user_role["user_id"] == user2.user_id
         assert user_role["workspace_id"] == workspace.workspace_id
 
@@ -2441,8 +2436,8 @@ class TestWorkspaceMembersEndpoint(object):
         last_event = event_helper.last_event
         assert last_event.event_type == "workspace_member.deleted"
         assert last_event.member == {
+            "email_notification_type": "none",
             "role": "workspace-manager",
-            "do_notify": False,
         }
 
         user_schema = UserDigestSchema()
@@ -2835,8 +2830,7 @@ class TestUserInvitationWithMailActivatedSyncDefaultProfileTrustedUser(object):
         user_id = user_role_found["user_id"]
         assert user_role_found["workspace_id"] == workspace.workspace_id
         assert user_role_found["newly_created"] is True
-        assert user_role_found["email_sent"] is True
-        assert user_role_found["do_notify"] is False
+        assert user_role_found["email_notification_type"] == "summary"
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
@@ -2902,8 +2896,7 @@ class TestUserInvitationWithMailActivatedSync(object):
         user_id = user_role_found["user_id"]
         assert user_role_found["workspace_id"] == workspace.workspace_id
         assert user_role_found["newly_created"] is True
-        assert user_role_found["email_sent"] is True
-        assert user_role_found["do_notify"] is False
+        assert user_role_found["email_notification_type"] == "summary"
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
@@ -3022,8 +3015,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
         user_id = user_role_found["user_id"]
         assert user_role_found["workspace_id"] == workspace.workspace_id
         assert user_role_found["newly_created"] is True
-        assert user_role_found["email_sent"] is True
-        assert user_role_found["do_notify"] is True
+        assert user_role_found["email_notification_type"] == "summary"
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
@@ -3250,7 +3242,6 @@ class TestUserInvitationWithMailActivatedASync(object):
         res = web_testapp.post_json("/api/workspaces/1/members", status=200, params=params)
         user_role_found = res.json_body
         assert user_role_found["newly_created"] is True
-        assert user_role_found["email_sent"] is False
 
     def test_api__create_workspace_member_role__ok_200__new_user_rfc_email(self, web_testapp):
         """
@@ -3267,7 +3258,6 @@ class TestUserInvitationWithMailActivatedASync(object):
         res = web_testapp.post_json("/api/workspaces/1/members", status=200, params=params)
         user_role_found = res.json_body
         assert user_role_found["newly_created"] is True
-        assert user_role_found["email_sent"] is False
         assert user_role_found["user"]["public_name"] == "Bob !"
         user_id = user_role_found["user_id"]
         res = web_testapp.get("/api/users/{}".format(user_id), status=200, params=params)
