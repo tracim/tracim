@@ -33,7 +33,7 @@
     <ul>
     % for notification in notification_summary:
       <li>
-        ${_('{event_count} events in the space').format(event_count=notification[0])}
+        ${_('{event_count} activity in the space').format(event_count=notification[0])}
         <% notification_link = config.WEBSITE__BASE_URL + "/ui/workspaces/" + str(notification[1]) + "/dashboard" %>
         <a href="${notification_link}" target="_blank">${notification[2]}</a>
       </li>
@@ -42,12 +42,21 @@
   % endif
 
   <p>${_("Suricat', your digital assistant")}</p>
+
+  <p>
+    ${_("You are receiving this email because you have at least one space set with the daily email.")}<br />
+    ${_('You can change this setting by going to the "My Spaces" menu through this <a href="https://algoo.tracim.fr/ui/account">link</a>')}
+    (<a href='https://algoo.tracim.fr/ui/account'>https://algoo.tracim.fr/ui/account</a>)
+  </p>
+  <p style="color: #666666;">
+    ${_("This email is automatically created, please do not reply.")}
+  </p>
   <pre>
-  --
-  ${_("Suricat', the bot")}
-  ${config.WEBSITE__TITLE}
-  <a href="${config.WEBSITE__BASE_URL}">${config.WEBSITE__BASE_URL}</a>
-  ${_("powered by tracim software")} - <a href="https://www.tracim.fr">https://www.tracim.fr</a>
+    --
+    ${_("Suricat', the bot")}
+    ${config.WEBSITE__TITLE}
+    <a href="${config.WEBSITE__BASE_URL}">${config.WEBSITE__BASE_URL}</a>
+    ${_("powered by tracim software")} - <a href="https://www.tracim.fr">https://www.tracim.fr</a>
   </pre>
 </body>
 </html>

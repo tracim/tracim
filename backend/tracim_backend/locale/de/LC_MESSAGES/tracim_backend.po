@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 3.7.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-03-08 10:05+0100\n"
+"POT-Creation-Date: 2023-03-14 15:53+0100\n"
 "PO-Revision-Date: 2022-02-17 13:47+0000\n"
 "Last-Translator: Marie Bégué <marie.prandstetter@gmail.com>\n"
 "Language: de\n"
@@ -101,12 +101,8 @@ msgstr "Nachricht von {username}: {message}"
 msgid "Uploaded by {username}."
 msgstr "Hochgeladen von {username}."
 
-#: tracim_backend/command/periodic.py:58
+#: tracim_backend/command/periodic.py:60
 msgid "[{website_title}] Your daily summary"
-msgstr ""
-
-#: tracim_backend/command/periodic.py:62 tracim_backend/command/periodic.py:69
-msgid "Administrator (through {website_title})"
 msgstr ""
 
 #: tracim_backend/lib/core/content.py:752
@@ -259,7 +255,7 @@ msgstr "Suricat', Ihr digitaler Assistent"
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:21
 #: tracim_backend/templates/mail/reset_password_body_html.mak:25
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:21
-#: tracim_backend/templates/mail/summary_body_html.mak:47
+#: tracim_backend/templates/mail/summary_body_html.mak:56
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:21
 msgid "Suricat', the bot"
 msgstr "Suricat', der Bot"
@@ -269,7 +265,7 @@ msgstr "Suricat', der Bot"
 #: tracim_backend/templates/mail/reset_password_body_html.mak:28
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:24
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:32
-#: tracim_backend/templates/mail/summary_body_html.mak:50
+#: tracim_backend/templates/mail/summary_body_html.mak:59
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:24
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:26
 msgid "powered by tracim software"
@@ -398,7 +394,26 @@ msgid "Here is the summary of your unread notifications in the last 24h:"
 msgstr ""
 
 #: tracim_backend/templates/mail/summary_body_html.mak:36
-msgid "{event_count} events in the space"
+msgid "{event_count} activity in the space"
+msgstr ""
+
+#: tracim_backend/templates/mail/summary_body_html.mak:47
+#, fuzzy
+#| msgid "You're receiving this email because of your account on
+#| {website_title}."
+msgid ""
+"You are receiving this email because you have at least one space set with"
+" the daily email."
+msgstr "Sie erhalten diese E-Mail aufgrund Ihres Kontos auf {website_title}."
+
+#: tracim_backend/templates/mail/summary_body_html.mak:48
+msgid ""
+"You can change this setting by going to the \"My Spaces\" menu through "
+"this <a href=\"https://algoo.tracim.fr/ui/account\">link</a>"
+msgstr ""
+
+#: tracim_backend/templates/mail/summary_body_html.mak:52
+msgid "This email is automatically created, please do not reply."
 msgstr ""
 
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:5
@@ -433,3 +448,10 @@ msgstr ""
 "Dieser Upload ist durch ein Passwort geschützt, bitte kontaktieren Sie "
 "mich (<a href=\"mailto:{emitter_email}\">{username}</a>), um das Passwort"
 " zu erhalten."
+
+#~ msgid "Administrator (through {website_title})"
+#~ msgstr ""
+
+#~ msgid "{event_count} events in the space"
+#~ msgstr ""
+
