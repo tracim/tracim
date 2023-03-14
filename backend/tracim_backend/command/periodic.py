@@ -11,12 +11,14 @@ from tracim_backend.command import AppContextCommand
 from tracim_backend.config import CFG
 from tracim_backend.lib.core.event import EventApi
 from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.mail_notifier.sender import EmailSender
 from tracim_backend.lib.mail_notifier.utils import EST
 from tracim_backend.lib.mail_notifier.utils import EmailAddress
 from tracim_backend.lib.mail_notifier.utils import EmailNotificationMessage
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
 from tracim_backend.lib.utils.translation import Translator
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.event import EventTypeDatabaseParameters
 from tracim_backend.models.event import ReadStatus
 
@@ -108,9 +110,11 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
                 created_after=created_after,
                 event_type=EventTypeDatabaseParameters.from_event_type("mention.created"),
                 read_status=ReadStatus.UNREAD,
+                email_notification_type=EmailNotificationType.SUMMARY,
             )
             notification_summary = event_api.get_unread_messages_summary(
-                user.user_id, created_after=created_after
+                user.user_id,
+                created_after=created_after,
             )
 
             if len(mentions) == 0 and len(notification_summary) == 0:
