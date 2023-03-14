@@ -9,6 +9,7 @@ from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models.auth import User
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 
@@ -52,13 +53,13 @@ class Content(Fixture):
             user=bob,
             workspace=recipe_workspace,
             role_level=UserRoleInWorkspace.CONTENT_MANAGER,
-            with_notif=False,
+            email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             user=john_the_reader,
             workspace=recipe_workspace,
             role_level=UserRoleInWorkspace.READER,
-            with_notif=False,
+            email_notification_type=EmailNotificationType.NONE,
         )
         # Folders
 

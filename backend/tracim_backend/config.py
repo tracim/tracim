@@ -716,8 +716,8 @@ class CFG(object):
         ###
         # EMAIL related stuff (notification, reply)
         ##
-        self.EMAIL__NOTIFICATION__ENABLED_ON_INVITATION = asbool(
-            self.get_raw_config("email.notification.enabled_on_invitation", "True")
+        self.EMAIL__NOTIFICATION__TYPE_ON_INVITATION = str(
+            self.get_raw_config("email.notification.type_on_invitation", "summary")
         )
 
         # TODO - G.M - 2019-04-05 - keep as parameters
@@ -781,6 +781,11 @@ class CFG(object):
         self.EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__SUBJECT = self.get_raw_config(
             "email.notification.reset_password_request.subject",
             _("[{website_title}] A password reset has been requested"),
+        )
+
+        # Summary
+        self.EMAIL__SUMMARY__TEMPLATE__HTML = self.get_raw_config(
+            "email.summary.template.html", "{}/{}".format(template_dir, "summary_body_html.mak"),
         )
 
         # TODO - G.M - 2019-01-22 - add feature to process notification email

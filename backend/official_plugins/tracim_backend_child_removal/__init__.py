@@ -24,10 +24,10 @@ class ChildRemovalPlugin:
         """
         user = role.user
         parent_workspace = role.workspace
-        rapi = RoleApi(session=context.dbsession, config=context.app_config, current_user=None)
+        role_api = RoleApi(session=context.dbsession, config=context.app_config, current_user=None)
         for workspace in parent_workspace.recursive_children:
             try:
-                rapi.delete_one(
+                role_api.delete_one(
                     user_id=user.user_id, workspace_id=workspace.workspace_id, flush=False,
                 )
             except UserRoleNotFound:

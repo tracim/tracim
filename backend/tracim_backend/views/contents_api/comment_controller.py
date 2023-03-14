@@ -4,6 +4,7 @@ from http import HTTPStatus
 from pyramid.config import Configurator
 import transaction
 
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import EmptyCommentContentNotAllowed
@@ -62,7 +63,7 @@ class CommentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         comment = api.get_one(
             hapic_data.path.comment_id, parent=content, content_type=content_type_list.Comment.slug
         )
@@ -114,7 +115,7 @@ class CommentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         comments_page = content.get_subcontents(
             page_token=hapic_data.query["page_token"],
             count=hapic_data.query["count"],
@@ -144,7 +145,7 @@ class CommentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         comment = api.create_comment(
             content.workspace, content, hapic_data.body.raw_content, do_save=True
         )
@@ -174,7 +175,7 @@ class CommentController(Controller):
         )
         workspace = wapi.get_one(hapic_data.path.workspace_id)
         parent = api.get_one(
-            hapic_data.path.content_id, content_type=content_type_list.Any_SLUG, workspace=workspace
+            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value, workspace=workspace
         )
         comment = api.get_one(
             hapic_data.path.comment_id,
@@ -208,7 +209,7 @@ class CommentController(Controller):
         )
         workspace = wapi.get_one(hapic_data.path.workspace_id)
         parent = api.get_one(
-            hapic_data.path.content_id, content_type=content_type_list.Any_SLUG, workspace=workspace
+            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value, workspace=workspace
         )
         comment = api.get_one(
             hapic_data.path.comment_id,

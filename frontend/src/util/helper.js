@@ -125,6 +125,12 @@ export const unLoggedAllowedPageList = [
   PAGE.GUEST_DOWNLOAD('')
 ]
 
+export const EMAIL_NOTIFICATION_TYPE = {
+  INDIVIDUAL: 'individual',
+  SUMMARY: 'summary',
+  NONE: 'none'
+}
+
 /**
  * Function to initialize a custom element
  * @param {String} htmlTag tag name that will be replaced with the HTML Element

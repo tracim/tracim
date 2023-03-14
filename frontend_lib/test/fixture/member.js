@@ -2,7 +2,7 @@ import { user } from './user.js'
 import { workspace } from './workspace.js'
 
 export const member = {
-  do_notify: true,
+  email_notification_type: 'summary',
   is_active: true,
   role: 'workspace-manager',
   user: user,

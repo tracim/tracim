@@ -150,7 +150,7 @@ optional arguments:
   --public-name PUBLIC_NAME
                         set the user's public name
   --allowed_space ALLOWED_SPACE
-                        set thes user's allowed space in bytes
+                        set the user's allowed space in bytes
   --lang LANG           set the user's language (ISO 639 format)
   -p PASSWORD, --password PASSWORD
                         set the user's password
@@ -269,6 +269,37 @@ you can run:
 
 ```shell
   tracimcli webdav start
+```
+
+## Periodic tasks
+
+### Send summary mails
+
+This command will send mails for users who selected to receive a summary of changes/mentions instead of getting notified immediately.
+
+```shell
+tracimcli periodic send-summary-mails
+```
+
+#### Arguments
+
+This command take the parameters `--since` which specifies how much time we have to go back to
+create the summary.
+
+### Cron
+
+It can easily be called from a cron job, for example every 24h:
+
+First setup a cron job:
+
+```shell
+crontab -e
+```
+
+Then add a line and save the crontab file:
+
+```crontab
+0 0 * * * tracimcli periodic send-summary-mails -c <path to development.ini> --since 24
 ```
 
 ## Help

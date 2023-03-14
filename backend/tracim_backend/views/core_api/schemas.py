@@ -10,8 +10,7 @@ from marshmallow.fields import String
 from marshmallow.fields import ValidatedField
 from marshmallow.validate import OneOf
 
-from tracim_backend.app_models.contents import FILE_TYPE
-from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import open_status
 from tracim_backend.app_models.email_validators import RFCEmailValidator
 from tracim_backend.app_models.email_validators import TracimEmailValidator
@@ -108,6 +107,7 @@ from tracim_backend.models.context_models import WorkspaceUpdate
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentSortOrder
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import EventTypeDatabaseParameters
@@ -379,7 +379,9 @@ class FileCreationFormSchema(marshmallow.Schema):
     content_namespace = EnumField(
         ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
     )
-    content_type = marshmallow.fields.String(missing=FILE_TYPE, example=FILE_TYPE)
+    content_type = marshmallow.fields.String(
+        missing=ContentTypeSlug.FILE.value, example=ContentTypeSlug.FILE.value
+    )
     template_id = marshmallow.fields.Int(
         example=2, default=0, validate=positive_int_validator, allow_none=True
     )
@@ -1157,8 +1159,8 @@ class FilterContentQuerySchema(BaseOptionalPaginatedQuerySchema):
         validate=bool_as_int_validator,
     )
     content_type = StrippedString(
-        example=content_type_list.Any_SLUG,
-        default=content_type_list.Any_SLUG,
+        example=ContentTypeSlug.ANY.value,
+        default=ContentTypeSlug.ANY.value,
         validate=all_content_types_validator,
     )
     label = StrippedString(
@@ -1523,11 +1525,15 @@ class WorkspaceDiskSpaceSchema(marshmallow.Schema):
     workspace = marshmallow.fields.Nested(WorkspaceDigestSchema(), attribute="workspace_in_context")
 
 
-class WorkspaceMemberDigestSchema(marshmallow.Schema):
-    role = StrippedString(example="contributor", validate=user_role_validator)
-    do_notify = marshmallow.fields.Bool(
-        description="has user enabled notification for this workspace", example=True
+class EmailNotificationTypeSchema(marshmallow.Schema):
+    email_notification_type = StrippedString(
+        example=EmailNotificationType.SUMMARY.name,
+        description="Type of email notification for a specific space",
     )
+
+
+class WorkspaceMemberDigestSchema(EmailNotificationTypeSchema):
+    role = StrippedString(example="contributor", validate=user_role_validator)
 
 
 class WorkspaceMemberSchema(WorkspaceMemberDigestSchema):

@@ -16,6 +16,7 @@ from sqlakeyset import Page
 from sqlakeyset import get_page
 from sqlalchemy import and_
 from sqlalchemy import event as sqlalchemy_event
+from sqlalchemy import func
 from sqlalchemy import inspect
 from sqlalchemy import not_
 from sqlalchemy import null
@@ -24,12 +25,7 @@ from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
-from tracim_backend.app_models.contents import COMMENT_TYPE
-from tracim_backend.app_models.contents import FILE_TYPE
-from tracim_backend.app_models.contents import FOLDER_TYPE
-from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
-from tracim_backend.app_models.contents import THREAD_TYPE
-from tracim_backend.app_models.contents import TODO_TYPE
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import MessageDoesNotExist
 from tracim_backend.exceptions import UserDoesNotExist
@@ -52,6 +48,7 @@ from tracim_backend.models.call import UserCall
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceAccessType
@@ -92,12 +89,12 @@ class EventApi:
     workspace_schema = WorkspaceSchema()
     workspace_without_description_schema = WorkspaceWithoutDescriptionSchema()
     content_schemas = {
-        COMMENT_TYPE: MessageCommentSchema(),
-        HTML_DOCUMENTS_TYPE: MessageContentSchema(),
-        FILE_TYPE: FileContentSchema(),
-        FOLDER_TYPE: MessageContentSchema(),
-        THREAD_TYPE: MessageContentSchema(),
-        TODO_TYPE: ToDoSchema(),
+        ContentTypeSlug.COMMENT.value: MessageCommentSchema(),
+        ContentTypeSlug.HTML_DOCUMENTS.value: MessageContentSchema(),
+        ContentTypeSlug.FILE.value: FileContentSchema(),
+        ContentTypeSlug.FOLDER.value: MessageContentSchema(),
+        ContentTypeSlug.THREAD.value: MessageContentSchema(),
+        ContentTypeSlug.TODO.value: ToDoSchema(),
     }
     reaction_schema = ReactionSchema()
     tag_schema = TagSchema()
@@ -307,8 +304,30 @@ class EventApi:
         self._session.flush()
         return unread_messages
 
-    def get_messages_for_user(self, user_id: int, after_event_id: int = 0) -> List[Message]:
-        query = self._base_query(user_id=user_id, after_event_id=after_event_id,)
+    def get_messages_for_user(
+        self,
+        user_id: int,
+        after_event_id: int = 0,
+        created_after: Optional[datetime] = None,
+        event_type: Optional[EventTypeDatabaseParameters] = None,
+        read_status: ReadStatus = ReadStatus.ALL,
+        email_notification_type: Optional[EmailNotificationType] = None,
+    ) -> List[Message]:
+        query = self._base_query(
+            user_id=user_id,
+            after_event_id=after_event_id,
+            include_event_types=[event_type] if event_type is not None else None,
+            read_status=read_status,
+        )
+        if created_after:
+            query = query.filter(Event.created >= created_after)
+        if email_notification_type is not None:
+            query = (
+                query.filter(UserRoleInWorkspace.workspace_id == Event.workspace_id)
+                .filter(UserRoleInWorkspace.user_id == user_id)
+                .filter(UserRoleInWorkspace.email_notification_type == email_notification_type)
+            )
+
         return query.all()
 
     def get_mentions_for_content(self, content_id: int, after_event_id: int = 0) -> List[Message]:
@@ -365,6 +384,36 @@ class EventApi:
             workspace_ids=workspace_ids,
             related_to_content_ids=related_to_content_ids,
         ).count()
+
+    def get_unread_messages_summary(
+        self, user_id: int, created_after: datetime,
+    ) -> List[typing.Tuple[int, str]]:
+        query = (
+            self._session.query(
+                func.count(Message.event_id), Workspace.workspace_id, Workspace.label
+            )
+            .join(Event)
+            .join(Workspace, Event.workspace_id == Workspace.workspace_id)
+        )
+        query = query.filter(Message.receiver_id == user_id)
+        query = query.filter(Message.read == None)  # noqa: E711
+        query = query.filter(Event.created >= created_after)
+        query = query.filter(UserRoleInWorkspace.workspace_id == Event.workspace_id)
+        query = query.filter(UserRoleInWorkspace.user_id == user_id)
+        query = query.filter(
+            UserRoleInWorkspace.email_notification_type == EmailNotificationType.SUMMARY
+        )
+
+        # INFO - MP - 2023-03-14 - Filtering entity type WORKSPACE_MEMBER.MODIFIED because we want
+        # to display an equivalent result as the notification wall.
+        query = query.filter(
+            or_(
+                Event.entity_type != EntityType.WORKSPACE_MEMBER,
+                Event.operation != OperationType.MODIFIED,
+            )
+        )  # noqa: E711
+        query = query.group_by(Workspace.workspace_id)
+        return query.all()
 
     def create_event(
         self,

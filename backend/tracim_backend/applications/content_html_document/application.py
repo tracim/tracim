@@ -1,7 +1,7 @@
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
 
-from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.config import CFG
 from tracim_backend.lib.core.mention import DescriptionMentionParser
@@ -14,7 +14,7 @@ from tracim_backend.models.roles import WorkspaceRoles
 class ContentHTMLDocumentApp(TracimApplication):
     def load_content_types(self) -> None:
         content_type = TracimContentType(
-            slug=HTML_DOCUMENTS_TYPE,
+            slug=ContentTypeSlug.HTML_DOCUMENTS.value,
             fa_icon=self.fa_icon,
             label="Note",
             creation_label="Write a note",
@@ -25,7 +25,9 @@ class ContentHTMLDocumentApp(TracimApplication):
             app=self,
         )
         self.content_types.append(content_type)
-        MentionBuilder.register_content_type_parser(HTML_DOCUMENTS_TYPE, DescriptionMentionParser())
+        MentionBuilder.register_content_type_parser(
+            ContentTypeSlug.HTML_DOCUMENTS.value, DescriptionMentionParser()
+        )
 
     def load_config(self, app_config: CFG) -> None:
         pass
@@ -51,7 +53,7 @@ class ContentHTMLDocumentApp(TracimApplication):
 def create_app() -> TracimApplication:
     return ContentHTMLDocumentApp(
         label="Notes",  # TODO - G.M - 24-05-2018 - Check label
-        slug="contents/{}".format(HTML_DOCUMENTS_TYPE),
+        slug="contents/{}".format(ContentTypeSlug.HTML_DOCUMENTS.value),
         fa_icon="far fa-file-alt",
         config={},
         main_route="",

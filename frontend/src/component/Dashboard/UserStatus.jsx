@@ -1,11 +1,11 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import {
-  BtnSwitch,
   Icon,
   PAGE,
   ROLE_LIST
 } from 'tracim_frontend_lib'
+import EmailNotificationTypeButton from '../EmailNotificationTypeButton.jsx'
 
 require('./UserStatus.styl')
 
@@ -30,23 +30,10 @@ export const UserStatus = props => {
 
       <div className='userstatus__informations'>
         {props.displayNotifBtn && (
-          <div
-            className='userstatus__informations__notification primaryColorFontHover'
-            title={props.t('You can change your notification status by clicking here')}
-          >
-            <BtnSwitch
-              checked={mySelf.doNotify}
-              onChange={mySelf.doNotify ? props.onClickRemoveNotify : props.onClickAddNotify}
-              smallSize
-            />
-
-            <div
-              className='userstatus__informations__notification__text'
-              onClick={mySelf.doNotify ? props.onClickRemoveNotify : props.onClickAddNotify}
-            >
-              {props.t('Email notifications')}
-            </div>
-          </div>
+          <EmailNotificationTypeButton
+            onClickChangeEmailNotificationType={props.onClickChangeEmailNotificationType}
+            currentEmailNotificationType={mySelf.emailNotificationType}
+          />
         )}
 
         {props.displaySubscriptionRequestsInformation && (

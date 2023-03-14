@@ -25,9 +25,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.elements import and_
 import transaction
 
-from tracim_backend.app_models.contents import COMMENT_TYPE
-from tracim_backend.app_models.contents import FOLDER_TYPE
-from tracim_backend.app_models.contents import TODO_TYPE
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
@@ -405,7 +403,7 @@ class ContentApi(object):
         content_namespace: ContentNamespaces = ContentNamespaces.CONTENT,
     ) -> Content:
         # TODO - G.M - 2018-07-16 - raise Exception instead of assert
-        assert content_type_slug != content_type_list.Any_SLUG
+        assert content_type_slug != ContentTypeSlug.ANY.value
         assert not (label and filename)
         assert content_namespace
 
@@ -417,7 +415,7 @@ class ContentApi(object):
                 "parent namespace and content namespace should be the same."
             )
 
-        if content_type_slug == FOLDER_TYPE and not label:
+        if content_type_slug == ContentTypeSlug.FOLDER.value and not label:
             label = self.generate_folder_label(workspace, parent)
 
         if content_namespace == ContentNamespaces.PUBLICATION:
@@ -496,11 +494,13 @@ class ContentApi(object):
     def copy_todos(self, new_parent: Content, template_id: int) -> None:
         """Create extra data for templates: todos"""
         try:
-            todos = self.get_all_query(parent_ids=[template_id], content_type_slug=TODO_TYPE,).all()
+            todos = self.get_all_query(
+                parent_ids=[template_id], content_type_slug=ContentTypeSlug.TODO.value,
+            ).all()
 
             for todo in todos:
                 self.create(
-                    content_type_slug=TODO_TYPE,
+                    content_type_slug=ContentTypeSlug.TODO.value,
                     workspace=new_parent.workspace,
                     template_id=todo.content_id,
                     parent=new_parent,
@@ -522,7 +522,7 @@ class ContentApi(object):
         do_notify=True,
     ) -> Content:
         # TODO: check parent allowed_type and workspace allowed_ type
-        assert parent and parent.type != FOLDER_TYPE
+        assert parent and parent.type != ContentTypeSlug.FOLDER.value
         if not self.is_editable(parent):
             raise ContentInNotEditableState(
                 "Can't create comment on content, you need to change its"
@@ -581,7 +581,7 @@ class ContentApi(object):
     def get_one(
         self,
         content_id: int,
-        content_type: str = content_type_list.Any_SLUG,
+        content_type: str = ContentTypeSlug.ANY.value,
         workspace: Workspace = None,
         parent: Content = None,
         ignore_content_state_filter: bool = False,
@@ -599,7 +599,7 @@ class ContentApi(object):
 
         base_request = base_request.filter(Content.content_id == content_id)
 
-        if content_type != content_type_list.Any_SLUG:
+        if content_type != ContentTypeSlug.ANY.value:
             base_request = base_request.filter(Content.type == content_type)
 
         if parent:
@@ -879,7 +879,7 @@ class ContentApi(object):
     def get_all_query(
         self,
         parent_ids: typing.Optional[typing.List[int]] = None,
-        content_type_slug: str = content_type_list.Any_SLUG,
+        content_type_slug: str = ContentTypeSlug.ANY.value,
         workspaces: typing.Optional[typing.List[Workspace]] = None,
         label: typing.Optional[str] = None,
         order_by_properties: typing.Optional[
@@ -913,7 +913,7 @@ class ContentApi(object):
         #  of content, workspace root included
         if complete_path_to_id:
             content = self.get_one(
-                complete_path_to_id, content_type_list.Any_SLUG, ignore_content_state_filter=True
+                complete_path_to_id, ContentTypeSlug.ANY.value, ignore_content_state_filter=True
             )
             if content.parent_id:
                 content = content.parent
@@ -925,7 +925,7 @@ class ContentApi(object):
             # parent_ids list when complete_path_to_id is set
             parent_ids.append(0)
 
-        if content_type_slug != content_type_list.Any_SLUG:
+        if content_type_slug != ContentTypeSlug.ANY.value:
             # INFO - G.M - 2018-07-05 - convert with
             #  content type object to support legacy slug
             content_type_object = content_type_list.get_one_by_slug(content_type_slug)
@@ -977,7 +977,7 @@ class ContentApi(object):
     def get_all(
         self,
         parent_ids: typing.Optional[typing.List[int]] = None,
-        content_type: str = content_type_list.Any_SLUG,
+        content_type: str = ContentTypeSlug.ANY.value,
         workspaces: typing.Optional[typing.List[Workspace]] = None,
         label: typing.Optional[str] = None,
         order_by_properties: typing.Optional[
@@ -2113,7 +2113,10 @@ class ContentApi(object):
         return _("New folder {0}").format(query.count() + 1)
 
     def _allow_empty_label(self, content_type_slug: str) -> bool:
-        if content_type_list.get_one_by_slug(content_type_slug).slug in [COMMENT_TYPE, TODO_TYPE]:
+        if content_type_list.get_one_by_slug(content_type_slug).slug in [
+            ContentTypeSlug.COMMENT.value,
+            ContentTypeSlug.TODO.value,
+        ]:
             return True
         return False
 
@@ -2171,7 +2174,7 @@ class ContentApi(object):
         query = (
             self.get_all_query(
                 parent_ids=None,
-                content_type_slug=content_type_list.Any_SLUG,
+                content_type_slug=ContentTypeSlug.ANY.value,
                 workspaces=None,
                 label=None,
             )

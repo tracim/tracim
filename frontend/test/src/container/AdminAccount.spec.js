@@ -26,7 +26,6 @@ import { mount } from 'enzyme'
 import {
   mockGetUser200,
   mockGetUserCalendar200,
-  mockPutUserWorkspaceDoNotify204,
   mockPutUserPassword204,
   mockPutUserPassword403
 } from '../../apiMock'
@@ -171,17 +170,6 @@ describe('In <Account /> at AdminAccount.jsx', () => {
       it('should call newFlashMessageWarningCallBack with invalid new Name', (done) => {
         adminAccountInstance.handleSubmitPersonalData('d', '', '').then(() => {
           expect(newFlashMessageWarningCallBack.called).to.equal(true)
-        }).then(done, done)
-      })
-    })
-
-    describe('handleChangeSubscriptionNotif', () => {
-      it('should call newFlashMessageWarningCallBack with invalid workspaceId', (done) => {
-        mockPutUserWorkspaceDoNotify204(FETCH_CONFIG.apiUrl, adminAccountWrapper.state().userToEditId, 1, true)
-
-        adminAccountInstance.handleChangeSubscriptionNotif(0, 'activate').then(() => {
-          expect(newFlashMessageWarningCallBack.called).to.equal(true)
-          restoreHistoryCallBack([newFlashMessageWarningCallBack])
         }).then(done, done)
       })
     })

@@ -155,7 +155,7 @@ export class WorkspaceAdvanced extends React.Component {
           user: data.fields.user,
           workspace_id: data.fields.workspace.workspace_id,
           workspace: data.fields.workspace,
-          do_notify: data.fields.member.do_notify,
+          email_notification_type: data.fields.member.email_notification_type,
           is_active: data.fields.user.is_active,
           role: data.fields.member.role
         }]
@@ -178,7 +178,7 @@ export class WorkspaceAdvanced extends React.Component {
             user: data.fields.user,
             workspace_id: data.fields.workspace.workspace_id,
             workspace: data.fields.workspace,
-            do_notify: data.fields.member.do_notify,
+            email_notification_type: data.fields.member.email_notification_type,
             is_active: data.fields.user.is_active,
             role: data.fields.member.role
           }

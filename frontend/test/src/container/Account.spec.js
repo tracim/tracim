@@ -15,7 +15,7 @@ import {
   UPDATE,
   USER,
   USER_AGENDA_URL,
-  USER_WORKSPACE_DO_NOTIFY,
+  USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
   WORKSPACE_LIST_MEMBER,
   ADD,
   FLASH_MESSAGE,
@@ -29,7 +29,6 @@ import {
 import { mount } from 'enzyme'
 import {
   mockGetLoggedUserCalendar200,
-  mockMyselfWorkspaceDoNotify204,
   mockPutMyselfPassword204,
   mockPutMyselfPassword403
 } from '../../apiMock'
@@ -55,7 +54,7 @@ describe('In <Account />', () => {
     switch (type) {
       case `${UPDATE}/${USER}`: updateUserCallBack(); break
       case `${SET}/${USER_AGENDA_URL}`: updateUserAgendaUrlCallBack(); break
-      case `${UPDATE}/${USER_WORKSPACE_DO_NOTIFY}`: updateUserWorkspaceSubscriptionNotifCallBack(); break
+      case `${UPDATE}/${USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE}`: updateUserWorkspaceSubscriptionNotifCallBack(); break
       case `${SET}/${WORKSPACE_LIST_MEMBER}`: setWorkspaceListMemberListCallBack(); break
       case `${SET}/${BREADCRUMBS}`: setBreadcrumbsCallBack(); break
       case `${ADD}/${FLASH_MESSAGE}`:
@@ -123,17 +122,6 @@ describe('In <Account />', () => {
       it('should call newFlashMessageWarningCallBack with invalid new Name', (done) => {
         accountInstance.handleSubmitPersonalData('d', '', '').then(() => {
           expect(newFlashMessageWarningCallBack.called).to.equal(true)
-        }).then(done, done)
-      })
-    })
-
-    describe('handleChangeSubscriptionNotif', () => {
-      it('should call newFlashMessageWarningCallBack with invalid workspaceId', (done) => {
-        mockMyselfWorkspaceDoNotify204(FETCH_CONFIG.apiUrl, 1, true)
-
-        accountInstance.handleChangeSubscriptionNotif(0, 'activate').then(() => {
-          expect(newFlashMessageWarningCallBack.called).to.equal(true)
-          restoreHistoryCallBack([newFlashMessageWarningCallBack])
         }).then(done, done)
       })
     })

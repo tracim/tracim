@@ -5,6 +5,7 @@ import pytest
 import transaction
 
 from tracim_backend.app_models.contents import ContentTypeInContext
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentInNotEditableState
 from tracim_backend.exceptions import EmptyLabelNotAllowed
@@ -16,6 +17,7 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.roles import WorkspaceRoles
@@ -60,9 +62,11 @@ class TestContentApi(object):
         app_config,
         content_type_list,
     ):
-        uapi = user_api_factory.get()
+        user_api = user_api_factory.get()
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
+        user = user_api.create_minimal_user(
+            email="this.is@user", profile=Profile.ADMIN, save_now=True
+        )
         template_workspace = workspace_api_factory.get(user).create_workspace(
             "template_workspace", save_now=True
         )
@@ -70,7 +74,10 @@ class TestContentApi(object):
             "template_workspace", save_now=True
         )
         role_api_factory.get().create_one(
-            admin_user, template_workspace, WorkspaceRoles.CONTRIBUTOR.level, False
+            user=admin_user,
+            workspace=template_workspace,
+            role_level=WorkspaceRoles.CONTRIBUTOR.level,
+            email_notification_type=EmailNotificationType.NONE,
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         folder = api.create(
@@ -607,10 +614,10 @@ class TestContentApi(object):
         workspace_api = workspace_api_factory.get(current_user=user)
         workspace = workspace_api.get_one(wid)
         api = ContentApi(current_user=user, session=session, config=app_config)
-        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
+        items = api.get_all(None, ContentTypeSlug.ANY, [workspace])
         eq_(2, len(items))
 
-        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
+        items = api.get_all(None, ContentTypeSlug.ANY, [workspace])
         with new_revision(session=session, tm=transaction.manager, content=items[0]):
             api.delete(items[0])
         transaction.commit()
@@ -620,7 +627,7 @@ class TestContentApi(object):
         workspace_api = workspace_api_factory.get(current_user=user)
         workspace = workspace_api.get_one(wid)
         api = ContentApi(current_user=user, session=session, config=app_config)
-        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
+        items = api.get_all(None, ContentTypeSlug.ANY, [workspace])
         eq_(1, len(items))
         transaction.commit()
 
@@ -629,7 +636,7 @@ class TestContentApi(object):
         user = uapi.get_one(uid)
         workspace_api = workspace_api_factory.get(current_user=user)
         api = ContentApi(current_user=user, session=session, config=app_config, show_deleted=True)
-        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
+        items = api.get_all(None, ContentTypeSlug.ANY, [workspace])
         eq_(2, len(items))
 
     def test_unit__delete__ok__do_not_change_file_extension(
@@ -747,10 +754,10 @@ class TestContentApi(object):
         workspace_api = workspace_api_factory.get(current_user=user)
         api = ContentApi(session=session, current_user=user, config=app_config)
 
-        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
+        items = api.get_all(None, ContentTypeSlug.ANY, [workspace])
         eq_(2, len(items))
 
-        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
+        items = api.get_all(None, ContentTypeSlug.ANY, [workspace])
         with new_revision(session=session, tm=transaction.manager, content=items[0]):
             api.archive(items[0])
         transaction.commit()
@@ -761,7 +768,7 @@ class TestContentApi(object):
         workspace = workspace_api.get_one(wid)
         api = ContentApi(current_user=user, session=session, config=app_config)
 
-        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
+        items = api.get_all(None, ContentTypeSlug.ANY, [workspace])
         eq_(1, len(items))
         transaction.commit()
 
@@ -773,7 +780,7 @@ class TestContentApi(object):
 
         # Test that the item is still available if "show deleted" is activated
         api = ContentApi(current_user=None, session=session, config=app_config, show_archived=True)
-        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
+        items = api.get_all(None, ContentTypeSlug.ANY, [workspace])
         eq_(2, len(items))
 
     def test_get_all_with_filter(
@@ -811,7 +818,7 @@ class TestContentApi(object):
         workspace = workspace_api.get_one(wid)
         api = ContentApi(current_user=user, session=session, config=app_config)
 
-        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
+        items = api.get_all(None, ContentTypeSlug.ANY, [workspace])
         eq_(2, len(items))
 
         items2 = api.get_all(None, content_type_list.File.slug, [workspace])
@@ -865,7 +872,7 @@ class TestContentApi(object):
         workspace = workspace_api.get_one(wid)
         api = ContentApi(current_user=user, session=session, config=app_config)
 
-        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
+        items = api.get_all(None, ContentTypeSlug.ANY, [workspace])
         eq_(3, len(items))
 
         items2 = api.get_all([parent_id], content_type_list.File.slug, [workspace])
@@ -910,8 +917,13 @@ class TestContentApi(object):
         workspace = workspace_api_factory.get(current_user=user2).create_workspace(
             "test workspace", save_now=True
         )
-        rapi = role_api_factory.get(current_user=user2)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
+        role_api = role_api_factory.get(current_user=user2)
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api2 = ContentApi(current_user=user2, session=session, config=app_config)
         c = api2.create(
             content_type_slug=content_type_list.Folder.slug,
@@ -1018,7 +1030,10 @@ class TestContentApi(object):
             "test workspace", save_now=True
         )
         role_api_factory.get().create_one(
-            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+            user=user2,
+            workspace=workspace,
+            role_level=WorkspaceRoles.WORKSPACE_MANAGER.level,
+            email_notification_type=EmailNotificationType.NONE,
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(
@@ -1081,7 +1096,10 @@ class TestContentApi(object):
             "test workspace", save_now=True
         )
         role_api_factory.get().create_one(
-            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+            user=user2,
+            workspace=workspace,
+            role_level=WorkspaceRoles.WORKSPACE_MANAGER.level,
+            email_notification_type=EmailNotificationType.NONE,
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(
@@ -1152,7 +1170,10 @@ class TestContentApi(object):
             "test workspace", save_now=True
         )
         role_api_factory.get().create_one(
-            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+            user=user2,
+            workspace=workspace,
+            role_level=WorkspaceRoles.WORKSPACE_MANAGER.level,
+            email_notification_type=EmailNotificationType.NONE,
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(
@@ -1228,7 +1249,10 @@ class TestContentApi(object):
             "test workspace", save_now=True
         )
         role_api_factory.get().create_one(
-            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+            user=user2,
+            workspace=workspace,
+            role_level=WorkspaceRoles.WORKSPACE_MANAGER.level,
+            email_notification_type=EmailNotificationType.NONE,
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(
@@ -1315,7 +1339,10 @@ class TestContentApi(object):
             "test workspace", save_now=True
         )
         role_api_factory.get().create_one(
-            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+            user=user2,
+            workspace=workspace,
+            role_level=WorkspaceRoles.WORKSPACE_MANAGER.level,
+            email_notification_type=EmailNotificationType.NONE,
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         with session.no_autoflush:
@@ -1381,7 +1408,10 @@ class TestContentApi(object):
             "test workspace", save_now=True
         )
         role_api_factory.get().create_one(
-            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+            user=user2,
+            workspace=workspace,
+            role_level=WorkspaceRoles.WORKSPACE_MANAGER.level,
+            email_notification_type=EmailNotificationType.NONE,
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(
@@ -1476,7 +1506,10 @@ class TestContentApi(object):
             "test workspace", save_now=True
         )
         role_api_factory.get().create_one(
-            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+            user=user2,
+            workspace=workspace,
+            role_level=WorkspaceRoles.WORKSPACE_MANAGER.level,
+            email_notification_type=EmailNotificationType.NONE,
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(
@@ -1534,7 +1567,10 @@ class TestContentApi(object):
             "test workspace", save_now=True
         )
         role_api_factory.get().create_one(
-            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+            user=user2,
+            workspace=workspace,
+            role_level=WorkspaceRoles.WORKSPACE_MANAGER.level,
+            email_notification_type=EmailNotificationType.NONE,
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(
@@ -1604,7 +1640,10 @@ class TestContentApi(object):
             "test workspace", save_now=True
         )
         role_api_factory.get().create_one(
-            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+            user=user2,
+            workspace=workspace,
+            role_level=WorkspaceRoles.WORKSPACE_MANAGER.level,
+            email_notification_type=EmailNotificationType.NONE,
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(
@@ -1670,7 +1709,10 @@ class TestContentApi(object):
             "test workspace", save_now=True
         )
         role_api_factory.get().create_one(
-            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+            user=user2,
+            workspace=workspace,
+            role_level=WorkspaceRoles.WORKSPACE_MANAGER.level,
+            email_notification_type=EmailNotificationType.NONE,
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(
@@ -1718,7 +1760,10 @@ class TestContentApi(object):
             "test workspace", save_now=True
         )
         role_api_factory.get().create_one(
-            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+            user=user2,
+            workspace=workspace,
+            role_level=WorkspaceRoles.WORKSPACE_MANAGER.level,
+            email_notification_type=EmailNotificationType.NONE,
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(
@@ -1773,15 +1818,25 @@ class TestContentApi(object):
             email="this.is@another.user", profile=profile, save_now=True
         )
 
-        wapi = workspace_api_factory.get(current_user=user_a)
-        workspace1 = wapi.create_workspace("test workspace n°1", save_now=True)
-        workspace2 = wapi.create_workspace("test workspace n°2", save_now=True)
+        workspace_api = workspace_api_factory.get(current_user=user_a)
+        workspace1 = workspace_api.create_workspace("test workspace n°1", save_now=True)
+        workspace2 = workspace_api.create_workspace("test workspace n°2", save_now=True)
 
-        role_api1 = role_api_factory.get(current_user=user_a)
-        role_api1.create_one(user_b, workspace1, UserRoleInWorkspace.READER, False)
+        role_api_1 = role_api_factory.get(current_user=user_a)
+        role_api_1.create_one(
+            user=user_b,
+            workspace=workspace1,
+            role_level=UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
 
-        role_api2 = role_api_factory.get(current_user=user_b)
-        role_api2.create_one(user_b, workspace2, UserRoleInWorkspace.READER, False)
+        role_api_2 = role_api_factory.get(current_user=user_b)
+        role_api_2.create_one(
+            user=user_b,
+            workspace=workspace2,
+            role_level=UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
 
         cont_api_a = ContentApi(current_user=user_a, session=session, config=app_config)
         cont_api_b = ContentApi(current_user=user_b, session=session, config=app_config)
@@ -1868,7 +1923,12 @@ class TestContentApi(object):
         workspace = wapi.create_workspace("test workspace", save_now=True)
 
         role_api = role_api_factory.get(current_user=user_a)
-        role_api.create_one(user_b, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(
+            user=user_b,
+            workspace=workspace,
+            role_level=UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         cont_api_a = ContentApi(current_user=user_a, session=session, config=app_config)
         cont_api_b = ContentApi(current_user=user_b, session=session, config=app_config)
 
@@ -1908,7 +1968,12 @@ class TestContentApi(object):
         workspace = wapi.create_workspace("test workspace", save_now=True)
 
         role_api = role_api_factory.get(current_user=user_a)
-        role_api.create_one(user_b, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(
+            user=user_b,
+            workspace=workspace,
+            role_level=UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         cont_api_a = ContentApi(current_user=user_a, session=session, config=app_config)
         cont_api_b = ContentApi(current_user=user_b, session=session, config=app_config)
 
@@ -1975,7 +2040,11 @@ class TestContentApi(object):
         uapi.save(user2)
 
         role_api_factory.get(current_user=user1).create_one(
-            user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=False, flush=True
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+            flush=True,
         )
 
         # Test starts here
@@ -2002,13 +2071,13 @@ class TestContentApi(object):
         workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
         api = ContentApi(current_user=user1, session=session, config=app_config)
 
-        content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content = api.get_one(pcid, ContentTypeSlug.ANY, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
         u2 = uapi.get_one(u2id)
         api2 = ContentApi(current_user=u2, session=session, config=app_config)
-        content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content2 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         with new_revision(session=session, tm=transaction.manager, content=content2):
             api2.update_content(content2, "this is an updated page", new_raw_content="new content")
         api2.save(content2)
@@ -2019,7 +2088,7 @@ class TestContentApi(object):
         workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
         api = ContentApi(current_user=user1, session=session, config=app_config)
 
-        updated = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        updated = api.get_one(pcid, ContentTypeSlug.ANY, workspace)
         assert u2id == updated.owner_id, "the owner id should be {} (found {})".format(
             u2id, updated.owner_id
         )
@@ -2051,7 +2120,11 @@ class TestContentApi(object):
         uapi.save(user2)
 
         role_api_factory.get(current_user=user1).create_one(
-            user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=False, flush=True
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+            flush=True,
         )
 
         # Test starts here
@@ -2079,18 +2152,18 @@ class TestContentApi(object):
         workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
         api = ContentApi(current_user=user1, session=session, config=app_config)
 
-        content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content = api.get_one(pcid, ContentTypeSlug.ANY, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
         u2 = uapi.get_one(u2id)
         api2 = ContentApi(current_user=u2, session=session, config=app_config)
-        content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content2 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         content2_nb_rev = len(content2.revisions)
         with pytest.raises(ContentInNotEditableState):
             with new_revision(session=session, tm=transaction.manager, content=content2):
                 api2.update_content(content2, "this is an updated page", "new content")
-        content3 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content3 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         assert content3.label == "this_is_a_page"
         assert content2_nb_rev == len(content3.revisions)
 
@@ -2118,7 +2191,11 @@ class TestContentApi(object):
         uapi.save(user2)
 
         role_api_factory.get(current_user=user1).create_one(
-            user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=False, flush=True
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+            flush=True,
         )
 
         # Test starts here
@@ -2151,19 +2228,19 @@ class TestContentApi(object):
         workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
         api = ContentApi(current_user=user1, session=session, config=app_config)
 
-        content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content = api.get_one(pcid, ContentTypeSlug.ANY, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
         u2 = uapi.get_one(u2id)
         api2 = ContentApi(current_user=u2, session=session, config=app_config)
-        content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content2 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         content2_nb_rev = len(content2.revisions)
         with pytest.raises(ContentFilenameAlreadyUsedInFolder):
             with new_revision(session=session, tm=transaction.manager, content=content2):
                 api2.update_content(content2, "this_is_a_page2", "new content")
             api2.save(content2)
-        content3 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content3 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         assert content3.label == "this_is_a_page"
         assert content2_nb_rev == len(content3.revisions)
 
@@ -2191,7 +2268,11 @@ class TestContentApi(object):
         uapi.save(user2)
 
         role_api_factory.get(current_user=user1).create_one(
-            user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=False, flush=True
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+            flush=True,
         )
 
         # Test starts here
@@ -2224,19 +2305,19 @@ class TestContentApi(object):
         workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
         api = ContentApi(current_user=user1, session=session, config=app_config)
 
-        content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content = api.get_one(pcid, ContentTypeSlug.ANY, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
         u2 = uapi.get_one(u2id)
         api2 = ContentApi(current_user=u2, session=session, config=app_config)
-        content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content2 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         content2_nb_rev = len(content2.revisions)
         with pytest.raises(SameValueError):
             with new_revision(session=session, tm=transaction.manager, content=content2):
                 api2.update_content(content2, "this_is_a_page", "")
         api2.save(content2)
-        content3 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content3 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         assert content3.label == "this_is_a_page"
         assert content2_nb_rev == len(content3.revisions)
 
@@ -2263,7 +2344,11 @@ class TestContentApi(object):
         uapi.save(user2)
 
         role_api_factory.get(current_user=user1).create_one(
-            user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=True, flush=True
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.SUMMARY,
+            flush=True,
         )
 
         # Test starts here
@@ -2290,13 +2375,13 @@ class TestContentApi(object):
         workspace = workspace_api2.get_one(wid)
         api = ContentApi(current_user=user1, session=session, config=app_config)
 
-        content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content = api.get_one(pcid, ContentTypeSlug.ANY, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
         u2 = uapi.get_one(u2id)
         api2 = ContentApi(current_user=u2, session=session, config=app_config)
-        content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content2 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         with new_revision(session=session, tm=transaction.manager, content=content2):
             api2.update_file_data(content2, "index.html", "text/html", b"<html>hello world</html>")
         api2.save(content2)
@@ -2306,7 +2391,7 @@ class TestContentApi(object):
         user1 = uapi.get_one(u1id)
         workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
 
-        updated = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        updated = api.get_one(pcid, ContentTypeSlug.ANY, workspace)
         eq_(
             u2id,
             updated.owner_id,
@@ -2340,7 +2425,11 @@ class TestContentApi(object):
         uapi.save(user2)
 
         role_api_factory.get(current_user=user1).create_one(
-            user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=True, flush=True
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.SUMMARY,
+            flush=True,
         )
 
         # Test starts here
@@ -2369,20 +2458,20 @@ class TestContentApi(object):
         workspace = workspace_api2.get_one(wid)
         api = ContentApi(current_user=user1, session=session, config=app_config)
 
-        content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content = api.get_one(pcid, ContentTypeSlug.ANY, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
         u2 = uapi.get_one(u2id)
         api2 = ContentApi(current_user=u2, session=session, config=app_config)
-        content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content2 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         content2_nb_rev = len(content2.revisions)
         with pytest.raises(ContentInNotEditableState):
             with new_revision(session=session, tm=transaction.manager, content=content2):
                 api2.update_file_data(
                     content2, "index.html", "text/html", b"<html>hello world</html>"
                 )
-        content3 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content3 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         assert content3.label == "this_is_a_page"
         assert content2_nb_rev == len(content3.revisions)
 
@@ -2409,7 +2498,11 @@ class TestContentApi(object):
         uapi.save(user2)
 
         role_api_factory.get(current_user=user1).create_one(
-            user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=True, flush=True
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.SUMMARY,
+            flush=True,
         )
 
         # Test starts here
@@ -2438,20 +2531,20 @@ class TestContentApi(object):
         workspace = workspace_api2.get_one(wid)
         api = ContentApi(current_user=user1, session=session, config=app_config, show_archived=True)
 
-        content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content = api.get_one(pcid, ContentTypeSlug.ANY, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
         u2 = uapi.get_one(u2id)
         api2 = ContentApi(current_user=u2, session=session, config=app_config, show_archived=True)
-        content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content2 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         content2_nb_rev = len(content2.revisions)
         with pytest.raises(ContentInNotEditableState):
             with new_revision(session=session, tm=transaction.manager, content=content2):
                 api2.update_file_data(
                     content2, "index.html", "text/html", b"<html>hello world</html>"
                 )
-        content3 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content3 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         assert content3.label == "this_is_a_page"
         assert content2_nb_rev == len(content3.revisions)
 
@@ -2477,7 +2570,11 @@ class TestContentApi(object):
         user2 = uapi.create_minimal_user("this.is@another.user")
         uapi.save(user2)
         role_api_factory.get(current_user=user1).create_one(
-            user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=True, flush=True
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.SUMMARY,
+            flush=True,
         )
 
         # Test starts here
@@ -2506,20 +2603,20 @@ class TestContentApi(object):
         workspace = workspace_api2.get_one(wid)
         api = ContentApi(current_user=user1, session=session, config=app_config, show_deleted=True)
 
-        content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content = api.get_one(pcid, ContentTypeSlug.ANY, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
         u2 = uapi.get_one(u2id)
         api2 = ContentApi(current_user=u2, session=session, config=app_config, show_deleted=True)
-        content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content2 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         content2_nb_rev = len(content2.revisions)
         with pytest.raises(ContentInNotEditableState):
             with new_revision(session=session, tm=transaction.manager, content=content2):
                 api2.update_file_data(
                     content2, "index.html", "text/html", b"<html>hello world</html>"
                 )
-        content3 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content3 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         assert content3.label == "this_is_a_page"
         assert content2_nb_rev == len(content3.revisions)
 
@@ -2546,7 +2643,11 @@ class TestContentApi(object):
         uapi.save(user2)
 
         role_api_factory.get(current_user=user1).create_one(
-            user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=False, flush=True
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+            flush=True,
         )
         api = ContentApi(current_user=user1, session=session, config=app_config)
         with session.no_autoflush:
@@ -2561,7 +2662,7 @@ class TestContentApi(object):
         transaction.commit()
 
         api2 = ContentApi(current_user=user2, session=session, config=app_config)
-        content2 = api2.get_one(page.content_id, content_type_list.Any_SLUG, workspace)
+        content2 = api2.get_one(page.content_id, ContentTypeSlug.ANY, workspace)
         content2_nb_rev = len(content2.revisions)
         with new_revision(session=session, tm=transaction.manager, content=content2):
             with pytest.raises(SameValueError):
@@ -2570,7 +2671,7 @@ class TestContentApi(object):
                 )
         api2.save(content2)
         transaction.commit()
-        content3 = api2.get_one(page.content_id, content_type_list.Any_SLUG, workspace)
+        content3 = api2.get_one(page.content_id, ContentTypeSlug.ANY, workspace)
         assert content3.label == "index"
         assert content2_nb_rev == len(content3.revisions)
 
@@ -2598,7 +2699,11 @@ class TestContentApi(object):
         uapi.save(user2)
 
         role_api_factory.get(current_user=user1).create_one(
-            user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=True, flush=True
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.SUMMARY,
+            flush=True,
         )
 
         # show archived is used at the top end of the test
@@ -2624,14 +2729,14 @@ class TestContentApi(object):
         user1 = uapi.get_one(u1id)
         workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
 
-        content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content = api.get_one(pcid, ContentTypeSlug.ANY, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
         u2api = user_api_factory.get()
         u2 = u2api.get_one(u2id)
         api2 = ContentApi(current_user=u2, session=session, config=app_config, show_archived=True)
-        content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content2 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         with new_revision(session=session, tm=transaction.manager, content=content2):
             api2.archive(content2)
         api2.save(content2)
@@ -2644,7 +2749,7 @@ class TestContentApi(object):
         api = ContentApi(current_user=user1, session=session, config=app_config, show_archived=True)
         api2 = ContentApi(current_user=u2, session=session, config=app_config, show_archived=True)
 
-        updated = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        updated = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         eq_(
             u2id,
             updated.owner_id,
@@ -2655,7 +2760,7 @@ class TestContentApi(object):
 
         ####
 
-        updated2 = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        updated2 = api.get_one(pcid, ContentTypeSlug.ANY, workspace)
         with new_revision(session=session, tm=transaction.manager, content=updated):
             api.unarchive(updated)
         api.save(updated2)
@@ -2687,7 +2792,11 @@ class TestContentApi(object):
         uapi.save(user2)
 
         role_api_factory.get(current_user=user1).create_one(
-            user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=True, flush=True
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.SUMMARY,
+            flush=True,
         )
 
         # show archived is used at the top end of the test
@@ -2711,13 +2820,13 @@ class TestContentApi(object):
         user1 = uapi.get_one(u1id)
         workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
 
-        content = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content = api.get_one(pcid, ContentTypeSlug.ANY, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
         u2 = uapi.get_one(u2id)
         api2 = ContentApi(current_user=u2, session=session, config=app_config, show_deleted=True)
-        content2 = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        content2 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         with new_revision(session=session, tm=transaction.manager, content=content2):
             api2.delete(content2)
         api2.save(content2)
@@ -2732,7 +2841,7 @@ class TestContentApi(object):
         u2 = uapi.get_one(u2id)
         api2 = ContentApi(current_user=u2, session=session, config=app_config, show_deleted=True)
 
-        updated = api2.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        updated = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         eq_(
             u2id,
             updated.owner_id,
@@ -2743,7 +2852,7 @@ class TestContentApi(object):
 
         ####
 
-        updated2 = api.get_one(pcid, content_type_list.Any_SLUG, workspace)
+        updated2 = api.get_one(pcid, ContentTypeSlug.ANY, workspace)
         with new_revision(tm=transaction.manager, session=session, content=updated2):
             api.undelete(updated2)
         api.save(updated2)

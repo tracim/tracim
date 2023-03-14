@@ -72,9 +72,9 @@ export const unDeleteWorkspaceContentList = (workspaceContentList, workspaceId) 
 
 export const updateWorkspaceFilter = filterList => ({ type: `${UPDATE}/${WORKSPACE}/Filter`, filterList })
 
-export const USER_WORKSPACE_DO_NOTIFY = `${USER}/${WORKSPACE}/SubscriptionNotif`
-export const updateUserWorkspaceSubscriptionNotif = (userId, workspaceId, doNotify) =>
-  ({ type: `${UPDATE}/${USER_WORKSPACE_DO_NOTIFY}`, userId, workspaceId, doNotify })
+export const USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE = `${USER}/${WORKSPACE}/EmailNotificationType`
+export const updateUserWorkspaceEmailNotificationType = (userId, workspaceId, emailNotificationType) =>
+  ({ type: `${UPDATE}/${USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE}`, userId, workspaceId, emailNotificationType })
 
 export const WORKSPACE_CONTENT_ARCHIVED = `${WORKSPACE_CONTENT}/Archived`
 export const WORKSPACE_CONTENT_DELETED = `${WORKSPACE_CONTENT}/Deleted`

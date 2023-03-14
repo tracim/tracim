@@ -10,6 +10,7 @@ from tracim_backend.applications.agenda.lib import AgendaHooks
 from tracim_backend.applications.agenda.models import AgendaResourceType
 from tracim_backend.lib.cleanup.cleanup import CleanupLib
 from tracim_backend.models.auth import Profile
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
@@ -144,9 +145,14 @@ class TestCaldavRadicaleProxyEndpoints(object):
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         workspace.agenda_enabled = True
-        rapi = role_api_factory.get()
+        role_api = role_api_factory.get()
 
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         web_testapp.get(
@@ -293,8 +299,13 @@ class TestCaldavRadicaleProxyEndpoints(object):
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         workspace.agenda_enabled = True
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         event = VALID_CALDAV_BODY_PUT_EVENT
@@ -458,8 +469,13 @@ class TestCaldavRadicaleProxyEndpoints(object):
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         workspace.agenda_enabled = True
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         web_testapp.get("/dav/addressbook/workspace/{}/".format(workspace.workspace_id), status=200)
@@ -529,8 +545,13 @@ class TestCaldavRadicaleSync(object):
         session.add(user)
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("wp1", save_now=True, agenda_enabled=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.CONTRIBUTOR,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         session.flush()
         transaction.commit()
 
@@ -619,8 +640,13 @@ class TestCaldavRadicaleSync(object):
         session.add(user)
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("wp1", save_now=True, agenda_enabled=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.CONTRIBUTOR,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         session.flush()
         transaction.commit()
 
@@ -713,8 +739,13 @@ class TestCaldavRadicaleSync(object):
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("wp1", save_now=True)
         workspace.agenda_enabled = True
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.CONTRIBUTOR,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         session.flush()
         transaction.commit()
         workspace_agenda_path = "{source_path}/{local_path}".format(
@@ -746,7 +777,7 @@ class TestCaldavRadicaleSync(object):
         # Links are created
         assert os.path.islink(workspace_addressbook_symlink_path)
         assert os.path.islink(workspace_calendar_symlink_path)
-        rapi.delete_one(user_id=user.user_id, workspace_id=workspace.workspace_id, flush=True)
+        role_api.delete_one(user_id=user.user_id, workspace_id=workspace.workspace_id, flush=True)
         transaction.commit()
         assert os.path.isdir(workspace_agenda_path)
         assert os.path.isdir(workspace_addressbook_path)
@@ -754,7 +785,12 @@ class TestCaldavRadicaleSync(object):
         assert not os.path.islink(workspace_addressbook_symlink_path)
         assert not os.path.islink(workspace_calendar_symlink_path)
 
-        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, True)
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.SUMMARY,
+        )
         transaction.commit()
         assert os.path.isdir(workspace_agenda_path)
         assert os.path.isdir(workspace_addressbook_path)
@@ -787,8 +823,13 @@ class TestCaldavRadicaleSync(object):
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("wp1", save_now=True)
         workspace.agenda_enabled = True
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.CONTRIBUTOR,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         session.flush()
         transaction.commit()
         workspace_agenda_path = "{source_path}/{local_path}".format(
@@ -860,8 +901,13 @@ class TestCaldavRadicaleSync(object):
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("wp1", save_now=True)
         workspace.agenda_enabled = True
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.CONTRIBUTOR,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         session.flush()
         transaction.commit()
         workspace_agenda_path = "{source_path}/{local_path}".format(
@@ -933,8 +979,13 @@ class TestCaldavRadicaleSync(object):
         session.add(user)
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("wp1", save_now=True, agenda_enabled=False)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.CONTRIBUTOR,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         session.flush()
         transaction.commit()
         workspace_agenda_path = "{source_path}/{local_path}".format(
@@ -1008,8 +1059,13 @@ class TestCaldavRadicaleSync(object):
         session.add(user)
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("wp1", save_now=True, agenda_enabled=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.CONTRIBUTOR,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         session.flush()
         transaction.commit()
 
@@ -1154,10 +1210,25 @@ class TestAgendaApi(object):
         workspace3.agenda_enabled = False
         secret_workspace = workspace_api.create_workspace("secret", save_now=True)
         secret_workspace.agenda_enabled = True
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)
-        rapi.create_one(user, workspace2, UserRoleInWorkspace.READER, False)
-        rapi.create_one(user, workspace3, UserRoleInWorkspace.READER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.CONTRIBUTOR,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            user,
+            workspace2,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            user,
+            workspace3,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         result = web_testapp.get("/api/users/{}/agenda".format(user.user_id), status=200)
@@ -1200,10 +1271,25 @@ class TestAgendaApi(object):
         workspace2.agenda_enabled = True
         workspace3 = workspace_api.create_workspace("wp3", save_now=True)
         workspace3.agenda_enabled = True
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)
-        rapi.create_one(user, workspace2, UserRoleInWorkspace.READER, False)
-        rapi.create_one(user, workspace3, UserRoleInWorkspace.READER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.CONTRIBUTOR,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            user,
+            workspace2,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            user,
+            workspace3,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         params = {
