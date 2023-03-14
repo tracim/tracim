@@ -119,7 +119,7 @@ export const TinyEditor = props => {
             // TinyMCE recommends to use custom plugins in "external plugins" section
             // 'autocompletion',
             // /////////////////////////////////////////////
-            'advlist autolink lists link image charmap print preview anchor',
+            'advlist autolink autoresize lists link image charmap print preview anchor',
             'searchreplace visualblocks code codesample fullscreen emoticons',
             'insertdatetime media table paste code help wordcount'
           ],
