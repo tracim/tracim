@@ -1205,7 +1205,7 @@ def user_search_fixture(
     role_api.create_one(
         riyad_user,
         bob_and_riyad,
-        ole_level=UserRoleInWorkspace.CONTRIBUTOR,
+        role_level=UserRoleInWorkspace.CONTRIBUTOR,
         email_notification_type=EmailNotificationType.NONE,
     )
 

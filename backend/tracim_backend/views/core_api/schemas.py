@@ -1552,12 +1552,6 @@ class WorkspaceMemberCreationSchema(WorkspaceMemberSchema):
         exemple=False,
         description="Is the user completely new " "(and account was just created) or not ?",
     )
-    email_sent = marshmallow.fields.Bool(
-        exemple=False,
-        description="Has an email been sent to user to inform him about "
-        "this new workspace registration and eventually his account"
-        "creation",
-    )
 
 
 class TimezoneSchema(marshmallow.Schema):
