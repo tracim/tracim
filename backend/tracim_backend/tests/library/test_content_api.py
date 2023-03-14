@@ -1818,15 +1818,25 @@ class TestContentApi(object):
             email="this.is@another.user", profile=profile, save_now=True
         )
 
-        wapi = workspace_api_factory.get(current_user=user_a)
-        workspace1 = wapi.create_workspace("test workspace n°1", save_now=True)
-        workspace2 = wapi.create_workspace("test workspace n°2", save_now=True)
+        workspace_api = workspace_api_factory.get(current_user=user_a)
+        workspace1 = workspace_api.create_workspace("test workspace n°1", save_now=True)
+        workspace2 = workspace_api.create_workspace("test workspace n°2", save_now=True)
 
-        role_api1 = role_api_factory.get(current_user=user_a)
-        role_api1.create_one(user_b, workspace1, UserRoleInWorkspace.READER, False)
+        role_api_1 = role_api_factory.get(current_user=user_a)
+        role_api_1.create_one(
+            user=user_b,
+            workspace=workspace1,
+            role_level=UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
 
-        role_api2 = role_api_factory.get(current_user=user_b)
-        role_api2.create_one(user_b, workspace2, UserRoleInWorkspace.READER, False)
+        role_api_2 = role_api_factory.get(current_user=user_b)
+        role_api_2.create_one(
+            user=user_b,
+            workspace=workspace2,
+            role_level=UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
 
         cont_api_a = ContentApi(current_user=user_a, session=session, config=app_config)
         cont_api_b = ContentApi(current_user=user_b, session=session, config=app_config)
