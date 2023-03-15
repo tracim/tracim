@@ -3,7 +3,7 @@
 # Tracim
 <!-- Add better description here -->
 
-[Tracim](https://www.algoo.fr/fr/tracim) is a tool designed to help you and your team to a better collaboration.
+[Tracim](https://www.tracim.fr) is a tool designed to help you and your team to a better collaboration.
 It's officially supported in Arabic, English, French, German and Portuguese.
 
 Any questions, remarks? Reach us on [Tracim Community](https://public-community.tracim.fr).<br>
