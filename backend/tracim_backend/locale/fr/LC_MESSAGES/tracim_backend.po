@@ -408,8 +408,8 @@ msgid ""
 "You are receiving this email because you have at least one space set with"
 " the daily email."
 msgstr ""
-"Vous recevez cet email par ce que vous avez au moins un espace configuré "
-"pour le mail quotidien."
+"Vous recevez cet e-mail parce que vous avez configuré au moins un espace"
+" pour le mail quotidien."
 
 #: tracim_backend/templates/mail/summary_body_html.mak:48
 #, fuzzy
@@ -419,12 +419,12 @@ msgid ""
 "You can change this setting by going to the \"My Spaces\" menu through "
 "this link:"
 msgstr ""
-"Vous pouvez changer ce paramètre en allant sur \"Mes Espaces\" depuis ce "
+"Vous pouvez changer ce paramètre en allant sur \"Mes Espaces\" via ce "
 "lien :"
 
 #: tracim_backend/templates/mail/summary_body_html.mak:53
 msgid "This email is automatically created, please do not reply."
-msgstr "Cet email a été créé automatiquement, ne pas répondre."
+msgstr "Cet e-mail a été créé automatiquement, ne pas répondre."
 
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:5
 msgid ""
