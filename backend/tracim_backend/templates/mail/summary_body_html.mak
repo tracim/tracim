@@ -47,7 +47,6 @@
     ${_("You are receiving this email because you have at least one space set with the daily email.")}<br />
     ${_('You can change this setting by going to the "My Spaces" menu through this link:')}
     <a href="${config.WEBSITE__BASE_URL}/ui/account">${config.WEBSITE__BASE_URL}/ui/account</a>
-    (<a href='https://algoo.tracim.fr/ui/account'>https://algoo.tracim.fr/ui/account</a>)
   </p>
   <p>
     ${_("This email is automatically created, please do not reply.")}
