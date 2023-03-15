@@ -287,7 +287,7 @@ export class Sidebar extends React.Component {
           <div className='sidebar__footer__text'>
             Copyright - 2013 - 2022
             <div className='sidebar__footer__text__link'>
-              <a href='https://www.algoo.fr/fr/tracim' target='_blank' rel='noopener noreferrer'>tracim.fr</a>
+              <a href='https://www.tracim.fr' target='_blank' rel='noopener noreferrer'>tracim.fr</a>
             </div>
           </div>
         </div>

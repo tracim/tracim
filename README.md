@@ -7,7 +7,7 @@
 It's officially supported in Arabic, English, French, German and Portuguese.
 
 Any questions, remarks? Reach us on [Tracim Community](https://public-community.tracim.fr).<br>
-More informations on our [website](https://www.algoo.fr/fr/tracim).
+More informations on our [website](https://www.tracim.fr).
 
 ## Quick start (using Docker)
 
