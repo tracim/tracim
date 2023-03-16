@@ -15,7 +15,7 @@ Once you have finished your development and you want to merge it on `develop`, p
 
 ### Contribute to the translation
 
-[Tracim](https://www.algoo.fr/fr/tracim) translation is done through [Weblate](https://weblate.org/tracim/tracim/).<br>
+[Tracim](https://www.tracim.fr) translation is done through [Weblate](https://weblate.org/tracim/tracim/).<br>
 Head over to [Weblate](https://weblate.org/tracim/tracim/) and contribute to the translation.
 
 ### Develop a new feature
@@ -29,11 +29,11 @@ Now you can start coding :)
 
 ##### Build
 
-See [build](./doc/BUILD.md) to see how to build [Tracim](https://www.algoo.fr/fr/tracim). Especially the [development build section](./doc/BUILD.md#development-build).
+See [build](./doc/BUILD.md) to see how to build [Tracim](https://www.tracim.fr). Especially the [development build section](./doc/BUILD.md#development-build).
 
 ##### Testing
 
-See [testing](./doc/TESTING.md) to see how to test [Tracim](https://www.algoo.fr/fr/tracim) and your developments.
+See [testing](./doc/TESTING.md) to see how to test [Tracim](https://www.tracim.fr) and your developments.
 
 ##### Commiting to the repository
 

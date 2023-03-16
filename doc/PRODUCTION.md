@@ -1,6 +1,6 @@
 # Running Tracim for production
 
-[Tracim](https://www.algoo.fr/fr/tracim) is composed of multiples services, some are web wsgi applications and others are daemons (servers not web-related to do some task like sending email).
+[Tracim](https://www.tracim.fr) is composed of multiples services, some are web wsgi applications and others are daemons (servers not web-related to do some task like sending email).
 
 You should install pushpin, see [their installation procedure](https://pushpin.org/docs/install/) for your OS. We recommend to use pushpin version 1.30 as this version has been extensively tested and is in use in our official docker image.
 
