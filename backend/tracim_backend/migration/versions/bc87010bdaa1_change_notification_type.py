@@ -45,7 +45,7 @@ where email_notification_type != 'NONE'
 downgrade_email_notification_type_false = """
 update user_workspace
 set do_notify = false
-where email_notification_type == 'NONE'
+where email_notification_type = 'NONE'
 """
 
 
