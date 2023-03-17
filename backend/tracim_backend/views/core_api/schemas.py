@@ -2224,7 +2224,7 @@ class PathSuffixSchema(marshmallow.Schema):
         required=False,
         description='any path, could include "/"',
         default="",
-        example="/workspaces/1/notifications/activate",
+        example="/workspaces/1/email_notification_type",
     )
 
 

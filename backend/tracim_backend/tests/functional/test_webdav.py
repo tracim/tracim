@@ -358,6 +358,12 @@ class TestFunctionalWebdavGet(object):
         role_api = role_api_factory.get()
         role_api.create_one(
             user,
+            workspace_parent,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            user,
             workspace_child,
             UserRoleInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
