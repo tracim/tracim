@@ -57,7 +57,7 @@ class TestMailNotifyDaemon(object):
         space_api = workspace_api_factory.get(current_user=current_user)
         workspace = space_api.get_one_by_filemanager_filename("Recipes.space")
         user = user_api.get_one_by_email("bob@fsf.local")
-        role = role_api.get_one(user_id=user.user_id, workspace_id=workspace.workspace_id,)
+        role = role_api.get_one(user_id=current_user.user_id, workspace_id=workspace.workspace_id,)
         role_api.update_role(
             role=role,
             email_notification_type_value=EmailNotificationType.INDIVIDUAL.value,

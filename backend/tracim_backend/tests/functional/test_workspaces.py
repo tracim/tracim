@@ -2994,7 +2994,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
             user,
             workspace,
             UserRoleInWorkspace.WORKSPACE_MANAGER,
-            email_notification_type=EmailNotificationType.NONE,
+            email_notification_type=EmailNotificationType.INDIVIDUAL,
         )
         transaction.commit()
 
@@ -3017,7 +3017,14 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
         assert user_role_found["newly_created"] is True
         assert user_role_found["email_notification_type"] == "summary"
 
+        # Set email notification type to `all`
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.put_json(
+            f"/api/users/{user_id}/workspaces/{workspace.workspace_id}/email_notification_type",
+            status=204,
+            params={"email_notification_type": "individual"},
+        )
+
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["profile"] == "users"
@@ -3041,7 +3048,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
         )
         transaction.commit()
         response = mailhog.get_mailhog_mails()
-        assert len(response) == 0
+        assert len(response) == 1
         # check for notification to new connected user, user should not be notified
         # until it connected to tracim.
         bob = uapi.get_one_by_email(email="bob@bob.bob")
@@ -3059,7 +3066,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
         )
         transaction.commit()
         response = mailhog.get_mailhog_mails()
-        assert len(response) == 1
+        assert len(response) == 2
         headers = response[0]["Content"]["Headers"]
         assert headers["From"][0] == "Global manager via Tracim <test_user_from+1@localhost>"
         assert headers["To"][0] == "bob <bob@bob.bob>"

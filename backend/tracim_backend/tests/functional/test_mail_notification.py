@@ -181,14 +181,12 @@ class TestNotificationsSync(object):
         user_api = user_api_factory.get(current_user=None)
         role_api = role_api_factory.get(current_user=None)
         current_user = user_api.get_one_by_email("admin@admin.admin")
-        # set admin as french, useful to verify if i18n work properly
-        current_user.lang = "fr"
         # Create new user with notification enabled on w1 workspace
         space_api = workspace_api_factory.get(current_user=current_user)
         workspace = space_api.get_one_by_filemanager_filename("Recipes.space")
         user = user_api.get_one_by_email("bob@fsf.local")
 
-        role = role_api.get_one(user_id=user.user_id, workspace_id=workspace.workspace_id,)
+        role = role_api.get_one(user_id=current_user.user_id, workspace_id=workspace.workspace_id,)
         role_api.update_role(
             role=role,
             email_notification_type_value=EmailNotificationType.INDIVIDUAL.value,
@@ -243,7 +241,7 @@ class TestNotificationsSync(object):
         workspace = space_api.get_one_by_filemanager_filename("Recipes.space")
         user = user_api.get_one_by_email("bob@fsf.local")
 
-        role = role_api.get_one(user_id=user.user_id, workspace_id=workspace.workspace_id,)
+        role = role_api.get_one(user_id=current_user.user_id, workspace_id=workspace.workspace_id,)
         role_api.update_role(
             role=role,
             email_notification_type_value=EmailNotificationType.INDIVIDUAL.value,
@@ -349,7 +347,7 @@ class TestNotificationsAsync(object):
         workspace = space_api.get_one_by_filemanager_filename("Recipes.space")
         user = user_api.get_one_by_email("bob@fsf.local")
 
-        role = role_api.get_one(user_id=user.user_id, workspace_id=workspace.workspace_id,)
+        role = role_api.get_one(user_id=current_user.user_id, workspace_id=workspace.workspace_id,)
         role_api.update_role(
             role=role,
             email_notification_type_value=EmailNotificationType.INDIVIDUAL.value,
