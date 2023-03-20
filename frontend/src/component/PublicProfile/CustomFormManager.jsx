@@ -238,15 +238,14 @@ const TextRichWidget = connect(({ user }) => ({ user }))(props => {
     <TinyEditor
       apiUrl=''
       setContent={(text) => { props.onChange(text) }}
-      // End of required props ///////////////////////////////////////////////
+      // End of required props /////////////////////////////////////////////////
       codeLanguageList={[]}
       content={props.value}
-      height={300}
       isAdvancedEdition
+      isAutoResizeEnabled={false}
       isContentLinkEnabled={false}
       isMentionEnabled={false}
-      maxHeight={700}
-      minHeight={300}
+      isStatusBarEnabled
       {...props}
     />
   )

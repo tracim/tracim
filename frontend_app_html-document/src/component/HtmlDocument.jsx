@@ -164,16 +164,18 @@ export const HtmlDocument = props => {
                 content={textToEdit}
                 height='100%'
                 isAdvancedEdition
+                isAutoResizeEnabled={false}
+                isStatusBarEnabled
                 onCtrlEnterEvent={props.onClickValidateBtn}
                 roleList={DEFAULT_ROLE_LIST}
                 spaceId={props.workspaceId}
                 userList={props.memberList}
               />
 
-              <div className={`${props.customClass}__button editionmode__button`}>
+              <div className='html-document__editionmode__button'>
                 <IconButton
                   color={props.customColor}
-                  customClass={`${props.customClass}__cancel editionmode__button__cancel`}
+                  customClass='html-document__editionmode__cancel'
                   icon='fas fa-times'
                   intent='secondary'
                   key='TinyEditor__cancel'
@@ -184,7 +186,7 @@ export const HtmlDocument = props => {
 
                 <IconButton
                   color={props.customColor}
-                  customClass={`${props.customClass}__submit editionmode__button__submit`}
+                  customClass='html-document__editionmode__submit'
                   dataCy='editionmode__button__submit'
                   disabled={props.disableValidateBtn(textToEdit)}
                   icon='fas fa-check'

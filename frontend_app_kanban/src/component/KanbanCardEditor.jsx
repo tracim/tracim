@@ -56,7 +56,7 @@ function KanbanCardEditor (props) {
             content={description}
             height={200}
             isAdvancedEdition
-            maxHeight={500}
+            maxHeight={300}
             minHeight={200}
             placeholder={props.t('Description of the card')}
           />

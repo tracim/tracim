@@ -61,7 +61,7 @@ export const SpaceDescription = (props) => {
       </div>
       {isModeEdition
         ? (
-          <>
+          <div class='workspace_advanced__description'>
             <TinyEditor
               apiUrl={props.apiUrl}
               setContent={setContent}
@@ -71,7 +71,8 @@ export const SpaceDescription = (props) => {
               onCtrlEnterEvent={sendDescription}
               height={200}
               isAdvancedEdition
-              maxHeight={500}
+              isStatusBarEnabled
+              maxHeight={300}
               minHeight={200}
               placeholder={props.t('Description of the space')}
               roleList={props.roleList}
@@ -88,7 +89,7 @@ export const SpaceDescription = (props) => {
                 text={props.t('Confirm')}
               />
             </div>
-          </>
+          </div>
         )
         : (
           <div className='workspace_advanced__description'>

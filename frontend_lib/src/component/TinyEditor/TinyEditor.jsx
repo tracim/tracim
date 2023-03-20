@@ -112,16 +112,18 @@ export const TinyEditor = props => {
           width: '100%',
           placeholder: props.placeholder,
           menubar: false,
-          statusbar: true,
+          resize: false,
+          statusbar: props.isStatusBarEnabled,
           toolbar: toolbar,
           plugins: [
             // /////////////////////////////////////////////
             // TinyMCE recommends to use custom plugins in "external plugins" section
             // 'autocompletion',
             // /////////////////////////////////////////////
-            'advlist autolink autoresize lists link image charmap print preview anchor',
+            'advlist autolink lists link image charmap print preview anchor',
             'searchreplace visualblocks code codesample fullscreen emoticons',
-            'insertdatetime media table paste code help wordcount'
+            'insertdatetime media table paste code help wordcount',
+            props.isAutoResizeEnabled ? 'autoresize' : ''
           ],
           contextmenu: 'selectall copy paste link customInsertImage table',
           codesample_global_prismjs: true,
@@ -394,8 +396,10 @@ TinyEditor.propTypes = {
   onCtrlEnterEvent: PropTypes.func,
   height: PropTypes.any,
   isAdvancedEdition: PropTypes.bool,
+  isAutoResizeEnabled: PropTypes.bool,
   isContentLinkEnabled: PropTypes.bool,
   isMentionEnabled: PropTypes.bool,
+  isStatusBarEnabled: PropTypes.bool,
   maxHeight: PropTypes.number,
   minHeight: PropTypes.number,
   placeholder: PropTypes.string,
@@ -409,8 +413,10 @@ TinyEditor.defaultProps = {
   onCtrlEnterEvent: () => { },
   height: undefined,
   isAdvancedEdition: false,
+  isAutoResizeEnabled: true,
   isContentLinkEnabled: true,
   isMentionEnabled: true,
+  isStatusBarEnabled: false,
   maxHeight: undefined,
   minHeight: 100,
   placeholder: '',
