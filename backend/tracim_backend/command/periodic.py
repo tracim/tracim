@@ -26,7 +26,7 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
     @staticmethod
     def _render_template(config: CFG, context: dict, translator: Translator) -> str:
         template = Template(
-            filename=config.EMAIL__SUMMARY__TEMPLATE__HTML,
+            filename=config.EMAIL__NOTIFICATION__SUMMARY__TEMPLATE__HTML,
             default_filters=["html_escape"],
             imports=[
                 "from mako.filters import html_escape",
