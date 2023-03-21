@@ -2,6 +2,7 @@ import pytest
 import transaction
 
 from tracim_backend import AuthType
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.tests.fixtures import *  # noqa:F401,F403
@@ -39,7 +40,10 @@ class TestParentAccessPlugin(object):
             )
             role_api = role_api_factory.get()
             role_api.create_one(
-                user_1, grandson_workspace, WorkspaceRoles.CONTENT_MANAGER.level, False
+                user_1,
+                grandson_workspace,
+                WorkspaceRoles.CONTENT_MANAGER.level,
+                email_notification_type=EmailNotificationType.NONE,
             )
 
             assert grandson_workspace.get_user_role(user_1) == WorkspaceRoles.CONTENT_MANAGER.level
@@ -75,10 +79,18 @@ class TestParentAccessPlugin(object):
             email="u.1@u.u", auth_type=AuthType.INTERNAL, do_save=True, do_notify=False
         )
         role_api = role_api_factory.get()
-        role_api.create_one(user_1, child_workspace, WorkspaceRoles.CONTRIBUTOR.level, False)
+        role_api.create_one(
+            user_1,
+            child_workspace,
+            WorkspaceRoles.CONTRIBUTOR.level,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         with load_parent_access_plugin:
             role_api.create_one(
-                user_1, grandson_workspace, WorkspaceRoles.CONTENT_MANAGER.level, False
+                user_1,
+                grandson_workspace,
+                WorkspaceRoles.CONTENT_MANAGER.level,
+                email_notification_type=EmailNotificationType.NONE,
             )
 
             assert grandson_workspace.get_user_role(user_1) == WorkspaceRoles.CONTENT_MANAGER.level

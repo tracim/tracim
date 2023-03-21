@@ -4,6 +4,7 @@ from tracim_backend.exceptions import RoleAlreadyExistError
 from tracim_backend.lib.core.plugins import hookimpl
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.utils.request import TracimContext
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.tracim_session import TracimSession
 
@@ -30,17 +31,17 @@ class ParentAccessPlugin:
         """
         user = role.user
         current_workspace = role.workspace.parent
-        rapi = RoleApi(session=context.dbsession, config=context.app_config, current_user=None)
+        role_api = RoleApi(session=context.dbsession, config=context.app_config, current_user=None)
         while current_workspace:
             if not current_workspace.is_deleted and not self._is_role_in_session(
                 context.dbsession, user.user_id, current_workspace.workspace_id
             ):
                 try:
-                    rapi.create_one(
+                    role_api.create_one(
                         user=user,
                         workspace=current_workspace,
                         role_level=current_workspace.default_user_role.level,
-                        with_notif=True,
+                        email_notification_type=EmailNotificationType.SUMMARY,
                         flush=False,
                     )
                 except RoleAlreadyExistError:

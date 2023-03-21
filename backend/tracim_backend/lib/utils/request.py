@@ -9,6 +9,7 @@ import pluggy
 from pyramid.request import Request
 from sqlalchemy.orm import Session
 
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentNotFoundInTracimRequest
@@ -279,7 +280,7 @@ class TracimContext(ABC):
         return api.get_one(
             content_id=content_id,
             workspace=current_workspace,
-            content_type=content_type_list.Any_SLUG,
+            content_type=ContentTypeSlug.ANY.value,
         )
 
     def _get_reaction(self, reaction_id_fetcher: typing.Callable[[], int]) -> Reaction:

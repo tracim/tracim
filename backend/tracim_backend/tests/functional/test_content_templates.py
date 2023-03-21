@@ -1,7 +1,7 @@
 import pytest
 import transaction
 
-from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
@@ -30,7 +30,7 @@ class TestTemplates(object):
         content_api = content_api_factory.get()
         workspace = workspace_api.create_workspace("test")
         test_html_document = content_api.create(
-            content_type_slug=HTML_DOCUMENTS_TYPE,
+            content_type_slug=ContentTypeSlug.HTML_DOCUMENTS.value,
             workspace=workspace,
             label="just a content",
             do_save=True,
@@ -111,7 +111,7 @@ class TestTemplates(object):
         content_api = content_api_factory.get()
         workspace = workspace_api.create_workspace("test")
         test_html_document = content_api.create(
-            content_type_slug=HTML_DOCUMENTS_TYPE,
+            content_type_slug=ContentTypeSlug.HTML_DOCUMENTS.value,
             workspace=workspace,
             label="just a content",
             do_save=True,

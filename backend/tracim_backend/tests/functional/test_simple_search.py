@@ -3,6 +3,7 @@ import transaction
 
 from tracim_backend.lib.core.tag import TagLib
 from tracim_backend.models.auth import Profile
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
@@ -52,8 +53,13 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get(current_user=user)
         api.create(
             content_type_slug="html-document",
@@ -118,8 +124,13 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get(current_user=user)
         api.create(
             content_type_slug="html-document",
@@ -200,8 +211,13 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get(current_user=user)
         content = api.create(
             content_type_slug="html-document",
@@ -290,8 +306,13 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get(current_user=user)
         content = api.create(
             content_type_slug="html-document",
@@ -384,8 +405,13 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get(current_user=user)
         content = api.create(
             content_type_slug="html-document",
@@ -455,8 +481,13 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get(current_user=user)
         content = api.create(
             content_type_slug="html-document",
@@ -520,8 +551,13 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get(current_user=user)
         api.create(
             content_type_slug="html-document", workspace=workspace, label="test", do_save=True
@@ -557,8 +593,13 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get(current_user=user)
         api.create(
             content_type_slug="html-document",
@@ -651,8 +692,13 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get(current_user=user)
         api.create(
             content_type_slug="html-document",

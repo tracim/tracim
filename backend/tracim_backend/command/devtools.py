@@ -249,7 +249,7 @@ class SMTPMailCheckerCommand(AppContextCommand):
         )
         sender.send_mail(msg)
         sender.disconnect()
-        print("Email sended")
+        print("Email sent")
 
 
 class ExtractCustomPropertiesTranslationsCommand(AppContextCommand):

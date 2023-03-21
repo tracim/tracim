@@ -8,7 +8,7 @@ export const globalManagerAsMemberFromApi = {
   },
   role: ROLE.workspaceManager.slug,
   is_active: true,
-  do_notify: true
+  email_notification_type: 'summary'
 }
 
 export const globalManagerAsMember = serializeMember(globalManagerAsMemberFromApi)

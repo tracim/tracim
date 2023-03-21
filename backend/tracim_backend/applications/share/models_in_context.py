@@ -3,7 +3,7 @@ import typing
 
 from sqlalchemy.orm import Session
 
-from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.applications.share.models import ContentShare
 from tracim_backend.config import CFG
 from tracim_backend.lib.utils.utils import EmailUser
@@ -94,7 +94,7 @@ class ContentShareInContext(object):
 
         content_api = ContentApi(config=self.config, session=self.dbsession, current_user=None)
         content = content_api.get_one(
-            content_id=self.content_share.content_id, content_type=content_type_list.Any_SLUG
+            content_id=self.content_share.content_id, content_type=ContentTypeSlug.ANY.value
         )
         return content_api.get_content_in_context(content)
 

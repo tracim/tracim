@@ -4,9 +4,10 @@ import pytest
 import responses
 import transaction
 
-from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.translate.services.systran import FILE_TRANSLATION_ENDPOINT
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
@@ -17,7 +18,7 @@ oldest_comment = {
     "parent_content_type": "thread",
     "parent_content_namespace": "content",
     "parent_label": "Best Cakes?",
-    "raw_content": "<p>What is for you the best cake ever? <br/> I personnally vote for Chocolate cupcake!</p>",
+    "raw_content": "<p>What is for you the best cake ever? <br/> I personally vote for Chocolate cupcake!</p>",
     "author": {
         "user_id": 1,
         "has_avatar": True,
@@ -141,7 +142,7 @@ class TestCommentsEndpoint(object):
         workspace_api = workspace_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         content_api = content_api_factory.get()
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=ContentTypeSlug.ANY)
         test_thread = content_api.create(
             content_type_slug=content_type_list.Thread.slug,
             workspace=business_workspace,
@@ -196,7 +197,7 @@ class TestCommentsEndpoint(object):
         workspace_api = workspace_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         content_api = content_api_factory.get()
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=ContentTypeSlug.ANY)
         test_thread = content_api.create(
             content_type_slug=content_type_list.Thread.slug,
             workspace=business_workspace,
@@ -444,7 +445,7 @@ class TestCommentsEndpoint(object):
 def create_doc_and_comment(workspace_api, content_api_note, content_api_comment):
     workspace = workspace_api.create_workspace("test")
     test_html_document = content_api_note.create(
-        content_type_slug=HTML_DOCUMENTS_TYPE,
+        content_type_slug=ContentTypeSlug.HTML_DOCUMENTS.value,
         workspace=workspace,
         label="just a content",
         do_save=True,
@@ -668,7 +669,12 @@ class TestEditComment(object):
         workspace, test_html_document, comment = create_doc_and_comment(
             workspace_api, content_api, content_api
         )
-        role_api.create_one(riyad_user, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(
+            riyad_user,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         web_testapp.authorization = ("Basic", (riyad_user.username, "password"))
         res_get = web_testapp.get(

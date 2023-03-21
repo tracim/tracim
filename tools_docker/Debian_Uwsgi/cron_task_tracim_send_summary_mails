@@ -1,0 +1,1 @@
+0 0 * * * root /etc/tracim/send_summary_mails.sh >> /var/tracim/logs/cron_task_tracim_send_summary_mails.log 2>&1

@@ -3,7 +3,7 @@ import {
   REMOVE,
   SET,
   UPDATE,
-  USER_WORKSPACE_DO_NOTIFY,
+  USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
   WORKSPACE_LIST,
   WORKSPACE_LIST_MEMBER,
   WORKSPACE_MEMBER,
@@ -62,12 +62,12 @@ export function workspaceList (state = [], action, lang) {
         memberList: action.workspaceListMemberList.find(wlml => wlml.workspaceId === ws.id).memberList.map(m => (serializeMember(m)))
       }))
 
-    case `${UPDATE}/${USER_WORKSPACE_DO_NOTIFY}`:
+    case `${UPDATE}/${USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE}`:
       return state.map(ws => ws.id === action.workspaceId
         ? {
           ...ws,
           memberList: ws.memberList.map(u => u.id === action.userId
-            ? { ...u, doNotify: action.doNotify }
+            ? { ...u, emailNotificationType: action.emailNotificationType }
             : u
           )
         }

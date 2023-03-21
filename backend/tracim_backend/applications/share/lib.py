@@ -9,7 +9,7 @@ from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
-from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.applications.share.email_manager import ShareEmailManager
 from tracim_backend.applications.share.models import ContentShare
 from tracim_backend.applications.share.models import ContentShareType
@@ -189,7 +189,7 @@ class ShareLib(object):
             config=self._config, session=self._session, current_user=self._user
         )
         content = content_api.get_one(
-            content_id=content_share.content_id, content_type=content_type_list.Any_SLUG
+            content_id=content_share.content_id, content_type=ContentTypeSlug.ANY.value
         )
 
         return PUBLIC_API_SHARED_CONTENT_LINK_PATTERN.format(

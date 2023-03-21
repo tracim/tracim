@@ -593,6 +593,7 @@ export const hasSpaces = name => /\s/.test(name)
 
 // FIXME - GM - 2020-06-24 - This function doesn't handle nested object, it need to be improved
 // https://github.com/tracim/tracim/issues/3229
+// DEPRECATED - CH - 20230302 - This function is unused
 export const serialize = (objectToSerialize, propertyMap) => {
   return Object.fromEntries(
     Object.entries(objectToSerialize)

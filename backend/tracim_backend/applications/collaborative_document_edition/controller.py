@@ -9,8 +9,7 @@ import transaction
 from tracim_backend import ContentNotFound
 from tracim_backend import TracimRequest
 from tracim_backend import hapic
-from tracim_backend.app_models.contents import FILE_TYPE
-from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.applications.collaborative_document_edition.data import (
     COLLABORATIVE_DOCUMENT_EDITION_BASE,
 )
@@ -114,7 +113,7 @@ class CollaborativeDocumentEditionController(Controller):
         if hapic_data.body.parent_id:
             try:
                 parent = api.get_one(
-                    content_id=hapic_data.body.parent_id, content_type=content_type_list.Any_SLUG
+                    content_id=hapic_data.body.parent_id, content_type=ContentTypeSlug.ANY.value
                 )
             except ContentNotFound as exc:
                 raise ParentNotFound(
@@ -123,7 +122,7 @@ class CollaborativeDocumentEditionController(Controller):
 
         with request.dbsession.no_autoflush:
             content = api.create(
-                content_type_slug=FILE_TYPE,
+                content_type_slug=ContentTypeSlug.FILE.value,
                 do_save=True,
                 filename=hapic_data.body.filename,
                 template_id=hapic_data.body.template_id,
