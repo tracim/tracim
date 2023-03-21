@@ -255,11 +255,11 @@
   "Unexpected error, please inform an administrator": "Erro inesperado, informe um administrador",
   "of": "de",
   "Download": "Baixar",
-  "Every members of the space": "",
-  "All": "",
-  "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?": "",
-  "Insert": "",
-  "Image": "",
-  "Fullscreen": "",
-  "Please notice that I did an important update on this content.": ""
+  "Every members of the space": "Todos os membros do espaço",
+  "All": "Todos",
+  "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?": "{{filename}} é maior que 1MB, isto pode demorar algum tempo a carregar, quer continuar?",
+  "Insert": "Inserir",
+  "Image": "Imagem",
+  "Fullscreen": "Ecrã inteiro",
+  "Please notice that I did an important update on this content.": "Reparem que fiz uma actualização importante deste conteúdo."
 }
