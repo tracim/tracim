@@ -597,16 +597,16 @@
   "No matter how many spaces are set to 'Daily', only one mail will be sent. This daily mail will include all notifications (including mentions) you haven't read in the last 24h for each space set to 'Daily'.": "",
   "No notification for this space will be sent by mail. You will have to rely solely on Tracim's notifications wall.": "",
   "Error while changing email subscription": "",
+  "Every members of the space": "Todos os membros do espaço",
+  "All": "Todos",
+  "all": "todos",
+  "Tracim doesn't support the current version of your browser. Please upgrade your browser.": "O Tracim não suporta a versão do seu navegador. Por favor, actualize-a.",
+  "UnknownUser": "UtilizadorDesconhecido",
+  "UnknownRole": "FunçãoDesconhecida",
   "Sort by type": "Ordenar por tipo",
   "Sort by title": "Ordenar por título",
   "Sort by last modification": "Ordenar por última modificação",
   "Sort by information": "Ordenar por informações",
   "Sort by role": "Ordenar por função",
-  "Sort by status": "Ordenar por status",
-  "Every members of the space": "",
-  "All": "",
-  "all": "",
-  "Tracim doesn't support the current version of your browser. Please upgrade your browser.": "",
-  "UnknownUser": "",
-  "UnknownRole": ""
+  "Sort by status": "Ordenar por status"
 }

@@ -54,13 +54,13 @@
   "There are no users that matches you filter": "Ingen brukere samsvarer med filteret ditt",
   "Filter spaces": "Filtrer rom",
   "There are no spaces that matches you filter": "Ingen rom samsvarer med filteret ditt",
-  "Sort by full name": "",
-  "Sort by username": "",
-  "Sort by email": "",
-  "Id": "",
-  "Sort by id": "",
-  "Sort by type": "",
-  "Sort by title": "",
-  "Sort by description": "",
-  "Sort by number of members": ""
+  "Sort by full name": "Sorter etter fullt navn",
+  "Sort by username": "Sorter etter brukernavn",
+  "Sort by email": "Sorter etter e-postadresse",
+  "Id": "ID",
+  "Sort by id": "Sorter etter ID",
+  "Sort by type": "Sorter etter type",
+  "Sort by title": "Sorter etter navn",
+  "Sort by description": "Sorter etter beskrivelse",
+  "Sort by number of members": "Sorter etter antall medlemmer"
 }
