@@ -597,16 +597,16 @@
   "No matter how many spaces are set to 'Daily', only one mail will be sent. This daily mail will include all notifications (including mentions) you haven't read in the last 24h for each space set to 'Daily'.": "Peu importe combien d'espace sont paramétré en 'Quotidien', seulement un mail sera envoyé. Ce mail quotidien contiendra toutes les notifications (mentions comprises) que vous n'avez pas lu durant les dernières 24h de chaque espace paramétré en 'Quotidien'.",
   "No notification for this space will be sent by mail. You will have to rely solely on Tracim's notifications wall.": "Aucune notification pour cet espace sera envoyé par mail. Vous devrez vous fier uniquement au mur de notification de Tracim.",
   "Error while changing email subscription": "Erreur lors du changement d'abonnement de mail",
+  "Every members of the space": "Tous les membres de l'espace",
+  "All": "Tous",
+  "all": "tous",
+  "Tracim doesn't support the current version of your browser. Please upgrade your browser.": "Tracim ne supporte pas la version de votre navigateur. Merci de le mettre à jour.",
+  "UnknownUser": "UtilisateurInconnu",
+  "UnknownRole": "RoleInconnu",
   "Sort by type": "Trier par type",
   "Sort by title": "Trier par titre",
   "Sort by last modification": "Trier par dernière modification",
   "Sort by information": "Trier par information",
   "Sort by role": "Trier par rôle",
-  "Sort by status": "Trier par statut",
-  "Every members of the space": "Tous les membres de l'espaces",
-  "All": "Tous",
-  "all": "tous",
-  "Tracim doesn't support the current version of your browser. Please upgrade your browser.": "Tracim ne supporte pas la version actuelle de votre navigateur. Veuillez mettre à jour votre navigateur.",
-  "UnknownUser": "UtilisateurInconnu",
-  "UnknownRole": "RoleInconnu"
+  "Sort by status": "Trier par statut"
 }
