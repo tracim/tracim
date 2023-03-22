@@ -6,8 +6,13 @@ This list is generated using:
 tracimcli dev parameters list --template "| {env_var_name: <74}| {config_file_name: <63}| {config_name: <67}|"
 ```
 
-⚠️ The generated list is based on your configuration file. ⚠️  
-You need to activate all applications (`app.enabled` setting) for this list to be complete.
+⚠️ The generated list is based on your `development.ini` file. ⚠️
+
+To update the list below you will need to:
+
+- Activate all applications (`app.enabled` setting)
+- Set `collaborative_document_edition.software` to `collabora`
+- Give a value to `collaborative_document_edition.collabora.base_url`
 
 | Environment variable name                                                 | Configuration file name                                        | Displayed configuration name                                       |
 |---------------------------------------------------------------------------|----------------------------------------------------------------|--------------------------------------------------------------------|
