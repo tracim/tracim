@@ -77,6 +77,13 @@ fi
 printenv |grep TRACIM > /var/tracim/data/tracim_env_variables || true
 # Add variable for using xvfb with uwsgi
 echo "DISPLAY=:99.0" >> /var/tracim/data/tracim_env_variables
+
+# FIXME - MP - 2023-03-22 - Create a file with every TRACIM environment variables
+# The difference with the `printenv` above is that it escapes the values
+# This creates two files: `tracim_env_variables` and `tracim_env_variables_cron` which should be
+# merged in one. See https://github.com/tracim/tracim/issues/6106#issuecomment-1479730122
+declare -x | grep TRACIM | cut -c12- > /var/tracim/data/tracim_env_variables_cron || true
+
 log "Ensuring www-data is the owner of /var/tracim files"
 find /var/tracim/ \( ! -user www-data -o ! -group www-data \) -exec chown www-data:www-data {} \;
 loggood "Ensuring www-data is the owner of /var/tracim files: success"
