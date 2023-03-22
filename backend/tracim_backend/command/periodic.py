@@ -11,7 +11,6 @@ from tracim_backend.command import AppContextCommand
 from tracim_backend.config import CFG
 from tracim_backend.lib.core.event import EventApi
 from tracim_backend.lib.core.user import UserApi
-from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.mail_notifier.sender import EmailSender
 from tracim_backend.lib.mail_notifier.utils import EST
 from tracim_backend.lib.mail_notifier.utils import EmailAddress
@@ -27,7 +26,7 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
     @staticmethod
     def _render_template(config: CFG, context: dict, translator: Translator) -> str:
         template = Template(
-            filename=config.EMAIL__SUMMARY__TEMPLATE__HTML,
+            filename=config.EMAIL__NOTIFICATION__SUMMARY__TEMPLATE__HTML,
             default_filters=["html_escape"],
             imports=[
                 "from mako.filters import html_escape",
@@ -113,8 +112,7 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
                 email_notification_type=EmailNotificationType.SUMMARY,
             )
             notification_summary = event_api.get_unread_messages_summary(
-                user.user_id,
-                created_after=created_after,
+                user.user_id, created_after=created_after,
             )
 
             if len(mentions) == 0 and len(notification_summary) == 0:

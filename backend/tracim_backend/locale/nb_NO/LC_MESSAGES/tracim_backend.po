@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-03-14 16:36+0100\n"
+"POT-Creation-Date: 2023-03-22 10:17+0100\n"
 "PO-Revision-Date: 2022-09-01 15:01+0000\n"
 "Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
 "Language: nb_NO\n"
@@ -167,6 +167,7 @@ msgid "<a href=\"{call_to_action_url}\">view it on tracim</a>"
 msgstr "<a href=\"{call_to_action_url}\">vis på tracim</a>"
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:65
+#: tracim_backend/templates/mail/summary_body_html.mak:47
 #, fuzzy
 msgid "You're receiving this email because of your account on {website_title}."
 msgstr "Du mottar denne e-posten fordi du har en konto på {website_title}."
@@ -250,7 +251,7 @@ msgstr "Suricat', din digitale assistent"
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:21
 #: tracim_backend/templates/mail/reset_password_body_html.mak:25
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:21
-#: tracim_backend/templates/mail/summary_body_html.mak:57
+#: tracim_backend/templates/mail/summary_body_html.mak:56
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:21
 #, fuzzy
 msgid "Suricat', the bot"
@@ -261,7 +262,7 @@ msgstr "Suricat', bott-en"
 #: tracim_backend/templates/mail/reset_password_body_html.mak:28
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:24
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:32
-#: tracim_backend/templates/mail/summary_body_html.mak:60
+#: tracim_backend/templates/mail/summary_body_html.mak:59
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:24
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:26
 #, fuzzy
@@ -393,22 +394,13 @@ msgstr ""
 msgid "{event_count} activity in the space"
 msgstr ""
 
-# | msgid "You're receiving this email because of your account on
-# | {website_title}."
-#: tracim_backend/templates/mail/summary_body_html.mak:47
-#, fuzzy
-msgid ""
-"You are receiving this email because you have at least one space set with"
-" the daily email."
-msgstr "Du mottar denne e-posten fordi du har en konto på {website_title}."
-
 #: tracim_backend/templates/mail/summary_body_html.mak:48
 msgid ""
 "You can change this setting by going to the \"My Spaces\" menu through "
 "this link:"
 msgstr ""
 
-#: tracim_backend/templates/mail/summary_body_html.mak:53
+#: tracim_backend/templates/mail/summary_body_html.mak:52
 msgid "This email is automatically created, please do not reply."
 msgstr ""
 
@@ -458,3 +450,10 @@ msgstr ""
 #~ "href=\"https://algoo.tracim.fr/ui/account\">link</a>"
 #~ msgstr ""
 
+# | msgid "You're receiving this email because of your account on
+# | {website_title}."
+#~ msgid ""
+#~ "You are receiving this email because "
+#~ "you have at least one space set"
+#~ " with the daily email."
+#~ msgstr "Du mottar denne e-posten fordi du har en konto på {website_title}."

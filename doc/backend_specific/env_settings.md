@@ -1,10 +1,18 @@
 # Tracim configuration parameters which can be given as an environment variable
 
-This list is generated using
-```
+This list is generated using:
+
+```shell
 tracimcli dev parameters list --template "| {env_var_name: <74}| {config_file_name: <63}| {config_name: <67}|"
 ```
-Note that you need to activate all applications (`app.enabled` setting) for this list to be complete.
+
+⚠️ The generated list is based on your `development.ini` file. ⚠️
+
+To update the list below you will need to:
+
+- Activate all applications (`app.enabled` setting)
+- Set `collaborative_document_edition.software` to `collabora`
+- Give a value to `collaborative_document_edition.collabora.base_url`
 
 | Environment variable name                                                 | Configuration file name                                        | Displayed configuration name                                       |
 |---------------------------------------------------------------------------|----------------------------------------------------------------|--------------------------------------------------------------------|
@@ -84,7 +92,7 @@ Note that you need to activate all applications (`app.enabled` setting) for this
 | TRACIM_LIVE_MESSAGES__CONTROL_ZMQ_URI                                     | live_messages.control_zmq_uri                                  | LIVE_MESSAGES__CONTROL_ZMQ_URI                                     |
 | TRACIM_LIVE_MESSAGES__STATS_ZMQ_URI                                       | live_messages.stats_zmq_uri                                    | LIVE_MESSAGES__STATS_ZMQ_URI                                       |
 | TRACIM_LIVE_MESSAGES__BLOCKING_PUBLISH                                    | live_messages.blocking_publish                                 | LIVE_MESSAGES__BLOCKING_PUBLISH                                    |
-| TRACIM_EMAIL__NOTIFICATION__ENABLED_ON_INVITATION                         | email.notification.enabled_on_invitation                       | EMAIL__NOTIFICATION__ENABLED_ON_INVITATION                         |
+| TRACIM_EMAIL__NOTIFICATION__TYPE_ON_INVITATION                            | email.notification.type_on_invitation                          | EMAIL__NOTIFICATION__TYPE_ON_INVITATION                            |
 | TRACIM_EMAIL__NOTIFICATION__FROM__EMAIL                                   | email.notification.from.email                                  | EMAIL__NOTIFICATION__FROM__EMAIL                                   |
 | TRACIM_EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL                           | email.notification.from.default_label                          | EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL                           |
 | TRACIM_EMAIL__NOTIFICATION__REPLY_TO__EMAIL                               | email.notification.reply_to.email                              | EMAIL__NOTIFICATION__REPLY_TO__EMAIL                               |
@@ -95,6 +103,7 @@ Note that you need to activate all applications (`app.enabled` setting) for this
 | TRACIM_EMAIL__NOTIFICATION__CREATED_ACCOUNT__SUBJECT                      | email.notification.created_account.subject                     | EMAIL__NOTIFICATION__CREATED_ACCOUNT__SUBJECT                      |
 | TRACIM_EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__TEMPLATE__HTML        | email.notification.reset_password_request.template.html        | EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__TEMPLATE__HTML        |
 | TRACIM_EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__SUBJECT               | email.notification.reset_password_request.subject              | EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__SUBJECT               |
+| TRACIM_EMAIL__NOTIFICATION__SUMMARY__TEMPLATE__HTML                       | email.notification.summary.template.html                       | EMAIL__NOTIFICATION__SUMMARY__TEMPLATE__HTML                       |
 | TRACIM_EMAIL__NOTIFICATION__ACTIVATED                                     | email.notification.activated                                   | EMAIL__NOTIFICATION__ACTIVATED                                     |
 | TRACIM_EMAIL__NOTIFICATION__SMTP__SERVER                                  | email.notification.smtp.server                                 | EMAIL__NOTIFICATION__SMTP__SERVER                                  |
 | TRACIM_EMAIL__NOTIFICATION__SMTP__PORT                                    | email.notification.smtp.port                                   | EMAIL__NOTIFICATION__SMTP__PORT                                    |
