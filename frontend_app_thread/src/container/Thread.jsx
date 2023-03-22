@@ -239,7 +239,6 @@ export class Thread extends React.Component {
     props.appContentChangeTitle(state.content, newTitle, state.config.slug)
   }
 
-  // TODO: Check this
   handleChangeNewComment = e => {
     const { props, state } = this
     props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)

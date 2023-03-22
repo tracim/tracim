@@ -464,7 +464,6 @@ export class File extends React.Component {
     }
   }
 
-  // TODO: Check this
   handleChangeNewComment = e => {
     const { props, state } = this
     props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)

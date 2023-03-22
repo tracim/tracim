@@ -172,10 +172,8 @@ describe('appContentFactory.js', () => {
   describe('function appContentCustomEventHandlerReloadContent', () => {
     const newContent = { ...fakeContent, content_id: fakeContent.content_id + 1 }
     const initialState = { content: fakeContent }
-    const fakeTinymceRemove = sinon.spy()
 
     before(() => {
-      global.tinymce.remove = fakeTinymceRemove
       wrapper.instance().setState(initialState)
       wrapper.instance().appContentCustomEventHandlerReloadContent(newContent, fakeSetState, appContentSlug)
       const lastSetStateArg = fakeSetState.lastCall.args[0]
@@ -185,7 +183,6 @@ describe('appContentFactory.js', () => {
     })
 
     after(() => {
-      fakeTinymceRemove.resetHistory()
       global.localStorage.getItem.resetHistory()
       fakeSetState.resetHistory()
     })
@@ -220,7 +217,6 @@ describe('appContentFactory.js', () => {
   })
 
   describe('function appContentCustomEventHandlerAllAppChangeLanguage', () => {
-    const fakeTinymceRemove = sinon.spy()
     const fakeI18nChangeLanguage = sinon.spy()
     const fakeI18n = {
       changeLanguage: fakeI18nChangeLanguage
@@ -229,7 +225,6 @@ describe('appContentFactory.js', () => {
     const fakeWysiwygConstructor = sinon.spy()
 
     before(() => {
-      global.tinymce.remove = fakeTinymceRemove
       global.wysiwyg = fakeWysiwygConstructor
       wrapper.instance().appContentCustomEventHandlerAllAppChangeLanguage(newLang, fakeSetState, fakeI18n)
     })
