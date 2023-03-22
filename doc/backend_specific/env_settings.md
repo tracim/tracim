@@ -1,9 +1,11 @@
 # Tracim configuration parameters which can be given as an environment variable
 
 This list is generated using
-```
+
+```shell
 tracimcli dev parameters list --template "| {env_var_name: <74}| {config_file_name: <63}| {config_name: <67}|"
 ```
+
 Note that you need to activate all applications (`app.enabled` setting) for this list to be complete.
 
 | Environment variable name                                                 | Configuration file name                                        | Displayed configuration name                                       |
@@ -84,7 +86,7 @@ Note that you need to activate all applications (`app.enabled` setting) for this
 | TRACIM_LIVE_MESSAGES__CONTROL_ZMQ_URI                                     | live_messages.control_zmq_uri                                  | LIVE_MESSAGES__CONTROL_ZMQ_URI                                     |
 | TRACIM_LIVE_MESSAGES__STATS_ZMQ_URI                                       | live_messages.stats_zmq_uri                                    | LIVE_MESSAGES__STATS_ZMQ_URI                                       |
 | TRACIM_LIVE_MESSAGES__BLOCKING_PUBLISH                                    | live_messages.blocking_publish                                 | LIVE_MESSAGES__BLOCKING_PUBLISH                                    |
-| TRACIM_EMAIL__NOTIFICATION__ENABLED_ON_INVITATION                         | email.notification.enabled_on_invitation                       | EMAIL__NOTIFICATION__ENABLED_ON_INVITATION                         |
+| TRACIM_EMAIL__NOTIFICATION__TYPE_ON_INVITATION                            | email.notification.type_on_invitation                          | EMAIL__NOTIFICATION__TYPE_ON_INVITATION                            |
 | TRACIM_EMAIL__NOTIFICATION__FROM__EMAIL                                   | email.notification.from.email                                  | EMAIL__NOTIFICATION__FROM__EMAIL                                   |
 | TRACIM_EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL                           | email.notification.from.default_label                          | EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL                           |
 | TRACIM_EMAIL__NOTIFICATION__REPLY_TO__EMAIL                               | email.notification.reply_to.email                              | EMAIL__NOTIFICATION__REPLY_TO__EMAIL                               |
@@ -175,3 +177,4 @@ Note that you need to activate all applications (`app.enabled` setting) for this
 | TRACIM_EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__SUBJECT         | email.notification.upload_permission_to_emitter.subject        | EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__SUBJECT         |
 | TRACIM_EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML              | email.notification.new_upload_event.template.html              | EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML              |
 | TRACIM_EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT                     | email.notification.new_upload_event.subject                    | EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT                     |
+| TRACIM_EMAIL__NOTIFICATION__SUMMARY__TEMPLATE__HTML                       | email.notification.summary.template.html                       | EMAIL__NOTIFICATION__SUMMARY__TEMPLATE__HTML                       |
