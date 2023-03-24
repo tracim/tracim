@@ -292,7 +292,7 @@ export const TinyEditor = props => {
                 ch: '#',
                 columns: 1,
                 highlightOn: ['content_label', 'content_id'],
-                minChars: 1,
+                minChars: 0,
                 maxResults: maxFetchResults,
                 fetch: async function (pattern) {
                   try {
