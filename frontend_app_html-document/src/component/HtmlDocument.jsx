@@ -172,10 +172,10 @@ export const HtmlDocument = props => {
                 userList={props.memberList}
               />
 
-              <div className='html-document__editionmode__button'>
+              <div className={`${props.customClass}__editionmode__button`}>
                 <IconButton
                   color={props.customColor}
-                  customClass='html-document__editionmode__cancel'
+                  customClass={`${props.customClass}__editionmode__cancel`}
                   icon='fas fa-times'
                   intent='secondary'
                   key='TinyEditor__cancel'
@@ -186,7 +186,7 @@ export const HtmlDocument = props => {
 
                 <IconButton
                   color={props.customColor}
-                  customClass='html-document__editionmode__submit'
+                  customClass={`${props.customClass}__editionmode__submit`}
                   dataCy='editionmode__button__submit'
                   disabled={props.disableValidateBtn(textToEdit)}
                   icon='fas fa-check'
@@ -213,6 +213,7 @@ HtmlDocument.propTypes = {
   codeLanguageList: PropTypes.array,
   contentId: PropTypes.number,
   contentType: PropTypes.string,
+  customClass: PropTypes.string,
   customColor: PropTypes.string,
   disableValidateBtn: PropTypes.func,
   displayNotifyAllMessage: PropTypes.bool,
@@ -247,6 +248,7 @@ HtmlDocument.propTypes = {
 HtmlDocument.defaultProps = {
   contentId: 0,
   contentType: CONTENT_TYPE.HTML_DOCUMENT,
+  customClass: 'html-document',
   customColor: '#252525',
   deprecatedStatus: {
     faIcon: ''

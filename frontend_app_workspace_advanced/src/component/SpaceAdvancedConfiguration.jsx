@@ -1,5 +1,4 @@
 import React from 'react'
-import Radium from 'radium'
 import PropTypes from 'prop-types'
 import {
   ROLE_LIST,
@@ -18,7 +17,7 @@ export const SpaceAdvancedConfiguration = (props) => {
       <SpaceDescription
         apiUrl={props.apiUrl}
         onClickSubmit={props.onClickSubmit}
-        // End of required props /////////////////////////////////////////////////////////////////
+        // End of required props ///////////////////////////////////////////////////////////////////
         customColor={props.customColor}
         description={props.description}
         isReadOnlyMode={props.isReadOnlyMode}
@@ -103,7 +102,7 @@ export const SpaceAdvancedConfiguration = (props) => {
   )
 }
 
-export default translate()(Radium(SpaceAdvancedConfiguration))
+export default translate()(SpaceAdvancedConfiguration)
 
 SpaceAdvancedConfiguration.propTypes = {
   apiUrl: PropTypes.string.isRequired,
