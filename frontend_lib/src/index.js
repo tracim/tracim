@@ -85,8 +85,8 @@ import {
   handleLinksBeforeSave,
   handleMentionsBeforeSave,
   replaceHTMLElementWithMention,
-  searchContentAndPlaceBalise,
-  searchMentionAndPlaceBalise
+  searchContentAndReplaceWithTag,
+  searchMentionAndReplaceWithTag
 } from './mentionOrLink.js'
 
 import { TracimComponent } from './tracimComponent.js'
@@ -508,8 +508,8 @@ export {
   replaceHTMLElementWithMention,
   revisionTypeList,
   scrollIntoViewIfNeeded,
-  searchContentAndPlaceBalise,
-  searchMentionAndPlaceBalise,
+  searchContentAndReplaceWithTag,
+  searchMentionAndReplaceWithTag,
   sendGlobalFlashMessage,
   serialize,
   setupCommonRequestHeaders,

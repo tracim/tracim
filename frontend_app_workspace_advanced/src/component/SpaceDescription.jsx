@@ -4,8 +4,8 @@ import {
   IconButton,
   TinyEditor,
   replaceHTMLElementWithMention,
-  searchContentAndPlaceBalise,
-  searchMentionAndPlaceBalise
+  searchContentAndReplaceWithTag,
+  searchMentionAndReplaceWithTag
 } from 'tracim_frontend_lib'
 import { translate } from 'react-i18next'
 
@@ -32,14 +32,14 @@ export const SpaceDescription = (props) => {
    * Send the description to the backend
    * @param {string} description The description to send
    */
-  const sendDescription = async (description) => {
-    const parsedMentionCommentObject = searchMentionAndPlaceBalise(
+  const handleCtrlEnterEvent = async (description) => {
+    const parsedMentionCommentObject = searchMentionAndReplaceWithTag(
       props.roleList,
       props.memberList,
       description
     )
 
-    const parsedContentCommentObject = await searchContentAndPlaceBalise(
+    const parsedContentCommentObject = await searchContentAndReplaceWithTag(
       props.apiUrl,
       parsedMentionCommentObject.html
     )
@@ -68,7 +68,7 @@ export const SpaceDescription = (props) => {
               // End of required props ///////////////////////////////////////////////
               codeLanguageList={props.codeLanguageList}
               content={content}
-              onCtrlEnterEvent={sendDescription}
+              onCtrlEnterEvent={handleCtrlEnterEvent}
               height={200}
               isAdvancedEdition
               isStatusBarEnabled
@@ -85,7 +85,7 @@ export const SpaceDescription = (props) => {
                 icon='fas fa-check'
                 intent='primary'
                 mode='light'
-                onClick={() => { sendDescription(content) }}
+                onClick={() => { handleCtrlEnterEvent(content) }}
                 text={props.t('Confirm')}
               />
             </div>

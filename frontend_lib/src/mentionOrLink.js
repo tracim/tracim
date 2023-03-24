@@ -248,7 +248,7 @@ export const searchMention = (text) => {
  *   invalidMentionList: [];
  * }
  */
-export const searchMentionAndPlaceBalise = (rolelist, userList, html) => {
+export const searchMentionAndReplaceWithTag = (rolelist, userList, html) => {
   const mentionList = searchMention(html)
   const invalidMentionList = []
 
@@ -403,7 +403,7 @@ const searchContent = (text) => {
  *   invalidContentList: [];
  * }
  */
-export const searchContentAndPlaceBalise = async (apiUrl, html) => {
+export const searchContentAndReplaceWithTag = async (apiUrl, html) => {
   const contentList = searchContent(html)
   const invalidContentList = []
 

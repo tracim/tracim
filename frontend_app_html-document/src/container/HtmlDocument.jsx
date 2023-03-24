@@ -45,8 +45,8 @@ import {
   putUserConfiguration,
   removeLocalStorageItem,
   replaceHTMLElementWithMention,
-  searchContentAndPlaceBalise,
-  searchMentionAndPlaceBalise,
+  searchContentAndReplaceWithTag,
+  searchMentionAndReplaceWithTag,
   sendGlobalFlashMessage,
   sortListByMultipleCriteria
 } from 'tracim_frontend_lib'
@@ -466,11 +466,11 @@ export class HtmlDocument extends React.Component {
   handleClickSaveDocument = async () => {
     const { state } = this
     const content = tinymce.activeEditor.getContent()
-    const parsedContentCommentObject = await searchContentAndPlaceBalise(
+    const parsedContentCommentObject = await searchContentAndReplaceWithTag(
       state.config.apiUrl,
       content
     )
-    const parsedMentionCommentObject = searchMentionAndPlaceBalise(
+    const parsedMentionCommentObject = searchMentionAndReplaceWithTag(
       DEFAULT_ROLE_LIST,
       state.config.workspace.memberList,
       parsedContentCommentObject.html
