@@ -97,7 +97,7 @@ msgstr "Uploaded by {username}."
 
 #: tracim_backend/command/periodic.py:59
 msgid "[{website_title}] Your daily summary"
-msgstr ""
+msgstr "[{website_title}] Your daily summary"
 
 #: tracim_backend/lib/core/content.py:753
 msgid "Space {workspace_name}"
