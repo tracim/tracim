@@ -1735,7 +1735,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role_found["user_id"] == 2
         assert user_role_found["workspace_id"] == 1
         assert user_role_found["newly_created"] is False
-        assert user_role_found["email_notification_type"] == "summary"
+        assert user_role_found["email_notification_type"] == "none"
         last_event = event_helper.last_event
         assert last_event.event_type == "workspace_member.created"
         assert last_event.member == {
@@ -1793,7 +1793,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role_found["user_id"]
         assert user_role_found["workspace_id"] == workspace_id
         assert user_role_found["newly_created"] is False
-        assert user_role_found["email_notification_type"] == "summary"
+        assert user_role_found["email_notification_type"] == "none"
 
         res = web_testapp.get(
             "/api/workspaces/{}/members".format(workspace_id), status=200
@@ -1854,7 +1854,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role_found["user_id"]
         assert user_role_found["workspace_id"] == workspace_id
         assert user_role_found["newly_created"] is False
-        assert user_role_found["email_notification_type"] == "summary"
+        assert user_role_found["email_notification_type"] == "none"
 
         res = web_testapp.get(
             "/api/workspaces/{}/members".format(workspace_id), status=200
@@ -1887,7 +1887,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role_found["user_id"] == 2
         assert user_role_found["workspace_id"] == 1
         assert user_role_found["newly_created"] is False
-        assert user_role_found["email_notification_type"] == "summary"
+        assert user_role_found["email_notification_type"] == "none"
 
         res = web_testapp.get("/api/workspaces/1/members", status=200).json_body
         assert len(res) == 2
@@ -1966,7 +1966,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role_found["user_id"] == 3
         assert user_role_found["workspace_id"] == 1
         assert user_role_found["newly_created"] is False
-        assert user_role_found["email_notification_type"] == "summary"
+        assert user_role_found["email_notification_type"] == "none"
 
         res = web_testapp.get("/api/workspaces/1/members", status=200).json_body
         assert len(res) == 2
@@ -2830,7 +2830,7 @@ class TestUserInvitationWithMailActivatedSyncDefaultProfileTrustedUser(object):
         user_id = user_role_found["user_id"]
         assert user_role_found["workspace_id"] == workspace.workspace_id
         assert user_role_found["newly_created"] is True
-        assert user_role_found["email_notification_type"] == "summary"
+        assert user_role_found["email_notification_type"] == "none"
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
@@ -2896,7 +2896,7 @@ class TestUserInvitationWithMailActivatedSync(object):
         user_id = user_role_found["user_id"]
         assert user_role_found["workspace_id"] == workspace.workspace_id
         assert user_role_found["newly_created"] is True
-        assert user_role_found["email_notification_type"] == "summary"
+        assert user_role_found["email_notification_type"] == "none"
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
@@ -3015,7 +3015,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
         user_id = user_role_found["user_id"]
         assert user_role_found["workspace_id"] == workspace.workspace_id
         assert user_role_found["newly_created"] is True
-        assert user_role_found["email_notification_type"] == "summary"
+        assert user_role_found["email_notification_type"] == "individual"
 
         # Set email notification type to `all`
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))

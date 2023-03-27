@@ -784,8 +784,9 @@ class CFG(object):
         )
 
         # Summary
-        self.EMAIL__SUMMARY__TEMPLATE__HTML = self.get_raw_config(
-            "email.summary.template.html", "{}/{}".format(template_dir, "summary_body_html.mak"),
+        self.EMAIL__NOTIFICATION__SUMMARY__TEMPLATE__HTML = self.get_raw_config(
+            "email.notification.summary.template.html",
+            "{}/{}".format(template_dir, "summary_body_html.mak"),
         )
 
         # TODO - G.M - 2019-01-22 - add feature to process notification email

@@ -45,11 +45,10 @@ import {
   putUserConfiguration,
   removeLocalStorageItem,
   replaceHTMLElementWithMention,
-  searchContentAndPlaceBalise,
-  searchMentionAndPlaceBalise,
+  searchContentAndReplaceWithTag,
+  searchMentionAndReplaceWithTag,
   sendGlobalFlashMessage,
-  sortListByMultipleCriteria,
-  tinymceAutoCompleteHandleClickItem
+  sortListByMultipleCriteria
 } from 'tracim_frontend_lib'
 import {
   getHtmlDocContent,
@@ -420,7 +419,7 @@ export class HtmlDocument extends React.Component {
   }
 
   handleClickNewVersion = () => {
-    const { props, state } = this
+    const { state } = this
     const previouslyUnsavedRawContent = getLocalStorageItem(
       state.appName,
       state.content.content_id,
@@ -429,11 +428,7 @@ export class HtmlDocument extends React.Component {
     )
 
     const rawContent = replaceHTMLElementWithMention(
-      [{
-        id: 0,
-        label: props.t('All'),
-        slug: props.t('all')
-      }],
+      DEFAULT_ROLE_LIST,
       state.config.workspace.memberList,
       previouslyUnsavedRawContent || state.content.raw_content
     )
@@ -471,11 +466,11 @@ export class HtmlDocument extends React.Component {
   handleClickSaveDocument = async () => {
     const { state } = this
     const content = tinymce.activeEditor.getContent()
-    const parsedContentCommentObject = await searchContentAndPlaceBalise(
+    const parsedContentCommentObject = await searchContentAndReplaceWithTag(
       state.config.apiUrl,
       content
     )
-    const parsedMentionCommentObject = searchMentionAndPlaceBalise(
+    const parsedMentionCommentObject = searchMentionAndReplaceWithTag(
       DEFAULT_ROLE_LIST,
       state.config.workspace.memberList,
       parsedContentCommentObject.html
@@ -1045,7 +1040,6 @@ export class HtmlDocument extends React.Component {
             onClickShowDraft={this.handleClickNewVersion}
             key='html-document'
             isRefreshNeeded={state.showRefreshWarning}
-            onClickAutoCompleteItem={(mention) => tinymceAutoCompleteHandleClickItem(mention, this.setState.bind(this))}
             displayNotifyAllMessage={this.shouldDisplayNotifyAllMessage()}
             onClickCloseNotifyAllMessage={this.handleCloseNotifyAllMessage}
             onClickNotifyAll={this.handleClickNotifyAll}

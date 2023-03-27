@@ -4,8 +4,8 @@ import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 
 import {
-  searchContentAndPlaceBalise,
-  searchMentionAndPlaceBalise
+  searchContentAndReplaceWithTag,
+  searchMentionAndReplaceWithTag
 } from '../../mentionOrLink.js'
 import {
   LOCAL_STORAGE_FIELD,
@@ -72,7 +72,7 @@ export const CommentArea = props => {
     let commentToSend = comment
 
     if (!force) {
-      const parsedMentionCommentObject = searchMentionAndPlaceBalise(
+      const parsedMentionCommentObject = searchMentionAndReplaceWithTag(
         props.roleList,
         props.memberList,
         commentToSend
@@ -85,7 +85,7 @@ export const CommentArea = props => {
       }
     }
 
-    const parsedContentCommentObject = await searchContentAndPlaceBalise(
+    const parsedContentCommentObject = await searchContentAndReplaceWithTag(
       props.apiUrl,
       commentToSend
     )

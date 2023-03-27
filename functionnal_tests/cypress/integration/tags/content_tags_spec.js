@@ -60,7 +60,7 @@ describe('Create tags', () => {
                   params: { contentId }
                 })
                 cy.contains('.html-document__contentpage__edition__header__title', 'A note')
-                cy.get('.editionmode__button__cancel').should('be.visible').click()
+                cy.get('.html-document__editionmode__cancel').should('be.visible').click()
                 cy.get('[data-cy=popin_right_part_tag]').should('be.visible').click()
               })
             }

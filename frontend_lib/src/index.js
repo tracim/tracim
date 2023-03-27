@@ -65,7 +65,6 @@ import {
   setupCommonRequestHeaders,
   splitFilenameExtension,
   stringIncludes,
-  tinymceRemove,
   updateTLMUser
 } from './helper.js'
 
@@ -86,8 +85,8 @@ import {
   handleLinksBeforeSave,
   handleMentionsBeforeSave,
   replaceHTMLElementWithMention,
-  searchContentAndPlaceBalise,
-  searchMentionAndPlaceBalise
+  searchContentAndReplaceWithTag,
+  searchMentionAndReplaceWithTag
 } from './mentionOrLink.js'
 
 import { TracimComponent } from './tracimComponent.js'
@@ -140,7 +139,6 @@ import TinyEditor from './component/TinyEditor/TinyEditor.jsx'
 
 import ScrollToBottomWrapper from './component/ScrollToBottomWrapper/ScrollToBottomWrapper.jsx'
 
-import TextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
 import BtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
 import Checkbox from './component/Input/Checkbox.jsx'
 import SingleChoiceList from './component/Input/SingleChoiceList/SingleChoiceList.jsx'
@@ -412,7 +410,6 @@ export {
   ShareDownload,
   ShareLink,
   SingleChoiceList,
-  TextAreaApp,
   TextInput,
   TimedEvent,
   Timeline,
@@ -511,8 +508,8 @@ export {
   replaceHTMLElementWithMention,
   revisionTypeList,
   scrollIntoViewIfNeeded,
-  searchContentAndPlaceBalise,
-  searchMentionAndPlaceBalise,
+  searchContentAndReplaceWithTag,
+  searchMentionAndReplaceWithTag,
   sendGlobalFlashMessage,
   serialize,
   setupCommonRequestHeaders,
@@ -526,7 +523,6 @@ export {
   tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleSelectionChange,
-  tinymceRemove,
   updateTLMUser,
   uploadFile
 }

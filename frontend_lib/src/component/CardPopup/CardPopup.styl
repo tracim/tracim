@@ -6,7 +6,6 @@
   left 50%
   position fixed
   top 50%
-  transform translate(-50%, -50%)
   width 50%
   z-index 32
   &__container
@@ -41,6 +40,9 @@
     padding 0 pageSpacing pageSpacing
     &__close_btn
       margin-inline-start auto
+
+body:not(.tox-fullscreen) .cardPopup
+  transform translate(-50%, -50%)
 
 .callpopup
   width 300px

@@ -44,10 +44,5 @@ describe('operation :: workspace > create_new > custom-form', function () {
     cy.get('.content__name').click()
     cy.get('#root_odj_0').should('have.value', element1)
     cy.get('#root_duree').should('have.value', duree)
-    //        Problem to write text in iframe
-    //        cy.get('#wysiwygNewVersion_ifr').click()
-    //        cy.get('body').type('Ceci est le début du document')
-    //        cy.get('.custom-form__editionmode__submit.editionmode__button__submit').click()
-    //        cy.get('.custom-form__contentpage__textnote__text span').contains('Ceci est le début du document')
   })
 })

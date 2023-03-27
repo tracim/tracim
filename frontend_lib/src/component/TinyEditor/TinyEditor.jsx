@@ -24,7 +24,7 @@ const advancedToolBar = [
   'code codesample | insert | removeformat | customFullscreen help'
 ].join('')
 
-const simpleToolBar = 'bold italic underline | bullist numlist'
+const simpleToolBar = 'bold italic underline | bullist numlist | customFullscreen help'
 
 const handleFileSelected = (e, editorRef) => {
   const files = Array.from(e.target.files)
@@ -112,7 +112,8 @@ export const TinyEditor = props => {
           width: '100%',
           placeholder: props.placeholder,
           menubar: false,
-          statusbar: true,
+          resize: false,
+          statusbar: props.isStatusBarEnabled,
           toolbar: toolbar,
           plugins: [
             // /////////////////////////////////////////////
@@ -121,7 +122,8 @@ export const TinyEditor = props => {
             // /////////////////////////////////////////////
             'advlist autolink lists link image charmap print preview anchor',
             'searchreplace visualblocks code codesample fullscreen emoticons',
-            'insertdatetime media table paste code help wordcount'
+            'insertdatetime media table paste code help wordcount',
+            props.isAutoResizeEnabled ? 'autoresize' : ''
           ],
           contextmenu: 'selectall copy paste link customInsertImage table',
           codesample_global_prismjs: true,
@@ -219,139 +221,143 @@ export const TinyEditor = props => {
             // /////////////////////////////////////////////
             // Handle mentions
             const maxFetchResults = 15
-            editor.ui.registry.addAutocompleter('mentions', {
-              ch: '@',
-              columns: 1,
-              highlightOn: ['roleName', 'publicName', 'username'],
-              minChars: 0,
-              maxResults: maxFetchResults,
-              fetch: async function (pattern) {
-                const insensitivePattern = pattern.toLowerCase()
-                const matchedMemberList = props.userList.filter((user) => {
-                  if (!user.username) {
-                    return false
-                  }
-                  const insensitiveUsername = user.username.toLowerCase()
-                  const insensitivePublicName = user.publicName.toLowerCase()
-                  const isUsername = insensitiveUsername.indexOf(insensitivePattern) !== -1
-                  const isPublicName = insensitivePublicName.indexOf(insensitivePattern) !== -1
-                  return isUsername || isPublicName
-                })
-                const matchedRoleList = defaultRoleList.filter((role) => {
-                  const insensitiveRoleLabel = role.label.toLowerCase()
-                  const isRole = insensitiveRoleLabel.indexOf(insensitivePattern) !== -1
-                  return isRole
-                })
-                const userResultList = matchedMemberList.map((user) => ({
-                  type: 'cardmenuitem',
-                  value: `@${user.username} `,
-                  label: `@${user.username}`,
-                  direction: 'horizontal',
-                  items: [
-                    {
-                      type: 'cardimage',
-                      src: `${getAvatarBaseUrl(props.apiUrl, user.id)}/raw/avatar`,
-                      alt: user.publicName,
-                      name: 'avatar',
-                      classes: ['tinymce-avatar']
-                    },
-                    {
-                      type: 'cardcontainer',
-                      direction: 'horizontal',
-                      align: 'left',
-                      valign: 'middle',
-                      items: [
-                        {
-                          type: 'cardtext',
-                          text: ` ${user.publicName}`,
-                          name: 'publicName'
-                        },
-                        {
-                          type: 'cardtext',
-                          text: `@${user.username}`,
-                          name: 'username',
-                          classes: ['tinymce-username']
-                        }
-                      ]
+            if (props.isMentionEnabled) {
+              editor.ui.registry.addAutocompleter('mentions', {
+                ch: '@',
+                columns: 1,
+                highlightOn: ['roleName', 'publicName', 'username'],
+                minChars: 0,
+                maxResults: maxFetchResults,
+                fetch: async function (pattern) {
+                  const insensitivePattern = pattern.toLowerCase()
+                  const matchedMemberList = props.userList.filter((user) => {
+                    if (!user.username) {
+                      return false
                     }
-                  ]
-                }))
+                    const insensitiveUsername = user.username.toLowerCase()
+                    const insensitivePublicName = user.publicName.toLowerCase()
+                    const isUsername = insensitiveUsername.indexOf(insensitivePattern) !== -1
+                    const isPublicName = insensitivePublicName.indexOf(insensitivePattern) !== -1
+                    return isUsername || isPublicName
+                  })
+                  const matchedRoleList = defaultRoleList.filter((role) => {
+                    const insensitiveRoleLabel = role.label.toLowerCase()
+                    const isRole = insensitiveRoleLabel.indexOf(insensitivePattern) !== -1
+                    return isRole
+                  })
+                  const userResultList = matchedMemberList.map((user) => ({
+                    type: 'cardmenuitem',
+                    value: `@${user.username} `,
+                    label: `@${user.username}`,
+                    direction: 'horizontal',
+                    items: [
+                      {
+                        type: 'cardimage',
+                        src: `${getAvatarBaseUrl(props.apiUrl, user.id)}/raw/avatar`,
+                        alt: user.publicName,
+                        name: 'avatar',
+                        classes: ['tinymce-avatar']
+                      },
+                      {
+                        type: 'cardcontainer',
+                        direction: 'horizontal',
+                        align: 'left',
+                        valign: 'middle',
+                        items: [
+                          {
+                            type: 'cardtext',
+                            text: ` ${user.publicName}`,
+                            name: 'publicName'
+                          },
+                          {
+                            type: 'cardtext',
+                            text: `@${user.username}`,
+                            name: 'username',
+                            classes: ['tinymce-username']
+                          }
+                        ]
+                      }
+                    ]
+                  }))
 
-                return matchedRoleList.concat(userResultList)
-              },
-              onAction: onAction
-            })
+                  return matchedRoleList.concat(userResultList)
+                },
+                onAction: onAction
+              })
+            }
             // /////////////////////////////////////////////
             // Handle content link
-            editor.ui.registry.addAutocompleter('content', {
-              ch: '#',
-              columns: 1,
-              highlightOn: ['content_label', 'content_id'],
-              minChars: 1,
-              maxResults: maxFetchResults,
-              fetch: async function (pattern) {
-                try {
-                  const contentList = await handleFetchResult(
-                    await getMyselfKnownContents(props.apiUrl, pattern, maxFetchResults)
-                  )
-                  const insensitivePattern = pattern.toLowerCase()
-                  const matchedContentList = contentList.body.filter((content) => {
-                    const insensitiveContentLabel = content.label.toLowerCase()
-                    const contentId = content.content_id
-                    const isLabel = insensitiveContentLabel.indexOf(insensitivePattern) !== -1
-                    const isId = contentId.toString().indexOf(insensitivePattern) !== -1
-                    return isLabel || isId
-                  })
+            if (props.isContentLinkEnabled) {
+              editor.ui.registry.addAutocompleter('content', {
+                ch: '#',
+                columns: 1,
+                highlightOn: ['content_label', 'content_id'],
+                minChars: 0,
+                maxResults: maxFetchResults,
+                fetch: async function (pattern) {
+                  try {
+                    const contentList = await handleFetchResult(
+                      await getMyselfKnownContents(props.apiUrl, pattern, maxFetchResults)
+                    )
+                    const insensitivePattern = pattern.toLowerCase()
+                    const matchedContentList = contentList.body.filter((content) => {
+                      const insensitiveContentLabel = content.label.toLowerCase()
+                      const contentId = content.content_id
+                      const isLabel = insensitiveContentLabel.indexOf(insensitivePattern) !== -1
+                      const isId = contentId.toString().indexOf(insensitivePattern) !== -1
+                      return isLabel || isId
+                    })
 
-                  const resultList = matchedContentList.map((content) => {
-                    return {
-                      type: 'cardmenuitem',
-                      value: `#${content.content_id} `,
-                      label: content.label,
-                      items: [
-                        {
-                          type: 'cardcontainer',
-                          direction: 'vertical',
-                          items: [
-                            {
-                              type: 'cardcontainer',
-                              direction: 'horizontal',
-                              items: [
-                                {
-                                  type: 'cardtext',
-                                  text: content.label,
-                                  name: 'content_label'
-                                }
-                              ]
-                            },
-                            {
-                              type: 'cardcontainer',
-                              direction: 'horizontal',
-                              items: [
-                                {
-                                  type: 'cardtext',
-                                  text: `#${content.content_id.toString()}`,
-                                  name: 'content_id',
-                                  classes: ['tinymce-username']
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  })
+                    const resultList = matchedContentList.map((content) => {
+                      return {
+                        type: 'cardmenuitem',
+                        value: `#${content.content_id} `,
+                        label: content.label,
+                        items: [
+                          {
+                            type: 'cardcontainer',
+                            direction: 'vertical',
+                            items: [
+                              {
+                                type: 'cardcontainer',
+                                direction: 'horizontal',
+                                items: [
+                                  {
+                                    type: 'cardtext',
+                                    text: content.label,
+                                    name: 'content_label'
+                                  }
+                                ]
+                              },
+                              {
+                                type: 'cardcontainer',
+                                direction: 'horizontal',
+                                items: [
+                                  {
+                                    type: 'cardtext',
+                                    text: `#${content.content_id.toString()}`,
+                                    name: 'content_id',
+                                    classes: ['tinymce-username']
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    })
 
-                  return resultList
-                } catch (e) {
-                  console.error(
-                    'Error in TinyEditor.jsx, couldn\'t fetch content list properly:\n', e
-                  )
-                  return []
-                }
-              },
-              onAction: onAction
-            })
+                    return resultList
+                  } catch (e) {
+                    console.error(
+                      'Error in TinyEditor.jsx, couldn\'t fetch content list properly:\n', e
+                    )
+                    return []
+                  }
+                },
+                onAction: onAction
+              })
+            }
             // /////////////////////////////////////////////
             // Handle tab to select autocomplete
             editor.on('keydown', function (e) {
@@ -390,6 +396,10 @@ TinyEditor.propTypes = {
   onCtrlEnterEvent: PropTypes.func,
   height: PropTypes.any,
   isAdvancedEdition: PropTypes.bool,
+  isAutoResizeEnabled: PropTypes.bool,
+  isContentLinkEnabled: PropTypes.bool,
+  isMentionEnabled: PropTypes.bool,
+  isStatusBarEnabled: PropTypes.bool,
   maxHeight: PropTypes.number,
   minHeight: PropTypes.number,
   placeholder: PropTypes.string,
@@ -403,6 +413,10 @@ TinyEditor.defaultProps = {
   onCtrlEnterEvent: () => { },
   height: undefined,
   isAdvancedEdition: false,
+  isAutoResizeEnabled: true,
+  isContentLinkEnabled: true,
+  isMentionEnabled: true,
+  isStatusBarEnabled: false,
   maxHeight: undefined,
   minHeight: 100,
   placeholder: '',

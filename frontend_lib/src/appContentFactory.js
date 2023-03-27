@@ -13,7 +13,6 @@ import {
   CONTENT_TYPE,
   permissiveNumberEqual,
   getOrCreateSessionClientToken,
-  tinymceRemove,
   addRevisionFromTLM,
   stringIncludes
 } from './helper.js'
@@ -354,21 +353,16 @@ export function appContentFactory (WrappedComponent) {
 
     // INFO - CH - 2019-01-08 - event called by OpenContentApp in case of opening another app feature
     appContentCustomEventHandlerHideApp = setState => {
-      tinymceRemove('#wysiwygTimelineComment')
       setState({
-        isVisible: false,
-        timelineWysiwyg: false
+        isVisible: false
       })
     }
 
     // CH - 2019-31-12 - This event is used to send a new content_id that will trigger data reload through componentDidUpdate
     appContentCustomEventHandlerReloadContent = (newContent, setState, appSlug) => {
-      tinymceRemove('#wysiwygTimelineComment')
-
       setState(prev => ({
         content: { ...prev.content, ...newContent },
         isVisible: true,
-        timelineWysiwyg: false,
         newComment: prev.content.content_id === newContent.content_id
           ? prev.newComment
           : getLocalStorageItem(
@@ -386,13 +380,7 @@ export function appContentFactory (WrappedComponent) {
       loadTimeline()
     }
 
-    // INFO - 2019-01-09 - if param isTimelineWysiwyg is false, param changeNewCommentHandler isn't required
-    appContentCustomEventHandlerAllAppChangeLanguage = (newLang, setState, i18n, isTimelineWysiwyg, changeNewCommentHandler = null) => {
-      if (isTimelineWysiwyg) {
-        tinymceRemove('#wysiwygTimelineComment')
-        globalThis.wysiwyg('#wysiwygTimelineComment', newLang, changeNewCommentHandler)
-      }
-
+    appContentCustomEventHandlerAllAppChangeLanguage = (newLang, setState, i18n) => {
       setState(prev => ({
         loggedUser: {
           ...prev.loggedUser,
