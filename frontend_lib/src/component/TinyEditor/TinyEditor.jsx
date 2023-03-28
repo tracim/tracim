@@ -115,6 +115,7 @@ export const TinyEditor = props => {
           resize: false,
           statusbar: props.isStatusBarEnabled,
           toolbar: toolbar,
+          default_link_target: '_blank',
           plugins: [
             // /////////////////////////////////////////////
             // TinyMCE recommends to use custom plugins in "external plugins" section
