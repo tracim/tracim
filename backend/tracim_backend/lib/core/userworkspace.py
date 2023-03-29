@@ -213,7 +213,7 @@ class RoleApi(object):
         return query.all()
 
     def get_workspace_member_ids(
-        self, workspace_id: int, min_role: typing.Optional[WorkspaceRoles] = None
+        self, workspace_id: int, min_role: typing.Optional[WorkspaceRoles] = None,
     ) -> typing.List[int]:
         """Get a list of user ids that are members of the workspace.
 
@@ -224,7 +224,18 @@ class RoleApi(object):
         Returns:
             typing.List[int]: The list of user ids.
         """
-        return [user.user_id for user in self.get_workspace_members(workspace_id, min_role)]
+
+        def fetch_results_from_db():
+            query = self._apply_base_filters(
+                self._session.query(UserRoleInWorkspace.user_id)
+            ).filter(UserRoleInWorkspace.workspace_id == workspace_id)
+            if min_role is not None:
+                query = query.filter(UserRoleInWorkspace.role >= min_role.level)
+            return [r[0] for r in query.all()]
+
+        return self._session.use_cache(
+            f"RoleApi.get_workspace_member_ids({workspace_id}, {min_role})", fetch_results_from_db,
+        )
 
     def get_common_workspace_ids(self, user_id: int) -> typing.List[int]:
         """

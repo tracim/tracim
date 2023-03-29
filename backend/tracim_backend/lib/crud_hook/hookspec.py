@@ -1,3 +1,5 @@
+import typing
+
 from tracim_backend.lib.core.plugins import hookspec
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import User
@@ -51,6 +53,12 @@ class DatabaseCrudHookSpec:
     @hookspec
     def on_user_role_in_workspace_created(
         self, role: UserRoleInWorkspace, context: TracimContext,
+    ) -> None:
+        ...
+
+    @hookspec
+    def on_user_role_in_workspaces_created(
+        self, roles: typing.List[UserRoleInWorkspace], context: TracimContext,
     ) -> None:
         ...
 

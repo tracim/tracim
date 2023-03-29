@@ -374,6 +374,7 @@ class EventApi:
         workspace_ids: Optional[List[int]] = None,
         related_to_content_ids: Optional[List[int]] = None,
     ) -> int:
+
         return self._base_query(
             user_id=user_id,
             include_event_types=include_event_types,
@@ -465,6 +466,7 @@ class EventApi:
             return []
 
         session = self._session
+
         already_known_event_ids_query = session.query(Message.event_id).filter(
             Message.receiver_id == user_id
         )
@@ -476,10 +478,6 @@ class EventApi:
                 Event.event_id.desc()
             ).limit(max_messages_count)
 
-        # INFO - G.M - 2020-11-20 - Process result of workspace_event_ids_query instead of using subquery as
-        # mysql/mariadb doesn't support limit operator in subquery
-        workspace_event_ids = [event_id for event_id, in workspace_event_ids_query.all()]
-
         # INFO - S.G - 2021-05-12 - Do not create messages for pending events
         # as messages for those will be handled by EventPublisher.
         # This avoids to create twice the same Message() which causes an integrity error.
@@ -488,32 +486,35 @@ class EventApi:
         ]
         event_query = (
             session.query(Event)
-            .filter(Event.event_id.in_(workspace_event_ids))
+            .filter(Event.event_id.in_(workspace_event_ids_query.subquery()))
             .filter(Event.event_id.notin_(already_known_event_ids_query.subquery()))
             .filter(Event.event_id.notin_(pending_event_ids))
         )
         messages = []
-        for event in event_query:
-            try:
-                receiver_ids = BaseLiveMessageBuilder.get_receiver_ids(event, session, self._config)
-            except Exception as exc:
-                # NOTE - 2021-02-03 - S.G.
-                # Safeguard easy mistakes due to changing JSON structure of fields
-                msg = (
-                    "Event {} is malformed " "ignoring it during historic messages creation"
-                ).format(event.event_id, exc)
-                logger.warning(self, msg, exc_info=True)
-                receiver_ids = []
-            if user_id in receiver_ids:
-                messages.append(
-                    Message(
-                        receiver_id=user_id,
-                        event=event,
-                        event_id=event.event_id,
-                        sent=None,
-                        read=datetime.utcnow(),
+        with session.cache():
+            for event in event_query:
+                try:
+                    receiver_ids = BaseLiveMessageBuilder.get_receiver_ids(
+                        event, session, self._config
                     )
-                )
+                except Exception as exc:
+                    # NOTE - 2021-02-03 - S.G.
+                    # Safeguard easy mistakes due to changing JSON structure of fields
+                    msg = (
+                        "Event {} is malformed " "ignoring it during historic messages creation"
+                    ).format(event.event_id, exc)
+                    logger.warning(self, msg, exc_info=True)
+                    receiver_ids = []
+                if user_id in receiver_ids:
+                    messages.append(
+                        Message(
+                            receiver_id=user_id,
+                            event=event,
+                            event_id=event.event_id,
+                            sent=None,
+                            read=datetime.utcnow(),
+                        )
+                    )
         session.add_all(messages)
         return messages
 
@@ -997,14 +998,17 @@ def get_event_user_id(session: TracimSession, event: Event) -> typing.Optional[i
     # INFO - G.M - 2022-01-10 - user is None case
     if not event.fields.get(Event.USER_FIELD):
         return None
+    user_id = event.user["user_id"]
     try:
-        # TODO - MP - 2022-11-29 - Should use line 934, keep testing like this and remove 935 before
-        # merge (comment start line 933)
-        # return int(event.user["user_id"])
-        return session.query(User.user_id).filter(User.user_id == event.user["user_id"]).scalar()
-    except (AttributeError, NoResultFound):
+        # NOTE - SGD - 2023-03-28 - Validate that the user is still existing
+        user_id = session.use_cache(
+            f"get_event_user_id({user_id})",
+            lambda: session.query(User.user_id).filter(User.user_id == event.user["user_id"]).all(),
+        )[0][0]
+    except (IndexError):
         # no user in event or user does not exist anymore
-        return None
+        user_id = None
+    return user_id
 
 
 def _get_user_event_receiver_ids(event: Event, session: TracimSession, config: CFG) -> Set[int]:
@@ -1055,7 +1059,7 @@ def _get_workspace_event_receiver_ids(
         access_type = WorkspaceAccessType.CONFIDENTIAL
     if access_type in Workspace.ACCESSIBLE_TYPES:
         user_api = UserApi(current_user=None, session=session, config=config)
-        receiver_ids = set(user.user_id for user in user_api.get_all())
+        receiver_ids = set(user_api.get_all_user_ids())
     else:
         receiver_ids = _get_members_and_administrators_ids(event, session, config)
     return receiver_ids
@@ -1213,22 +1217,19 @@ class SyncLiveMessageBuilder(BaseLiveMessageBuilder):
 
 
 class MessageHooks:
-    def _create_workspace_historic_messages_for_current_user(
-        self, role: UserRoleInWorkspace, context: TracimContext
-    ):
+    @hookimpl
+    def on_user_role_in_workspaces_created(
+        self, roles: typing.List[UserRoleInWorkspace], context: TracimContext
+    ) -> None:
         current_user = context.safe_current_user()
         event_api = EventApi(current_user, context.dbsession, context.app_config)
+        user_id = roles[0].user_id
         event_api.create_messages_history_for_user(
-            user_id=role.user_id,
-            workspace_ids=[role.workspace_id],
-            max_messages_count=context.app_config.WORKSPACE__JOIN__MAX_MESSAGES_HISTORY_COUNT,
+            user_id=user_id,
+            workspace_ids=[role.workspace_id for role in roles],
+            max_messages_count=len(roles)
+            * context.app_config.WORKSPACE__JOIN__MAX_MESSAGES_HISTORY_COUNT,
         )
-
-    @hookimpl
-    def on_user_role_in_workspace_created(
-        self, role: UserRoleInWorkspace, context: TracimContext
-    ) -> None:
-        self._create_workspace_historic_messages_for_current_user(role, context)
 
     @hookimpl
     def on_workspace_deleted(self, workspace: Workspace, context: TracimContext) -> None:

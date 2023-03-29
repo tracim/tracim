@@ -17,6 +17,33 @@ class TracimSession(Session):
         super().__init__(*args, **kwargs)
         self._allow_revision_deletion = False  # type: bool
         self._context = None  # type: typing.Optional[weakref.CallableProxyType]
+        self._results_cache = {}
+        self.use_cache_hint = False
+
+    @contextmanager
+    def cache(self) -> typing.Iterator["TracimSession"]:
+        self.use_cache_hint = True
+        try:
+            yield self
+        finally:
+            self._results_cache.clear()
+            self.use_cache_hint = False
+
+    def use_cache(
+        self, key: str, fetch_from_db: typing.Callable[[], typing.Iterable[typing.Any]]
+    ) -> typing.Iterable[typing.Any]:
+        """Very simple caching mechanism.
+
+        Results are cached only for the current session.
+        """
+        if not self.use_cache_hint:
+            return fetch_from_db()
+        try:
+            results = self._results_cache[key]
+        except KeyError:
+            results = fetch_from_db()
+            self._results_cache[key] = results
+        return results
 
     # TODO S.G 2020-06-08: this is a temporary setup until #1834 is done
     @property
