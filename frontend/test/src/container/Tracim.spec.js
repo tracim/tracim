@@ -7,7 +7,6 @@ import { user } from '../../hocMock/redux/user/user'
 import { contentType } from '../../hocMock/redux/contentType/contentType.js'
 import { appList } from '../../hocMock/redux/appList/appList'
 import { workspaceList } from '../../hocMock/redux/workspaceList/workspaceList'
-import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
 import configureMockStore from 'redux-mock-store'
 import { translateMock } from '../../hocMock/translate'
 import { Provider } from 'react-redux'
@@ -24,8 +23,7 @@ import {
   SET,
   USER,
   USER_CONFIGURATION,
-  WORKSPACE_LIST,
-  WORKSPACE_LIST_MEMBER
+  WORKSPACE_LIST
 } from '../../../src/action-creator.sync'
 import { withRouterMock } from '../../hocMock/withRouter'
 import { FETCH_CONFIG } from '../../../src/util/helper.js'
@@ -34,8 +32,7 @@ import {
   mockGetConfig200,
   mockGetContentType200,
   mockGetMyselfWorkspaceList200,
-  mockGetUserConfig200,
-  mockGetWorkspaceMemberList200
+  mockGetUserConfig200
 } from '../../apiMock'
 import { notificationPage } from '../../fixture/notification/notificationPage.js'
 
@@ -49,7 +46,6 @@ describe('<Tracim />', () => {
   const setWorkspaceListCallBack = sinon.spy()
   const setBreadcrumbsCallBack = sinon.spy()
   const appendBreadcrumbsCallBack = sinon.spy()
-  const setWorkspaceListMemberListCallBack = sinon.spy()
   const setUserConfigurationCallBack = sinon.spy()
 
   const dispatchCallBack = (param) => {
@@ -90,9 +86,6 @@ describe('<Tracim />', () => {
         break
       case `${APPEND}/${BREADCRUMBS}`:
         appendBreadcrumbsCallBack()
-        break
-      case `${SET}/${WORKSPACE_LIST_MEMBER}`:
-        setWorkspaceListMemberListCallBack()
         break
       default:
         return param
@@ -172,15 +165,6 @@ describe('<Tracim />', () => {
         mockGetMyselfWorkspaceList200(FETCH_CONFIG.apiUrl, false, workspaceList.workspaceList)
         wrapperInstance.loadWorkspaceLists().then(() => {
           expect(setWorkspaceListCallBack.called).to.equal(true)
-        }).then(done, done)
-      })
-    })
-
-    describe('loadWorkspaceListMemberList', () => {
-      it('setWorkspaceListMemberListCallBack should be called when loadWorkspaceListMemberList() is called', (done) => {
-        mockGetWorkspaceMemberList200(FETCH_CONFIG.apiUrl, firstWorkspaceFromApi.workspace_id, [user])
-        wrapperInstance.loadWorkspaceListMemberList([firstWorkspaceFromApi]).then(() => {
-          expect(setWorkspaceListMemberListCallBack.called).to.equal(true)
         }).then(done, done)
       })
     })

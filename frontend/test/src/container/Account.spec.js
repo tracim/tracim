@@ -16,7 +16,6 @@ import {
   USER,
   USER_AGENDA_URL,
   USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
-  WORKSPACE_LIST_MEMBER,
   ADD,
   FLASH_MESSAGE,
   REMOVE
@@ -39,7 +38,6 @@ describe('In <Account />', () => {
   reactstrapPopoverHack(document, 'popoverUsername')
   reactstrapPopoverHack(document, 'popoverPageTitle')
 
-  const setWorkspaceListMemberListCallBack = sinon.spy()
   const newFlashMessageWarningCallBack = sinon.spy()
   const updateUserCallBack = sinon.spy()
   const updateUserWorkspaceSubscriptionNotifCallBack = sinon.spy()
@@ -55,7 +53,6 @@ describe('In <Account />', () => {
       case `${UPDATE}/${USER}`: updateUserCallBack(); break
       case `${SET}/${USER_AGENDA_URL}`: updateUserAgendaUrlCallBack(); break
       case `${UPDATE}/${USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE}`: updateUserWorkspaceSubscriptionNotifCallBack(); break
-      case `${SET}/${WORKSPACE_LIST_MEMBER}`: setWorkspaceListMemberListCallBack(); break
       case `${SET}/${BREADCRUMBS}`: setBreadcrumbsCallBack(); break
       case `${ADD}/${FLASH_MESSAGE}`:
         if (params.msg.type === 'warning') {
@@ -110,7 +107,6 @@ describe('In <Account />', () => {
 
     beforeEach(() => {
       restoreHistoryCallBack([
-        setWorkspaceListMemberListCallBack,
         newFlashMessageWarningCallBack,
         updateUserAgendaUrlCallBack,
         setBreadcrumbsCallBack,

@@ -6,7 +6,7 @@ import {
   REMOVE,
   removeWorkspace, removeWorkspaceMember,
   SET,
-  setWorkspaceList, setWorkspaceListMemberList,
+  setWorkspaceList,
   UPDATE,
   updateWorkspaceDetail,
   updateWorkspaceMember,
@@ -15,7 +15,7 @@ import {
 } from '../../../src/action-creator.sync'
 import { ROLE, serialize } from 'tracim_frontend_lib'
 import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace'
-import { serializeMember, serializeSidebarEntryProps } from '../../../src/reducer/currentWorkspace'
+import { serializeSidebarEntryProps } from '../../../src/reducer/currentWorkspace'
 import { globalManagerFromApi } from '../../fixture/user/globalManagerFromApi'
 
 describe('workspaceList reducer', () => {
@@ -23,8 +23,7 @@ describe('workspaceList reducer', () => {
     const initialState = [
       {
         ...serialize({ ...firstWorkspaceFromApi, workspace_id: firstWorkspaceFromApi.workspace_id + 1 }, serializeWorkspaceListProps),
-        sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps)),
-        memberList: []
+        sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps))
       }
     ]
 
@@ -42,8 +41,7 @@ describe('workspaceList reducer', () => {
         expect(rez).to.deep.equal([
           {
             ...serializedFirstWorkspaceFromApi,
-            sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps)),
-            memberList: []
+            sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps))
           }
         ])
       })
@@ -56,8 +54,7 @@ describe('workspaceList reducer', () => {
         expect(rez).to.deep.equal([
           {
             ...serializedFirstWorkspaceFromApi,
-            sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps)),
-            memberList: []
+            sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps))
           },
           ...initialState
         ])
@@ -96,8 +93,7 @@ describe('workspaceList reducer', () => {
           [
             ...initialState,
             {
-              ...serializedFirstWorkspaceFromApi,
-              memberList: []
+              ...serializedFirstWorkspaceFromApi
             }
           ],
           addWorkspaceMember(
@@ -110,14 +106,7 @@ describe('workspaceList reducer', () => {
         expect(rez).to.deep.equal([
           ...initialState,
           {
-            ...serializedFirstWorkspaceFromApi,
-            memberList: [{
-              ...serializeMember({
-                user: globalManagerFromApi,
-                email_notification_type: 'summary',
-                role: ROLE.workspaceManager
-              })
-            }]
+            ...serializedFirstWorkspaceFromApi
           }
         ])
       })
@@ -126,8 +115,7 @@ describe('workspaceList reducer', () => {
         const initialStateWithMember = [
           ...initialState,
           {
-            ...serializedFirstWorkspaceFromApi,
-            memberList: [{ id: globalManagerFromApi.user_id }]
+            ...serializedFirstWorkspaceFromApi
           }
         ]
         const rez = workspaceList(
@@ -148,14 +136,7 @@ describe('workspaceList reducer', () => {
         [
           ...initialState,
           {
-            ...serializedFirstWorkspaceFromApi,
-            memberList: [{
-              ...serializeMember({
-                user: globalManagerFromApi,
-                email_notification_type: 'summary',
-                role: ROLE.workspaceManager
-              })
-            }]
+            ...serializedFirstWorkspaceFromApi
           }
         ],
         updateWorkspaceMember(globalManagerFromApi, firstWorkspaceFromApi.workspace_id, { user: globalManagerFromApi, email_notification_type: 'none', role: ROLE.contributor })
@@ -165,14 +146,7 @@ describe('workspaceList reducer', () => {
         expect(rez).to.deep.equal([
           ...initialState,
           {
-            ...serializedFirstWorkspaceFromApi,
-            memberList: [{
-              ...serializeMember({
-                user: globalManagerFromApi,
-                email_notification_type: 'none',
-                role: ROLE.contributor
-              })
-            }]
+            ...serializedFirstWorkspaceFromApi
           }
         ])
       })
@@ -183,14 +157,7 @@ describe('workspaceList reducer', () => {
         [
           ...initialState,
           {
-            ...serializedFirstWorkspaceFromApi,
-            memberList: [{
-              ...serializeMember({
-                user: globalManagerFromApi,
-                email_notification_type: 'summary',
-                role: ROLE.workspaceManager
-              })
-            }]
+            ...serializedFirstWorkspaceFromApi
           }
         ],
         removeWorkspaceMember(globalManagerFromApi.user_id, firstWorkspaceFromApi.workspace_id)
@@ -200,40 +167,7 @@ describe('workspaceList reducer', () => {
         expect(rez).to.deep.equal([
           ...initialState,
           {
-            ...serializedFirstWorkspaceFromApi,
-            memberList: []
-          }
-        ])
-      })
-    })
-
-    describe(`${SET}/${WORKSPACE_MEMBER}`, () => {
-      const serializedFirstWorkspace = {
-        ...serializedFirstWorkspaceFromApi,
-        memberList: []
-      }
-      const rez = workspaceList(
-        [serializedFirstWorkspace],
-        setWorkspaceListMemberList([{
-          ...serializedFirstWorkspace,
-          workspaceId: firstWorkspaceFromApi.workspace_id,
-          memberList: [
-            { user: globalManagerFromApi, email_notification_type: 'none', role: ROLE.contributor }
-          ]
-        }])
-      )
-
-      it('should return a workspace list with the memberList correctly added in the right workspace', () => {
-        expect(rez).to.deep.equal([
-          {
-            ...serializedFirstWorkspaceFromApi,
-            memberList: [{
-              ...serializeMember({
-                user: globalManagerFromApi,
-                email_notification_type: 'none',
-                role: ROLE.contributor
-              })
-            }]
+            ...serializedFirstWorkspaceFromApi
           }
         ])
       })

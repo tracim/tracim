@@ -40,8 +40,6 @@ import {
   TracimComponent,
   buildHeadTitle,
   formatAbsoluteDate,
-  getSpaceMemberList,
-  handleFetchResult,
   serialize
 } from 'tracim_frontend_lib'
 import {
@@ -80,7 +78,6 @@ import {
   setWorkspaceList,
   setBreadcrumbs,
   appendBreadcrumbs,
-  setWorkspaceListMemberList,
   setUnreadMentionCount,
   setUnreadNotificationCount,
   setHeadTitle,
@@ -453,7 +450,6 @@ export class Tracim extends React.Component {
     if (fetchGetWorkspaceList.status !== 200) return false
 
     props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
-    this.loadWorkspaceListMemberList(fetchGetWorkspaceList.json)
     this.setState({ workspaceListLoaded: true })
 
     const fetchAccessibleWorkspaceList = await props.dispatch(getAccessibleWorkspaces(props.user.userId))
@@ -463,24 +459,6 @@ export class Tracim extends React.Component {
     props.dispatch(setAccessibleWorkspaceList(fetchAccessibleWorkspaceList.json))
 
     return true
-  }
-
-  loadWorkspaceListMemberList = async workspaceList => {
-    const { props } = this
-
-    const fetchWorkspaceListMemberList = await Promise.all(
-      workspaceList.map(async ws => ({
-        workspaceId: ws.workspace_id,
-        fetchMemberList: await handleFetchResult(await getSpaceMemberList(FETCH_CONFIG.apiUrl, ws.workspace_id))
-      }))
-    )
-
-    const workspaceListMemberList = fetchWorkspaceListMemberList.map(memberList => ({
-      workspaceId: memberList.workspaceId,
-      memberList: memberList.fetchMemberList.apiResponse.status === 200 ? memberList.fetchMemberList.body : []
-    }))
-
-    props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
   }
 
   loadNotificationNotRead = async (userId) => {

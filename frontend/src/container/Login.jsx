@@ -9,7 +9,6 @@ import * as Cookies from 'js-cookie'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import {
   CUSTOM_EVENT,
-  getSpaceMemberList,
   handleFetchResult,
   checkEmailValidity,
   PAGE,
@@ -29,7 +28,6 @@ import {
   resetBreadcrumbs,
   setUserConfiguration,
   setUserLang,
-  setWorkspaceListMemberList,
   setUnreadMentionCount,
   setUnreadNotificationCount,
   setHeadTitle,
@@ -369,30 +367,11 @@ class Login extends React.Component {
     const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList(showOwnedWorkspace))
     if (fetchGetWorkspaceList.status === 200) {
       props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
-      this.loadWorkspaceListMemberList(fetchGetWorkspaceList.json)
     }
 
     const fetchAccessibleWorkspaceList = await props.dispatch(getAccessibleWorkspaces(props.user.userId))
     if (fetchAccessibleWorkspaceList.status !== 200) return
     props.dispatch(setAccessibleWorkspaceList(fetchAccessibleWorkspaceList.json))
-  }
-
-  loadWorkspaceListMemberList = async workspaceList => {
-    const { props } = this
-
-    const fetchWorkspaceListMemberList = await Promise.all(
-      workspaceList.map(async ws => ({
-        workspaceId: ws.workspace_id,
-        fetchMemberList: await handleFetchResult(await getSpaceMemberList(FETCH_CONFIG.apiUrl, ws.workspace_id))
-      }))
-    )
-
-    const workspaceListMemberList = fetchWorkspaceListMemberList.map(memberList => ({
-      workspaceId: memberList.workspaceId,
-      memberList: memberList.fetchMemberList.apiResponse.status === 200 ? memberList.fetchMemberList.body : []
-    }))
-
-    props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
   }
 
   loadUserConfiguration = async userId => {
