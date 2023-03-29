@@ -204,14 +204,6 @@ import ToDoItem from './component/ToDo/ToDoItem.jsx'
 import ContentType from './component/ContentType/ContentType.jsx'
 
 import {
-  tinymceAutoCompleteHandleInput,
-  tinymceAutoCompleteHandleKeyDown,
-  tinymceAutoCompleteHandleKeyUp,
-  tinymceAutoCompleteHandleClickItem,
-  tinymceAutoCompleteHandleSelectionChange
-} from './tinymceAutoCompleteHelper.js'
-
-import {
   baseFetch,
   deleteToDo,
   deleteWorkspace,
@@ -518,11 +510,6 @@ export {
   sortTimelineByDate,
   splitFilenameExtension,
   stringIncludes,
-  tinymceAutoCompleteHandleClickItem,
-  tinymceAutoCompleteHandleInput,
-  tinymceAutoCompleteHandleKeyDown,
-  tinymceAutoCompleteHandleKeyUp,
-  tinymceAutoCompleteHandleSelectionChange,
   updateTLMUser,
   uploadFile
 }
