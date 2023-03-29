@@ -1,24 +1,18 @@
 @import '../../css/Variable.styl'
 
-.tinymce-username
-  // NOTE - SGD - 2023-01-31 - 'important' is needed as we want to override
-  // the default tinymce styles
-  margin-left textSpacing !important
-  color darkGrey1 !important
-
-.tinymce-avatar
-  max-width 25px
-  max-height 25px
-  // NOTE - SGD - 2023-01-31 - 'important' is needed as we want to override
-  // the default tinymce styles
-  margin-right textSpacing !important
-
-.tox-autocompleter
-  max-width unset
-  width max-content
-
-.tox-collection__item-label
-  line-height unset
+// NOTE - SGD - 2023-01-31 - 'important' is needed as we want to override
+// the default tinymce styles
+.tinymce
+  &-public-name, &-role-description
+    margin-left textSpacing !important
+  &-username, &-role-name
+    margin-left textSpacing !important
+    color darkGrey1 !important
+  &-content-id
+    color darkGrey1 !important
+  &-avatar
+    width 25px !important
+    height 25px !important
 
 div.tox.tox-tinymce
   border-radius standardBorderRadius

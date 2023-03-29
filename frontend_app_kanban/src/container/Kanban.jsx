@@ -679,6 +679,7 @@ export class Kanban extends React.Component {
           <KanbanComponent
             config={state.config}
             content={state.content}
+            // End of required props ///////////////////////////////////////////
             editionAuthor={state.editionAuthor}
             fullscreen={state.fullscreen}
             isNewContentRevision={!!state.currentContentRevisionId}

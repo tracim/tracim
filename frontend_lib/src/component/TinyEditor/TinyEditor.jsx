@@ -78,13 +78,14 @@ export const TinyEditor = props => {
         {
           type: 'cardtext',
           text: role.description,
-          name: 'roleDescription'
+          name: 'roleDescription',
+          classes: ['tinymce-role-description']
         },
         {
           type: 'cardtext',
           text: `@${role.slug}`,
           name: 'roleName',
-          classes: ['tinymce-username']
+          classes: ['tinymce-role-name']
         }
       ]
     }))
@@ -250,25 +251,25 @@ export const TinyEditor = props => {
                     type: 'cardmenuitem',
                     value: `@${user.username} `,
                     label: `@${user.username}`,
-                    direction: 'horizontal',
                     items: [
                       {
-                        type: 'cardimage',
-                        src: `${getAvatarBaseUrl(props.apiUrl, user.id)}/raw/avatar`,
-                        alt: user.publicName,
-                        name: 'avatar',
-                        classes: ['tinymce-avatar']
-                      },
-                      {
                         type: 'cardcontainer',
-                        direction: 'horizontal',
                         align: 'left',
+                        direction: 'horizontal',
                         valign: 'middle',
                         items: [
                           {
+                            type: 'cardimage',
+                            src: `${getAvatarBaseUrl(props.apiUrl, user.id)}/raw/avatar`,
+                            alt: user.publicName,
+                            name: 'avatar',
+                            classes: ['tinymce-avatar']
+                          },
+                          {
                             type: 'cardtext',
-                            text: ` ${user.publicName}`,
-                            name: 'publicName'
+                            text: user.publicName,
+                            name: 'publicName',
+                            classes: ['tinymce-public-name']
                           },
                           {
                             type: 'cardtext',
@@ -317,30 +318,21 @@ export const TinyEditor = props => {
                         items: [
                           {
                             type: 'cardcontainer',
+                            align: 'left',
                             direction: 'vertical',
+                            valign: 'middle',
                             items: [
                               {
-                                type: 'cardcontainer',
-                                direction: 'horizontal',
-                                items: [
-                                  {
-                                    type: 'cardtext',
-                                    text: content.label,
-                                    name: 'content_label'
-                                  }
-                                ]
+                                type: 'cardtext',
+                                text: content.label,
+                                name: 'content_label',
+                                classes: ['tinymce-content-label']
                               },
                               {
-                                type: 'cardcontainer',
-                                direction: 'horizontal',
-                                items: [
-                                  {
-                                    type: 'cardtext',
-                                    text: `#${content.content_id.toString()}`,
-                                    name: 'content_id',
-                                    classes: ['tinymce-username']
-                                  }
-                                ]
+                                type: 'cardtext',
+                                text: `#${content.content_id.toString()}`,
+                                name: 'content_id',
+                                classes: ['tinymce-content-id']
                               }
                             ]
                           }
