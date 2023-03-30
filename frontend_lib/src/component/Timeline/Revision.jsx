@@ -12,7 +12,7 @@ const Revision = props => {
   const revisionType = revisionTypeList.find(r => r.id === props.revisionType) || { id: '', faIcon: '', label: '' }
 
   const label = revisionType.id === 'status-update'
-    ? revisionType.label(props.status.label)
+    ? revisionType.label(props.t(props.status.label))
     : props.t(revisionType.label)
 
   return (
