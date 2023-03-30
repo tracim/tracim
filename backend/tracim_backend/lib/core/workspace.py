@@ -98,11 +98,15 @@ class WorkspaceApi(object):
         )
         return owned_workspace_count < self._config.LIMITATION__SHAREDSPACE_PER_USER
 
-    def get_workspace_with_context(self, workspace: Workspace) -> WorkspaceInContext:
+    def get_workspace_with_context(
+        self, workspace: Workspace, user: typing.Optional[User] = None
+    ) -> WorkspaceInContext:
         """
         Return WorkspaceInContext object from Workspace
         """
-        return WorkspaceInContext(workspace=workspace, dbsession=self._session, config=self._config)
+        return WorkspaceInContext(
+            workspace=workspace, dbsession=self._session, config=self._config, user=user,
+        )
 
     def create_workspace(
         self,

@@ -4,8 +4,6 @@ import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import {
-  getSpaceMemberList,
-  handleFetchResult,
   PAGE,
   PROFILE,
   ROLE,
@@ -27,7 +25,6 @@ import {
 } from 'tracim_frontend_lib'
 import { serializeWorkspaceListProps } from '../../reducer/workspaceList.js'
 import { serializeMember } from '../../reducer/currentWorkspace.js'
-import { FETCH_CONFIG } from '../../util/helper.js'
 import { newFlashMessage } from '../../action-creator.sync.js'
 import { deleteWorkspaceMember, getUserWorkspaceList } from '../../action-creator.async.js'
 import AdminUserSpacesConfig from '../../container/AdminUserSpacesConfig.jsx'
@@ -41,14 +38,6 @@ export const onlyManager = (userToEditId, member, memberList) => {
   }
 
   return !memberList.some(m => m.user_id !== userToEditId && m.role === manager)
-}
-
-export const fillMemberList = async (space) => {
-  const fetchMemberList = await handleFetchResult(await getSpaceMemberList(FETCH_CONFIG.apiUrl, space.id))
-  return {
-    ...space,
-    memberList: fetchMemberList.body.map(member => serializeMember(member)) || []
-  }
 }
 
 export const UserSpacesConfig = (props) => {
@@ -158,13 +147,13 @@ export const UserSpacesConfig = (props) => {
   }
 
   const handleMemberCreated = async (data) => {
-    const spaceIndex = spaceList.findIndex(space => space.id === data.fields.workspace.workspace_id)
+    const space = spaceList.find(space => space.id === data.fields.workspace.workspace_id)
 
-    if (spaceIndex) {
-      setSpaceList(spaceList.map(space => {
-        if (space.id === data.fields.workspace.workspace_id) {
+    if (space) {
+      setSpaceList(spaceList.map(s => {
+        if (s === space.id) {
           return {
-            ...space,
+            ...s,
             memberList: [...space.memberList, serializeMember({ user: data.fields.user, ...data.fields.member })]
           }
         } else {
@@ -172,7 +161,6 @@ export const UserSpacesConfig = (props) => {
         }
       }))
     } else {
-      const space = await fillMemberList(data.fields.workspace)
       setSpaceList(sortListByMultipleCriteria([...spaceList, space], [SORT_BY.LABEL, SORT_BY.ID]))
     }
   }
@@ -183,20 +171,11 @@ export const UserSpacesConfig = (props) => {
     switch (fetchGetUserWorkspaceList.status) {
       case 200: {
         const userSpaceList = fetchGetUserWorkspaceList.json.map(space => serialize(space, serializeWorkspaceListProps))
-        getUserSpaceListMemberList(userSpaceList)
+        setSpaceList(userSpaceList)
         break
       }
       default: props.dispatch(newFlashMessage(props.t('Error while loading user')))
     }
-  }
-
-  const getUserSpaceListMemberList = async (fetchedSpaceList) => {
-    Promise.all(fetchedSpaceList.map(userSpace => {
-      return props.workspaceList.find(space => space.id === userSpace.id && space.memberList.length > 0) || fillMemberList(userSpace)
-    })).then((spaceListResult) => {
-      setSpaceList(sortListByMultipleCriteria(spaceListResult, [SORT_BY.LABEL, SORT_BY.ID]))
-      setIsLoading(false)
-    })
   }
 
   const handleConfirmDeleteSpace = async () => {

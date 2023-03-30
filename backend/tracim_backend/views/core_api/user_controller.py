@@ -113,9 +113,7 @@ from tracim_backend.views.core_api.schemas import UserWorkspaceIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSubscriptionSchema
-from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_EVENT_ENDPOINTS
-from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_USER_CONFIG_ENDPOINTS
-from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_USER_SUBSCRIPTIONS_SECTION
+from tracim_backend.views.core_api.schemas import WorkspaceWithUserMemberSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ENABLE_AND_DISABLE_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__NOTIFICATION_SECTION
@@ -167,7 +165,7 @@ class UserController(Controller):
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(UserWorkspaceFilterQuerySchema())
-    @hapic.output_body(WorkspaceSchema(many=True))
+    @hapic.output_body(WorkspaceWithUserMemberSchema(many=True))
     def user_workspace(self, context, request: TracimRequest, hapic_data=None):
         """
         Get list of user workspaces
@@ -185,7 +183,10 @@ class UserController(Controller):
             include_with_role=hapic_data.query.show_workspace_with_role,
             parents_ids=hapic_data.query.parent_ids,
         )
-        return [wapi.get_workspace_with_context(workspace) for workspace in workspaces]
+        return [
+            wapi.get_workspace_with_context(workspace, user=request.candidate_user)
+            for workspace in workspaces
+        ]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.BAD_REQUEST)

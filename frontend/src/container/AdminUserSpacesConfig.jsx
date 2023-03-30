@@ -26,7 +26,7 @@ import {
   updateWorkspaceMember
 } from '../action-creator.async.js'
 import AdminUserSpacesConfigItem from '../component/Account/AdminUserSpacesConfigItem.jsx'
-import { fillMemberList, onlyManager } from '../component/Account/UserSpacesConfig.jsx'
+import { onlyManager } from '../component/Account/UserSpacesConfig.jsx'
 import { serializeMember } from '../reducer/currentWorkspace.js'
 
 const filterSpaceList = (list, filterList) => {
@@ -112,12 +112,8 @@ export const AdminUserSpacesConfig = (props) => {
     switch (fetchGetSpaceList.status) {
       case 200: {
         const spaceList = fetchGetSpaceList.json.map(space => serialize(space, serializeWorkspaceListProps))
-        Promise.all(spaceList.map(userSpace => {
-          return props.workspaceList.find(space => space.id === userSpace.id && space.memberList.length > 0) || fillMemberList(userSpace)
-        })).then((spaceListResult) => {
-          setSpaceList(sortListByMultipleCriteria(spaceListResult, [SORT_BY.LABEL, SORT_BY.ID]))
-          setIsLoading(false)
-        })
+        setSpaceList(sortListByMultipleCriteria(spaceList, [SORT_BY.LABEL, SORT_BY.ID]))
+        setIsLoading(false)
         break
       }
       default: props.dispatch(newFlashMessage(props.t('Error while loading user')))
@@ -174,7 +170,7 @@ export const AdminUserSpacesConfig = (props) => {
         }
       }))
     } else {
-      setSpaceList(sortListByMultipleCriteria([...spaceList, fillMemberList(space)], [SORT_BY.LABEL, SORT_BY.ID]))
+      setSpaceList(sortListByMultipleCriteria([...spaceList, space], [SORT_BY.LABEL, SORT_BY.ID]))
     }
   }
 
