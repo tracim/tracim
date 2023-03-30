@@ -126,7 +126,6 @@ KanbanCardEditor.propTypes = {
   codeLanguageList: PropTypes.array,
   customColor: PropTypes.string,
   focusOnDescription: PropTypes.bool,
-  // i18n: PropTypes.object,
   language: PropTypes.string,
   memberList: PropTypes.array,
   roleList: PropTypes.array
@@ -137,7 +136,4 @@ KanbanCardEditor.defaultProps = {
   customColor: '',
   focusOnDescription: false,
   language: 'en'
-  // i18n: {
-  //   language: 'en'
-  // }
 }
