@@ -1,4 +1,4 @@
-tinymce.addI18n('pt_PT',{
+tinymce.addI18n('pt',{
 "Redo": "Refazer",
 "Undo": "Anular",
 "Cut": "Cortar",

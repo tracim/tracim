@@ -107,6 +107,7 @@ export const TinyEditor = props => {
         }}
         init={{
           selector: 'textarea',
+          language: props.language,
           height: props.height,
           max_height: props.maxHeight,
           min_height: props.minHeight,
@@ -393,6 +394,7 @@ TinyEditor.propTypes = {
   isContentLinkEnabled: PropTypes.bool,
   isMentionEnabled: PropTypes.bool,
   isStatusBarEnabled: PropTypes.bool,
+  language: PropTypes.string,
   maxHeight: PropTypes.number,
   minHeight: PropTypes.number,
   placeholder: PropTypes.string,
@@ -410,6 +412,7 @@ TinyEditor.defaultProps = {
   isContentLinkEnabled: true,
   isMentionEnabled: true,
   isStatusBarEnabled: false,
+  language: 'en',
   maxHeight: undefined,
   minHeight: 100,
   placeholder: '',

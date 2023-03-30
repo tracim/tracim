@@ -57,6 +57,7 @@ export class EditCommentPopup extends React.Component {
           isDisplayedAdvancedEditionButton={false}
           isDisplayedCancelButton
           isDisplayedUploadFileButton={false}
+          language={props.loggedUserLanguage}
           newComment={state.newComment}
           onClickWithstand={props.onClickClose}
           roleList={DEFAULT_ROLE_LIST}

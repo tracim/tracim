@@ -72,6 +72,7 @@ export const SpaceDescription = (props) => {
               height={200}
               isAdvancedEdition
               isStatusBarEnabled
+              language={props.lang}
               maxHeight={300}
               minHeight={200}
               placeholder={props.t('Description of the space')}

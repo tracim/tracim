@@ -158,6 +158,7 @@ export const CommentArea = props => {
         onCtrlEnterEvent={sendComment}
         height={100}
         isAdvancedEdition={isAdvancedEdition}
+        language={props.language}
         maxHeight={300}
         minHeight={100}
         placeholder={props.placeholder}
@@ -258,6 +259,7 @@ CommentArea.propTypes = {
   contentType: PropTypes.string.isRequired,
   onClickSubmit: PropTypes.func.isRequired,
   workspaceId: PropTypes.number.isRequired,
+  // End of required props /////////////////////////////////////////////////////
   codeLanguageList: PropTypes.array,
   customClass: PropTypes.string,
   customColor: PropTypes.string,
@@ -269,6 +271,7 @@ CommentArea.propTypes = {
   isDisplayedSendButton: PropTypes.bool,
   isDisplayedUploadFileButton: PropTypes.bool,
   isFileCommentLoading: PropTypes.bool,
+  language: PropTypes.string,
   memberList: PropTypes.array,
   multipleFiles: PropTypes.bool,
   newComment: PropTypes.string,
@@ -292,6 +295,7 @@ CommentArea.defaultProps = {
   isDisplayedSendButton: true,
   isDisplayedUploadFileButton: true,
   isFileCommentLoading: false,
+  language: 'en',
   memberList: [],
   multipleFiles: true,
   newComment: undefined,

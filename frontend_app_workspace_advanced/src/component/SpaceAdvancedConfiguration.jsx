@@ -21,8 +21,8 @@ export const SpaceAdvancedConfiguration = (props) => {
         customColor={props.customColor}
         description={props.description}
         isReadOnlyMode={props.isReadOnlyMode}
-        memberList={props.memberList}
         lang={props.lang}
+        memberList={props.memberList}
         roleList={props.roleList}
       />
 
