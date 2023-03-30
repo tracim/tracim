@@ -113,9 +113,6 @@ COPY --from=build_frontend /tracim/frontend/dist /tracim/frontend/dist
 # backend translation
 COPY --from=build_frontend /tracim/backend/tracim_backend/locale /tracim/backend/tracim_backend/locale
 
-# RUN cp -r /tracim/frontend/dist/assets/font/Nunito/ /usr/share/fonts/nunito \
-#     && fc-cache -f
-
 VOLUME ["/etc/tracim", "/var/tracim"]
 EXPOSE 80
 
