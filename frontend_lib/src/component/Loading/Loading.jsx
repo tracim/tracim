@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 
 const Loading = (props) => (
   <div className='loader'>
-    <span className='loader__spinner' style={{height: props.height, width: props.width}} />
+    <span className='loader__spinner' style={{ height: props.height, width: props.width }} />
     <div className='loader__text'>{props.t('Loading…')}</div>
   </div>
 )

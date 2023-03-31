@@ -547,19 +547,21 @@ export class Tracim extends React.Component {
     if (!props.location.pathname.includes('/ui')) return <Redirect to={PAGE.HOME} />
 
     if (
-      (!unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url)) && (
+      !unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url)) && (
         !props.system.workspaceListLoaded ||
         !props.system.appListLoaded ||
         !props.system.contentTypeListLoaded
-      ))
-    ) return (
-      <div className='tracim fullWidthFullHeight' dir={i18next.dir()}>
-        <Loading
-          height={48}
-          width={48}
-        />
-      </div>
-    )
+      )
+    ) {
+      return (
+        <div className='tracim fullWidthFullHeight' dir={i18next.dir()}>
+          <Loading
+            height={48}
+            width={48}
+          />
+        </div>
+      )
+    }
 
     return (
       <div className='tracim fullWidthFullHeight' dir={i18next.dir()}>
