@@ -207,9 +207,22 @@ class UserApi(object):
     def get_all(self) -> typing.List[User]:
         return self._get_all_query().all()
 
+    def get_all_user_ids(self) -> typing.List[int]:
+        """When only needing user ids, this is much faster than get_all()."""
+        return self._session.use_cache(
+            "UserApi.get_all_user_ids()",
+            lambda: [r[0] for r in self._session.query(User.user_id).all()],
+        )
+
     def get_user_ids_from_profile(self, profile: Profile) -> typing.Iterable[int]:
-        query = self._apply_base_filters(self._session.query(User.user_id))
-        return [res[0] for res in query.filter(User.profile == profile)]
+        ids = self._session.use_cache(
+            f"UserApi.get_user_ids_from_profile({profile})",
+            lambda: [
+                r[0]
+                for r in self._session.query(User.user_id).filter(User.profile == profile).all()
+            ],
+        )
+        return ids
 
     def get_members_of_workspaces(self, workspace_ids: typing.List[int]) -> typing.List[int]:
         user_ids_in_workspaces_tuples = (
