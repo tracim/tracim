@@ -684,6 +684,7 @@ export class Kanban extends React.Component {
             fullscreen={state.fullscreen}
             isNewContentRevision={!!state.currentContentRevisionId}
             isRefreshNeeded={state.showRefreshWarning}
+            language={state.loggedUser.lang}
             mode={state.mode}
             onClickFullscreen={this.handleClickFullscreen}
             onClickLastVersion={this.handleClickLastVersion}

@@ -56,6 +56,7 @@ function KanbanCardEditor (props) {
             content={description}
             height={200}
             isAdvancedEdition
+            language={props.language}
             maxHeight={300}
             minHeight={200}
             placeholder={props.t('Description of the card')}
@@ -125,7 +126,7 @@ KanbanCardEditor.propTypes = {
   codeLanguageList: PropTypes.array,
   customColor: PropTypes.string,
   focusOnDescription: PropTypes.bool,
-  i18n: PropTypes.object,
+  language: PropTypes.string,
   memberList: PropTypes.array,
   roleList: PropTypes.array
 }
@@ -134,7 +135,5 @@ KanbanCardEditor.defaultProps = {
   codeLanguageList: [],
   customColor: '',
   focusOnDescription: false,
-  i18n: {
-    language: 'en'
-  }
+  language: 'en'
 }

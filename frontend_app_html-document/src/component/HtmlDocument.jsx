@@ -166,6 +166,7 @@ export const HtmlDocument = props => {
                 isAdvancedEdition
                 isAutoResizeEnabled={false}
                 isStatusBarEnabled
+                language={props.lang}
                 onCtrlEnterEvent={props.onClickValidateBtn}
                 roleList={DEFAULT_ROLE_LIST}
                 spaceId={props.workspaceId}

@@ -237,6 +237,7 @@ export class Timeline extends React.Component {
               disableComment={disableComment}
               invalidMentionList={props.invalidMentionList}
               isFileCommentLoading={props.isFileCommentLoading}
+              language={props.loggedUser.lang}
               memberList={props.memberList}
               placeHolder={props.t('Write an answer...')}
               roleList={props.roleList}

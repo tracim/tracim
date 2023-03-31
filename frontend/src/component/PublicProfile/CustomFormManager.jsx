@@ -246,6 +246,7 @@ const TextRichWidget = connect(({ user }) => ({ user }))(props => {
       isContentLinkEnabled={false}
       isMentionEnabled={false}
       isStatusBarEnabled
+      language={props.user.lang}
       {...props}
     />
   )

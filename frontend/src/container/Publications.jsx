@@ -485,6 +485,7 @@ export class Publications extends React.Component {
               customClass='publishArea'
               icon='fa-fw far fa-paper-plane'
               invalidMentionList={state.invalidMentionList}
+              language={props.user.lang}
               memberList={props.currentWorkspace.memberList}
               multipleFiles
               placeHolder={props.t('Share a news...')}

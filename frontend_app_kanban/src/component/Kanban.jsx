@@ -395,6 +395,7 @@ export class Kanban extends React.Component {
                 // End of required props ///////////////////////////////////////
                 customColor={props.config.hexcolor}
                 focusOnDescription={state.editedCardInfos.focusOnDescription}
+                language={props.language}
               />
             </CardPopup>
           )}
@@ -423,10 +424,13 @@ export class Kanban extends React.Component {
 Kanban.propTypes = {
   config: PropTypes.object.isRequired,
   content: PropTypes.object.isRequired,
+  // End of required props /////////////////////////////////////////////////////
+  language: PropTypes.string,
   readOnly: PropTypes.bool
 }
 
 Kanban.defaultProps = {
+  language: 'en',
   readOnly: false
 }
 

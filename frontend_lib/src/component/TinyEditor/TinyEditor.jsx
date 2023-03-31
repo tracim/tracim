@@ -57,6 +57,22 @@ const base64EncodeAndTinyMceInsert = (editorRef, files) => {
   }
 }
 
+/**
+ * Translate Tracim language code to TinyMCE language code
+ * @param {String} lang
+ * @returns {String} TinyMCE language code
+ */
+const getTinyMceLang = (lang) => {
+  switch (lang) {
+    case 'fr':
+      return 'fr_FR'
+    case 'pt':
+      return 'pt_PT'
+    default:
+      return lang
+  }
+}
+
 export const TinyEditor = props => {
   const editorRef = useRef(null)
   const inputRef = useRef(null)
@@ -107,6 +123,7 @@ export const TinyEditor = props => {
         }}
         init={{
           selector: 'textarea',
+          language: getTinyMceLang(props.language),
           height: props.height,
           max_height: props.maxHeight,
           min_height: props.minHeight,
@@ -393,6 +410,7 @@ TinyEditor.propTypes = {
   isContentLinkEnabled: PropTypes.bool,
   isMentionEnabled: PropTypes.bool,
   isStatusBarEnabled: PropTypes.bool,
+  language: PropTypes.string,
   maxHeight: PropTypes.number,
   minHeight: PropTypes.number,
   placeholder: PropTypes.string,
@@ -410,6 +428,7 @@ TinyEditor.defaultProps = {
   isContentLinkEnabled: true,
   isMentionEnabled: true,
   isStatusBarEnabled: false,
+  language: 'en',
   maxHeight: undefined,
   minHeight: 100,
   placeholder: '',
