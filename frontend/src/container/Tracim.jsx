@@ -37,6 +37,7 @@ import {
   CardPopup,
   IconButton,
   LiveMessageManager,
+  Loading,
   TracimComponent,
   buildHeadTitle,
   formatAbsoluteDate,
@@ -540,17 +541,25 @@ export class Tracim extends React.Component {
       )
     }
 
+    // INFO - MP - 2023-03-31 - Displaying a loader here make the loading page flicker
     if (props.user.logged === null) return null // @TODO show loader
 
     if (!props.location.pathname.includes('/ui')) return <Redirect to={PAGE.HOME} />
 
     if (
-      !unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url)) && (
+      (!unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url)) && (
         !props.system.workspaceListLoaded ||
         !props.system.appListLoaded ||
         !props.system.contentTypeListLoaded
-      )
-    ) return null // @TODO Côme - 2018/08/22 - should show loader here
+      ))
+    ) return (
+      <div className='tracim fullWidthFullHeight' dir={i18next.dir()}>
+        <Loading
+          height={48}
+          width={48}
+        />
+      </div>
+    )
 
     return (
       <div className='tracim fullWidthFullHeight' dir={i18next.dir()}>

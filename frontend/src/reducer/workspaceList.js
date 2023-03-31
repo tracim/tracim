@@ -7,7 +7,7 @@ import {
   WORKSPACE_DETAIL
 } from '../action-creator.sync.js'
 import { serialize, sortListByMultipleCriteria, SORT_BY, SORT_ORDER } from 'tracim_frontend_lib'
-import { serializeSidebarEntryProps } from './currentWorkspace.js'
+import { serializeMember, serializeSidebarEntryProps } from './currentWorkspace.js'
 
 export const serializeWorkspaceListProps = {
   access_type: 'accessType',

@@ -1,16 +1,24 @@
 import React from 'react'
 import { translate } from 'react-i18next'
-import Icon from '../Icon/Icon.jsx'
+import PropTypes from 'prop-types'
 
 // require('./Loading.styl') // see https://github.com/tracim/tracim/issues/1156
 
 const Loading = (props) => (
-  <div className='loading'>
-    <div className='loading__icon'>
-      <Icon icon='fas fa-spin fa-spinner' title={props.t('Loading…')} />
-    </div>
-    <div className='loading__text'>{props.t('Loading…')}</div>
+  <div className='loader'>
+    <span className='loader__spinner' style={{height: props.height, width: props.width}} />
+    <div className='loader__text'>{props.t('Loading…')}</div>
   </div>
 )
 
 export default translate()(Loading)
+
+Loading.propTypes = {
+  height: PropTypes.number,
+  width: PropTypes.number
+}
+
+Loading.defaultProps = {
+  height: 24,
+  width: 24
+}
