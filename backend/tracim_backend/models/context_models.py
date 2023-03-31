@@ -13,9 +13,7 @@ from typing import TypeVar
 
 from slugify import slugify
 from sqlakeyset import Page
-from sqlalchemy.sql import func
 from sqlalchemy.orm import Session
-from sqlalchemy.orm.exc import NoResultFound
 
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
@@ -1177,6 +1175,7 @@ class WorkspaceInContext(object):
             UserRoleWorkspaceInContext(user_role, self.dbsession, self.config)
             for user_role in self.workspace.roles
         ]
+
 
 class UserRoleWorkspaceInContext(object):
     """
