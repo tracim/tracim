@@ -239,7 +239,7 @@ export class Timeline extends React.Component {
               isFileCommentLoading={props.isFileCommentLoading}
               language={props.loggedUser.lang}
               memberList={props.memberList}
-              placeHolder={props.t('Write an answer...')}
+              placeholder={props.t('Write an answer...')}
               roleList={props.roleList}
               submitLabel={props.t('Send')}
             />

@@ -488,7 +488,7 @@ export class Publications extends React.Component {
               language={props.user.lang}
               memberList={props.currentWorkspace.memberList}
               multipleFiles
-              placeHolder={props.t('Share a news...')}
+              placeholder={props.t('Share a news...')}
               roleList={DEFAULT_ROLE_LIST}
               submitLabel={props.t('Publish')}
             />

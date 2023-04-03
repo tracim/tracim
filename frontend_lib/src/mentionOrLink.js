@@ -206,14 +206,15 @@ const wrapLinksFromText = async (text, doc, apiUrl) => {
 // NOTE - MP - 2022-12-02 - MENTION SECTION
 // /////////////////////////////////////////////////////////////////////////////
 
-// NOTE - MP - 2023-01-11 - This should be fusionned with ROLE_LIST. However, since we only support
+// NOTE - MP - 2023-01-11 - This should be merged with ROLE_LIST. However, since we only support
 // `all` role, it requires some additional processing.
 export const DEFAULT_ROLE_LIST = [
   {
-    description: i18n.t('Every members of the space'),
+    description: 'Every members of the space',
     id: 0,
-    label: i18n.t('All'),
-    slug: i18n.t('all')
+    label: 'All',
+    slug: 'all',
+    tradKey: [i18n.t('Every members of the space'), i18n.t('All'), i18n.t('all')]
   }
 ]
 
@@ -222,8 +223,8 @@ export const DEFAULT_ROLE_LIST = [
  * @param {String} text The text to search mentions in
  * @returns {List[String]} List of mentions found
  * Example:
- * - Input: `<p>Test @Jhon</p>`
- * - Output: `['@Jhon']`
+ * - Input: `<p>Test @John</p>`
+ * - Output: `['@John']`
  */
 export const searchMention = (text) => {
   // Regex explanation: https://regex101.com/r/hHosBa/10
@@ -236,19 +237,19 @@ export const searchMention = (text) => {
 
 /**
  * Replace not formatted mention with html mention element
- * @param {List[role]} roleList List of role that can be mentionned
- * @param {List[user]} userList List of user that can be mentionned
+ * @param {List[role]} roleList List of role that can be mentioned
+ * @param {List[user]} userList List of user that can be mentioned
  * @param {String} html Current content of the editor
  * @returns {{html: String, invalidMentionList: List[String]}} Correctly formatted html content
  * Example:
- * - Input: `<p>Test @Jhon</p>`
+ * - Input: `<p>Test @John</p>`
  * - Output:
  * {
  *   html: `<p>Test <html-mention userid="151"/></p>`;
  *   invalidMentionList: [];
  * }
  */
-export const searchMentionAndReplaceWithTag = (rolelist, userList, html) => {
+export const searchMentionAndReplaceWithTag = (roleList, userList, html) => {
   const mentionList = searchMention(html)
   const invalidMentionList = []
 
@@ -256,7 +257,7 @@ export const searchMentionAndReplaceWithTag = (rolelist, userList, html) => {
 
   mentionList.forEach(mention => {
     const mentionWithoutAt = mention.slice(1)
-    const role = rolelist.find(r => r.slug === mentionWithoutAt)
+    const role = roleList.find(r => i18n.t(r.slug) === mentionWithoutAt)
     const user = userList.find(u => u.username === mentionWithoutAt)
     if (role || user) {
       const mentionBalise = `<html-mention ${
@@ -264,11 +265,11 @@ export const searchMentionAndReplaceWithTag = (rolelist, userList, html) => {
       }="${
         role ? role.id : user.id
       }"></html-mention>`
-      const mentionText = role ? role.slug : user.username
+      const mentionText = role ? i18n.t(role.slug) : user.username
       // Regex explanation: https://regex101.com/r/hHosBa/10
       // Match (@XXX part): '@XXX', ' @XXX ', '@XXX-', ':@XXX:', '(@XXX)', '!@XXX!', ...
       // Don't match: 'XXX@XXX', '@<span>XXX</span>'
-      // ${mentionText} will be repladed with role or user variable
+      // ${mentionText} will be replaced with role or user variable
       const mentionRegex = new RegExp(`(?<=^|\\s|\\W)@${mentionText}\\b`, 'g')
       newHtml = newHtml.replace(mentionRegex, mentionBalise)
     } else {
@@ -305,9 +306,9 @@ const replaceHTMLElementWithMentionRole = (roleList, html) => {
       console.warn(
         `helper.js - replaceHTMLElementWithMentionRole - Role from id ${roleId} not found`
       )
-      mention = '@UnknownRole'
+      mention = `@${i18n.t('UnknownRole')}`
     } else {
-      mention = `@${role.slug}`
+      mention = `@${i18n.t(role.slug)}`
     }
     newHtml = newHtml.replace(mentionTag, mention)
   })
@@ -322,7 +323,7 @@ const replaceHTMLElementWithMentionRole = (roleList, html) => {
  * @returns Html text without mention balise
  * Example:
  * - Input: `<p>Test <html-mention userid="151"><\html-mention></p>`
- * - Output: `<p>Test @Jhon</p>`
+ * - Output: `<p>Test @John</p>`
  */
 const replaceHTMLElementWithMentionUser = (userList, html) => {
   const mentionRegex = /<html-mention userid="(\d+)"><\/html-mention>/g
@@ -353,12 +354,12 @@ const replaceHTMLElementWithMentionUser = (userList, html) => {
 
 /**
  * Replace html mention element with mention
- * @param {List[role]} roleList List of role that can be mentionned
- * @param {List[user]} userList List of user that can be mentionned
+ * @param {List[role]} roleList List of role that can be mentioned
+ * @param {List[user]} userList List of user that can be mentioned
  * @param {String} html Current content of the editor
  * Example:
  * - Input: `<p>Test <html-mention userid="151"/><html-mention></p>`
- * - Output: `<p>Test @Jhon</p>`
+ * - Output: `<p>Test @John</p>`
  */
 export const replaceHTMLElementWithMention = (roleList, userList, html) => {
   let newHtml = replaceHTMLElementWithMentionRole(roleList, html)
@@ -399,7 +400,7 @@ const searchContent = (text) => {
  * - Output:
  * {
  *   html: `<p>Test <a class="internal_link primaryColorFont" href="/ui/contents/762" title="#844">
- * Jhon content</a>`;
+ * John content</a>`;
  *   invalidContentList: [];
  * }
  */
@@ -421,7 +422,7 @@ export const searchContentAndReplaceWithTag = async (apiUrl, html) => {
       // Regex explanation: https://regex101.com/r/z1WUUu/3
       // Match (#XXX part): '#XXX', '#XXX ', ' #XXX', '#XXX:', ':#XXX', '(#XXX)', '#XXX!', ...
       // Don't match: 'XXX#XXX', '#<span>XXX</span>', 'title="#XXX'
-      // ${contentId} will be repladed with contentId
+      // ${contentId} will be replaced with contentId
       const mentionRegex = new RegExp(`(?<=^|\\s|\\W)(?<!title=")#${contentId}\\b`, 'g')
       newHtml = newHtml.replace(mentionRegex, linkBalise)
     } else {
