@@ -72,7 +72,7 @@ const calculateRoleMention = (props) => {
   const role = DEFAULT_ROLE_LIST.find(r => Number(r.id) === roleId)
 
   if (role) {
-    mention.text = role.slug
+    mention.text = props.t(role.slug)
   }
 
   // NOTE - MP - 2023-01-11 - So far we don't support other roles than `all`

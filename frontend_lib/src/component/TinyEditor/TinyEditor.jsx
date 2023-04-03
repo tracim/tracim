@@ -88,18 +88,18 @@ export const TinyEditor = props => {
     defaultRoleList = props.roleList.map(role => ({
       type: 'cardmenuitem',
       direction: 'horizontal',
-      value: `@${role.slug} `,
-      label: `@${role.slug}`,
+      value: `@${props.t(role.slug)} `,
+      label: `@${props.t(role.slug)}`,
       items: [
         {
           type: 'cardtext',
-          text: role.description,
+          text: props.t(role.description),
           name: 'roleDescription',
           classes: ['tinymce-role-description']
         },
         {
           type: 'cardtext',
-          text: `@${role.slug}`,
+          text: `@${props.t(role.slug)}`,
           name: 'roleName',
           classes: ['tinymce-role-name']
         }
