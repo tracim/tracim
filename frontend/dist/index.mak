@@ -20,6 +20,9 @@
     <link rel="stylesheet" type="text/css" href="/assets/bootstrap/bootstrap-4.0.0-beta.css?token=${cache_token}" nonce="${csp_nonce}">
     <link rel="stylesheet" type="text/css" href="/assets/branding/${website__welcome_page_style}?token=${cache_token}" nonce="${csp_nonce}">
 
+    <!-- TinyMCE CSS -->
+    <link rel="stylesheet" type="text/css" href="/assets/tinymce-5.10.3/js/tinymce/skins/ui/oxide/skin.min.css?token=${cache_token}" nonce="${csp_nonce}">
+
     <!-- Apple icons -->
     <link rel="apple-touch-icon" href="/assets/branding/images/wa-tracim-logo-180x180.png">
     <link rel="mask-icon" href="/assets/images/branding/safari-pinned-tab-icon.svg" color="${colors['primary'].web}">
