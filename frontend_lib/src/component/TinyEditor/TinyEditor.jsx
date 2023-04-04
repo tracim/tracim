@@ -118,6 +118,7 @@ export const TinyEditor = props => {
       />
       <Editor
         key={editorKey}
+        tinymceScriptSrc='/assets/tinymce-5.10.3/js/tinymce/tinymce.min.js'
         onInit={(evt, editor) => {
           editorRef.current = editor
         }}
