@@ -94,11 +94,11 @@ export const CommentArea = props => {
     // In case of an error it's preferable to hide the popup
     setInvalidMentionList([])
 
-    const submitSuccessfull = await props.onClickSubmit(
+    const submitSuccessful = await props.onClickSubmit(
       parsedContentCommentObject.html,
       fileListToUpload
     )
-    if (submitSuccessfull) {
+    if (submitSuccessful) {
       setContent('')
       setFileListToUpload([])
     }

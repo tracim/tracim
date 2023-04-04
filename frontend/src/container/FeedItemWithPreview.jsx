@@ -122,8 +122,7 @@ export class FeedItemWithPreview extends React.Component {
     }
     await props.appContentSaveNewCommentText(
       content,
-      comment,
-      props.content.type
+      comment
     )
     await props.appContentSaveNewCommentFileList(
       this.setState.bind(this),
