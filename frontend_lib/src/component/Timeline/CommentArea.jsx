@@ -158,6 +158,7 @@ export const CommentArea = props => {
         onCtrlEnterEvent={sendComment}
         height={100}
         isAdvancedEdition={isAdvancedEdition}
+        isDisabled={props.disableComment}
         language={props.language}
         maxHeight={300}
         minHeight={100}

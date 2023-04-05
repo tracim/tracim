@@ -835,7 +835,11 @@ export class HtmlDocument extends React.Component {
             codeLanguageList={state.config.system.config.code_languages}
             customClass={`${state.config.slug}__contentpage__timeline`}
             customColor={state.config.hexcolor}
-            disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
+            disableComment={
+              state.mode === APP_FEATURE_MODE.REVISION ||
+              state.mode === APP_FEATURE_MODE.EDIT ||
+              !state.content.is_editable
+            }
             invalidMentionList={state.invalidMentionList}
             isFileCommentLoading={state.isFileCommentLoading}
             isLastTimelineItemCurrentToken={props.isLastTimelineItemCurrentToken}

@@ -34,13 +34,11 @@ export class Avatar extends React.Component {
         title={publicName || props.t('Unknown')}
         data-cy='avatar'
       >
-        {userId && (
-          <img
-            className='avatar'
-            src={`${avatarBaseUrl}/preview/jpg/${sizeAsNumber}x${sizeAsNumber}/${filenameInUrl}`}
-            alt={props.t('Avatar of {{publicName}}', { publicName })}
-          />
-        )}
+        <img
+          className='avatar'
+          src={`${avatarBaseUrl}/preview/jpg/${sizeAsNumber}x${sizeAsNumber}/${filenameInUrl}`}
+          alt={props.t('Avatar of {{publicName}}', { publicName })}
+        />
       </div>
     )
   }

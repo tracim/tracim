@@ -59,6 +59,8 @@ const base64EncodeAndTinyMceInsert = (editorRef, files) => {
 
 /**
  * Translate Tracim language code to TinyMCE language code
+ * In some cases, Tracim and TinyMCE use different language codes
+ * In these cases, we need to translate the language code
  * @param {String} lang
  * @returns {String} TinyMCE language code
  */
@@ -119,6 +121,7 @@ export const TinyEditor = props => {
       <Editor
         key={editorKey}
         tinymceScriptSrc='/assets/tinymce-5.10.3/js/tinymce/tinymce.min.js'
+        disabled={props.isDisabled}
         onInit={(evt, editor) => {
           editorRef.current = editor
         }}
@@ -405,6 +408,7 @@ TinyEditor.propTypes = {
   isAdvancedEdition: PropTypes.bool,
   isAutoResizeEnabled: PropTypes.bool,
   isContentLinkEnabled: PropTypes.bool,
+  isDisabled: PropTypes.bool,
   isMentionEnabled: PropTypes.bool,
   isStatusBarEnabled: PropTypes.bool,
   language: PropTypes.string,
@@ -423,6 +427,7 @@ TinyEditor.defaultProps = {
   isAdvancedEdition: false,
   isAutoResizeEnabled: true,
   isContentLinkEnabled: true,
+  isDisabled: false,
   isMentionEnabled: true,
   isStatusBarEnabled: false,
   language: 'en',
