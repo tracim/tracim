@@ -413,8 +413,7 @@ export class Publications extends React.Component {
 
     await props.appContentSaveNewCommentText(
       fetchPostPublication.json,
-      publication,
-      ''
+      publication
     )
     await props.appContentSaveNewCommentFileList(
       this.setState.bind(this),

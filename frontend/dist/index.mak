@@ -142,22 +142,5 @@
     <script type="text/javascript" src="/assets/bootstrap/jquery-3.2.1.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     <script type="text/javascript" src="/assets/bootstrap/popper-1.12.3.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     <script type="text/javascript" src="/assets/bootstrap/bootstrap-4.0.0-beta.2.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-
-    <script type="text/javascript" src="/assets/tinymce-5.10.3/js/tinymce/jquery.tinymce.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <script type="text/javascript" src="/assets/tinymce-5.10.3/js/tinymce/tinymce.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <script type="text/javascript" src="/assets/tinymce-5.10.3/js/tinymce/themes/silver/theme.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <script type="text/javascript" src="/assets/tinymce-5.10.3/js/tinymce/icons/default/icons.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    % for plugin in glob("assets/tinymce-5.10.3/js/tinymce/plugins/*/plugin.min.js"):
-    <script type="text/javascript" src="/${plugin}?token=${cache_token}" nonce="${csp_nonce}"></script>
-    %endfor
-
-    ## INFO - CH - 20221108 - hardcode the emoji library script because otherwise, it is loaded on the fly by the emoticons plugin
-    ## but doesn't include the cache_token and the csp_nonce. The script would then be blocked by browsers
-    <script type="text/javascript" src="/assets/tinymce-5.10.3/js/tinymce/plugins/emoticons/js/emojis.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-
-    % for lang in glob("assets/tinymce-5.10.3/js/tinymce/langs/*.js"):
-    <script type="text/javascript" src="/${lang}?token=${cache_token}" nonce="${csp_nonce}"></script>
-    %endfor
-
   </body>
 </html>

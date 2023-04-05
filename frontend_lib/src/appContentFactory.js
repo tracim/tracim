@@ -551,8 +551,12 @@ export function appContentFactory (WrappedComponent) {
       )
     }
 
-    appContentSaveNewCommentText = async (content, newComment, appSlug) => {
+    appContentSaveNewCommentText = async (content, newComment) => {
       this.checkApiUrl()
+
+      if (newComment === '') {
+        return { apiResponse: { status: 400 }, body: { code: 2003 } }
+      }
 
       const contentToSend = Autolinker.link(newComment, { stripPrefix: false })
 
@@ -750,11 +754,11 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
-    appContentNotifyAll = (content, setState, appSlug) => {
+    appContentNotifyAll = (content) => {
       const comment = i18n.t('Please notice that I did an important update on this content.')
       const commentWithMention = `<html-mention roleid="0"></html-mention> ${comment}`
 
-      this.appContentSaveNewCommentText(content, commentWithMention, appSlug)
+      this.appContentSaveNewCommentText(content, commentWithMention)
     }
 
     buildTimelineItemComment = (content, loggedUser, initialCommentTranslationState) => ({

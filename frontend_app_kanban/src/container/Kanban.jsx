@@ -497,8 +497,7 @@ export class Kanban extends React.Component {
     const { props, state } = this
     await props.appContentSaveNewCommentText(
       state.content,
-      comment,
-      state.config.slug
+      comment
     )
     await props.appContentSaveNewCommentFileList(
       this.setState.bind(this),

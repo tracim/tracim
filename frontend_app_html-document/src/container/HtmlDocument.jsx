@@ -551,8 +551,7 @@ export class HtmlDocument extends React.Component {
     const { props, state } = this
     await props.appContentSaveNewCommentText(
       state.content,
-      comment,
-      state.config.slug
+      comment
     )
     await props.appContentSaveNewCommentFileList(
       this.setState.bind(this),
@@ -723,7 +722,7 @@ export class HtmlDocument extends React.Component {
   handleClickNotifyAll = async () => {
     const { state, props } = this
 
-    props.appContentNotifyAll(state.content, state.config.slug)
+    props.appContentNotifyAll(state.content)
     this.handleCloseNotifyAllMessage()
   }
 

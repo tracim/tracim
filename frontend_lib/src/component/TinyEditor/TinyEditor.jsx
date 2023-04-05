@@ -118,6 +118,7 @@ export const TinyEditor = props => {
       />
       <Editor
         key={editorKey}
+        tinymceScriptSrc='/assets/tinymce-5.10.3/js/tinymce/tinymce.min.js'
         onInit={(evt, editor) => {
           editorRef.current = editor
         }}
@@ -135,10 +136,6 @@ export const TinyEditor = props => {
           toolbar: toolbar,
           default_link_target: '_blank',
           plugins: [
-            // /////////////////////////////////////////////
-            // TinyMCE recommends to use custom plugins in "external plugins" section
-            // 'autocompletion',
-            // /////////////////////////////////////////////
             'advlist autolink lists link image charmap print preview anchor',
             'searchreplace visualblocks code codesample fullscreen emoticons',
             'insertdatetime media table paste code help wordcount',
