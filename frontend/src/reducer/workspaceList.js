@@ -23,13 +23,15 @@ export const serializeWorkspaceListProps = {
   sidebar_entries: 'sidebarEntryList',
   slug: 'slug',
   public_upload_enabled: 'uploadEnabled',
-  memberList: 'memberList'
+  members: 'memberList'
 }
 
 const serializeWorkspace = workspace => {
   return {
     ...serialize(workspace, serializeWorkspaceListProps),
-    sidebarEntryList: workspace.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps)),
+    sidebarEntryList: workspace.sidebar_entries.map(
+      sbe => serialize(sbe, serializeSidebarEntryProps)
+    ),
     memberList: workspace.members.map(serializeMember)
   }
 }

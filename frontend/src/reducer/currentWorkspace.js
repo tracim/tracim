@@ -42,15 +42,16 @@ const defaultWorkspace = {
 export const serializeWorkspace = ws => {
   return {
     accessType: ws.access_type,
-    defaultRole: ws.default_user_role,
-    id: ws.workspace_id,
-    slug: ws.slug,
-    label: ws.label,
-    description: ws.description,
     agendaEnabled: ws.agenda_enabled,
+    defaultRole: ws.default_user_role,
+    description: ws.description,
     downloadEnabled: ws.public_download_enabled,
-    uploadEnabled: ws.public_upload_enabled,
-    publicationEnabled: ws.publication_enabled
+    id: ws.workspace_id,
+    label: ws.label,
+    memberList: ws.members,
+    publicationEnabled: ws.publication_enabled,
+    slug: ws.slug,
+    uploadEnabled: ws.public_upload_enabled
   }
 }
 

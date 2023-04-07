@@ -373,7 +373,9 @@ export class Dashboard extends React.Component {
   render () {
     const { props, state } = this
 
-    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
+    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(
+      props.user.userId, props.currentWorkspace.memberList, ROLE_LIST
+    )
 
     // INFO - GB - 2019-08-29 - these filters are made temporarily by the frontend, but may change to have all the intelligence in the backend
     // https://github.com/tracim/tracim/issues/2326

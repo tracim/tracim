@@ -15,19 +15,29 @@ import {
 } from '../../../src/action-creator.sync'
 import { ROLE, serialize } from 'tracim_frontend_lib'
 import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace'
-import { serializeSidebarEntryProps } from '../../../src/reducer/currentWorkspace'
+import {
+  serializeMember,
+  serializeSidebarEntryProps
+} from '../../../src/reducer/currentWorkspace'
 import { globalManagerFromApi } from '../../fixture/user/globalManagerFromApi'
 
 describe('workspaceList reducer', () => {
   describe('actions', () => {
     const initialState = [
       {
-        ...serialize({ ...firstWorkspaceFromApi, workspace_id: firstWorkspaceFromApi.workspace_id + 1 }, serializeWorkspaceListProps),
-        sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps))
+        ...serialize(
+          { ...firstWorkspaceFromApi, workspace_id: firstWorkspaceFromApi.workspace_id + 1 },
+          serializeWorkspaceListProps
+        ),
+        sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(
+          sbe => serialize(sbe, serializeSidebarEntryProps)
+        )
       }
     ]
 
-    const serializedFirstWorkspaceFromApi = serialize(firstWorkspaceFromApi, serializeWorkspaceListProps)
+    const serializedFirstWorkspaceFromApi = serialize(
+      firstWorkspaceFromApi, serializeWorkspaceListProps
+    )
 
     it('should return the initial state when no action given', () => {
       const rez = workspaceList(initialState, { type: 'nothing that will match', action: {} })
@@ -41,7 +51,12 @@ describe('workspaceList reducer', () => {
         expect(rez).to.deep.equal([
           {
             ...serializedFirstWorkspaceFromApi,
-            sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps))
+            sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(
+              sbe => serialize(sbe, serializeSidebarEntryProps)
+            ),
+            memberList: firstWorkspaceFromApi.members.map(
+              m => serializeMember(m)
+            )
           }
         ])
       })
@@ -54,7 +69,12 @@ describe('workspaceList reducer', () => {
         expect(rez).to.deep.equal([
           {
             ...serializedFirstWorkspaceFromApi,
-            sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps))
+            sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(
+              sbe => serialize(sbe, serializeSidebarEntryProps)
+            ),
+            memberList: firstWorkspaceFromApi.members.map(
+              m => serializeMember(m)
+            )
           },
           ...initialState
         ])
@@ -81,7 +101,12 @@ describe('workspaceList reducer', () => {
           {
             ...serializedFirstWorkspaceFromApi,
             label: 'labelChanged',
-            sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps))
+            sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(
+              sbe => serialize(sbe, serializeSidebarEntryProps)
+            ),
+            memberList: firstWorkspaceFromApi.members.map(
+              m => serializeMember(m)
+            )
           }
         ])
       })
