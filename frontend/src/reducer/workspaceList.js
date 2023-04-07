@@ -32,7 +32,7 @@ const serializeWorkspace = workspace => {
     sidebarEntryList: workspace.sidebar_entries.map(
       sbe => serialize(sbe, serializeSidebarEntryProps)
     ),
-    memberList: workspace.members.map(serializeMember)
+    memberList: (workspace.members || []).map(serializeMember)
   }
 }
 
@@ -58,7 +58,7 @@ export function workspaceList (state = [], action, lang) {
       if (!state.some(ws => ws.id === action.workspaceDetail.workspace_id)) return state
       const spaceList = state.map(
         ws => ws.id === action.workspaceDetail.workspace_id
-          ? serializeWorkspace(action.workspaceDetail)
+          ? serializeWorkspace(action.workspaceDetail) // Error here ; members is undefined
           : ws
       )
       return sortListByMultipleCriteria(spaceList, [SORT_BY.LABEL, SORT_BY.ID], SORT_ORDER.ASCENDING, lang)
