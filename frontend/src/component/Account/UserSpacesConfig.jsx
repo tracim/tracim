@@ -6,21 +6,22 @@ import { translate } from 'react-i18next'
 import {
   PAGE,
   PROFILE,
+  ROLE_LIST,
   ROLE,
-  serialize,
-  ConfirmPopup,
-  IconButton,
-  Loading,
   SORT_BY,
   SORT_ORDER,
-  sortListBy,
-  sortListByMultipleCriteria,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  ConfirmPopup,
+  EmptyListMessage,
+  FilterBar,
+  IconButton,
+  Loading,
   TitleListHeader,
   TracimComponent,
-  TLM_ENTITY_TYPE as TLM_ET,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  FilterBar,
-  ROLE_LIST,
+  serialize,
+  sortListBy,
+  sortListByMultipleCriteria,
   stringIncludes
 } from 'tracim_frontend_lib'
 import { serializeWorkspaceListProps } from '../../reducer/workspaceList.js'
@@ -61,7 +62,7 @@ export const UserSpacesConfig = (props) => {
     const filteredListWithMember = []
 
     spaceList.forEach(space => {
-      const member = space.memberList.find(u => u.id === props.userToEditId)
+      const member = space.memberList.find(u => u.user_id === props.userToEditId)
       if (space.memberList.length > 0 && member) {
         filteredListWithMember.push({ ...space, member })
       }
@@ -91,6 +92,7 @@ export const UserSpacesConfig = (props) => {
         />
       )
     })
+
     setEntries(entryList)
   }, [spaceList, sortOrder, selectedSortCriterion, userFilter])
 
@@ -113,11 +115,11 @@ export const UserSpacesConfig = (props) => {
   }
 
   useEffect(() => {
-    if (props.userToEditId === props.user.userId && props.workspaceList) {
+    if (props.userToEditId === props.user.userId) {
       setSpaceList(props.workspaceList)
       setIsLoading(false)
     } else getSpaceList()
-  }, [props.userToEditId])
+  }, [props.userToEditId, props.workspaceList])
 
   const handleMemberModified = (data) => {
     const newSpaceList = spaceList.map(space => space.id === data.fields.workspace.workspace_id
@@ -166,16 +168,22 @@ export const UserSpacesConfig = (props) => {
   }
 
   const getSpaceList = async () => {
-    const fetchGetUserWorkspaceList = await props.dispatch(getUserWorkspaceList(props.userToEditId, false))
+    const fetchGetUserWorkspaceList = await props.dispatch(
+      getUserWorkspaceList(props.userToEditId, false)
+    )
 
     switch (fetchGetUserWorkspaceList.status) {
       case 200: {
-        const userSpaceList = fetchGetUserWorkspaceList.json.map(space => serialize(space, serializeWorkspaceListProps))
+        const userSpaceList = fetchGetUserWorkspaceList.json.map(
+          space => serialize(space, serializeWorkspaceListProps)
+        )
         setSpaceList(userSpaceList)
         break
       }
       default: props.dispatch(newFlashMessage(props.t('Error while loading user')))
     }
+
+    setIsLoading(false)
   }
 
   const handleConfirmDeleteSpace = async () => {
@@ -291,11 +299,19 @@ export const UserSpacesConfig = (props) => {
                 ))}
               </div>
             ) : (
-              userFilter !== ''
-                ? props.t('There are no spaces that matches your filter')
-                : props.admin
-                  ? props.t('This user is not a member of any space yet')
-                  : props.t('You are not a member of any space yet')
+              <EmptyListMessage>
+                {
+                  userFilter !== ''
+                    ? (
+                      props.t('There are no spaces that matches your filter')
+                    ) : props.admin
+                      ? (
+                        props.t('This user is not a member of any space yet')
+                      ) : (
+                        props.t('You are not a member of any space yet')
+                      )
+                  }
+              </EmptyListMessage>
             )
           )}
         </div>
