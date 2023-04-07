@@ -443,17 +443,16 @@ export class Tracim extends React.Component {
 
   loadWorkspaceLists = async () => {
     const { props } = this
-
     const showOwnedWorkspace = false
-
     const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList(showOwnedWorkspace))
 
     if (fetchGetWorkspaceList.status !== 200) return false
 
     props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
-    this.setState({ workspaceListLoaded: true })
 
-    const fetchAccessibleWorkspaceList = await props.dispatch(getAccessibleWorkspaces(props.user.userId))
+    const fetchAccessibleWorkspaceList = await props.dispatch(
+      getAccessibleWorkspaces(props.user.userId)
+    )
 
     if (fetchAccessibleWorkspaceList.status !== 200) return false
 
@@ -548,7 +547,6 @@ export class Tracim extends React.Component {
 
     if (
       !unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url)) && (
-        !props.system.workspaceListLoaded ||
         !props.system.appListLoaded ||
         !props.system.contentTypeListLoaded
       )
@@ -731,10 +729,11 @@ export class Tracim extends React.Component {
           <Route
             render={() => (
               <Sidebar
-                onClickNotification={this.handleClickNotificationButton}
-                unreadNotificationCount={props.notificationPage.unreadNotificationCount}
-                unreadMentionCount={props.notificationPage.unreadMentionCount}
                 isNotificationWallOpen={state.isNotificationWallOpen}
+                onClickNotification={this.handleClickNotificationButton}
+                unreadMentionCount={props.notificationPage.unreadMentionCount}
+                unreadNotificationCount={props.notificationPage.unreadNotificationCount}
+                isSpaceListLoaded={props.system.workspaceListLoaded}
               />
             )}
           />

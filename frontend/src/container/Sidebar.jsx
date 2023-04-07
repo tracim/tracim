@@ -275,6 +275,7 @@ export class Sidebar extends React.Component {
           onToggleFoldChildren={this.handleToggleFoldChildren}
           showSpaceList={state.showSpaceList}
           spaceList={props.workspaceList}
+          isSpaceListLoaded={props.isSpaceListLoaded}
           userId={props.user.userId}
         />
 
@@ -316,6 +317,7 @@ export default connect(mapStateToProps)(appFactory(translate()(TracimComponent(S
 
 Sidebar.propTypes = {
   isNotificationWallOpen: PropTypes.bool,
+  isSpaceListLoaded: PropTypes.bool,
   onClickNotification: PropTypes.func,
   unreadMentionCount: PropTypes.number,
   unreadNotificationCount: PropTypes.number
@@ -323,6 +325,7 @@ Sidebar.propTypes = {
 
 Sidebar.defaultProps = {
   isNotificationWallOpen: false,
+  isSpaceListLoaded: false,
   onClickNotification: () => { },
   unreadMentionCount: 0,
   unreadNotificationCount: 0

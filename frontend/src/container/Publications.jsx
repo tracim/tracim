@@ -454,7 +454,20 @@ export class Publications extends React.Component {
 
   render () {
     const { props, state } = this
-    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
+
+    if (props.currentWorkspace.memberList === undefined) {
+      return (
+        <Loading
+          height={100}
+          width={100}
+        />
+      )
+    }
+
+    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(
+      props.user.userId, props.currentWorkspace.memberList, ROLE_LIST
+    )
+
     const currentPublicationId = Number(props.match.params.idcts || 0)
     const isPublicationListEmpty = props.publicationPage.list.length === 0
 

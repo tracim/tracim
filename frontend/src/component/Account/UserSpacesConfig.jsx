@@ -301,16 +301,14 @@ export const UserSpacesConfig = (props) => {
             ) : (
               <EmptyListMessage>
                 {
-                  userFilter !== ''
-                    ? (
-                      props.t('There are no spaces that matches your filter')
-                    ) : props.admin
-                      ? (
-                        props.t('This user is not a member of any space yet')
-                      ) : (
-                        props.t('You are not a member of any space yet')
-                      )
-                  }
+                  userFilter !== '' ? (
+                    props.t('There are no spaces that matches your filter')
+                  ) : props.admin ? (
+                    props.t('This user is not a member of any space yet')
+                  ) : (
+                    props.t('You are not a member of any space yet')
+                  )
+                }
               </EmptyListMessage>
             )
           )}

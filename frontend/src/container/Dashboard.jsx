@@ -3,22 +3,23 @@ import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import { withRouter } from 'react-router-dom'
 import {
-  TracimComponent,
-  TLM_ENTITY_TYPE as TLM_ET,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  PageWrapper,
-  PageContent,
-  IconButton,
   BREADCRUMBS_TYPE,
   COLORS,
   CUSTOM_EVENT,
+  PAGE,
+  PROFILE,
   ROLE,
   ROLE_LIST,
-  PROFILE,
-  buildHeadTitle,
-  PAGE,
-  removeAtInUsername,
   SPACE_TYPE,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  IconButton,
+  Loading,
+  PageContent,
+  PageWrapper,
+  TracimComponent,
+  buildHeadTitle,
+  removeAtInUsername,
   addExternalLinksIcons
 } from 'tracim_frontend_lib'
 import {
@@ -372,6 +373,15 @@ export class Dashboard extends React.Component {
 
   render () {
     const { props, state } = this
+
+    if (props.currentWorkspace.memberList === undefined) {
+      return (
+        <Loading
+          height={100}
+          width={100}
+        />
+      )
+    }
 
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(
       props.user.userId, props.currentWorkspace.memberList, ROLE_LIST

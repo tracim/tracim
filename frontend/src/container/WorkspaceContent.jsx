@@ -735,7 +735,18 @@ export class WorkspaceContent extends React.Component {
       ? props.workspaceContentList.contentList
       : []
 
-    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(user.userId, currentWorkspace.memberList, ROLE_LIST)
+    if (currentWorkspace.memberList === undefined) {
+      return (
+        <Loading
+          height={100}
+          width={100}
+        />
+      )
+    }
+
+    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(
+      user.userId, currentWorkspace.memberList, ROLE_LIST
+    )
 
     const createContentAvailableApp = [
       ...contentType
