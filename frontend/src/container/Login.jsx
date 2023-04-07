@@ -21,6 +21,7 @@ import {
   newFlashMessage,
   setUserConnected,
   setUserDisconnected,
+  setWorkspaceList,
   setContentTypeList,
   setAppList,
   setConfig,
@@ -29,18 +30,21 @@ import {
   setUserLang,
   setUnreadMentionCount,
   setUnreadNotificationCount,
-  setHeadTitle
+  setHeadTitle,
+  setAccessibleWorkspaceList
 } from '../action-creator.sync.js'
 import {
   getAppList,
   getConfig,
   getContentTypeList,
+  getMyselfWorkspaceList,
   getUsageConditions,
   getUserConfiguration,
   getUserMessagesSummary,
   postUserLogout,
   postUserLogin,
   putUserLang,
+  getAccessibleWorkspaces,
   postUserRegister
 } from '../action-creator.async.js'
 import {
@@ -271,6 +275,7 @@ class Login extends React.Component {
 
         this.loadAppList()
         this.loadContentTypeList()
+        this.loadWorkspaceLists()
         this.loadNotificationNotRead(loggedUser.user_id)
         this.loadUserConfiguration(loggedUser.user_id)
         break
@@ -353,6 +358,22 @@ class Login extends React.Component {
 
     const fetchGetContentTypeList = await props.dispatch(getContentTypeList())
     if (fetchGetContentTypeList.status === 200) props.dispatch(setContentTypeList(fetchGetContentTypeList.json))
+  }
+
+  loadWorkspaceLists = async () => {
+    const { props } = this
+    const showOwnedWorkspace = false
+
+    const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList(showOwnedWorkspace))
+    if (fetchGetWorkspaceList.status === 200) {
+      props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
+    }
+
+    const fetchAccessibleWorkspaceList = await props.dispatch(
+      getAccessibleWorkspaces(props.user.userId)
+    )
+    if (fetchAccessibleWorkspaceList.status !== 200) return
+    props.dispatch(setAccessibleWorkspaceList(fetchAccessibleWorkspaceList.json))
   }
 
   loadUserConfiguration = async userId => {
