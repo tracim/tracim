@@ -45,29 +45,19 @@ describe('A comment in TinyMCE', () => {
   })
 
   describe(`type ${linkChar}`, () => {
-    it('should show autocomplete', () => {
+    it('should display the auto completer with data', () => {
       cy.inputInTinyMCE(`${linkChar}ti`)
+      // Display the auto completer
       cy.get('.tox-autocompleter')
         .should('be.visible')
-    })
-
-    it('should contain the id and the title in an autocomplete item', () => {
-      cy.inputInTinyMCE(`${linkChar}ti`)
+      // Items are correctly displayed
       cy.contains('.tox-collection__item', noteId)
         .should('be.visible')
       cy.contains('.tox-collection__item', noteTitle)
         .should('be.visible')
-    })
-
-    it('should contain all created contents in autocomplete', () => {
-      cy.inputInTinyMCE(`${linkChar}ti`)
+      // Display the 3 expected items
       cy.get('.tox-collection__item').should('have.length', 3)
-    })
-  })
-
-  describe('click on an item of autocomplete popup', () => {
-    it('should complete the comment with content id', () => {
-      cy.inputInTinyMCE(`${linkChar}ti`)
+      // Click on the first item
       cy.contains('.tox-collection__item', fileTitle)
         .click()
       cy.assertTinyMCEContent(`${linkChar}${fileId}`)
