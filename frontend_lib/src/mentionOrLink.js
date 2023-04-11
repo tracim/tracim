@@ -423,10 +423,10 @@ export const searchContentAndReplaceWithTag = async (apiUrl, html) => {
       // Match (#XXX part): '#XXX', '#XXX ', ' #XXX', '#XXX:', ':#XXX', '(#XXX)', '#XXX!', ...
       // Don't match: 'XXX#XXX', '#<span>XXX</span>', '"#XXX'
       // ${contentId} will be replaced with contentId
-      const mentionRegex = new RegExp(`(?!")(?:^|\\s|\\W)#${contentId}\\b`, 'g')
-      // NOTE - MP - 2023-04-11 - We use mention[0] because the regex lookahead is included in the
+      const contentRegex = new RegExp(`(?!")(?:^|\\s|\\W)#${contentId}\\b`, 'g')
+      // NOTE - MP - 2023-04-11 - We use content[0] because the regex lookahead is included in the
       // match
-      newHtml = newHtml.replace(mentionRegex, `${content[0]}${linkBalise}`)
+      newHtml = newHtml.replace(contentRegex, `${content[0]}${linkBalise}`)
     } else {
       invalidContentList.push(content)
     }
