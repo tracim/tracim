@@ -227,10 +227,10 @@ export const DEFAULT_ROLE_LIST = [
  * - Output: `['@John']`
  */
 export const searchMention = (text) => {
-  // Regex explanation: https://regex101.com/r/hHosBa/10
+  // Regex explanation: https://regex101.com/r/hHosBa/11
   // Match (@XXX part): '@XXX', ' @XXX ', '@XXX-', ':@XXX:', '(@XXX)', '!@XXX!', ...
   // Don't match: 'XXX@XXX', '@<span>XXX</span>'
-  const mentionRegex = /(?<=^|\s|\W)@([a-zA-Z0-9_-]+)\b/g
+  const mentionRegex = /(?:^|\s|\W)@([a-zA-Z0-9_-]+)\b/g
   const mentionList = text.match(mentionRegex)
   return mentionList || []
 }
@@ -256,22 +256,22 @@ export const searchMentionAndReplaceWithTag = (roleList, userList, html) => {
   let newHtml = html
 
   mentionList.forEach(mention => {
-    const mentionWithoutAt = mention.slice(1)
+    const mentionWithoutAt = mention.slice(2)
     const role = roleList.find(r => i18n.t(r.slug) === mentionWithoutAt)
     const user = userList.find(u => u.username === mentionWithoutAt)
     if (role || user) {
-      const mentionBalise = `<html-mention ${
-        role ? 'roleid' : 'userid'
-      }="${
-        role ? role.id : user.id
-      }"></html-mention>`
+      const labelId = role ? 'roleid' : 'userid'
+      const valueId = role ? role.id : user.id
+      const mentionBalise = `<html-mention ${labelId}="${valueId}"></html-mention>`
       const mentionText = role ? i18n.t(role.slug) : user.username
-      // Regex explanation: https://regex101.com/r/hHosBa/10
+      // Regex explanation: https://regex101.com/r/hHosBa/11
       // Match (@XXX part): '@XXX', ' @XXX ', '@XXX-', ':@XXX:', '(@XXX)', '!@XXX!', ...
       // Don't match: 'XXX@XXX', '@<span>XXX</span>'
       // ${mentionText} will be replaced with role or user variable
-      const mentionRegex = new RegExp(`(?<=^|\\s|\\W)@${mentionText}\\b`, 'g')
-      newHtml = newHtml.replace(mentionRegex, mentionBalise)
+      const mentionRegex = new RegExp(`(?:^|\\s|\\W)@${mentionText}\\b`, 'g')
+      // NOTE - MP - 2023-04-11 - We use mention[0] because the regex lookahead is included in the
+      // match
+      newHtml = newHtml.replace(mentionRegex, `${mention[0]}${mentionBalise}`)
     } else {
       invalidMentionList.push(mention)
     }
@@ -380,10 +380,10 @@ export const replaceHTMLElementWithMention = (roleList, userList, html) => {
  * - Output: `['#844']`
  */
 const searchContent = (text) => {
-  // Regex explanation: https://regex101.com/r/z1WUUu/3
+  // Regex explanation: https://regex101.com/r/z1WUUu/4
   // Match (#XXX part): '#XXX', '#XXX ', ' #XXX', '#XXX:', ':#XXX', '(#XXX)', '#XXX!', ...
-  // Don't match: 'XXX#XXX', '#<span>XXX</span>', 'title="#XXX'
-  const contentRegex = /(?<=^|\s|\W)(?<!title=")#([0-9]+)\b/g
+  // Don't match: 'XXX#XXX', '#<span>XXX</span>', '#XXX'
+  const contentRegex = /(?!")(?:^|\s|\W)#([0-9]+)\b/g
   const contentList = text.match(contentRegex)
   return contentList || []
 }
@@ -411,20 +411,22 @@ export const searchContentAndReplaceWithTag = async (apiUrl, html) => {
   let newHtml = html
 
   await Promise.all(contentList.map(async content => {
-    const contentId = content.slice(1)
+    const contentId = content.slice(2)
     const fetchContent = await getContent(apiUrl, contentId)
 
     if (fetchContent.status === 200) {
       const contentTitle = (await fetchContent.json()).label
       const linkBalise = `<a class="internal_link primaryColorFont" href="${
         PAGE.CONTENT(contentId)
-      }" title="${content}">${contentTitle}</a>`
-      // Regex explanation: https://regex101.com/r/z1WUUu/3
+      }" title="${content.slice(1)}">${contentTitle}</a>`
+      // Regex explanation: https://regex101.com/r/z1WUUu/4
       // Match (#XXX part): '#XXX', '#XXX ', ' #XXX', '#XXX:', ':#XXX', '(#XXX)', '#XXX!', ...
-      // Don't match: 'XXX#XXX', '#<span>XXX</span>', 'title="#XXX'
+      // Don't match: 'XXX#XXX', '#<span>XXX</span>', '"#XXX'
       // ${contentId} will be replaced with contentId
-      const mentionRegex = new RegExp(`(?<=^|\\s|\\W)(?<!title=")#${contentId}\\b`, 'g')
-      newHtml = newHtml.replace(mentionRegex, linkBalise)
+      const contentRegex = new RegExp(`(?!")(?:^|\\s|\\W)#${contentId}\\b`, 'g')
+      // NOTE - MP - 2023-04-11 - We use content[0] because the regex lookahead is included in the
+      // match
+      newHtml = newHtml.replace(contentRegex, `${content[0]}${linkBalise}`)
     } else {
       invalidContentList.push(content)
     }
