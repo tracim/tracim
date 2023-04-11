@@ -19,12 +19,11 @@ import {
   Loading,
   TitleListHeader,
   TracimComponent,
-  serialize,
   sortListBy,
   sortListByMultipleCriteria,
   stringIncludes
 } from 'tracim_frontend_lib'
-import { serializeWorkspaceListProps } from '../../reducer/workspaceList.js'
+import { serializeWorkspace } from '../../reducer/workspaceList.js'
 import { serializeMember } from '../../reducer/currentWorkspace.js'
 import { newFlashMessage } from '../../action-creator.sync.js'
 import { deleteWorkspaceMember, getUserWorkspaceList } from '../../action-creator.async.js'
@@ -62,7 +61,8 @@ export const UserSpacesConfig = (props) => {
     const filteredListWithMember = []
 
     spaceList.forEach(space => {
-      const member = space.memberList.find(u => u.user_id === props.userToEditId)
+      const member = space.memberList.find(u => u.id === props.userToEditId)
+      console.log("BAR", space.memberList, props.userToEditId, member)
       if (space.memberList.length > 0 && member) {
         filteredListWithMember.push({ ...space, member })
       }
@@ -92,7 +92,7 @@ export const UserSpacesConfig = (props) => {
         />
       )
     })
-
+    console.log("FOO")
     setEntries(entryList)
   }, [spaceList, sortOrder, selectedSortCriterion, userFilter])
 
@@ -118,7 +118,10 @@ export const UserSpacesConfig = (props) => {
     if (props.userToEditId === props.user.userId) {
       setSpaceList(props.workspaceList)
       setIsLoading(false)
-    } else getSpaceList()
+      console.log("OUI", props.workspaceList)
+    } else {
+      getSpaceList()
+    }
   }, [props.userToEditId, props.workspaceList])
 
   const handleMemberModified = (data) => {
@@ -175,7 +178,7 @@ export const UserSpacesConfig = (props) => {
     switch (fetchGetUserWorkspaceList.status) {
       case 200: {
         const userSpaceList = fetchGetUserWorkspaceList.json.map(
-          space => serialize(space, serializeWorkspaceListProps)
+          space => serializeWorkspace(space)
         )
         setSpaceList(userSpaceList)
         break

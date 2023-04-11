@@ -8,7 +8,6 @@ import {
   Loading,
   PROFILE,
   ROLE_LIST,
-  serialize,
   SORT_BY,
   sortListByMultipleCriteria,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -17,7 +16,7 @@ import {
   FilterBar,
   stringIncludes
 } from 'tracim_frontend_lib'
-import { serializeWorkspaceListProps } from '../reducer/workspaceList.js'
+import { serializeWorkspace } from '../reducer/workspaceList.js'
 import { newFlashMessage } from '../action-creator.sync.js'
 import {
   deleteWorkspaceMember,
@@ -111,7 +110,7 @@ export const AdminUserSpacesConfig = (props) => {
 
     switch (fetchGetSpaceList.status) {
       case 200: {
-        const spaceList = fetchGetSpaceList.json.map(space => serialize(space, serializeWorkspaceListProps))
+        const spaceList = fetchGetSpaceList.json.map(space => serializeWorkspace(space))
         setSpaceList(sortListByMultipleCriteria(spaceList, [SORT_BY.LABEL, SORT_BY.ID]))
         setIsLoading(false)
         break

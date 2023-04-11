@@ -7,6 +7,7 @@ import {
   CONTENT_TYPE,
   PAGE,
   TLM_ENTITY_TYPE as TLM_ET,
+  EmptyListMessage,
   IconButton,
   Loading,
   serialize
@@ -150,7 +151,12 @@ const ActivityList = (props) => {
                     width={100}
                   />
                 )
-                : props.t('No activity')}
+                : (
+                  <EmptyListMessage>
+                    {props.t('No activity')}
+                  </EmptyListMessage>
+                )
+              }
             </div>
           )
         )}

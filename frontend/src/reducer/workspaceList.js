@@ -26,7 +26,7 @@ export const serializeWorkspaceListProps = {
   members: 'memberList'
 }
 
-const serializeWorkspace = workspace => {
+export const serializeWorkspace = workspace => {
   return {
     ...serialize(workspace, serializeWorkspaceListProps),
     sidebarEntryList: workspace.sidebar_entries.map(
