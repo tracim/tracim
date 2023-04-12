@@ -7,6 +7,7 @@ import {
   handleMentionsBeforeSave,
   removeMentionMeClass,
   searchMention,
+  searchMentionAndReplaceWithTag,
   wrapMentionsInSpanTags
 } from '../src/mentionOrLink.js'
 
@@ -17,32 +18,32 @@ describe('mentions on mentionOrLink.js', () => {
     const possibleTests = [
       {
         content: '<p>Hello @foo</p>',
-        expected: ['@foo'],
+        expected: [' @foo'],
         description: 'Single mention'
       },
       {
         content: '<p>Hello @foo and @bar</p>',
-        expected: ['@foo', '@bar'],
+        expected: [' @foo', ' @bar'],
         description: 'Multiple mentions'
       },
       {
         content: '<p>Hello @foo, how are you?</p>',
-        expected: ['@foo'],
+        expected: [' @foo'],
         description: 'Single mention with text before and after'
       },
       {
         content: '<p>Hello @foo_bar, how are you?</p>',
-        expected: ['@foo_bar'],
+        expected: [' @foo_bar'],
         description: 'Single mention with underscores'
       },
       {
         content: '<p>Hello @1foobar, how are you?</p>',
-        expected: ['@1foobar'],
+        expected: [' @1foobar'],
         description: 'Single mention with numbers'
       },
       {
         content: '<p>Hello @FOOBAR, how are you?</p>',
-        expected: ['@FOOBAR'],
+        expected: [' @FOOBAR'],
         description: 'Single mention with uppercase letters'
       },
       {
@@ -52,22 +53,22 @@ describe('mentions on mentionOrLink.js', () => {
       },
       {
         content: '<p>Hello @foo!</p>',
-        expected: ['@foo'],
+        expected: [' @foo'],
         description: 'Mention followed by punctuation'
       },
       {
         content: '<p>Hello,@foo</p>',
-        expected: ['@foo'],
+        expected: [',@foo'],
         description: 'Mention with punctuation before'
       },
       {
         content: '<p>Hello @foo_bar-baz, how are you?</p>',
-        expected: ['@foo_bar-baz'],
+        expected: [' @foo_bar-baz'],
         description: 'Single mention with underscores and hyphens'
       },
       {
         content: '<p>Hello @foo_bar baz, how are you?</p>',
-        expected: ['@foo_bar'],
+        expected: [' @foo_bar'],
         description: 'Single mention with underscore before whitespace'
       }
     ]
@@ -75,6 +76,69 @@ describe('mentions on mentionOrLink.js', () => {
       const { content, expected, description } = test
       const result = searchMention(content)
       const expectedResult = `have ${expected.length} results`
+      describe(`For: ${description}`, () => {
+        it(`should ${expectedResult}`, () => {
+          expect(result).to.deep.equal(expected)
+        })
+      })
+    })
+  })
+
+  describe('function searchMentionAndReplaceWithTag', () => {
+    const roleList = [
+      {
+        slug: 'all',
+        id: 1
+      }
+    ]
+    const userList = [
+      {
+        username: 'foo',
+        id: 1
+      },
+      {
+        username: 'bar',
+        id: 2
+      }
+    ]
+    const possibleTests = [
+      {
+        content: '<p>Hello @foo</p>',
+        expected: {
+          html: '<p>Hello <html-mention userid="1"></html-mention></p>',
+          invalidMentionList: []
+        },
+        description: 'Single mention'
+      },
+      {
+        content: '<p>Hello @foo and @bar</p>',
+        expected: {
+          html: '<p>Hello <html-mention userid="1"></html-mention> and <html-mention userid="2"></html-mention></p>',
+          invalidMentionList: []
+        },
+        description: 'Multiple mentions'
+      },
+      {
+        content: '<p>Hello @all!</p>',
+        expected: {
+          html: '<p>Hello <html-mention roleid="1"></html-mention>!</p>',
+          invalidMentionList: []
+        },
+        description: 'Mention of a role'
+      },
+      {
+        content: '<p>Hello @all and @foo</p>',
+        expected: {
+          html: '<p>Hello <html-mention roleid="1"></html-mention> and <html-mention userid="1"></html-mention></p>',
+          invalidMentionList: []
+        },
+        description: 'Mention of a role and a user'
+      }
+    ]
+    possibleTests.forEach(test => {
+      const { content, expected, description } = test
+      const result = searchMentionAndReplaceWithTag(roleList, userList, content)
+      const expectedResult = `have ${expected}`
       describe(`For: ${description}`, () => {
         it(`should ${expectedResult}`, () => {
           expect(result).to.deep.equal(expected)
