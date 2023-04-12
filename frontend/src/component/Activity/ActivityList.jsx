@@ -143,20 +143,17 @@ const ActivityList = (props) => {
           ? activityList
           : (
             <div className='activityList__placeholder'>
-              {props.activity.hasNextPage
-                ? (
-                  <Loading
-                    height={100}
-                    text={props.t('Loading recent activities…')}
-                    width={100}
-                  />
-                )
-                : (
-                  <EmptyListMessage>
-                    {props.t('No activity')}
-                  </EmptyListMessage>
-                )
-              }
+              {props.activity.hasNextPage ? (
+                <Loading
+                  height={100}
+                  text={props.t('Loading recent activities…')}
+                  width={100}
+                />
+              ) : (
+                <EmptyListMessage>
+                  {props.t('No activity')}
+                </EmptyListMessage>
+              )}
             </div>
           )
         )}

@@ -4,14 +4,15 @@ import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 
 import {
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_SUB_TYPE as TLM_SUB,
+  Loading,
+  TracimComponent,
   getComment,
   getContent,
   handleFetchResult,
-  TracimComponent,
-  permissiveNumberEqual,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_ENTITY_TYPE as TLM_ET,
-  TLM_SUB_TYPE as TLM_SUB
+  permissiveNumberEqual
 } from 'tracim_frontend_lib'
 import { FETCH_CONFIG } from '../util/helper.js'
 import {
@@ -29,6 +30,7 @@ export class WorkspaceRecentActivities extends React.Component {
     super(props)
     props.registerGlobalLiveMessageHandler(this.handleTlm)
     this.isLoadMoreIsProgress = false
+    this.lastSpaceLoaded = -1
   }
 
   componentDidMount () {
@@ -40,9 +42,11 @@ export class WorkspaceRecentActivities extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    if (prevProps.workspaceId === this.props.workspaceId) return
-    this.props.cancelCurrentLoadActivities()
-    this.props.loadActivities(ACTIVITY_COUNT_PER_PAGE, true, this.props.workspaceId)
+    if (this.props.system.workspaceListLoaded && this.lastSpaceLoaded !== this.props.workspaceId) {
+      this.props.cancelCurrentLoadActivities()
+      this.props.loadActivities(ACTIVITY_COUNT_PER_PAGE, true, this.props.workspaceId)
+      this.lastSpaceLoaded = this.props.workspaceId
+    }
   }
 
   /**
@@ -82,7 +86,9 @@ export class WorkspaceRecentActivities extends React.Component {
     if (this.isLoadMoreIsProgress) return
 
     this.isLoadMoreIsProgress = true
-    await props.loadActivities(props.activity.list.length + ACTIVITY_COUNT_PER_PAGE, false, props.workspaceId)
+    await props.loadActivities(
+      props.activity.list.length + ACTIVITY_COUNT_PER_PAGE, false, props.workspaceId
+    )
     this.isLoadMoreIsProgress = false
   }
 
@@ -95,16 +101,24 @@ export class WorkspaceRecentActivities extends React.Component {
           {props.t('Recent activities')}
         </div>
 
-        <ActivityList
-          activity={props.activity}
-          onRefreshClicked={props.onRefreshClicked}
-          onLoadMoreClicked={this.handleClickLoadMore}
-          onCopyLinkClicked={props.onCopyLinkClicked}
-          onEventClicked={props.onEventClicked}
-          showRefresh={props.showRefresh}
-          userId={props.user.userId}
-          workspaceList={props.workspaceList}
-        />
+        {this.lastSpaceLoaded === this.props.workspaceId ? (
+          <ActivityList
+            activity={props.activity}
+            onRefreshClicked={props.onRefreshClicked}
+            onLoadMoreClicked={this.handleClickLoadMore}
+            onCopyLinkClicked={props.onCopyLinkClicked}
+            onEventClicked={props.onEventClicked}
+            showRefresh={props.showRefresh}
+            userId={props.user.userId}
+            workspaceList={props.workspaceList}
+          />
+        ) : (
+          <Loading
+            height={100}
+            text={props.t('Loading recent activities…')}
+            width={100}
+          />
+        )}
       </div>
     )
   }
@@ -118,8 +132,12 @@ WorkspaceRecentActivities.propTypes = {
   workspaceId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired
 }
 
-const mapStateToProps = ({ lang, user, workspaceActivity, currentWorkspace, breadcrumbs, workspaceList }) => {
-  return { lang, user, activity: workspaceActivity, currentWorkspace, breadcrumbs, workspaceList }
+const mapStateToProps = (
+  { lang, user, workspaceActivity, currentWorkspace, breadcrumbs, system, workspaceList }
+) => {
+  return {
+    lang, user, activity: workspaceActivity, currentWorkspace, breadcrumbs, system, workspaceList
+  }
 }
 const component = withActivity(
   TracimComponent(WorkspaceRecentActivities),

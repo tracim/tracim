@@ -62,7 +62,6 @@ export const UserSpacesConfig = (props) => {
 
     spaceList.forEach(space => {
       const member = space.memberList.find(u => u.id === props.userToEditId)
-      console.log("BAR", space.memberList, props.userToEditId, member)
       if (space.memberList.length > 0 && member) {
         filteredListWithMember.push({ ...space, member })
       }
@@ -92,7 +91,6 @@ export const UserSpacesConfig = (props) => {
         />
       )
     })
-    console.log("FOO")
     setEntries(entryList)
   }, [spaceList, sortOrder, selectedSortCriterion, userFilter])
 
@@ -118,7 +116,6 @@ export const UserSpacesConfig = (props) => {
     if (props.userToEditId === props.user.userId) {
       setSpaceList(props.workspaceList)
       setIsLoading(false)
-      console.log("OUI", props.workspaceList)
     } else {
       getSpaceList()
     }
