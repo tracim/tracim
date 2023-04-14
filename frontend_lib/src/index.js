@@ -79,11 +79,8 @@ import {
 
 import {
   DEFAULT_ROLE_LIST,
-  GROUP_MENTION_TRANSLATION_LIST,
   addClassToMentionsOfUser,
   getInvalidMentionList,
-  handleLinksBeforeSave,
-  handleMentionsBeforeSave,
   replaceHTMLElementWithMention,
   searchContentAndReplaceWithTag,
   searchMentionAndReplaceWithTag
@@ -321,7 +318,6 @@ export {
   DEFAULT_ROLE_LIST,
   FETCH_CONFIG,
   FILE_PREVIEW_STATE,
-  GROUP_MENTION_TRANSLATION_LIST,
   IMG_LOAD_STATE,
   LIVE_MESSAGE_ERROR_CODE,
   LIVE_MESSAGE_STATUS,
@@ -468,8 +464,6 @@ export {
   getWorkspaceDetail,
   handleClickCopyLink,
   handleFetchResult,
-  handleLinksBeforeSave,
-  handleMentionsBeforeSave,
   hasSpaces,
   htmlToText,
   isFileUploadInErrorState,
