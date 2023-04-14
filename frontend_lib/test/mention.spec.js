@@ -145,7 +145,6 @@ describe('mentions on mentionOrLink.js', () => {
   })
 
   describe('the addClassToMentionsOfUser() and removeClassFromMentionsOfUser() functions', () => {
-    const parser = new globalThis.DOMParser()
     const mentionForFoo = `<span id="${MENTION_ID_PREFIX}foobar">@foo</span>`
     const mentionForAll = `<span id="${MENTION_ID_PREFIX}foobar">@all</span>`
     const htmlCommentWithoutMention = '<p>Hello <strong>world.</strong></p> <p><span style="background-color: #ffff00;">Yop</span></p> <ul> <li>Plop</li> </ul>'
