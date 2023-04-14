@@ -35,7 +35,7 @@ import {
   TracimComponent,
   getContentPath,
   handleFetchResult,
-  sortListByMultipleCriteria,
+  sortListByMultipleCriteria
 } from 'tracim_frontend_lib'
 import { escape as escapeHtml, uniqBy } from 'lodash'
 import NotificationItem from '../component/NotificationItem.jsx'
