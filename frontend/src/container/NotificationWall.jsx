@@ -424,7 +424,7 @@ export const NotificationWall = props => {
     }
 
     if (entityType === TLM_ENTITY.MENTION && eventType === TLM_EVENT.CREATED) {
-      const groupMention = notification.mention.type === 2
+      const groupMention = notification.mention.type === MENTION_CONSTANT.TYPE.ROLE
       const mentionEveryone = props.t('{{author}} mentioned everyone in {{content}}', i18nOpts)
       const mentionYou = props.t('{{author}} mentioned you in {{content}}', i18nOpts)
       const isHtmlDocument = notification.content.type === CONTENT_TYPE.HTML_DOCUMENT

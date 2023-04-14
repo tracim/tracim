@@ -4,6 +4,14 @@ import {
   getDocumentFromHTMLString
 } from './helper.js'
 import { getContent } from './action.async.js'
+
+export const MENTION_CONSTANT = {
+  TYPE: {
+    USER: 1,
+    ROLE: 2
+  }
+}
+
 export const MENTION_ID_PREFIX = 'mention-'
 export const MENTION_CLASS = 'mention'
 export const MENTION_ME_CLASS = 'mention-me'

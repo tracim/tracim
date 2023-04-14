@@ -79,6 +79,7 @@ import {
 
 import {
   DEFAULT_ROLE_LIST,
+  MENTION_CONSTANT,
   addClassToMentionsOfUser,
   getInvalidMentionList,
   replaceHTMLElementWithMention,
@@ -322,6 +323,7 @@ export {
   LIVE_MESSAGE_ERROR_CODE,
   LIVE_MESSAGE_STATUS,
   MAXIMUM_CHARACTERS_USERNAME,
+  MENTION_CONSTANT,
   MINIMUM_CHARACTERS_USERNAME,
   NUMBER_RESULTS_BY_PAGE,
   PAGE,
