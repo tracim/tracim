@@ -861,7 +861,7 @@ export class WorkspaceAdvanced extends React.Component {
             agendaUrl={state.content.agendaUrl}
             autoCompleteCursorPosition={state.autoCompleteCursorPosition}
             autoCompleteItemList={state.autoCompleteItemList}
-            codeLanguageList={state.config.system.config.code_languages}
+            codeLanguageList={state.config.system.config.ui__notes__code_sample_languages}
             customColor={state.config.hexcolor}
             defaultRole={state.content.default_user_role}
             description={state.content.description}

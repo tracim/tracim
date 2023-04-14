@@ -2,7 +2,7 @@
 
 .editCommentPopup
   & .cardPopup__container
-    width auto
+    width 100%
   & .cardPopup__body
     flex-direction column
     overflow visible
@@ -22,3 +22,8 @@
   & .autocomplete
     width auto
     left unset
+
+@media (max-width: max-xs)
+  .editCommentPopup
+    position absolute
+

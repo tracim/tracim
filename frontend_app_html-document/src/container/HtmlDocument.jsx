@@ -493,7 +493,13 @@ export class HtmlDocument extends React.Component {
     const { state, props } = this
 
     const fetchResultSaveHtmlDoc = await handleFetchResult(
-      await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, textToSend)
+      await putHtmlDocContent(
+        state.config.apiUrl,
+        state.content.workspace_id,
+        state.content.content_id,
+        state.content.label,
+        textToSend
+      )
     )
 
     switch (fetchResultSaveHtmlDoc.apiResponse.status) {
@@ -832,7 +838,7 @@ export class HtmlDocument extends React.Component {
             // End of required props ///////////////////////////////////////////
             availableStatusList={state.config.availableStatuses}
             canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
-            codeLanguageList={state.config.system.config.code_languages}
+            codeLanguageList={state.config.system.config.ui__notes__code_sample_languages}
             customClass={`${state.config.slug}__contentpage__timeline`}
             customColor={state.config.hexcolor}
             disableComment={

@@ -437,7 +437,7 @@ export class Thread extends React.Component {
                 allowClickOnRevision={false}
                 availableStatusList={state.config.availableStatuses}
                 canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
-                codeLanguageList={state.config.system.config.code_languages}
+                codeLanguageList={state.config.system.config.ui__notes__code_sample_languages}
                 customClass={`${state.config.slug}__contentpage`}
                 customColor={color}
                 deprecatedStatus={state.config.availableStatuses[3]}

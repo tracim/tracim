@@ -411,7 +411,7 @@ export class FeedItemWithPreview extends React.Component {
                 translationTargetLanguageList={props.system.config.translation_service__target_languages}
                 workspaceId={props.workspaceId}
                 // End of required props ///////////////////////////////////////
-                codeLanguageList={props.system.config.code_languages}
+                codeLanguageList={props.system.config.ui__notes__code_sample_languages}
                 customClass='feedItem__timeline'
                 customColor={contentType.hexcolor}
                 id={props.content.id}

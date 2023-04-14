@@ -479,7 +479,7 @@ export class Publications extends React.Component {
               onClickSubmit={this.handleSaveThreadPublication}
               workspaceId={parseInt(props.match.params.idws)}
               // End of required props /////////////////////////////////////////
-              codeLanguageList={props.system.config.code_languages}
+              codeLanguageList={props.system.config.ui__notes__code_sample_languages}
               customColor={COLORS.PUBLICATION}
               customClass='publishArea'
               icon='fa-fw far fa-paper-plane'
@@ -535,7 +535,7 @@ export class Publications extends React.Component {
         {!state.loading && state.showEditPopup && (
           <EditCommentPopup
             apiUrl={FETCH_CONFIG.apiUrl}
-            codeLanguageList={props.system.config.code_languages}
+            codeLanguageList={props.system.config.ui__notes__code_sample_languages}
             comment={replaceHTMLElementWithMention(
               DEFAULT_ROLE_LIST,
               props.currentWorkspace.memberList,
