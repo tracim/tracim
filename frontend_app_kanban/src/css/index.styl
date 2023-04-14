@@ -235,9 +235,13 @@ cardWidth = 280px
             margin standardSpacing 0
 
 @media (max-width: max-xs)
+  body:not(.tox-fullscreen) .kanban__KanbanPopup
+    transform translate(-50%, 0%) !important
+
   .kanban__KanbanPopup
+    position absolute
     top 10%
-    max-height "calc(100% - %s)" % standardSpacing
+    max-height "calc(100% - %s)" % listIconWidth
 
     & .cardPopup__container
       min-width 100%
