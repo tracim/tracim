@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid'
 import i18n from './i18n.js'
 import {
   PAGE,
