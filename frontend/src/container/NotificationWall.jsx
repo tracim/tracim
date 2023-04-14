@@ -20,7 +20,6 @@ import {
   CONTENT_NAMESPACE,
   CONTENT_TYPE,
   getContentPath,
-  GROUP_MENTION_TRANSLATION_LIST,
   handleFetchResult,
   Loading,
   NUMBER_RESULTS_BY_PAGE,
@@ -425,7 +424,7 @@ export const NotificationWall = props => {
     }
 
     if (entityType === TLM_ENTITY.MENTION && eventType === TLM_EVENT.CREATED) {
-      const groupMention = GROUP_MENTION_TRANSLATION_LIST.includes(notification.mention.recipient)
+      const groupMention = notification.mention.type === 2
       const mentionEveryone = props.t('{{author}} mentioned everyone in {{content}}', i18nOpts)
       const mentionYou = props.t('{{author}} mentioned you in {{content}}', i18nOpts)
       const isHtmlDocument = notification.content.type === CONTENT_TYPE.HTML_DOCUMENT
