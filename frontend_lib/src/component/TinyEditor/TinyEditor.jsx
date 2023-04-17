@@ -24,7 +24,10 @@ const advancedToolBar = [
   'code codesample | insert | removeformat | customFullscreen help'
 ].join('')
 
-const simpleToolBar = 'bold italic underline | bullist numlist | customFullscreen help'
+const simpleToolBar = [
+  'bold italic underline | bullist numlist | link customInsertImage emoticons | ',
+  'customFullscreen help'
+].join('')
 
 const handleFileSelected = (e, editorRef) => {
   const files = Array.from(e.target.files)
