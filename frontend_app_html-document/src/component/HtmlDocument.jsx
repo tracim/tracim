@@ -247,6 +247,7 @@ HtmlDocument.propTypes = {
 }
 
 HtmlDocument.defaultProps = {
+  codeLanguageList: [],
   contentId: 0,
   contentType: CONTENT_TYPE.HTML_DOCUMENT,
   customClass: 'html-document',

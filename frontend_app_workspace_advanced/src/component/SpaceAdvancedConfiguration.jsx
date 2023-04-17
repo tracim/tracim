@@ -18,6 +18,7 @@ export const SpaceAdvancedConfiguration = (props) => {
         apiUrl={props.apiUrl}
         onClickSubmit={props.onClickSubmit}
         // End of required props ///////////////////////////////////////////////////////////////////
+        codeLanguageList={props.codeLanguageList}
         customColor={props.customColor}
         description={props.description}
         isReadOnlyMode={props.isReadOnlyMode}
