@@ -48,7 +48,6 @@
   "Cancel": "Cancel",
   "Search user...": "Search user…",
   "Unknown": "Unknown",
-  "Unknown error, please inform an administrator": "Unknown error, please inform an administrator",
   "Error detail": "Error detail",
   "This content is archived": "This content is archived",
   "This content is deleted": "This content is deleted",
@@ -130,7 +129,6 @@
   "Error while archiving content": "Error while archiving content",
   "Error while deleting content": "Error while deleting content",
   "Error while restoring content": "Error while restoring content",
-  "@all Please notice that I did an important update on this content.": "@all Please notice that I did an important update on this content.",
   "An error has happened while getting the known members list": "An error has happened while getting the known members list",
   "Sends a notification to all members of the space": "Sends a notification to all members of the space",
   "Error while detecting the mentions": "Error while detecting the mentions",
@@ -245,7 +243,6 @@
   "Create from text": "Create from text",
   "Item marked as template": "Item marked as template",
   "Item unmarked as template": "Item unmarked as template",
-  "Information": "Information",
   "To create a task, type the + character followed by the username, then the text of your task.": "To create a task, type the + character followed by the username, then the text of your task.",
   "Each new line corresponds to a new task.": "Each new line corresponds to a new task.",
   "For the task to be assigned to a member, the username must be at the beginning of the line.": "For the task to be assigned to a member, the username must be at the beginning of the line.",
@@ -257,5 +254,12 @@
   "modified": "modified",
   "Unexpected error, please inform an administrator": "Unexpected error, please inform an administrator",
   "of": "of",
-  "Download": "Download"
+  "Download": "Download",
+  "Every members of the space": "Every members of the space",
+  "All": "All",
+  "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?": "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?",
+  "Insert": "Insert",
+  "Image": "Image",
+  "Fullscreen": "Fullscreen",
+  "Please notice that I did an important update on this content.": "Please notice that I did an important update on this content."
 }

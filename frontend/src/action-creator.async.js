@@ -39,7 +39,7 @@ import {
   USER_PUBLIC_NAME,
   USER_REQUEST_PASSWORD,
   USER_USERNAME,
-  USER_WORKSPACE_DO_NOTIFY,
+  USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
   USER_WORKSPACE_LIST,
   WORKSPACE,
   WORKSPACE_AGENDA_URL,
@@ -480,32 +480,38 @@ export const putUserLang = (user, newLang) => dispatch => {
   })
 }
 
-export const putMyselfWorkspaceDoNotify = (workspaceId, doNotify) => dispatch => {
+export const putMyselfWorkspaceEmailNotificationType = (workspaceId, emailNotificationType) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${workspaceId}/notifications/${doNotify ? 'activate' : 'deactivate'}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${workspaceId}/email_notification_type`,
     param: {
       credentials: 'include',
       headers: {
         ...FETCH_CONFIG.headers
       },
-      method: 'PUT'
+      method: 'PUT',
+      body: JSON.stringify({
+        email_notification_type: emailNotificationType
+      })
     },
-    actionName: USER_WORKSPACE_DO_NOTIFY,
+    actionName: USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
     dispatch
   })
 }
 
-export const putUserWorkspaceDoNotify = (user, workspaceId, doNotify) => dispatch => {
+export const putUserWorkspaceEmailNotificationType = (user, workspaceId, emailNotificationType) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${user.userId}/workspaces/${workspaceId}/notifications/${doNotify ? 'activate' : 'deactivate'}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.userId}/workspaces/${workspaceId}/email_notification_type`,
     param: {
       credentials: 'include',
       headers: {
         ...FETCH_CONFIG.headers
       },
-      method: 'PUT'
+      method: 'PUT',
+      body: JSON.stringify({
+        email_notification_type: emailNotificationType
+      })
     },
-    actionName: USER_WORKSPACE_DO_NOTIFY,
+    actionName: USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
     dispatch
   })
 }

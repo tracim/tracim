@@ -94,14 +94,14 @@ class TestUserCallEndpoint:
         )
         assert res.json["call_id"] == 1
         assert res.json["callee"] == {
-            "has_avatar": False,
+            "has_avatar": True,
             "has_cover": False,
             "public_name": "Riyad Faisal",
             "user_id": 3,
             "username": "riyad",
         }
         assert res.json["caller"] == {
-            "has_avatar": False,
+            "has_avatar": True,
             "has_cover": False,
             "public_name": "bob",
             "user_id": 2,
@@ -149,14 +149,14 @@ class TestUserCallEndpoint:
         )
         assert res.json["call_id"] == 1
         assert res.json["callee"] == {
-            "has_avatar": False,
+            "has_avatar": True,
             "has_cover": False,
             "public_name": "Riyad Faisal",
             "user_id": 3,
             "username": "riyad",
         }
         assert res.json["caller"] == {
-            "has_avatar": False,
+            "has_avatar": True,
             "has_cover": False,
             "public_name": "bob",
             "user_id": 2,

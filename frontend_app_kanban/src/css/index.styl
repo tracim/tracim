@@ -116,8 +116,6 @@ cardWidth = 280px
           &:hover
             overflow-y auto
   &__KanbanPopup
-    width 100%
-    top 15%
     max-height 80%
     &.hidden
       display none
@@ -128,8 +126,7 @@ cardWidth = 280px
         flex-direction row
 
     & .cardPopup__container
-      width unset
-      min-width 550px
+      width 80%
       display flex
       flex-direction column
       overflow auto
@@ -238,9 +235,13 @@ cardWidth = 280px
             margin standardSpacing 0
 
 @media (max-width: max-xs)
+  body:not(.tox-fullscreen) .kanban__KanbanPopup
+    transform translate(-50%, 0%) !important
+
   .kanban__KanbanPopup
+    position absolute
     top 10%
-    max-height "calc(100% - %s)" % standardSpacing
+    max-height "calc(100% - %s)" % listIconWidth
 
     & .cardPopup__container
       min-width 100%

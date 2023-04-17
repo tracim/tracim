@@ -23,7 +23,7 @@ BASE_CSP_DIRECTIVES = (
     # NOTE S.G - 2020-12-14 - unsafe-eval is needed for
     # custom forms app and user profile page
     # (react-jsonschema-form/ajv dependency)
-    ("script-src", "'unsafe-eval' 'nonce-{nonce}'"),
+    ("script-src", "'unsafe-eval' 'nonce-{nonce}' {base_url}/assets/tinymce-5.10.3/js/"),
     # NOTE S.G. - 2020-12-14 - unsafe-inline is needed for tinyMce
     ("style-src", "'unsafe-inline' 'self'"),
     ("connect-src", "'self'"),
@@ -110,7 +110,7 @@ class FrontendController(Controller):
 
             csp = "; ".join("{} {}".format(key, value) for key, value in csp_directives.items())
             csp = "{}; {}".format(app_config.CONTENT_SECURITY_POLICY__ADDITIONAL_DIRECTIVES, csp)
-            csp_header_value = csp.format(nonce=csp_nonce)
+            csp_header_value = csp.format(nonce=csp_nonce, base_url=app_config.WEBSITE__BASE_URL)
             if app_config.CONTENT_SECURITY_POLICY__REPORT_URI:
                 csp_headers.append(("Report-To", app_config.CONTENT_SECURITY_POLICY__REPORT_URI))
                 csp_header_value = "{}; report-uri {}".format(

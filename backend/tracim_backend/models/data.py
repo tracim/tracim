@@ -71,6 +71,12 @@ class WorkspaceAccessType(enum.Enum):
     OPEN = "open"
 
 
+class EmailNotificationType(enum.Enum):
+    INDIVIDUAL = "individual"
+    NONE = "none"
+    SUMMARY = "summary"
+
+
 class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeBase):
     MAX_WORKSPACE_LABEL_LENGTH = 1024
     MIN_WORKSPACE_LABEL_LENGTH = 1
@@ -268,7 +274,11 @@ class UserRoleInWorkspace(DeclarativeBase):
         primary_key=True,
     )
     role = Column(Integer, nullable=False, default=0, primary_key=False)
-    do_notify = Column(Boolean, unique=False, nullable=False, default=False)
+    email_notification_type = Column(
+        Enum(EmailNotificationType),
+        nullable=False,
+        server_default=EmailNotificationType.SUMMARY.name,
+    )
 
     workspace = relationship(
         "Workspace", remote_side=[Workspace.workspace_id], backref="roles", lazy="joined",

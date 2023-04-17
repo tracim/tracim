@@ -28,7 +28,6 @@ export const PopupCreateContent = (props) => {
         customClass='popupCreateContent'
         customColor={props.customColor}
         onClose={props.onClose}
-        customStyle={props.customStyle}
         faIcon={props.faIcon}
         label={props.label}
       >

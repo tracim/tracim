@@ -10,8 +10,10 @@
   "thread": "tråd",
   "threads": "tråder",
   "Delete": "Slett",
-  "Error while saving the comment": "Kunne ikke lagre kommentaren",
   "The content has been modified by {{author}}": "Innholdet har blitt endret av {{author}}",
   "The link has been copied to clipboard": "Lenke kopiert til utklippstavle",
-  "Copy content link": "Kopier innholdslenke"
+  "Copy content link": "Kopier innholdslenke",
+  "Every members of the space": "",
+  "All": "Alle",
+  "all": "alle"
 }

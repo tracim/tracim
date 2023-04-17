@@ -203,31 +203,4 @@ describe('<Publications />', () => {
       expect(wrapper.state('newComment')).to.equal('a')
     })
   })
-
-  describe('handleCancelSave()', () => {
-    it('should set showInvalidMentionPopupInComment state to false if it is false', () => {
-      wrapper.setState({ showInvalidMentionPopupInComment: false })
-      publicationInstance.handleCancelSave()
-      expect(wrapper.state('showInvalidMentionPopupInComment')).to.equal(false)
-    })
-
-    it('should set showInvalidMentionPopupInComment state to false if it is true', () => {
-      wrapper.setState({ showInvalidMentionPopupInComment: true })
-      publicationInstance.handleCancelSave()
-      expect(wrapper.state('showInvalidMentionPopupInComment')).to.equal(false)
-    })
-  })
-
-  describe('handleClickValidateAnyway()', () => {
-    global.localStorage = {
-      getItem: sinon.spy(),
-      setItem: sinon.spy(),
-      removeItem: sinon.spy()
-    }
-    it('should call appendPublication()', (done) => {
-      publicationInstance.handleClickValidateAnyway().then(() => {
-        expect(appendPublicationCallBack.called).to.equal(true)
-      }).then(done, done)
-    })
-  })
 })

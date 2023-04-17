@@ -8,7 +8,6 @@
   "Edit": "Bearbeiten",
   "A content with the same name already exists": "Ein Inhalt mit demselben Namen existiert bereits",
   "Error while creating note": "Fehler beim Anlegen eines Hinweises",
-  "Error while saving the comment": "Fehler beim Speichern des Kommentars",
   "This content is archived": "Dieser Inhalt wird archiviert",
   "Restore": "Wiederherstellen",
   "This content is deleted": "Dieser Inhalt wird gelöscht",
@@ -34,5 +33,10 @@
   "Download as PDF": "",
   "Tasks": "",
   "The link has been copied to clipboard": "Der Link wurde in die Clipboard kopiert",
-  "Copy content link": "Link zum Inhalt kopieren"
+  "Copy content link": "Link zum Inhalt kopieren",
+  "Every members of the space": "",
+  "All": "Alle",
+  "all": "alle",
+  "Cancel": "",
+  "Validate": ""
 }

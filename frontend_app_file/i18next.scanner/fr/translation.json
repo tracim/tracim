@@ -3,7 +3,6 @@
   "Last version": "Dernière version",
   "Restore": "Restaurer",
   "Error while creating file": "Erreur lors de la création du fichier",
-  "Error while saving the comment": "Erreur pendant la sauvegarde du commentaire",
   "Cancel": "Annuler",
   "Validate": "Valider",
   "Download file": "Télécharger le fichier",
@@ -65,5 +64,8 @@
   "Delete": "Supprimer",
   "Tasks": "Tâches",
   "The link has been copied to clipboard": "Lien copié dans le presse-papiers",
-  "Copy content link": "Copier le lien du contenu"
+  "Copy content link": "Copier le lien du contenu",
+  "Every members of the space": "Tous les membres de l'espace",
+  "All": "Tous",
+  "all": "tous"
 }

@@ -25,9 +25,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.elements import and_
 import transaction
 
-from tracim_backend.app_models.contents import COMMENT_TYPE
-from tracim_backend.app_models.contents import FOLDER_TYPE
-from tracim_backend.app_models.contents import TODO_TYPE
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
@@ -78,9 +76,13 @@ from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import RevisionReadStatus
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.event import OperationType
 from tracim_backend.models.favorites import FavoriteContent
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.tracim_session import TracimSession
+
+if typing.TYPE_CHECKING:
+    from tracim_backend.lib.utils.request import TracimContext
 
 __author__ = "damien"
 
@@ -401,7 +403,7 @@ class ContentApi(object):
         content_namespace: ContentNamespaces = ContentNamespaces.CONTENT,
     ) -> Content:
         # TODO - G.M - 2018-07-16 - raise Exception instead of assert
-        assert content_type_slug != content_type_list.Any_SLUG
+        assert content_type_slug != ContentTypeSlug.ANY.value
         assert not (label and filename)
         assert content_namespace
 
@@ -413,7 +415,7 @@ class ContentApi(object):
                 "parent namespace and content namespace should be the same."
             )
 
-        if content_type_slug == FOLDER_TYPE and not label:
+        if content_type_slug == ContentTypeSlug.FOLDER.value and not label:
             label = self.generate_folder_label(workspace, parent)
 
         if content_namespace == ContentNamespaces.PUBLICATION:
@@ -429,7 +431,7 @@ class ContentApi(object):
         self._check_valid_content_type_in_dir(content_type, parent, workspace)
         content = Content()
 
-        # NOTE - MP - 2022-07-04 - We should copy the template, note try to create a copy
+        # NOTE - MP - 2022-07-04 - We should copy the template, not try to create a copy
         if template_id:
             template = self.get_one(template_id)
             content = self.copy_from_template(
@@ -438,7 +440,6 @@ class ContentApi(object):
                 new_parent=parent,
                 new_content_namespace=content_namespace,
             )
-
         else:
             content.revision_type = ActionDescription.CREATION
 
@@ -493,11 +494,13 @@ class ContentApi(object):
     def copy_todos(self, new_parent: Content, template_id: int) -> None:
         """Create extra data for templates: todos"""
         try:
-            todos = self.get_all_query(parent_ids=[template_id], content_type_slug=TODO_TYPE,).all()
+            todos = self.get_all_query(
+                parent_ids=[template_id], content_type_slug=ContentTypeSlug.TODO.value,
+            ).all()
 
             for todo in todos:
                 self.create(
-                    content_type_slug=TODO_TYPE,
+                    content_type_slug=ContentTypeSlug.TODO.value,
                     workspace=new_parent.workspace,
                     template_id=todo.content_id,
                     parent=new_parent,
@@ -519,7 +522,7 @@ class ContentApi(object):
         do_notify=True,
     ) -> Content:
         # TODO: check parent allowed_type and workspace allowed_ type
-        assert parent and parent.type != FOLDER_TYPE
+        assert parent and parent.type != ContentTypeSlug.FOLDER.value
         if not self.is_editable(parent):
             raise ContentInNotEditableState(
                 "Can't create comment on content, you need to change its"
@@ -529,6 +532,7 @@ class ContentApi(object):
         config = HtmlSanitizerConfig(tag_blacklist=["script"], tag_whitelist=list())
         sanitizer = HtmlSanitizer(html_body=content, config=config)
         content = sanitizer.sanitize_html()
+
         if (not content) or sanitizer.html_is_empty():
             raise EmptyCommentContentNotAllowed()
 
@@ -541,6 +545,7 @@ class ContentApi(object):
             do_save=False,
             label="",
         )
+
         item.raw_content = content
         item.revision_type = ActionDescription.COMMENT
         if do_save:
@@ -576,7 +581,7 @@ class ContentApi(object):
     def get_one(
         self,
         content_id: int,
-        content_type: str = content_type_list.Any_SLUG,
+        content_type: str = ContentTypeSlug.ANY.value,
         workspace: Workspace = None,
         parent: Content = None,
         ignore_content_state_filter: bool = False,
@@ -594,7 +599,7 @@ class ContentApi(object):
 
         base_request = base_request.filter(Content.content_id == content_id)
 
-        if content_type != content_type_list.Any_SLUG:
+        if content_type != ContentTypeSlug.ANY.value:
             base_request = base_request.filter(Content.type == content_type)
 
         if parent:
@@ -874,7 +879,7 @@ class ContentApi(object):
     def get_all_query(
         self,
         parent_ids: typing.Optional[typing.List[int]] = None,
-        content_type_slug: str = content_type_list.Any_SLUG,
+        content_type_slug: str = ContentTypeSlug.ANY.value,
         workspaces: typing.Optional[typing.List[Workspace]] = None,
         label: typing.Optional[str] = None,
         order_by_properties: typing.Optional[
@@ -908,7 +913,7 @@ class ContentApi(object):
         #  of content, workspace root included
         if complete_path_to_id:
             content = self.get_one(
-                complete_path_to_id, content_type_list.Any_SLUG, ignore_content_state_filter=True
+                complete_path_to_id, ContentTypeSlug.ANY.value, ignore_content_state_filter=True
             )
             if content.parent_id:
                 content = content.parent
@@ -920,7 +925,7 @@ class ContentApi(object):
             # parent_ids list when complete_path_to_id is set
             parent_ids.append(0)
 
-        if content_type_slug != content_type_list.Any_SLUG:
+        if content_type_slug != ContentTypeSlug.ANY.value:
             # INFO - G.M - 2018-07-05 - convert with
             #  content type object to support legacy slug
             content_type_object = content_type_list.get_one_by_slug(content_type_slug)
@@ -972,7 +977,7 @@ class ContentApi(object):
     def get_all(
         self,
         parent_ids: typing.Optional[typing.List[int]] = None,
-        content_type: str = content_type_list.Any_SLUG,
+        content_type: str = ContentTypeSlug.ANY.value,
         workspaces: typing.Optional[typing.List[Workspace]] = None,
         label: typing.Optional[str] = None,
         order_by_properties: typing.Optional[
@@ -1300,6 +1305,7 @@ class ContentApi(object):
     def copy(
         self,
         item: Content,
+        context: "TracimContext",
         new_parent: Content = None,
         new_label: str = None,
         new_workspace: Workspace = None,
@@ -1390,22 +1396,24 @@ class ContentApi(object):
                 "content {} of type {} should always have a label "
                 "and a valid filename".format(item.content_id, content_type_slug)
             )
-
-        copy_result = self._copy(item, content_namespace, parent)
-
-        copy_result = self._add_copy_revisions(
-            original_content=item,
-            new_content=copy_result.new_content,
-            original_content_children=copy_result.original_children_dict,
-            new_content_children=copy_result.new_children_dict,
-            new_parent=parent,
-            new_label=label,
-            new_workspace=workspace,
-            new_file_extension=file_extension,
-            new_content_namespace=content_namespace,
-            do_save=do_save,
-            do_notify=do_notify,
-        )
+        new_content = Content()
+        with context.batched_events(
+            operation_type=OperationType.COPIED, obj=new_content,
+        ):
+            copy_result = self._copy(item, new_content, content_namespace, parent)
+            copy_result = self._add_copy_revisions(
+                original_content=item,
+                new_content=copy_result.new_content,
+                original_content_children=copy_result.original_children_dict,
+                new_content_children=copy_result.new_children_dict,
+                new_parent=parent,
+                new_label=label,
+                new_workspace=workspace,
+                new_file_extension=file_extension,
+                new_content_namespace=content_namespace,
+                do_save=do_save,
+                do_notify=do_notify,
+            )
         return copy_result.new_content
 
     def copy_from_template(
@@ -1432,6 +1440,7 @@ class ContentApi(object):
     def _copy(
         self,
         content: Content,
+        new_content: Content,
         new_content_namespace: ContentNamespaces = None,
         new_parent: Content = None,
     ) -> AddCopyRevisionsResult:
@@ -1443,7 +1452,6 @@ class ContentApi(object):
         :return: new content created based on original root content,
         dict of new children content and original children content with original content id as key.
         """
-        new_content = Content()
         # INFO - G.M - 2019-04-30 - we store all children content created and old content id of them
         # to be able to retrieve them for applying new revisions on them easily. key of dict is
         # original content_id.
@@ -1586,7 +1594,7 @@ class ContentApi(object):
     def update_container_content(
         self,
         item: Content,
-        allowed_content_type_slug_list: typing.List[str],
+        allowed_content_type_slug_list: typing.Optional[typing.List[str]],
         new_label: str,
         new_description: typing.Optional[str] = None,
         new_raw_content: typing.Optional[str] = None,
@@ -1602,11 +1610,13 @@ class ContentApi(object):
          of content.
         :return:
         """
-        try:
-            item = self.set_allowed_content(item, allowed_content_type_slug_list)
-            content_has_changed = True
-        except SameValueError:
-            content_has_changed = False
+        content_has_changed = False
+        if allowed_content_type_slug_list is not None:
+            try:
+                item = self.set_allowed_content(item, allowed_content_type_slug_list)
+                content_has_changed = True
+            except SameValueError:
+                pass
         item = self.update_content(
             item,
             new_label,
@@ -2007,9 +2017,12 @@ class ContentApi(object):
     def save(self, content: Content, action_description: str = None, do_flush=True, do_notify=True):
         """
         Save an object, flush the session and set the revision_type property
-        :param content:
-        :param action_description:
-        :return:
+
+        Args:
+            content (Content): Content to save
+            action_description (str, optional): Action done on the content. Defaults to None.
+            do_flush (bool, optional): Should it flush. Defaults to True.
+            do_notify (bool, optional): Should it notify users. Defaults to True.
         """
         assert (
             action_description is None or action_description in ActionDescription.allowed_values()
@@ -2100,7 +2113,10 @@ class ContentApi(object):
         return _("New folder {0}").format(query.count() + 1)
 
     def _allow_empty_label(self, content_type_slug: str) -> bool:
-        if content_type_list.get_one_by_slug(content_type_slug).slug in [COMMENT_TYPE, TODO_TYPE]:
+        if content_type_list.get_one_by_slug(content_type_slug).slug in [
+            ContentTypeSlug.COMMENT.value,
+            ContentTypeSlug.TODO.value,
+        ]:
             return True
         return False
 
@@ -2158,7 +2174,7 @@ class ContentApi(object):
         query = (
             self.get_all_query(
                 parent_ids=None,
-                content_type_slug=content_type_list.Any_SLUG,
+                content_type_slug=ContentTypeSlug.ANY.value,
                 workspaces=None,
                 label=None,
             )

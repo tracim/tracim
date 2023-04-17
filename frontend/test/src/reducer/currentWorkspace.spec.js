@@ -21,13 +21,13 @@ import {
   setWorkspaceReadStatusList,
   UPDATE,
   updateUser,
-  updateUserWorkspaceSubscriptionNotif,
+  updateUserWorkspaceEmailNotificationType,
   updateWorkspaceContentList,
   updateWorkspaceDetail,
   updateWorkspaceMember,
   addWorkspaceReadStatus,
   USER,
-  USER_WORKSPACE_DO_NOTIFY,
+  USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
   WORKSPACE_AGENDA_URL,
   WORKSPACE_CONTENT,
   WORKSPACE_DETAIL,
@@ -71,9 +71,9 @@ describe('reducer currentWorkspace.js', () => {
           id: globalManagerAsMemberFromApi.user.user_id,
           publicName: globalManagerAsMemberFromApi.user.public_name,
           role: globalManagerAsMemberFromApi.role,
-          doNotify: globalManagerAsMemberFromApi.do_notify,
+          emailNotificationType: globalManagerAsMemberFromApi.email_notification_type,
           username: globalManagerAsMemberFromApi.user.username,
-          hasAvatar: false,
+          hasAvatar: true,
           hasCover: false
         })
       })
@@ -135,7 +135,7 @@ describe('reducer currentWorkspace.js', () => {
         id: 15,
         publicName: 'random user',
         role: ROLE.reader.slug,
-        doNotify: true,
+        emailNotificationType: 'summary',
         username: 'random'
       }
       const initialStateWithMember = { ...initialState, memberList: [randomMember] }
@@ -145,7 +145,7 @@ describe('reducer currentWorkspace.js', () => {
           addWorkspaceMember(
             globalManagerFromApi,
             initialState.id,
-            { role: ROLE.workspaceManager.slug, do_notify: true }
+            { role: ROLE.workspaceManager.slug, email_notification_type: 'summary' }
           )
         )
 
@@ -176,7 +176,11 @@ describe('reducer currentWorkspace.js', () => {
       const initialStateWithMember = { ...initialState, memberList: [globalManagerAsMember] }
       const rez = currentWorkspace(
         initialStateWithMember,
-        updateWorkspaceMember(globalManagerFromApi, initialState.id, { role: ROLE.contributor.slug, do_notify: true })
+        updateWorkspaceMember(
+          globalManagerFromApi, initialState.id, {
+            role: ROLE.contributor.slug, email_notification_type: 'summary'
+          }
+        )
       )
       it('should return a workspace object with the member global manager as contributor', () => {
         expect(rez).to.deep.equal({
@@ -203,18 +207,23 @@ describe('reducer currentWorkspace.js', () => {
       })
     })
 
-    describe(`${UPDATE}/${USER_WORKSPACE_DO_NOTIFY}`, () => {
-      const initialStateWithMember = { ...initialState, memberList: [{ ...globalManagerAsMember, doNotify: true }] }
+    describe(`${UPDATE}/${USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE}`, () => {
+      const initialStateWithMember = {
+        ...initialState,
+        memberList: [{
+          ...globalManagerAsMember, emailNotificationType: 'summary'
+        }]
+      }
       const rez = currentWorkspace(
         initialStateWithMember,
-        updateUserWorkspaceSubscriptionNotif(globalManagerAsMember.id, initialState.id, false)
+        updateUserWorkspaceEmailNotificationType(globalManagerAsMember.id, initialState.id, 'none')
       )
       it('should return a workspace object with the member as notification disabled', () => {
         expect(rez).to.deep.equal({
           ...initialStateWithMember,
           memberList: [{
             ...globalManagerAsMember,
-            doNotify: false
+            emailNotificationType: 'none'
           }]
         })
       })
@@ -465,7 +474,7 @@ describe('reducer currentWorkspace.js', () => {
         ...initialState,
         memberList: [{
           ...serializeMember(globalManagerAsMemberFromApi),
-          doNotify: false
+          emailNotificationType: 'none'
         }]
       }
       const rez = currentWorkspace(newInitialState, updateUser({ ...globalManagerFromApi, username: 'newUsername' }))
@@ -474,7 +483,7 @@ describe('reducer currentWorkspace.js', () => {
           ...newInitialState,
           memberList: [{
             ...globalManagerAsMember,
-            doNotify: false,
+            emailNotificationType: 'none',
             username: 'newUsername'
           }]
         })

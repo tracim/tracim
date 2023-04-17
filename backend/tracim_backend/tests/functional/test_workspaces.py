@@ -10,8 +10,10 @@ from freezegun import freeze_time
 import pytest
 import transaction
 
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.error import ErrorCode
 from tracim_backend.models.auth import Profile
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceAccessType
@@ -145,7 +147,7 @@ class TestWorkspaceCreationEndpointWorkspaceAccessTypeChecks(object):
         assert workspace["public_download_enabled"] is False
         assert workspace["description"] == "mysuperdescription"
         assert workspace["owner"]["user_id"] == 1
-        assert workspace["owner"]["has_avatar"] is False
+        assert workspace["owner"]["has_avatar"] is True
         assert workspace["owner"]["public_name"] == "Global manager"
         assert workspace["owner"]["username"] == "TheAdmin"
         assert workspace["owner"]
@@ -196,7 +198,7 @@ class TestWorkspaceCreationEndpointWorkspaceAccessTypeChecks(object):
         assert workspace["public_download_enabled"] is False
         assert workspace["description"] == "mysuperdescription"
         assert workspace["owner"]["user_id"] == 1
-        assert workspace["owner"]["has_avatar"] is False
+        assert workspace["owner"]["has_avatar"] is True
         assert workspace["owner"]["public_name"] == "Global manager"
         assert workspace["owner"]["username"] == "TheAdmin"
         assert workspace["owner"]
@@ -291,8 +293,13 @@ class TestWorkspaceDiskSpaceEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.CONTRIBUTOR,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.get_one(workspace.workspace_id)
         transaction.commit()
@@ -346,8 +353,13 @@ class TestWorkspaceEndpoint(object):
         workspace_api = workspace_api_factory.get(show_deleted=True)
         parent_workspace = workspace_api.create_workspace("test_parent", save_now=True)
         workspace = workspace_api.create_workspace("test", parent=parent_workspace, save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.get_one(workspace.workspace_id)
         app_api = application_api_factory.get()
@@ -729,7 +741,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["public_download_enabled"] is False
         assert workspace["description"] == "mysuperdescription"
         assert workspace["owner"]["user_id"] == 1
-        assert workspace["owner"]["has_avatar"] is False
+        assert workspace["owner"]["has_avatar"] is True
         assert workspace["owner"]["public_name"] == "Global manager"
         assert workspace["owner"]["username"] == "TheAdmin"
         assert workspace["owner"]
@@ -887,8 +899,13 @@ class TestWorkspaceEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -917,8 +934,13 @@ class TestWorkspaceEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -945,8 +967,13 @@ class TestWorkspaceEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -1036,8 +1063,13 @@ class TestWorkspaceEndpoint(object):
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         workspace_api.delete(workspace, flush=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -1066,8 +1098,13 @@ class TestWorkspaceEndpoint(object):
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         workspace_api.delete(workspace, flush=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -1095,8 +1132,13 @@ class TestWorkspaceEndpoint(object):
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         workspace_api.delete(workspace, flush=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -1227,8 +1269,13 @@ class TestWorkspacesEndpoints(object):
         workspace_api.create_workspace("test", save_now=True)
         space2 = workspace_api.create_workspace("test2", save_now=True)
 
-        rapi = role_api_factory.get(current_user=admin2)
-        rapi.create_one(user, space2, UserRoleInWorkspace.READER, False)
+        role_api = role_api_factory.get(current_user=admin2)
+        role_api.create_one(
+            user,
+            space2,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1368,10 +1415,10 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user"]["username"] == "TheAdmin"
         assert user_role["user"]["user_id"] == 1
         assert user_role["is_active"] is True
-        assert user_role["do_notify"] is True
+        assert user_role["email_notification_type"] == "summary"
         # TODO - G.M - 24-05-2018 - [Avatar] Replace
         # by correct value when avatar feature will be enabled
-        assert user_role["user"]["has_avatar"] is False
+        assert user_role["user"]["has_avatar"] is True
 
     def test_api__get_workspace_members__ok_200_show_disabled_users(
         self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
@@ -1389,9 +1436,14 @@ class TestWorkspaceMembersEndpoint(object):
         )
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test_2", save_now=True)
-        rapi = role_api_factory.get(current_user=admin_user)
+        role_api = role_api_factory.get(current_user=admin_user)
         uapi.disable(user, do_save=True)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         user_id = user.user_id
         workspace_id = workspace.workspace_id
@@ -1405,7 +1457,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user_id"] == user_id
         assert user_role["workspace_id"] == workspace_id
         assert user_role["is_active"] is False
-        assert user_role["do_notify"] is False
+        assert user_role["email_notification_type"] == "none"
 
     def test_api__get_workspace_members__ok_200_show_only_enabled_users(
         self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
@@ -1423,9 +1475,14 @@ class TestWorkspaceMembersEndpoint(object):
         )
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test_2", save_now=True)
-        rapi = role_api_factory.get(current_user=admin_user)
+        role_api = role_api_factory.get(current_user=admin_user)
         uapi.disable(user, do_save=True)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         workspace_id = workspace.workspace_id
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -1437,7 +1494,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user_id"] == admin_user.user_id
         assert user_role["workspace_id"] == workspace_id
         assert user_role["is_active"] is True
-        assert user_role["do_notify"] is True
+        assert user_role["email_notification_type"] == "summary"
 
     def test_api__get_workspace_members__ok_200__as_admin(
         self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
@@ -1460,8 +1517,13 @@ class TestWorkspaceMembersEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(current_user=admin2)
         workspace = workspace_api.create_workspace("test_2", save_now=True)
-        rapi = role_api_factory.get(current_user=admin2)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
+        role_api = role_api_factory.get(current_user=admin2)
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         user_id = user.user_id
         workspace_id = workspace.workspace_id
@@ -1475,7 +1537,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user_id"] == user_id
         assert user_role["workspace_id"] == workspace_id
         assert user_role["is_active"] is True
-        assert user_role["do_notify"] is False
+        assert user_role["email_notification_type"] == "none"
 
     def test_api__get_workspace_members__err_400__unallowed_user(self, web_testapp):
         """
@@ -1519,10 +1581,10 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user"]["username"] == "TheAdmin"
         assert user_role["user"]["user_id"] == 1
         assert user_role["is_active"] is True
-        assert user_role["do_notify"] is True
+        assert user_role["email_notification_type"] == "summary"
         # TODO - G.M - 24-05-2018 - [Avatar] Replace
         # by correct value when avatar feature will be enabled
-        assert user_role["user"]["has_avatar"] is False
+        assert user_role["user"]["has_avatar"] is True
 
     def test_api__get_workspace_member__ok_200__as_admin(
         self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
@@ -1545,8 +1607,13 @@ class TestWorkspaceMembersEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(current_user=admin2)
         workspace = workspace_api.create_workspace("test_2", save_now=True)
-        rapi = role_api_factory.get(current_user=admin2)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
+        role_api = role_api_factory.get(current_user=admin2)
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         user_id = user.user_id
         workspace_id = workspace.workspace_id
@@ -1559,7 +1626,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user_id"] == user_id
         assert user_role["workspace_id"] == workspace_id
         assert user_role["is_active"] is True
-        assert user_role["do_notify"] is False
+        assert user_role["email_notification_type"] == "none"
 
     def test_api__get_workspace_member__ok_200__other_user(
         self, user_api_factory, workspace_api_factory, role_api_factory, admin_user, web_testapp
@@ -1578,8 +1645,13 @@ class TestWorkspaceMembersEndpoint(object):
         )
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test_2", save_now=True)
-        rapi = role_api_factory.get(current_user=None)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
+        role_api = role_api_factory.get(current_user=None)
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         user_id = user.user_id
         workspace_id = workspace.workspace_id
@@ -1593,7 +1665,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user_id"] == user_id
         assert user_role["workspace_id"] == workspace_id
         assert user_role["is_active"] is True
-        assert user_role["do_notify"] is False
+        assert user_role["email_notification_type"] == "none"
 
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         res = web_testapp.get(
@@ -1604,7 +1676,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user_id"] == admin_id
         assert user_role["workspace_id"] == workspace_id
         assert user_role["is_active"] is True
-        assert user_role["do_notify"] is True
+        assert user_role["email_notification_type"] == "summary"
 
     def test_api__get_workspace_member__err_400__unallowed_user(self, web_testapp):
         """
@@ -1663,13 +1735,12 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role_found["user_id"] == 2
         assert user_role_found["workspace_id"] == 1
         assert user_role_found["newly_created"] is False
-        assert user_role_found["email_sent"] is False
-        assert user_role_found["do_notify"] is False
+        assert user_role_found["email_notification_type"] == "none"
         last_event = event_helper.last_event
         assert last_event.event_type == "workspace_member.created"
         assert last_event.member == {
             "role": user_role_found["role"],
-            "do_notify": user_role_found["do_notify"],
+            "email_notification_type": user_role_found["email_notification_type"],
         }
         workspace = web_testapp.get("/api/workspaces/1", status=200).json_body
         assert last_event.workspace == {k: v for k, v in workspace.items() if k != "description"}
@@ -1722,8 +1793,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role_found["user_id"]
         assert user_role_found["workspace_id"] == workspace_id
         assert user_role_found["newly_created"] is False
-        assert user_role_found["email_sent"] is False
-        assert user_role_found["do_notify"] is False
+        assert user_role_found["email_notification_type"] == "none"
 
         res = web_testapp.get(
             "/api/workspaces/{}/members".format(workspace_id), status=200
@@ -1757,10 +1827,15 @@ class TestWorkspaceMembersEndpoint(object):
         admin2 = uapi.create_user(
             email="admin2@admin2.admin2", profile=Profile.ADMIN, do_notify=False
         )
-        rapi = role_api_factory.get(current_user=admin2)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        role_api = role_api_factory.get(current_user=admin2)
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
-        rapi.delete_one(admin_user.user_id, workspace.workspace_id)
+        role_api.delete_one(admin_user.user_id, workspace.workspace_id)
         transaction.commit()
         user_id = user.user_id
         workspace_id = workspace.workspace_id
@@ -1779,8 +1854,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role_found["user_id"]
         assert user_role_found["workspace_id"] == workspace_id
         assert user_role_found["newly_created"] is False
-        assert user_role_found["email_sent"] is False
-        assert user_role_found["do_notify"] is False
+        assert user_role_found["email_notification_type"] == "none"
 
         res = web_testapp.get(
             "/api/workspaces/{}/members".format(workspace_id), status=200
@@ -1813,8 +1887,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role_found["user_id"] == 2
         assert user_role_found["workspace_id"] == 1
         assert user_role_found["newly_created"] is False
-        assert user_role_found["email_sent"] is False
-        assert user_role_found["do_notify"] is False
+        assert user_role_found["email_notification_type"] == "none"
 
         res = web_testapp.get("/api/workspaces/1/members", status=200).json_body
         assert len(res) == 2
@@ -1893,8 +1966,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role_found["user_id"] == 3
         assert user_role_found["workspace_id"] == 1
         assert user_role_found["newly_created"] is False
-        assert user_role_found["email_sent"] is False
-        assert user_role_found["do_notify"] is False
+        assert user_role_found["email_notification_type"] == "none"
 
         res = web_testapp.get("/api/workspaces/1/members", status=200).json_body
         assert len(res) == 2
@@ -2000,11 +2072,21 @@ class TestWorkspaceMembersEndpoint(object):
 
         profile = Profile.ADMIN
         admin2 = uapi.create_user(email="admin2@admin2.admin2", profile=profile, do_notify=False)
-        rapi = role_api_factory.get(current_user=admin2)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)
+        role_api = role_api_factory.get(current_user=admin2)
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            user2,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
-        rapi.delete_one(admin_user.user_id, workspace.workspace_id)
+        role_api.delete_one(admin_user.user_id, workspace.workspace_id)
         transaction.commit()
         # before
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -2033,7 +2115,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert last_event.event_type == "workspace_member.modified"
         assert last_event.member == {
             "role": user_role["role"],
-            "do_notify": user_role["do_notify"],
+            "email_notification_type": user_role["email_notification_type"],
         }
         workspace_dict = web_testapp.get(
             "/api/workspaces/{}".format(workspace.workspace_id), status=200
@@ -2057,7 +2139,7 @@ class TestWorkspaceMembersEndpoint(object):
         ).json_body
         user_role = res
         assert user_role["role"] == "content-manager"
-        assert user_role["do_notify"] is False
+        assert user_role["email_notification_type"] == "none"
         assert user_role["user_id"] == user2.user_id
         assert user_role["workspace_id"] == workspace.workspace_id
 
@@ -2141,9 +2223,19 @@ class TestWorkspaceMembersEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(current_user=admin2, show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get(current_user=admin2)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)
-        rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)
+        role_api = role_api_factory.get(current_user=admin2)
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.CONTRIBUTOR,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            user2,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         # update workspace role
         web_testapp.authorization = ("Basic", ("admin2@admin2.admin2", "admin2@admin2.admin2"))
@@ -2194,9 +2286,19 @@ class TestWorkspaceMembersEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(current_user=admin2, show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get(current_user=admin2)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)
+        role_api = role_api_factory.get(current_user=admin2)
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            user2,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         # update workspace role
         web_testapp.authorization = ("Basic", ("admin2@admin2.admin2", "admin2@admin2.admin2"))
@@ -2210,7 +2312,7 @@ class TestWorkspaceMembersEndpoint(object):
         )
         user_role = res.json_body
         assert user_role["role"] == "content-manager"
-        assert user_role["do_notify"] is True
+        assert user_role["email_notification_type"] == "summary"
         assert user_role["user_id"] == admin2.user_id
         assert user_role["workspace_id"] == workspace.workspace_id
 
@@ -2244,11 +2346,21 @@ class TestWorkspaceMembersEndpoint(object):
 
         profile = Profile.ADMIN
         admin2 = uapi.create_user(email="admin2@admin2.admin2", profile=profile, do_notify=False)
-        rapi = role_api_factory.get(current_user=admin2)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)
+        role_api = role_api_factory.get(current_user=admin2)
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            user2,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
-        rapi.delete_one(admin_user.user_id, workspace.workspace_id)
+        role_api.delete_one(admin_user.user_id, workspace.workspace_id)
         transaction.commit()
         # before
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -2280,7 +2392,7 @@ class TestWorkspaceMembersEndpoint(object):
         ).json_body
         user_role = res
         assert user_role["role"] == "content-manager"
-        assert user_role["do_notify"] is False
+        assert user_role["email_notification_type"] == "none"
         assert user_role["user_id"] == user2.user_id
         assert user_role["workspace_id"] == workspace.workspace_id
 
@@ -2303,8 +2415,13 @@ class TestWorkspaceMembersEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
@@ -2319,8 +2436,8 @@ class TestWorkspaceMembersEndpoint(object):
         last_event = event_helper.last_event
         assert last_event.event_type == "workspace_member.deleted"
         assert last_event.member == {
+            "email_notification_type": "none",
             "role": "workspace-manager",
-            "do_notify": False,
         }
 
         user_schema = UserDigestSchema()
@@ -2369,9 +2486,19 @@ class TestWorkspaceMembersEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            user2,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -2454,8 +2581,13 @@ class TestWorkspaceMembersEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(current_user=user2, show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("test2@test2.test2", "test2@test2.test2"))
@@ -2499,8 +2631,13 @@ class TestWorkspaceMembersEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(current_user=user2, show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("test2@test2.test2", "test2@test2.test2"))
@@ -2551,8 +2688,13 @@ class TestWorkspaceMembersEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(current_user=user2, show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("test2@test2.test2", "test2@test2.test2"))
@@ -2603,9 +2745,19 @@ class TestWorkspaceMembersEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
-        rapi.create_one(user2, workspace, UserRoleInWorkspace.READER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            user2,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("test2@test2.test2", "test2@test2.test2"))
@@ -2654,8 +2806,13 @@ class TestUserInvitationWithMailActivatedSyncDefaultProfileTrustedUser(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # create workspace role
@@ -2673,8 +2830,7 @@ class TestUserInvitationWithMailActivatedSyncDefaultProfileTrustedUser(object):
         user_id = user_role_found["user_id"]
         assert user_role_found["workspace_id"] == workspace.workspace_id
         assert user_role_found["newly_created"] is True
-        assert user_role_found["email_sent"] is True
-        assert user_role_found["do_notify"] is False
+        assert user_role_found["email_notification_type"] == "none"
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
@@ -2716,8 +2872,13 @@ class TestUserInvitationWithMailActivatedSync(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # create workspace role
@@ -2735,8 +2896,7 @@ class TestUserInvitationWithMailActivatedSync(object):
         user_id = user_role_found["user_id"]
         assert user_role_found["workspace_id"] == workspace.workspace_id
         assert user_role_found["newly_created"] is True
-        assert user_role_found["email_sent"] is True
-        assert user_role_found["do_notify"] is False
+        assert user_role_found["email_notification_type"] == "none"
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
@@ -2771,8 +2931,13 @@ class TestUserInvitationWithMailActivatedSync(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -2824,8 +2989,13 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.INDIVIDUAL,
+        )
         transaction.commit()
 
         mailhog.cleanup_mailhog()
@@ -2845,10 +3015,16 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
         user_id = user_role_found["user_id"]
         assert user_role_found["workspace_id"] == workspace.workspace_id
         assert user_role_found["newly_created"] is True
-        assert user_role_found["email_sent"] is True
-        assert user_role_found["do_notify"] is True
+        assert user_role_found["email_notification_type"] == "individual"
 
+        # Set email notification type to `all`
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.put_json(
+            f"/api/users/{user_id}/workspaces/{workspace.workspace_id}/email_notification_type",
+            status=204,
+            params={"email_notification_type": "individual"},
+        )
+
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["profile"] == "users"
@@ -2872,7 +3048,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
         )
         transaction.commit()
         response = mailhog.get_mailhog_mails()
-        assert len(response) == 0
+        assert len(response) == 1
         # check for notification to new connected user, user should not be notified
         # until it connected to tracim.
         bob = uapi.get_one_by_email(email="bob@bob.bob")
@@ -2890,7 +3066,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
         )
         transaction.commit()
         response = mailhog.get_mailhog_mails()
-        assert len(response) == 1
+        assert len(response) == 2
         headers = response[0]["Content"]["Headers"]
         assert headers["From"][0] == "Global manager via Tracim <test_user_from+1@localhost>"
         assert headers["To"][0] == "bob <bob@bob.bob>"
@@ -3073,7 +3249,6 @@ class TestUserInvitationWithMailActivatedASync(object):
         res = web_testapp.post_json("/api/workspaces/1/members", status=200, params=params)
         user_role_found = res.json_body
         assert user_role_found["newly_created"] is True
-        assert user_role_found["email_sent"] is False
 
     def test_api__create_workspace_member_role__ok_200__new_user_rfc_email(self, web_testapp):
         """
@@ -3090,7 +3265,6 @@ class TestUserInvitationWithMailActivatedASync(object):
         res = web_testapp.post_json("/api/workspaces/1/members", status=200, params=params)
         user_role_found = res.json_body
         assert user_role_found["newly_created"] is True
-        assert user_role_found["email_sent"] is False
         assert user_role_found["user"]["public_name"] == "Bob !"
         user_id = user_role_found["user_id"]
         res = web_testapp.get("/api/users/{}".format(user_id), status=200, params=params)
@@ -3963,7 +4137,7 @@ class TestWorkspaceContentsWithFixture(object):
         workspace_api = workspace_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         content_api = content_api_factory.get()
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=ContentTypeSlug.ANY)
         test_thread = content_api.create(
             content_type_slug=content_type_list.Thread.slug,
             workspace=business_workspace,
@@ -4048,7 +4222,7 @@ class TestWorkspaceContentsWithFixture(object):
         workspace_api = workspace_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         content_api = content_api_factory.get()
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=ContentTypeSlug.ANY)
         test_thread = content_api.create(
             content_type_slug=content_type_list.Thread.slug,
             workspace=business_workspace,
@@ -4675,8 +4849,13 @@ class TestWorkspaceContentsWithFixture(object):
         )
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.CONTRIBUTOR,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         content_api = content_api_factory.get()
         folder = content_api.create(
             label="test-folder",
@@ -4729,8 +4908,13 @@ class TestWorkspaceContentsWithFixture(object):
         )
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         content_api = content_api_factory.get()
         folder = content_api.create(
             label="test-folder",
@@ -4780,8 +4964,13 @@ class TestWorkspaceContentsWithFixture(object):
         )
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         content_api = content_api_factory.get()
         thread = content_api.create(
             label="test-thread",
@@ -4842,8 +5031,13 @@ class TestWorkspaceContentsWithFixture(object):
         )
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         content_api = content_api_factory.get()
         folder = content_api.create(
             label="test-folder",
@@ -5051,9 +5245,19 @@ class TestWorkspaceContentsWithFixture(object):
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         projectA_workspace = workspace_api.create_workspace("projectA", save_now=True)
         projectB_workspace = workspace_api.create_workspace("projectB", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, projectA_workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
-        rapi.create_one(user, projectB_workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            projectA_workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            user,
+            projectB_workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         content_api = content_api_factory.get()
 
         documentation_folder = content_api.create(
@@ -5365,8 +5569,13 @@ class TestWorkspaceContents(object):
             do_notify=False,
             profile=profile,
         )
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
 

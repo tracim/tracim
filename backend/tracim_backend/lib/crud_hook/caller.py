@@ -29,6 +29,7 @@ class DatabaseCrudHookCaller:
     def _call_hooks(self, session: TracimSession, flush_context: UOWTransaction,) -> None:
         assert session.context, "session must have a context"
         assert session.context.dbsession
+        roles = []
         for obj in session.new:
             if isinstance(obj, User):
                 self._plugin_manager.hook.on_user_created(user=obj, context=session.context)
@@ -40,6 +41,7 @@ class DatabaseCrudHookCaller:
                 self._plugin_manager.hook.on_user_role_in_workspace_created(
                     role=obj, context=session.context
                 )
+                roles.append(obj)
             elif isinstance(obj, Content):
                 self._plugin_manager.hook.on_content_created(content=obj, context=session.context)
             elif isinstance(obj, WorkspaceSubscription):
@@ -58,6 +60,10 @@ class DatabaseCrudHookCaller:
                 self._plugin_manager.hook.on_user_call_created(
                     user_call=obj, context=session.context
                 )
+        if roles:
+            self._plugin_manager.hook.on_user_role_in_workspaces_created(
+                roles=roles, context=session.context
+            )
 
         for obj in session.dirty:
             # NOTE S.G 2020-05-08: session.dirty contains objects that do not have to be

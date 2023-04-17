@@ -43,7 +43,7 @@ const notification = {
   author: {
     publicName: globalManagerFromApi.public_name,
     userId: globalManagerFromApi.user_id,
-    hasAvatar: false,
+    hasAvatar: true,
     hasCover: false
   },
   content: null,
@@ -72,7 +72,7 @@ const mention = {
   author: {
     publicName: globalManagerFromApi.public_name,
     userId: globalManagerFromApi.user_id,
-    hasAvatar: false,
+    hasAvatar: true,
     hasCover: false
   },
   content: null,

@@ -4,6 +4,7 @@ import transaction
 
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.core.tag import TagLib
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
@@ -326,8 +327,13 @@ class TestTagsEndpoint(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(riyad_user, test_workspace, UserRoleInWorkspace.READER, with_notif=False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            riyad_user,
+            test_workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         folder = content_api.create(
             label="test-folder",
             content_type_slug=content_type_list.Folder.slug,
@@ -368,8 +374,13 @@ class TestTagsEndpoint(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(riyad_user, test_workspace, UserRoleInWorkspace.READER, with_notif=False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            riyad_user,
+            test_workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         folder = content_api.create(
             label="test-folder",
             content_type_slug=content_type_list.Folder.slug,
@@ -514,8 +525,13 @@ class TestTagsEndpoint(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(riyad_user, test_workspace, UserRoleInWorkspace.READER, with_notif=False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            riyad_user,
+            test_workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         folder = content_api.create(
             label="test-folder",
             content_type_slug=content_type_list.Folder.slug,

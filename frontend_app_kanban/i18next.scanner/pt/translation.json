@@ -1,6 +1,5 @@
 {
   "Create a Kanban board": "Criar um quadro Kanban",
-  "Error while saving the comment": "Erro ao guardar o comentário",
   "Delete": "Eliminar",
   "A content with the same name already exists": "Um conteúdo com o mesmo nome já existe",
   "Error while creating kanban": "Erro ao criar Kanban",
@@ -46,5 +45,8 @@
   "You have reached your storage limit, you cannot add new files": "Atingiu o limite de depósito, não é possível acrescentar novos ficheiros",
   "Tasks": "Tarefas",
   "The link has been copied to clipboard": "Ligação copiada para a área de transferência",
-  "Copy content link": "Copiar ligação do conteúdo"
+  "Copy content link": "Copiar ligação do conteúdo",
+  "Every members of the space": "Todos os membros do espaço",
+  "All": "Todos",
+  "all": "todos"
 }

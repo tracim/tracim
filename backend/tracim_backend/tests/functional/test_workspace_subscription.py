@@ -11,6 +11,7 @@ from webtest import TestApp
 from tracim_backend.error import ErrorCode
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.data import WorkspaceSubscriptionState
@@ -422,8 +423,13 @@ class TestWorkspaceSubscriptionEndpoint(object):
             do_save=True,
             do_notify=False,
         )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, on_request_workspace, UserRoleInWorkspace.READER, False)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            test_user,
+            on_request_workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         subscription_lib_factory.get(test_user).submit_subscription(workspace=on_request_workspace)
         transaction.commit()
         params = {"role": "contributor"}

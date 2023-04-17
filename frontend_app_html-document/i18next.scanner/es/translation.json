@@ -4,7 +4,6 @@
   "Delete": "Suprimir",
   "A content with the same name already exists": "Ya existe un contenido con el mismo nombre",
   "Validate and create": "Validar y crear",
-  "Error while saving the comment": "Error al guardar el comentario",
   "The content has been modified by {{author}}": "El contenido fue modificado por {{author}}",
   "Restore": "Restaurar",
   "Unknown content": "Contenido desconocido",
@@ -34,5 +33,10 @@
   "Tasks": "Tareas",
   "Download as PDF": "Descargar como PDF",
   "The link has been copied to clipboard": "Enlace copiado en el portapapeles",
-  "Copy content link": "Copiar enlace al contenido"
+  "Copy content link": "Copiar enlace al contenido",
+  "Every members of the space": "Cada miembro del espacio",
+  "All": "Todos",
+  "all": "todos",
+  "Cancel": "Cancelar",
+  "Validate": "Validar"
 }

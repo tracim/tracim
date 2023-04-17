@@ -4,7 +4,7 @@ describe('having default role selected when adding a new member to space', funct
     let workspaceId
     let workspaceLabel
     const user = 'John Doe'
-    const getWorkspacedetails = '.dashboard__workspace__detail__buttons .iconbutton'
+    const getWorkspacedetails = '.dashboard__workspace__rightMenu__contents .fa-cog'
     const validateDefaultRole = '.workspace_advanced__defaultRole__bottom__btn'
     const radioButton = '.singleChoiceList__item__radioButton'
 

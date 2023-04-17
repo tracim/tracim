@@ -49,6 +49,7 @@ from tracim_backend.lib.core.user import DEFAULT_COVER_SIZE
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.user_custom_properties import UserCustomPropertiesApi
 from tracim_backend.lib.core.userconfig import UserConfigApi
+from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import has_personal_access
@@ -73,6 +74,7 @@ from tracim_backend.views.core_api.schemas import AboutUserSchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentIdsQuerySchema
 from tracim_backend.views.core_api.schemas import DeleteFollowedUserPathSchema
+from tracim_backend.views.core_api.schemas import EmailNotificationTypeSchema
 from tracim_backend.views.core_api.schemas import FileQuerySchema
 from tracim_backend.views.core_api.schemas import FollowedUsersSchemaPage
 from tracim_backend.views.core_api.schemas import GetLiveMessageQuerySchema
@@ -157,6 +159,7 @@ ALLOWED__AVATAR_MIMETYPES = [
     "image/bmp",
     "image/x-ms-bmp",
     "image/gif",
+    "image/svg+xml",
 ]
 
 
@@ -681,38 +684,25 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_NOTIFICATION_ENDPOINTS])
     @check_right(has_personal_access)
     @hapic.input_path(UserWorkspaceIdPathSchema())
+    @hapic.input_body(EmailNotificationTypeSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def enable_workspace_notification(self, context, request: TracimRequest, hapic_data=None):
-        """
-        enable workspace notification
-        """
-        app_config = request.registry.settings["CFG"]  # type: CFG
-        wapi = WorkspaceApi(
-            current_user=request.candidate_user,  # User
-            session=request.dbsession,
-            config=app_config,
-        )
-        workspace = wapi.get_one(hapic_data.path.workspace_id)
-        wapi.enable_notifications(request.candidate_user, workspace)
-        wapi.save(workspace)
+    def change_space_notification(self, context, request: TracimRequest, hapic_data=None):
+        """Change space notification"""
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_NOTIFICATION_ENDPOINTS])
-    @check_right(has_personal_access)
-    @hapic.input_path(UserWorkspaceIdPathSchema())
-    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def disable_workspace_notification(self, context, request: TracimRequest, hapic_data=None):
-        """
-        disable workspace notification
-        """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        wapi = WorkspaceApi(
+        user_id = request.candidate_user.user_id
+        space_id = hapic_data.path.workspace_id
+        role_api = RoleApi(
             current_user=request.candidate_user,  # User
             session=request.dbsession,
             config=app_config,
         )
-        workspace = wapi.get_one(hapic_data.path.workspace_id)
-        wapi.disable_notifications(request.candidate_user, workspace)
-        wapi.save(workspace)
+        role_in_space = role_api.get_one(user_id=user_id, workspace_id=space_id)
+        role_api.update_role(
+            role=role_in_space,
+            email_notification_type_value=hapic_data.body["email_notification_type"],
+            save_now=True,
+        )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
     @check_right(has_personal_access)
@@ -1530,23 +1520,14 @@ class UserController(Controller):
 
         # enable workspace notification
         configurator.add_route(
-            "enable_workspace_notification",
-            "/users/{user_id:\d+}/workspaces/{workspace_id}/notifications/activate",  # noqa: W605
+            "change_space_notification",
+            "/users/{user_id:\d+}/workspaces/{workspace_id}/email_notification_type",  # noqa: W605
             request_method="PUT",
         )
         configurator.add_view(
-            self.enable_workspace_notification, route_name="enable_workspace_notification"
+            self.change_space_notification, route_name="change_space_notification"
         )
 
-        # enable workspace notification
-        configurator.add_route(
-            "disable_workspace_notification",
-            "/users/{user_id:\d+}/workspaces/{workspace_id}/notifications/deactivate",  # noqa: W605
-            request_method="PUT",
-        )
-        configurator.add_view(
-            self.disable_workspace_notification, route_name="disable_workspace_notification"
-        )
         # TracimLiveMessages notification
         configurator.add_route(
             "live_messages",

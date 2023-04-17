@@ -10,6 +10,7 @@ from tracim_backend.exceptions import InvalidWorkspaceAccessType
 from tracim_backend.exceptions import SubcriptionDoesNotExist
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.models.auth import User
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.data import WorkspaceSubscription
@@ -89,7 +90,7 @@ class SubscriptionLib(object):
             user=subscription.author,
             workspace=subscription.workspace,
             role_level=user_role.level,
-            with_notif=True,
+            email_notification_type=EmailNotificationType.SUMMARY,
         )
         self._session.add(subscription)
         self._session.add(role)

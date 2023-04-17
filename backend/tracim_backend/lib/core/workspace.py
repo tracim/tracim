@@ -21,6 +21,7 @@ from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import WorkspaceInContext
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceAccessType
@@ -146,7 +147,7 @@ class WorkspaceApi(object):
                 self._user,
                 workspace,
                 UserRoleInWorkspace.WORKSPACE_MANAGER,
-                with_notif=True,
+                email_notification_type=EmailNotificationType.SUMMARY,
                 flush=False,
             )
         self._session.add(workspace)
@@ -239,8 +240,13 @@ class WorkspaceApi(object):
             raise WorkspaceNotFound(
                 "workspace {} does not exist or not visible for user".format(workspace_id)
             ) from exc
-        rapi = RoleApi(current_user=self._user, session=self._session, config=self._config,)
-        rapi.create_one(self._user, workspace, workspace.default_user_role.level, with_notif=True)
+        role_api = RoleApi(current_user=self._user, session=self._session, config=self._config,)
+        role_api.create_one(
+            self._user,
+            workspace,
+            workspace.default_user_role.level,
+            email_notification_type=EmailNotificationType.SUMMARY,
+        )
         return workspace
 
     def get_one(self, workspace_id: int) -> Workspace:
@@ -272,8 +278,8 @@ class WorkspaceApi(object):
         if parent:
             query = query.filter(Workspace.parent_id == parent.workspace_id)
         else:
-            rapi = RoleApi(session=self._session, current_user=self._user, config=self._config)
-            workspace_ids = rapi.get_user_workspaces_ids(
+            role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
+            workspace_ids = role_api.get_user_workspaces_ids(
                 user_id=self._user.user_id, min_role=UserRoleInWorkspace.READER
             )
             query = query.filter(
@@ -355,10 +361,10 @@ class WorkspaceApi(object):
         """
         query = self._base_query()
         workspace_ids = []
-        rapi = RoleApi(session=self._session, current_user=self._user, config=self._config)
+        role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
         if include_with_role:
             workspace_ids.extend(
-                rapi.get_user_workspaces_ids(
+                role_api.get_user_workspaces_ids(
                     user_id=user.user_id, min_role=UserRoleInWorkspace.READER
                 )
             )
@@ -375,9 +381,11 @@ class WorkspaceApi(object):
         """Get all user workspaces where the users is not member of the parent and parent exists"""
         query = self._base_query()
         workspace_ids = []
-        rapi = RoleApi(session=self._session, current_user=self._user, config=self._config)
+        role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
         workspace_ids.extend(
-            rapi.get_user_workspaces_ids(user_id=user.user_id, min_role=UserRoleInWorkspace.READER)
+            role_api.get_user_workspaces_ids(
+                user_id=user.user_id, min_role=UserRoleInWorkspace.READER
+            )
         )
         query = query.filter(Workspace.workspace_id.in_(workspace_ids))
         query = query.filter(Workspace.parent_id.isnot(None))
@@ -417,16 +425,6 @@ class WorkspaceApi(object):
             )
         return workspaces
 
-    def disable_notifications(self, user: User, workspace: Workspace):
-        for role in user.roles:
-            if role.workspace == workspace:
-                role.do_notify = False
-
-    def enable_notifications(self, user: User, workspace: Workspace):
-        for role in user.roles:
-            if role.workspace == workspace:
-                role.do_notify = True
-
     def get_notifiable_roles(
         self, workspace: Workspace, force_notify: bool = False
     ) -> typing.List[UserRoleInWorkspace]:
@@ -440,7 +438,7 @@ class WorkspaceApi(object):
         roles = []
         for role in workspace.roles:
             if (
-                (force_notify or role.do_notify is True)
+                (force_notify or role.email_notification_type == EmailNotificationType.INDIVIDUAL)
                 and (not self._user or role.user != self._user)
                 and role.user.is_active
                 and not role.user.is_deleted

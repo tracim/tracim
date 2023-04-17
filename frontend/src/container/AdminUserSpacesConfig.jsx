@@ -97,6 +97,7 @@ export const AdminUserSpacesConfig = (props) => {
       const hasFilterMatchOnSpaceId = space.id && includesFilter(space.id.toString())
 
       return (
+        filterList === '' ||
         hasFilterMatchOnUserRole ||
         hasFilterMatchOnSpaceLabel ||
         hasFilterMatchOnSpaceId
@@ -297,7 +298,9 @@ export const AdminUserSpacesConfig = (props) => {
                           <AdminUserSpacesConfigItem
                             emailNotificationActivated={props.system.config.email_notification_activated}
                             key={`memberSpaceList_${space.id}`}
-                            onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
+                            onChangeEmailNotificationType={
+                              emailNotificationType => props.onChangeEmailNotificationType(space.id, emailNotificationType)
+                            }
                             onClickButton={handleLeaveSpace}
                             onClickChangeRole={handleClickChangeRole}
                             onlyManager={onlyManager(props.userToEditId, member, space.memberList)}
@@ -335,10 +338,10 @@ AdminUserSpacesConfig.propTypes = {
   userUsername: PropTypes.string.isRequired,
   onClose: PropTypes.func.isRequired,
   userPublicName: PropTypes.string,
-  onChangeSubscriptionNotif: PropTypes.func
+  onChangeEmailNotificationType: PropTypes.func
 }
 
 AdminUserSpacesConfig.defaultProps = {
-  onChangeSubscriptionNotif: () => { },
+  onChangeEmailNotificationType: () => { },
   userPublicName: ''
 }

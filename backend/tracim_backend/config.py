@@ -494,9 +494,7 @@ class CFG(object):
         )
         self.KNOWN_MEMBERS__FILTER = asbool(self.get_raw_config("known_members.filter", "True"))
         self.DEBUG = asbool(self.get_raw_config("debug", "False"))
-        self.BUILD_VERSION = self.get_raw_config(
-            "build_version", get_build_version(os.path.abspath(__file__))
-        )
+        self.BUILD_VERSION = self.get_raw_config("build_version", get_build_version())
         self.PREVIEW__JPG__RESTRICTED_DIMS = asbool(
             self.get_raw_config("preview.jpg.restricted_dims", "False")
         )
@@ -514,9 +512,7 @@ class CFG(object):
         tracim_folder = os.path.dirname(backend_folder)
         backend_i18n_folder = os.path.join(backend_folder, "tracim_backend", "locale")
 
-        self.FRONTEND__CACHE_TOKEN = self.get_raw_config(
-            "frontend.cache_token", get_cache_token(os.path.abspath(__file__))
-        )
+        self.FRONTEND__CACHE_TOKEN = self.get_raw_config("frontend.cache_token", get_cache_token())
 
         self.BACKEND__I18N_FOLDER_PATH = self.get_raw_config(
             "backend.i18n_folder_path", backend_i18n_folder
@@ -720,8 +716,8 @@ class CFG(object):
         ###
         # EMAIL related stuff (notification, reply)
         ##
-        self.EMAIL__NOTIFICATION__ENABLED_ON_INVITATION = asbool(
-            self.get_raw_config("email.notification.enabled_on_invitation", "True")
+        self.EMAIL__NOTIFICATION__TYPE_ON_INVITATION = str(
+            self.get_raw_config("email.notification.type_on_invitation", "summary")
         )
 
         # TODO - G.M - 2019-04-05 - keep as parameters
@@ -785,6 +781,12 @@ class CFG(object):
         self.EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__SUBJECT = self.get_raw_config(
             "email.notification.reset_password_request.subject",
             _("[{website_title}] A password reset has been requested"),
+        )
+
+        # Summary
+        self.EMAIL__NOTIFICATION__SUMMARY__TEMPLATE__HTML = self.get_raw_config(
+            "email.notification.summary.template.html",
+            "{}/{}".format(template_dir, "summary_body_html.mak"),
         )
 
         # TODO - G.M - 2019-01-22 - add feature to process notification email

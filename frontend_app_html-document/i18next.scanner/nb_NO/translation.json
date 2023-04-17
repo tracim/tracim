@@ -13,7 +13,6 @@
   "Validate anyway": "Bekreft uansett",
   "Tasks": "Gjøremål",
   "Download as PDF": "Last ned som PDF",
-  "Error while saving the comment": "Kunne ikke lagre kommentaren",
   "Error while saving the new version": "Kunne ikke lagre den nye versjonen",
   "The content has been modified by {{author}}": "Innholdet har blitt endret av {{author}}",
   "The link has been copied to clipboard": "Lenke kopiert til utklippstavle",
@@ -34,5 +33,10 @@
   "You are trying to mention an invalid user": "Du prøver å nevne en ugyldig bruker",
   "To notify all members of the space of your modification": "For å varsle alle medlemmene av rommet om din endring",
   "note": "notat",
-  "Note's title": "Notatnavn"
+  "Note's title": "Notatnavn",
+  "Every members of the space": "",
+  "All": "Alle",
+  "all": "alle",
+  "Cancel": "",
+  "Validate": ""
 }

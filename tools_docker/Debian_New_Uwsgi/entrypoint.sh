@@ -77,9 +77,20 @@ fi
 printenv |grep TRACIM > /var/tracim/data/tracim_env_variables || true
 # Add variable for using xvfb with uwsgi
 echo "DISPLAY=:99.0" >> /var/tracim/data/tracim_env_variables
+
+# FIXME - MP - 2023-03-22 - Create a file with every TRACIM environment variables
+# The difference with the `printenv` above is that it escapes the values
+# This creates two files: `tracim_env_variables` and `tracim_env_variables_cron` which should be
+# merged in one. See https://github.com/tracim/tracim/issues/6106#issuecomment-1479730122
+declare -x | grep TRACIM | cut -c12- > /var/tracim/data/tracim_env_variables_cron || true
+
 log "Ensuring www-data is the owner of /var/tracim files"
 find /var/tracim/ \( ! -user www-data -o ! -group www-data \) -exec chown www-data:www-data {} \;
 loggood "Ensuring www-data is the owner of /var/tracim files: success"
+
+log "[HACK - MP - 06-03-2023] Storing HEAD information in a file while finding a fix. See https://github.com/gitpython-developers/GitPython/issues/1016"
+cd /tracim && git rev-parse HEAD > revision.txt
+cd /
 
 log "Checking database"
 case "$DATABASE_TYPE" in
@@ -113,7 +124,13 @@ case "$DATABASE_TYPE" in
     fi
     ;;
 esac
-loggood "checking of database success"
+loggood "Checking of database success"
+
+log "Starting redis server..."
+# Start the redis server before initializing the database to store avatars
+service redis-server start  # async jobs (for mails and TLMs)
+loggood "Redis server started"
+
 # Initialize database if needed
 if [ "$INIT_DATABASE" = true ] ; then
     log "Initialise Database"
@@ -170,12 +187,19 @@ sed -i "s|^;\s*app.enabled = .*|app.enabled = $DEFAULT_APP_LIST|g" /etc/tracim/d
 cd /tracim/backend/
 tracimcli_as_user "search index-create"
 
-log "Start all services"
-# starting services
+# Starting remaining services
+log "Starting Puspin service..."
 service pushpin start # tracim live messages (TLMs) sending
+loggood "Pushpin started"
+log "Starting Zurl service..."
 service zurl start # tracim live messages (TLMs) sending
-service redis-server start  # async jobs (for mails and TLMs)
+loggood "Zurl started"
+log "Restarting Apache2 service..."
 service apache2 restart
+loggood "Apache2 restarted"
+
+service cron start
+
 log "Run supervisord"
 supervisord -c "$docker_script_dir/supervisord_tracim.conf"
 # Activate daemon for reply by email

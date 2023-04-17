@@ -179,12 +179,8 @@ export class JoinWorkspace extends React.Component {
   createIconForAccessType (accessType) {
     const spaceType = SPACE_TYPE_LIST.find(t => t.slug === accessType)
     return spaceType
-      ? <i className={`fas fa-fw fa-2x ${spaceType.faIcon}`} title={this.props.t(spaceType.tradKey[0])} />
+      ? <i className={`fas fa-fw fa-2x ${spaceType.faIcon}`} title={this.props.t(spaceType.label)} />
       : <i className='fas fa-fw fa-2x fa-search' title={this.props.t('Unknown space type')} />
-    // RJ - 2020-10-30 - NOTE
-    // This code uses props.t on a key that is translated in frontend_lib (spaceType.tradKey[0]).
-    // This works because translations are grouped during compilation.
-    // This may break in the future but there is a Cypress test to catch this
   }
 
   handleWorkspaceFilter (filter) {
@@ -206,26 +202,32 @@ export class JoinWorkspace extends React.Component {
     }
   }
 
-  filterWorkspaces (workspace) {
-    const spaceType = SPACE_TYPE_LIST.find(type => type.slug === workspace.accessType) || { label: '' }
+  filterWorkspaces () {
+    if (this.state.filter === '') return this.state.displayedSpaceList
 
-    const includesFilter = stringIncludes(this.state.filter)
+    return this.state.displayedSpaceList.filter(workspace => {
+      const spaceType = SPACE_TYPE_LIST.find(type => type.slug === workspace.accessType) || { label: '' }
 
-    const hasFilterMatchOnLabel = includesFilter(workspace.label)
-    const hasFilterMatchOnDescription = includesFilter(workspace.description)
-    const hasFilterMatchOnType = spaceType && includesFilter(this.props.t(spaceType.label))
+      const includesFilter = stringIncludes(this.state.filter)
 
-    return (
-      hasFilterMatchOnLabel ||
-      hasFilterMatchOnDescription ||
-      hasFilterMatchOnType
-    )
+      const hasFilterMatchOnLabel = includesFilter(workspace.label)
+      const hasFilterMatchOnDescription = includesFilter(workspace.description)
+      const hasFilterMatchOnType = spaceType && includesFilter(this.props.t(spaceType.label))
+
+      return (
+        hasFilterMatchOnLabel ||
+        hasFilterMatchOnDescription ||
+        hasFilterMatchOnType
+      )
+    })
   }
 
   render () {
     const { props, state } = this
     const className = 'joinWorkspace'
     const parser = new DOMParser()
+    const filteredList = this.filterWorkspaces()
+
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
@@ -265,7 +267,7 @@ export class JoinWorkspace extends React.Component {
                   />
                 </div>
 
-                {state.displayedSpaceList.filter(this.filterWorkspaces.bind(this)).map((workspace) => {
+                {filteredList.map((workspace) => {
                   const descriptionText = htmlToText(parser, workspace.description)
                   return (
                     <div key={workspace.id} className={`${className}__content__workspaceList__item`}>

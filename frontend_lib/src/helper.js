@@ -137,8 +137,6 @@ export const displayDistanceDate = (dateToDisplay, lang) => {
   )
 }
 
-export const convertBackslashNToBr = msg => msg.replace(/\n/g, '<br />')
-
 export const BREADCRUMBS_TYPE = {
   CORE: 'CORE',
   APP_FULLSCREEN: 'APP_FULLSCREEN',
@@ -595,6 +593,7 @@ export const hasSpaces = name => /\s/.test(name)
 
 // FIXME - GM - 2020-06-24 - This function doesn't handle nested object, it need to be improved
 // https://github.com/tracim/tracim/issues/3229
+// DEPRECATED - CH - 20230302 - This function is unused
 export const serialize = (objectToSerialize, propertyMap) => {
   return Object.fromEntries(
     Object.entries(objectToSerialize)
@@ -873,18 +872,6 @@ const seekUsernameEnd = (text, offset) => {
   return offset
 }
 
-export const tinymceRemove = (selector) => {
-  try {
-    globalThis.tinymce.remove(selector)
-  } catch (e) {
-    if (e instanceof TypeError) {
-      console.error('HACK(#5437): removing TinyMCE raised a TypeError exception. If the message looks like "Can\'t access dead object". Ignoring the exception but please fix this.', e)
-    } else {
-      throw e
-    }
-  }
-}
-
 export const autoCompleteItem = (text, item, cursorPos, endCharacter) => {
   let character, keyword
   let textBegin, textEnd
@@ -931,5 +918,37 @@ export const handleClickCopyLink = (contentId) => {
 // Useful when you have to test if a single string is included in multiple others
 // Usage: const fn = stringIncludes('bc'); fn('abcd') -> Outputs: true
 export const stringIncludes = (a) => {
-  return (b) => b && b.toUpperCase().includes(a.toUpperCase())
+  return (b) => {
+    if (!a || !b) return false
+    return b.toUpperCase().includes(a.toUpperCase())
+  }
+}
+
+export const getRevisionTypeLabel = (revisionType, t) => {
+  switch (revisionType) {
+    case 'revision':
+      return t('modified')
+    case 'creation':
+      return t('created')
+    case 'edition':
+      return t('modified')
+    case 'deletion':
+      return t('deleted')
+    case 'undeletion':
+      return t('undeleted')
+    case 'mention':
+      return t('mention made')
+    case 'content-comment':
+      return t('commented')
+    case 'status-update':
+      return t('status modified')
+    case 'move':
+      return t('moved')
+    case 'copy':
+      return t('copied')
+    case 'unknown':
+      return t('unknown')
+  }
+
+  return revisionType
 }

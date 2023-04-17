@@ -19,7 +19,7 @@ Create configuration file for a development environment:
     cp development.ini.sample development.ini
 
 The provided default configuration is suitable for local-test. If you need to run Tracim
-over network, see [configuration file documentation](../doc/backend_specific/setting.md).
+over network, see [configuration file documentation](../doc/backend/setting.md).
 
 You need to create the branding folder containing customizable ui elements. Starting with the provided sample is a good way:
 
@@ -29,7 +29,8 @@ You should also create requested folder for running Tracim:
 
     mkdir sessions_data sessions_lock depot previews radicale_storage
 
-Initialize the database using [tracimcli](../doc/backend_specific/cli.md) tool
+Initialize the database using [tracimcli](../doc/backend/cli.md) tool. Be careful, if you use Tracim
+with `Redis`, you want to have the `Redis` service running.
 
     tracimcli db init
 
@@ -38,6 +39,7 @@ Optional functionalities are available through official plugins, please [read th
 ## Deployment
 
 You can run Tracim WSGI apps with many WSGI servers. We provide examples to run them with:
+
 - uWSGI using wsgi/* script.
 - The pserve command of pyramid which only rely on development.ini pastedeploy config.
 
@@ -54,7 +56,6 @@ Or with PIP:
     sudo pip3 install uwsgi
 
 #### All in terminal way
-
 
 Run all web services with UWSGI:
 
@@ -125,7 +126,7 @@ You can then run the process this way:
 ### With Pserve: legacy way, useful for debug and dev
 
 This method relies on development.ini configuration. default web server used is _Waitress_
-in` development.ini.sample`
+in`development.ini.sample`
 
 :warning: By default, python warning are disabled. To enable warning please set
 `PYTHONWARNINGS` env var, for example `export PYTHONWARNINGS=default` .
@@ -141,7 +142,6 @@ Run the WsgiDAV server:
 Run the CalDAV server:
 
     tracimcli caldav start
-
 
 ## Running the Tracim Backend Daemons
 
@@ -222,7 +222,6 @@ Run with (supervisord.conf should be provided, see [supervisord.conf default_pat
 
     supervisord
 
-
 ## Lint the code
 
 Install the required tool, `flake8` and its dependencies:
@@ -235,9 +234,9 @@ Then run flake8:
 
 ## The Tracim API
 
-Tracim_backend gives access to a REST API in */api*.
+Tracim_backend gives access to a REST API in _/api_.
 This API is auto-documented with [Hapic](https://github.com/algoo/hapic).
-The specification is accessible when you run Tracim, go to */api/doc* .
+The specification is accessible when you run Tracim, go to _/api/doc_ .
 
 For example, with the default configuration:
 
@@ -249,9 +248,9 @@ For example, with the default configuration:
 ## Roles, Profile and Access Rights
 
 In Tracim, only some users can access to some information, this is also true in
-the Tracim REST API. you can check the [roles documentation](../doc/backend_specific/roles.md) to check
+the Tracim REST API. you can check the [roles documentation](../doc/backend/roles.md) to check
 what a specific user can do.
 
 ## Other Documentation
 
-Detailed documentation on several topics is available in the [doc/backend_specific](../doc/backend_specific/) directory.
+Detailed documentation on several topics is available in the [doc/backend](../doc/backend/) directory.

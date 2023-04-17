@@ -73,7 +73,6 @@
       "fetch",
       "history",
       "btoa",
-      "wysiwyg",
       "tinymce",
       "globalThis",
       "GLOBAL_renderAppFeature",

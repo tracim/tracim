@@ -45,6 +45,10 @@ export class FeedItemHeader extends React.Component {
         return props.t('deleted')
       case TLM_CET.UNDELETED:
         return props.t('restored')
+      case TLM_CET.COPIED:
+        return props.t('copied')
+      case TLM_CET.MOVED:
+        return props.t('moved')
     }
     return props.t('unknown')
   }

@@ -78,7 +78,7 @@ describe('<WorkspaceAdvanced />', () => {
           fields: {
             author: author,
             user: user,
-            member: { role: 'workspace-manager', do_notify: true },
+            member: { role: 'workspace-manager', email_notification_type: 'summary' },
             workspace: workspace
           }
         }
@@ -104,7 +104,7 @@ describe('<WorkspaceAdvanced />', () => {
               fields: {
                 author: author,
                 user: user,
-                member: { role: 'contributor', do_notify: true },
+                member: { role: 'contributor', email_notification_type: 'summary' },
                 workspace: workspace
               }
             }

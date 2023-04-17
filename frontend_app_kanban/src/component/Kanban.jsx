@@ -17,11 +17,6 @@ import '@asseinfo/react-kanban/dist/styles.css'
 
 import {
   APP_FEATURE_MODE,
-  tinymceAutoCompleteHandleInput,
-  tinymceAutoCompleteHandleKeyUp,
-  tinymceAutoCompleteHandleKeyDown,
-  tinymceAutoCompleteHandleClickItem,
-  tinymceAutoCompleteHandleSelectionChange,
   IconButton,
   handleFetchResult,
   putRawFileContent,
@@ -282,47 +277,6 @@ export class Kanban extends React.Component {
     this.setState({ editedCardInfos: null })
   }
 
-  handleTinyMceInput = (e, position) => {
-    tinymceAutoCompleteHandleInput(
-      e,
-      this.setState.bind(this),
-      this.searchForMentionOrLinkInQuery,
-      this.state.isAutoCompleteActivated
-    )
-  }
-
-  handleTinyMceKeyUp = event => {
-    const { state } = this
-
-    tinymceAutoCompleteHandleKeyUp(
-      event,
-      this.setState.bind(this),
-      state.isAutoCompleteActivated,
-      this.searchForMentionOrLinkInQuery
-    )
-  }
-
-  handleTinyMceKeyDown = event => {
-    const { state } = this
-
-    tinymceAutoCompleteHandleKeyDown(
-      event,
-      this.setState.bind(this),
-      state.isAutoCompleteActivated,
-      state.autoCompleteCursorPosition,
-      state.autoCompleteItemList,
-      this.searchForMentionOrLinkInQuery
-    )
-  }
-
-  handleTinyMceSelectionChange = () => {
-    tinymceAutoCompleteHandleSelectionChange(
-      this.setState.bind(this),
-      this.searchForMentionOrLinkInQuery,
-      this.state.isAutoCompleteActivated
-    )
-  }
-
   render () {
     const { props, state } = this
     const changesAllowed = !props.readOnly && state.boardState === BOARD_STATE.LOADED
@@ -436,16 +390,12 @@ export class Kanban extends React.Component {
               <KanbanCardEditor
                 apiUrl={props.config.apiUrl}
                 card={state.editedCardInfos.card}
-                customColor={props.config.hexcolor}
-                focusOnDescription={state.editedCardInfos.focusOnDescription}
                 onValidate={this.handleCardEdited}
                 onCancel={this.handleCardEditCancel}
-                isAutoCompleteActivated={state.isAutoCompleteActivated}
-                autoCompleteItemList={state.autoCompleteItemList}
-                autoCompleteCursorPosition={state.autoCompleteCursorPosition}
-                onClickAutoCompleteItem={(item) => {
-                  tinymceAutoCompleteHandleClickItem(item, this.setState.bind(this))
-                }}
+                // End of required props ///////////////////////////////////////
+                customColor={props.config.hexcolor}
+                focusOnDescription={state.editedCardInfos.focusOnDescription}
+                language={props.language}
               />
             </CardPopup>
           )}
@@ -474,10 +424,13 @@ export class Kanban extends React.Component {
 Kanban.propTypes = {
   config: PropTypes.object.isRequired,
   content: PropTypes.object.isRequired,
+  // End of required props /////////////////////////////////////////////////////
+  language: PropTypes.string,
   readOnly: PropTypes.bool
 }
 
 Kanban.defaultProps = {
+  language: 'en',
   readOnly: false
 }
 
