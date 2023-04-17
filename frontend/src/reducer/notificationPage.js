@@ -237,7 +237,12 @@ export default function notificationPage (state = defaultNotificationsObject, ac
         return markNotificationAsRead(notification)
       })
 
-      return { ...state, list: uniqBy(newNotificationList, 'id'), unreadMentionCount, unreadNotificationCount }
+      return {
+        ...state,
+        list: uniqBy(newNotificationList, 'id'),
+        unreadMentionCount,
+        unreadNotificationCount
+      }
     }
 
     case `${SET}/${NEXT_PAGE}`:
