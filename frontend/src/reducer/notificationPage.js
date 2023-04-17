@@ -184,13 +184,21 @@ export default function notificationPage (state = defaultNotificationsObject, ac
     }
 
     case `${READ}/${NOTIFICATION_LIST}`: {
-      const notificationList = state.list.filter(n => !n.read && action.notificationIdList.includes(n.id))
+      const notificationList = state.list.filter(
+        n => !n.read && action.notificationIdList.includes(n.id)
+      )
 
       if (notificationList.length === 0) return state
 
-      const replaceList = state.list.map(n => action.notificationIdList.includes(n.id) ? { ...n, read: true } : n)
-      const newUnreadMentionCount = replaceList.filter(n => !n.read && n.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}`).length
-      const newUnreadNotificationCount = replaceList.filter(n => !n.read).length
+      const replaceList = state.list.map(
+        n => action.notificationIdList.includes(n.id) ? { ...n, read: true } : n
+      )
+
+      const newUnreadMentionCount = state.unreadMentionCount - notificationList.filter(
+        n => n.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}`
+      ).length
+
+      const newUnreadNotificationCount = state.unreadNotificationCount - notificationList.length
 
       return {
         ...state,
@@ -202,7 +210,12 @@ export default function notificationPage (state = defaultNotificationsObject, ac
 
     case `${READ}/${EVERY_NOTIFICATION}`: {
       const notificationList = state.list.map(notification => ({ ...notification, read: true }))
-      return { ...state, list: uniqBy(notificationList, 'id'), unreadMentionCount: 0, unreadNotificationCount: 0 }
+      return {
+        ...state,
+        list: uniqBy(notificationList, 'id'),
+        unreadMentionCount: 0,
+        unreadNotificationCount: 0
+      }
     }
 
     case `${READ}/${CONTENT}/${NOTIFICATION}`: {
