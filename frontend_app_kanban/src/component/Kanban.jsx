@@ -393,7 +393,7 @@ export class Kanban extends React.Component {
                 onValidate={this.handleCardEdited}
                 onCancel={this.handleCardEditCancel}
                 // End of required props ///////////////////////////////////////
-                codeLanguageList={state.config.system.config.ui__notes__code_sample_languages}
+                codeLanguageList={props.config.system.config.ui__notes__code_sample_languages}
                 customColor={props.config.hexcolor}
                 focusOnDescription={state.editedCardInfos.focusOnDescription}
                 language={props.language}
