@@ -37,7 +37,6 @@ export class Avatar extends React.Component {
         <img
           className='avatar'
           src={`${avatarBaseUrl}/preview/jpg/${sizeAsNumber}x${sizeAsNumber}/${filenameInUrl}`}
-          alt={props.t('Avatar of {{publicName}}', { publicName })}
         />
       </div>
     )
