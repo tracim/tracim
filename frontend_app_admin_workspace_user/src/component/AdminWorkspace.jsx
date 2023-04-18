@@ -11,6 +11,7 @@ import {
   Loading,
   SPACE_TYPE_LIST,
   SORT_BY,
+  PAGE,
   TitleListHeader,
   EmptyListMessage,
   FilterBar,
@@ -155,9 +156,8 @@ const AdminWorkspace = props => {
                     </td>
                     <td
                       className='table__sharedSpace adminWorkspace__workspaceTable__tr__td-link primaryColorFontHover'
-                      onClick={() => props.onClickWorkspace(ws.workspace_id)}
                     >
-                      {ws.label}
+                      <a href={PAGE.WORKSPACE.ADVANCED_DASHBOARD(ws.workspace_id)}>{ws.label}</a>
                     </td>
                     <td className='table__description adminWorkspace__workspaceTable__tr__td-description'>{descriptionText}</td>
                     <td className='table__memberCount'>{ws.number_of_members}</td>
