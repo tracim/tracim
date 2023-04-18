@@ -94,6 +94,7 @@ export const SpaceAdvancedConfiguration = (props) => {
               onCancel={props.onClickClosePopupDeleteWorkspace}
               confirmLabel={props.t('Delete')}
               confirmIcon='far fa-fw fa-trash-alt'
+              customColor={props.customColor}
             />
           )}
         </div>

@@ -149,6 +149,7 @@ export const HtmlDocument = props => {
             confirmIcon='fas fa-fw fa-edit'
             cancelLabel={props.t('Validate anyway')}
             cancelIcon='fas fa-fw fa-check'
+            customColor={props.customColor}
           />
         )}
 

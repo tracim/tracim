@@ -227,6 +227,7 @@ class TagList extends React.Component {
                   confirmIcon='far fa-fw fa-trash-alt'
                   onCancel={() => this.setState({ workspaceTagToDeleteId: 0 })}
                   onConfirm={() => this.handleClickDeleteTag(this.state.workspaceTagToDeleteId)}
+                  customColor={props.customColor}
                 />
               )}
             </div>

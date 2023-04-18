@@ -142,10 +142,11 @@ export const CommentArea = props => {
               </div>
             </>
           }
-          confirmLabel={props.t('Edit')}
-          confirmIcon='fas fa-edit'
-          cancelLabel={props.t('Validate anyway')}
           cancelIcon='fas fa-fw fa-check'
+          cancelLabel={props.t('Validate anyway')}
+          confirmIcon='fas fa-edit'
+          confirmLabel={props.t('Edit')}
+          customColor={props.customColor}
         />
       )}
       <TinyEditor

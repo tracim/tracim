@@ -57,9 +57,9 @@ export class EditCommentPopup extends React.Component {
           isDisplayedCancelButton
           isDisplayedUploadFileButton={false}
           language={props.loggedUserLanguage}
+          memberList={props.memberList}
           newComment={state.newComment}
           onClickWithstand={props.onClickClose}
-          memberList={props.memberList}
           submitLabel={props.t('Send')}
           withstandLabel={props.t('Cancel')}
         />
