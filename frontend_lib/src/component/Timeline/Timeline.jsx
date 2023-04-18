@@ -201,7 +201,7 @@ export class Timeline extends React.Component {
             )}
             commentId={state.newComment.content_id}
             customColor={props.customColor}
-            loggedUserLanguage={props.loggedUser.lang}
+            user={props.loggedUser}
             memberList={props.memberList}
             onClickClose={() => this.setState({ showEditCommentPopup: false })}
             onClickValidate={this.handleClickValidateEditComment}

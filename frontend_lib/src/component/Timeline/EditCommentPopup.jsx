@@ -56,7 +56,7 @@ export class EditCommentPopup extends React.Component {
           isDisplayedAdvancedEditionButton={false}
           isDisplayedCancelButton
           isDisplayedUploadFileButton={false}
-          language={props.loggedUserLanguage}
+          language={props.user.lang}
           memberList={props.memberList}
           newComment={state.newComment}
           onClickWithstand={props.onClickClose}
@@ -77,9 +77,9 @@ EditCommentPopup.propTypes = {
   codeLanguageList: PropTypes.array,
   commentId: PropTypes.number,
   customColor: PropTypes.string,
-  loggedUserLanguage: PropTypes.string,
   memberList: PropTypes.array,
   parentId: PropTypes.number,
+  user: PropTypes.object,
   // NOTE - MP - 2023-01-06 - There is no workspaceId in string
   workspaceId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 }
@@ -88,8 +88,8 @@ EditCommentPopup.defaultProps = {
   codeLanguageList: [],
   commentId: 0,
   customColor: undefined,
-  loggedUserLanguage: 'en',
   memberList: [],
   parentId: 0,
+  user: undefined,
   workspaceId: undefined
 }

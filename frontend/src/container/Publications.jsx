@@ -540,7 +540,7 @@ export class Publications extends React.Component {
             )}
             commentId={state.commentToEdit.content_id}
             customColor={COLORS.PUBLICATION}
-            loggedUserLanguage={props.user.lang}
+            user={props.user}
             memberList={props.currentWorkspace.memberList}
             onClickClose={() => this.setState({ showEditPopup: false })}
             onClickValidate={this.handleClickValidateEdit}
