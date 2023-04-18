@@ -112,7 +112,6 @@ export const searchMention = (text) => {
 
 /**
  * Replace not formatted mention with html mention element
- * @param {List[role]} roleList List of role that can be mentioned
  * @param {List[user]} userList List of user that can be mentioned
  * @param {String} html Current content of the editor
  * @returns {{html: String, invalidMentionList: List[String]}} Correctly formatted html content
@@ -124,7 +123,7 @@ export const searchMention = (text) => {
  *   invalidMentionList: [];
  * }
  */
-export const searchMentionAndReplaceWithTag = (roleList, userList, html) => {
+export const searchMentionAndReplaceWithTag = (userList, html) => {
   const mentionList = searchMention(html)
   const invalidMentionList = []
 
@@ -132,7 +131,7 @@ export const searchMentionAndReplaceWithTag = (roleList, userList, html) => {
 
   mentionList.forEach(mention => {
     const mentionWithoutAt = mention.slice(2)
-    const role = roleList.find(r => i18n.t(r.slug) === mentionWithoutAt)
+    const role = DEFAULT_ROLE_LIST.find(r => i18n.t(r.slug) === mentionWithoutAt)
     const user = userList.find(u => u.username === mentionWithoutAt)
     if (role || user) {
       const labelId = role ? 'roleid' : 'userid'
@@ -148,7 +147,7 @@ export const searchMentionAndReplaceWithTag = (roleList, userList, html) => {
       // match
       newHtml = newHtml.replace(mentionRegex, `${mention[0]}${mentionBalise}`)
     } else {
-      invalidMentionList.push(mention)
+      invalidMentionList.push(mention.slice(1))
     }
   })
 
@@ -157,14 +156,13 @@ export const searchMentionAndReplaceWithTag = (roleList, userList, html) => {
 
 /**
  * Replace the given HTML string containing the mention with the role slug
- * @param {Array[object]} roleList List of roles
  * @param {String} html Current html text with balise mention
  * @returns Html text without mention balise
  * Example:
  * - Input: `<p>Test <html-mention roleid="0"><\html-mention></p>`
  * - Output: `<p>Test @all</p>`
  */
-const replaceHTMLElementWithMentionRole = (roleList, html) => {
+const replaceHTMLElementWithMentionRole = (html) => {
   const mentionRegex = /<html-mention roleid="(\d+)"><\/html-mention>/g
   const mentionTagList = html.match(mentionRegex)
   if (!mentionTagList) return html
@@ -175,7 +173,7 @@ const replaceHTMLElementWithMentionRole = (roleList, html) => {
     const mentionTagData = mentionTag.match(/roleid="(\d+)"/)
     const roleId = Number(mentionTagData[1])
 
-    const role = roleList.find(r => r.id === roleId)
+    const role = DEFAULT_ROLE_LIST.find(r => r.id === roleId)
     let mention = ''
     if (!role) {
       console.warn(
@@ -229,15 +227,14 @@ const replaceHTMLElementWithMentionUser = (userList, html) => {
 
 /**
  * Replace html mention element with mention
- * @param {List[role]} roleList List of role that can be mentioned
  * @param {List[user]} userList List of user that can be mentioned
  * @param {String} html Current content of the editor
  * Example:
  * - Input: `<p>Test <html-mention userid="151"/><html-mention></p>`
  * - Output: `<p>Test @John</p>`
  */
-export const replaceHTMLElementWithMention = (roleList, userList, html) => {
-  let newHtml = replaceHTMLElementWithMentionRole(roleList, html)
+export const replaceHTMLElementWithMention = (userList, html) => {
+  let newHtml = replaceHTMLElementWithMentionRole(html)
   newHtml = replaceHTMLElementWithMentionUser(userList, newHtml)
   return newHtml
 }

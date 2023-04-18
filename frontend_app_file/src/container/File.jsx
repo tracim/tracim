@@ -7,7 +7,6 @@ import {
   BREADCRUMBS_TYPE,
   COLLABORA_EXTENSIONS,
   CONTENT_TYPE,
-  DEFAULT_ROLE_LIST,
   handleClickCopyLink,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -933,7 +932,6 @@ export class File extends React.Component {
             onClickOpenFileComment={this.handleClickOpenFileComment}
             onClickRevisionBtn={this.handleClickShowRevision}
             onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
-            roleList={DEFAULT_ROLE_LIST}
             shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
           />
         </PopinFixedRightPartContent>

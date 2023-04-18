@@ -5,7 +5,6 @@ import classnames from 'classnames'
 import {
   APP_FEATURE_MODE,
   CONTENT_TYPE,
-  DEFAULT_ROLE_LIST,
   LOCAL_STORAGE_FIELD,
   TRANSLATION_STATE,
   ConfirmPopup,
@@ -168,7 +167,6 @@ export const HtmlDocument = props => {
                 isStatusBarEnabled
                 language={props.lang}
                 onCtrlEnterEvent={props.onClickValidateBtn}
-                roleList={DEFAULT_ROLE_LIST}
                 spaceId={props.workspaceId}
                 userList={props.memberList}
               />

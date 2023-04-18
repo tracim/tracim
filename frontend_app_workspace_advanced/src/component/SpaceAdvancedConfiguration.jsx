@@ -24,7 +24,6 @@ export const SpaceAdvancedConfiguration = (props) => {
         isReadOnlyMode={props.isReadOnlyMode}
         lang={props.lang}
         memberList={props.memberList}
-        roleList={props.roleList}
       />
 
       {!props.isReadOnlyMode && (
@@ -117,8 +116,7 @@ SpaceAdvancedConfiguration.propTypes = {
   isCurrentSpaceAgendaEnabled: PropTypes.bool,
   isReadOnlyMode: PropTypes.bool,
   lang: PropTypes.string,
-  memberList: PropTypes.array,
-  roleList: PropTypes.array
+  memberList: PropTypes.array
 }
 
 SpaceAdvancedConfiguration.defaultProps = {
@@ -130,6 +128,5 @@ SpaceAdvancedConfiguration.defaultProps = {
   isCurrentSpaceAgendaEnabled: false,
   isReadOnlyMode: true,
   lang: 'en',
-  memberList: [],
-  roleList: []
+  memberList: []
 }

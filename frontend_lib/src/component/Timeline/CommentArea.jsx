@@ -73,7 +73,6 @@ export const CommentArea = props => {
 
     if (!force) {
       const parsedMentionCommentObject = searchMentionAndReplaceWithTag(
-        props.roleList,
         props.memberList,
         commentToSend
       )
@@ -163,7 +162,6 @@ export const CommentArea = props => {
         maxHeight={300}
         minHeight={100}
         placeholder={props.placeholder}
-        roleList={props.roleList}
         userList={props.memberList}
       />
       <div
@@ -278,7 +276,6 @@ CommentArea.propTypes = {
   newComment: PropTypes.string,
   onClickWithstand: PropTypes.func,
   placeholder: PropTypes.string,
-  roleList: PropTypes.array,
   submitIcon: PropTypes.string,
   submitLabel: PropTypes.string,
   withstandLabel: PropTypes.string
@@ -302,7 +299,6 @@ CommentArea.defaultProps = {
   newComment: undefined,
   onClickWithstand: () => { },
   placeholder: 'Write a comment...',
-  roleList: [],
   submitIcon: 'far fa-paper-plane',
   submitLabel: 'Submit',
   withstandLabel: 'Withstand'
