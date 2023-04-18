@@ -280,8 +280,8 @@ export const TinyEditor = props => {
                         items: [
                           {
                             type: 'cardimage',
-                            src: `${getAvatarBaseUrl(props.apiUrl, user.id)}/raw/avatar`,
-                            alt: user.publicName,
+                            src: `${getAvatarBaseUrl(props.apiUrl, user.id)}/preview/jpg/15x15/avatar`,
+                            alt: '',
                             name: 'avatar',
                             classes: ['tinymce-avatar']
                           },
