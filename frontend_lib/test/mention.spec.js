@@ -82,12 +82,6 @@ describe('mentions on mentionOrLink.js', () => {
   })
 
   describe('function searchMentionAndReplaceWithTag', () => {
-    const roleList = [
-      {
-        slug: 'all',
-        id: 1
-      }
-    ]
     const userList = [
       {
         username: 'foo',
@@ -118,7 +112,7 @@ describe('mentions on mentionOrLink.js', () => {
       {
         content: '<p>Hello @all!</p>',
         expected: {
-          html: '<p>Hello <html-mention roleid="1"></html-mention>!</p>',
+          html: '<p>Hello <html-mention roleid="0"></html-mention>!</p>',
           invalidMentionList: []
         },
         description: 'Mention of a role'
@@ -126,7 +120,7 @@ describe('mentions on mentionOrLink.js', () => {
       {
         content: '<p>Hello @all and @foo</p>',
         expected: {
-          html: '<p>Hello <html-mention roleid="1"></html-mention> and <html-mention userid="1"></html-mention></p>',
+          html: '<p>Hello <html-mention roleid="0"></html-mention> and <html-mention userid="1"></html-mention></p>',
           invalidMentionList: []
         },
         description: 'Mention of a role and a user'
@@ -134,7 +128,7 @@ describe('mentions on mentionOrLink.js', () => {
     ]
     possibleTests.forEach(test => {
       const { content, expected, description } = test
-      const result = searchMentionAndReplaceWithTag(roleList, userList, content)
+      const result = searchMentionAndReplaceWithTag(userList, content)
       const expectedResult = `have ${expected}`
       describe(`For: ${description}`, () => {
         it(`should ${expectedResult}`, () => {
