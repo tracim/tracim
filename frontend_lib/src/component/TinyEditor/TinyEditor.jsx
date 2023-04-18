@@ -382,6 +382,7 @@ export const TinyEditor = props => {
             // /////////////////////////////////////////////
             // Handle shortcuts
             editor.addShortcut('ctrl+13', 'Send comment', () => {
+              if (editor.getContent() === '') return
               props.onCtrlEnterEvent(editor.getContent(), false)
               document.activeElement.blur()
             })
