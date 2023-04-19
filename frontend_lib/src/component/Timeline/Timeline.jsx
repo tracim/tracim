@@ -90,8 +90,6 @@ export class Timeline extends React.Component {
       return null
     }
 
-    const disableComment = props.disableComment || props.loading
-
     return (
       <div className={classnames('timeline')}>
         <div className='timeline__warning'>
@@ -220,7 +218,7 @@ export class Timeline extends React.Component {
           />
         )}
 
-        {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && !props.showParticipateButton && (
+        {!props.loading && props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && !props.showParticipateButton && (
           <div className='timeline__texteditor'>
             <CommentArea
               apiUrl={props.apiUrl}
@@ -232,11 +230,12 @@ export class Timeline extends React.Component {
               codeLanguageList={props.codeLanguageList}
               customClass={props.customClass}
               customColor={props.customColor}
-              disableComment={disableComment}
+              disableComment={props.disableComment}
               invalidMentionList={props.invalidMentionList}
               isFileCommentLoading={props.isFileCommentLoading}
               language={props.loggedUser.lang}
               memberList={props.memberList}
+              multipleFiles
               placeholder={props.t('Write an answer...')}
               submitLabel={props.t('Send')}
             />

@@ -479,8 +479,8 @@ export class Publications extends React.Component {
               workspaceId={parseInt(props.match.params.idws)}
               // End of required props /////////////////////////////////////////
               codeLanguageList={props.system.config.ui__notes__code_sample_languages}
-              customColor={COLORS.PUBLICATION}
               customClass='publishArea'
+              customColor={COLORS.PUBLICATION}
               icon='fa-fw far fa-paper-plane'
               invalidMentionList={state.invalidMentionList}
               language={props.user.lang}
