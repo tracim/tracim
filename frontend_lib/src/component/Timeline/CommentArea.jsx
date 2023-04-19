@@ -28,7 +28,7 @@ export const CommentArea = props => {
   const [textToSend, setTextToSend] = useState('')
 
   useEffect(() => {
-    if (props.newComment) {
+    if (props.newComment !== undefined && props.newComment !== '') {
       setContent(props.newComment)
     } else {
       const savedComment = getLocalStorageItem(
@@ -45,20 +45,20 @@ export const CommentArea = props => {
   }, [props.contentType, props.contentId, props.workspaceId])
 
   useEffect(() => {
-    if (content) {
+    if (content === undefined || content === '') {
+      removeLocalStorageItem(
+        props.contentType,
+        props.contentId,
+        props.workspaceId,
+        LOCAL_STORAGE_FIELD.COMMENT
+      )
+    } else {
       setLocalStorageItem(
         props.contentType,
         props.contentId,
         props.workspaceId,
         LOCAL_STORAGE_FIELD.COMMENT,
         content
-      )
-    } else {
-      removeLocalStorageItem(
-        props.contentType,
-        props.contentId,
-        props.workspaceId,
-        LOCAL_STORAGE_FIELD.COMMENT
       )
     }
   }, [content])
@@ -73,7 +73,6 @@ export const CommentArea = props => {
 
     if (!force) {
       const parsedMentionCommentObject = searchMentionAndReplaceWithTag(
-        props.roleList,
         props.memberList,
         commentToSend
       )
@@ -143,10 +142,11 @@ export const CommentArea = props => {
               </div>
             </>
           }
-          confirmLabel={props.t('Edit')}
-          confirmIcon='fas fa-edit'
-          cancelLabel={props.t('Validate anyway')}
           cancelIcon='fas fa-fw fa-check'
+          cancelLabel={props.t('Validate anyway')}
+          confirmIcon='fas fa-edit'
+          confirmLabel={props.t('Edit')}
+          customColor={props.customColor}
         />
       )}
       <TinyEditor
@@ -163,7 +163,6 @@ export const CommentArea = props => {
         maxHeight={300}
         minHeight={100}
         placeholder={props.placeholder}
-        roleList={props.roleList}
         userList={props.memberList}
       />
       <div
@@ -278,7 +277,6 @@ CommentArea.propTypes = {
   newComment: PropTypes.string,
   onClickWithstand: PropTypes.func,
   placeholder: PropTypes.string,
-  roleList: PropTypes.array,
   submitIcon: PropTypes.string,
   submitLabel: PropTypes.string,
   withstandLabel: PropTypes.string
@@ -302,7 +300,6 @@ CommentArea.defaultProps = {
   newComment: undefined,
   onClickWithstand: () => { },
   placeholder: 'Write a comment...',
-  roleList: [],
   submitIcon: 'far fa-paper-plane',
   submitLabel: 'Submit',
   withstandLabel: 'Withstand'

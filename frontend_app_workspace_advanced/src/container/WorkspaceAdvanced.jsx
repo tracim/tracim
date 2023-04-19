@@ -4,7 +4,6 @@ import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
   CUSTOM_EVENT,
-  DEFAULT_ROLE_LIST,
   PAGE,
   PROFILE,
   ROLE_LIST,
@@ -883,7 +882,6 @@ export class WorkspaceAdvanced extends React.Component {
             onClickValidateNewDefaultRole={this.handleClickValidateNewDefaultRole}
             onClickValidateNewDescription={this.handleClickValidateNewDescription}
             onClickValidatePopupDeleteWorkspace={this.handleClickValidateDeleteWorkspace}
-            roleList={DEFAULT_ROLE_LIST}
           />
 
           <PopinFixedRightPart

@@ -16,7 +16,6 @@ import {
   formatAbsoluteDate
 } from '../../helper.js'
 import {
-  DEFAULT_ROLE_LIST,
   replaceHTMLElementWithMention
 } from '../../mentionOrLink.js'
 import { TRANSLATION_STATE } from '../../translation.js'
@@ -90,8 +89,6 @@ export class Timeline extends React.Component {
       console.error('Error in Timeline.jsx, props.timelineData is not an array. timelineData: ', props.timelineData)
       return null
     }
-
-    const disableComment = props.disableComment || props.loading
 
     return (
       <div className={classnames('timeline')}>
@@ -197,13 +194,12 @@ export class Timeline extends React.Component {
             apiUrl={props.apiUrl}
             codeLanguageList={props.codeLanguageList}
             comment={replaceHTMLElementWithMention(
-              DEFAULT_ROLE_LIST,
               props.memberList,
               state.newComment.raw_content
             )}
             commentId={state.newComment.content_id}
             customColor={props.customColor}
-            loggedUserLanguage={props.loggedUser.lang}
+            user={props.loggedUser}
             memberList={props.memberList}
             onClickClose={() => this.setState({ showEditCommentPopup: false })}
             onClickValidate={this.handleClickValidateEditComment}
@@ -222,7 +218,7 @@ export class Timeline extends React.Component {
           />
         )}
 
-        {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && !props.showParticipateButton && (
+        {!props.loading && props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && !props.showParticipateButton && (
           <div className='timeline__texteditor'>
             <CommentArea
               apiUrl={props.apiUrl}
@@ -234,13 +230,13 @@ export class Timeline extends React.Component {
               codeLanguageList={props.codeLanguageList}
               customClass={props.customClass}
               customColor={props.customColor}
-              disableComment={disableComment}
+              disableComment={props.disableComment}
               invalidMentionList={props.invalidMentionList}
               isFileCommentLoading={props.isFileCommentLoading}
               language={props.loggedUser.lang}
               memberList={props.memberList}
+              multipleFiles
               placeholder={props.t('Write an answer...')}
-              roleList={props.roleList}
               submitLabel={props.t('Send')}
             />
           </div>
@@ -304,7 +300,6 @@ Timeline.propTypes = {
   onClickRestoreDeleted: PropTypes.func,
   onClickRevisionBtn: PropTypes.func,
   onClickShowMoreTimelineItems: PropTypes.func,
-  roleList: PropTypes.array,
   shouldScrollToBottom: PropTypes.bool,
   showParticipateButton: PropTypes.bool
 }
@@ -337,7 +332,6 @@ Timeline.defaultProps = {
   onClickRevisionBtn: () => { },
   onClickShowMoreTimelineItems: () => { },
   onClickTranslateComment: content => { },
-  roleList: [],
   shouldScrollToBottom: true,
   showParticipateButton: false,
   timelineData: []

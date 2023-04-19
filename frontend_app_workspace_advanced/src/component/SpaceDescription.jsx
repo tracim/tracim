@@ -20,7 +20,6 @@ export const SpaceDescription = (props) => {
   useEffect(() => {
     if (isModeEdition) {
       const contentWithMention = replaceHTMLElementWithMention(
-        props.roleList,
         props.memberList,
         content
       )
@@ -34,7 +33,6 @@ export const SpaceDescription = (props) => {
    */
   const handleCtrlEnterEvent = async (description) => {
     const parsedMentionCommentObject = searchMentionAndReplaceWithTag(
-      props.roleList,
       props.memberList,
       description
     )
@@ -76,7 +74,6 @@ export const SpaceDescription = (props) => {
               maxHeight={300}
               minHeight={200}
               placeholder={props.t('Description of the space')}
-              roleList={props.roleList}
               userList={props.memberList}
             />
 
@@ -127,8 +124,7 @@ SpaceDescription.propTypes = {
   description: PropTypes.string,
   isReadOnlyMode: PropTypes.bool,
   lang: PropTypes.string,
-  memberList: PropTypes.array,
-  roleList: PropTypes.array
+  memberList: PropTypes.array
 }
 
 SpaceDescription.defaultProps = {
@@ -137,6 +133,5 @@ SpaceDescription.defaultProps = {
   isAutoCompleteActivated: false,
   isReadOnlyMode: true,
   lang: 'en',
-  memberList: [],
-  roleList: []
+  memberList: []
 }

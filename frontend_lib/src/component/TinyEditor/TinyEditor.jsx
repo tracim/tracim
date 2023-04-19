@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useRef } from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import i18n from '../../i18n.js'
@@ -14,6 +14,9 @@ import {
 import {
   CUSTOM_EVENT
 } from '../../customEvent.js'
+import {
+  DEFAULT_ROLE_LIST
+} from '../../mentionOrLink.js'
 
 // require('./TinyEditor.styl') // see https://github.com/tracim/tracim/issues/1156
 
@@ -24,7 +27,10 @@ const advancedToolBar = [
   'code codesample | insert | removeformat | customFullscreen help'
 ].join('')
 
-const simpleToolBar = 'bold italic underline | bullist numlist | customFullscreen help'
+const simpleToolBar = [
+  'bold italic underline | bullist numlist | link customInsertImage emoticons | ',
+  'customFullscreen help'
+].join('')
 
 const handleFileSelected = (e, editorRef) => {
   const files = Array.from(e.target.files)
@@ -76,38 +82,34 @@ const getTinyMceLang = (lang) => {
 }
 
 export const TinyEditor = props => {
+  const defaultRoleList = DEFAULT_ROLE_LIST.map(role => ({
+    type: 'cardmenuitem',
+    direction: 'horizontal',
+    value: `@${props.t(role.slug)} `,
+    label: `@${props.t(role.slug)}`,
+    items: [
+      {
+        type: 'cardtext',
+        text: props.t(role.description),
+        name: 'roleDescription',
+        classes: ['tinymce-role-description']
+      },
+      {
+        type: 'cardtext',
+        text: `@${props.t(role.slug)}`,
+        name: 'roleName',
+        classes: ['tinymce-role-name']
+      }
+    ]
+  }))
+
   const editorRef = useRef(null)
   const inputRef = useRef(null)
-
-  let defaultRoleList = []
 
   const toolbar = props.isAdvancedEdition ? advancedToolBar : simpleToolBar
   // NOTE - MP - 2023-01-10 - Changing the key allow reloading the Editor component this allows us
   // to change the toolbar
   const editorKey = props.isAdvancedEdition ? 'advanced_key' : 'simple_key'
-
-  useEffect(() => {
-    defaultRoleList = props.roleList.map(role => ({
-      type: 'cardmenuitem',
-      direction: 'horizontal',
-      value: `@${props.t(role.slug)} `,
-      label: `@${props.t(role.slug)}`,
-      items: [
-        {
-          type: 'cardtext',
-          text: props.t(role.description),
-          name: 'roleDescription',
-          classes: ['tinymce-role-description']
-        },
-        {
-          type: 'cardtext',
-          text: `@${props.t(role.slug)}`,
-          name: 'roleName',
-          classes: ['tinymce-role-name']
-        }
-      ]
-    }))
-  }, [props.isAdvancedEdition, props.roleList])
 
   return (
     <>
@@ -277,8 +279,8 @@ export const TinyEditor = props => {
                         items: [
                           {
                             type: 'cardimage',
-                            src: `${getAvatarBaseUrl(props.apiUrl, user.id)}/raw/avatar`,
-                            alt: user.publicName,
+                            src: `${getAvatarBaseUrl(props.apiUrl, user.id)}/preview/jpg/15x15/avatar`,
+                            alt: '',
                             name: 'avatar',
                             classes: ['tinymce-avatar']
                           },
@@ -416,7 +418,6 @@ TinyEditor.propTypes = {
   maxHeight: PropTypes.number,
   minHeight: PropTypes.number,
   placeholder: PropTypes.string,
-  roleList: PropTypes.array,
   userList: PropTypes.array
 }
 
@@ -435,6 +436,5 @@ TinyEditor.defaultProps = {
   maxHeight: undefined,
   minHeight: 100,
   placeholder: '',
-  roleList: [],
   userList: []
 }

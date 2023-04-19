@@ -17,7 +17,7 @@
     <link rel="stylesheet" type="text/css" href="/assets/font/fontawesome-free-5.15.2-web/css/all.css?token=${cache_token}" nonce="${csp_nonce}">
     <link rel="stylesheet" type="text/css" href="/assets/font/fontawesome-free-5.15.2-web/css/regular.css?token=${cache_token}" nonce="${csp_nonce}">
 
-    <link rel="stylesheet" type="text/css" href="/assets/bootstrap/bootstrap-4.0.0-beta.css?token=${cache_token}" nonce="${csp_nonce}">
+    <link rel="stylesheet" type="text/css" href="/assets/bootstrap/bootstrap.min.css?token=${cache_token}" nonce="${csp_nonce}">
     <link rel="stylesheet" type="text/css" href="/assets/branding/${website__welcome_page_style}?token=${cache_token}" nonce="${csp_nonce}">
 
     <!-- Apple icons -->
@@ -139,8 +139,8 @@
     <script type="text/javascript" src="/app/admin_workspace_user.app.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     <script type="text/javascript" src="/app/workspace_advanced.app.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
 
-    <script type="text/javascript" src="/assets/bootstrap/jquery-3.2.1.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <script type="text/javascript" src="/assets/bootstrap/popper-1.12.3.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <script type="text/javascript" src="/assets/bootstrap/bootstrap-4.0.0-beta.2.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/assets/bootstrap/jquery-3.5.1.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/assets/bootstrap/popper-1.16.1.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/assets/bootstrap/bootstrap.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
   </body>
 </html>

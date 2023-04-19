@@ -18,12 +18,12 @@ export const SpaceAdvancedConfiguration = (props) => {
         apiUrl={props.apiUrl}
         onClickSubmit={props.onClickSubmit}
         // End of required props ///////////////////////////////////////////////////////////////////
+        codeLanguageList={props.codeLanguageList}
         customColor={props.customColor}
         description={props.description}
         isReadOnlyMode={props.isReadOnlyMode}
         lang={props.lang}
         memberList={props.memberList}
-        roleList={props.roleList}
       />
 
       {!props.isReadOnlyMode && (
@@ -94,6 +94,7 @@ export const SpaceAdvancedConfiguration = (props) => {
               onCancel={props.onClickClosePopupDeleteWorkspace}
               confirmLabel={props.t('Delete')}
               confirmIcon='far fa-fw fa-trash-alt'
+              customColor={props.customColor}
             />
           )}
         </div>
@@ -116,8 +117,7 @@ SpaceAdvancedConfiguration.propTypes = {
   isCurrentSpaceAgendaEnabled: PropTypes.bool,
   isReadOnlyMode: PropTypes.bool,
   lang: PropTypes.string,
-  memberList: PropTypes.array,
-  roleList: PropTypes.array
+  memberList: PropTypes.array
 }
 
 SpaceAdvancedConfiguration.defaultProps = {
@@ -129,6 +129,5 @@ SpaceAdvancedConfiguration.defaultProps = {
   isCurrentSpaceAgendaEnabled: false,
   isReadOnlyMode: true,
   lang: 'en',
-  memberList: [],
-  roleList: []
+  memberList: []
 }

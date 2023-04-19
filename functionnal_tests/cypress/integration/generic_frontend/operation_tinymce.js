@@ -125,7 +125,7 @@ describe('TinyMce text editor', function () {
           .then(editor => {
             editor.setContent('Hello')
           })
-        cy.get('[title="More..."]').click()
+        cy.get('[title="More..."]').eq(0).click()
         // NOTE - MP - 2023-04-05 - eq(1) corresponds to the second button displayed in the HTML
         // editor toolbar. The first one is the one from the comment area.
         cy.get(`[title="${buttonTitle}"]`).eq(1).click()

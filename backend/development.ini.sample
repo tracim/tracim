@@ -370,7 +370,7 @@ api.key = %(basic_setup.api_key)s
 ## Attribute name of user record who contain user login (email)
 ; ldap_login_attribute = mail
 ## Attribute for default name of new user from ldap
-; ldap_name_attributes = givenName
+; ldap_name_attribute = givenName
 ## TLS usage to communicate with your LDAP server
 ; ldap_tls = False
 

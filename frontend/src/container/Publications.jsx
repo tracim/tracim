@@ -8,7 +8,6 @@ import {
   CONTENT_NAMESPACE,
   CONTENT_TYPE,
   CUSTOM_EVENT,
-  DEFAULT_ROLE_LIST,
   NUMBER_RESULTS_BY_PAGE,
   PAGE,
   ROLE_LIST,
@@ -480,15 +479,14 @@ export class Publications extends React.Component {
               workspaceId={parseInt(props.match.params.idws)}
               // End of required props /////////////////////////////////////////
               codeLanguageList={props.system.config.ui__notes__code_sample_languages}
-              customColor={COLORS.PUBLICATION}
               customClass='publishArea'
+              customColor={COLORS.PUBLICATION}
               icon='fa-fw far fa-paper-plane'
               invalidMentionList={state.invalidMentionList}
               language={props.user.lang}
               memberList={props.currentWorkspace.memberList}
               multipleFiles
               placeholder={props.t('Share a news...')}
-              roleList={DEFAULT_ROLE_LIST}
               submitLabel={props.t('Publish')}
             />
           </div>
@@ -537,13 +535,12 @@ export class Publications extends React.Component {
             apiUrl={FETCH_CONFIG.apiUrl}
             codeLanguageList={props.system.config.ui__notes__code_sample_languages}
             comment={replaceHTMLElementWithMention(
-              DEFAULT_ROLE_LIST,
               props.currentWorkspace.memberList,
               state.commentToEdit.raw_content
             )}
             commentId={state.commentToEdit.content_id}
             customColor={COLORS.PUBLICATION}
-            loggedUserLanguage={props.user.lang}
+            user={props.user}
             memberList={props.currentWorkspace.memberList}
             onClickClose={() => this.setState({ showEditPopup: false })}
             onClickValidate={this.handleClickValidateEdit}
