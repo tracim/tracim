@@ -139,8 +139,8 @@
     <script type="text/javascript" src="/app/admin_workspace_user.app.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     <script type="text/javascript" src="/app/workspace_advanced.app.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
 
-    <script type="text/javascript" src="/assets/bootstrap/jquery-3.2.1.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <script type="text/javascript" src="/assets/bootstrap/popper-1.12.3.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/assets/bootstrap/jquery-3.5.1.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/assets/bootstrap/popper-1.16.1.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     <script type="text/javascript" src="/assets/bootstrap/bootstrap.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
   </body>
 </html>
