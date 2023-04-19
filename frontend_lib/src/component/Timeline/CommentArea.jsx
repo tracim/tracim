@@ -28,7 +28,7 @@ export const CommentArea = props => {
   const [textToSend, setTextToSend] = useState('')
 
   useEffect(() => {
-    if (props.newComment) {
+    if (props.newComment !== undefined && props.newComment !== '') {
       setContent(props.newComment)
     } else {
       const savedComment = getLocalStorageItem(
@@ -45,20 +45,20 @@ export const CommentArea = props => {
   }, [props.contentType, props.contentId, props.workspaceId])
 
   useEffect(() => {
-    if (content) {
+    if (content === undefined || content === '') {
+      removeLocalStorageItem(
+        props.contentType,
+        props.contentId,
+        props.workspaceId,
+        LOCAL_STORAGE_FIELD.COMMENT
+      )
+    } else {
       setLocalStorageItem(
         props.contentType,
         props.contentId,
         props.workspaceId,
         LOCAL_STORAGE_FIELD.COMMENT,
         content
-      )
-    } else {
-      removeLocalStorageItem(
-        props.contentType,
-        props.contentId,
-        props.workspaceId,
-        LOCAL_STORAGE_FIELD.COMMENT
       )
     }
   }, [content])
