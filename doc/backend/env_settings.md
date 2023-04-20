@@ -2,7 +2,7 @@
 
 This list is generated using:
 
-```shell
+```bash
 tracimcli dev parameters list --template "| {env_var_name: <74}| {config_file_name: <63}| {config_name: <67}|"
 ```
 

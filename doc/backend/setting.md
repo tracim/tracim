@@ -52,7 +52,7 @@ The last one will check the internal user database first. Then, if the auth fail
 
 The authentication is done with a login, which is either the user's email address or the username. For authentication methods which don't provide a way to distinguish between the two, a login with "@" will be considered as an email address and a login without as a username.
 
-:warning: If you use LDAP or the Remote Auth method, the automatic creation of a username-only user (without "@") can fail if:
+⚠ If you use LDAP or the Remote Auth method, the automatic creation of a username-only user (without "@") can fail if:
 `email.required=True`, which means every user should have an email address set. To solve this case, either:
 
 - set `email.required` to `False`, or
@@ -77,7 +77,7 @@ ldap_name_attribute = givenName
 ldap_tls = False
 ```
 
-:heavy_exclamation_mark: When logging in Tracim, if a valid LDAP user doesn't
+⚠ When logging in Tracim, if a valid LDAP user doesn't
 exist in Tracim, it will be created as a standard user.
 
 ### Special Authentication Mechanism
@@ -86,7 +86,7 @@ Those special authentication mechanisms are not linked to `auth_types` in the co
 
 #### API-Key Authentification
 
-:heavy_exclamation_mark: Unlike other authentication mechanism, this mechanism is not built
+⚠ Unlike other authentication mechanism, this mechanism is not built
 for normal user authentication.
 It is aimed at administrators or daemons (e.g. an email reply daemon).
 This authentication mechanism is the only one that bypasses the authentication mechanism check (user are linked to
@@ -108,7 +108,7 @@ If `api.key` is empty, the API key authentication will be disabled.
 It is possible to connect to Tracim using remote authentification (e.g. the Apache authentication method).
 The idea is that the webserver authenticates the user and then pass the login of the authenticated user through uWSGI environment variables or an HTTP header.
 
-:heavy_exclamation_mark: When logging in Tracim, if a valid remote user doesn't
+⚠ When logging in Tracim, if a valid remote user doesn't
 exist in Tracim, it will be created as a standard user.
 
 To do this, you need to properly configure your webserver in order to do
@@ -118,7 +118,7 @@ In Tracim, you just need to change value of `remote_user_header` in the INI conf
 file. The value should be an CGI-like environment variable name, so the `Remote-User` HTTP header
 becomes `HTTP-REMOTE-USER`.
 
-:warning: You should be very careful using this feature with the HTTP header, your
+⚠ You should be very careful using this feature with the HTTP header, your
 webserver should be properly configured to prevent someone from setting a custom
 remote user header. You should also make sure that, if you use the web server as a proxy,
 no one can bypass this proxy and access Tracim in a way that lets
@@ -174,7 +174,7 @@ Tracim is actively used and tested with 2 session back-ends: files and redis.
 
 The recommended session back-end for production is redis as it avoids having to manage deletion of expired session files. For other session back-ends, please read [beaker documentation](https://beaker.readthedocs.io/en/latest/configuration.html) for more information.
 
-:warning: If you change the session configuration, it's safer to delete the existing sessions in order to force users to log again (and use a cookie with the changed options).
+⚠ If you change the session configuration, it's safer to delete the existing sessions in order to force users to log again (and use a cookie with the changed options).
 
 ### File storage configuration (default)
 
@@ -192,7 +192,7 @@ You should use this command in both session data and session lock dirs.
 
 #### delete all existing sessions (file storage)
 
-```shell
+```bash
 # note: <session.data_dir> refers to the absolute path given by the config parameter `session.data_dir`.
 rm -r <session.data_dir>/*
 ```
@@ -209,7 +209,7 @@ Then you'll need to set those parameters for redis backend:
 
 #### delete the existing sessions (redis storage)
 
-```shell
+```bash
 # note: <session.url> refers to the value of the config parameter `session.url` (redis url)
 redis-cli -u <session.url> keys 'beaker_cache:*' | xargs redis-cli -u <session.url> del
 ```
@@ -254,7 +254,7 @@ To enable mail notification, the smallest config is:
 Don't forget to set `website.base_url` and `website.title` for the frontend, as some features use them to
 link the frontend in emails.
 
-:warning: It is necessary to check if your SMTP configuration is working correctly before using Tracim. To do so,
+⚠ It is necessary to check if your SMTP configuration is working correctly before using Tracim. To do so,
 we do provide this command:
 
     tracimcli dev test smtp -r myemailadress@mydomain.local
@@ -378,30 +378,30 @@ To enable simple debug configuration:
     debug = True
 
 Production configuration (no reload, no debugtoolbar):
+```
+[app:tracim_web]
+...
+pyramid.reload_templates = false
+pyramid.debug_authorization = false
+pyramid.debug_notfound = false
+pyramid.debug_routematch = false
 
-    [app:tracim_web]
-    ...
-    pyramid.reload_templates = false
-    pyramid.debug_authorization = false
-    pyramid.debug_notfound = false
-    pyramid.debug_routematch = false
-
-    [DEFAULT]
-    ...
-    debug = False
-
+[DEFAULT]
+...
+debug = False
+```
 You can, of course, also set level of one of the different logger
 to have more/less log about something.
-
-    [logger_sqlalchemy]
-    ...
-    level = INFO
-
+```
+[logger_sqlalchemy]
+...
+level = INFO
+```
 ## Configure indexing and search to use Elasticsearch/Opensearch (Tracim v2.3+)
 
 First, you need an Elasticsearch server. An easy way to have one with docker can be (don't use this for production):
 
-```shell
+```bash
 # First build the elasticsearch-ingest image provided in tracim repository
 cd tools_docker/elasticsearch_ingest
 docker build -t elasticsearch-ingest .
@@ -412,7 +412,7 @@ docker run -d -p 9200:9200 -p 9300:9300 -v esdata:/usr/share/elasticsearch -v es
 
 Alternatively you can you Opensearch server instead:
 
-```shell
+```bash
 # First build the opensearch-ingest image provided in tracim repository
 cd tools_docker/opensearch_ingest
 docker build -t opensearch-ingest .
@@ -432,21 +432,21 @@ search.elasticsearch.use_ingest = True
 ```
 
 Your Elasticsearch server needs to be running. You can then set up the index with:
-
-    tracimcli search index-create
-
+```bash
+tracimcli search index-create
+```
 You can (re)sync data with:
-
-    tracimcli search index-populate
-
+```bash
+tracimcli search index-populate
+```
 You can delete the index using:
-
-    tracimcli search index-drop
-
+```bash
+tracimcli search index-drop
+```
 If there is an update of Tracim, use this one to migrate the index (experimental, prefer delete, init, index mechanism):
-
-    tracimcli search index-upgrade-experimental
-
+```bash
+tracimcli search index-upgrade-experimental
+```
 Your data are correctly indexed now, you can go to the Tracim UI and use the search mechanism.
 
 ## Collaborative Edition Online (Tracim v2.4+)
@@ -461,71 +461,71 @@ We do not support other collaborative edition online service for now but we do s
 **To set up a `Collabora CODE` server using docker for testing purpose ([image](https://hub.docker.com/r/collabora/code)):**
 
 note: you should replace <DOT_ESCAPED_DOMAIN_OF_TRACIM_API> with real value like `domain=tracim\\.mysuperdomain\\.com`):
-
-    sudo docker run -d -t -p 9980:9980 -e "domain=<DOT_ESCAPED_DOMAIN_OF_TRACIM_API>" -e "SLEEPFORDEBUGGER=0" -e "extra_params=--o:ssl.enable=false" --cap-add MKNOD --restart always collabora/code:4.2.6.2
-
-:warning: Tracim is tested with version 4.0.5.2. Use the latest version at your own risk.
+```bash
+sudo docker run -d -t -p 9980:9980 -e "domain=<DOT_ESCAPED_DOMAIN_OF_TRACIM_API>" -e "SLEEPFORDEBUGGER=0" -e "extra_params=--o:ssl.enable=false" --cap-add MKNOD --restart always collabora/code:4.2.6.2
+```
+⚠ Tracim is tested with version 4.0.5.2. Use the latest version at your own risk.
 
 **To set up a `LibreOfficeOnline` server(rolling release, unstable :warning:) using docker ([image](https://hub.docker.com/r/libreoffice/online)):**
-
-    sudo docker run -d -t -p 9980:9980 -e "domain=<DOT_ESCAPED_DOMAIN_OF_TRACIM_API>" -e "SLEEPFORDEBUGGER=0" -e "extra_params=--o:ssl.enable=false" --cap-add MKNOD --restart always libreoffice/online:master
-
+```bash
+sudo docker run -d -t -p 9980:9980 -e "domain=<DOT_ESCAPED_DOMAIN_OF_TRACIM_API>" -e "SLEEPFORDEBUGGER=0" -e "extra_params=--o:ssl.enable=false" --cap-add MKNOD --restart always libreoffice/online:master
+```
 :information_source: All the information to set up a `Collabora CODE/ LibreofficelOnline` server can be found on the [official documentation](https://www.collaboraoffice.com/code/docker/)
 
-:warning: Be really careful about configuring the domain parameter. As written at the [official documentation](https://www.collaboraoffice.com/code/docker/), dots should be escaped (e.g. `domain=.*\\.mysuperdomain\\.com`).
+⚠ Be really careful about configuring the domain parameter. As written at the [official documentation](https://www.collaboraoffice.com/code/docker/), dots should be escaped (e.g. `domain=.*\\.mysuperdomain\\.com`).
 
 :information_source: You can configure Collabora administration username/password too:
-
-    -e "username=admin" -e "password=S3cRet"
-
+```
+-e "username=admin" -e "password=S3cRet"
+```
 The administration interface is available at `https://<collabora_host>/loleaflet/dist/admin/admin.html`.
 
 With a Collabora host, `<collabora_host>` may look like `collaboradomain.ndd` or `localhost:9980`
 
 :information_source: To avoid using automatic SSL/TLS encryption in Collabora, you should disable it:
-
-    -e "extra_params=--o:ssl.enable=false"
-
+```
+-e "extra_params=--o:ssl.enable=false"
+```
 ### Configuring Tracim in `development.ini`
 
 To enable online edition on Tracim and allow communication with your edition software.
 
 First you need to enable the edition on the API. To do that you have to add the application to app_enabled. For example:
+```
+Before:
+app.enabled = contents/thread,contents/html-document,contents/folder,agenda
 
-    Before:
-    app.enabled = contents/thread,contents/html-document,contents/folder,agenda
-
-    After:
-    app.enabled = contents/thread,contents/html-document,contents/folder,agenda,collaborative_document_edition
-
+After:
+app.enabled = contents/thread,contents/html-document,contents/folder,agenda,collaborative_document_edition
+```
 This application need contents/file application to work fully. You will have to add this application too. With our example:
+```
+Before:
+app.enabled = contents/thread,contents/html-document,contents/folder,agenda,collaborative_document_edition
 
-    Before:
-    app.enabled = contents/thread,contents/html-document,contents/folder,agenda,collaborative_document_edition
-
-    After:
-    app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,agenda,collaborative_document_edition
-
+After:
+app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,agenda,collaborative_document_edition
+```
 Once the application enabled, you will have to specify which software you desire to use. So far Tracim only support Collabora.
-
-    collaborative_document_edition.software = collabora
-
+```
+collaborative_document_edition.software = collabora
+```
 Then you need to indicate the ip address of the server for the protocol `WOPI`:
-
-    collaborative_document_edition.collabora.base_url = <collabora_base_url>
-
+```
+collaborative_document_edition.collabora.base_url = <collabora_base_url>
+```
 with collabora_base_url can be value like `http://localhost:9980` or `http://mycollaboraserver.ndd`
 
 Then you can set up default office document templates files, these templates will be the one used to create an empty document using Tracim online app.
 
 Basic templates are provided by default with Tracim:
-
-    basic_setup.file_template_dir = %(here)s/tracim_backend/templates/open_documents
-
+```
+basic_setup.file_template_dir = %(here)s/tracim_backend/templates/open_documents
+```
 But you can change the default directory to use your templates files:
-
-    collaborative_document_edition.file_template_dir =  PATH_TO_YOUR_TEMPLATE_DIRECTORY
-
+```
+collaborative_document_edition.file_template_dir =  PATH_TO_YOUR_TEMPLATE_DIRECTORY
+```
 Filenames of the templates inside the directory are not relevant. Only their extensions matter and need to match the software's default extensions.
 For instance, `CODE` edits `Libre Office` files, so extensions will be `odt`, `odp`, `ods`.
 
@@ -538,27 +538,27 @@ After all these changes in the configuration, you should restart every process (
 To enable the call feature on Tracim.
 
 First you need to enable the call feature:
-
-    call.enabled = True
-
+```
+call.enabled = True
+```
 #### Mandatory parameters
 
 Then select a provider:
-
-    call.provider = jitsi_meet
-
+```
+call.provider = jitsi_meet
+```
 Tracim is only supporting jitsi so far.
 
 Once you have selected a provider you will have to select an url:
-
-    call.jitsi_meet.url = https://meet.jit.si
-
+```
+call.jitsi_meet.url = https://meet.jit.si
+```
 #### Facultative parameters
 
 You can specify the time (in seconds) before the call is considered unanswered:
-
-    call.unanswered_timeout = 30
-
+```
+call.unanswered_timeout = 30
+```
 The default value is 30 seconds.
 
 ## User Custom Properties
@@ -571,9 +571,9 @@ to know more about this feature](./user_custom_properties.md).
 It's possible to set a default agenda event description when creating an event in the agenda from Tracim.
 Write the text you which to have as the defaut event description in a file and put its path in the corresponding parameter.
 For instance:
-
-    agenda.pre_filled_event.description_file_path = %(here)s/tracim_backend/templates/pre-filled_agenda_event_description.txt
-
+```
+agenda.pre_filled_event.description_file_path = %(here)s/tracim_backend/templates/pre-filled_agenda_event_description.txt
+```
 ## Security settings
 
 ### Content Security Policy
@@ -594,11 +594,11 @@ This directory is configurable through the `basic_setup.uploaded_files_storage_p
 Tracim can also be configured to use a Amazon S3 compatible storage back-end by setting those parameters:
 
 ```
-  basic_setup.uploaded_files_storage_type = s3
-  uploaded_files.storage.s3.access_key_id =
-  uploaded_files.storage.s3.secret_access_key =
-  ; Use this parameter to specify an alternative S3 storage back-end
-  # uploaded_files.storage.s3.endpoint_url = https://my_s3_storage.mydomain.tld
+basic_setup.uploaded_files_storage_type = s3
+uploaded_files.storage.s3.access_key_id =
+uploaded_files.storage.s3.secret_access_key =
+; Use this parameter to specify an alternative S3 storage back-end
+# uploaded_files.storage.s3.endpoint_url = https://my_s3_storage.mydomain.tld
 ```
 
 If you want to use your own S3 compatible back-end we recommend [minio](https://min.io) as we have tested its usage with Tracim.
