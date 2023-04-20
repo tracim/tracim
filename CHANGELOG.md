@@ -1,23 +1,233 @@
-# 4.4.3 / 2022-11-29
+# Changelog
+
+## 4.5.0 / 2023-04-28
+
+### New Features
+
+#### Avatar
+
+Avatars are now real images.
+
+##### Fixed Issues
+
+- Bug: The generated background color of the avatar circle can get a too low contrast with the page
+  background ([#4658](https://github/tracim/tracim/issues/4658))
+
+#### Daily notification type
+
+With the new daily notification type, you will receive a daily email containing all the unread
+notifications and mentions of the past 24h. The email will be sent at 00:00 AM (UTC).
+
+##### Fixed Issues
+
+- ✨ Feat: Reduce mail notification by grouping them in one daily email ([#6106](https://github/tracim/tracim/issues/6106))
+
+#### Interface
+
+We did some work on the interface to make it more consistent and easier to use.
+
+Here is some change that are worth your attention:
+
+- Space settings and dashboard buttons improvements
+  - Display scrollbar
+  - ---
+  - If the user can not edit the space, the button display "Space information" instead of "Space settings"
+  - The description now have an edition and a view mode
+  - The buttons are normalized
+    - The space settings button is now with other buttons on the right menu
+  - The default text is removed (no more `0` displayed)
+- Previews improved
+- Listing
+  - ``Last modification`` column added in content listing
+  - Sort content by available criteria
+
+##### Fixed Issues
+
+- Fix the ``customColor`` to match the current application
+- Bug: breadcrumbs are incoherent when you delete content in the favorites space ([#5336](https://github/tracim/tracim/issues/5336))
+- ✨Feat: change labels in the Account Settings ([#5629](https://github/tracim/tracim/issues/5629))
+- 🐛 Bug: Elements are not aligned well on sidebar ([#5966](https://github/tracim/tracim/issues/5966))
+- ✨ Feat: Improve space settings page and dashboard buttons ([#5967](https://github/tracim/tracim/issues/5967))
+- 🐛 Bug: The popups are hidden by the sidebar on mobile ([#5989](https://github/tracim/tracim/issues/5989))
+- 🐛 Bug: Large button to join spaces ([#5994](https://github/tracim/tracim/issues/5994))
+- ✨ Feat: Improve preview size on screen ([#5996](https://github/tracim/tracim/issues/5996))
+- ✨ Feat: Preview files instead of downloading it when clicking on it in threads / comments ([#5997](https://github/tracim/tracim/issues/5997))
+- ✨ Feat: Add a "Last modification" column in content listings ([#6027](https://github/tracim/tracim/issues/6027))
+- ✨ Feat: Add filters on content listings ([#6029](https://github/tracim/tracim/issues/6029))
+- ✨ Feat: Sort content by available criteria on content listings ([#6030](https://github/tracim/tracim/issues/6030))
+- ✨ Feat: Refactor listings ([#6034](https://github/tracim/tracim/issues/6034))
+  - Tables are now using the same component. The complete change will take some times, but the first
+  step is done
+- Bug: Cannot scroll on advanced dashboard ([#6065](https://github/tracim/tracim/issues/6065)) - Thank to @gbonaspetti
+- Bug: Wrong tag button color ([#6088](https://github/tracim/tracim/issues/6088)) - Thank to @gbonaspetti
+- 🐛 Bug: The number of mentions which is displayed in the sidebar can be wrong ([#6134](https://github/tracim/tracim/issues/6134))
+  - No more incorrect mention number
+
+#### Mentions
+
+Mentions have been completely reworked from the ground up. They are now more flexible and reliable.
+You can now mention users, before and after a punctuation mark. We also updated the mention display,
+mentions to someone else are now in blue. The new mention system is also easy to extend and we plan
+to add much more functionalities to mentions in the future. Like clicking on a mention to see the
+user profile, update the mention color according to the user role, etc.
+
+``@all`` is now translated to your display language and mentions are dynamically updated. This means
+that if you mention a user, and then they change the username, the mention will be updated.
+
+##### Fixed Issues
+
+- Bug: typing a mention scrolls to the comments on small screens (#3519)
+- Bug: Loss of highlight at mentions when changing username (#3590)
+- Bug: Editing out a mention does not remove its associated metadata (#3640)
+  - Mentions are now calculated differently, you can now move the mention without breaking it
+- Bug: mentions are sometimes not highlighted after saving an HTML document (#3671)
+- Misc: Handle user id instead of username in mention event internally (#4136)
+- Bug: @all mention translation (to @tous in French) does not work without to change language
+  (#4463)
+- Feat: allow mentioning or linking after some punctuation marks (#4795)
+  - `@FooBar!` is now valid
+  - `!@FooBar` is now valid
+- Bug: its not possible to edit publication and remove mention (#4972)
+- Bug: editing after a mention in a note includes the new text in the mention HTML tag (#5080)
+- Bug: I can't save a comment edit if I add a mention to an invalid user. (#5132)
+- ✨ Feat: Better mention support #6007
+
+#### Performances
+
+Joining a space is now much faster.
+
+##### Fixed Issues
+
+- 🐛 Bug: Creating a member take too long time when there is already a big history ([#4652](https://github/tracim/tracim/issues/4652))
+  - Old: created 458 messages by seconds
+  - New: created 3906 messages by seconds
+
+#### TinyMCE
+
+TinyMCE is now used as the default editor for all text areas with a better autocomplete system.
+
+- The `TextArea` component is replaced by `TinyMCE` in the following components:
+  - `CommentArea`
+  - `CustomFormManager`
+  - `EditCommentPopup`
+  - `HtmlDocument`
+  - `KanbanCardEditor`
+  - `SpaceDescription`
+
+Emoji support has been added for simple and advanced edition.
+
+##### Fixed Issues
+
+- Feat: Allow sending a message in the timeline using a keyboard shortcut ([#2817](https://github/tracim/tracim/issues/2817))
+  - `ctrl + enter` to submit a comment, a HTML document or a news.
+- Bug: Focus loss when clicking on an autocompletion suggestion ([#3520](https://github/tracim/tracim/issues/3520))
+- Misc: Have a TinyMCE component ([#4396](https://github/tracim/tracim/issues/4396))
+  - This means that you can now use TinyMCE in your own components
+- Feat: Add emojis to comments and notes ([#4436](https://github/tracim/tracim/issues/4436))
+  - ✨ Feat: Add emoji button in TinyMCE editor ([#6006](https://github/tracim/tracim/issues/6006))
+- Bug: New line added automatically when using advanced edition ([#4437](https://github/tracim/tracim/issues/4437))
+- Bug: the advanced edition is displayed too small ([#4583](https://github/tracim/tracim/issues/4583))
+- Bug: [at]all is on the wrong place in the mention autocompletion ([#4705](https://github/tracim/tracim/issues/4705))
+- Bug: autocomplete menu is unreadable at note's beginning ([#4714](https://github/tracim/tracim/issues/4714))
+- Feat: highlight the text that matches with proposals in autocompletion ([#4727](https://github/tracim/tracim/issues/4727))
+- Feat: allow TinyMCE to be resized ([#5394](https://github/tracim/tracim/issues/5394))
+  - The area is now automatically resized to fit the content until a maximum height
+- Bug: Sidebar menu does not collapse when editing html notes in full screen ([#5407](https://github/tracim/tracim/issues/5407))
+- Bug: the autocompletion popup is put on top of the field to write a new news, instead of above,
+  moving the field ([#5429](https://github/tracim/tracim/issues/5429))
+- Misc: Make TinyMCE's height adapt to its container's height ([#5442](https://github/tracim/tracim/issues/5442))
+- Bug: external links does NOT open in new tab ([#5546](https://github/tracim/tracim/issues/5546))
+- Feat: scroll in the autocompletion list ([#5831](https://github/tracim/tracim/issues/5831))
+- 🐛 Bug: The autocompletion popup is hidden behind the sidebar menu ([#6035](https://github/tracim/tracim/issues/6035))
+
+### Fixed Issues
+
+- Misc: Duplicated code for activityDisplayFilter ([#4677](https://github/tracim/tracim/issues/4677))
+- Bug: Document state is not translated in comments ([#5869](https://github/tracim/tracim/issues/5869))
+- ✨ Feat: "Unknown error" flash must be more descriptive ([#6018](https://github/tracim/tracim/issues/6018))
+- Misc: missing tests for "sort by" feature ([#6041](https://github/tracim/tracim/issues/6041))
+- ✨ Feat: write missing tests from build_096 ([#6062](https://github/tracim/tracim/issues/6062))
+- Bug: Can't start a docker image that just being built ([#6100](https://github/tracim/tracim/issues/6100))
+
+### Breaking/Important changes
+
+#### Configuration
+
+- _email.notification.enabled_on_invitation_ -> __email.notification.type_on_invitation__
+  - Possible values:
+    - `none`: doesn't send any mail
+    - `individual`: send a mail for every notification received
+    - `summary`: send a daily mail containing notification summary
+  - Default value: `summary`
+
+#### API (Endpoint)
+
+##### Removed
+
+- [`PUT`] /api/users/{user_id:\d+}/workspaces/{workspace_id}/notifications/activate
+- [`PUT`] /api/users/{user_id:\d+}/workspaces/{workspace_id}/notifications/deactivate
+
+##### Added
+
+- [`PUT`] /api/users/{user_id:\d+}/workspaces/{workspace_id}/email_notification_type
+  - Body:
+    - `email_notification_type`: `none`, `individual`, `summary`
+
+#### API (Code)
+
+`RoleAPI.create_role`:  
+`with_notif` is removed in favor of `email_notification_type`.  
+That means you will have to change `with_notif=True` to `email_notification_type=EmailNotificationType.SUMMARY` or `email_notification_type=EmailNotificationType.ALL` in your plugins.  
+`with_notif=False` is now `email_notification_type=EmailNotificationType.NONE`
+
+Possible values for `email_notification_type` are:
+
+- `EmailNotificationType.NONE`
+- `EmailNotificationType.INDIVIDUAL`
+- `EmailNotificationType.SUMMARY`
+
+### Documentation updates
+
+- Fix a typo in the documentation
+- Fix dead links in the documentation
+- Document how to trigger a mention from the API ([#3892](https://github/tracim/tracim/issues/3892))
+- Doc: Mysql and MariaDB are not supported anymore ([#6073](https://github/tracim/tracim/issues/6073))
+
+### Dependencies updates
+
+#### Added
+
+- `tinymce-react ^4.2.0`
+
+#### Updated
+
+- `Bootstrap` from `4.0.0-beta2` to `4.6.2`
+- `JQuery` from `3.3.1` to `3.5.1`
+- `Popper` from `1.12.3` to `1.16.1`
+
+#### Removed
+
+- `git`
+
+## 4.4.3 / 2022-11-29
 
 ### Fixed Issues
 
 - Frontend: [#6048](https://github.com/tracim/tracim/issues/6048)
 
-
-# 4.4.2 / 2022-11-04
+## 4.4.2 / 2022-11-04
 
 ### Fixed Issues
 
 - Frontend: [#4926](https://github.com/tracim/tracim/issues/4926)
 
-# 4.4.1 / 2022-10-28
+## 4.4.1 / 2022-10-28
 
 ### Fixed Issues
 
 - Backend: [#5917](https://github.com/tracim/tracim/issues/5917)
 
-# 4.4.0 / 2022-10-27
+## 4.4.0 / 2022-10-27
 
 ### New Features
 
@@ -63,15 +273,13 @@
 - The file app menu shows in two lines on mobile (issue [#5976](https://github.com/tracim/tracim/issues/5976))
 - The "My profile" button does not change its name when using admin rights to check the profile of another user. (issue [#5975](https://github.com/tracim/tracim/issues/5975))
 
-
-# 4.3.2 / 2022-08-09
+## 4.3.2 / 2022-08-09
 
 ### Fixed Issue
 
 - Backend: [#5813](https://github.com/tracim/tracim/issues/5813)
 
-
-# 4.3.1 / 2022-07-27
+## 4.3.1 / 2022-07-27
 
 ### Fixed Issues
 
@@ -79,10 +287,10 @@
 - Docker: [#5801](https://github.com/tracim/tracim/pull/5801)
 
 ### Breaking/Important change
+
 - We have updated our documentation and our scripts in order to follow [the changes in docker compose v2](https://docs.docker.com/compose/#compose-v2-and-the-new-docker-compose-command).
 
-
-# 4.3.0 / 2022-07-21
+## 4.3.0 / 2022-07-21
 
 ### New Features
 
@@ -124,23 +332,20 @@
 - Task notification do not read all notification from the content (issue [#5797](https://github.com/tracim/tracim/issues/5797))
 - Notification "Someone called you" appears when the callee rejected/accepted the call (issue [#5044](https://github.com/tracim/tracim/issues/5044))
 
-
-# 4.2.2 / 2022-05-05
-
-### Fixed Issues
-
- - Frontend: [#5642](https://github.com/tracim/tracim/issues/5642)
-
-
-# 4.2.1 / 2022-05-03
+## 4.2.2 / 2022-05-05
 
 ### Fixed Issues
 
- - Frontend: [#5622](https://github.com/tracim/tracim/issues/5622),
+- Frontend: [#5642](https://github.com/tracim/tracim/issues/5642)
+
+## 4.2.1 / 2022-05-03
+
+### Fixed Issues
+
+- Frontend: [#5622](https://github.com/tracim/tracim/issues/5622),
 [#5637](https://github.com/tracim/tracim/issues/5637)
 
-
-# 4.2.0 / 2022-04-28
+## 4.2.0 / 2022-04-28
 
 ### New Features
 
@@ -151,6 +356,7 @@
 - External links to pictures now have a preview in comments
 
 For technical users:
+
 - Tracimcli command lines have been added to validate custom properties schema and mail config validation
 - Add support for anonymous LDAP and anonymous SMTP authentication has been added
 
@@ -200,8 +406,7 @@ For technical users:
 - Sometimes, the header disappears on mobile devices, see [#5117](https://github.com/tracim/tracim/issues/5117)
 - Creation popups are not centered on mobile devices, see [#5625](https://github.com/tracim/tracim/issues/5625)
 
-
-# 4.1.3 / 2022-03-02
+## 4.1.3 / 2022-03-02
 
 ### Fixed Issues
 
@@ -209,13 +414,13 @@ For technical users:
 [#5453](https://github.com/tracim/tracim/issues/5453),
 [#5455](https://github.com/tracim/tracim/issues/5455)
 
-
-# 4.1.2 / 2022-02-15
+## 4.1.2 / 2022-02-15
 
 This maintenance release fixes a few things:
- - the experimental Docker image for arm64, broken after a setuptools update, once again works
- - on mobile devices, a workaround prevents the send button to be covered by the browser's native UI
- - a dependency has been updated, hoping this prevents the connection error popup from showing up when everything actually works correctly
+
+- the experimental Docker image for arm64, broken after a setuptools update, once again works
+- on mobile devices, a workaround prevents the send button to be covered by the browser's native UI
+- a dependency has been updated, hoping this prevents the connection error popup from showing up when everything actually works correctly
 
 ### Fixed Issues
 
@@ -223,8 +428,7 @@ This maintenance release fixes a few things:
 - Frontend: [#5370](https://github.com/tracim/tracim/issues/5370),
 [#5175](https://github.com/tracim/tracim/issues/5175)
 
-
-# 4.1.1 / 2022-02-03
+## 4.1.1 / 2022-02-03
 
 ### Fixed Issues
 
@@ -233,8 +437,7 @@ This maintenance release fixes a few things:
 [#5285](https://github.com/tracim/tracim/issues/5285),
 [#5315](https://github.com/tracim/tracim/issues/5315)
 
-
-# 4.1.0 / 2022-01-21
+## 4.1.0 / 2022-01-21
 
 ### New Features
 
@@ -276,29 +479,25 @@ This maintenance release fixes a few things:
 - Activation/Deactivation of agenda is not properly handled. In some cases you will not be able to remove users from spaces because of this. See the workaround in issue:([#5263](https://github.com/tracim/tracim/issues/5263#issuecomment-1016454036))
 - Having a double quote (`"`) or a slash (`\`) in a kanban's title causes the kanban to not load. See: ([#5220](https://github.com/tracim/tracim/issues/5220))
 
-
-# 4.0.6 / 2022-01-18
+## 4.0.6 / 2022-01-18
 
 ### Fixed Issues
 
 - Backend: [#5253](https://github.com/tracim/tracim/issues/5253)
 
-
-# 4.0.5 / 2021-12-29
+## 4.0.5 / 2021-12-29
 
 ### Fixed Issues
 
 - CI/tests: [#5212](https://github.com/tracim/tracim/issues/5212)
 
-
-# 4.0.4 / 2021-12-21
+## 4.0.4 / 2021-12-21
 
 ### Fixed Issues
 
 - Docker: [#5183](https://github.com/tracim/tracim/issues/5183)
 
-
-# 4.0.3 / 2021-11-22
+## 4.0.3 / 2021-11-22
 
 ### Fixed Issues
 
@@ -309,14 +508,13 @@ This maintenance release fixes a few things:
 [#5090](https://github.com/tracim/tracim/issues/5090),
 [#5096](https://github.com/tracim/tracim/issues/5096)
 
-# 4.0.2 / 2021-11-05
+## 4.0.2 / 2021-11-05
 
 ### Fixed Issues
 
 - Frontend: [#5049](https://github.com/tracim/tracim/issues/5049)
 
-
-# 4.0.1 / 2021-11-04
+## 4.0.1 / 2021-11-04
 
 ### Fixed Issues
 
@@ -324,8 +522,7 @@ This maintenance release fixes a few things:
 - Frontend: [#4895](https://github.com/tracim/tracim/issues/4895),
 [#5049](https://github.com/tracim/tracim/issues/5049)
 
-
-# 4.0.0 / 2021-10-29
+## 4.0.0 / 2021-10-29
 
 ### New Features
 
@@ -390,65 +587,67 @@ This maintenance release fixes a few things:
 - RAW image previews are broken (issue [#5008](https://github.com/tracim/tracim/issues/5008))
 - Notification call issue (issue [#5044](https://github.com/tracim/tracim/issues/5044))
 
-
-# 3.9.2 / 2021-07-30
+## 3.9.2 / 2021-07-30
 
 Fix installation process (broken due to the last version of Yarn).
 
 ### Fixed Issues
+
 - Backend/Docker: [#4830](https://github.com/tracim/tracim/issues/4830)
 
-
-# 3.9.1 / 2021-07-19
+## 3.9.1 / 2021-07-19
 
 This stabilisation release fixes a frontend crash that happens when anchor elements with an empty or inexistent href
 attribute end up in publications, notes or comments. Any user of Tracim 3.9 is strongly encouraged to update. Releases
 prior to Tracim 3.9 are not affected by this crash.
 
 ### Fixed Issues
- - Frontend: [#4805](https://github.com/tracim/tracim/issues/4805)
 
+- Frontend: [#4805](https://github.com/tracim/tracim/issues/4805)
 
-# 3.9.0 / 2021-07-09
+## 3.9.0 / 2021-07-09
 
 ### New Features
 
 For end users:
- - Links to Tracim contents. A user can now create a link to other Tracim contents in comments and notes. An
+
+- Links to Tracim contents. A user can now create a link to other Tracim contents in comments and notes. An
    autocompletion popup will help the user create the link as soon as they type `#` and then a word in the title
    of the content, or its id. The created link will display the title of the document, and will have a specific color
    showing it is an internal link in notes.
- - Tags on contents (notes and files). Tagging is done in the new tab between the area that shows the
+- Tags on contents (notes and files). Tagging is done in the new tab between the area that shows the
    content and the timeline. Tags can be added and removed there. They are per space (spaces have different sets of
    tags). Tags of a space can be listed and managed in the space settings that a user can find in the dashboard.
    Readers cannot add or remove tags to contents or to space. Contributor can add/remove tags to/from contents, but
    cannot manage tags of a space. Space and content managers can manage tags of a space. Contents can be searched
    by tags when the advanced search feature is enabled.
- - Revamped app appearance (size and headers). Formerly, apps showing notes, topics and files didn't take the whole
+- Revamped app appearance (size and headers). Formerly, apps showing notes, topics and files didn't take the whole
    space vertically and horizontally. They also had both a header and a toolbar.
    The space and screen estate is now better used. Apps now take as much space as possible, both vertically and
    horizontally, and the header and the toolbar have been merged to put the focus on the content.
- - The valitity time of the password reset link is given in the reset password email sent when users forget their passwords
- - The autocompletion popup for mentions (and now, for links) is now correctly positioned even when the text being
+- The validity time of the password reset link is given in the reset password email sent when users forget their passwords
+- The autocompletion popup for mentions (and now, for links) is now correctly positioned even when the text being
    edited is scrolled.
 
 For administrators:
- - More robust previews. Some office documents take a lot of time and resources to preview. There is now a timeout for
+
+- More robust previews. Some office documents take a lot of time and resources to preview. There is now a timeout for
    previews of documents generated using LibreOffice to limit issues that can arise from this problem. For this reason,
    previews of spreadsheets are now disabled by default.
- - Easier database creation: when creating a database with `tracimcli db init`,
+- Easier database creation: when creating a database with `tracimcli db init`,
    the command now automatically stamps `head`, which, until now, required to run a dedicated command. It is now
    a bit easier to install a new database when installing Tracim.
- - Migration to MinIO. Instances using standard storage can now be easily be migrated
+- Migration to MinIO. Instances using standard storage can now be easily be migrated
    to MinIO using the new command `tracimcli db migrate-storage`.
- - Limitation of simultaneous online users: administrators can now limit how many simultaneous users are using a Tracim
+- Limitation of simultaneous online users: administrators can now limit how many simultaneous users are using a Tracim
    instance. If the limit is reached, user loading tracim will be shown an error message telling them to contact
    the administrator. A custom message can be configured. This feature is disabled by default.
- - Restriction of support to specific kinds of document in Collabora Online. The support can be restricted to a
+- Restriction of support to specific kinds of document in Collabora Online. The support can be restricted to a
    limited set of extensions. This feature is disabled by default.
 
 ### Fixed Issues
- - Frontend: [#4692](https://github.com/tracim/tracim/issues/4692),
+
+- Frontend: [#4692](https://github.com/tracim/tracim/issues/4692),
 [#4746](https://github.com/tracim/tracim/issues/4746),
 [#4766](https://github.com/tracim/tracim/issues/4766),
 [#4702](https://github.com/tracim/tracim/issues/4702),
@@ -463,7 +662,7 @@ For administrators:
 [#4707](https://github.com/tracim/tracim/issues/4707),
 [#4730](https://github.com/tracim/tracim/issues/4730)
 
- - Backend: [#4751](https://github.com/tracim/tracim/issues/4751),
+- Backend: [#4751](https://github.com/tracim/tracim/issues/4751),
 [#3559](https://github.com/tracim/tracim/issues/3559),
 [#4552](https://github.com/tracim/tracim/issues/4552),
 [#4713](https://github.com/tracim/tracim/issues/4713),
@@ -471,7 +670,7 @@ For administrators:
 [#4685](https://github.com/tracim/tracim/issues/4685),
 [#4404](https://github.com/tracim/tracim/issues/4404)
 
- - Backend and frontend: [#4732](https://github.com/tracim/tracim/issues/4732),
+- Backend and frontend: [#4732](https://github.com/tracim/tracim/issues/4732),
 [#4680](https://github.com/tracim/tracim/issues/4680),
 [#4703](https://github.com/tracim/tracim/issues/4703),
 [#4700](https://github.com/tracim/tracim/issues/4700),
@@ -483,9 +682,9 @@ For administrators:
 - The new tags feature adds new live message types which are excluded from web notifications by default.
   If you have customized parameter `web.notifications.excluded`, you should update it and add `tag.*,content_tag.*`.
 - The template at backend/tracim_backend/templates/mail/reset_password_body_html.mak related to the password reset
-  email has been updated to show the validity duration of the reset passwork link.
+  email has been updated to show the validity duration of the reset password link.
   If you have customized this template, you may want to update it.
-- The limitation of simultaneous online users requires running an additionnal
+- The limitation of simultaneous online users requires running an additional
   daemon (`daemons/user_connection_state_monitor.py`). This is done automatically in our Docker container but you
   need to run it manually if you run Tracim without using the Docker container.
   If you are running Pushpin using the our docker compose configuration, be sure to set the configuration parameter
@@ -499,15 +698,13 @@ For administrators:
   tracimcli search index-populate
   ```
 
-
-# 3.8.3 / 2021-09-23
+## 3.8.3 / 2021-09-23
 
 ### Fixed Issues
 
 - UX: [#4950](https://github.com/tracim/tracim/issues/4950)
 
-
-# 3.8.2 / 2021-05-27
+## 3.8.2 / 2021-05-27
 
 ### New Features
 
@@ -526,7 +723,6 @@ For administrators:
 [#4654](https://github.com/tracim/tracim/issues/4654)
 - Misc: [#4649](https://github.com/tracim/tracim/issues/4649),
 [#4656](https://github.com/tracim/tracim/issues/4656)
-
 
 ### Breaking/Important change
 
@@ -553,8 +749,7 @@ For administrators:
       - if you have customized your `color.json`:
         - it's better to change the new `color.json` file available in `/{docker-volume}/etc/branding/` (the new key `"sidebar":` is mandatory and available by default since Tracim 3.8.1)
 
-
-# 3.8.1 / 2021-05-12
+## 3.8.1 / 2021-05-12
 
 ### New Features
 
@@ -590,8 +785,7 @@ For administrators:
 - Update preview-generator version
 - Change of the graphic charter (tracim logo, standard image for login page)
 
-
-# 3.8.0 / 2021-04-27
+## 3.8.0 / 2021-04-27
 
 ### New Features
 
@@ -622,15 +816,13 @@ For administrators:
   - `Recent activity` and `Activity feed` is changed to `Recent activities`
   - `Click here to unsubscribe/subscribe` is changed to `Email notifications`
 
-
-# 3.7.1 / 2021-04-14
+## 3.7.1 / 2021-04-14
 
 ### Fixed Issues
 
 - Frontend: fix for a problem where the dashboard blinks in some cases
 
-
-# 3.7.0 / 2021-04-02
+## 3.7.0 / 2021-04-02
 
 ### New Features
 
@@ -653,15 +845,13 @@ For administrators:
 - Modification of a default value in `development.ini`: the default value for `web.notifications.excluded` has changed to a simpler syntax for `user` and adds filtering for the new notification type `reaction` (issue [#4272](https://github.com/tracim/tracim/issues/4272)).
   - On existing Tracim installations, including the official docker image: you may want to update your `development.ini` configuration file (use this file [development.ini.sample](backend/development.ini.sample) to compare).
 
-
-# 3.6.1 / 2021-03-26
+## 3.6.1 / 2021-03-26
 
 ### Fixed Issues
 
 - Documentation: [#4355](https://github.com/tracim/tracim/issues/4355)
 
-
-# 3.6.0 / 2021-03-24
+## 3.6.0 / 2021-03-24
 
 ### New Features
 
@@ -685,11 +875,11 @@ For administrators:
 
 ### Breaking Changes
 
-- :warning: You need to migrate your database before running this version. See the *Upgrading the Database to the Last Revision* section of the [migration documentation](backend/doc/migration.md) for more information (issue [#4133](https://github.com/tracim/tracim/issues/4133)). We advise you to run this step after each upgrade of Tracim.
+- :warning: You need to migrate your database before running this version. See the _Upgrading the Database to the Last Revision_ section of the [migration documentation](backend/doc/migration.md) for more information (issue [#4133](https://github.com/tracim/tracim/issues/4133)). We advise you to run this step after each upgrade of Tracim.
 If you use docker image, the migration is done automatically when new image is started.
 - ElasticSearch: refactor of the indexing logic.
 - The `search.elasticsearch.index_alias` parameter has been renamed to `search.elasticsearch.index_alias_prefix` (issue [#4147](https://github.com/tracim/tracim/issues/4147)).
-  - It is necessary to drop the existing index, create it again and populate it to use ElasticSearch, use the CLI command for that. See *Configure indexing and search to use Elasticsearch* section of the [setting documentation](backend/doc/setting.md) or see *Updating index of ElasticSearch* section of the [docker documentation](tools_docker/README.md) for more information.
+  - It is necessary to drop the existing index, create it again and populate it to use ElasticSearch, use the CLI command for that. See _Configure indexing and search to use Elasticsearch_ section of the [setting documentation](backend/doc/setting.md) or see _Updating index of ElasticSearch_ section of the [docker documentation](tools_docker/README.md) for more information.
 
 #### Backend configuration file (development.ini)
 
@@ -698,10 +888,9 @@ If you use docker image, the migration is done automatically when new image is s
 ### Other Changes
 
 - Security: email addresses of users are no longer returned by API when it is not strictly necessary.
-- Translation service: new parameters available in the development.ini file to activate this feature. See the *Translation feature* section of the [setting documentation](backend/doc/setting.md) for more information (issue [#4093](https://github.com/tracim/tracim/issues/4093)).
+- Translation service: new parameters available in the development.ini file to activate this feature. See the _Translation feature_ section of the [setting documentation](backend/doc/setting.md) for more information (issue [#4093](https://github.com/tracim/tracim/issues/4093)).
 
-
-# 3.5.0 / 2021-02-11
+## 3.5.0 / 2021-02-11
 
 ### New Features
 
@@ -738,13 +927,11 @@ If you use docker image, the migration is done automatically when new image is s
 - Implemented an API to allow users to follow each other (issue [#3916](https://github.com/tracim/tracim/issues/3916))
 - Simplified way to run tests (backend/frontend) in development environments (issue [#4020](https://github.com/tracim/tracim/issues/4020))
 
-
 ## 3.4.3 / 2021-01-11
 
 ### Fixed Issues
 
 - Backend: [#4033](https://github.com/tracim/tracim/issues/4033)
-
 
 ## 3.4.2 / 2021-01-08
 
@@ -757,7 +944,6 @@ If you use docker image, the migration is done automatically when new image is s
 - Backend: [#3997](https://github.com/tracim/tracim/issues/3997),
 [#4000](https://github.com/tracim/tracim/issues/4000)
 - Doc: [#3988](https://github.com/tracim/tracim/issues/3988)
-
 
 ## 3.4.1 / 2020-12-23
 
@@ -775,7 +961,6 @@ If you use docker image, the migration is done automatically when new image is s
 
 The old parameter names are still functional but their usage is deprecated and they will be removed in a future release.
 
-
 ## 3.4.0 / 2020-12-21
 
 ### New Features
@@ -787,7 +972,6 @@ The old parameter names are still functional but their usage is deprecated and t
 
 - Frontend: [#3903](https://github.com/tracim/tracim/issues/3903)
 
-
 ## 3.3.1 / 2020-12-18
 
 ### Fixed Issues
@@ -796,7 +980,6 @@ The old parameter names are still functional but their usage is deprecated and t
 [#3927](https://github.com/tracim/tracim/issues/3927)
 - Frontend: [#3542](https://github.com/tracim/tracim/issues/3542),
 [#3809](https://github.com/tracim/tracim/issues/3809)
-
 
 ## 3.3.0 / 2020-12-02
 
@@ -816,13 +999,11 @@ The old parameter names are still functional but their usage is deprecated and t
 [#3877](https://github.com/tracim/tracim/issues/3877)
 - Backend: [#3830](https://github.com/tracim/tracim/issues/3830)
 
-
 ## 3.2.2 / 2020-11-17
 
 ### Fixed Issues
 
 - Backend: [#3836](https://github.com/tracim/tracim/issues/3836)
-
 
 ## 3.2.1 / 2020-11-04
 
@@ -844,7 +1025,6 @@ The old parameter names are still functional but their usage is deprecated and t
 [#3706](https://github.com/tracim/tracim/issues/3706),
 [#3768](https://github.com/tracim/tracim/issues/3768)
 - Backend: [#3604](https://github.com/tracim/tracim/issues/3604)
-
 
 ## 3.2.0 / 2020-10-16
 
@@ -874,13 +1054,11 @@ The old parameter names are still functional but their usage is deprecated and t
   - It is no longer possible to show two spaces with the same name in WebDAV. If two spaces at the same place have the same name, only the oldest space will be shown.
   - It is no longer possible to create/modify a space from WebDAV
 
-
 ## 3.1.5 / 2020-10-16
 
 ### Fixed Issues
 
 - Backend: [#3685](https://github.com/tracim/tracim/issues/3685)
-
 
 ## 3.1.4 / 2020-10-07
 
@@ -888,13 +1066,11 @@ The old parameter names are still functional but their usage is deprecated and t
 
 - TLM: [#3547](https://github.com/tracim/tracim/issues/3547)
 
-
 ## 3.1.3 / 2020-09-28
 
 ### Fixed Issues
 
 - Notifications: [#3643](https://github.com/tracim/tracim/issues/3643)
-
 
 ## 3.1.2 / 2020-09-25
 
@@ -916,7 +1092,6 @@ The old parameter names are still functional but their usage is deprecated and t
 
 - New parameter `web.notifications.excluded` added in `development.ini.sample` to define what you want to exclude in notifications panel. There is no need to update your configuration file on existing installations if you want to keep the default set of excluded notifications.
 
-
 ## 3.1.1 / 2020-09-21
 
 ### Fixed Issues
@@ -931,7 +1106,6 @@ The old parameter names are still functional but their usage is deprecated and t
 [#3526](https://github.com/tracim/tracim/issues/3526),
 [#3562](https://github.com/tracim/tracim/issues/3562),
 [#3567](https://github.com/tracim/tracim/issues/3567)
-
 
 ## 3.1.0 / 2020-09-14
 
@@ -966,14 +1140,12 @@ The old parameter names are still functional but their usage is deprecated and t
 - These deprecated configuration parameters (in development.ini) have been removed: user.reset_password.validity, caldav.enabled, collaborative_document_edition.activated, email.notification.from. They were already ignored in previous versions. (issue [#1483](https://github.com/tracim/tracim/issues/1483))
 - The minimal PostgreSQL is now 9.6 (instead of 9.3 in previous versions of Tracim). A JSON-related bug in version 9.3 affected Tracim 3.1 and was likely fixed in version 9.4. Versions 9.4, 9.5, 9.6 also brought many related fixes, including a potential buffer overflow in its JSON parser. (issue [#3523](https://github.com/tracim/tracim/issues/3523))
 
-
 ## 3.0.4 / 2020-08-27
 
 ### Fixed Issues
 
 - Frontend: [#3461](https://github.com/tracim/tracim/issues/3461)
 - Backend: [#3401](https://github.com/tracim/tracim/issues/3401)
-
 
 ## 3.0.3 / 2020-08-25
 
@@ -982,7 +1154,6 @@ The old parameter names are still functional but their usage is deprecated and t
 - Frontend: [#3409](https://github.com/tracim/tracim/issues/3409)
 - Backend: [#3049](https://github.com/tracim/tracim/issues/3049),
 [#3409](https://github.com/tracim/tracim/issues/3409)
-
 
 ## 3.0.2 / 2020-08-17
 
@@ -993,13 +1164,11 @@ The old parameter names are still functional but their usage is deprecated and t
 - Backend: [#3431](https://github.com/tracim/tracim/issues/3431),
 [#3436](https://github.com/tracim/tracim/issues/3436)
 
-
 ## 3.0.1 / 2020-08-10
 
 ### Fixed Issues
 
 - Docker: [#3418](https://github.com/tracim/tracim/issues/3418)
-
 
 ## 3.0.0 / 2020-08-07
 
@@ -1054,11 +1223,10 @@ The old parameter names are still functional but their usage is deprecated and t
 - API: api path `/v2/` no more exists in Tracim. Scripts using this old API path need to be changed and a configuration is needed to make some direct links visible in old emails work (issue [#1478](https://github.com/tracim/tracim/issues/1478), [#3052](https://github.com/tracim/tracim/issues/3052), [#3395](https://github.com/tracim/tracim/issues/3395))
 - uWSGI: default configuration change. You need to delete your config file `/{docker-volume}/etc/tracim_*.ini` (backup your files first) before starting/restarting the docker image
 - Apache: default configuration change. You need to delete your config file `/{docker-volume}/etc/apache.conf` (backup your file first) before starting/restarting the docker image
-- Database: databases that were created from Tracim v1 need to be updated manually, more information here: https://github.com/tracim/tracim/issues/2785#issuecomment-660879104 (issue [#3343](https://github.com/tracim/tracim/issues/3343))
+- Database: databases that were created from Tracim v1 need to be updated manually, more information here: <https://github.com/tracim/tracim/issues/2785#issuecomment-660879104> (issue [#3343](https://github.com/tracim/tracim/issues/3343))
 - Pushpin is now mandatory to run Tracim (pushpin is integrated by default in Tracim docker images)
-- Some parameters in development.ini have been renamed, more information here https://github.com/tracim/tracim/issues/2785#issuecomment-637544988 (issue [#3100](https://github.com/tracim/tracim/issues/3100))
+- Some parameters in development.ini have been renamed, more information here <https://github.com/tracim/tracim/issues/2785#issuecomment-637544988> (issue [#3100](https://github.com/tracim/tracim/issues/3100))
 - The default log of the Tracim docker image is now also visible with the `docker logs` command
-
 
 ## 2.7.6 / 2020-07-01
 
@@ -1066,13 +1234,11 @@ The old parameter names are still functional but their usage is deprecated and t
 
 - Backend: [#3261](https://github.com/tracim/tracim/issues/3261)
 
-
 ## 2.7.5 / 2020-06-16
 
 ### New Features
 
 - Allow playing video files inside Tracim (experimental)
-
 
 ## 2.7.4 / 2020-05-13
 
@@ -1082,13 +1248,11 @@ The old parameter names are still functional but their usage is deprecated and t
 - Backend: [#3025](https://github.com/tracim/tracim/issues/3025),
 [#3043](https://github.com/tracim/tracim/issues/3043)
 
-
 ## 2.7.3 / 2020-05-07
 
 ### Fixed Issues
 
 - UX: [#2993](https://github.com/tracim/tracim/issues/2993)
-
 
 ## 2.7.2 / 2020-05-04
 
@@ -1100,13 +1264,11 @@ The old parameter names are still functional but their usage is deprecated and t
 
 - If you launched Tracim 2.7.0 or 2.7.1 on an existing database (≤ 2.6.3), an incorrect migration was performed. As a consequence, you need to downgrade your database to revision `ce074202abb2` before running Tracim 2.7.2. Please see the [documentation about downgrading](https://github.com/tracim/tracim/blob/master/backend/doc/migration.md#downgrading-the-database).
 
-
 ## 2.7.1 / 2020-04-30
 
 ### Fixed Issues
 
 - Backend: [#2920](https://github.com/tracim/tracim/issues/2920)
-
 
 ## 2.7.0 / 2020-04-24
 
@@ -1153,7 +1315,6 @@ The old parameter names are still functional but their usage is deprecated and t
 
 - Supported databases: PostgreSQL(9.3+), MySQL(8.0.1+), MariaDB(10.3+) or SQLite(bundle with python). Older versions are no longer supported.
 
-
 ## 2.6.3 / 2020-04-09
 
 ### Improvement
@@ -1177,7 +1338,6 @@ The old parameter names are still functional but their usage is deprecated and t
 - SMTP servers using implicit SSL may cause issues with Tracim. If you not activate `email.notification.smtp.use_implicit_ssl` and you use `email.processing_mode = sync`, when Tracim tries to send email, 500 errors appear after a 5 minute timeout and its also not possible to create a new account.
 In next release we will add information [here](https://github.com/tracim/tracim/blob/master/backend/doc/setting.md#enabling-the-mail-notification-feature) to test your SMTP configuration with the Tracim configuration file (issue [#2827](https://github.com/tracim/tracim/issues/2827))
 
-
 ## 2.6.2 / 2020-03-20
 
 ### Fixed Issues
@@ -1192,7 +1352,6 @@ In next release we will add information [here](https://github.com/tracim/tracim/
 [#2692](https://github.com/tracim/tracim/issues/2692),
 [#2749](https://github.com/tracim/tracim/issues/2749)
 - Documentation: [#2739](https://github.com/tracim/tracim/issues/2739)
-
 
 ## 2.6.1 / 2020-02-21
 
@@ -1209,7 +1368,6 @@ In next release we will add information [here](https://github.com/tracim/tracim/
 - Contents: [#1342](https://github.com/tracim/tracim/issues/1342)
 - Sidebar: [#2665](https://github.com/tracim/tracim/issues/2665)
 - Backend: [#2592](https://github.com/tracim/tracim/issues/2592)
-
 
 ## 2.6.0 / 2020-02-06
 
@@ -1256,7 +1414,6 @@ In next release we will add information [here](https://github.com/tracim/tracim/
 - 2 deprecated ldap parameters: `ldap_base_url` and `ldap_base_dn` (they where not implemented in Tracim's backend code so using them had no impact)
 - 2 deprecated app parameters: `caldav.enabled` and `collaborative_document_edition.activated`
 
-
 ## 2.5.1 / 2019-12-06
 
 ### New Features
@@ -1268,7 +1425,6 @@ In next release we will add information [here](https://github.com/tracim/tracim/
 - Email: [#2565](https://github.com/tracim/tracim/issues/2565)
 - Frontend: [#2345](https://github.com/tracim/tracim/issues/2345)
 - Backend: [#2558](https://github.com/tracim/tracim/issues/2558)
-
 
 ## 2.5.0 / 2019-11-29
 
@@ -1285,7 +1441,6 @@ In next release we will add information [here](https://github.com/tracim/tracim/
 ### Breaking change api
 
 - remove "size" parameter from create/update/get/get all workspaces endpoint
-
 
 ## 2.4.5 / 2019-11-21
 
@@ -1324,7 +1479,6 @@ In next release we will add information [here](https://github.com/tracim/tracim/
 
 - Manual modification to install Tracim on Ubuntu Trusty (14.04) is necessary (issue [#2514](https://github.com/tracim/tracim/issues/2514))
 
-
 ## 2.4.3 / 2019-09-26
 
 ### Fixed Issues
@@ -1332,19 +1486,17 @@ In next release we will add information [here](https://github.com/tracim/tracim/
 - Docker: [#2445](https://github.com/tracim/tracim/issues/2445)
 - Content Listing: extended action button not working correctly
 
-
 ## 2.4.2 / 2019-09-24
 
 ### Fixed Issues
-- Timeline: Missing css rule about word-break for comment
 
+- Timeline: Missing css rule about word-break for comment
 
 ## 2.4.1 / 2019-09-20
 
 ### Fixed Issues
 
 - Migration issue introduced with 2.4.0
-
 
 ## 2.4.0 / 2019-09-19
 
@@ -1423,13 +1575,11 @@ In next release we will add information [here](https://github.com/tracim/tracim/
 
 Archive button not more used in Tracim. All archive buttons is hide (issue [#2347](https://github.com/tracim/tracim/issues/2347))
 
-
 ## 2.3.2 / 2019-08-01
 
 ### Fixed Issues
 
 - Email notifications: [#2134](https://github.com/tracim/tracim/issues/2134)
-
 
 ## 2.3.1 / 2019-07-05
 
@@ -1447,7 +1597,6 @@ Archive button not more used in Tracim. All archive buttons is hide (issue [#234
 - Email: [#2036](https://github.com/tracim/tracim/issues/2036)
 - Content preview: [#2022](https://github.com/tracim/tracim/issues/2022)
 - Security: [#2060](https://github.com/tracim/tracim/issues/2060)
-
 
 ## 2.3.0 / 2019-06-21
 
@@ -1552,7 +1701,6 @@ Archive button not more used in Tracim. All archive buttons is hide (issue [#234
 
 website.server_name parameter is now deleted in config file and code. Not more used in Tracim.
 
-
 ## 2.2.0 / 2019-05-27
 
 ### New Features
@@ -1618,7 +1766,7 @@ website.server_name parameter is now deleted in config file and code. Not more u
 [#1371](https://github.com/tracim/tracim/issues/1371),
 [#1686](https://github.com/tracim/tracim/issues/1686),
 [#1786](https://github.com/tracim/tracim/issues/1786)
-- Dashbord: [#871](https://github.com/tracim/tracim/issues/871),
+- Dashboard: [#871](https://github.com/tracim/tracim/issues/871),
 [#1064](https://github.com/tracim/tracim/issues/1064),
 [#1084](https://github.com/tracim/tracim/issues/1084),
 [#1488](https://github.com/tracim/tracim/issues/1488),
@@ -1698,18 +1846,18 @@ website.server_name parameter is now deleted in config file and code. Not more u
 
 - Removing 'caldav_url' unused param from user returned by api(commit 3861a373e7b0039545ac65cfb7e51ca2c308f23c)
 
-
 ## 2.1.0 / 2019-02-15
 
 ### New Features
+
 - Folders
 - Progressive web app support (possibility to "install" Tracim on smartphone)
 - Webdav + create/move operations
 - Full database migration from Tracim v1
 - Authentication:
-    - LDAP authentication
-    - Web SSO Authentication - beta (based on HTTP Headers)
-    - Authentication chaining - beta (internal, ldap, apache)
+  - LDAP authentication
+  - Web SSO Authentication - beta (based on HTTP Headers)
+  - Authentication chaining - beta (internal, ldap, apache)
 
 ### Known Issues
 
