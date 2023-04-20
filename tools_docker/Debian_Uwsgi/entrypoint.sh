@@ -201,17 +201,17 @@ fi
 ## Check running services
 REDIS_SERVICE_RUNNING=$(ps -ef | grep -v grep|grep "redis-server" | wc -l)
 if [ $REDIS_SERVICE_RUNNING = 0 ]; then
-    logerror "Redis service not start correctly!!"
+    logerror "Redis service not start. Mandatory!!"
     exit 1
 fi
 PUSHPIN_SERVICE_RUNNING=$(ps -ef | grep -v grep|grep "pushpin" | wc -l)
 if [ $PUSHPIN_SERVICE_RUNNING = 0 ]; then
-    logerror "Pushpin service not start correctly!!"
+    logerror "Pushpin service not start. Mandatory!!"
     exit 1
 fi
 ZURL_SERVICE_RUNNING=$(ps -ef | grep -v grep|grep "zurl" | wc -l)
 if [ $ZURL_SERVICE_RUNNING = 0 ]; then
-    logerror "Zurl service not start correctly!!"
+    logerror "Zurl service not start. Mandatory!!"
     exit 1
 fi
 
