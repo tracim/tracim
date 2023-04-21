@@ -62,7 +62,6 @@ export class AdminWorkspaceUser extends React.Component {
       usernameInvalidMsg: '',
       popupDeleteWorkspaceDisplay: false,
       workspaceToDelete: null,
-      workspaceIdOpened: null,
       loaded: false,
       selectedSpaceSortCriteria: SORT_BY.ID,
       selectedUserSortCriteria: SORT_BY.PUBLIC_NAME,

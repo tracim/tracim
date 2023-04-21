@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import {
   Delimiter,
@@ -155,9 +156,14 @@ const AdminWorkspace = props => {
                       <div className='label'>{props.t(spaceType.label)}</div>
                     </td>
                     <td
-                      className='table__sharedSpace adminWorkspace__workspaceTable__tr__td-link primaryColorFontHover'
+                      className='table__sharedSpace adminWorkspace__workspaceTable__tr__td-link'
                     >
-                      <a href={PAGE.WORKSPACE.ADVANCED_DASHBOARD(ws.workspace_id)}>{ws.label}</a>
+                      <Link
+                        to={PAGE.WORKSPACE.ADVANCED_DASHBOARD(ws.workspace_id)}
+                        className='primaryColorFont primaryColorFontDarkenHover'
+                      >
+                        {ws.label}
+                      </Link>
                     </td>
                     <td className='table__description adminWorkspace__workspaceTable__tr__td-description'>{descriptionText}</td>
                     <td className='table__memberCount'>{ws.number_of_members}</td>
