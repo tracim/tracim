@@ -44,7 +44,7 @@ class ResetPasswordController(Controller):
         with a token to be used for password reset operation.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        uapi = UserApi(None, session=request.dbsession, config=app_config)
+        uapi = UserApi(None, session=request.dbsession, config=app_config, show_deactivated=False)
         if hapic_data.body.username:
             user = uapi.get_one_by_username(username=hapic_data.body.username)
         else:
