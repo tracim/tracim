@@ -87,22 +87,22 @@ export class ForgotPassword extends React.Component {
         checkEmailValidity(backupLogin) ? { email: backupLogin } : { username: backupLogin }
       )
     )
+
+    props.history.push(PAGE.LOGIN)
+
     switch (fetchPostResetPassword.status) {
       case 204:
-        props.history.push(PAGE.LOGIN)
-        props.dispatch(newFlashMessage(props.t("Email sent, don't forget to check your spam"), 'info'))
+        props.dispatch(
+          newFlashMessage(
+            props.t('If your email address exists in our database, you will receive a password recovery link at your email address shortly. If it doesn’t appear check your spam folder.'),
+            'info'
+          )
+        )
         break
-      case 400:
-        switch (fetchPostResetPassword.json.code) {
-          case 1001: props.dispatch(newFlashMessage(props.t('Unknown email or username'), 'warning')); break
-          case 2001: props.dispatch(newFlashMessage(props.t('Not a valid email'), 'warning')); break
-          case 2046: props.dispatch(newFlashMessage(props.t('Cannot reset password while email are disabled, please contact an administrator'), 'warning')); break
-          case 2049: props.dispatch(newFlashMessage(props.t("Your account's password cannot be changed, please contact an administrator"), 'warning')); break
-          case 2064: props.dispatch(newFlashMessage(props.t('This username is not linked to any email, please contact an administrator to reset your password'), 'warning')); break
-          default: props.dispatch(newFlashMessage(props.t('An error has happened, please try again'), 'warning')); break
-        }
-        break
-      default: props.dispatch(newFlashMessage(props.t('An error has happened, please try again'), 'warning'))
+      default:
+        props.dispatch(
+          newFlashMessage(props.t('An error has happened, please try again'), 'warning')
+        )
     }
   }
 
