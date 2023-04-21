@@ -206,7 +206,7 @@ if [ $REDIS_SERVICE_RUNNING = 0 ]; then
 fi
 PUSHPIN_SERVICE_RUNNING=$(ps -ef | grep -v grep|grep "pushpin" | wc -l)
 if [ $PUSHPIN_SERVICE_RUNNING = 0 ]; then
-    logerror "Pushpin service not start. Mandatory!!"
+    logerror "Pushpin service must be running."
     exit 1
 fi
 ZURL_SERVICE_RUNNING=$(ps -ef | grep -v grep|grep "zurl" | wc -l)
