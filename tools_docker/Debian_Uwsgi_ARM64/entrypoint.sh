@@ -211,7 +211,7 @@ if [ $PUSHPIN_SERVICE_RUNNING = 0 ]; then
 fi
 ZURL_SERVICE_RUNNING=$(ps -ef | grep -v grep|grep "zurl" | wc -l)
 if [ $ZURL_SERVICE_RUNNING = 0 ]; then
-    logerror "Zurl service not start. Mandatory!!"
+    logerror "Zurl service must be running."
     exit 1
 fi
 
