@@ -7,8 +7,11 @@ from tracim_backend.config import CFG
 from tracim_backend.exceptions import ExpiredResetPasswordToken
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import InvalidResetPasswordToken
+from tracim_backend.exceptions import MissingEmailCantResetPassword
+from tracim_backend.exceptions import NotificationDisabledCantResetPassword
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import UserAuthTypeDisabled
+from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.utils.logger import logger
@@ -44,7 +47,13 @@ class ResetPasswordController(Controller):
             else:
                 user = uapi.get_one_by_email(email=hapic_data.body.email)
             uapi.reset_password_notification(user, do_save=True)
-        except Exception as exc:
+        except (
+            ExternalAuthUserPasswordModificationDisallowed,
+            MissingEmailCantResetPassword,
+            NotificationDisabledCantResetPassword,
+            UserAuthTypeDisabled,
+            UserDoesNotExist,
+        ) as exc:
             # INFO - MP - 2023-04-21 - We do not want to give information about user existence to
             # external user, so we just return a 200 even if there is any error.
             logger.error(self, exc)
