@@ -211,7 +211,7 @@ fi
 ## Check running services
 REDIS_SERVICE_RUNNING=$(ps -ef | grep -v grep|grep "redis-server" | wc -l)
 if [ $REDIS_SERVICE_RUNNING = 0 ]; then
-    logerror "Redis service not start. Mandatory!!"
+    logerror "Redis service must be running."
     exit 1
 fi
 PUSHPIN_SERVICE_RUNNING=$(ps -ef | grep -v grep|grep "pushpin" | wc -l)
