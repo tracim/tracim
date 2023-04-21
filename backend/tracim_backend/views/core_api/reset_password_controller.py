@@ -7,12 +7,11 @@ from tracim_backend.config import CFG
 from tracim_backend.exceptions import ExpiredResetPasswordToken
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import InvalidResetPasswordToken
-from tracim_backend.exceptions import MissingEmailCantResetPassword
-from tracim_backend.exceptions import NotificationDisabledCantResetPassword
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.views.controllers import Controller
@@ -30,12 +29,6 @@ SWAGGER_TAG__AUTHENTICATION_RESET_PASSWORD_ENDPOINTS = generate_documentation_sw
 
 class ResetPasswordController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__AUTHENTICATION_RESET_PASSWORD_ENDPOINTS])
-    @hapic.handle_exception(MissingEmailCantResetPassword, http_code=HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(NotificationDisabledCantResetPassword, http_code=HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(
-        ExternalAuthUserPasswordModificationDisallowed, http_code=HTTPStatus.BAD_REQUEST
-    )
-    @hapic.handle_exception(UserAuthTypeDisabled, http_code=HTTPStatus.BAD_REQUEST)
     @hapic.input_body(ResetPasswordRequestSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def reset_password_request(self, context, request: TracimRequest, hapic_data=None):
@@ -45,11 +38,16 @@ class ResetPasswordController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(None, session=request.dbsession, config=app_config, show_deactivated=False)
-        if hapic_data.body.username:
-            user = uapi.get_one_by_username(username=hapic_data.body.username)
-        else:
-            user = uapi.get_one_by_email(email=hapic_data.body.email)
-        uapi.reset_password_notification(user, do_save=True)
+        try:
+            if hapic_data.body.username:
+                user = uapi.get_one_by_username(username=hapic_data.body.username)
+            else:
+                user = uapi.get_one_by_email(email=hapic_data.body.email)
+            uapi.reset_password_notification(user, do_save=True)
+        except Exception as exc:
+            # INFO - MP - 2023-04-21 - We do not want to give information about user existence to
+            # external user, so we just return a 200 even if there is any error.
+            logger.error(self, exc)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__AUTHENTICATION_RESET_PASSWORD_ENDPOINTS])
     @hapic.handle_exception(ExpiredResetPasswordToken, http_code=HTTPStatus.BAD_REQUEST)
