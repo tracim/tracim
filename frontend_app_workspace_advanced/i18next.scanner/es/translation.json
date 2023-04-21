@@ -26,7 +26,6 @@
   "Error while fetching known members list": "Error al obtener la lista de miembros conocidos",
   "Error while loading space details": "Error al cargar los detalles del espacio",
   "Error while saving new space label": "Error al guardar la nueva etiqueta de espacio",
-  "Space's description": "Descripción del espacio",
   "Delete space": "Eliminar espacio",
   "Error while loading app list": "aviso",
   "Agenda activated": "Agenda activada",
@@ -56,9 +55,11 @@
   "Please set a name, an email or a username": "Por favor, ponga un nombre, un correo electrónico o un nombre de usuario",
   "Error while rejecting user": "Error al rechazar al usuario",
   "Reject request": "Rechazar la solicitud",
-  "Error while saving the new version": "Error al guardar la nueva versión",
   "Error while loading members list": "Error al cargar la lista de miembros",
   "You cannot change this member role because there are no other space managers.": "No se puede modificar esta función de miembro porque no hay otros gestores de espacios.",
   "Save successful": "Guardado con éxito",
-  "Filter users": "Filtrar a los usuarios"
+  "Filter users": "Filtrar a los usuarios",
+  "Description of the space": "Descripción del espacio",
+  "This space doesn't have a description yet.": "Este espacio no tiene una descripción todavía.",
+  "Edit": "Editar"
 }
