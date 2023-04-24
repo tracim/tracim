@@ -50,9 +50,9 @@ You can chose valid auth_source and order them by priority with `auth_types` par
 For instance:
 
 - `auth_types = internal`
-- `auth_types = internal,ldap`
+- `auth_types = ldap,internal`
 
-The last one will check the internal user database first. Then, if the auth fails, it will also try to authenticate the user using LDAP.
+The last one will check the ldap user first. Then, if the auth fails, it will also try to authenticate the user using internal.
 
 The authentication is done with a login, which is either the user's email address or the username. For authentication methods which don't provide a way to distinguish between the two, a login with "@" will be considered as an email address and a login without as a username.
 
