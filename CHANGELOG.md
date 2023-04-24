@@ -28,6 +28,8 @@ Here is some changes that are worth your attention:
     - The space settings button is now with other buttons on the right menu
   - The default text is removed (no more `0` displayed)
 - Previews improved
+  - Clicking on a preview will display the file instead of downloading it
+  - The previews size takes the whole available space
 - Listing
   - ``Last modification`` column added in content listing
   - Sort content by available criteria
@@ -47,14 +49,6 @@ that if you mention a user, and then they change the username, the mention will 
 
 TinyMCE is now used as the default editor for all text areas with a better autocomplete system.
 
-- The `TextArea` component is replaced by `TinyMCE` in the following components:
-  - `CommentArea`
-  - `CustomFormManager`
-  - `EditCommentPopup`
-  - `HtmlDocument`
-  - `KanbanCardEditor`
-  - `SpaceDescription`
-
 Emoji support has been added for simple and advanced edition.
 
 ### ✨ New Features
@@ -73,20 +67,21 @@ Emoji support has been added for simple and advanced edition.
 
 #### @ Mentions
 
-- Feat: allow mentioning or linking after some punctuation marks ([#4795](https://github.com/tracim/tracim/issues/4795))
+- ✨ Feat: allow mentioning or linking after some punctuation marks ([#4795](https://github.com/tracim/tracim/issues/4795))
   - `@FooBar!` is now valid
   - `!@FooBar` is now valid
 - ✨ Feat: Better mention support ([#6007](https://github.com/tracim/tracim/issues/6007))
 
 #### 📝 Text Editor
 
-- Feat: Allow sending a message in the timeline using a keyboard shortcut ([#2817](https://github.com/tracim/tracim/issues/2817))
+- ✨ Feat: Allow sending a message in the timeline using a keyboard shortcut ([#2817](https://github.com/tracim/tracim/issues/2817))
   - `ctrl + enter` to submit a comment, a HTML document or a news.
-- Feat: Add emojis to comments and notes ([#4436](https://github.com/tracim/tracim/issues/4436))
+- ✨ Feat: Add emojis to comments and notes ([#4436](https://github.com/tracim/tracim/issues/4436))
   - ✨ Feat: Add emoji button in TinyMCE editor ([#6006](https://github.com/tracim/tracim/issues/6006))
-- Feat: allow TinyMCE to be resized ([#5394](https://github.com/tracim/tracim/issues/5394))
+- ✨ Feat: highlight the text that matches with proposals in autocompletion ([#4727](https://github.com/tracim/tracim/issues/4727))
+- ✨ Feat: allow TinyMCE to be resized ([#5394](https://github.com/tracim/tracim/issues/5394))
   - The area is now automatically resized to fit the content until a maximum height
-- Feat: scroll in the autocompletion list ([#5831](https://github.com/tracim/tracim/issues/5831))
+- ✨ Feat: scroll in the autocompletion list ([#5831](https://github.com/tracim/tracim/issues/5831))
 
 #### General
 
@@ -98,31 +93,29 @@ Emoji support has been added for simple and advanced edition.
 
 #### 💄 Interface
 
-- Fix the ``customColor`` to match the current application
-- Bug: breadcrumbs are incoherent when you delete content in the favorites space ([#5336](https://github.com/tracim/tracim/issues/5336))
+- 🐛 Bug: Fix the ``customColor`` to match the current application
+- 🐛 Bug: breadcrumbs are incoherent when you delete content in the favorites space ([#5336](https://github.com/tracim/tracim/issues/5336))
 - 🐛 Bug: Elements are not aligned well on sidebar ([#5966](https://github.com/tracim/tracim/issues/5966))
 - 🐛 Bug: The popups are hidden by the sidebar on mobile ([#5989](https://github.com/tracim/tracim/issues/5989))
 - 🐛 Bug: Large button to join spaces ([#5994](https://github.com/tracim/tracim/issues/5994))
-
-  step is done
-- Bug: Cannot scroll on advanced dashboard ([#6065](https://github.com/tracim/tracim/issues/6065)) - Thank to @gbonaspetti
-- Bug: Wrong tag button color ([#6088](https://github.com/tracim/tracim/issues/6088)) - Thank to @gbonaspetti
+- 🐛 Bug: Cannot scroll on advanced dashboard ([#6065](https://github.com/tracim/tracim/issues/6065)) - Thank to @gbonaspetti
+- 🐛 Bug: Wrong tag button color ([#6088](https://github.com/tracim/tracim/issues/6088)) - Thank to @gbonaspetti
 - 🐛 Bug: The number of mentions which is displayed in the sidebar can be wrong ([#6134](https://github.com/tracim/tracim/issues/6134))
   - No more incorrect mention number
 
 #### @ Mentions
 
-- Bug: typing a mention scrolls to the comments on small screens ([#3519](https://github.com/tracim/tracim/issues/3519))
-- Bug: Loss of highlight at mentions when changing username ([#3590](https://github.com/tracim/tracim/issues/3590))
-- Bug: Editing out a mention does not remove its associated metadata ([#3640](https://github.com/tracim/tracim/issues/3640))
+- 🐛 Bug: typing a mention scrolls to the comments on small screens ([#3519](https://github.com/tracim/tracim/issues/3519))
+- 🐛 Bug: Loss of highlight at mentions when changing username ([#3590](https://github.com/tracim/tracim/issues/3590))
+- 🐛 Bug: Editing out a mention does not remove its associated metadata ([#3640](https://github.com/tracim/tracim/issues/3640))
   - Mentions are now calculated differently, you can now move the mention without breaking it
-- Bug: mentions are sometimes not highlighted after saving an HTML document ([#3671](https://github.com/tracim/tracim/issues/3671))
+- 🐛 Bug: mentions are sometimes not highlighted after saving an HTML document ([#3671](https://github.com/tracim/tracim/issues/3671))
 - Misc: Handle user id instead of username in mention event internally ([#4136](https://github.com/tracim/tracim/issues/4136))
-- Bug:  mention translation (to @tous in French) does not work without to change language
+- 🐛 Bug:  mention translation (to @tous in French) does not work without to change language
   ([#4463](https://github.com/tracim/tracim/issues/4463))
-- Bug: its not possible to edit publication and remove mention ([#4972](https://github.com/tracim/tracim/issues/4972))
-- Bug: editing after a mention in a note includes the new text in the mention HTML tag ([#5080](https://github.com/tracim/tracim/issues/5080))
-- Bug: I can't save a comment edit if I add a mention to an invalid user. ([#5132](https://github.com/tracim/tracim/issues/5132))
+- 🐛 Bug: its not possible to edit publication and remove mention ([#4972](https://github.com/tracim/tracim/issues/4972))
+- 🐛 Bug: editing after a mention in a note includes the new text in the mention HTML tag ([#5080](https://github.com/tracim/tracim/issues/5080))
+- 🐛 Bug: I can't save a comment edit if I add a mention to an invalid user. ([#5132](https://github.com/tracim/tracim/issues/5132))
 
 #### ⚡️ Performances
 
@@ -132,71 +125,37 @@ Emoji support has been added for simple and advanced edition.
 
 #### 📝 Text Editor
 
-- Bug: Focus loss when clicking on an autocompletion suggestion ([#3520](https://github.com/tracim/tracim/issues/3520))
+- 🐛 Bug: Focus loss when clicking on an autocompletion suggestion ([#3520](https://github.com/tracim/tracim/issues/3520))
 - Misc: Have a TinyMCE component ([#4396](https://github.com/tracim/tracim/issues/4396))
   - This means that you can now use TinyMCE in your own components
-- Bug: New line added automatically when using advanced edition ([#4437](https://github.com/tracim/tracim/issues/4437))
-- Bug: the advanced edition is displayed too small ([#4583](https://github.com/tracim/tracim/issues/4583))
-- Bug: [at]all is on the wrong place in the mention autocompletion ([#4705](https://github.com/tracim/tracim/issues/4705))
-- Bug: autocomplete menu is unreadable at note's beginning ([#4714](https://github.com/tracim/tracim/issues/4714))
-- Feat: highlight the text that matches with proposals in autocompletion ([#4727](https://github.com/tracim/tracim/issues/4727))
-- Bug: Sidebar menu does not collapse when editing html notes in full screen ([#5407](https://github.com/tracim/tracim/issues/5407))
-- Bug: the autocompletion popup is put on top of the field to write a new news, instead of above,
+- 🐛 Bug: New line added automatically when using advanced edition ([#4437](https://github.com/tracim/tracim/issues/4437))
+- 🐛 Bug: the advanced edition is displayed too small ([#4583](https://github.com/tracim/tracim/issues/4583))
+- 🐛 Bug: [at]all is on the wrong place in the mention autocompletion ([#4705](https://github.com/tracim/tracim/issues/4705))
+- 🐛 Bug: autocomplete menu is unreadable at note's beginning ([#4714](https://github.com/tracim/tracim/issues/4714))
+- 🐛 Bug: Sidebar menu does not collapse when editing html notes in full screen ([#5407](https://github.com/tracim/tracim/issues/5407))
+- 🐛 Bug: the autocompletion popup is put on top of the field to write a new news, instead of above,
   moving the field ([#5429](https://github.com/tracim/tracim/issues/5429))
 - Misc: Make TinyMCE's height adapt to its container's height ([#5442](https://github.com/tracim/tracim/issues/5442))
-- Bug: external links does NOT open in new tab ([#5546](https://github.com/tracim/tracim/issues/5546))
+- 🐛 Bug: external links does NOT open in new tab ([#5546](https://github.com/tracim/tracim/issues/5546))
 - 🐛 Bug: The autocompletion popup is hidden behind the sidebar menu ([#6035](https://github.com/tracim/tracim/issues/6035))
 
 #### 📝 Documentation
 
-- Document how to trigger a mention from the API ([#3892](https://github.com/tracim/tracim/issues/3892))
-- Doc: Mysql and MariaDB are not supported anymore ([#6073](https://github.com/tracim/tracim/issues/6073))
+Documentation updates
 
-##### General
+#### General
 
 - Misc: Duplicated code for activityDisplayFilter ([#4677](https://github.com/tracim/tracim/issues/4677))
-- Bug: Document state is not translated in comments ([#5869](https://github.com/tracim/tracim/issues/5869))
+- 🐛 Bug: Document state is not translated in comments ([#5869](https://github.com/tracim/tracim/issues/5869))
 - Misc: missing tests for "sort by" feature ([#6041](https://github.com/tracim/tracim/issues/6041))
-- Bug: Can't start a docker image that just being built ([#6100](https://github.com/tracim/tracim/issues/6100))
+- 🐛 Bug: Can't start a docker image that just being built ([#6100](https://github.com/tracim/tracim/issues/6100))
 
 ### 💥 Breaking/Important changes
 
-#### 🔧 Configuration
+We had to do some breaking changes in this release. You will find a documentation about how to
+upgrade your Tracim instance in the [upgrade documentation](https://github.com/tracim/tracim/issues/6161).
 
-- _email.notification.enabled_on_invitation_ -> __email.notification.type_on_invitation__
-  - Possible values:
-    - `none`: doesn't send any mail
-    - `individual`: send a mail for every notification received
-    - `summary`: send a daily mail containing notification summary
-  - Default value: `summary`
-
-#### API (Endpoint)
-
-##### Added
-
-- [`PUT`] /api/users/{user_id:\d+}/workspaces/{workspace_id}/email_notification_type
-  - Body:
-    - `email_notification_type`: `none`, `individual`, `summary`
-
-##### 🔥 Removed
-
-- [`PUT`] /api/users/{user_id:\d+}/workspaces/{workspace_id}/notifications/activate
-- [`PUT`] /api/users/{user_id:\d+}/workspaces/{workspace_id}/notifications/deactivate
-
-#### API (Code)
-
-`RoleAPI.create_role`:  
-`with_notif` is removed in favor of `email_notification_type`.  
-That means you will have to change `with_notif=True` to `email_notification_type=EmailNotificationType.SUMMARY` or `email_notification_type=EmailNotificationType.ALL` in your plugins.  
-`with_notif=False` is now `email_notification_type=EmailNotificationType.NONE`
-
-Possible values for `email_notification_type` are:
-
-- `EmailNotificationType.NONE`
-- `EmailNotificationType.INDIVIDUAL`
-- `EmailNotificationType.SUMMARY`
-
-### Dependencies updates
+### 🔄 Dependencies updates
 
 #### ➕ Added
 
