@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 1.9.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-03-22 10:17+0100\n"
+"POT-Creation-Date: 2023-04-24 16:25+0200\n"
 "PO-Revision-Date: 2022-06-22 14:36+0000\n"
 "Last-Translator: gbonaspetti <gbonaspetti@hotmail.com>\n"
 "Language: en\n"
@@ -123,6 +123,10 @@ msgstr "New folder"
 msgid "New folder {0}"
 msgstr "New folder {0}"
 
+#: tracim_backend/lib/core/mention.py:144 tracim_backend/models/mention.py:5
+msgid "all"
+msgstr "all"
+
 #: tracim_backend/lib/core/workspace.py:495
 msgid "Space"
 msgstr "Space"
@@ -131,13 +135,9 @@ msgstr "Space"
 msgid "Space {}"
 msgstr "Space {}"
 
-#: tracim_backend/lib/mail_notifier/notifier.py:282
+#: tracim_backend/lib/mail_notifier/notifier.py:283
 msgid "{username} & all members of {workspace}"
 msgstr "{username} & all members of {workspace}"
-
-#: tracim_backend/models/mention.py:5
-msgid "all"
-msgstr "all"
 
 #: tracim_backend/models/mention.py:6
 msgid "reader"
@@ -406,7 +406,8 @@ msgstr "{event_count} activity in the space"
 msgid ""
 "You can change this setting by going to the \"My Spaces\" menu through "
 "this link:"
-msgstr "You can change this setting by going to the \"My Spaces\" menu through "
+msgstr ""
+"You can change this setting by going to the \"My Spaces\" menu through "
 "this link:"
 
 #: tracim_backend/templates/mail/summary_body_html.mak:52

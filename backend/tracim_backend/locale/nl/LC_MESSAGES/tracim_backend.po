@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-03-22 10:17+0100\n"
+"POT-Creation-Date: 2023-04-24 16:25+0200\n"
 "PO-Revision-Date: 2022-08-31 08:22+0000\n"
 "Last-Translator: gbonaspetti <gbonaspetti@hotmail.com>\n"
 "Language: nl\n"
@@ -127,6 +127,10 @@ msgstr "Nieuwe Map"
 msgid "New folder {0}"
 msgstr "Nieuwe map {0}"
 
+#: tracim_backend/lib/core/mention.py:144 tracim_backend/models/mention.py:5
+msgid "all"
+msgstr "alles"
+
 #: tracim_backend/lib/core/workspace.py:495
 msgid "Space"
 msgstr "Omgeving"
@@ -135,29 +139,25 @@ msgstr "Omgeving"
 msgid "Space {}"
 msgstr "Omgeving {}"
 
-#: tracim_backend/lib/mail_notifier/notifier.py:282
+#: tracim_backend/lib/mail_notifier/notifier.py:283
 msgid "{username} & all members of {workspace}"
 msgstr "{username} & alle leden van {workspace}"
 
-#: tracim_backend/models/mention.py:5
-msgid "all"
-msgstr ""
-
 #: tracim_backend/models/mention.py:6
 msgid "reader"
-msgstr ""
+msgstr "lezer"
 
 #: tracim_backend/models/mention.py:7
 msgid "contributor"
-msgstr ""
+msgstr "bijdrager"
 
 #: tracim_backend/models/mention.py:8
 msgid "content-manager"
-msgstr ""
+msgstr "inhoudsbeheerder"
 
 #: tracim_backend/models/mention.py:9
 msgid "space-manager"
-msgstr ""
+msgstr "ruimtebeheerder"
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:31
 msgid ""

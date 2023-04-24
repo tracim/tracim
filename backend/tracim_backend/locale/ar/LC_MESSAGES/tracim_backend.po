@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 4.1.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-03-22 10:17+0100\n"
+"POT-Creation-Date: 2023-04-24 16:25+0200\n"
 "PO-Revision-Date: 2023-03-13 19:38+0000\n"
 "Last-Translator: gbonaspetti <gbonaspetti@hotmail.com>\n"
 "Language: ar\n"
@@ -176,6 +176,11 @@ msgstr "مجلد جديد"
 msgid "New folder {0}"
 msgstr "مجلّد جديد {0}"
 
+#: tracim_backend/lib/core/mention.py:144 tracim_backend/models/mention.py:5
+#, fuzzy
+msgid "all"
+msgstr "الكل"
+
 #: tracim_backend/lib/core/workspace.py:495
 msgid "Space"
 msgstr "فضاء"
@@ -184,14 +189,9 @@ msgstr "فضاء"
 msgid "Space {}"
 msgstr "فضاء {}"
 
-#: tracim_backend/lib/mail_notifier/notifier.py:282
+#: tracim_backend/lib/mail_notifier/notifier.py:283
 msgid "{username} & all members of {workspace}"
 msgstr "{username} و كل أعضاء {workspace}"
-
-#: tracim_backend/models/mention.py:5
-#, fuzzy
-msgid "all"
-msgstr "الكل"
 
 #: tracim_backend/models/mention.py:6
 msgid "reader"

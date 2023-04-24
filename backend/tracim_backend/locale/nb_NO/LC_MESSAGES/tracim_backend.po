@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-03-22 10:17+0100\n"
+"POT-Creation-Date: 2023-04-24 16:25+0200\n"
 "PO-Revision-Date: 2023-03-01 11:00+0000\n"
 "Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
 "Language: nb_NO\n"
@@ -121,6 +121,10 @@ msgstr "Ny mappe"
 msgid "New folder {0}"
 msgstr "Ny mappe {0}"
 
+#: tracim_backend/lib/core/mention.py:144 tracim_backend/models/mention.py:5
+msgid "all"
+msgstr "alle"
+
 #: tracim_backend/lib/core/workspace.py:495
 msgid "Space"
 msgstr "Rom"
@@ -130,14 +134,10 @@ msgstr "Rom"
 msgid "Space {}"
 msgstr "{}-rommet"
 
-#: tracim_backend/lib/mail_notifier/notifier.py:282
+#: tracim_backend/lib/mail_notifier/notifier.py:283
 #, fuzzy
 msgid "{username} & all members of {workspace}"
 msgstr "{username} og alle medlemmer i {workspace}"
-
-#: tracim_backend/models/mention.py:5
-msgid "all"
-msgstr "alle"
 
 #: tracim_backend/models/mention.py:6
 msgid "reader"

@@ -440,13 +440,12 @@ need to be in every workspace you include."
         :param user: user to check,, can be none if user not found, will try
          to create new user if none but ldap auth succeed
         :param login: login of the user
-        :param password: cleartext password of the user
+        :param password: plaintext password of the user
         :param ldap_connector: ldap connector, enable ldap auth if provided
         """
         auth_type = AuthType.LDAP
 
-        # INFO - G.M - 2018-11-22 - Do no_t authenticate user with auth_type
-        # different from LDAP
+        # INFO - G.M - 2018-11-22 - Do not authenticate user with auth_type different from LDAP
         if user and user.auth_type not in [auth_type, AuthType.UNKNOWN]:
             raise WrongAuthTypeForUser(
                 'User "{}" auth_type is {} not {}'.format(
@@ -516,7 +515,7 @@ need to be in every workspace you include."
         WrongUserPassword or UserAuthenticatedIsNotActive
         :param user: user to check, can be none if user not found, will raise
         UserDoesNotExist exception if none
-        :param password: cleartext password of the user
+        :param password: plaintext password of the user
         :param ldap_connector: ldap connector, enable ldap auth if provided
         """
         auth_type = AuthType.INTERNAL
@@ -638,7 +637,7 @@ need to be in every workspace you include."
         if incorrect. try all auth available in order and raise issue of
         last auth if all auth failed.
         :param login: login or username of the user
-        :param password: cleartext password of the user
+        :param password: plaintext password of the user
         :param ldap_connector: ldap connector, enable ldap auth if provided
         :return: User who was authenticated.
         """
@@ -668,7 +667,7 @@ need to be in every workspace you include."
         Authenticate user with email/username and password, raise AuthenticationFailed
         if incorrect. check only one auth
         :param login: login of the user
-        :param password: cleartext password of the user
+        :param password: plaintext password of the user
         :param ldap_connector: ldap connector, enable ldap auth if provided
         :param auth_type: auth type to test.
         :return: User who was authenticated.
@@ -711,7 +710,7 @@ need to be in every workspace you include."
         Set User password if logged-in user password is correct
         and both new_password are the same.
         :param user: User who need password changed
-        :param loggedin_user_password: cleartext password of logged user (not
+        :param loggedin_user_password: plaintext password of logged user (not
         same as user)
         :param new_password: new password for user
         :param new_password2: should be same as new_password
@@ -742,7 +741,7 @@ need to be in every workspace you include."
         """
         Set email address of user if loggedin user password is correct
         :param user: User who need email changed
-        :param loggedin_user_password: cleartext password of logged user (not
+        :param loggedin_user_password: plaintext password of logged user (not
         same as user)
         :param email:
         :param do_save:
@@ -766,7 +765,7 @@ need to be in every workspace you include."
         """
         Set username of user if loggedin user password is correct
         :param user: User who need email changed
-        :param loggedin_user_password: cleartext password of logged user (not
+        :param loggedin_user_password: plaintext password of logged user (not
         same as user)
         :param username: new username
         :param do_save: if True, flush database session

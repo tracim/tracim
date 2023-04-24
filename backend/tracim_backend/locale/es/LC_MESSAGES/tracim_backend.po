@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-03-22 10:17+0100\n"
+"POT-Creation-Date: 2023-04-24 16:25+0200\n"
 "PO-Revision-Date: 2023-03-01 11:00+0000\n"
 "Last-Translator: Quiwy <github@quiwy.ninja>\n"
 "Language: es\n"
@@ -123,6 +123,10 @@ msgstr "Carpeta nueva"
 msgid "New folder {0}"
 msgstr "Carpeta nueva {0}"
 
+#: tracim_backend/lib/core/mention.py:144 tracim_backend/models/mention.py:5
+msgid "all"
+msgstr "todos"
+
 #: tracim_backend/lib/core/workspace.py:495
 msgid "Space"
 msgstr "Espacio"
@@ -131,13 +135,9 @@ msgstr "Espacio"
 msgid "Space {}"
 msgstr "Espacio {}"
 
-#: tracim_backend/lib/mail_notifier/notifier.py:282
+#: tracim_backend/lib/mail_notifier/notifier.py:283
 msgid "{username} & all members of {workspace}"
 msgstr "{username} y todos los miembros de {workspace}"
-
-#: tracim_backend/models/mention.py:5
-msgid "all"
-msgstr "todos"
 
 #: tracim_backend/models/mention.py:6
 msgid "reader"

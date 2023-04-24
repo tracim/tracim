@@ -13,10 +13,12 @@ from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.event import BaseLiveMessageBuilder
 from tracim_backend.lib.core.event import EventApi
 from tracim_backend.lib.core.plugins import hookimpl
+from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimContext
+from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.event import EntityType
@@ -111,6 +113,41 @@ class DescriptionMentionParser(BaseMentionParser):
                 f"The current mention is empty: no userid and no roleid specified."
             )
         return mentions
+
+    @classmethod
+    def get_email_html_from_html_with_mention_tags(
+        cls, session: TracimSession, cfg: CFG, translator: Translator, html: str
+    ) -> str:
+        """
+        This method will replace every mention tag by a simple string mention.
+        :param session: session to use for database access
+        :param cfg: current config
+        :param translator: translator to use for role translation
+        :param html: html to parse
+        :return: html with mention tags replaced by simple string mention
+
+        Example:\n
+        html = <div>Hello <html-mention userid="1"></html-mention>!</div>\n
+        return = <div>Hello @foo!</div>\n
+        Where @foo is the username of user with id 1
+        """
+
+        soup = BeautifulSoup(html, "lxml")
+        _ = translator.get_translation
+
+        for mention_tag in soup.find_all(DescriptionMentionParser.is_html_mention_tag):
+            user_id = mention_tag.attrs.get("userid")
+            role_id = mention_tag.attrs.get("roleid")
+            # breakpoint()
+            if user_id and user_id != "":
+                user = UserApi(current_user=None, session=session, config=cfg).get_one(user_id)
+                mention_tag.replaceWith(f"@{user.display_name}")
+            elif role_id and role_id != "":
+                # TODO - MP - 2023-04-24 - Since we don't have any other role mention than "all"
+                # we can hardcode it for now. We should find a way to handle other roles
+                all = _("all")
+                mention_tag.replaceWith(f"@{all}")
+        return str(soup)
 
 
 class MentionBuilder:
