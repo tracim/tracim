@@ -47,7 +47,7 @@ You can now head to (if pushpin is correctly configured and use default port 799
  - user: `admin@admin.admin`
  - password: `admin@admin.admin`
 
-:warning: If this does not work, you can try to access [http://localhost:6543](http://localhost:6543). If it works, the issue is related to the configuration of pushpin.
+⚠️ If this does not work, you can try to access [http://localhost:6543](http://localhost:6543). If it works, the issue is related to the configuration of pushpin.
 
 The full documentation about running the Tracim services with uWSGI and supervisor is available in the [Backend README](../backend/README.md), sections `Running Tracim Backend Daemon`
 and `Running Tracim Backend WSGI APP`.

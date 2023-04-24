@@ -77,7 +77,7 @@ Possible entity types of TLM (plus their needed fields):
 
 Each entry in fields is a subset of the corresponding HTTP API structure.
 
-:warning: "content" field structure vary depending on the type of content (see below).
+⚠️ "content" field structure vary depending on the type of content (see below).
 
 ### user and author (same as UserSchema in API)
 

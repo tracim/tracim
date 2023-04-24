@@ -8,6 +8,7 @@ The other is workspace-related and is called `workspace role`.
 ## Global Profile
 
 Available slugs:
+
 - `users` is for normal users.
 - `trysted-users` is for trusted users.
 - `administrators` is for admin.
@@ -34,16 +35,15 @@ Available slugs:
 | activate/deactivate user      |  no         | no          | yes     |
 | delete user/ undelete user    |  no         | no          | yes     |
 
-
 ## Workspace Roles
 
-A workspace role is a role that is specific to a workspace.<br>
+A workspace role is a role that is specific to a workspace.  
 Available slugs:
+
 - `reader` is for readers.
 - `contributor` is for contributors.
 - `content-manager` is for content managers.
 - `workspace-manager` is for workspace managers.
-
 
 |                              | Reader | Contributor | Content Manager | Workspace Manager |
 |------------------------------|--------|-------------|-----------------|-------------------|
@@ -80,9 +80,11 @@ Available slugs:
  ***: allow with link/email external user to upload some files in workspace inbox. The upload permission feature needs to be activated in the workspace by the workspace manager (see "edit workspace").
 
 ### To do roles
+
 On top of the [workspace roles](#workspace-roles) we add the assignee and owner role. They don't have a specific slug, but they are defined by the following rules:
-  - assignee: the user is assigned to the todo.
-  - owner: the user is the owner of the todo.
+
+- assignee: the user is assigned to the todo.
+- owner: the user is the owner of the todo.
 
 || Reader | Reader + assignee | Reader + owner | Contributor | Contributor + assignee | Contributor + owner | Content Manager | Workspace Manager |
 |-|-|-|-|-|-|-|-|-|

@@ -76,7 +76,7 @@ See the [Backend README](../backend/README.md).
 
 To install the backend, you need to install the following dependencies:
 
-```shell
+```bash
 sudo apt update
 xargs sudo apt install < system_packages/debian/build_backend_packages.list
 xargs sudo apt install < system_packages/debian/run_backend_packages.list
@@ -84,7 +84,7 @@ xargs sudo apt install < system_packages/debian/run_backend_packages.list
 
 Additionally, you can install the preview dependencies for a better preview support (LibreOffice, Inkscape, FFmpeg,...):
 
-```shell
+```bash
 sudo apt install system_packages/debian/optional_preview_packages.list
 ```
 
@@ -120,7 +120,7 @@ Install the project in editable mode with its develop requirements:
     pip install -r requirements-test.txt
     pip install -e "."
 
-If you want to use PostgreSQL, database engine instead of the default one (SQLite bundled with 
+If you want to use PostgreSQL, database engine instead of the default one (SQLite bundled with
 python), you need to install the python driver for those databases that are supported by SQLAlchemy.
 
 For PostgreSQL, those are shortcuts to install Tracim with test and specific driver.

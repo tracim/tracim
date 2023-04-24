@@ -128,7 +128,7 @@ You can then run the process this way:
 This method relies on development.ini configuration. default web server used is _Waitress_
 in`development.ini.sample`
 
-:warning: By default, python warning are disabled. To enable warning please set
+⚠️ By default, python warning are disabled. To enable warning please set
 `PYTHONWARNINGS` env var, for example `export PYTHONWARNINGS=default` .
 
 Run the Tracim backend web API (doesn't include live messages):
