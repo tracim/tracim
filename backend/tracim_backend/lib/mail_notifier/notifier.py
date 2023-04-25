@@ -300,7 +300,7 @@ class EmailManager(object):
             )
 
             body_html = DescriptionMentionParser.get_email_html_from_html_with_mention_tags(
-                session=self.session, cfg=self.config, html=body_html
+                session=self.session, cfg=self.config, translator=translator, html=body_html
             )
 
             message = EmailNotificationMessage(
