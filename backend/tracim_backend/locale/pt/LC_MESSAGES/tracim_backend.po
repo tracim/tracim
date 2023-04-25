@@ -9,15 +9,16 @@ msgstr ""
 "Project-Id-Version: tracim_backend 2.6.3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2023-03-22 10:17+0100\n"
-"PO-Revision-Date: 2023-03-12 18:38+0000\n"
+"PO-Revision-Date: 2023-04-01 15:41+0000\n"
 "Last-Translator: gbonaspetti <gbonaspetti@hotmail.com>\n"
+"Language-Team: Portuguese <https://hosted.weblate.org/projects/tracim/"
+"backend/pt/>\n"
 "Language: pt\n"
-"Language-Team: Portuguese "
-"<https://hosted.weblate.org/projects/tracim/backend/pt/>\n"
-"Plural-Forms: nplurals=2; plural=n != 1\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.17-dev\n"
 "Generated-By: Babel 2.9.1\n"
 
 #: tracim_backend/config.py:764
@@ -102,7 +103,7 @@ msgstr "Subido por {username}."
 
 #: tracim_backend/command/periodic.py:59
 msgid "[{website_title}] Your daily summary"
-msgstr ""
+msgstr "[{website_title}] Seu resumo diário"
 
 #: tracim_backend/lib/core/content.py:753
 msgid "Space {workspace_name}"
@@ -395,29 +396,31 @@ msgstr "{username} (através de Tracim)"
 
 #: tracim_backend/templates/mail/summary_body_html.mak:7
 msgid "Here is the list of your unread mentions in the last 24h:"
-msgstr ""
+msgstr "Aqui está a lista de suas menções não lidas nas últimas 24h:"
 
 #: tracim_backend/templates/mail/summary_body_html.mak:24
 msgid "{author} mentioned you in"
-msgstr ""
+msgstr "{author} mencionou você em"
 
 #: tracim_backend/templates/mail/summary_body_html.mak:32
 msgid "Here is the summary of your unread notifications in the last 24h:"
-msgstr ""
+msgstr "Aqui está o resumo de suas notificações não lidas nas últimas 24h:"
 
 #: tracim_backend/templates/mail/summary_body_html.mak:36
 msgid "{event_count} activity in the space"
-msgstr ""
+msgstr "{event_count} atividade(s) no espaço"
 
 #: tracim_backend/templates/mail/summary_body_html.mak:48
 msgid ""
 "You can change this setting by going to the \"My Spaces\" menu through "
 "this link:"
 msgstr ""
+"Você pode alterar essa configuração acessando o menu \"Meus espaços\" "
+"através deste link:"
 
 #: tracim_backend/templates/mail/summary_body_html.mak:52
 msgid "This email is automatically created, please do not reply."
-msgstr ""
+msgstr "Este e-mail foi criado automaticamente, por favor não responda."
 
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:5
 msgid ""
