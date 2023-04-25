@@ -130,6 +130,10 @@ msgstr "Nouveau dossier"
 msgid "New folder {0}"
 msgstr "Nouveau dossier {0}"
 
+#: tracim_backend/lib/core/mention.py:144 tracim_backend/models/mention.py:5
+msgid "all"
+msgstr "tous"
+
 #: tracim_backend/lib/core/workspace.py:495
 msgid "Space"
 msgstr "Espace"
@@ -138,13 +142,9 @@ msgstr "Espace"
 msgid "Space {}"
 msgstr "Espace {0}"
 
-#: tracim_backend/lib/mail_notifier/notifier.py:282
+#: tracim_backend/lib/mail_notifier/notifier.py:283
 msgid "{username} & all members of {workspace}"
 msgstr "{username} & tous les membres de {workspace}"
-
-#: tracim_backend/models/mention.py:5
-msgid "all"
-msgstr "tous"
 
 #: tracim_backend/models/mention.py:6
 msgid "reader"

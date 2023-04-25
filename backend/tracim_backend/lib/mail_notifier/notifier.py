@@ -200,6 +200,7 @@ class EmailManager(object):
         # Dirty import. It's here in order to avoid circular import
         from tracim_backend.lib.core.content import ContentApi
         from tracim_backend.lib.core.user import UserApi
+        from tracim_backend.lib.core.mention import DescriptionMentionParser
 
         user = UserApi(None, config=self.config, session=self.session).get_one(event_actor_id)
         logger.debug(self, "Content: {}".format(event_content_id))
@@ -296,6 +297,10 @@ class EmailManager(object):
                 workspace_in_context,
                 user,
                 translator,
+            )
+
+            body_html = DescriptionMentionParser.get_email_html_from_html_with_mention_tags(
+                session=self.session, cfg=self.config, translator=translator, html=body_html
             )
 
             message = EmailNotificationMessage(
