@@ -14,7 +14,6 @@
   "Timeline": "Tidslinje",
   "Tags": "Etiketter",
   "Restore": "Gjenopprett",
-  "Description": "Beskrivelse",
   "Are you sure?": "Er du sikker?",
   "Add new column": "Legg til ny kolonne",
   "Edit Column": "Rediger kolonne",
@@ -46,7 +45,5 @@
   "The file is larger than the maximum file size allowed": "Filen er større enn det som er tillatt",
   "Error, the space exceed its maximum size": "Rommet er nå større enn det som tillates",
   "Title:": "Navn:",
-  "Every members of the space": "",
-  "All": "Alle",
-  "all": "alle"
+  "Description of the card": ""
 }
