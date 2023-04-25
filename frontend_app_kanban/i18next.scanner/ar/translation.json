@@ -35,7 +35,6 @@
   "See less": "عرض عناصر أقل",
   "Title:": "عنوان:",
   "Description:": "وصف:",
-  "Description": "وصف",
   "Color:": "اللون:",
   "Deadline:": "الموعد النهائي:",
   "Value:": "القيمة:",
@@ -46,7 +45,5 @@
   "Tasks": "",
   "The link has been copied to clipboard": "تم نسخ الرابط إلى الحافظة",
   "Copy content link": "نسخ رابط المحتوى",
-  "Every members of the space": "",
-  "All": "",
-  "all": "الكل"
+  "Description of the card": ""
 }

@@ -10,7 +10,6 @@
   "Error, the space exceed its maximum size": "Error, el espacio excede su tamaño máximo",
   "You have reached your storage limit, you cannot add new files": "Has alcanzado su límite de almacenamiento, no puede añadir nuevos archivos",
   "Validate and create": "Validar y crear",
-  "Description": "Descripción",
   "The content has been modified by {{author}}": "El contenido fue modificado por {{author}}",
   "Restore": "Restaurar",
   "Are you sure?": "¿Está seguro?",
@@ -46,7 +45,5 @@
   "Tasks": "Tareas",
   "The link has been copied to clipboard": "Enlace copiado en el portapapeles",
   "Copy content link": "Copiar enlace al contenido",
-  "Every members of the space": "Cada miembro del espacio",
-  "All": "Todos",
-  "all": "todos"
+  "Description of the card": "Descripción de la tarjeta"
 }
