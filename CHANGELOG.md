@@ -146,6 +146,7 @@ Documentation updates
 #### General
 
 - Misc: Duplicated code for activityDisplayFilter ([#4677](https://github.com/tracim/tracim/issues/4677))
+- 🐛 Bug: Deactivated user can use forgot password feature ([#4976](https://github.com/tracim/tracim/issues/4976))
 - 🐛 Bug: Document state is not translated in comments ([#5869](https://github.com/tracim/tracim/issues/5869))
 - Misc: missing tests for "sort by" feature ([#6041](https://github.com/tracim/tracim/issues/6041))
 - 🐛 Bug: Can't start a docker image that just being built ([#6100](https://github.com/tracim/tracim/issues/6100))
@@ -223,7 +224,7 @@ upgrade your Tracim instance in the [upgrade documentation](https://github.com/t
 
 ### Breaking/Important change
 
-- :warning: Two new colors (`sidebar/font` and `sidebar/logo`) were added in `branding/color.json`: this requires all existing instances to update their `frontend/dist/assets/branding/color.json` files to add these new colors. Otherwise the backend won't start at all. For more details see: [#5860](https://github.com/tracim/tracim/issues/5860).
+- ⚠️ Two new colors (`sidebar/font` and `sidebar/logo`) were added in `branding/color.json`: this requires all existing instances to update their `frontend/dist/assets/branding/color.json` files to add these new colors. Otherwise the backend won't start at all. For more details see: [#5860](https://github.com/tracim/tracim/issues/5860).
 - Norwegian has been added as a possible interface language. If you have Custom Properties specific to your instance, you will need to make specific translations as well. See the documentation at `backend/doc/user_custom_properties.md`
 - A new variable was added `ui.notes.code_sample_languages` (`TRACIM_UI__NOTES__CODE_SAMPLE_LANGUAGES`) that defines the list of languages available to create code samples in the notes.
 - Some API URLs are deprecated. See [#5860](https://github.com/tracim/tracim/issues/5860) for more details.
@@ -282,7 +283,7 @@ upgrade your Tracim instance in the [upgrade documentation](https://github.com/t
 
 ### Breaking/Important change
 
-- :warning: With the to do feature, you will need to rebuild the index of Advanced Search (if you use it). For more information see: [#5711](https://github.com/tracim/tracim/issues/5711)
+- ⚠️ With the to do feature, you will need to rebuild the index of Advanced Search (if you use it). For more information see: [#5711](https://github.com/tracim/tracim/issues/5711)
 - The to do feature is enabled on apps by default. If you have customized the parameter `app.enabled`, you can update it and add `contents/todo`.
 
 ### Known Issues
@@ -352,8 +353,8 @@ For technical users:
 
 ### Breaking/Important change
 
-- :warning: Radicale has been updated from version 2 to version 3.1. Tracim can't start if you do not adjust some settings before running this version. For more information see: [#5479](https://github.com/tracim/tracim/issues/5479)
-- :warning: Advanced Search (Elasticsearch) has been improved. If you use it, you will need to rebuild the index. For more information see: [#5479](https://github.com/tracim/tracim/issues/5479)
+- ⚠️ Radicale has been updated from version 2 to version 3.1. Tracim can't start if you do not adjust some settings before running this version. For more information see: [#5479](https://github.com/tracim/tracim/issues/5479)
+- ⚠️ Advanced Search (Elasticsearch) has been improved. If you use it, you will need to rebuild the index. For more information see: [#5479](https://github.com/tracim/tracim/issues/5479)
 - Translations are now handled via Weblate. If you want to contribute, check out this [link](https://github.com/tracim/tracim#translation)
 - Language switch button moved in the account settings
 - Caldav and Webdav links are displayed in the account settings
@@ -428,7 +429,7 @@ This maintenance release fixes a few things:
 
 ### Breaking/Important change
 
-- :warning: You need to adjust some settings before running this version. For more information see: [#5118](https://github.com/tracim/tracim/issues/5118)
+- ⚠️ You need to adjust some settings before running this version. For more information see: [#5118](https://github.com/tracim/tracim/issues/5118)
 - Poppler-utils and webp now need to be present (and qpdf can be gotten rid off) on Tracim installations that don't use Docker (PR [#5121](https://github.com/tracim/tracim/pull/5121)),
 - By default, EPS previews are now disabled for security reasons, unless you manually enable them. ([see preview generator documentation](https://github.com/algoo/preview-generator#eps-support))
 - Docker image support for ARM64 ([#3985](https://github.com/tracim/tracim/issues/3985))
@@ -534,10 +535,10 @@ This maintenance release fixes a few things:
 
 ### Breaking/Important change
 
-- :warning: Apache default configuration change. See [Migrate to 4.0.0](https://github.com/tracim/tracim/issues/5039)
+- ⚠️ Apache default configuration change. See [Migrate to 4.0.0](https://github.com/tracim/tracim/issues/5039)
 - Video calls: requires a modification on existing installations. See [Migrate to 4.0.0](https://github.com/tracim/tracim/issues/5039)
 - Configuration file `development.ini`: default configuration change. See [Migrate to 4.0.0](https://github.com/tracim/tracim/issues/5039)
-- :warning: Python 3.5 support dropped (issue [#4874](https://github.com/tracim/tracim/issues/4874))
+- ⚠️ Python 3.5 support dropped (issue [#4874](https://github.com/tracim/tracim/issues/4874))
 - Python 3.8 and 3.9 support (issue [#4874](https://github.com/tracim/tracim/issues/4874))
 - Docker images now rely on Debian Bullseye (11) (issue [#4874](https://github.com/tracim/tracim/issues/4874))
 - Supported OS: see [README](README.md)
@@ -689,10 +690,10 @@ For administrators:
 ### Breaking/Important change
 
 - Apache: default configuration change. You need to delete your config file `/{docker-volume}/etc/apache2.conf` (backup your file first) before starting/restarting the docker image
-:warning: if you not apply this, Tracim can't show the `favicon.ico`.
+⚠️ if you not apply this, Tracim can't show the `favicon.ico`.
 - All necessary files to customize Tracim instance (logo, color) must be placed in the `branding/` folder (issue [#4606](https://github.com/tracim/tracim/issues/4606)). A `branding.sample`folder is given as an example. Some manual changes are required to run this version (same process for local installation or docker installation):
   - for Tracim >= 3.8.0
-  :warning: if you not apply that, Tracim won't start and use your customization
+  ⚠️ if you not apply that, Tracim won't start and use your customization
     - First, it's necessary to backup the existing branding folder if you have added some customization (if not, it's necessary to delete the branding folder: `rm -r /{docker-volume}/etc/branding`). To do that, you need to:
       - `mv /{docker-volume}/etc/branding/ /{docker-volume}/etc/branding-back/`
       - The `branding/` folder is created automatically by Tracim if it does not exist
@@ -704,7 +705,7 @@ For administrators:
       - if you have customized some files in the old `branding/` folder, you need to copy your file from `/{docker-volume}/etc/branding-back/` folder
     - Finally, restart Tracim
   - for Tracim < 3.8.0, if you have customized `logo.png` and/or `color.json`
-  :warning: if you not apply that, Tracim can't use your customization
+  ⚠️ if you not apply that, Tracim can't use your customization
     - After first start of the version 3.8.2, you need to:
       - if you have customized your `logo.png`:
         - `mv /{docker-volume}/etc/logo.png /{docker-volume}/etc/branding/images/tracim-logo.png`
@@ -837,7 +838,7 @@ For administrators:
 
 ### Breaking Changes
 
-- :warning: You need to migrate your database before running this version. See the _Upgrading the Database to the Last Revision_ section of the [migration documentation](backend/doc/migration.md) for more information (issue [#4133](https://github.com/tracim/tracim/issues/4133)). We advise you to run this step after each upgrade of Tracim.
+- ⚠️ You need to migrate your database before running this version. See the _Upgrading the Database to the Last Revision_ section of the [migration documentation](backend/doc/migration.md) for more information (issue [#4133](https://github.com/tracim/tracim/issues/4133)). We advise you to run this step after each upgrade of Tracim.
 If you use docker image, the migration is done automatically when new image is started.
 - ElasticSearch: refactor of the indexing logic.
 - The `search.elasticsearch.index_alias` parameter has been renamed to `search.elasticsearch.index_alias_prefix` (issue [#4147](https://github.com/tracim/tracim/issues/4147)).
