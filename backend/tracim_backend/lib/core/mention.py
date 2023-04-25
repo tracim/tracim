@@ -27,6 +27,9 @@ from tracim_backend.models.event import OperationType
 from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.models.tracim_session import TracimSession
 
+USER_ID = "userid"
+ROLE_ID = "roleid"
+
 
 class MentionType:
     USER = 1
@@ -91,9 +94,7 @@ class DescriptionMentionParser(BaseMentionParser):
 
     @classmethod
     def is_html_mention_tag(cls, tag: Tag) -> bool:
-        return cls.MENTION_TAG_NAME == tag.name and (
-            tag.has_attr("userid") or tag.has_attr("roleid")
-        )
+        return cls.MENTION_TAG_NAME == tag.name and (tag.has_attr(USER_ID) or tag.has_attr(ROLE_ID))
 
     @classmethod
     def get_mentions_from_html(cls, content_id: int, html: str) -> typing.List[Mention]:
@@ -101,8 +102,8 @@ class DescriptionMentionParser(BaseMentionParser):
         soup = BeautifulSoup(html, "lxml")
         mentions = []
         for mention_tag in soup.find_all(DescriptionMentionParser.is_html_mention_tag):
-            user_id = mention_tag.attrs.get("userid")
-            role_id = mention_tag.attrs.get("roleid")
+            user_id = mention_tag.attrs.get(USER_ID)
+            role_id = mention_tag.attrs.get(ROLE_ID)
             if user_id and user_id != "":
                 mentions.append(Mention(MentionType.USER, int(user_id), content_id))
                 continue
@@ -126,9 +127,11 @@ class DescriptionMentionParser(BaseMentionParser):
         :param html: html to parse
         :return: html with mention tags replaced by simple string mention
 
-        Example:\n
-        html = <div>Hello <html-mention userid="1"></html-mention>!</div>\n
-        return = <div>Hello @foo!</div>\n
+        Example:
+        ```
+        html = <div>Hello <html-mention userid="1"></html-mention>!</div>
+        return = <div>Hello @foo!</div>
+        ```
         Where @foo is the username of user with id 1
         """
 
@@ -136,9 +139,8 @@ class DescriptionMentionParser(BaseMentionParser):
         _ = translator.get_translation
 
         for mention_tag in soup.find_all(DescriptionMentionParser.is_html_mention_tag):
-            user_id = mention_tag.attrs.get("userid")
-            role_id = mention_tag.attrs.get("roleid")
-            # breakpoint()
+            user_id = mention_tag.attrs.get(USER_ID)
+            role_id = mention_tag.attrs.get(ROLE_ID)
             if user_id and user_id != "":
                 user = UserApi(current_user=None, session=session, config=cfg).get_one(user_id)
                 mention_tag.replaceWith(f"@{user.display_name}")
