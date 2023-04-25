@@ -14,7 +14,7 @@ User-visible parts of these properties (title/description/…) can be translated
 these translations will allow the backend to automatically translate both the UI Schema and JSONSchema according
 to connected user lang.
 
-:warning: Tracim does not handle changes in the property schema when custom property values are already existing in the database.
+⚠️ Tracim does not handle changes in the property schema when custom property values are already existing in the database.
 If you want to change the schema in an incompatible way with the existing property values you'll have to update the `user_custom_properties` table manually.
 
 ## Configuration
@@ -22,29 +22,32 @@ If you want to change the schema in an incompatible way with the existing proper
 You can set a schema for all users of the instance in the settings (`development.ini`):
 
 Simple example with `user.custom_properties.dir` shortcut:
+
 ```ini
 user.custom_properties.dir = %(here)s/tracim_backend/templates/user_custom_properties/default
 user.custom_properties.json_schema_file_path = %(user.custom_properties.dir)s/schema.json
 user.custom_properties.ui_schema_file_path = %(user.custom_properties.dir)s/ui.json
 user.custom_properties.translations_dir_path = %(user.custom_properties.dir)s/locale
 ```
-See the [provided files](../tracim_backend/templates/user_custom_properties) as examples.
 
+See the [provided files](../tracim_backend/templates/user_custom_properties) as examples.
 
 ## JSONSchema
 
 Configurable through:
+
 ```ini
 user.custom_properties.json_schema_file_path
 ```
 
-#### Tracim specific properties in json schemas
+### Tracim specific properties in json schemas
 
 No specific properties for now in json schema.
 
 ## UISchema
 
 Configurable through:
+
 ```ini
 user.custom_properties.ui_schema_file_path
 ```
@@ -69,7 +72,7 @@ See [ui schema](../examples/user_custom_properties/organization/ui.json) for an 
 
 To verify if the schemas provided will be valid for tracim, there is a command line to do so:
 
-```shell
+```bash
 tracimcli dev custom-properties checker -s path/to/json_schema_path -u path/to/ui_schema_path
 ```
 
@@ -77,12 +80,13 @@ tracimcli dev custom-properties checker -s path/to/json_schema_path -u path/to/u
 
 The json and ui schema returned in the HTTP API are directly translated.
 The following json schema field values are translated:
+
 - `description`
 - `title`
 - `EnumNames` (not standard JSONSchema but supported, see [here]('https://react-jsonschema-form.readthedocs.io/en/latest/usage/single/#custom-labels-for-enum-fields'))
 
-
 The following ui schema field values are translated:
+
 - `description`
 - `title`
 - `placeholder`
@@ -95,7 +99,8 @@ The content of the translations should be `{"original value": "translation value
 make them compatible with [i18next-json-v3]('https://www.i18next.com/misc/json-format#i-18-next-json-v3').
 
 To generate translation for an existing schema, a tool is available, which does a part of the job:
-```shell
+
+```bash
  $ tracimcli dev custom-properties extract-translation-source
 {'Address': '',
  'Administrator': '',

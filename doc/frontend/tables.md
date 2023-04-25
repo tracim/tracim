@@ -3,39 +3,39 @@
 Table and columns in Tracim are a new way of coding and rendering tables and listings
 for Tracim. It contributes to a more consistent interface in Tracim.
 
-For developers, it provides an easier way to design tables. 
+For developers, it provides an easier way to design tables.
 It is designed to reduce development time,
-since columns are designed to be reusable in different tables. 
+since columns are designed to be reusable in different tables.
 It also removes the necessity to implement
 per table sorting and filtering, since it is managed by the columns.
 
 It also drastically reduces the code size for pages. Since the rendering, filtering and sorting
 of the data is managed by the tables and columns.
 
-
 ## Table of contents
 
-* [Columns](#columns)
-  + [How to create a new column](#how-to-create-a-new-column)
-    - [Step 1](#step-1)
-    - [Step 2](#step-2)
-    - [Step 3](#step-3)
-    - [Step 4](#step-4)
-    - [Step 5](#step-5)
-    - [Step 6 (Optional)](#step-6--optional-)
-    - [Step 7 (Optional)](#step-7--optional-)
-    - [Conclusion](#conclusion)
-* [Tables](#tables)
-  + [How to create a new table](#how-to-create-a-new-table)
-    - [Step 1](#step-1-1)
-    - [Step 2](#step-2-1)
-    - [Step 3](#step-3-1)
-  + [Props](#props)
-* [Example](#example)
-  + [Column](#column)
-  + [Table](#table)
-  + [Result](#result)
-
+- [Tables and columns in Tracim](#tables-and-columns-in-tracim)
+  - [Table of contents](#table-of-contents)
+  - [Columns](#columns)
+    - [How to create a new column](#how-to-create-a-new-column)
+      - [Step 1](#step-1)
+      - [Step 2](#step-2)
+      - [Step 3](#step-3)
+      - [Step 4](#step-4)
+      - [Step 5](#step-5)
+      - [Step 6 (Optional)](#step-6-optional)
+      - [Step 7 (Optional)](#step-7-optional)
+      - [Conclusion](#conclusion)
+  - [Tables](#tables)
+    - [How to create a new table](#how-to-create-a-new-table)
+      - [Step 1](#step-1-1)
+      - [Step 2](#step-2-1)
+      - [Step 3](#step-3-1)
+    - [Props](#props)
+  - [Example](#example)
+    - [Column](#column)
+    - [Table](#table)
+    - [Result](#result)
 
 ## Columns
 
@@ -95,7 +95,7 @@ const myColumn = (settings) => {
 }
 ```
 
-For more information about this function refer to the library's documentation on 
+For more information about this function refer to the library's documentation on
 [tanstack.com](https://tanstack.com/).
 
 ---
@@ -127,7 +127,7 @@ const usernameColumn = (settings) => {
 }
 ```
 
-The `row => row.username` accessor function is used to choose which data 
+The `row => row.username` accessor function is used to choose which data
 will be passed to the filter function.
 Its return value needs to be set to a primitive for this feature to work.
 (e.g. `row => row.username`).
@@ -135,8 +135,8 @@ Its return value needs to be set to a primitive for this feature to work.
 Preprocessing complex data to output a primitive should be considered.
 (e.g. ``row => `${row.firstName} ${row.lastName}` ``)
 
-This however brings limitations for the sorting and filtering functions, 
-it is still possible to circumvent this limitation. 
+This however brings limitations for the sorting and filtering functions,
+it is still possible to circumvent this limitation.
 (e.g. serializing the JSON to a string, and deserialize it in the filter function).
 
 ---
@@ -198,6 +198,7 @@ const usernameColumn = (settings) => {
   })
 }
 ```
+
 The row's data is stored in `props.row.original`.
 
 Like `header`, `cell` is similar to a React Function Component.
@@ -211,7 +212,7 @@ If the accessor is properly set, the column will be filterable by default.
 The appropriate filter function will be automatically chosen from the built-in filters.
 however it is preferable to specify it in the `filterFn` field to avoid any unexpected behavior.
 
-The list of built-in filter functions can be found on 
+The list of built-in filter functions can be found on
 [tanstack.com](https://tanstack.com/table/v8/docs/api/features/filters#filter-functions).
 
 ```javascript
@@ -245,6 +246,7 @@ Instead of using a built-in, it is possible to set it to a custom filter functio
 instead of the built-in's string.
 
 Here is the signature of a filter function:
+
 ```javascript
 FilterFn = (row, columnId, filterValue) => boolean
 ```
@@ -300,6 +302,7 @@ Instead of using a built-in, it is possible to set it to a custom filter functio
 instead of the built-in's string.
 
 Here is the signature of a filter function:
+
 ```javascript
 SortingFn = (rowA, rowB, columnId) => number
 ```
@@ -320,15 +323,15 @@ can now be used it in tables!
 
 ## Tables
 
-A table or a listing is a container rendering the `TracimTable` component 
+A table or a listing is a container rendering the `TracimTable` component
 (`frontend_lib/src/component/TracimTable/TracimTable.jsx`).
 
 The `TracimTable` manages the rendering, filtering, and sorting of the data.
 
-###  How to create a new table
+### How to create a new table
 
-A table is somewhat like a container of the `TracimTable` component, 
-it manages which data and columns should be rendered, along with multiple optional parameters 
+A table is somewhat like a container of the `TracimTable` component,
+it manages which data and columns should be rendered, along with multiple optional parameters
 that can be tweaked through the props.
 
 ---
@@ -351,7 +354,7 @@ myTable.propsType = {
 
 #### Step 2
 
-Set the displayed columns in an array, note that the columns will be displayed 
+Set the displayed columns in an array, note that the columns will be displayed
 in the order of the array, left to right.
 
 ```javascript
@@ -396,10 +399,10 @@ myTable.propsType = {
 }
 ```
 
-(Additional props can be passed to `TracimTable`. We will see these in the 
+(Additional props can be passed to `TracimTable`. We will see these in the
 [table props section](#props))
 
-Now the `TracimTable` will automatically render the column headers, 
+Now the `TracimTable` will automatically render the column headers,
 and a row per entry in the data array.
 
 ---
@@ -421,7 +424,6 @@ The `TracimTable` is highly configurable through its props. Here is an exhaustiv
 | filterPlaceholder   | String                 | No         | 'Filter this list'   | The placeholder to put in the filter bar's input field.                                                                                                                        |
 | sortable            | Bool                   | No         | false                | Set to true to enable sorting for the table, the sorting parameters are defined in each columns. The table manages sorting by itself.                                          |
 | defaultSortColumnId | String                 | No         | undefined            | The default columnId on which the table should sort it's data                                                                                                                  |
-
 
 ## Example
 

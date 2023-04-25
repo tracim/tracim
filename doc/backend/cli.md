@@ -9,70 +9,112 @@ This document is intended to developers or sysadmin.
 In order to use the `tracimcli` commands, go to the root of the project and
 and active the Tracim virtualenv:
 
-```shell
-  user@host:~/tracim_backend$ source env/bin/activate
-  (env) user@host:~/tracim_backend$
+```bash
+user@host:~/tracim_backend$ source env/bin/activate
+(env) user@host:~/tracim_backend$
+```
+
+There are two ways to use tracimcli, you can either type direct command:
+
+```bash
+tracimcli help
+```
+
+Or use the interactive mode:
+
+```bash
+tracimcli
+# in tracimcli shell
+# check (tracimcli) in prompt
+help
+dev parameter list
+```
+
+## Help
+
+```bash
+tracimcli help
 ```
 
 ## Database
 
+Command to deal with the RDBMS database of tracim (postgresql or sqlite).
+
 ### Create the database
 
-```shell
-  tracimcli db init
+```bash
+tracimcli db init
 ```
 
 __If using Redis, the service must be started.__
 
-### Create the database with some default test data (many users, workspaces, etc…)
+Create the database with some default test data (many users, workspaces, etc…):
 
-```shell
-  tracimcli db init --test-data
+```bash
+tracimcli db init --test-data
 ```
 
 ### Delete the database /!\
 
 This will drop the entire database, be careful!
 
-```shell
-  tracimcli db delete --force
+```bash
+tracimcli db delete --force
 ```
+
+#### Migrate storage
+
+Command: `db migrate-storage`
+
+This command is useful if you want to change the file storage of tracim, for example if you want to
+switch from S3 to local file dir. This is database related as this change the database content.
+
+See [migrate_storage.md](migrate_storage.md)
 
 ### Update naming conventions for database coming from Tracim V1 (only works with PostgreSQL)
 
 Useful to migrate old databases, to run before applying v3.0.0 migration scripts with alembic:
 
-```shell
-    tracimcli db update-naming-conventions
+```bash
+tracimcli db update-naming-conventions
 ```
 
-### Migrate Mysql/Mariadb database to utf8mb4 (added for tracim 3.7)
+#### Migrate Mysql/Mariadb database to utf8mb4 (added for tracim 3.7)
 
-❗: Since [Tracim 4.0.0](https://github.com/tracim/tracim/blob/maintenance/4.4/CHANGELOG.md#400--2021-10-29), mysql is not officialy supported by Tracim team. You are on your own when using it.
+❗: Since
+[Tracim 4.0.0](https://github.com/tracim/tracim/blob/maintenance/4.4/CHANGELOG.md#400--2021-10-29),
+mysql is not officialy supported by Tracim team. You are on your own when using it.
 
-:warning: This will modify the character set and collation of Tracim's database, including the already existing tables. We strongly suggest you to do a backup of the database before applying this command. We suggest you to follow official documentation of your database to do so.
+⚠️ This will modify the character set and collation of Tracim's database, including the already
+existing tables. We strongly suggest you to do a backup of the database before applying this
+command. We suggest you to follow official documentation of your database to do so.
 
-Useful to migrate old databases on MySQL or MariaDB in order to have full Unicode support. This is mandatory on Tracim version 3.7 and later to support emoji reactions.
+Useful to migrate old databases on MySQL or MariaDB in order to have full Unicode support. This is
+mandatory on Tracim version 3.7 and later to support emoji reactions.
 
-This fix is needed for proper working emoji character in tracim, don't applying this fix (if you database has not already the correct charset/collation) will lead to an almost working tracim, but adding emoji or complex unicode character in tracim will fail, this will make impossible to add any reaction.
+This fix is needed for proper working emoji character in tracim, don't applying this fix (if you
+database has not already the correct charset/collation) will lead to an almost working tracim, but
+adding emoji or complex Unicode character in tracim will fail, this will make impossible to add any
+reaction.
 
-For mysql 8.0.1+ (force collation to `utf8mb4_0900_ai_ci` as this is better than `utf8mb4_unicode_520_ci`):
+For mysql 8.0.1+ (force collation to `utf8mb4_0900_ai_ci` as this is better than
+`utf8mb4_unicode_520_ci`):
 
-```shell
-  tracimcli db migrate-mysql-charset -d --collation utf8mb4_0900_ai_ci
+```bash
+tracimcli db migrate-mysql-charset -d --collation utf8mb4_0900_ai_ci
 ```
 
 For mariadb 10.3+ (use collation `utf8mb4_unicode_520_ci` by default):
 
-```shell
-  tracimcli db migrate-mysql-charset -d
+```bash
+tracimcli db migrate-mysql-charset -d
 ```
 
 ## User
 
-### add a user
+### Add a user
 
-```shell
+```bash
 $ tracimcli user create -h
 usage: tracimcli user create [-h] [-c CONFIG_FILE] [-d] [-e EMAIL]
                              [-u USERNAME] [--public-name PUBLIC_NAME]
@@ -94,7 +136,7 @@ optional arguments:
   --public-name PUBLIC_NAME
                         set the user's public name
   --allowed_space ALLOWED_SPACE
-                        set thes user's allowed space in bytes
+                        set the user's allowed space in bytes
   --lang LANG           set the user's language (ISO 639 format)
   -p PASSWORD, --password PASSWORD
                         set the user's password
@@ -108,25 +150,25 @@ optional arguments:
 
 Example of creating a user with an email, a password and sending account information by email:
 
-```shell
-  tracimcli user create -e "john.does@example.tld" -p "superpassword" --send-email
+```bash
+tracimcli user create -e "john.does@example.tld" -p "super_password" --send-email
 ```
 
 If you don't provide password and use --send-email, an autogenerated password will be created and sent to the user by email, example:
 
-```shell
-  tracimcli user create -e "john.does@example.tld" --send-email --lang "fr"
+```bash
+tracimcli user create -e "john.does@example.tld" --send-email --lang "fr"
 ```
 
-:warning: if you don't provide any password and don't use `--send-email`, no password will be created. You can use `tracimcli user update` to set the password later.
+⚠️ if you don't provide any password and don't use `--send-email`, no password will be created. You can use `tracimcli user update` to set the password later.
 
 Another example with a username-only user (this requires `email.required=false`) and more parameters:
 
-```shell
-  tracimcli user create -u "john" -p "superpassword" --profile "trusted-users" --lang "fr" --public-name "John Doe"
+```bash
+tracimcli user create -u "john" -p "super_password" --profile "trusted-users" --lang "fr" --public-name "John Doe"
 ```
 
-### update user password
+### Update user
 
 ```bash
 $ tracimcli user update -h
@@ -164,8 +206,8 @@ optional arguments:
 
 Example:
 
-```shell
-  tracimcli user update -l "john.does@example.tld" -p "mynewsuperpassword"
+```bash
+tracimcli user update -l "john.does@example.tld" -p "my_new_super_password"
 ```
 
 Note: login (-l) is the current login of the user whereas username(-u), email (-e), password (-p), etc… are the
@@ -173,8 +215,8 @@ new values to set.
 
 Another example with more parameters
 
-```shell
-  tracimcli user update -l "john.does@example.tld" -u "john" --profile "trusted-users" --lang "fr" --public-name "John Doe"
+```bash
+tracimcli user update -l "john.does@example.tld" -u "john" --profile "trusted-users" --lang "fr" --public-name "John Doe"
 ```
 
 ### Delete user(s)
@@ -185,7 +227,7 @@ UI which only hides data, this command does delete the content from database, so
 `user delete` provides many parameters in order to choose how you want to delete an user.
 We suggest to anonymize them (see `-a` or `-b` ) in case deleting them might cause trouble.
 
-```shell
+```bash
 $ tracimcli user delete -h
 usage: tracimcli user delete [-h] [-c CONFIG_FILE] [-d] [--dry-run] [-b] [-f]
                              [-a] [--anonymize-name ANONYMIZE_NAME] [-r] [-w]
@@ -224,7 +266,7 @@ optional arguments:
 You can also anonymize user without deleting any user data user using
 command `tracimcli anonymize`.
 
-```shell
+```bash
 $ tracimcli user anonymize -h
 usage: tracimcli user anonymize [-h] [-c CONFIG_FILE] [-d] [--dry-run]
                                 [--anonymize-name ANONYMIZE_NAME] -l LOGINS
@@ -249,8 +291,8 @@ optional arguments:
 
 ### Run the Service
 
-```shell
-  tracimcli caldav start
+```bash
+tracimcli caldav start
 ```
 
 ### Check and Recreate the Agenda for a User/Workspace
@@ -259,16 +301,16 @@ In some cases, creating the agenda of an user or a workspace can fail.
 To check if all agendas are created and to force their creation if they are not,
 you can run:
 
-```shell
-  tracimcli caldav sync
+```bash
+tracimcli caldav sync
 ```
 
 ## WebDAV
 
 ### Run the Service
 
-```shell
-  tracimcli webdav start
+```bash
+tracimcli webdav start
 ```
 
 ## Periodic tasks
@@ -277,7 +319,7 @@ you can run:
 
 This command will send mails for users who selected to receive a summary of changes/mentions instead of getting notified immediately.
 
-```shell
+```bash
 tracimcli periodic send-summary-mails
 ```
 
@@ -292,7 +334,7 @@ It can easily be called from a cron job, for example every 24h:
 
 First setup a cron job:
 
-```shell
+```bash
 crontab -e
 ```
 
@@ -302,23 +344,17 @@ Then add a line and save the crontab file:
 0 0 * * * tracimcli periodic send-summary-mails -c <path to development.ini> --since 24
 ```
 
-## Help
-
-```shell
-  tracimcli -h
-```
-
 ## Dev/Support Tools
 
-:warning: These tools are only for dev or support and are experimental, syntax and behaviour may change in future tracim version.
+⚠️ These tools are only for dev or support and are experimental, syntax and behavior may change in future tracim version.
 
-## Parameters list
+### Parameters list
 
 To know fresh tracim parameters list used,
 you can do:
 
-```shell
-  tracimcli dev parameters list
+```bash
+tracimcli dev parameters list
 ```
 
 This will give you an almost complete list of tracim parameters available.
@@ -326,43 +362,68 @@ The list is the same as the list available in [settings documentation](setting.m
 
 Others parameters are available using internal documentation:
 
-```shell
-  tracimcli dev parameters list -h
+```bash
+tracimcli dev parameters list -h
 ```
 
-## Parameters values and more
+### Parameters values and more
 
 To get all parameters values applied:
 
-```shell
-  tracimcli dev parameters value
+```bash
+tracimcli dev parameters value
 ```
 
 Many others parameters are available using internal documentation:
 
-```shell
-  tracimcli dev parameters value -h
+```bash
+tracimcli dev parameters value -h
 ```
 
 Example 1: getting a specific parameter value applied:
 
-```shell
-  # with config file name syntax:
-  tracimcli dev parameters value -n app.enabled
-  # is equivalent to (tracim internal parameter syntax):
-  tracimcli dev parameters value -n APP__ENABLED
-  # is equivalent to (env var syntax):
-  tracimcli dev parameters value -n TRACIM_APP__ENABLED
+```bash
+# with config file name syntax:
+tracimcli dev parameters value -n app.enabled
+# is equivalent to (tracim internal parameter syntax):
+tracimcli dev parameters value -n APP__ENABLED
+# is equivalent to (env var syntax):
+tracimcli dev parameters value -n TRACIM_APP__ENABLED
 ```
 
 Example 2: getting default value of parameters:
 
-```shell
-  tracimcli dev parameters value --template "|{config_name: <30}|{default_value: <30}"
+```bash
+tracimcli dev parameters value --template "|{config_name: <30}|{default_value: <30}"
 ```
 
 Example 3: getting the maximum information known about a specific parameter:
 
-```shell
-  tracimcli dev parameters value -f -n DEBUG
+```bash
+tracimcli dev parameters value -f -n DEBUG
 ```
+
+### Check of smtp configuration
+
+Command: `dev test smtp`
+
+Useful for checking smtp configuration by sending email with same configuration see
+[section "Enabling the Mail Notification Feature" in setting.md doc](setting.md) for more
+information.
+
+### Check of live messages
+
+Command: `dev test live-messages`
+
+Useful to check if live messages (TLM) does work.
+See [section Manually testing live messages in live_message_setup.md doc](live_message_setup.md).
+
+### Custom Properties checker/extract-translation source
+
+Commands:
+
+- `dev custom-properties checker`
+- `dev custom-properties extract-translation-source`
+
+Theses 2 commands are related to user custom-properties, see
+[user custom properties doc](user_custom_properties.md).

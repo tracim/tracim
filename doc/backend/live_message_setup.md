@@ -1,81 +1,81 @@
 
-# Install Live Message mecanism for development purpose
+# Install Live Message mechanism for development purpose
 
 ## Install Pushpin in docker
 
-On ubuntu/debian:
+On ubuntu/Debian:
 
-~~~bash
+```bash
 apt install docker.io docker-compose-plugin
-~~~
+```
 
-:warning: do not install pushpin package as it will conflict with the docker based pushpin (`apt remove pushpin` if installed).
+⚠️ do not install pushpin package as it will conflict with the docker based pushpin (`apt remove pushpin` if installed).
 
 ## Some configuration needed
 
 you need to set tracim config like this to use default pushpin port:
 
-~~~ini
+```ini
 basic_setup.website_base_url = http://localhost:7999
 live_messages.control_zmq_uri = tcp://localhost:5563
-~~~
+```
 
-:warning:  Temporary, you also need to ensure "jobs.processing_mode" parameter is unset or set to "sync".
+⚠️  Temporary, you also need to ensure "jobs.processing_mode" parameter is unset or set to "sync".
 
 ## Run tracim with Pushpin (dev)
 
 First move to `backend` dir:
 
-~~~bash
+```bash
 cd backend
-~~~
+```
 
 run pushpin docker (from tracim root dir):
-~~~bash
+
+```bash
 docker compose up -d pushpin
-~~~
+```
 
 then run tracim:
-~~~bash
-pserve development.ini
-~~~
 
-:warning: pushpin for dev and pushpin for cypress cannot be started at the same time (they do use same ports)
+```bash
+pserve development.ini
+```
+
+⚠️ pushpin for dev and pushpin for cypress cannot be started at the same time (they do use same ports)
 
 you can check if pushpin reverse-proxy works correctly:
 
-~~~bash
+```bash
 firefox localhost:7999
-~~~
+```
 
 ### More info about docker
 
+To stop "pushpin" containers (from `backend` directory):
 
-to stop "pushpin" containers (from `backend` directory):
-
-~~~bash
+```bash
 docker compose down
-~~~
+```
 
-to see running container list (pushpin container will be named `backend_pushpin_1`):
+To see running container list (pushpin container will be named `backend_pushpin_1`):
 
-~~~bash
+```bash
 docker ps
-~~~
+```
 
 ## Manually testing live messages
 
 To manually test live messages, you can first open a connexion on live message stream for one user:
 (this use the default admin user, of course you can do this with other users too)
 
-~~~bash
+```bash
 http -S -a admin@admin.admin:admin@admin.admin localhost:7999/api/users/1/live_messages
-~~~
-
+```
 
 And you can test message with this command:
 (in this example, we use use also the default admin user)
 
-~~~bash
+```bash
 tracimcli dev test live-messages -u 1 -d
-~~~
+```
