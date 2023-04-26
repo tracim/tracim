@@ -141,7 +141,7 @@ Emoji support has been added for simple and advanced edition.
 
 #### 📝 Documentation
 
-Documentation updates
+We worked on the documentation to make it more consistent and detailed.
 
 #### General
 
@@ -155,6 +155,10 @@ Documentation updates
 
 We had to do some breaking changes in this release. You will find a documentation about how to
 upgrade your Tracim instance in the [upgrade documentation](https://github.com/tracim/tracim/issues/6161).
+
+⚠️ The parameter `basic_setup.website_base_url` is now required for Tracim to work properly if you
+are using the Docker image or if your Tracim is designed to be accessible from a different URL than
+the localhost.
 
 ### 🔄 Dependencies updates
 
