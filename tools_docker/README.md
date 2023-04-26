@@ -1,8 +1,22 @@
-## Tracim with Docker
+#Tracim with Docker
 
-### Run containers
+## Table of contents
 
-#### Information about container
+- [Run containers](#run-containers)
+  - [Information about container](#information-about-container)
+  - [Example commands](#example-commands)
+- [Tracimcli inside docker](#tracimcli-inside-docker)
+  - [Updating index of ElasticSearch](#updating_index_of_elasticSearch)
+- [Troubleshooting](#troubleshooting)
+- [Build images](#build-images)
+  - [With custom branch or tag](#with-custom-branch-or-tag)
+  - [With custom repository](#with-custom-repository)
+- [ARM64 build](#arm64-build)
+- [Running with gocryptfs encryption](#running-with-gocryptfs-encryption)
+
+## Run containers
+
+### Information about container
 
 Environment variables can be given to the container:
 
@@ -57,7 +71,7 @@ have `agenda` app in `app.enabled` list, you MUST have `START_CALDAV=0`.
 If you want to use plugins and/or custom_toolbox you need to add files in `~/tracim/etc/plugins/` and `~/tracim/etc/custom_toolbox/` (default configuration). This two path are created when you start docker image for the first time.
 
 
-#### Example commands
+### Example commands
 
 Example with SQLite:
 
@@ -146,7 +160,7 @@ Example to use Tracim with ElasticSearch-ingest: (you need to create your elasti
 ⚠ After execute one of these command, Tracim will be reachable on your system on port 8080.
 
 
-### Tracimcli inside docker
+## Tracimcli inside docker
 
 For maintenance purpose you can use tracimcli command line in the docker this way:
 
@@ -163,7 +177,7 @@ or launching command directly:
 docker exec -i -u www-data -w /etc/tracim {CONTAINER ID or NAMES} tracimcli dev parameters value -f -d
 ```
 
-#### Updating index of ElasticSearch
+### Updating index of ElasticSearch
 
 ⚠ Prerequiste: ElasticSearch is running and you have starting Tracim with parameter to communicate with elasticsearch
 
@@ -184,7 +198,84 @@ search index-populate -d
 When is finished, you can quit your container. Index is now updated with all of your Tracim content.
 
 
-#### Running with gocryptfs encryption (Experimental !)
+## Troubleshooting
+
+If you encounter problems during the startup of the docker image, you can pass `DEBUG=1` to get additional messages that can help to find the problem cause:
+
+```bash
+    docker run \
+        -e DATABASE_TYPE=sqlite \
+        -e TRACIM_WEBSITE__BASE_URL=http://{ip_address}:{port} \
+        -p 8080:80 \
+        -v ~/tracim/etc:/etc/tracim \
+        -v ~/tracim/var:/var/tracim \
+        -e DEBUG=1 \
+        algoo/tracim:latest
+```
+## Build images
+
+To build image
+
+```bash
+cd tools_docker/Debian_Uwsgi
+docker build -t algoo/tracim:<version_name> .
+```
+
+To build encryption-enabled (gocryptfs based) image (experimental):
+
+```bash
+cd tools_docker/Debian_New_Uwsgi
+docker build -t algoo/tracim:<version_name> .
+```
+
+### With custom branch or tag
+
+⚠ **It is not possible to build an image with both ARG `TAG` and ARG `BRANCH` at same time.**
+
+You can build with specific branch
+
+```bash
+cd tools_docker/Debian_Uwsgi
+docker build --build-arg BRANCH="<branch_name>" -t algoo/tracim:<version_name> .
+```
+Ex: `docker build --build-arg BRANCH="feature/new_app" -t algoo/tracim:test_branch .`
+
+You can also build image with specific tag (This build is make just with necessary files: no other branch available)
+
+```bash
+cd tools_docker/Debian_Uwsgi
+docker build --build-arg TAG="<tag_name>" -t algoo/tracim:<tag_name> .
+```
+Ex: `docker build --build-arg TAG="release_02.00.00" -t algoo/tracim:release_02.00.00 .`
+
+### With custom repository
+
+By default, the Docker image is built from the main repository of Tracim. To clone Tracim from another repository, use the REPO argument. Don't forget to set a suitable image name.
+
+Ex: `docker build --build-arg REPO="https://github.com/<me>/tracim.git" -t algoo/tracim:myrepo .`
+
+## ARM64 build
+
+> Experimental !
+
+The ARM64 build is an experimental build without VTK enabled.
+
+To build image for ARM64 on a AMD64 machine, you need to:
+- install docker buildx: https://docs.docker.com/buildx/working-with-buildx/
+- add `binfmt_misc` multi-arch support (check `tonistiigi/binfmt` docker image in this doc: https://github.com/docker/buildx/#building-multi-platform-images)
+- install `qemu` and `qemu-user-static`.
+
+then do:
+
+```bash
+cd tools_docker/Debian_New_Uwsgi_ARM64
+docker buildx build -t algoo/tracim:arm64 . --platform linux/arm64/v8
+```
+for arm64/aarch64/v8
+
+## Running with gocryptfs encryption
+
+> Experimental !
 
 Warning: This is an experimental docker image,
 the new feature from this docker will maybe be merged to the standard docker or removed.
@@ -240,77 +331,3 @@ You will need it each time you need to run the docker.
 ```bash
 rm ~/tracim/secret/password.txt
 ```
-
-#### Troubleshooting
-
-If you encounter problems during the startup of the docker image, you can pass `DEBUG=1` to get additional messages that can help to find the problem cause:
-
-```bash
-    docker run \
-        -e DATABASE_TYPE=sqlite \
-        -e TRACIM_WEBSITE__BASE_URL=http://{ip_address}:{port} \
-        -p 8080:80 \
-        -v ~/tracim/etc:/etc/tracim \
-        -v ~/tracim/var:/var/tracim \
-        -e DEBUG=1 \
-        algoo/tracim:latest
-```
-### Build images
-
-To build image
-
-```bash
-cd tools_docker/Debian_Uwsgi
-docker build -t algoo/tracim:<version_name> .
-```
-
-To build encryption-enabled (gocryptfs based) image (experimental):
-
-```bash
-cd tools_docker/Debian_New_Uwsgi
-docker build -t algoo/tracim:<version_name> .
-```
-
-
-#### With Custom Branch or Tag
-
-⚠ **It is not possible to build an image with both ARG `TAG` and ARG `BRANCH` at same time.**
-
-You can build with specific branch
-
-```bash
-cd tools_docker/Debian_Uwsgi
-docker build --build-arg BRANCH="<branch_name>" -t algoo/tracim:<version_name> .
-```
-Ex: `docker build --build-arg BRANCH="feature/new_app" -t algoo/tracim:test_branch .`
-
-You can also build image with specific tag (This build is make just with necessary files: no other branch available)
-
-```bash
-cd tools_docker/Debian_Uwsgi
-docker build --build-arg TAG="<tag_name>" -t algoo/tracim:<tag_name> .
-```
-Ex: `docker build --build-arg TAG="release_02.00.00" -t algoo/tracim:release_02.00.00 .`
-
-#### With Custom Repository
-
-By default, the Docker image is built from the main repository of Tracim. To clone Tracim from another repository, use the REPO argument. Don't forget to set a suitable image name.
-
-Ex: `docker build --build-arg REPO="https://github.com/<me>/tracim.git" -t algoo/tracim:myrepo .`
-
-### ARM64 build (experimental)
-
-The ARM64 build is an experimental build without VTK enabled.
-
-To build image for ARM64 on a AMD64 machine, you need to:
-- install docker buildx: https://docs.docker.com/buildx/working-with-buildx/
-- add `binfmt_misc` multi-arch support (check `tonistiigi/binfmt` docker image in this doc: https://github.com/docker/buildx/#building-multi-platform-images)
-- install `qemu` and `qemu-user-static`.
-
-then do:
-
-```bash
-cd tools_docker/Debian_New_Uwsgi_ARM64
-docker buildx build -t algoo/tracim:arm64 . --platform linux/arm64/v8
-```
-for arm64/aarch64/v8
