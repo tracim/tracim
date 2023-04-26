@@ -5,12 +5,12 @@
 - [Run containers](#run-containers)
   - [Information about container](#information-about-container)
   - [Example commands](#example-commands)
-- [Tracimcli inside docker](#tracimcli-inside-docker)
-  - [Updating index of ElasticSearch](#updating_index_of_elasticSearch)
-- [Troubleshooting](#troubleshooting)
 - [Build images](#build-images)
   - [With custom branch or tag](#with-custom-branch-or-tag)
   - [With custom repository](#with-custom-repository)
+- [Troubleshooting](#troubleshooting)
+- [Tracimcli inside docker](#tracimcli-inside-docker)
+  - [Updating index of ElasticSearch](#updating_index_of_elasticSearch)
 - [ARM64 build](#arm64-build)
 - [Running with gocryptfs encryption](#running-with-gocryptfs-encryption)
 
@@ -159,59 +159,6 @@ Example to use Tracim with ElasticSearch-ingest: (you need to create your elasti
 ```
 ⚠ After execute one of these command, Tracim will be reachable on your system on port 8080.
 
-
-## Tracimcli inside docker
-
-For maintenance purpose you can use tracimcli command line in the docker this way:
-
-```bash
-docker exec -it -u www-data -w /etc/tracim {CONTAINER ID or NAMES} tracimcli
-```
-for the interactive mode
-note: /etc/tracim is the folder in container where the configuration file is stored.
-
-
-or launching command directly:
-
-```bash
-docker exec -i -u www-data -w /etc/tracim {CONTAINER ID or NAMES} tracimcli dev parameters value -f -d
-```
-
-### Updating index of ElasticSearch
-
-⚠ Prerequiste: ElasticSearch is running and you have starting Tracim with parameter to communicate with elasticsearch
-
-To make an update of ElasticSearch index you need to go inside your running Tracim container:
-
-```bash
-docker ps
-docker exec -it -u www-data -w /etc/tracim {CONTAINER ID or NAMES} tracimcli
-```
-
-Now you are in your Tracim container.
-
-```bash
-search index-drop -d
-search index-create -d
-search index-populate -d
-```
-When is finished, you can quit your container. Index is now updated with all of your Tracim content.
-
-
-## Troubleshooting
-
-If you encounter problems during the startup of the docker image, you can pass `DEBUG=1` to get additional messages that can help to find the problem cause:
-
-```bash
-    docker run \
-        -e DATABASE_TYPE=sqlite \
-        -e TRACIM_WEBSITE__BASE_URL=http://{ip_address}:{port} \
-        -p 8080:80 \
-        -v ~/tracim/etc:/etc/tracim \
-        -v ~/tracim/var:/var/tracim \
-        -e DEBUG=1 \
-        algoo/tracim:latest
-```
 ## Build images
 
 To build image
@@ -253,6 +200,58 @@ Ex: `docker build --build-arg TAG="release_02.00.00" -t algoo/tracim:release_02.
 By default, the Docker image is built from the main repository of Tracim. To clone Tracim from another repository, use the REPO argument. Don't forget to set a suitable image name.
 
 Ex: `docker build --build-arg REPO="https://github.com/<me>/tracim.git" -t algoo/tracim:myrepo .`
+
+## Troubleshooting
+
+If you encounter problems during the startup of the docker image, you can pass `DEBUG=1` to get additional messages that can help to find the problem cause:
+
+```bash
+    docker run \
+        -e DATABASE_TYPE=sqlite \
+        -e TRACIM_WEBSITE__BASE_URL=http://{ip_address}:{port} \
+        -p 8080:80 \
+        -v ~/tracim/etc:/etc/tracim \
+        -v ~/tracim/var:/var/tracim \
+        -e DEBUG=1 \
+        algoo/tracim:latest
+```
+
+## Tracimcli inside docker
+
+For maintenance purpose you can use tracimcli command line in the docker this way:
+
+```bash
+docker exec -it -u www-data -w /etc/tracim {CONTAINER ID or NAMES} tracimcli
+```
+for the interactive mode
+note: /etc/tracim is the folder in container where the configuration file is stored.
+
+
+or launching command directly:
+
+```bash
+docker exec -i -u www-data -w /etc/tracim {CONTAINER ID or NAMES} tracimcli dev parameters value -f -d
+```
+
+### Updating index of ElasticSearch
+
+⚠ Prerequiste: ElasticSearch is running and you have starting Tracim with parameter to communicate with elasticsearch
+
+To make an update of ElasticSearch index you need to go inside your running Tracim container:
+
+```bash
+docker ps
+docker exec -it -u www-data -w /etc/tracim {CONTAINER ID or NAMES} tracimcli
+```
+
+Now you are in your Tracim container.
+
+```bash
+search index-drop -d
+search index-create -d
+search index-populate -d
+```
+When is finished, you can quit your container. Index is now updated with all of your Tracim content.
 
 ## ARM64 build
 
