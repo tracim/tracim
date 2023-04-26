@@ -58,9 +58,13 @@ If you want to use plugins and/or custom_toolbox you need to add files in `~/tra
 
 
 #### Example commands
+
+Example with SQLite:
+
 ```bash
     docker run \
         -e DATABASE_TYPE=sqlite \
+        -e TRACIM_WEBSITE__BASE_URL=http://{ip_address}:{port} \
         -p 8080:80 \
         -v ~/tracim/etc:/etc/tracim \
         -v ~/tracim/var:/var/tracim \
@@ -69,6 +73,7 @@ If you want to use plugins and/or custom_toolbox you need to add files in `~/tra
 To run the Tracim container with PostgreSQL, you must set the ``DATABASE_USER, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_PORT, DATABASE_NAME`` environment variables.
 
 Example with PostgreSQL:
+
 ```bash
     docker run \
         -e DATABASE_TYPE=postgresql \
@@ -77,21 +82,15 @@ Example with PostgreSQL:
         -e DATABASE_USER=tracim \
         -e DATABASE_PASSWORD=tracim \
         -e DATABASE_NAME=tracim \
+        -e TRACIM_WEBSITE__BASE_URL=http://{ip_address}:{port} \
         -p 8080:80 \
         -v ~/tracim/etc:/etc/tracim \
         -v ~/tracim/var:/var/tracim \
         algoo/tracim:latest
 ```
-Example with SQLite:
-```bash
-    docker run \
-        -e DATABASE_TYPE=sqlite \
-        -p 8080:80 \
-        -v ~/tracim/etc:/etc/tracim \
-        -v ~/tracim/var:/var/tracim \
-        algoo/tracim:latest
-```
+
 Example with SQlite, email notifications and some small customisations:
+
 ```bash
     docker run \
         -e DATABASE_TYPE=sqlite \
@@ -100,11 +99,11 @@ Example with SQlite, email notifications and some small customisations:
         -e TRACIM_EMAIL__NOTIFICATION__SMTP__PORT=25 \
         -e TRACIM_EMAIL__NOTIFICATION__SMTP__USER=xxxxxxxxxx \
         -e TRACIM_EMAIL__NOTIFICATION__SMTP__PASSWORD=xxxxxxxxxx \
-        -e EMAIL__NOTIFICATION__FROM__EMAIL=xxx+{user_id}@servermail.xx \
-        -e EMAIL__NOTIFICATION__REPLY_TO__EMAIL=xxxx+{content_id}@servermail.xx \
+        -e TRACIM_EMAIL__NOTIFICATION__FROM__EMAIL=xxx+{user_id}@servermail.xx \
+        -e TRACIM_EMAIL__NOTIFICATION__REPLY_TO__EMAIL=xxxx+{content_id}@servermail.xx \
         -e TRACIM_EMAIL__NOTIFICATION__REFERENCES__EMAIL=xxxx+{content_id}@servermail.xx \
         -e TRACIM_WEBSITE__TITLE=xxxxxx \
-        -e TRACIM_WEBSITE__BASE_URL=http://{ip_or_domain} \
+        -e TRACIM_WEBSITE__BASE_URL=http://{ip_address}:{port} \
         -p 8080:80 \
         -v ~/tracim/etc:/etc/tracim \
         -v ~/tracim/var:/var/tracim \
@@ -113,6 +112,7 @@ Example with SQlite, email notifications and some small customisations:
 With this example, Tracim is now accessible on your network and Tracim can send notification by email when content change.
 
 Example to use Tracim with ElasticSearch: (you need to start elasticsearch first)
+
 ```bash
     docker run \
         -e DATABASE_TYPE=sqlite \
@@ -120,12 +120,15 @@ Example to use Tracim with ElasticSearch: (you need to start elasticsearch first
         -e TRACIM_SEARCH__ELASTICSEARCH__HOST={ip_of_elasticsearch_container} \
         -e TRACIM_SEARCH__ELASTICSEARCH__PORT=9200 \
         -e TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS_PREFIX=test_tracim \
+        -e TRACIM_WEBSITE__BASE_URL=http://{ip_address}:{port} \
         -p 8080:80 \
         -v ~/tracim/etc:/etc/tracim \
         -v ~/tracim/var:/var/tracim \
         algoo/tracim:latest
 ```
+
 Example to use Tracim with ElasticSearch-ingest: (you need to create your elasticsearch-ingest image first and start this image before Tracim)
+
 ```bash
     docker run \
         -e DATABASE_TYPE=sqlite \
@@ -134,6 +137,7 @@ Example to use Tracim with ElasticSearch-ingest: (you need to create your elasti
         -e TRACIM_SEARCH__ELASTICSEARCH__PORT=9200 \
         -e TRACIM_SEARCH__ELASTICSEARCH__INDEX_ALIAS_PREFIX=test_tracim \
         -e TRACIM_SEARCH__ELASTICSEARCH__USE_INGEST=True \
+        -e TRACIM_WEBSITE__BASE_URL=http://{ip_address}:{port} \
         -p 8080:80 \
         -v ~/tracim/etc:/etc/tracim \
         -v ~/tracim/var:/var/tracim \
@@ -164,12 +168,14 @@ docker exec -i -u www-data -w /etc/tracim {CONTAINER ID or NAMES} tracimcli dev 
 ⚠ Prerequiste: ElasticSearch is running and you have starting Tracim with parameter to communicate with elasticsearch
 
 To make an update of ElasticSearch index you need to go inside your running Tracim container:
+
 ```bash
 docker ps
 docker exec -it -u www-data -w /etc/tracim {CONTAINER ID or NAMES} tracimcli
 ```
 
 Now you are in your Tracim container.
+
 ```bash
 search index-drop -d
 search index-create -d
@@ -220,6 +226,7 @@ instead in order to not store the password in the bash history.
         -e GOCRYPTFS_UPLOADED_FILES_STORAGE_DIR=/var/tracim/data/uploaded_files \
         -e TRACIM_DEPOT_STORAGE_DIR=/media/uploaded_files \
         -e GOCRYPTFS_PASSWORD_PATH=/var/secret/password.txt \
+        -e TRACIM_WEBSITE__BASE_URL=http://{ip_address}:{port} \
         -p 8080:80 \
         -v ~/tracim/etc:/etc/tracim \
         -v ~/tracim/var:/var/tracim \
@@ -237,9 +244,11 @@ rm ~/tracim/secret/password.txt
 #### Troubleshooting
 
 If you encounter problems during the startup of the docker image, you can pass `DEBUG=1` to get additional messages that can help to find the problem cause:
+
 ```bash
     docker run \
         -e DATABASE_TYPE=sqlite \
+        -e TRACIM_WEBSITE__BASE_URL=http://{ip_address}:{port} \
         -p 8080:80 \
         -v ~/tracim/etc:/etc/tracim \
         -v ~/tracim/var:/var/tracim \
@@ -249,12 +258,14 @@ If you encounter problems during the startup of the docker image, you can pass `
 ### Build images
 
 To build image
+
 ```bash
 cd tools_docker/Debian_Uwsgi
 docker build -t algoo/tracim:<version_name> .
 ```
 
 To build encryption-enabled (gocryptfs based) image (experimental):
+
 ```bash
 cd tools_docker/Debian_New_Uwsgi
 docker build -t algoo/tracim:<version_name> .
@@ -266,6 +277,7 @@ docker build -t algoo/tracim:<version_name> .
 ⚠ **It is not possible to build an image with both ARG `TAG` and ARG `BRANCH` at same time.**
 
 You can build with specific branch
+
 ```bash
 cd tools_docker/Debian_Uwsgi
 docker build --build-arg BRANCH="<branch_name>" -t algoo/tracim:<version_name> .
@@ -273,6 +285,7 @@ docker build --build-arg BRANCH="<branch_name>" -t algoo/tracim:<version_name> .
 Ex: `docker build --build-arg BRANCH="feature/new_app" -t algoo/tracim:test_branch .`
 
 You can also build image with specific tag (This build is make just with necessary files: no other branch available)
+
 ```bash
 cd tools_docker/Debian_Uwsgi
 docker build --build-arg TAG="<tag_name>" -t algoo/tracim:<tag_name> .
@@ -295,6 +308,7 @@ To build image for ARM64 on a AMD64 machine, you need to:
 - install `qemu` and `qemu-user-static`.
 
 then do:
+
 ```bash
 cd tools_docker/Debian_New_Uwsgi_ARM64
 docker buildx build -t algoo/tracim:arm64 . --platform linux/arm64/v8
