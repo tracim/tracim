@@ -20,24 +20,24 @@
 
 Environment variables can be given to the container:
 
-* DATABASE_TYPE (values: postgresql, sqlite)
+* `DATABASE_TYPE` (values: `postgresql` or `sqlite`)
 
 If DATABASE_TYPE is `postgresql` set these variables:
 
-* DATABASE_USER
-* DATABASE_PASSWORD
-* DATABASE_HOST
-* DATABASE_PORT
-* DATABASE_NAME
+* `DATABASE_USER`
+* `DATABASE_PASSWORD`
+* `DATABASE_HOST`
+* `DATABASE_PORT`
+* `DATABASE_NAME`
 
 Container volume are:
 
-* /etc/tracim (used for persistent configuration files)
-* /var/tracim (used for persistent data like user session and sqlite SQLite database if chosen)
+* `/etc/tracim` (used for persistent configuration files)
+* `/var/tracim` (used for persistent data like user session and sqlite SQLite database if chosen)
 
 Used port in container:
 
-* 80 (Tracim HTTP API and web user interface)
+* `80` (Tracim HTTP API and web user interface)
 
 ⚠ You can also use this list of [supported variables](https://github.com/tracim/tracim/blob/develop/doc/backend/env_settings.md) (there variables are from development.ini.sample configuration file)
 
@@ -47,19 +47,19 @@ If you want to use notification by email:
 
 If you want to use reply_by_email feature:
 
-* REPLY_BY_EMAIL=1 (In this case you need to give some imap parameter visible in [development.ini.sample](https://github.com/tracim/tracim/blob/master/backend/development.ini.sample))
+* `REPLY_BY_EMAIL=1` (In this case you need to give some imap parameter visible in [development.ini.sample](https://github.com/tracim/tracim/blob/master/backend/development.ini.sample))
 
 If you don't want to use webdav (webdav is started by default):
 
-* START_WEBDAV=0 (to deactivate webdav in Tracim)
+* `START_WEBDAV=0` (to deactivate webdav in Tracim)
 
 If you don't want to use caldav (webdav is started by default):
 
-* START_CALDAV=0 (to deactivate agenda in Tracim)
+* `START_CALDAV=0` (to deactivate agenda in Tracim)
 
 If you want to use collaborative_document_edition feature:
 
-* ENABLE_COLLABORATIVE_DOCUMENT_EDITION=1 (In this case you need to set `collaborative_document_edition.*` parameters in [development.ini.sample](https://github.com/tracim/tracim/blob/master/backend/development.ini.sample))
+* `ENABLE_COLLABORATIVE_DOCUMENT_EDITION=1` (In this case you need to set `collaborative_document_edition.*` parameters in [development.ini.sample](https://github.com/tracim/tracim/blob/master/backend/development.ini.sample))
 
 see also [setting documentation](https://github.com/tracim/tracim/blob/master/doc/backend/setting.md)
 
