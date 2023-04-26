@@ -84,7 +84,7 @@ Example with SQLite:
         -v ~/tracim/var:/var/tracim \
         algoo/tracim:latest
 ```
-To run the Tracim container with PostgreSQL, you must set the ``DATABASE_USER, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_PORT, DATABASE_NAME`` environment variables.
+To run the Tracim container with PostgreSQL, you must set the `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_NAME` environment variables.
 
 Example with PostgreSQL:
 
