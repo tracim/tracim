@@ -95,7 +95,8 @@ export class ForgotPassword extends React.Component {
         props.dispatch(
           newFlashMessage(
             props.t('If your email address exists in our database, you will receive there a password recovery link shortly. If it doesn’t appear check your spam folder.'),
-            'info'
+            'info',
+            10000
           )
         )
         break
