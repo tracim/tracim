@@ -3,11 +3,11 @@ from http import HTTPStatus
 import pytest
 import transaction
 
-from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
-from tracim_backend.app_models.contents import THREAD_TYPE
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.error import ErrorCode
 from tracim_backend.exceptions import FavoriteContentNotFound
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
@@ -17,7 +17,7 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 def create_content(
     content_api: ContentApi,
     workspace: Workspace,
-    content_type=THREAD_TYPE,
+    content_type=ContentTypeSlug.THREAD.value,
     label="Test Thread",
     set_as_favorite: bool = False,
 ):
@@ -178,7 +178,7 @@ class TestFavoriteContent(object):
             content_api,
             test_workspace,
             set_as_favorite=False,
-            content_type=HTML_DOCUMENTS_TYPE,
+            content_type=ContentTypeSlug.HTML_DOCUMENTS.value,
             label="Test Note",
         )
         # non-accessible content: should give none content
@@ -186,7 +186,7 @@ class TestFavoriteContent(object):
             content_api,
             confidential_space,
             set_as_favorite=True,
-            content_type=HTML_DOCUMENTS_TYPE,
+            content_type=ContentTypeSlug.HTML_DOCUMENTS.value,
             label="Test Note2",
         )
         # deleted content: should be accessible
@@ -194,7 +194,7 @@ class TestFavoriteContent(object):
             content_api,
             test_workspace,
             set_as_favorite=True,
-            content_type=HTML_DOCUMENTS_TYPE,
+            content_type=ContentTypeSlug.HTML_DOCUMENTS.value,
             label="Test Note3",
         )
         with new_revision(session=session, tm=transaction.manager, content=note3_deleted):
@@ -297,7 +297,7 @@ class TestFavoriteContent(object):
             riyad_user,
             test_workspace,
             role_level=UserRoleInWorkspace.CONTENT_MANAGER,
-            with_notif=False,
+            email_notification_type=EmailNotificationType.NONE,
         )
         content_api = content_api_factory.get(current_user=riyad_user)  # type: ContentApi
         test_thread = create_content(content_api, test_workspace, set_as_favorite=True)
@@ -341,7 +341,7 @@ class TestFavoriteContent(object):
             riyad_user,
             test_workspace,
             role_level=UserRoleInWorkspace.CONTENT_MANAGER,
-            with_notif=False,
+            email_notification_type=EmailNotificationType.NONE,
         )
         content_api = content_api_factory.get(current_user=riyad_user)  # type: ContentApi
         test_thread = create_content(content_api, test_workspace, set_as_favorite=True)

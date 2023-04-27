@@ -8,10 +8,10 @@ import {
   ListItemWrapper,
   FilenameWithBadges,
   TimedEvent,
+  getRevisionTypeLabel,
   PAGE
 } from 'tracim_frontend_lib'
 import { Link } from 'react-router-dom'
-import { getRevisionTypeLabel } from '../../util/helper.js'
 
 require('./AdvancedSearchContentList.styl')
 

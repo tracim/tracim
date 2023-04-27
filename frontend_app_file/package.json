@@ -75,7 +75,6 @@
       "fetch",
       "history",
       "btoa",
-      "wysiwyg",
       "tinymce",
       "FormData",
       "XMLHttpRequest",

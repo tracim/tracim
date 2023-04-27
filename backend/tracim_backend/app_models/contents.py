@@ -171,16 +171,6 @@ class ContentTypeSlug(str, Enum):
     ANY = "any"
 
 
-# TODO - G.M - 2022-06-29 - Replace these variable by usage of ContentTypeSlug Enum
-COMMENT_TYPE = ContentTypeSlug.COMMENT.value
-FILE_TYPE = ContentTypeSlug.FILE.value
-FOLDER_TYPE = ContentTypeSlug.FOLDER.value
-HTML_DOCUMENTS_TYPE = ContentTypeSlug.HTML_DOCUMENTS.value
-KANBAN_TYPE = ContentTypeSlug.KANBAN.value
-THREAD_TYPE = ContentTypeSlug.THREAD.value
-TODO_TYPE = ContentTypeSlug.TODO.value
-
-
 # TODO - G.M - 31-05-2018 - Set Better Comment params
 comment_type = TracimContentType(
     slug=ContentTypeSlug.COMMENT.value,
@@ -196,14 +186,15 @@ class ContentTypeList(object):
     ContentType List
     """
 
-    # TODO - G.M - 2022-06-29 - Replace this variable by direct usage of ContentTypeSlug.ANY
-    Any_SLUG = ContentTypeSlug.ANY.value
-
     Comment = comment_type
 
     @property
     def Folder(self) -> TracimContentType:
         return self.get_one_by_slug(ContentTypeSlug.FOLDER.value)
+
+    @property
+    def Kanban(self) -> TracimContentType:
+        return self.get_one_by_slug(ContentTypeSlug.KANBAN.value)
 
     @property
     def File(self) -> TracimContentType:
@@ -276,7 +267,7 @@ class ContentTypeList(object):
         """
         Return all allowed types slug : content_type slug + all alias, any
         and special content_type like comment. Do not return event.
-        Usefull allowed value to perform query to database.
+        Useful allowed value to perform query to database.
         """
         allowed_types_slug = []
         content_types = self._content_types

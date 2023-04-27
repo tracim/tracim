@@ -2,7 +2,6 @@
   "Create a Kanban board": "إنشاء لوح كانبان",
   "Timeline": "السِجلّ",
   "Tags": "إشارات",
-  "Error while saving the comment": "خطأ أثناء حفظ التعليق",
   "Fullscreen": "ملء الشاشة",
   "Delete": "حذف",
   "New Kanban board": "لوح كانبان جديد",
@@ -36,7 +35,6 @@
   "See less": "عرض عناصر أقل",
   "Title:": "عنوان:",
   "Description:": "وصف:",
-  "Description": "وصف",
   "Color:": "اللون:",
   "Deadline:": "الموعد النهائي:",
   "Value:": "القيمة:",
@@ -46,5 +44,6 @@
   "Delete this column": "حذف هذا العمود",
   "Tasks": "",
   "The link has been copied to clipboard": "تم نسخ الرابط إلى الحافظة",
-  "Copy content link": "نسخ رابط المحتوى"
+  "Copy content link": "نسخ رابط المحتوى",
+  "Description of the card": ""
 }

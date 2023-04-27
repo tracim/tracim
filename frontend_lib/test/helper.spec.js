@@ -3,7 +3,6 @@ import {
   buildFilePreviewUrl,
   checkEmailValidity,
   createSpaceTree,
-  convertBackslashNToBr,
   formatAbsoluteDate,
   handleFetchResult,
   hasSpaces,
@@ -16,14 +15,13 @@ import {
   COMMON_REQUEST_HEADERS,
   setupCommonRequestHeaders,
   serialize,
-  sortTimelineByDate,
-  sortWorkspaceList,
   addRevisionFromTLM,
   checkUsernameValidity,
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
   permissiveNumberEqual,
-  updateTLMUser
+  updateTLMUser,
+  stringIncludes
 } from '../src/helper.js'
 
 import {
@@ -36,15 +34,6 @@ import {
 import sinon from 'sinon'
 
 describe('helper.js', () => {
-  describe('convertBackslashNToBr()', () => {
-    it('should return the proper msg', () => {
-      const msg = 'random\nMessage'
-      const expectedMsg = 'random<br />Message'
-      const returnedMsg = convertBackslashNToBr(msg)
-      expect(returnedMsg).to.equal(expectedMsg)
-    })
-  })
-
   describe('updateTLMUser()', () => {
     it('should return the author object added with is_from_system_admin if author is not null', () => {
       const author = { username: 'Author' }
@@ -487,65 +476,6 @@ describe('helper.js', () => {
     })
   })
 
-  describe('Function sortWorkspaceList()', () => {
-    it('should naturally sort the array of workspace', () => {
-      const workspaceList = [
-        { id: 1, label: 'content 0' },
-        { id: 3, label: 'content 1' },
-        { id: 21, label: 'content 10' },
-        { id: 23, label: 'content 11' },
-        { id: 25, label: 'content 12' },
-        { id: 27, label: 'content 13' },
-        { id: 29, label: 'content 14' },
-        { id: 31, label: 'content 15' },
-        { id: 33, label: 'content 16' },
-        { id: 35, label: 'content 17' },
-        { id: 37, label: 'content 18' },
-        { id: 39, label: 'content 19' },
-        { id: 5, label: 'content 2' },
-        { id: 41, label: 'content 20' },
-        { id: 7, label: 'content 3' },
-        { id: 9, label: 'content 4' },
-        { id: 11, label: 'content 5' },
-        { id: 13, label: 'content 6' },
-        { id: 15, label: 'content 7' },
-        { id: 17, label: 'content 8' },
-        { id: 19, label: 'content 9' },
-        { id: 36, label: 'content 9b' },
-        { id: 43, label: 'content 9a' }
-      ]
-
-      const workspaceListSortedByFolderAndNaturally = [
-        { id: 1, label: 'content 0' },
-        { id: 3, label: 'content 1' },
-        { id: 5, label: 'content 2' },
-        { id: 7, label: 'content 3' },
-        { id: 9, label: 'content 4' },
-        { id: 11, label: 'content 5' },
-        { id: 13, label: 'content 6' },
-        { id: 15, label: 'content 7' },
-        { id: 17, label: 'content 8' },
-        { id: 19, label: 'content 9' },
-        { id: 43, label: 'content 9a' },
-        { id: 36, label: 'content 9b' },
-        { id: 21, label: 'content 10' },
-        { id: 23, label: 'content 11' },
-        { id: 25, label: 'content 12' },
-        { id: 27, label: 'content 13' },
-        { id: 29, label: 'content 14' },
-        { id: 31, label: 'content 15' },
-        { id: 33, label: 'content 16' },
-        { id: 35, label: 'content 17' },
-        { id: 37, label: 'content 18' },
-        { id: 39, label: 'content 19' },
-        { id: 41, label: 'content 20' }
-      ]
-
-      sortWorkspaceList(workspaceList, 'en')
-      expect(workspaceList).to.deep.equal(workspaceListSortedByFolderAndNaturally)
-    })
-  })
-
   describe('Function buildFilePreviewUrl', () => {
     it('should URL-encode the file name', () => {
       expect(
@@ -614,134 +544,148 @@ describe('helper.js', () => {
     })
   })
 
-  describe('Function sortTimelineByDate()', () => {
-    it('should sort the timeline array for creation date', () => {
-      const timelineData = [
-        { created_raw: 1 },
-        { created_raw: 3 },
-        { created_raw: 21 },
-        { created_raw: 23 },
-        { created_raw: 35 },
-        { created_raw: 5 },
-        { created_raw: 41 },
-        { created_raw: 7 },
-        { created_raw: 19 },
-        { created_raw: 36 },
-        { created_raw: 43 }
-      ]
+  describe('stringIncludes()', () => {
+    const token = 'abc'
+    const tests = [
+      {
+        title: 'should return false with an undefined string and token',
+        expect: false
+      },
+      {
+        title: 'should return false with an undefined string',
+        token: token,
+        expect: false
+      },
+      {
+        title: 'should return false with an undefined token',
+        value: 'hello there',
+        expect: false
+      },
+      {
+        title: 'should return false with an empty string and token',
+        value: '',
+        token: '',
+        expect: false
+      },
+      {
+        title: 'should return false with an empty token',
+        value: 'general kenobi',
+        token: '',
+        expect: false
+      },
+      {
+        title: 'should return false with an empty string',
+        value: '',
+        token: token,
+        expect: false
+      },
+      {
+        title: 'should return false with smaller string (1 char)',
+        value: 'a',
+        token: token,
+        expect: false
+      },
+      {
+        title: 'should return false with smaller string (2 char)',
+        value: 'ab',
+        token: token,
+        expect: false
+      },
+      {
+        title: 'should return true with an exact match (case matching)',
+        value: 'abc',
+        token: token,
+        expect: true
+      },
+      {
+        title: 'should return true with a greater string (start) (case matching)',
+        value: 'abcdefghijkl',
+        token: token,
+        expect: true
+      },
+      {
+        title: 'should return true with a greater string (middle) (case matching)',
+        value: 'defgabchijkl',
+        token: token,
+        expect: true
+      },
+      {
+        title: 'should return true with a greater string (end) (case matching)',
+        value: 'defghijklabc',
+        token: token,
+        expect: true
+      },
+      {
+        title: 'should return true with token repeated in string (case matching)',
+        value: 'deabcfghiabcjklabc',
+        token: token,
+        expect: true
+      },
+      {
+        title: 'should return true with an exact match (case not matching)',
+        value: 'Abc',
+        token: token,
+        expect: true
+      },
+      {
+        title: 'should return true with a greater string (start) (case not matching)',
+        value: 'aBcdefghijkl',
+        token: token,
+        expect: true
+      },
+      {
+        title: 'should return true with a greater string (middle) (case not matching)',
+        value: 'defgaBChijkl',
+        token: token,
+        expect: true
+      },
+      {
+        title: 'should return true with a greater string (end) (case not matching)',
+        value: 'defghijklAbC',
+        token: token,
+        expect: true
+      },
+      {
+        title: 'should return true with token repeated in string (case not matching)',
+        value: 'deAbcfghiaBcjklabc',
+        token: token,
+        expect: true
+      },
+      {
+        title: 'should return false with token scattered in string',
+        value: 'f38kqV89oxyPp%^h98F2a7kYinuyj!b@po1129xEst#UP3CZSp5N',
+        token: token,
+        expect: false
+      },
+      {
+        title: 'should return true in string with special characters',
+        value: 'f38kqV89oxyPp\0x% fðßghœþäöabcö«öó³¤€²³¤¹²ähgf»¬æææ¤̛‘’¥FGGØÖÅØ§÷áßþghœøïúhœö¶```ðßfgðëfühfþg’‘öóœþüïåþ²³äëþ²³¹ëä¤œø³²åóáøç¶öí¶óíó«úüïßðfë^h98 \tF2a7\nYinuyj!b@po1129x\tEst#UP3CZSp5N',
+        token: token,
+        expect: true
+      },
+      {
+        title: 'should return true in string and token with special characters',
+        value: 'f38kqV89oxyPp\0x% fðßghœþäöabcö«öó³¤€²³¤¹²ähgf»¬æææ¤̛‘’¥FGGØÖÅØ§÷áßþghœøïúhœö¶```ðßfgðëfühfþg’‘öóœþüïåþ²³äëþ²³¹ëä¤œø³²åóáøç¶öí¶óíó«úüïßðfë^h98 \tF2a7\nYinuyj!b@po1129x\tEst#UP3CZSp5N',
+        token: '\0x% fðßghœþäöab',
+        expect: true
+      },
+      {
+        title: 'should return false in string with special characters when there is no match',
+        value: 'f38kqV89oxyPp\0x% fðßghœþäöö«öó³¤€²³¤¹²ähgf»¬æææ¤̛‘’¥FGGØÖÅØ§÷áßþghœøïúhœö¶```ðßfgðëfühfþg’‘öóœþüïåþ²³äëþ²³¹ëä¤œø³²åóáøç¶öí¶óíó«úüïßðfë^h98 \tF2a7\nYinuyj!b@po1129x\tEst#UP3CZSp5N',
+        token: token,
+        expect: false
+      },
+      {
+        title: 'should return false in string and token with special characters when there is no match',
+        value: 'f38kqV89oxyPp\0x% fðßghœþäöabcö«öó³¤€²³¤¹²ähgf»¬æææ¤̛‘’¥FGGØÖÅØ§÷áßþghœøïúhœö¶```ðßfgðëfühfþg’‘öóœþüïåþ²³äëþ²³¹ëä¤œø³²åóáøç¶öí¶óíó«úüïßðfë^h98 \tF2a7\nYinuyj!b@po1129x\tEst#UP3CZSp5N',
+        token: '\0x% fðßgœþäöab',
+        expect: false
+      }
+    ]
 
-      const sortedTimelineData = [
-        { created_raw: 1 },
-        { created_raw: 3 },
-        { created_raw: 5 },
-        { created_raw: 7 },
-        { created_raw: 19 },
-        { created_raw: 21 },
-        { created_raw: 23 },
-        { created_raw: 35 },
-        { created_raw: 36 },
-        { created_raw: 41 },
-        { created_raw: 43 }
-      ]
-
-      expect(sortTimelineByDate(timelineData)).to.deep.equal(sortedTimelineData)
-    })
-
-    describe('if two elements has same creation date', () => {
-      it('should sort two revision by revision_id', () => {
-        const timelineData = [
-          { created_raw: 1 },
-          { created_raw: 3 },
-          { created_raw: 21 },
-          { created_raw: 23 },
-          { created_raw: 43, revision_id: 5 },
-          { created_raw: 5 },
-          { created_raw: 41 },
-          { created_raw: 7 },
-          { created_raw: 19 },
-          { created_raw: 36 },
-          { created_raw: 43, revision_id: 1 }
-        ]
-
-        const sortedTimelineData = [
-          { created_raw: 1 },
-          { created_raw: 3 },
-          { created_raw: 5 },
-          { created_raw: 7 },
-          { created_raw: 19 },
-          { created_raw: 21 },
-          { created_raw: 23 },
-          { created_raw: 36 },
-          { created_raw: 41 },
-          { created_raw: 43, revision_id: 1 },
-          { created_raw: 43, revision_id: 5 }
-        ]
-
-        expect(sortTimelineByDate(timelineData)).to.deep.equal(sortedTimelineData)
-      })
-
-      it('should sort two comments by content_id', () => {
-        const timelineData = [
-          { created_raw: 1 },
-          { created_raw: 3 },
-          { created_raw: 21 },
-          { created_raw: 23 },
-          { created_raw: 43, content_id: 8 },
-          { created_raw: 5 },
-          { created_raw: 41 },
-          { created_raw: 7 },
-          { created_raw: 19 },
-          { created_raw: 36 },
-          { created_raw: 43, content_id: 9 }
-        ]
-
-        const sortedTimelineData = [
-          { created_raw: 1 },
-          { created_raw: 3 },
-          { created_raw: 5 },
-          { created_raw: 7 },
-          { created_raw: 19 },
-          { created_raw: 21 },
-          { created_raw: 23 },
-          { created_raw: 36 },
-          { created_raw: 41 },
-          { created_raw: 43, content_id: 8 },
-          { created_raw: 43, content_id: 9 }
-        ]
-
-        expect(sortTimelineByDate(timelineData)).to.deep.equal(sortedTimelineData)
-      })
-
-      it('should choose the revision first between a revision and a comment', () => {
-        const timelineData = [
-          { created_raw: 1 },
-          { created_raw: 3 },
-          { created_raw: 21 },
-          { created_raw: 23 },
-          { created_raw: 43, revision_id: 95, content_id: 63 },
-          { created_raw: 5 },
-          { created_raw: 41 },
-          { created_raw: 7 },
-          { created_raw: 19 },
-          { created_raw: 36 },
-          { created_raw: 43, content_id: 4 }
-        ]
-
-        const sortedTimelineData = [
-          { created_raw: 1 },
-          { created_raw: 3 },
-          { created_raw: 5 },
-          { created_raw: 7 },
-          { created_raw: 19 },
-          { created_raw: 21 },
-          { created_raw: 23 },
-          { created_raw: 36 },
-          { created_raw: 41 },
-          { created_raw: 43, revision_id: 95, content_id: 63 },
-          { created_raw: 43, content_id: 4 }
-        ]
-
-        expect(sortTimelineByDate(timelineData)).to.deep.equal(sortedTimelineData)
+    tests.forEach(test => {
+      it(test.title, () => {
+        expect(stringIncludes(test.token)(test.value)).to.equal(test.expect)
       })
     })
   })

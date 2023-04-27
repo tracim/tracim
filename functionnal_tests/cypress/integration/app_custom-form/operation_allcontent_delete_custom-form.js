@@ -23,8 +23,6 @@ describe('operation :: workspace > delete > custom-form', function () {
     cy.get('.custom-form.visible').should('be.visible')
     cy.get('.custom-form.visible .custom-form__contentpage__messagelist__version.revision').should('be.visible')
     cy.get('.custom-form.visible .wsContentGeneric__header__title').contains(titre1)
-    //        cy.get('iframe#wysiwygNewVersion_ifr').should('be.visible')
-    //        const $tinymce = Cypress.$.event(document)
     cy.get('.custom-form.visible .wsContentGeneric__header__close.custom-form__header__close').should('be.visible')
     cy.get('.custom-form.visible .wsContentGeneric__header__close.custom-form__header__close').click()
     cy.get('.custom-form.visible').should('not.be.visible')

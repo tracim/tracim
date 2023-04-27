@@ -48,5 +48,19 @@
   "Choose the user's type": "Escolher o tipo do utilizador",
   "Type": "Tipo",
   "Create and add to spaces": "Criar e acrescentar aos espaços",
-  "Create": "Criar"
+  "Create": "Criar",
+  "Inactive": "Inativo",
+  "Filter users": "Filtrar usuários",
+  "There are no users that matches you filter": "Nenhum usuário corresponde ao seu filtro",
+  "Filter spaces": "Filtrar espaços",
+  "There are no spaces that matches you filter": "Não há espaços que correspondem ao seu filtro",
+  "Sort by full name": "Ordenar por nome completo",
+  "Sort by username": "Ordenar por identificador",
+  "Sort by email": "Ordenar por e-mail",
+  "Id": "ID",
+  "Sort by id": "Ordenar por ID",
+  "Sort by type": "Ordenar por tipo",
+  "Sort by title": "Ordenar por título",
+  "Sort by description": "Ordenar por descrição",
+  "Sort by number of members": "Ordenar por número de membros"
 }

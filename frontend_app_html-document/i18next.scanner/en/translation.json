@@ -8,7 +8,6 @@
   "Edit": "Edit",
   "A content with the same name already exists": "Content with the same name already exists",
   "Error while creating note": "Error while creating note",
-  "Error while saving the comment": "Error while saving the comment",
   "This content is archived": "This content is archived",
   "Restore": "Restore",
   "This content is deleted": "This content is deleted",
@@ -34,5 +33,7 @@
   "Download as PDF": "Download as PDF",
   "Tasks": "Tasks",
   "The link has been copied to clipboard": "Link copied to clipboard",
-  "Copy content link": "Copy content link"
+  "Copy content link": "Copy content link",
+  "Cancel": "Cancel",
+  "Validate": "Validate"
 }

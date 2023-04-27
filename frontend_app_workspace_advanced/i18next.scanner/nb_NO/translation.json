@@ -4,7 +4,6 @@
   "Default role:": "Forvalgt rolle:",
   "Description": "Beskrivelse",
   "Error while saving new default role": "Kunne ikke lagre ny forvalgt rolle",
-  "Error while saving the new version": "Kunne ikke lagre den nye versjonen",
   "Error while loading members list": "Kunne ikke laste inn medlemslisten",
   "Add a member": "Legg til et medlem",
   "Save successful": "Lagret",
@@ -12,7 +11,6 @@
   "Please set a name, an email or a username": "Velg et navn, en e-postadresse, eller et brukernavn",
   "Please set a role": "Sett en rolle",
   "Member added": "Medlem lagt til",
-  "Space's description": "Beskrivelse av rommet",
   "Delete space": "Slett rom",
   "Delete": "Slett",
   "This account is deactivated": "Denne kontoen er deaktivert",
@@ -59,5 +57,9 @@
   "You cannot change this member role because there are no other space managers.": "Du kan ikke endre dette medlemmets rolle, siden det ikke finnes noen andre rom-håndterere.",
   "Error while deactivating agenda": "Kunne ikke skru av agendaen",
   "Error while activating agenda": "Kunne ikke slå på agendaen",
-  "This is the role that members will have by default when they join your space (for open and on request spaces only).": "Rollen medlemmer vil ha som forvalg når det tar del i rommet ditt (dvs. for åpne og forespørselsrom)."
+  "This is the role that members will have by default when they join your space (for open and on request spaces only).": "Rollen medlemmer vil ha som forvalg når det tar del i rommet ditt (dvs. for åpne og forespørselsrom).",
+  "Filter users": "Filtrer brukere",
+  "Description of the space": "Beskrivelse av rommet",
+  "This space doesn't have a description yet.": "Dette rommet har ikke en beskrivelse enda.",
+  "Edit": "Rediger"
 }

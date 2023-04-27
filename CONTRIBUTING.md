@@ -15,29 +15,29 @@ Once you have finished your development and you want to merge it on `develop`, p
 
 ### Contribute to the translation
 
-[Tracim](https://www.algoo.fr/fr/tracim) translation is done through [Weblate](https://weblate.org/tracim/tracim/).<br>
+[Tracim](https://www.tracim.fr) translation is done through [Weblate](https://weblate.org/tracim/tracim/).  
 Head over to [Weblate](https://weblate.org/tracim/tracim/) and contribute to the translation.
 
 ### Develop a new feature
 
-You have a new feature to develop?<br>
-Let's start by opening an issue with the feature template.<br>
-Then create a branch from develop, which should be named `feat/<your ticket title>`.<br>
-Now you can start coding :)
+You have a new feature to develop?  
+Let's start by opening an issue with the feature template.  
+Then create a branch from develop, which should be named `feat/<your ticket title>`.  
+Now you can start coding 😄
 
 #### Development journey
 
 ##### Build
 
-See [build](./doc/BUILD.md) to see how to build [Tracim](https://www.algoo.fr/fr/tracim). Especially the [development build section](./doc/BUILD.md#development-build).
+See [build](./doc/BUILD.md) to see how to build [Tracim](https://www.tracim.fr). Especially the [development build section](./doc/BUILD.md#development-build).
 
 ##### Testing
 
-See [testing](./doc/TESTING.md) to see how to test [Tracim](https://www.algoo.fr/fr/tracim) and your developments.
+See [testing](./doc/TESTING.md) to see how to test [Tracim](https://www.tracim.fr) and your developments.
 
-##### Commiting to the repository
+##### Committing to the repository
 
-First, you need to sign every commit you make with the `-s` arg of `git commit` command.<br>
+First, you need to sign every commit you make with the `-s` arg of `git commit` command.  
 See [git signature](https://git-scm.com/docs/git-commit#git-commit--s).
 
 This will prove that you are the author of the commit and you have accepted the licenses ([MIT](https://opensource.org/licenses/MIT), [LGPLv3](https://www.gnu.org/licenses/lgpl-3.0.html) and [AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)) and [Developer Certificate of Origin](./doc/DCO).

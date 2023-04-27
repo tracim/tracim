@@ -26,11 +26,10 @@ import {
   getSubscriptions,
   postWorkspaceMember,
   deleteWorkspaceMember,
-  putMyselfWorkspaceDoNotify
+  putMyselfWorkspaceEmailNotificationType
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
-  updateUserWorkspaceSubscriptionNotif,
   setBreadcrumbs,
   setHeadTitle
 } from '../action-creator.sync.js'
@@ -197,8 +196,6 @@ export class Dashboard extends React.Component {
 
   handleClickCloseAddMemberBtn = () => this.setState({ displayNewMemberForm: false })
 
-  handleToggleNotifBtn = () => this.setState(prevState => ({ displayNotifBtn: !prevState.displayNotifBtn }))
-
   handleToggleWebdavBtn = () => this.setState(prevState => ({ displayWebdavBtn: !prevState.displayWebdavBtn }))
 
   handleSearchUser = async personalDataToSearch => {
@@ -356,21 +353,20 @@ export class Dashboard extends React.Component {
     this.setState({ advancedDashboardOpenedId: props.currentWorkspace.id })
   }
 
-  handleClickAddNotification = async () => {
+  handleClickChangeEmailNotificationType = async (emailNotificationType) => {
     const { props } = this
-    const fetchWorkspaceUserAddNotification = await props.dispatch(putMyselfWorkspaceDoNotify(props.currentWorkspace.id, true))
-    switch (fetchWorkspaceUserAddNotification.status) {
-      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.userId, props.currentWorkspace.id, true)); break
-      default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
-    }
-  }
 
-  handleClickRemoveNotification = async () => {
-    const { props } = this
-    const fetchWorkspaceUserAddNotification = await props.dispatch(putMyselfWorkspaceDoNotify(props.currentWorkspace.id, false))
-    switch (fetchWorkspaceUserAddNotification.status) {
-      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.userId, props.currentWorkspace.id, false)); break
-      default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
+    let fetchChangeEmailNotificationType
+    try {
+      fetchChangeEmailNotificationType = await props.dispatch(putMyselfWorkspaceEmailNotificationType(
+        props.currentWorkspace.id, emailNotificationType
+      ))
+    } catch (e) {
+      props.dispatch(newFlashMessage(props.t('Error while changing email subscription'), 'warning'))
+      console.error(
+        'Error while changing email subscription. handleClickChangeEmailNotificationType.',
+        fetchChangeEmailNotificationType
+      )
     }
   }
 
@@ -443,15 +439,6 @@ export class Dashboard extends React.Component {
       : []
     )
 
-    // INFO - CH - 2019-04-03 - hard coding the button "explore contents" since it is not an app for now
-    contentTypeButtonList.push({
-      slug: 'content/all', // INFO - CH - 2019-04-03 - This will be overridden but it avoid a unique key warning
-      ...props.currentWorkspace.sidebarEntryList.find(se => se.slug === 'contents/all'),
-      creationLabel: props.t('Explore contents'),
-      route: PAGE.WORKSPACE.CONTENT_LIST(props.currentWorkspace.id),
-      hexcolor: '#999' // INFO - CH - 2019-04-08 - different color from sidebar because it is more readable here
-    })
-
     const description = addExternalLinksIcons(props.currentWorkspace.description.trim())
 
     return (
@@ -481,15 +468,10 @@ export class Dashboard extends React.Component {
                         </div>
                       )
                     )}
-                    <div className='dashboard__workspace__detail__buttons'>
-                      <IconButton
-                        icon='fas fa-fw fa-cog'
-                        text={props.t('Space settings')}
-                        onClick={this.handleClickOpenAdvancedDashboard}
-                      />
-                    </div>
                   </div>
-                  {props.currentWorkspace && props.currentWorkspace.id && <WorkspaceRecentActivities workspaceId={props.currentWorkspace.id} />}
+                  {props.currentWorkspace && props.currentWorkspace.id && (
+                    <WorkspaceRecentActivities workspaceId={props.currentWorkspace.id} />
+                  )}
                 </div>
 
                 <div className='dashboard__workspace__rightMenu'>
@@ -502,9 +484,7 @@ export class Dashboard extends React.Component {
                       props.currentWorkspace.accessType === SPACE_TYPE.onRequest.slug
                     }
                     newSubscriptionRequestsNumber={state.newSubscriptionRequestsNumber}
-                    onClickToggleNotifBtn={this.handleToggleNotifBtn}
-                    onClickAddNotify={this.handleClickAddNotification}
-                    onClickRemoveNotify={this.handleClickRemoveNotification}
+                    onClickChangeEmailNotificationType={this.handleClickChangeEmailNotificationType}
                     t={props.t}
                   />
 
@@ -526,6 +506,15 @@ export class Dashboard extends React.Component {
                         />
                       )
                     })}
+
+                    <IconButton
+                      icon='fas fa-fw fa-cog'
+                      text={(userRoleIdInWorkspace >= ROLE.contentManager.id
+                        ? props.t('Space settings')
+                        : props.t('Space information')
+                      )}
+                      onClick={this.handleClickOpenAdvancedDashboard}
+                    />
                   </div>
 
                   <MemberList
@@ -541,8 +530,6 @@ export class Dashboard extends React.Component {
                     isLoading={state.isMemberListLoading}
                     onChangePersonalData={this.handleChangePersonalData}
                     onClickKnownMember={this.handleClickKnownMember}
-                    // createAccount={state.newMember.createAccount}
-                    // onChangeCreateAccount={this.handleChangeNewMemberCreateAccount}
                     role={state.newMember.role}
                     onChangeRole={this.handleChangeNewMemberRole}
                     onClickValidateNewMember={this.handleClickValidateNewMember}

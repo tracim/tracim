@@ -83,4 +83,11 @@ describe('Space settings in reader mode', () => {
     cy.get('[data-cy=IconButton_DeleteTagFromSpace]').should('not.exist')
     cy.get('.tagList__list__item__info').contains('Tag')
   })
+
+  it('should have the proper button label', () => {
+    cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
+    cy.contains('.pageTitleGeneric__title__label', 'My space')
+    cy.contains('.userstatus__role__text', 'Reader')
+    cy.contains('.dashboard__workspace__rightMenu__contents', 'Space information')
+  })
 })

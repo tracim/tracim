@@ -19,22 +19,23 @@ import {
 import {
   CONTENT_NAMESPACE,
   CONTENT_TYPE,
-  getContentPath,
-  GROUP_MENTION_TRANSLATION_LIST,
-  handleFetchResult,
-  Loading,
+  MENTION_CONSTANT,
   NUMBER_RESULTS_BY_PAGE,
   PAGE,
   PROFILE,
+  SORT_BY,
   SUBSCRIPTION_TYPE,
   TLM_CORE_EVENT_TYPE as TLM_EVENT,
   TLM_ENTITY_TYPE as TLM_ENTITY,
   TLM_SUB_TYPE as TLM_SUB,
   IconButton,
   ListItemWrapper,
+  Loading,
   PopinFixedHeader,
-  sortContentByCreatedDateAndID,
-  TracimComponent
+  TracimComponent,
+  getContentPath,
+  handleFetchResult,
+  sortListByMultipleCriteria
 } from 'tracim_frontend_lib'
 import { escape as escapeHtml, uniqBy } from 'lodash'
 import NotificationItem from '../component/NotificationItem.jsx'
@@ -93,15 +94,15 @@ const canBeGrouped = (notificationList, numberOfCriteria = NUMBER_OF_CRITERIA.TW
 
 // INFO - MP - 2022-05-24 - Add a notification to an existing group
 const addNotificationToGroup = (notification, notificationGroup) => {
-  notificationGroup.group = sortContentByCreatedDateAndID([notification, ...notificationGroup.group])
+  notificationGroup.group = sortListByMultipleCriteria([notification, ...notificationGroup.group], [SORT_BY.CREATION_DATE, SORT_BY.ID])
 
   notificationGroup.created = new Date(notification.created).getTime() < new Date(notificationGroup.created).getTime()
     ? notificationGroup.created
     : notification.created
 }
 
-// INFO - MP - 2022-05-24 - Check if I can create a group with the three notifications with two criterias
-// or six notifications with one criteria
+// INFO - MP - 2022-05-24 - Check if I can create a group with the three notifications with two criteria
+// or six notifications with one criterion
 const tryGroupingNotification = (notificationList) => {
   const twoCriteriaList = notificationList.slice(notificationList.length - 3)
   const twoCriteriaListContainsGroup = twoCriteriaList.some(notification => notification.group)
@@ -424,7 +425,7 @@ export const NotificationWall = props => {
     }
 
     if (entityType === TLM_ENTITY.MENTION && eventType === TLM_EVENT.CREATED) {
-      const groupMention = GROUP_MENTION_TRANSLATION_LIST.includes(notification.mention.recipient)
+      const groupMention = notification.mention.type === MENTION_CONSTANT.TYPE.ROLE
       const mentionEveryone = props.t('{{author}} mentioned everyone in {{content}}', i18nOpts)
       const mentionYou = props.t('{{author}} mentioned you in {{content}}', i18nOpts)
       const isHtmlDocument = notification.content.type === CONTENT_TYPE.HTML_DOCUMENT

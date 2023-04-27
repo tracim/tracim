@@ -16,6 +16,7 @@ from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
 from tracim_backend.lib.rq import RqQueueName
 from tracim_backend.lib.rq import get_redis_connection
 from tracim_backend.lib.rq import get_rq_queue
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
@@ -174,17 +175,23 @@ class TestNotificationsSync(object):
         workspace_api_factory,
         content_api_factory,
         mailhog,
+        role_api_factory,
         content_type_list,
     ):
-        uapi = user_api_factory.get(current_user=None)
-        current_user = uapi.get_one_by_email("admin@admin.admin")
-        # set admin as french, useful to verify if i18n work properly
-        current_user.lang = "fr"
+        user_api = user_api_factory.get(current_user=None)
+        role_api = role_api_factory.get(current_user=None)
+        current_user = user_api.get_one_by_email("admin@admin.admin")
         # Create new user with notification enabled on w1 workspace
-        wapi = workspace_api_factory.get(current_user=current_user)
-        workspace = wapi.get_one_by_filemanager_filename("Recipes.space")
-        user = uapi.get_one_by_email("bob@fsf.local")
-        wapi.enable_notifications(user, workspace)
+        space_api = workspace_api_factory.get(current_user=current_user)
+        workspace = space_api.get_one_by_filemanager_filename("Recipes.space")
+        user = user_api.get_one_by_email("bob@fsf.local")
+
+        role = role_api.get_one(user_id=current_user.user_id, workspace_id=workspace.workspace_id,)
+        role_api.update_role(
+            role=role,
+            email_notification_type_value=EmailNotificationType.INDIVIDUAL.value,
+            save_now=True,
+        )
 
         api = content_api_factory.get(current_user=user)
         item = api.create(
@@ -221,17 +228,25 @@ class TestNotificationsSync(object):
         workspace_api_factory,
         content_api_factory,
         mailhog,
+        role_api_factory,
         content_type_list,
     ):
-        uapi = user_api_factory.get(current_user=None)
-        current_user = uapi.get_one_by_email("admin@admin.admin")
+        user_api = user_api_factory.get(current_user=None)
+        role_api = role_api_factory.get(current_user=None)
+        current_user = user_api.get_one_by_email("admin@admin.admin")
         # set admin as french, useful to verify if i18n work properly
         current_user.lang = "fr"
         # Create new user with notification enabled on w1 workspace
-        wapi = workspace_api_factory.get(current_user=current_user)
-        workspace = wapi.get_one_by_filemanager_filename("Recipes.space")
-        user = uapi.get_one_by_email("bob@fsf.local")
-        wapi.enable_notifications(user, workspace)
+        space_api = workspace_api_factory.get(current_user=current_user)
+        workspace = space_api.get_one_by_filemanager_filename("Recipes.space")
+        user = user_api.get_one_by_email("bob@fsf.local")
+
+        role = role_api.get_one(user_id=current_user.user_id, workspace_id=workspace.workspace_id,)
+        role_api.update_role(
+            role=role,
+            email_notification_type_value=EmailNotificationType.INDIVIDUAL.value,
+            save_now=True,
+        )
 
         api = content_api_factory.get(current_user=user)
         item = api.create(
@@ -254,6 +269,7 @@ class TestNotificationsSync(object):
 
         # check mail received
         response = mailhog.get_mailhog_mails()
+        assert len(response) > 0
         headers = response[0]["Content"]["Headers"]
         assert headers["From"][0] == '"Bob i. via Tracim" <test_user_from+3@localhost>'
         assert headers["To"][0] == "Global manager <admin@admin.admin>"
@@ -319,16 +335,24 @@ class TestNotificationsAsync(object):
         workspace_api_factory,
         content_api_factory,
         mailhog,
+        role_api_factory,
         app_config,
         content_type_list,
     ):
-        uapi = user_api_factory.get(current_user=None)
-        current_user = uapi.get_one_by_email("admin@admin.admin")
+        user_api = user_api_factory.get(current_user=None)
+        role_api = role_api_factory.get(current_user=None)
+        current_user = user_api.get_one_by_email("admin@admin.admin")
         # Create new user with notification enabled on w1 workspace
-        wapi = workspace_api_factory.get(current_user=current_user)
-        workspace = wapi.get_one_by_filemanager_filename("Recipes.space")
-        user = uapi.get_one_by_email("bob@fsf.local")
-        wapi.enable_notifications(user, workspace)
+        space_api = workspace_api_factory.get(current_user=current_user)
+        workspace = space_api.get_one_by_filemanager_filename("Recipes.space")
+        user = user_api.get_one_by_email("bob@fsf.local")
+
+        role = role_api.get_one(user_id=current_user.user_id, workspace_id=workspace.workspace_id,)
+        role_api.update_role(
+            role=role,
+            email_notification_type_value=EmailNotificationType.INDIVIDUAL.value,
+            save_now=True,
+        )
 
         api = content_api_factory.get(current_user=user)
         item = api.create(
@@ -353,6 +377,7 @@ class TestNotificationsAsync(object):
         worker.work(burst=True)
         # check mail received
         response = mailhog.get_mailhog_mails()
+        assert len(response) > 0
         headers = response[0]["Content"]["Headers"]
         assert headers["From"][0] == '"Bob i. via Tracim" <test_user_from+3@localhost>'
         assert headers["To"][0] == "Global manager <admin@admin.admin>"

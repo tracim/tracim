@@ -5,9 +5,9 @@ from bs4 import BeautifulSoup
 from bs4 import Tag
 from pluggy import PluginManager
 
-from tracim_backend import UserDoesNotExist
-from tracim_backend.app_models.contents import COMMENT_TYPE
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import InvalidMention
 from tracim_backend.exceptions import UserNotMemberOfWorkspace
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.event import BaseLiveMessageBuilder
@@ -18,35 +18,52 @@ from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimContext
+from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import Event
 from tracim_backend.models.event import OperationType
-from tracim_backend.models.mention import ALL__GROUP_MENTIONS
+from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.models.tracim_session import TracimSession
+
+USER_ID = "userid"
+ROLE_ID = "roleid"
+
+
+class MentionType:
+    USER = 1
+    ROLE = 2
 
 
 class Mention:
     """A mention with its attributes: id and recipient."""
 
-    def __init__(self, recipient: str, id_: str) -> None:
+    def __init__(self, type: MentionType, recipient: int, content_id: int) -> None:
+        self.type = type
         self.recipient = recipient
-        self.id = id_
+        self.content_id = content_id
 
     def __eq__(self, other) -> bool:
         return (
-            isinstance(other, Mention) and other.recipient == self.recipient and other.id == self.id
+            isinstance(other, Mention)
+            and self.type == other.type
+            and self.recipient == other.recipient
+            and self.content_id == other.content_id
         )
 
     def __repr__(self) -> str:
-        return "<Mention(recipient={}, id={})>".format(self.recipient, self.id)
+        return (
+            f"<Mention(type={self.type}, recipient={self.recipient}, content_id={self.content_id})>"
+        )
 
     def __hash__(self) -> int:
-        return hash(self.id)
+        return hash((self.type, self.recipient, self.content_id))
 
 
 class BaseMentionParser(abc.ABC):
+    """Base class for mention parsers."""
+
     @abc.abstractmethod
     def get_mentions(self, revision: ContentRevisionRO) -> typing.List[Mention]:
         """Parse mentions found in the given content revision and return them.
@@ -63,33 +80,76 @@ class DescriptionMentionParser(BaseMentionParser):
     mentions found in it considering description is HTML.
 
     HTML mentions must have the following structure:
-      <span id="mention-{a unique id}">@recipient</span>
+      `<html-mention {DATA}></html-mention>`
+
+    DATA should be one of theses:
+     - userid="{user_id}"
+     - roleid="{role_id}"
     """
 
-    MENTION_ID_START = "mention-"
-    MENTION_TAG_NAME = "span"
+    MENTION_TAG_NAME = "html-mention"
 
     def get_mentions(self, revision: ContentRevisionRO) -> typing.List[Mention]:
-        return self.get_mentions_from_html(revision.raw_content)
+        return self.get_mentions_from_html(revision.content_id, revision.raw_content)
 
     @classmethod
     def is_html_mention_tag(cls, tag: Tag) -> bool:
-        return (
-            cls.MENTION_TAG_NAME == tag.name
-            and tag.has_attr("id")
-            and tag["id"].startswith(cls.MENTION_ID_START)
-        )
+        return cls.MENTION_TAG_NAME == tag.name and (tag.has_attr(USER_ID) or tag.has_attr(ROLE_ID))
 
     @classmethod
-    def get_mentions_from_html(cls, html: str) -> typing.List[Mention]:
-        # NOTE S.G - 2020-07-30: using lxml parser as it is the fastest in beautifulsoup
+    def get_mentions_from_html(cls, content_id: int, html: str) -> typing.List[Mention]:
+        # NOTE S.G - 2020-07-30 - using lxml parser as it is the fastest in beautifulsoup
         soup = BeautifulSoup(html, "lxml")
         mentions = []
         for mention_tag in soup.find_all(DescriptionMentionParser.is_html_mention_tag):
-            recipient = mention_tag.string[1:] if mention_tag.string else ""
-            id_ = mention_tag["id"].replace(cls.MENTION_ID_START, "")
-            mentions.append(Mention(recipient, id_))
+            user_id = mention_tag.attrs.get(USER_ID)
+            role_id = mention_tag.attrs.get(ROLE_ID)
+            if user_id and user_id != "":
+                mentions.append(Mention(MentionType.USER, int(user_id), content_id))
+                continue
+            elif role_id and role_id != "":
+                mentions.append(Mention(MentionType.ROLE, int(role_id), content_id))
+                continue
+            raise InvalidMention(
+                f"The current mention is empty: no userid and no roleid specified."
+            )
         return mentions
+
+    @classmethod
+    def get_email_html_from_html_with_mention_tags(
+        cls, session: TracimSession, cfg: CFG, translator: Translator, html: str
+    ) -> str:
+        """
+        This method will replace every mention tag by a simple string mention.
+        :param session: session to use for database access
+        :param cfg: current config
+        :param translator: translator to use for role translation
+        :param html: html to parse
+        :return: html with mention tags replaced by simple string mention
+
+        Example:
+        ```
+        html = <div>Hello <html-mention userid="1"></html-mention>!</div>
+        return = <div>Hello @foo!</div>
+        ```
+        Where @foo is the username of user with id 1
+        """
+
+        soup = BeautifulSoup(html, "lxml")
+        _ = translator.get_translation
+
+        for mention_tag in soup.find_all(DescriptionMentionParser.is_html_mention_tag):
+            user_id = mention_tag.attrs.get(USER_ID)
+            role_id = mention_tag.attrs.get(ROLE_ID)
+            if user_id and user_id != "":
+                user = UserApi(current_user=None, session=session, config=cfg).get_one(user_id)
+                mention_tag.replaceWith(f"@{user.display_name}")
+            elif role_id and role_id != "":
+                # TODO - MP - 2023-04-24 - Since we don't have any other role mention than "all"
+                # we can hardcode it for now. We should find a way to handle other roles
+                all = _("all")
+                mention_tag.replaceWith(f"@{all}")
+        return str(soup)
 
 
 class MentionBuilder:
@@ -103,7 +163,7 @@ class MentionBuilder:
     """
 
     _parsers = {
-        COMMENT_TYPE: DescriptionMentionParser()
+        ContentTypeSlug.COMMENT.value: DescriptionMentionParser()
     }  # type: typing.Dict[str, BaseMentionParser]
 
     MENTION_FIELD = "mention"
@@ -156,45 +216,33 @@ class MentionBuilder:
     def get_receiver_ids(
         cls, event: Event, session: TracimSession, config: CFG
     ) -> typing.Iterable[int]:
-        recipient = event.fields[cls.MENTION_FIELD]["recipient"]
-        if recipient in ALL__GROUP_MENTIONS:
-            # send to all workspace users
+        mention = event.fields.get(cls.MENTION_FIELD)
+        recipient = mention["recipient"]
+        if mention["type"] == MentionType.USER:
+            return [int(recipient)]
+        elif mention["type"] == MentionType.ROLE:
             role_api = RoleApi(session=session, config=config, current_user=None)
-            workspace_id = event.workspace_id
-            return role_api.get_workspace_member_ids(workspace_id)
-        else:
-            # send to mentioned user
-            user_api = UserApi(session=session, config=config, current_user=None)
-            try:
-                user = user_api.get_one_by_username(recipient)
-                return [user.user_id]
-            except UserDoesNotExist:
-                logger.warning(
-                    cls,
-                    "Could not find user with username {} while obtaining the receiver list of event {}, "
-                    "user may have changed their username.".format(recipient, event.event_id),
-                )
-                return []
+            min_level = WorkspaceRoles.get_role_from_level(int(recipient))
+            return role_api.get_workspace_member_ids(event.workspace_id, min_level)
 
     @classmethod
     def _create_mention_events(
         cls, mentions: typing.Iterable[Mention], content: Content, context: TracimContext
     ) -> None:
         role_api = RoleApi(session=context.dbsession, config=context.app_config, current_user=None)
-
-        workspace_members_usernames = [
-            user.username for user in role_api.get_workspace_members(content.workspace_id)
-        ]
+        space_members_ids = role_api.get_workspace_member_ids(content.workspace_id)
 
         for mention in mentions:
+            if mention.type == MentionType.ROLE:
+                continue
+
             recipient = mention.recipient
-            if (
-                recipient not in workspace_members_usernames
-                and recipient not in ALL__GROUP_MENTIONS
-            ):
+            if int(recipient) not in space_members_ids:
                 raise UserNotMemberOfWorkspace(
-                    "This user is not a member of this workspace: {}".format(mention.recipient)
+                    f"The user of id {mention.recipient} is not a member of the workspace of id \
+                        {content.workspace_id}"
                 )
+                # TODO - MP - 2022-11-29 - We should send the notification to a dummy user
 
         current_user = context.safe_current_user()
         content_api = ContentApi(context.dbsession, current_user, context.app_config)
@@ -212,7 +260,13 @@ class MentionBuilder:
 
         event_api = EventApi(current_user, context.dbsession, context.app_config)
         for mention in mentions:
-            fields = {cls.MENTION_FIELD: {"recipient": mention.recipient, "id": mention.id}}
+            fields = {
+                cls.MENTION_FIELD: {
+                    "type": mention.type,
+                    "recipient": mention.recipient,
+                    "content_id": mention.content_id,
+                }
+            }
             fields.update(common_fields)
             event_api.create_event(
                 entity_type=EntityType.MENTION,

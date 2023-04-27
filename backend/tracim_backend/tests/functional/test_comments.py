@@ -4,9 +4,10 @@ import pytest
 import responses
 import transaction
 
-from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.translate.services.systran import FILE_TRANSLATION_ENDPOINT
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
@@ -17,10 +18,10 @@ oldest_comment = {
     "parent_content_type": "thread",
     "parent_content_namespace": "content",
     "parent_label": "Best Cakes?",
-    "raw_content": "<p>What is for you the best cake ever? <br/> I personnally vote for Chocolate cupcake!</p>",
+    "raw_content": "<p>What is for you the best cake ever? <br/> I personally vote for Chocolate cupcake!</p>",
     "author": {
         "user_id": 1,
-        "has_avatar": False,
+        "has_avatar": True,
         "public_name": "Global manager",
         "username": "TheAdmin",
     },
@@ -33,7 +34,7 @@ newest_comment = {
     "parent_content_namespace": "content",
     "parent_label": "Best Cakes?",
     "raw_content": "<p>You are right, but Kouign-amann are clearly better.</p>",
-    "author": {"user_id": 4, "has_avatar": False, "public_name": "John Reader", "username": None},
+    "author": {"user_id": 4, "has_avatar": True, "public_name": "John Reader", "username": None},
 }
 
 
@@ -121,7 +122,7 @@ class TestCommentsEndpoint(object):
         assert comment["raw_content"] == raw_content
         assert comment["author"]
         assert comment["author"]["user_id"] == 1
-        assert comment["author"]["has_avatar"] is False
+        assert comment["author"]["has_avatar"] is True
         assert comment["author"]["public_name"] == "Global manager"
         assert comment["author"]["username"] == "TheAdmin"
 
@@ -141,7 +142,7 @@ class TestCommentsEndpoint(object):
         workspace_api = workspace_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         content_api = content_api_factory.get()
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=ContentTypeSlug.ANY)
         test_thread = content_api.create(
             content_type_slug=content_type_list.Thread.slug,
             workspace=business_workspace,
@@ -171,7 +172,7 @@ class TestCommentsEndpoint(object):
         assert comment["author"]
         assert comment["author"]["user_id"] == admin_user.user_id
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
-        assert comment["author"]["has_avatar"] is False
+        assert comment["author"]["has_avatar"] is True
         assert comment["author"]["public_name"] == admin_user.display_name
         assert comment["author"]["username"] == admin_user.username
         # TODO - G.M - 2018-06-179 - better check for datetime
@@ -196,7 +197,7 @@ class TestCommentsEndpoint(object):
         workspace_api = workspace_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         content_api = content_api_factory.get()
-        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        tool_folder = content_api.get_one(1, content_type=ContentTypeSlug.ANY)
         test_thread = content_api.create(
             content_type_slug=content_type_list.Thread.slug,
             workspace=business_workspace,
@@ -351,50 +352,28 @@ class TestCommentsEndpoint(object):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
 
-    def test_api__post_content_comment__err_400__nasty_mention(
-        self, web_testapp, html_with_nasty_mention
+    @pytest.mark.parametrize(
+        "comment_to_send, expected_error",
+        [
+            ("html_with_nasty_mention", ErrorCode.USER_NOT_MEMBER_OF_WORKSPACE),
+            ("html_with_wrong_user_mention", ErrorCode.USER_NOT_MEMBER_OF_WORKSPACE),
+            ("html_with_empty_mention", ErrorCode.INVALID_MENTION),
+        ],
+    )
+    def test_api__post_content_comment__err_400(
+        self, web_testapp, request, comment_to_send: str, expected_error: ErrorCode,
     ) -> None:
         """
         This test should raise an error as the html contains a mention to a user not member of the workspace
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"raw_content": html_with_nasty_mention}
+        params = {"raw_content": request.getfixturevalue(comment_to_send)}
         res = web_testapp.post_json(
             "/api/workspaces/2/contents/7/comments", params=params, status=400
         )
         assert res.json_body
         assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.USER_NOT_MEMBER_OF_WORKSPACE
-
-    def test_api__post_content_comment__err_400__user_not_member_of_workspace(
-        self, web_testapp, html_with_wrong_user_mention
-    ) -> None:
-        """
-        This test should raise an error as the html contains a mention to a user not member of the workspace
-        """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"raw_content": html_with_wrong_user_mention}
-        res = web_testapp.post_json(
-            "/api/workspaces/2/contents/7/comments", params=params, status=400
-        )
-        assert res.json_body
-        assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.USER_NOT_MEMBER_OF_WORKSPACE
-
-    def test_api__post_content_comment__err_400__empty_mention(
-        self, web_testapp, html_with_empty_mention
-    ) -> None:
-        """
-        This test should raise an error as the html contains a mention to a user not member of the workspace
-        """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"raw_content": html_with_empty_mention}
-        res = web_testapp.post_json(
-            "/api/workspaces/2/contents/7/comments", params=params, status=400
-        )
-        assert res.json_body
-        assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.USER_NOT_MEMBER_OF_WORKSPACE
+        assert res.json_body["code"] == expected_error
 
     def test_api__post_content_comment__ok__200__empty_iframes_are_not_deleted(
         self, web_testapp
@@ -466,7 +445,7 @@ class TestCommentsEndpoint(object):
 def create_doc_and_comment(workspace_api, content_api_note, content_api_comment):
     workspace = workspace_api.create_workspace("test")
     test_html_document = content_api_note.create(
-        content_type_slug=HTML_DOCUMENTS_TYPE,
+        content_type_slug=ContentTypeSlug.HTML_DOCUMENTS.value,
         workspace=workspace,
         label="just a content",
         do_save=True,
@@ -525,14 +504,22 @@ class TestEditComment(object):
         )
         assert new_res_get.json_body == res_put.json_body
 
-    def test_api__edit_comment__err_400__nasty_mention(
+    @pytest.mark.parametrize(
+        "comment_to_send, expected_error",
+        [
+            ("html_with_nasty_mention", ErrorCode.USER_NOT_MEMBER_OF_WORKSPACE),
+            ("html_with_wrong_user_mention", ErrorCode.USER_NOT_MEMBER_OF_WORKSPACE),
+            ("html_with_empty_mention", ErrorCode.INVALID_MENTION),
+        ],
+    )
+    def test_api__edit_comment__err_400(
         self,
         web_testapp,
         workspace_api_factory,
         content_api_factory,
-        content_type_list,
-        session,
-        html_with_nasty_mention,
+        request,
+        comment_to_send: str,
+        expected_error: ErrorCode,
     ) -> None:
         """
         This test should raise an error as the html contains a mention to a user not member of the workspace
@@ -550,7 +537,7 @@ class TestEditComment(object):
             status=200,
         )
         assert res_get.json_body["raw_content"] == "First version"
-        params = {"raw_content": html_with_nasty_mention}
+        params = {"raw_content": request.getfixturevalue(comment_to_send)}
         res = web_testapp.put_json(
             "/api/workspaces/{}/contents/{}/comments/{}".format(
                 workspace.workspace_id, test_html_document.content_id, comment.content_id,
@@ -560,82 +547,7 @@ class TestEditComment(object):
         )
         assert res.json_body
         assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.USER_NOT_MEMBER_OF_WORKSPACE
-
-    def test_api__edit_comment__err_400__user_not_in_workspace(
-        self,
-        web_testapp,
-        workspace_api_factory,
-        content_api_factory,
-        content_type_list,
-        session,
-        html_with_wrong_user_mention,
-    ) -> None:
-        """
-        This test should raise an error as the html contains a mention to a user not member of the workspace
-        """
-        workspace_api = workspace_api_factory.get()
-        content_api = content_api_factory.get()
-        workspace, test_html_document, comment = create_doc_and_comment(
-            workspace_api, content_api, content_api
-        )
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res_get = web_testapp.get(
-            "/api/workspaces/{}/contents/{}/comments/{}".format(
-                workspace.workspace_id, test_html_document.content_id, comment.content_id,
-            ),
-            status=200,
-        )
-        assert res_get.json_body["raw_content"] == "First version"
-        params = {"raw_content": html_with_wrong_user_mention}
-        res = web_testapp.put_json(
-            "/api/workspaces/{}/contents/{}/comments/{}".format(
-                workspace.workspace_id, test_html_document.content_id, comment.content_id,
-            ),
-            params=params,
-            status=400,
-        )
-        assert res.json_body
-        assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.USER_NOT_MEMBER_OF_WORKSPACE
-
-    def test_api__edit_comment__err_400__empty_mention(
-        self,
-        web_testapp,
-        workspace_api_factory,
-        content_api_factory,
-        content_type_list,
-        session,
-        html_with_empty_mention,
-    ) -> None:
-        """
-        This test should raise an error as the html contains a mention empty (without anyway to
-        detect the user)
-        """
-        workspace_api = workspace_api_factory.get()
-        content_api = content_api_factory.get()
-        workspace, test_html_document, comment = create_doc_and_comment(
-            workspace_api, content_api, content_api
-        )
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res_get = web_testapp.get(
-            "/api/workspaces/{}/contents/{}/comments/{}".format(
-                workspace.workspace_id, test_html_document.content_id, comment.content_id,
-            ),
-            status=200,
-        )
-        assert res_get.json_body["raw_content"] == "First version"
-        params = {"raw_content": html_with_empty_mention}
-        res = web_testapp.put_json(
-            "/api/workspaces/{}/contents/{}/comments/{}".format(
-                workspace.workspace_id, test_html_document.content_id, comment.content_id,
-            ),
-            params=params,
-            status=400,
-        )
-        assert res.json_body
-        assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.USER_NOT_MEMBER_OF_WORKSPACE
+        assert res.json_body["code"] == expected_error
 
     def test_api__edit_comment__err__empty_raw_content(
         self, web_testapp, workspace_api_factory, content_api_factory, content_type_list, session,
@@ -757,7 +669,12 @@ class TestEditComment(object):
         workspace, test_html_document, comment = create_doc_and_comment(
             workspace_api, content_api, content_api
         )
-        role_api.create_one(riyad_user, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(
+            riyad_user,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         web_testapp.authorization = ("Basic", (riyad_user.username, "password"))
         res_get = web_testapp.get(

@@ -120,7 +120,7 @@ echo "Database type: '$database_type', service: '$database_service'"
 teardown () {
     if [ -n "$backend_pid" ]; then kill "$backend_pid"; fi
     pushd "$script_dir/backend"
-    docker compose stop
+    docker compose stop pushpin
 }
 
 run_docker_services () {

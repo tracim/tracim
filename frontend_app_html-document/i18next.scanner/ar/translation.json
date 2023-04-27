@@ -8,7 +8,6 @@
   "Error while saving the user configuration": "خطأ أثناء حفظ إعدادات المستخدم",
   "You are trying to mention an invalid user": "أنت تحاول أن تشير إلى مستخدم غير صحيح",
   "You must change the status or restore this note before any change": "يجب أن تغير الحالة أو تستعيد هذه الملاحظة قبل إدخال أي تغيير",
-  "Error while saving the comment": "خطأ أثناء حفظ التعليق",
   "Timeline": "السِجلّ",
   "Tags": "إشارات",
   "Edit": "تعديل",
@@ -34,5 +33,7 @@
   "Download as PDF": "تنزيل على شكل PDF",
   "Tasks": "",
   "The link has been copied to clipboard": "تم نسخ الرابط إلى الحافظة",
-  "Copy content link": "نسخ رابط المحتوى"
+  "Copy content link": "نسخ رابط المحتوى",
+  "Cancel": "",
+  "Validate": ""
 }

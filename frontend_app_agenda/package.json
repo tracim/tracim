@@ -71,7 +71,6 @@
       "fetch",
       "history",
       "btoa",
-      "wysiwyg",
       "tinymce",
       "GLOBAL_renderAppFeature",
       "GLOBAL_unmountApp",

@@ -59,7 +59,7 @@ basic_setup.session_secret = change_this_value_please!
 # CORE
 ####
 
-# hapic debug mode: return python traceback of error
+# hapic debug mode: return python stacktrace of error
 ; debug = False
 
 
@@ -71,7 +71,7 @@ basic_setup.session_secret = change_this_value_please!
 ### Apps ###
 
 ## app enabled explicit list:
-# this allow you to explictly disable default app or enabled beta app now
+# this allow you to explicitly disable default app or enabled beta app now
 # already added to default list.
 # This parameter is a list of app slug separated by ',' char.
 # Not exhaustive list of available apps:
@@ -83,9 +83,9 @@ basic_setup.session_secret = change_this_value_please!
 # - contents/folder -> allow to put content into folder.
 # - contents/kanban -> allow to work with kanban-styled boards. It requires content/file to be enabled.
 # - contents/todo -> allow to use todos on contents
-# - agenda -> add caldav agenda feature (specific process need to be runned)
+# - agenda -> add caldav agenda feature (specific process need to be started)
 # - collaborative_document_edition -> add support for collaborative document edition,
-#   add support for collaborative edition server like collabora/libreofficeOnline.
+#   add support for collaborative edition server like collabora/LibreOfficeOnline.
 # - share_content -> allow user to share Tracim content with external user
 # - upload_permission -> allow external with permission to upload some file in a space.
 # - gallery -> add gallery app in Tracim
@@ -141,7 +141,7 @@ workspace.join.max_messages_history_count = -1
 ; default_anonymized_user_display_name = "Deleted user"
 
 ## Build Version
-# If you leave build_version empty or unsetted here, Tracim will automatically
+# If you leave build_version empty or not set here, Tracim will automatically
 # try to get a meaningful value according to context, it will try to
 # use last commit tag or hash as build_version. If your Tracim code is not placed
 # in a git repository or git isn't installed on the server, default value will be
@@ -181,7 +181,7 @@ workspace.join.max_messages_history_count = -1
 ; url_preview.fetch_timeout = 30
 
 # max content length parsed for fetching URL preview (in bytes), default to 1048576 (1 Mo)
-# note: setting to 0 will disallow the limitation, but is not recommanded for security and performance
+# note: setting to 0 will disallow the limitation, but is not recommended for security and performance
 # reason.
 ; url_preview.max_content_length = 1048576
 
@@ -208,7 +208,7 @@ workspace.join.max_messages_history_count = -1
 ## limit. Limit is on the sum of sizes of owned by user space.
 ; limitation.user_default_allowed_space = 0
 
-# maximum count of simulteanously online users, 0 means unlimited and is the default value.
+# maximum count of simultaneously online users, 0 means unlimited and is the default value.
 ; limitation.maximum_online_users = 0
 
 # The customized error message shown to the user when the limit is reached.
@@ -229,7 +229,7 @@ workspace.join.max_messages_history_count = -1
 ## mysql/mariadb:
 # sqlalchemy.url = mysql+pymysql://user:password@dbhost:dbport/dbname
 ## postgresql:
-# sqlalchemy.url = postgresql://user:paswword@dbhost:dbport/dbname?client_encoding=utf8
+# sqlalchemy.url = postgresql://user:password@dbhost:dbport/dbname?client_encoding=utf8
 # see also for more info:
 # https://docs.sqlalchemy.org/en/latest/core/engines.html#sqlalchemy.create_engine ##
 ; sqlalchemy.url = sqlite:///%(here)s/tracim.sqlite
@@ -244,7 +244,7 @@ uploaded_files.storage.storage_type = %(basic_setup.uploaded_files_storage_type)
 ## This is where the files uploaded by users will be stored if storage_type is "local"
 uploaded_files.storage.local.storage_path = %(basic_setup.uploaded_files_storage_path)s
 
-## S3 credentials (requires the boto3 packaqe):
+## S3 credentials (requires the boto3 package):
 ; uploaded_files.storage.s3.access_key_id =
 ; uploaded_files.storage.s3.secret_access_key =
 ; uploaded_files.storage.s3.bucket =
@@ -370,7 +370,7 @@ api.key = %(basic_setup.api_key)s
 ## Attribute name of user record who contain user login (email)
 ; ldap_login_attribute = mail
 ## Attribute for default name of new user from ldap
-; ldap_name_attributes = givenName
+; ldap_name_attribute = givenName
 ## TLS usage to communicate with your LDAP server
 ; ldap_tls = False
 
@@ -429,7 +429,7 @@ website.title = %(basic_setup.website_title)s
 ; website.welcome_page_style = welcome-simple.css
 
 # The following base_url is used for links and icons
-# integrated in the email notifcations, it's the frontend config.
+# integrated in the email notifications, it's the frontend config.
 ; website.base_url = http://localhost:6543
 website.base_url = %(basic_setup.website_base_url)s
 
@@ -461,7 +461,7 @@ website.usage_conditions =
 # try to get a meaningful value according to context, it will try to
 # use last commit hash as cache_token. If your Tracim code is not placed
 # in a git repository or git isn't installed on the server, Tracim will use an
-# autogenerated uuid. This uuid will change at each restart of Tracim
+# autogenerated UUID. This UUID will change at each restart of Tracim
 # You can override predefined cache_token here.
 # Leave as empty to let Tracim find automatically cache_token value.
 ; frontend.cache_token =
@@ -522,7 +522,7 @@ website.usage_conditions =
 
 ### configuration of potentially lengthy jobs ###
 # processing_mode may be sync or async,
-# if async is choosen, you need also to run:
+# if async is chosen, you need also to run:
 #  - a custom rq worker (see backend/README.md)
 #  - a redis server
 ; jobs.processing_mode = sync
@@ -545,10 +545,13 @@ website.usage_conditions =
 
 ## send some notification when user make specific action in Tracim
 ; email.notification.activated = False
-## you can enable or disable if invited user to space will be notified
-## on this space by default.
+## you can change the type of email notification when a user is invited to a space by default.
+## possible values are:
+## - 'summary': send a daily mail containing notification summary
+## - 'individual': send a mail for every notification received
+## - 'none': doesn't send any mail
 ## NB: new users will not being notified until they login to Tracim a first time
-; email.notification.enabled_on_invitation = True
+; email.notification.type_on_invitation = summary
 # You can enable notification-specific logs using the 'tracim_email_notification' logger.
 
 
@@ -594,14 +597,14 @@ website.usage_conditions =
 
 ## valid variable is 'user_id' for 'from' header:
 ; email.notification.from.email =
-# example of recommanded pattern (for 'from' header):
+# example of recommended pattern (for 'from' header):
 # email.notification.from.email = noreply+{user_id}@domainname.tld
 
 ## valid variable is 'content_id' for 'reply_to' header:
 ; email.notification.reply_to.email =
 # tagging reply_to header of email with content_id is needed for working
 # email_reply feature
-# example of recommanded pattern (for 'reply_to' header):
+# example of recommended pattern (for 'reply_to' header):
 # email.notification.reply_to.email = reply+{content_id}@domainname.tld
 # email.notification.reply_to.email = {content_id}@reply.domainname.tld
 # email.notification.reply_to.email = reply+cid{content_id}@domainname.tld
@@ -612,7 +615,7 @@ website.usage_conditions =
 # all modification to a same content in a same email client thread
 # Note: reference doesn't need to be an existing email account but should
 # be a email like string.
-# example of recommanded pattern (for 'references' header):
+# example of recommended pattern (for 'references' header):
 # email.notification.references.email = thread+{content_id}@domainname.tld
 
 # emails subjects:
@@ -634,7 +637,7 @@ website.usage_conditions =
 ; email.notification.upload_permission_to_emitter.template.html = %(here)s/tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak
 ; email.notification.upload_permission_to_receiver.template.html = %(here)s/tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak
 ; email.notification.new_upload_event.template.html = %(here)s/tracim_backend/templates/mail/new_upload_event_body_html.mak
-
+; email.notification.summary.template.html = %(here)s/tracim_backend/templates/mail/summary_body_html.mak
 
 # example with shortcut for template_dir path:
 ; email.template_dir =
@@ -890,7 +893,7 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 # translation_service.systran.api_url = https://api-translate.systran.net
 # translation_service.systran.api_key = your-systran-api-key
 
-## all next lines are not directly concerned by syntax explain in beggining of this file.
+## all next lines are not directly concerned by syntax explain in beginning of this file.
 
 ####
 # Call service

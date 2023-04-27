@@ -9,9 +9,7 @@
   "The file is larger than the maximum file size allowed": "El archivo supera el tamaño máximo permitido",
   "Error, the space exceed its maximum size": "Error, el espacio excede su tamaño máximo",
   "You have reached your storage limit, you cannot add new files": "Has alcanzado su límite de almacenamiento, no puede añadir nuevos archivos",
-  "Error while saving the comment": "Error al guardar el comentario",
   "Validate and create": "Validar y crear",
-  "Description": "Descripción",
   "The content has been modified by {{author}}": "El contenido fue modificado por {{author}}",
   "Restore": "Restaurar",
   "Are you sure?": "¿Está seguro?",
@@ -46,5 +44,6 @@
   "You must change the status or restore this kanban board before any change": "Debe cambiar el estado o restaurar esta tabla kanban antes de cualquier cambio",
   "Tasks": "Tareas",
   "The link has been copied to clipboard": "Enlace copiado en el portapapeles",
-  "Copy content link": "Copiar enlace al contenido"
+  "Copy content link": "Copiar enlace al contenido",
+  "Description of the card": "Descripción de la tarjeta"
 }

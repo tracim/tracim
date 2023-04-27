@@ -6,7 +6,6 @@
   "Description": "Descrição",
   "Error while rejecting user": "Erro ao rejeitar o utilizador",
   "Error while saving new default role": "Erro ao salvar nova função predefinida",
-  "Error while saving the new version": "Erro ao guardar a nova versão",
   "Add a member": "Acrescentar um membro",
   "Error while loading members list": "Erro ao carregamento da lista de membros",
   "Save successful": "Salvo com sucesso",
@@ -20,7 +19,6 @@
   "Error while loading space details": "Erro ao carregar detalhes do espaço",
   "Error while saving new space label": "Erro ao salvar a nova etiqueta do espaço",
   "Error while adding the member to the space": "Erro ao acrescentar o membro ao espaço",
-  "Space's description": "Descrição do espaço",
   "Delete space": "Eliminar espaço",
   "Delete": "Eliminar",
   "Unknown user": "Utilizador desconhecido",
@@ -59,5 +57,9 @@
   "Error while deactivating news": "Erro ao desactivar notícias",
   "You cannot change this member role because there are no other space managers.": "Não se pode alterar a função deste membro porque não há outros gestores de espaço.",
   "Use this link to integrate this agenda to your": "Utilize este link para incluir esta agenda ao seu",
-  "CalDAV compatible software": "Software compatível com CalDAV"
+  "CalDAV compatible software": "Software compatível com CalDAV",
+  "Filter users": "Filtrar usuários",
+  "Description of the space": "Descrição do espaço",
+  "This space doesn't have a description yet.": "Este espaço não tem uma descrição ainda.",
+  "Edit": "Editar"
 }

@@ -85,7 +85,7 @@ class PopinFixedContent extends React.Component {
                     </div>
                   )}
 
-                  {props.lastVersion &&
+                  {props.lastVersion !== 0 &&
                    (props.appMode === APP_FEATURE_MODE.VIEW || props.appMode === APP_FEATURE_MODE.REVISION) &&
                    (
                      <div

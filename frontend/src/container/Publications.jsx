@@ -3,40 +3,39 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import {
-  CONTENT_NAMESPACE,
-  formatAbsoluteDate,
-  appContentFactory,
   BREADCRUMBS_TYPE,
-  buildHeadTitle,
-  CommentArea,
-  CUSTOM_EVENT,
-  EditCommentPopup,
-  EmptyListMessage,
-  getComment,
-  getContentComment,
-  getFileChildContent,
-  getOrCreateSessionClientToken,
-  handleClickCopyLink,
-  handleFetchResult,
-  handleInvalidMentionInComment,
-  tinymceRemove,
-  IconButton,
-  Loading,
-  PAGE,
-  ROLE,
-  ROLE_LIST,
   COLORS,
-  ScrollToBottomWrapper,
+  CONTENT_NAMESPACE,
+  CONTENT_TYPE,
+  CUSTOM_EVENT,
+  NUMBER_RESULTS_BY_PAGE,
+  PAGE,
+  ROLE_LIST,
+  ROLE,
+  TIMELINE_TYPE,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
-  TracimComponent,
   TRANSLATION_STATE,
-  CONTENT_TYPE,
+  CommentArea,
+  EditCommentPopup,
+  EmptyListMessage,
+  IconButton,
+  Loading,
+  ScrollToBottomWrapper,
+  TracimComponent,
+  appContentFactory,
+  buildHeadTitle,
+  displayDistanceDate,
+  formatAbsoluteDate,
+  getComment,
+  getContentComment,
+  getFileChildContent,
   getFileDownloadUrl,
-  NUMBER_RESULTS_BY_PAGE,
-  LOCAL_STORAGE_FIELD,
-  setLocalStorageItem
+  getOrCreateSessionClientToken,
+  handleClickCopyLink,
+  handleFetchResult,
+  replaceHTMLElementWithMention
 } from 'tracim_frontend_lib'
 import {
   FETCH_CONFIG,
@@ -64,7 +63,6 @@ import {
 import TabBar from '../component/TabBar/TabBar.jsx'
 import FeedItemWithPreview, { LINK_TYPE } from './FeedItemWithPreview.jsx'
 
-const wysiwygId = 'wysiwygTimelineCommentPublication'
 // INFO - G.B. - 2021-10-18 - The value below is used only for local storage, it's a fake id for the
 // publication that is being written but has not been sent yet (i.e. does not have an id)
 const newPublicationId = -5
@@ -102,9 +100,7 @@ export class Publications extends React.Component {
       newCurrentPublication: !!this.props.match.params.idcts,
       isLastItemAddedFromCurrentToken: false,
       invalidMentionList: [],
-      publicationWysiwyg: false,
       showEditPopup: false,
-      showInvalidMentionPopupInComment: false,
       showReorderButton: false
     }
   }
@@ -138,27 +134,22 @@ export class Publications extends React.Component {
       this.gotToCurrentPublication()
     }
 
-    if (prevState.publicationWysiwyg && !state.publicationWysiwyg) {
-      tinymceRemove(`#${wysiwygId}`)
-    }
-
     if (prevProps.match.params.idcts !== props.match.params.idcts || state.newCurrentPublication) {
       this.gotToCurrentPublication()
     }
   }
 
-  componentWillUnmount () {
-    tinymceRemove(`#${wysiwygId}`)
-  }
-
   handleAllAppChangeLanguage = (data) => {
-    if (this.state.publicationWysiwyg) {
-      tinymceRemove(`#${wysiwygId}`)
-      globalThis.wysiwyg(`#${wysiwygId}`, data, this.handleChangeNewPublication)
-    }
     this.buildBreadcrumbs()
     this.setHeadTitle()
   }
+
+  buildCommentAsFile = (content, loggedUser) => ({
+    ...content,
+    timelineType: TIMELINE_TYPE.COMMENT_AS_FILE,
+    created_raw: content.created,
+    created: displayDistanceDate(content.created, loggedUser.lang)
+  })
 
   handleContentCommentModified = async (data) => {
     const { props } = this
@@ -201,29 +192,29 @@ export class Publications extends React.Component {
     props.dispatch(setCommentListToPublication(parentPublication.id, newTimeline))
   }
 
-  handleClickPublish = (publication, publicationAsFileList) => {
-    const { props, state } = this
-
-    if (!handleInvalidMentionInComment(
-      props.currentWorkspace.memberList,
-      state.publicationWysiwyg,
-      publication,
-      this.setState.bind(this)
-    )) {
-      this.handleClickValidateAnyway(publication, publicationAsFileList)
-      return true
-    }
-    return false
-  }
-
   handleContentCreatedOrRestored = (data) => {
+    const { props } = this
+
     if (
       data.fields.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION ||
-      data.fields.content.parent_id !== null ||
-      data.fields.content.workspace_id !== this.props.currentWorkspace.id
+      data.fields.content.workspace_id !== props.currentWorkspace.id
     ) return
+
+    if (data.fields.content.parent_id !== null) {
+      const parent = props.publicationPage.list.find(publication => publication.id === data.fields.content.parent_id)
+      if (parent === undefined) return
+
+      const newCommentList = [...parent.commentList]
+      const index = newCommentList.findIndex(comment => comment.content_id === data.fields.content.content_id)
+      if (index < 0) return
+
+      newCommentList[index] = this.buildCommentAsFile(data.fields.content, props.user)
+      props.dispatch(setCommentListToPublication(parent.id, newCommentList))
+      return
+    }
+
     this.setState({ isLastItemAddedFromCurrentToken: data.fields.client_token === getOrCreateSessionClientToken() })
-    this.props.dispatch(appendPublication(data.fields.content))
+    props.dispatch(appendPublication(data.fields.content))
   }
 
   handleCommentCreated = async (data) => {
@@ -293,8 +284,6 @@ export class Publications extends React.Component {
     if (data.fields.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION) return
     this.props.dispatch(removePublication(data.fields.content.content_id))
   }
-
-  handleToggleWysiwyg = () => this.setState(prev => ({ publicationWysiwyg: !prev.publicationWysiwyg }))
 
   buildBreadcrumbs = () => {
     const { props } = this
@@ -387,38 +376,16 @@ export class Publications extends React.Component {
     this.setState({ showEditPopup: true, commentToEdit: publication.firstComment })
   }
 
-  handleClickValidateEdit = (publication) => {
+  handleClickValidateEdit = (comment, commentId, parentId) => {
     const { props } = this
-    if (!handleInvalidMentionInComment(
-      props.currentWorkspace.memberList,
-      true,
-      publication,
-      this.setState.bind(this)
-    )) {
-      this.handleClickValidateAnywayEdit()
-    }
-  }
-
-  handleClickValidateAnywayEdit = () => {
-    this.setState({
-      invalidMentionList: [],
-      showEditPopup: false,
-      showInvalidMentionPopupInComment: false
-    })
-    this.handleEditPublication()
-  }
-
-  handleEditPublication = () => {
-    const { props, state } = this
     props.appContentEditComment(
       props.currentWorkspace.id,
-      state.commentToEdit.parent_id,
-      state.commentToEdit.content_id,
-      props.user.username
+      parentId,
+      commentId,
+      comment
     )
+    this.setState({ showEditPopup: false })
   }
-
-  handleCancelSave = () => this.setState({ showInvalidMentionPopupInComment: false })
 
   buildPublicationName = (authorName, userLang) => {
     const { props } = this
@@ -430,52 +397,29 @@ export class Publications extends React.Component {
     })
   }
 
-  saveThreadPublication = async (publication, publicationAsFileList) => {
-    const { props, state } = this
+  handleSaveThreadPublication = async (publication, publicationAsFileList) => {
+    const { props } = this
 
-    const workspaceId = props.currentWorkspace.id
+    const spaceId = props.currentWorkspace.id
     const publicationName = this.buildPublicationName(props.user.publicName, props.user.lang)
 
-    const fetchPostPublication = await props.dispatch(postThreadPublication(workspaceId, publicationName))
+    const fetchPostPublication = await props.dispatch(postThreadPublication(spaceId, publicationName))
 
     if (fetchPostPublication.status !== 200) {
       props.dispatch(newFlashMessage(`${props.t('Error while saving new news')}`, 'warning'))
       return
     }
 
-    try {
-      props.appContentSaveNewComment(
-        fetchPostPublication.json,
-        state.publicationWysiwyg,
-        publication,
-        publicationAsFileList,
-        this.setState.bind(this),
-        '',
-        props.user.username,
-        'Publication'
-      )
-    } catch (e) {
-      props.dispatch(newFlashMessage(e.message || props.t('Error while saving the comment')))
-    }
-  }
-
-  handleClickValidateAnyway = async (publication, publicationAsFileList = []) => {
-    const { state, props } = this
-
-    if (state.showEditPopup) {
-      this.handleClickValidateAnywayEdit()
-      return
-    }
-
-    this.saveThreadPublication(publication, publicationAsFileList)
-
-    setLocalStorageItem(
-      CONTENT_TYPE.THREAD,
-      newPublicationId,
-      parseInt(props.match.params.idws),
-      LOCAL_STORAGE_FIELD.COMMENT,
-      ''
+    await props.appContentSaveNewCommentText(
+      fetchPostPublication.json,
+      publication
     )
+    await props.appContentSaveNewCommentFileList(
+      this.setState.bind(this),
+      fetchPostPublication.json,
+      publicationAsFileList
+    )
+    return true
   }
 
   handleClickCopyLink = content => {
@@ -487,10 +431,6 @@ export class Publications extends React.Component {
   handleClickReorder = () => {
     this.props.dispatch(updatePublicationList())
     this.setState({ showReorderButton: false })
-  }
-
-  searchForMentionOrLinkInQuery = async (query) => {
-    return await this.props.searchForMentionOrLinkInQuery(query, this.props.currentWorkspace.id)
   }
 
   getPreviewLinkParameters = (publication) => {
@@ -533,27 +473,21 @@ export class Publications extends React.Component {
           <div className='publishAreaContainer'>
             <CommentArea
               apiUrl={FETCH_CONFIG.apiUrl}
-              bottomAutocomplete
-              buttonLabel={props.t('Publish')}
               contentId={newPublicationId}
               contentType={CONTENT_TYPE.THREAD}
-              customColor={COLORS.PUBLICATION}
-              customClass='publishArea'
-              icon='fa-fw far fa-paper-plane'
-              id={wysiwygId}
-              invalidMentionList={state.invalidMentionList}
-              lang={props.user.lang}
-              multipleFiles
-              onClickCancelSave={this.handleCancelSave}
-              onClickSaveAnyway={this.handleClickValidateAnyway}
-              onClickValidateNewCommentBtn={this.handleClickPublish}
-              onClickWysiwygBtn={this.handleToggleWysiwyg}
-              placeHolder={props.t('Share a news...')}
-              searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
-              showInvalidMentionPopup={!state.loading && state.showInvalidMentionPopupInComment}
+              onClickSubmit={this.handleSaveThreadPublication}
               workspaceId={parseInt(props.match.params.idws)}
-              wysiwygIdSelector={`#${wysiwygId}`}
-              wysiwyg={state.publicationWysiwyg}
+              // End of required props /////////////////////////////////////////
+              codeLanguageList={props.system.config.ui__notes__code_sample_languages}
+              customClass='publishArea'
+              customColor={COLORS.PUBLICATION}
+              icon='fa-fw far fa-paper-plane'
+              invalidMentionList={state.invalidMentionList}
+              language={props.user.lang}
+              memberList={props.currentWorkspace.memberList}
+              multipleFiles
+              placeholder={props.t('Share a news...')}
+              submitLabel={props.t('Publish')}
             />
           </div>
         )}
@@ -599,12 +533,18 @@ export class Publications extends React.Component {
         {!state.loading && state.showEditPopup && (
           <EditCommentPopup
             apiUrl={FETCH_CONFIG.apiUrl}
-            comment={state.commentToEdit.raw_content}
+            codeLanguageList={props.system.config.ui__notes__code_sample_languages}
+            comment={replaceHTMLElementWithMention(
+              props.currentWorkspace.memberList,
+              state.commentToEdit.raw_content
+            )}
             commentId={state.commentToEdit.content_id}
             customColor={COLORS.PUBLICATION}
-            loggedUserLanguage={props.user.lang}
-            onClickValidate={this.handleClickValidateEdit}
+            user={props.user}
+            memberList={props.currentWorkspace.memberList}
             onClickClose={() => this.setState({ showEditPopup: false })}
+            onClickValidate={this.handleClickValidateEdit}
+            parentId={state.commentToEdit.parent_id}
             workspaceId={props.currentWorkspace.id}
           />
         )}

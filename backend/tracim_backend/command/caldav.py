@@ -83,7 +83,7 @@ class CaldavSyncCommand(AppContextCommand):
         nb_verified_user_agenda = len(users) - nb_error_agenda_access
         print("{}/{} users agenda verified".format(nb_verified_user_agenda, nb_user_agendas))
 
-        # # INFO - G.M - 2019-03-13 - check workspaces agendas
+        # INFO - G.M - 2019-03-13 - check workspaces agendas
         workspaces = self._workspace_api.get_all()
         nb_error_agenda_access = 0
         nb_workspaces = 0

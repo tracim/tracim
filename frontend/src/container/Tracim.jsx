@@ -27,22 +27,22 @@ import WIPcomponent from './WIPcomponent.jsx'
 import CardPopupUsername from './CardPopupUsername'
 import {
   CUSTOM_EVENT,
-  getWorkspaceMemberList,
-  handleFetchResult,
+  LIVE_MESSAGE_ERROR_CODE,
+  LIVE_MESSAGE_STATUS,
+  PAGE,
   PROFILE,
-  formatAbsoluteDate,
-  serialize,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  USER_CALL_STATE,
   CardPopup,
   IconButton,
+  LiveMessageManager,
   TracimComponent,
   buildHeadTitle,
-  LiveMessageManager,
-  LIVE_MESSAGE_STATUS,
-  LIVE_MESSAGE_ERROR_CODE,
-  PAGE,
-  USER_CALL_STATE,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_ENTITY_TYPE as TLM_ET
+  formatAbsoluteDate,
+  getSpaceMemberList,
+  handleFetchResult,
+  serialize
 } from 'tracim_frontend_lib'
 import {
   COOKIE_FRONTEND,
@@ -50,6 +50,7 @@ import {
   SEARCH_TYPE,
   WELCOME_ELEMENT_ID,
   getUserProfile,
+  initializeCustomElements,
   toggleFavicon,
   unLoggedAllowedPageList
 } from '../util/helper.js'
@@ -85,6 +86,7 @@ import {
   setHeadTitle,
   setAccessibleWorkspaceList
 } from '../action-creator.sync.js'
+import HTMLMention from '../component/Mention/HTMLMention.js'
 import NotificationWall from './NotificationWall.jsx'
 import AdvancedSearch from './AdvancedSearch.jsx'
 import SimpleSearch from './SimpleSearch.jsx'
@@ -116,6 +118,8 @@ export class Tracim extends React.Component {
       userCall: undefined,
       unansweredCallTimeoutId: -1
     }
+
+    initializeCustomElements('html-mention', HTMLMention)
 
     this.audioCall = new Audio('/assets/branding/incoming-call.ogg')
     this.liveMessageManager = new LiveMessageManager()
@@ -467,7 +471,7 @@ export class Tracim extends React.Component {
     const fetchWorkspaceListMemberList = await Promise.all(
       workspaceList.map(async ws => ({
         workspaceId: ws.workspace_id,
-        fetchMemberList: await handleFetchResult(await getWorkspaceMemberList(FETCH_CONFIG.apiUrl, ws.workspace_id))
+        fetchMemberList: await handleFetchResult(await getSpaceMemberList(FETCH_CONFIG.apiUrl, ws.workspace_id))
       }))
     )
 

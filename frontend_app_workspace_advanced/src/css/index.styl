@@ -14,23 +14,21 @@
 .workspace_advanced
   overflow-y auto
   overflow-x hidden
+  &__filterBar
+    margin-inline-start standardSpacing
+    margin-inline-end standardSpacing
   &-content
     padding standardSpacing
-  &__contentpage__content
-    overflow-y hidden
-    &__left
-      background-color offWhite
-      overflow auto
+  &__contentpage__content__left
+    background-color offWhite
+    overflow auto
   &__description
     padding standardSpacing
     &__text
       height 300px
-      &__textarea
-        height 300px
-        width 100%
     &__bottom
       display flex
-      padding-inline-end standardSpacing
+      margin-top standardSpacing
       &__btn
         margin-inline-start auto
   &__defaultRole

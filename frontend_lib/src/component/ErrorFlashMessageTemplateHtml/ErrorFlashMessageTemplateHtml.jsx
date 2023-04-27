@@ -6,7 +6,7 @@ require('./ErrorFlashMessageTemplateHtml.styl')
 
 export const ErrorFlashMessageTemplateHtml = props => (
   <div className='flashMessageHtml'>
-    {props.t('Unknown error, please inform an administrator')}
+    {props.t('Unexpected error, please inform an administrator')}
 
     <div className='flashMessageHtml__detail'>
       {props.t('Error detail')}

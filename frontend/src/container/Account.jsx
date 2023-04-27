@@ -38,7 +38,7 @@ import {
   putMyselfEmail,
   putUserUsername,
   putMyselfPassword,
-  putMyselfWorkspaceDoNotify,
+  putMyselfWorkspaceEmailNotificationType,
   getLoggedUserCalendar,
   putUserLang
 } from '../action-creator.async.js'
@@ -62,20 +62,20 @@ export class Account extends React.Component {
     }, {
       name: 'spacesConfig',
       active: false,
-      label: 'Spaces',
-      translationKey: props.t('Spaces'),
+      label: 'My Spaces',
+      translationKey: props.t('My Spaces'),
       display: true
     }, {
       name: 'password',
       active: false,
-      label: 'Password',
-      translationKey: props.t('Password'),
+      label: 'My Password',
+      translationKey: props.t('My Password'),
       display: editableUserAuthTypeList.includes(props.user.authType) // allow pw change only for users in tracim's db (eg. not from ldap)
     }, {
       name: 'configurationLinks',
       active: false,
-      label: 'Configuration links',
-      translationKey: props.t('Configuration links'),
+      label: 'My Configuration links',
+      translationKey: props.t('My Configuration links'),
       display: props.appList.some(a => a.slug === 'agenda') || props.system.config.webdav_url
     }]
 
@@ -251,12 +251,20 @@ export class Account extends React.Component {
 
   handleChangeUsername = debounce(this.changeUsername, CHECK_USERNAME_DEBOUNCE_WAIT)
 
-  handleChangeSubscriptionNotif = async (workspaceId, doNotify) => {
+  handleChangeEmailNotificationType = async (workspaceId, emailNotificationType) => {
     const { props } = this
 
-    const fetchPutUserWorkspaceDoNotify = await props.dispatch(putMyselfWorkspaceDoNotify(workspaceId, doNotify))
-    if (fetchPutUserWorkspaceDoNotify.status !== 204) {
-      props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
+    let fetchChangeEmailNotificationType
+    try {
+      fetchChangeEmailNotificationType = await props.dispatch(putMyselfWorkspaceEmailNotificationType(
+        workspaceId, emailNotificationType
+      ))
+    } catch (e) {
+      props.dispatch(newFlashMessage(props.t('Error while changing email subscription'), 'warning'))
+      console.error(
+        'Error while changing email subscription. handleChangeEmailNotificationType.',
+        fetchChangeEmailNotificationType
+      )
     }
   }
 
@@ -294,7 +302,7 @@ export class Account extends React.Component {
             />
 
             <PageContent parentClass='account'>
-              <UserInfo user={props.user} />
+              <UserInfo user={props.user} profileButtonText={props.t('My profile')} />
 
               <Delimiter customClass='account__delimiter' />
 
@@ -326,7 +334,7 @@ export class Account extends React.Component {
                         return (
                           <UserSpacesConfig
                             userToEditId={props.user.userId}
-                            onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
+                            onChangeEmailNotificationType={this.handleChangeEmailNotificationType}
                             admin={false}
                           />
                         )

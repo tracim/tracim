@@ -72,9 +72,9 @@ export const unDeleteWorkspaceContentList = (workspaceContentList, workspaceId) 
 
 export const updateWorkspaceFilter = filterList => ({ type: `${UPDATE}/${WORKSPACE}/Filter`, filterList })
 
-export const USER_WORKSPACE_DO_NOTIFY = `${USER}/${WORKSPACE}/SubscriptionNotif`
-export const updateUserWorkspaceSubscriptionNotif = (userId, workspaceId, doNotify) =>
-  ({ type: `${UPDATE}/${USER_WORKSPACE_DO_NOTIFY}`, userId, workspaceId, doNotify })
+export const USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE = `${USER}/${WORKSPACE}/EmailNotificationType`
+export const updateUserWorkspaceEmailNotificationType = (userId, workspaceId, emailNotificationType) =>
+  ({ type: `${UPDATE}/${USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE}`, userId, workspaceId, emailNotificationType })
 
 export const WORKSPACE_CONTENT_ARCHIVED = `${WORKSPACE_CONTENT}/Archived`
 export const WORKSPACE_CONTENT_DELETED = `${WORKSPACE_CONTENT}/Deleted`
@@ -215,9 +215,15 @@ export const addNotification = (notification, spaceList) => ({
   spaceList
 })
 export const updateNotification = (notificationId, notificationList) => ({ type: `${UPDATE}/${NOTIFICATION}`, notificationId, notificationList })
-export const readNotificationList = notificationIdList => ({ type: `${READ}/${NOTIFICATION_LIST}`, notificationIdList })
+export const readNotificationList = notificationIdList => ({
+  type: `${READ}/${NOTIFICATION_LIST}`,
+  notificationIdList
+})
 export const readEveryNotification = () => ({ type: `${READ}/${EVERY_NOTIFICATION}` })
-export const readContentNotification = contentId => ({ type: `${READ}/${CONTENT}/${NOTIFICATION}`, contentId })
+export const readContentNotification = contentId => ({
+  type: `${READ}/${CONTENT}/${NOTIFICATION}`,
+  contentId
+})
 export const setNextPage = (hasNextPage, nextPageToken) => ({ type: `${SET}/${NEXT_PAGE}`, hasNextPage, nextPageToken })
 export const setUnreadMentionCount = (count) => ({ type: `${SET}/${UNREAD_MENTION_COUNT}`, count })
 export const setUnreadNotificationCount = (count) => ({ type: `${SET}/${UNREAD_NOTIFICATION_COUNT}`, count })

@@ -346,8 +346,8 @@ class ESSearchApi(SearchApi):
         """Index the given user in the appropriate index."""
         user_in_context = UserInContext(user, dbsession=self._session, config=self._config)
 
-        rapi = RoleApi(config=self._config, session=self._session, current_user=None)
-        workspace_ids = rapi.get_user_workspaces_ids(user.user_id)
+        role_api = RoleApi(config=self._config, session=self._session, current_user=None)
+        workspace_ids = role_api.get_user_workspaces_ids(user.user_id)
         capi = ContentApi(config=self._config, session=self._session, current_user=None)
         try:
             newest_authored_content_date = capi.get_newest_authored_content(
@@ -383,9 +383,9 @@ class ESSearchApi(SearchApi):
 
     def index_workspace(self, workspace: Workspace) -> None:
         """Index the given worspace in the appropriate ES index."""
-        rapi = RoleApi(config=self._config, session=self._session, current_user=None)
+        role_api = RoleApi(config=self._config, session=self._session, current_user=None)
         capi = ContentApi(config=self._config, session=self._session, current_user=None)
-        member_ids = rapi.get_workspace_member_ids(workspace.workspace_id)
+        member_ids = role_api.get_workspace_member_ids(workspace.workspace_id)
         indexed_workspace = IndexedWorkspace(
             access_type=workspace.access_type.value,
             workspace_id=workspace.workspace_id,

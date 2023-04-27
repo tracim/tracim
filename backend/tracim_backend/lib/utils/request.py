@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from abc import ABC
 from abc import abstractmethod
+import contextlib
 from json import JSONDecodeError
 import typing
 
@@ -8,6 +9,7 @@ import pluggy
 from pyramid.request import Request
 from sqlalchemy.orm import Session
 
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentNotFoundInTracimRequest
@@ -61,7 +63,23 @@ class TracimContext(ABC):
         self._client_token = None  # type: typing.Optional[str]
         # Pending events: have been created but are commited to the DB
         self._pending_events = []  # type: typing.List[Event]
+        self._disable_events = False
         self.force_anonymous_context = False
+
+    @property
+    def disable_events(self):
+        return self._disable_events
+
+    @contextlib.contextmanager
+    def batched_events(self, operation_type, obj: object):
+        self._disable_events = True
+        try:
+            yield
+        finally:
+            self._disable_events = False
+        self.plugin_manager.hook.on_batched_events_finished(
+            operation_type=operation_type, obj=obj, context=self
+        )
 
     @property
     def pending_events(self) -> typing.List[Event]:
@@ -262,7 +280,7 @@ class TracimContext(ABC):
         return api.get_one(
             content_id=content_id,
             workspace=current_workspace,
-            content_type=content_type_list.Any_SLUG,
+            content_type=ContentTypeSlug.ANY.value,
         )
 
     def _get_reaction(self, reaction_id_fetcher: typing.Callable[[], int]) -> Reaction:

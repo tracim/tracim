@@ -23,7 +23,7 @@ describe('App Kanban (columns)', () => {
     createKanbanColumn(columnTitle)
     cy.get('[data-cy=columnActions]').click()
     cy.get('[data-cy=editColumn]').click()
-    cy.get('.textinput__text').should('be.visible').type('Edited' + columnTitle)
+    cy.get('.kanban__KanbanPopup__title .textinput__text').should('be.visible').type('Edited' + columnTitle)
     cy.get('.kanban__KanbanPopup__form_buttons .iconbutton').last().should('be.visible').click()
     cy.contains('.kanban__contentpage__wrapper__board__column__title', 'Edited' + columnTitle)
     cy.get('[data-cy=revision_data_4]')

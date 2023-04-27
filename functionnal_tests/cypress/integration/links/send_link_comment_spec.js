@@ -9,8 +9,6 @@ let workspaceId
 let commentInputText
 let commentDisplayedText
 
-const commentAreaInput = '.commentArea__textinput #wysiwygTimelineComment'
-
 describe('In a comment', () => {
   before(() => {
     cy.resetDB()
@@ -35,12 +33,11 @@ describe('In a comment', () => {
       pageName: PAGES.CONTENT_OPEN,
       params: { contentId: threadId }
     })
-    cy.get(commentAreaInput)
-      .should('be.visible')
-      .type(commentInputText)
-    cy.contains(commentAreaInput, commentInputText)
-    cy.get('.commentArea__submit__btn')
-      .click()
+    cy.get('.componentTitle').should('be.visible')
+    cy.inputInTinyMCE(commentInputText).then(() => {
+      cy.get('.commentArea__submit__btn')
+        .click()
+    })
   })
 
   afterEach(() => {

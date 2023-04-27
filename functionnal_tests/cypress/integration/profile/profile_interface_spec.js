@@ -10,6 +10,10 @@ describe('Profile', () => {
     cy.visitPage({ pageName: PAGES.PROFILE, params: { userId: baseUser.user_id } })
   })
 
+  after(() => {
+    cy.cancelXHR()
+  })
+
   it("should have the user's avatar", () => {
     cy.get('.profile__mainBar .avatar-wrapper')
       .should('have.attr', 'title', baseUser.public_name)
@@ -22,13 +26,11 @@ describe('Profile', () => {
   })
 
   it('should have the information part', () => {
-    cy.contains('.profile__content__information', 'Information')
-      .should('be.visible')
+    cy.get('.profile__content__information').should('be.visible')
   })
 
   it('should have the personal page part', () => {
-    cy.contains('.profile__content__page', 'Personal Page')
-      .should('be.visible')
+    cy.get('.profile__content__page').should('be.visible')
   })
 })
 
@@ -36,6 +38,10 @@ describe('Account settings button', () => {
   before(function () {
     cy.resetDB()
     cy.setupBaseDB()
+  })
+
+  afterEach(() => {
+    cy.cancelXHR()
   })
 
   it("As an admin on another user's profile, should redirect to the /admin/user page", () => {

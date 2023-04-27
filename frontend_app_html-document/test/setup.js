@@ -34,8 +34,7 @@ if (!global.window && !global.document) {
   global.globalThis = {
     tinymce: {
       remove: () => { }
-    },
-    wysiwyg: () => { }
+    }
   }
   const nodeCrypto = require('crypto')
   global.crypto = {

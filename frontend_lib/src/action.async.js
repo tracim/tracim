@@ -106,7 +106,13 @@ export const putContentRestoreArchive = (apiUrl, workspaceId, contentId) =>
 export const putContentRestoreDelete = (apiUrl, workspaceId, contentId) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/trashed/restore`)
 
-export const getMyselfKnownMember = (apiUrl, userNameToSearch, workspaceIdToInclude, workspaceIdToExclude, limit = 0) => {
+export const getMyselfKnownMember = (
+  apiUrl,
+  userNameToSearch,
+  workspaceIdToInclude,
+  workspaceIdToExclude,
+  limit = 0
+) => {
   let opts = ''
   if (workspaceIdToInclude) opts += `&include_workspace_ids=${workspaceIdToInclude}`
   if (workspaceIdToExclude) opts += `&exclude_workspace_ids=${workspaceIdToExclude}`
@@ -139,8 +145,11 @@ export const getReservedUsernames = async (apiUrl) =>
 export const getWorkspaceDetail = (apiUrl, workspaceId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}`)
 
-export const getWorkspaceMemberList = (apiUrl, workspaceId, showDisabledUser = false) =>
-  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/members${showDisabledUser ? '?show_disabled_user=1' : ''}`)
+export const getSpaceMemberList = (apiUrl, spaceId, showDisabledUser = false) =>
+  baseFetch(
+    'GET',
+    `${apiUrl}/workspaces/${spaceId}/members${showDisabledUser ? '?show_disabled_user=1' : ''}`
+  )
 
 export const getSpaceMemberFromId = (apiUrl, spaceId, userId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${spaceId}/members/${userId}`)

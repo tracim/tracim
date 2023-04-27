@@ -1,0 +1,19 @@
+@import '../../css/Variable.styl'
+
+// NOTE - SGD - 2023-01-31 - 'important' is needed as we want to override
+// the default tinymce styles
+.tinymce
+  &-public-name, &-role-description
+    margin-left textSpacing !important
+  &-username, &-role-name
+    color darkGrey1 !important
+    margin-left textSpacing !important
+  &-content-id
+    color darkGrey1 !important
+  &-avatar
+    border-radius mentionBorderRadius
+    height 25px !important
+    width 25px !important
+
+div.tox.tox-tinymce
+  border-radius standardBorderRadius
