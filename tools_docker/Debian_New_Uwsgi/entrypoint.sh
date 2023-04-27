@@ -207,6 +207,25 @@ if [ "$REPLY_BY_EMAIL" = "1" ];then
     log "Starting mail fetcher"
     supervisorctl start tracim_mail_fetcher
 fi
+
+## Check running services
+REDIS_SERVICE_RUNNING=$(ps -ef | grep -v grep|grep "redis-server" | wc -l)
+if [ $REDIS_SERVICE_RUNNING = 0 ]; then
+    logerror "Redis service must be running."
+    exit 1
+fi
+PUSHPIN_SERVICE_RUNNING=$(ps -ef | grep -v grep|grep "pushpin" | wc -l)
+if [ $PUSHPIN_SERVICE_RUNNING = 0 ]; then
+    logerror "Pushpin service must be running."
+    exit 1
+fi
+ZURL_SERVICE_RUNNING=$(ps -ef | grep -v grep|grep "zurl" | wc -l)
+if [ $ZURL_SERVICE_RUNNING = 0 ]; then
+    logerror "Zurl service must be running."
+    exit 1
+fi
+
+
 # Start tracim
 log "start uwsgi"
 set +e

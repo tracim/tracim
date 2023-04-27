@@ -1,18 +1,22 @@
 # Miscellaneous Information About the Developer Tools
 
-# Checking third party licences
+## Checking third party licences
 
 Install `yolk3k` pip package:
 
-    pip install yolk3k
+```bash
+pip install yolk3k
+```
 
 Then execute command:
 
-    yolk -l -f license
+```bash
+yolk -l -f license
+```
 
 Output will look like:
 
-```
+```bash
 PyYAML (3.12) !
     License: MIT
 

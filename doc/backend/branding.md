@@ -1,6 +1,7 @@
 # Customize Tracim's appearance to your brand
 
 All editable files (with the exception of `development.ini`) are available in a `branding` folder which is located:
+
 - in `frontend/dist/assets/branding` if you have installed Tracim directly on your computer
 - in `/etc/tracim/branding` if you are using the official Docker image (which exposes `/etc/tracim` as a docker volume).
 
@@ -10,7 +11,7 @@ This folder will be named `<branding_folder>` in the following documentation.
 
 The title and description of Tracim's page can be changed through `development.ini`:
 
-```
+```ini
 website.title = My Tracim instance
 website.description = For storing files and collaborating with people.
 ```
@@ -81,10 +82,11 @@ You can use a markdown editor to generate your HTML text, for instance [CuteMark
 
 Create your HTML page as you want, copy its CSS file(s) and image(s) in `<branding_folder>` and change the welcome page name in `development.ini`:
 
-```
+```ini
 website.welcome_page = my-welcome-page.html
 website.welcome_page_style = my-welcome-page.css
 ```
+
 The paths of the files in `development.ini` are relative to `<branding_folder>`.
 
 These parameters can also be changed with an environment variable as described in [setting.md](setting.md).
@@ -106,7 +108,7 @@ Tracim allows showing documents that newly registered user should accept before 
 By default, there are none, but you can add any file you want.
 To do so, you can set a list of files separated by `,` in `development.ini`, an empty list mean no conditions:
 
-```
+```ini
 website.usage_conditions = Terms Of Service.pdf,Privacy Policy.pdf
 ```
 
@@ -118,14 +120,14 @@ supported by browsers. These files it will be accessible through links.
 
 ### Change Audio file
 
-The original audio track used here for 'incoming-call.ogg' is 'data_sounds_ringtones_Solarium.ogg', it was found in Android's repository : https://android.googlesource.com/platform/frameworks/base.git which is licenced under Apache 2.0.
+The original audio track used here for 'incoming-call.ogg' is 'data_sounds_ringtones_Solarium.ogg', from [Android's repository]( https://android.googlesource.com/platform/frameworks/base.git) which is licensed under Apache 2.0.
 If you want to change it, choose another audio file and change it's name, or change the variable.
-
 
 ## Customize Note as pdf convertion rendering
 
 Tracim convert Note as PDF using both pandoc and weasyprint tool.
 This process is customizable through 2 files in branding:
+
 - The css style : `rich_text_preview.css`.
 - The html template : `rich_text_preview.template`.
 

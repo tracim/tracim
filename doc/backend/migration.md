@@ -1,58 +1,69 @@
-# Performing Migrations #
+# Performing Migrations
 
-## Introduction ##
+## Introduction
 
 This document is intended for developers.
 
 Migrations on `Tracim` uses [alembic](http://alembic.zzzcomputing.com/en/latest/index.html) which is the migration tool dedicated to SQLAlchemy.
 
-In order to use the `tracimcli` commands, go to the root of the project and
-and activate the Tracim virtualenv:
+In order to use the `tracimcli` commands, go to the root of the project and activate the Tracim virtualenv:
 
-    user@host:~/tracim_backend$ source env/bin/activate
-    (env) user@host:~/tracim_backend$
+```bash
+user@host:~/tracim_backend$ source env/bin/activate
+(env) user@host:~/tracim_backend$
+```
 
-## Migration How-To - Overview ##
+## Migration How-To - Overview
 
-### Upgrading the Database to the Last Revision ###
+### Upgrading the Database to the Last Revision
 
-    alembic -c development.ini upgrade head
+```bash
+alembic -c development.ini upgrade head
+```
 
-### Downgrading the Database ###
+### Downgrading the Database
 
 To the previous version:
 
-    alembic -c development.ini downgrade -1
+```bash
+alembic -c development.ini downgrade -1
+```
 
 To a specific database revision:
 
-    alembic -c development.ini downgrade <database_revision>
+```bash
+alembic -c development.ini downgrade <database_revision>
+```
 
-## Migration How-To - Advanced (for Developers) ##
+## Migration How-To - Advanced (for Developers)
 
-### Retrieving the Current Version of the Database ###
+### Retrieving the Current Version of the Database
 
-    alembic -c development.ini current
+```bash
+alembic -c development.ini current
+```
 
-## Set Alembic Stamp to the Last Version (First-Time Use) ##
+## Set Alembic Stamp to the Last Version (First-Time Use)
 
-    alembic -c development.ini stamp head
+```bash
+alembic -c development.ini stamp head
+```
 
-### Creating a New Database Migration (Revision) ###
+### Creating a New Database Migration (Revision)
 
 This creates a new auto-generated python migration file:
 
 in `tracim_backend/migration/versions/` ending with `migration_label.py`:
 
-    alembic -c development.ini revision --autogenerate -m "migration label"
+```bash
+alembic -c development.ini revision --autogenerate -m "migration label"
+```
 
+# Creating working migration
 
-# Creating working migration #
+Creating a working alembic migration for all database engines supported by Tracim is not so easy, here are some tricks to help us.
 
-Creating a working alembic migration for all database engines supported by Tracim is not so easy,
-here are some tricks to help us.
-
-## sqlite support of alter table is limited, use always batch_op!
+## sqlite support of alter table is limited, use always batch_op
 
 SQLite has limited support for ops altering tables. As a consequence, you can't easily add/remove/rename columns.
 
@@ -77,6 +88,7 @@ def upgrade():
 ```
 
 There are many examples of this in Tracim migration revision:
+
 - [2b4043fa2502_remove_webdav_right_digest_response_.py]("../tracim_backend/migration/2b4043fa2502_remove_webdav_right_digest_response_.py")
 - [5a4962fb875f_add_allowed_space_to_user.py]("../tracim_backend/migration/5a4962fb875f_add_allowed_space_to_user.py")
 - [32e629b17e2e_change_calendar_enabled_to_agenda_enabled_colum.py]("../tracim_backend/migration/32e629b17e2e_change_calendar_enabled_to_agenda_enabled_colum.py")
@@ -132,7 +144,6 @@ def upgrade():
 
 Will work on both postgresql and sqlite but will fail on mysql, you need to specify
 type_ like this:
-
 
 ```python
 from alembic import op
@@ -196,6 +207,7 @@ def downgrade():
 ```
 
 As you see, for the version of Alembic (1.0.5) currently used in Tracim, you need to:
+
 - drop explicit constraint for MySQL 8.0+
 - do rename for MySQL and MariaDB without creating constraint, then reapply type with
 the constraint to be sure the constraint will be readded.
@@ -341,9 +353,9 @@ def upgrade():
 ```
 
 See:
+
 - [354d62d490ad_remove_page_slug_from_properties.py](../tracim_backend/migration/354d62d490ad_remove_page_slug_from_properties.py)
 - [cd79614189ac_add_owner_to_workspace.py](../tracim_backend/migration/cd79614189ac_add_owner_to_workspace.py)
-
 
 #### Use Raw SQL
 
@@ -390,14 +402,9 @@ if not dialect._is_mysql:
 
 To have restriction on version, you can do this way:
 
-```
+```python
 from alembic import op
 dialect = op.get_context().dialect
 if dialect.server_version_info >= (8, 0, 0):
    pass
 ```
-
-### Avoid Multiple Heads
-
-Currently, Tracim tests do not support multiple heads, so we do need to have a linear migration tree.
-So we need to modify "down_revision" in your new revision to the last one in order to fix this kind of issue.
