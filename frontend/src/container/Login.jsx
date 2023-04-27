@@ -158,29 +158,55 @@ class Login extends React.Component {
     event.preventDefault()
 
     if (name.value === '' || loginTrimmed === '' || password.value === '') {
-      props.dispatch(newFlashMessage(props.t('All fields are required. Please enter a name, an email and a password.'), 'warning'))
+      props.dispatch(
+        newFlashMessage(
+          props.t('All fields are required. Please enter a name, an email and a password.'),
+          'warning',
+          10000
+        )
+      )
       return
     }
 
     if (!checkEmailValidity(loginTrimmed)) {
-      props.dispatch(newFlashMessage(props.t('Invalid email. Please enter a valid email.'), 'warning'))
+      props.dispatch(
+        newFlashMessage(props.t('Invalid email. Please enter a valid email.'), 'warning', 10000)
+      )
       return
     }
 
     if (name.value.length < MINIMUM_CHARACTERS_PUBLIC_NAME) {
-      props.dispatch(newFlashMessage(
-        props.t('Full name must be at least {{minimumCharactersPublicName}} characters', { minimumCharactersPublicName: MINIMUM_CHARACTERS_PUBLIC_NAME }),
-        'warning'))
+      props.dispatch(
+        newFlashMessage(
+          props.t('Full name must be at least {{minimumCharactersPublicName}} characters', {
+            minimumCharactersPublicName: MINIMUM_CHARACTERS_PUBLIC_NAME
+          }),
+          'warning',
+          10000
+        )
+      )
       return
     }
 
     if (password.value.length < 6) {
-      props.dispatch(newFlashMessage(props.t('New password is too short (minimum 6 characters)'), 'warning'))
+      props.dispatch(
+        newFlashMessage(
+          props.t('New password is too short (minimum 6 characters)'),
+          'warning',
+          10000
+        )
+      )
       return
     }
 
     if (password.value.length > 512) {
-      props.dispatch(newFlashMessage(props.t('New password is too long (maximum 512 characters)'), 'warning'))
+      props.dispatch(
+        newFlashMessage(
+          props.t('New password is too long (maximum 512 characters)'),
+          'warning',
+          10000
+        )
+      )
       return
     }
 

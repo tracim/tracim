@@ -255,7 +255,7 @@ When is finished, you can quit your container. Index is now updated with all of 
 
 ## ARM64 build
 
-> Experimental !
+> Experimental!
 
 The ARM64 build is an experimental build without VTK enabled.
 
@@ -274,7 +274,7 @@ for arm64/aarch64/v8
 
 ## Running with gocryptfs encryption
 
-> Experimental !
+> Experimental!
 
 Warning: This is an experimental docker image,
 the new feature from this docker will maybe be merged to the standard docker or removed.

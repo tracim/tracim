@@ -1,6 +1,6 @@
 # Migrate file storage
 
-⚠️ This feature is experimental !
+⚠️ This feature is experimental!
 
 If you want to migrate between the existing storage
 available for uploaded_file or just want to migrate
