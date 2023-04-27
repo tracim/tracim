@@ -30,7 +30,7 @@ Available slugs:
 | delete workspace              |  no         | yes, if manager of a given workspace         | yes     |
 |-------------------------------|-------------|-------------|---------|
 | get list of all user          | no          | no          | yes     |
-| get list of all worskpace     | no          | no          | yes     |
+| get list of all workspace     | no          | no          | yes     |
 | set user global profile rights|  no         | no          | yes     |
 | activate/deactivate user      |  no         | no          | yes     |
 | delete user/ undelete user    |  no         | no          | yes     |
