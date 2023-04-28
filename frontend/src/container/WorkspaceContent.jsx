@@ -166,8 +166,8 @@ export class WorkspaceContent extends React.Component {
     this.setDisplayedContentList()
   }
 
-  // Côme - 2018/11/26 - refactor idea: do not rebuild folder_open when on direct link of an app (without folder_open)
-  // and add process that always keep url and folders open sync
+  // CH - 2018-11-26 - refactor idea: do not rebuild folder_open when on direct link of an app
+  // (without folder_open) and add process that always keep url and folders open sync
   async componentDidUpdate (prevProps, prevState) {
     const { props, state } = this
 
@@ -698,8 +698,8 @@ export class WorkspaceContent extends React.Component {
     const { props } = this
 
     const creationAllowedMessage = !isWorkspaceEmpty && isFilteredWorkspaceEmpty
-      ? props.t('This space has no content of that type yet') + props.t(", create the first content of that type by clicking on the button 'Create'")
-      : props.t('This space has no content yet') + props.t(", create the first content by clicking on the button 'Create'")
+      ? props.t("This space has no content of that type yet, create the first content of that type by clicking on the button 'Create'")
+      : props.t("This space has no content yet, create the first content by clicking on the button 'Create'")
 
     const creationNotAllowedMessage = !isWorkspaceEmpty && isFilteredWorkspaceEmpty
       ? props.t('This space has no content of that type yet')
