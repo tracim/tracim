@@ -56,7 +56,7 @@ function KanbanCardEditor (props) {
             content={description}
             height={200}
             isAdvancedEdition
-            isMentionEnabled
+            isMentionEnabled={false}
             language={props.language}
             maxHeight={300}
             userList={props.memberList}
