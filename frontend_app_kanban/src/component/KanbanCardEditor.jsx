@@ -86,7 +86,7 @@ function KanbanCardEditor (props) {
         </div>
 
         <div className='kanban__KanbanPopup__freeInput'>
-          <label htmlFor='kanban__KanbanPopup__freeInput'>{props.t('Value:')}</label>
+          <label htmlFor='kanban__KanbanPopup__freeInput'>{props.t('Open field:')}</label>
           <TextInput
             id='kanban__KanbanPopup__freeInput'
             onChange={(e) => setFreeInput(e.target.value)}
