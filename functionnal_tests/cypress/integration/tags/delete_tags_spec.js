@@ -42,7 +42,7 @@ describe('Create tags', () => {
       cy.visitPage({ pageName: PAGES.DASHBOARD, params: { workspaceId } })
       cy.contains('.userstatus__role__text', 'Space manager')
       cy.getTag({ selectorName: SELECTORS.WORKSPACE_DASHBOARD })
-        .find('.dashboard__workspace__detail__buttons .iconbutton')
+        .find('.dashboard__workspace__rightMenu__contents .fa-cog')
         .click()
       cy.get('[data-cy=popin_right_part_tag').click()
 

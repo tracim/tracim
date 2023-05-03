@@ -16,7 +16,7 @@ apispec-marshmallow-advanced==0.4
     # via
     #   hapic
     #   tracim-backend (setup.py)
-attrs==21.2.0
+attrs==21.4.0
     # via
     #   cmd2
     #   jsonschema
@@ -54,7 +54,7 @@ cliff==3.8.0
     # via tracim-backend (setup.py)
 cmd2==2.1.1
     # via cliff
-colorama==0.4.4
+colorama==0.4.5
     # via cmd2
 colorlog==5.0.1
     # via tracim-backend (setup.py)
@@ -89,7 +89,7 @@ gitpython==3.1.18
     # via tracim-backend (setup.py)
 gripcontrol==4.1.0
     # via tracim-backend (setup.py)
-hapic[marshmallow]==0.84
+hapic[marshmallow]==0.95
     # via tracim-backend (setup.py)
 html2text==2020.1.16
     # via tracim-backend (setup.py)
@@ -101,7 +101,7 @@ hupper==1.10.3
     # via pyramid
 idna==2.10
     # via requests
-imapclient==2.2.0
+imapclient==2.3.1
     # via tracim-backend (setup.py)
 importlib-metadata==4.6.0
     # via tracim-backend (setup.py)
@@ -115,7 +115,7 @@ lxml==4.9.1
     # via
     #   caldav
     #   tracim-backend (setup.py)
-mako==1.1.4
+mako==1.2.2
     # via
     #   alembic
     #   pyramid-mako
@@ -129,7 +129,7 @@ marshmallow==2.21.0
     #   apispec-marshmallow-advanced
     #   hapic
     #   tracim-backend (setup.py)
-multidict==5.1.0
+multidict==5.2.0
     # via hapic
 packaging==20.9
     # via sqlakeyset

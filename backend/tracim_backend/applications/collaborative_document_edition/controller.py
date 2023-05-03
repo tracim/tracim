@@ -9,8 +9,7 @@ import transaction
 from tracim_backend import ContentNotFound
 from tracim_backend import TracimRequest
 from tracim_backend import hapic
-from tracim_backend.app_models.contents import FILE_TYPE
-from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.applications.collaborative_document_edition.data import (
     COLLABORATIVE_DOCUMENT_EDITION_BASE,
 )
@@ -114,27 +113,35 @@ class CollaborativeDocumentEditionController(Controller):
         if hapic_data.body.parent_id:
             try:
                 parent = api.get_one(
-                    content_id=hapic_data.body.parent_id, content_type=content_type_list.Any_SLUG
+                    content_id=hapic_data.body.parent_id, content_type=ContentTypeSlug.ANY.value
                 )
             except ContentNotFound as exc:
                 raise ParentNotFound(
                     "Parent with content_id {} not found".format(hapic_data.body.parent_id)
                 ) from exc
 
-        content = api.create(
-            content_type_slug=FILE_TYPE,
-            do_save=True,
-            filename=hapic_data.body.filename,
-            template_id=hapic_data.body.template_id,
-            workspace=request.current_workspace,
-            parent=parent,
-        )
+        with request.dbsession.no_autoflush:
+            content = api.create(
+                content_type_slug=ContentTypeSlug.FILE.value,
+                do_save=True,
+                filename=hapic_data.body.filename,
+                template_id=hapic_data.body.template_id,
+                workspace=request.current_workspace,
+                parent=parent,
+            )
 
         if not hapic_data.body.template_id:
             with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
                 collaborative_document_edition_api.update_content_from_template(
                     content=content, template_filename=hapic_data.body.template
                 )
+        else:
+            api.copy_tags(
+                destination=content, source_content_id=hapic_data.body.template_id,
+            )
+            api.copy_todos(
+                new_parent=content, template_id=hapic_data.body.template_id,
+            )
 
         return api.get_content_in_context(content)
 

@@ -26,5 +26,13 @@ describe('Dashboard button list', () => {
     cy.changeLanguage('de')
     cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
     cy.get('button[title="Diskussion beginnen"]').contains('Diskussion beginnen')
+
+    cy.changeLanguage('ar')
+    cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
+    cy.get('button[title="الشروع في محادثة"]').contains('الشروع في محادثة')
+
+    cy.changeLanguage('es')
+    cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
+    cy.get('button[title="Iniciar una discusión"]').contains('Iniciar una discusión')
   })
 })

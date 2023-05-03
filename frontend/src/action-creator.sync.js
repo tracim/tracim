@@ -72,9 +72,9 @@ export const unDeleteWorkspaceContentList = (workspaceContentList, workspaceId) 
 
 export const updateWorkspaceFilter = filterList => ({ type: `${UPDATE}/${WORKSPACE}/Filter`, filterList })
 
-export const USER_WORKSPACE_DO_NOTIFY = `${USER}/${WORKSPACE}/SubscriptionNotif`
-export const updateUserWorkspaceSubscriptionNotif = (userId, workspaceId, doNotify) =>
-  ({ type: `${UPDATE}/${USER_WORKSPACE_DO_NOTIFY}`, userId, workspaceId, doNotify })
+export const USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE = `${USER}/${WORKSPACE}/EmailNotificationType`
+export const updateUserWorkspaceEmailNotificationType = (userId, workspaceId, emailNotificationType) =>
+  ({ type: `${UPDATE}/${USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE}`, userId, workspaceId, emailNotificationType })
 
 export const WORKSPACE_CONTENT_ARCHIVED = `${WORKSPACE_CONTENT}/Archived`
 export const WORKSPACE_CONTENT_DELETED = `${WORKSPACE_CONTENT}/Deleted`
@@ -197,17 +197,33 @@ export const APPLIED_FILTER = (searchType) => `AppliedFilter_${searchType}`
 export const setAppliedFilter = (key, value, searchType) => ({ type: `${SET}/${APPLIED_FILTER(searchType)}`, key, value })
 export const resetAppliedFilter = (searchType) => ({ type: `${RESET}/${APPLIED_FILTER(searchType)}` })
 
-export const NEXT_PAGE = 'NextPage'
-export const NOTIFICATION_LIST = 'NotificationList'
 export const NOTIFICATION = 'Notification'
+export const NEXT_PAGE = 'NextPage'
+export const NOTIFICATION_LIST = `${NOTIFICATION}/List`
+export const EVERY_NOTIFICATION = `Every${NOTIFICATION}`
 export const UNREAD_MENTION_COUNT = 'UnreadMentionCount'
-export const UNREAD_NOTIFICATION_COUNT = 'UnreadNotificationCount'
-export const appendNotificationList = (notificationList, spaceList) => ({ type: `${APPEND}/${NOTIFICATION_LIST}`, notificationList, spaceList })
-export const addNotification = (notification, spaceList) => ({ type: `${ADD}/${NOTIFICATION}`, notification, spaceList })
+export const UNREAD_NOTIFICATION_COUNT = `Unread${NOTIFICATION}Count`
+export const appendNotificationList = (userId, notificationList, spaceList) => ({
+  type: `${APPEND}/${NOTIFICATION_LIST}`,
+  userId,
+  notificationList,
+  spaceList
+})
+export const addNotification = (notification, spaceList) => ({
+  type: `${ADD}/${NOTIFICATION}`,
+  notification,
+  spaceList
+})
 export const updateNotification = (notificationId, notificationList) => ({ type: `${UPDATE}/${NOTIFICATION}`, notificationId, notificationList })
-export const readNotification = notificationId => ({ type: `${READ}/${NOTIFICATION}`, notificationId })
-export const readNotificationList = () => ({ type: `${READ}/${NOTIFICATION_LIST}` })
-export const readContentNotification = contentId => ({ type: `${READ}/${CONTENT}/${NOTIFICATION}`, contentId })
+export const readNotificationList = notificationIdList => ({
+  type: `${READ}/${NOTIFICATION_LIST}`,
+  notificationIdList
+})
+export const readEveryNotification = () => ({ type: `${READ}/${EVERY_NOTIFICATION}` })
+export const readContentNotification = contentId => ({
+  type: `${READ}/${CONTENT}/${NOTIFICATION}`,
+  contentId
+})
 export const setNextPage = (hasNextPage, nextPageToken) => ({ type: `${SET}/${NEXT_PAGE}`, hasNextPage, nextPageToken })
 export const setUnreadMentionCount = (count) => ({ type: `${SET}/${UNREAD_MENTION_COUNT}`, count })
 export const setUnreadNotificationCount = (count) => ({ type: `${SET}/${UNREAD_NOTIFICATION_COUNT}`, count })

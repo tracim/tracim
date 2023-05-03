@@ -9,31 +9,33 @@ import {
 import {
   appendNotificationList,
   newFlashMessage,
-  readNotificationList,
+  readEveryNotification,
   setNextPage
 } from '../action-creator.sync.js'
 import {
-  CONTENT_NAMESPACE,
   GROUP_NOTIFICATION_CRITERIA,
   FETCH_CONFIG
 } from '../util/helper.js'
 import {
+  CONTENT_NAMESPACE,
   CONTENT_TYPE,
-  getContentPath,
-  GROUP_MENTION_TRANSLATION_LIST,
-  handleFetchResult,
-  Loading,
+  MENTION_CONSTANT,
   NUMBER_RESULTS_BY_PAGE,
   PAGE,
   PROFILE,
+  SORT_BY,
   SUBSCRIPTION_TYPE,
   TLM_CORE_EVENT_TYPE as TLM_EVENT,
   TLM_ENTITY_TYPE as TLM_ENTITY,
   TLM_SUB_TYPE as TLM_SUB,
   IconButton,
   ListItemWrapper,
+  Loading,
   PopinFixedHeader,
-  TracimComponent
+  TracimComponent,
+  getContentPath,
+  handleFetchResult,
+  sortListByMultipleCriteria
 } from 'tracim_frontend_lib'
 import { escape as escapeHtml, uniqBy } from 'lodash'
 import NotificationItem from '../component/NotificationItem.jsx'
@@ -72,18 +74,6 @@ const hasSameContent = (notificationList) => {
   })
 }
 
-const sortByCreatedDateAndID = (arrayToSort) => {
-  return arrayToSort.sort(function (a, b) {
-    if (a.created < b.created) return 1
-    if (a.created > b.created) return -1
-    if (a.created === b.created) {
-      if (a.id < b.id) return 1
-      if (a.id > b.id) return -1
-    }
-    return 0
-  })
-}
-
 // INFO - MP - 2022-05-24 - Return true if the notification list can be grouped
 const canBeGrouped = (notificationList, numberOfCriteria = NUMBER_OF_CRITERIA.TWO) => {
   const isSameContent = hasSameContent(notificationList)
@@ -104,15 +94,15 @@ const canBeGrouped = (notificationList, numberOfCriteria = NUMBER_OF_CRITERIA.TW
 
 // INFO - MP - 2022-05-24 - Add a notification to an existing group
 const addNotificationToGroup = (notification, notificationGroup) => {
-  notificationGroup.group = sortByCreatedDateAndID([notification, ...notificationGroup.group])
+  notificationGroup.group = sortListByMultipleCriteria([notification, ...notificationGroup.group], [SORT_BY.CREATION_DATE, SORT_BY.ID])
 
   notificationGroup.created = new Date(notification.created).getTime() < new Date(notificationGroup.created).getTime()
     ? notificationGroup.created
     : notification.created
 }
 
-// INFO - MP - 2022-05-24 - Check if I can create a group with the three notifications with two criterias
-// or six notifications with one criteria
+// INFO - MP - 2022-05-24 - Check if I can create a group with the three notifications with two criteria
+// or six notifications with one criterion
 const tryGroupingNotification = (notificationList) => {
   const twoCriteriaList = notificationList.slice(notificationList.length - 3)
   const twoCriteriaListContainsGroup = twoCriteriaList.some(notification => notification.group)
@@ -208,7 +198,7 @@ const linkToParentContent = (notification) => {
 
 export const NotificationWall = props => {
   const [notificationList, setNotificationList] = useState([])
-  // INFO - GB -2022-06-05 - The no set bellow is not used because folderPath is a dictionary and the manipulations are done directly
+  // INFO - GB -2022-06-05 - The no set below is not used because folderPath is a dictionary and the manipulations are done directly
   const [folderPath, setFolderPath] = useState({}) // eslint-disable-line no-unused-vars
   const [isFolderPathLoading, setIsFolderPathLoading] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -256,7 +246,7 @@ export const NotificationWall = props => {
     const fetchAllPutNotificationAsRead = await props.dispatch(putAllNotificationAsRead(props.user.userId))
     switch (fetchAllPutNotificationAsRead.status) {
       case 204:
-        props.dispatch(readNotificationList())
+        props.dispatch(readEveryNotification())
         break
       default:
         props.dispatch(newFlashMessage(props.t('An error has happened while setting "mark all as read"'), 'warning'))
@@ -278,7 +268,13 @@ export const NotificationWall = props => {
           // INFO - MP - 2022-05-23 - We need to set the next page first and update the list of notifications
           // after, so the hook isn't triggered too early.
           props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
-          props.dispatch(appendNotificationList(fetchGetNotificationWall.json.items, props.workspaceList))
+          props.dispatch(
+            appendNotificationList(
+              props.user.userId,
+              fetchGetNotificationWall.json.items,
+              props.workspaceList
+            )
+          )
           break
         default:
           props.dispatch(newFlashMessage(props.t('Error while loading the notification list'), 'warning'))
@@ -312,15 +308,26 @@ export const NotificationWall = props => {
         )
         : ''
     )
+    const escapedToDoLabel = (
+      notification.content
+        ? notification.content.toDoLabel
+          ? escapeHtml(notification.content.toDoLabel)
+          : props.t('a task')
+        : ''
+    )
+    const hasToDo = notification.content ? notification.content.hasToDo : false
 
     const numberOfContents = notification.numberOfContents || 1
     const i18nOpts = {
       user: `<span title='${escapedUser}'>${escapedUser}</span>`,
       author: `<span title='${escapedAuthor}'>${escapedAuthor}</span>`,
-      content: `<span title='${escapedContentLabel}' class='${numberOfContents === 1
-        ? 'contentTitle__highlight'
-        : ''
-        }'>${escapedContentLabel}</span>`,
+      content: hasToDo
+        ? `<span title='${escapedContentLabel}' class='contentTitle__highlight'>${escapedContentLabel}</span>`
+        : `<span title='${escapedContentLabel}' class='${numberOfContents === 1
+            ? 'contentTitle__highlight'
+            : ''
+          }'>${escapedContentLabel}</span>`,
+      task: `<span title='${escapedToDoLabel}'>${escapedToDoLabel}</span>`,
       interpolation: { escapeValue: false }
     }
 
@@ -355,7 +362,7 @@ export const NotificationWall = props => {
           if (contentType === TLM_SUB.TODO) {
             return {
               title: props.t('Task to do created'),
-              text: props.t('{{author}} created a task on {{content}}{{workspaceInfo}}', i18nOpts),
+              text: props.t('{{author}} created {{task}} on {{content}}{{workspaceInfo}}', i18nOpts),
               url: linkToParentContent(notification),
               isToDo: true
             }
@@ -372,7 +379,7 @@ export const NotificationWall = props => {
             if (contentType === TLM_SUB.TODO) {
               return {
                 title: props.t('Task updated'),
-                text: props.t('{{author}} updated a task on {{content}}{{workspaceInfo}}', i18nOpts),
+                text: props.t('{{author}} updated {{task}} on {{content}}{{workspaceInfo}}', i18nOpts),
                 url: linkToParentContent(notification),
                 isToDo: true
               }
@@ -395,7 +402,7 @@ export const NotificationWall = props => {
           if (contentType === TLM_SUB.TODO) {
             return {
               title: props.t('Task deleted'),
-              text: props.t('{{author}} deleted a task on {{content}}{{workspaceInfo}}', i18nOpts),
+              text: props.t('{{author}} deleted {{task}} on {{content}}{{workspaceInfo}}', i18nOpts),
               url: linkToParentContent(notification),
               isToDo: true
             }
@@ -418,7 +425,7 @@ export const NotificationWall = props => {
     }
 
     if (entityType === TLM_ENTITY.MENTION && eventType === TLM_EVENT.CREATED) {
-      const groupMention = GROUP_MENTION_TRANSLATION_LIST.includes(notification.mention.recipient)
+      const groupMention = notification.mention.type === MENTION_CONSTANT.TYPE.ROLE
       const mentionEveryone = props.t('{{author}} mentioned everyone in {{content}}', i18nOpts)
       const mentionYou = props.t('{{author}} mentioned you in {{content}}', i18nOpts)
       const isHtmlDocument = notification.content.type === CONTENT_TYPE.HTML_DOCUMENT

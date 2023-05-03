@@ -1,7 +1,6 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
+@import '~tracim_frontend_lib/src/css/Variable.styl'
 
 .newSpace
-  top 15%
   max-height 80%
   &__menu
     width 100%
@@ -25,7 +24,7 @@
       font-size titleFontSize
   &__input
     width 100%
-    border borderStyle
+    border none
     border-radius standardBorderRadius
     min-height 38px
     &[type='text']
@@ -62,7 +61,6 @@
 
 @media (max-width: max-xs)
   .newSpace
-    top "calc(5px + %s)" % headerHeight
     max-height "calc(100% - %s)" % headerHeight
     & .cardPopup
       &__container

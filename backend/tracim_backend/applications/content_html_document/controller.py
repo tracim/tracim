@@ -6,12 +6,12 @@ from hapic.data import HapicFile
 from pyramid.config import Configurator
 import transaction
 
-from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
-from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentStatusException
 from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import InvalidMention
 from tracim_backend.exceptions import UserNotMemberOfWorkspace
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
@@ -49,7 +49,7 @@ SWAGGER_TAG__CONTENT_HTML_DOCUMENT_SECTION = "HTML documents"
 SWAGGER_TAG__CONTENT_HTML_DOCUMENT_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__CONTENT_ENDPOINTS, SWAGGER_TAG__CONTENT_HTML_DOCUMENT_SECTION
 )
-is_html_document_content = ContentTypeChecker([HTML_DOCUMENTS_TYPE])
+is_html_document_content = ContentTypeChecker([ContentTypeSlug.HTML_DOCUMENTS.value])
 CONTENT_TYPE_TEXT_HTML = "text/html"
 
 
@@ -73,7 +73,7 @@ class HTMLDocumentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         return api.get_content_in_context(content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_HTML_DOCUMENT_ENDPOINTS])
@@ -98,7 +98,7 @@ class HTMLDocumentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         file = BytesIO(content.raw_content.encode("utf-8"))
         byte_size = len(file.getvalue())
         filename = hapic_data.path.filename
@@ -169,8 +169,9 @@ class HTMLDocumentController(Controller):
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_HTML_DOCUMENT_ENDPOINTS])
-    @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(InvalidMention, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UserNotMemberOfWorkspace, HTTPStatus.BAD_REQUEST)
     @check_right(is_contributor)
     @check_right(is_html_document_content)
@@ -191,7 +192,7 @@ class HTMLDocumentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.update_content(
                 item=content,
@@ -221,7 +222,7 @@ class HTMLDocumentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
         return api.get_revision_in_context(revision)
 
@@ -245,7 +246,7 @@ class HTMLDocumentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         revisions_page = content.get_revisions(
             page_token=hapic_data.query["page_token"],
             count=hapic_data.query["count"],
@@ -275,7 +276,7 @@ class HTMLDocumentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         if content.status == request.json_body.get("status"):
             raise ContentStatusException(
                 "Content id {} already have status {}".format(content.content_id, content.status)
@@ -305,7 +306,7 @@ class HTMLDocumentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         default_filename = "{label}.pdf".format(label=content.label)
         result = api.get_full_pdf_preview_from_html_raw_content(
             revision=content.revision,
@@ -335,7 +336,7 @@ class HTMLDocumentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
         default_filename = "{label}_r{revision_id}.pdf".format(
             revision_id=revision.revision_id, label=revision.label

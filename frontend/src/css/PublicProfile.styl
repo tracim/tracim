@@ -4,7 +4,7 @@
 
 .profile
   &__text__loading
-    background-color lightGrey
+    background-color lightGrey2
     height 20px
     width 200px
     margin standardSpacing
@@ -12,7 +12,6 @@
     width 400px
   &__popup_select_cover
     width 50%
-    margin-inline-start -25%
   &__cover
     height 150px
     width 100%
@@ -27,7 +26,7 @@
       bottom standardSpacing
       background-color offWhite
       &:hover
-        background-color lightGrey
+        background-color lightGrey2
     &__loading
       margin standardSpacing
     &__image
@@ -40,9 +39,13 @@
     padding-inline-start pageSpacing
     background-color offWhite
     display flex
-    &__callBtn
-      align-self start
-      margin standardSpacing pageSpacing standardSpacing
+    &__btnGrp
+      display flex
+      flex-direction row
+      margin standardSpacing pageSpacing
+      &__btn
+        align-self start
+        margin 0 standardSpacing
     &__avatar
       position relative
       &__medium
@@ -91,7 +94,6 @@
       background-color offWhite
       height max-content
       min-height 300px
-      border borderStyle
       border-radius standardBorderRadius
       padding standardSpacing
     &__information
@@ -107,7 +109,7 @@
       margin-inline-start standardSpacing
       width 70%
     &__loading
-      background-color veryLightGrey
+      background-color lightGrey2
       height 200px
       margin standardSpacing
   &__customForm__submit
@@ -131,8 +133,6 @@
     left pageSpacing
   &__customForm__submit
     left 0
-  &__popup_select_cover
-    left 25%
   &__mainBar__avatar__changeBtn
     left -5px
 

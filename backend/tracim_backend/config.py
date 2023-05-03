@@ -72,6 +72,11 @@ def create_target_langage(value: str) -> typing.Tuple[str, str]:
     return (code, display)
 
 
+def create_code_sample_langage(language: str) -> typing.Tuple[str, str]:
+    value, text = language.split(":")
+    return (value, text)
+
+
 class ConfigParam(object):
     def __init__(
         self,
@@ -489,9 +494,7 @@ class CFG(object):
         )
         self.KNOWN_MEMBERS__FILTER = asbool(self.get_raw_config("known_members.filter", "True"))
         self.DEBUG = asbool(self.get_raw_config("debug", "False"))
-        self.BUILD_VERSION = self.get_raw_config(
-            "build_version", get_build_version(os.path.abspath(__file__))
-        )
+        self.BUILD_VERSION = self.get_raw_config("build_version", get_build_version())
         self.PREVIEW__JPG__RESTRICTED_DIMS = asbool(
             self.get_raw_config("preview.jpg.restricted_dims", "False")
         )
@@ -509,9 +512,7 @@ class CFG(object):
         tracim_folder = os.path.dirname(backend_folder)
         backend_i18n_folder = os.path.join(backend_folder, "tracim_backend", "locale")
 
-        self.FRONTEND__CACHE_TOKEN = self.get_raw_config(
-            "frontend.cache_token", get_cache_token(os.path.abspath(__file__))
-        )
+        self.FRONTEND__CACHE_TOKEN = self.get_raw_config("frontend.cache_token", get_cache_token())
 
         self.BACKEND__I18N_FOLDER_PATH = self.get_raw_config(
             "backend.i18n_folder_path", backend_i18n_folder
@@ -560,6 +561,81 @@ class CFG(object):
         self.UI__SPACES__CREATION__PARENT_SPACE_CHOICE__VISIBLE = asbool(
             self.get_raw_config("ui.spaces.creation.parent_space_choice.visible", "True")
         )
+
+        default_code_sample_languages = """
+            apacheconf:Apache Configuration,
+            arduino:Arduino,
+            aspnet:ASP.NET,
+            bash:Bash,
+            batch:Batch,
+            bbcode:BBcode,
+            c:C,
+            clike:C-like,
+            csharp:C#,
+            cpp:C++,
+            cobol:COBOL,
+            css:CSS,
+            css-extras:CSS Extras,
+            csv:CSV,
+            diff:Diff,
+            django:Django/Jinja2,
+            docker:Docker,
+            erlang:Erlang,
+            excel-formula:Excel Formula,
+            fortran:Fortran,
+            git:Git,
+            haskell:Haskell,
+            ignore:.ignore,
+            ini:Ini,
+            java:Java,
+            javascript:JavaScript,
+            jq:JQ,
+            json:JSON,
+            json5:JSON5,
+            jsonp:JSONP,
+            latex:LaTeX,
+            lisp:Lisp,
+            lua:Lua,
+            makefile:Makefile,
+            markdown:Markdown,
+            markup:Markup,
+            matlab:MATLAB,
+            nginx:nginx,
+            objectivec:Objective-C,
+            ocaml:OCaml,
+            pascal:Pascal,
+            perl:Perl,
+            php:PHP,
+            phpdoc:PHPDoc,
+            php-extras:PHP Extras,
+            powershell:PowerShell,
+            properties:.properties,
+            python:Python,
+            r:R,
+            jsx:React JSX,
+            tsx:React TSX,
+            regex:Regex,
+            ruby:Ruby,
+            rust:Rust,
+            sql:SQL,
+            vbnet:VB.Net,
+            vim:vim,
+            visual-basic:Visual Basic,
+            yaml:YAML,
+            wiki:Wiki markup
+        """
+        code_sample_languages = string_to_unique_item_list(
+            self.get_raw_config("ui.notes.code_sample_languages", default_code_sample_languages),
+            separator=",",
+            cast_func=create_code_sample_langage,
+            do_strip=True,
+        )
+        try:
+            self.UI__NOTES__CODE_SAMPLE_LANGUAGES = [
+                {"value": value, "text": text} for value, text in code_sample_languages
+            ]
+        except ValueError:
+            raise ConfigurationError("The value of ui.notes.code_sample_languages is malformed")
 
     def __load_uploaded_files_config(self) -> None:
         default_depot_storage_path = self.here_macro_replace("%(here)s/depot")
@@ -640,8 +716,8 @@ class CFG(object):
         ###
         # EMAIL related stuff (notification, reply)
         ##
-        self.EMAIL__NOTIFICATION__ENABLED_ON_INVITATION = asbool(
-            self.get_raw_config("email.notification.enabled_on_invitation", "True")
+        self.EMAIL__NOTIFICATION__TYPE_ON_INVITATION = str(
+            self.get_raw_config("email.notification.type_on_invitation", "summary")
         )
 
         # TODO - G.M - 2019-04-05 - keep as parameters
@@ -705,6 +781,12 @@ class CFG(object):
         self.EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__SUBJECT = self.get_raw_config(
             "email.notification.reset_password_request.subject",
             _("[{website_title}] A password reset has been requested"),
+        )
+
+        # Summary
+        self.EMAIL__NOTIFICATION__SUMMARY__TEMPLATE__HTML = self.get_raw_config(
+            "email.notification.summary.template.html",
+            "{}/{}".format(template_dir, "summary_body_html.mak"),
         )
 
         # TODO - G.M - 2019-01-22 - add feature to process notification email
@@ -923,7 +1005,15 @@ class CFG(object):
         self.TRANSLATION_SERVICE__SYSTRAN__API_KEY = self.get_raw_config(
             "{}.systran.api_key".format(prefix)
         )
-        default_target_languages = "fr:Français,en:English,pt:Português,de:Deutsch,ar:العربية"
+        default_target_languages = """
+            fr:Français,
+            en:English,
+            pt:Português,
+            de:Deutsch,
+            ar:العربية,
+            es:Español,
+            nb_NO:Norsk
+        """
         target_language_pairs = string_to_unique_item_list(
             self.get_raw_config("{}.target_languages".format(prefix), default_target_languages),
             separator=",",
@@ -1029,7 +1119,7 @@ class CFG(object):
             "COLOR__CONFIG_FILE_PATH", self.COLOR__CONFIG_FILE_PATH,
         )
 
-        for required_color in ("primary", "sidebar"):
+        for required_color in ("primary", "sidebar", "sidebar/font"):
             try:
                 self.APPS_COLORS[required_color]
             except KeyError as e:

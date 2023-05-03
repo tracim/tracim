@@ -24,6 +24,6 @@ describe('operation :: workspace > create_new > thread', function () {
     cy.get('.thread.visible .wsContentGeneric__header__title').contains(titre1)
     cy.get('.thread.visible .thread__contentpage__header__close').click()
     cy.get('.thread.visible').should('not.be.visible')
-    cy.contains('.workspace__content__fileandfolder .content__name', titre1)
+    cy.contains('.workspace__content__file_and_folder .content__name', titre1)
   })
 })

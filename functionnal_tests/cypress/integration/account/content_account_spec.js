@@ -1,18 +1,23 @@
-import { PAGES } from '../../support/urls_commands'
+import { PAGES, URLS } from '../../support/urls_commands'
 import { SELECTORS as s } from '../../support/generic_selector_commands'
 import baseUser from '../../fixtures/baseUser.json'
+import defaultAdmin from '../../fixtures/defaultAdmin.json'
 
 
 
 describe('Account page', () => {
   beforeEach(() => {
-    cy.cancelXHR()
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('users')
     cy.visitPage({ pageName: PAGES.ACCOUNT })
     cy.log('Todo must be reworked')
   })
+
+  afterEach(() => {
+    cy.cancelXHR()
+  })
+
   const validateButton = 'Validate'
 
   describe('Account header', () => {
@@ -276,6 +281,23 @@ describe('Account page', () => {
         cy.contains('.account__userpreference__setting__spacename', 'You are not a member of any space yet')
       })
     })
+  })
+})
 
+describe('Profile link button', () => {
+  beforeEach(() => {
+    cy.resetDB()
+    cy.setupBaseDB()
+    cy.loginAs('administrators')
+  })
+
+  afterEach(() => {
+    cy.cancelXHR()
+  })
+
+  it("should redirect to user's public profile", () => {
+    cy.visitPage({ pageName: PAGES.ACCOUNT })
+    cy.get('.userinfo__profile_button').click()
+    cy.url().should('include', URLS[PAGES.PROFILE]({ userId: defaultAdmin.user_id }));
   })
 })

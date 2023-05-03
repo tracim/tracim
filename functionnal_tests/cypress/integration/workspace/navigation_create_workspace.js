@@ -9,7 +9,7 @@ describe('navigate :: create_new > workspace', function () {
     cy.visit('/ui/workspaces/1/dashboard')
   })
   it('', function () {
-    cy.get('[data-cy=sidebarCreateWorkspaceBtn]')
+    cy.get('[data-cy=sidebarCreateSpaceBtn]')
       .should('be.visible')
       .click()
     cy.get('.cardPopup__container .cardPopup__header__title')

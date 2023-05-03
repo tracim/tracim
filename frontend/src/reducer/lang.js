@@ -1,17 +1,23 @@
 import { UPDATE, LANG } from '../action-creator.sync.js'
 
 const defaultLang = [{
+  id: 'de',
+  label: 'Deutsch'
+}, {
   id: 'en',
   label: 'English'
+}, {
+  id: 'es',
+  label: 'Español'
 }, {
   id: 'fr',
   label: 'Français'
 }, {
+  id: 'nb_NO',
+  label: 'Norsk'
+}, {
   id: 'pt',
   label: 'Português'
-}, {
-  id: 'de',
-  label: 'Deutsch'
 }, {
   id: 'ar',
   label: 'العربية'

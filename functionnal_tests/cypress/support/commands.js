@@ -55,18 +55,9 @@ Cypress.Commands.add('typeInTinyMCE', (content) => {
 })
 
 Cypress.Commands.add('inputInTinyMCE', (content) => {
-  cy.window()
-    .its('tinyMCE')
-    .its('activeEditor')
-    .then(activeEditor => {
-      activeEditor.focus()
-      activeEditor.execCommand('mceInsertContent', false, content)
-      content.split('').forEach(contentChar => {
-        activeEditor.fire('input', { data: contentChar })
-        activeEditor.fire('keyup', { key: contentChar })
-        activeEditor.fire('keydown', { key: contentChar })
-      })
-    })
+  cy.getActiveTinyMCEEditor().then(activeEditor => {
+    cy.wrap(activeEditor.getBody()).type(content)
+  })
 })
 
 Cypress.Commands.add('clearTinyMCE', () => {
@@ -138,16 +129,16 @@ Cypress.Commands.add('waitForTinyMCELoaded', () => {
     if (activeEditor) isTinyMCEActive = true
   })
 
-  cy.document().then( $doc => {
+  cy.document().then($doc => {
     return isTinyMCEActive
       ? true
       : new Cypress.Promise(resolve => { // Cypress will wait for this Promise to resolve
-      const onTinyMceLoaded = () => {
-        $doc.removeEventListener('tinymceLoaded', onTinyMceLoaded) // cleanup
-        resolve() // resolve and allow Cypress to continue
-      }
-      $doc.addEventListener('tinymceLoaded', onTinyMceLoaded)
-    })
+        const onTinyMceLoaded = () => {
+          $doc.removeEventListener('tinymceLoaded', onTinyMceLoaded) // cleanup
+          resolve() // resolve and allow Cypress to continue
+        }
+        $doc.addEventListener('tinymceLoaded', onTinyMceLoaded)
+      })
   })
 })
 
@@ -210,8 +201,8 @@ Cypress.Commands.add('changeLanguage', (langCode) => {
     const dropdown = elements[0]
     const button = dropdown.getElementsByTagName('button')[0]
     if (button && button.getAttribute('data-cy') === `${langCode}-active`) return
+    cy.get(button).click()
     cy.wrap(dropdown)
-      .click('left')
       .find(`[data-cy="${langCode}"]`)
       .click()
     cy.get('[data-cy=IconButton_PersonalData]').click()

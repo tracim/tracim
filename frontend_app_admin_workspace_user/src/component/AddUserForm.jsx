@@ -64,9 +64,9 @@ export class AddUserForm extends React.Component {
 
   isValidateButtonDisabled = () => {
     const { props, state } = this
-    if (props.emailNotifActivated && state.newUserEmail === '' && state.newUserPassword === '') return true
+    if (props.isEmailNotifActivated && state.newUserEmail === '' && state.newUserPassword === '') return true
     if (state.newUserName === '' || state.newUserType === '') return true
-    if (!props.emailNotifActivated && state.newUserPassword === '') return true
+    if (!props.isEmailNotifActivated && state.newUserPassword === '') return true
     if (props.isEmailRequired && state.newUserEmail === '') return true
     else return ((state.newUserUsername === '' && state.newUserEmail === '') || !props.isUsernameValid)
   }
@@ -83,7 +83,7 @@ export class AddUserForm extends React.Component {
 
           <input
             type='text'
-            className='userData__input form-control primaryColorBorderLighten'
+            className='userData__input form-control'
             id='adduser_name'
             placeholder={props.t('Full name')}
             value={state.newUserName}
@@ -98,7 +98,7 @@ export class AddUserForm extends React.Component {
           <div>
             <input
               type='text'
-              className='userData__input userData__input__username form-control primaryColorBorderLighten'
+              className='userData__input userData__input__username form-control'
               id='adduser_username'
               placeholder={props.t('Username')}
               value={state.newUserUsername}
@@ -123,7 +123,7 @@ export class AddUserForm extends React.Component {
               {props.t('Email')}
             </label>
 
-            {!props.emailNotifActivated && (
+            {!props.isEmailNotifActivated && (
               <>
                 <button
                   type='button'
@@ -143,7 +143,7 @@ export class AddUserForm extends React.Component {
 
           <input
             type='email'
-            className='userData__input form-control primaryColorBorderLighten'
+            className='userData__input form-control'
             id='adduser_email'
             placeholder={props.t('Email')}
             value={state.newUserEmail}
@@ -158,7 +158,7 @@ export class AddUserForm extends React.Component {
 
             <input
               type='text'
-              className='userData__input form-control primaryColorBorderLighten'
+              className='userData__input form-control'
               id='adduser_password'
               placeholder={props.t('Password')}
               value={state.newUserPassword}
@@ -167,7 +167,7 @@ export class AddUserForm extends React.Component {
             />
           </div>
 
-          {(props.emailNotifActivated && state.newUserEmail === '') && (
+          {(props.isEmailNotifActivated && state.newUserEmail === '') && (
             <div className='userData__info'>
               <i className='fas fa-exclamation-triangle userData__info__icon' />
               {props.t('If you do not link an email to this new user, please notify manually the username and password.')}

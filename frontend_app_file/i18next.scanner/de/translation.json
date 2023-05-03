@@ -3,7 +3,6 @@
   "Last version": "Letzte Version",
   "Restore": "Wiederherstellen",
   "Error while creating file": "Fehler beim Erstellen der Datei",
-  "Error while saving the comment": "Fehler beim Speichern des Kommentars",
   "Cancel": "Abbrechen",
   "Validate": "Validieren",
   "Download file": "Datei herunterladen",
@@ -63,5 +62,7 @@
   "Error while saving the user configuration": "Fehler beim Speichern der Benutzerkonfiguration",
   "Tags": "Markierungen",
   "Delete": "Löschen",
-  "Tasks": ""
+  "Tasks": "",
+  "The link has been copied to clipboard": "Der Link wurde in die Clipboard kopiert",
+  "Copy content link": "Link zum Inhalt kopieren"
 }

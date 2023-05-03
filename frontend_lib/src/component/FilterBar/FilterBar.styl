@@ -1,0 +1,20 @@
+@import '../../css/Variable.styl'
+
+.filterBar
+  border 1px solid lightGrey2
+  background-color offWhite
+  margin-top standardSpacing
+  margin-bottom standardSpacing * 2
+  border-radius standardBorderRadius
+  padding 0 standardSpacing
+  min-width 0
+
+.filterBar:focus-within
+  border 1px solid lightBlue
+
+.filterBar .textinput__box:focus-within
+  border 0
+
+.filterBar .textinput__text
+  overflow hidden
+  text-overflow ellipsis

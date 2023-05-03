@@ -1,6 +1,7 @@
 ghostscript
 git
 imagemagick
+libmagickcore-6.q16-6-extra
 iproute2
 libfile-mimeinfo-perl
 libimage-exiftool-perl
@@ -13,3 +14,5 @@ python3-pip
 pandoc
 libpango-1.0-0
 libpangoft2-1.0-0
+fonts-noto-color-emoji
+cron

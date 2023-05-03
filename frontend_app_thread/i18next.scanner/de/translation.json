@@ -6,10 +6,11 @@
   "Start a topic": "Diskussion beginnen",
   "A content with the same name already exists": "Ein Inhalt mit demselben Namen existiert bereits",
   "Error while creating thread": "Fehler beim Erzeugen der Diskussion",
-  "Error while saving the comment": "Fehler beim Speichern des Kommentars",
   "Thread": "Diskussion",
   "thread": "Diskussion",
   "threads": "Diskussionen",
   "The content has been modified by {{author}}": "Der Inhalt wurde geändert von {{author}}",
-  "Delete": "Löschen"
+  "Delete": "Löschen",
+  "The link has been copied to clipboard": "Link in die Zwischenablage kopiert",
+  "Copy content link": "Link zum Inhalt kopieren"
 }

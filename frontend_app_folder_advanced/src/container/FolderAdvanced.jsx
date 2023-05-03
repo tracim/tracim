@@ -6,6 +6,7 @@ import {
   buildContentPathBreadcrumbs,
   getContentTypeList,
   appContentFactory,
+  handleClickCopyLink,
   PopinFixed,
   PopinFixedHeader,
   PopinFixedContent,
@@ -190,6 +191,12 @@ export class FolderAdvanced extends React.Component {
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
   }
 
+  handleClickCopyLink = () => {
+    const { props, state } = this
+    handleClickCopyLink(state.content.content_id)
+    sendGlobalFlashMessage(props.t('The link has been copied to clipboard'), 'info')
+  }
+
   handleSaveEditLabel = async newTitle => {
     const { props, state } = this
     await props.appContentChangeTitle(state.content, newTitle, state.config.slug, { sub_content_types: state.content.sub_content_types })
@@ -284,6 +291,12 @@ export class FolderAdvanced extends React.Component {
           onValidateChangeTitle={this.handleSaveEditLabel}
           actionList={[
             {
+              icon: 'fas fa-link',
+              label: props.t('Copy content link'),
+              onClick: this.handleClickCopyLink,
+              showAction: true,
+              dataCy: 'popinListItem__copyLink'
+            }, {
               icon: 'far fa-trash-alt',
               label: props.t('Delete'),
               onClick: this.handleClickDelete,

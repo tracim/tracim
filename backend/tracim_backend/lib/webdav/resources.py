@@ -20,6 +20,7 @@ from wsgidav.dav_provider import DAVCollection
 from wsgidav.dav_provider import DAVNonCollection
 from wsgidav.dav_provider import _DAVResource
 
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import FileSizeOverMaxLimitation
@@ -100,11 +101,12 @@ def get_content_resource(
             content=content,
             tracim_context=tracim_context,
         )
-    elif content.type == content_type_list.File.slug:
+    elif content.depot_file:
         return FileResource(
             path=path, environ=environ, content=content, tracim_context=tracim_context,
         )
     else:
+        # Content is assumed to be in raw_content
         return OtherFileResource(
             path=path, environ=environ, content=content, tracim_context=tracim_context
         )
@@ -136,7 +138,7 @@ class WebdavContainer(ABC):
         pass
 
     @abstractmethod
-    def getMemberList(self) -> [_DAVResource]:
+    def getMemberList(self) -> typing.List[_DAVResource]:
         """Get list of all sub-resources of the current resource"""
         pass
 
@@ -309,14 +311,14 @@ class ContentOnlyContainer(WebdavContainer):
         if self.content:
             parent_id = self.content.content_id
             children = self.content_api.get_all(
-                content_type=content_type_list.Any_SLUG,
+                content_type=ContentTypeSlug.ANY.value,
                 workspaces=[self.workspace],
                 parent_ids=[parent_id],
                 order_by_properties=["content_id"],
             )
         else:
             children = self.content_api.get_all(
-                content_type=content_type_list.Any_SLUG,
+                content_type=ContentTypeSlug.ANY.value,
                 workspaces=[self.workspace],
                 parent_ids=[0],
                 order_by_properties=["content_id"],
@@ -406,7 +408,7 @@ class ContentOnlyContainer(WebdavContainer):
             workspace=self.workspace,
         )
 
-    def getMemberNames(self) -> [str]:
+    def getMemberNames(self) -> typing.List[str]:
         """
         Access to the list of content names for current workspace/folder
         """
@@ -424,7 +426,7 @@ class ContentOnlyContainer(WebdavContainer):
             "%s/%s" % (self.path, webdav_convert_file_name_to_display(label)), self.environ
         )
 
-    def getMemberList(self) -> [_DAVResource]:
+    def getMemberList(self) -> typing.List[_DAVResource]:
         """
         Access to the list of content of current workspace/folder
         """
@@ -485,7 +487,7 @@ class WorkspaceAndContentContainer(WebdavContainer):
     def createCollection(self, label: str) -> "FolderResource":
         return self.content_container.createCollection(label=label)
 
-    def getMemberNames(self) -> [str]:
+    def getMemberNames(self) -> typing.List[str]:
         # INFO - G.M - 2020-14-10 - Unclear if this method is really used by wsgidav
         workspace_names = self.workspace_container.getMemberNames()
         content_names = self.content_container.getMemberNames()
@@ -502,7 +504,7 @@ class WorkspaceAndContentContainer(WebdavContainer):
         if not member:
             member = self.content_container.getMember(label=label)
 
-    def getMemberList(self) -> [_DAVResource]:
+    def getMemberList(self) -> typing.List[_DAVResource]:
         workspace_names = self.workspace_container.getMemberNames()
         workspaces = self.workspace_container.getMemberList()
         content_resources = self.content_container.getMemberList()
@@ -636,13 +638,13 @@ class WorkspaceResource(DAVCollection):
             HTTP_FORBIDDEN, contextinfo="Not allowed to rename or move workspace through webdav"
         )
 
-    def getMemberNames(self) -> [str]:
+    def getMemberNames(self) -> typing.List[str]:
         return self.container.getMemberNames()
 
     def getMember(self, label: str) -> _DAVResource:
         return self.container.getMember(label=label)
 
-    def getMemberList(self) -> [_DAVResource]:
+    def getMemberList(self) -> typing.List[_DAVResource]:
         return self.container.getMemberList()
 
     @webdav_check_right(is_contributor)
@@ -803,13 +805,13 @@ class FolderResource(DAVCollection):
     def createCollection(self, label: str) -> "FolderResource":
         return self.content_container.createCollection(label=label)
 
-    def getMemberNames(self) -> [str]:
+    def getMemberNames(self) -> typing.List[str]:
         return self.content_container.getMemberNames()
 
     def getMember(self, label: str) -> _DAVResource:
         return self.content_container.getMember(label=label)
 
-    def getMemberList(self) -> [_DAVResource]:
+    def getMemberList(self) -> typing.List[_DAVResource]:
         return self.content_container.getMemberList()
 
 
@@ -1031,6 +1033,7 @@ class FileResource(DAVNonCollection):
         try:
             self.content_api.copy(
                 item=self.content,
+                context=self.tracim_context,
                 new_label=new_label,
                 new_file_extension=new_file_extension,
                 new_parent=destination_parent,
@@ -1110,3 +1113,4 @@ class OtherFileResource(FileResource):
                 self.content_revision,
                 self.content_api.get_all([self.content.content_id], content_type_list.Comment.slug),
             )
+        raise NotImplementedError()

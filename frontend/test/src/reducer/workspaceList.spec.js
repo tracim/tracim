@@ -103,7 +103,7 @@ describe('workspaceList reducer', () => {
           addWorkspaceMember(
             globalManagerFromApi,
             firstWorkspaceFromApi.workspace_id,
-            { ...globalManagerFromApi, do_notify: true, role: ROLE.workspaceManager }
+            { ...globalManagerFromApi, email_notification_type: 'summary', role: ROLE.workspaceManager }
           )
         )
 
@@ -114,7 +114,7 @@ describe('workspaceList reducer', () => {
             memberList: [{
               ...serializeMember({
                 user: globalManagerFromApi,
-                do_notify: true,
+                email_notification_type: 'summary',
                 role: ROLE.workspaceManager
               })
             }]
@@ -152,13 +152,13 @@ describe('workspaceList reducer', () => {
             memberList: [{
               ...serializeMember({
                 user: globalManagerFromApi,
-                do_notify: true,
+                email_notification_type: 'summary',
                 role: ROLE.workspaceManager
               })
             }]
           }
         ],
-        updateWorkspaceMember(globalManagerFromApi, firstWorkspaceFromApi.workspace_id, { user: globalManagerFromApi, do_notify: false, role: ROLE.contributor })
+        updateWorkspaceMember(globalManagerFromApi, firstWorkspaceFromApi.workspace_id, { user: globalManagerFromApi, email_notification_type: 'none', role: ROLE.contributor })
       )
 
       it('should return a workspace list with the member correctly updated in the right workspace', () => {
@@ -169,7 +169,7 @@ describe('workspaceList reducer', () => {
             memberList: [{
               ...serializeMember({
                 user: globalManagerFromApi,
-                do_notify: false,
+                email_notification_type: 'none',
                 role: ROLE.contributor
               })
             }]
@@ -187,7 +187,7 @@ describe('workspaceList reducer', () => {
             memberList: [{
               ...serializeMember({
                 user: globalManagerFromApi,
-                do_notify: true,
+                email_notification_type: 'summary',
                 role: ROLE.workspaceManager
               })
             }]
@@ -217,7 +217,9 @@ describe('workspaceList reducer', () => {
         setWorkspaceListMemberList([{
           ...serializedFirstWorkspace,
           workspaceId: firstWorkspaceFromApi.workspace_id,
-          memberList: [{ user: globalManagerFromApi, do_notify: false, role: ROLE.contributor }]
+          memberList: [
+            { user: globalManagerFromApi, email_notification_type: 'none', role: ROLE.contributor }
+          ]
         }])
       )
 
@@ -228,7 +230,7 @@ describe('workspaceList reducer', () => {
             memberList: [{
               ...serializeMember({
                 user: globalManagerFromApi,
-                do_notify: false,
+                email_notification_type: 'none',
                 role: ROLE.contributor
               })
             }]

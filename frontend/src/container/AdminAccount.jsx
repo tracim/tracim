@@ -39,7 +39,7 @@ import {
   putUserEmail,
   putUserUsername,
   putUserPassword,
-  putUserWorkspaceDoNotify,
+  putUserWorkspaceEmailNotificationType,
   getUserCalendar
 } from '../action-creator.async.js'
 import {
@@ -231,7 +231,7 @@ export class Account extends React.Component {
             props.dispatch(newFlashMessage(props.t('Name has been changed'), 'info'))
             return true
           }
-          // else, if email also has been changed, flash msg is handled bellow to not display 2 flash msg
+          // else, if email also has been changed, flash msg is handled below to not display 2 flash msg
           break
         default: props.dispatch(newFlashMessage(props.t('Error while changing name'), 'warning')); break
       }
@@ -313,13 +313,20 @@ export class Account extends React.Component {
 
   handleChangeUsername = debounce(this.changeUsername, CHECK_USERNAME_DEBOUNCE_WAIT)
 
-  handleChangeSubscriptionNotif = async (workspaceId, doNotify) => {
+  handleChangeEmailNotificationType = async (workspaceId, emailNotificationType) => {
     const { props, state } = this
 
-    const fetchPutUserWorkspaceDoNotify = await props.dispatch(putUserWorkspaceDoNotify(state.userToEdit, workspaceId, doNotify))
-    switch (fetchPutUserWorkspaceDoNotify.status) {
-      case 204: break
-      default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
+    let fetchChangeEmailNotificationType
+    try {
+      fetchChangeEmailNotificationType = await props.dispatch(putUserWorkspaceEmailNotificationType(
+        state.userToEdit, workspaceId, emailNotificationType
+      ))
+    } catch (e) {
+      props.dispatch(newFlashMessage(props.t('Error while changing email subscription'), 'warning'))
+      console.error(
+        'Error while changing email subscription. handleChangeEmailNotificationType.',
+        fetchChangeEmailNotificationType
+      )
     }
   }
 
@@ -372,10 +379,11 @@ export class Account extends React.Component {
               title={this.setTitle()}
               icon='user-o'
               breadcrumbsList={props.breadcrumbs}
+              isEmailNotifActivated={props.system.config.email_notification_activated}
             />
 
             <PageContent parentClass='account'>
-              <UserInfo user={state.userToEdit} />
+              <UserInfo user={state.userToEdit} profileButtonText={props.t('Profile')} />
 
               <Delimiter customClass='account__delimiter' />
 
@@ -410,7 +418,7 @@ export class Account extends React.Component {
                             userEmail={state.userToEdit.email}
                             userPublicName={state.userToEdit.publicName}
                             userUsername={state.userToEdit.username}
-                            onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
+                            onChangeEmailNotificationType={this.handleChangeEmailNotificationType}
                             openSpacesManagement={props.openSpacesManagement}
                             admin
                           />

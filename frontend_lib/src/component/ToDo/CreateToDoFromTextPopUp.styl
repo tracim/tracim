@@ -1,4 +1,4 @@
-@import "../../css/Variable.styl"
+@import '../../css/Variable.styl'
 
 .createToDoFromTextPopup
   & .cardPopup__body
@@ -11,12 +11,25 @@
 
     & textarea
       width 100%
+      border none
+      border-radius standardBorderRadius
+      padding textSpacing
+      &:disabled
+        border borderStyle
 
   &__main
     width 100%
 
+    &__title
+      display flex
+      justify-content space-between
+
+      &__info
+        color grey
+
   &__buttons
     align-self flex-end
+    margin-top textSpacing
 
     & button:last-child
       margin-inline-start standardSpacing

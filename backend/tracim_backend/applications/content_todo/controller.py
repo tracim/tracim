@@ -5,6 +5,7 @@ import typing
 from pyramid.config import Configurator
 import transaction
 
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.applications.content_todo.schema import SetTodoSchema
 from tracim_backend.applications.content_todo.schema import TodoPathSchema
@@ -49,7 +50,7 @@ class TodoController(Controller):
         self, context, request: TracimRequest, hapic_data=None
     ) -> typing.List[ContentInContext]:
         """
-        Get every todos related to a user
+        Get every todo related to a user
         user_id: user is that we want to fetch the todos
         """
 
@@ -144,7 +145,7 @@ class TodoController(Controller):
         try:
             parent = content_api.get_one(
                 content_id=request.current_content.content_id,
-                content_type=content_type_list.Any_SLUG,
+                content_type=ContentTypeSlug.ANY.value,
             )
         except ContentNotFound as exc:
             raise ParentNotFound(
@@ -222,13 +223,13 @@ class TodoController(Controller):
             content_api.delete(todo_content)
 
     def bind(self, configurator: Configurator):
-        # Get every todos of a user
+        # Get every todo of a user
         configurator.add_route(
             "user_todos", "/users/{user_id}/todos", request_method="GET",
         )
         configurator.add_view(self.get_user_todos, route_name="user_todos")
 
-        # Get every todos of a content
+        # Get every todo of a content
         configurator.add_route(
             "todos", "/workspaces/{workspace_id}/contents/{content_id}/todos", request_method="GET",
         )

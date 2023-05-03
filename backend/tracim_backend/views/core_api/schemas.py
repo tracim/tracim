@@ -10,8 +10,7 @@ from marshmallow.fields import String
 from marshmallow.fields import ValidatedField
 from marshmallow.validate import OneOf
 
-from tracim_backend.app_models.contents import FILE_TYPE
-from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import open_status
 from tracim_backend.app_models.email_validators import RFCEmailValidator
 from tracim_backend.app_models.email_validators import TracimEmailValidator
@@ -108,6 +107,7 @@ from tracim_backend.models.context_models import WorkspaceUpdate
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentSortOrder
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import EventTypeDatabaseParameters
@@ -379,7 +379,12 @@ class FileCreationFormSchema(marshmallow.Schema):
     content_namespace = EnumField(
         ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
     )
-    content_type = marshmallow.fields.String(missing=FILE_TYPE, example=FILE_TYPE)
+    content_type = marshmallow.fields.String(
+        missing=ContentTypeSlug.FILE.value, example=ContentTypeSlug.FILE.value
+    )
+    template_id = marshmallow.fields.Int(
+        example=2, default=0, validate=positive_int_validator, allow_none=True
+    )
 
     @post_load
     def file_creation_object(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -1154,8 +1159,8 @@ class FilterContentQuerySchema(BaseOptionalPaginatedQuerySchema):
         validate=bool_as_int_validator,
     )
     content_type = StrippedString(
-        example=content_type_list.Any_SLUG,
-        default=content_type_list.Any_SLUG,
+        example=ContentTypeSlug.ANY.value,
+        default=ContentTypeSlug.ANY.value,
         validate=all_content_types_validator,
     )
     label = StrippedString(
@@ -1520,11 +1525,15 @@ class WorkspaceDiskSpaceSchema(marshmallow.Schema):
     workspace = marshmallow.fields.Nested(WorkspaceDigestSchema(), attribute="workspace_in_context")
 
 
-class WorkspaceMemberDigestSchema(marshmallow.Schema):
-    role = StrippedString(example="contributor", validate=user_role_validator)
-    do_notify = marshmallow.fields.Bool(
-        description="has user enabled notification for this workspace", example=True
+class EmailNotificationTypeSchema(marshmallow.Schema):
+    email_notification_type = StrippedString(
+        example=EmailNotificationType.SUMMARY.name,
+        description="Type of email notification for a specific space",
     )
+
+
+class WorkspaceMemberDigestSchema(EmailNotificationTypeSchema):
+    role = StrippedString(example="contributor", validate=user_role_validator)
 
 
 class WorkspaceMemberSchema(WorkspaceMemberDigestSchema):
@@ -1542,12 +1551,6 @@ class WorkspaceMemberCreationSchema(WorkspaceMemberSchema):
     newly_created = marshmallow.fields.Bool(
         exemple=False,
         description="Is the user completely new " "(and account was just created) or not ?",
-    )
-    email_sent = marshmallow.fields.Bool(
-        exemple=False,
-        description="Has an email been sent to user to inform him about "
-        "this new workspace registration and eventually his account"
-        "creation",
     )
 
 
@@ -1931,23 +1934,35 @@ class TagSchema(marshmallow.Schema):
 
 
 class MessageCommentSchema(marshmallow.Schema):
-    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
-    parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
-    content_type = StrippedString(example="html-document", validate=all_content_types_validator)
-    parent_content_type = String(example="html-document", validate=all_content_types_validator)
-    parent_content_namespace = EnumField(
-        ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
-    )
-    parent_label = String(example="This is a label")
-    description = StrippedString(example="This is a description")
+    """
+    Schema for comments without raw_content
+    """
+
     author = marshmallow.fields.Nested(UserDigestSchema)
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="comment creation date"
     )
+    modified = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, description="Comment last edition date"
+    )
+    last_modifier = marshmallow.fields.Nested(UserDigestSchema)
+    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    content_type = StrippedString(example="html-document", validate=all_content_types_validator)
+    description = StrippedString(example="This is a description")
+    parent_content_namespace = EnumField(
+        ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
+    )
+    parent_content_type = String(example="html-document", validate=all_content_types_validator)
+    parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
+    parent_label = String(example="This is a label")
 
 
 class CommentSchema(MessageCommentSchema):
-    raw_content = StrippedString(example="<p>This is just an html comment !</p>")
+    """
+    Schema for comments with raw_content
+    """
+
+    raw_content = StrippedString(example="<p>This is just an html comment!</p>")
 
 
 class SetCommentSchema(marshmallow.Schema):
@@ -2003,9 +2018,7 @@ class ContentModifySchema(ContentModifyAbstractSchema):
 class FolderContentModifySchema(ContentModifyAbstractSchema):
     sub_content_types = marshmallow.fields.List(
         StrippedString(example="html-document", validate=all_content_types_validator),
-        description="list of content types allowed as sub contents. "
-        "This field is required for folder contents, "
-        "set it to empty list in other cases",
+        description="list of content types allowed as sub contents.",
         required=False,
     )
 
@@ -2037,12 +2050,24 @@ class SetContentIsTemplateSchema(marshmallow.Schema):
 
 
 class TemplateQuerySchema(marshmallow.Schema):
-    type = StrippedString(example="html-document", validate=all_content_types_validator)
+    type = StrippedString(
+        example="html-document", validate=all_content_types_validator, required=True
+    )
 
 
 class TargetLanguageSchema(marshmallow.Schema):
     code = marshmallow.fields.String(required=True, example="fr")
     display = marshmallow.fields.String(required=True, example="Français")
+
+
+class CodeSampleLanguageSchema(marshmallow.Schema):
+    value = marshmallow.fields.String(required=True, example="markup")
+    text = marshmallow.fields.String(required=True, example="Markup")
+
+
+class RoleSchema(marshmallow.Schema):
+    level = marshmallow.fields.String(required=True, example="1")
+    label = marshmallow.fields.String(required=True, example="Reader")
 
 
 class ConfigSchema(marshmallow.Schema):
@@ -2065,6 +2090,11 @@ class ConfigSchema(marshmallow.Schema):
     )
     user__self_registration__enabled = marshmallow.fields.Bool()
     ui__spaces__creation__parent_space_choice__visible = marshmallow.fields.Bool()
+    # NOTE - MP - 2022-11-29 - The line under is probably wrong and do not require
+    # `marshmallow.fields.items`
+    ui__notes__code_sample_languages = marshmallow.fields.items = marshmallow.fields.Nested(
+        CodeSampleLanguageSchema, many=True
+    )
     limitation__maximum_online_users_message = marshmallow.fields.String()
     call__enabled = marshmallow.fields.Bool()
     call__unanswered_timeout = marshmallow.fields.Int()
@@ -2194,20 +2224,33 @@ class PathSuffixSchema(marshmallow.Schema):
         required=False,
         description='any path, could include "/"',
         default="",
-        example="/workspaces/1/notifications/activate",
+        example="/workspaces/1/email_notification_type",
     )
 
 
 class UserMessagesMarkAsReadQuerySchema(marshmallow.Schema):
     content_ids = StrippedString(
         validate=regex_string_as_list_of_int,
-        example="3,4",
-        description="comma separated list of content_ids to check for marking event as read",
+        example="1,4",
+        description="Comma separated list of content ids. Every event related to these contents\
+            will be marked as read.",
+    )
+    event_ids = StrippedString(
+        validate=regex_string_as_list_of_int,
+        example="3,5",
+        description="Comma separated list of event ids. Every event ids will be marked as read.",
     )
     parent_ids = StrippedString(
         validate=regex_string_as_list_of_int,
-        example="3,4",
-        description="comma separated list of parent_ids to check for marking event as read",
+        example="2,6",
+        description="Comma separated list of parent content ids. Every event related to theses\
+            parents will be marked as read.",
+    )
+    space_ids = StrippedString(
+        validate=regex_string_as_list_of_int,
+        example="7",
+        description="Comma separated list of space ids. Every event related to theses space\
+            will be marked as read.",
     )
 
     @post_load

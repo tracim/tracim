@@ -1,4 +1,4 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
+@import '~tracim_frontend_lib/src/css/Variable.styl'
 
 .carousel
   &__main
@@ -6,7 +6,7 @@
   &__thumbnail
     height 157px
     margin-top standardSpacing
-    background-color #f0f0f0
+    background-color lightGrey2
     & > .slick-list
       height 100%
     & .slick-current
@@ -70,7 +70,7 @@
       transform translateX(-50%) scale(1, 1)
       font-size bigIconSize
     &:hover
-      background-color rgba(0, 0, 0, 0.1)
+      background-color secodaryButtonHover
       border-radius standardBorderRadius
     &.arrownext
       right -20px
@@ -99,6 +99,8 @@
         background-color rgba(0, 0, 0, 0.5)
         &:hover
           color #FFFFFF
+        & > i
+          display flex
   &__delete__file__popup
     & .cardPopup__container
       width 400px

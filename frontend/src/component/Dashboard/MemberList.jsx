@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import {
@@ -7,18 +7,57 @@ import {
   Avatar,
   Loading,
   NewMemberForm,
-  ProfileNavigation
+  ProfileNavigation,
+  sortListBy,
+  SORT_BY,
+  SORT_ORDER,
+  FilterBar,
+  ROLE_LIST,
+  stringIncludes
 } from 'tracim_frontend_lib'
 
 require('./MemberList.styl')
 
 export const MemberList = (props) => {
+  const [userFilter, setUserFilter] = useState('')
+
+  const filterMemberList = () => {
+    if (userFilter === '') return props.memberList
+
+    return props.memberList.filter(member => {
+      const userRole = ROLE_LIST.find(type => type.slug === member.role) || { label: '' }
+
+      const includesFilter = stringIncludes(userFilter)
+
+      const hasFilterMatchOnPublicName = includesFilter(member.publicName)
+      const hasFilterMatchOnUsername = includesFilter(member.username)
+      const hasFilterMatchOnRole = userRole && includesFilter(props.t(userRole.label))
+
+      return (
+        hasFilterMatchOnPublicName ||
+        hasFilterMatchOnUsername ||
+        hasFilterMatchOnRole
+      )
+    })
+  }
+
+  const filteredMemberList = filterMemberList()
+
   return (
     <div className='memberlist' data-cy='memberlist'>
 
       <div className='memberlist__header'>
         {props.t('Member List')}
       </div>
+
+      <FilterBar
+        onChange={e => {
+          const newFilter = e.target.value
+          setUserFilter(newFilter)
+        }}
+        value={userFilter}
+        placeholder={props.t('Filter users')}
+      />
 
       {props.isLoading
         ? <Loading />
@@ -39,7 +78,7 @@ export const MemberList = (props) => {
                   role={props.role}
                   onChangeRole={props.onChangeRole}
                   onClickBtnValidate={props.onClickValidateNewMember}
-                  emailNotifActivated={props.emailNotifActivated}
+                  isEmailNotifActivated={props.isEmailNotifActivated}
                   canSendInviteNewUser={props.canSendInviteNewUser}
                   userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                   autoCompleteClicked={props.autoCompleteClicked}
@@ -65,11 +104,11 @@ export const MemberList = (props) => {
                   )}
 
                   <ul className={classnames('memberlist__list', { withAddBtn: props.userRoleIdInWorkspace >= ROLE.workspaceManager.id })}>
-                    {props.memberList.map((m, index) =>
+                    {sortListBy(filteredMemberList, SORT_BY.PUBLIC_NAME, SORT_ORDER.ASCENDING, props.loggedUser.lang).map((m, index) =>
                       <li
                         className={classnames(
                           'memberlist__list__item',
-                          { memberlist__list__item__last: props.memberList.length === index + 1 }
+                          { memberlist__list__item__last: filteredMemberList.length === index + 1 }
                         )}
                         key={m.id}
                       >

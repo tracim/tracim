@@ -14,14 +14,25 @@ describe('App Gallery', function () {
 
   it('should have translations', () => {
     cy.get('.gallery__action__button').contains('Play')
+
     cy.changeLanguage('fr')
     cy.visitPage({ pageName: PAGES.GALLERY, params: { workspaceId } })
     cy.get('.gallery__action__button').contains('Lecture')
+
     cy.changeLanguage('pt')
     cy.visitPage({ pageName: PAGES.GALLERY, params: { workspaceId } })
     cy.get('.gallery__action__button').contains('Reproduzir')
+
     cy.changeLanguage('de')
     cy.visitPage({ pageName: PAGES.GALLERY, params: { workspaceId } })
     cy.get('.gallery__action__button').contains('Abspielen')
+
+    cy.changeLanguage('ar')
+    cy.visitPage({ pageName: PAGES.GALLERY, params: { workspaceId } })
+    cy.get('.gallery__action__button').contains('تشغيل')
+
+    cy.changeLanguage('es')
+    cy.visitPage({ pageName: PAGES.GALLERY, params: { workspaceId } })
+    cy.get('.gallery__action__button').contains('Jugar')
   })
 })

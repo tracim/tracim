@@ -1,30 +1,29 @@
 import React from 'react'
+import { isEqual } from 'lodash'
 
 import {
   CONTENT_TYPE,
-  getContent,
-  handleFetchResult,
   NUMBER_RESULTS_BY_PAGE,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_SUB,
-  SUBSCRIPTION_TYPE
+  getComment,
+  getContent,
+  handleClickCopyLink,
+  handleFetchResult
 } from 'tracim_frontend_lib'
 
 import {
-  mergeWithActivityList,
+  activityDisplayFilter,
   addMessageToActivityList,
+  mergeWithActivityList,
   sortActivityList
 } from '../util/activity.js'
-import {
-  FETCH_CONFIG,
-  CONTENT_NAMESPACE,
-  handleClickCopyLink
-} from '../util/helper.js'
+import { FETCH_CONFIG } from '../util/helper.js'
 import { getNotificationList } from '../action-creator.async.js'
 import { newFlashMessage } from '../action-creator.sync.js'
 
-const ACTIVITY_COUNT_PER_PAGE = NUMBER_RESULTS_BY_PAGE
+const ACTIVITY_COUNT_PER_PAGE = NUMBER_RESULTS_BY_PAGE // 15
 const ACTIVITY_HISTORY_COUNT = 5
 const ACTIVITY_BATCH_COUNT = 5
 // NOTE - SG - 2021-05-05 - empirically we noted that building an activity
@@ -44,9 +43,6 @@ const makeCancelable = (promise) => {
     cancel: () => { isCanceled = true }
   }
 }
-
-const DISPLAYED_SUBSCRIPTION_STATE_LIST = [SUBSCRIPTION_TYPE.rejected.slug]
-const DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST = [TLM_CET.CREATED, TLM_CET.MODIFIED]
 
 /**
  * Higher-Order Component which factorizes the common behavior between workspace and personal
@@ -87,16 +83,8 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
     handleClickCopyLink = content => {
       const { props } = this
       handleClickCopyLink(content.content_type === CONTENT_TYPE.COMMENT
-        ? {
-          id: content.parent_id,
-          workspaceId: props.workspaceId,
-          type: content.parent_content_type
-        }
-        : {
-          id: content.content_id,
-          workspaceId: content.workspace_id,
-          type: content.content_type
-        }
+        ? content.parent_id
+        : content.content_id
       )
       props.dispatch(newFlashMessage(props.t('The link has been copied to clipboard'), 'info'))
     }
@@ -127,20 +115,41 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
       }
     }
 
+    /**
+     * Get a complete comment
+     *
+     * This function exists also in appContentFactory
+     * @param {int} spaceId
+     * @param {int} contentId
+     * @param {int} commentId
+     * @returns {Promise<JSON>}
+     */
+    getComment = async (spaceId, contentId, commentId) => {
+      const { props } = this
+      const fetchGetComment = await handleFetchResult(
+        await getComment(FETCH_CONFIG.apiUrl, spaceId, contentId, commentId)
+      )
+      switch (fetchGetComment.apiResponse.status) {
+        case 200: return fetchGetComment.body
+        default:
+          props.dispatch(newFlashMessage(props.t('Unknown comment')))
+          return {}
+      }
+    }
+
+    /**
+     * Update the activity list according to the TLM
+     * Every operation on ActivityList from TLM should be in this function
+     * @param {TLM} data
+     * @returns
+     */
     updateActivityListFromTlm = async (data) => {
       const { props } = this
-      if (
-        data.event_type === `${TLM_ET.CONTENT}.${TLM_CET.MODIFIED}.${TLM_SUB.COMMENT}` ||
-        data.event_type === `${TLM_ET.CONTENT}.${TLM_CET.DELETED}.${TLM_SUB.COMMENT}`
-      ) return
       await this.waitForNoChange()
       this.changingActivityList = true
       let activity = data
-      if (
-        (data.event_type.includes(TLM_ET.CONTENT) && !(
-          data.event_type.includes(TLM_SUB.COMMENT) || data.event_type.includes(TLM_SUB.TODO)
-        )) ||
-        (data.event_type.includes(TLM_ET.MENTION) && data.fields.content.content_type !== TLM_SUB.COMMENT)
+      if (data.event_type.includes(TLM_SUB.COMMENT) ||
+        (data.event_type.includes(TLM_ET.MENTION) && data.fields.content.content_type === TLM_SUB.COMMENT)
       ) {
         activity = {
           ...data,
@@ -148,18 +157,46 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
             ...data.fields,
             content: {
               ...data.fields.content,
-              ...await this.getContent(data.fields.content.content_id)
+              ...await this.getComment(
+                data.fields.workspace.workspace_id,
+                data.fields.content.parent_id,
+                data.fields.content.content_id
+              )
+            }
+          }
+        }
+      } else {
+        if (
+          (data.event_type.includes(TLM_ET.CONTENT) && !data.event_type.includes(TLM_SUB.TODO)) ||
+          data.event_type.includes(TLM_ET.MENTION)
+        ) {
+          activity = {
+            ...data,
+            fields: {
+              ...data.fields,
+              content: {
+                ...data.fields.content,
+                ...await this.getContent(data.fields.content.content_id)
+              }
             }
           }
         }
       }
-      const updatedActivityList = await addMessageToActivityList(activity, props.activity.list, FETCH_CONFIG.apiUrl)
-      props.dispatch(setActivityList(updatedActivityList))
-      const showRefresh = (
-        updatedActivityList.length > 0 &&
-        updatedActivityList[0].newestMessage.event_id !== data.event_id
+      const updatedActivityList = await addMessageToActivityList(
+        activity, props.activity.list, FETCH_CONFIG.apiUrl
       )
-      this.setState({ showRefresh })
+      if (!isEqual(props.activity.list, updatedActivityList)) {
+        props.dispatch(setActivityList(updatedActivityList))
+      }
+      if (data.event_type.includes(TLM_SUB.COMMENT) && !(
+        data.event_type.includes(TLM_CET.MODIFIED) || data.event_type.includes(TLM_CET.DELETED)
+      )) {
+        const showRefresh = (
+          updatedActivityList.length > 0 &&
+          updatedActivityList[0].newestMessage.event_id !== data.event_id
+        )
+        this.setState({ showRefresh })
+      }
       this.changingActivityList = false
     }
 
@@ -177,9 +214,11 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
      * DOC - SG - 2021-05-05
      * Load the given count of activities.
      * Activities are loaded & dispatched by batch to update the display quicker.
-     * @param {Number} minActivityCount minimum count of new activites to load
-     * @param {Boolean} resetList if true, the current list in props is reset before loading activities
-     * @param {Number} workspaceId filter the messages by workspace id (useful for the workspace recent activities)
+     * @param {Number} minActivityCount minimum count of new activities to load
+     * @param {Boolean} resetList if true, the current list in props is reset before loading
+     *  activities
+     * @param {Number} workspaceId filter the messages by workspace id (useful for the workspace
+     *  recent activities)
      * Wraps loadActivitiesBatch() so that the dispatches in redux can be cancelled.
      */
     loadActivities = async (minActivityCount, resetList = false, workspaceId = null) => {
@@ -222,58 +261,20 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
       this.changingActivityList = false
     }
 
-    // FIXME - MB - 2021-05-26 - this code is duplicated for activityDisplayFilter, in ActivityList
-    // See this ticket https://github.com/tracim/tracim/issues/4677
-
-    isSubscriptionRequestOrRejection = (activity) => {
-      return (activity.entityType === TLM_ET.SHAREDSPACE_SUBSCRIPTION &&
-        DISPLAYED_SUBSCRIPTION_STATE_LIST.includes(activity.newestMessage.fields.subscription.state))
-    }
-
-    isMemberCreatedOrModified = (activity) => {
-      const coreEventType = activity.newestMessage.event_type.split('.')[1]
-      return (activity.entityType === TLM_ET.SHAREDSPACE_MEMBER &&
-        DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST.includes(coreEventType))
-    }
-
-    isLoggedUserMember = (activity) => this.props.workspaceList.find(space => space.id === activity.newestMessage.fields.workspace.workspace_id)
-
-    isNotPublicationOrInWorkspaceWithActivatedPublications = (activity) => {
-      const { props } = this
-      if (activity.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION ||
-        !activity.newestMessage.fields.workspace) return true
-      const currentWorkspace = props.workspaceList.find(ws => ws.id === activity.newestMessage.fields.workspace.workspace_id)
-      if (!currentWorkspace) return true
-      return currentWorkspace.publicationEnabled
-    }
-
-    activityDisplayFilter = (activity) => {
-      const { props } = this
-      const entityType = [TLM_ET.CONTENT, TLM_ET.SHAREDSPACE_MEMBER, TLM_ET.SHAREDSPACE_SUBSCRIPTION, TLM_ET.SHAREDSPACE]
-
-      return entityType.includes(activity.entityType) &&
-        (
-          (activity.entityType === TLM_ET.CONTENT && this.isNotPublicationOrInWorkspaceWithActivatedPublications(activity)) ||
-          (this.isSubscriptionRequestOrRejection(activity) && this.isLoggedUserMember(activity)) ||
-          (this.isMemberCreatedOrModified(activity) && this.isLoggedUserMember(activity)) ||
-          (activity.entityType === TLM_ET.SHAREDSPACE && activity.newestMessage.fields.author.user_id !== props.user.userId)
-        )
-    }
-
     /**
      * DOC - SG - 2021-05-05
      * Load a batch of activities and merge them into the given list
-     * Activities are built by calling /api/users/<user_id>/messages
+     * Activities are built by calling /api/users/{user_id}/messages
      * @param {Array} activityList activity list to update
      * @param {boolean} hasNextPage are there remaining messages to load
      * @param {string} nextPageToken token to get the next page of messages
-     * @param {Number} workspaceId filter the messages by workspace id (useful for the workspace recent activities)
+     * @param {Number} workspaceId filter the messages by workspace id (useful for the workspace
+     *  recent activities)
      */
-
     loadActivitiesBatch = async (activityList, hasNextPage, nextPageToken, workspaceId = null) => {
       const { props } = this
-      const initialActivityListLength = activityList.length
-      while (hasNextPage && activityList.length < initialActivityListLength + ACTIVITY_BATCH_COUNT) {
+      const activityListLengthGoal = activityList.length + ACTIVITY_BATCH_COUNT
+      while (hasNextPage && activityList.length < activityListLengthGoal) {
         const messageListResponse = await props.dispatch(getNotificationList(
           props.user.userId,
           {
@@ -289,7 +290,9 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
           activityList,
           FETCH_CONFIG.apiUrl
         )
-        activityList = activityList.filter(this.activityDisplayFilter)
+        activityList = activityList.filter(
+          (activity) => activityDisplayFilter(activity, props.workspaceList, props.user.userId)
+        )
         hasNextPage = messageListResponse.json.has_next
         nextPageToken = messageListResponse.json.next_page_token
       }

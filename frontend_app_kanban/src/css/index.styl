@@ -16,10 +16,11 @@ cardWidth = 280px
       height "calc(100% - %s)" % (headerHeight + 28px)
       &.fullscreen
         position fixed
-        top headerHeight
-        width 100%
-        height "calc(100% - %s)" % headerHeight
-        z-index 1
+        width "calc(100% - %s)" % closedSidebarWidth
+        height 100%
+        // INFO - GB - 2022-08-09 - .kanban.fullscreen has z-index 2 to be above TinyMCE (.tox .tox-editor-header)
+        // In case advanced edition is enabled at the moment the user goes into fullscreen mode.
+        z-index 2
         background offWhite
 
       &__options
@@ -59,11 +60,12 @@ cardWidth = 280px
               overflow hidden
               text-overflow ellipsis
             &__actions.dropdownMenuButton
+              color fontColor
               padding 0
               &::after
                 display none
           & button:hover
-            background-color grey-hover
+            background-color lightGrey1
           &.buttonHidden
             .dropdown, .kanban_addCard
               display none
@@ -86,7 +88,7 @@ cardWidth = 280px
         & .iconbutton
           background-color offWhite
           &:hover
-            background-color veryLightGrey
+            background-color lightGrey2
         &:empty
           display none
 
@@ -102,7 +104,7 @@ cardWidth = 280px
 
       & .react-kanban-column
         padding standardSpacing
-        background-color lightGrey
+        background-color lightGrey2
         border-radius standardBorderRadius
         margin 0 textSpacing
         min-width 315px
@@ -114,8 +116,6 @@ cardWidth = 280px
           &:hover
             overflow-y auto
   &__KanbanPopup
-    width 100%
-    top 15%
     max-height 80%
     &.hidden
       display none
@@ -126,10 +126,10 @@ cardWidth = 280px
         flex-direction row
 
     & .cardPopup__container
-      width unset
-      min-width 550px
+      width 80%
       display flex
       flex-direction column
+      overflow auto
 
     & [type=checkbox]
       margin textSpacing
@@ -162,12 +162,13 @@ cardWidth = 280px
           width calc(100% - 2px) // NOTE - RJ - 19-01-2022 - TinyMCE borders make the form overflow if we don't remove these 2px here
         label
           padding-inline-end textSpacing
-        
+
         & .form-control
           color unset
           font-size standardFontSize
           padding-inline-start textSpacing
-          
+          border none
+
       &_buttons
         margin-bottom 0
         padding-bottom 0
@@ -183,7 +184,7 @@ cardWidth = 280px
         margin-inline-start standardSpacing
 
   &__columnAdder
-    border 1px mediumGrey dashed
+    border 1px lightGrey1 dashed
     min-width cardWidth
     max-height 70px
     margin 0 textSpacing
@@ -197,7 +198,7 @@ cardWidth = 280px
       opacity 0.5
 
     &:hover
-      background-color veryLightGrey
+      background-color lightGrey2
     & > *
       margin auto
 
@@ -205,7 +206,7 @@ cardWidth = 280px
   &__contentpage
     &__wrapper
       &.fullscreen
-        left 0
+        left closedSidebarWidth
       &__toolbar
         right standardSpacing
 
@@ -213,7 +214,7 @@ cardWidth = 280px
   &__contentpage
     &__wrapper
       &.fullscreen
-        right 0
+        right closedSidebarWidth
       &__toolbar
         left standardSpacing
 
@@ -234,15 +235,19 @@ cardWidth = 280px
             margin standardSpacing 0
 
 @media (max-width: max-xs)
+  body:not(.tox-fullscreen) .kanban__KanbanPopup
+    transform translate(-50%, 0%) !important
+
   .kanban__KanbanPopup
+    position absolute
     top 10%
-    max-height "calc(100% - %s)" % (headerHeight + standardSpacing)
+    max-height "calc(100% - %s)" % listIconWidth
 
     & .cardPopup__container
       min-width 100%
       max-height 100%
       overflow auto
       & .cardPopup__body
-        height "calc(100% - %s)" % headerHeight
+        height 100%
         & .kanban__KanbanPopup__form
           height "calc(100% - %s)" % standardSpacing

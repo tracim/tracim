@@ -2,9 +2,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-import { IconButton, Checkbox } from 'tracim_frontend_lib'
 import Form from 'react-jsonschema-form-bs4'
-import TextareaRich from './TextareaRich.jsx'
+import {
+  Checkbox,
+  IconButton,
+  TinyEditor
+} from 'tracim_frontend_lib'
 
 require('./CustomFormManager.styl')
 
@@ -232,9 +235,18 @@ const SchemaAsView = props => {
 
 const TextRichWidget = connect(({ user }) => ({ user }))(props => {
   return (
-    <TextareaRich
-      onChangeText={props.onChange}
-      initializationLanguage={props.user.lang}
+    <TinyEditor
+      apiUrl=''
+      setContent={(text) => { props.onChange(text) }}
+      // End of required props /////////////////////////////////////////////////
+      codeLanguageList={[]}
+      content={props.value}
+      isAdvancedEdition
+      isAutoResizeEnabled={false}
+      isContentLinkEnabled={false}
+      isMentionEnabled={false}
+      isStatusBarEnabled
+      language={props.user.lang}
       {...props}
     />
   )

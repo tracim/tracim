@@ -68,7 +68,7 @@ class UserCommand(AppContextCommand, ABC):
         )
         parser.add_argument(
             "--allowed_space",
-            help="set thes user's allowed space in bytes",
+            help="set the user's allowed space in bytes",
             dest="allowed_space",
             required=False,
             default=None,

@@ -21,10 +21,10 @@ const NewToDo = (props) => {
 
       <div className='toDo__new__toDoText'>
         <span>
-          {props.t('Enter your tasks bellow:')}
+          {props.t('Enter your tasks below:')}
         </span>
         <textarea
-          placeholder={props.placeHolder || props.t('Your message...')}
+          placeholder={props.t('Your message...')}
           onChange={props.onChangeValue}
           value={props.value}
         />

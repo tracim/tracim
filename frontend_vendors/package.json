@@ -12,7 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "classnames": "^2.2.6",
-    "core-js": "^3.6.4",
+    "core-js": "^3.25.5",
     "date-fns": "^2.19.0",
     "lodash": "^4.17.21",
     "pnp-webpack-plugin": "^1.6.4",
@@ -21,7 +21,7 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-image-lightbox": "^5.1.0",
-    "react-router-dom": "^5.2.0",
+    "react-router-dom": "^5.3.3",
     "reactstrap": "^8.9.0",
     "regenerator-runtime": "^0.13.2",
     "webpack": "^5.72.0",

@@ -13,5 +13,7 @@
   "New folder": "مجلد جديد",
   "Error while saving new folder": "خطأ أثناء حفظ المجلد الجديد",
   "Validate and create": "اعتماد و إنشاء",
-  "Folder's name": "اسم المجلد"
+  "Folder's name": "اسم المجلد",
+  "The link has been copied to clipboard": "تم نسخ الرابط إلى الحافظة",
+  "Copy content link": "نسخ رابط المحتوى"
 }

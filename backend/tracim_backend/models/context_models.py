@@ -12,7 +12,6 @@ from slugify import slugify
 from sqlakeyset import Page
 from sqlalchemy.orm import Session
 
-from tracim_backend.app_models.contents import FILE_TYPE
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.workspace_menu_entries import WorkspaceMenuEntry
@@ -82,6 +81,7 @@ class ConfigModel(object):
         translation_service__target_languages: List[Dict[str, str]],
         user__self_registration__enabled: bool,
         ui__spaces__creation__parent_space_choice__visible: bool,
+        ui__notes__code_sample_languages: List[Dict[str, str]],
         limitation__maximum_online_users_message: str,
         call__enabled: bool,
         call__unanswered_timeout: int,
@@ -103,6 +103,7 @@ class ConfigModel(object):
         self.ui__spaces__creation__parent_space_choice__visible = (
             ui__spaces__creation__parent_space_choice__visible
         )
+        self.ui__notes__code_sample_languages = ui__notes__code_sample_languages
         self.limitation__maximum_online_users_message = limitation__maximum_online_users_message
         self.call__enabled = call__enabled
         self.call__unanswered_timeout = call__unanswered_timeout
@@ -217,11 +218,13 @@ class FileCreation(object):
         self,
         content_namespace: ContentNamespaces = ContentNamespaces.CONTENT,
         parent_id: int = 0,
-        content_type: str = FILE_TYPE,
+        content_type: str = ContentTypeSlug.FILE.value,
+        template_id: int = 0,
     ) -> None:
         self.parent_id = parent_id
         self.content_namespace = content_namespace
         self.content_type = content_type
+        self.template_id = template_id
 
 
 class SetPassword(object):
@@ -846,10 +849,12 @@ class LiveMessageQuery(BasePaginatedQuery):
 
 class UserMessagesMarkAsReadQuery(object):
     def __init__(
-        self, content_ids: str = "", parent_ids: str = "",
+        self, content_ids: str = "", event_ids: str = "", parent_ids: str = "", space_ids: str = "",
     ):
         self.content_ids = string_to_list(content_ids, ",", int)
+        self.event_ids = string_to_list(event_ids, ",", int)
         self.parent_ids = string_to_list(parent_ids, ",", int)
+        self.space_ids = string_to_list(space_ids, ",", int)
 
 
 class UserMessagesSummaryQuery(object):
@@ -972,7 +977,7 @@ class UserInContext(object):
 
     @property
     def has_avatar(self) -> bool:
-        return bool(self.user.avatar)
+        return True
 
     @property
     def has_cover(self) -> bool:
@@ -1151,14 +1156,12 @@ class UserRoleWorkspaceInContext(object):
         config: CFG,
         # Extended params
         newly_created: bool = None,
-        email_sent: bool = None,
     ) -> None:
         self.user_role = user_role
         self.dbsession = dbsession
         self.config = config
         # Extended params
         self.newly_created = newly_created
-        self.email_sent = email_sent
 
     @property
     def user_id(self) -> int:
@@ -1205,8 +1208,8 @@ class UserRoleWorkspaceInContext(object):
         return self.user.is_active
 
     @property
-    def do_notify(self) -> bool:
-        return self.user_role.do_notify
+    def email_notification_type(self) -> str:
+        return self.user_role.email_notification_type.value
 
     @property
     def user(self) -> UserInContext:
@@ -1724,7 +1727,7 @@ class RevisionInContext(object):
         # INFO - G.M - 2018-11-02 - check if revision is last one and if it is,
         # return editability of content.
         content = content_api.get_one(
-            content_id=self.revision.content_id, content_type=content_type_list.Any_SLUG
+            content_id=self.revision.content_id, content_type=ContentTypeSlug.ANY.value
         )
         if content.cached_revision_id == self.revision_id:
             return content_api.is_editable(content)

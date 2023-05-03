@@ -10,8 +10,8 @@ import {
   NOTIFICATION_LIST,
   READ,
   readContentNotification,
-  readNotification,
   readNotificationList,
+  readEveryNotification,
   SET,
   setNextPage,
   UPDATE,
@@ -43,7 +43,7 @@ const notification = {
   author: {
     publicName: globalManagerFromApi.public_name,
     userId: globalManagerFromApi.user_id,
-    hasAvatar: false,
+    hasAvatar: true,
     hasCover: false
   },
   content: null,
@@ -72,7 +72,7 @@ const mention = {
   author: {
     publicName: globalManagerFromApi.public_name,
     userId: globalManagerFromApi.user_id,
-    hasAvatar: false,
+    hasAvatar: true,
     hasCover: false
   },
   content: null,
@@ -85,14 +85,21 @@ const mention = {
   user: serialize(globalManagerFromApi, serializeUserProps)
 }
 
+const DEFAULT_UNREAD_NOTIFICATION_COUNT = 10
+const DEFAULT_UNREAD_MENTION_COUNT = 5
+
 describe('reducer notificationPage.js', () => {
   describe('actions', () => {
     const initialState = {
       list: [],
       hasNextPage: false,
       nextPageToken: '',
-      unreadNotificationCount: 0,
-      unreadMentionCount: 0
+      // NOTE - MP - 2023-04-17 - Defining unreadNotificationCount and unreadMentionCount as bigger
+      // than 0 is necessary to test the good behavior of the reducer when theses values doesn't
+      // correspond to the number of unread notifications in the list. (typically when the user
+      // haven't loaded the full list of notifications)
+      unreadNotificationCount: DEFAULT_UNREAD_NOTIFICATION_COUNT,
+      unreadMentionCount: DEFAULT_UNREAD_MENTION_COUNT
     }
 
     describe(`${ADD}/${NOTIFICATION}`, () => {
@@ -103,8 +110,8 @@ describe('reducer notificationPage.js', () => {
         expect(listOfNotification).to.deep.equal({
           ...initialState,
           list: [notification],
-          unreadMentionCount: 0,
-          unreadNotificationCount: 1
+          unreadMentionCount: DEFAULT_UNREAD_MENTION_COUNT,
+          unreadNotificationCount: DEFAULT_UNREAD_NOTIFICATION_COUNT + 1
         })
       })
 
@@ -112,8 +119,8 @@ describe('reducer notificationPage.js', () => {
         expect(listOfMention).to.deep.equal({
           ...initialState,
           list: [mention],
-          unreadMentionCount: 1,
-          unreadNotificationCount: 1
+          unreadMentionCount: DEFAULT_UNREAD_MENTION_COUNT + 1,
+          unreadNotificationCount: DEFAULT_UNREAD_NOTIFICATION_COUNT + 1
         })
       })
     })
@@ -130,13 +137,32 @@ describe('reducer notificationPage.js', () => {
     })
 
     describe(`${READ}/${NOTIFICATION}`, () => {
-      it('should read a notification in a flat list', () => {
-        const initState = { ...initialState, list: [notification], unreadNotificationCount: 1 }
-        const listOfNotification = notificationPage(initState, readNotification(notification.id))
-        expect(listOfNotification).to.deep.equal({
-          ...initialState,
-          list: [{ ...notification, read: true }],
-          unreadNotificationCount: 0
+      const testCases = [
+        {
+          type: notification,
+          expectedResult: {
+            ...initialState,
+            list: [{ ...notification, read: true }],
+            unreadNotificationCount: DEFAULT_UNREAD_NOTIFICATION_COUNT - 1
+          },
+          description: 'notification'
+        },
+        {
+          type: mention,
+          expectedResult: {
+            ...initialState,
+            list: [{ ...mention, read: true }],
+            unreadMentionCount: DEFAULT_UNREAD_MENTION_COUNT - 1,
+            unreadNotificationCount: DEFAULT_UNREAD_NOTIFICATION_COUNT - 1
+          },
+          description: 'mention'
+        }
+      ]
+      testCases.forEach(testCase => {
+        it(`should read a ${testCase.description} in a flat list`, () => {
+          const initState = { ...initialState, list: [testCase.type] }
+          const resultList = notificationPage(initState, readNotificationList([testCase.type.id]))
+          expect(resultList).to.deep.equal(testCase.expectedResult)
         })
       })
     })
@@ -147,33 +173,51 @@ describe('reducer notificationPage.js', () => {
         content: { label: 'test', id: 5 }
       }
       const listOfNotification = notificationPage(
-        { ...initialState, list: [notificationWithContent], unreadNotificationCount: 1 },
+        { ...initialState, list: [notificationWithContent] },
         readContentNotification(5)
       )
 
       it('should return the list of objects with read set as true and counts as 0', () => {
         expect(listOfNotification).to.deep.equal(
-          { ...initialState, list: [{ ...notificationWithContent, read: true }], unreadNotificationCount: 0 })
+          {
+            ...initialState,
+            list: [{ ...notificationWithContent, read: true }],
+            unreadNotificationCount: DEFAULT_UNREAD_NOTIFICATION_COUNT - 1
+          })
       })
     })
 
     describe(`${READ}/${NOTIFICATION_LIST}`, () => {
-      const listOfNotification = notificationPage({ ...initialState, list: [notification], unreadNotificationCount: 1 }, readNotificationList())
+      const listOfNotification = notificationPage(
+        { ...initialState, list: [notification] },
+        readEveryNotification()
+      )
 
-      it('should return the list of objects passed as parameter', () => {
-        expect(listOfNotification).to.deep.equal({ ...initialState, list: [{ ...notification, read: true }], unreadNotificationCount: 0 })
+      it('should read every notification in a flat list', () => {
+        expect(listOfNotification).to.deep.equal(
+          {
+            ...initialState,
+            list: [{ ...notification, read: true }],
+            unreadNotificationCount: 0,
+            unreadMentionCount: 0
+          }
+        )
       })
     })
 
     describe(`${APPEND}/${NOTIFICATION_LIST}`, () => {
       const listOfNotification = notificationPage(
         { ...initialState, list: [notification] },
-        appendNotificationList([{ ...TLM, event_id: 999 }], workspaceList.workspaceList)
+        appendNotificationList(-1, [{ ...TLM, event_id: 999 }], workspaceList.workspaceList)
       )
 
-      it('should return the list of notifications appended with the list passed as parameter', () => {
-        expect(listOfNotification).to.deep.equal({ ...initialState, list: [notification, { ...notification, id: 999 }] })
-      })
+      it('should return the list of notifications appended with the list passed as parameter',
+        () => {
+          expect(listOfNotification).to.deep.equal(
+            { ...initialState, list: [notification, { ...notification, id: 999 }] }
+          )
+        }
+      )
     })
 
     describe(`${SET}/${NEXT_PAGE}`, () => {

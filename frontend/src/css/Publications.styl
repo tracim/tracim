@@ -4,6 +4,7 @@
   > .ScrollToBottomContents
     display flex
     flex-direction column
+    height 100%
     & > .tabBar
       margin-bottom pageSpacing
   &__showMoreButton
@@ -11,8 +12,6 @@
     margin-inline-start auto
     margin-inline-end auto
     margin-bottom standardSpacing
-  &__empty
-    margin 0 pageSpacing
   & .feedItem
     margin-block-end standardSpacing
   &__reorder
@@ -21,13 +20,14 @@
     margin 0 pageSpacing
     padding-bottom pageSpacing
     & textarea
-      border borderStyle
       border-radius standardBorderRadius
       padding textSpacing
       width 100%
       order 2
       &:focus
         outline-color publicationColor
+      &:disabled
+        border borderStyle
     & .tox-container
       order 2
     & .autocomplete

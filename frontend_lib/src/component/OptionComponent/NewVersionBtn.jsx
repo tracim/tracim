@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 const NewVersionBtn = props => {
   return (
     <GenericButton
-      customClass='wsContentGeneric__option__menu__addversion newVersionBtn btn outlineTextBtn'
+      customClass='wsContentGeneric__option__menu__addversion newVersionBtn btn'
       dataCy='wsContentGeneric__option__menu__addversion'
       onClick={props.onClickNewVersionBtn}
       disabled={props.disabled}

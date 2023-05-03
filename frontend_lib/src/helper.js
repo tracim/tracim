@@ -1,13 +1,15 @@
 import { v4 as uuidv4 } from 'uuid'
 import React from 'react'
 import i18n from './i18n.js'
-import { formatDistance, isAfter } from 'date-fns'
+import { format, formatDistance } from 'date-fns'
 import color from 'color'
 import dateFnsFr from 'date-fns/locale/fr'
 import dateFnsEn from 'date-fns/locale/en-US'
 import dateFnsPt from 'date-fns/locale/pt'
 import dateFnsDe from 'date-fns/locale/de'
 import dateFnsAr from 'date-fns/locale/ar-SA'
+import dateFnsEs from 'date-fns/locale/es'
+import dateFnsNbNO from 'date-fns/locale/nb'
 
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -66,10 +68,12 @@ export const DATE_FNS_LOCALE = {
   en: dateFnsEn,
   pt: dateFnsPt,
   de: dateFnsDe,
-  ar: dateFnsAr
+  ar: dateFnsAr,
+  es: dateFnsEs,
+  nb_NO: dateFnsNbNO
 }
 
-// INFO - MP - 2022-06-09 - This oarray must stay synchronized with the supported extensions
+// INFO - MP - 2022-06-09 - This array must stay synchronized with the supported extensions
 export const COLLABORA_EXTENSIONS = [
   '.odg',
   '.odp',
@@ -132,8 +136,6 @@ export const displayDistanceDate = (dateToDisplay, lang) => {
     { locale: DATE_FNS_LOCALE[lang], addSuffix: true }
   )
 }
-
-export const convertBackslashNToBr = msg => msg.replace(/\n/g, '<br />')
 
 export const BREADCRUMBS_TYPE = {
   CORE: 'CORE',
@@ -523,16 +525,6 @@ export const STATUSES = {
   DEPRECATED: 'closed-deprecated'
 }
 
-export const sortContentByStatus = (contentList) => {
-  return contentList.sort((contantA, contentB) => {
-    if (contantA.status === STATUSES.VALIDATED && contentB.status === STATUSES.OPEN) {
-      return 1
-    } if (contantA.status === STATUSES.OPEN && contentB.status === STATUSES.VALIDATED) {
-      return -1
-    } else return 0
-  })
-}
-
 export const buildTracimLiveMessageEventType = (entityType, coreEntityType, optionalSubType = null) => `${entityType}.${coreEntityType}${optionalSubType ? `.${optionalSubType}` : ''}`
 
 // INFO - CH - 2019-06-11 - This object must stay synchronized with the slugs of /api/system/content_types
@@ -546,8 +538,6 @@ export const CONTENT_TYPE = {
   TODO: 'todo'
 }
 
-// FIXME - CH - 20210324 - this constant is a duplicate from frontend/src/util/helper.js
-// see https://github.com/tracim/tracim/issues/4340
 export const CONTENT_NAMESPACE = {
   CONTENT: 'content',
   UPLOAD: 'upload',
@@ -558,20 +548,6 @@ export const TIMELINE_TYPE = {
   COMMENT: CONTENT_TYPE.COMMENT,
   COMMENT_AS_FILE: `${CONTENT_TYPE.COMMENT}AsFile`,
   REVISION: 'revision'
-}
-
-export const sortTimelineByDate = (timeline) => {
-  return timeline.sort((a, b) => {
-    // INFO - GB - 2021-12-07 - since we don't have the millisecond from backend, we can
-    // have contents created at the same second. So we sort on revision_id for revision,
-    // content_id for comments and we choose revision over comments if we have to sort between both.
-    if (a.created_raw === b.created_raw) {
-      if (a.revision_id && b.revision_id) return parseInt(a.revision_id) - parseInt(b.revision_id)
-      if (!a.revision_id && !b.revision_id) return parseInt(a.content_id) - parseInt(b.content_id)
-      else return a.revision_id ? -1 : 1
-    }
-    return isAfter(new Date(a.created_raw), new Date(b.created_raw)) ? 1 : -1
-  })
 }
 
 export const addRevisionFromTLM = (data, timeline, lang, isTokenClient = true) => {
@@ -617,6 +593,7 @@ export const hasSpaces = name => /\s/.test(name)
 
 // FIXME - GM - 2020-06-24 - This function doesn't handle nested object, it need to be improved
 // https://github.com/tracim/tracim/issues/3229
+// DEPRECATED - CH - 20230302 - This function is unused
 export const serialize = (objectToSerialize, propertyMap) => {
   return Object.fromEntries(
     Object.entries(objectToSerialize)
@@ -699,11 +676,26 @@ export const checkUsernameValidity = async (apiUrl, username, props) => {
   }
 }
 
-export const formatAbsoluteDate = (rawDate, lang, options = {}) => new Date(rawDate).toLocaleString(lang, options)
+/**
+ * INFO - G.B. - 2022-09-10
+ * @param {*} rawDate Date to format
+ * @param {*} lang Locale lang
+ * @param {*} formatTime To see the different format time: https://date-fns.org/v2.29.2/docs/format
+ * @returns
+ */
+export const formatAbsoluteDate = (rawDate, lang = 'en', formatTime) => {
+  if (!rawDate) return
+  return format(new Date(rawDate), formatTime || 'Pp', { locale: DATE_FNS_LOCALE[lang] })
+}
 
-// Equality test done as numbers with the following rules:
-// - strings are converted to numbers before comparing
-// - undefined and null are converted to 0 before comparing
+/**
+ * Equality test done as numbers with the following rules:
+ * - strings are converted to numbers before comparing
+ * - undefined and null are converted to 0 before comparing
+ * @param {*} var1 number 1 to test
+ * @param {*} var2 number 2 to test
+ * @returns
+ */
 export const permissiveNumberEqual = (var1, var2) => {
   return Number(var1 || 0) === Number(var2 || 0)
 }
@@ -730,24 +722,10 @@ export const createSpaceTree = spaceList => {
   return newSpaceList
 }
 
-export const naturalCompareLabels = (itemA, itemB, lang) => {
-  // 2020-09-04 - RJ - WARNING. Option ignorePunctuation is seducing but makes the sort unstable.
-  return naturalCompare(itemA, itemB, lang, 'label')
-}
-
 export const naturalCompare = (itemA, itemB, lang, field) => {
   // 2020-09-04 - RJ - WARNING. Option ignorePunctuation is seducing but makes the sort unstable.
-  return itemA[field].localeCompare(itemB[field], lang, { numeric: true })
-}
-
-export const sortWorkspaceList = (workspaceList, lang) => {
-  return workspaceList.sort((a, b) => {
-    let res = naturalCompareLabels(a, b, lang)
-    if (!res) {
-      res = getSpaceId(a) - getSpaceId(b)
-    }
-    return res
-  })
+  const locale = lang ? lang.replaceAll('_', '-') : undefined
+  return itemA[field].localeCompare(itemB[field], locale, { numeric: true })
 }
 
 export const humanAndList = (list) => {
@@ -894,18 +872,6 @@ const seekUsernameEnd = (text, offset) => {
   return offset
 }
 
-export const tinymceRemove = (selector) => {
-  try {
-    globalThis.tinymce.remove(selector)
-  } catch (e) {
-    if (e instanceof TypeError) {
-      console.error('HACK(#5437): removing TinyMCE raised a TypeError exception. If the message looks like "Can\'t access dead object". Ignoring the exception but please fix this.', e)
-    } else {
-      throw e
-    }
-  }
-}
-
 export const autoCompleteItem = (text, item, cursorPos, endCharacter) => {
   let character, keyword
   let textBegin, textEnd
@@ -932,4 +898,57 @@ export const autoCompleteItem = (text, item, cursorPos, endCharacter) => {
   }
 
   return { textBegin, textEnd }
+}
+
+export const handleClickCopyLink = (contentId) => {
+  // INFO - G.B. - 2022-08-26 - document.execCommand() is deprecated, but the alternative navigator.clipboard is
+  // not compatible with all browsers versions at this time, so a fallback was made to the old algorithm
+  const link = `${window.location.origin}${PAGE.CONTENT(contentId)}`
+  if (!navigator.clipboard) {
+    const tmp = document.createElement('textarea')
+    document.body.appendChild(tmp)
+    tmp.value = link
+    tmp.select()
+    document.execCommand('copy')
+    document.body.removeChild(tmp)
+  } else navigator.clipboard.writeText(link)
+}
+
+// INFO - ML - 2022-11-22 - Generates a function testing if 'b' includes 'a', ignoring letter case
+// Useful when you have to test if a single string is included in multiple others
+// Usage: const fn = stringIncludes('bc'); fn('abcd') -> Outputs: true
+export const stringIncludes = (a) => {
+  return (b) => {
+    if (!a || !b) return false
+    return b.toUpperCase().includes(a.toUpperCase())
+  }
+}
+
+export const getRevisionTypeLabel = (revisionType, t) => {
+  switch (revisionType) {
+    case 'revision':
+      return t('modified')
+    case 'creation':
+      return t('created')
+    case 'edition':
+      return t('modified')
+    case 'deletion':
+      return t('deleted')
+    case 'undeletion':
+      return t('undeleted')
+    case 'mention':
+      return t('mention made')
+    case 'content-comment':
+      return t('commented')
+    case 'status-update':
+      return t('status modified')
+    case 'move':
+      return t('moved')
+    case 'copy':
+      return t('copied')
+    case 'unknown':
+      return t('unknown')
+  }
+
+  return revisionType
 }

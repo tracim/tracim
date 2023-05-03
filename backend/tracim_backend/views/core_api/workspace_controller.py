@@ -5,8 +5,7 @@ from pyramid.config import Configurator
 from pyramid.httpexceptions import HTTPFound
 import transaction
 
-from tracim_backend.app_models.contents import FILE_TYPE
-from tracim_backend.app_models.contents import KANBAN_TYPE
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ConflictingMoveInChild
@@ -40,6 +39,7 @@ from tracim_backend.lib.utils.authorization import can_modify_workspace
 from tracim_backend.lib.utils.authorization import can_move_content
 from tracim_backend.lib.utils.authorization import can_see_workspace_information
 from tracim_backend.lib.utils.authorization import check_right
+from tracim_backend.lib.utils.authorization import has_personal_access
 from tracim_backend.lib.utils.authorization import is_administrator
 from tracim_backend.lib.utils.authorization import is_content_manager
 from tracim_backend.lib.utils.authorization import is_contributor
@@ -56,6 +56,7 @@ from tracim_backend.models.context_models import PaginatedObject
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import WorkspaceSubscription
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.roles import WorkspaceRoles
@@ -272,15 +273,15 @@ class WorkspaceController(Controller):
         Returns the list of space members with their role, avatar, etc.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        rapi = RoleApi(
+        role_api = RoleApi(
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
             show_disabled_user=hapic_data.query.show_disabled_user,
         )
 
-        roles = rapi.get_all_for_workspace(workspace=request.current_workspace)
-        return [rapi.get_user_role_workspace_with_context(user_role) for user_role in roles]
+        roles = role_api.get_all_for_workspace(workspace=request.current_workspace)
+        return [role_api.get_user_role_workspace_with_context(user_role) for user_role in roles]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
     @check_right(can_see_workspace_information)
@@ -293,14 +294,14 @@ class WorkspaceController(Controller):
         Returns given space member with its role, avatar, etc.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        rapi = RoleApi(
+        role_api = RoleApi(
             current_user=request.current_user, session=request.dbsession, config=app_config
         )
 
-        role = rapi.get_one(
+        role = role_api.get_one(
             user_id=hapic_data.path.user_id, workspace_id=hapic_data.path.workspace_id
         )
-        return rapi.get_user_role_workspace_with_context(role)
+        return role_api.get_user_role_workspace_with_context(role)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
     @hapic.handle_exception(UserRoleNotFound, HTTPStatus.BAD_REQUEST)
@@ -317,15 +318,15 @@ class WorkspaceController(Controller):
         This feature is for workspace managers, trusted users and administrators.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        rapi = RoleApi(
+        role_api = RoleApi(
             current_user=request.current_user, session=request.dbsession, config=app_config
         )
 
-        role = rapi.get_one(
+        role = role_api.get_one(
             user_id=hapic_data.path.user_id, workspace_id=hapic_data.path.workspace_id
         )
-        role = rapi.update_role(role, role_level=hapic_data.body.role.level)
-        return rapi.get_user_role_workspace_with_context(role)
+        role = role_api.update_role(role, role_level=hapic_data.body.role.level)
+        return role_api.get_user_role_workspace_with_context(role)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
     @check_right(can_leave_workspace)
@@ -342,10 +343,12 @@ class WorkspaceController(Controller):
         """
 
         app_config = request.registry.settings["CFG"]  # type: CFG
-        rapi = RoleApi(
+        role_api = RoleApi(
             current_user=request.current_user, session=request.dbsession, config=app_config
         )
-        rapi.delete_one(user_id=hapic_data.path.user_id, workspace_id=hapic_data.path.workspace_id)
+        role_api.delete_one(
+            user_id=hapic_data.path.user_id, workspace_id=hapic_data.path.workspace_id
+        )
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
@@ -365,9 +368,8 @@ class WorkspaceController(Controller):
         This feature is for workspace managers and administrators.
         """
         newly_created = False
-        email_sent = False
         app_config = request.registry.settings["CFG"]  # type: CFG
-        rapi = RoleApi(
+        role_api = RoleApi(
             current_user=request.current_user, session=request.dbsession, config=app_config
         )
         uapi = UserApi(
@@ -410,12 +412,6 @@ class WorkspaceController(Controller):
                     creation_type=UserCreationType.INVITATION,
                     creation_author=request.current_user,
                 )
-                if (
-                    app_config.EMAIL__NOTIFICATION__ACTIVATED
-                    and app_config.NEW_USER__INVITATION__DO_NOTIFY
-                    and app_config.JOBS__PROCESSING_MODE == app_config.CST.SYNC
-                ):
-                    email_sent = True
             else:
                 user = uapi.create_user(
                     auth_type=AuthType.UNKNOWN,
@@ -428,16 +424,16 @@ class WorkspaceController(Controller):
                 )
             newly_created = True
 
-        role = rapi.create_one(
+        role = role_api.create_one(
             user=user,
             workspace=request.current_workspace,
             role_level=WorkspaceRoles.get_role_from_slug(hapic_data.body.role).level,
-            with_notif=app_config.EMAIL__NOTIFICATION__ENABLED_ON_INVITATION,
+            email_notification_type=EmailNotificationType(
+                app_config.EMAIL__NOTIFICATION__TYPE_ON_INVITATION
+            ),
             flush=True,
         )
-        return rapi.get_user_role_workspace_with_context(
-            role, newly_created=newly_created, email_sent=email_sent
-        )
+        return role_api.get_user_role_workspace_with_context(role, newly_created=newly_created)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_SUBSCRIPTION_ENDPOINTS])
     @check_right(can_modify_workspace)
@@ -514,7 +510,7 @@ class WorkspaceController(Controller):
             parent_ids=content_filter.parent_ids,
             complete_path_to_id=content_filter.complete_path_to_id,
             workspaces=[request.current_workspace],
-            content_type=content_filter.content_type or content_type_list.Any_SLUG,
+            content_type=content_filter.content_type or ContentTypeSlug.ANY.value,
             label=content_filter.label,
             order_by_properties=[
                 get_sort_expression(content_filter.sort, Content, {"modified": "updated"}),
@@ -554,22 +550,23 @@ class WorkspaceController(Controller):
         if creation_data.parent_id:
             try:
                 parent = api.get_one(
-                    content_id=creation_data.parent_id, content_type=content_type_list.Any_SLUG
+                    content_id=creation_data.parent_id, content_type=ContentTypeSlug.ANY.value
                 )
             except ContentNotFound as exc:
                 raise ParentNotFound(
                     "Parent with content_id {} not found".format(creation_data.parent_id)
                 ) from exc
 
-        content = api.create(
-            content_type_slug=creation_data.content_type,
-            do_save=True,
-            label=creation_data.label,
-            template_id=creation_data.template_id,
-            workspace=request.current_workspace,
-            parent=parent,
-            content_namespace=creation_data.content_namespace,
-        )
+        with request.dbsession.no_autoflush:
+            content = api.create(
+                content_type_slug=creation_data.content_type,
+                do_save=True,
+                label=creation_data.label,
+                template_id=creation_data.template_id,
+                workspace=request.current_workspace,
+                parent=parent,
+                content_namespace=creation_data.content_namespace,
+            )
 
         if creation_data.template_id:
             api.copy_tags(
@@ -621,12 +618,12 @@ class WorkspaceController(Controller):
             config=app_config,
         )
         content = api.get_one(
-            content_id=hapic_data.path["content_id"], content_type=content_type_list.Any_SLUG
+            content_id=hapic_data.path["content_id"], content_type=ContentTypeSlug.ANY.value
         )
         content_type = content_type_list.get_one_by_slug(content.type).slug
 
-        if content_type == KANBAN_TYPE:
-            content_type = FILE_TYPE
+        if content_type == ContentTypeSlug.KANBAN.value:
+            content_type = ContentTypeSlug.FILE.value
 
         # TODO - G.M - 2018-08-03 - Jsonify redirect response ?
         raise HTTPFound(
@@ -696,8 +693,8 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(path_data.content_id, content_type=content_type_list.Any_SLUG)
-        new_parent = api.get_one(move_data.new_parent_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(path_data.content_id, content_type=ContentTypeSlug.ANY.value)
+        new_parent = api.get_one(move_data.new_parent_id, content_type=ContentTypeSlug.ANY.value)
 
         new_workspace = request.candidate_workspace
 
@@ -709,7 +706,7 @@ class WorkspaceController(Controller):
                 new_content_namespace=ContentNamespaces.CONTENT,
                 must_stay_in_same_workspace=False,
             )
-        updated_content = api.get_one(path_data.content_id, content_type=content_type_list.Any_SLUG)
+        updated_content = api.get_one(path_data.content_id, content_type=ContentTypeSlug.ANY.value)
         return api.get_content_in_context(updated_content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ALL_TRASH_AND_RESTORE_ENDPOINTS])
@@ -731,7 +728,7 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(path_data.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(path_data.content_id, content_type=ContentTypeSlug.ANY.value)
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.delete(content)
         return
@@ -753,7 +750,7 @@ class WorkspaceController(Controller):
             show_deleted=True,
             show_archived=True,
         )
-        content = api.get_one(path_data.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(path_data.content_id, content_type=ContentTypeSlug.ANY.value)
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.undelete(content)
         return
@@ -779,7 +776,7 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(path_data.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(path_data.content_id, content_type=ContentTypeSlug.ANY.value)
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.archive(content)
         return
@@ -801,7 +798,7 @@ class WorkspaceController(Controller):
             show_archived=True,
             show_deleted=True,
         )
-        content = api.get_one(path_data.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(path_data.content_id, content_type=ContentTypeSlug.ANY.value)
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.unarchive(content)
         return
@@ -823,19 +820,20 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.set_template(content, hapic_data.body.is_template)
             api.save(content)
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
+    @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(TemplateQuerySchema())
     @hapic.output_body(ContentDigestSchema(many=True), default_http_code=HTTPStatus.OK)
     def get_templates(
         self, context, request: TracimRequest, hapic_data=None
-    ) -> typing.List[ContentDigestSchema]:
+    ) -> typing.List[Content]:
         """
         Get all templates
         """
@@ -847,9 +845,10 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        return api.get_templates(
-            user_id=hapic_data.path["user_id"], template_type=hapic_data.query["type"]
+        user = UserApi(current_user=None, session=request.dbsession, config=app_config).get_one(
+            hapic_data.path["user_id"]
         )
+        return api.get_templates(user=user, template_type=hapic_data.query["type"])
 
     def bind(self, configurator: Configurator) -> None:
         """
@@ -988,7 +987,7 @@ class WorkspaceController(Controller):
         )
         configurator.add_view(self.set_content_template, route_name="set_content_template")
 
-        # Get every templates
+        # Get every template
         configurator.add_route(
             "get_templates", "/users/{user_id}/template_contents", request_method="GET"
         )

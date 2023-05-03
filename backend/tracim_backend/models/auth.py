@@ -118,7 +118,7 @@ class User(TrashableMixin, DeclarativeBase):
     MAX_IMPORTED_FROM_LENGTH = 32
     MAX_TIMEZONE_LENGTH = 32
     MIN_LANG_LENGTH = 2
-    MAX_LANG_LENGTH = 3
+    MAX_LANG_LENGTH = 6
     MAX_AUTH_TOKEN_LENGTH = 255
     MAX_RESET_PASSWORD_TOKEN_HASH_LENGTH = 255
     DEFAULT_ALLOWED_SPACE = 0
@@ -157,6 +157,7 @@ class User(TrashableMixin, DeclarativeBase):
     reset_password_token_created = Column(DateTime, nullable=True, default=None)
     allowed_space = Column(BigInteger, nullable=False, server_default=str(DEFAULT_ALLOWED_SPACE))
     profile = Column(Enum(Profile), nullable=False, server_default=Profile.NOBODY.name)
+    is_avatar_default = Column(Boolean, default=False, nullable=False)
     avatar = Column(TracimUploadedFileField, unique=False, nullable=True)
     cropped_avatar = Column(TracimUploadedFileField, unique=False, nullable=True)
     cover = Column(TracimUploadedFileField, unique=False, nullable=True)
@@ -182,7 +183,7 @@ class User(TrashableMixin, DeclarativeBase):
 
     @property
     def has_avatar(self) -> bool:
-        return bool(self.avatar)
+        return True
 
     @property
     def has_cover(self) -> bool:

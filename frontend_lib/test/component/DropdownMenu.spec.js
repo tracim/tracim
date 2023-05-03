@@ -74,11 +74,6 @@ describe('<DropdownMenu />', () => {
       expect(wrapper.find('button.dropdown-toggle').prop('data-cy')).to.equal(dataCy)
     })
 
-    it('if isButton prop is true, the dropdown button should have a primaryColorBorder class', () => {
-      wrapper.setProps({ isButton: true })
-      expect(wrapper.find('button.dropdown-toggle').prop('className')).to.include('primaryColorBorder')
-    })
-
     it('if isButton prop is false, the dropdown button should have a transparentButton class', () => {
       wrapper.setProps({ isButton: false })
       expect(wrapper.find('button.dropdown-toggle').prop('className')).to.include('transparentButton')

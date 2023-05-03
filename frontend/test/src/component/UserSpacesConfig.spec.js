@@ -36,21 +36,21 @@ describe('<UserSpacesConfig />', () => {
   const memberManager1 = {
     user_id: 0,
     role: ROLE.workspaceManager.slug,
-    doNotify: true,
+    emailNotificationType: 'summary',
     publicName: 'publicname_01',
     username: 'username_01'
   }
   const memberNotManager = {
     user_id: 1,
     role: ROLE.contributor.slug,
-    doNotify: true,
+    emailNotificationType: 'summary',
     publicName: 'publicname_02',
     username: 'username_02'
   }
   const memberManager2 = {
     user_id: 2,
     role: ROLE.workspaceManager.slug,
-    doNotify: true,
+    emailNotificationType: 'summary',
     publicName: 'publicname_03',
     username: 'username_03'
   }
@@ -97,7 +97,7 @@ describe('<UserSpacesConfig />', () => {
           fields: {
             author: userFromApi,
             user: { ...userFromApi, user_id: 0 },
-            member: { role: 'workspace-manager', do_notify: false },
+            member: { role: 'workspace-manager', email_notification_type: false },
             workspace: { ...firstWorkspaceFromApi, workspace_id: 2 }
           }
         }
@@ -107,7 +107,9 @@ describe('<UserSpacesConfig />', () => {
           space => space.workspace_id === tlmData.fields.workspace.workspace_id
         ).memberList.find(m => m.user_id === tlmData.fields.user.user_id)
 
-        expect(member.do_notify).to.equal(tlmData.fields.member.do_notify)
+        expect(member.email_notification_type).to.equal(
+          tlmData.fields.member.email_notification_type
+        )
       })
     })
   })

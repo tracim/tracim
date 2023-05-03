@@ -4,7 +4,7 @@ import { PAGES as p } from '../../support/urls_commands'
 describe('Account page', () => {
   const createOneSpace = (cy, spaceName) => {
     cy.visitPage({ pageName: p.ACCOUNT })
-    cy.get('[data-cy=sidebarCreateWorkspaceBtn]')
+    cy.get('[data-cy=sidebarCreateSpaceBtn]')
       .should('be.visible')
       .click()
     cy.contains('.cardPopup__header__title', 'New space')

@@ -1,1 +1,13 @@
-{}
+{
+  "Deprecated": "Deprecato",
+  "Cancelled": "Annullato",
+  "Opened": "Aperto",
+  "Validated": "Validato",
+  "Space": "Spazio",
+  "My Spaces": "",
+  "My Password": "",
+  "My Configuration links": "",
+  "Cancel": "Annulla",
+  "{{user}}'s profile": "Profilo di {{user}}",
+  "{{label}}: ": "{{label}}: "
+}

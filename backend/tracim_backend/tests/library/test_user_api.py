@@ -23,6 +23,7 @@ from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import UserInContext
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
@@ -205,9 +206,12 @@ class TestUserApi(object):
         with pytest.raises(UsernameAlreadyExists):
             api.create_minimal_user(username="boby", email="boby2@boba.fet", save_now=True)
 
-    @pytest.mark.parametrize("username", ["all", "tous", "todos", "alle"])
+    @mock.patch(
+        "tracim_backend.lib.core.user.UserApi.get_reserved_usernames", return_value=tuple(["all"])
+    )
+    @pytest.mark.parametrize("username", ["all"])
     def test_unit__create_minimal_user__error__reserved_username(
-        self, session, app_config, username: str
+        self, get_reserved_usernames_mock, session, app_config, username: str
     ):
         api = UserApi(current_user=None, session=session, config=app_config)
         with pytest.raises(ReservedUsernameError):
@@ -262,9 +266,12 @@ class TestUserApi(object):
         with pytest.raises(UsernameAlreadyExists):
             api.update(user=u1, username="jean")
 
-    @pytest.mark.parametrize("username", ["all", "tous", "todos", "alle"])
+    @mock.patch(
+        "tracim_backend.lib.core.user.UserApi.get_reserved_usernames", return_value=tuple(["all"])
+    )
+    @pytest.mark.parametrize("username", ["all"])
     def test_unit__update_user_username__error__reserved_username(
-        self, session, app_config, username: str
+        self, get_reserved_usernames_mock, session, app_config, username: str
     ):
         api = UserApi(current_user=None, session=session, config=app_config)
         u1 = api.create_minimal_user(username="boby", email="boby@boba.fet", save_now=True)
@@ -360,9 +367,9 @@ class TestUserApi(object):
         api = UserApi(current_user=None, session=session, config=app_config)
         u = api.create_minimal_user("bob@bob")
         with pytest.raises(TracimValidationFailed):
-            lang = "n" * 4
+            lang = "n" * 7
             u = api.update(user=u, lang=lang)
-        lang = "n" * 3
+        lang = "n" * 6
         api.update(user=u, lang=lang)
 
     # timezone
@@ -540,9 +547,24 @@ class TestUserApi(object):
         wapi = workspace_api_factory.get()
         workspace = wapi.create_workspace("test workspace n°1", save_now=True)
         role_api = role_api_factory.get()
-        role_api.create_one(u1, workspace, UserRoleInWorkspace.READER, False)
-        role_api.create_one(u2, workspace, UserRoleInWorkspace.READER, False)
-        role_api.create_one(u3, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(
+            u1,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            u2,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            u3,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api2 = UserApi(current_user=u1, session=session, config=app_config)
         users = api2.get_known_users("name")
         assert len(users) == 2
@@ -563,10 +585,30 @@ class TestUserApi(object):
         wapi = workspace_api_factory.get()
         workspace_2 = wapi.create_workspace("test workspace n°2", save_now=True)
         role_api = role_api_factory.get()
-        role_api.create_one(u1, workspace, UserRoleInWorkspace.READER, False)
-        role_api.create_one(u2, workspace_2, UserRoleInWorkspace.READER, False)
-        role_api.create_one(u3, workspace, UserRoleInWorkspace.READER, False)
-        role_api.create_one(u3, workspace_2, UserRoleInWorkspace.READER, False)
+        role_api.create_one(
+            u1,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            u2,
+            workspace_2,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            u3,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            u3,
+            workspace_2,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api2 = UserApi(current_user=u3, session=session, config=app_config)
         users = api2.get_known_users("name", exclude_workspace_ids=[workspace.workspace_id])
         assert len(users) == 1
@@ -602,11 +644,36 @@ class TestUserApi(object):
         wapi = workspace_api_factory.get()
         workspace_2 = wapi.create_workspace("test workspace n°2", save_now=True)
         role_api = role_api_factory.get()
-        role_api.create_one(u1, workspace, UserRoleInWorkspace.READER, False)
-        role_api.create_one(u2, workspace_2, UserRoleInWorkspace.READER, False)
-        role_api.create_one(u4, workspace_2, UserRoleInWorkspace.READER, False)
-        role_api.create_one(u3, workspace, UserRoleInWorkspace.READER, False)
-        role_api.create_one(u3, workspace_2, UserRoleInWorkspace.READER, False)
+        role_api.create_one(
+            u1,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            u2,
+            workspace_2,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            u4,
+            workspace_2,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            u3,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            u3,
+            workspace_2,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api2 = UserApi(current_user=u3, session=session, config=app_config)
         users = api2.get_known_users("name", include_workspace_ids=[workspace_2.workspace_id])
         assert set(users) == set([u2, u4])
@@ -627,7 +694,12 @@ class TestUserApi(object):
                 do_save=True,
             )
             role_api = role_api_factory.get()
-            role_api.create_one(u1, workspace, UserRoleInWorkspace.READER, False)
+            role_api.create_one(
+                u1,
+                workspace,
+                UserRoleInWorkspace.READER,
+                email_notification_type=EmailNotificationType.NONE,
+            )
 
         apiu1 = UserApi(current_user=u1, session=session, config=app_config)
         users = apiu1.get_known_users("", include_workspace_ids=[workspace.workspace_id], limit=10)
@@ -649,11 +721,36 @@ class TestUserApi(object):
         wapi = workspace_api_factory.get()
         workspace_2 = wapi.create_workspace("test workspace n°2", save_now=True)
         role_api = role_api_factory.get()
-        role_api.create_one(u1, workspace, UserRoleInWorkspace.READER, False)
-        role_api.create_one(u2, workspace_2, UserRoleInWorkspace.READER, False)
-        role_api.create_one(u4, workspace_2, UserRoleInWorkspace.READER, False)
-        role_api.create_one(u3, workspace, UserRoleInWorkspace.READER, False)
-        role_api.create_one(u3, workspace_2, UserRoleInWorkspace.READER, False)
+        role_api.create_one(
+            u1,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            u2,
+            workspace_2,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            u4,
+            workspace_2,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            u3,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            u3,
+            workspace_2,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api2 = UserApi(current_user=u3, session=session, config=app_config)
         users = api2.get_known_users(
             "name", exclude_workspace_ids=[workspace.workspace_id], exclude_user_ids=[u4.user_id]
@@ -675,10 +772,30 @@ class TestUserApi(object):
         wapi = workspace_api_factory.get()
         workspace_2 = wapi.create_workspace("test workspace n°2", save_now=True)
         role_api = role_api_factory.get()
-        role_api.create_one(u1, workspace, UserRoleInWorkspace.READER, False)
-        role_api.create_one(u2, workspace_2, UserRoleInWorkspace.READER, False)
-        role_api.create_one(u3, workspace, UserRoleInWorkspace.READER, False)
-        role_api.create_one(u3, workspace_2, UserRoleInWorkspace.READER, False)
+        role_api.create_one(
+            u1,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            u2,
+            workspace_2,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            u3,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            u3,
+            workspace_2,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api2 = UserApi(current_user=u3, session=session, config=app_config)
         users = api2.get_known_users("name")
         assert len(users) == 2
@@ -697,9 +814,24 @@ class TestUserApi(object):
         wapi = workspace_api_factory.get()
         workspace = wapi.create_workspace("test workspace n°1", save_now=True)
         role_api = role_api_factory.get()
-        role_api.create_one(u1, workspace, UserRoleInWorkspace.READER, False)
-        role_api.create_one(u2, workspace, UserRoleInWorkspace.READER, False)
-        role_api.create_one(u3, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(
+            u1,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            u2,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            u3,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api2 = UserApi(current_user=u1, session=session, config=app_config)
         users = api2.get_known_users("name", exclude_user_ids=[u1.user_id])
         assert len(users) == 1
@@ -717,9 +849,24 @@ class TestUserApi(object):
         wapi = workspace_api_factory.get()
         workspace = wapi.create_workspace("test workspace n°1", save_now=True)
         role_api = role_api_factory.get()
-        role_api.create_one(u1, workspace, UserRoleInWorkspace.READER, False)
-        role_api.create_one(u2, workspace, UserRoleInWorkspace.READER, False)
-        role_api.create_one(u3, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(
+            u1,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            u2,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            u3,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api2 = UserApi(current_user=u1, session=session, config=app_config)
         users = api2.get_known_users("email")
         assert len(users) == 2
@@ -757,7 +904,7 @@ class TestUserApi(object):
         assert new_user.email == "admin@tracim.tracim"
         assert new_user.display_name == "Admin"
         assert new_user.is_active is True
-        assert new_user.has_avatar is False
+        assert new_user.has_avatar is True
 
     def test_unit__get_current_user_ok__nominal_case(self, session, app_config):
         user = User(email="admin@tracim.tracim")
@@ -1111,3 +1258,31 @@ class TestFakeLDAPUserApi(object):
         api._user = u
         with pytest.raises(ExternalAuthUserEmailModificationDisallowed):
             api.set_email(u, "pass", "bob@bobi")
+
+    @pytest.mark.parametrize(
+        "display_name, avatar_initials",
+        [
+            pytest.param("bob", "BO", id="One word"),
+            pytest.param("bob.leponge", "BL", id="Two words with '.'"),
+            pytest.param("bob leponge", "BL", id="Two words with ' '"),
+            pytest.param("bob junior leponge", "BJ", id="Three words"),
+            pytest.param("   bob     leponge    ", "BL", id="Superfluous spaces"),
+        ],
+    )
+    def test_unit__get_avatar__ok__default_avatar(
+        self, session, app_config, display_name, avatar_initials
+    ):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        u = api.create_user(
+            email="bob@bob",
+            password=None,
+            name=display_name,
+            lang="en",
+            do_save=True,
+            do_notify=False,
+        )
+        hapic_file = api.get_avatar(u.user_id, "avatar.svg", "avatar.svg")
+        assert u.avatar
+        assert u.cropped_avatar
+        content = hapic_file.file_object.read().decode()
+        assert avatar_initials in content

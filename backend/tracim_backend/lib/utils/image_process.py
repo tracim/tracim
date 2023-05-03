@@ -1,8 +1,7 @@
 from fractions import Fraction
 import typing
 
-from PIL import Image
-from PIL import ImageOps
+from wand.image import Image
 
 
 class ImageRatio:
@@ -66,11 +65,12 @@ def crop_image(
     Crop Image according to ratio.
     result will be stored into destination_file(fileobj)
     """
-    img = Image.open(source_file)
-    size = ImageSize(*img.size)
-    new_size = ratio.sized_to_ratio(size)
-    # TODO - G.M - 2021-01-21 - Allow to choose which part of the image
-    # to crop, by default, this will center cropped image.
-    img = ImageOps.fit(img, (new_size.width, new_size.height))
-    img.save(destination_file, format=format)
+    with Image(blob=source_file) as image:
+        size = ImageSize(image.width, image.height)
+        new_size = ratio.sized_to_ratio(size)
+        # TODO - G.M - 2021-01-21 - Allow to choose which part of the image
+        # to crop, by default, this will center cropped image.
+        image.crop(width=new_size.width, height=new_size.height, gravity="center")
+        image.format = format
+        image.save(destination_file)
     destination_file.seek(0)

@@ -116,7 +116,9 @@ class PopupUploadFile extends React.Component {
       this.setState({
         fileUploadList: failedFileUploadList
       })
-      sendGlobalFlashMessage(props.t('Error while uploading file(s)'))
+      let message = props.t('Error while uploading file(s)')
+      if (failedFileUploadList.length === 1) message = failedFileUploadList[0].errorMessage
+      sendGlobalFlashMessage(message)
       props.onFailure(failedFileUploadList)
     } else props.onSuccess(successfulFileUploadList)
     this.setState({ uploadStarted: false })
@@ -184,7 +186,6 @@ class PopupUploadFile extends React.Component {
         onChangeContentName={() => {}}
         onChangeTemplate={props.onChangeTemplate}
         btnValidateLabel={props.validateLabel || props.t('Validate')}
-        customStyle={{ top: '50%', transform: 'translateY(-50%)' }}
         templateList={props.templateList}
       >
         <div>

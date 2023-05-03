@@ -5,8 +5,7 @@ import typing
 from pyramid.config import Configurator
 import transaction
 
-from tracim_backend.app_models.contents import FILE_TYPE
-from tracim_backend.app_models.contents import KANBAN_TYPE
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
@@ -69,10 +68,10 @@ SWAGGER_TAG__CONTENT_FILE_SECTION = "Files"
 SWAGGER_TAG__CONTENT_FILE_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__CONTENT_ENDPOINTS, SWAGGER_TAG__CONTENT_FILE_SECTION
 )
-is_file_content = ContentTypeChecker([FILE_TYPE, KANBAN_TYPE])
+is_file_content = ContentTypeChecker([ContentTypeSlug.FILE.value, ContentTypeSlug.KANBAN.value])
 can_create_file = OrAuthorizationChecker(
-    ContentTypeCreationChecker(content_type_list, FILE_TYPE),
-    ContentTypeCreationChecker(content_type_list, KANBAN_TYPE),
+    ContentTypeCreationChecker(content_type_list, ContentTypeSlug.FILE.value),
+    ContentTypeCreationChecker(content_type_list, ContentTypeSlug.KANBAN.value),
 )
 
 
@@ -120,26 +119,39 @@ class FileController(Controller):
         parent = None  # type: typing.Optional['Content']
         if parent_id:
             try:
-                parent = api.get_one(content_id=parent_id, content_type=content_type_list.Any_SLUG)
+                parent = api.get_one(content_id=parent_id, content_type=ContentTypeSlug.ANY.value)
             except ContentNotFound as exc:
                 raise ParentNotFound(
                     "Parent with content_id {} not found".format(parent_id)
                 ) from exc
-        content = api.create(
-            filename=_file.filename,
-            content_type_slug=hapic_data.forms.content_type,
-            workspace=request.current_workspace,
-            parent=parent,
-            content_namespace=hapic_data.forms.content_namespace,
-        )
-        api.save(content, ActionDescription.CREATION)
-        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
-            api.update_file_data(
-                content,
-                new_filename=_file.filename,
-                new_mimetype=_file.type,
-                new_content=_file.file,
+        with request.dbsession.no_autoflush:
+            content = api.create(
+                filename=_file.filename,
+                content_type_slug=hapic_data.forms.content_type,
+                workspace=request.current_workspace,
+                parent=parent,
+                content_namespace=hapic_data.forms.content_namespace,
+                template_id=hapic_data.forms.template_id,
+                do_save=hapic_data.forms.template_id,
             )
+
+        if not hapic_data.forms.template_id:
+            api.save(content, ActionDescription.CREATION)
+            with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
+                api.update_file_data(
+                    content,
+                    new_filename=_file.filename,
+                    new_mimetype=_file.type,
+                    new_content=_file.file,
+                )
+        else:
+            api.copy_tags(
+                destination=content, source_content_id=hapic_data.forms.template_id,
+            )
+            api.copy_todos(
+                new_parent=content, template_id=hapic_data.forms.template_id,
+            )
+
         return api.get_content_in_context(content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -173,7 +185,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         api.check_upload_size(request.content_length, content.workspace)
         _file = hapic_data.files.files
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
@@ -208,7 +220,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         try:
             return StorageLib(request.app_config).get_raw_file(
                 depot_file=content.depot_file,
@@ -245,7 +257,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
 
         default_filename = "{label}_r{revision_id}{file_extension}".format(
@@ -293,7 +305,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         default_filename = "{label}_page_{page_number}.pdf".format(
             label=content.label, page_number=hapic_data.query.page
         )
@@ -327,7 +339,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         default_filename = "{label}.pdf".format(label=content.label)
         return api.get_full_pdf_preview(
             revision=content.revision,
@@ -358,7 +370,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
         default_filename = "{label}_r{revision_id}.pdf".format(
             revision_id=revision.revision_id, label=revision.label
@@ -392,7 +404,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
         default_filename = "{label}_page_{page_number}.pdf".format(
             label=content.label, page_number=hapic_data.query.page
@@ -428,7 +440,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         allowed_dim = api.get_jpg_preview_allowed_dim()
         default_filename = "{label}_page_{page_number}.jpg".format(
             label=content.label, page_number=hapic_data.query.page
@@ -466,7 +478,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         default_filename = "{label}_page_{page_number}_{width}x{height}.jpg".format(
             label=content.label,
             page_number=hapic_data.query.page,
@@ -506,7 +518,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
         default_filename = "{label}_r{revision_id}_page_{page_number}_{width}x{height}.jpg".format(
             revision_id=revision.revision_id,
@@ -565,7 +577,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         return api.get_content_in_context(content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -590,7 +602,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.update_content(
                 item=content,
@@ -621,7 +633,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         revisions_page = content.get_revisions(
             page_token=hapic_data.query["page_token"],
             count=hapic_data.query["count"],
@@ -652,7 +664,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         if content.status == request.json_body.get("status"):
             raise ContentStatusException(
                 "Content id {} already have status {}".format(content.content_id, content.status)
@@ -681,7 +693,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         return api.get_revision_in_context(content.current_revision)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -703,7 +715,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
         return api.get_revision_in_context(revision)
 

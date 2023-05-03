@@ -2,8 +2,8 @@
 
 .adminUserSpacesConfig
   &.cardPopup
-    top 1%
     height 98%
+    width 98%
   & .cardPopup
     &__container
       width 98%
@@ -14,6 +14,10 @@
     display flex
     width 100%
     height calc(100% - 50px) // 50px is the close button height
+    &__filterBar
+      flex 1
+      margin-inline-start standardSpacing
+      margin-inline-end standardSpacing
     &__title
       font-size titleFontSize
       display flex
@@ -23,6 +27,7 @@
       & > .textinput__box
         flex-grow 1
         margin-inline-start standardSpacing
+        box-shadow 0px 0px 20px 0px lightGrey1
     &__availableSpaces, &__spacesMembership
       background-color offWhite
       border-radius standardBorderRadius

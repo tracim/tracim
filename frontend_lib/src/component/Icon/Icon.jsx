@@ -12,15 +12,16 @@ const Icon = props => (
 )
 
 Icon.propTypes = {
-  icon: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   color: PropTypes.string,
-  customClass: PropTypes.string
+  customClass: PropTypes.string,
+  icon: PropTypes.string
 }
 
 Icon.defaultProps = {
+  color: '',
   customClass: '',
-  color: '#252525' // INFO - G.B. - 20210211 - Default font color
+  icon: 'fas fa-question'
 }
 
 export default Icon

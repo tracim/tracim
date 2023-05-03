@@ -21,5 +21,7 @@
     "errHttp401": "non autorizzato",
     "errHttp403": "vietato",
     "pholderPassword": "Password",
-    "errHttp405": "metodo non consentito"
+    "errHttp405": "metodo non consentito",
+    "txtResources": "Risorse",
+    "txtNote": "Nota"
 }

@@ -1,4 +1,5 @@
 # coding=utf-8
+from unittest import mock
 from urllib.parse import quote
 
 from mock import patch
@@ -7,6 +8,7 @@ import transaction
 
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.utils.utils import get_timezones_list
+from tracim_backend.models.mention import TRANSLATED_GROUP_MENTIONS
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
@@ -157,7 +159,7 @@ class TestAboutEndpoint(object):
         assert res.json_body["name"] == "Tracim"
         assert res.json_body["version"]
         assert res.json_body["datetime"]
-        assert res.json_body["website"] == "https://www.algoo.fr/fr/tracim"
+        assert res.json_body["website"] == "https://www.tracim.fr"
         assert res.json_body["database_schema_version"] is None
 
     def test_api__get_about__err_401__unregistered_user(self, web_testapp):
@@ -180,6 +182,9 @@ class TestUsernameEndpoints(object):
      - /api/system/reserved-usernames
     """
 
+    @mock.patch(
+        "tracim_backend.lib.core.user.UserApi.get_reserved_usernames", return_value=tuple(["all"])
+    )
     @pytest.mark.parametrize(
         "username,is_available",
         [
@@ -188,14 +193,10 @@ class TestUsernameEndpoints(object):
             ("Cloclo", True),
             ("anotherOne", True),
             ("all", False),
-            ("tous", False),
-            ("todos", False),
-            ("alle", False),
-            ("الكل", False),
         ],
     )
     def test_api__get_username_availability__ok_200__nominal_case(
-        self, web_testapp, username: str, is_available: bool
+        self, get_reserved_usernames_mock, web_testapp, username: str, is_available: bool
     ) -> None:
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
@@ -206,7 +207,11 @@ class TestUsernameEndpoints(object):
     def test_api__get_reserved_usernames__ok_200__nominal_case(self, web_testapp) -> None:
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/system/reserved-usernames", status=200)
-        assert set(res.json["items"]) == set(("all", "tous", "todos", "alle", "الكل"))
+        assert TRANSLATED_GROUP_MENTIONS["all"] in res.json["items"]
+        assert TRANSLATED_GROUP_MENTIONS["reader"] in res.json["items"]
+        assert TRANSLATED_GROUP_MENTIONS["contributor"] in res.json["items"]
+        assert TRANSLATED_GROUP_MENTIONS["content-manager"] in res.json["items"]
+        assert TRANSLATED_GROUP_MENTIONS["space-manager"] in res.json["items"]
 
 
 @pytest.mark.usefixtures("test_fixture")
@@ -330,9 +335,73 @@ class TestConfigEndpoint(object):
             {"code": "pt", "display": "Português"},
             {"code": "de", "display": "Deutsch"},
             {"code": "ar", "display": "العربية"},
+            {"code": "es", "display": "Español"},
+            {"code": "nb_NO", "display": "Norsk"},
         ]
         assert res.json_body["user__self_registration__enabled"] is False
         assert res.json_body["ui__spaces__creation__parent_space_choice__visible"] is True
+        assert res.json_body["ui__notes__code_sample_languages"] == [
+            {"value": "apacheconf", "text": "Apache Configuration"},
+            {"value": "arduino", "text": "Arduino"},
+            {"value": "aspnet", "text": "ASP.NET"},
+            {"value": "bash", "text": "Bash"},
+            {"value": "batch", "text": "Batch"},
+            {"value": "bbcode", "text": "BBcode"},
+            {"value": "c", "text": "C"},
+            {"value": "clike", "text": "C-like"},
+            {"value": "csharp", "text": "C#"},
+            {"value": "cpp", "text": "C++"},
+            {"value": "cobol", "text": "COBOL"},
+            {"value": "css", "text": "CSS"},
+            {"value": "css-extras", "text": "CSS Extras"},
+            {"value": "csv", "text": "CSV"},
+            {"value": "diff", "text": "Diff"},
+            {"value": "django", "text": "Django/Jinja2"},
+            {"value": "docker", "text": "Docker"},
+            {"value": "erlang", "text": "Erlang"},
+            {"value": "excel-formula", "text": "Excel Formula"},
+            {"value": "fortran", "text": "Fortran"},
+            {"value": "git", "text": "Git"},
+            {"value": "haskell", "text": "Haskell"},
+            {"value": "ignore", "text": ".ignore"},
+            {"value": "ini", "text": "Ini"},
+            {"value": "java", "text": "Java"},
+            {"value": "javascript", "text": "JavaScript"},
+            {"value": "jq", "text": "JQ"},
+            {"value": "json", "text": "JSON"},
+            {"value": "json5", "text": "JSON5"},
+            {"value": "jsonp", "text": "JSONP"},
+            {"value": "latex", "text": "LaTeX"},
+            {"value": "lisp", "text": "Lisp"},
+            {"value": "lua", "text": "Lua"},
+            {"value": "makefile", "text": "Makefile"},
+            {"value": "markdown", "text": "Markdown"},
+            {"value": "markup", "text": "Markup"},
+            {"value": "matlab", "text": "MATLAB"},
+            {"value": "nginx", "text": "nginx"},
+            {"value": "objectivec", "text": "Objective-C"},
+            {"value": "ocaml", "text": "OCaml"},
+            {"value": "pascal", "text": "Pascal"},
+            {"value": "perl", "text": "Perl"},
+            {"value": "php", "text": "PHP"},
+            {"value": "phpdoc", "text": "PHPDoc"},
+            {"value": "php-extras", "text": "PHP Extras"},
+            {"value": "powershell", "text": "PowerShell"},
+            {"value": "properties", "text": ".properties"},
+            {"value": "python", "text": "Python"},
+            {"value": "r", "text": "R"},
+            {"value": "jsx", "text": "React JSX"},
+            {"value": "tsx", "text": "React TSX"},
+            {"value": "regex", "text": "Regex"},
+            {"value": "ruby", "text": "Ruby"},
+            {"value": "rust", "text": "Rust"},
+            {"value": "sql", "text": "SQL"},
+            {"value": "vbnet", "text": "VB.Net"},
+            {"value": "vim", "text": "vim"},
+            {"value": "visual-basic", "text": "Visual Basic"},
+            {"value": "yaml", "text": "YAML"},
+            {"value": "wiki", "text": "Wiki markup"},
+        ]
         assert res.json_body["limitation__maximum_online_users_message"] == ""
         assert res.json_body["call__enabled"] is False
 

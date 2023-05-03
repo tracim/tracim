@@ -2,22 +2,28 @@
 
 .content
   &__name.searchResultPage
-    flex 1
+    flex 8
     width 0
   &__path
-    flex 2
-    white-space nowrap
-    overflow hidden
-    text-overflow ellipsis
-    margin-inline-end standardSpacing
-    color fontColor
-    padding 5px
-  &__lastModification
-    flex 1
+    flex 7
     white-space nowrap
     overflow hidden
     text-overflow ellipsis
     margin-inline-end standardSpacing
     color fontColor
     padding textSpacing
+  &__search
+    &__lastModification
+      flex 7
+      white-space nowrap
+      overflow hidden
+      text-overflow ellipsis
+      margin-inline-end standardSpacing
+      color fontColor
+      padding textSpacing
 
+@media (max-width: max-md)
+  .content
+    &__search
+      &__lastModification
+        display none

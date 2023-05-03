@@ -13,6 +13,7 @@ import {
 } from 'tracim_frontend_lib'
 
 import { FETCH_CONFIG } from '../../util/helper.js'
+import { Link } from 'react-router-dom'
 
 export const ProfileMainBar = props => {
   const hasUser = Object.keys(props.displayedUser).length > 0
@@ -30,14 +31,14 @@ export const ProfileMainBar = props => {
         <Avatar
           customClass='profile__mainBar__avatar__big'
           apiUrl={FETCH_CONFIG.apiUrl}
-          user={hasUser ? props.displayedUser : {}}
+          user={props.displayedUser}
           size={AVATAR_SIZE.BIG}
           dataCy='profile-avatar'
         />
         <Avatar
           customClass='profile__mainBar__avatar__medium'
           apiUrl={FETCH_CONFIG.apiUrl}
-          user={hasUser ? props.displayedUser : {}}
+          user={props.displayedUser}
           size={AVATAR_SIZE.MEDIUM}
         />
         {props.changeAvatarEnabled && (
@@ -66,14 +67,26 @@ export const ProfileMainBar = props => {
               </div>
               <Breadcrumbs root={breadcrumbsRoot} breadcrumbsList={props.breadcrumbsList} />
             </div>
-            {props.system.config.call__enabled && props.user.userId !== props.displayedUser.userId && (
-              <IconButton
-                text={props.t('Call')}
-                icon='fas fa-phone'
-                onClick={props.onClickDisplayCallPopup}
-                customClass='profile__mainBar__callBtn'
-              />
-            )}
+            <div className='profile__mainBar__btnGrp'>
+              {props.changeAvatarEnabled && (
+                <Link
+                  className='profile__mainBar__btnGrp__btn'
+                  to={props.user.userId === props.displayedUser.userId
+                    ? PAGE.ACCOUNT
+                    : PAGE.ADMIN.USER_EDIT(props.displayedUser.userId)}
+                >
+                  <IconButton text={props.t('Account Settings')} type='button' icon='fas fa-cogs' />
+                </Link>
+              )}
+              {props.system.config.call__enabled && props.user.userId !== props.displayedUser.userId && (
+                <IconButton
+                  text={props.t('Call')}
+                  icon='fas fa-phone'
+                  onClick={props.onClickDisplayCallPopup}
+                  customClass='profile__mainBar__btnGrp__btn'
+                />
+              )}
+            </div>
           </div>
         )
         : (

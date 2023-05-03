@@ -17,6 +17,8 @@ const CREATED = 'created'
 const MODIFIED = 'modified'
 const DELETED = 'deleted'
 const UNDELETED = 'undeleted'
+const COPIED = 'copied'
+const MOVED = 'moved'
 
 export const TLM_SUB_TYPE = CONTENT_TYPE
 
@@ -36,5 +38,7 @@ export const TLM_CORE_EVENT_TYPE = {
   CREATED,
   MODIFIED,
   DELETED,
-  UNDELETED
+  UNDELETED,
+  COPIED,
+  MOVED
 }

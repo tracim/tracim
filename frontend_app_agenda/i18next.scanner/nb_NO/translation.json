@@ -8,5 +8,6 @@
   "Some information was modified by {{author}}": "Noe av informasjonen ble endret av {{author}}",
   "User": "Bruker",
   "All my agendas": "Alle mine agendaer",
-  "Agenda of space {{workspaceLabel}}": "Agenda for {{workspaceLabel}}-rommet"
+  "Agenda of space {{workspaceLabel}}": "Agenda for {{workspaceLabel}}-rommet",
+  "Error while loading pre-filled agenda event information": "Kunne ikke laste inn forhåndsutfylt begivenhetsinfo om agenda"
 }

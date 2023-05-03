@@ -1,7 +1,7 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
+@import '~tracim_frontend_lib/src/css/Variable.styl'
 
 .custom-form
-  height "calc(100% - %s)" % headerHeight
+  height 100%
   &__header
     &__editionmode
       display none
@@ -64,9 +64,9 @@
       min-height 70px
       &__item
         &__content
-          color darkGrey
+          color offBlack
       &__version
-        background-color grey-hover
+        background-color lightGrey1
         &__btn
           padding 5px 25px
           border-radius standardBorderRadius
@@ -75,7 +75,7 @@
           font-size 17px
           & > i
             margin-inline-end standardSpacing
-            color darkGrey
+            color offBlack
             font-size titleFontSize
         &__date
           color fontColor
@@ -85,10 +85,6 @@
   .timeline__messagelist
     flex 0
     min-height 0
-
-.received
-  .timeline__messagelist__item__content
-    background-color htmlColor
 
 i
   &.glyphicon

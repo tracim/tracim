@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from abc import ABC
 from abc import abstractmethod
+import contextlib
 from json import JSONDecodeError
 import typing
 
@@ -8,6 +9,7 @@ import pluggy
 from pyramid.request import Request
 from sqlalchemy.orm import Session
 
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentNotFoundInTracimRequest
@@ -47,6 +49,8 @@ class TracimContext(ABC):
         self._current_content = None  # type: Content
         # Current comment, found in request path
         self._current_comment = None  # type: Content
+        # Current todo, found in request path
+        self._current_todo = None  # type: Content
         # Current reaction, found in request path
         self._current_reaction = None  # type: Reaction
         # Candidate user found in request body
@@ -59,7 +63,23 @@ class TracimContext(ABC):
         self._client_token = None  # type: typing.Optional[str]
         # Pending events: have been created but are commited to the DB
         self._pending_events = []  # type: typing.List[Event]
+        self._disable_events = False
         self.force_anonymous_context = False
+
+    @property
+    def disable_events(self):
+        return self._disable_events
+
+    @contextlib.contextmanager
+    def batched_events(self, operation_type, obj: object):
+        self._disable_events = True
+        try:
+            yield
+        finally:
+            self._disable_events = False
+        self.plugin_manager.hook.on_batched_events_finished(
+            operation_type=operation_type, obj=obj, context=self
+        )
 
     @property
     def pending_events(self) -> typing.List[Event]:
@@ -130,6 +150,16 @@ class TracimContext(ABC):
         """
         return self._generate_if_none(
             self._current_comment, self._get_content, self._get_current_comment_id
+        )
+
+    @property
+    def current_todo(self) -> Content:
+        """
+        Current todo if exist, if you are deleting todo 8 of content 21,
+        current todo will be 8.
+        """
+        return self._generate_if_none(
+            self._current_todo, self._get_content, self._get_current_todo_id
         )
 
     @property
@@ -250,7 +280,7 @@ class TracimContext(ABC):
         return api.get_one(
             content_id=content_id,
             workspace=current_workspace,
-            content_type=content_type_list.Any_SLUG,
+            content_type=ContentTypeSlug.ANY.value,
         )
 
     def _get_reaction(self, reaction_id_fetcher: typing.Callable[[], int]) -> Reaction:
@@ -467,8 +497,8 @@ class TracimRequest(TracimContext, Request):
         return self._get_path_id("reaction_id", exception_if_none, exception_if_invalid_id)
 
     def _get_current_todo_id(self) -> int:
-        exception_if_none = ReactionNotFoundInTracimRequest("No todo_id property found in request")
-        exception_if_invalid_id = InvalidReactionId("todo_id is not a correct integer")
+        exception_if_none = ContentNotFoundInTracimRequest("No todo_id property found in request")
+        exception_if_invalid_id = InvalidCommentId("todo_id is not a correct integer")
         return self._get_path_id("todo_id", exception_if_none, exception_if_invalid_id)
 
     def _get_candidate_user_id(self) -> int:

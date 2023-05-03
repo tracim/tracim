@@ -3,19 +3,18 @@
 .cardPopup
   display flex
   justify-content center
-  left 0
-  margin-inline-end "calc(%s / 2)" % pageSpacing
-  margin-inline-start "calc(%s / 2)" % pageSpacing
+  left 50%
   position fixed
-  right 0
-  top calc(50% - 113px)
+  top 50%
+  width 50%
   z-index 32
   &__container
-    background lightGrey
+    background lightGrey2
     border 0
     border-radius standardBorderRadius
     box-shadow shadow-all
     width 800px
+    overflow visible
   &__border
     border-start-end-radius standardBorderRadius
     border-start-start-radius standardBorderRadius
@@ -42,6 +41,9 @@
     &__close_btn
       margin-inline-start auto
 
+body:not(.tox-fullscreen) .cardPopup
+  transform translate(-50%, -50%)
+
 .callpopup
   width 300px
   &__text
@@ -62,6 +64,7 @@
 
 @media (max-width: max-xs)
   .cardPopup
+    width 90%
     &__header
       padding standardSpacing
     &__body

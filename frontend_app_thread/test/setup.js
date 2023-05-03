@@ -20,13 +20,13 @@ if (!global.window && !global.document) {
 
   global.window = window
   global.document = window.document
+  global.Element = window.Element
   global.navigator = window.navigator
   global.self = global
   global.localStorage = {
     getItem: () => {}
   }
   global.GLOBAL_primaryColor = '#aaaaaa'
-  global.wysiwyg = () => {}
   global.GLOBAL_dispatchEvent = () => {}
   const nodeCrypto = require('crypto')
   global.crypto = {

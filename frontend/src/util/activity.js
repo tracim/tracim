@@ -1,12 +1,102 @@
 import {
-  TLM_ENTITY_TYPE as TLM_ET,
+  CONTENT_NAMESPACE,
+  CONTENT_TYPE,
+  SUBSCRIPTION_TYPE,
   TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
+  getContent,
   getContentComment,
+  getFileChildContent,
   handleFetchResult,
-  getWorkspaceContent,
-  getContentPath
+  getSpaceContent,
+  getContentPath,
+  sortTimelineByDate,
+  TIMELINE_TYPE
 } from 'tracim_frontend_lib'
+
+const DISPLAYED_SUBSCRIPTION_STATE_LIST = [SUBSCRIPTION_TYPE.rejected.slug]
+const DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST = [TLM_CET.CREATED, TLM_CET.MODIFIED]
+
+const isLoggedUserMember = (activity, spaceList) => spaceList.find(
+  space => space.id === activity.newestMessage.fields.workspace.workspace_id
+)
+
+const isSubscriptionRequestOrRejection = (activity) => {
+  return (activity.entityType === TLM_ET.SHAREDSPACE_SUBSCRIPTION &&
+    DISPLAYED_SUBSCRIPTION_STATE_LIST.includes(activity.newestMessage.fields.subscription.state))
+}
+
+const isMemberCreatedOrModified = (activity) => {
+  const coreEventType = activity.newestMessage.event_type.split('.')[1]
+  return (activity.entityType === TLM_ET.SHAREDSPACE_MEMBER &&
+    DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST.includes(coreEventType))
+}
+
+const isRoleChange = (activity) => {
+  // FIXME - CH - 20230203 - We should not create an activity when user change their email subscription
+  // Currently, we cannot know if an event_type: "workspace_member.modified" is for role or email_notification_type
+  // So display neither of them.
+  // Only display the member added
+  // See https://github.com/tracim/tracim/issues/6106 known issues
+  const coreEventType = activity.newestMessage.event_type.split('.')[1]
+  return (
+    activity.entityType === TLM_ET.SHAREDSPACE_MEMBER &&
+    coreEventType === TLM_CET.CREATED
+  )
+}
+
+const isNews = (activity) => {
+  const isNews = activity.content && (
+    activity.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION
+  )
+  const hasSpace = activity.newestMessage.fields.workspace
+  return isNews && hasSpace
+}
+
+const isInSpaceWithNews = (activity, spaceList) => {
+  const space = spaceList.find(
+    space => space.id === activity.newestMessage.fields.workspace.workspace_id
+  )
+  if (!space) return true
+  return space.publicationEnabled
+}
+
+/**
+ * Check if an activity is an attached file on a publication
+ * @param {*} activity the activity to check
+ * @returns true if the activity is an attached file on a publication
+ */
+const isActivityAnAttachedFileOnNews = (activity) => activity.content
+  ? activity.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION && activity.content.content_type === CONTENT_TYPE.FILE
+  : false
+
+export const activityDisplayFilter = (activity, spaceList, userId) => {
+  const entityType = [
+    TLM_ET.CONTENT,
+    TLM_ET.SHAREDSPACE_MEMBER,
+    TLM_ET.SHAREDSPACE_SUBSCRIPTION,
+    TLM_ET.SHAREDSPACE
+  ]
+  const hasAttachedFile = isActivityAnAttachedFileOnNews(activity)
+
+  const _isContent = activity.entityType === TLM_ET.CONTENT
+  const _isSharedSpace = activity.entityType === TLM_ET.SHAREDSPACE
+  const _isNews = isNews(activity)
+  const _isInSpaceWithNews = isInSpaceWithNews(activity, spaceList)
+  const _isSubscription = isSubscriptionRequestOrRejection(activity)
+  const _isMember = isMemberCreatedOrModified(activity)
+  const _isLoggedUserMember = isLoggedUserMember(activity, spaceList)
+  const _isRoleChange = isRoleChange(activity)
+
+  return entityType.includes(activity.entityType) && !hasAttachedFile &&
+    (
+      (_isContent && (!_isNews || _isInSpaceWithNews)) ||
+      (_isSubscription && _isLoggedUserMember) ||
+      (_isMember && _isLoggedUserMember && _isRoleChange) ||
+      (_isSharedSpace && activity.newestMessage.fields.author.user_id !== userId)
+    )
+}
 
 const createActivityEvent = (message) => {
   const [, eventType, subEntityType] = message.event_type.split('.')
@@ -31,8 +121,19 @@ const createSingleMessageActivity = (activityParams, messageList) => {
 }
 
 const getCommentList = async (content, apiUrl) => {
-  const response = await handleFetchResult(await getContentComment(apiUrl, content.workspace_id, content.content_id))
-  return response.apiResponse.status === 200 ? response.body.items : []
+  const [resComment, resCommentAsFile] = await Promise.all([
+    handleFetchResult(await getContentComment(apiUrl, content.workspace_id, content.content_id)),
+    handleFetchResult(await getFileChildContent(apiUrl, content.workspace_id, content.content_id))
+  ])
+
+  if (resComment.apiResponse.status !== 200 || resCommentAsFile.apiResponse.status !== 200) return []
+
+  const commentList = sortTimelineByDate([
+    ...resComment.body.items.map(comment => ({ ...comment, timelineType: TIMELINE_TYPE.COMMENT })),
+    ...resCommentAsFile.body.items.map(comment => ({ ...comment, timelineType: TIMELINE_TYPE.COMMENT_AS_FILE }))
+  ])
+
+  return commentList
 }
 
 /**
@@ -44,41 +145,44 @@ const getCommentList = async (content, apiUrl) => {
  */
 const createContentActivity = async (activityParams, messageList, apiUrl) => {
   // INFO - RJ - 2021-08-23
-  // Beware, a content may have been moved to another workspace or deleted, so
-  // the workspace field of the messages might be outdated or the content
+  // Beware, a content may have been moved to another space or deleted, so
+  // the space field of the messages might be outdated or the content
   // inaccessible. This should be kept in mind while working on this code
   const newestMessage = messageList[0]
 
   let content = newestMessage.fields.content
+  let contentType
+  let parentContentType
 
-  if (content.content_type === TLM_ST.COMMENT ||
-    content.content_type === TLM_ST.MENTION ||
-    content.content_type === TLM_ST.TODO) {
-    // INFO - SG - 2021-04-16
-    // We have to get the parent content as comments shall produce an activity
-    // for it and not for the comment.
-    const parentContentType = content.parent_content_type
-    const parentId = content.parent_id
-    if (!(parentContentType && parentId)) return null
+  const isMention = content.content_type === TLM_ET.MENTION
+  const isComment = content.content_type === TLM_ST.COMMENT
 
-    const response = await handleFetchResult(await getWorkspaceContent(
-      apiUrl,
-      newestMessage.fields.workspace.workspace_id,
-      parentContentType,
-      parentId
-    ))
-    if (!response.apiResponse.ok) return null
-    content = { ...content, ...response.body }
-  } else {
-    const response = await handleFetchResult(await getWorkspaceContent(
-      apiUrl,
-      newestMessage.fields.workspace.workspace_id,
-      content.content_type,
-      content.content_id
-    ))
-    if (!response.apiResponse.ok) return null
-    content = { ...content, ...response.body }
+  if (isMention || isComment) parentContentType = content.parent_content_type
+  else if (content.assignee) parentContentType = content.parent.content_type
+  else if (content.parent_id) {
+    const parentType = await getParentType(content.parent_id, apiUrl)
+    if (parentType !== CONTENT_TYPE.FOLDER) parentContentType = parentType
   }
+
+  contentType = parentContentType || content.content_type
+
+  // INFO - MP - 2022-10-21 - Override the kanban type since kanban are files
+  if (contentType === CONTENT_TYPE.KANBAN) contentType = CONTENT_TYPE.FILE
+
+  // INFO - SG - 2021-04-16
+  // We have to get the parent content as comments shall produce an activity
+  // for it and not for the comment.
+  const fetchGetSpaceContent = await handleFetchResult(await getSpaceContent(
+    apiUrl,
+    newestMessage.fields.workspace.workspace_id,
+    contentType,
+    parentContentType
+      ? content.parent_id || content.parent.content_id
+      : content.content_id
+  ))
+
+  if (!fetchGetSpaceContent.apiResponse.ok) return null
+  content = { ...content, ...fetchGetSpaceContent.body }
 
   const fetchGetContentPath = await handleFetchResult(
     await getContentPath(apiUrl, content.content_id)
@@ -99,14 +203,28 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
   }
 }
 
-const getActivityParams = (message) => {
-  const [entityType, coreEventType, subEntityType] = message.event_type.split('.')
+const getParentType = async (parentId, apiUrl) => {
+  const fetchGetContent = await handleFetchResult(
+    await getContent(apiUrl, parentId)
+  )
+  return fetchGetContent.apiResponse.status === 200
+    ? fetchGetContent.body.content_type
+    : null
+}
+
+const getActivityParams = async (message, apiUrl) => {
+  const [entityType, , subEntityType] = message.event_type.split('.')
   switch (entityType) {
     case TLM_ET.CONTENT: {
-      if (subEntityType === TLM_ST.COMMENT && coreEventType !== TLM_CET.CREATED) return null
-      const id = (subEntityType === TLM_ST.COMMENT)
-        ? message.fields.content.parent_id
-        : message.fields.content.content_id
+      let id
+      if (subEntityType === TLM_ST.COMMENT) id = message.fields.content.parent_id
+      else if (subEntityType === TLM_ST.TODO) id = message.fields.content.parent.content_id
+      else if (message.fields.content.parent_id) {
+        const parentType = await getParentType(message.fields.content.parent_id, apiUrl)
+        if (parentType === CONTENT_TYPE.FOLDER) id = message.fields.content.content_id
+        else id = message.fields.content.parent_id
+      } else id = message.fields.content.content_id
+
       return { id: `${entityType}-${id}`, entityType: entityType }
     }
     case TLM_ET.MENTION: {
@@ -135,10 +253,10 @@ const createActivity = async (activityParams, activityMessageList, apiUrl) => {
   }
 }
 
-const groupMessageListByActivityId = (messageList) => {
+const groupMessageListByActivityId = async (messageList, apiUrl) => {
   const activityMap = new Map()
   for (const message of messageList) {
-    const activityParams = getActivityParams(message)
+    const activityParams = await getActivityParams(message, apiUrl)
     if (activityParams !== null) {
       const activityParamsAndMessageList = activityMap.get(activityParams.id) || { list: [] }
       activityMap.set(activityParams.id, { params: activityParams, list: [...activityParamsAndMessageList.list, message] })
@@ -164,7 +282,7 @@ const createActivityListFromActivityMap = async (activityMap, apiUrl) => {
  * INFO - SG - 2020-11-12 - this function assumes that the message list is already ordered from newest to oldest.
  */
 export const mergeWithActivityList = async (messageList, activityList, apiUrl) => {
-  const activityMap = groupMessageListByActivityId(messageList)
+  const activityMap = await groupMessageListByActivityId(messageList, apiUrl)
 
   for (const activity of activityList) {
     if (activityMap.has(activity.id)) {
@@ -184,12 +302,35 @@ export const sortActivityList = (activityList) => {
   return [...activityList].sort((a, b) => b.newestMessage.event_id - a.newestMessage.event_id)
 }
 
+/**
+ * Update an activity list with a new event
+ * @param {*} message New event to add to the activity list
+ * @param {*} activity The activity list
+ * @returns The new activity list
+ */
 const updateActivity = (message, activity) => {
-  const isComment = message.event_type.endsWith(`.${TLM_ST.COMMENT}`)
-  const isMentionOnComment = (
-    message.event_type.startsWith(`${TLM_ET.MENTION}.`) &&
-    message.fields.content.content_type === TLM_ST.COMMENT
+  const isContentAChild = activity.content && (
+    (message.fields.content && message.fields.content.parent_id === activity.content.content_id) ||
+    (message.fields.content.parent && message.fields.content.parent.content_id === activity.content.content_id)
   )
+
+  // NOTE - MP - 2022-09-23 - This piece of code deals with commentary
+  // If the message is an existing commentary, it will update the existing commentary
+  // (the tlm processed is a commentary update)
+  // If the message is a new commentary, it will append the commentary to the list
+  // (the tlm processed is a new commentary)
+  let found = false
+  const commentList = activity.commentList.map((comment) => {
+    if (comment.content_id === message.fields.content.content_id) {
+      found = true
+      return message.fields.content
+    } else return comment
+  })
+
+  if (!found && message.event_type.includes(TLM_ST.COMMENT)) {
+    commentList.push(message.fields.content)
+  }
+
   // NOTE SG 2020-11-12: keep the existing content
   // if the message is a comment as a comment cannot change anything
   // on its parent
@@ -200,11 +341,9 @@ const updateActivity = (message, activity) => {
       createActivityEvent(message),
       ...activity.eventList
     ],
-    commentList: isComment
-      ? [...activity.commentList, message.fields.content]
-      : activity.commentList,
+    commentList: commentList,
     newestMessage: message,
-    content: isComment || isMentionOnComment ? activity.content : message.fields.content
+    content: isContentAChild ? activity.content : message.fields.content
   }
 }
 
@@ -218,13 +357,15 @@ const updateActivity = (message, activity) => {
  * @param {*} activityList
  */
 export const addMessageToActivityList = async (message, activityList, apiUrl) => {
-  const activityParams = getActivityParams(message)
+  const activityParams = await getActivityParams(message, apiUrl)
   if (!activityParams) return activityList
+
   const activityIndex = activityList.findIndex(a => a.id === activityParams.id)
   if (activityIndex === -1) {
     const activity = await createActivity(activityParams, [message], apiUrl)
     return activity ? [activity, ...activityList] : activityList
   }
+
   const oldActivity = activityList[activityIndex]
   const updatedActivity = updateActivity(message, oldActivity)
   const updatedActivityList = [...activityList]
@@ -236,7 +377,7 @@ export const addMessageToActivityList = async (message, activityList, apiUrl) =>
  * Set the event list of a given activity by building them from messages.
  * Does nothing if the activity is not in the given list
  * @param {str} activityId id of the activity to modify
- * @param {*} activityList list of activitiesx
+ * @param {*} activityList list of activities
  * @param {*} messageList list of messages for building events
  * @return updated activity
  */

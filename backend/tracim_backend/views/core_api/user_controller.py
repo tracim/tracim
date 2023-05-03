@@ -49,6 +49,7 @@ from tracim_backend.lib.core.user import DEFAULT_COVER_SIZE
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.user_custom_properties import UserCustomPropertiesApi
 from tracim_backend.lib.core.userconfig import UserConfigApi
+from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import has_personal_access
@@ -73,6 +74,7 @@ from tracim_backend.views.core_api.schemas import AboutUserSchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentIdsQuerySchema
 from tracim_backend.views.core_api.schemas import DeleteFollowedUserPathSchema
+from tracim_backend.views.core_api.schemas import EmailNotificationTypeSchema
 from tracim_backend.views.core_api.schemas import FileQuerySchema
 from tracim_backend.views.core_api.schemas import FollowedUsersSchemaPage
 from tracim_backend.views.core_api.schemas import GetLiveMessageQuerySchema
@@ -157,6 +159,7 @@ ALLOWED__AVATAR_MIMETYPES = [
     "image/bmp",
     "image/x-ms-bmp",
     "image/gif",
+    "image/svg+xml",
 ]
 
 
@@ -681,38 +684,25 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_NOTIFICATION_ENDPOINTS])
     @check_right(has_personal_access)
     @hapic.input_path(UserWorkspaceIdPathSchema())
+    @hapic.input_body(EmailNotificationTypeSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def enable_workspace_notification(self, context, request: TracimRequest, hapic_data=None):
-        """
-        enable workspace notification
-        """
-        app_config = request.registry.settings["CFG"]  # type: CFG
-        wapi = WorkspaceApi(
-            current_user=request.candidate_user,  # User
-            session=request.dbsession,
-            config=app_config,
-        )
-        workspace = wapi.get_one(hapic_data.path.workspace_id)
-        wapi.enable_notifications(request.candidate_user, workspace)
-        wapi.save(workspace)
+    def change_space_notification(self, context, request: TracimRequest, hapic_data=None):
+        """Change space notification"""
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_NOTIFICATION_ENDPOINTS])
-    @check_right(has_personal_access)
-    @hapic.input_path(UserWorkspaceIdPathSchema())
-    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def disable_workspace_notification(self, context, request: TracimRequest, hapic_data=None):
-        """
-        disable workspace notification
-        """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        wapi = WorkspaceApi(
+        user_id = request.candidate_user.user_id
+        space_id = hapic_data.path.workspace_id
+        role_api = RoleApi(
             current_user=request.candidate_user,  # User
             session=request.dbsession,
             config=app_config,
         )
-        workspace = wapi.get_one(hapic_data.path.workspace_id)
-        wapi.disable_notifications(request.candidate_user, workspace)
-        wapi.save(workspace)
+        role_in_space = role_api.get_one(user_id=user_id, workspace_id=space_id)
+        role_api.update_role(
+            role=role_in_space,
+            email_notification_type_value=hapic_data.body["email_notification_type"],
+            save_now=True,
+        )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
     @check_right(has_personal_access)
@@ -793,17 +783,57 @@ class UserController(Controller):
         self, context, request: TracimRequest, hapic_data: HapicData
     ) -> None:
         """
-        Read all unread message for user
+        Read every message that will match the parameters (parameters works as an AND not an OR).
+        If there is no parameters provided, the function will read every messages of the user\
+            specified.
+
+        event_ids=1,2
+        content_ids=3
+
+        Will read event id 1 and 2 that are related to content id 3.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         event_api = EventApi(request.current_user, request.dbsession, app_config)
-        event_api.mark_user_messages_as_read(
+        event_api.mark_user_messages_as_read_or_unread(
             request.candidate_user.user_id,
             content_ids=hapic_data.query.content_ids,
+            event_ids=hapic_data.query.event_ids,
             parent_ids=hapic_data.query.parent_ids,
+            space_ids=hapic_data.query.space_ids,
+            is_read=True,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_query(UserMessagesMarkAsReadQuerySchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def set_user_messages_as_unread(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> None:
+        """
+        Unread every message that will match the parameters (parameters works as an AND not an OR).
+        If there is no parameters provided, the function will unread every messages of the user\
+            specified.
+
+        event_ids=1,2
+        content_ids=3
+
+        Will unread event id 1 and 2 that are related to content id 3 and 4.
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        event_api = EventApi(request.current_user, request.dbsession, app_config)
+
+        event_api.mark_user_messages_as_read_or_unread(
+            request.candidate_user.user_id,
+            content_ids=hapic_data.query.content_ids,
+            event_ids=hapic_data.query.event_ids,
+            parent_ids=hapic_data.query.parent_ids,
+            space_ids=hapic_data.query.space_ids,
+            is_read=False,
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS], deprecated=True)
     @hapic.handle_exception(MessageDoesNotExist, http_code=HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_path(MessageIdsPathSchema())
@@ -818,14 +848,14 @@ class UserController(Controller):
             event_id=hapic_data.path.event_id, user_id=request.candidate_user.user_id
         )
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS], deprecated=True)
     @hapic.handle_exception(MessageDoesNotExist, http_code=HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_path(MessageIdsPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def set_message_as_unread(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
         """
-        unread one message
+        Unread one message
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         event_api = EventApi(request.current_user, request.dbsession, app_config)
@@ -1490,23 +1520,14 @@ class UserController(Controller):
 
         # enable workspace notification
         configurator.add_route(
-            "enable_workspace_notification",
-            "/users/{user_id:\d+}/workspaces/{workspace_id}/notifications/activate",  # noqa: W605
+            "change_space_notification",
+            "/users/{user_id:\d+}/workspaces/{workspace_id}/email_notification_type",  # noqa: W605
             request_method="PUT",
         )
         configurator.add_view(
-            self.enable_workspace_notification, route_name="enable_workspace_notification"
+            self.change_space_notification, route_name="change_space_notification"
         )
 
-        # enable workspace notification
-        configurator.add_route(
-            "disable_workspace_notification",
-            "/users/{user_id:\d+}/workspaces/{workspace_id}/notifications/deactivate",  # noqa: W605
-            request_method="PUT",
-        )
-        configurator.add_view(
-            self.disable_workspace_notification, route_name="disable_workspace_notification"
-        )
         # TracimLiveMessages notification
         configurator.add_route(
             "live_messages",
@@ -1528,7 +1549,7 @@ class UserController(Controller):
         )
         configurator.add_view(self.get_user_messages_summary, route_name="messages_summary")
 
-        # read all unread messages for user
+        # read a list of messages or every messages for a user
         configurator.add_route(
             "read_messages",
             "/users/{user_id:\d+}/messages/read",
@@ -1536,7 +1557,16 @@ class UserController(Controller):
         )
         configurator.add_view(self.set_user_messages_as_read, route_name="read_messages")
 
-        # read all unread messages for user
+        # unread a list of messages or every messages for a user
+        configurator.add_route(
+            "unread_messages",
+            "/users/{user_id:\d+}/messages/unread",
+            request_method="PUT",  # noqa: W605
+        )
+        configurator.add_view(self.set_user_messages_as_unread, route_name="unread_messages")
+
+        # read one messages for user
+        # DEPRECATED - MP - 2022-09-22 - https://github.com/tracim/tracim/issues/5941
         configurator.add_route(
             "read_message",
             "/users/{user_id:\d+}/messages/{event_id:\d+}/read",
@@ -1544,7 +1574,8 @@ class UserController(Controller):
         )
         configurator.add_view(self.set_message_as_read, route_name="read_message")
 
-        # read all unread messages for user
+        # unread one messages for user
+        # DEPRECATED - MP - 2022-09-22 - https://github.com/tracim/tracim/issues/5941
         configurator.add_route(
             "unread_message",
             "/users/{user_id:\d+}/messages/{event_id:\d+}/unread",

@@ -28,7 +28,7 @@ describe('App Workspace Advanced', function () {
     beforeEach(() => {
       cy.visitPage({ pageName: PAGES.DASHBOARD, params: { workspaceId } })
       cy.contains('.pageTitleGeneric__title__label', workspaceLabel)
-      cy.get('.dashboard__workspace__detail__buttons .iconbutton').click()
+      cy.get('.dashboard__workspace__rightMenu__contents .fa-cog').click()
     })
 
     it('should open when clicking on the button', () => {

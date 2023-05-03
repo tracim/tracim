@@ -29,11 +29,7 @@
         font-size metadataFontSize
       .autocomplete
         position absolute
-        width 300px
-        background-color offWhite
-        border-radius standardBorderRadius
-        border-width 1px
-        border-style solid
+        min-width 300px
         z-index 1
         &__item
           display flex
@@ -41,7 +37,7 @@
           cursor pointer
           padding 5px 8px
           &:hover
-            background-color: grey-hover
+            background-color lightGrey1
           &:first-child
             border-start-start-radius 10px
             border-start-end-radius 10px
@@ -71,7 +67,6 @@
                 color grey
                 font-size metadataFontSize
     .name__input
-      border borderStyle
       border-radius standardBorderRadius
       padding standardSpacing
       width 100%
@@ -101,3 +96,20 @@
   &:last-child
     border-bottom-left-radius 10px
     border-bottom-right-radius 10px
+
+.autocomplete
+  background-color offWhite
+  border-radius standardBorderRadius
+  box-shadow shadow-all
+  font-size metadataFontSize
+  left 0
+  padding 3px 0
+  width 100%
+  &__item
+    align-items baseline
+    cursor pointer
+    display flex
+    flex-direction row
+    padding 1px 5px
+    &:hover
+      background-color lightGrey1

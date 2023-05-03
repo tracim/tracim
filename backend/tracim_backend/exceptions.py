@@ -686,3 +686,7 @@ class UserCallTransitionNotAllowed(TracimException):
 
 class UserCallNotFound(NotFound):
     error_code = ErrorCode.USER_CALL_NOT_FOUND
+
+
+class InvalidMention(TracimException):
+    error_code = ErrorCode.INVALID_MENTION

@@ -27,7 +27,8 @@ describe('<PopupCreateKanban />', () => {
     t: tSpy,
     data: debug,
     setApiUrl: () => {},
-    registerCustomEventHandlerList: () => {}
+    registerCustomEventHandlerList: () => {},
+    getTemplateList: () => {}
   }
 
   const wrapper = shallow(<PopupCreateKanban {...props} />)

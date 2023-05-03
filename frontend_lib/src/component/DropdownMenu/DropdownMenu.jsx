@@ -12,14 +12,18 @@ const DropdownMenu = props => {
         className={classnames(
           'btn dropdown-toggle',
           'dropdownMenuButton',
-          props.isButton ? 'primaryColorBorder' : 'transparentButton',
+          { transparentButton: !props.isButton },
           props.buttonCustomClass
         )}
         data-cy={props.buttonDataCy}
         data-toggle='dropdown'
         disabled={props.buttonDisabled}
         onClick={e => { e.stopPropagation(); props.buttonClick() }}
-        title={props.buttonTooltip ? props.buttonTooltip : ((typeof props.buttonLabel) === 'string' ? props.buttonLabel : undefined)}
+        title={
+          props.buttonTooltip
+            ? props.buttonTooltip
+            : ((typeof props.buttonLabel) === 'string' ? props.buttonLabel : undefined)
+        }
         type='button'
       >
         {props.buttonOpts}

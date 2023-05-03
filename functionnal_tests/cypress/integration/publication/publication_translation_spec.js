@@ -14,7 +14,7 @@ describe('Publications', () => {
         params: { workspaceId: workspace.workspace_id },
         waitForTlm: true
       })
-      cy.get('#wysiwygTimelineCommentPublication').type(text)
+      cy.inputInTinyMCE(text)
       cy.contains(publishButton, 'Publish').click()
     })
   })

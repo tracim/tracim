@@ -23,7 +23,7 @@ class PopinFixed extends React.Component {
   }
 
   componentDidMount () {
-    const isSidebarVisible = !document.querySelector('.sidebarclose')
+    const isSidebarVisible = !document.querySelector('.sidebarClose')
     if (this.state.isSidebarVisible !== isSidebarVisible) {
       this.setState({ isSidebarVisible })
     }

@@ -62,7 +62,7 @@ def set_cors_headers(request, response):
 
 def cors_options_view(context, request):
     response = request.response
-    # @TODO Côme - 2018/09/04 - I commented the test bellow because I can't work with for editing a file in app file.
+    # @TODO Côme - 2018/09/04 - I commented the test below because I can't work with for editing a file in app file.
     # I checked with GM and this test might require some fixes
     # if 'Access-Control-Request-Headers' in request.headers:
     response.headers[

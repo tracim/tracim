@@ -1,0 +1,18 @@
+@import '../../../css/Variable.styl'
+
+.contentStatusColumn
+  &__status
+    flex 1
+    color fontColor
+    display flex
+    & > *
+      font-size metadataFontSize
+    & > span
+      align-items center
+      display flex
+
+
+@media (max-width: max-md)
+  .contentStatusColumn
+    &__status
+      display none

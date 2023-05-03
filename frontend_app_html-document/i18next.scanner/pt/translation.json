@@ -8,7 +8,6 @@
   "Edit": "Editar",
   "A content with the same name already exists": "Um conteúdo com o mesmo nome já existe",
   "Error while creating note": "Erro ao criar a nota",
-  "Error while saving the comment": "Erro ao guardar o comentário",
   "This content is archived": "Este conteúdo está arquivado",
   "Restore": "Restaurar",
   "This content is deleted": "Este conteúdo está eliminado",
@@ -31,6 +30,10 @@
   "Tags": "Etiquetas",
   "Delete": "Eliminar",
   "Unknown content": "Conteúdo desconhecido",
-  "Download as PDF": "",
-  "Tasks": ""
+  "Download as PDF": "Download como PDF",
+  "Tasks": "Tarefas",
+  "The link has been copied to clipboard": "Ligação copiada para a área de transferência",
+  "Copy content link": "Copiar ligação do conteúdo",
+  "Cancel": "Anular",
+  "Validate": "Validar"
 }
