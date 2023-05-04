@@ -1,11 +1,11 @@
 import shutil
-from sqlalchemy import and_
-from sqlalchemy.orm import Session
-from sqlalchemy.orm.exc import NoResultFound
 import transaction
 import typing
 import uuid
 
+from sqlalchemy import and_
+from sqlalchemy.orm import Session
+from sqlalchemy.orm.exc import NoResultFound
 from tracim_backend.applications.agenda.lib import AgendaApi
 from tracim_backend.applications.agenda.models import AgendaResourceType
 from tracim_backend.applications.share.models import ContentShare
@@ -98,9 +98,7 @@ class CleanupLib(object):
             logger.debug(self, "fake deletion of {} dir".format(dir_path))
 
     def delete_revision(
-        self,
-        revision: ContentRevisionRO,
-        do_update_content_last_revision: bool = True,
+        self, revision: ContentRevisionRO, do_update_content_last_revision: bool = True,
     ) -> int:
         """
         :param do_update_content_last_revision: update last revision of content associated to last one if needed. Set only
