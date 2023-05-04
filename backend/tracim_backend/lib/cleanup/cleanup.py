@@ -214,7 +214,7 @@ class CleanupLib(object):
             logger.info(
                 self, "delete event {} from content {}".format(event.event_id, event.content_id)
             )
-            #self.delete_event_messages(event)
+            self.delete_event_messages(event)
             self.safe_delete(event)
         return deleted_events_ids
 
@@ -285,7 +285,7 @@ class CleanupLib(object):
             )
         self.delete_content_reactions(content)
         self.delete_content_favorites(content)
-        # self.delete_content_events(content)
+        self.delete_content_events(content)
         logger.info(self, "delete content {}".format(content.content_id))
         deleted_contents.append(content.content_id)
         self.safe_delete(content)
