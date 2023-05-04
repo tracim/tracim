@@ -1,11 +1,12 @@
 import shutil
-import transaction
 import typing
 import uuid
 
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
+import transaction
+
 from tracim_backend.applications.agenda.lib import AgendaApi
 from tracim_backend.applications.agenda.models import AgendaResourceType
 from tracim_backend.applications.share.models import ContentShare
@@ -360,8 +361,7 @@ class CleanupLib(object):
         except FileNotFoundError as e:
             raise AgendaNotFoundError(
                 'Try to delete user "{user_id}" DAV resource root but directory {resource_dir} not found'.format(
-                    user_id=user_id,
-                    resource_dir=resource_dir,
+                    user_id=user_id, resource_dir=resource_dir,
                 )
             ) from e
         return resource_dir
