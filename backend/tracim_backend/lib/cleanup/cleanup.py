@@ -24,6 +24,8 @@ from tracim_backend.models.data import RevisionReadStatus
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.favorites import FavoriteContent
+from tracim_backend.models.event import Event
+from tracim_backend.models.event import Message
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.reaction import Reaction
 from tracim_backend.models.revision_protection import new_revision
@@ -160,6 +162,83 @@ class CleanupLib(object):
             capi.delete(content)
         self.safe_update(content)
 
+    def delete_content_reactions(self, content: Content) -> typing.List[int]:
+        """
+        Delete all reactions on content
+
+        :param content: tracim content
+        :return: reaction id for all reaction deleted
+        """
+        deleted_reactions_ids = []  # typing.List[int]
+        reactions = self.session.query(Reaction).filter(Reaction.content_id == content.content_id)
+        for reaction in reactions:
+            deleted_reactions_ids.append(reaction.reaction_id)
+            logger.info(
+                self,
+                "delete reaction {} from content {}".format(
+                    reaction.reaction_id, reaction.content_id
+                ),
+            )
+            self.safe_delete(reaction)
+        return deleted_reactions_ids
+
+    def delete_event_messages(self, event: Event) -> typing.List[int]:
+        """
+        Delete all messages on content
+
+        :param event: tracim event
+        :return: message id for all message deleted
+        """
+        deleted_messages_ids = []
+        messages = self.session.query(Message).filter(Message.event_id == event.event_id)
+        for message in messages:
+            deleted_messages_ids.append(message.event_id)
+            logger.info(
+                self, "delete message from event {}"
+                .format(message.event_id)
+            )
+            self.safe_delete(message)
+        return deleted_messages_ids
+
+    def delete_content_events(self, content: Content) -> typing.List[int]:
+        """
+        Delete all events on content
+
+        :param content: tracim content
+        :return: event id for all event deleted
+        """
+        deleted_events_ids = []
+        events = self.session.query(Event).filter(Event.content_id == content.content_id)
+        for event in events:
+            deleted_events_ids.append(event.event_id)
+            logger.info(
+                self, "delete event {} from content {}".format(event.event_id, event.content_id)
+            )
+            #self.delete_event_messages(event)
+            self.safe_delete(event)
+        return deleted_events_ids
+
+    def delete_content_favorites(self, content: Content) -> typing.List[int]:
+        """
+        Delete all favorites on content
+
+        :param content: tracim content
+        :return: favorite id for all favorite deleted
+        """
+        deleted_favorites_ids = []
+        favorites = self.session.query(FavoriteContent).\
+            filter(FavoriteContent.content_id == content.content_id)
+        for favorite in favorites:
+            deleted_favorites_ids.append(favorite.content_id)
+            logger.info(
+                self,
+                "delete favorite from content {}".format(
+                    favorite.content_id
+                ),
+            )
+            self.safe_delete(favorite)
+        return deleted_favorites_ids
+
     def delete_content(self, content: Content, recursively: bool = True) -> typing.List[str]:
         """
         Delete content and associated stuff:
@@ -204,6 +283,9 @@ class CleanupLib(object):
             deleted_contents.append(
                 self.delete_revision(revision, do_update_content_last_revision=False)
             )
+        self.delete_content_reactions(content)
+        self.delete_content_favorites(content)
+        # self.delete_content_events(content)
         logger.info(self, "delete content {}".format(content.content_id))
         deleted_contents.append(content.content_id)
         self.safe_delete(content)
