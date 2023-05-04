@@ -160,7 +160,7 @@ const AdminWorkspace = props => {
                     >
                       <Link
                         to={PAGE.WORKSPACE.ADVANCED_DASHBOARD(ws.workspace_id)}
-                        className='primaryColorFont primaryColorFontDarkenHover'
+                        className='adminWorkspace__workspaceTable__tr__td-link__link primaryColorFontHover'
                       >
                         {ws.label}
                       </Link>
