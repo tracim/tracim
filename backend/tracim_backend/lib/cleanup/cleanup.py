@@ -1,11 +1,10 @@
 import shutil
-import typing
-import uuid
-
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 import transaction
+import typing
+import uuid
 
 from tracim_backend.applications.agenda.lib import AgendaApi
 from tracim_backend.applications.agenda.models import AgendaResourceType
@@ -23,8 +22,6 @@ from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import RevisionReadStatus
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
-from tracim_backend.models.event import Event
-from tracim_backend.models.event import Message
 from tracim_backend.models.favorites import FavoriteContent
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.reaction import Reaction
@@ -101,7 +98,9 @@ class CleanupLib(object):
             logger.debug(self, "fake deletion of {} dir".format(dir_path))
 
     def delete_revision(
-        self, revision: ContentRevisionRO, do_update_content_last_revision: bool = True,
+        self,
+        revision: ContentRevisionRO,
+        do_update_content_last_revision: bool = True,
     ) -> int:
         """
         :param do_update_content_last_revision: update last revision of content associated to last one if needed. Set only
@@ -249,7 +248,7 @@ class CleanupLib(object):
         for upload_permission in upload_permissions:
             logger.info(
                 self,
-                "delete upload_permission {} of workspace".format(
+                "delete upload_permission {} of workspace {}".format(
                     upload_permission.upload_permission_id, workspace.workspace_id
                 ),
             )
@@ -363,7 +362,8 @@ class CleanupLib(object):
         except FileNotFoundError as e:
             raise AgendaNotFoundError(
                 'Try to delete user "{user_id}" DAV resource root but directory {resource_dir} not found'.format(
-                    user_id=user_id, resource_dir=resource_dir,
+                    user_id=user_id,
+                    resource_dir=resource_dir,
                 )
             ) from e
         return resource_dir
@@ -398,7 +398,9 @@ class CleanupLib(object):
         except FileNotFoundError as e:
             raise AgendaNotFoundError(
                 'Try to delete user "{user_id}" {resource_type} (agenda) but no {resource_type} found at {agenda_dir}'.format(
-                    user_id=user_id, resource_type=resource_type.value, agenda_dir=agenda_dir,
+                    user_id=user_id,
+                    resource_type=resource_type.value,
+                    agenda_dir=agenda_dir,
                 )
             ) from e
         return agenda_dir
@@ -477,7 +479,8 @@ class CleanupLib(object):
         return user_id
 
     def prepare_deletion_or_anonymization(
-        self, user: User,
+        self,
+        user: User,
     ):
         """
         Disable and delete user with flag to get proper TLM.
