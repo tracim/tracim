@@ -4,7 +4,6 @@ import typing
 
 from pyramid.config import Configurator
 from sqlalchemy import engine_from_config
-from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from sqlalchemy.event import listen
 from sqlalchemy.orm import Session
@@ -34,13 +33,6 @@ if typing.TYPE_CHECKING:
 # run configure_mappers after defining all of the models to ensure
 # all relationships can be setup
 configure_mappers()
-
-
-@event.listens_for(Engine, "connect")
-def set_sqlite_pragma(dbapi_connection, connection_record):
-    cursor = dbapi_connection.cursor()
-    cursor.execute("PRAGMA foreign_keys=ON")
-    cursor.close()
 
 
 def get_engine(app_config: "CFG", prefix="sqlalchemy.", **kwargs) -> Engine:
