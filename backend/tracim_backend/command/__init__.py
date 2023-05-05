@@ -21,7 +21,10 @@ from tracim_backend.lib.utils.utils import DEFAULT_TRACIM_CONFIG_FILE
 
 def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor = dbapi_connection.cursor()
-    cursor.execute("PRAGMA foreign_keys=ON")
+    try:
+        cursor.execute("PRAGMA foreign_keys=ON")
+    except Exception:
+        pass
     cursor.close()
 
 
