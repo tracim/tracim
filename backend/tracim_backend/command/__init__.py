@@ -71,7 +71,8 @@ class AppContextCommand(Command):
             self._setup_logging(parsed_args)
             if self.auto_setup_context:
                 with bootstrap(parsed_args.config_file) as app_context:
-                    listen(Engine, "connect", set_sqlite_pragma)
+                    if app_context["request"].dbsession.bind.dialect.name == "sqlite":
+                        listen(Engine, "connect", set_sqlite_pragma)
                     with app_context["request"].tm:
                         self.take_app_action(parsed_args, app_context)
         except transaction.interfaces.DoomedTransaction:
