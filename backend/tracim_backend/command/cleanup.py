@@ -392,7 +392,7 @@ class DeleteContentRevisionCommand(AppContextCommand):
 
         with unprotected_content_revision(self._session) as session:
             capi = ContentApi(
-                config=self._app_config, session=session, current_user=None, show_deleted=True,
+                config=self._app_config, session=session, current_user=None, show_deleted=True
             )
             revision_list = []  # type: typing.List[ContentRevisionRO]
             for revision_id in parsed_args.revision_ids:
@@ -420,7 +420,7 @@ class DeleteContentRevisionCommand(AppContextCommand):
                     )
                     raise exc
                 self._session.flush()
-                print('revision "{}" deleted".'.format(revision.revision_id,))
+                print('revision "{}" deleted".'.format(revision.revision_id))
                 print("~~~~~~~~~~")
 
 
@@ -438,7 +438,7 @@ class DeleteContentCommand(AppContextCommand):
             action="store_true",
         )
         parser.add_argument(
-            "-z", "--content-id", nargs="+", help="content ids", dest="content_ids", required=True,
+            "-z", "--content-id", nargs="+", help="content ids", dest="content_ids", required=True
         )
         return parser
 
@@ -451,7 +451,7 @@ class DeleteContentCommand(AppContextCommand):
             app_context["request"].tm.doom()
 
         capi = ContentApi(
-            config=self._app_config, session=self._session, current_user=None, show_deleted=True,
+            config=self._app_config, session=self._session, current_user=None, show_deleted=True
         )
         content_list = []  # type: typing.List[Content]
         for content_id in parsed_args.content_ids:
@@ -480,7 +480,7 @@ class DeleteContentCommand(AppContextCommand):
                 )
                 cleanup_lib_unprotected.delete_content(content)
                 session.flush()
-            print('content "{}" deleted".'.format(content.content_id,))
+            print('content "{}" deleted".'.format(content.content_id))
             print("~~~~~~~~~~")
 
 
@@ -498,7 +498,7 @@ class DeleteSpaceCommand(AppContextCommand):
             action="store_true",
         )
         parser.add_argument(
-            "-z", "--space-id", nargs="+", help="space ids", dest="space_ids", required=True,
+            "-z", "--space-id", nargs="+", help="space ids", dest="space_ids", required=True
         )
         return parser
 
@@ -512,7 +512,7 @@ class DeleteSpaceCommand(AppContextCommand):
 
         with unprotected_content_revision(self._session) as session:
             wapi = WorkspaceApi(
-                config=self._app_config, session=session, current_user=None, show_deleted=True,
+                config=self._app_config, session=session, current_user=None, show_deleted=True
             )
             space_list = []  # type: typing.List[Workspace]
             for space_id in parsed_args.space_ids:
@@ -536,7 +536,7 @@ class DeleteSpaceCommand(AppContextCommand):
                 print("delete space {}.".format(space.workspace_id))
                 cleanup_lib.delete_workspace(space)
                 session.flush()
-                print('space "{}" deleted".'.format(space.workspace_id,))
+                print('space "{}" deleted".'.format(space.workspace_id))
                 print("~~~~~~~~~~")
 
 

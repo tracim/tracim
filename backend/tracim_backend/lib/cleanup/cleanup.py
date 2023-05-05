@@ -99,7 +99,7 @@ class CleanupLib(object):
             logger.debug(self, "fake deletion of {} dir".format(dir_path))
 
     def delete_revision(
-        self, revision: ContentRevisionRO, do_update_content_last_revision: bool = True,
+        self, revision: ContentRevisionRO, do_update_content_last_revision: bool = True
     ) -> int:
         """
         :param do_update_content_last_revision: update last revision of content associated to last one if needed. Set only
@@ -361,7 +361,7 @@ class CleanupLib(object):
         except FileNotFoundError as e:
             raise AgendaNotFoundError(
                 'Try to delete user "{user_id}" DAV resource root but directory {resource_dir} not found'.format(
-                    user_id=user_id, resource_dir=resource_dir,
+                    user_id=user_id, resource_dir=resource_dir
                 )
             ) from e
         return resource_dir
@@ -396,9 +396,7 @@ class CleanupLib(object):
         except FileNotFoundError as e:
             raise AgendaNotFoundError(
                 'Try to delete user "{user_id}" {resource_type} (agenda) but no {resource_type} found at {agenda_dir}'.format(
-                    user_id=user_id,
-                    resource_type=resource_type.value,
-                    agenda_dir=agenda_dir,
+                    user_id=user_id, resource_type=resource_type.value, agenda_dir=agenda_dir
                 )
             ) from e
         return agenda_dir
@@ -476,10 +474,7 @@ class CleanupLib(object):
         self.safe_delete(user)
         return user_id
 
-    def prepare_deletion_or_anonymization(
-        self,
-        user: User,
-    ):
+    def prepare_deletion_or_anonymization(self, user: User):
         """
         Disable and delete user with flag to get proper TLM.
         """
