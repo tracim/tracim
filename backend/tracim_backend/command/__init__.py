@@ -96,7 +96,6 @@ class AppContextCommand(Command):
         parser = super(AppContextCommand, self).get_parser(prog_name)
 
         parser.add_argument(
-            "-s",
             "--sqlite",
             help="set PRAGMA foreign_keys=ON for sqlite use only",
             required=False,
