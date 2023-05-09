@@ -11,10 +11,21 @@ from cliff.command import Command
 from cliff.commandmanager import CommandManager
 from pyramid.paster import bootstrap
 from pyramid.paster import setup_logging
+from sqlalchemy.engine import Engine
+from sqlalchemy.event import listen
 import transaction
 
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import DEFAULT_TRACIM_CONFIG_FILE
+
+
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    try:
+        cursor.execute("PRAGMA foreign_keys=ON")
+    except Exception:
+        pass
+    cursor.close()
 
 
 class TracimCLI(App):
@@ -60,6 +71,8 @@ class AppContextCommand(Command):
             self._setup_logging(parsed_args)
             if self.auto_setup_context:
                 with bootstrap(parsed_args.config_file) as app_context:
+                    if parsed_args.sqlite:
+                        listen(Engine, "connect", set_sqlite_pragma)
                     with app_context["request"].tm:
                         self.take_app_action(parsed_args, app_context)
         except transaction.interfaces.DoomedTransaction:
@@ -81,6 +94,15 @@ class AppContextCommand(Command):
 
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super(AppContextCommand, self).get_parser(prog_name)
+
+        parser.add_argument(
+            '-s',
+            '--sqlite',
+            help='set PRAGMA foreign_keys=ON for sqlite use only',
+            required=False,
+            action='store_true',
+            default=False,
+        )
 
         parser.add_argument(
             "-c",
