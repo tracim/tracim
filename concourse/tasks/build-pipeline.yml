@@ -1,0 +1,12 @@
+---
+platform: linux
+inputs:
+  - name: tracim-source
+outputs:
+  - name: pipeline
+run:
+  path: tracim-source/concourse/scripts/build-pipeline
+  args:
+    - tracim-source/concourse/pipelines/((pipeline))-bootstrap.yml
+    - tracim-source/concourse/pipelines/build-jobs.yml
+    - pipeline/((pipeline)).yml

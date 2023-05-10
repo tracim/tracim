@@ -1,0 +1,84 @@
+# This pipeline boostraps another pipeline which will build and test a Tracim pull-request.
+# It requires a ((github-webhook-token)) and a ((github-access-token)) variables when used.
+# It will use "build-jobs.yml" to produce a complete pipeline.
+
+## YAML definitions re-used in plans
+
+# plan step to put the current job name as pending in github's PR
+pending_status_notification: &pending_status_notification
+  put: tracim-status-update
+  resource: tracim-source
+  inputs: [tracim-source]
+  params: {path: tracim-source, status: pending, context: $BUILD_JOB_NAME}
+  get_params: {skip_download: true}
+
+# sync job statuses as success/failure/error in github's PR.
+status_notifications: &status_notifications
+  on_success:
+    put: tracim-source
+    inputs: [tracim-source]
+    params: {path: tracim-source, status: success, context: $BUILD_JOB_NAME}
+    get_params: {skip_download: true}
+  on_failure:
+    put: tracim-source
+    inputs: [tracim-source]
+    params: {path: tracim-source, status: failure, context: $BUILD_JOB_NAME}
+    get_params: {skip_download: true}
+  on_abort:
+    put: tracim-source
+    inputs: [tracim-source]
+    params: {path: tracim-source, status: error, context: $BUILD_JOB_NAME}
+    get_params: {skip_download: true}
+## END YAML definitions
+
+
+resource_types:
+- name: tracim-source
+  type: registry-image
+  source:
+    repository: aoldershaw/github-pr-resource
+
+resources:
+# the github's tracim-source
+- name: tracim-source
+  type: tracim-source
+  check_every: 30s
+  # TODO - S.G. - 2021/08/02
+  # The token is not used as one webhook would have to be created PER PR in github.
+  # This could be automated, but is not so easy.
+  webhook_token: ((github-webhook-token))
+  source:
+    repository: tracim/tracim
+    access_token: ((github-access-token))
+    number: ((number))
+# docker image used for running tests.
+- name: test-image
+  type: registry-image
+  source:
+    repository: algooci/tracim
+
+
+# Pipeline jobs:
+# 1. update this pipeline if the PR's file has changed
+# 2. run tests in parallel (backend, frontend, end-to-end)
+# Each check/test has its own status in the github's PR.
+jobs:
+- name: reconfigure-self
+  plan:
+    - in_parallel:
+      - get: tracim-source
+        trigger: true
+        timeout: 5m
+      - get: test-image
+
+    - task: build-pipeline
+      image: test-image
+      vars:
+        pipeline: pull-request
+      file: tracim-source/concourse/tasks/build-pipeline.yml
+
+    - set_pipeline: self
+      file: pipeline/pull-request.yml
+      vars:
+        github-webhook-token: ((github-webhook-token))
+        github-access-token: ((github-access-token))

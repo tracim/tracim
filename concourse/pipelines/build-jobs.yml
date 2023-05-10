@@ -1,0 +1,132 @@
+# Shared jobs definition
+# can be included/appended in a complete pipeline definition.
+# It must have access to:
+# 1. Tracim sources through a "tracim-source" resource
+# 2. Test container image through a "test-image" resource
+# 3. Github status notifications called with YAML anchors:
+#    - "status_notifications" (on_success/…)
+#    - "pending_status_notification" job.
+# 4. a "reconfigure-self" job which takes care of updating the full pipeline
+
+
+## YAML definitions re-used in plans
+definitions:
+  main_python_version: &main_python_version "3.9.6"
+  python_versions: &python_versions ["3.7.11", "3.8.11", "3.9.6"]
+  databases: &databases ["sqlite", "postgresql"]
+
+# Pipeline jobs:
+# - run backend (lint -> quick tests -> full tests) checks
+# - run frontend (lint + unit tests) checks
+# - run end-to-end (cypress) checks
+# All of these in parallel.
+- name: backend-tests
+  <<: *status_notifications
+  plan:
+
+  - in_parallel:
+    - get: tracim-source
+      passed: [reconfigure-self]
+      trigger: true
+    - get: test-image
+
+  - *pending_status_notification
+
+  - task: backend-lint
+    image: test-image
+    timeout: 5m
+    config:
+      platform: linux
+      inputs:
+        - name: tracim-source
+      run:
+        dir: tracim-source
+        path: concourse/scripts/backend-lint
+
+  - across:
+    - var: python_version
+      values: *python_versions
+      max_in_flight: all
+    task: backend-quick-tests_((.:python_version))
+    image: test-image
+    timeout: 30m
+    # TODO - S.G. - 2021-08-04: is there a less instrusive way to allow docker-in-docker ?
+    privileged: true
+    config:
+      platform: linux
+      inputs:
+        - name: tracim-source
+      run:
+        dir: tracim-source
+        path: concourse/scripts/backend-quick-tests
+        args:
+          - ((.:python_version))
+
+  - across:
+    - var: database
+      values: *databases
+      max_in_flight: all
+    task: backend-full-tests_((.:database))
+    image: test-image
+    timeout: 1h30m
+    # TODO - S.G. - 2021-08-04: is there a less instrusive way to allow docker-in-docker ?
+    privileged: true
+    config:
+      platform: linux
+      inputs:
+        - name: tracim-source
+      run:
+        dir: tracim-source
+        path: concourse/scripts/backend-full-tests
+        args:
+          - *main_python_version
+          - ((.:database))
+
+- name: frontend-tests
+  <<: *status_notifications
+
+  plan:
+
+  - in_parallel:
+    - get: tracim-source
+      passed: [reconfigure-self]
+      trigger: true
+    - get: test-image
+
+  - *pending_status_notification
+
+  - task: frontend-unit-tests
+    image: test-image
+    timeout: 15m
+    config:
+      platform: linux
+      inputs:
+        - name: tracim-source
+      run:
+        dir: tracim-source
+        path: concourse/scripts/frontend-unit-tests
+
+- name: end-to-end-tests
+  <<: *status_notifications
+  plan:
+  - in_parallel:
+    - get: tracim-source
+      passed: [reconfigure-self]
+      trigger: true
+    - get: test-image
+
+  - *pending_status_notification
+
+  - task: end-to-end-cypress-tests
+    image: test-image
+    timeout: 1h40m
+    # needed for docker during tests
+    # TODO - S.G. - 2021-08-04: is there a less instrusive way to allow docker-in-docker ?
+    privileged: true
+    config:
+      platform: linux
+      inputs:
+        - name: tracim-source
+      run:
+        dir: tracim-source
+        path: concourse/scripts/end-to-end-cypress-tests
