@@ -95,6 +95,9 @@ class AppContextCommand(Command):
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super(AppContextCommand, self).get_parser(prog_name)
 
+        # INFO - M.L - 2023-05-11 - Use this argument to enable cascade delete on sqlite
+        # It is not enabled by default because it is not compatible with postgresql and crashes
+        # most of the tests, manual activation seems to be the best way right now.
         parser.add_argument(
             "--sqlite",
             help="set PRAGMA foreign_keys=ON for sqlite use only",
