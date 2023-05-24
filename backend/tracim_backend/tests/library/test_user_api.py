@@ -11,7 +11,6 @@ from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import InvalidUsernameFormat
-from tracim_backend.exceptions import MissingLDAPConnector
 from tracim_backend.exceptions import ReservedUsernameError
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import TracimValidationFailed
@@ -1020,6 +1019,7 @@ class TestUserApi(object):
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "base_test_ldap"}], indirect=True)
 class TestFakeLDAPUserApi(object):
+
     # NOTE - M.L - 2023-05-24 - disabled because not pertinent anymore
     # (connection w/ email is disabled if email is not mandatory)
     # @pytest.mark.ldap
