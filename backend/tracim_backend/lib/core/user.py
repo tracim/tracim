@@ -479,7 +479,7 @@ need to be in every workspace you include."
             name = None
             mail = None
             username = None
-            if self._config.LDAP_NAME_ATTRIBUTE:
+            if self._config.LDAP_NAME_ATTRIBUTE and ldap_data[self._config.LDAP_NAME_ATTRIBUTE]:
                 name = ldap_data[self._config.LDAP_NAME_ATTRIBUTE][0]
             if self._config.LDAP_MAIL_ATTRIBUTE:
                 mail = ldap_data[self._config.LDAP_MAIL_ATTRIBUTE][0]
