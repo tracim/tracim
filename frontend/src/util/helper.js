@@ -170,8 +170,8 @@ export const DRAG_AND_DROP = {
   CONTENT_ITEM: 'contentItem'
 }
 
-// Côme - 2018/09/19 - the object below is a temporary hack to be able to generate translation keys that only exists in backend
-// and are returned through api.
+// INFO - CH - 2018/09/19 - the object below is a temporary hack to be able to generate translation keys that only
+// exists in backend and are returned through api.
 // We will later implement a better solution
 // this const isn't exported since it's only purpose is to generate key trads through i18n.scanner
 const backendTranslationKeyList = [ // eslint-disable-line no-unused-vars
