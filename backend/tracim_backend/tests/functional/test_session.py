@@ -141,7 +141,7 @@ class TestLDAPAuthOnlyEndpointAnonymous(object):
                 datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 == datetime.datetime.utcnow()
             )
-            assert res.json_body["public_name"] == "Hubert"
+            assert res.json_body["public_name"] == "Professor Farnsworth"
             assert res.json_body["email"] == "hubert@planetexpress.com"
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
@@ -161,7 +161,7 @@ class TestLDAPAuthOnlyEndpointAnonymous(object):
                 datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 != datetime.datetime.utcnow()
             )
-            assert res.json_body["public_name"] == "Hubert"
+            assert res.json_body["public_name"] == "Professor Farnsworth"
             assert res.json_body["email"] == "hubert@planetexpress.com"
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
@@ -184,7 +184,7 @@ class TestLDAPAuthOnlyEndpoint(object):
                 datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 == datetime.datetime.utcnow()
             )
-            assert res.json_body["public_name"] == "Hubert"
+            assert res.json_body["public_name"] == "Professor Farnsworth"
             assert res.json_body["email"] == "hubert@planetexpress.com"
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
@@ -204,7 +204,7 @@ class TestLDAPAuthOnlyEndpoint(object):
                 datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 != datetime.datetime.utcnow()
             )
-            assert res.json_body["public_name"] == "Hubert"
+            assert res.json_body["public_name"] == "Professor Farnsworth"
             assert res.json_body["email"] == "hubert@planetexpress.com"
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
@@ -245,7 +245,7 @@ class TestLDAPAuthOnlyEndpoint(object):
                 datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 == datetime.datetime.utcnow()
             )
-            assert res.json_body["public_name"] == "Hubert"
+            assert res.json_body["public_name"] == "Professor Farnsworth"
             assert res.json_body["email"] == "hubert@planetexpress.com"
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
@@ -265,7 +265,7 @@ class TestLDAPAuthOnlyEndpoint(object):
                 datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 != datetime.datetime.utcnow()
             )
-            assert res.json_body["public_name"] == "Hubert"
+            assert res.json_body["public_name"] == "Professor Farnsworth"
             assert res.json_body["email"] == "hubert@planetexpress.com"
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
@@ -305,7 +305,7 @@ class TestLDAPAuthOnlyUsingUsernameLoginEndpoint(object):
                 datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 == datetime.datetime.utcnow()
             )
-            assert res.json_body["public_name"] == "Hubert"
+            assert res.json_body["public_name"] == "Professor Farnsworth"
             assert res.json_body["email"] is None
             assert res.json_body["username"] == "Hubert"
             assert res.json_body["is_active"]
@@ -326,7 +326,7 @@ class TestLDAPAuthOnlyUsingUsernameLoginEndpoint(object):
                 datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 != datetime.datetime.utcnow()
             )
-            assert res.json_body["public_name"] == "Hubert"
+            assert res.json_body["public_name"] == "Professor Farnsworth"
             assert res.json_body["username"] == "Hubert"
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
@@ -367,7 +367,7 @@ class TestLDAPAuthOnlyUsingUsernameLoginEndpoint(object):
                 datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 == datetime.datetime.utcnow()
             )
-            assert res.json_body["public_name"] == "Hubert"
+            assert res.json_body["public_name"] == "Professor Farnsworth"
             assert res.json_body["username"] == "Hubert"
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
@@ -387,7 +387,7 @@ class TestLDAPAuthOnlyUsingUsernameLoginEndpoint(object):
                 datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 != datetime.datetime.utcnow()
             )
-            assert res.json_body["public_name"] == "Hubert"
+            assert res.json_body["public_name"] == "Professor Farnsworth"
             assert res.json_body["username"] == "Hubert"
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
@@ -427,7 +427,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(object):
                 datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 == datetime.datetime.utcnow()
             )
-            assert res.json_body["public_name"] == "Hubert"
+            assert res.json_body["public_name"] == "Professor Farnsworth"
             assert res.json_body["email"] == "hubert@planetexpress.com"
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
@@ -447,7 +447,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(object):
                 datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 != datetime.datetime.utcnow()
             )
-            assert res.json_body["public_name"] == "Hubert"
+            assert res.json_body["public_name"] == "Professor Farnsworth"
             assert res.json_body["email"] == "hubert@planetexpress.com"
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
@@ -494,7 +494,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(object):
                 datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 == datetime.datetime.utcnow()
             )
-            assert res.json_body["public_name"] == "Hubert"
+            assert res.json_body["public_name"] == "Professor Farnsworth"
             assert res.json_body["email"] == "hubert@planetexpress.com"
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
@@ -514,7 +514,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(object):
                 datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 != datetime.datetime.utcnow()
             )
-            assert res.json_body["public_name"] == "Hubert"
+            assert res.json_body["public_name"] == "Professor Farnsworth"
             assert res.json_body["email"] == "hubert@planetexpress.com"
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
