@@ -1020,64 +1020,66 @@ class TestUserApi(object):
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "base_test_ldap"}], indirect=True)
 class TestFakeLDAPUserApi(object):
-    @pytest.mark.ldap
-    def test_unit__authenticate_user___err__no_ldap_connector(self, session, app_config):
-        api = UserApi(current_user=None, session=session, config=app_config)
-        with pytest.raises(MissingLDAPConnector):
-            api.authenticate(login="hubert@planetexpress.com", password="professor")
+    # NOTE - M.L - 2023-05-24 - disabled because not pertinent anymore
+    # (connection w/ email is disabled if email is not mandatory)
+    # @pytest.mark.ldap
+    # def test_unit__authenticate_user___err__no_ldap_connector(self, session, app_config):
+    #    api = UserApi(current_user=None, session=session, config=app_config)
+    #    with pytest.raises(MissingLDAPConnector):
+    #        api.authenticate(login="hubert@planetexpress.com", password="professor")
 
-    @pytest.mark.xfail(reason="create account with specific profile ldap feature disabled")
-    @pytest.mark.ldap
-    def test_unit__authenticate_user___ok__new_user_ldap_auth_custom_profile(
-        self, session, app_config
-    ):
-        # TODO - G.M - 2018-12-05 - [ldap_profile]
-        # support for profile attribute disabled
-        # Should be reenabled later probably with a better code
-        class fake_ldap_connector(object):
-            def authenticate(self, email: str, password: str):
-                if not email == "hubert@planetexpress.com" and password == "professor":
-                    return None
-                return [
-                    None,
-                    {
-                        "mail": ["huber@planetepress.com"],
-                        "givenName": ["Hubert"],
-                        "profile": ["trusted-users"],
-                    },
-                ]
+    # @pytest.mark.xfail(reason="create account with specific profile ldap feature disabled")
+    # @pytest.mark.ldap
+    # def test_unit__authenticate_user___ok__new_user_ldap_auth_custom_profile(
+    #    self, session, app_config
+    # ):
+    #    # TODO - G.M - 2018-12-05 - [ldap_profile]
+    #    # support for profile attribute disabled
+    #    # Should be reenabled later probably with a better code
+    #    class fake_ldap_connector(object):
+    #        def authenticate(self, email: str, password: str):
+    #            if not email == "hubert@planetexpress.com" and password == "professor":
+    #                return None
+    #            return [
+    #                None,
+    #                {
+    #                    "mail": ["huber@planetepress.com"],
+    #                    "givenName": ["Hubert"],
+    #                    "profile": ["trusted-users"],
+    #                },
+    #            ]
 
-        api = UserApi(current_user=None, session=session, config=app_config)
-        user = api.authenticate(
-            login="hubert@planetexpress.com",
-            password="professor",
-            ldap_connector=fake_ldap_connector(),
-        )
-        assert isinstance(user, User)
-        assert user.email == "hubert@planetexpress.com"
-        assert user.auth_type == AuthType.LDAP
-        assert user.display_name == "Hubert"
-        assert user.profile.slug == "trusted-users"
+    #    api = UserApi(current_user=None, session=session, config=app_config)
+    #    user = api.authenticate(
+    #        login="hubert@planetexpress.com",
+    #        password="professor",
+    #        ldap_connector=fake_ldap_connector(),
+    #    )
+    #    assert isinstance(user, User)
+    #    assert user.email == "hubert@planetexpress.com"
+    #    assert user.auth_type == AuthType.LDAP
+    #    assert user.display_name == "Hubert"
+    #    assert user.profile.slug == "trusted-users"
 
-    @pytest.mark.ldap
-    def test_unit__authenticate_user___ok__new_user_ldap_auth(self, session, app_config):
-        class fake_ldap_connector(object):
-            def authenticate(self, email: str, password: str):
-                if not email == "hubert@planetexpress.com" and password == "professor":
-                    return None
-                return [None, {"mail": ["huber@planetepress.com"], "givenName": ["Hubert"]}]
+    # @pytest.mark.ldap
+    # def test_unit__authenticate_user___ok__new_user_ldap_auth(self, session, app_config):
+    #     class fake_ldap_connector(object):
+    #         def authenticate(self, email: str, password: str):
+    #             if not email == "hubert@planetexpress.com" and password == "professor":
+    #                 return None
+    #             return [None, {"mail": ["huber@planetepress.com"], "givenName": ["Hubert"]}]
 
-        api = UserApi(current_user=None, session=session, config=app_config)
-        user = api.authenticate(
-            login="hubert@planetexpress.com",
-            password="professor",
-            ldap_connector=fake_ldap_connector(),
-        )
-        assert isinstance(user, User)
-        assert user.email == "hubert@planetexpress.com"
-        assert user.auth_type == AuthType.LDAP
-        assert user.display_name == "Hubert"
-        assert user.profile.slug == "users"
+    #     api = UserApi(current_user=None, session=session, config=app_config)
+    #     user = api.authenticate(
+    #         login="hubert@planetexpress.com",
+    #         password="professor",
+    #         ldap_connector=fake_ldap_connector(),
+    #     )
+    #     assert isinstance(user, User)
+    #     assert user.email == "hubert@planetexpress.com"
+    #     assert user.auth_type == AuthType.LDAP
+    #     assert user.display_name == "Hubert"
+    #     assert user.profile.slug == "users"
 
     @pytest.mark.ldap
     def test__unit__create_user__err__external_auth_ldap_with_password(self, session, app_config):
