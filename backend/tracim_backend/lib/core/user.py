@@ -445,7 +445,6 @@ need to be in every workspace you include."
         """
         auth_type = AuthType.LDAP
 
-        logger.debug("", "Authenticating user {} with LDAP".format(user))
         # INFO - G.M - 2018-11-22 - Do not authenticate user with auth_type different from LDAP
         if user and user.auth_type not in [auth_type, AuthType.UNKNOWN]:
             raise WrongAuthTypeForUser(
