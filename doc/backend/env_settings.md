@@ -134,7 +134,7 @@ To update the list below you will need to:
 | TRACIM_LDAP_BIND_ANONYMOUS                                                | ldap_bind_anonymous                                            | LDAP_BIND_ANONYMOUS                                                |
 | TRACIM_LDAP_TLS                                                           | ldap_tls                                                       | LDAP_TLS                                                           |
 | TRACIM_LDAP_USER_BASE_DN                                                  | ldap_user_base_dn                                              | LDAP_USER_BASE_DN                                                  |
-| TRACIM_LDAP_LOGIN_ATTRIBUTE                                               | ldap_login_attribute                                           | LDAP_LOGIN_ATTRIBUTE                                               |
+| TRACIM_LDAP_USERNAME_ATTRIBUTE                                               | ldap_username_attribute                                           | LDAP_USERNAME_ATTRIBUTE                                               |
 | TRACIM_LDAP_NAME_ATTRIBUTE                                                | ldap_name_attribute                                            | LDAP_NAME_ATTRIBUTE                                                |
 | TRACIM_WEBDAV__UI__ENABLED                                                | webdav.ui.enabled                                              | WEBDAV__UI__ENABLED                                                |
 | TRACIM_WEBDAV__BASE_URL                                                   | webdav.base_url                                                | WEBDAV__BASE_URL                                                   |

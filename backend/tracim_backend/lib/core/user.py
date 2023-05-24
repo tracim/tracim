@@ -445,6 +445,7 @@ need to be in every workspace you include."
         """
         auth_type = AuthType.LDAP
 
+        logger.debug("", "Authenticating user {} with LDAP".format(user))
         # INFO - G.M - 2018-11-22 - Do not authenticate user with auth_type different from LDAP
         if user and user.auth_type not in [auth_type, AuthType.UNKNOWN]:
             raise WrongAuthTypeForUser(
@@ -477,15 +478,18 @@ need to be in every workspace you include."
             #             )
             #         )
             name = None
+            mail = None
+            username = None
             if self._config.LDAP_NAME_ATTRIBUTE:
                 name = ldap_data[self._config.LDAP_NAME_ATTRIBUTE][0]
+            if self._config.LDAP_MAIL_ATTRIBUTE:
+                mail = ldap_data[self._config.LDAP_MAIL_ATTRIBUTE][0]
+            if self._config.LDAP_USERNAME_ATTRIBUTE:
+                username = ldap_data[self._config.LDAP_USERNAME_ATTRIBUTE][0]
             # INFO - G.M - 2018-11-08 - Create new user from ldap credentials
-            use_email = False
-            if "@" in login:
-                use_email = True
             user = self.create_user(
-                email=login if use_email else None,
-                username=login if not use_email else None,
+                email=mail,
+                username=username,
                 name=name,
                 profile=profile,
                 auth_type=AuthType.LDAP,

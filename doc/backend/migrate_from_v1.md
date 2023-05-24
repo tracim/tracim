@@ -234,7 +234,7 @@ edit parameters, which are mostly in section `[DEFAULT]`.
 | retry.attemps | new | pyramid specific parameter link to [pyramid_retry](https://docs.pylonsproject.org/projects/pyramid-retry/en/latest/), number of try per request. |
 | script_location | new | ⚠️ required for database migration, in `[alembic]` section, alembic specific param. you probably should use default value: `tracim_backend/migration`|
 | ldap_user_base_dn | new | base dn to make queries of users
-| ldap_login_attribute | new | attribute for email login (default:mail) in ldap
+| ldap_username_attribute | new | attribute for email login (default:mail) in ldap
 | ldap_name_attribute | new | attribute for user name in ldap, used only for automatic new Tracim user creation at first login
 --------------------------------
 
