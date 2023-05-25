@@ -1026,7 +1026,7 @@ class TestFakeLDAPUserApi(object):
     # def test_unit__authenticate_user___err__no_ldap_connector(self, session, app_config):
     #    api = UserApi(current_user=None, session=session, config=app_config)
     #    with pytest.raises(MissingLDAPConnector):
-    #        api.authenticate(login="hubert@planetexpress.com", password="professor")
+    #        api.authenticate(login="professor@planetexpress.com", password="professor")
 
     # @pytest.mark.xfail(reason="create account with specific profile ldap feature disabled")
     # @pytest.mark.ldap
@@ -1038,7 +1038,7 @@ class TestFakeLDAPUserApi(object):
     #    # Should be reenabled later probably with a better code
     #    class fake_ldap_connector(object):
     #        def authenticate(self, email: str, password: str):
-    #            if not email == "hubert@planetexpress.com" and password == "professor":
+    #            if not email == "professor@planetexpress.com" and password == "professor":
     #                return None
     #            return [
     #                None,
@@ -1051,12 +1051,12 @@ class TestFakeLDAPUserApi(object):
 
     #    api = UserApi(current_user=None, session=session, config=app_config)
     #    user = api.authenticate(
-    #        login="hubert@planetexpress.com",
+    #        login="professor@planetexpress.com",
     #        password="professor",
     #        ldap_connector=fake_ldap_connector(),
     #    )
     #    assert isinstance(user, User)
-    #    assert user.email == "hubert@planetexpress.com"
+    #    assert user.email == "professor@planetexpress.com"
     #    assert user.auth_type == AuthType.LDAP
     #    assert user.display_name == "Hubert"
     #    assert user.profile.slug == "trusted-users"
@@ -1065,18 +1065,18 @@ class TestFakeLDAPUserApi(object):
     # def test_unit__authenticate_user___ok__new_user_ldap_auth(self, session, app_config):
     #     class fake_ldap_connector(object):
     #         def authenticate(self, email: str, password: str):
-    #             if not email == "hubert@planetexpress.com" and password == "professor":
+    #             if not email == "professor@planetexpress.com" and password == "professor":
     #                 return None
     #             return [None, {"mail": ["huber@planetepress.com"], "givenName": ["Hubert"]}]
 
     #     api = UserApi(current_user=None, session=session, config=app_config)
     #     user = api.authenticate(
-    #         login="hubert@planetexpress.com",
+    #         login="professor@planetexpress.com",
     #         password="professor",
     #         ldap_connector=fake_ldap_connector(),
     #     )
     #     assert isinstance(user, User)
-    #     assert user.email == "hubert@planetexpress.com"
+    #     assert user.email == "professor@planetexpress.com"
     #     assert user.auth_type == AuthType.LDAP
     #     assert user.display_name == "Hubert"
     #     assert user.profile.slug == "users"
