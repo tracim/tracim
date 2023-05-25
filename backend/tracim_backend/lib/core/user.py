@@ -477,15 +477,18 @@ need to be in every workspace you include."
             #             )
             #         )
             name = None
-            if self._config.LDAP_NAME_ATTRIBUTE:
+            mail = None
+            username = None
+            if self._config.LDAP_NAME_ATTRIBUTE and self._config.LDAP_NAME_ATTRIBUTE in ldap_data:
                 name = ldap_data[self._config.LDAP_NAME_ATTRIBUTE][0]
+            if self._config.LDAP_MAIL_ATTRIBUTE:
+                mail = ldap_data[self._config.LDAP_MAIL_ATTRIBUTE][0]
+            if self._config.LDAP_USERNAME_ATTRIBUTE:
+                username = ldap_data[self._config.LDAP_USERNAME_ATTRIBUTE][0]
             # INFO - G.M - 2018-11-08 - Create new user from ldap credentials
-            use_email = False
-            if "@" in login:
-                use_email = True
             user = self.create_user(
-                email=login if use_email else None,
-                username=login if not use_email else None,
+                email=mail,
+                username=username,
                 name=name,
                 profile=profile,
                 auth_type=AuthType.LDAP,
@@ -861,7 +864,7 @@ need to be in every workspace you include."
         if len(username) < User.MIN_USERNAME_LENGTH or len(username) > User.MAX_USERNAME_LENGTH:
             return False
         for char in username:
-            if char not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_":
+            if char not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.":
                 return False
         return True
 
