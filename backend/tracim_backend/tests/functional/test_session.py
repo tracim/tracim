@@ -306,7 +306,7 @@ class TestLDAPAuthOnlyUsingUsernameLoginEndpoint(object):
                 == datetime.datetime.utcnow()
             )
             assert res.json_body["public_name"] == "Professor Farnsworth"
-            assert res.json_body["email"] is None
+            assert res.json_body["email"] is "professor@planetexpress.com"
             assert res.json_body["username"] == "Hubert"
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
