@@ -26,6 +26,17 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.tracim_session import unprotected_content_revision
+from sqlalchemy.engine import Engine
+from sqlalchemy.event import listen
+
+# INFO - F.S - 2023-05-30 - Enable cascade delete on sqlite database
+def set_sqlite_pragma_on(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    try:
+        cursor.execute("PRAGMA foreign_keys=ON")
+    except Exception:
+        pass
+    cursor.close()
 
 
 class DeleteResultIds(object):
@@ -385,6 +396,8 @@ class DeleteContentRevisionCommand(AppContextCommand):
     def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]
+        if self._session.bind.dialect.name == "sqlite":
+            listen(Engine, "connect", set_sqlite_pragma_on)
 
         if parsed_args.dry_run_mode:
             print("(!) Running in dry-run mode, no change will be applied.")
@@ -445,6 +458,8 @@ class DeleteContentCommand(AppContextCommand):
     def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]
+        if self._session.bind.dialect.name == "sqlite":
+            listen(Engine, "connect", set_sqlite_pragma_on)
 
         if parsed_args.dry_run_mode:
             print("(!) Running in dry-run mode, no change will be applied.")
