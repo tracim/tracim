@@ -11,13 +11,10 @@ from cliff.command import Command
 from cliff.commandmanager import CommandManager
 from pyramid.paster import bootstrap
 from pyramid.paster import setup_logging
-from sqlalchemy.engine import Engine
-from sqlalchemy.event import listen
 import transaction
 
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import DEFAULT_TRACIM_CONFIG_FILE
-
 
 
 class TracimCLI(App):
