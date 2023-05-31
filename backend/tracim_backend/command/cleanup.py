@@ -3,6 +3,8 @@ import traceback
 import typing
 
 from pyramid.scripting import AppEnvironment
+from sqlalchemy.engine import Engine
+from sqlalchemy.event import listen
 
 from tracim_backend.applications.agenda.models import AgendaResourceType
 from tracim_backend.apps import AGENDA__APP_SLUG
@@ -26,8 +28,7 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.tracim_session import unprotected_content_revision
-from sqlalchemy.engine import Engine
-from sqlalchemy.event import listen
+
 
 # INFO - F.S - 2023-05-30 - Enable cascade delete on sqlite database
 def set_sqlite_pragma_on(dbapi_connection, connection_record):
@@ -520,6 +521,8 @@ class DeleteSpaceCommand(AppContextCommand):
     def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]
+        if self._session.bind.dialect.name == "sqlite":
+            listen(Engine, "connect", set_sqlite_pragma_on)
 
         if parsed_args.dry_run_mode:
             print("(!) Running in dry-run mode, no change will be applied.")
