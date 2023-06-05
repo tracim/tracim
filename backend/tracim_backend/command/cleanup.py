@@ -40,6 +40,16 @@ def set_sqlite_pragma_on(dbapi_connection, connection_record):
     cursor.close()
 
 
+# INFO - F.S - 2023-06-05 - Disable cascade delete on sqlite database
+def set_sqlite_pragma_off(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    try:
+        cursor.execute("PRAGMA foreign_keys=OFF")
+    except Exception:
+        pass
+    cursor.close()
+
+
 class DeleteResultIds(object):
     def __init__(
         self, user_id: int, workspace_ids: typing.Optional[typing.List[int]] = None
@@ -436,6 +446,8 @@ class DeleteContentRevisionCommand(AppContextCommand):
                 self._session.flush()
                 print('revision "{}" deleted".'.format(revision.revision_id))
                 print("~~~~~~~~~~")
+        if self._session.bind.dialect.name == "sqlite":
+            listen(Engine, "connect", set_sqlite_pragma_off)
 
 
 class DeleteContentCommand(AppContextCommand):
@@ -448,6 +460,14 @@ class DeleteContentCommand(AppContextCommand):
             "--dry-run",
             help="dry-run mode",
             dest="dry_run_mode",
+            default=False,
+            action="store_true",
+        )
+        parser.add_argument(
+            "-f",
+            "--force",
+            help="force delete",
+            dest="force_delete",
             default=False,
             action="store_true",
         )
@@ -484,20 +504,29 @@ class DeleteContentCommand(AppContextCommand):
                 self._session, self._app_config, dry_run_mode=parsed_args.dry_run_mode
             )
             print("delete content {}.".format(content.id))
-            # FIXME - G.M - 2022-04-11 - For unclear reason doing soft delete in dry_run
-            # give Attribute error in recursive children.
-            if not parsed_args.dry_run_mode:
-                cleanup_lib.soft_delete_content(content)
-            self._session.flush()
-            self._session.expire_all()
-            with unprotected_content_revision(self._session) as session:
-                cleanup_lib_unprotected = CleanupLib(
-                    session, self._app_config, dry_run_mode=parsed_args.dry_run_mode
+            if parsed_args.force_delete or content.is_deleted:
+                # FIXME - G.M - 2022-04-11 - For unclear reason doing soft delete in dry_run
+                # give Attribute error in recursive children.
+                if not parsed_args.dry_run_mode:
+                    cleanup_lib.soft_delete_content(content)
+                self._session.flush()
+                self._session.expire_all()
+                with unprotected_content_revision(self._session) as session:
+                    cleanup_lib_unprotected = CleanupLib(
+                        session, self._app_config, dry_run_mode=parsed_args.dry_run_mode
+                    )
+                    cleanup_lib_unprotected.delete_content(content)
+                    session.flush()
+                print('content "{}" deleted".'.format(content.content_id))
+            else:
+                print(
+                    "couldn't delete content {}, use --force to force delete content or set it as delete".format(
+                        content.id
+                    )
                 )
-                cleanup_lib_unprotected.delete_content(content)
-                session.flush()
-            print('content "{}" deleted".'.format(content.content_id))
             print("~~~~~~~~~~")
+        if self._session.bind.dialect.name == "sqlite":
+            listen(Engine, "connect", set_sqlite_pragma_off)
 
 
 class DeleteSpaceCommand(AppContextCommand):
@@ -510,6 +539,14 @@ class DeleteSpaceCommand(AppContextCommand):
             "--dry-run",
             help="dry-run mode",
             dest="dry_run_mode",
+            default=False,
+            action="store_true",
+        )
+        parser.add_argument(
+            "-f",
+            "--force",
+            help="force delete",
+            dest="force_delete",
             default=False,
             action="store_true",
         )
@@ -542,20 +579,48 @@ class DeleteSpaceCommand(AppContextCommand):
                     raise exc
             for space in space_list:
                 print("~~~~~~~~~~")
-                cleanup_lib = CleanupLib(
-                    session, self._app_config, dry_run_mode=parsed_args.dry_run_mode
-                )
-                # FIXME - G.M - 2022-04-11 - For unclear reason doing soft delete in dry_run
-                # give DetachedInstanceError.
-                if not parsed_args.dry_run_mode:
-                    cleanup_lib.soft_delete_workspace(space)
-                session.flush()
-                session.expire_all()
-                print("delete space {}.".format(space.workspace_id))
-                cleanup_lib.delete_workspace(space)
-                session.flush()
-                print('space "{}" deleted".'.format(space.workspace_id))
+                force_delete_retour = "no"
+                if not parsed_args.force_delete:
+                    nb_children = space.get_children().__len__()
+                    nb_content = len(space.contents)
+                    print(
+                        "space {0} have {1} children and {2} content,".format(
+                            space.workspace_id, nb_children, nb_content
+                        )
+                    )
+                    print(
+                        "are you sure you want to delete this space and all it's content (this action is permanant) ? yes/(no)"
+                    )
+                    force_delete_retour = input()
+                    force_delete_retour = force_delete_retour.lower()
+                if (
+                    parsed_args.force_delete
+                    or force_delete_retour == "yes"
+                    or force_delete_retour == "y"
+                    or parsed_args.dry_run_mode
+                ):
+                    cleanup_lib = CleanupLib(
+                        session, self._app_config, dry_run_mode=parsed_args.dry_run_mode
+                    )
+                    # FIXME - G.M - 2022-04-11 - For unclear reason doing soft delete in dry_run
+                    # give DetachedInstanceError.
+                    if not parsed_args.dry_run_mode:
+                        cleanup_lib.soft_delete_workspace(space)
+                    session.flush()
+                    session.expire_all()
+                    print("delete space {}.".format(space.workspace_id))
+                    cleanup_lib.delete_workspace(space)
+                    session.flush()
+                    print('space "{}" deleted".'.format(space.workspace_id))
+                else:
+                    print(
+                        "couldn't delete space {}, use --force to force delete".format(
+                            space.workspace_id
+                        )
+                    )
                 print("~~~~~~~~~~")
+        if self._session.bind.dialect.name == "sqlite":
+            listen(Engine, "connect", set_sqlite_pragma_off)
 
 
 class AnonymizeUserCommand(AppContextCommand):

@@ -11,6 +11,7 @@ import transaction
 import tracim_backend
 from tracim_backend.command import TracimCLI
 from tracim_backend.exceptions import UserDoesNotExist
+from tracim_backend.lib.core.reaction import ReactionLib
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import Content
@@ -19,6 +20,7 @@ from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import User
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.reaction import Reaction
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.user_custom_properties import UserCustomProperties
 from tracim_backend.models.userconfig import UserConfig
@@ -73,6 +75,11 @@ class TestCommandsList(object):
         assert output.find("dev test smtp") > 0
         assert output.find("dev custom-properties extract-translation-source") > 0
         assert output.find("dev custom-properties checker") > 0
+        # content
+        assert output.find("content delete") > 0
+        assert output.find("content show") > 0
+        # revision
+        assert output.find("revision delete") > 0
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -1409,7 +1416,11 @@ class TestCommands(object):
         )
         assert result == 0
 
-    def test_func__delete_user__ok__dry_run(self, session, user_api_factory,) -> None:
+    def test_func__delete_user__ok__dry_run(
+        self,
+        session,
+        user_api_factory,
+    ) -> None:
         """
         Non-regression test for an error that occured with dry-run and user config.
         """
@@ -1578,3 +1589,421 @@ class TestCommands(object):
         assert deleted_user_event.user["public_name"] == "bob"
         assert anonymized_user_event.event_type == "user.modified"
         assert anonymized_user_event.user["public_name"] == "Custom Name"
+
+    def test_func__delete_content__ok__nominal_case(
+        self,
+        session,
+        user_api_factory,
+        hapic,
+        content_api_factory,
+        workspace_api_factory,
+        content_type_list,
+    ) -> None:
+        """
+        Test Content deletion : nominal case, content whith 4 revision and is set to be deleted
+        """
+        uapi = user_api_factory.get()
+        user = uapi.get_one_by_email("admin@admin.admin")
+
+        workspace_api = workspace_api_factory.get(current_user=user)
+        test_workspace = workspace_api.create_workspace("test_workspace")
+        session.add(test_workspace)
+        session.flush()
+        content_api = content_api_factory.get(
+            show_deleted=True, show_active=True, show_archived=True, current_user=user
+        )
+        content = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=test_workspace,
+            label="Test content",
+            do_save=True,
+            do_notify=False,
+        )
+        content_id = content.content_id
+        with new_revision(session=session, tm=transaction.manager, content=content):
+            content = content_api.update_file_data(
+                content, "foo.png", "image/png", create_1000px_png_test_image()
+            )
+
+        with new_revision(
+            session=session, tm=transaction.manager, content=content, force_create_new_revision=True
+        ):
+            content = content_api.update_file_data(
+                content, "fo.png", "image/png", create_1000px_png_test_image()
+            )
+        with new_revision(
+            session=session, tm=transaction.manager, content=content, force_create_new_revision=True
+        ):
+            content = content_api.update_file_data(
+                content, "f.png", "image/png", create_1000px_png_test_image()
+            )
+        content.is_deleted = True
+        transaction.commit()
+        session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
+        DepotManager._clear()
+        app = TracimCLI()
+        result = app.run(
+            [
+                "content",
+                "delete",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-z",
+                "{}".format(content_id),
+            ]
+        )
+        assert result == 0
+        assert (
+            session.query(ContentRevisionRO)
+            .filter(ContentRevisionRO.content_id == content_id)
+            .all()
+            == []
+        )
+        with pytest.raises(NoResultFound):
+            session.query(Content).filter(Content.content_id == content_id).one()
+
+    def test_func__delete_content__ok__force_delete_case(
+        self,
+        session,
+        user_api_factory,
+        hapic,
+        content_api_factory,
+        workspace_api_factory,
+        content_type_list,
+    ) -> None:
+        """
+        Test Content deletion : content whith an under content and reaction delete by force
+        """
+        uapi = user_api_factory.get()
+        user = uapi.get_one_by_email("admin@admin.admin")
+
+        workspace_api = workspace_api_factory.get(current_user=user)
+        test_workspace = workspace_api.create_workspace("test_workspace")
+        session.add(test_workspace)
+        session.flush()
+        content_api = content_api_factory.get(
+            show_deleted=True, show_active=True, show_archived=True, current_user=user
+        )
+        content = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=test_workspace,
+            label="Test content",
+            do_save=True,
+            do_notify=False,
+        )
+        content_id = content.content_id
+        content2 = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=test_workspace,
+            parent=content,
+            label="Test content 2",
+            do_save=True,
+            do_notify=False,
+        )
+        content_id2 = content2.content_id
+        with new_revision(session=session, tm=transaction.manager, content=content):
+            content = content_api.update_file_data(
+                content, "foo.png", "image/png", create_1000px_png_test_image()
+            )
+        reactionApi = ReactionLib(session=session)
+        reaction = reactionApi.create(
+            user=user,
+            content=content,
+            value="😀",
+            do_save=True,
+        )
+        reaction_id = reaction.reaction_id
+        transaction.commit()
+        session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
+        DepotManager._clear()
+        app = TracimCLI()
+        result = app.run(
+            [
+                "content",
+                "delete",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-f",
+                "-z",
+                "{}".format(content_id),
+            ]
+        )
+        assert result == 0
+        assert (
+            session.query(ContentRevisionRO)
+            .filter(ContentRevisionRO.content_id == content_id)
+            .all()
+            == []
+        )
+        with pytest.raises(NoResultFound):
+            session.query(Content).filter(Content.content_id == content_id).one()
+        with pytest.raises(NoResultFound):
+            session.query(Content).filter(Content.content_id == content_id2).one()
+        with pytest.raises(NoResultFound):
+            session.query(Reaction).filter(Reaction.reaction_id == reaction_id).one()
+
+    def test_func__delete_content__ok__refuse_delete_case(
+        self,
+        session,
+        user_api_factory,
+        hapic,
+        content_api_factory,
+        workspace_api_factory,
+        content_type_list,
+    ) -> None:
+        """
+        Test Content deletion : nominal case, content whith a single revision
+        """
+        uapi = user_api_factory.get()
+        user = uapi.get_one_by_email("admin@admin.admin")
+
+        workspace_api = workspace_api_factory.get(current_user=user)
+        test_workspace = workspace_api.create_workspace("test_workspace")
+        session.add(test_workspace)
+        session.flush()
+        content_api = content_api_factory.get(
+            show_deleted=True, show_active=True, show_archived=True, current_user=user
+        )
+        content = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=test_workspace,
+            label="Test file",
+            do_save=True,
+            do_notify=False,
+        )
+        content_id = content.content_id
+        with new_revision(session=session, tm=transaction.manager, content=content):
+            content = content_api.update_file_data(
+                content, "foo.png", "image/png", create_1000px_png_test_image()
+            )
+        transaction.commit()
+        session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
+        DepotManager._clear()
+        app = TracimCLI()
+        result = app.run(
+            [
+                "content",
+                "delete",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-z",
+                "{}".format(content_id),
+            ]
+        )
+        assert result == 0
+        assert len(session.query(Content).filter(Content.content_id == content_id).all()) == 1
+
+    def test_func__delete_workspace__ok__input_no_delete_case(
+        self,
+        session,
+        user_api_factory,
+        hapic,
+        content_api_factory,
+        workspace_api_factory,
+        content_type_list,
+        monkeypatch,
+    ) -> None:
+        """
+        Test Workspace deletion : Workspace whith content and revision didn't force and cancel delete
+        """
+        uapi = user_api_factory.get()
+        user = uapi.get_one_by_email("admin@admin.admin")
+
+        workspace_api = workspace_api_factory.get(current_user=user)
+        test_workspace = workspace_api.create_workspace("test_workspace")
+        session.add(test_workspace)
+        session.flush()
+        content_api = content_api_factory.get(
+            show_deleted=True, show_active=True, show_archived=True, current_user=user
+        )
+        content = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=test_workspace,
+            label="Test file",
+            do_save=True,
+            do_notify=False,
+        )
+        workspace_id = test_workspace.workspace_id
+        content_id = content.content_id
+        with new_revision(session=session, tm=transaction.manager, content=content):
+            content = content_api.update_file_data(
+                content, "foo.png", "image/png", create_1000px_png_test_image()
+            )
+        transaction.commit()
+        session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
+        DepotManager._clear()
+        app = TracimCLI()
+        # NOTE - FS - 2023-06-05: Use monkeypatch to send the input to the second verification
+        monkeypatch.setattr("builtins.input", lambda: "no")
+        result = app.run(
+            [
+                "space",
+                "delete",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-z",
+                "{}".format(workspace_id),
+            ]
+        )
+        assert result == 1
+        assert len(session.query(Content).filter(Content.content_id == content_id).all()) == 1
+        assert (
+            len(
+                session.query(ContentRevisionRO)
+                .filter(ContentRevisionRO.content_id == content_id)
+                .all()
+            )
+            == 2
+        )
+        assert (
+            len(session.query(Workspace).filter(Workspace.workspace_id == workspace_id).all()) == 1
+        )
+
+    def test_func__delete_workspace__ok__force_delete_case(
+        self,
+        session,
+        user_api_factory,
+        hapic,
+        content_api_factory,
+        workspace_api_factory,
+        content_type_list,
+    ) -> None:
+        """
+        Test Workspace deletion : Workspace whith content and revision force delete
+        """
+        uapi = user_api_factory.get()
+        user = uapi.get_one_by_email("admin@admin.admin")
+
+        workspace_api = workspace_api_factory.get(current_user=user)
+        test_workspace = workspace_api.create_workspace("test_workspace")
+        session.add(test_workspace)
+        session.flush()
+        content_api = content_api_factory.get(
+            show_deleted=True, show_active=True, show_archived=True, current_user=user
+        )
+        content = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=test_workspace,
+            label="Test file",
+            do_save=True,
+            do_notify=False,
+        )
+        workspace_id = test_workspace.workspace_id
+        content_id = content.content_id
+        with new_revision(session=session, tm=transaction.manager, content=content):
+            content = content_api.update_file_data(
+                content, "foo.png", "image/png", create_1000px_png_test_image()
+            )
+        transaction.commit()
+        session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
+        DepotManager._clear()
+        app = TracimCLI()
+        result = app.run(
+            [
+                "space",
+                "delete",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-f",
+                "-z",
+                "{}".format(workspace_id),
+            ]
+        )
+        assert result == 0
+        assert len(session.query(Content).filter(Content.content_id == content_id).all()) == 0
+        assert (
+            session.query(ContentRevisionRO)
+            .filter(ContentRevisionRO.content_id == content_id)
+            .all()
+            == []
+        )
+        assert (
+            len(session.query(Workspace).filter(Workspace.workspace_id == workspace_id).all()) == 0
+        )
+
+    def test_func__delete_revision__ok__nominal_case(
+        self,
+        session,
+        user_api_factory,
+        hapic,
+        content_api_factory,
+        workspace_api_factory,
+        content_type_list,
+    ) -> None:
+        """
+        Test Revision deletion : nominal case, delete one of the 4 revision of a content
+        """
+        uapi = user_api_factory.get()
+        user = uapi.get_one_by_email("admin@admin.admin")
+
+        workspace_api = workspace_api_factory.get(current_user=user)
+        test_workspace = workspace_api.create_workspace("test_workspace")
+        session.add(test_workspace)
+        session.flush()
+        content_api = content_api_factory.get(
+            show_deleted=True, show_active=True, show_archived=True, current_user=user
+        )
+        content = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=test_workspace,
+            label="Test file",
+            do_save=True,
+            do_notify=False,
+        )
+        content_id = content.content_id
+        with new_revision(session=session, tm=transaction.manager, content=content):
+            content = content_api.update_file_data(
+                content, "foo.png", "image/png", create_1000px_png_test_image()
+            )
+        with new_revision(
+            session=session, tm=transaction.manager, content=content, force_create_new_revision=True
+        ):
+            content = content_api.update_file_data(
+                content, "fo.png", "image/png", create_1000px_png_test_image()
+            )
+        with new_revision(
+            session=session, tm=transaction.manager, content=content, force_create_new_revision=True
+        ):
+            content = content_api.update_file_data(
+                content, "f.png", "image/png", create_1000px_png_test_image()
+            )
+        revision_id = content.cached_revision_id
+        transaction.commit()
+        session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
+        DepotManager._clear()
+        app = TracimCLI()
+        result = app.run(
+            [
+                "revision",
+                "delete",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-z",
+                "{}".format(revision_id),
+            ]
+        )
+        assert result == 0
+        assert (
+            len(
+                session.query(ContentRevisionRO)
+                .filter(ContentRevisionRO.content_id == content_id)
+                .all()
+            )
+            == 3
+        )
+        with pytest.raises(NoResultFound):
+            session.query(ContentRevisionRO).filter(
+                ContentRevisionRO.revision_id == revision_id
+            ).one()
