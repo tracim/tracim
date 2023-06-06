@@ -1,6 +1,6 @@
-import datetime
 from urllib.parse import quote
 
+import datetime
 from depot.manager import DepotManager
 from freezegun import freeze_time
 import pytest
@@ -156,8 +156,10 @@ class TestWOPI(object):
         with freeze_time("2000-01-01 00:00:05"):
             access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
             transaction.commit()
-            url = "/api/collaborative-document-edition/wopi/files/{}/contents?access_token={}".format(
-                test_file.content_id, quote(access_token)
+            url = (
+                "/api/collaborative-document-edition/wopi/files/{}/contents?access_token={}".format(
+                    test_file.content_id, quote(access_token)
+                )
             )
             updated_at = test_file.updated
             new_content = b"content has been modified"
@@ -217,8 +219,10 @@ class TestWOPI(object):
         with freeze_time("2000-01-01 00:00:05"):
             access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
             transaction.commit()
-            url = "/api/collaborative-document-edition/wopi/files/{}/contents?access_token={}".format(
-                test_file.content_id, quote(access_token)
+            url = (
+                "/api/collaborative-document-edition/wopi/files/{}/contents?access_token={}".format(
+                    test_file.content_id, quote(access_token)
+                )
             )
             updated_at = test_file.updated
             new_content = b"content has been modified"

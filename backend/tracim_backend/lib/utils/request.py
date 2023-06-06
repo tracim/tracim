@@ -3,11 +3,10 @@ from abc import ABC
 from abc import abstractmethod
 import contextlib
 from json import JSONDecodeError
-import typing
-
 import pluggy
 from pyramid.request import Request
 from sqlalchemy.orm import Session
+import typing
 
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list

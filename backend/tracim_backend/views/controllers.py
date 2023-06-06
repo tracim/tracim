@@ -1,6 +1,5 @@
 from abc import ABC
 from abc import abstractmethod
-
 from pyramid.config import Configurator
 
 

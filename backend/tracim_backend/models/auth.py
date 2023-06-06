@@ -11,11 +11,6 @@ from datetime import datetime
 import enum
 from hashlib import sha256
 import os
-import time
-import typing
-from typing import TYPE_CHECKING
-import uuid
-
 from sqlalchemy import BigInteger
 from sqlalchemy import CheckConstraint
 from sqlalchemy import Column
@@ -30,6 +25,10 @@ from sqlalchemy.types import DateTime
 from sqlalchemy.types import Enum
 from sqlalchemy.types import Integer
 from sqlalchemy.types import Unicode
+import time
+import typing
+from typing import TYPE_CHECKING
+import uuid
 
 from tracim_backend.exceptions import ExpiredResetPasswordToken
 from tracim_backend.exceptions import InvalidResetPasswordToken
@@ -39,8 +38,8 @@ from tracim_backend.models.mixins import TrashableMixin
 from tracim_backend.models.types import TracimUploadedFileField
 
 if TYPE_CHECKING:
-    from tracim_backend.models.data import Workspace
     from tracim_backend.models.data import UserRoleInWorkspace
+    from tracim_backend.models.data import Workspace
 __all__ = ["User"]
 
 

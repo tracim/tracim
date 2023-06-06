@@ -1,9 +1,8 @@
-from http import HTTPStatus
-
 from hapic import HapicData
+from http import HTTPStatus
 from pyramid.config import Configurator
 
-from tracim_backend.config import CFG
+from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import AdvancedSearchNotEnabled
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import ESSearchApi

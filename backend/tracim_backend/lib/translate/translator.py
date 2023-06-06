@@ -60,13 +60,13 @@ class TranslationService(ABC):
         mimetype: str,
         **kwargs: Any
     ) -> BinaryIO:
-        """ Translate a file"""
+        """Translate a file"""
         pass
 
     @property
     @abstractmethod
     def name(self) -> str:
-        """ Name of the Translation service"""
+        """Name of the Translation service"""
         pass
 
     @property
@@ -78,5 +78,5 @@ class TranslationService(ABC):
     @property
     @abstractmethod
     def supported_mimetype_pairs(self) -> List[TranslationMimetypePair]:
-        """ List of supported mimetypes for the service"""
+        """List of supported mimetypes for the service"""
         pass

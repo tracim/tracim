@@ -1,7 +1,6 @@
-import typing
-
 from defusedxml import ElementTree
 import requests
+import typing
 
 from tracim_backend.applications.collaborative_document_edition.lib import (
     CollaborativeDocumentEditionLib,

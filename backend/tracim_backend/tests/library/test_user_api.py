@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-import typing
-from unittest import mock
-
 import pytest
 import transaction
+import typing
+from unittest import mock
 
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import CannotUseBothIncludeAndExcludeWorkspaceUsers
@@ -70,7 +69,10 @@ class TestUserApiWithCustomDefaultProfileForUser(object):
 class TestUserApiWithNotifications:
     @pytest.mark.parametrize("email", ("bob@bob.local", None))
     def test__unit__create_user__ok__with_or_without_email(
-        self, session, app_config, email: typing.Optional[str],
+        self,
+        session,
+        app_config,
+        email: typing.Optional[str],
     ):
         api = UserApi(current_user=None, session=session, config=app_config)
         with mock.patch(
@@ -528,7 +530,6 @@ class TestUserApi(object):
     def test_unit__get_known_users__user__no_workspace_empty_known_user(
         self, session, app_config, admin_user
     ):
-
         api = UserApi(current_user=admin_user, session=session, config=app_config)
         u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
         api2 = UserApi(current_user=u1, session=session, config=app_config)

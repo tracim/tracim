@@ -1,6 +1,5 @@
 # coding=utf-8
 from http import HTTPStatus
-
 from pyramid.config import Configurator
 
 from tracim_backend.exceptions import FavoriteContentNotFound
@@ -67,7 +66,8 @@ class FavoriteContentController(Controller):
             show_archived=True,
         )
         return api.get_user_favorite_contents(
-            user_id=request.candidate_user.user_id, order_by_properties=[FavoriteContent.created],
+            user_id=request.candidate_user.user_id,
+            order_by_properties=[FavoriteContent.created],
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_FAVORITE_ENDPOINTS])
@@ -114,7 +114,9 @@ class FavoriteContentController(Controller):
     def bind(self, configurator: Configurator):
         # Get Favorites content
         configurator.add_route(
-            "user_favorite_contents", "/users/{user_id}/favorite-contents", request_method="GET",
+            "user_favorite_contents",
+            "/users/{user_id}/favorite-contents",
+            request_method="GET",
         )
         configurator.add_view(self.user_favorite_contents, route_name="user_favorite_contents")
 

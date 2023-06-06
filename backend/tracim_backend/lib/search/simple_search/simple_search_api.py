@@ -1,11 +1,10 @@
 import re
-import typing
-
 from sqlalchemy import and_
 from sqlalchemy import desc
 from sqlalchemy import or_
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import joinedload
+import typing
 
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list

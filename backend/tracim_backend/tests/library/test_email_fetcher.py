@@ -1,5 +1,4 @@
 from email.message import Message
-
 from mock import MagicMock
 from mock import Mock
 import pytest

@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 import logging
-import typing
-
 from mako.template import Template
 from sqlalchemy.orm import Session
+import typing
 
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
@@ -57,7 +56,6 @@ class EmailNotifier(INotifier):
         )
 
     def notify_content_update(self, content: Content):
-
         if content.get_last_action().id not in self.config.EMAIL__NOTIFICATION__NOTIFIED_EVENTS:
             logger.info(
                 self,
@@ -199,8 +197,8 @@ class EmailManager(object):
         # FIXME - D.A. - 2014-11-05
         # Dirty import. It's here in order to avoid circular import
         from tracim_backend.lib.core.content import ContentApi
-        from tracim_backend.lib.core.user import UserApi
         from tracim_backend.lib.core.mention import DescriptionMentionParser
+        from tracim_backend.lib.core.user import UserApi
 
         user = UserApi(None, config=self.config, session=self.session).get_one(event_actor_id)
         logger.debug(self, "Content: {}".format(event_content_id))
@@ -461,7 +459,6 @@ class EmailManager(object):
         actor: User,
         translator: Translator,
     ):
-
         _ = translator.get_translation
         content = content_in_context.content
         action = content.get_last_action().id

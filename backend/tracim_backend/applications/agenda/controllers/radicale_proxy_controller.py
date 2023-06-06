@@ -1,7 +1,6 @@
 # coding: utf-8
-from http import HTTPStatus
-
 from hapic import HapicData
+from http import HTTPStatus
 from pyramid.config import Configurator
 from pyramid.httpexceptions import HTTPMovedPermanently
 from pyramid.response import Response
@@ -35,7 +34,8 @@ RADICALE_PROXY_EXTRA_HEADERS = {"X-Script-Name": "/dav"}
 
 class RadicaleProxyController(Controller):
     def __init__(
-        self, proxy_base_address,
+        self,
+        proxy_base_address,
     ):
         self._authorization = CaldavAuthorizationDeterminer()
         self.proxy_base_address = proxy_base_address
@@ -98,7 +98,8 @@ class RadicaleProxyController(Controller):
             user_id=request.candidate_user.user_id,
         )
         path = "{user_calendar_path}/{sub_item}/".format(
-            user_calendar_path=user_calendar_path, sub_item=hapic_data.path.sub_item,
+            user_calendar_path=user_calendar_path,
+            sub_item=hapic_data.path.sub_item,
         )
         return self._proxy.get_response_for_request(
             request, path, extra_request_headers=RADICALE_PROXY_EXTRA_HEADERS
@@ -120,7 +121,8 @@ class RadicaleProxyController(Controller):
             user_id=request.candidate_user.user_id,
         )
         path = "{user_addressbook_path}/{sub_item}/".format(
-            user_addressbook_path=user_addressbook_path, sub_item=hapic_data.path.sub_item,
+            user_addressbook_path=user_addressbook_path,
+            sub_item=hapic_data.path.sub_item,
         )
         return self._proxy.get_response_for_request(
             request, path, extra_request_headers=RADICALE_PROXY_EXTRA_HEADERS
@@ -396,21 +398,26 @@ class RadicaleProxyController(Controller):
         # INFO - G.M - 2021-12-08 - Please keep theses URL in sync with url proxified
         # (check RADICALE config parameters)
         configurator.add_route(
-            "root_discovery", "/dav/", request_method="PROPFIND",
+            "root_discovery",
+            "/dav/",
+            request_method="PROPFIND",
         )
         configurator.add_view(self.root_discovery, route_name="root_discovery")
 
         configurator.add_route(
-            "well_known_caldav", "/.well-known/caldav",
+            "well_known_caldav",
+            "/.well-known/caldav",
         )
         configurator.add_view(self.well_known_caldav, route_name="well_known_caldav")
         configurator.add_route(
-            "well_known_carddav", "/.well-known/carddav",
+            "well_known_carddav",
+            "/.well-known/carddav",
         )
         configurator.add_view(self.well_known_carddav, route_name="well_known_carddav")
         # Radicale user resource agenda
         configurator.add_route(
-            "radicale_proxy__user_resource", "/dav/user_{user_id:[0-9]+}{trailing_slash:[/]?}",
+            "radicale_proxy__user_resource",
+            "/dav/user_{user_id:[0-9]+}{trailing_slash:[/]?}",
         )
         configurator.add_view(
             self.radicale_proxy__user_resource, route_name="radicale_proxy__user_resource"
@@ -453,7 +460,8 @@ class RadicaleProxyController(Controller):
 
         # user agenda
         configurator.add_route(
-            "radicale_proxy__user_agenda", "/dav/agenda/user/{user_id:[0-9]+}{trailing_slash:[/]?}",
+            "radicale_proxy__user_agenda",
+            "/dav/agenda/user/{user_id:[0-9]+}{trailing_slash:[/]?}",
         )
         configurator.add_view(
             self.radicale_proxy__user_agenda, route_name="radicale_proxy__user_agenda"

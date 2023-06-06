@@ -11,7 +11,6 @@ from tracim_backend.models.context_models import ContentInContext
 
 
 class SimpleContentSearchResponse(ContentSearchResponse):
-
     DEFAULT_SCORE = 1
 
     def __init__(self, content_list: typing.List[ContentInContext], total_hits: int):

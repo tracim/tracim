@@ -1,13 +1,13 @@
+from urllib.parse import quote
+
 from datetime import datetime
 from smtplib import SMTPException
 from smtplib import SMTPRecipientsRefused
-import typing
-from urllib.parse import quote
-import uuid
-
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
+import typing
+import uuid
 
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.applications.share.email_manager import ShareEmailManager

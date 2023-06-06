@@ -1,6 +1,5 @@
-import typing
-
 from sqlalchemy import Column
+import typing
 
 from tracim_backend.models.meta import DeclarativeBase
 

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-import io
 from urllib.parse import quote
 
 from PIL import Image
 import dateutil.parser
 from depot.io.utils import FileIntent
+import io
 import pytest
 import responses
 import transaction
@@ -1492,7 +1492,12 @@ class TestHtmlDocuments(object):
         assert res.json_body["code"] == ErrorCode.SAME_VALUE_ERROR
 
     def test_api__get_html_document_revision__ok_200__nominal_case(
-        self, web_testapp, workspace_api_factory, content_api_factory, content_type_list, session,
+        self,
+        web_testapp,
+        workspace_api_factory,
+        content_api_factory,
+        content_type_list,
+        session,
     ) -> None:
         """
         Get a specific revision of an html content
@@ -1547,10 +1552,30 @@ class TestHtmlDocuments(object):
     @pytest.mark.parametrize(
         "query, expected_item_count, first_revision, last_revision",
         [
-            ("", 3, FIRST_REVISION, THIRD_REVISION,),
-            ("?count=2", 2, FIRST_REVISION, SECOND_REVISION,),
-            ("?sort=modified:desc", 3, THIRD_REVISION, FIRST_REVISION,),
-            ("?sort=modified:desc&count=2", 2, THIRD_REVISION, SECOND_REVISION,),
+            (
+                "",
+                3,
+                FIRST_REVISION,
+                THIRD_REVISION,
+            ),
+            (
+                "?count=2",
+                2,
+                FIRST_REVISION,
+                SECOND_REVISION,
+            ),
+            (
+                "?sort=modified:desc",
+                3,
+                THIRD_REVISION,
+                FIRST_REVISION,
+            ),
+            (
+                "?sort=modified:desc&count=2",
+                2,
+                THIRD_REVISION,
+                SECOND_REVISION,
+            ),
         ],
     )
     def test_api__get_html_document_revisions__ok_200__nominal_cases(
@@ -1618,7 +1643,6 @@ class TestHtmlDocuments(object):
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__set_document_status__err_400__same_status(self, web_testapp) -> None:
-
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"status": "open"}
         res = web_testapp.put_json(
@@ -3084,7 +3108,10 @@ class TestFiles(object):
         assert last_event.content["workspace_id"] == res["workspace_id"]
         author = web_testapp.get("/api/users/1", status=200).json_body
         assert last_event.author == UserDigestSchema().dump(author).data
-        workspace = web_testapp.get("/api/workspaces/1", status=200,).json_body
+        workspace = web_testapp.get(
+            "/api/workspaces/1",
+            status=200,
+        ).json_body
         assert last_event.workspace == {k: v for k, v in workspace.items() if k != "description"}
 
         res = web_testapp.get(
@@ -3254,7 +3281,6 @@ class TestFiles(object):
     def test_api__get_allowed_size_dim__ok__nominal_case(
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
     ) -> None:
-
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
@@ -3396,7 +3422,9 @@ class TestFiles(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"force_download": 0}
         res = web_testapp.get(
-            "/api/workspaces/1/files/{}/preview/jpg/".format(content_id), status=400, params=params,
+            "/api/workspaces/1/files/{}/preview/jpg/".format(content_id),
+            status=400,
+            params=params,
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
@@ -3859,7 +3887,7 @@ class TestFiles(object):
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
     ) -> None:
         """
-       get full pdf preview of a png image -> error UnavailablePreviewType
+        get full pdf preview of a png image -> error UnavailablePreviewType
         """
 
         workspace_api = workspace_api_factory.get()
@@ -3896,7 +3924,7 @@ class TestFiles(object):
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
     ) -> None:
         """
-       get full pdf preview of a png image -> error UnavailablePreviewType
+        get full pdf preview of a png image -> error UnavailablePreviewType
         """
 
         workspace_api = workspace_api_factory.get()
@@ -4004,7 +4032,9 @@ class TestFiles(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"page": 1}
         res = web_testapp.get(
-            "/api/workspaces/1/files/{}/preview/pdf/".format(content_id), status=400, params=params,
+            "/api/workspaces/1/files/{}/preview/pdf/".format(content_id),
+            status=400,
+            params=params,
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
@@ -4089,7 +4119,9 @@ class TestFiles(object):
         )
         params = {"page": 2}
         res = web_testapp.get(
-            "/api/workspaces/1/files/{}/preview/pdf/".format(content_id), status=400, params=params,
+            "/api/workspaces/1/files/{}/preview/pdf/".format(content_id),
+            status=400,
+            params=params,
         )
         assert res.json_body
         assert "code" in res.json_body
@@ -4135,11 +4167,10 @@ class TestFiles(object):
             status=200,
         )
         assert res.content_type == "text/plain"
-        params = {"page": 1}
         filename = "test_image__page_1.pdf"
         res = web_testapp.get(
             "/api/workspaces/1/files/{content_id}/revisions/{revision_id}/preview/pdf/{filename}".format(
-                content_id=content_id, revision_id=revision_id, params=params, filename=filename
+                content_id=content_id, revision_id=revision_id, filename=filename
             ),
             status=200,
         )
@@ -4302,7 +4333,6 @@ class TestFiles(object):
     def test_api__set_file_status__err_400__same_status(
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
     ) -> None:
-
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         business_workspace = workspace_api.get_one(1)
@@ -4440,7 +4470,12 @@ class TestThreads(object):
         assert res.content_type == "text/html"
 
     def test_api__get_thread_html_preview__err__400__no_first_comment(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list,
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         get thread html preview
@@ -5133,7 +5168,9 @@ class TestOwnerLimitedContentSize(object):
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize(
-    "config_section", [{"name": "functional_translation_test"}], indirect=True,
+    "config_section",
+    [{"name": "functional_translation_test"}],
+    indirect=True,
 )
 class TestContentTranslation(object):
     @responses.activate

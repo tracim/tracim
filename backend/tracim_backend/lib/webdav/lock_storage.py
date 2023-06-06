@@ -1,5 +1,4 @@
 import time
-
 from wsgidav import util
 from wsgidav.lock_manager import generateLockToken
 from wsgidav.lock_manager import lockString

@@ -1,5 +1,4 @@
 from http import HTTPStatus
-
 from pyramid.config import Configurator
 
 from tracim_backend.exceptions import UserCallNotFound
@@ -154,7 +153,9 @@ class CallController(Controller):
 
     def bind(self, configurator: Configurator) -> None:
         configurator.add_route(
-            "create_call", "/users/{user_id}/outgoing_calls", request_method="POST",
+            "create_call",
+            "/users/{user_id}/outgoing_calls",
+            request_method="POST",
         )
         configurator.add_view(self.create_call, route_name="create_call")
 
@@ -177,21 +178,29 @@ class CallController(Controller):
         )
 
         configurator.add_route(
-            "get_incoming_call", "/users/{user_id}/incoming_calls/{call_id}", request_method="GET",
+            "get_incoming_call",
+            "/users/{user_id}/incoming_calls/{call_id}",
+            request_method="GET",
         )
         configurator.add_view(self.get_incoming_call, route_name="get_incoming_call")
 
         configurator.add_route(
-            "get_outgoing_call", "/users/{user_id}/outgoing_calls/{call_id}", request_method="GET",
+            "get_outgoing_call",
+            "/users/{user_id}/outgoing_calls/{call_id}",
+            request_method="GET",
         )
         configurator.add_view(self.get_outgoing_call, route_name="get_outgoing_call")
 
         configurator.add_route(
-            "get_incoming_calls", "/users/{user_id}/incoming_calls", request_method="GET",
+            "get_incoming_calls",
+            "/users/{user_id}/incoming_calls",
+            request_method="GET",
         )
         configurator.add_view(self.get_incoming_calls, route_name="get_incoming_calls")
 
         configurator.add_route(
-            "get_outgoing_calls", "/users/{user_id}/outgoing_calls", request_method="GET",
+            "get_outgoing_calls",
+            "/users/{user_id}/outgoing_calls",
+            request_method="GET",
         )
         configurator.add_view(self.get_outgoing_calls, route_name="get_outgoing_calls")

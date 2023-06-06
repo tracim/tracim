@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
-import argparse
-import re
-import traceback
-import typing
-
 from alembic import command as alembic_command
 from alembic.config import Config
+import argparse
 from depot.io.utils import FileIntent
 from depot.manager import DepotManager
 import pluggy
 from pyramid.paster import get_appsettings
+import re
 from sqlalchemy import text
 from sqlalchemy.engine import reflection
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
+import traceback
 import transaction
+import typing
 
 from tracim_backend.command import AppContextCommand
 from tracim_backend.config import CFG
@@ -214,7 +213,11 @@ class MigrateMysqlCharsetCommand(AppContextCommand):
             default=None,
         )
         parser.add_argument(
-            "--charset", help="set database charset", dest="charset", required=False, default=None,
+            "--charset",
+            help="set database charset",
+            dest="charset",
+            required=False,
+            default=None,
         )
         return parser
 
@@ -233,8 +236,10 @@ class MigrateMysqlCharsetCommand(AppContextCommand):
         if not engine.dialect.name.startswith("mysql"):
             raise ValueError("This command is only supported on Mysql/Mariadb databases")
         logger.info(self, "Database not deleted")
-        set_database = "ALTER DATABASE {database} CHARACTER SET {charset} COLLATE {collation};".format(
-            database=database_name, charset=charset, collation=collation
+        set_database = (
+            "ALTER DATABASE {database} CHARACTER SET {charset} COLLATE {collation};".format(
+                database=database_name, charset=charset, collation=collation
+            )
         )
         logger.debug(self, set_database)
         engine.execute(set_database)

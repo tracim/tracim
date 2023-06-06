@@ -1,8 +1,7 @@
-import typing
-from typing import Optional
-
 import marshmallow
 from marshmallow import post_load
+import typing
+from typing import Optional
 
 from tracim_backend.app_models.validator import positive_int_validator
 from tracim_backend.views.core_api.schemas import StrippedString

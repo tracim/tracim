@@ -1,18 +1,16 @@
 from http import HTTPStatus
-import typing
-
 from pyramid.config import Configurator
+import typing
 
 from tracim_backend import TracimRequest
 from tracim_backend.applications.upload_permissions.authorization import has_public_upload_enabled
 from tracim_backend.applications.upload_permissions.lib import UploadPermissionLib
-from tracim_backend.applications.upload_permissions.models import UploadPermission
 from tracim_backend.applications.upload_permissions.models_in_context import (
     UploadPermissionInContext,
 )
 from tracim_backend.applications.upload_permissions.schema import UploadDataFormSchema
-from tracim_backend.applications.upload_permissions.schema import UploadFiles
 from tracim_backend.applications.upload_permissions.schema import UploadFileSchema
+from tracim_backend.applications.upload_permissions.schema import UploadFiles
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionCreationBodySchema
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionIdPathSchema
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionListQuerySchema
@@ -20,7 +18,6 @@ from tracim_backend.applications.upload_permissions.schema import UploadPermissi
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionPublicInfoSchema
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionSchema
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionTokenPath
-from tracim_backend.config import CFG
 from tracim_backend.exceptions import FileSizeOverOwnerEmptySpace
 from tracim_backend.exceptions import FileSizeOverWorkspaceEmptySpace
 from tracim_backend.exceptions import NoFileValidationError

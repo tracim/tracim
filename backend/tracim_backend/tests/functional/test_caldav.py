@@ -1,9 +1,8 @@
 import os.path
-from time import sleep
-
 import pytest
 import requests
 from requests.exceptions import ConnectionError
+from time import sleep
 import transaction
 
 from tracim_backend.applications.agenda.lib import AgendaHooks
@@ -114,7 +113,8 @@ class TestCaldavRadicaleProxyEndpoints(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         web_testapp.get(
-            "/dav/user_{user_id}/user_{user_id}_calendar".format(user_id=user.user_id), status=200,
+            "/dav/user_{user_id}/user_{user_id}_calendar".format(user_id=user.user_id),
+            status=200,
         )
         web_testapp.get(
             "/dav/user_{user_id}/user_{user_id}_addressbook".format(user_id=user.user_id),
@@ -248,7 +248,7 @@ class TestCaldavRadicaleProxyEndpoints(object):
         web_testapp.delete(
             "/dav/agenda/user/{}/{}.ics".format(user.user_id, sub_item_label), status=200
         )
-        web_testapp.delete("/dav/agenda/user/{}/".format(user.user_id, sub_item_label), status=403)
+        web_testapp.delete("/dav/agenda/user/{}/".format(user.user_id), status=403)
 
     def test_proxy_user_agenda__err__other_user_agenda(
         self, radicale_server, user_api_factory, web_testapp, test_context
@@ -416,9 +416,7 @@ class TestCaldavRadicaleProxyEndpoints(object):
         web_testapp.delete(
             "/dav/addressbook/user/{}/{}.vcf".format(user.user_id, sub_item_label), status=200
         )
-        web_testapp.delete(
-            "/dav/addressbook/user/{}/".format(user.user_id, sub_item_label), status=200
-        )
+        web_testapp.delete("/dav/addressbook/user/{}/".format(user.user_id), status=200)
 
     def test_proxy_user_addressbook__err__other_user_agenda(
         self, radicale_server, user_api_factory, web_testapp, test_context
@@ -626,7 +624,6 @@ class TestCaldavRadicaleSync(object):
         workspace_api_factory,
         role_api_factory,
     ) -> None:
-
         test_context.plugin_manager.register(AgendaHooks())
         uapi = user_api_factory.get()
         profile = Profile.USER
@@ -1045,7 +1042,6 @@ class TestCaldavRadicaleSync(object):
         session,
         test_context,
     ) -> None:
-
         test_context.plugin_manager.register(AgendaHooks())
         uapi = user_api_factory.get()
         profile = Profile.USER
@@ -1190,7 +1186,6 @@ class TestAgendaApi(object):
     def test_proxy_user_agenda__ok__nominal_case(
         self, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -1253,7 +1248,6 @@ class TestAgendaApi(object):
     def test_proxy_user_agenda__ok__workspace_filter(
         self, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER

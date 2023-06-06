@@ -1,5 +1,4 @@
 import argparse
-
 from pyramid.scripting import AppEnvironment
 
 from tracim_backend.command import AppContextCommand
@@ -13,7 +12,11 @@ class ShowContentTreeCommand(AppContextCommand):
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super().get_parser(prog_name)
         parser.add_argument(
-            "-z", "--content_id", help="content_id", dest="content_id", required=True,
+            "-z",
+            "--content_id",
+            help="content_id",
+            dest="content_id",
+            required=True,
         )
         return parser
 
@@ -22,7 +25,10 @@ class ShowContentTreeCommand(AppContextCommand):
         self._app_config = app_context["registry"].settings["CFG"]
 
         capi = ContentApi(
-            config=self._app_config, session=self._session, current_user=None, show_deleted=True,
+            config=self._app_config,
+            session=self._session,
+            current_user=None,
+            show_deleted=True,
         )
         content = capi.get_one(content_id=parsed_args.content_id)
         content_in_context = capi.get_content_in_context(content)

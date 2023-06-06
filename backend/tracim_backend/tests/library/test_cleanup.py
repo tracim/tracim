@@ -1,8 +1,7 @@
 from pathlib import Path
-import tempfile
-
 import pytest
 from sqlalchemy.orm.exc import NoResultFound
+import tempfile
 import transaction
 
 from tracim_backend import ContentNotFound
@@ -82,7 +81,6 @@ class TestCleanupLib(object):
         workspace_api_factory,
         share_lib_factory,
     ) -> None:
-
         content_api = content_api_factory.get(
             show_deleted=True, show_active=True, show_archived=True
         )
@@ -143,7 +141,6 @@ class TestCleanupLib(object):
         share_lib_factory,
         upload_permission_lib_factory,
     ) -> None:
-
         content_api = content_api_factory.get(
             show_deleted=True, show_active=True, show_archived=True
         )
@@ -240,7 +237,6 @@ class TestCleanupLib(object):
         share_lib_factory,
         upload_permission_lib_factory,
     ) -> None:
-
         content_api = content_api_factory.get(
             show_deleted=True, show_active=True, show_archived=True
         )
@@ -345,7 +341,6 @@ class TestCleanupLib(object):
         share_lib_factory,
         upload_permission_lib_factory,
     ) -> None:
-
         content_api = content_api_factory.get(
             show_deleted=True, show_active=True, show_archived=True
         )
@@ -444,7 +439,6 @@ class TestCleanupLib(object):
         share_lib_factory,
         upload_permission_lib_factory,
     ) -> None:
-
         content_api = content_api_factory.get(
             show_deleted=True, show_active=True, show_archived=True
         )

@@ -1,8 +1,8 @@
-from typing import Optional
 from urllib.parse import urljoin
 from urllib.parse import urlparse
 
 from requests.exceptions import InvalidURL
+from typing import Optional
 from webpreview import MaxLengthResponse
 from webpreview import WebpreviewException
 from webpreview import do_request
@@ -69,7 +69,10 @@ class URLPreviewResponse(MaxLengthResponse):
 
 
 class URLPreviewLib(object):
-    def __init__(self, config: CFG,) -> None:
+    def __init__(
+        self,
+        config: CFG,
+    ) -> None:
         self.app_config = config
 
     def get_preview(self, url: str) -> URLPreview:

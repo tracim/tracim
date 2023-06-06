@@ -1,13 +1,12 @@
 from http import HTTPStatus
-import typing
-
 from pyramid.config import Configurator
 from pyramid.httpexceptions import HTTPFound
 import transaction
+import typing
 
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.config import CFG
+from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import ConflictingMoveInChild
 from tracim_backend.exceptions import ConflictingMoveInItself
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
@@ -443,7 +442,9 @@ class WorkspaceController(Controller):
         self, context, request: TracimRequest, hapic_data=None
     ) -> typing.List[WorkspaceSubscription]:
         subscription_lib = SubscriptionLib(
-            current_user=request.current_user, session=request.dbsession, config=request.app_config,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=request.app_config,
         )
         return subscription_lib.get_workspace_subscriptions(request.current_workspace.workspace_id)
 
@@ -457,7 +458,9 @@ class WorkspaceController(Controller):
         self, context, request: TracimRequest, hapic_data=None
     ) -> typing.List[WorkspaceSubscription]:
         subscription_lib = SubscriptionLib(
-            current_user=request.current_user, session=request.dbsession, config=request.app_config,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=request.app_config,
         )
         subscription = subscription_lib.get_one(
             author_id=hapic_data.path.user_id, workspace_id=hapic_data.path.workspace_id
@@ -474,7 +477,9 @@ class WorkspaceController(Controller):
         self, context, request: TracimRequest, hapic_data=None
     ) -> typing.List[WorkspaceSubscription]:
         subscription_lib = SubscriptionLib(
-            current_user=request.current_user, session=request.dbsession, config=request.app_config,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=request.app_config,
         )
         subscription = subscription_lib.get_one(
             author_id=hapic_data.path.user_id, workspace_id=hapic_data.path.workspace_id
@@ -570,11 +575,13 @@ class WorkspaceController(Controller):
 
         if creation_data.template_id:
             api.copy_tags(
-                destination=content, source_content_id=creation_data.template_id,
+                destination=content,
+                source_content_id=creation_data.template_id,
             )
 
             api.copy_todos(
-                new_parent=content, template_id=creation_data.template_id,
+                new_parent=content,
+                template_id=creation_data.template_id,
             )
 
         content = api.get_content_in_context(content)
@@ -662,7 +669,8 @@ class WorkspaceController(Controller):
         content = request.current_content
         raise HTTPFound(
             "{base_url}contents/{content_id}/path".format(
-                base_url=BASE_API, content_id=content.content_id,
+                base_url=BASE_API,
+                content_id=content.content_id,
             )
         )
 
@@ -1017,7 +1025,9 @@ class WorkspaceController(Controller):
 
         # Content path
         configurator.add_route(
-            "get_content_path", "/contents/{content_id}/path", request_method="GET",
+            "get_content_path",
+            "/contents/{content_id}/path",
+            request_method="GET",
         )
         configurator.add_view(self.get_content_path, route_name="get_content_path")
 

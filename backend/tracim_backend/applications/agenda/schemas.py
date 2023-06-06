@@ -1,7 +1,6 @@
-import typing
-
 import marshmallow
 from marshmallow import post_load
+import typing
 
 from tracim_backend.app_models.validator import agenda_resource_type_validator
 from tracim_backend.app_models.validator import agenda_type_validator

@@ -5,10 +5,9 @@
 # Create Date: 2019-07-30 12:15:16.519364
 #
 # """
-from datetime import datetime
-
 # revision identifiers, used by Alembic.
 from alembic import op
+from datetime import datetime
 import sqlalchemy as sa
 from sqlalchemy import ForeignKey
 from sqlalchemy import Sequence

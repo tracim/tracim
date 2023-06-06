@@ -2,12 +2,10 @@
 from contextlib import contextmanager
 import datetime
 from datetime import timezone
-import os
-import typing
-
 from depot.io.utils import FileIntent
 from hapic.data import HapicFile
 from importlib_metadata import metadata
+import os
 from preview_generator.exception import UnsupportedMimeType
 from preview_generator.manager import PreviewManager
 from sqlakeyset import Page
@@ -24,6 +22,7 @@ from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.elements import and_
 import transaction
+import typing
 
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_status_list
@@ -101,7 +100,6 @@ class AddCopyRevisionsResult(object):
 
 
 class ContentApi(object):
-
     # DISPLAYABLE_CONTENTS = (
     #     content_type_list.Folder.slug,
     #     content_type_list.File.slug,
@@ -223,7 +221,8 @@ class ContentApi(object):
                     Content.workspace_id.in_(workspace_ids),
                     # And allow access to non workspace document when he is owner
                     and_(
-                        Content.workspace_id == None, Content.owner_id == self._user_id
+                        Content.workspace_id == None,  # noqa: E711
+                        Content.owner_id == self._user_id,  # noqa: E711
                     ),  # noqa: E711
                 )
             )
@@ -235,16 +234,16 @@ class ContentApi(object):
 
         if not self._show_active:
             result = result.filter(
-                or_(Content.is_deleted == True, Content.is_archived == True)
+                or_(Content.is_deleted == True, Content.is_archived == True)  # noqa: E712
             )  # noqa: E711
         if not self._show_deleted:
-            result = result.filter(Content.is_deleted == False)  # noqa: E711
+            result = result.filter(Content.is_deleted == False)  # noqa: E712
 
         if not self._show_archived:
-            result = result.filter(Content.is_archived == False)  # noqa: E711
+            result = result.filter(Content.is_archived == False)  # noqa: E712
 
         if not self._show_temporary:
-            result = result.filter(Content.is_temporary == False)  # noqa: E711
+            result = result.filter(Content.is_temporary == False)  # noqa: E712
 
         if self.namespaces_filter:
             result = result.filter(Content.content_namespace.in_(self.namespaces_filter))
@@ -275,13 +274,13 @@ class ContentApi(object):
         result = self.__revisions_real_base_query(workspace)
 
         if not self._show_deleted:
-            result = result.filter(ContentRevisionRO.is_deleted == False)  # noqa: E711
+            result = result.filter(ContentRevisionRO.is_deleted == False)  # noqa: E712
 
         if not self._show_archived:
-            result = result.filter(ContentRevisionRO.is_archived == False)  # noqa: E711
+            result = result.filter(ContentRevisionRO.is_archived == False)  # noqa: E712
 
         if not self._show_temporary:
-            result = result.filter(Content.is_temporary == False)  # noqa: E711
+            result = result.filter(Content.is_temporary == False)  # noqa: E712
 
         return result
 
@@ -484,7 +483,11 @@ class ContentApi(object):
 
         return content
 
-    def copy_tags(self, destination: Content, source_content_id: int,) -> None:
+    def copy_tags(
+        self,
+        destination: Content,
+        source_content_id: int,
+    ) -> None:
         """Create extra data for templates: tags"""
         tag_lib = TagLib(self._session)
         tags_values = tag_lib.get_all(content_id=source_content_id)
@@ -496,7 +499,8 @@ class ContentApi(object):
         """Create extra data for templates: todos"""
         try:
             todos = self.get_all_query(
-                parent_ids=[template_id], content_type_slug=ContentTypeSlug.TODO.value,
+                parent_ids=[template_id],
+                content_type_slug=ContentTypeSlug.TODO.value,
             ).all()
 
             for todo in todos:
@@ -587,7 +591,6 @@ class ContentApi(object):
         parent: Content = None,
         ignore_content_state_filter: bool = False,
     ) -> typing.Optional[Content]:
-
         if not content_id:
             return None
 
@@ -706,7 +709,10 @@ class ContentApi(object):
             ) from exc
 
     def get_one_by_filename(
-        self, filename: str, workspace: Workspace, parent: typing.Optional[Content] = None,
+        self,
+        filename: str,
+        workspace: Workspace,
+        parent: typing.Optional[Content] = None,
     ):
         query = self._base_query([workspace] if workspace else None)
         query = query.filter((Content.label + Content.file_extension) == filename)
@@ -956,7 +962,8 @@ class ContentApi(object):
             if allow_root:
                 query = query.filter(
                     or_(
-                        Content.parent_id.in_(allowed_parent_ids), Content.parent_id == None
+                        Content.parent_id.in_(allowed_parent_ids),
+                        Content.parent_id == None,  # noqa: E712,E711
                     )  # noqa: E711
                 )
             else:
@@ -1404,7 +1411,8 @@ class ContentApi(object):
             )
         new_content = Content()
         with context.batched_events(
-            operation_type=OperationType.COPIED, obj=new_content,
+            operation_type=OperationType.COPIED,
+            obj=new_content,
         ):
             copy_result = self._copy(item, new_content, content_namespace, parent)
             copy_result = self._add_copy_revisions(
@@ -1467,7 +1475,6 @@ class ContentApi(object):
         original_content_children = {}  # type: typing.Dict[int,Content]
 
         for rev, is_current_rev in content.get_tree_revisions_advanced():
-
             if rev.content_id == content.content_id:
                 related_content = new_content  # type: Content
                 related_parent = new_parent
@@ -1496,7 +1503,9 @@ class ContentApi(object):
         )
 
     def _flag_revision_as_copy(
-        self, content: ContentRevisionRO, original_content: Content,
+        self,
+        content: ContentRevisionRO,
+        original_content: Content,
     ):
         properties = content.properties.copy()
         properties["origin"] = {
@@ -1798,7 +1807,10 @@ class ContentApi(object):
             return []
         content_list = (
             self._base_query(space_list)
-            .filter(Content.is_template.is_(True), Content.type == template_type,)
+            .filter(
+                Content.is_template.is_(True),
+                Content.type == template_type,
+            )
             .all()
         )
 
@@ -2166,7 +2178,8 @@ class ContentApi(object):
         )
         favorite_content_ids = [elem[0] for elem in favorite_content_ids_tuple]
         paged_favorites = self._get_user_favorite_contents(
-            user_id=user_id, order_by_properties=[FavoriteContent.created],
+            user_id=user_id,
+            order_by_properties=[FavoriteContent.created],
         )
         favorites = []
         for favorite in paged_favorites:
@@ -2258,7 +2271,8 @@ class ContentApi(object):
 
     def remove_favorite(self, content_id: int, do_save: bool = True) -> None:
         self._session.query(FavoriteContent).filter(
-            FavoriteContent.user_id == self._user.user_id, FavoriteContent.content_id == content_id,
+            FavoriteContent.user_id == self._user.user_id,
+            FavoriteContent.content_id == content_id,
         ).delete()
         if do_save:
             self._session.flush()

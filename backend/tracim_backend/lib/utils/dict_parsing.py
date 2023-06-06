@@ -1,8 +1,7 @@
-import re
-import typing
-
 from marshmallow import ValidationError
 from marshmallow.validate import Regexp
+import re
+import typing
 
 
 def validate_simple_dict(dict_: typing.Dict) -> None:
@@ -63,7 +62,9 @@ def translate_dict(
         new_value = value
         if isinstance(value, dict):
             new_value = translate_dict(
-                data=value, keys_to_check=keys_to_check, translation_method=translation_method,
+                data=value,
+                keys_to_check=keys_to_check,
+                translation_method=translation_method,
             )
         elif isinstance(value, list):
             if key in keys_to_check:

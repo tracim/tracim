@@ -1,6 +1,6 @@
-from http import HTTPStatus
 from urllib.parse import quote
 
+from http import HTTPStatus
 import pytest
 import transaction
 
@@ -20,7 +20,6 @@ class TestFunctionWebdavRemoteUser(object):
     def test_functional__webdav_access_to_root_remote_auth__as_http_header(
         self, session, webdav_testapp, user_api_factory
     ) -> None:
-
         uapi = user_api_factory.get()
 
         uapi.create_user(
@@ -39,7 +38,6 @@ class TestFunctionWebdavRemoteUser(object):
     def test_functional__webdav_access_to_root__remote_auth(
         self, session, webdav_testapp, user_api_factory
     ) -> None:
-
         uapi = user_api_factory.get()
 
         user = uapi.create_user(
@@ -93,7 +91,6 @@ class TestFunctionalWebdavGet(object):
     def test_functional__webdav_access_to_root__nominal_cases(
         self, session, user_api_factory, webdav_testapp, login
     ) -> None:
-
         uapi = user_api_factory.get()
 
         uapi.create_user(
@@ -137,7 +134,6 @@ class TestFunctionalWebdavGet(object):
         role_api_factory,
         webdav_testapp,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -417,7 +413,6 @@ class TestFunctionalWebdavGet(object):
     def test_functional__webdav_access_to_workspace__no_role_in_workspace(
         self, user_api_factory, workspace_api_factory, webdav_testapp
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -439,7 +434,6 @@ class TestFunctionalWebdavGet(object):
     def test_functional__webdav_access_to_workspace__workspace_not_exist(
         self, session, user_api_factory, webdav_testapp
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -459,7 +453,6 @@ class TestFunctionalWebdavGet(object):
     def test_functional__webdav_access_to_workspace__subworkspace_or_content_not_exist_in_workspace(
         self, session, user_api_factory, webdav_testapp, workspace_api_factory
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -508,7 +501,6 @@ class TestFunctionalWebdavGet(object):
         admin_user,
         webdav_testapp,
     ) -> None:
-
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         api = content_api_factory.get()
@@ -540,7 +532,6 @@ class TestFunctionalWebdavGet(object):
     def test_functional__webdav_access_to_content__err__file_not_exist(
         self, session, workspace_api_factory, webdav_testapp
     ) -> None:
-
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace_api.create_workspace("workspace1", save_now=True)
         transaction.commit()
@@ -583,7 +574,6 @@ class TestFunctionalWebdavGet(object):
         session,
         webdav_testapp,
     ) -> None:
-
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         api = content_api_factory.get()
@@ -630,7 +620,6 @@ class TestFunctionalWebdavGet(object):
     def test_functional__webdav_access_to_subdir_content__err__file_not_exist(
         self, session, workspace_api_factory, content_api_factory, content_type_list, webdav_testapp
     ) -> None:
-
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("workspace1", save_now=True)
         api = content_api_factory.get()
@@ -735,7 +724,6 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         webdav_testapp,
         session,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -934,7 +922,6 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         webdav_testapp,
         event_helper,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -1119,7 +1106,6 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         webdav_testapp,
         session,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -1297,7 +1283,6 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         session,
         webdav_testapp,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -1461,7 +1446,6 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         session,
         webdav_testapp,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -1630,7 +1614,6 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         session,
         webdav_testapp,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -1787,7 +1770,6 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         webdav_testapp,
         session,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -1927,7 +1909,6 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         content_type_list,
         webdav_testapp,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER

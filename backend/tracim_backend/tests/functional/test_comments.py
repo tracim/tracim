@@ -50,7 +50,11 @@ class TestCommentsEndpoint(object):
     @pytest.mark.parametrize(
         "query, first_comment, comment_count",
         [
-            ("", oldest_comment, 3,),
+            (
+                "",
+                oldest_comment,
+                3,
+            ),
             ("?sort=created:desc", newest_comment, 3),
             ("?count=2", oldest_comment, 2),
             ("?count=2&sort=created:desc", newest_comment, 2),
@@ -240,7 +244,6 @@ class TestCommentsEndpoint(object):
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__post_content_comment__err_400__empty_simple_html(self, web_testapp) -> None:
-
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {"raw_content": "<p></p>"}
         res = web_testapp.post_json(
@@ -361,7 +364,11 @@ class TestCommentsEndpoint(object):
         ],
     )
     def test_api__post_content_comment__err_400(
-        self, web_testapp, request, comment_to_send: str, expected_error: ErrorCode,
+        self,
+        web_testapp,
+        request,
+        comment_to_send: str,
+        expected_error: ErrorCode,
     ) -> None:
         """
         This test should raise an error as the html contains a mention to a user not member of the workspace
@@ -464,11 +471,18 @@ def create_doc_and_comment(workspace_api, content_api_note, content_api_comment)
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize(
-    "config_section", [{"name": "functional_test"}], indirect=True,
+    "config_section",
+    [{"name": "functional_test"}],
+    indirect=True,
 )
 class TestEditComment(object):
     def test_api__edit_comment__ok__nominal_case(
-        self, web_testapp, workspace_api_factory, content_api_factory, content_type_list, session,
+        self,
+        web_testapp,
+        workspace_api_factory,
+        content_api_factory,
+        content_type_list,
+        session,
     ):
         """
         Edit comment content
@@ -481,7 +495,9 @@ class TestEditComment(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res_get = web_testapp.get(
             "/api/workspaces/{}/contents/{}/comments/{}".format(
-                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+                workspace.workspace_id,
+                test_html_document.content_id,
+                comment.content_id,
             ),
             status=200,
         )
@@ -489,7 +505,9 @@ class TestEditComment(object):
         new_content = "Second version"
         res_put = web_testapp.put_json(
             "/api/workspaces/{}/contents/{}/comments/{}".format(
-                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+                workspace.workspace_id,
+                test_html_document.content_id,
+                comment.content_id,
             ),
             params={"raw_content": new_content},
             status=200,
@@ -498,7 +516,9 @@ class TestEditComment(object):
 
         new_res_get = web_testapp.get(
             "/api/workspaces/{}/contents/{}/comments/{}".format(
-                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+                workspace.workspace_id,
+                test_html_document.content_id,
+                comment.content_id,
             ),
             status=200,
         )
@@ -532,7 +552,9 @@ class TestEditComment(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res_get = web_testapp.get(
             "/api/workspaces/{}/contents/{}/comments/{}".format(
-                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+                workspace.workspace_id,
+                test_html_document.content_id,
+                comment.content_id,
             ),
             status=200,
         )
@@ -540,7 +562,9 @@ class TestEditComment(object):
         params = {"raw_content": request.getfixturevalue(comment_to_send)}
         res = web_testapp.put_json(
             "/api/workspaces/{}/contents/{}/comments/{}".format(
-                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+                workspace.workspace_id,
+                test_html_document.content_id,
+                comment.content_id,
             ),
             params=params,
             status=400,
@@ -550,7 +574,12 @@ class TestEditComment(object):
         assert res.json_body["code"] == expected_error
 
     def test_api__edit_comment__err__empty_raw_content(
-        self, web_testapp, workspace_api_factory, content_api_factory, content_type_list, session,
+        self,
+        web_testapp,
+        workspace_api_factory,
+        content_api_factory,
+        content_type_list,
+        session,
     ):
         """
         Edit comment content and set empty content
@@ -563,7 +592,9 @@ class TestEditComment(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res_get = web_testapp.get(
             "/api/workspaces/{}/contents/{}/comments/{}".format(
-                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+                workspace.workspace_id,
+                test_html_document.content_id,
+                comment.content_id,
             ),
             status=200,
         )
@@ -571,7 +602,9 @@ class TestEditComment(object):
         new_content = ""
         res_put = web_testapp.put_json(
             "/api/workspaces/{}/contents/{}/comments/{}".format(
-                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+                workspace.workspace_id,
+                test_html_document.content_id,
+                comment.content_id,
             ),
             params={"raw_content": new_content},
             status=400,
@@ -600,7 +633,9 @@ class TestEditComment(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res_get = web_testapp.get(
             "/api/workspaces/{}/contents/{}/comments/{}".format(
-                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+                workspace.workspace_id,
+                test_html_document.content_id,
+                comment.content_id,
             ),
             status=200,
         )
@@ -608,7 +643,9 @@ class TestEditComment(object):
         new_content = "Second version"
         web_testapp.put_json(
             "/api/workspaces/{}/contents/{}/comments/{}".format(
-                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+                workspace.workspace_id,
+                test_html_document.content_id,
+                comment.content_id,
             ),
             params={"raw_content": new_content},
             status=200,
@@ -636,14 +673,18 @@ class TestEditComment(object):
         web_testapp.authorization = ("Basic", (riyad_user.username, "password"))
         res_get = web_testapp.get(
             "/api/workspaces/{}/contents/{}/comments/{}".format(
-                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+                workspace.workspace_id,
+                test_html_document.content_id,
+                comment.content_id,
             ),
             status=400,
         )
         assert res_get.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
         res_put = web_testapp.put_json(
             "/api/workspaces/{}/contents/{}/comments/{}".format(
-                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+                workspace.workspace_id,
+                test_html_document.content_id,
+                comment.content_id,
             ),
             params={"raw_content": "Second revision"},
             status=400,
@@ -679,7 +720,9 @@ class TestEditComment(object):
         web_testapp.authorization = ("Basic", (riyad_user.username, "password"))
         res_get = web_testapp.get(
             "/api/workspaces/{}/contents/{}/comments/{}".format(
-                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+                workspace.workspace_id,
+                test_html_document.content_id,
+                comment.content_id,
             ),
             status=200,
         )
@@ -687,7 +730,9 @@ class TestEditComment(object):
         new_content = "Second version"
         web_testapp.put_json(
             "/api/workspaces/{}/contents/{}/comments/{}".format(
-                workspace.workspace_id, test_html_document.content_id, comment.content_id,
+                workspace.workspace_id,
+                test_html_document.content_id,
+                comment.content_id,
             ),
             params={"raw_content": new_content},
             status=403,
@@ -696,7 +741,9 @@ class TestEditComment(object):
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize(
-    "config_section", [{"name": "functional_translation_test"}], indirect=True,
+    "config_section",
+    [{"name": "functional_translation_test"}],
+    indirect=True,
 )
 class TestCommentTranslation(object):
     @responses.activate

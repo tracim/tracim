@@ -26,7 +26,10 @@ from tracim_backend.views.core_api.schemas import WorkspaceSubscriptionSchema
 
 
 def create_workspace_and_users(
-    access_type: WorkspaceAccessType, user_api_factory, workspace_api_factory, role_api_factory,
+    access_type: WorkspaceAccessType,
+    user_api_factory,
+    workspace_api_factory,
+    role_api_factory,
 ):
     """
     Create a workspace, a member and a non member user
@@ -73,7 +76,9 @@ def create_workspace_and_users(
 
 @pytest.fixture
 def workspace_and_users(
-    user_api_factory, workspace_api_factory, role_api_factory,
+    user_api_factory,
+    workspace_api_factory,
+    role_api_factory,
 ):
     return create_workspace_and_users(
         WorkspaceAccessType.CONFIDENTIAL, user_api_factory, workspace_api_factory, role_api_factory
@@ -82,7 +87,9 @@ def workspace_and_users(
 
 @pytest.fixture
 def accessible_workspace_and_users(
-    user_api_factory, workspace_api_factory, role_api_factory,
+    user_api_factory,
+    workspace_api_factory,
+    role_api_factory,
 ):
     return create_workspace_and_users(
         WorkspaceAccessType.OPEN, user_api_factory, workspace_api_factory, role_api_factory

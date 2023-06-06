@@ -1,13 +1,11 @@
-from http import HTTPStatus
-import typing
-
 from hapic.data import HapicFile
+from http import HTTPStatus
 from pyramid.config import Configurator
+import typing
 
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.applications.share.authorization import has_public_download_enabled
 from tracim_backend.applications.share.lib import ShareLib
-from tracim_backend.applications.share.models import ContentShare
 from tracim_backend.applications.share.models_in_context import ContentShareInContext
 from tracim_backend.applications.share.schema import ContentShareInfoSchema
 from tracim_backend.applications.share.schema import ContentShareSchema
@@ -18,7 +16,6 @@ from tracim_backend.applications.share.schema import SharePasswordBodySchema
 from tracim_backend.applications.share.schema import SharePasswordFormSchema
 from tracim_backend.applications.share.schema import ShareTokenPathSchema
 from tracim_backend.applications.share.schema import ShareTokenWithFilenamePathSchema
-from tracim_backend.config import CFG
 from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
 from tracim_backend.exceptions import ContentShareNotFound
 from tracim_backend.exceptions import ContentTypeNotAllowed

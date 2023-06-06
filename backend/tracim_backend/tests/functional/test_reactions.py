@@ -23,7 +23,17 @@ class TestReactionsEndpoint(object):
 
     @pytest.mark.parametrize(
         "admin_reaction_values, ryiad_reaction_values",
-        [((":custom_text:", "😀", "🐧", "🦋",), ("🐧", "🐻‍❄️", "👨‍👨‍👧‍👧"))],
+        [
+            (
+                (
+                    ":custom_text:",
+                    "😀",
+                    "🐧",
+                    "🦋",
+                ),
+                ("🐧", "🐻‍❄️", "👨‍👨‍👧‍👧"),
+            )
+        ],
     )
     def test_api__get_contents_reactions__ok_200__nominal_case(
         self,
@@ -75,7 +85,8 @@ class TestReactionsEndpoint(object):
             assert reaction_res["value"] == reaction_value
 
     @pytest.mark.parametrize(
-        "reaction_value", SAMPLE_REACTION_LIST,
+        "reaction_value",
+        SAMPLE_REACTION_LIST,
     )
     def test_api__get_one_reaction__ok_200__nominal_case(
         self,
@@ -149,7 +160,8 @@ class TestReactionsEndpoint(object):
         params = {"value": reaction_value}
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/reactions".format(
-                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
             ),
             status=200,
             params=params,
@@ -205,14 +217,16 @@ class TestReactionsEndpoint(object):
         params = {"value": reaction_value}
         web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/reactions".format(
-                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
             ),
             status=200,
             params=params,
         )
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/reactions".format(
-                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
             ),
             status=400,
             params=params,
@@ -249,7 +263,8 @@ class TestReactionsEndpoint(object):
         params = {"value": reaction_value}
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/reactions".format(
-                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
             ),
             status=200,
             params=params,
@@ -336,7 +351,8 @@ class TestReactionsEndpoint(object):
         params = {"value": reaction_value}
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/reactions".format(
-                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
             ),
             status=200,
             params=params,

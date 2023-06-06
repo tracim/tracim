@@ -1,9 +1,8 @@
 # coding=utf-8
 from http import HTTPStatus
-
 from pyramid.config import Configurator
 
-from tracim_backend.config import CFG
+from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import ExpiredResetPasswordToken
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import InvalidResetPasswordToken

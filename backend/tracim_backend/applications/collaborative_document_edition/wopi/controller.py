@@ -1,16 +1,15 @@
 # coding=utf-8
 from datetime import timezone
-from http import HTTPStatus
-import typing
-
 from hapic.data import HapicData
 from hapic.data import HapicFile
+from http import HTTPStatus
 from pyramid.config import Configurator
 from pyramid.response import Response
 from pyramid.traversal import DefaultRootFactory
 import transaction
+import typing
 
-from tracim_backend import CFG
+from tracim_backend import CFG  # noqa: F401
 from tracim_backend import TracimRequest
 from tracim_backend import hapic
 from tracim_backend.applications.collaborative_document_edition.data import (
@@ -20,21 +19,21 @@ from tracim_backend.applications.collaborative_document_edition.data import (
     SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS,
 )
 from tracim_backend.applications.collaborative_document_edition.wopi.lib import WopiLib
-from tracim_backend.applications.collaborative_document_edition.wopi.models import WopiCheckFileInfo
 from tracim_backend.applications.collaborative_document_edition.wopi.models import (
     WopiLastModifiedTime,
 )
+from tracim_backend.applications.collaborative_document_edition.wopi.models import WopiCheckFileInfo
 from tracim_backend.applications.collaborative_document_edition.wopi.schema import (
     WOPICheckFileInfoSchema,
+)
+from tracim_backend.applications.collaborative_document_edition.wopi.schema import (
+    WOPITokenQuerySchema,
 )
 from tracim_backend.applications.collaborative_document_edition.wopi.schema import (
     WopiPutHeadersSchema,
 )
 from tracim_backend.applications.collaborative_document_edition.wopi.schema import (
     WopiPutResponseSchema,
-)
-from tracim_backend.applications.collaborative_document_edition.wopi.schema import (
-    WOPITokenQuerySchema,
 )
 from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
 from tracim_backend.exceptions import TracimFileNotFound
@@ -161,7 +160,6 @@ class WOPIController(Controller):
         ).last_modified_time(request.current_content)
 
     def bind(self, configurator: Configurator) -> None:
-
         # Get content
         configurator.add_route(
             "wopi_get_content", "/{}/contents".format(WOPI_FILES), request_method="GET"

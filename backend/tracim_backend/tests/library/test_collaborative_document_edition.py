@@ -1,6 +1,5 @@
-import typing
-
 import pytest
+import typing
 
 from tracim_backend import CFG
 from tracim_backend.applications.collaborative_document_edition.lib import (

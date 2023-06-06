@@ -2006,6 +2006,3 @@ class TestCommands(object):
             session.query(ContentRevisionRO).filter(
                 ContentRevisionRO.revision_id == revision_id
             ).one()
-
-
-n

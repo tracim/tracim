@@ -1,5 +1,4 @@
 from http import HTTPStatus
-
 import pytest
 import transaction
 
@@ -128,7 +127,9 @@ class TestFavoriteContent(object):
     ):
         web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
         res = web_testapp.get(
-            "/api/users/{}/favorite-contents/1010".format(riyad_user.user_id,),
+            "/api/users/{}/favorite-contents/1010".format(
+                riyad_user.user_id,
+            ),
             status=HTTPStatus.BAD_REQUEST,
         )
         assert res.json_body["code"] == ErrorCode.FAVORITE_CONTENT_NOT_FOUND
@@ -172,7 +173,6 @@ class TestFavoriteContent(object):
         )
         content_api = content_api_factory.get(current_user=riyad_user)  # type: ContentApi
         # accessible and active content
-        test_thread = create_content(content_api, test_workspace, set_as_favorite=True)
         # not favorite content
         create_content(
             content_api,
@@ -202,7 +202,7 @@ class TestFavoriteContent(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
         res = web_testapp.get(
-            "/api/users/{}/favorite-contents".format(riyad_user.user_id, test_thread.content_id),
+            "/api/users/{}/favorite-contents".format(riyad_user.user_id),
             status=HTTPStatus.OK,
         )
         favorite_contents = res.json_body["items"]

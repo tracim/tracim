@@ -4,9 +4,8 @@ import mimetypes
 import os
 from os.path import isfile
 from os.path import join
-import typing
-
 from sqlalchemy.orm import Session
+import typing
 
 from tracim_backend import CFG
 from tracim_backend.applications.collaborative_document_edition.models import (
@@ -84,7 +83,7 @@ class CollaborativeDocumentEditionLib(ABC):
         try:
             is_dir_exist(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR)
             is_dir_readable(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR)
-        except (NotADirectoryError) as exc:
+        except NotADirectoryError as exc:
             raise FileTemplateNotAvailable from exc
 
         template_filenames = [

@@ -1,9 +1,8 @@
 # coding=utf-8
 from http import HTTPStatus
-import typing
-
 from pyramid.config import Configurator
 import transaction
+import typing
 
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
@@ -57,7 +56,9 @@ class TodoController(Controller):
         app_config = request.registry.settings["CFG"]
 
         content_api = ContentApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
 
         todos = content_api.get_all_query(
@@ -86,7 +87,9 @@ class TodoController(Controller):
         app_config = request.registry.settings["CFG"]
 
         content_api = ContentApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
 
         todos = content_api.get_all(
@@ -112,7 +115,9 @@ class TodoController(Controller):
         app_config = request.registry.settings["CFG"]
 
         content_api = ContentApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
 
         todo = content_api.get_one(
@@ -135,10 +140,14 @@ class TodoController(Controller):
         app_config = request.registry.settings["CFG"]
 
         content_api = ContentApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
         user_api = UserApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
 
         parent = None  # type: typing.Optional['Content']
@@ -164,7 +173,9 @@ class TodoController(Controller):
                 ) from exc
 
         todo = content_api.create_todo(
-            parent=parent, raw_content=hapic_data.body["raw_content"], assignee=assignee,
+            parent=parent,
+            raw_content=hapic_data.body["raw_content"],
+            assignee=assignee,
         )
 
         todo_in_context = content_api.get_content_in_context(todo)
@@ -184,7 +195,9 @@ class TodoController(Controller):
         app_config = request.registry.settings["CFG"]
 
         content_api = ContentApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
 
         todo_content = content_api.get_one(
@@ -207,7 +220,9 @@ class TodoController(Controller):
         app_config = request.registry.settings["CFG"]
 
         content_api = ContentApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
 
         try:
@@ -225,13 +240,17 @@ class TodoController(Controller):
     def bind(self, configurator: Configurator):
         # Get every todo of a user
         configurator.add_route(
-            "user_todos", "/users/{user_id}/todos", request_method="GET",
+            "user_todos",
+            "/users/{user_id}/todos",
+            request_method="GET",
         )
         configurator.add_view(self.get_user_todos, route_name="user_todos")
 
         # Get every todo of a content
         configurator.add_route(
-            "todos", "/workspaces/{workspace_id}/contents/{content_id}/todos", request_method="GET",
+            "todos",
+            "/workspaces/{workspace_id}/contents/{content_id}/todos",
+            request_method="GET",
         )
         configurator.add_view(self.get_todos, route_name="todos")
 

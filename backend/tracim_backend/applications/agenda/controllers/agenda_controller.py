@@ -4,7 +4,6 @@ from tracim_backend.applications.agenda.lib import AgendaApi
 from tracim_backend.applications.agenda.schemas import AgendaFilterQuerySchema
 from tracim_backend.applications.agenda.schemas import AgendaSchema
 from tracim_backend.applications.agenda.schemas import PreFilledAgendaEventSchema
-from tracim_backend.config import CFG
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import has_personal_access
@@ -70,7 +69,7 @@ class AgendaController(Controller):
 
         # INFO - G.M - 2019-04-01 - user agenda
         configurator.add_route(
-            "user_agendas", "/users/{user_id:\d+}/agenda", request_method="GET"
+            "user_agendas", "/users/{user_id:\d+}/agenda", request_method="GET"  # noqa: W605
         )  # noqa: W605
         configurator.add_view(self.user_agendas, route_name="user_agendas")
 
@@ -80,6 +79,8 @@ class AgendaController(Controller):
 
         # pre-filled agenda event
         configurator.add_route(
-            "pre_filled_agenda_event", "/system/pre-filled-agenda-event", request_method="GET",
+            "pre_filled_agenda_event",
+            "/system/pre-filled-agenda-event",
+            request_method="GET",
         )
         configurator.add_view(self.pre_filled_agenda_event, route_name="pre_filled_agenda_event")

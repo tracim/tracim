@@ -1,8 +1,6 @@
 import enum
 from hashlib import sha256
 import os
-import typing
-
 import sqlalchemy
 from sqlalchemy import Boolean
 from sqlalchemy import Column
@@ -14,6 +12,7 @@ from sqlalchemy import Sequence
 from sqlalchemy import Unicode
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import synonym
+import typing
 
 from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
@@ -26,7 +25,6 @@ class ContentShareType(enum.Enum):
 
 
 class ContentShare(CreationDateMixin, DeclarativeBase):
-
     MIN_PASSWORD_LENGTH = 6
     MAX_PASSWORD_LENGTH = 512
     MIN_EMAIL_LENGTH = 3
@@ -59,7 +57,7 @@ class ContentShare(CreationDateMixin, DeclarativeBase):
 
     @classmethod
     def _hash(cls, cleartext_password_or_token: str) -> str:
-        """ Hash method to create hash from string """
+        """Hash method to create hash from string"""
         salt = sha256()
         salt.update(os.urandom(60))
         salt = salt.hexdigest()

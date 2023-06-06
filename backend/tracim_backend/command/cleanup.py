@@ -1,10 +1,9 @@
 import argparse
-import traceback
-import typing
-
 from pyramid.scripting import AppEnvironment
 from sqlalchemy.engine import Engine
 from sqlalchemy.event import listen
+import traceback
+import typing
 
 from tracim_backend.applications.agenda.models import AgendaResourceType
 from tracim_backend.apps import AGENDA__APP_SLUG
@@ -24,9 +23,6 @@ from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models.auth import User
-from tracim_backend.models.data import Content
-from tracim_backend.models.data import ContentRevisionRO
-from tracim_backend.models.data import Workspace
 from tracim_backend.models.tracim_session import unprotected_content_revision
 
 

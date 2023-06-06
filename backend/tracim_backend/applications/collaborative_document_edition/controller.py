@@ -1,7 +1,5 @@
-from http import HTTPStatus
-import typing
-
 from hapic import HapicData
+from http import HTTPStatus
 from pyramid.config import Configurator
 from pyramid.traversal import DefaultRootFactory
 import transaction
@@ -31,7 +29,6 @@ from tracim_backend.applications.collaborative_document_edition.schema import (
 )
 from tracim_backend.applications.collaborative_document_edition.schema import FileTemplateInfoSchema
 from tracim_backend.applications.content_file.controller import can_create_file
-from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import FileTemplateNotAvailable
@@ -98,7 +95,9 @@ class CollaborativeDocumentEditionController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
         collaborative_document_edition_api = CollaborativeDocumentEditionFactory().get_lib(
             current_user=request.current_user, session=request.dbsession, config=app_config
@@ -137,16 +136,17 @@ class CollaborativeDocumentEditionController(Controller):
                 )
         else:
             api.copy_tags(
-                destination=content, source_content_id=hapic_data.body.template_id,
+                destination=content,
+                source_content_id=hapic_data.body.template_id,
             )
             api.copy_todos(
-                new_parent=content, template_id=hapic_data.body.template_id,
+                new_parent=content,
+                template_id=hapic_data.body.template_id,
             )
 
         return api.get_content_in_context(content)
 
     def bind(self, configurator: Configurator) -> None:
-
         # Get file template info
         configurator.add_route(
             "file_template_info",

@@ -1,12 +1,11 @@
 # coding=utf-8
 from http import HTTPStatus
-
 from pyramid.config import Configurator
 import transaction
 
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.config import CFG
+from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import EmptyCommentContentNotAllowed
 from tracim_backend.exceptions import InvalidMention
 from tracim_backend.exceptions import UserNotMemberOfWorkspace

@@ -1,7 +1,6 @@
-import typing
-
 from sqlalchemy.orm import Query
 from sqlalchemy.orm.exc import NoResultFound
+import typing
 
 from tracim_backend.exceptions import ReactionAlreadyExistError
 from tracim_backend.exceptions import ReactionNotFound
@@ -12,7 +11,10 @@ from tracim_backend.models.tracim_session import TracimSession
 
 
 class ReactionLib:
-    def __init__(self, session: TracimSession,) -> None:
+    def __init__(
+        self,
+        session: TracimSession,
+    ) -> None:
         self._session = session
 
     def _base_query(self):

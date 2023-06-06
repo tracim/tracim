@@ -1,9 +1,8 @@
 from datetime import datetime
-from typing import List
-from typing import Optional
-
 from sqlalchemy.orm import Query
 from sqlalchemy.orm.exc import NoResultFound
+from typing import List
+from typing import Optional
 
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import InvalidWorkspaceAccessType
@@ -20,7 +19,12 @@ from tracim_backend.models.tracim_session import TracimSession
 
 
 class SubscriptionLib(object):
-    def __init__(self, current_user: Optional[User], session: TracimSession, config: CFG,) -> None:
+    def __init__(
+        self,
+        current_user: Optional[User],
+        session: TracimSession,
+        config: CFG,
+    ) -> None:
         session.assert_event_mechanism()
         self._session = session
         self._user = current_user

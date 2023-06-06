@@ -1,11 +1,10 @@
 # coding=utf-8
-import typing
-
 from hapic.data import HapicData
 from pyramid.config import Configurator
+import typing
 
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.config import CFG
+from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.extensions import app_list
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.application import ApplicationApi

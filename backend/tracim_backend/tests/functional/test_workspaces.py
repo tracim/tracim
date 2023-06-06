@@ -3,12 +3,11 @@
 Tests for /api/workspaces subpath endpoints.
 """
 import datetime
-import typing
-
 from depot.io.utils import FileIntent
 from freezegun import freeze_time
 import pytest
 import transaction
+import typing
 
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.error import ErrorCode
@@ -40,7 +39,10 @@ def contents_for_pagination(
     with freeze_time("2021-03-16T08:47:00Z") as frozen_time:
         for label in ("World", "Spam", "Eggs", "Hello"):
             content = capi.create(
-                content_type_slug="html-document", workspace=workspace, label=label, do_save=True,
+                content_type_slug="html-document",
+                workspace=workspace,
+                label=label,
+                do_save=True,
             )
             with new_revision(session, transaction, content):
                 content.modified = datetime.datetime.utcnow()
@@ -1424,7 +1426,7 @@ class TestWorkspaceMembersEndpoint(object):
         self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
     ):
         """
-            Check obtain workspace members list with also disabled users
+        Check obtain workspace members list with also disabled users
         """
         uapi = user_api_factory.get()
         user = uapi.create_user(
@@ -1463,7 +1465,7 @@ class TestWorkspaceMembersEndpoint(object):
         self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
     ):
         """
-            Check obtain workspace members list with only enabled users
+        Check obtain workspace members list with only enabled users
         """
         uapi = user_api_factory.get()
         user = uapi.create_user(
@@ -1529,7 +1531,7 @@ class TestWorkspaceMembersEndpoint(object):
         workspace_id = workspace.workspace_id
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
-            "/api/workspaces/{}/members".format(workspace_id, user_id), status=200
+            "/api/workspaces/{}/members".format(workspace_id), status=200
         ).json_body
         assert len(res) == 2
         user_role = res[0]
@@ -2822,7 +2824,9 @@ class TestUserInvitationWithMailActivatedSyncDefaultProfileTrustedUser(object):
             "role": "content-manager",
         }
         res = web_testapp.post_json(
-            "/api/workspaces/{}/members".format(workspace.workspace_id), status=200, params=params,
+            "/api/workspaces/{}/members".format(workspace.workspace_id),
+            status=200,
+            params=params,
         )
         user_role_found = res.json_body
         assert user_role_found["role"] == "content-manager"
@@ -2888,7 +2892,9 @@ class TestUserInvitationWithMailActivatedSync(object):
             "role": "content-manager",
         }
         res = web_testapp.post_json(
-            "/api/workspaces/{}/members".format(workspace.workspace_id), status=200, params=params,
+            "/api/workspaces/{}/members".format(workspace.workspace_id),
+            status=200,
+            params=params,
         )
         user_role_found = res.json_body
         assert user_role_found["role"] == "content-manager"
@@ -2948,7 +2954,9 @@ class TestUserInvitationWithMailActivatedSync(object):
             "role": "content-manager",
         }
         res = web_testapp.post_json(
-            "/api/workspaces/{}/members".format(workspace.workspace_id), status=400, params=params,
+            "/api/workspaces/{}/members".format(workspace.workspace_id),
+            status=400,
+            params=params,
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
@@ -3007,7 +3015,9 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
             "role": "content-manager",
         }
         res = web_testapp.post_json(
-            "/api/workspaces/{}/members".format(workspace.workspace_id), status=200, params=params,
+            "/api/workspaces/{}/members".format(workspace.workspace_id),
+            status=200,
+            params=params,
         )
         user_role_found = res.json_body
         assert user_role_found["role"] == "content-manager"
@@ -3107,7 +3117,9 @@ class TestUserInvitationWithMailActivatedSyncLDAPAuthOnly(object):
             "role": "content-manager",
         }
         res = web_testapp.post_json(
-            "/api/workspaces/{}/members".format(workspace.workspace_id), status=200, params=params,
+            "/api/workspaces/{}/members".format(workspace.workspace_id),
+            status=200,
+            params=params,
         )
         user_id = res.json_body["user_id"]
         assert res.json_body["role"] == "content-manager"
@@ -3145,7 +3157,9 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledButInvitationEmai
             "role": "content-manager",
         }
         res = web_testapp.post_json(
-            "/api/workspaces/{}/members".format(workspace.workspace_id), status=400, params=params,
+            "/api/workspaces/{}/members".format(workspace.workspace_id),
+            status=400,
+            params=params,
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
@@ -3180,7 +3194,9 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledAndInvitationEmai
             "role": "content-manager",
         }
         res = web_testapp.post_json(
-            "/api/workspaces/{}/members".format(workspace.workspace_id), status=200, params=params,
+            "/api/workspaces/{}/members".format(workspace.workspace_id),
+            status=200,
+            params=params,
         )
         user_id = res.json_body["user_id"]
         assert res.json_body["role"] == "content-manager"
@@ -3218,7 +3234,9 @@ class TestUserInvitationWithMailActivatedSyncEmailEnabledAndInvitationEmailDisab
             "role": "content-manager",
         }
         res = web_testapp.post_json(
-            "/api/workspaces/{}/members".format(workspace.workspace_id), status=200, params=params,
+            "/api/workspaces/{}/members".format(workspace.workspace_id),
+            status=200,
+            params=params,
         )
         user_id = res.json_body["user_id"]
         assert res.json_body["role"] == "content-manager"
@@ -4083,8 +4101,8 @@ class TestWorkspaceContentsWithFixture(object):
 
     def test_api__get_workspace_content__ok_200__get_only_deleted_root_content(self, web_testapp):
         """
-         Check obtain workspace root deleted contents
-         """
+        Check obtain workspace root deleted contents
+        """
         params = {"parent_id": 0, "show_archived": 0, "show_deleted": 1, "show_active": 0}
         web_testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
         res = web_testapp.get("/api/workspaces/3/contents", status=200, params=params).json_body[
@@ -4325,8 +4343,8 @@ class TestWorkspaceContentsWithFixture(object):
 
     def test_api__get_workspace_content__ok_200__get_all_folder_content(self, web_testapp):
         """
-         Check obtain workspace folder all contents
-         """
+        Check obtain workspace folder all contents
+        """
         params = {
             "parent_ids": 10,  # TODO - G.M - 30-05-2018 - Find a real id
             "show_archived": 1,
@@ -4405,8 +4423,8 @@ class TestWorkspaceContentsWithFixture(object):
 
     def test_api__get_workspace_content__ok_200__get_only_active_folder_content(self, web_testapp):
         """
-         Check obtain workspace folder active contents
-         """
+        Check obtain workspace folder active contents
+        """
         params = {"parent_ids": 10, "show_archived": 0, "show_deleted": 0, "show_active": 1}
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/workspaces/2/contents", status=200, params=params).json_body[
@@ -4439,8 +4457,8 @@ class TestWorkspaceContentsWithFixture(object):
         self, web_testapp
     ):
         """
-         Check obtain workspace folder archived contents
-         """
+        Check obtain workspace folder archived contents
+        """
         params = {"parent_ids": 10, "show_archived": 1, "show_deleted": 0, "show_active": 0}
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/workspaces/2/contents", status=200, params=params).json_body[
@@ -4471,8 +4489,8 @@ class TestWorkspaceContentsWithFixture(object):
 
     def test_api__get_workspace_content__ok_200__get_only_deleted_folder_content(self, web_testapp):
         """
-         Check obtain workspace folder deleted contents
-         """
+        Check obtain workspace folder deleted contents
+        """
         params = {"parent_ids": 10, "show_archived": 0, "show_deleted": 1, "show_active": 0}
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/workspaces/2/contents", status=200, params=params).json_body[
@@ -5580,7 +5598,8 @@ class TestWorkspaceContents(object):
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
 
         my_file_path = web_testapp.get(
-            "/api/contents/{}/path".format(my_file.content_id), status=200,
+            "/api/contents/{}/path".format(my_file.content_id),
+            status=200,
         ).json_body
         assert len(my_file_path["items"]) == 3
         assert my_file_path["items"][0]["content_id"] == first_dir.content_id
@@ -5596,7 +5615,8 @@ class TestWorkspaceContents(object):
         assert my_file_path["items"][2]["content_type"] == "html-document"
 
         my_file_path = web_testapp.get(
-            "/api/contents/{}/path".format(second_dir.content_id), status=200,
+            "/api/contents/{}/path".format(second_dir.content_id),
+            status=200,
         ).json_body
         assert len(my_file_path["items"]) == 2
         assert my_file_path["items"][0]["content_id"] == first_dir.content_id
@@ -5608,7 +5628,8 @@ class TestWorkspaceContents(object):
         assert my_file_path["items"][1]["content_type"] == "folder"
 
         my_file_path = web_testapp.get(
-            "/api/contents/{}/path".format(another_content.content_id), status=200,
+            "/api/contents/{}/path".format(another_content.content_id),
+            status=200,
         ).json_body
         assert len(my_file_path["items"]) == 1
         assert my_file_path["items"][0]["content_id"] == another_content.content_id
@@ -5685,13 +5706,29 @@ class TestGetContentsPaginationAndSort:
     @pytest.mark.parametrize(
         "params, expected_content_ids, next_page_token",
         [
-            pytest.param({"sort": "label:asc"}, [3, 4, 2, 1], "", id="sort by ascending label",),
-            pytest.param({"sort": "label:desc"}, [1, 2, 4, 3], "", id="sort by descending label",),
             pytest.param(
-                {"sort": "modified:asc"}, [1, 2, 3, 4], "", id="sort by ascending modified",
+                {"sort": "label:asc"},
+                [3, 4, 2, 1],
+                "",
+                id="sort by ascending label",
             ),
             pytest.param(
-                {"sort": "modified:desc"}, [4, 3, 2, 1], "", id="sort by descending modified",
+                {"sort": "label:desc"},
+                [1, 2, 4, 3],
+                "",
+                id="sort by descending label",
+            ),
+            pytest.param(
+                {"sort": "modified:asc"},
+                [1, 2, 3, 4],
+                "",
+                id="sort by ascending modified",
+            ),
+            pytest.param(
+                {"sort": "modified:desc"},
+                [4, 3, 2, 1],
+                "",
+                id="sort by descending modified",
             ),
             pytest.param({"count": 2}, [3, 4], ">s:Hello~i:4", id="paginate (count=2)"),
             pytest.param(

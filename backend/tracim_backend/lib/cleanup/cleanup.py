@@ -1,11 +1,10 @@
 import shutil
-import typing
-import uuid
-
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 import transaction
+import typing
+import uuid
 
 from tracim_backend.applications.agenda.lib import AgendaApi
 from tracim_backend.applications.agenda.models import AgendaResourceType

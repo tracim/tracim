@@ -1,12 +1,11 @@
 from http import HTTPStatus
 import mimetypes
 import re
+import requests
 from typing import Any
 from typing import BinaryIO
 from typing import List
 from typing import Optional
-
-import requests
 
 from tracim_backend.lib.translate.translator import InvalidParametersForTranslationService
 from tracim_backend.lib.translate.translator import TranslationInputLanguageEqualToOutput
@@ -31,7 +30,8 @@ class SystranFormat:
 
     def __repr__(self) -> str:
         return "<SystranFormat(name={}, translation_pair={})>".format(
-            repr(self.name), repr(self.mimetype_pair),
+            repr(self.name),
+            repr(self.mimetype_pair),
         )
 
 
@@ -123,7 +123,8 @@ class SystranTranslationService(TranslationService):
         formats = []
         headers = self._add_auth_to_headers({})
         response = requests.get(
-            "{}{}".format(self.api_url, SUPPORTED_FORMAT_ENDPOINT), headers=headers,
+            "{}{}".format(self.api_url, SUPPORTED_FORMAT_ENDPOINT),
+            headers=headers,
         )
         json_response = response.json()
         for format in json_response["formats"]:
@@ -146,7 +147,8 @@ class SystranTranslationService(TranslationService):
         language_pairs = []
         headers = self._add_auth_to_headers({})
         response = requests.get(
-            "{}{}".format(self.api_url, SUPPORTED_LANGUAGES_ENDPOINT), headers=headers,
+            "{}{}".format(self.api_url, SUPPORTED_LANGUAGES_ENDPOINT),
+            headers=headers,
         )
         json_response = response.json()
         pairs = json_response["languagePairs"]

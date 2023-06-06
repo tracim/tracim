@@ -1,7 +1,5 @@
 # coding=utf-8
 from enum import Enum
-import typing
-
 import marshmallow
 from marshmallow import post_load
 from marshmallow.fields import Email
@@ -9,6 +7,7 @@ from marshmallow.fields import Field
 from marshmallow.fields import String
 from marshmallow.fields import ValidatedField
 from marshmallow.validate import OneOf
+import typing
 
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import open_status
@@ -825,7 +824,9 @@ class RadicaleUserResourceUserSubItemPathSchema(UserIdPathSchema):
         description="id of a valid user",
         validate=strictly_positive_int_validator,
     )
-    type = marshmallow.fields.Str(required=True,)
+    type = marshmallow.fields.Str(
+        required=True,
+    )
     sub_item = marshmallow.fields.String(default="", allow_none=True)
     trailing_slash = marshmallow.fields.String()
 
@@ -835,7 +836,9 @@ class RadicaleUserResourceUserSubItemPathSchema(UserIdPathSchema):
 
 
 class RadicaleUserResourceWorkspaceSubItemPathSchema(UserIdPathSchema, WorkspaceIdPathSchema):
-    type = marshmallow.fields.Str(required=True,)
+    type = marshmallow.fields.Str(
+        required=True,
+    )
     sub_item = marshmallow.fields.String()
     trailing_slash = marshmallow.fields.String()
 
@@ -1269,7 +1272,6 @@ class ResetPasswordModifySchema(marshmallow.Schema):
 
 
 class BasicAuthSchema(marshmallow.Schema):
-
     email = TracimEmail(
         example="hello@tracim.fr", required=False, validate=user_email_validator, allow_none=True
     )
@@ -1978,7 +1980,11 @@ class SetCommentSchema(marshmallow.Schema):
 
 
 class SetReactionSchema(marshmallow.Schema):
-    value = StrippedString(example="😀", validate=reaction_value_length_validator, required=True,)
+    value = StrippedString(
+        example="😀",
+        validate=reaction_value_length_validator,
+        required=True,
+    )
 
     @post_load()
     def create_reaction(self, data: typing.Dict[str, typing.Any]) -> object:

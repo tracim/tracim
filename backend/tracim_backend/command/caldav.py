@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import argparse
-
 import plaster
 from pyramid.scripting import AppEnvironment
 
