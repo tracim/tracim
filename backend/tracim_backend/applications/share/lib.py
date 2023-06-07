@@ -27,7 +27,9 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
 from tracim_backend.views import BASE_PUBLIC_API
 
-FRONTEND_SHARED_CONTENT_LINK_PATTERN = "{frontend_ui_base_url}guest-download/{share_token}"
+FRONTEND_SHARED_CONTENT_LINK_PATTERN = (
+    "{frontend_ui_base_url}guest-download/{share_token}"
+)
 PUBLIC_API_SHARED_CONTENT_LINK_PATTERN = (
     "{api_base_url}{base_public_api}guest-download/{share_token}/{filename}"
 )
@@ -79,14 +81,18 @@ class ShareLib(object):
             self._session.flush()
 
         if do_notify:
-            api = ContentApi(config=self._config, session=self._session, current_user=self._user)
+            api = ContentApi(
+                config=self._config, session=self._session, current_user=self._user
+            )
             content_in_context = api.get_content_in_context(content)
             try:
                 email_manager = self._get_email_manager(self._config, self._session)
                 email_manager.notify__share__content(
                     emitter=self._user,
                     shared_content=content_in_context,
-                    content_share_receivers=self.get_content_shares_in_context(content_shares),
+                    content_share_receivers=self.get_content_shares_in_context(
+                        content_shares
+                    ),
                     share_password=password,
                 )
             # FIXME - G.M - 2018-11-02 - hack: accept bad recipient user creation
@@ -117,31 +123,49 @@ class ShareLib(object):
             config.EMAIL__NOTIFICATION__SMTP__AUTHENTICATION,
         )
 
-        return ShareEmailManager(config=config, smtp_config=smtp_config, session=session)
+        return ShareEmailManager(
+            config=config, smtp_config=smtp_config, session=session
+        )
 
     def get_content_shares(self, content: Content) -> typing.List[ContentShare]:
-        return self.base_query().filter(ContentShare.content_id == content.content_id).all()
+        return (
+            self.base_query()
+            .filter(ContentShare.content_id == content.content_id)
+            .all()
+        )
 
-    def get_content_share_in_context(self, content_share: ContentShare) -> ContentShareInContext:
-        return ContentShareInContext(content_share, self._session, self._config, self._user)
+    def get_content_share_in_context(
+        self, content_share: ContentShare
+    ) -> ContentShareInContext:
+        return ContentShareInContext(
+            content_share, self._session, self._config, self._user
+        )
 
     def get_content_shares_in_context(
         self, content_shares: typing.List[ContentShare]
     ) -> typing.List[ContentShareInContext]:
         content_shares_in_context = []
         for content_share in content_shares:
-            content_shares_in_context.append(self.get_content_share_in_context(content_share))
+            content_shares_in_context.append(
+                self.get_content_share_in_context(content_share)
+            )
         return content_shares_in_context
 
     def get_content_share_by_token(self, share_token: str) -> ContentShare:
         try:
-            return self.base_query().filter(ContentShare.share_token == share_token).one()
+            return (
+                self.base_query().filter(ContentShare.share_token == share_token).one()
+            )
         except NoResultFound as exc:
             raise ContentShareNotFound(
-                'Content Share with token "{}" not found in database'.format(share_token)
+                'Content Share with token "{}" not found in database'.format(
+                    share_token
+                )
             ) from exc
 
-    def check_password(self, content_share: ContentShare, password: typing.Optional[str]) -> None:
+    def check_password(
+        self, content_share: ContentShare, password: typing.Optional[str]
+    ) -> None:
         """
         Check password if content_share has password. If there is a content_share password, it
         will check and raise WrongSharePassword Exception in case password given
@@ -181,7 +205,8 @@ class ShareLib(object):
     def frontend_url(self, content_share: ContentShare) -> str:
         frontend_ui_base_url = get_frontend_ui_base_url(config=self._config)
         return FRONTEND_SHARED_CONTENT_LINK_PATTERN.format(
-            frontend_ui_base_url=frontend_ui_base_url, share_token=content_share.share_token
+            frontend_ui_base_url=frontend_ui_base_url,
+            share_token=content_share.share_token,
         )
 
     def direct_api_url(self, content_share: ContentShare) -> str:

@@ -11,7 +11,9 @@ class ErrorSchema(MarshmallowDefaultErrorBuilder):
     a nice naming in swagger ui.
     """
 
-    def build_from_exception(self, exception: Exception, include_traceback: bool = False) -> dict:
+    def build_from_exception(
+        self, exception: Exception, include_traceback: bool = False
+    ) -> dict:
         error_dict = MarshmallowDefaultErrorBuilder.build_from_exception(
             self, exception, include_traceback
         )
@@ -20,6 +22,8 @@ class ErrorSchema(MarshmallowDefaultErrorBuilder):
         return error_dict
 
     def build_from_validation_error(self, error: ProcessValidationError) -> dict:
-        error_dict = MarshmallowDefaultErrorBuilder.build_from_validation_error(self, error)
+        error_dict = MarshmallowDefaultErrorBuilder.build_from_validation_error(
+            self, error
+        )
         error_dict["code"] = ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
         return error_dict

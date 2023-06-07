@@ -37,7 +37,9 @@ class FileTemplateSchema(marshmallow.Schema):
     template_name = StrippedString(
         example="default.odt", description="template name you can use", required=True
     )
-    category = StrippedString(example="calc", description="category of the template", required=True)
+    category = StrippedString(
+        example="calc", description="category of the template", required=True
+    )
 
 
 class FileTemplateInfoSchema(marshmallow.Schema):
@@ -51,7 +53,9 @@ class FileCreateFromTemplateSchema(marshmallow.Schema):
         required=True,
     )
     filename = StrippedString(
-        required=True, example="test.odt", description="The file name, as saved in the workspace"
+        required=True,
+        example="test.odt",
+        description="The file name, as saved in the workspace",
     )
     parent_id = marshmallow.fields.Int(
         example=42,

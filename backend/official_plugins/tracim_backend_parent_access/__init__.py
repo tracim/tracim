@@ -12,7 +12,9 @@ from tracim_backend.models.tracim_session import TracimSession
 class ParentAccessPlugin:
     """Needs a registration using 'register_tracim_plugin' function."""
 
-    def _is_role_in_session(self, session: TracimSession, user_id: int, workspace_id: int) -> bool:
+    def _is_role_in_session(
+        self, session: TracimSession, user_id: int, workspace_id: int
+    ) -> bool:
         for obj in session.new:
             if (
                 isinstance(obj, UserRoleInWorkspace)
@@ -31,7 +33,9 @@ class ParentAccessPlugin:
         """
         user = role.user
         current_workspace = role.workspace.parent
-        role_api = RoleApi(session=context.dbsession, config=context.app_config, current_user=None)
+        role_api = RoleApi(
+            session=context.dbsession, config=context.app_config, current_user=None
+        )
         while current_workspace:
             if not current_workspace.is_deleted and not self._is_role_in_session(
                 context.dbsession, user.user_id, current_workspace.workspace_id

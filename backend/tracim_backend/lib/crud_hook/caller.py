@@ -36,7 +36,9 @@ class DatabaseCrudHookCaller:
         roles = []
         for obj in session.new:
             if isinstance(obj, User):
-                self._plugin_manager.hook.on_user_created(user=obj, context=session.context)
+                self._plugin_manager.hook.on_user_created(
+                    user=obj, context=session.context
+                )
             elif isinstance(obj, Workspace):
                 self._plugin_manager.hook.on_workspace_created(
                     workspace=obj, context=session.context
@@ -47,19 +49,25 @@ class DatabaseCrudHookCaller:
                 )
                 roles.append(obj)
             elif isinstance(obj, Content):
-                self._plugin_manager.hook.on_content_created(content=obj, context=session.context)
+                self._plugin_manager.hook.on_content_created(
+                    content=obj, context=session.context
+                )
             elif isinstance(obj, WorkspaceSubscription):
                 self._plugin_manager.hook.on_workspace_subscription_created(
                     subscription=obj, context=session.context
                 )
             elif isinstance(obj, Reaction):
-                self._plugin_manager.hook.on_reaction_created(reaction=obj, context=session.context)
+                self._plugin_manager.hook.on_reaction_created(
+                    reaction=obj, context=session.context
+                )
             elif isinstance(obj, TagOnContent):
                 self._plugin_manager.hook.on_content_tag_created(
                     content_tag=obj, context=session.context
                 )
             elif isinstance(obj, Tag):
-                self._plugin_manager.hook.on_tag_created(tag=obj, context=session.context)
+                self._plugin_manager.hook.on_tag_created(
+                    tag=obj, context=session.context
+                )
             elif isinstance(obj, UserCall):
                 self._plugin_manager.hook.on_user_call_created(
                     user_call=obj, context=session.context
@@ -76,9 +84,13 @@ class DatabaseCrudHookCaller:
             if not session.is_modified(obj):
                 continue
             if isinstance(obj, User):
-                self._plugin_manager.hook.on_user_modified(user=obj, context=session.context)
+                self._plugin_manager.hook.on_user_modified(
+                    user=obj, context=session.context
+                )
             elif isinstance(obj, UserCustomProperties):
-                self._plugin_manager.hook.on_user_modified(user=obj.user, context=session.context)
+                self._plugin_manager.hook.on_user_modified(
+                    user=obj.user, context=session.context
+                )
             elif isinstance(obj, Workspace):
                 self._plugin_manager.hook.on_workspace_modified(
                     workspace=obj, context=session.context
@@ -88,7 +100,9 @@ class DatabaseCrudHookCaller:
                     role=obj, context=session.context
                 )
             elif isinstance(obj, Content):
-                self._plugin_manager.hook.on_content_modified(content=obj, context=session.context)
+                self._plugin_manager.hook.on_content_modified(
+                    content=obj, context=session.context
+                )
             elif isinstance(obj, WorkspaceSubscription):
                 self._plugin_manager.hook.on_workspace_subscription_modified(
                     subscription=obj, context=session.context
@@ -102,7 +116,9 @@ class DatabaseCrudHookCaller:
                     content_tag=obj, context=session.context
                 )
             elif isinstance(obj, Tag):
-                self._plugin_manager.hook.on_tag_modified(tag=obj, context=session.context)
+                self._plugin_manager.hook.on_tag_modified(
+                    tag=obj, context=session.context
+                )
             elif isinstance(obj, UserCall):
                 self._plugin_manager.hook.on_user_call_modified(
                     user_call=obj, context=session.context
@@ -110,7 +126,9 @@ class DatabaseCrudHookCaller:
 
         for obj in session.deleted:
             if isinstance(obj, User):
-                self._plugin_manager.hook.on_user_deleted(user=obj, context=session.context)
+                self._plugin_manager.hook.on_user_deleted(
+                    user=obj, context=session.context
+                )
             elif isinstance(obj, Workspace):
                 self._plugin_manager.hook.on_workspace_deleted(
                     workspace=obj, context=session.context
@@ -120,19 +138,25 @@ class DatabaseCrudHookCaller:
                     role=obj, context=session.context
                 )
             elif isinstance(obj, Content):
-                self._plugin_manager.hook.on_content_deleted(content=obj, context=session.context)
+                self._plugin_manager.hook.on_content_deleted(
+                    content=obj, context=session.context
+                )
             elif isinstance(obj, WorkspaceSubscription):
                 self._plugin_manager.hook.on_workspace_subscription_deleted(
                     subscription=obj, context=session.context
                 )
             elif isinstance(obj, Reaction):
-                self._plugin_manager.hook.on_reaction_deleted(reaction=obj, context=session.context)
+                self._plugin_manager.hook.on_reaction_deleted(
+                    reaction=obj, context=session.context
+                )
             elif isinstance(obj, TagOnContent):
                 self._plugin_manager.hook.on_content_tag_deleted(
                     content_tag=obj, context=session.context
                 )
             elif isinstance(obj, Tag):
-                self._plugin_manager.hook.on_tag_deleted(tag=obj, context=session.context)
+                self._plugin_manager.hook.on_tag_deleted(
+                    tag=obj, context=session.context
+                )
             elif isinstance(obj, UserCall):
                 self._plugin_manager.hook.on_user_call_deleted(
                     user_call=obj, context=session.context

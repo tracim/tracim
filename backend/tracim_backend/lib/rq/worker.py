@@ -58,7 +58,9 @@ def worker_context() -> typing.Generator[TracimContext, None, None]:
     context = RqWorkerTracimContext(config=config)
 
     session_factory = get_session_factory(engine)
-    session = create_dbsession_for_context(session_factory, transaction.manager, context)
+    session = create_dbsession_for_context(
+        session_factory, transaction.manager, context
+    )
     context._dbsession = session
     try:
         yield context

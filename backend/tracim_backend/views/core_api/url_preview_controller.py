@@ -23,7 +23,9 @@ class URLPreviewController(Controller):
     @hapic.handle_exception(UnavailableURLPreview, HTTPStatus.BAD_REQUEST)
     @hapic.input_query(UrlQuerySchema())
     @hapic.output_body(UrlPreviewSchema())
-    def url_preview(self, context, request: TracimRequest, hapic_data=None) -> URLPreview:
+    def url_preview(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> URLPreview:
         """
         Get url Preview
         """

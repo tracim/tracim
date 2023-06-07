@@ -64,14 +64,19 @@ class TestReactionsEndpoint(object):
             reaction_lib.create(riyad_user, folder, reaction, do_save=True)
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/workspaces/{workspace_id}/contents/{content_id}/reactions".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id
             ),
             status=200,
         )
-        assert len(res.json_body) == len(admin_reaction_values) + len(ryiad_reaction_values)
+        assert len(res.json_body) == len(admin_reaction_values) + len(
+            ryiad_reaction_values
+        )
         reactions = iter(res.json_body)
         for reaction_value in admin_reaction_values:
             reaction_res = next(reactions)
@@ -115,7 +120,10 @@ class TestReactionsEndpoint(object):
         reaction = reaction_lib.create(riyad_user, folder, reaction_value, do_save=True)
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/workspaces/{workspace_id}/contents/{content_id}/reactions/{reaction_id}".format(
                 workspace_id=test_workspace.workspace_id,
@@ -156,7 +164,10 @@ class TestReactionsEndpoint(object):
             do_notify=False,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"value": reaction_value}
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/reactions".format(
@@ -176,13 +187,20 @@ class TestReactionsEndpoint(object):
 
         last_event = event_helper.last_event
         assert last_event.event_type == "reaction.created"
-        author = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200).json_body
+        author = web_testapp.get(
+            "/api/users/{}".format(admin_user.user_id), status=200
+        ).json_body
         assert last_event.author == UserDigestSchema().dump(author).data
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(test_workspace.workspace_id), status=200
         ).json_body
-        assert last_event.workspace == {k: v for k, v in workspace.items() if k != "description"}
+        assert last_event.workspace == {
+            k: v for k, v in workspace.items() if k != "description"
+        }
         assert last_event.reaction["author"] == UserDigestSchema().dump(author).data
         assert last_event.reaction["content_id"] == folder.content_id
         assert last_event.reaction["reaction_id"] == reaction_id
@@ -213,7 +231,10 @@ class TestReactionsEndpoint(object):
         )
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"value": reaction_value}
         web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/reactions".format(
@@ -259,7 +280,10 @@ class TestReactionsEndpoint(object):
             do_notify=False,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"value": reaction_value}
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/reactions".format(
@@ -299,13 +323,20 @@ class TestReactionsEndpoint(object):
 
         last_event = event_helper.last_event
         assert last_event.event_type == "reaction.deleted"
-        author = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200).json_body
+        author = web_testapp.get(
+            "/api/users/{}".format(admin_user.user_id), status=200
+        ).json_body
         assert last_event.author == UserDigestSchema().dump(author).data
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(test_workspace.workspace_id), status=200
         ).json_body
-        assert last_event.workspace == {k: v for k, v in workspace.items() if k != "description"}
+        assert last_event.workspace == {
+            k: v for k, v in workspace.items() if k != "description"
+        }
         assert last_event.reaction["author"] == UserDigestSchema().dump(author).data
         assert last_event.reaction["content_id"] == folder.content_id
         assert last_event.reaction["reaction_id"] == reaction_id
@@ -347,7 +378,10 @@ class TestReactionsEndpoint(object):
         )
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"value": reaction_value}
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/reactions".format(

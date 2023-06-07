@@ -61,7 +61,9 @@ class UploadPermissionLib(object):
     def base_query(self) -> Query:
         base_query = self._session.query(UploadPermission)
         if not self.show_disabled:
-            base_query = base_query.filter(UploadPermission.enabled == True)  # noqa: E712
+            base_query = base_query.filter(
+                UploadPermission.enabled == True
+            )  # noqa: E712
         return base_query
 
     def add_permission_to_workspace(
@@ -91,7 +93,9 @@ class UploadPermissionLib(object):
             self._session.flush()
 
         if do_notify:
-            userlib = UserApi(config=self._config, current_user=self._user, session=self._session)
+            userlib = UserApi(
+                config=self._config, current_user=self._user, session=self._session
+            )
             workspace_lib = WorkspaceApi(
                 config=self._config, current_user=self._user, session=self._session
             )
@@ -99,7 +103,9 @@ class UploadPermissionLib(object):
                 email_manager = self._get_email_manager(self._config, self._session)
                 email_manager.notify_upload_permission(
                     emitter=userlib.get_user_with_context(self._user),
-                    workspace_in_context=workspace_lib.get_workspace_with_context(workspace),
+                    workspace_in_context=workspace_lib.get_workspace_with_context(
+                        workspace
+                    ),
                     upload_permission_receivers=self.get_upload_permissions_in_context(
                         upload_permissions
                     ),
@@ -120,7 +126,9 @@ class UploadPermissionLib(object):
                 ) from exc
         return upload_permissions
 
-    def _get_email_manager(self, config: CFG, session: Session) -> UploadPermissionEmailManager:
+    def _get_email_manager(
+        self, config: CFG, session: Session
+    ) -> UploadPermissionEmailManager:
         """
         :return: EmailManager instance
         """
@@ -133,17 +141,25 @@ class UploadPermissionLib(object):
             config.EMAIL__NOTIFICATION__SMTP__AUTHENTICATION,
         )
 
-        return UploadPermissionEmailManager(config=config, smtp_config=smtp_config, session=session)
+        return UploadPermissionEmailManager(
+            config=config, smtp_config=smtp_config, session=session
+        )
 
-    def get_upload_permissions(self, workspace: Workspace) -> typing.List[UploadPermission]:
+    def get_upload_permissions(
+        self, workspace: Workspace
+    ) -> typing.List[UploadPermission]:
         return (
-            self.base_query().filter(UploadPermission.workspace_id == workspace.workspace_id).all()
+            self.base_query()
+            .filter(UploadPermission.workspace_id == workspace.workspace_id)
+            .all()
         )
 
     def get_upload_permission_in_context(
         self, upload_permission: UploadPermission
     ) -> UploadPermissionInContext:
-        return UploadPermissionInContext(upload_permission, self._session, self._config, self._user)
+        return UploadPermissionInContext(
+            upload_permission, self._session, self._config, self._user
+        )
 
     def get_upload_permissions_in_context(
         self, upload_permissions: typing.List[UploadPermission]
@@ -155,9 +171,15 @@ class UploadPermissionLib(object):
             )
         return upload_permissions_in_context
 
-    def get_upload_permission_by_token(self, upload_permission_token: str) -> UploadPermission:
+    def get_upload_permission_by_token(
+        self, upload_permission_token: str
+    ) -> UploadPermission:
         try:
-            return self.base_query().filter(UploadPermission.token == upload_permission_token).one()
+            return (
+                self.base_query()
+                .filter(UploadPermission.token == upload_permission_token)
+                .one()
+            )
         except NoResultFound as exc:
             raise UploadPermissionNotFound(
                 'Upload permission with token "{}" not found in database'.format(
@@ -197,13 +219,17 @@ class UploadPermissionLib(object):
             )  # INFO - GM - 2020-04-02 - do not put typing here, black error : https://github.com/psf/black/issues/1329
         except NoResultFound as exc:
             raise UploadPermissionNotFound(
-                'Upload permission "{}" not found in database'.format(upload_permission_id)
+                'Upload permission "{}" not found in database'.format(
+                    upload_permission_id
+                )
             ) from exc
 
     def disable_upload_permission(
         self, workspace: Workspace, upload_permission_id: int
     ) -> UploadPermission:
-        upload_permission_to_disable = self.get_upload_permission(workspace, upload_permission_id)
+        upload_permission_to_disable = self.get_upload_permission(
+            workspace, upload_permission_id
+        )
         upload_permission_to_disable.disabled = datetime.utcnow()
         upload_permission_to_disable.enabled = False
         self.save(upload_permission=upload_permission_to_disable)
@@ -281,7 +307,9 @@ class UploadPermissionLib(object):
                 username=uploader_username, message=message
             )
         else:
-            comment_message = _("Uploaded by {username}.").format(username=uploader_username)
+            comment_message = _("Uploaded by {username}.").format(
+                username=uploader_username
+            )
 
         for _file in files:
             content = content_api.create(
@@ -293,7 +321,9 @@ class UploadPermissionLib(object):
                 content_namespace=ContentNamespaces.UPLOAD,
             )
             content_api.save(content, ActionDescription.CREATION)
-            with new_revision(session=self._session, tm=transaction.manager, content=content):
+            with new_revision(
+                session=self._session, tm=transaction.manager, content=content
+            ):
                 content_api.update_file_data(
                     content,
                     new_filename=_file.filename,
@@ -307,7 +337,9 @@ class UploadPermissionLib(object):
 
         if do_notify:
             workspace_lib = WorkspaceApi(
-                config=self._config, current_user=upload_permission.author, session=self._session
+                config=self._config,
+                current_user=upload_permission.author,
+                session=self._session,
             )
             self._notify_uploaded_contents(
                 uploader_username=uploader_username,

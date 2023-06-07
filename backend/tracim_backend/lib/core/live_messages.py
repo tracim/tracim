@@ -78,7 +78,9 @@ class LiveMessagesLib(object):
     def get_server_side_event_string(
         cls, event_type: ServerSideEventType, data: typing.Any, comment: str = ""
     ) -> str:
-        return str(JsonServerSideEvent(event_type=event_type, data=data, comment=comment))
+        return str(
+            JsonServerSideEvent(event_type=event_type, data=data, comment=comment)
+        )
 
     @staticmethod
     def user_grip_channel(user_id: int) -> str:
@@ -86,18 +88,26 @@ class LiveMessagesLib(object):
 
     def publish_message_to_user(self, message: Message):
         channel_name = self.user_grip_channel(message.receiver_id)
-        self.publish_dict(channel_name, message_as_dict=LiveMessagesLib.message_as_dict(message))
+        self.publish_dict(
+            channel_name, message_as_dict=LiveMessagesLib.message_as_dict(message)
+        )
 
     def close_channel_connections(self, channel: str) -> None:
         _grip_pub_control.publish_http_stream(
             channel, HttpStreamFormat(close=True), blocking=self._blocking_publish
         )
 
-    def publish_dict(self, channel_name: str, message_as_dict: typing.Dict[str, typing.Any]):
+    def publish_dict(
+        self, channel_name: str, message_as_dict: typing.Dict[str, typing.Any]
+    ):
         global _grip_pub_control
         assert _grip_pub_control
         _grip_pub_control.publish_http_stream(
             channel_name,
-            str(JsonServerSideEvent(data=message_as_dict, event_type=ServerSideEventType.TLM)),
+            str(
+                JsonServerSideEvent(
+                    data=message_as_dict, event_type=ServerSideEventType.TLM
+                )
+            ),
             blocking=self._blocking_publish,
         )

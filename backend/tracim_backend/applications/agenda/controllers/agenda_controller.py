@@ -29,7 +29,9 @@ class AgendaController(Controller):
     def user_agendas(self, context, request: TracimRequest, hapic_data=None):
         app_config = request.registry.settings["CFG"]  # type: CFG
         agenda_api = AgendaApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
         return agenda_api.get_user_agendas(
             request.candidate_user,
@@ -45,7 +47,9 @@ class AgendaController(Controller):
     def account_agendas(self, context, request: TracimRequest, hapic_data=None):
         app_config = request.registry.settings["CFG"]  # type : CFG
         agenda_api = AgendaApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
         return agenda_api.get_user_agendas(
             request.current_user,
@@ -69,12 +73,16 @@ class AgendaController(Controller):
 
         # INFO - G.M - 2019-04-01 - user agenda
         configurator.add_route(
-            "user_agendas", "/users/{user_id:\d+}/agenda", request_method="GET"  # noqa: W605
+            "user_agendas",
+            "/users/{user_id:\d+}/agenda",
+            request_method="GET",  # noqa: W605
         )  # noqa: W605
         configurator.add_view(self.user_agendas, route_name="user_agendas")
 
         # INFO - G.M - 2019-04-01 - own user agenda
-        configurator.add_route("account_agendas", "/users/me/agenda", request_method="GET")
+        configurator.add_route(
+            "account_agendas", "/users/me/agenda", request_method="GET"
+        )
         configurator.add_view(self.account_agendas, route_name="account_agendas")
 
         # pre-filled agenda event
@@ -83,4 +91,6 @@ class AgendaController(Controller):
             "/system/pre-filled-agenda-event",
             request_method="GET",
         )
-        configurator.add_view(self.pre_filled_agenda_event, route_name="pre_filled_agenda_event")
+        configurator.add_view(
+            self.pre_filled_agenda_event, route_name="pre_filled_agenda_event"
+        )

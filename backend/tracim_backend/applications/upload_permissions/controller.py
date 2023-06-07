@@ -47,7 +47,9 @@ class UploadPermissionController(Controller):
     """
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_UPLOAD_PERMISSION_ENDPOINTS])
-    @hapic.handle_exception(WorkspacePublicUploadDisabledException, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(
+        WorkspacePublicUploadDisabledException, HTTPStatus.BAD_REQUEST
+    )
     @check_right(is_content_manager)
     @check_right(has_public_upload_enabled)
     @hapic.input_path(WorkspaceIdPathSchema())
@@ -61,7 +63,9 @@ class UploadPermissionController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = UploadPermissionLib(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
         upload_permission = api.add_permission_to_workspace(
             request.current_workspace,
@@ -72,7 +76,9 @@ class UploadPermissionController(Controller):
         return api.get_upload_permissions_in_context(upload_permission)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_UPLOAD_PERMISSION_ENDPOINTS])
-    @hapic.handle_exception(WorkspacePublicUploadDisabledException, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(
+        WorkspacePublicUploadDisabledException, HTTPStatus.BAD_REQUEST
+    )
     @check_right(is_content_manager)
     @check_right(has_public_upload_enabled)
     @hapic.input_query(UploadPermissionListQuerySchema())
@@ -95,26 +101,34 @@ class UploadPermissionController(Controller):
         return api.get_upload_permissions_in_context(upload_permissions)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_UPLOAD_PERMISSION_ENDPOINTS])
-    @hapic.handle_exception(WorkspacePublicUploadDisabledException, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(
+        WorkspacePublicUploadDisabledException, HTTPStatus.BAD_REQUEST
+    )
     @hapic.handle_exception(UploadPermissionNotFound, HTTPStatus.BAD_REQUEST)
     @check_right(is_content_manager)
     @check_right(has_public_upload_enabled)
     @hapic.input_path(UploadPermissionIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def disable_upload_permission(self, context, request: TracimRequest, hapic_data=None) -> None:
+    def disable_upload_permission(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> None:
         """
         remove an upload permission
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = UploadPermissionLib(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
         api.disable_upload_permission(
             request.current_workspace, hapic_data.path.upload_permission_id
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_UPLOAD_PERMISSION_ENDPOINTS])
-    @hapic.handle_exception(WorkspacePublicUploadDisabledException, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(
+        WorkspacePublicUploadDisabledException, HTTPStatus.BAD_REQUEST
+    )
     @hapic.handle_exception(UploadPermissionNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(UploadPermissionTokenPath())
     @hapic.output_body(UploadPermissionPublicInfoSchema())
@@ -125,7 +139,9 @@ class UploadPermissionController(Controller):
         get somes informations about upload permission
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        api = UploadPermissionLib(current_user=None, session=request.dbsession, config=app_config)
+        api = UploadPermissionLib(
+            current_user=None, session=request.dbsession, config=app_config
+        )
         upload_permission = api.get_upload_permission_by_token(
             upload_permission_token=hapic_data.path.upload_permission_token
         )  # type: UploadPermission
@@ -139,16 +155,22 @@ class UploadPermissionController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_UPLOAD_PERMISSION_ENDPOINTS])
     @hapic.handle_exception(WrongSharePassword, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(UploadPermissionNotFound, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(WorkspacePublicUploadDisabledException, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(
+        WorkspacePublicUploadDisabledException, HTTPStatus.BAD_REQUEST
+    )
     @hapic.input_path(UploadPermissionTokenPath())
     @hapic.input_body(UploadPermissionPasswordBodySchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def guest_upload_check(self, context, request: TracimRequest, hapic_data=None) -> None:
+    def guest_upload_check(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> None:
         """
         check upload password and token validity
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        api = UploadPermissionLib(current_user=None, session=request.dbsession, config=app_config)
+        api = UploadPermissionLib(
+            current_user=None, session=request.dbsession, config=app_config
+        )
         upload_permission = api.get_upload_permission_by_token(
             upload_permission_token=hapic_data.path.upload_permission_token
         )  # type: UploadPermission
@@ -166,14 +188,18 @@ class UploadPermissionController(Controller):
     @hapic.handle_exception(WrongSharePassword, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(UploadPermissionNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(NoFileValidationError, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(WorkspacePublicUploadDisabledException, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(
+        WorkspacePublicUploadDisabledException, HTTPStatus.BAD_REQUEST
+    )
     @hapic.handle_exception(FileSizeOverWorkspaceEmptySpace, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(FileSizeOverOwnerEmptySpace, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(UploadPermissionTokenPath())
     @hapic.input_forms(UploadDataFormSchema())
     @hapic.input_files(UploadFileSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def guest_upload_file(self, context, request: TracimRequest, hapic_data=None) -> None:
+    def guest_upload_file(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> None:
         """
         upload files as guest
         """
@@ -188,7 +214,9 @@ class UploadPermissionController(Controller):
         if len(upload_files.files) < 1:
             raise NoFileValidationError("No files given at input, validation failed.")
         app_config = request.registry.settings["CFG"]  # type: CFG
-        api = UploadPermissionLib(current_user=None, session=request.dbsession, config=app_config)
+        api = UploadPermissionLib(
+            current_user=None, session=request.dbsession, config=app_config
+        )
         upload_permission = api.get_upload_permission_by_token(
             upload_permission_token=hapic_data.path.upload_permission_token
         )  # type: UploadPermission
@@ -200,7 +228,9 @@ class UploadPermissionController(Controller):
         workspace = workspace_api.get_one(upload_permission.workspace_id)
         workspace_api.check_public_upload_enabled(workspace)
         api.check_password(upload_permission, password=hapic_data.forms.password)
-        content_api = ContentApi(current_user=None, session=request.dbsession, config=app_config)
+        content_api = ContentApi(
+            current_user=None, session=request.dbsession, config=app_config
+        )
         content_api.check_workspace_size_limitation(
             content_length=request.content_length, workspace=workspace
         )
@@ -223,19 +253,25 @@ class UploadPermissionController(Controller):
             "/workspaces/{workspace_id}/upload_permissions",
             request_method="POST",
         )
-        configurator.add_view(self.add_upload_permission, route_name="add_upload_permission")
+        configurator.add_view(
+            self.add_upload_permission, route_name="add_upload_permission"
+        )
         configurator.add_route(
             "get_upload_permissions",
             "/workspaces/{workspace_id}/upload_permissions",
             request_method="GET",
         )
-        configurator.add_view(self.get_upload_permission, route_name="get_upload_permissions")
+        configurator.add_view(
+            self.get_upload_permission, route_name="get_upload_permissions"
+        )
         configurator.add_route(
             "delete_upload_permission",
             "/workspaces/{workspace_id}/upload_permissions/{upload_permission_id}",
             request_method="DELETE",
         )
-        configurator.add_view(self.disable_upload_permission, route_name="delete_upload_permission")
+        configurator.add_view(
+            self.disable_upload_permission, route_name="delete_upload_permission"
+        )
 
         # public upload api
         configurator.add_route(

@@ -95,7 +95,9 @@ class LockStorage(object):
         """
         self._lock.acquireRead()
         try:
-            lock_base = self._session.query(Lock).filter(Lock.token == token).one_or_none()
+            lock_base = (
+                self._session.query(Lock).filter(Lock.token == token).one_or_none()
+            )
             if lock_base is None:
                 # Lock not found: purge dangling URL2TOKEN entries
                 _logger.debug("Lock purged dangling: %s" % token)
@@ -104,7 +106,8 @@ class LockStorage(object):
             expire = float(lock_base.expire)
             if 0 <= expire < time.time():
                 _logger.debug(
-                    "Lock timed-out(%s): %s" % (expire, lockString(from_base_to_dict(lock_base)))
+                    "Lock timed-out(%s): %s"
+                    % (expire, lockString(from_base_to_dict(lock_base)))
                 )
                 self.delete(token)
                 return None
@@ -209,7 +212,9 @@ class LockStorage(object):
         """
         self._lock.acquireWrite()
         try:
-            lock_db = self._session.query(Lock).filter(Lock.token == token).one_or_none()
+            lock_db = (
+                self._session.query(Lock).filter(Lock.token == token).one_or_none()
+            )
             _logger.debug("delete %s" % lockString(from_base_to_dict(lock_db)))
             if lock_db is None:
                 return False
@@ -265,16 +270,24 @@ class LockStorage(object):
         path = normalizeLockRoot(path)
         self._lock.acquireRead()
         try:
-            tokList = self._session.query(Url2Token.token).filter(Url2Token.path == path).all()
+            tokList = (
+                self._session.query(Url2Token.token)
+                .filter(Url2Token.path == path)
+                .all()
+            )
             lockList = []
             if includeRoot:
                 __appendLocks(tokList)
 
             if includeChildren:
-                for (url,) in self._session.query(Url2Token.path).group_by(Url2Token.path):
+                for (url,) in self._session.query(Url2Token.path).group_by(
+                    Url2Token.path
+                ):
                     if util.isChildUri(path, url):
                         __appendLocks(
-                            self._session.query(Url2Token.token).filter(Url2Token.path == url)
+                            self._session.query(Url2Token.token).filter(
+                                Url2Token.path == url
+                            )
                         )
 
             return lockList

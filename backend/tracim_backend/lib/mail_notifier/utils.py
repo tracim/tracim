@@ -56,7 +56,12 @@ class EST(object):
 
     @classmethod
     def all(cls):
-        return [cls.CONTENT_LABEL, cls.CONTENT_STATUS_LABEL, cls.WEBSITE_TITLE, cls.WORKSPACE_LABEL]
+        return [
+            cls.CONTENT_LABEL,
+            cls.CONTENT_STATUS_LABEL,
+            cls.WEBSITE_TITLE,
+            cls.WORKSPACE_LABEL,
+        ]
 
 
 class EmailAddress(object):
@@ -70,7 +75,9 @@ class EmailAddress(object):
         return ".".join([p.encode("idna").decode("ascii") for p in part.split(".")])
 
     def _encode_idna(self, email: str):
-        username, domain = [self._encode_idna_part(part) for part in email.rsplit("@", 1)]
+        username, domain = [
+            self._encode_idna_part(part) for part in email.rsplit("@", 1)
+        ]
 
         username = self._encode_idna_part(username)
         domain = self._encode_idna_part(domain)

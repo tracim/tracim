@@ -48,6 +48,8 @@ def downgrade():
             onupdate="CASCADE",
             ondelete="CASCADE",
         ),
-        sa.PrimaryKeyConstraint("group_id", "permission_id", name="pk_group_permission"),
+        sa.PrimaryKeyConstraint(
+            "group_id", "permission_id", name="pk_group_permission"
+        ),
     )
     # ### end Alembic commands ###

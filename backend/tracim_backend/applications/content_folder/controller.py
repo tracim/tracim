@@ -40,7 +40,9 @@ class FolderController(Controller):
     @check_right(is_folder_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(ContentSchema())
-    def get_folder(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
+    def get_folder(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> ContentInContext:
         """
         Get folder info
         """
@@ -52,7 +54,9 @@ class FolderController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        content = api.get_one(
+            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
+        )
         return api.get_content_in_context(content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FOLDER_ENDPOINTS])
@@ -63,7 +67,9 @@ class FolderController(Controller):
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(FolderContentModifySchema())
     @hapic.output_body(ContentSchema())
-    def update_folder(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
+    def update_folder(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> ContentInContext:
         """
         update folder
         """
@@ -75,8 +81,12 @@ class FolderController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
-        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
+        content = api.get_one(
+            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
+        )
+        with new_revision(
+            session=request.dbsession, tm=transaction.manager, content=content
+        ):
             api.update_container_content(
                 item=content,
                 new_label=hapic_data.body.label,
@@ -105,9 +115,14 @@ class FolderController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        content = api.get_one(
+            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
+        )
         revisions = content.get_revisions()
-        return [api.get_revision_in_context(revision, number) for revision, number in revisions]
+        return [
+            api.get_revision_in_context(revision, number)
+            for revision, number in revisions
+        ]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FOLDER_ENDPOINTS])
     @check_right(is_contributor)
@@ -115,7 +130,9 @@ class FolderController(Controller):
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetContentStatusSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def set_folder_status(self, context, request: TracimRequest, hapic_data=None) -> None:
+    def set_folder_status(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> None:
         """
         set folder status
         """
@@ -127,8 +144,12 @@ class FolderController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
-        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
+        content = api.get_one(
+            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
+        )
+        with new_revision(
+            session=request.dbsession, tm=transaction.manager, content=content
+        ):
             api.set_status(content, hapic_data.body.status)
             api.save(content)
         return
@@ -136,13 +157,17 @@ class FolderController(Controller):
     def bind(self, configurator: Configurator) -> None:
         # Get folder
         configurator.add_route(
-            "folder", "/workspaces/{workspace_id}/folders/{content_id}", request_method="GET"
+            "folder",
+            "/workspaces/{workspace_id}/folders/{content_id}",
+            request_method="GET",
         )
         configurator.add_view(self.get_folder, route_name="folder")
 
         # update folder
         configurator.add_route(
-            "update_folder", "/workspaces/{workspace_id}/folders/{content_id}", request_method="PUT"
+            "update_folder",
+            "/workspaces/{workspace_id}/folders/{content_id}",
+            request_method="PUT",
         )
         configurator.add_view(self.update_folder, route_name="update_folder")
 

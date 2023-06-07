@@ -22,7 +22,10 @@ BASE_CSP_DIRECTIVES = (
     # NOTE S.G - 2020-12-14 - unsafe-eval is needed for
     # custom forms app and user profile page
     # (react-jsonschema-form/ajv dependency)
-    ("script-src", "'unsafe-eval' 'nonce-{nonce}' {base_url}/assets/tinymce-5.10.3/js/"),
+    (
+        "script-src",
+        "'unsafe-eval' 'nonce-{nonce}' {base_url}/assets/tinymce-5.10.3/js/",
+    ),
     # NOTE S.G. - 2020-12-14 - unsafe-inline is needed for tinyMce
     ("style-src", "'unsafe-inline' 'self'"),
     ("connect-src", "'self'"),
@@ -59,7 +62,9 @@ class FrontendController(Controller):
             raise FileNotFoundError()
         return index_file_path
 
-    def _get_custom_toolboxes_files(self, custom_toolbox_dir: str) -> typing.List["os.DirEntry"]:
+    def _get_custom_toolboxes_files(
+        self, custom_toolbox_dir: str
+    ) -> typing.List["os.DirEntry"]:
         custom_toolbox_files = []
         scanned_dir = os.scandir(custom_toolbox_dir)
         for entry in scanned_dir:
@@ -76,7 +81,8 @@ class FrontendController(Controller):
         frontend_apps = []
         app_api = ApplicationApi(app_list=app_list)
         applications = [
-            app_api.get_application_in_context(app, app_config) for app in app_api.get_all()
+            app_api.get_application_in_context(app, app_config)
+            for app in app_api.get_all()
         ]
         for app in applications:
             app_frontend_path = APP_FRONTEND_PATH.replace("{minislug}", app.minislug)
@@ -103,28 +109,44 @@ class FrontendController(Controller):
                 app_directives = app.get_content_security_policy_directives(app_config)
                 for app_key, app_value in app_directives:
                     try:
-                        csp_directives[app_key] = "{} {}".format(csp_directives[app_key], app_value)
+                        csp_directives[app_key] = "{} {}".format(
+                            csp_directives[app_key], app_value
+                        )
                     except KeyError:
                         csp_directives[app_key] = app_value
 
-            csp = "; ".join("{} {}".format(key, value) for key, value in csp_directives.items())
-            csp = "{}; {}".format(app_config.CONTENT_SECURITY_POLICY__ADDITIONAL_DIRECTIVES, csp)
-            csp_header_value = csp.format(nonce=csp_nonce, base_url=app_config.WEBSITE__BASE_URL)
+            csp = "; ".join(
+                "{} {}".format(key, value) for key, value in csp_directives.items()
+            )
+            csp = "{}; {}".format(
+                app_config.CONTENT_SECURITY_POLICY__ADDITIONAL_DIRECTIVES, csp
+            )
+            csp_header_value = csp.format(
+                nonce=csp_nonce, base_url=app_config.WEBSITE__BASE_URL
+            )
             if app_config.CONTENT_SECURITY_POLICY__REPORT_URI:
-                csp_headers.append(("Report-To", app_config.CONTENT_SECURITY_POLICY__REPORT_URI))
+                csp_headers.append(
+                    ("Report-To", app_config.CONTENT_SECURITY_POLICY__REPORT_URI)
+                )
                 csp_header_value = "{}; report-uri {}".format(
                     csp_header_value, app_config.CONTENT_SECURITY_POLICY__REPORT_URI
                 )
             csp_headers.append((csp_header_key, csp_header_value))
-            base_response = Response(headerlist=[("Content-Type", "text/html")] + csp_headers)
+            base_response = Response(
+                headerlist=[("Content-Type", "text/html")] + csp_headers
+            )
         return render_to_response(
             self._get_index_file_path(),
             {
                 "colors": {
                     "primary": ExtendedColor(app_config.APPS_COLORS["primary"]),
                     "sidebar": ExtendedColor(app_config.APPS_COLORS["sidebar"]),
-                    "sidebar/logo": ExtendedColor(app_config.APPS_COLORS["sidebar/logo"]),
-                    "sidebar/font": ExtendedColor(app_config.APPS_COLORS["sidebar/font"]),
+                    "sidebar/logo": ExtendedColor(
+                        app_config.APPS_COLORS["sidebar/logo"]
+                    ),
+                    "sidebar/font": ExtendedColor(
+                        app_config.APPS_COLORS["sidebar/font"]
+                    ),
                 },
                 "applications": frontend_apps,
                 "website_title": app_config.WEBSITE__TITLE,
@@ -146,7 +168,9 @@ class FrontendController(Controller):
         configurator.add_route("root", "/", request_method="GET")
         configurator.add_view(self.index, route_name="root")
         configurator.add_route(
-            "ui", "/{}{{ui_subpath:.*}}".format(FRONTEND_UI_SUBPATH), request_method="GET"
+            "ui",
+            "/{}{{ui_subpath:.*}}".format(FRONTEND_UI_SUBPATH),
+            request_method="GET",
         )
         configurator.add_view(self.ui, route_name="ui")
         configurator.add_route("index", INDEX_PAGE_NAME, request_method="GET")

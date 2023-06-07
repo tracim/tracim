@@ -19,7 +19,9 @@ JSON_SCHEMA_KEYS_TO_TRANSLATE = ("enumNames", "title", "description")
 # INFO - G.M - 2020-01-11 - UISchema field useful to be translated
 # see https://react-jsonschema-form.readthedocs.io/en/latest/api-reference/uiSchema/
 UI_SCHEMA_KEYS_TO_TRANSLATE = ("title", "description", "placeholder", "help")
-UI_SCHEMA_KEYS_TO_TRANSLATE += tuple("ui:{}".format(key) for key in UI_SCHEMA_KEYS_TO_TRANSLATE)
+UI_SCHEMA_KEYS_TO_TRANSLATE += tuple(
+    "ui:{}".format(key) for key in UI_SCHEMA_KEYS_TO_TRANSLATE
+)
 
 
 class UserCustomPropertiesApi:
@@ -38,7 +40,9 @@ class UserCustomPropertiesApi:
 
     def get_custom_properties(self) -> UserCustomProperties:
         query = self._session.query(UserCustomProperties)
-        return query.filter(UserCustomProperties.user_id == self._current_user.user_id).one()
+        return query.filter(
+            UserCustomProperties.user_id == self._current_user.user_id
+        ).one()
 
     def get_all_params(self) -> Dict[str, Any]:
         # TODO - G.M - 2021-01-13 - Filtering by permission needed there
@@ -49,7 +53,9 @@ class UserCustomPropertiesApi:
         # TODO - G.M - 2021-01-13 - Filtering by permission needed there
         # issue #4004. PUT style behavior should be keep, so some tweaking
         # is required, to not drop properties user is not able to edit.
-        CustomPropertiesValidator().validate_data(params, json_schema=self.get_json_schema())
+        CustomPropertiesValidator().validate_data(
+            params, json_schema=self.get_json_schema()
+        )
 
         custom_properties = self.get_custom_properties()
         custom_properties.fields = params

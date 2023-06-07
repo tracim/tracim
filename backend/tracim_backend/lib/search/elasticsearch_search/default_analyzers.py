@@ -7,7 +7,9 @@ from elasticsearch_dsl import analyzer
 # - filter/token_filter : modify the token
 # As existing tokenizer doesn't look to be extendable with new separator, the workaround used here to
 # be able to split on "_" is to replace them in char_filter to "-" which is an existing separator.
-underscore_as_minus = analysis.char_filter("underscore_as_space", type="mapping", mappings=["_=>-"])
+underscore_as_minus = analysis.char_filter(
+    "underscore_as_space", type="mapping", mappings=["_=>-"]
+)
 
 # INFO - G.M - 2022-04-07 - Locally  Testing analyser without running tracim is possible with elyzer
 # (need same name python package)  with command like :
@@ -37,13 +39,23 @@ max_token_length_filter = analysis.token_filter(
 edge_ngram_folding = analyzer(
     "edge_ngram_folding",
     tokenizer="standard",
-    filter=[max_token_length_filter, "lowercase", "asciifolding", edge_ngram_token_filter],
+    filter=[
+        max_token_length_filter,
+        "lowercase",
+        "asciifolding",
+        edge_ngram_token_filter,
+    ],
     char_filter=underscore_as_minus,
 )
 html_folding = analyzer(
     "html_folding",
     tokenizer="standard",
-    filter=[max_token_length_filter, "lowercase", "asciifolding", edge_ngram_token_filter],
+    filter=[
+        max_token_length_filter,
+        "lowercase",
+        "asciifolding",
+        edge_ngram_token_filter,
+    ],
     char_filter=["html_strip", underscore_as_minus],
 )
 html_exact_folding = analyzer(

@@ -20,12 +20,18 @@ def upgrade():
         sa.Column("leader_id", sa.Integer(), nullable=False),
         sa.Column("created_date", sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(
-            ("follower_id",), ["users.user_id"], name=op.f("fk_user_followers_follower_id_users")
+            ("follower_id",),
+            ["users.user_id"],
+            name=op.f("fk_user_followers_follower_id_users"),
         ),
         sa.ForeignKeyConstraint(
-            ("leader_id",), ["users.user_id"], name=op.f("fk_user_followers_leader_id_users")
+            ("leader_id",),
+            ["users.user_id"],
+            name=op.f("fk_user_followers_leader_id_users"),
         ),
-        sa.PrimaryKeyConstraint("follower_id", "leader_id", name=op.f("pk_user_followers")),
+        sa.PrimaryKeyConstraint(
+            "follower_id", "leader_id", name=op.f("pk_user_followers")
+        ),
     )
 
 

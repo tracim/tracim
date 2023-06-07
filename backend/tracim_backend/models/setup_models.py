@@ -92,7 +92,9 @@ def get_tm_session(session_factory, transaction_manager) -> Session:
     # Understand what those params really mean and check if it can cause
     # troubles somewhere else.
     # see https://stackoverflow.com/questions/16152241/how-to-get-a-sqlalchemy-session-managed-by-zope-transaction-that-has-the-same-sc
-    zope.sqlalchemy.register(dbsession, transaction_manager=transaction_manager, keep_session=True)
+    zope.sqlalchemy.register(
+        dbsession, transaction_manager=transaction_manager, keep_session=True
+    )
     from tracim_backend.models.revision_protection import prevent_content_revision_delete
 
     listen(dbsession, "before_flush", prevent_content_revision_delete)
@@ -106,8 +108,12 @@ def create_dbsession_for_context(
     dbsession = get_tm_session(session_factory, transaction_manager)
     dbsession.set_context(context)
     # Keep a reference on the crud hook caller for the session's lifetime
-    dbsession.info["crud_hook_caller"] = DatabaseCrudHookCaller(dbsession, context.plugin_manager)
-    context.plugin_manager.hook.on_context_session_created(db_session=dbsession, context=context)
+    dbsession.info["crud_hook_caller"] = DatabaseCrudHookCaller(
+        dbsession, context.plugin_manager
+    )
+    context.plugin_manager.hook.on_context_session_created(
+        db_session=dbsession, context=context
+    )
     return dbsession
 
 

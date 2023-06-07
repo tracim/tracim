@@ -19,7 +19,9 @@ class BaseController(Controller):
         headers = [("Content-Type", "application/json")]
         from pyramid.response import Response
 
-        return Response(body=json.dumps(error_body), headers=headers, status=HTTPStatus.NOT_FOUND)
+        return Response(
+            body=json.dumps(error_body), headers=headers, status=HTTPStatus.NOT_FOUND
+        )
 
     def bind(self, configurator: Configurator) -> None:
         configurator.add_notfound_view(self.not_found_view, append_slash=True)

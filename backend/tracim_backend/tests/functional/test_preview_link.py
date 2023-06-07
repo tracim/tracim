@@ -133,7 +133,10 @@ class TestUrlPreview(object):
             stream=True,
         )
         params = {"url": link_name}
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/url-preview?{params}".format(params=urlencode(params)),
             status=200,
@@ -174,7 +177,10 @@ class TestUrlPreview(object):
             stream=True,
         )
         params = {"url": link_name}
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/url-preview?{params}".format(params=urlencode(params)),
             status=200,
@@ -209,7 +215,10 @@ class TestUrlPreview(object):
             stream=True,
         )
         params = {"url": link_name}
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/url-preview?{params}".format(params=urlencode(params)),
             status=200,
@@ -222,7 +231,10 @@ class TestUrlPreview(object):
         web_testapp,
     ):
         params = {"url": "http://thisurldoesnotexist.invalid"}
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/url-preview?{params}".format(params=urlencode(params)),
             status=400,
@@ -235,7 +247,10 @@ class TestUrlPreview(object):
         web_testapp,
     ):
         params = {"url": "https://example.org.invalid/unescaped%20space"}
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/url-preview?{params}".format(params=urlencode(params)),
             status=400,

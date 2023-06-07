@@ -27,7 +27,9 @@ class SimpleContentSearchResponse(ContentSearchResponse):
             ]
 
             comments = [
-                SearchedDigestComment(content_id=comment.content_id, parent_id=comment.parent_id)
+                SearchedDigestComment(
+                    content_id=comment.content_id, parent_id=comment.parent_id
+                )
                 for comment in content.comments
             ]
             todos = [
@@ -36,7 +38,8 @@ class SimpleContentSearchResponse(ContentSearchResponse):
             ]
 
             workspace = SearchedDigestWorkspace(
-                workspace_id=content.workspace.workspace_id, label=content.workspace.label
+                workspace_id=content.workspace.workspace_id,
+                label=content.workspace.label,
             )
             last_modifier = SearchedDigestUser(
                 user_id=content.last_modifier.user_id,
@@ -83,4 +86,6 @@ class SimpleContentSearchResponse(ContentSearchResponse):
                 parent_id=content.parent_id,
             )
             contents.append(content)
-        super().__init__(contents=contents, total_hits=total_hits, is_total_hits_accurate=False)
+        super().__init__(
+            contents=contents, total_hits=total_hits, is_total_hits_accurate=False
+        )

@@ -46,7 +46,9 @@ if TYPE_CHECKING:
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 DEFAULT_TRACIM_CONFIG_FILE = "development.ini"
-CONTENT_FRONTEND_URL_SCHEMA = "workspaces/{workspace_id}/contents/{content_type}/{content_id}"
+CONTENT_FRONTEND_URL_SCHEMA = (
+    "workspaces/{workspace_id}/contents/{content_type}/{content_id}"
+)
 WORKSPACE_FRONTEND_URL_SCHEMA = "workspaces/{workspace_id}"
 FRONTEND_UI_SUBPATH = "ui"
 LOGIN_SUBPATH = "login"
@@ -150,7 +152,8 @@ DEFAULT_PASSWORD_GEN_CHAR_LENGTH = 12
 
 
 def password_generator(
-    length: int = DEFAULT_PASSWORD_GEN_CHAR_LENGTH, chars: str = ALLOWED_AUTOGEN_PASSWORD_CHAR
+    length: int = DEFAULT_PASSWORD_GEN_CHAR_LENGTH,
+    chars: str = ALLOWED_AUTOGEN_PASSWORD_CHAR,
 ) -> str:
     """
     :param length: length of the new password
@@ -272,7 +275,15 @@ def webdav_convert_file_name_to_display(string: str) -> str:
     isn't limited in his naming choice
     """
     string = core_convert_file_name_to_display(string)
-    REPLACE_CHARS = {":": "∶", "*": "∗", "?": "ʔ", '"': "ʺ", "<": "❮", ">": "❯", "|": "∣"}
+    REPLACE_CHARS = {
+        ":": "∶",
+        "*": "∗",
+        "?": "ʔ",
+        '"': "ʺ",
+        "<": "❮",
+        ">": "❯",
+        "|": "∣",
+    }
 
     for key, value in REPLACE_CHARS.items():
         string = string.replace(key, value)
@@ -340,7 +351,10 @@ def is_dir_writable(path: str) -> bool:
     the process)
     """
     if not os.access(
-        path=path, mode=os.W_OK | os.X_OK, dir_fd=None, effective_ids=os.supports_effective_ids
+        path=path,
+        mode=os.W_OK | os.X_OK,
+        dir_fd=None,
+        effective_ids=os.supports_effective_ids,
     ):
         raise NotWritableDirectory("{} is not a writable directory".format(path))
     return True
@@ -352,7 +366,10 @@ def is_dir_readable(path: str) -> bool:
     the process)
     """
     if not os.access(
-        path=path, mode=os.R_OK | os.X_OK, dir_fd=None, effective_ids=os.supports_effective_ids
+        path=path,
+        mode=os.R_OK | os.X_OK,
+        dir_fd=None,
+        effective_ids=os.supports_effective_ids,
     ):
         raise NotReadableDirectory("{} is not a readable directory".format(path))
     return True
@@ -401,7 +418,9 @@ def find_direct_submodule_path(module: types.ModuleType) -> List[str]:
     :return: list of path of direct submodule
     """
     module_path_list = []
-    for importer, submodule_relative_path, is_package in pkgutil.iter_modules(module.__path__):
+    for importer, submodule_relative_path, is_package in pkgutil.iter_modules(
+        module.__path__
+    ):
         submodule_path = "{module_name}.{submodule_relative_path}".format(
             module_name=module.__name__, submodule_relative_path=submodule_relative_path
         )
@@ -419,7 +438,9 @@ def find_all_submodule_path(module: types.ModuleType) -> List[str]:
     """
     module_path_list = []
     module_spec_list = []
-    for importer, submodule_relative_path, is_package in pkgutil.walk_packages(module.__path__):
+    for importer, submodule_relative_path, is_package in pkgutil.walk_packages(
+        module.__path__
+    ):
         submodule_path = "{module_name}.{submodule_relative_path}".format(
             module_name=module.__name__, submodule_relative_path=submodule_relative_path
         )
@@ -495,7 +516,9 @@ class CustomPropertiesValidator:
         try:
             return validate_json(file_path)
         except json.JSONDecodeError as exc:
-            raise UnvalidJsonFile("{} is not a valid json file".format(file_path)) from exc
+            raise UnvalidJsonFile(
+                "{} is not a valid json file".format(file_path)
+            ) from exc
 
     def validate_json_schema(self, json_schema: Dict[str, Any]):
         # INFO - G.M - 2021-01-13 Check here schema with jsonschema meta-schema to:
@@ -510,7 +533,9 @@ class CustomPropertiesValidator:
 
         properties = json_schema.get("properties")
         if not properties:
-            raise UnvalidCustomPropertiesSchema('Missing "properties" key at json root.')
+            raise UnvalidCustomPropertiesSchema(
+                'Missing "properties" key at json root.'
+            )
 
         missing_or_empty_title_properties = []
         for property_name, value in properties.items():

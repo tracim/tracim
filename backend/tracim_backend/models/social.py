@@ -12,12 +12,20 @@ from tracim_backend.models.meta import DeclarativeBase
 class UserFollower(DeclarativeBase):
     __tablename__ = "user_followers"
 
-    follower_id = Column(Integer, ForeignKey("users.user_id"), nullable=False, primary_key=True)
-    follower = relationship("User", remote_side=[User.user_id], foreign_keys=[follower_id])
-    leader_id = Column(Integer, ForeignKey("users.user_id"), nullable=False, primary_key=True)
+    follower_id = Column(
+        Integer, ForeignKey("users.user_id"), nullable=False, primary_key=True
+    )
+    follower = relationship(
+        "User", remote_side=[User.user_id], foreign_keys=[follower_id]
+    )
+    leader_id = Column(
+        Integer, ForeignKey("users.user_id"), nullable=False, primary_key=True
+    )
     leader = relationship("User", remote_side=[User.user_id], foreign_keys=[leader_id])
     # TODO - G.M - 2021-03-10:  use CreationDateMixin instead
-    created_date = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
+    created_date = Column(
+        DateTime, unique=False, nullable=False, default=datetime.utcnow
+    )
 
     def __repr__(self):
         return "<UserFollower: follower_id={}, leader_id={}>".format(

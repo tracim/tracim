@@ -35,7 +35,9 @@ class StorageLib:
         self.uploaded_file_depot = DepotManager.get(
             app_config.UPLOADED_FILES__STORAGE__STORAGE_NAME
         )
-        self.preview_manager = PreviewManager(app_config.PREVIEW_CACHE_DIR, create_folder=True)
+        self.preview_manager = PreviewManager(
+            app_config.PREVIEW_CACHE_DIR, create_folder=True
+        )
 
     def _get_depot_file(self, depot_file) -> StoredFile:
         if depot_file is None:
@@ -44,10 +46,14 @@ class StorageLib:
             return self.uploaded_file_depot.get(depot_file)
         except IOError as exc:
             logger.warning(
-                self, "Unable to get content filepath, depot is corrupted", exc_info=True
+                self,
+                "Unable to get content filepath, depot is corrupted",
+                exc_info=True,
             )
             raise CannotGetDepotFileDepotCorrupted(
-                "depot file {} is not accessible, depot seems corrupted".format(depot_file.file_id)
+                "depot file {} is not accessible, depot seems corrupted".format(
+                    depot_file.file_id
+                )
             ) from exc
 
     def get_raw_file(
@@ -99,11 +105,16 @@ class StorageLib:
         :return: a valid filepath for the content of depot_file
         """
         depot_stored_file = self._get_depot_file(depot_file)  # type: StoredFile
-        if self.app_config.UPLOADED_FILES__STORAGE__STORAGE_TYPE == DepotFileStorageType.LOCAL.slug:
+        if (
+            self.app_config.UPLOADED_FILES__STORAGE__STORAGE_TYPE
+            == DepotFileStorageType.LOCAL.slug
+        ):
             yield from self._get_valid_content_filepath_legacy(depot_stored_file)
         else:
             yield from self._get_valid_content_filepath(
-                depot_stored_file, file_extension=file_extension, prefix=temporary_prefix
+                depot_stored_file,
+                file_extension=file_extension,
+                prefix=temporary_prefix,
             )
 
     @contextmanager
@@ -134,7 +145,9 @@ class StorageLib:
                 "this kind of preview is not available for this file"
             ) from exc
         except UnsupportedMimeType as exc:
-            raise UnavailablePreview("No Preview available for this type of file") from exc
+            raise UnavailablePreview(
+                "No Preview available for this type of file"
+            ) from exc
         except CannotGetDepotFileDepotCorrupted as exc:
             raise UnavailablePreview(
                 "No Preview available, original file seems no available"
@@ -144,7 +157,9 @@ class StorageLib:
             # specific error code.
             raise exc
         except Exception as exc:
-            logger.warning(self, "Unknown Preview_Generator Exception Occured", exc_info=True)
+            logger.warning(
+                self, "Unknown Preview_Generator Exception Occured", exc_info=True
+            )
             raise UnavailablePreview("No preview available") from exc
 
     def get_jpeg_preview(
@@ -279,7 +294,8 @@ class StorageLib:
         ):
             raise PageOfPreviewNotFound(
                 "page {page_number} of depot_file {file_id} does not exist".format(
-                    page_number=preview_generator_page_number, file_id=depot_file.file_id
+                    page_number=preview_generator_page_number,
+                    file_id=depot_file.file_id,
                 )
             )
         return preview_generator_page_number
@@ -297,7 +313,9 @@ class StorageLib:
         :return: content filepath
         """
 
-        file_label = "{prefix}-{file_id}".format(prefix=prefix, file_id=depot_stored_file.file_id)
+        file_label = "{prefix}-{file_id}".format(
+            prefix=prefix, file_id=depot_stored_file.file_id
+        )
         base_path = "{temp_dir}/{file_label}".format(
             temp_dir=tempfile.gettempdir(),
             file_label=file_label,

@@ -1,8 +1,7 @@
 import argparse
+from pyramid.scripting import AppEnvironment
 import traceback
 import typing
-
-from pyramid.scripting import AppEnvironment
 
 from tracim_backend import UserDoesNotExist
 from tracim_backend.applications.agenda.models import AgendaResourceType
@@ -98,15 +97,23 @@ class DeleteUserCommand(AppContextCommand):
         )
         return parser
 
-    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
+    def take_app_action(
+        self, parsed_args: argparse.Namespace, app_context: AppEnvironment
+    ) -> None:
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]
 
-        delete_user_revision_and_reaction = parsed_args.force or parsed_args.delete_revisions
-        delete_owned_sharespaces = (
-            parsed_args.force or parsed_args.best_effort or parsed_args.delete_sharespaces
+        delete_user_revision_and_reaction = (
+            parsed_args.force or parsed_args.delete_revisions
         )
-        anonymize_if_required = parsed_args.best_effort or parsed_args.anonymize_if_required
+        delete_owned_sharespaces = (
+            parsed_args.force
+            or parsed_args.best_effort
+            or parsed_args.delete_sharespaces
+        )
+        anonymize_if_required = (
+            parsed_args.best_effort or parsed_args.anonymize_if_required
+        )
 
         if parsed_args.dry_run_mode:
             print("(!) Running in dry-run mode, no changes will be applied.")
@@ -126,7 +133,9 @@ class DeleteUserCommand(AppContextCommand):
             print("(!) Will anonymize user if not possible to delete it")
             if parsed_args.anonymize_name:
                 print(
-                    '(!) Custom anonymize name choosen is: "{}"'.format(parsed_args.anonymize_name)
+                    '(!) Custom anonymize name choosen is: "{}"'.format(
+                        parsed_args.anonymize_name
+                    )
                 )
         print("")
         deleted_user_ids = set()  # typing.Set[int]
@@ -145,7 +154,11 @@ class DeleteUserCommand(AppContextCommand):
                     user = uapi.get_one_by_login(login)
                     user_list.append(user)
                 except UserDoesNotExist as exc:
-                    print('ERROR: user with email/username "{}" does not exist'.format(login))
+                    print(
+                        'ERROR: user with email/username "{}" does not exist'.format(
+                            login
+                        )
+                    )
                     raise exc
             print("~~~~")
             print("Deletion of user from Database")
@@ -177,7 +190,8 @@ class DeleteUserCommand(AppContextCommand):
                 # INFO - G.M - 2019-12-13 - cleanup agenda at end of process
                 if deleted_workspace_ids:
                     deleted_workspace_ids_str = [
-                        '"{}"'.format(workspace_id) for workspace_id in deleted_workspace_ids
+                        '"{}"'.format(workspace_id)
+                        for workspace_id in deleted_workspace_ids
                     ]
                     print(
                         "delete agenda of workspaces {}".format(
@@ -190,7 +204,8 @@ class DeleteUserCommand(AppContextCommand):
                                 workspace_id, resource_type=AgendaResourceType.calendar
                             )
                             cleanup_lib.delete_workspace_agenda(
-                                workspace_id, resource_type=AgendaResourceType.addressbook
+                                workspace_id,
+                                resource_type=AgendaResourceType.addressbook,
                             )
                         except AgendaNotFoundError:
                             print(
@@ -201,12 +216,22 @@ class DeleteUserCommand(AppContextCommand):
                             print(traceback.format_exc())
 
                 if deleted_user_ids:
-                    deleted_user_ids_str = ['"{}"'.format(user_id) for user_id in deleted_user_ids]
-                    print("delete agenda of users {}".format(", ".join(deleted_user_ids_str)))
+                    deleted_user_ids_str = [
+                        '"{}"'.format(user_id) for user_id in deleted_user_ids
+                    ]
+                    print(
+                        "delete agenda of users {}".format(
+                            ", ".join(deleted_user_ids_str)
+                        )
+                    )
                     for user_id in deleted_user_ids:
                         try:
-                            cleanup_lib.delete_user_agenda(user_id, AgendaResourceType.calendar)
-                            cleanup_lib.delete_user_agenda(user_id, AgendaResourceType.addressbook)
+                            cleanup_lib.delete_user_agenda(
+                                user_id, AgendaResourceType.calendar
+                            )
+                            cleanup_lib.delete_user_agenda(
+                                user_id, AgendaResourceType.addressbook
+                            )
                             cleanup_lib.delete_user_dav_symlinks(user_id)
                         except AgendaNotFoundError:
                             print(
@@ -226,7 +251,10 @@ class DeleteUserCommand(AppContextCommand):
                 print("Finished")
 
     def should_anonymize(
-        self, user: User, owned_workspaces_will_be_deleted: bool, cleanup_lib: CleanupLib
+        self,
+        user: User,
+        owned_workspaces_will_be_deleted: bool,
+        cleanup_lib: CleanupLib,
     ) -> UserNeedAnonymization:
         # INFO - G.M - 2019-12-20 - check user revisions that need to be deleted for consistent database
         # if we do not want to anonymize user but delete him
@@ -237,12 +265,16 @@ class DeleteUserCommand(AppContextCommand):
         if should_anonymize.blocking_reactions:
             print(
                 '{} reactions of user "{}" in sharespaces found, deleting them, can cause inconsistent'
-                " database.".format(len(should_anonymize.blocking_reactions), user.user_id)
+                " database.".format(
+                    len(should_anonymize.blocking_reactions), user.user_id
+                )
             )
         if should_anonymize.blocking_revisions:
             print(
                 '{} revision of user "{}" in sharespaces found, deleting them, can cause inconsistent'
-                " database.".format(len(should_anonymize.blocking_revisions), user.user_id)
+                " database.".format(
+                    len(should_anonymize.blocking_revisions), user.user_id
+                )
             )
 
         if should_anonymize.blocking_workspaces:
@@ -268,7 +300,9 @@ class DeleteUserCommand(AppContextCommand):
         deleted_workspace_ids = []
         deleted_user_id = user.user_id
         should_anonymize = self.should_anonymize(
-            user, owned_workspaces_will_be_deleted=delete_owned_workspaces, cleanup_lib=cleanup_lib
+            user,
+            owned_workspaces_will_be_deleted=delete_owned_workspaces,
+            cleanup_lib=cleanup_lib,
         )
         force_delete_all_associated_data = (
             force_delete_all_user_revisions_and_reactions and delete_owned_workspaces
@@ -379,7 +413,9 @@ class AnonymizeUserCommand(AppContextCommand):
         )
         return parser
 
-    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
+    def take_app_action(
+        self, parsed_args: argparse.Namespace, app_context: AppEnvironment
+    ) -> None:
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]
 

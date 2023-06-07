@@ -17,13 +17,17 @@ if typing.TYPE_CHECKING:
 
 
 class CallLib:
-    def __init__(self, session: TracimSession, config: "CFG", current_user: User) -> None:
+    def __init__(
+        self, session: TracimSession, config: "CFG", current_user: User
+    ) -> None:
         self._session = session
         self._config = config
         self._user = current_user
 
     def create(self, callee_id: int) -> UserCall:
-        user_api = UserApi(session=self._session, config=self._config, current_user=self._user)
+        user_api = UserApi(
+            session=self._session, config=self._config, current_user=self._user
+        )
         call = UserCall(caller=self._user, callee=user_api.get_one(callee_id))
         call.url = self._create_call_url(call)
         self._session.add(call)
@@ -37,9 +41,13 @@ class CallLib:
                 "Cannot change the state of a call if it is not in progress"
             )
         if state not in UserCall.CALLER_STATES and self._user.user_id == call.caller_id:
-            raise UserCallTransitionNotAllowed("Only callee can change state to {}".format(state))
+            raise UserCallTransitionNotAllowed(
+                "Only callee can change state to {}".format(state)
+            )
         if state not in UserCall.CALLEE_STATES and self._user.user_id == call.callee_id:
-            raise UserCallTransitionNotAllowed("Only caller can change state to {}".format(state))
+            raise UserCallTransitionNotAllowed(
+                "Only caller can change state to {}".format(state)
+            )
         call.state = state
         self._session.flush()
         return call
@@ -50,7 +58,9 @@ class CallLib:
         state: typing.Optional[UserCallState] = None,
         caller: typing.Optional[bool] = None,
     ) -> typing.List[UserCall]:
-        query = self._session.query(UserCall).filter(literal(user_id).in_(UserCall.user_ids))
+        query = self._session.query(UserCall).filter(
+            literal(user_id).in_(UserCall.user_ids)
+        )
         if caller is True:
             query = query.filter(UserCall.caller_id == user_id)
         if caller is False:

@@ -14,10 +14,26 @@ french_elision = analysis.token_filter(
     "french_elision",
     type="elision",
     article_case=True,
-    articles=["l", "m", "t", "qu", "n", "s", "j", "d", "c", "jusqu", "quoiqu", "lorsqu", "puisqu"],
+    articles=[
+        "l",
+        "m",
+        "t",
+        "qu",
+        "n",
+        "s",
+        "j",
+        "d",
+        "c",
+        "jusqu",
+        "quoiqu",
+        "lorsqu",
+        "puisqu",
+    ],
 )
 french_stop = analysis.token_filter("french_stop", type="stop", stopwords="_french_")
-french_stemmer = analysis.token_filter("french_stemmer", type="stemmer", language="light_french")
+french_stemmer = analysis.token_filter(
+    "french_stemmer", type="stemmer", language="light_french"
+)
 tracim_french_analyzer = analyzer(
     "tracim_french",
     tokenizer="standard",

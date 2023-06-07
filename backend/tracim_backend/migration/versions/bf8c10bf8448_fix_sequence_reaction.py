@@ -18,8 +18,12 @@ def upgrade():
         op.execute(
             "ALTER SEQUENCE IF EXISTS reaction_reaction_id_seq RENAME TO seq__reaction__reaction_id ;"
         )
-        op.execute("ALTER SEQUENCE IF EXISTS events_event_id_seq RENAME TO seq__events__event_id ;")
-        op.execute("ALTER SEQUENCE IF EXISTS content_id_seq RENAME TO seq__content__id ;")
+        op.execute(
+            "ALTER SEQUENCE IF EXISTS events_event_id_seq RENAME TO seq__events__event_id ;"
+        )
+        op.execute(
+            "ALTER SEQUENCE IF EXISTS content_id_seq RENAME TO seq__content__id ;"
+        )
         op.execute(
             "ALTER SEQUENCE IF EXISTS content_revisions_revision_id_seq RENAME TO seq__content_revisions__revision_id ;"
         )
@@ -32,8 +36,12 @@ def downgrade():
         op.execute(
             "ALTER SEQUENCE IF EXISTS seq__reaction__reaction_id RENAME TO reaction_reaction_id_seq;"
         )
-        op.execute("ALTER SEQUENCE IF EXISTS seq__events__event_id RENAME TO events_event_id_seq;")
-        op.execute("ALTER SEQUENCE IF EXISTS seq__content__id RENAME TO content_id_seq;")
+        op.execute(
+            "ALTER SEQUENCE IF EXISTS seq__events__event_id RENAME TO events_event_id_seq;"
+        )
+        op.execute(
+            "ALTER SEQUENCE IF EXISTS seq__content__id RENAME TO content_id_seq;"
+        )
         op.execute(
             "ALTER SEQUENCE IF EXISTS seq__content_revisions__revision_id RENAME TO content_revisions_revision_id_seq ;"
         )

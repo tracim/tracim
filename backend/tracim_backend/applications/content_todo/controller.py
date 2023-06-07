@@ -62,7 +62,8 @@ class TodoController(Controller):
         )
 
         todos = content_api.get_all_query(
-            content_type_slug=content_type_list.Todo.slug, assignee_id=hapic_data.path["user_id"]
+            content_type_slug=content_type_list.Todo.slug,
+            assignee_id=hapic_data.path["user_id"],
         )
 
         todos_in_context = []
@@ -93,7 +94,8 @@ class TodoController(Controller):
         )
 
         todos = content_api.get_all(
-            parent_ids=[hapic_data.path.content_id], content_type=content_type_list.Todo.slug
+            parent_ids=[hapic_data.path.content_id],
+            content_type=content_type_list.Todo.slug,
         )
 
         todos_in_context = []
@@ -107,7 +109,9 @@ class TodoController(Controller):
     @check_right(is_reader)
     @hapic.input_path(TodoPathSchema())
     @hapic.output_body(ToDoSchema())
-    def get_todo(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
+    def get_todo(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> ContentInContext:
         """
         Get a todo
         """
@@ -133,7 +137,9 @@ class TodoController(Controller):
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetTodoSchema())
     @hapic.output_body(ToDoSchema())
-    def create_todo(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
+    def create_todo(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> ContentInContext:
         """
         Create a todo
         """
@@ -158,7 +164,9 @@ class TodoController(Controller):
             )
         except ContentNotFound as exc:
             raise ParentNotFound(
-                "Parent with content_id {} not found".format(request.current_content.content_id)
+                "Parent with content_id {} not found".format(
+                    request.current_content.content_id
+                )
             ) from exc
 
         assignee = None  # type: typing.Optional['User']
@@ -204,7 +212,9 @@ class TodoController(Controller):
             content_id=hapic_data.path.todo_id, content_type=content_type_list.Todo.slug
         )
 
-        with new_revision(session=request.dbsession, tm=transaction.manager, content=todo_content):
+        with new_revision(
+            session=request.dbsession, tm=transaction.manager, content=todo_content
+        ):
             content_api.set_status(todo_content, hapic_data.body.status)
             content_api.save(todo_content)
 
@@ -227,14 +237,19 @@ class TodoController(Controller):
 
         try:
             todo_content = content_api.get_one(
-                content_id=hapic_data.path.todo_id, content_type=content_type_list.Todo.slug
+                content_id=hapic_data.path.todo_id,
+                content_type=content_type_list.Todo.slug,
             )
         except ContentNotFound as exc:
             raise TodoNotFound(
-                "Todo with content_id {} not found".format(request.current_content.content_id)
+                "Todo with content_id {} not found".format(
+                    request.current_content.content_id
+                )
             ) from exc
 
-        with new_revision(session=request.dbsession, tm=transaction.manager, content=todo_content):
+        with new_revision(
+            session=request.dbsession, tm=transaction.manager, content=todo_content
+        ):
             content_api.delete(todo_content)
 
     def bind(self, configurator: Configurator):

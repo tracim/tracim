@@ -25,7 +25,9 @@ def upgrade():
             )
         )
     connection = op.get_bind()
-    connection.execute("UPDATE users SET is_avatar_default=(avatar = '' OR avatar IS NULL)")
+    connection.execute(
+        "UPDATE users SET is_avatar_default=(avatar = '' OR avatar IS NULL)"
+    )
 
 
 def downgrade():

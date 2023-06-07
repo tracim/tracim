@@ -36,12 +36,16 @@ events = sa.Table(
 
 def upgrade():
     connection = op.get_bind()
-    for event in connection.execute(events.select().where(events.c.entity_type != "WORKSPACE")):
+    for event in connection.execute(
+        events.select().where(events.c.entity_type != "WORKSPACE")
+    ):
         try:
             fields = copy.deepcopy(event.fields)
             del fields["workspace"]["description"]
             connection.execute(
-                events.update().where(events.c.event_id == event.event_id).values(fields=fields)
+                events.update()
+                .where(events.c.event_id == event.event_id)
+                .values(fields=fields)
             )
         except KeyError:
             pass

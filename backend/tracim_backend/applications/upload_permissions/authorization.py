@@ -16,7 +16,9 @@ class HasPublicUploadEnabled(AuthorizationChecker):
             return True
         raise WorkspacePublicUploadDisabledException(
             'Workspace "{}" has public '
-            "upload feature disabled".format(tracim_context.current_workspace.workspace_id)
+            "upload feature disabled".format(
+                tracim_context.current_workspace.workspace_id
+            )
         )
 
 

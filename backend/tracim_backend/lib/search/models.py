@@ -31,7 +31,9 @@ class DateRange:
 
 
 class SearchedDigestUser(object):
-    def __init__(self, user_id: int, public_name: str, has_avatar: bool, has_cover: bool) -> None:
+    def __init__(
+        self, user_id: int, public_name: str, has_avatar: bool, has_cover: bool
+    ) -> None:
         self.user_id = user_id
         self.public_name = public_name
         self.has_avatar = has_avatar
@@ -45,7 +47,9 @@ class SearchedDigestWorkspace(object):
 
 
 class SearchedDigestContent(object):
-    def __init__(self, content_id: int, label: str, slug: str, content_type: str) -> None:
+    def __init__(
+        self, content_id: int, label: str, slug: str, content_type: str
+    ) -> None:
         self.content_id = content_id
         self.label = label
         self.slug = slug

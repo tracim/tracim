@@ -33,21 +33,24 @@ def upgrade():
     connection.execute(
         events.update()
         .where(
-            sa.func.cast(events.c.fields["content"]["content_id"], sa.String) != sa.text("'null'"),
+            sa.func.cast(events.c.fields["content"]["content_id"], sa.String)
+            != sa.text("'null'"),
         )
         .values(content_id=events.c.fields["content"]["content_id"].as_integer())
     )
     connection.execute(
         events.update()
         .where(
-            sa.func.cast(events.c.fields["author"]["user_id"], sa.String) != sa.text("'null'"),
+            sa.func.cast(events.c.fields["author"]["user_id"], sa.String)
+            != sa.text("'null'"),
         )
         .values(author_id=events.c.fields["author"]["user_id"].as_integer())
     )
     connection.execute(
         events.update()
         .where(
-            sa.func.cast(events.c.fields["content"]["parent_id"], sa.String) != sa.text("'null'"),
+            sa.func.cast(events.c.fields["content"]["parent_id"], sa.String)
+            != sa.text("'null'"),
         )
         .values(parent_id=events.c.fields["content"]["parent_id"].as_integer())
     )

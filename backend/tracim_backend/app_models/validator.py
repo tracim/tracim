@@ -34,7 +34,9 @@ class TracimValidator(object):
     """
 
     def __init__(self) -> None:
-        self.validators = {}  # type: typing.Dict[str, typing.Callable[[typing.Any], None]]
+        self.validators = (
+            {}
+        )  # type: typing.Dict[str, typing.Callable[[typing.Any], None]]
         self.values = {}  # type: typing.Dict[str, str]
 
     def add_validator(
@@ -70,7 +72,9 @@ class TracimValidator(object):
                 self.validators[field](value)
             except ValidationError as e:
                 errors.append(
-                    "Validation of {field} failed : {msg}".format(field=field, msg=str(e))
+                    "Validation of {field} failed : {msg}".format(
+                        field=field, msg=str(e)
+                    )
                 )
         if errors:
             raise TracimValidationFailed(str(errors))
@@ -88,28 +92,40 @@ positive_int_validator = Range(min=0, error="Value must be positive or 0")
 
 # String
 # string matching list of int separated by ','
-regex_string_as_list_of_int = Regexp(regex=(re.compile("^(\d+(,\d+)*)?$")))  # noqa: W605
+regex_string_as_list_of_int = Regexp(
+    regex=(re.compile("^(\d+(,\d+)*)?$"))
+)  # noqa: W605
 # string matching list of string (without',') separated by ','
-regex_string_as_list_of_string = Regexp(regex=(re.compile("^([^,]+(,[^,]+)*)?$")))  # noqa: W605
+regex_string_as_list_of_string = Regexp(
+    regex=(re.compile("^([^,]+(,[^,]+)*)?$"))
+)  # noqa: W605
 
 not_empty_string_validator = Length(min=1)
 action_description_validator = OneOf(ActionDescription.allowed_values())
-workspace_access_type_validator = OneOf([access_type.value for access_type in WorkspaceAccessType])
+workspace_access_type_validator = OneOf(
+    [access_type.value for access_type in WorkspaceAccessType]
+)
 workspace_subscription_state_validator = OneOf(
     [subscription_state.value for subscription_state in WorkspaceSubscriptionState]
 )
 content_global_status_validator = OneOf([status.value for status in GlobalStatus])
 content_status_validator = OneOf(content_status_list.get_all_slugs_values())
 user_profile_validator = OneOf(Profile.get_all_valid_slugs())
-user_profile_validator_with_nobody = OneOf(Profile.get_all_valid_slugs(include_nobody=True))
+user_profile_validator_with_nobody = OneOf(
+    Profile.get_all_valid_slugs(include_nobody=True)
+)
 agenda_type_validator = OneOf([agenda_type.value for agenda_type in AgendaType])
 agenda_resource_type_validator = OneOf(
     [agenda_resource_type.value for agenda_resource_type in AgendaResourceType]
 )
 user_timezone_validator = Length(max=User.MAX_TIMEZONE_LENGTH)
 user_email_validator = Length(min=User.MIN_EMAIL_LENGTH, max=User.MAX_EMAIL_LENGTH)
-user_username_validator = Length(min=User.MIN_USERNAME_LENGTH, max=User.MAX_USERNAME_LENGTH)
-user_password_validator = Length(min=User.MIN_PASSWORD_LENGTH, max=User.MAX_PASSWORD_LENGTH)
+user_username_validator = Length(
+    min=User.MIN_USERNAME_LENGTH, max=User.MAX_USERNAME_LENGTH
+)
+user_password_validator = Length(
+    min=User.MIN_PASSWORD_LENGTH, max=User.MAX_PASSWORD_LENGTH
+)
 user_public_name_validator = Length(
     min=User.MIN_PUBLIC_NAME_LENGTH, max=User.MAX_PUBLIC_NAME_LENGTH
 )
@@ -131,4 +147,6 @@ all_content_types_validator = OneOf(choices=[])
 
 
 def update_validators() -> None:
-    all_content_types_validator.choices = content_type_list.endpoint_allowed_types_slug()
+    all_content_types_validator.choices = (
+        content_type_list.endpoint_allowed_types_slug()
+    )

@@ -83,7 +83,9 @@ class TestStringToList(object):
         ) == ["one", "two", "three", "fo ur"]
 
     def test_unit__string_to_list__ok__list_of_int_(self):
-        assert string_to_list("1,2,3,4", separator=",", cast_func=int, do_strip=True) == [
+        assert string_to_list(
+            "1,2,3,4", separator=",", cast_func=int, do_strip=True
+        ) == [
             1,
             2,
             3,
@@ -115,7 +117,10 @@ class TestTranslateDict(object):
                 {"modify": ["this", "should", "be", "modified"]},
                 {"modify": ["THIS", "SHOULD", "BE", "MODIFIED"]},
             ],
-            [{"nomodify": [{"modify": "modify"}]}, {"nomodify": [{"modify": "MODIFY"}]}],
+            [
+                {"nomodify": [{"modify": "modify"}]},
+                {"nomodify": [{"modify": "MODIFY"}]},
+            ],
         ],
     )
     def test__unit_translate_dict__to_uppercase(self, data, result):
@@ -159,7 +164,9 @@ class TestEmailAddress(object):
         assert john_address.force_angle_bracket is False
         assert john_address.address == "john.doe@domainame.ndl"
 
-    def test_unit__email_address_address__ok__empty_label_and_force_angle_brackets(self):
+    def test_unit__email_address_address__ok__empty_label_and_force_angle_brackets(
+        self,
+    ):
         john_address = EmailAddress(
             label="", email="john.doe@domainame.ndl", force_angle_bracket=True
         )
@@ -169,7 +176,9 @@ class TestEmailAddress(object):
         assert john_address.force_angle_bracket is True
         assert john_address.address == "<john.doe@domainame.ndl>"
 
-    def test_unit__email_address_address__ok__from_rfc_email_address__no_label_no_bracket(self):
+    def test_unit__email_address_address__ok__from_rfc_email_address__no_label_no_bracket(
+        self,
+    ):
         john_address = EmailAddress.from_rfc_email_address("john.doe@domainame.ndl")
         assert john_address.domain == "domainame.ndl"
         assert john_address.label == ""
@@ -177,7 +186,9 @@ class TestEmailAddress(object):
         assert john_address.force_angle_bracket is False
         assert john_address.address == "john.doe@domainame.ndl"
 
-    def test_unit__email_address_address__ok__from_rfc_email_address__no_label_with_bracket(self):
+    def test_unit__email_address_address__ok__from_rfc_email_address__no_label_with_bracket(
+        self,
+    ):
         john_address = EmailAddress.from_rfc_email_address("<john.doe@domainame.ndl>")
         assert john_address.domain == "domainame.ndl"
         assert john_address.label == ""
@@ -185,16 +196,24 @@ class TestEmailAddress(object):
         assert john_address.force_angle_bracket is False
         assert john_address.address == "john.doe@domainame.ndl"
 
-    def test_unit__email_address_address__ok__from_rfc_email_address__nominal_case(self):
-        john_address = EmailAddress.from_rfc_email_address("John Doe <john.doe@domainame.ndl>")
+    def test_unit__email_address_address__ok__from_rfc_email_address__nominal_case(
+        self,
+    ):
+        john_address = EmailAddress.from_rfc_email_address(
+            "John Doe <john.doe@domainame.ndl>"
+        )
         assert john_address.domain == "domainame.ndl"
         assert john_address.label == "John Doe"
         assert john_address.email == "john.doe@domainame.ndl"
         assert john_address.force_angle_bracket is False
         assert john_address.address == "John Doe <john.doe@domainame.ndl>"
 
-    def test_unit__email_address_address__ok__from_rfc_email_address__with_label_quotation(self):
-        john_address = EmailAddress.from_rfc_email_address('"John Doe" <john.doe@domainame.ndl>')
+    def test_unit__email_address_address__ok__from_rfc_email_address__with_label_quotation(
+        self,
+    ):
+        john_address = EmailAddress.from_rfc_email_address(
+            '"John Doe" <john.doe@domainame.ndl>'
+        )
         assert john_address.domain == "domainame.ndl"
         assert john_address.label == "John Doe"
         assert john_address.email == "john.doe@domainame.ndl"
@@ -205,25 +224,36 @@ class TestEmailAddress(object):
 class TestCustomPropertiesCheck(object):
     def test_unit__validate_json_schema__ok__nominal_case(self):
         json_schema = {
-            "properties": {"super": {"title": "Super"}, "something": {"title": "Something"}}
+            "properties": {
+                "super": {"title": "Super"},
+                "something": {"title": "Something"},
+            }
         }
         CustomPropertiesValidator().validate_json_schema(json_schema)
 
     def test_unit__validate_json_schema__err__missing_title(self):
         json_schema = {
-            "properties": {"super": {"section": "a long text"}, "something": {"title": "Something"}}
+            "properties": {
+                "super": {"section": "a long text"},
+                "something": {"title": "Something"},
+            }
         }
         with pytest.raises(UnvalidCustomPropertiesSchema):
             CustomPropertiesValidator().validate_json_schema(json_schema)
 
     def test_unit__validate_json_schema__err__empty_title(self):
-        json_schema = {"properties": {"super": {"title": ""}, "something": {"title": "Something"}}}
+        json_schema = {
+            "properties": {"super": {"title": ""}, "something": {"title": "Something"}}
+        }
         with pytest.raises(UnvalidCustomPropertiesSchema):
             CustomPropertiesValidator().validate_json_schema(json_schema)
 
     def test_unit__validate_json_schema__err__missing_properties(self):
         json_schema = {
-            "super_section": {"super": {"title": ""}, "something": {"title": "Something"}}
+            "super_section": {
+                "super": {"title": ""},
+                "something": {"title": "Something"},
+            }
         }
         with pytest.raises(UnvalidCustomPropertiesSchema):
             CustomPropertiesValidator().validate_json_schema(json_schema)

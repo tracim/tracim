@@ -29,14 +29,21 @@ class TestParentAccessPlugin(object):
                 label="parent", default_user_role=WorkspaceRoles.READER
             )
             child_workspace = wapi.create_workspace(
-                label="child", parent=parent_workspace, default_user_role=WorkspaceRoles.CONTRIBUTOR
+                label="child",
+                parent=parent_workspace,
+                default_user_role=WorkspaceRoles.CONTRIBUTOR,
             )
             grandson_workspace = wapi.create_workspace(
-                label="grandson", parent=child_workspace, default_user_role=WorkspaceRoles.READER
+                label="grandson",
+                parent=child_workspace,
+                default_user_role=WorkspaceRoles.READER,
             )
             uapi = user_api_factory.get()
             user_1 = uapi.create_user(
-                email="u.1@u.u", auth_type=AuthType.INTERNAL, do_save=True, do_notify=False
+                email="u.1@u.u",
+                auth_type=AuthType.INTERNAL,
+                do_save=True,
+                do_notify=False,
             )
             role_api = role_api_factory.get()
             role_api.create_one(
@@ -46,8 +53,14 @@ class TestParentAccessPlugin(object):
                 email_notification_type=EmailNotificationType.NONE,
             )
 
-            assert grandson_workspace.get_user_role(user_1) == WorkspaceRoles.CONTENT_MANAGER.level
-            assert child_workspace.get_user_role(user_1) == WorkspaceRoles.CONTRIBUTOR.level
+            assert (
+                grandson_workspace.get_user_role(user_1)
+                == WorkspaceRoles.CONTENT_MANAGER.level
+            )
+            assert (
+                child_workspace.get_user_role(user_1)
+                == WorkspaceRoles.CONTRIBUTOR.level
+            )
             assert parent_workspace.get_user_role(user_1) == WorkspaceRoles.READER.level
 
     def test__add_new_user_to_parent_workspaces__ok__user_in_child_space(
@@ -69,10 +82,14 @@ class TestParentAccessPlugin(object):
             label="parent", default_user_role=WorkspaceRoles.READER
         )
         child_workspace = wapi.create_workspace(
-            label="child", parent=parent_workspace, default_user_role=WorkspaceRoles.CONTRIBUTOR
+            label="child",
+            parent=parent_workspace,
+            default_user_role=WorkspaceRoles.CONTRIBUTOR,
         )
         grandson_workspace = wapi.create_workspace(
-            label="grandson", parent=child_workspace, default_user_role=WorkspaceRoles.READER
+            label="grandson",
+            parent=child_workspace,
+            default_user_role=WorkspaceRoles.READER,
         )
         uapi = user_api_factory.get()
         user_1 = uapi.create_user(
@@ -93,8 +110,14 @@ class TestParentAccessPlugin(object):
                 email_notification_type=EmailNotificationType.NONE,
             )
 
-            assert grandson_workspace.get_user_role(user_1) == WorkspaceRoles.CONTENT_MANAGER.level
-            assert child_workspace.get_user_role(user_1) == WorkspaceRoles.CONTRIBUTOR.level
+            assert (
+                grandson_workspace.get_user_role(user_1)
+                == WorkspaceRoles.CONTENT_MANAGER.level
+            )
+            assert (
+                child_workspace.get_user_role(user_1)
+                == WorkspaceRoles.CONTRIBUTOR.level
+            )
             assert parent_workspace.get_user_role(user_1) == WorkspaceRoles.READER.level
 
     def test__add_new_user_to_parent_workspaces__ok__several_child_workspaces(
@@ -136,11 +159,23 @@ class TestParentAccessPlugin(object):
         with load_auto_invite_plugin, load_parent_access_plugin:
             uapi = user_api_factory.get()
             user_1 = uapi.create_user(
-                email="u.1@u.u", auth_type=AuthType.INTERNAL, do_save=True, do_notify=False
+                email="u.1@u.u",
+                auth_type=AuthType.INTERNAL,
+                do_save=True,
+                do_notify=False,
             )
             session.flush()
-            assert grandchild_workspace.get_user_role(user_1) == WorkspaceRoles.CONTRIBUTOR.level
-            assert child_workspace.get_user_role(user_1) == WorkspaceRoles.CONTRIBUTOR.level
-            assert child2_workspace.get_user_role(user_1) == WorkspaceRoles.CONTRIBUTOR.level
+            assert (
+                grandchild_workspace.get_user_role(user_1)
+                == WorkspaceRoles.CONTRIBUTOR.level
+            )
+            assert (
+                child_workspace.get_user_role(user_1)
+                == WorkspaceRoles.CONTRIBUTOR.level
+            )
+            assert (
+                child2_workspace.get_user_role(user_1)
+                == WorkspaceRoles.CONTRIBUTOR.level
+            )
             assert parent_workspace.get_user_role(user_1) == WorkspaceRoles.READER.level
             transaction.commit()

@@ -13,12 +13,12 @@ class UploadPermissionApp(TracimApplication):
         pass
 
     def load_config(self, app_config: CFG) -> None:
-        template_dir = app_config.here_macro_replace("%(here)s/tracim_backend/templates/mail")
-        app_config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__TEMPLATE__HTML = (
-            app_config.get_raw_config(
-                "email.notification.upload_permission_to_receiver.template.html",
-                "{}/{}".format(template_dir, "upload_permission_to_receiver_body_html.mak"),
-            )
+        template_dir = app_config.here_macro_replace(
+            "%(here)s/tracim_backend/templates/mail"
+        )
+        app_config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__TEMPLATE__HTML = app_config.get_raw_config(
+            "email.notification.upload_permission_to_receiver.template.html",
+            "{}/{}".format(template_dir, "upload_permission_to_receiver_body_html.mak"),
         )
         app_config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__SUBJECT = (
             app_config.get_raw_config(
@@ -29,7 +29,9 @@ class UploadPermissionApp(TracimApplication):
         app_config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__TEMPLATE__HTML = (
             app_config.get_raw_config(
                 "email.notification.upload_permission_to_emitter.template.html",
-                "{}/{}".format(template_dir, "upload_permission_to_emitter_body_html.mak"),
+                "{}/{}".format(
+                    template_dir, "upload_permission_to_emitter_body_html.mak"
+                ),
             )
         )
         app_config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__SUBJECT = app_config.get_raw_config(
@@ -66,7 +68,8 @@ class UploadPermissionApp(TracimApplication):
                     raise ConfigurationError(
                         "ERROR: email template for {template_description} "
                         'not found at "{template_path}".'.format(
-                            template_description=template_description, template_path=template_path
+                            template_description=template_description,
+                            template_path=template_path,
                         )
                     )
 
@@ -82,7 +85,9 @@ class UploadPermissionApp(TracimApplication):
         )
 
         upload_permission_controller = UploadPermissionController()
-        configurator.include(upload_permission_controller.bind, route_prefix=route_prefix)
+        configurator.include(
+            upload_permission_controller.bind, route_prefix=route_prefix
+        )
 
 
 def create_app() -> TracimApplication:

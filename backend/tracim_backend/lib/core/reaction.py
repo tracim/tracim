@@ -41,25 +41,35 @@ class ReactionLib:
             query = query.filter(Reaction.value == value)
         return query
 
-    def get_one(self, reaction_id: int, content_id: typing.Optional[int] = None) -> Reaction:
+    def get_one(
+        self, reaction_id: int, content_id: typing.Optional[int] = None
+    ) -> Reaction:
         try:
             reaction = self.base_filter(
                 self._base_query(), reaction_id=reaction_id, content_id=content_id
             ).one()
         except NoResultFound:
             raise ReactionNotFound(
-                "Reaction of id {reaction_id} was not found.".format(reaction_id=reaction_id)
+                "Reaction of id {reaction_id} was not found.".format(
+                    reaction_id=reaction_id
+                )
             )
         return reaction
 
     def get_all(
-        self, content_id: typing.Optional[int] = None, user_id: typing.Optional[int] = None
+        self,
+        content_id: typing.Optional[int] = None,
+        user_id: typing.Optional[int] = None,
     ) -> typing.List[Reaction]:
-        query = self.base_filter(self._base_query(), content_id=content_id, user_id=user_id)
+        query = self.base_filter(
+            self._base_query(), content_id=content_id, user_id=user_id
+        )
         query = query.order_by(Reaction.reaction_id)
         return query.all()
 
-    def create(self, user: User, content: Content, value: str, do_save: bool) -> Reaction:
+    def create(
+        self, user: User, content: Content, value: str, do_save: bool
+    ) -> Reaction:
         query = self.base_filter(
             query=self._base_query(),
             user_id=user.user_id,

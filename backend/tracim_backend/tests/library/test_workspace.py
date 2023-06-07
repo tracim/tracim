@@ -25,14 +25,20 @@ class TestThread(object):
         session.add(folder)
         session.flush()
 
-        thread = Content(type=content_type_list.Thread.slug, owner=admin_user, parent=folder)
+        thread = Content(
+            type=content_type_list.Thread.slug, owner=admin_user, parent=folder
+        )
         thread.label = "thread_1"
         thread.workspace = workspace
         session.add(folder)
         session.flush()
-        workspace = session.query(Workspace).filter(Workspace.label == "workspace_1").one()
+        workspace = (
+            session.query(Workspace).filter(Workspace.label == "workspace_1").one()
+        )
         content_api = content_api_factory.get()
-        folder = content_api.get_canonical_query().filter(Content.label == "folder_1").one()
+        folder = (
+            content_api.get_canonical_query().filter(Content.label == "folder_1").one()
+        )
         assert [folder] == list(workspace.get_valid_children())
 
     def test__unit__get_notifiable_roles__ok__nominal_case(
@@ -312,4 +318,6 @@ class TestThread(object):
         wapi = WorkspaceApi(session=session, current_user=admin_user, config=app_config)
         wapi.create_workspace(label="business", save_now=True)
         workspace2 = wapi.create_workspace(label="meeting", save_now=True)
-        wapi.update_workspace(workspace=workspace2, label="business", save_now=True, description="")
+        wapi.update_workspace(
+            workspace=workspace2, label="business", save_now=True, description=""
+        )

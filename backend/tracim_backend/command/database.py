@@ -109,10 +109,14 @@ class InitializeDBCommand(AppContextCommand):
         print("- Populate database with default data -")
         with transaction.manager:
             context = CustomTracimContext(app_config)
-            dbsession = create_dbsession_for_context(session_factory, transaction.manager, context)
+            dbsession = create_dbsession_for_context(
+                session_factory, transaction.manager, context
+            )
             context._session = dbsession
             try:
-                user_api = UserApi(current_user=None, session=dbsession, config=app_config)
+                user_api = UserApi(
+                    current_user=None, session=dbsession, config=app_config
+                )
                 app_config.configure_filedepot()
                 user_api.create_user(
                     name="Global manager",
@@ -173,7 +177,9 @@ class DeleteDBCommand(AppContextCommand):
             print("Database deletion done.")
             try:
                 print("Cleaning depot begin.")
-                depot = DepotManager.get(app_config.UPLOADED_FILES__STORAGE__STORAGE_NAME)
+                depot = DepotManager.get(
+                    app_config.UPLOADED_FILES__STORAGE__STORAGE_NAME
+                )
                 depot_files = depot.list()
                 for file_ in depot_files:
                     try:
@@ -181,11 +187,16 @@ class DeleteDBCommand(AppContextCommand):
                     # TODO - G.M - 2019-05-09 - better handling of specific exception here
                     except Exception as exc:
                         traceback.print_exc()
-                        print("Something goes wrong during deletion of {}".format(file_))
+                        print(
+                            "Something goes wrong during deletion of {}".format(file_)
+                        )
                         raise exc
                 print("Cleaning depot done.")
             except FileNotFoundError:
-                print("Warning! Can delete depots file, is depot path correctly" " configured?")
+                print(
+                    "Warning! Can delete depots file, is depot path correctly"
+                    " configured?"
+                )
         else:
             force_arg_required = (
                 "Warning! You should use --force if you really want to delete database."
@@ -234,12 +245,12 @@ class MigrateMysqlCharsetCommand(AppContextCommand):
         collation = parsed_args.collation or self.DEFAULT_COLLATION
         charset = parsed_args.charset or self.DEFAULT_CHARSET
         if not engine.dialect.name.startswith("mysql"):
-            raise ValueError("This command is only supported on Mysql/Mariadb databases")
-        logger.info(self, "Database not deleted")
-        set_database = (
-            "ALTER DATABASE {database} CHARACTER SET {charset} COLLATE {collation};".format(
-                database=database_name, charset=charset, collation=collation
+            raise ValueError(
+                "This command is only supported on Mysql/Mariadb databases"
             )
+        logger.info(self, "Database not deleted")
+        set_database = "ALTER DATABASE {database} CHARACTER SET {charset} COLLATE {collation};".format(
+            database=database_name, charset=charset, collation=collation
         )
         logger.debug(self, set_database)
         engine.execute(set_database)
@@ -249,7 +260,11 @@ class MigrateMysqlCharsetCommand(AppContextCommand):
             )
             logger.debug(self, set_table)
             engine.execute(set_table)
-        print('Database set to "{}" character set with "{}" collation '.format(charset, collation))
+        print(
+            'Database set to "{}" character set with "{}" collation '.format(
+                charset, collation
+            )
+        )
 
 
 class UpdateNamingConventionsV1ToV2Command(AppContextCommand):
@@ -300,7 +315,9 @@ class UpdateNamingConventionsV1ToV2Command(AppContextCommand):
                             )
                         )
                     elif foreign_key["name"] == "revision_read_status_revision_id_fkey":
-                        new_name = "fk_revision_read_status_revision_id_content_revisions"
+                        new_name = (
+                            "fk_revision_read_status_revision_id_content_revisions"
+                        )
                         engine.execute(
                             "ALTER TABLE {} RENAME CONSTRAINT {} TO {}".format(
                                 table_name, foreign_key["name"], new_name
@@ -328,7 +345,9 @@ class UpdateNamingConventionsV1ToV2Command(AppContextCommand):
                     match = v1_primary_key_convention.search(primary_key["name"])
                     if primary_key["name"] == "pk__users__user_id":
                         engine.execute(
-                            "ALTER INDEX {} RENAME TO pk_users".format(primary_key["name"])
+                            "ALTER INDEX {} RENAME TO pk_users".format(
+                                primary_key["name"]
+                            )
                         )
                     elif primary_key["name"] == "pk__content_revisions__revision_id":
                         engine.execute(
@@ -336,13 +355,20 @@ class UpdateNamingConventionsV1ToV2Command(AppContextCommand):
                                 primary_key["name"]
                             )
                         )
-                    elif primary_key["name"] == "pk__user_workspace__user_id__workspace_id":
+                    elif (
+                        primary_key["name"]
+                        == "pk__user_workspace__user_id__workspace_id"
+                    ):
                         engine.execute(
-                            "ALTER INDEX {} RENAME TO pk_user_workspace".format(primary_key["name"])
+                            "ALTER INDEX {} RENAME TO pk_user_workspace".format(
+                                primary_key["name"]
+                            )
                         )
                     elif primary_key["name"] == "pk__workspace__workspace_id":
                         engine.execute(
-                            "ALTER INDEX {} RENAME TO pk_workspaces".format(primary_key["name"])
+                            "ALTER INDEX {} RENAME TO pk_workspaces".format(
+                                primary_key["name"]
+                            )
                         )
                     elif primary_key["name"] == "revision_read_status_pkey":
                         engine.execute(
@@ -353,7 +379,9 @@ class UpdateNamingConventionsV1ToV2Command(AppContextCommand):
                     elif match:
                         new_name = "pk_{}".format(match.group(1))
                         engine.execute(
-                            "ALTER INDEX {} RENAME TO {}".format(primary_key["name"], new_name)
+                            "ALTER INDEX {} RENAME TO {}".format(
+                                primary_key["name"], new_name
+                            )
                         )
 
 
@@ -374,14 +402,18 @@ class MigrateStorageCommand(AppContextCommand):
         )
         return parser
 
-    def _reupload_depot_file(self, db_object, field_names: typing.List[str], dbsession: Session):
+    def _reupload_depot_file(
+        self, db_object, field_names: typing.List[str], dbsession: Session
+    ):
         for field_name in field_names:
             field_value = getattr(db_object, field_name)
             if field_value:
                 setattr(
                     db_object,
                     field_name,
-                    FileIntent(field_value.file, field_value.filename, field_value.content_type),
+                    FileIntent(
+                        field_value.file, field_value.filename, field_value.content_type
+                    ),
                 )
                 dbsession.add(db_object)
                 dbsession.flush()
@@ -407,7 +439,10 @@ class MigrateStorageCommand(AppContextCommand):
         new_storage_type = new_cfg.UPLOADED_FILES__STORAGE__STORAGE_TYPE
         print(
             "Migration of storage from {}({}) to {}({}) started".format(
-                original_storage_name, original_storage_type, new_storage_name, new_storage_type
+                original_storage_name,
+                original_storage_type,
+                new_storage_name,
+                new_storage_type,
             )
         )
 
@@ -425,7 +460,9 @@ class MigrateStorageCommand(AppContextCommand):
             dbsession = get_tm_session(session_factory, transaction.manager)
             revisions = dbsession.query(ContentRevisionRO).all()
             for revision in revisions:
-                self._reupload_depot_file(revision, field_names=["depot_file"], dbsession=dbsession)
+                self._reupload_depot_file(
+                    revision, field_names=["depot_file"], dbsession=dbsession
+                )
             users = dbsession.query(User).all()
             for user in users:
                 self._reupload_depot_file(
@@ -436,6 +473,9 @@ class MigrateStorageCommand(AppContextCommand):
             transaction.commit()
         print(
             "Migration of storage finished from {}({}) to {}({})".format(
-                original_storage_name, original_storage_type, new_storage_name, new_storage_type
+                original_storage_name,
+                original_storage_type,
+                new_storage_name,
+                new_storage_type,
             )
         )

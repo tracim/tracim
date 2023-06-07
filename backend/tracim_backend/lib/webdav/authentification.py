@@ -19,7 +19,9 @@ class TracimDomainController(object):
     def __init__(self, app_config: CFG, presetdomain=None, presetserver=None):
         self.app_config = app_config
 
-    def getDomainRealm(self, inputURL: str, environ: typing.Dict[str, typing.Any]) -> str:
+    def getDomainRealm(
+        self, inputURL: str, environ: typing.Dict[str, typing.Any]
+    ) -> str:
         return DEFAULT_TRACIM_WEBDAV_REALM
 
     def getRealmUserPassword(
@@ -32,7 +34,9 @@ class TracimDomainController(object):
         """
         raise DigestAuthNotImplemented
 
-    def requireAuthentication(self, realmname: str, environ: typing.Dict[str, typing.Any]) -> bool:
+    def requireAuthentication(
+        self, realmname: str, environ: typing.Dict[str, typing.Any]
+    ) -> bool:
         return True
 
     def isRealmUser(
@@ -53,7 +57,11 @@ class TracimDomainController(object):
             return False
 
     def authDomainUser(
-        self, realmname: str, username: str, password: str, environ: typing.Dict[str, typing.Any]
+        self,
+        realmname: str,
+        username: str,
+        password: str,
+        environ: typing.Dict[str, typing.Any],
     ) -> bool:
         """
         If you ever feel the need to send a request al-mano with a curl, this is the function that'll be called by

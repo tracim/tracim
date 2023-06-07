@@ -31,7 +31,11 @@ class TestHtmlMailQuoteChecker(object):
         assert HtmlMailQuoteChecker._is_thunderbird_quote(main_elem) is False
 
     def test_unit__is_gmail_quote_ok(self):
-        html = '<div class="gmail_extra">' + '<a></a><div class="gmail_quote"></div>' + "</div>"
+        html = (
+            '<div class="gmail_extra">'
+            + '<a></a><div class="gmail_quote"></div>'
+            + "</div>"
+        )
         soup = BeautifulSoup(html, "html.parser")
         main_elem = soup.find()
         assert HtmlMailQuoteChecker._is_gmail_quote(main_elem) is True
@@ -42,7 +46,11 @@ class TestHtmlMailQuoteChecker(object):
         assert HtmlMailQuoteChecker._is_gmail_quote(main_elem) is False
 
     def test_unit__is_gmail_quote_no_2(self):
-        html = '<div class="gmail_extra">' + '<a></a><div class="gmail_signature"></div>' + "</div>"
+        html = (
+            '<div class="gmail_extra">'
+            + '<a></a><div class="gmail_signature"></div>'
+            + "</div>"
+        )
         soup = BeautifulSoup(html, "html.parser")
         main_elem = soup.find()
         assert HtmlMailQuoteChecker._is_gmail_quote(main_elem) is False
@@ -73,7 +81,11 @@ class TestHtmlMailSignatureChecker(object):
         assert HtmlMailSignatureChecker._is_thunderbird_signature(main_elem) is False
 
     def test_unit__is_gmail_signature_ok(self):
-        html = '<div class="gmail_extra">' + '<a></a><div class="gmail_quote"></div>' + "</div>"
+        html = (
+            '<div class="gmail_extra">'
+            + '<a></a><div class="gmail_quote"></div>'
+            + "</div>"
+        )
         soup = BeautifulSoup(html, "html.parser")
         main_elem = soup.find()
         assert HtmlMailSignatureChecker._is_gmail_signature(main_elem) is False
@@ -84,7 +96,11 @@ class TestHtmlMailSignatureChecker(object):
         assert HtmlMailSignatureChecker._is_gmail_signature(main_elem) is False
 
     def test_unit__is_gmail_signature_yes(self):
-        html = '<div class="gmail_extra">' + '<a></a><div class="gmail_signature"></div>' + "</div>"
+        html = (
+            '<div class="gmail_extra">'
+            + '<a></a><div class="gmail_signature"></div>'
+            + "</div>"
+        )
         soup = BeautifulSoup(html, "html.parser")
         main_elem = soup.find()
         assert HtmlMailSignatureChecker._is_gmail_signature(main_elem) is True

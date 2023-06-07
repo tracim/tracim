@@ -111,11 +111,14 @@ class TestAccountKnownMembersEndpoint(object):
         transaction.commit()
         int(admin_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"acp": "bob"}
-        res = web_testapp.get("/api/users/me/known_members", status=307, params=params).follow(
-            status=200
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
         )
+        params = {"acp": "bob"}
+        res = web_testapp.get(
+            "/api/users/me/known_members", status=307, params=params
+        ).follow(status=200)
         res = res.json_body
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
@@ -166,11 +169,14 @@ class TestAccountKnownMembersEndpoint(object):
         transaction.commit()
         int(admin_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"acp": "bob", "exclude_user_ids": str(test_user2.user_id)}
-        res = web_testapp.get("/api/users/me/known_members", status=307, params=params).follow(
-            status=200
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
         )
+        params = {"acp": "bob", "exclude_user_ids": str(test_user2.user_id)}
+        res = web_testapp.get(
+            "/api/users/me/known_members", status=307, params=params
+        ).follow(status=200)
         res = res.json_body
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
@@ -215,11 +221,14 @@ class TestAccountKnownMembersEndpoint(object):
         transaction.commit()
         int(admin_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"acp": "t"}
-        res = web_testapp.get("/api/users/me/known_members", status=307, params=params).follow(
-            status=400
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
         )
+        params = {"acp": "t"}
+        res = web_testapp.get(
+            "/api/users/me/known_members", status=307, params=params
+        ).follow(status=400)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.ACP_STRING_TOO_SHORT
@@ -270,7 +279,9 @@ class TestAccountKnownMembersEndpoint(object):
         uapi.save(test_user)
         uapi.save(test_user2)
         uapi.save(test_user3)
-        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        workspace = workspace_api_factory.get().create_workspace(
+            "test workspace", save_now=True
+        )
         role_api = role_api_factory.get()
         role_api.create_one(
             test_user,
@@ -289,9 +300,9 @@ class TestAccountKnownMembersEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         params = {"acp": "test"}
-        res = web_testapp.get("/api/users/me/known_members", status=307, params=params).follow(
-            status=200
-        )
+        res = web_testapp.get(
+            "/api/users/me/known_members", status=307, params=params
+        ).follow(status=200)
         res = res.json_body
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
@@ -402,7 +413,10 @@ class TestSetEmailEndpoint(object):
         assert res["email"] == "test@test.test"
 
         # Set password
-        params = {"email": "mysuperemail@email.fr", "loggedin_user_password": "badpassword"}
+        params = {
+            "email": "mysuperemail@email.fr",
+            "loggedin_user_password": "badpassword",
+        }
         res = follow_put_json(
             web_testapp.put_json("/api/users/me/email", params=params, status=307),
             status=403,
@@ -450,7 +464,10 @@ class TestSetEmailEndpoint(object):
         assert res["email"] == "test@test.test"
 
         # Set password
-        params = {"email": "mysuperemail@email.fr", "loggedin_user_password": "password"}
+        params = {
+            "email": "mysuperemail@email.fr",
+            "loggedin_user_password": "password",
+        }
         follow_put_json(
             web_testapp.put_json("/api/users/me/email", params=params, status=307),
             status=200,

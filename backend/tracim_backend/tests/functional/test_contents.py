@@ -21,7 +21,9 @@ from tracim_backend.views.core_api.schemas import UserDigestSchema
 
 
 @pytest.fixture
-def test_file(workspace_api_factory, content_api_factory, content_type_list, session) -> Content:
+def test_file(
+    workspace_api_factory, content_api_factory, content_type_list, session
+) -> Content:
     workspace_api = workspace_api_factory.get()
     content_api = content_api_factory.get()
     business_workspace = workspace_api.get_one(1)
@@ -34,7 +36,10 @@ def test_file(workspace_api_factory, content_api_factory, content_type_list, ses
     )
     with new_revision(session=session, tm=transaction.manager, content=test_file):
         content_api.update_file_data(
-            test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+            test_file,
+            "Test_file.txt",
+            new_mimetype="plain/text",
+            new_content=b"Test file",
         )
     with new_revision(session=session, tm=transaction.manager, content=test_file):
         content_api.update_content(test_file, "Test_file", "<p>description</p>")
@@ -69,7 +74,10 @@ class TestFolder(object):
         )
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/workspaces/{workspace_id}/folders/{content_id}".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id
@@ -114,7 +122,10 @@ class TestFolder(object):
         """
         Get one folder of a content content 7 is not folder
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
 
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
@@ -143,7 +154,10 @@ class TestFolder(object):
         """
         Get one folder content (content 170 does not exist in db)
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
 
         workspace_api = workspace_api_factory.get()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
@@ -164,7 +178,10 @@ class TestFolder(object):
         """
         Get one folders of a content (content is in another workspace)
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
 
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
@@ -178,7 +195,10 @@ class TestFolder(object):
         )
         test_workspace2 = workspace_api.create_workspace(label="test2", save_now=True)
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/workspaces/{workspace_id}/folders/{content_id}".format(
                 workspace_id=test_workspace2.workspace_id, content_id=folder.content_id
@@ -207,9 +227,14 @@ class TestFolder(object):
             do_notify=False,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
-            "/api/workspaces/40/folders/{content_id}".format(content_id=folder.content_id),
+            "/api/workspaces/40/folders/{content_id}".format(
+                content_id=folder.content_id
+            ),
             status=400,
         )
         assert res.json_body
@@ -234,9 +259,14 @@ class TestFolder(object):
             do_notify=False,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
-            "/api/workspaces/coucou/folders/{content_id}".format(content_id=folder.content_id),
+            "/api/workspaces/coucou/folders/{content_id}".format(
+                content_id=folder.content_id
+            ),
             status=400,
         )
         assert res.json_body
@@ -262,7 +292,10 @@ class TestFolder(object):
         )
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/workspaces/{workspace_id}/folders/coucou".format(
                 workspace_id=test_workspace.workspace_id
@@ -291,7 +324,10 @@ class TestFolder(object):
             do_notify=False,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "label": "",
             "raw_content": "<p> Le nouveau contenu </p>",
@@ -332,7 +368,10 @@ class TestFolder(object):
             do_notify=False,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "label": "My New label",
             "description": "<p> Le nouveau contenu </p>",
@@ -409,7 +448,10 @@ class TestFolder(object):
             do_notify=False,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "label": "My New label",
         }
@@ -441,7 +483,10 @@ class TestFolder(object):
             do_notify=False,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "label": "My New label",
             "description": "<p> Le nouveau contenu </p>",
@@ -509,7 +554,10 @@ class TestFolder(object):
             do_notify=False,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "label": "My New label",
             "description": "<p> Le nouveau contenu </p>",
@@ -551,7 +599,10 @@ class TestFolder(object):
         params = {
             "label": "My New label",
             "raw_content": "<p> Le nouveau contenu </p>",
-            "sub_content_types": [content_type_list.Folder.slug, content_type_list.Thread.slug],
+            "sub_content_types": [
+                content_type_list.Folder.slug,
+                content_type_list.Thread.slug,
+            ],
         }
 
         res = web_testapp.put_json(
@@ -607,7 +658,10 @@ class TestFolder(object):
             do_notify=False,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "label": "My New label",
             "description": "<p> Le nouveau contenu </p>",
@@ -710,7 +764,10 @@ class TestFolder(object):
             do_notify=False,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "label": "already_used",
             "description": "<p> Le nouveau contenu </p>",
@@ -725,10 +782,17 @@ class TestFolder(object):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
+        assert (
+            res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
+        )
 
     def test_api__get_folder_revisions__ok_200__nominal_case(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Get one html document of a content
@@ -756,7 +820,10 @@ class TestFolder(object):
             content_api.unarchive(folder)
         content_api.save(folder)
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/workspaces/{workspace_id}/folders/{content_id}/revisions".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id
@@ -877,7 +944,10 @@ class TestFolder(object):
             do_notify=False,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"status": "closed-deprecated"}
 
         # before
@@ -919,7 +989,10 @@ class TestFolder(object):
         """
         Get one folder content
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"status": "unexistant-status"}
 
         workspace_api = workspace_api_factory.get()
@@ -1012,7 +1085,10 @@ class TestHtmlDocuments(object):
         """
         Get one html document of a content
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         set_html_document_slug_to_legacy(session_factory)
         res = web_testapp.get("/api/workspaces/2/html-documents/6", status=200)
         content = res.json_body
@@ -1043,7 +1119,8 @@ class TestHtmlDocuments(object):
         assert content["last_modifier"]["username"] == "TheBobi"
         assert content["last_modifier"]["has_avatar"] is True
         assert (
-            content["raw_content"] == "<p>To cook a great Tiramisu, you need many ingredients.</p>"
+            content["raw_content"]
+            == "<p>To cook a great Tiramisu, you need many ingredients.</p>"
         )
         assert content["file_extension"] == ".document.html"
 
@@ -1051,7 +1128,10 @@ class TestHtmlDocuments(object):
         """
         Get one html document of a content
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/2/html-documents/6", status=200)
         content = res.json_body
         assert content["content_type"] == "html-document"
@@ -1081,15 +1161,21 @@ class TestHtmlDocuments(object):
         assert content["last_modifier"]["username"] == "TheBobi"
         assert content["last_modifier"]["has_avatar"] is True
         assert (
-            content["raw_content"] == "<p>To cook a great Tiramisu, you need many ingredients.</p>"
+            content["raw_content"]
+            == "<p>To cook a great Tiramisu, you need many ingredients.</p>"
         )
         assert content["file_extension"] == ".document.html"
 
-    def test_api__get_html_document__ok_200__archived_content(self, web_testapp) -> None:
+    def test_api__get_html_document__ok_200__archived_content(
+        self, web_testapp
+    ) -> None:
         """
         Get one html document of a content
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put_json("/api/workspaces/2/contents/6/archived", status=204)
         res = web_testapp.get("/api/workspaces/2/html-documents/6", status=200)
         content = res.json_body
@@ -1101,7 +1187,10 @@ class TestHtmlDocuments(object):
         """
         Get one html document of a content
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put_json("/api/workspaces/2/contents/6/trashed", status=204)
         res = web_testapp.get("/api/workspaces/2/html-documents/6", status=200)
         content = res.json_body
@@ -1109,61 +1198,91 @@ class TestHtmlDocuments(object):
         assert content["content_id"] == 6
         assert content["is_deleted"] is True
 
-    def test_api__get_html_document__err_400__wrong_content_type(self, web_testapp) -> None:
+    def test_api__get_html_document__err_400__wrong_content_type(
+        self, web_testapp
+    ) -> None:
         """
         Get one html document of a content content 7 is not html_document
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/2/html-documents/7", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_TYPE_NOT_ALLOWED
 
-    def test_api__get_html_document__err_400__content_does_not_exist(self, web_testapp) -> None:
+    def test_api__get_html_document__err_400__content_does_not_exist(
+        self, web_testapp
+    ) -> None:
         """
         Get one html document of a content (content 170 does not exist in db
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/2/html-documents/170", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
-    def test_api__get_html_document__err_400__content_not_in_workspace(self, web_testapp) -> None:
+    def test_api__get_html_document__err_400__content_not_in_workspace(
+        self, web_testapp
+    ) -> None:
         """
         Get one html document of a content (content 6 is in workspace 2)
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/1/html-documents/6", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
-    def test_api__get_html_document__err_400__workspace_does_not_exist(self, web_testapp) -> None:
+    def test_api__get_html_document__err_400__workspace_does_not_exist(
+        self, web_testapp
+    ) -> None:
         """
         Get one html document of a content (Workspace 40 does not exist)
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/40/html-documents/6", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
 
-    def test_api__get_html_document__err_400__workspace_id_is_not_int(self, web_testapp) -> None:
+    def test_api__get_html_document__err_400__workspace_id_is_not_int(
+        self, web_testapp
+    ) -> None:
         """
         Get one html document of a content, workspace id is not int
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/coucou/html-documents/6", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.WORKSPACE_INVALID_ID
 
-    def test_api__get_html_document__err_400__content_id_is_not_int(self, web_testapp) -> None:
+    def test_api__get_html_document__err_400__content_id_is_not_int(
+        self, web_testapp
+    ) -> None:
         """
         Get one html document of a content, content_id is not int
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/2/html-documents/coucou", status=400)
         assert res.json_body
         assert "code" in res.json_body
@@ -1192,12 +1311,17 @@ class TestHtmlDocuments(object):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=session, tm=transaction.manager, content=test_html_document):
+        with new_revision(
+            session=session, tm=transaction.manager, content=test_html_document
+        ):
             content_api.update_content(
                 test_html_document, "test_page", new_raw_content=content_raw_data
             )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/workspaces/1/html-documents/{}/preview/html/".format(
                 test_html_document.content_id
@@ -1233,13 +1357,18 @@ class TestHtmlDocuments(object):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=session, tm=transaction.manager, content=test_html_document):
+        with new_revision(
+            session=session, tm=transaction.manager, content=test_html_document
+        ):
             content_api.update_content(
                 test_html_document, "test_page", new_raw_content=content_raw_data
             )
         transaction.commit()
         params = {"force_download": 1}
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         filename = test_html_document.label + ".pdf"
         res = web_testapp.get(
             "/api/workspaces/1/html-documents/{}/preview/pdf/full/{}".format(
@@ -1250,7 +1379,9 @@ class TestHtmlDocuments(object):
         )
         assert res.headers[
             "Content-Disposition"
-        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(filename, filename)
+        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
+            filename, filename
+        )
         assert res.content_type == "application/pdf"
 
     @pytest.mark.parametrize("content_raw_data", ["<b>a first html comment</b>"])
@@ -1276,13 +1407,18 @@ class TestHtmlDocuments(object):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=session, tm=transaction.manager, content=test_html_document):
+        with new_revision(
+            session=session, tm=transaction.manager, content=test_html_document
+        ):
             content_api.update_content(
                 test_html_document, "test_page", new_raw_content=content_raw_data
             )
         transaction.commit()
         params = {"force_download": 1}
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         filename = test_html_document.label + ".pdf"
         res = web_testapp.get(
             "/api/workspaces/1/html-documents/{}/revisions/{}/preview/pdf/full/{}".format(
@@ -1293,17 +1429,24 @@ class TestHtmlDocuments(object):
         )
         assert res.headers[
             "Content-Disposition"
-        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(filename, filename)
+        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
+            filename, filename
+        )
         assert res.content_type == "application/pdf"
 
     def test_api__update_html_document__err_400__empty_label(self, web_testapp) -> None:
         """
         Update(put) one html document of a content
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"label": "", "raw_content": "<p> Le nouveau contenu </p>"}
 
-        res = web_testapp.put_json("/api/workspaces/2/html-documents/6", params=params, status=400)
+        res = web_testapp.put_json(
+            "/api/workspaces/2/html-documents/6", params=params, status=400
+        )
         # INFO - G.M - 2018-09-10 -  Handled by marshmallow schema
         assert res.json_body
         assert "code" in res.json_body
@@ -1315,10 +1458,15 @@ class TestHtmlDocuments(object):
         """
         Update(put) one html document of a content
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"label": "", "raw_content": html_with_nasty_mention}
 
-        res = web_testapp.put_json("/api/workspaces/2/html-documents/6", params=params, status=400)
+        res = web_testapp.put_json(
+            "/api/workspaces/2/html-documents/6", params=params, status=400
+        )
         # INFO - G.M - 2018-09-10 -  Handled by marshmallow schema
         assert res.json_body
         assert "code" in res.json_body
@@ -1330,9 +1478,14 @@ class TestHtmlDocuments(object):
         """
         Update(put) one html document of a content
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"label": "My New label", "raw_content": "<p> Le nouveau contenu </p>"}
-        res = web_testapp.put_json("/api/workspaces/2/html-documents/6", params=params, status=200)
+        res = web_testapp.put_json(
+            "/api/workspaces/2/html-documents/6", params=params, status=200
+        )
         content = res.json_body
         assert content["content_type"] == "html-document"
         assert content["content_id"] == 6
@@ -1392,11 +1545,16 @@ class TestHtmlDocuments(object):
         assert modified_event.event_type == "content.modified.html-document"
         # NOTE S.G 2020-05-12: allow a small difference in modified time
         # as tests with MySQL sometimes fails with a strict equality
-        event_content_modified = dateutil.parser.isoparse(modified_event.content["modified"])
+        event_content_modified = dateutil.parser.isoparse(
+            modified_event.content["modified"]
+        )
         content_modified = dateutil.parser.isoparse(content["modified"])
         modified_diff = (event_content_modified - content_modified).total_seconds()
         assert abs(modified_diff) < 2
-        assert modified_event.content["current_revision_type"] == content["current_revision_type"]
+        assert (
+            modified_event.content["current_revision_type"]
+            == content["current_revision_type"]
+        )
         assert modified_event.content["file_extension"] == content["file_extension"]
         assert modified_event.content["filename"] == content["filename"]
         assert modified_event.content["is_archived"] == content["is_archived"]
@@ -1407,34 +1565,55 @@ class TestHtmlDocuments(object):
         assert modified_event.content["show_in_ui"] == content["show_in_ui"]
         assert modified_event.content["slug"] == content["slug"]
         assert modified_event.content["status"] == content["status"]
-        assert modified_event.content["sub_content_types"] == content["sub_content_types"]
+        assert (
+            modified_event.content["sub_content_types"] == content["sub_content_types"]
+        )
         assert modified_event.content["workspace_id"] == content["workspace_id"]
         workspace = web_testapp.get("/api/workspaces/2", status=200).json_body
         assert modified_event.workspace == {
             k: v for k, v in workspace.items() if k != "description"
         }
 
-    def test_api__update_html_document__err_400__not_editable(self, web_testapp) -> None:
+    def test_api__update_html_document__err_400__not_editable(
+        self, web_testapp
+    ) -> None:
         """
         Update(put) one html document of a content
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"status": "closed-deprecated"}
-        web_testapp.put_json("/api/workspaces/2/html-documents/6/status", params=params, status=204)
+        web_testapp.put_json(
+            "/api/workspaces/2/html-documents/6/status", params=params, status=204
+        )
 
-        params = {"label": "My New label", "raw_content": "<p> Le nouveau contenu ! </p>"}
-        res = web_testapp.put_json("/api/workspaces/2/html-documents/6", params=params, status=400)
+        params = {
+            "label": "My New label",
+            "raw_content": "<p> Le nouveau contenu ! </p>",
+        }
+        res = web_testapp.put_json(
+            "/api/workspaces/2/html-documents/6", params=params, status=400
+        )
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_IN_NOT_EDITABLE_STATE
 
-    def test_api__update_html_document__err_400__not_modified(self, web_testapp) -> None:
+    def test_api__update_html_document__err_400__not_modified(
+        self, web_testapp
+    ) -> None:
         """
         Update(put) one html document of a content
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"label": "My New label", "raw_content": "<p> Le nouveau contenu </p>"}
-        res = web_testapp.put_json("/api/workspaces/2/html-documents/6", params=params, status=200)
+        res = web_testapp.put_json(
+            "/api/workspaces/2/html-documents/6", params=params, status=200
+        )
         content = res.json_body
         assert content["content_type"] == "html-document"
         assert content["content_id"] == 6
@@ -1486,7 +1665,9 @@ class TestHtmlDocuments(object):
         assert content["last_modifier"] == content["author"]
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
 
-        res = web_testapp.put_json("/api/workspaces/2/html-documents/6", params=params, status=400)
+        res = web_testapp.put_json(
+            "/api/workspaces/2/html-documents/6", params=params, status=400
+        )
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.SAME_VALUE_ERROR
@@ -1514,12 +1695,17 @@ class TestHtmlDocuments(object):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=session, tm=transaction.manager, content=test_html_document):
+        with new_revision(
+            session=session, tm=transaction.manager, content=test_html_document
+        ):
             content_api.update_content(
                 test_html_document, content_label, new_raw_content=content_raw_content
             )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/workspaces/{}/html-documents/{}/revisions/{}".format(
                 business_workspace.workspace_id,
@@ -1589,7 +1775,10 @@ class TestHtmlDocuments(object):
         """
         Get the revisions of an HTML document.
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/workspaces/2/html-documents/6/revisions{}".format(query), status=200
         )
@@ -1605,11 +1794,16 @@ class TestHtmlDocuments(object):
             assert revision[key] == value, key
         assert revision["sub_content_types"]
 
-    def test_api__set_html_document_status__ok_200__nominal_case(self, web_testapp) -> None:
+    def test_api__set_html_document_status__ok_200__nominal_case(
+        self, web_testapp
+    ) -> None:
         """
         Get one html document of a content
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"status": "closed-deprecated"}
 
         # before
@@ -1620,7 +1814,9 @@ class TestHtmlDocuments(object):
         assert content["status"] == "open"
 
         # set status
-        web_testapp.put_json("/api/workspaces/2/html-documents/6/status", params=params, status=204)
+        web_testapp.put_json(
+            "/api/workspaces/2/html-documents/6/status", params=params, status=204
+        )
 
         # after
         res = web_testapp.get("/api/workspaces/2/html-documents/6", status=200)
@@ -1629,11 +1825,16 @@ class TestHtmlDocuments(object):
         assert content["content_id"] == 6
         assert content["status"] == "closed-deprecated"
 
-    def test_api__set_html_document_status__err_400__wrong_status(self, web_testapp) -> None:
+    def test_api__set_html_document_status__err_400__wrong_status(
+        self, web_testapp
+    ) -> None:
         """
         Get one html document of a content
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"status": "unexistant-status"}
         res = web_testapp.put_json(
             "/api/workspaces/2/html-documents/6/status", params=params, status=400
@@ -1643,7 +1844,10 @@ class TestHtmlDocuments(object):
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__set_document_status__err_400__same_status(self, web_testapp) -> None:
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"status": "open"}
         res = web_testapp.put_json(
             "/api/workspaces/2/html-documents/6/status", params=params, status=400
@@ -1667,7 +1871,12 @@ class TestFiles(object):
     """
 
     def test_api__get_file__ok_200__nominal_case(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Get one file of a content
@@ -1687,15 +1896,23 @@ class TestFiles(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
             session.flush()
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/workspaces/1/files/{}".format(test_file.content_id), status=200)
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        res = web_testapp.get(
+            "/api/workspaces/1/files/{}".format(test_file.content_id), status=200
+        )
         content = res.json_body
         assert content["content_type"] == ContentTypeSlug.FILE.value
         assert content["content_id"] == test_file.content_id
@@ -1728,7 +1945,10 @@ class TestFiles(object):
     def test_api__get_preview_info__ok_200__nominal_case(
         self, test_file: Content, web_testapp
     ) -> None:
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             f"/api/workspaces/{test_file.workspace_id}/files/{test_file.content_id}/preview_info",
             status=200,
@@ -1743,7 +1963,10 @@ class TestFiles(object):
     def test_api__get_revision_preview_info__ok_200__nominal_case(
         self, test_file: Content, web_testapp
     ) -> None:
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             f"/api/workspaces/{test_file.workspace_id}/files/{test_file.content_id}/revisions/{test_file.revision_id}/preview_info",
             status=200,
@@ -1756,7 +1979,12 @@ class TestFiles(object):
         assert info["revision_id"] == test_file.revision_id
 
     def test_api__get_kanban__ok_200__nominal_case(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Get a kanban from content endpoint
@@ -1777,15 +2005,23 @@ class TestFiles(object):
 
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/contents/{}".format(test_file.content_id), status=302).follow(
-            status=200
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
         )
+        res = web_testapp.get(
+            "/api/contents/{}".format(test_file.content_id), status=302
+        ).follow(status=200)
         content = res.json_body
         assert content["content_type"] == ContentTypeSlug.KANBAN.value
 
     def test_api__get_kanban__ok_200__deleted_kanban(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Get a kanban from content endpoint
@@ -1807,15 +2043,23 @@ class TestFiles(object):
             content_api.delete(test_file)
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/contents/{}".format(test_file.content_id), status=302).follow(
-            status=200
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
         )
+        res = web_testapp.get(
+            "/api/contents/{}".format(test_file.content_id), status=302
+        ).follow(status=200)
         content = res.json_body
         assert content["content_type"] == ContentTypeSlug.KANBAN.value
 
     def test_api__get_file__ok_200__no_file_add(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Get one file of a content
@@ -1836,8 +2080,13 @@ class TestFiles(object):
         session.flush()
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/workspaces/1/files/{}".format(test_file.content_id), status=200)
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        res = web_testapp.get(
+            "/api/workspaces/1/files/{}".format(test_file.content_id), status=200
+        )
         content = res.json_body
         assert content["content_type"] == "file"
         assert content["content_id"] == test_file.content_id
@@ -1868,7 +2117,12 @@ class TestFiles(object):
         assert content["size"] == 0
 
     def test_api__get_file__ok_200__binary_file(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Get one file of a content
@@ -1897,8 +2151,13 @@ class TestFiles(object):
         session.flush()
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/workspaces/1/files/{}".format(test_file.content_id), status=200)
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        res = web_testapp.get(
+            "/api/workspaces/1/files/{}".format(test_file.content_id), status=200
+        )
         content = res.json_body
         assert content["content_type"] == "file"
         assert content["content_id"] == test_file.content_id
@@ -1932,7 +2191,10 @@ class TestFiles(object):
         """
         Get one file of a content content
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/2/files/6", status=400)
         assert res.json_body
         assert "code" in res.json_body
@@ -1942,7 +2204,10 @@ class TestFiles(object):
         """
         Get one file (content 170 does not exist in db)
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/1/files/170", status=400)
         assert res.json_body
         assert "code" in res.json_body
@@ -1954,7 +2219,10 @@ class TestFiles(object):
         """
         Get one file (file has not been uploaded)
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         workspace_api = workspace_api_factory.get()
         business_workspace = workspace_api.get_one(1)
         res = web_testapp.post_json(
@@ -1963,28 +2231,40 @@ class TestFiles(object):
             status=200,
         )
         res = web_testapp.get(
-            "/api/workspaces/1/files/{}/raw/filename".format(res.json_body["content_id"]),
+            "/api/workspaces/1/files/{}/raw/filename".format(
+                res.json_body["content_id"]
+            ),
             status=400,
         )
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
-    def test_api__get_file__err_400__content_not_in_workspace(self, web_testapp) -> None:
+    def test_api__get_file__err_400__content_not_in_workspace(
+        self, web_testapp
+    ) -> None:
         """
         Get one file (content 9 is in workspace 2)
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/1/files/9", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
-    def test_api__get_file__err_400__workspace_does_not_exist(self, web_testapp) -> None:
+    def test_api__get_file__err_400__workspace_does_not_exist(
+        self, web_testapp
+    ) -> None:
         """
         Get one file (Workspace 40 does not exist)
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/40/files/9", status=400)
         assert res.json_body
         assert "code" in res.json_body
@@ -1994,7 +2274,10 @@ class TestFiles(object):
         """
         Get one file, workspace id is not int
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/coucou/files/9", status=400)
         assert res.json_body
         assert "code" in res.json_body
@@ -2004,14 +2287,22 @@ class TestFiles(object):
         """
         Get one file, content_id is not int
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/2/files/coucou", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_INVALID_ID
 
     def test_api__update_file_info_err_400__empty_label(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Update(put) one file
@@ -2031,17 +2322,25 @@ class TestFiles(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
             session.flush()
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"label": "", "raw_content": "<p> Le nouveau contenu </p>"}
         res = web_testapp.put_json(
-            "/api/workspaces/1/files/{}".format(test_file.content_id), params=params, status=400
+            "/api/workspaces/1/files/{}".format(test_file.content_id),
+            params=params,
+            status=400,
         )
         # INFO - G.M - 2018-09-10 - Handle by marshmallow schema
         assert res.json_body
@@ -2049,7 +2348,12 @@ class TestFiles(object):
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__update_file_info__ok_200__nominal_case(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Update(put) one file
@@ -2069,17 +2373,25 @@ class TestFiles(object):
                 do_notify=False,
             )
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
         session.flush()
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"label": "My New label", "raw_content": "<p> Le nouveau contenu </p>"}
         res = web_testapp.put_json(
-            "/api/workspaces/1/files/{}".format(test_file.content_id), params=params, status=200
+            "/api/workspaces/1/files/{}".format(test_file.content_id),
+            params=params,
+            status=200,
         )
         content = res.json_body
         assert content["content_type"] == "file"
@@ -2109,7 +2421,9 @@ class TestFiles(object):
         assert content["size"] == len(b"Test file")
         assert content["current_revision_type"] == "edition"
 
-        res = web_testapp.get("/api/workspaces/1/files/{}".format(test_file.content_id), status=200)
+        res = web_testapp.get(
+            "/api/workspaces/1/files/{}".format(test_file.content_id), status=200
+        )
         content = res.json_body
         assert content["content_type"] == "file"
         assert content["content_id"] == test_file.content_id
@@ -2139,7 +2453,12 @@ class TestFiles(object):
         assert content["current_revision_type"] == "edition"
 
     def test_api__update_file_info__err_400__content_status_closed(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Update(put) one file
@@ -2159,7 +2478,10 @@ class TestFiles(object):
                 do_notify=False,
             )
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
@@ -2168,17 +2490,27 @@ class TestFiles(object):
         session.flush()
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"label": "My New label", "raw_content": "<p> Le nouveau contenu </p>"}
         res = web_testapp.put_json(
-            "/api/workspaces/1/files/{}".format(test_file.content_id), params=params, status=400
+            "/api/workspaces/1/files/{}".format(test_file.content_id),
+            params=params,
+            status=400,
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.CONTENT_IN_NOT_EDITABLE_STATE
 
     def test_api__update_file_info__err_400__content_deleted(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Update(put) one file
@@ -2198,7 +2530,10 @@ class TestFiles(object):
                 do_notify=False,
             )
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
@@ -2207,17 +2542,27 @@ class TestFiles(object):
         session.flush()
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"label": "My New label", "raw_content": "<p> Le nouveau contenu </p>"}
         res = web_testapp.put_json(
-            "/api/workspaces/1/files/{}".format(test_file.content_id), params=params, status=400
+            "/api/workspaces/1/files/{}".format(test_file.content_id),
+            params=params,
+            status=400,
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.CONTENT_IN_NOT_EDITABLE_STATE
 
     def test_api__update_file_info__err_400__content_archived(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Update(put) one file
@@ -2237,7 +2582,10 @@ class TestFiles(object):
                 do_notify=False,
             )
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
@@ -2246,17 +2594,27 @@ class TestFiles(object):
         session.flush()
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"label": "My New label", "raw_content": "<p> Le nouveau contenu </p>"}
         res = web_testapp.put_json(
-            "/api/workspaces/1/files/{}".format(test_file.content_id), params=params, status=400
+            "/api/workspaces/1/files/{}".format(test_file.content_id),
+            params=params,
+            status=400,
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.CONTENT_IN_NOT_EDITABLE_STATE
 
     def test_api__update_file_info__err_400__not_modified(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Update(put) one file
@@ -2276,17 +2634,25 @@ class TestFiles(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
         session.flush()
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"label": "My New label", "raw_content": "<p> Le nouveau contenu </p>"}
         res = web_testapp.put_json(
-            "/api/workspaces/1/files/{}".format(test_file.content_id), params=params, status=200
+            "/api/workspaces/1/files/{}".format(test_file.content_id),
+            params=params,
+            status=200,
         )
         content = res.json_body
         assert content["content_type"] == "file"
@@ -2315,7 +2681,9 @@ class TestFiles(object):
         assert content["mimetype"] == "plain/text"
         assert content["size"] == len(b"Test file")
 
-        res = web_testapp.get("/api/workspaces/1/files/{}".format(test_file.content_id), status=200)
+        res = web_testapp.get(
+            "/api/workspaces/1/files/{}".format(test_file.content_id), status=200
+        )
         content = res.json_body
         assert content["content_type"] == "file"
         assert content["content_id"] == test_file.content_id
@@ -2344,14 +2712,21 @@ class TestFiles(object):
         assert content["size"] == len(b"Test file")
 
         res = web_testapp.put_json(
-            "/api/workspaces/1/files/{}".format(test_file.content_id), params=params, status=400
+            "/api/workspaces/1/files/{}".format(test_file.content_id),
+            params=params,
+            status=400,
         )
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.SAME_VALUE_ERROR
 
     def test_api__update_file_info__err_400__label_already_used(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Update(put) one file, failed because label already used
@@ -2379,7 +2754,9 @@ class TestFiles(object):
                 do_notify=False,
             )
             test_file.file_extension = ".txt"
-            test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
+            test_file.depot_file = FileIntent(
+                b"Test file", "Test_file.txt", "text/plain"
+            )
         test_file2 = content_api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=business_workspace,
@@ -2389,27 +2766,43 @@ class TestFiles(object):
             do_notify=False,
         )
         test_file2.file_extension = ".txt"
-        test_file2.depot_file = FileIntent(b"Test file", "already_used.txt", "text/plain")
+        test_file2.depot_file = FileIntent(
+            b"Test file", "already_used.txt", "text/plain"
+        )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
         session.flush()
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"label": "folder_used", "raw_content": "<p> Le nouveau contenu </p>"}
         web_testapp.put_json(
-            "/api/workspaces/1/files/{}".format(test_file.content_id), params=params, status=200
+            "/api/workspaces/1/files/{}".format(test_file.content_id),
+            params=params,
+            status=200,
         )
         params = {"label": "already_used", "raw_content": "<p> Le nouveau contenu </p>"}
         res = web_testapp.put_json(
-            "/api/workspaces/1/files/{}".format(test_file.content_id), params=params, status=400
+            "/api/workspaces/1/files/{}".format(test_file.content_id),
+            params=params,
+            status=400,
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
+        assert (
+            res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
+        )
 
     def test_api__get_file_revisions__ok_200__nominal_case(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Get file revisions
@@ -2429,16 +2822,23 @@ class TestFiles(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
             session.flush()
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
-            "/api/workspaces/1/files/{}/revisions".format(test_file.content_id), status=200
+            "/api/workspaces/1/files/{}/revisions".format(test_file.content_id),
+            status=200,
         )
         revisions = res.json_body["items"]
         assert len(revisions) == 1
@@ -2468,7 +2868,12 @@ class TestFiles(object):
         assert revision["version_number"] == 1
 
     def test_api__set_file_status__ok_200__nominal_case(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         set file status
@@ -2493,11 +2898,16 @@ class TestFiles(object):
         session.flush()
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"status": "closed-deprecated"}
 
         # before
-        res = web_testapp.get("/api/workspaces/1/files/{}".format(test_file.content_id), status=200)
+        res = web_testapp.get(
+            "/api/workspaces/1/files/{}".format(test_file.content_id), status=200
+        )
         content = res.json_body
         assert content["content_type"] == "file"
         assert content["content_id"] == test_file.content_id
@@ -2511,14 +2921,21 @@ class TestFiles(object):
         )
 
         # after
-        res = web_testapp.get("/api/workspaces/1/files/{}".format(test_file.content_id), status=200)
+        res = web_testapp.get(
+            "/api/workspaces/1/files/{}".format(test_file.content_id), status=200
+        )
         content = res.json_body
         assert content["content_type"] == "file"
         assert content["content_id"] == test_file.content_id
         assert content["status"] == "closed-deprecated"
 
     def test_api__set_file_status__err_400__wrong_status(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         set file status
@@ -2542,11 +2959,16 @@ class TestFiles(object):
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
         session.flush()
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"status": "unexistant-status"}
 
         # before
-        res = web_testapp.get("/api/workspaces/1/files/{}".format(test_file.content_id), status=200)
+        res = web_testapp.get(
+            "/api/workspaces/1/files/{}".format(test_file.content_id), status=200
+        )
         content = res.json_body
         assert content["content_type"] == "file"
         assert content["content_id"] == test_file.content_id
@@ -2563,7 +2985,12 @@ class TestFiles(object):
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__get_file_raw__ok_200__nominal_case(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Get one file of a content
@@ -2588,7 +3015,10 @@ class TestFiles(object):
             session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         filename = "Test_file.txt"
         res = web_testapp.get(
             "/api/workspaces/1/files/{}/raw/{}".format(content_id, filename), status=200
@@ -2604,7 +3034,12 @@ class TestFiles(object):
         assert res.last_modified.year == test_file.updated.year
 
     def test_api__get_file_raw__ok_200__force_download_case(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Get one file of a content
@@ -2633,7 +3068,10 @@ class TestFiles(object):
         session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"force_download": 1}
         filename = "Test_file.txt"
         res = web_testapp.get(
@@ -2643,7 +3081,9 @@ class TestFiles(object):
         )
         assert res.headers[
             "Content-Disposition"
-        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(filename, filename)
+        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
+            filename, filename
+        )
         assert res.body == b"Test file"
         assert res.content_type == "text/plain"
         assert res.content_length == len(b"Test file")
@@ -2676,7 +3116,10 @@ class TestFiles(object):
         workspace_api = workspace_api_factory.get()
         business_workspace = workspace_api.get_one(1)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         image = create_1000px_png_test_image()
         res = web_testapp.post(
             "/api/workspaces/{}/files".format(business_workspace.workspace_id),
@@ -2705,17 +3148,23 @@ class TestFiles(object):
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(business_workspace.workspace_id), status=200
         ).json_body
-        assert created_event.workspace == {k: v for k, v in workspace.items() if k != "description"}
+        assert created_event.workspace == {
+            k: v for k, v in workspace.items() if k != "description"
+        }
 
         assert modified_event.event_type == "content.modified.file"
         content = web_testapp.get(
-            "/api/workspaces/{}/files/{}".format(business_workspace.workspace_id, content_id),
+            "/api/workspaces/{}/files/{}".format(
+                business_workspace.workspace_id, content_id
+            ),
             status=200,
         ).json_body
 
         # NOTE S.G 2020-05-12: allow a small difference in modified time
         # as tests with MySQL sometimes fails with a strict equality
-        event_content_modified = dateutil.parser.isoparse(modified_event.content["modified"])
+        event_content_modified = dateutil.parser.isoparse(
+            modified_event.content["modified"]
+        )
         content_modified = dateutil.parser.isoparse(res["modified"])
         modified_diff = (event_content_modified - content_modified).total_seconds()
         assert abs(modified_diff) < 2
@@ -2763,7 +3212,10 @@ class TestFiles(object):
         )
         transaction.commit()
         image = create_1000px_png_test_image()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.post(
             "/api/workspaces/{}/files".format(workspace.workspace_id),
             upload_files=[("files", image.name, image.getvalue())],
@@ -2784,7 +3236,10 @@ class TestFiles(object):
             label="No publication", publication_enabled=False
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.post_json(
             "/api/workspaces/{}/contents".format(workspace.workspace_id),
             params={
@@ -2807,7 +3262,10 @@ class TestFiles(object):
 
         business_workspace = workspace_api.get_one(1)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         image = create_1000px_png_test_image()
         res = web_testapp.post(
             "/api/workspaces/{}/files".format(business_workspace.workspace_id),
@@ -2833,7 +3291,9 @@ class TestFiles(object):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
+        assert (
+            res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
+        )
 
     def test_api__create_file__err_400__no_file_given(
         self, workspace_api_factory, content_api_factory, session, web_testapp
@@ -2846,9 +3306,13 @@ class TestFiles(object):
 
         business_workspace = workspace_api.get_one(1)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.post(
-            "/api/workspaces/{}/files".format(business_workspace.workspace_id), status=400
+            "/api/workspaces/{}/files".format(business_workspace.workspace_id),
+            status=400,
         )
         assert res.json_body["code"] == ErrorCode.NO_FILE_VALIDATION_ERROR
 
@@ -2876,7 +3340,10 @@ class TestFiles(object):
             do_notify=False,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"parent_id": folder.content_id}
         image = create_1000px_png_test_image()
         res = web_testapp.post(
@@ -2943,7 +3410,10 @@ class TestFiles(object):
             do_notify=False,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"parent_id": parent_file.content_id}
         image = create_1000px_png_test_image()
         res = web_testapp.post(
@@ -2987,7 +3457,12 @@ class TestFiles(object):
         assert res["mimetype"] == "image/png"
 
     def test_api__create_file__err__400__unallow_subcontent(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         create one file of a content but subcontent of type file unallowed here
@@ -3007,7 +3482,10 @@ class TestFiles(object):
             content_api.set_allowed_content(folder, [])
         content_api.save(folder)
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"parent_id": folder.content_id}
         image = create_1000px_png_test_image()
         res = web_testapp.post(
@@ -3031,7 +3509,10 @@ class TestFiles(object):
 
         business_workspace = workspace_api.get_one(1)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"parent_id": 3000}
         image = create_1000px_png_test_image()
         res = web_testapp.post(
@@ -3073,13 +3554,18 @@ class TestFiles(object):
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put(
             "/api/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status=204,
         )
-        res = web_testapp.get("/api/workspaces/1/files/{}".format(content_id), status=200).json_body
+        res = web_testapp.get(
+            "/api/workspaces/1/files/{}".format(content_id), status=200
+        ).json_body
         last_event = event_helper.last_event
         assert last_event.event_type == "content.modified.file"
         assert last_event.content["actives_shares"] == res["actives_shares"]
@@ -3090,7 +3576,9 @@ class TestFiles(object):
         assert last_event.content["created"] == res["created"]
         # NOTE S.G 2020-05-12: allow a small difference in modified time
         # as tests with MySQL sometimes fails with a strict equality
-        event_content_modified = dateutil.parser.isoparse(last_event.content["modified"])
+        event_content_modified = dateutil.parser.isoparse(
+            last_event.content["modified"]
+        )
         content_modified = dateutil.parser.isoparse(res["modified"])
         modified_diff = (event_content_modified - content_modified).total_seconds()
         assert abs(modified_diff) < 2
@@ -3112,17 +3600,25 @@ class TestFiles(object):
             "/api/workspaces/1",
             status=200,
         ).json_body
-        assert last_event.workspace == {k: v for k, v in workspace.items() if k != "description"}
+        assert last_event.workspace == {
+            k: v for k, v in workspace.items() if k != "description"
+        }
 
         res = web_testapp.get(
-            "/api/workspaces/1/files/{}/raw/{}".format(content_id, image.name), status=200
+            "/api/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
+            status=200,
         )
         assert res.body == image.getvalue()
         assert res.content_type == "image/png"
         assert res.content_length == len(image.getvalue())
 
     def test_api__set_file_raw__err_400__no_file_given(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Set one file of a content to no file: error
@@ -3143,14 +3639,23 @@ class TestFiles(object):
         session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.put(
-            "/api/workspaces/1/files/{}/raw/{}".format(content_id, "toto.jpg"), status=400
+            "/api/workspaces/1/files/{}/raw/{}".format(content_id, "toto.jpg"),
+            status=400,
         )
         assert res.json_body["code"] == ErrorCode.NO_FILE_VALIDATION_ERROR
 
     def test_api__set_file_raw__ok_200__filename_already_used(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Set one file of a content
@@ -3181,7 +3686,10 @@ class TestFiles(object):
         content_id = int(test_file.content_id)
         content2_id = int(test_file_2.content_id)
         image = create_1000px_png_test_image()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put(
             "/api/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
@@ -3194,10 +3702,17 @@ class TestFiles(object):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
+        assert (
+            res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
+        )
 
     def test_api__set_file_raw__err_400__closed_status_file(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Set one file of a content
@@ -3221,7 +3736,10 @@ class TestFiles(object):
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.put(
             "/api/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
@@ -3231,9 +3749,16 @@ class TestFiles(object):
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.CONTENT_IN_NOT_EDITABLE_STATE
 
-    @pytest.mark.xfail(raises=AssertionError, reason="Broken feature dues to pyramid behaviour")
+    @pytest.mark.xfail(
+        raises=AssertionError, reason="Broken feature dues to pyramid behaviour"
+    )
     def test_api__set_file_raw__err_400_not_modified(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Set one file of a content
@@ -3255,14 +3780,18 @@ class TestFiles(object):
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put(
             "/api/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status=204,
         )
         res = web_testapp.get(
-            "/api/workspaces/1/files/{}/raw/{}".format(content_id, image.name), status=200
+            "/api/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
+            status=200,
         )
         assert res.body == image.getvalue()
         assert res.content_type == "image/png"
@@ -3276,10 +3805,17 @@ class TestFiles(object):
         assert res.status == 400
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
+        assert (
+            res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
+        )
 
     def test_api__get_allowed_size_dim__ok__nominal_case(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
@@ -3297,10 +3833,14 @@ class TestFiles(object):
         test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
         session.flush()
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         content_id = int(test_file.content_id)
         res = web_testapp.get(
-            "/api/workspaces/1/files/{}/preview/jpg/allowed_dims".format(content_id), status=200
+            "/api/workspaces/1/files/{}/preview/jpg/allowed_dims".format(content_id),
+            status=200,
         )
         res = res.json_body
         assert res["restricted"] is True
@@ -3310,7 +3850,12 @@ class TestFiles(object):
         assert dim["height"] == 256
 
     def test_api__get_jpeg_preview__ok__200__nominal_case(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Set one file of a content
@@ -3334,7 +3879,10 @@ class TestFiles(object):
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put(
             "/api/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
@@ -3347,7 +3895,12 @@ class TestFiles(object):
         assert res.content_type == "image/jpeg"
 
     def test_api__get_jpeg_preview__ok__200__force_download_case(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Set one file of a content
@@ -3371,7 +3924,10 @@ class TestFiles(object):
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put(
             "/api/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
@@ -3386,12 +3942,19 @@ class TestFiles(object):
         filename = "test_image_page_1.jpg"
         assert res.headers[
             "Content-Disposition"
-        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(filename, filename)
+        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
+            filename, filename
+        )
         assert res.body != image.getvalue()
         assert res.content_type == "image/jpeg"
 
     def test_api__get_jpeg_preview__err_400__UnavailablePreview(
-        self, workspace_api_factory, content_api_factory, web_testapp, session, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        web_testapp,
+        session,
+        content_type_list,
     ) -> None:
         """
         Set one file of a content
@@ -3419,7 +3982,10 @@ class TestFiles(object):
         session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"force_download": 0}
         res = web_testapp.get(
             "/api/workspaces/1/files/{}/preview/jpg/".format(content_id),
@@ -3431,7 +3997,12 @@ class TestFiles(object):
         assert res.json_body["code"] == ErrorCode.UNAVAILABLE_FILE_PREVIEW
 
     def test_api__get_sized_jpeg_preview__ok__200__nominal_case(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         get 256x256 preview of a txt file
@@ -3453,14 +4024,19 @@ class TestFiles(object):
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put(
             "/api/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status=204,
         )
         res = web_testapp.get(
-            "/api/workspaces/1/files/{}/preview/jpg/256x256/{}".format(content_id, image.name),
+            "/api/workspaces/1/files/{}/preview/jpg/256x256/{}".format(
+                content_id, image.name
+            ),
             status=200,
         )
         assert res.body != image.getvalue()
@@ -3469,7 +4045,12 @@ class TestFiles(object):
         assert 256, 256 == new_image.size
 
     def test_api__get_sized_jpeg_preview__err_400__UnavailablePreview(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Set one file of a content
@@ -3497,10 +4078,15 @@ class TestFiles(object):
         session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"force_download": 0}
         res = web_testapp.get(
-            "/api/workspaces/1/files/{}/preview/jpg/256x256/{}".format(content_id, "Test_file.bin"),
+            "/api/workspaces/1/files/{}/preview/jpg/256x256/{}".format(
+                content_id, "Test_file.bin"
+            ),
             status=400,
             params=params,
         )
@@ -3509,7 +4095,12 @@ class TestFiles(object):
         assert res.json_body["code"] == ErrorCode.UNAVAILABLE_FILE_PREVIEW
 
     def test_api__get_sized_jpeg_preview__ok__200__force_download_case(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         get 256x256 preview of a txt file
@@ -3531,7 +4122,10 @@ class TestFiles(object):
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put(
             "/api/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
@@ -3540,20 +4134,29 @@ class TestFiles(object):
         params = {"force_download": 1}
         dl_filename = "test_image_page_1_256x256.jpg"
         res = web_testapp.get(
-            "/api/workspaces/1/files/{}/preview/jpg/256x256/{}".format(content_id, dl_filename),
+            "/api/workspaces/1/files/{}/preview/jpg/256x256/{}".format(
+                content_id, dl_filename
+            ),
             status=200,
             params=params,
         )
         assert res.body != image.getvalue()
         assert res.headers[
             "Content-Disposition"
-        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(dl_filename, dl_filename)
+        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
+            dl_filename, dl_filename
+        )
         assert res.content_type == "image/jpeg"
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
 
     def test_api__get_sized_jpeg_preview__ok__200__force_download_case_no_filename(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         get 256x256 preview of a txt file
@@ -3575,7 +4178,10 @@ class TestFiles(object):
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put(
             "/api/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
@@ -3591,13 +4197,20 @@ class TestFiles(object):
         assert res.body != image.getvalue()
         assert res.headers[
             "Content-Disposition"
-        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(dl_filename, dl_filename)
+        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
+            dl_filename, dl_filename
+        )
         assert res.content_type == "image/jpeg"
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
 
     def test_api__get_sized_jpeg_preview__ok__200__force_download_case_filename_is_raw(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         get 256x256 preview of a txt file
@@ -3619,7 +4232,10 @@ class TestFiles(object):
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put(
             "/api/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
@@ -3635,13 +4251,20 @@ class TestFiles(object):
         assert res.body != image.getvalue()
         assert res.headers[
             "Content-Disposition"
-        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(dl_filename, dl_filename)
+        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
+            dl_filename, dl_filename
+        )
         assert res.content_type == "image/jpeg"
         new_image = Image.open(io.BytesIO(res.body))
         assert 256, 256 == new_image.size
 
     def test_api__get_sized_jpeg_preview__err__400__SizeNotAllowed(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         get 256x256 preview of a txt file
@@ -3663,7 +4286,10 @@ class TestFiles(object):
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put(
             "/api/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
@@ -3671,7 +4297,9 @@ class TestFiles(object):
         )
         filename = "test_image_512x512.jpg"
         res = web_testapp.get(
-            "/api/workspaces/1/files/{}/preview/jpg/512x512/{}".format(content_id, filename),
+            "/api/workspaces/1/files/{}/preview/jpg/512x512/{}".format(
+                content_id, filename
+            ),
             status=400,
         )
         assert res.json_body
@@ -3679,7 +4307,12 @@ class TestFiles(object):
         assert res.json_body["code"] == ErrorCode.PREVIEW_DIM_NOT_ALLOWED
 
     def test_api__get_sized_jpeg_revision_preview__ok__200__nominal_case(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         get 256x256 revision preview of a txt file
@@ -3704,7 +4337,10 @@ class TestFiles(object):
         content_id = int(test_file.content_id)
         revision_id = int(test_file.revision_id)
         image = create_1000px_png_test_image()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put(
             "/api/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
@@ -3731,7 +4367,12 @@ class TestFiles(object):
         assert 256, 256 == new_image.size
 
     def test_api__get_sized_jpeg_revision_preview__ok__200__force_download_case(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         get 256x256 revision preview of a txt file
@@ -3756,7 +4397,10 @@ class TestFiles(object):
         content_id = int(test_file.content_id)
         revision_id = int(test_file.revision_id)
         image = create_1000px_png_test_image()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put(
             "/api/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
@@ -3790,7 +4434,12 @@ class TestFiles(object):
         assert 256, 256 == new_image.size
 
     def test_api__get_full_pdf_preview__ok__200__nominal_case(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         get full pdf preview of a txt file
@@ -3810,26 +4459,40 @@ class TestFiles(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             test_file.file_extension = ".txt"
-            test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
+            test_file.depot_file = FileIntent(
+                b"Test file", "Test_file.txt", "text/plain"
+            )
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
         session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put(
             "/api/workspaces/1/files/{}/raw/{}".format(content_id, test_file.file_name),
-            upload_files=[("files", test_file.file_name, test_file.depot_file.file.read())],
+            upload_files=[
+                ("files", test_file.file_name, test_file.depot_file.file.read())
+            ],
             status=204,
         )
         filename = "test_image.pdf"
         res = web_testapp.get(
-            "/api/workspaces/1/files/{}/preview/pdf/full/{}".format(content_id, filename),
+            "/api/workspaces/1/files/{}/preview/pdf/full/{}".format(
+                content_id, filename
+            ),
             status=200,
         )
         assert res.content_type == "application/pdf"
 
     def test_api__get_full_pdf_preview__ok__200__force_download_case(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         get full pdf preview of a txt file
@@ -3849,42 +4512,62 @@ class TestFiles(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             test_file.file_extension = ".txt"
-            test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
+            test_file.depot_file = FileIntent(
+                b"Test file", "Test_file.txt", "text/plain"
+            )
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
         session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         filename = "Test_file.txt"
         web_testapp.put(
             "/api/workspaces/1/files/{}/raw/{}".format(content_id, filename),
-            upload_files=[("files", test_file.file_name, test_file.depot_file.file.read())],
+            upload_files=[
+                ("files", test_file.file_name, test_file.depot_file.file.read())
+            ],
             status=204,
         )
         params = {"force_download": 1}
         res = web_testapp.get(
-            "/api/workspaces/1/files/{}/preview/pdf/full/{}".format(content_id, filename),
+            "/api/workspaces/1/files/{}/preview/pdf/full/{}".format(
+                content_id, filename
+            ),
             status=200,
             params=params,
         )
         assert res.headers[
             "Content-Disposition"
-        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(filename, filename)
+        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
+            filename, filename
+        )
         assert res.content_type == "application/pdf"
 
         res = web_testapp.get(
-            "/api/workspaces/1/files/{}/preview/pdf/full/{}".format(content_id, "Test_file.pdf"),
+            "/api/workspaces/1/files/{}/preview/pdf/full/{}".format(
+                content_id, "Test_file.pdf"
+            ),
             status=200,
             params=params,
         )
         filename = "Test_file.pdf"
         assert res.headers[
             "Content-Disposition"
-        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(filename, filename)
+        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
+            filename, filename
+        )
         assert res.content_type == "application/pdf"
 
     def test_api__get_full_pdf_preview__err__400__png_UnavailablePreviewType(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         get full pdf preview of a png image -> error UnavailablePreviewType
@@ -3906,14 +4589,19 @@ class TestFiles(object):
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put(
             "/api/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
             status=204,
         )
         res = web_testapp.get(
-            "/api/workspaces/1/files/{}/preview/pdf/full/{}".format(content_id, image.name),
+            "/api/workspaces/1/files/{}/preview/pdf/full/{}".format(
+                content_id, image.name
+            ),
             status=400,
         )
         assert res.json_body
@@ -3921,7 +4609,12 @@ class TestFiles(object):
         assert res.json_body["code"] == ErrorCode.UNAVAILABLE_PREVIEW_TYPE
 
     def test_api__get_full_pdf_preview__err__400__png_UnavailablePreview(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         get full pdf preview of a png image -> error UnavailablePreviewType
@@ -3949,10 +4642,15 @@ class TestFiles(object):
         session.flush()
         content_id = test_file.content_id
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         filename = "Test_file.bin"
         res = web_testapp.get(
-            "/api/workspaces/1/files/{}/preview/pdf/full/{}".format(content_id, filename),
+            "/api/workspaces/1/files/{}/preview/pdf/full/{}".format(
+                content_id, filename
+            ),
             status=400,
         )
         assert isinstance(res.json, dict)
@@ -3960,7 +4658,12 @@ class TestFiles(object):
         assert res.json_body["code"] == ErrorCode.UNAVAILABLE_FILE_PREVIEW
 
     def test_api__get_pdf_preview__ok__200__nominal_case(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         get full pdf preview of a txt file
@@ -3980,15 +4683,22 @@ class TestFiles(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             test_file.file_extension = ".txt"
-            test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
+            test_file.depot_file = FileIntent(
+                b"Test file", "Test_file.txt", "text/plain"
+            )
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
         session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put(
             "/api/workspaces/1/files/{}/raw/{}".format(content_id, test_file.file_name),
-            upload_files=[("files", test_file.file_name, test_file.depot_file.file.read())],
+            upload_files=[
+                ("files", test_file.file_name, test_file.depot_file.file.read())
+            ],
             status=204,
         )
         params = {"page": 1}
@@ -4001,7 +4711,12 @@ class TestFiles(object):
         assert res.content_type == "application/pdf"
 
     def test_api__get_pdf_preview_err__400__UnavailablePreview(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         get full pdf preview of a txt file
@@ -4029,7 +4744,10 @@ class TestFiles(object):
         session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"page": 1}
         res = web_testapp.get(
             "/api/workspaces/1/files/{}/preview/pdf/".format(content_id),
@@ -4041,7 +4759,12 @@ class TestFiles(object):
         assert res.json_body["code"] == ErrorCode.UNAVAILABLE_FILE_PREVIEW
 
     def test_api__get_pdf_preview__ok__200__force_download_case(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         get full pdf preview of a txt file
@@ -4061,16 +4784,23 @@ class TestFiles(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             test_file.file_extension = ".txt"
-            test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
+            test_file.depot_file = FileIntent(
+                b"Test file", "Test_file.txt", "text/plain"
+            )
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
         session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         filename = "test_file.txt"
         web_testapp.put(
             "/api/workspaces/1/files/{}/raw/{}".format(content_id, filename),
-            upload_files=[("files", test_file.file_name, test_file.depot_file.file.read())],
+            upload_files=[
+                ("files", test_file.file_name, test_file.depot_file.file.read())
+            ],
             status=204,
         )
         filename = "Test_file_page_1.pdf"
@@ -4083,10 +4813,17 @@ class TestFiles(object):
         assert res.content_type == "application/pdf"
         assert res.headers[
             "Content-Disposition"
-        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(filename, filename)
+        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
+            filename, filename
+        )
 
     def test_api__get_pdf_preview__ok__err__400_page_of_preview_not_found(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         get full pdf preview of a txt file
@@ -4106,15 +4843,22 @@ class TestFiles(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             test_file.file_extension = ".txt"
-            test_file.depot_file = FileIntent(b"Test file", "Test_file.txt", "text/plain")
+            test_file.depot_file = FileIntent(
+                b"Test file", "Test_file.txt", "text/plain"
+            )
             content_api.update_content(test_file, "Test_file", "<p>description</p>")
         session.flush()
         transaction.commit()
         content_id = int(test_file.content_id)
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put(
             "/api/workspaces/1/files/{}/raw/".format(content_id),
-            upload_files=[("files", test_file.file_name, test_file.depot_file.file.read())],
+            upload_files=[
+                ("files", test_file.file_name, test_file.depot_file.file.read())
+            ],
             status=204,
         )
         params = {"page": 2}
@@ -4128,7 +4872,12 @@ class TestFiles(object):
         assert res.json_body["code"] == ErrorCode.PAGE_OF_PREVIEW_NOT_FOUND
 
     def test_api__get_pdf_revision_preview__ok__200__nominal_case(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         get pdf revision preview of content
@@ -4153,7 +4902,10 @@ class TestFiles(object):
         content_id = int(test_file.content_id)
         revision_id = int(test_file.revision_id)
         image = create_1000px_png_test_image()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put(
             "/api/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
@@ -4177,7 +4929,12 @@ class TestFiles(object):
         assert res.content_type == "application/pdf"
 
     def test_api__get_full_pdf_revision_preview__ok__200__nominal_case(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         get pdf revision preview of content
@@ -4202,7 +4959,10 @@ class TestFiles(object):
         content_id = int(test_file.content_id)
         revision_id = int(test_file.revision_id)
         image = create_1000px_png_test_image()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put(
             "/api/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
@@ -4224,7 +4984,12 @@ class TestFiles(object):
         assert res.content_type == "application/pdf"
 
     def test_api__get_full_pdf_revision_preview__ok__200__force_download_case(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         get pdf revision preview of content
@@ -4249,7 +5014,10 @@ class TestFiles(object):
         content_id = int(test_file.content_id)
         revision_id = int(test_file.revision_id)
         image = create_1000px_png_test_image()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put(
             "/api/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
@@ -4274,11 +5042,18 @@ class TestFiles(object):
 
         assert res.headers[
             "Content-Disposition"
-        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(filename, filename)
+        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
+            filename, filename
+        )
         assert res.content_type == "application/pdf"
 
     def test_api__get_pdf_revision_preview__ok__200__force_download_case(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         get pdf revision preview of content
@@ -4303,7 +5078,10 @@ class TestFiles(object):
         content_id = int(test_file.content_id)
         revision_id = int(test_file.revision_id)
         image = create_1000px_png_test_image()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put(
             "/api/workspaces/1/files/{}/raw/{}".format(content_id, image.name),
             upload_files=[("files", image.name, image.getvalue())],
@@ -4327,11 +5105,18 @@ class TestFiles(object):
         )
         assert res.headers[
             "Content-Disposition"
-        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(filename, filename)
+        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
+            filename, filename
+        )
         assert res.content_type == "application/pdf"
 
     def test_api__set_file_status__err_400__same_status(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
@@ -4352,7 +5137,10 @@ class TestFiles(object):
         session.flush()
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"status": "open"}
         # set status
         res = web_testapp.put_json(
@@ -4379,7 +5167,10 @@ class TestThreads(object):
         """
         Get one html document of a content
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/2/threads/6", status=400)
         assert res.json_body
         assert "code" in res.json_body
@@ -4389,7 +5180,10 @@ class TestThreads(object):
         """
         Get one html document of a content
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/2/threads/7", status=200)
         content = res.json_body
         assert content["content_type"] == "thread"
@@ -4423,7 +5217,8 @@ class TestThreads(object):
         assert content["filename"] == "Best Cakes?.thread.html"
 
     @pytest.mark.parametrize(
-        "comments_content", [["<b>a first html comment</b>", "a second one !", "a third"]]
+        "comments_content",
+        [["<b>a first html comment</b>", "a second one !", "a third"]],
     )
     def test_api__get_thread_html_preview__ok__200__nominal_case(
         self,
@@ -4450,7 +5245,10 @@ class TestThreads(object):
             do_notify=False,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         for content in comments_content:
             params = {"raw_content": content}
             res = web_testapp.post_json(
@@ -4461,7 +5259,8 @@ class TestThreads(object):
                 status=200,
             )
         res = web_testapp.get(
-            "/api/workspaces/1/threads/{}/preview/html/".format(test_thread.content_id), status=200
+            "/api/workspaces/1/threads/{}/preview/html/".format(test_thread.content_id),
+            status=200,
         )
         binary_first_comment_content = comments_content[0].encode("utf-8")
         assert res.body == binary_first_comment_content
@@ -4493,47 +5292,71 @@ class TestThreads(object):
             do_notify=False,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
-            "/api/workspaces/1/threads/{}/preview/html/".format(test_thread.content_id), status=400
+            "/api/workspaces/1/threads/{}/preview/html/".format(test_thread.content_id),
+            status=400,
         )
         assert res.json_body["code"] == ErrorCode.UNAVAILABLE_FILE_PREVIEW
 
-    def test_api__get_thread__err_400__content_does_not_exist(self, web_testapp) -> None:
+    def test_api__get_thread__err_400__content_does_not_exist(
+        self, web_testapp
+    ) -> None:
         """
         Get one thread (content 170 does not exist)
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/2/threads/170", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
-    def test_api__get_thread__err_400__content_not_in_workspace(self, web_testapp) -> None:
+    def test_api__get_thread__err_400__content_not_in_workspace(
+        self, web_testapp
+    ) -> None:
         """
         Get one thread(content 7 is in workspace 2)
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/1/threads/7", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
-    def test_api__get_thread__err_400__workspace_does_not_exist(self, web_testapp) -> None:
+    def test_api__get_thread__err_400__workspace_does_not_exist(
+        self, web_testapp
+    ) -> None:
         """
         Get one thread (Workspace 40 does not exist)
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/40/threads/7", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
 
-    def test_api__get_thread__err_400__workspace_id_is_not_int(self, web_testapp) -> None:
+    def test_api__get_thread__err_400__workspace_id_is_not_int(
+        self, web_testapp
+    ) -> None:
         """
         Get one thread, workspace id is not int
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/coucou/threads/7", status=400)
         assert res.json_body
         assert "code" in res.json_body
@@ -4543,19 +5366,29 @@ class TestThreads(object):
         """
         Get one thread, content id is not int
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/2/threads/coucou", status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_INVALID_ID
 
-    def test_api__update_thread__ok_200__nominal_case(self, web_testapp, event_helper) -> None:
+    def test_api__update_thread__ok_200__nominal_case(
+        self, web_testapp, event_helper
+    ) -> None:
         """
         Update(put) thread
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"label": "My New label", "raw_content": "<p> Le nouveau contenu </p>"}
-        res = web_testapp.put_json("/api/workspaces/2/threads/7", params=params, status=200)
+        res = web_testapp.put_json(
+            "/api/workspaces/2/threads/7", params=params, status=200
+        )
         content = res.json_body
         assert content["content_type"] == "thread"
         assert content["content_id"] == 7
@@ -4617,7 +5450,9 @@ class TestThreads(object):
         assert modified_event.event_type == "content.modified.thread"
         # NOTE S.G 2020-05-12: allow a small difference in modified time
         # as tests with MySQL sometimes fails with a strict equality
-        event_content_modified = dateutil.parser.isoparse(modified_event.content["modified"])
+        event_content_modified = dateutil.parser.isoparse(
+            modified_event.content["modified"]
+        )
         content_modified = dateutil.parser.isoparse(content["modified"])
         modified_diff = (event_content_modified - content_modified).total_seconds()
         assert abs(modified_diff) < 2
@@ -4633,7 +5468,9 @@ class TestThreads(object):
         assert modified_event.content["show_in_ui"] == content["show_in_ui"]
         assert modified_event.content["slug"] == content["slug"]
         assert modified_event.content["status"] == content["status"]
-        assert modified_event.content["sub_content_types"] == content["sub_content_types"]
+        assert (
+            modified_event.content["sub_content_types"] == content["sub_content_types"]
+        )
         assert modified_event.content["workspace_id"] == content["workspace_id"]
         workspace = web_testapp.get("/api/workspaces/2", status=200).json_body
         assert modified_event.workspace == {
@@ -4644,9 +5481,14 @@ class TestThreads(object):
         """
         Update(put) thread
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"label": "My New label", "raw_content": "<p> Le nouveau contenu </p>"}
-        res = web_testapp.put_json("/api/workspaces/2/threads/7", params=params, status=200)
+        res = web_testapp.put_json(
+            "/api/workspaces/2/threads/7", params=params, status=200
+        )
         content = res.json_body
         assert content["content_type"] == "thread"
         assert content["content_id"] == 7
@@ -4698,7 +5540,9 @@ class TestThreads(object):
         assert content["last_modifier"] == content["author"]
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
 
-        res = web_testapp.put_json("/api/workspaces/2/threads/7", params=params, status=400)
+        res = web_testapp.put_json(
+            "/api/workspaces/2/threads/7", params=params, status=400
+        )
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.SAME_VALUE_ERROR
@@ -4707,9 +5551,14 @@ class TestThreads(object):
         """
         Update(put) thread
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"label": "", "raw_content": "<p> Le nouveau contenu </p>"}
-        res = web_testapp.put_json("/api/workspaces/2/threads/7", params=params, status=400)
+        res = web_testapp.put_json(
+            "/api/workspaces/2/threads/7", params=params, status=400
+        )
         # TODO - G.M - 2018-09-10 - Handle by marshmallow schema
         assert res.json_body
         assert "code" in res.json_body
@@ -4721,9 +5570,14 @@ class TestThreads(object):
         """
         Update(put) thread
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"label": "Hello", "raw_content": html_with_nasty_mention}
-        res = web_testapp.put_json("/api/workspaces/2/threads/7", params=params, status=400)
+        res = web_testapp.put_json(
+            "/api/workspaces/2/threads/7", params=params, status=400
+        )
         # TODO - G.M - 2018-09-10 - Handle by marshmallow schema
         assert res.json_body
         assert "code" in res.json_body
@@ -4733,7 +5587,10 @@ class TestThreads(object):
         """
         Get threads revisions
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/2/threads/7/revisions", status=200)
         revisions = res.json_body["items"]
         assert len(revisions) == 2
@@ -4786,7 +5643,12 @@ class TestThreads(object):
         assert revision["filename"] == "Best Cakes?.thread.html"
 
     def test_api__get_thread_revisions__ok_200__most_revision_type(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         get threads revisions
@@ -4806,7 +5668,9 @@ class TestThreads(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_thread):
             content_api.update_content(
-                test_thread, new_label="test_thread_updated", new_raw_content="Just a test"
+                test_thread,
+                new_label="test_thread_updated",
+                new_raw_content="Just a test",
             )
         content_api.save(test_thread)
         with new_revision(session=session, tm=transaction.manager, content=test_thread):
@@ -4826,9 +5690,13 @@ class TestThreads(object):
         content_api.save(test_thread)
         session.flush()
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
-            "/api/workspaces/1/threads/{}/revisions".format(test_thread.content_id), status=200
+            "/api/workspaces/1/threads/{}/revisions".format(test_thread.content_id),
+            status=200,
         )
         revisions = res.json_body["items"]
         assert len(revisions) == 6
@@ -4859,7 +5727,10 @@ class TestThreads(object):
         """
         Set thread status
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"status": "closed-deprecated"}
 
         # before
@@ -4870,7 +5741,9 @@ class TestThreads(object):
         assert content["status"] == "open"
         assert content["is_editable"] is True
         # set status
-        web_testapp.put_json("/api/workspaces/2/threads/7/status", params=params, status=204)
+        web_testapp.put_json(
+            "/api/workspaces/2/threads/7/status", params=params, status=204
+        )
 
         # after
         res = web_testapp.get("/api/workspaces/2/threads/7", status=200)
@@ -4884,20 +5757,30 @@ class TestThreads(object):
         """
         Set thread status
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"status": "unexistant-status"}
 
-        res = web_testapp.put_json("/api/workspaces/2/threads/7/status", params=params, status=400)
+        res = web_testapp.put_json(
+            "/api/workspaces/2/threads/7/status", params=params, status=400
+        )
         # INFO - G.M - 2018-09-10 - Handle by marshmallow schema
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__set_thread_status__err_400__same_status(self, web_testapp) -> None:
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"status": "open"}
 
-        res = web_testapp.put_json("/api/workspaces/2/threads/7/status", params=params, status=400)
+        res = web_testapp.put_json(
+            "/api/workspaces/2/threads/7/status", params=params, status=400
+        )
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.INVALID_STATUS_CHANGE
@@ -4909,7 +5792,12 @@ class TestThreads(object):
 )
 class TestFileLimitedContentSize(object):
     def test_api__set_file_raw__err_400__file_size_limit_over_limitation(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Try set one file of a content with different size according to size limit
@@ -4930,7 +5818,10 @@ class TestFileLimitedContentSize(object):
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put(
             "/api/workspaces/{}/files/{}/raw/{}".format(
                 business_workspace.workspace_id, content_id, image.name
@@ -4951,7 +5842,12 @@ class TestFileLimitedContentSize(object):
         assert res.json_body["code"] == ErrorCode.FILE_SIZE_OVER_MAX_LIMITATION
 
     def test_api__create_file__err__400__file_size_limit_over_limitation(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, admin_user
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        admin_user,
     ) -> None:
         """
         try to create one file of a content at workspace root with different size
@@ -4961,7 +5857,10 @@ class TestFileLimitedContentSize(object):
         workspace_api = workspace_api_factory.get()
         business_workspace = workspace_api.create_workspace("Business")
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         image = create_1000px_png_test_image()
         res = web_testapp.post(
             "/api/workspaces/{}/files".format(business_workspace.workspace_id),
@@ -4985,7 +5884,12 @@ class TestFileLimitedContentSize(object):
 )
 class TestWorkspaceLimitedContentSize(object):
     def test_api__set_file_raw__err_400__file_size_limit_over_limitation(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Try set one file of a content with different size according to size limit
@@ -5006,7 +5910,10 @@ class TestWorkspaceLimitedContentSize(object):
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put(
             "/api/workspaces/{}/files/{}/raw/{}".format(
                 business_workspace.workspace_id, content_id, image.name
@@ -5027,7 +5934,12 @@ class TestWorkspaceLimitedContentSize(object):
         assert res.json_body["code"] == ErrorCode.FILE_SIZE_OVER_WORKSPACE_EMPTY_SPACE
 
     def test_api__create_file__err__400__file_size_limit_over_limitation(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, admin_user
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        admin_user,
     ) -> None:
         """
         try to create one file of a content at workspace root with different size
@@ -5037,7 +5949,10 @@ class TestWorkspaceLimitedContentSize(object):
         workspace_api = workspace_api_factory.get()
         business_workspace = workspace_api.create_workspace("Business")
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         image = create_1000px_png_test_image()
         res = web_testapp.post(
             "/api/workspaces/{}/files".format(business_workspace.workspace_id),
@@ -5095,7 +6010,10 @@ class TestOwnerLimitedContentSize(object):
         transaction.commit()
         content_id = int(test_file.content_id)
         image = create_1000px_png_test_image()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put(
             "/api/workspaces/{}/files/{}/raw/{}".format(
                 business_workspace.workspace_id, content_id, image.name
@@ -5128,7 +6046,12 @@ class TestOwnerLimitedContentSize(object):
         assert res.json_body["code"] == ErrorCode.FILE_SIZE_OVER_OWNER_EMPTY_SPACE
 
     def test_api__create_file__err__400__file_size_limit_over_limitation(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, admin_user
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        admin_user,
     ) -> None:
         """
         try to create one file of a content at workspace root with different size
@@ -5140,7 +6063,10 @@ class TestOwnerLimitedContentSize(object):
         business_workspace = workspace_api.create_workspace("Business")
         marketing_workspace = workspace_api.create_workspace("Marketing")
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         image = create_1000px_png_test_image()
         res = web_testapp.post(
             "/api/workspaces/{}/files".format(business_workspace.workspace_id),
@@ -5217,12 +6143,17 @@ class TestContentTranslation(object):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=session, tm=transaction.manager, content=test_html_document):
+        with new_revision(
+            session=session, tm=transaction.manager, content=test_html_document
+        ):
             content_api.update_content(
                 test_html_document, content_label, new_raw_content=raw_content
             )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/workspaces/{}/html-documents/{}/revisions/{}/translated/{}".format(
                 workspace.workspace_id,
@@ -5283,15 +6214,22 @@ class TestContentTranslation(object):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=session, tm=transaction.manager, content=test_html_document):
+        with new_revision(
+            session=session, tm=transaction.manager, content=test_html_document
+        ):
             content_api.update_content(
                 test_html_document, content_label, new_raw_content=raw_content
             )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/workspaces/{}/html-documents/{}/translated/{}".format(
-                workspace.workspace_id, test_html_document.content_id, translation_filename
+                workspace.workspace_id,
+                test_html_document.content_id,
+                translation_filename,
             ),
             params={
                 "source_language_code": original_lang,

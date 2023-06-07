@@ -13,7 +13,9 @@ from tracim_backend.models.mixins import CreationDateMixin
 class FavoriteContent(CreationDateMixin, DeclarativeBase):
     __tablename__ = "favorite_contents"
 
-    user_id = Column(Integer, ForeignKey("users.user_id"), nullable=False, primary_key=True)
+    user_id = Column(
+        Integer, ForeignKey("users.user_id"), nullable=False, primary_key=True
+    )
     user = relationship("User", remote_side=[User.user_id], foreign_keys=[user_id])
     content_id = Column(
         Integer,

@@ -6,7 +6,9 @@ import typing
 
 class WopiPutHeadersSchema(marshmallow.Schema):
     wopi_lool_timestamp = marshmallow.fields.DateTime(
-        required=False, load_from="X-LOOL-WOPI-Timestamp", dump_to="X-LOOL-WOPI-Timestamp"
+        required=False,
+        load_from="X-LOOL-WOPI-Timestamp",
+        dump_to="X-LOOL-WOPI-Timestamp",
     )
 
     @post_load
@@ -37,7 +39,9 @@ class WOPICheckFileInfoSchema(marshmallow.Schema):
     OwnerId = marshmallow.fields.Int(
         description="Owner's database identifier", attribute="owner_id"
     )
-    UserId = marshmallow.fields.Int(description="User's database identifier", attribute="user_id")
+    UserId = marshmallow.fields.Int(
+        description="User's database identifier", attribute="user_id"
+    )
     UserFriendlyName = marshmallow.fields.String(
         description="User's display name", attribute="user_friendly_name"
     )

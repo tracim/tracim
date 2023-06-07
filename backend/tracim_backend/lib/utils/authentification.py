@@ -134,7 +134,9 @@ class TracimBasicAuthAuthenticationPolicy(
 
 
 @implementer(IAuthenticationPolicy)
-class CookieSessionAuthentificationPolicy(TracimAuthenticationPolicy, SessionAuthenticationPolicy):
+class CookieSessionAuthentificationPolicy(
+    TracimAuthenticationPolicy, SessionAuthenticationPolicy
+):
     COOKIE_LAST_SET_TIME = "cookie_last_set_time"
 
     def __init__(self, debug: bool = False):
@@ -162,7 +164,8 @@ class CookieSessionAuthentificationPolicy(TracimAuthenticationPolicy, SessionAut
         if not request.session.new:
             # all computation is done in timestamps (Epoch)
             cookie_last_set_time = (
-                request.session.get(self.COOKIE_LAST_SET_TIME) or request.session.created
+                request.session.get(self.COOKIE_LAST_SET_TIME)
+                or request.session.created
             )
 
             # convert beaker parameter to timestamp
@@ -171,7 +174,9 @@ class CookieSessionAuthentificationPolicy(TracimAuthenticationPolicy, SessionAut
             if isinstance(cookie_expires, datetime.datetime):
                 cookie_expires_time = cookie_expires.timestamp()
             elif isinstance(cookie_expires, datetime.timedelta):
-                cookie_expires_time = cookie_last_set_time + cookie_expires.total_seconds()
+                cookie_expires_time = (
+                    cookie_last_set_time + cookie_expires.total_seconds()
+                )
             # the cases left are when session.cookie_expires is a boolean
             # which means there is no expiry date, so no renewal to do
 
@@ -198,7 +203,9 @@ class CookieSessionAuthentificationPolicy(TracimAuthenticationPolicy, SessionAut
 
 
 @implementer(IAuthenticationPolicy)
-class RemoteAuthentificationPolicy(TracimAuthenticationPolicy, CallbackAuthenticationPolicy):
+class RemoteAuthentificationPolicy(
+    TracimAuthenticationPolicy, CallbackAuthenticationPolicy
+):
     def __init__(self, remote_user_login_header: str) -> None:
         self.remote_user_login_header = remote_user_login_header
         self.callback = None
@@ -234,7 +241,9 @@ class RemoteAuthentificationPolicy(TracimAuthenticationPolicy, CallbackAuthentic
 
 
 @implementer(IAuthenticationPolicy)
-class ApiTokenAuthentificationPolicy(TracimAuthenticationPolicy, CallbackAuthenticationPolicy):
+class ApiTokenAuthentificationPolicy(
+    TracimAuthenticationPolicy, CallbackAuthenticationPolicy
+):
     def __init__(self, api_key_header: str, api_user_login_header: str) -> None:
         self.api_key_header = api_key_header
         self.api_user_login_header = api_user_login_header
@@ -282,7 +291,9 @@ class ApiTokenAuthentificationPolicy(TracimAuthenticationPolicy, CallbackAuthent
 
 
 @implementer(IAuthenticationPolicy)
-class QueryTokenAuthentificationPolicy(TracimAuthenticationPolicy, CallbackAuthenticationPolicy):
+class QueryTokenAuthentificationPolicy(
+    TracimAuthenticationPolicy, CallbackAuthenticationPolicy
+):
     def __init__(self) -> None:
         self.callback = None
 

@@ -1,10 +1,9 @@
 import shutil
-import typing
-import uuid
-
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
+import typing
+import uuid
 
 from tracim_backend.applications.agenda.lib import AgendaApi
 from tracim_backend.applications.agenda.models import AgendaResourceType
@@ -56,7 +55,9 @@ class CleanupLib(object):
     using "unsafe_tracim_session" context_manager
     """
 
-    def __init__(self, session: Session, app_config: CFG, dry_run_mode: bool = False) -> None:
+    def __init__(
+        self, session: Session, app_config: CFG, dry_run_mode: bool = False
+    ) -> None:
         self.session = session
         self.app_config = app_config
         self.dry_run_mode = dry_run_mode
@@ -95,7 +96,9 @@ class CleanupLib(object):
             logger.debug(self, "fake deletion of {} dir".format(dir_path))
 
     def delete_revision(
-        self, revision: ContentRevisionRO, do_update_content_last_revision: bool = True,
+        self,
+        revision: ContentRevisionRO,
+        do_update_content_last_revision: bool = True,
     ) -> int:
         """
         :param do_update_content_last_revision: update last revision of content associated to last one if needed. Set only
@@ -104,7 +107,10 @@ class CleanupLib(object):
         :return: revision_id of revision to delete
         """
 
-        if do_update_content_last_revision and revision.node.revision_id == revision.revision_id:
+        if (
+            do_update_content_last_revision
+            and revision.node.revision_id == revision.revision_id
+        ):
             try:
                 new_last_revision = (
                     self.session.query(ContentRevisionRO)
@@ -142,13 +148,17 @@ class CleanupLib(object):
 
         logger.info(
             self,
-            "delete revision {} of content {}".format(revision.revision_id, revision.content_id),
+            "delete revision {} of content {}".format(
+                revision.revision_id, revision.content_id
+            ),
         )
         revision_id = revision.revision_id
         self.safe_delete(revision)
         return revision_id
 
-    def delete_content(self, content: Content, recursively: bool = True) -> typing.List[str]:
+    def delete_content(
+        self, content: Content, recursively: bool = True
+    ) -> typing.List[str]:
         """
         Delete content and associated stuff:
         - all content revisions
@@ -166,7 +176,10 @@ class CleanupLib(object):
         )
         for share in shares:
             logger.info(
-                self, "delete share {} from content {}".format(share.share_id, share.content_id)
+                self,
+                "delete share {} from content {}".format(
+                    share.share_id, share.content_id
+                ),
             )
             self.safe_delete(share)
 
@@ -233,12 +246,16 @@ class CleanupLib(object):
     def delete_workspace_agenda(
         self, workspace_id: int, resource_type: AgendaResourceType
     ) -> typing.Optional[str]:
-        agenda_api = AgendaApi(config=self.app_config, current_user=None, session=self.session)
+        agenda_api = AgendaApi(
+            config=self.app_config, current_user=None, session=self.session
+        )
         resource_type_dir = agenda_api.get_resource_type_dir(resource_type)
-        workspace_agenda_path = self.app_config.RADICALE__WORKSPACE_AGENDA_PATH_PATTERN.format(
-            resource_type_dir=resource_type_dir,
-            workspace_subdir=self.app_config.RADICALE__WORKSPACE_SUBDIR,
-            workspace_id=workspace_id,
+        workspace_agenda_path = (
+            self.app_config.RADICALE__WORKSPACE_AGENDA_PATH_PATTERN.format(
+                resource_type_dir=resource_type_dir,
+                workspace_subdir=self.app_config.RADICALE__WORKSPACE_SUBDIR,
+                workspace_id=workspace_id,
+            )
         )
         agenda_dir = "{local_path}{workspace_agenda_path}".format(
             local_path=self.app_config.RADICALE__LOCAL_PATH_STORAGE,
@@ -247,7 +264,9 @@ class CleanupLib(object):
         logger.info(
             self,
             'delete workspace "{workspace_id}" {resource_type} (agenda) dir at "{agenda_dir}"'.format(
-                workspace_id=workspace_id, resource_type=resource_type.value, agenda_dir=agenda_dir
+                workspace_id=workspace_id,
+                resource_type=resource_type.value,
+                agenda_dir=agenda_dir,
             ),
         )
         try:
@@ -292,9 +311,14 @@ class CleanupLib(object):
             self.safe_delete(upload_permission)
 
         # INFO - G.M - 2019-12-11 - user share
-        shares = self.session.query(ContentShare).filter(ContentShare.author_id == user.user_id)
+        shares = self.session.query(ContentShare).filter(
+            ContentShare.author_id == user.user_id
+        )
         for share in shares:
-            logger.info(self, "delete share {} from user {}".format(share.share_id, user.user_id))
+            logger.info(
+                self,
+                "delete share {} from user {}".format(share.share_id, user.user_id),
+            )
             self.safe_delete(share)
 
         # INFO - G.M - 2019-12-11 - User role
@@ -304,7 +328,9 @@ class CleanupLib(object):
         for role in roles:
             logger.info(
                 self,
-                "delete role for user {} of workspace {}".format(role.user_id, role.workspace_id),
+                "delete role for user {} of workspace {}".format(
+                    role.user_id, role.workspace_id
+                ),
             )
             self.safe_delete(role)
 
@@ -330,7 +356,8 @@ class CleanupLib(object):
         except FileNotFoundError as e:
             raise AgendaNotFoundError(
                 'Try to delete user "{user_id}" DAV resource root but directory {resource_dir} not found'.format(
-                    user_id=user_id, resource_dir=resource_dir,
+                    user_id=user_id,
+                    resource_dir=resource_dir,
                 )
             ) from e
         return resource_dir
@@ -343,7 +370,9 @@ class CleanupLib(object):
         :param user_id: user_id of user whe delete agenda
         :return: path of deleted agenda
         """
-        agenda_api = AgendaApi(config=self.app_config, current_user=None, session=self.session)
+        agenda_api = AgendaApi(
+            config=self.app_config, current_user=None, session=self.session
+        )
         resource_type_dir = agenda_api.get_resource_type_dir(resource_type)
         user_agenda_path = self.app_config.RADICALE__USER_AGENDA_PATH_PATTERN.format(
             resource_type_dir=resource_type_dir,
@@ -357,7 +386,9 @@ class CleanupLib(object):
         logger.info(
             self,
             'delete user "{user_id}" {resource_type} (agenda) dir at "{agenda_dir}"'.format(
-                user_id=user_id, resource_type=resource_type.value, agenda_dir=agenda_dir
+                user_id=user_id,
+                resource_type=resource_type.value,
+                agenda_dir=agenda_dir,
             ),
         )
         try:
@@ -365,7 +396,9 @@ class CleanupLib(object):
         except FileNotFoundError as e:
             raise AgendaNotFoundError(
                 'Try to delete user "{user_id}" {resource_type} (agenda) but no {resource_type} found at {agenda_dir}'.format(
-                    user_id=user_id, resource_type=resource_type.value, agenda_dir=agenda_dir,
+                    user_id=user_id,
+                    resource_type=resource_type.value,
+                    agenda_dir=agenda_dir,
                 )
             ) from e
         return agenda_dir
@@ -378,7 +411,10 @@ class CleanupLib(object):
         """
         deleted_workspace_ids = []  # typing.List[int]
         wapi = WorkspaceApi(
-            config=self.app_config, session=self.session, current_user=None, show_deleted=True
+            config=self.app_config,
+            session=self.session,
+            current_user=None,
+            show_deleted=True,
         )
         user_owned_workspaces = wapi.get_all_for_user(
             user, include_owned=True, include_with_role=False
@@ -416,7 +452,9 @@ class CleanupLib(object):
         """
 
         deleted_reactions_ids = []  # typing.List[int]
-        reactions = self.session.query(Reaction).filter(Reaction.author_id == user.user_id)
+        reactions = self.session.query(Reaction).filter(
+            Reaction.author_id == user.user_id
+        )
         for reaction in reactions:
             deleted_reactions_ids.append(reaction.reaction_id)
             logger.info(
@@ -444,7 +482,8 @@ class CleanupLib(object):
         return user_id
 
     def prepare_deletion_or_anonymization(
-        self, user: User,
+        self,
+        user: User,
     ):
         """
         Disable and delete user with flag to get proper TLM.
@@ -463,7 +502,8 @@ class CleanupLib(object):
         """
         hash = str(uuid.uuid4().hex)
         user.display_name = (
-            anonymized_user_display_name or self.app_config.DEFAULT_ANONYMIZED_USER_DISPLAY_NAME
+            anonymized_user_display_name
+            or self.app_config.DEFAULT_ANONYMIZED_USER_DISPLAY_NAME
         )
         user.email = ANONYMIZED_USER_EMAIL_PATTERN.format(hash=hash)
         user.username = None
@@ -476,7 +516,10 @@ class CleanupLib(object):
         self, user: User, owned_workspace_will_be_deleted: bool = False
     ) -> UserNeedAnonymization:
         wapi = WorkspaceApi(
-            config=self.app_config, session=self.session, current_user=user, show_deleted=True
+            config=self.app_config,
+            session=self.session,
+            current_user=user,
+            show_deleted=True,
         )
         user_owned_workspaces_to_filter = wapi.get_all_for_user(
             user, include_owned=True, include_with_role=False
@@ -487,17 +530,24 @@ class CleanupLib(object):
         if owned_workspace_will_be_deleted:
             revision_query = revision_query.filter(
                 ~ContentRevisionRO.workspace_id.in_(
-                    [workspace.workspace_id for workspace in user_owned_workspaces_to_filter]
+                    [
+                        workspace.workspace_id
+                        for workspace in user_owned_workspaces_to_filter
+                    ]
                 )
             )
             reaction_query = (
                 reaction_query.join(Content)
                 .join(
-                    ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id
+                    ContentRevisionRO,
+                    Content.cached_revision_id == ContentRevisionRO.revision_id,
                 )
                 .filter(
                     ~ContentRevisionRO.workspace_id.in_(
-                        [workspace.workspace_id for workspace in user_owned_workspaces_to_filter]
+                        [
+                            workspace.workspace_id
+                            for workspace in user_owned_workspaces_to_filter
+                        ]
                     )
                 )
             )
@@ -505,7 +555,9 @@ class CleanupLib(object):
         else:
             user_blocking_workspaces = user_owned_workspaces_to_filter
 
-        revision_query = revision_query.filter(ContentRevisionRO.owner_id == user.user_id)
+        revision_query = revision_query.filter(
+            ContentRevisionRO.owner_id == user.user_id
+        )
         reaction_query = reaction_query.filter(Reaction.author_id == user.user_id)
         user_blocking_revisions = revision_query.all()
         user_blocking_reactions = reaction_query.all()

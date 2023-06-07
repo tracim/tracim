@@ -15,16 +15,21 @@ class CollaboraCollaborativeDocumentEditionLib(CollaborativeDocumentEditionLib):
     Collabora implementation of Collaborative Document Edition.
     """
 
-    def _get_supported_file_types(self) -> typing.List[CollaborativeDocumentEditionFileType]:
+    def _get_supported_file_types(
+        self,
+    ) -> typing.List[CollaborativeDocumentEditionFileType]:
         """
         Get list of supported file type for collaborative editions
         """
         response = requests.get(
-            self._config.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL + "/hosting/discovery",
+            self._config.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL
+            + "/hosting/discovery",
             timeout=2,
         )
         root = ElementTree.fromstring(response.text)
-        supported_collabora_file = []  # type: typing.List[CollaborativeDocumentEditionFileType]
+        supported_collabora_file = (
+            []
+        )  # type: typing.List[CollaborativeDocumentEditionFileType]
         for xml_app in root.findall("net-zone/app"):
             mimetype = xml_app.get("name")
             # INFO - G.M - 2019-07-17 - this list return also a non mimetype type,

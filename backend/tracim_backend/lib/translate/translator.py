@@ -6,7 +6,9 @@ from typing import BinaryIO
 from typing import List
 
 AUTODETECT_LANG = "auto"
-TranslationLanguagePair = namedtuple("TranslationLanguagePair", ["input_lang", "output_lang"])
+TranslationLanguagePair = namedtuple(
+    "TranslationLanguagePair", ["input_lang", "output_lang"]
+)
 TranslationMimetypePair = namedtuple(
     "TranslationMimetypePair", ["input_mimetype", "output_mimetype"]
 )
@@ -47,7 +49,12 @@ class TranslationService(ABC):
     """
 
     def translate_file(
-        self, input_lang: str, output_lang: str, binary_io: BinaryIO, mimetype: str, **options: Any
+        self,
+        input_lang: str,
+        output_lang: str,
+        binary_io: BinaryIO,
+        mimetype: str,
+        **options: Any
     ) -> BinaryIO:
         language_pair = TranslationLanguagePair(input_lang, output_lang)
         return self._translate_file(language_pair, binary_io, mimetype, **options)

@@ -40,7 +40,9 @@ class UploadPermissionEmailManager(EmailManager):
             logger.info(
                 self,
                 'Generating new upload notification in workspace "{}" from "{}" to "{}"'.format(
-                    workspace_in_context.workspace_id, uploader_username, role.user.email
+                    workspace_in_context.workspace_id,
+                    uploader_username,
+                    role.user.email,
                 ),
             )
             translator = Translator(app_config=self.config, default_lang=role.user.lang)
@@ -54,7 +56,9 @@ class UploadPermissionEmailManager(EmailManager):
                 uploader_message=uploader_message,
             )
             send_email_through(
-                config=self.config, sendmail_callable=email_sender.send_mail, message=message
+                config=self.config,
+                sendmail_callable=email_sender.send_mail,
+                message=message,
             )
 
     def _notify_new_upload(
@@ -83,7 +87,9 @@ class UploadPermissionEmailManager(EmailManager):
         )
         from_header = self._get_sender()
         to_header = EmailAddress(receiver.display_name, receiver.email)
-        html_template_file_path = self.config.EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML
+        html_template_file_path = (
+            self.config.EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML
+        )
         context = {
             "receiver": receiver,
             "workspace": workspace_in_context,
@@ -92,7 +98,9 @@ class UploadPermissionEmailManager(EmailManager):
             "uploader_message": uploader_message,
         }
         body_html = self._render_template(
-            mako_template_filepath=html_template_file_path, context=context, translator=translator
+            mako_template_filepath=html_template_file_path,
+            context=context,
+            translator=translator,
         )
         message = EmailNotificationMessage(
             subject=subject,
@@ -136,7 +144,9 @@ class UploadPermissionEmailManager(EmailManager):
                 translator=translator,
             )
             send_email_through(
-                config=self.config, sendmail_callable=email_sender.send_mail, message=message
+                config=self.config,
+                sendmail_callable=email_sender.send_mail,
+                message=message,
             )
         else:
             logger.debug(
@@ -163,7 +173,9 @@ class UploadPermissionEmailManager(EmailManager):
                 translator=translator,
             )
             send_email_through(
-                config=self.config, sendmail_callable=email_sender.send_mail, message=message
+                config=self.config,
+                sendmail_callable=email_sender.send_mail,
+                message=message,
             )
 
     def _notify_emitter(
@@ -200,7 +212,9 @@ class UploadPermissionEmailManager(EmailManager):
             "upload_permission_password": upload_permission_password,
         }
         body_html = self._render_template(
-            mako_template_filepath=html_template_file_path, context=context, translator=translator
+            mako_template_filepath=html_template_file_path,
+            context=context,
+            translator=translator,
         )
 
         message = EmailNotificationMessage(
@@ -246,7 +260,9 @@ class UploadPermissionEmailManager(EmailManager):
             "upload_permission_password_enabled": upload_permission_password_enabled,
         }
         body_html = self._render_template(
-            mako_template_filepath=html_template_file_path, context=context, translator=translator
+            mako_template_filepath=html_template_file_path,
+            context=context,
+            translator=translator,
         )
         message = EmailNotificationMessage(
             subject=subject,

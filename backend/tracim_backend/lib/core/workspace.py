@@ -64,7 +64,9 @@ class WorkspaceApi(object):
         if not self.show_deleted:
             query = query.filter(Workspace.is_deleted == False)  # noqa: E712
         if self._access_types_filter:
-            access_types_str = [access_type.name for access_type in self._access_types_filter]
+            access_types_str = [
+                access_type.name for access_type in self._access_types_filter
+            ]
             query = query.filter(Workspace.access_type.in_(access_types_str))
         return query
 
@@ -102,7 +104,9 @@ class WorkspaceApi(object):
         """
         Return WorkspaceInContext object from Workspace
         """
-        return WorkspaceInContext(workspace=workspace, dbsession=self._session, config=self._config)
+        return WorkspaceInContext(
+            workspace=workspace, dbsession=self._session, config=self._config
+        )
 
     def create_workspace(
         self,
@@ -117,13 +121,19 @@ class WorkspaceApi(object):
         parent: Workspace = None,
         save_now: bool = False,
     ) -> Workspace:
-        if not self._user or not self._user_allowed_to_create_new_workspaces(self._user):
-            raise UserNotAllowedToCreateMoreWorkspace("User not allowed to create more workspace")
+        if not self._user or not self._user_allowed_to_create_new_workspaces(
+            self._user
+        ):
+            raise UserNotAllowedToCreateMoreWorkspace(
+                "User not allowed to create more workspace"
+            )
         if not label:
             raise EmptyLabelNotAllowed("Workspace label cannot be empty")
         if access_type not in self._config.WORKSPACE__ALLOWED_ACCESS_TYPES:
             raise DisallowedWorkspaceAccessType(
-                'Access type "{}" is not allowed for this workspace'.format(access_type.name)
+                'Access type "{}" is not allowed for this workspace'.format(
+                    access_type.name
+                )
             )
         workspace = Workspace()
         workspace.label = label
@@ -140,7 +150,9 @@ class WorkspaceApi(object):
         workspace.publication_enabled = publication_enabled
         # By default, we force the current user to be the workspace manager
         # And to receive email notifications
-        role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
+        role_api = RoleApi(
+            session=self._session, current_user=self._user, config=self._config
+        )
         with self._session.no_autoflush:
             role = role_api.create_one(
                 self._user,
@@ -231,13 +243,17 @@ class WorkspaceApi(object):
 
         Role is set to the workspace default role.
         """
-        query = self._base_query_without_roles().filter(Workspace.workspace_id == workspace_id)
+        query = self._base_query_without_roles().filter(
+            Workspace.workspace_id == workspace_id
+        )
         query = query.filter(Workspace.access_type == WorkspaceAccessType.OPEN)
         try:
             workspace = query.one()
         except NoResultFound as exc:
             raise WorkspaceNotFound(
-                "workspace {} does not exist or not visible for user".format(workspace_id)
+                "workspace {} does not exist or not visible for user".format(
+                    workspace_id
+                )
             ) from exc
         role_api = RoleApi(
             current_user=self._user,
@@ -258,7 +274,9 @@ class WorkspaceApi(object):
             return query.one()
         except NoResultFound as exc:
             raise WorkspaceNotFound(
-                "workspace {} does not exist or not visible for user".format(workspace_id)
+                "workspace {} does not exist or not visible for user".format(
+                    workspace_id
+                )
             ) from exc
 
     def get_one_by_filemanager_filename(
@@ -281,7 +299,9 @@ class WorkspaceApi(object):
         if parent:
             query = query.filter(Workspace.parent_id == parent.workspace_id)
         else:
-            role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
+            role_api = RoleApi(
+                session=self._session, current_user=self._user, config=self._config
+            )
             workspace_ids = role_api.get_user_workspaces_ids(
                 user_id=self._user.user_id, min_role=UserRoleInWorkspace.READER
             )
@@ -336,18 +356,24 @@ class WorkspaceApi(object):
         return self.default_order_workspace(self._base_query()).all()
 
     def get_all_children(self, parent_ids: typing.List[int]) -> typing.List[Workspace]:
-        workspaces = self._parent_id_filter(parent_ids=parent_ids, query=self._base_query())
+        workspaces = self._parent_id_filter(
+            parent_ids=parent_ids, query=self._base_query()
+        )
         return self.default_order_workspace(workspaces).all()
 
     def get_user_used_space(self, user: User) -> int:
-        workspaces = self.get_all_for_user(user, include_owned=True, include_with_role=False)
+        workspaces = self.get_all_for_user(
+            user, include_owned=True, include_with_role=False
+        )
         used_space = 0
         for workspace in workspaces:
             used_space += workspace.get_size()
         return used_space
 
     def _get_workspaces_owned_by_user(self, user_id: int) -> typing.List[Workspace]:
-        return self._base_query_without_roles().filter(Workspace.owner_id == user_id).all()
+        return (
+            self._base_query_without_roles().filter(Workspace.owner_id == user_id).all()
+        )
 
     def get_all_for_user(
         self,
@@ -365,7 +391,9 @@ class WorkspaceApi(object):
         """
         query = self._base_query()
         workspace_ids = []
-        role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
+        role_api = RoleApi(
+            session=self._session, current_user=self._user, config=self._config
+        )
         if include_with_role:
             workspace_ids.extend(
                 role_api.get_user_workspaces_ids(
@@ -374,7 +402,9 @@ class WorkspaceApi(object):
             )
         if include_owned:
             owned_workspaces = self._get_workspaces_owned_by_user(user.user_id)
-            workspace_ids.extend([workspace.workspace_id for workspace in owned_workspaces])
+            workspace_ids.extend(
+                [workspace.workspace_id for workspace in owned_workspaces]
+            )
 
         query = self._parent_id_filter(query, parent_ids=parents_ids)
         query = query.filter(Workspace.workspace_id.in_(workspace_ids))
@@ -385,7 +415,9 @@ class WorkspaceApi(object):
         """Get all user workspaces where the users is not member of the parent and parent exists"""
         query = self._base_query()
         workspace_ids = []
-        role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
+        role_api = RoleApi(
+            session=self._session, current_user=self._user, config=self._config
+        )
         workspace_ids.extend(
             role_api.get_user_workspaces_ids(
                 user_id=user.user_id, min_role=UserRoleInWorkspace.READER
@@ -423,7 +455,9 @@ class WorkspaceApi(object):
         elif self._user.profile.id == Profile.TRUSTED_USER.id:
             workspaces = (
                 self._base_query()
-                .filter(UserRoleInWorkspace.role == UserRoleInWorkspace.WORKSPACE_MANAGER)
+                .filter(
+                    UserRoleInWorkspace.role == UserRoleInWorkspace.WORKSPACE_MANAGER
+                )
                 .order_by(Workspace.label)
                 .all()
             )
@@ -442,7 +476,10 @@ class WorkspaceApi(object):
         roles = []
         for role in workspace.roles:
             if (
-                (force_notify or role.email_notification_type == EmailNotificationType.INDIVIDUAL)
+                (
+                    force_notify
+                    or role.email_notification_type == EmailNotificationType.INDIVIDUAL
+                )
                 and (not self._user or role.user != self._user)
                 and role.user.is_active
                 and not role.user.is_deleted

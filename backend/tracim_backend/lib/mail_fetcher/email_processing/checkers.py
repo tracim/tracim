@@ -32,7 +32,10 @@ class ProprietaryHTMLAttrValues(object):
 class HtmlChecker(object):
     @classmethod
     def _has_attr_value(
-        cls, elem: typing.Union[Tag, NavigableString], attribute_name: str, attribute_value: str
+        cls,
+        elem: typing.Union[Tag, NavigableString],
+        attribute_name: str,
+        attribute_value: str,
     ) -> bool:
         """
         Check if elem contains attribute named attribute_name with
@@ -49,7 +52,9 @@ class HtmlChecker(object):
             # INFO - G.M - 2017-12-01 - attrs[value}] can be string or list
             # use get_attribute_list to always check in a list
             # see https://www.crummy.com/software/BeautifulSoup/bs4/doc/#multi-valued-attributes
-            values_lower = [value.lower() for value in elem.get_attribute_list(attribute_name)]
+            values_lower = [
+                value.lower() for value in elem.get_attribute_list(attribute_name)
+            ]
             return attribute_value.lower() in values_lower
         return False
 
@@ -84,21 +89,29 @@ class HtmlMailQuoteChecker(HtmlChecker):
 
     @classmethod
     def _is_gmail_quote(cls, elem: typing.Union[Tag, NavigableString]) -> bool:
-        if cls._has_attr_value(elem, "class", ProprietaryHTMLAttrValues.Gmail_extras_class):
+        if cls._has_attr_value(
+            elem, "class", ProprietaryHTMLAttrValues.Gmail_extras_class
+        ):
             for child in elem.children:
-                if cls._has_attr_value(child, "class", ProprietaryHTMLAttrValues.Gmail_quote_class):
+                if cls._has_attr_value(
+                    child, "class", ProprietaryHTMLAttrValues.Gmail_quote_class
+                ):
                     return True
         return False
 
     @classmethod
     def _is_outlook_com_quote(cls, elem: typing.Union[Tag, NavigableString]) -> bool:
-        if cls._has_attr_value(elem, "id", ProprietaryHTMLAttrValues.Outlook_com_quote_id):
+        if cls._has_attr_value(
+            elem, "id", ProprietaryHTMLAttrValues.Outlook_com_quote_id
+        ):
             return True
         return False
 
     @classmethod
     def _is_yahoo_quote(cls, elem: typing.Union[Tag, NavigableString]) -> bool:
-        return cls._has_attr_value(elem, "class", ProprietaryHTMLAttrValues.Yahoo_quote_class)
+        return cls._has_attr_value(
+            elem, "class", ProprietaryHTMLAttrValues.Yahoo_quote_class
+        )
 
     @classmethod
     def _is_roundcube_quote(cls, elem: typing.Union[Tag, NavigableString]) -> bool:
@@ -121,16 +134,22 @@ class HtmlMailSignatureChecker(HtmlChecker):
         )
 
     @classmethod
-    def _is_thunderbird_signature(cls, elem: typing.Union[Tag, NavigableString]) -> bool:
+    def _is_thunderbird_signature(
+        cls, elem: typing.Union[Tag, NavigableString]
+    ) -> bool:
         return cls._has_attr_value(
             elem, "class", ProprietaryHTMLAttrValues.Thunderbird_signature_class
         )
 
     @classmethod
     def _is_gmail_signature(cls, elem: typing.Union[Tag, NavigableString]) -> bool:
-        if cls._has_attr_value(elem, "class", ProprietaryHTMLAttrValues.Gmail_signature_class):
+        if cls._has_attr_value(
+            elem, "class", ProprietaryHTMLAttrValues.Gmail_signature_class
+        ):
             return True
-        if cls._has_attr_value(elem, "class", ProprietaryHTMLAttrValues.Gmail_extras_class):
+        if cls._has_attr_value(
+            elem, "class", ProprietaryHTMLAttrValues.Gmail_extras_class
+        ):
             for child in elem.children:
                 if cls._has_attr_value(
                     child, "class", ProprietaryHTMLAttrValues.Gmail_signature_class
@@ -145,7 +164,11 @@ class HtmlMailSignatureChecker(HtmlChecker):
         return False
 
     @classmethod
-    def _is_outlook_com_signature(cls, elem: typing.Union[Tag, NavigableString]) -> bool:
-        if cls._has_attr_value(elem, "id", ProprietaryHTMLAttrValues.Outlook_com_signature_id):
+    def _is_outlook_com_signature(
+        cls, elem: typing.Union[Tag, NavigableString]
+    ) -> bool:
+        if cls._has_attr_value(
+            elem, "id", ProprietaryHTMLAttrValues.Outlook_com_signature_id
+        ):
             return True
         return False

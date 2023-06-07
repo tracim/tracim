@@ -55,7 +55,9 @@ def contents_for_pagination(
 @pytest.mark.usefixtures("base_fixture")
 class TestWorkspaceEndpointWorkspacePerUserLimitation(object):
     @pytest.mark.parametrize(
-        "config_section", [{"name": "functional_test_one_workspace_per_user"}], indirect=True
+        "config_section",
+        [{"name": "functional_test_one_workspace_per_user"}],
+        indirect=True,
     )
     def test_api__create_workspace_err_400__one_workspace_limit(
         self, web_testapp, admin_user
@@ -64,7 +66,10 @@ class TestWorkspaceEndpointWorkspacePerUserLimitation(object):
         Test create workspace : workspace limit of 1 workspace
         """
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "label": "superworkspace",
             "description": "mysuperdescription",
@@ -81,10 +86,15 @@ class TestWorkspaceEndpointWorkspacePerUserLimitation(object):
             "parent_id": None,
         }
         res = web_testapp.post_json("/api/workspaces", status=400, params=params)
-        assert res.json_body["code"] == ErrorCode.USER_NOT_ALLOWED_TO_CREATE_MORE_WORKSPACES
+        assert (
+            res.json_body["code"]
+            == ErrorCode.USER_NOT_ALLOWED_TO_CREATE_MORE_WORKSPACES
+        )
 
     @pytest.mark.parametrize(
-        "config_section", [{"name": "functional_test_no_workspace_limit_per_user"}], indirect=True
+        "config_section",
+        [{"name": "functional_test_no_workspace_limit_per_user"}],
+        indirect=True,
     )
     def test_api__create_workspace_ok_200__no_workspace_limit(
         self, web_testapp, admin_user
@@ -93,7 +103,10 @@ class TestWorkspaceEndpointWorkspacePerUserLimitation(object):
         Test create workspace : workspace limit of 0 workspace -> unlimited
         """
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "label": "superworkspace",
             "description": "mysuperdescription",
@@ -122,14 +135,21 @@ class TestWorkspaceEndpointWorkspacePerUserLimitation(object):
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize(
-    "config_section", [{"name": "functional_test_only_confidential_workspace"}], indirect=True
+    "config_section",
+    [{"name": "functional_test_only_confidential_workspace"}],
+    indirect=True,
 )
 class TestWorkspaceCreationEndpointWorkspaceAccessTypeChecks(object):
-    def test_api__create_workspace__ok_200__nominal_case(self, web_testapp, event_helper) -> None:
+    def test_api__create_workspace__ok_200__nominal_case(
+        self, web_testapp, event_helper
+    ) -> None:
         """
         Test create workspace
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "label": "superworkspace",
             "description": "mysuperdescription",
@@ -164,11 +184,16 @@ class TestWorkspaceCreationEndpointWorkspaceAccessTypeChecks(object):
         assert workspace_created.author["user_id"] == workspace["owner"]["user_id"]
         assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
 
-    def test_api__create_workspace__ok_200__with_parent_id(self, web_testapp, event_helper) -> None:
+    def test_api__create_workspace__ok_200__with_parent_id(
+        self, web_testapp, event_helper
+    ) -> None:
         """
         Test create workspace
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "label": "superworkspaceparent",
             "description": "mysuperdescription",
@@ -221,7 +246,10 @@ class TestWorkspaceCreationEndpointWorkspaceAccessTypeChecks(object):
         """
         Test create workspace
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "label": "superworkspace",
             "description": "mysuperdescription",
@@ -243,7 +271,10 @@ class TestWorkspaceCreationEndpointWorkspaceAccessTypeChecks(object):
         """
         Test create workspace
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "label": "superworkspace",
             "description": "mysuperdescription",
@@ -354,7 +385,9 @@ class TestWorkspaceEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         parent_workspace = workspace_api.create_workspace("test_parent", save_now=True)
-        workspace = workspace_api.create_workspace("test", parent=parent_workspace, save_now=True)
+        workspace = workspace_api.create_workspace(
+            "test", parent=parent_workspace, save_now=True
+        )
         role_api = role_api_factory.get()
         role_api.create_one(
             user,
@@ -371,7 +404,9 @@ class TestWorkspaceEndpoint(object):
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = web_testapp.get("/api/workspaces/{}".format(workspace.workspace_id), status=200)
+        res = web_testapp.get(
+            "/api/workspaces/{}".format(workspace.workspace_id), status=200
+        )
         workspace_dict = res.json_body
         assert workspace_dict["workspace_id"] == workspace.workspace_id
         assert workspace_dict["label"] == workspace.label
@@ -386,8 +421,12 @@ class TestWorkspaceEndpoint(object):
             workspace_dict["sidebar_entries"][counter]["slug"] = sidebar_entry.slug
             workspace_dict["sidebar_entries"][counter]["label"] = sidebar_entry.label
             workspace_dict["sidebar_entries"][counter]["route"] = sidebar_entry.route
-            workspace_dict["sidebar_entries"][counter]["hexcolor"] = sidebar_entry.hexcolor
-            workspace_dict["sidebar_entries"][counter]["fa_icon"] = sidebar_entry.fa_icon
+            workspace_dict["sidebar_entries"][counter][
+                "hexcolor"
+            ] = sidebar_entry.hexcolor
+            workspace_dict["sidebar_entries"][counter][
+                "fa_icon"
+            ] = sidebar_entry.fa_icon
 
     def test_api__get_workspace__ok_200__admin_and_not_in_workspace(
         self,
@@ -407,7 +446,9 @@ class TestWorkspaceEndpoint(object):
         admin2 = uapi.create_user(
             email="admin2@admin2.admin2", profile=Profile.ADMIN, do_notify=False
         )
-        workspace_api = workspace_api_factory.get(current_user=admin2, show_deleted=True)
+        workspace_api = workspace_api_factory.get(
+            current_user=admin2, show_deleted=True
+        )
         workspace = workspace_api.create_workspace("test", save_now=True)
         workspace = workspace_api.get_one(workspace.workspace_id)
         app_api = application_api_factory.get()
@@ -416,8 +457,13 @@ class TestWorkspaceEndpoint(object):
         )
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/workspaces/{}".format(workspace.workspace_id), status=200)
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        res = web_testapp.get(
+            "/api/workspaces/{}".format(workspace.workspace_id), status=200
+        )
         workspace_dict = res.json_body
         assert workspace_dict["workspace_id"] == workspace.workspace_id
         assert workspace_dict["label"] == workspace.label
@@ -431,11 +477,20 @@ class TestWorkspaceEndpoint(object):
             workspace_dict["sidebar_entries"][counter]["slug"] = sidebar_entry.slug
             workspace_dict["sidebar_entries"][counter]["label"] = sidebar_entry.label
             workspace_dict["sidebar_entries"][counter]["route"] = sidebar_entry.route
-            workspace_dict["sidebar_entries"][counter]["hexcolor"] = sidebar_entry.hexcolor
-            workspace_dict["sidebar_entries"][counter]["fa_icon"] = sidebar_entry.fa_icon
+            workspace_dict["sidebar_entries"][counter][
+                "hexcolor"
+            ] = sidebar_entry.hexcolor
+            workspace_dict["sidebar_entries"][counter][
+                "fa_icon"
+            ] = sidebar_entry.fa_icon
 
     def test_api__update_workspace__ok_200__nominal_case(
-        self, workspace_api_factory, application_api_factory, web_testapp, app_config, event_helper
+        self,
+        workspace_api_factory,
+        application_api_factory,
+        web_testapp,
+        app_config,
+        event_helper,
     ) -> None:
         """
         Test update workspace
@@ -448,7 +503,10 @@ class TestWorkspaceEndpoint(object):
             workspace=workspace, app_config=app_config
         )  # nope8
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "label": "superworkspace",
             "description": "mysuperdescription",
@@ -527,7 +585,10 @@ class TestWorkspaceEndpoint(object):
             workspace=workspace, app_config=app_config
         )  # nope8
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # Before
         res = web_testapp.get("/api/workspaces/1", status=200)
         assert res.json_body
@@ -579,7 +640,10 @@ class TestWorkspaceEndpoint(object):
             workspace=workspace, app_config=app_config
         )  # nope8
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # Before
         res = web_testapp.get("/api/workspaces/1", status=200)
         assert res.json_body
@@ -631,7 +695,10 @@ class TestWorkspaceEndpoint(object):
             workspace=workspace, app_config=app_config
         )  # nope8
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
 
         # Before
         res = web_testapp.get("/api/workspaces/1", status=200)
@@ -670,11 +737,16 @@ class TestWorkspaceEndpoint(object):
         assert workspace["is_deleted"] is False
         assert workspace["agenda_enabled"] is True
 
-    def test_api__update_workspace__ok_200__workspace_label_already_used(self, web_testapp) -> None:
+    def test_api__update_workspace__ok_200__workspace_label_already_used(
+        self, web_testapp
+    ) -> None:
         """
         Test update workspace with empty label
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "label": "Documentation",
             "description": "mysuperdescription",
@@ -701,7 +773,9 @@ class TestWorkspaceEndpoint(object):
 
         params = {"label": "Documentation", "description": "mysuperdescription"}
         # INFO - G.M - 2019-05-21 - we can update to same value
-        web_testapp.put_json("/api/workspaces/{}".format(workspace1_id), status=200, params=params)
+        web_testapp.put_json(
+            "/api/workspaces/{}".format(workspace1_id), status=200, params=params
+        )
         # INFO - G.M - 2019-05-21 - updating one workspace to another workspace name is not allowed
         res = web_testapp.put_json(
             "/api/workspaces/{}".format(workspace2_id), status=200, params=params
@@ -711,18 +785,26 @@ class TestWorkspaceEndpoint(object):
         """
         Test update workspace with empty label
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"label": "", "description": "mysuperdescription"}
         res = web_testapp.put_json("/api/workspaces/1", status=400, params=params)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
-    def test_api__create_workspace__ok_200__nominal_case(self, web_testapp, event_helper) -> None:
+    def test_api__create_workspace__ok_200__nominal_case(
+        self, web_testapp, event_helper
+    ) -> None:
         """
         Test create workspace
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "label": "superworkspace",
             "description": "mysuperdescription",
@@ -771,7 +853,10 @@ class TestWorkspaceEndpoint(object):
         """
         Test create workspace
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "label": "parent",
             "description": "parent_workspace",
@@ -811,18 +896,25 @@ class TestWorkspaceEndpoint(object):
         assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
         assert workspace["default_user_role"] == WorkspaceRoles.READER.slug
         assert workspace["parent_id"] == parent_workspace_id
-        res = web_testapp.get("/api/workspaces/{}".format(children_workspace_id), status=200)
+        res = web_testapp.get(
+            "/api/workspaces/{}".format(children_workspace_id), status=200
+        )
         workspace_2 = res.json_body
         assert workspace["workspace_id"] == workspace_2["workspace_id"]
         assert workspace["parent_id"] == workspace_2["parent_id"]
         assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
         assert workspace["default_user_role"] == WorkspaceRoles.READER.slug
 
-    def test_api__create_workspace__ok_200__label_already_used(self, web_testapp) -> None:
+    def test_api__create_workspace__ok_200__label_already_used(
+        self, web_testapp
+    ) -> None:
         """
         Test create workspace : label already used
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "label": "superworkspace",
             "description": "mysuperdescription",
@@ -837,7 +929,10 @@ class TestWorkspaceEndpoint(object):
         """
         Test create workspace with empty label
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"label": "", "description": "mysuperdescription"}
         res = web_testapp.post_json("/api/workspaces", status=400, params=params)
         assert isinstance(res.json, dict)
@@ -850,7 +945,10 @@ class TestWorkspaceEndpoint(object):
         """
         Test delete workspace as admin
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
 
         uapi = user_api_factory.get()
         uapi.create_user(
@@ -864,7 +962,10 @@ class TestWorkspaceEndpoint(object):
         workspace = workspace_api.create_workspace("test", save_now=True)
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # delete
         web_testapp.put("/api/workspaces/{}/trashed".format(workspace_id), status=204)
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -872,7 +973,10 @@ class TestWorkspaceEndpoint(object):
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/{}".format(workspace_id), status=200)
         workspace = res.json_body
         assert workspace["is_deleted"] is True
@@ -888,7 +992,10 @@ class TestWorkspaceEndpoint(object):
         """
         Test delete workspace as global manager and workspace manager
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
 
         uapi = user_api_factory.get()
         profile = Profile.TRUSTED_USER
@@ -923,7 +1030,10 @@ class TestWorkspaceEndpoint(object):
         """
         Test delete workspace as simple user and workspace manager
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
 
         uapi = user_api_factory.get()
         profile = Profile.USER
@@ -947,7 +1057,9 @@ class TestWorkspaceEndpoint(object):
         workspace_id = int(workspace.workspace_id)
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # delete
-        res = web_testapp.put("/api/workspaces/{}/trashed".format(workspace_id), status=403)
+        res = web_testapp.put(
+            "/api/workspaces/{}/trashed".format(workspace_id), status=403
+        )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
@@ -961,7 +1073,10 @@ class TestWorkspaceEndpoint(object):
         """
         Test delete workspace as manager and reader of the workspace
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
 
         uapi = user_api_factory.get()
         user = uapi.create_user(
@@ -980,7 +1095,9 @@ class TestWorkspaceEndpoint(object):
         workspace_id = int(workspace.workspace_id)
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # delete
-        res = web_testapp.put("/api/workspaces/{}/trashed".format(workspace_id), status=403)
+        res = web_testapp.put(
+            "/api/workspaces/{}/trashed".format(workspace_id), status=403
+        )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
@@ -995,10 +1112,15 @@ class TestWorkspaceEndpoint(object):
         Test delete workspace as global manager without having any role in the
         workspace
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
 
         uapi = user_api_factory.get()
-        uapi.create_user("test@test.test", password="test@test.test", do_save=True, do_notify=False)
+        uapi.create_user(
+            "test@test.test", password="test@test.test", do_save=True, do_notify=False
+        )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         role_api_factory.get()
@@ -1006,7 +1128,9 @@ class TestWorkspaceEndpoint(object):
         workspace_id = int(workspace.workspace_id)
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # delete
-        res = web_testapp.put("/api/workspaces/{}/trashed".format(workspace_id), status=400)
+        res = web_testapp.put(
+            "/api/workspaces/{}/trashed".format(workspace_id), status=400
+        )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
@@ -1017,7 +1141,10 @@ class TestWorkspaceEndpoint(object):
         """
         Test undelete workspace as admin
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
 
         uapi = user_api_factory.get()
         uapi.create_user(
@@ -1033,15 +1160,23 @@ class TestWorkspaceEndpoint(object):
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
         # undelete
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        web_testapp.put("/api/workspaces/{}/trashed/restore".format(workspace_id), status=204)
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        web_testapp.put(
+            "/api/workspaces/{}/trashed/restore".format(workspace_id), status=204
+        )
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         res = web_testapp.get("/api/workspaces/{}".format(workspace_id), status=400)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/{}".format(workspace_id), status=200)
         workspace = res.json_body
         assert workspace["is_deleted"] is False
@@ -1052,7 +1187,10 @@ class TestWorkspaceEndpoint(object):
         """
         Test undelete workspace as global manager and workspace manager
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
 
         uapi = user_api_factory.get()
         user = uapi.create_user(
@@ -1076,7 +1214,9 @@ class TestWorkspaceEndpoint(object):
         workspace_id = int(workspace.workspace_id)
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # delete
-        web_testapp.put("/api/workspaces/{}/trashed/restore".format(workspace_id), status=204)
+        web_testapp.put(
+            "/api/workspaces/{}/trashed/restore".format(workspace_id), status=204
+        )
         res = web_testapp.get("/api/workspaces/{}".format(workspace_id), status=200)
         workspace = res.json_body
         assert workspace["is_deleted"] is False
@@ -1087,7 +1227,10 @@ class TestWorkspaceEndpoint(object):
         """
         Test undelete workspace as simple user and workspace manager
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
 
         uapi = user_api_factory.get()
         user = uapi.create_user(
@@ -1111,7 +1254,9 @@ class TestWorkspaceEndpoint(object):
         workspace_id = int(workspace.workspace_id)
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # delete
-        res = web_testapp.put("/api/workspaces/{}/trashed/restore".format(workspace_id), status=403)
+        res = web_testapp.put(
+            "/api/workspaces/{}/trashed/restore".format(workspace_id), status=403
+        )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
@@ -1125,7 +1270,10 @@ class TestWorkspaceEndpoint(object):
         """
         Test undelete workspace as manager and reader of the workspace
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
 
         uapi = user_api_factory.get()
         user = uapi.create_user(
@@ -1145,7 +1293,9 @@ class TestWorkspaceEndpoint(object):
         workspace_id = int(workspace.workspace_id)
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # delete
-        res = web_testapp.put("/api/workspaces/{}/trashed/restore".format(workspace_id), status=403)
+        res = web_testapp.put(
+            "/api/workspaces/{}/trashed/restore".format(workspace_id), status=403
+        )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
@@ -1160,10 +1310,15 @@ class TestWorkspaceEndpoint(object):
         Test delete workspace as global manager without having any role in the
         workspace
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
 
         uapi = user_api_factory.get()
-        uapi.create_user("test@test.test", password="test@test.test", do_save=True, do_notify=False)
+        uapi.create_user(
+            "test@test.test", password="test@test.test", do_save=True, do_notify=False
+        )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         workspace_api.delete(workspace, flush=True)
@@ -1171,7 +1326,9 @@ class TestWorkspaceEndpoint(object):
         workspace_id = int(workspace.workspace_id)
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         # delete
-        res = web_testapp.put("/api/workspaces/{}/trashed/restore".format(workspace_id), status=400)
+        res = web_testapp.put(
+            "/api/workspaces/{}/trashed/restore".format(workspace_id), status=400
+        )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
@@ -1180,7 +1337,10 @@ class TestWorkspaceEndpoint(object):
         """
         Check obtain workspace unreachable for user
         """
-        web_testapp.authorization = ("Basic", ("lawrence-not-real-email@fsf.local", "foobarbaz"))
+        web_testapp.authorization = (
+            "Basic",
+            ("lawrence-not-real-email@fsf.local", "foobarbaz"),
+        )
         res = web_testapp.get("/api/workspaces/1", status=400)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
@@ -1200,11 +1360,16 @@ class TestWorkspaceEndpoint(object):
         assert "message" in res.json.keys()
         assert "details" in res.json.keys()
 
-    def test_api__get_workspace__err_400__workspace_does_not_exist(self, web_testapp) -> None:
+    def test_api__get_workspace__err_400__workspace_does_not_exist(
+        self, web_testapp
+    ) -> None:
         """
         Check obtain workspace who does not exist with an existing user.
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/5", status=400)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
@@ -1220,7 +1385,9 @@ class TestWorkspacesEndpoints(object):
     Tests for /api/workspaces
     """
 
-    def test_api__get_workspaces__ok_200__nominal_case(self, workspace_api_factory, web_testapp):
+    def test_api__get_workspaces__ok_200__nominal_case(
+        self, workspace_api_factory, web_testapp
+    ):
         """
         Check obtain all workspaces reachables for admin user.
         """
@@ -1230,7 +1397,10 @@ class TestWorkspacesEndpoints(object):
         workspace_api.create_workspace("test2", save_now=True)
         workspace_api.create_workspace("test3", save_now=True)
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces", status=200)
         res = res.json_body
         assert len(res) == 3
@@ -1280,7 +1450,10 @@ class TestWorkspacesEndpoints(object):
         )
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces", status=200)
         res = res.json_body
         assert len(res) == 2
@@ -1291,7 +1464,9 @@ class TestWorkspacesEndpoints(object):
         assert workspace["label"] == "test2"
         assert workspace["number_of_members"] == 2
 
-    def test_api__get_workspaces__ok_200__with_parent_ids(self, workspace_api_factory, web_testapp):
+    def test_api__get_workspaces__ok_200__with_parent_ids(
+        self, workspace_api_factory, web_testapp
+    ):
         """
         Check obtain all workspaces reachables for user with user auth with explicit parent_ids
         """
@@ -1306,7 +1481,10 @@ class TestWorkspacesEndpoints(object):
         grandson2_1_1 = workspace_api.create_workspace("grandson2_1_1", parent=child2_1)
         grandson1_2_2 = workspace_api.create_workspace("grandson1_2_1", parent=child1_2)
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         implicit_all = web_testapp.get("/api/workspaces", status=200)
         assert len(implicit_all.json_body) == 8
 
@@ -1341,20 +1519,26 @@ class TestWorkspacesEndpoints(object):
         assert res.json_body[1]["workspace_id"] == parent2.workspace_id
 
         parent_ids = parent1.workspace_id
-        res = web_testapp.get("/api/workspaces", status=200, params={"parent_ids": parent_ids})
+        res = web_testapp.get(
+            "/api/workspaces", status=200, params={"parent_ids": parent_ids}
+        )
         assert len(res.json_body) == 2
         assert res.json_body[0]["workspace_id"] == child1_1.workspace_id
         assert res.json_body[1]["workspace_id"] == child1_2.workspace_id
 
         parent_ids = "0,{}".format(parent1.workspace_id)
-        res = web_testapp.get("/api/workspaces", status=200, params={"parent_ids": parent_ids})
+        res = web_testapp.get(
+            "/api/workspaces", status=200, params={"parent_ids": parent_ids}
+        )
         assert len(res.json_body) == 4
         assert res.json_body[0]["workspace_id"] == parent1.workspace_id
         assert res.json_body[1]["workspace_id"] == parent2.workspace_id
         assert res.json_body[2]["workspace_id"] == child1_1.workspace_id
         assert res.json_body[3]["workspace_id"] == child1_2.workspace_id
 
-    def test_api__get_workspaces__err_403__unallowed_user(self, user_api_factory, web_testapp):
+    def test_api__get_workspaces__err_403__unallowed_user(
+        self, user_api_factory, web_testapp
+    ):
         """
         Check obtain all workspaces reachables for one user
         with another non-admin user auth.
@@ -1403,7 +1587,10 @@ class TestWorkspaceMembersEndpoint(object):
         """
         Check obtain workspace members list with a reachable workspace for user
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/1/members", status=200).json_body
         assert len(res) == 1
         user_role = res[0]
@@ -1423,7 +1610,12 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user"]["has_avatar"] is True
 
     def test_api__get_workspace_members__ok_200_show_disabled_users(
-        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        admin_user,
     ):
         """
         Check obtain workspace members list with also disabled users
@@ -1449,9 +1641,13 @@ class TestWorkspaceMembersEndpoint(object):
         transaction.commit()
         user_id = user.user_id
         workspace_id = workspace.workspace_id
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
-            "/api/workspaces/{}/members?show_disabled_user=1".format(workspace_id), status=200
+            "/api/workspaces/{}/members?show_disabled_user=1".format(workspace_id),
+            status=200,
         ).json_body
         assert len(res) == 2
         user_role = res[1]
@@ -1462,7 +1658,12 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["email_notification_type"] == "none"
 
     def test_api__get_workspace_members__ok_200_show_only_enabled_users(
-        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        admin_user,
     ):
         """
         Check obtain workspace members list with only enabled users
@@ -1487,9 +1688,13 @@ class TestWorkspaceMembersEndpoint(object):
         )
         transaction.commit()
         workspace_id = workspace.workspace_id
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
-            "/api/workspaces/{}/members?show_disabled_user=0".format(workspace_id), status=200
+            "/api/workspaces/{}/members?show_disabled_user=0".format(workspace_id),
+            status=200,
         ).json_body
         assert len(res) == 1
         user_role = res[0]
@@ -1499,7 +1704,12 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["email_notification_type"] == "summary"
 
     def test_api__get_workspace_members__ok_200__as_admin(
-        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        admin_user,
     ):
         """
         Check obtain workspace members list of a workspace where admin doesn't
@@ -1529,7 +1739,10 @@ class TestWorkspaceMembersEndpoint(object):
         transaction.commit()
         user_id = user.user_id
         workspace_id = workspace.workspace_id
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/workspaces/{}/members".format(workspace_id), status=200
         ).json_body
@@ -1546,7 +1759,10 @@ class TestWorkspaceMembersEndpoint(object):
         Check obtain workspace members list with an unreachable workspace for
         user
         """
-        web_testapp.authorization = ("Basic", ("lawrence-not-real-email@fsf.local", "foobarbaz"))
+        web_testapp.authorization = (
+            "Basic",
+            ("lawrence-not-real-email@fsf.local", "foobarbaz"),
+        )
         res = web_testapp.get("/api/workspaces/3/members", status=400)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
@@ -1570,7 +1786,10 @@ class TestWorkspaceMembersEndpoint(object):
         """
         Check obtain workspace members list with a reachable workspace for user
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/1/members/1", status=200).json_body
         user_role = res
         assert user_role["role"] == "workspace-manager"
@@ -1589,7 +1808,12 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user"]["has_avatar"] is True
 
     def test_api__get_workspace_member__ok_200__as_admin(
-        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        admin_user,
     ):
         """
         Check obtain workspace members list with a reachable workspace for user
@@ -1619,7 +1843,10 @@ class TestWorkspaceMembersEndpoint(object):
         transaction.commit()
         user_id = user.user_id
         workspace_id = workspace.workspace_id
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/workspaces/{}/members/{}".format(workspace_id, user_id), status=200
         ).json_body
@@ -1631,7 +1858,12 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["email_notification_type"] == "none"
 
     def test_api__get_workspace_member__ok_200__other_user(
-        self, user_api_factory, workspace_api_factory, role_api_factory, admin_user, web_testapp
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        admin_user,
+        web_testapp,
     ):
         """
         Check obtain workspace members list with a reachable workspace for user
@@ -1658,7 +1890,10 @@ class TestWorkspaceMembersEndpoint(object):
         user_id = user.user_id
         workspace_id = workspace.workspace_id
         admin_id = admin_user.user_id
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/workspaces/{}/members/{}".format(workspace_id, user_id), status=200
         ).json_body
@@ -1685,7 +1920,10 @@ class TestWorkspaceMembersEndpoint(object):
         Check obtain workspace members info with an unreachable workspace for
         user
         """
-        web_testapp.authorization = ("Basic", ("lawrence-not-real-email@fsf.local", "foobarbaz"))
+        web_testapp.authorization = (
+            "Basic",
+            ("lawrence-not-real-email@fsf.local", "foobarbaz"),
+        )
         res = web_testapp.get("/api/workspaces/3/members/1", status=400)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
@@ -1705,12 +1943,17 @@ class TestWorkspaceMembersEndpoint(object):
         assert "message" in res.json.keys()
         assert "details" in res.json.keys()
 
-    def test_api__get_workspace_members__err_400__workspace_does_not_exist(self, web_testapp):
+    def test_api__get_workspace_members__err_400__workspace_does_not_exist(
+        self, web_testapp
+    ):
         """
         Check obtain workspace members list with an existing user but
         an unexisting workspace
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/5/members", status=400)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
@@ -1718,20 +1961,27 @@ class TestWorkspaceMembersEndpoint(object):
         assert "message" in res.json.keys()
         assert "details" in res.json.keys()
 
-    def test_api__create_workspace_member_role__ok_200__user_id(self, web_testapp, event_helper):
+    def test_api__create_workspace_member_role__ok_200__user_id(
+        self, web_testapp, event_helper
+    ):
         """
         Create workspace member role
         :return:
         """
         user_schema = UserDigestSchema()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # create workspace role
         params = {
             "user_id": 2,
             "user_email": None,
             "role": "content-manager",
         }
-        res = web_testapp.post_json("/api/workspaces/1/members", status=200, params=params)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/members", status=200, params=params
+        )
         user_role_found = res.json_body
         assert user_role_found["role"] == "content-manager"
         assert user_role_found["user_id"] == 2
@@ -1745,7 +1995,9 @@ class TestWorkspaceMembersEndpoint(object):
             "email_notification_type": user_role_found["email_notification_type"],
         }
         workspace = web_testapp.get("/api/workspaces/1", status=200).json_body
-        assert last_event.workspace == {k: v for k, v in workspace.items() if k != "description"}
+        assert last_event.workspace == {
+            k: v for k, v in workspace.items() if k != "description"
+        }
         author = web_testapp.get("/api/users/1", status=200).json_body
         assert last_event.author == user_schema.dump(author).data
         user = web_testapp.get("/api/users/2", status=200).json_body
@@ -1765,7 +2017,12 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role_found["workspace_id"] == user_role["workspace_id"]
 
     def test_api__create_workspace_members_role_ok_200__user_email_as_admin(
-        self, workspace_api_factory, user_api_factory, role_api_factory, admin_user, web_testapp
+        self,
+        workspace_api_factory,
+        user_api_factory,
+        role_api_factory,
+        admin_user,
+        web_testapp,
     ):
         """
         Check obtain workspace members list of a workspace where admin doesn't
@@ -1780,7 +2037,10 @@ class TestWorkspaceMembersEndpoint(object):
         workspace = workspace_api.create_workspace("test_2", save_now=True)
         transaction.commit()
         workspace_id = workspace.workspace_id
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # create workspace role
         params = {
             "user_id": None,
@@ -1807,7 +2067,12 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role_found["workspace_id"] == user_role["workspace_id"]
 
     def test_api__create_workspace_members_role_ok_200__user_email_as_workspace_manager(
-        self, admin_user, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
+        self,
+        admin_user,
+        user_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        web_testapp,
     ):
         """
         Check obtain workspace members list of a workspace where admin doesn't
@@ -1876,14 +2141,19 @@ class TestWorkspaceMembersEndpoint(object):
         Create workspace member role
         :return:
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # create workspace role
         params = {
             "user_id": None,
             "user_email": "lawrence-not-real-email@fsf.local",
             "role": "content-manager",
         }
-        res = web_testapp.post_json("/api/workspaces/1/members", status=200, params=params)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/members", status=200, params=params
+        )
         user_role_found = res.json_body
         assert user_role_found["role"] == "content-manager"
         assert user_role_found["user_id"] == 2
@@ -1915,7 +2185,10 @@ class TestWorkspaceMembersEndpoint(object):
         lawrence.is_active = False
         uapi.save(lawrence)
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
 
         # create workspace role
         params = {
@@ -1923,7 +2196,9 @@ class TestWorkspaceMembersEndpoint(object):
             "user_email": "lawrence-not-real-email@fsf.local",
             "role": "content-manager",
         }
-        res = web_testapp.post_json("/api/workspaces/1/members", status=400, params=params)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/members", status=400, params=params
+        )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.USER_NOT_ACTIVE
@@ -1941,7 +2216,10 @@ class TestWorkspaceMembersEndpoint(object):
         lawrence.is_deleted = True
         uapi.save(lawrence)
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
 
         # create workspace role
         params = {
@@ -1949,20 +2227,29 @@ class TestWorkspaceMembersEndpoint(object):
             "user_email": "lawrence-not-real-email@fsf.local",
             "role": "content-manager",
         }
-        res = web_testapp.post_json("/api/workspaces/1/members", status=400, params=params)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/members", status=400, params=params
+        )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.USER_DELETED
 
-    def test_api__create_workspace_member_role__ok_200__user_username(self, web_testapp):
+    def test_api__create_workspace_member_role__ok_200__user_username(
+        self, web_testapp
+    ):
         """
         Create workspace member role
         :return:
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # create workspace role
         params = {"user_username": "TheBobi", "role": "content-manager"}
-        res = web_testapp.post_json("/api/workspaces/1/members", status=200, params=params)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/members", status=200, params=params
+        )
         user_role_found = res.json_body
         assert user_role_found["role"] == "content-manager"
         assert user_role_found["user_id"] == 3
@@ -1988,14 +2275,19 @@ class TestWorkspaceMembersEndpoint(object):
         Create workspace member role
         :return:
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # create workspace role
         params = {
             "user_id": None,
             "user_email": None,
             "role": "content-manager",
         }
-        res = web_testapp.post_json("/api/workspaces/1/members", status=400, params=params)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/members", status=400, params=params
+        )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
@@ -2007,14 +2299,19 @@ class TestWorkspaceMembersEndpoint(object):
         Create workspace member role
         :return:
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # create workspace role
         params = {
             "user_id": 47,
             "user_email": None,
             "role": "content-manager",
         }
-        res = web_testapp.post_json("/api/workspaces/1/members", status=400, params=params)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/members", status=400, params=params
+        )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.USER_NOT_FOUND
@@ -2026,14 +2323,19 @@ class TestWorkspaceMembersEndpoint(object):
         Create workspace member role
         :return:
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # create workspace role
         params = {
             "user_id": None,
             "user_email": "nothing@nothing.nothing",
             "role": "content-manager",
         }
-        res = web_testapp.post_json("/api/workspaces/1/members", status=400, params=params)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/members", status=400, params=params
+        )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.USER_NOT_FOUND
@@ -2073,7 +2375,9 @@ class TestWorkspaceMembersEndpoint(object):
         user_schema = UserDigestSchema()
 
         profile = Profile.ADMIN
-        admin2 = uapi.create_user(email="admin2@admin2.admin2", profile=profile, do_notify=False)
+        admin2 = uapi.create_user(
+            email="admin2@admin2.admin2", profile=profile, do_notify=False
+        )
         role_api = role_api_factory.get(current_user=admin2)
         role_api.create_one(
             user,
@@ -2125,11 +2429,18 @@ class TestWorkspaceMembersEndpoint(object):
         assert last_event.workspace == {
             k: v for k, v in workspace_dict.items() if k != "description"
         }
-        author = web_testapp.get("/api/users/{}".format(user.user_id), status=200).json_body
+        author = web_testapp.get(
+            "/api/users/{}".format(user.user_id), status=200
+        ).json_body
         assert last_event.author == user_schema.dump(author).data
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        user = web_testapp.get("/api/users/{}".format(user2.user_id), status=200).json_body
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        user = web_testapp.get(
+            "/api/users/{}".format(user2.user_id), status=200
+        ).json_body
         assert last_event.user == user_schema.dump(user).data
 
         # after
@@ -2146,7 +2457,12 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["workspace_id"] == workspace.workspace_id
 
     def test_api__update_workspace_member_role__err_400__role_not_exist(
-        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        admin_user,
     ):
         """
         Update worskpace member role
@@ -2174,11 +2490,16 @@ class TestWorkspaceMembersEndpoint(object):
         admin2 = uapi.create_user(
             email="admin2@admin2.admin2", profile=Profile.ADMIN, do_notify=False
         )
-        workspace_api = workspace_api_factory.get(current_user=admin2, show_deleted=True)
+        workspace_api = workspace_api_factory.get(
+            current_user=admin2, show_deleted=True
+        )
         workspace = workspace_api.create_workspace("test", save_now=True)
         transaction.commit()
         # update workspace role
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"role": "content-manager"}
         res = web_testapp.put_json(
             "/api/workspaces/{workspace_id}/members/{user_id}".format(
@@ -2192,7 +2513,12 @@ class TestWorkspaceMembersEndpoint(object):
         assert res.json_body["code"] == ErrorCode.USER_ROLE_NOT_FOUND
 
     def test_api__update_workspace_member_role__err_400__cannot_change_role_of_last_workspace_manager(
-        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        admin_user,
     ):
         """
         Update workspace member role: user is last workspace manager so it cannot lower his role
@@ -2223,7 +2549,9 @@ class TestWorkspaceMembersEndpoint(object):
             profile=Profile.USER,
             do_notify=False,
         )
-        workspace_api = workspace_api_factory.get(current_user=admin2, show_deleted=True)
+        workspace_api = workspace_api_factory.get(
+            current_user=admin2, show_deleted=True
+        )
         workspace = workspace_api.create_workspace("test", save_now=True)
         role_api = role_api_factory.get(current_user=admin2)
         role_api.create_one(
@@ -2240,7 +2568,10 @@ class TestWorkspaceMembersEndpoint(object):
         )
         transaction.commit()
         # update workspace role
-        web_testapp.authorization = ("Basic", ("admin2@admin2.admin2", "admin2@admin2.admin2"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin2@admin2.admin2", "admin2@admin2.admin2"),
+        )
         params = {"role": "content-manager"}
         res = web_testapp.put_json(
             "/api/workspaces/{workspace_id}/members/{user_id}".format(
@@ -2251,10 +2582,18 @@ class TestWorkspaceMembersEndpoint(object):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.LAST_WORKSPACE_MANAGER_ROLE_CANT_BE_MODIFIED
+        assert (
+            res.json_body["code"]
+            == ErrorCode.LAST_WORKSPACE_MANAGER_ROLE_CANT_BE_MODIFIED
+        )
 
     def test_api__update_workspace_member_role__ok_200__not_last_workspace_manager(
-        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        admin_user,
     ):
         """
         Update worskpace member role : user is not last workspace manager, so it can lower his
@@ -2286,7 +2625,9 @@ class TestWorkspaceMembersEndpoint(object):
             profile=Profile.USER,
             do_notify=False,
         )
-        workspace_api = workspace_api_factory.get(current_user=admin2, show_deleted=True)
+        workspace_api = workspace_api_factory.get(
+            current_user=admin2, show_deleted=True
+        )
         workspace = workspace_api.create_workspace("test", save_now=True)
         role_api = role_api_factory.get(current_user=admin2)
         role_api.create_one(
@@ -2303,7 +2644,10 @@ class TestWorkspaceMembersEndpoint(object):
         )
         transaction.commit()
         # update workspace role
-        web_testapp.authorization = ("Basic", ("admin2@admin2.admin2", "admin2@admin2.admin2"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin2@admin2.admin2", "admin2@admin2.admin2"),
+        )
         params = {"role": "content-manager"}
         res = web_testapp.put_json(
             "/api/workspaces/{workspace_id}/members/{user_id}".format(
@@ -2319,7 +2663,12 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["workspace_id"] == workspace.workspace_id
 
     def test_api__update_workspace_member_role__ok_200__as_admin(
-        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        admin_user,
     ):
         """
         Update worskpace member role
@@ -2347,7 +2696,9 @@ class TestWorkspaceMembersEndpoint(object):
         uapi = user_api_factory.get()
 
         profile = Profile.ADMIN
-        admin2 = uapi.create_user(email="admin2@admin2.admin2", profile=profile, do_notify=False)
+        admin2 = uapi.create_user(
+            email="admin2@admin2.admin2", profile=profile, do_notify=False
+        )
         role_api = role_api_factory.get(current_user=admin2)
         role_api.create_one(
             user,
@@ -2365,7 +2716,10 @@ class TestWorkspaceMembersEndpoint(object):
         role_api.delete_one(admin_user.user_id, workspace.workspace_id)
         transaction.commit()
         # before
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.get(
             "/api/workspaces/{workspace_id}/members/{user_id}".format(
                 workspace_id=workspace.workspace_id, user_id=user2.user_id
@@ -2399,7 +2753,12 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["workspace_id"] == workspace.workspace_id
 
     def test_api__delete_workspace_member_role__ok_200__as_admin(
-        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, event_helper
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        event_helper,
     ):
         """
         Delete worskpace member role
@@ -2426,7 +2785,10 @@ class TestWorkspaceMembersEndpoint(object):
         )
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.delete(
             "/api/workspaces/{workspace_id}/members/{user_id}".format(
                 workspace_id=workspace.workspace_id, user_id=user.user_id
@@ -2451,7 +2813,9 @@ class TestWorkspaceMembersEndpoint(object):
         }
         author = web_testapp.get("/api/users/1", status=200).json_body
         assert last_event.author == user_schema.dump(author).data
-        user_dict = web_testapp.get("/api/users/{}".format(user.user_id), status=200).json_body
+        user_dict = web_testapp.get(
+            "/api/users/{}".format(user.user_id), status=200
+        ).json_body
         assert last_event.user == user_schema.dump(user_dict).data
         assert last_event.client_token is None
 
@@ -2545,7 +2909,10 @@ class TestWorkspaceMembersEndpoint(object):
         workspace = workspace_api.create_workspace("test", save_now=True)
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.delete(
             "/api/workspaces/{workspace_id}/members/{user_id}".format(
                 workspace_id=workspace.workspace_id, user_id=user2.user_id
@@ -2592,14 +2959,20 @@ class TestWorkspaceMembersEndpoint(object):
         )
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("test2@test2.test2", "test2@test2.test2"))
+        web_testapp.authorization = (
+            "Basic",
+            ("test2@test2.test2", "test2@test2.test2"),
+        )
         res = web_testapp.delete(
             "/api/workspaces/{workspace_id}/members/{user_id}".format(
                 workspace_id=workspace.workspace_id, user_id=user2.user_id
             ),
             status=400,
         )
-        assert res.json_body["code"] == ErrorCode.LAST_WORKSPACE_MANAGER_ROLE_CANT_BE_MODIFIED
+        assert (
+            res.json_body["code"]
+            == ErrorCode.LAST_WORKSPACE_MANAGER_ROLE_CANT_BE_MODIFIED
+        )
         # after
         roles = web_testapp.get(
             "/api/workspaces/{}/members".format(workspace.workspace_id), status=200
@@ -2642,7 +3015,10 @@ class TestWorkspaceMembersEndpoint(object):
         )
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("test2@test2.test2", "test2@test2.test2"))
+        web_testapp.authorization = (
+            "Basic",
+            ("test2@test2.test2", "test2@test2.test2"),
+        )
         res = web_testapp.delete(
             "/api/workspaces/{workspace_id}/members/{user_id}".format(
                 workspace_id=workspace.workspace_id, user_id=user2.user_id
@@ -2699,7 +3075,10 @@ class TestWorkspaceMembersEndpoint(object):
         )
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("test2@test2.test2", "test2@test2.test2"))
+        web_testapp.authorization = (
+            "Basic",
+            ("test2@test2.test2", "test2@test2.test2"),
+        )
         res = web_testapp.delete(
             "/api/workspaces/{workspace_id}/members/{user_id}".format(
                 workspace_id=workspace.workspace_id, user_id=user2.user_id
@@ -2762,7 +3141,10 @@ class TestWorkspaceMembersEndpoint(object):
         )
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("test2@test2.test2", "test2@test2.test2"))
+        web_testapp.authorization = (
+            "Basic",
+            ("test2@test2.test2", "test2@test2.test2"),
+        )
         res = web_testapp.delete(
             "/api/workspaces/{workspace_id}/members/{user_id}".format(
                 workspace_id=workspace.workspace_id, user_id=user.user_id
@@ -2774,7 +3156,9 @@ class TestWorkspaceMembersEndpoint(object):
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE
         # after
         roles = web_testapp.get(
-            "/api/workspaces/{workspace_id}/members".format(workspace_id=workspace.workspace_id),
+            "/api/workspaces/{workspace_id}/members".format(
+                workspace_id=workspace.workspace_id
+            ),
             status=200,
         ).json_body
         assert len([role for role in roles if role["user_id"] == user.user_id]) == 1
@@ -2789,7 +3173,12 @@ class TestWorkspaceMembersEndpoint(object):
 )
 class TestUserInvitationWithMailActivatedSyncDefaultProfileTrustedUser(object):
     def test_api__create_workspace_member_role__ok_200__new_user(
-        self, user_api_factory, workspace_api_factory, role_api_factory, web_testapp, mailhog
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        web_testapp,
+        mailhog,
     ):
         """
         Create workspace member role
@@ -2836,7 +3225,10 @@ class TestUserInvitationWithMailActivatedSyncDefaultProfileTrustedUser(object):
         assert user_role_found["newly_created"] is True
         assert user_role_found["email_notification_type"] == "none"
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["profile"] == "trusted-users"
@@ -2857,7 +3249,12 @@ class TestUserInvitationWithMailActivatedSyncDefaultProfileTrustedUser(object):
 )
 class TestUserInvitationWithMailActivatedSync(object):
     def test_api__create_workspace_member_role__ok_200__new_user(
-        self, user_api_factory, workspace_api_factory, role_api_factory, web_testapp, mailhog
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        web_testapp,
+        mailhog,
     ):
         """
         Create workspace member role
@@ -2904,7 +3301,10 @@ class TestUserInvitationWithMailActivatedSync(object):
         assert user_role_found["newly_created"] is True
         assert user_role_found["email_notification_type"] == "none"
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["profile"] == "users"
@@ -2918,7 +3318,12 @@ class TestUserInvitationWithMailActivatedSync(object):
         assert headers["Subject"][0] == "[Tracim] Created account"
 
     def test_api__create_workspace_member_role__err_400__user_not_found_as_simple_user(
-        self, user_api_factory, web_testapp, role_api_factory, workspace_api_factory, mailhog
+        self,
+        user_api_factory,
+        web_testapp,
+        role_api_factory,
+        workspace_api_factory,
+        mailhog,
     ):
         """
         Create workspace member role
@@ -3028,7 +3433,10 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
         assert user_role_found["email_notification_type"] == "individual"
 
         # Set email notification type to `all`
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.put_json(
             f"/api/users/{user_id}/workspaces/{workspace.workspace_id}/email_notification_type",
             status=204,
@@ -3078,7 +3486,10 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
         response = mailhog.get_mailhog_mails()
         assert len(response) == 2
         headers = response[0]["Content"]["Headers"]
-        assert headers["From"][0] == "Global manager via Tracim <test_user_from+1@localhost>"
+        assert (
+            headers["From"][0]
+            == "Global manager via Tracim <test_user_from+1@localhost>"
+        )
         assert headers["To"][0] == "bob <bob@bob.bob>"
         assert headers["Subject"][0] == "[Tracim] [test] test_document2 (Opened)"
 
@@ -3098,7 +3509,10 @@ class TestUserInvitationWithMailActivatedSyncLDAPAuthOnly(object):
         Create workspace member role
         :return:
         """
-        web_testapp.authorization = ("Basic", ("professor@planetexpress.com", "professor"))
+        web_testapp.authorization = (
+            "Basic",
+            ("professor@planetexpress.com", "professor"),
+        )
         res = web_testapp.get("/api/auth/whoami", status=200)
 
         uapi = user_api_factory.get(current_user=None)
@@ -3124,7 +3538,9 @@ class TestUserInvitationWithMailActivatedSyncLDAPAuthOnly(object):
         user_id = res.json_body["user_id"]
         assert res.json_body["role"] == "content-manager"
         assert res.json_body["user"]["public_name"] == "bob"
-        res = web_testapp.get("/api/users/{}".format(user_id), status=200, params=params)
+        res = web_testapp.get(
+            "/api/users/{}".format(user_id), status=200, params=params
+        )
         assert res.json_body["auth_type"] == "unknown"
         assert res.json_body["email"] == "bob@bob.bob"
 
@@ -3136,7 +3552,9 @@ class TestUserInvitationWithMailActivatedSyncLDAPAuthOnly(object):
     [{"name": "functional_test_with_no_email_notif_but_invitation_email_notif"}],
     indirect=True,
 )
-class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledButInvitationEmailEnabled(object):
+class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledButInvitationEmailEnabled(
+    object
+):
     def test_api__create_workspace_member_role__err_400__email_notif_disabe_but_invitation_notif_enabled(
         self, web_testapp, workspace_api_factory
     ):
@@ -3144,7 +3562,10 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledButInvitationEmai
         Create workspace member role
         :return:
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
 
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -3173,7 +3594,9 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledButInvitationEmai
     [{"name": "functional_test_with_no_email_notif_and_no_invitation_email_notif"}],
     indirect=True,
 )
-class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledAndInvitationEmailDisabled(object):
+class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledAndInvitationEmailDisabled(
+    object
+):
     def test_api__create_workspace_member_role__ok_200__email_notif_disabe_but_invitation_notif_enabled(
         self, web_testapp, workspace_api_factory, admin_user
     ):
@@ -3181,9 +3604,14 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledAndInvitationEmai
         Create workspace member role
         :return:
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
 
-        workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
+        workspace_api = workspace_api_factory.get(
+            current_user=admin_user, show_deleted=True
+        )
         workspace = workspace_api.create_workspace("test", save_now=True)
         transaction.commit()
 
@@ -3201,7 +3629,9 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledAndInvitationEmai
         user_id = res.json_body["user_id"]
         assert res.json_body["role"] == "content-manager"
         assert res.json_body["user"]["public_name"] == "bob"
-        res = web_testapp.get("/api/users/{}".format(user_id), status=200, params=params)
+        res = web_testapp.get(
+            "/api/users/{}".format(user_id), status=200, params=params
+        )
         assert res.json_body["auth_type"] == "unknown"
         assert res.json_body["email"] == "bob@bob.bob"
 
@@ -3213,7 +3643,9 @@ class TestUserInvitationWithMailActivatedSyncEmailNotifDisabledAndInvitationEmai
     [{"name": "functional_test_with_email_notif_and_no_invitation_email_notif"}],
     indirect=True,
 )
-class TestUserInvitationWithMailActivatedSyncEmailEnabledAndInvitationEmailDisabled(object):
+class TestUserInvitationWithMailActivatedSyncEmailEnabledAndInvitationEmailDisabled(
+    object
+):
     def test_api__create_workspace_member_role__ok_200__email_notif_disabe_but_invitation_notif_enabled(
         self, web_testapp, workspace_api_factory
     ):
@@ -3221,7 +3653,10 @@ class TestUserInvitationWithMailActivatedSyncEmailEnabledAndInvitationEmailDisab
         Create workspace member role
         :return:
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
 
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
@@ -3241,7 +3676,9 @@ class TestUserInvitationWithMailActivatedSyncEmailEnabledAndInvitationEmailDisab
         user_id = res.json_body["user_id"]
         assert res.json_body["role"] == "content-manager"
         assert res.json_body["user"]["public_name"] == "bob"
-        res = web_testapp.get("/api/users/{}".format(user_id), status=200, params=params)
+        res = web_testapp.get(
+            "/api/users/{}".format(user_id), status=200, params=params
+        )
         assert res.json_body["auth_type"] == "unknown"
         assert res.json_body["email"] == "bob@bob.bob"
 
@@ -3257,35 +3694,49 @@ class TestUserInvitationWithMailActivatedASync(object):
         Create workspace member role
         :return:
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # create workspace role
         params = {
             "user_id": None,
             "user_email": "bob@bob.bob",
             "role": "content-manager",
         }
-        res = web_testapp.post_json("/api/workspaces/1/members", status=200, params=params)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/members", status=200, params=params
+        )
         user_role_found = res.json_body
         assert user_role_found["newly_created"] is True
 
-    def test_api__create_workspace_member_role__ok_200__new_user_rfc_email(self, web_testapp):
+    def test_api__create_workspace_member_role__ok_200__new_user_rfc_email(
+        self, web_testapp
+    ):
         """
         Create workspace member role
         :return:
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # create workspace role
         params = {
             "user_id": None,
             "user_email": "Bob ! <bob@bob.bob>",
             "role": "content-manager",
         }
-        res = web_testapp.post_json("/api/workspaces/1/members", status=200, params=params)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/members", status=200, params=params
+        )
         user_role_found = res.json_body
         assert user_role_found["newly_created"] is True
         assert user_role_found["user"]["public_name"] == "Bob !"
         user_id = user_role_found["user_id"]
-        res = web_testapp.get("/api/users/{}".format(user_id), status=200, params=params)
+        res = web_testapp.get(
+            "/api/users/{}".format(user_id), status=200, params=params
+        )
         assert res.json_body["email"] == "bob@bob.bob"
 
 
@@ -3302,8 +3753,13 @@ class TestWorkspaceContentsWithFixture(object):
         """
         Check obtain workspace contents with defaults filters
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/workspaces/1/contents", status=200).json_body["items"]
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        res = web_testapp.get("/api/workspaces/1/contents", status=200).json_body[
+            "items"
+        ]
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 3
         content = res[0]
@@ -3360,15 +3816,20 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["modified"]
         assert content["created"]
 
-    def test_api__get_workspace_content__ok_200__get_default_html_documents(self, web_testapp):
+    def test_api__get_workspace_content__ok_200__get_default_html_documents(
+        self, web_testapp
+    ):
         """
         Check obtain workspace contents with defaults filters + content_filter
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"content_type": "html-document"}
-        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body[
-            "items"
-        ]
+        res = web_testapp.get(
+            "/api/workspaces/1/contents", status=200, params=params
+        ).json_body["items"]
         assert len(res) == 1
         content = res[0]
         assert content
@@ -3400,11 +3861,16 @@ class TestWorkspaceContentsWithFixture(object):
         Check obtain workspace all root contents
         """
         set_html_document_slug_to_legacy(session_factory)
-        params = {"parent_id": 0, "show_archived": 1, "show_deleted": 1, "show_active": 1}
+        params = {
+            "parent_id": 0,
+            "show_archived": 1,
+            "show_deleted": 1,
+            "show_active": 1,
+        }
         web_testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = web_testapp.get("/api/workspaces/3/contents", status=200, params=params).json_body[
-            "items"
-        ]
+        res = web_testapp.get(
+            "/api/workspaces/3/contents", status=200, params=params
+        ).json_body["items"]
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 4
         content = res[0]
@@ -3471,15 +3937,22 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["modified"]
         assert content["created"]
 
-    def test_api__get_workspace_content__ok_200__get_all_root_content(self, web_testapp):
+    def test_api__get_workspace_content__ok_200__get_all_root_content(
+        self, web_testapp
+    ):
         """
         Check obtain workspace all root contents
         """
-        params = {"parent_id": 0, "show_archived": 1, "show_deleted": 1, "show_active": 1}
+        params = {
+            "parent_id": 0,
+            "show_archived": 1,
+            "show_deleted": 1,
+            "show_active": 1,
+        }
         web_testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = web_testapp.get("/api/workspaces/3/contents", status=200, params=params).json_body[
-            "items"
-        ]
+        res = web_testapp.get(
+            "/api/workspaces/3/contents", status=200, params=params
+        ).json_body["items"]
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 4
         content = res[0]
@@ -3546,15 +4019,22 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["modified"]
         assert content["created"]
 
-    def test_api__get_workspace_content__ok_200__get_all_root_and_folder_content(self, web_testapp):
+    def test_api__get_workspace_content__ok_200__get_all_root_and_folder_content(
+        self, web_testapp
+    ):
         """
         Check obtain workspace all root contents and all subcontent content
         """
-        params = {"parent_ids": "0,3", "show_archived": 1, "show_deleted": 1, "show_active": 1}
+        params = {
+            "parent_ids": "0,3",
+            "show_archived": 1,
+            "show_deleted": 1,
+            "show_active": 1,
+        }
         web_testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = web_testapp.get("/api/workspaces/2/contents", status=200, params=params).json_body[
-            "items"
-        ]
+        res = web_testapp.get(
+            "/api/workspaces/2/contents", status=200, params=params
+        ).json_body["items"]
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 7
         assert [
@@ -3573,18 +4053,34 @@ class TestWorkspaceContentsWithFixture(object):
             and content["parent_id"] == 3
         ]
 
-    def test_api__get_workspace_content__ok_200__get_multiple_folder_content(self, web_testapp):
+    def test_api__get_workspace_content__ok_200__get_multiple_folder_content(
+        self, web_testapp
+    ):
         """
         Check obtain workspace all root contents and all subcontent content
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"parent_id": 1, "label": "GenericCreatedContent", "content_type": "html-document"}
-        res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=200)
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        params = {
+            "parent_id": 1,
+            "label": "GenericCreatedContent",
+            "content_type": "html-document",
+        }
+        res = web_testapp.post_json(
+            "/api/workspaces/1/contents", params=params, status=200
+        )
         content_id = res.json_body["content_id"]
-        params = {"parent_ids": "1,2", "show_archived": 1, "show_deleted": 1, "show_active": 1}
-        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body[
-            "items"
-        ]
+        params = {
+            "parent_ids": "1,2",
+            "show_archived": 1,
+            "show_deleted": 1,
+            "show_active": 1,
+        }
+        res = web_testapp.get(
+            "/api/workspaces/1/contents", status=200, params=params
+        ).json_body["items"]
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 2
         assert [
@@ -3610,26 +4106,41 @@ class TestWorkspaceContentsWithFixture(object):
         """
         Check obtain workspace all root contents and all subcontent content
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"parent_id": 1, "label": "subfolder", "content_type": "folder"}
-        res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=200)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/contents", params=params, status=200
+        )
         subfolder_content_id = res.json_body["content_id"]
         params = {
             "parent_id": subfolder_content_id,
             "label": "subsubfolder",
             "content_type": "folder",
         }
-        res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=200)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/contents", params=params, status=200
+        )
         subsubfolder_content_id = res.json_body["content_id"]
         params = {
             "parent_id": subsubfolder_content_id,
             "label": "InfolderContent",
             "content_type": "html-document",
         }
-        res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=200)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/contents", params=params, status=200
+        )
         infolder_content_id = res.json_body["content_id"]
-        params = {"parent_id": 1, "label": "GenericCreatedContent", "content_type": "html-document"}
-        res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=200)
+        params = {
+            "parent_id": 1,
+            "label": "GenericCreatedContent",
+            "content_type": "html-document",
+        }
+        res = web_testapp.post_json(
+            "/api/workspaces/1/contents", params=params, status=200
+        )
         generic_content_content_id = res.json_body["content_id"]
         params = {
             "parent_ids": "2",
@@ -3638,9 +4149,9 @@ class TestWorkspaceContentsWithFixture(object):
             "show_deleted": 1,
             "show_active": 1,
         }
-        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body[
-            "items"
-        ]
+        res = web_testapp.get(
+            "/api/workspaces/1/contents", status=200, params=params
+        ).json_body["items"]
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 7
         assert [
@@ -3688,26 +4199,41 @@ class TestWorkspaceContentsWithFixture(object):
         """
         Check obtain workspace all root contents and all subcontent content
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"parent_id": 1, "label": "subfolder", "content_type": "folder"}
-        res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=200)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/contents", params=params, status=200
+        )
         subfolder_content_id = res.json_body["content_id"]
         params = {
             "parent_id": subfolder_content_id,
             "label": "subsubfolder",
             "content_type": "folder",
         }
-        res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=200)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/contents", params=params, status=200
+        )
         subsubfolder_content_id = res.json_body["content_id"]
         params = {
             "parent_id": subsubfolder_content_id,
             "label": "InfolderContent",
             "content_type": "html-document",
         }
-        res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=200)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/contents", params=params, status=200
+        )
         infolder_content_id = res.json_body["content_id"]
-        params = {"parent_id": 1, "label": "GenericCreatedContent", "content_type": "html-document"}
-        res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=200)
+        params = {
+            "parent_id": 1,
+            "label": "GenericCreatedContent",
+            "content_type": "html-document",
+        }
+        res = web_testapp.post_json(
+            "/api/workspaces/1/contents", params=params, status=200
+        )
         generic_content_content_id = res.json_body["content_id"]
         params = {
             "complete_path_to_id": infolder_content_id,
@@ -3715,9 +4241,9 @@ class TestWorkspaceContentsWithFixture(object):
             "show_deleted": 1,
             "show_active": 1,
         }
-        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body[
-            "items"
-        ]
+        res = web_testapp.get(
+            "/api/workspaces/1/contents", status=200, params=params
+        ).json_body["items"]
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 6
         assert [
@@ -3759,30 +4285,46 @@ class TestWorkspaceContentsWithFixture(object):
         """
         Check obtain workspace all root contents and all subcontent content
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"parent_id": 1, "label": "subfolder", "content_type": "folder"}
-        res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=200)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/contents", params=params, status=200
+        )
         subfolder_content_id = res.json_body["content_id"]
         params = {
             "parent_id": subfolder_content_id,
             "label": "subsubfolder",
             "content_type": "folder",
         }
-        res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=200)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/contents", params=params, status=200
+        )
         subsubfolder_content_id = res.json_body["content_id"]
         params = {
             "parent_id": subsubfolder_content_id,
             "label": "InfolderContent",
             "content_type": "html-document",
         }
-        res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=200)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/contents", params=params, status=200
+        )
         infolder_content_id = res.json_body["content_id"]
         # delete
         res = web_testapp.put_json(
-            "/api/workspaces/1/contents/{}/trashed".format(infolder_content_id), status=204
+            "/api/workspaces/1/contents/{}/trashed".format(infolder_content_id),
+            status=204,
         )
-        params = {"parent_id": 1, "label": "GenericCreatedContent", "content_type": "html-document"}
-        res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=200)
+        params = {
+            "parent_id": 1,
+            "label": "GenericCreatedContent",
+            "content_type": "html-document",
+        }
+        res = web_testapp.post_json(
+            "/api/workspaces/1/contents", params=params, status=200
+        )
         generic_content_content_id = res.json_body["content_id"]
         params = {
             "complete_path_to_id": infolder_content_id,
@@ -3790,9 +4332,9 @@ class TestWorkspaceContentsWithFixture(object):
             "show_deleted": 1,
             "show_active": 1,
         }
-        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body[
-            "items"
-        ]
+        res = web_testapp.get(
+            "/api/workspaces/1/contents", status=200, params=params
+        ).json_body["items"]
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 6
         assert [
@@ -3835,9 +4377,9 @@ class TestWorkspaceContentsWithFixture(object):
             "show_deleted": 0,
             "show_active": 1,
         }
-        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body[
-            "items"
-        ]
+        res = web_testapp.get(
+            "/api/workspaces/1/contents", status=200, params=params
+        ).json_body["items"]
         assert len(res) == 5
         assert [
             content
@@ -3879,30 +4421,46 @@ class TestWorkspaceContentsWithFixture(object):
         """
         Check obtain workspace all root contents and all subcontent content
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"parent_id": 1, "label": "subfolder", "content_type": "folder"}
-        res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=200)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/contents", params=params, status=200
+        )
         subfolder_content_id = res.json_body["content_id"]
         params = {
             "parent_id": subfolder_content_id,
             "label": "subsubfolder",
             "content_type": "folder",
         }
-        res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=200)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/contents", params=params, status=200
+        )
         subsubfolder_content_id = res.json_body["content_id"]
         params = {
             "parent_id": subsubfolder_content_id,
             "label": "InfolderContent",
             "content_type": "html-document",
         }
-        res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=200)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/contents", params=params, status=200
+        )
         infolder_content_id = res.json_body["content_id"]
-        params = {"parent_id": 1, "label": "GenericCreatedContent", "content_type": "html-document"}
-        res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=200)
+        params = {
+            "parent_id": 1,
+            "label": "GenericCreatedContent",
+            "content_type": "html-document",
+        }
+        res = web_testapp.post_json(
+            "/api/workspaces/1/contents", params=params, status=200
+        )
         generic_content_content_id = res.json_body["content_id"]
         # archive
         res = web_testapp.put_json(
-            "/api/workspaces/1/contents/{}/archived".format(infolder_content_id), status=204
+            "/api/workspaces/1/contents/{}/archived".format(infolder_content_id),
+            status=204,
         )
         params = {
             "complete_path_to_id": infolder_content_id,
@@ -3910,9 +4468,9 @@ class TestWorkspaceContentsWithFixture(object):
             "show_deleted": 1,
             "show_active": 1,
         }
-        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body[
-            "items"
-        ]
+        res = web_testapp.get(
+            "/api/workspaces/1/contents", status=200, params=params
+        ).json_body["items"]
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 6
         assert [
@@ -3955,9 +4513,9 @@ class TestWorkspaceContentsWithFixture(object):
             "show_deleted": 1,
             "show_active": 1,
         }
-        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body[
-            "items"
-        ]
+        res = web_testapp.get(
+            "/api/workspaces/1/contents", status=200, params=params
+        ).json_body["items"]
         assert len(res) == 5
         assert [
             content
@@ -4007,9 +4565,9 @@ class TestWorkspaceContentsWithFixture(object):
             "label": "ew",
         }
         web_testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = web_testapp.get("/api/workspaces/3/contents", status=200, params=params).json_body[
-            "items"
-        ]
+        res = web_testapp.get(
+            "/api/workspaces/3/contents", status=200, params=params
+        ).json_body["items"]
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 1
         content = res[0]
@@ -4034,15 +4592,22 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["modified"]
         assert content["created"]
 
-    def test_api__get_workspace_content__ok_200__get_only_active_root_content(self, web_testapp):
+    def test_api__get_workspace_content__ok_200__get_only_active_root_content(
+        self, web_testapp
+    ):
         """
         Check obtain workspace root active contents
         """
-        params = {"parent_id": 0, "show_archived": 0, "show_deleted": 0, "show_active": 1}
+        params = {
+            "parent_id": 0,
+            "show_archived": 0,
+            "show_deleted": 0,
+            "show_active": 1,
+        }
         web_testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = web_testapp.get("/api/workspaces/3/contents", status=200, params=params).json_body[
-            "items"
-        ]
+        res = web_testapp.get(
+            "/api/workspaces/3/contents", status=200, params=params
+        ).json_body["items"]
         # TODO - G.M - 30-05-2018 - Check this test
         assert len(res) == 2
         content = res[1]
@@ -4067,15 +4632,22 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["modified"]
         assert content["created"]
 
-    def test_api__get_workspace_content__ok_200__get_only_archived_root_content(self, web_testapp):
+    def test_api__get_workspace_content__ok_200__get_only_archived_root_content(
+        self, web_testapp
+    ):
         """
         Check obtain workspace root archived contents
         """
-        params = {"parent_id": 0, "show_archived": 1, "show_deleted": 0, "show_active": 0}
+        params = {
+            "parent_id": 0,
+            "show_archived": 1,
+            "show_deleted": 0,
+            "show_active": 0,
+        }
         web_testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = web_testapp.get("/api/workspaces/3/contents", status=200, params=params).json_body[
-            "items"
-        ]
+        res = web_testapp.get(
+            "/api/workspaces/3/contents", status=200, params=params
+        ).json_body["items"]
         assert len(res) == 1
         content = res[0]
         assert content["content_type"] == "html-document"
@@ -4099,15 +4671,22 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["modified"]
         assert content["created"]
 
-    def test_api__get_workspace_content__ok_200__get_only_deleted_root_content(self, web_testapp):
+    def test_api__get_workspace_content__ok_200__get_only_deleted_root_content(
+        self, web_testapp
+    ):
         """
         Check obtain workspace root deleted contents
         """
-        params = {"parent_id": 0, "show_archived": 0, "show_deleted": 1, "show_active": 0}
+        params = {
+            "parent_id": 0,
+            "show_archived": 0,
+            "show_deleted": 1,
+            "show_active": 0,
+        }
         web_testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = web_testapp.get("/api/workspaces/3/contents", status=200, params=params).json_body[
-            "items"
-        ]
+        res = web_testapp.get(
+            "/api/workspaces/3/contents", status=200, params=params
+        ).json_body["items"]
         # TODO - G.M - 30-05-2018 - Check this test
 
         assert len(res) == 1
@@ -4133,22 +4712,34 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["modified"]
         assert content["created"]
 
-    def test_api__get_workspace_content__ok_200__get_nothing_root_content(self, web_testapp):
+    def test_api__get_workspace_content__ok_200__get_nothing_root_content(
+        self, web_testapp
+    ):
         """
         Check obtain workspace root content who does not match any type
         (archived, deleted, active) result should be empty list.
         """
-        params = {"parent_id": 0, "show_archived": 0, "show_deleted": 0, "show_active": 0}
+        params = {
+            "parent_id": 0,
+            "show_archived": 0,
+            "show_deleted": 0,
+            "show_active": 0,
+        }
         web_testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = web_testapp.get("/api/workspaces/3/contents", status=200, params=params).json_body[
-            "items"
-        ]
+        res = web_testapp.get(
+            "/api/workspaces/3/contents", status=200, params=params
+        ).json_body["items"]
         # TODO - G.M - 30-05-2018 - Check this test
         assert res == []
 
     # Folder related
     def test_api__get_workspace_content__ok_200__get_all_filter_content_thread(
-        self, web_testapp, workspace_api_factory, content_api_factory, session, content_type_list
+        self,
+        web_testapp,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        content_type_list,
     ):
         # prepare data
 
@@ -4184,7 +4775,9 @@ class TestWorkspaceContentsWithFixture(object):
             do_notify=False,
         )
         test_page_legacy.type = "page"
-        with new_revision(session=session, tm=transaction.manager, content=test_page_legacy):
+        with new_revision(
+            session=session, tm=transaction.manager, content=test_page_legacy
+        ):
             content_api.update_content(test_page_legacy, "test_page", "<p>PAGE</p>")
         test_html_document = content_api.create(
             content_type_slug=content_type_list.Page.slug,
@@ -4193,8 +4786,12 @@ class TestWorkspaceContentsWithFixture(object):
             do_save=False,
             do_notify=False,
         )
-        with new_revision(session=session, tm=transaction.manager, content=test_html_document):
-            content_api.update_content(test_html_document, "test_page", "<p>HTML_DOCUMENT</p>")
+        with new_revision(
+            session=session, tm=transaction.manager, content=test_html_document
+        ):
+            content_api.update_content(
+                test_html_document, "test_page", "<p>HTML_DOCUMENT</p>"
+            )
         session.flush()
         transaction.commit()
         # test-itself
@@ -4205,10 +4802,13 @@ class TestWorkspaceContentsWithFixture(object):
             "show_active": 1,
             "content_type": "thread",
         }
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body[
-            "items"
-        ]
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        res = web_testapp.get(
+            "/api/workspaces/1/contents", status=200, params=params
+        ).json_body["items"]
         assert len(res) == 1
         content = res[0]
         assert content["content_type"] == "thread"
@@ -4233,7 +4833,12 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["created"]
 
     def test_api__get_workspace_content__ok_200__get_all_filter_content_html_and_legacy_page(
-        self, content_type_list, workspace_api_factory, content_api_factory, session, web_testapp
+        self,
+        content_type_list,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
     ):
         # prepare data
 
@@ -4270,7 +4875,9 @@ class TestWorkspaceContentsWithFixture(object):
             do_notify=False,
         )
         test_page_legacy.type = "page"
-        with new_revision(session=session, tm=transaction.manager, content=test_page_legacy):
+        with new_revision(
+            session=session, tm=transaction.manager, content=test_page_legacy
+        ):
             content_api.update_content(test_page_legacy, "test_page", "<p>PAGE</p>")
         test_html_document = content_api.create(
             content_type_slug=content_type_list.Page.slug,
@@ -4280,8 +4887,12 @@ class TestWorkspaceContentsWithFixture(object):
             do_save=False,
             do_notify=False,
         )
-        with new_revision(session=session, tm=transaction.manager, content=test_html_document):
-            content_api.update_content(test_html_document, "test_html_page", "<p>HTML_DOCUMENT</p>")
+        with new_revision(
+            session=session, tm=transaction.manager, content=test_html_document
+        ):
+            content_api.update_content(
+                test_html_document, "test_html_page", "<p>HTML_DOCUMENT</p>"
+            )
             session.flush()
         transaction.commit()
         # test-itself
@@ -4292,10 +4903,13 @@ class TestWorkspaceContentsWithFixture(object):
             "show_active": 1,
             "content_type": "html-document",
         }
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/workspaces/1/contents", status=200, params=params).json_body[
-            "items"
-        ]
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        res = web_testapp.get(
+            "/api/workspaces/1/contents", status=200, params=params
+        ).json_body["items"]
         assert len(res) == 2
         content = res[0]
         assert content["content_type"] == "html-document"
@@ -4341,7 +4955,9 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["modified"]
         assert content["created"]
 
-    def test_api__get_workspace_content__ok_200__get_all_folder_content(self, web_testapp):
+    def test_api__get_workspace_content__ok_200__get_all_folder_content(
+        self, web_testapp
+    ):
         """
         Check obtain workspace folder all contents
         """
@@ -4352,10 +4968,13 @@ class TestWorkspaceContentsWithFixture(object):
             "show_active": 1,
             #   'content_type': 'any'
         }
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/workspaces/2/contents", status=200, params=params).json_body[
-            "items"
-        ]
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        res = web_testapp.get(
+            "/api/workspaces/2/contents", status=200, params=params
+        ).json_body["items"]
         assert len(res) == 3
         content = res[0]
         assert content["content_type"] == "html-document"
@@ -4421,15 +5040,25 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["modified"]
         assert content["created"]
 
-    def test_api__get_workspace_content__ok_200__get_only_active_folder_content(self, web_testapp):
+    def test_api__get_workspace_content__ok_200__get_only_active_folder_content(
+        self, web_testapp
+    ):
         """
         Check obtain workspace folder active contents
         """
-        params = {"parent_ids": 10, "show_archived": 0, "show_deleted": 0, "show_active": 1}
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/workspaces/2/contents", status=200, params=params).json_body[
-            "items"
-        ]
+        params = {
+            "parent_ids": 10,
+            "show_archived": 0,
+            "show_deleted": 0,
+            "show_active": 1,
+        }
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        res = web_testapp.get(
+            "/api/workspaces/2/contents", status=200, params=params
+        ).json_body["items"]
         assert len(res) == 1
         content = res[0]
         assert content["content_type"]
@@ -4459,11 +5088,19 @@ class TestWorkspaceContentsWithFixture(object):
         """
         Check obtain workspace folder archived contents
         """
-        params = {"parent_ids": 10, "show_archived": 1, "show_deleted": 0, "show_active": 0}
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/workspaces/2/contents", status=200, params=params).json_body[
-            "items"
-        ]
+        params = {
+            "parent_ids": 10,
+            "show_archived": 1,
+            "show_deleted": 0,
+            "show_active": 0,
+        }
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        res = web_testapp.get(
+            "/api/workspaces/2/contents", status=200, params=params
+        ).json_body["items"]
         assert len(res) == 1
         content = res[0]
         assert content["content_type"] == "html-document"
@@ -4487,15 +5124,25 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["modified"]
         assert content["created"]
 
-    def test_api__get_workspace_content__ok_200__get_only_deleted_folder_content(self, web_testapp):
+    def test_api__get_workspace_content__ok_200__get_only_deleted_folder_content(
+        self, web_testapp
+    ):
         """
         Check obtain workspace folder deleted contents
         """
-        params = {"parent_ids": 10, "show_archived": 0, "show_deleted": 1, "show_active": 0}
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/workspaces/2/contents", status=200, params=params).json_body[
-            "items"
-        ]
+        params = {
+            "parent_ids": 10,
+            "show_archived": 0,
+            "show_deleted": 1,
+            "show_active": 0,
+        }
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        res = web_testapp.get(
+            "/api/workspaces/2/contents", status=200, params=params
+        ).json_body["items"]
 
         assert len(res) == 1
         content = res[0]
@@ -4520,16 +5167,26 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["modified"]
         assert content["created"]
 
-    def test_api__get_workspace_content__ok_200__get_nothing_folder_content(self, web_testapp):
+    def test_api__get_workspace_content__ok_200__get_nothing_folder_content(
+        self, web_testapp
+    ):
         """
         Check obtain workspace folder content who does not match any type
         (archived, deleted, active) result should be empty list.
         """
-        params = {"parent_ids": 10, "show_archived": 0, "show_deleted": 0, "show_active": 0}
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/workspaces/2/contents", status=200, params=params).json_body[
-            "items"
-        ]
+        params = {
+            "parent_ids": 10,
+            "show_archived": 0,
+            "show_deleted": 0,
+            "show_active": 0,
+        }
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        res = web_testapp.get(
+            "/api/workspaces/2/contents", status=200, params=params
+        ).json_body["items"]
         # TODO - G.M - 30-05-2018 - Check this test
         assert res == []
 
@@ -4540,7 +5197,10 @@ class TestWorkspaceContentsWithFixture(object):
         Check obtain workspace content list with an unreachable workspace for
         user
         """
-        web_testapp.authorization = ("Basic", ("lawrence-not-real-email@fsf.local", "foobarbaz"))
+        web_testapp.authorization = (
+            "Basic",
+            ("lawrence-not-real-email@fsf.local", "foobarbaz"),
+        )
         res = web_testapp.get("/api/workspaces/3/contents", status=400)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
@@ -4560,12 +5220,17 @@ class TestWorkspaceContentsWithFixture(object):
         assert "message" in res.json.keys()
         assert "details" in res.json.keys()
 
-    def test_api__get_workspace_content__err_400__workspace_does_not_exist(self, web_testapp):
+    def test_api__get_workspace_content__err_400__workspace_does_not_exist(
+        self, web_testapp
+    ):
         """
         Check obtain workspace contents list with an existing user but
         an unexisting workspace
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/5/contents", status=400)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
@@ -4580,14 +5245,19 @@ class TestWorkspaceContentsWithFixture(object):
         """
         Create generic content as workspace root
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "parent_id": None,
             "label": "GenericCreatedContent",
             "content_type": "html-document",
             "content_namespace": content_namespace,
         }
-        res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=200)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/contents", params=params, status=200
+        )
         assert res
         assert res.json_body
         assert res.json_body["status"] == "open"
@@ -4625,13 +5295,18 @@ class TestWorkspaceContentsWithFixture(object):
         """
         Create generic content but filename is already used here
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "parent_id": None,
             "label": "GenericCreatedContent",
             "content_type": "html-document",
         }
-        res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=200)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/contents", params=params, status=200
+        )
         assert res
         assert res.json_body
         assert res.json_body["status"] == "open"
@@ -4648,7 +5323,12 @@ class TestWorkspaceContentsWithFixture(object):
         assert res.json_body["filename"] == "GenericCreatedContent.document.html"
         assert res.json_body["modified"]
         assert res.json_body["created"]
-        params_active = {"parent_ids": 0, "show_archived": 0, "show_deleted": 0, "show_active": 1}
+        params_active = {
+            "parent_ids": 0,
+            "show_archived": 0,
+            "show_deleted": 0,
+            "show_active": 1,
+        }
         # INFO - G.M - 2018-06-165 - Verify if new content is correctly created
         active_contents = web_testapp.get(
             "/api/workspaces/1/contents", params=params_active, status=200
@@ -4657,10 +5337,14 @@ class TestWorkspaceContentsWithFixture(object):
         assert res.json_body["content_id"] in content_ids
 
         # recreate same content
-        res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=400)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/contents", params=params, status=400
+        )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
+        assert (
+            res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
+        )
 
     def test_api__post_content_create_generic_content__ok_200__no_parent_id_param(
         self, web_testapp
@@ -4668,9 +5352,14 @@ class TestWorkspaceContentsWithFixture(object):
         """
         Create generic content without provided parent_id param
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"label": "GenericCreatedContent", "content_type": "html-document"}
-        res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=200)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/contents", params=params, status=200
+        )
         assert res
         assert res.json_body
         assert res.json_body["status"] == "open"
@@ -4687,7 +5376,12 @@ class TestWorkspaceContentsWithFixture(object):
         assert res.json_body["filename"] == "GenericCreatedContent.document.html"
         assert res.json_body["modified"]
         assert res.json_body["created"]
-        params_active = {"parent_ids": 0, "show_archived": 0, "show_deleted": 0, "show_active": 1}
+        params_active = {
+            "parent_ids": 0,
+            "show_archived": 0,
+            "show_deleted": 0,
+            "show_active": 1,
+        }
         # INFO - G.M - 2018-06-165 - Verify if new content is correctly created
         active_contents = web_testapp.get(
             "/api/workspaces/1/contents", params=params_active, status=200
@@ -4701,13 +5395,18 @@ class TestWorkspaceContentsWithFixture(object):
         """
         Create generic content but parent_id=0
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "parent_id": 0,
             "label": "GenericCreatedContent",
             "content_type": content_type_list.Page.slug,
         }
-        res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=400)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/contents", params=params, status=400
+        )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         # INFO - G.M - 2018-09-10 - handled by marshmallow schema
@@ -4719,13 +5418,18 @@ class TestWorkspaceContentsWithFixture(object):
         """
         Create generic content but parent id is not valable
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "parent_id": 1000,
             "label": "GenericCreatedContent",
             "content_type": content_type_list.Page.slug,
         }
-        res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=400)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/contents", params=params, status=400
+        )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.PARENT_NOT_FOUND
@@ -4736,13 +5440,18 @@ class TestWorkspaceContentsWithFixture(object):
         """
         Create generic content in folder
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "label": "GenericCreatedContent",
             "content_type": "html-document",
             "parent_id": 10,
         }
-        res = web_testapp.post_json("/api/workspaces/2/contents", params=params, status=200)
+        res = web_testapp.post_json(
+            "/api/workspaces/2/contents", params=params, status=200
+        )
         assert res
         assert res.json_body
         assert res.json_body["status"] == "open"
@@ -4759,7 +5468,12 @@ class TestWorkspaceContentsWithFixture(object):
         assert res.json_body["filename"] == "GenericCreatedContent.document.html"
         assert res.json_body["modified"]
         assert res.json_body["created"]
-        params_active = {"parent_ids": 10, "show_archived": 0, "show_deleted": 0, "show_active": 1}
+        params_active = {
+            "parent_ids": 10,
+            "show_archived": 0,
+            "show_deleted": 0,
+            "show_active": 1,
+        }
         # INFO - G.M - 2018-06-165 - Verify if new content is correctly created
         active_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_active, status=200
@@ -4773,9 +5487,14 @@ class TestWorkspaceContentsWithFixture(object):
         """
         Create generic content but label provided is empty
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"label": "", "content_type": content_type_list.Page.slug}
-        res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=400)
+        res = web_testapp.post_json(
+            "/api/workspaces/1/contents", params=params, status=400
+        )
         # INFO - G.M - 2018-09-10 - handled by marshmallow schema
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
@@ -4785,9 +5504,17 @@ class TestWorkspaceContentsWithFixture(object):
         """
         Create generic content but content type is uncorrect
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"label": "GenericCreatedContent", "content_type": "unexistent-content-type"}
-        res = web_testapp.post_json("/api/workspaces/1/contents", params=params, status=400)
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        params = {
+            "label": "GenericCreatedContent",
+            "content_type": "unexistent-content-type",
+        }
+        res = web_testapp.post_json(
+            "/api/workspaces/1/contents", params=params, status=400
+        )
         assert res.json_body["code"] == ErrorCode.CONTENT_TYPE_NOT_EXIST
 
     def test_api__post_content_create_generic_content__err_400__unallowed_content_type(
@@ -4810,7 +5537,10 @@ class TestWorkspaceContentsWithFixture(object):
         content_api.set_allowed_content(folder, [content_type_list.Folder.slug])
         content_api.save(folder)
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # unallowed_content_type
         params = {
             "label": "GenericCreatedContent",
@@ -4865,7 +5595,9 @@ class TestWorkspaceContentsWithFixture(object):
             do_notify=False,
             profile=profile,
         )
-        workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
+        workspace_api = workspace_api_factory.get(
+            current_user=admin_user, show_deleted=True
+        )
         workspace = workspace_api.create_workspace("test", save_now=True)
         role_api = role_api_factory.get()
         role_api.create_one(
@@ -4892,7 +5624,9 @@ class TestWorkspaceContentsWithFixture(object):
             "parent_id": folder.content_id,
         }
         res = web_testapp.post_json(
-            "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
+            "/api/workspaces/{workspace_id}/contents".format(
+                workspace_id=workspace.workspace_id
+            ),
             params=params,
             status=403,
         )
@@ -4924,7 +5658,9 @@ class TestWorkspaceContentsWithFixture(object):
             do_notify=False,
             profile=profile,
         )
-        workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
+        workspace_api = workspace_api_factory.get(
+            current_user=admin_user, show_deleted=True
+        )
         workspace = workspace_api.create_workspace("test", save_now=True)
         role_api = role_api_factory.get()
         role_api.create_one(
@@ -4951,7 +5687,9 @@ class TestWorkspaceContentsWithFixture(object):
             "parent_id": folder.content_id,
         }
         web_testapp.post_json(
-            "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
+            "/api/workspaces/{workspace_id}/contents".format(
+                workspace_id=workspace.workspace_id
+            ),
             params=params,
             status=200,
         )
@@ -4980,7 +5718,9 @@ class TestWorkspaceContentsWithFixture(object):
             do_notify=False,
             profile=profile,
         )
-        workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
+        workspace_api = workspace_api_factory.get(
+            current_user=admin_user, show_deleted=True
+        )
         workspace = workspace_api.create_workspace("test", save_now=True)
         role_api = role_api_factory.get()
         role_api.create_one(
@@ -5010,7 +5750,10 @@ class TestWorkspaceContentsWithFixture(object):
         thread_id = thread.content_id
         folder_id = folder.content_id
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "new_parent_id": "{}".format(folder_id),
             "new_workspace_id": "{}".format(workspace_id),
@@ -5047,7 +5790,9 @@ class TestWorkspaceContentsWithFixture(object):
             do_notify=False,
             profile=profile,
         )
-        workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
+        workspace_api = workspace_api_factory.get(
+            current_user=admin_user, show_deleted=True
+        )
         workspace = workspace_api.create_workspace("test", save_now=True)
         role_api = role_api_factory.get()
         role_api.create_one(
@@ -5079,7 +5824,10 @@ class TestWorkspaceContentsWithFixture(object):
         thread_id = thread.content_id
         folder_id = folder.content_id
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "new_parent_id": "{}".format(folder_id),
             "new_workspace_id": "{}".format(workspace_id),
@@ -5097,10 +5845,23 @@ class TestWorkspaceContentsWithFixture(object):
         from Desserts folder(content_id: 3) to Salads subfolder (content_id: 4)
         of workspace Recipes.
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"new_parent_id": "4", "new_workspace_id": "2"}  # Salads
-        params_folder1 = {"parent_ids": 3, "show_archived": 0, "show_deleted": 0, "show_active": 1}
-        params_folder2 = {"parent_ids": 4, "show_archived": 0, "show_deleted": 0, "show_active": 1}
+        params_folder1 = {
+            "parent_ids": 3,
+            "show_archived": 0,
+            "show_deleted": 0,
+            "show_active": 1,
+        }
+        params_folder2 = {
+            "parent_ids": 4,
+            "show_archived": 0,
+            "show_deleted": 0,
+            "show_active": 1,
+        }
         folder1_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder1, status=200
         ).json_body["items"]
@@ -5108,17 +5869,25 @@ class TestWorkspaceContentsWithFixture(object):
             "/api/workspaces/2/contents", params=params_folder2, status=200
         ).json_body["items"]
         assert [content for content in folder1_contents if content["content_id"] == 8]
-        assert not [content for content in folder2_contents if content["content_id"] == 8]
+        assert not [
+            content for content in folder2_contents if content["content_id"] == 8
+        ]
         # TODO - G.M - 2018-06-163 - Check content
-        res = web_testapp.put_json("/api/workspaces/2/contents/8/move", params=params, status=200)
+        res = web_testapp.put_json(
+            "/api/workspaces/2/contents/8/move", params=params, status=200
+        )
         new_folder1_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder1, status=200
         ).json_body["items"]
         new_folder2_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder2, status=200
         ).json_body["items"]
-        assert not [content for content in new_folder1_contents if content["content_id"] == 8]
-        assert [content for content in new_folder2_contents if content["content_id"] == 8]
+        assert not [
+            content for content in new_folder1_contents if content["content_id"] == 8
+        ]
+        assert [
+            content for content in new_folder2_contents if content["content_id"] == 8
+        ]
         assert res.json_body
         assert res.json_body["parent_id"] == 4
         assert res.json_body["content_id"] == 8
@@ -5131,10 +5900,23 @@ class TestWorkspaceContentsWithFixture(object):
         from Desserts folder(content_id: 3) to root (content_id: 0)
         of workspace Recipes.
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"new_parent_id": None, "new_workspace_id": 2}  # root
-        params_folder1 = {"parent_ids": 3, "show_archived": 0, "show_deleted": 0, "show_active": 1}
-        params_folder2 = {"parent_ids": 0, "show_archived": 0, "show_deleted": 0, "show_active": 1}
+        params_folder1 = {
+            "parent_ids": 3,
+            "show_archived": 0,
+            "show_deleted": 0,
+            "show_active": 1,
+        }
+        params_folder2 = {
+            "parent_ids": 0,
+            "show_archived": 0,
+            "show_deleted": 0,
+            "show_active": 1,
+        }
         folder1_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder1, status=200
         ).json_body["items"]
@@ -5142,18 +5924,26 @@ class TestWorkspaceContentsWithFixture(object):
             "/api/workspaces/2/contents", params=params_folder2, status=200
         ).json_body["items"]
         assert [content for content in folder1_contents if content["content_id"] == 8]
-        assert not [content for content in folder2_contents if content["content_id"] == 8]
+        assert not [
+            content for content in folder2_contents if content["content_id"] == 8
+        ]
         # TODO - G.M - 2018-06-163 - Check content
 
-        res = web_testapp.put_json("/api/workspaces/2/contents/8/move", params=params, status=200)
+        res = web_testapp.put_json(
+            "/api/workspaces/2/contents/8/move", params=params, status=200
+        )
         new_folder1_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder1, status=200
         ).json_body["items"]
         new_folder2_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder2, status=200
         ).json_body["items"]
-        assert not [content for content in new_folder1_contents if content["content_id"] == 8]
-        assert [content for content in new_folder2_contents if content["content_id"] == 8]
+        assert not [
+            content for content in new_folder1_contents if content["content_id"] == 8
+        ]
+        assert [
+            content for content in new_folder2_contents if content["content_id"] == 8
+        ]
         assert res.json_body
         assert res.json_body["parent_id"] is None
         assert res.json_body["content_id"] == 8
@@ -5166,10 +5956,23 @@ class TestWorkspaceContentsWithFixture(object):
         from Desserts folder(content_id: 3) to Salads subfolder (content_id: 4)
         of workspace Recipes.
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"new_parent_id": "4", "new_workspace_id": "2"}  # Salads
-        params_folder1 = {"parent_ids": 3, "show_archived": 0, "show_deleted": 0, "show_active": 1}
-        params_folder2 = {"parent_ids": 4, "show_archived": 0, "show_deleted": 0, "show_active": 1}
+        params_folder1 = {
+            "parent_ids": 3,
+            "show_archived": 0,
+            "show_deleted": 0,
+            "show_active": 1,
+        }
+        params_folder2 = {
+            "parent_ids": 4,
+            "show_archived": 0,
+            "show_deleted": 0,
+            "show_active": 1,
+        }
         folder1_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder1, status=200
         ).json_body["items"]
@@ -5177,17 +5980,25 @@ class TestWorkspaceContentsWithFixture(object):
             "/api/workspaces/2/contents", params=params_folder2, status=200
         ).json_body["items"]
         assert [content for content in folder1_contents if content["content_id"] == 8]
-        assert not [content for content in folder2_contents if content["content_id"] == 8]
+        assert not [
+            content for content in folder2_contents if content["content_id"] == 8
+        ]
         # TODO - G.M - 2018-06-163 - Check content
-        res = web_testapp.put_json("/api/workspaces/2/contents/8/move", params=params, status=200)
+        res = web_testapp.put_json(
+            "/api/workspaces/2/contents/8/move", params=params, status=200
+        )
         new_folder1_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder1, status=200
         ).json_body["items"]
         new_folder2_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder2, status=200
         ).json_body["items"]
-        assert not [content for content in new_folder1_contents if content["content_id"] == 8]
-        assert [content for content in new_folder2_contents if content["content_id"] == 8]
+        assert not [
+            content for content in new_folder1_contents if content["content_id"] == 8
+        ]
+        assert [
+            content for content in new_folder2_contents if content["content_id"] == 8
+        ]
         assert res.json_body
         assert res.json_body["parent_id"] == 4
         assert res.json_body["content_id"] == 8
@@ -5200,10 +6011,23 @@ class TestWorkspaceContentsWithFixture(object):
         from Desserts folder(content_id: 3) to Menus subfolder (content_id: 2)
         of workspace Business.
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"new_parent_id": "2", "new_workspace_id": "1"}  # Menus
-        params_folder1 = {"parent_ids": 3, "show_archived": 0, "show_deleted": 0, "show_active": 1}
-        params_folder2 = {"parent_ids": 2, "show_archived": 0, "show_deleted": 0, "show_active": 1}
+        params_folder1 = {
+            "parent_ids": 3,
+            "show_archived": 0,
+            "show_deleted": 0,
+            "show_active": 1,
+        }
+        params_folder2 = {
+            "parent_ids": 2,
+            "show_archived": 0,
+            "show_deleted": 0,
+            "show_active": 1,
+        }
         folder1_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder1, status=200
         ).json_body["items"]
@@ -5211,17 +6035,25 @@ class TestWorkspaceContentsWithFixture(object):
             "/api/workspaces/1/contents", params=params_folder2, status=200
         ).json_body["items"]
         assert [content for content in folder1_contents if content["content_id"] == 8]
-        assert not [content for content in folder2_contents if content["content_id"] == 8]
+        assert not [
+            content for content in folder2_contents if content["content_id"] == 8
+        ]
         # TODO - G.M - 2018-06-163 - Check content
-        res = web_testapp.put_json("/api/workspaces/2/contents/8/move", params=params, status=200)
+        res = web_testapp.put_json(
+            "/api/workspaces/2/contents/8/move", params=params, status=200
+        )
         new_folder1_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder1, status=200
         ).json_body["items"]
         new_folder2_contents = web_testapp.get(
             "/api/workspaces/1/contents", params=params_folder2, status=200
         ).json_body["items"]
-        assert not [content for content in new_folder1_contents if content["content_id"] == 8]
-        assert [content for content in new_folder2_contents if content["content_id"] == 8]
+        assert not [
+            content for content in new_folder1_contents if content["content_id"] == 8
+        ]
+        assert [
+            content for content in new_folder2_contents if content["content_id"] == 8
+        ]
         assert res.json_body
         assert res.json_body["parent_id"] == 2
         assert res.json_body["content_id"] == 8
@@ -5260,7 +6092,9 @@ class TestWorkspaceContentsWithFixture(object):
             do_notify=False,
             profile=profile,
         )
-        workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
+        workspace_api = workspace_api_factory.get(
+            current_user=admin_user, show_deleted=True
+        )
         projectA_workspace = workspace_api.create_workspace("projectA", save_now=True)
         projectB_workspace = workspace_api.create_workspace("projectB", save_now=True)
         role_api = role_api_factory.get()
@@ -5311,14 +6145,21 @@ class TestWorkspaceContentsWithFixture(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=readme_file):
             content_api.update_file_data(
-                readme_file, "readme.txt", new_mimetype="plain/text", new_content=b"To be completed"
+                readme_file,
+                "readme.txt",
+                new_mimetype="plain/text",
+                new_content=b"To be completed",
             )
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # verify coherence of workspace content first.
         projectA_workspace_contents = web_testapp.get(
-            "/api/workspaces/{}/contents".format(projectA_workspace.workspace_id), status=200
+            "/api/workspaces/{}/contents".format(projectA_workspace.workspace_id),
+            status=200,
         ).json_body["items"]
         assert len(projectA_workspace_contents) == 4
         assert not [
@@ -5327,7 +6168,8 @@ class TestWorkspaceContentsWithFixture(object):
             if content["workspace_id"] != projectA_workspace.workspace_id
         ]
         projectB_workspace_contents = web_testapp.get(
-            "/api/workspaces/{}/contents".format(projectB_workspace.workspace_id), status=200
+            "/api/workspaces/{}/contents".format(projectB_workspace.workspace_id),
+            status=200,
         ).json_body["items"]
         assert len(projectB_workspace_contents) == 0
         assert not [
@@ -5350,7 +6192,8 @@ class TestWorkspaceContentsWithFixture(object):
 
         # verify coherence of workspace after
         projectA_workspace_contents = web_testapp.get(
-            "/api/workspaces/{}/contents".format(projectA_workspace.workspace_id), status=200
+            "/api/workspaces/{}/contents".format(projectA_workspace.workspace_id),
+            status=200,
         ).json_body["items"]
         assert len(projectA_workspace_contents) == 0
         assert not [
@@ -5359,7 +6202,8 @@ class TestWorkspaceContentsWithFixture(object):
             if content["workspace_id"] != projectA_workspace.workspace_id
         ]
         projectB_workspace_contents = web_testapp.get(
-            "/api/workspaces/{}/contents".format(projectB_workspace.workspace_id), status=200
+            "/api/workspaces/{}/contents".format(projectB_workspace.workspace_id),
+            status=200,
         ).json_body["items"]
         assert len(projectB_workspace_contents) == 4
         assert not [
@@ -5375,10 +6219,23 @@ class TestWorkspaceContentsWithFixture(object):
         from Desserts folder(content_id: 3) to root (content_id: 0)
         of workspace Business.
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"new_parent_id": None, "new_workspace_id": "1"}  # root
-        params_folder1 = {"parent_ids": 3, "show_archived": 0, "show_deleted": 0, "show_active": 1}
-        params_folder2 = {"parent_ids": 0, "show_archived": 0, "show_deleted": 0, "show_active": 1}
+        params_folder1 = {
+            "parent_ids": 3,
+            "show_archived": 0,
+            "show_deleted": 0,
+            "show_active": 1,
+        }
+        params_folder2 = {
+            "parent_ids": 0,
+            "show_archived": 0,
+            "show_deleted": 0,
+            "show_active": 1,
+        }
         folder1_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder1, status=200
         ).json_body["items"]
@@ -5386,17 +6243,25 @@ class TestWorkspaceContentsWithFixture(object):
             "/api/workspaces/1/contents", params=params_folder2, status=200
         ).json_body["items"]
         assert [content for content in folder1_contents if content["content_id"] == 8]
-        assert not [content for content in folder2_contents if content["content_id"] == 8]
+        assert not [
+            content for content in folder2_contents if content["content_id"] == 8
+        ]
         # TODO - G.M - 2018-06-163 - Check content
-        res = web_testapp.put_json("/api/workspaces/2/contents/8/move", params=params, status=200)
+        res = web_testapp.put_json(
+            "/api/workspaces/2/contents/8/move", params=params, status=200
+        )
         new_folder1_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_folder1, status=200
         ).json_body["items"]
         new_folder2_contents = web_testapp.get(
             "/api/workspaces/1/contents", params=params_folder2, status=200
         ).json_body["items"]
-        assert not [content for content in new_folder1_contents if content["content_id"] == 8]
-        assert [content for content in new_folder2_contents if content["content_id"] == 8]
+        assert not [
+            content for content in new_folder1_contents if content["content_id"] == 8
+        ]
+        assert [
+            content for content in new_folder2_contents if content["content_id"] == 8
+        ]
         assert res.json_body
         assert res.json_body["parent_id"] is None
         assert res.json_body["content_id"] == 8
@@ -5410,9 +6275,14 @@ class TestWorkspaceContentsWithFixture(object):
         of workspace Recipes.
         Workspace_id of parent_id don't match with workspace_id of workspace
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"new_parent_id": "4", "new_workspace_id": "1"}  # Salads
-        res = web_testapp.put_json("/api/workspaces/2/contents/8/move", params=params, status=400)
+        res = web_testapp.put_json(
+            "/api/workspaces/2/contents/8/move", params=params, status=400
+        )
         assert res.json_body["code"] == ErrorCode.WORKSPACE_DO_NOT_MATCH
 
     def test_api_put_delete_content__ok_200__nominal_case(self, web_testapp):
@@ -5420,9 +6290,22 @@ class TestWorkspaceContentsWithFixture(object):
         delete content
         delete Apple_pie ( content_id: 8, parent_id: 3)
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params_active = {"parent_ids": 3, "show_archived": 0, "show_deleted": 0, "show_active": 1}
-        params_deleted = {"parent_ids": 3, "show_archived": 0, "show_deleted": 1, "show_active": 0}
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        params_active = {
+            "parent_ids": 3,
+            "show_archived": 0,
+            "show_deleted": 0,
+            "show_active": 1,
+        }
+        params_deleted = {
+            "parent_ids": 3,
+            "show_archived": 0,
+            "show_deleted": 1,
+            "show_active": 0,
+        }
         active_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_active, status=200
         ).json_body["items"]
@@ -5430,7 +6313,9 @@ class TestWorkspaceContentsWithFixture(object):
             "/api/workspaces/2/contents", params=params_deleted, status=200
         ).json_body["items"]
         assert [content for content in active_contents if content["content_id"] == 8]
-        assert not [content for content in deleted_contents if content["content_id"] == 8]
+        assert not [
+            content for content in deleted_contents if content["content_id"] == 8
+        ]
         # TODO - G.M - 2018-06-163 - Check content
         web_testapp.put_json(
             # INFO - G.M - 2018-06-163 - delete Apple_Pie
@@ -5443,17 +6328,34 @@ class TestWorkspaceContentsWithFixture(object):
         new_deleted_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_deleted, status=200
         ).json_body["items"]
-        assert not [content for content in new_active_contents if content["content_id"] == 8]
-        assert [content for content in new_deleted_contents if content["content_id"] == 8]
+        assert not [
+            content for content in new_active_contents if content["content_id"] == 8
+        ]
+        assert [
+            content for content in new_deleted_contents if content["content_id"] == 8
+        ]
 
     def test_api_put_archive_content__ok_200__nominal_case(self, web_testapp):
         """
         archive content
         archive Apple_pie ( content_id: 8, parent_id: 3)
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params_active = {"parent_ids": 3, "show_archived": 0, "show_deleted": 0, "show_active": 1}
-        params_archived = {"parent_ids": 3, "show_archived": 1, "show_deleted": 0, "show_active": 0}
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        params_active = {
+            "parent_ids": 3,
+            "show_archived": 0,
+            "show_deleted": 0,
+            "show_active": 1,
+        }
+        params_archived = {
+            "parent_ids": 3,
+            "show_archived": 1,
+            "show_deleted": 0,
+            "show_active": 0,
+        }
         active_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_active, status=200
         ).json_body["items"]
@@ -5461,7 +6363,9 @@ class TestWorkspaceContentsWithFixture(object):
             "/api/workspaces/2/contents", params=params_archived, status=200
         ).json_body["items"]
         assert [content for content in active_contents if content["content_id"] == 8]
-        assert not [content for content in archived_contents if content["content_id"] == 8]
+        assert not [
+            content for content in archived_contents if content["content_id"] == 8
+        ]
         web_testapp.put_json("/api/workspaces/2/contents/8/archived", status=204)
         new_active_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_active, status=200
@@ -5469,8 +6373,12 @@ class TestWorkspaceContentsWithFixture(object):
         new_archived_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_archived, status=200
         ).json_body["items"]
-        assert not [content for content in new_active_contents if content["content_id"] == 8]
-        assert [content for content in new_archived_contents if content["content_id"] == 8]
+        assert not [
+            content for content in new_active_contents if content["content_id"] == 8
+        ]
+        assert [
+            content for content in new_archived_contents if content["content_id"] == 8
+        ]
 
     def test_api_put_undelete_content__ok_200__nominal_case(self, web_testapp):
         """
@@ -5478,25 +6386,43 @@ class TestWorkspaceContentsWithFixture(object):
         undelete Bad_Fruit_Salad ( content_id: 14, parent_id: 10)
         """
         web_testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        params_active = {"parent_ids": 10, "show_archived": 0, "show_deleted": 0, "show_active": 1}
-        params_deleted = {"parent_ids": 10, "show_archived": 0, "show_deleted": 1, "show_active": 0}
+        params_active = {
+            "parent_ids": 10,
+            "show_archived": 0,
+            "show_deleted": 0,
+            "show_active": 1,
+        }
+        params_deleted = {
+            "parent_ids": 10,
+            "show_archived": 0,
+            "show_deleted": 1,
+            "show_active": 0,
+        }
         active_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_active, status=200
         ).json_body["items"]
         deleted_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_deleted, status=200
         ).json_body["items"]
-        assert not [content for content in active_contents if content["content_id"] == 14]
+        assert not [
+            content for content in active_contents if content["content_id"] == 14
+        ]
         assert [content for content in deleted_contents if content["content_id"] == 14]
-        web_testapp.put_json("/api/workspaces/2/contents/14/trashed/restore", status=204)
+        web_testapp.put_json(
+            "/api/workspaces/2/contents/14/trashed/restore", status=204
+        )
         new_active_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_active, status=200
         ).json_body["items"]
         new_deleted_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_deleted, status=200
         ).json_body["items"]
-        assert [content for content in new_active_contents if content["content_id"] == 14]
-        assert not [content for content in new_deleted_contents if content["content_id"] == 14]
+        assert [
+            content for content in new_active_contents if content["content_id"] == 14
+        ]
+        assert not [
+            content for content in new_deleted_contents if content["content_id"] == 14
+        ]
 
     def test_api_put_unarchive_content__ok_200__nominal_case(self, web_testapp):
         """
@@ -5504,7 +6430,12 @@ class TestWorkspaceContentsWithFixture(object):
         unarchive Fruit_salads ( content_id: 13, parent_id: 10)
         """
         web_testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        params_active = {"parent_ids": 10, "show_archived": 0, "show_deleted": 0, "show_active": 1}
+        params_active = {
+            "parent_ids": 10,
+            "show_archived": 0,
+            "show_deleted": 0,
+            "show_active": 1,
+        }
         params_archived = {
             "parent_ids": 10,
             "show_archived": 1,
@@ -5517,17 +6448,25 @@ class TestWorkspaceContentsWithFixture(object):
         archived_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_archived, status=200
         ).json_body["items"]
-        assert not [content for content in active_contents if content["content_id"] == 13]
+        assert not [
+            content for content in active_contents if content["content_id"] == 13
+        ]
         assert [content for content in archived_contents if content["content_id"] == 13]
-        web_testapp.put_json("/api/workspaces/2/contents/13/archived/restore", status=204)
+        web_testapp.put_json(
+            "/api/workspaces/2/contents/13/archived/restore", status=204
+        )
         new_active_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_active, status=200
         ).json_body["items"]
         new_archived_contents = web_testapp.get(
             "/api/workspaces/2/contents", params=params_archived, status=200
         ).json_body["items"]
-        assert [content for content in new_active_contents if content["content_id"] == 13]
-        assert not [content for content in new_archived_contents if content["content_id"] == 13]
+        assert [
+            content for content in new_active_contents if content["content_id"] == 13
+        ]
+        assert not [
+            content for content in new_archived_contents if content["content_id"] == 13
+        ]
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -5545,7 +6484,9 @@ class TestWorkspaceContents(object):
         web_testapp,
         content_type_list,
     ):
-        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        workspace = workspace_api_factory.get().create_workspace(
+            "test workspace", save_now=True
+        )
         api = content_api_factory.get()
         first_dir = api.create(
             content_type_slug=content_type_list.Folder.slug,
@@ -5646,7 +6587,9 @@ class TestWorkspaceContents(object):
         web_testapp,
         content_type_list,
     ):
-        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        workspace = workspace_api_factory.get().create_workspace(
+            "test workspace", save_now=True
+        )
         api = content_api_factory.get()
         first_dir = api.create(
             content_type_slug=content_type_list.Folder.slug,
@@ -5691,13 +6634,19 @@ class TestWorkspaceContents(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
 
-        res = web_testapp.get("/api/contents/{}/path".format(my_file.content_id), status=400)
+        res = web_testapp.get(
+            "/api/contents/{}/path".format(my_file.content_id), status=400
+        )
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
-        web_testapp.get("/api/contents/{}/path".format(second_dir.content_id), status=400)
+        web_testapp.get(
+            "/api/contents/{}/path".format(second_dir.content_id), status=400
+        )
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
-        web_testapp.get("/api/contents/{}/path".format(another_content.content_id), status=400)
+        web_testapp.get(
+            "/api/contents/{}/path".format(another_content.content_id), status=400
+        )
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
 
@@ -5750,7 +6699,10 @@ class TestGetContentsPaginationAndSort:
         """
         Test sorting and pagination of contents listing.
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/workspaces/{}/contents".format(contents_for_pagination.workspace_id),
             status=200,

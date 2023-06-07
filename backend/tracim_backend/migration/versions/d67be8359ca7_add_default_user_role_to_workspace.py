@@ -25,7 +25,9 @@ def upgrade():
     enum.create(op.get_bind(), checkfirst=False)
     with op.batch_alter_table("workspaces") as batch_op:
         batch_op.add_column(
-            sa.Column("default_user_role", enum, server_default="READER", nullable=False)
+            sa.Column(
+                "default_user_role", enum, server_default="READER", nullable=False
+            )
         )
 
 

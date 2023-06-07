@@ -40,12 +40,16 @@ class ProcessedWebdavPath(object):
     - provide useful properties to handle the WebDAV request
     """
 
-    def __init__(self, path: str, current_user: User, session: TracimSession, app_config: CFG):
+    def __init__(
+        self, path: str, current_user: User, session: TracimSession, app_config: CFG
+    ):
         self.path = path
         self.workspace_api = WorkspaceApi(
             current_user=current_user, session=session, config=app_config
         )
-        self.content_api = ContentApi(current_user=current_user, session=session, config=app_config)
+        self.content_api = ContentApi(
+            current_user=current_user, session=session, config=app_config
+        )
 
         self.workspaces = []
         self.contents = []
@@ -194,7 +198,9 @@ class WebdavTracimContext(TracimContext):
 
     def _get_user(self, get_webdav_username: typing.Callable) -> User:
         login = get_webdav_username()
-        uapi = UserApi(None, show_deleted=True, session=self.dbsession, config=self.app_config)
+        uapi = UserApi(
+            None, show_deleted=True, session=self.dbsession, config=self.app_config
+        )
         return uapi.get_one_by_login(login)
 
     def _get_current_webdav_username(self) -> str:
@@ -256,17 +262,23 @@ class TracimDavProvider(DAVProvider):
 
     #########################################################
     # Everything override from DAVProvider
-    def getResourceInst(self, path: str, environ: dict) -> typing.Optional[_DAVResource]:
+    def getResourceInst(
+        self, path: str, environ: dict
+    ) -> typing.Optional[_DAVResource]:
         """
         Called by wsgidav whenever a request is called to get the _DAVResource corresponding to the path
         """
         path = normpath(path)
         tracim_context = environ["tracim_context"]
         tracim_context.set_path(path)
-        current_path_resource_type = tracim_context.processed_path.current_path_resource_type
+        current_path_resource_type = (
+            tracim_context.processed_path.current_path_resource_type
+        )
         # root
         if current_path_resource_type == ResourceType.ROOT:
-            return resources.RootResource(path=path, environ=environ, tracim_context=tracim_context)
+            return resources.RootResource(
+                path=path, environ=environ, tracim_context=tracim_context
+            )
         if current_path_resource_type == ResourceType.WORKSPACE:
             workspace = tracim_context.current_workspace
             return get_workspace_resource(
@@ -294,5 +306,7 @@ class TracimDavProvider(DAVProvider):
         path = normpath(path)
         tracim_context = environ["tracim_context"]
         tracim_context.set_path(path)
-        current_path_resource_type = tracim_context.processed_path.current_path_resource_type
+        current_path_resource_type = (
+            tracim_context.processed_path.current_path_resource_type
+        )
         return current_path_resource_type is not None

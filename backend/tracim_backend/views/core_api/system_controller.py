@@ -43,7 +43,8 @@ class SystemController(Controller):
         app_config = request.registry.settings["CFG"]  # type: CFG
         app_api = ApplicationApi(app_list=app_list)
         applications_in_context = [
-            app_api.get_application_in_context(app, app_config) for app in app_api.get_all()
+            app_api.get_application_in_context(app, app_config)
+            for app in app_api.get_all()
         ]
         return applications_in_context
 
@@ -56,7 +57,9 @@ class SystemController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         content_types_slugs = content_type_list.endpoint_allowed_types_slug()
-        content_types = [content_type_list.get_one_by_slug(slug) for slug in content_types_slugs]
+        content_types = [
+            content_type_list.get_one_by_slug(slug) for slug in content_types_slugs
+        ]
         content_types_in_context = [
             content_type_list.get_content_type_in_context(content_type, app_config)
             for content_type in content_types
@@ -90,7 +93,9 @@ class SystemController(Controller):
     @check_right(is_user)
     @hapic.input_query(GetUsernameAvailability())
     @hapic.output_body(UsernameAvailability())
-    def username_availability(self, context, request: TracimRequest, hapic_data: HapicData) -> dict:
+    def username_availability(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> dict:
         """
         Return availability for each given username
         """
@@ -98,7 +103,9 @@ class SystemController(Controller):
         system_api = SystemApi(app_config, request.dbsession)
         return {
             "username": hapic_data.query["username"],
-            "available": system_api.get_username_availability(hapic_data.query["username"]),
+            "available": system_api.get_username_availability(
+                hapic_data.query["username"]
+            ),
         }
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
@@ -141,7 +148,9 @@ class SystemController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @check_right(is_user)
     @hapic.output_body(UserCustomPropertiesSchema())
-    def user_custom_properties_schema(self, context, request: TracimRequest, hapic_data=None):
+    def user_custom_properties_schema(
+        self, context, request: TracimRequest, hapic_data=None
+    ):
         """
         Returns user custom properties JSONSchema
         """
@@ -166,7 +175,9 @@ class SystemController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @check_right(is_user)
     @hapic.output_body(UserCustomPropertiesUiSchema())
-    def custom_user_properties_ui_schema(self, context, request: TracimRequest, hapic_data=None):
+    def custom_user_properties_ui_schema(
+        self, context, request: TracimRequest, hapic_data=None
+    ):
         """
         Returns user custom properties UISchema
         """
@@ -199,35 +210,53 @@ class SystemController(Controller):
         configurator.add_view(self.config, route_name="config")
 
         # Errors codes
-        configurator.add_route("error_codes", "/system/error_codes", request_method="GET")
+        configurator.add_route(
+            "error_codes", "/system/error_codes", request_method="GET"
+        )
         configurator.add_view(self.error_codes, route_name="error_codes")
 
         # Applications
-        configurator.add_route("applications", "/system/applications", request_method="GET")
+        configurator.add_route(
+            "applications", "/system/applications", request_method="GET"
+        )
         configurator.add_view(self.applications, route_name="applications")
 
         # Content_types
-        configurator.add_route("content_types", "/system/content_types", request_method="GET")
+        configurator.add_route(
+            "content_types", "/system/content_types", request_method="GET"
+        )
         configurator.add_view(self.content_types, route_name="content_types")
 
         # Allowed Workspace access types
         configurator.add_route(
-            "workspace_access_type", "/system/workspace_access_types", request_method="GET"
+            "workspace_access_type",
+            "/system/workspace_access_types",
+            request_method="GET",
         )
-        configurator.add_view(self.workspace_access_types, route_name="workspace_access_type")
+        configurator.add_view(
+            self.workspace_access_types, route_name="workspace_access_type"
+        )
 
         # Timezones
-        configurator.add_route("timezones_list", "/system/timezones", request_method="GET")
+        configurator.add_route(
+            "timezones_list", "/system/timezones", request_method="GET"
+        )
         configurator.add_view(self.timezones_list, route_name="timezones_list")
 
         # username availability
         configurator.add_route(
-            "username_availability", "/system/username-availability", request_method="GET"
+            "username_availability",
+            "/system/username-availability",
+            request_method="GET",
         )
-        configurator.add_view(self.username_availability, route_name="username_availability")
+        configurator.add_view(
+            self.username_availability, route_name="username_availability"
+        )
 
         # usage conditions
-        configurator.add_route("usage_conditions", "/system/usage_conditions", request_method="GET")
+        configurator.add_route(
+            "usage_conditions", "/system/usage_conditions", request_method="GET"
+        )
         configurator.add_view(self.usage_conditions, route_name="usage_conditions")
 
         # user custom-properties schema
@@ -237,7 +266,8 @@ class SystemController(Controller):
             request_method="GET",
         )
         configurator.add_view(
-            self.user_custom_properties_schema, route_name="user_custom_properties_schema"
+            self.user_custom_properties_schema,
+            route_name="user_custom_properties_schema",
         )
         configurator.add_route(
             "user_custom_properties_ui_schema",
@@ -245,7 +275,8 @@ class SystemController(Controller):
             request_method="GET",
         )
         configurator.add_view(
-            self.custom_user_properties_ui_schema, route_name="user_custom_properties_ui_schema"
+            self.custom_user_properties_ui_schema,
+            route_name="user_custom_properties_ui_schema",
         )
 
         # reserved usernames

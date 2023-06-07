@@ -24,7 +24,10 @@ class SharePassword(object):
 
 class SharePasswordFormSchema(marshmallow.Schema):
     password = marshmallow.fields.String(
-        required=False, allow_none=True, example="8QLa$<w", validate=share_password_validator
+        required=False,
+        allow_none=True,
+        example="8QLa$<w",
+        validate=share_password_validator,
     )
 
     @post_load
@@ -34,7 +37,10 @@ class SharePasswordFormSchema(marshmallow.Schema):
 
 class SharePasswordBodySchema(marshmallow.Schema):
     password = marshmallow.fields.String(
-        required=False, allow_none=True, example="8QLa$<w", validate=share_password_validator
+        required=False,
+        allow_none=True,
+        example="8QLa$<w",
+        validate=share_password_validator,
     )
 
     @post_load
@@ -51,7 +57,8 @@ class ShareListQuerySchema(marshmallow.Schema):
     show_disabled = marshmallow.fields.Int(
         example=0,
         default=0,
-        description="if set to 1, then show disabled share." " Default is 0 - hide disabled share",
+        description="if set to 1, then show disabled share."
+        " Default is 0 - hide disabled share",
         validate=bool_as_int_validator,
     )
 
@@ -86,7 +93,9 @@ class ShareTokenPath(object):
 
 
 class ShareTokenPathSchema(marshmallow.Schema):
-    share_token = marshmallow.fields.String(required=True, description="valid share token")
+    share_token = marshmallow.fields.String(
+        required=True, description="valid share token"
+    )
 
     @post_load
     def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -110,7 +119,10 @@ class ShareCreationBodySchema(marshmallow.Schema):
         RFCEmail(validate=share_email_validator), validate=Length(min=1), required=True
     )
     password = marshmallow.fields.String(
-        example="8QLa$<w", required=False, allow_none=True, validate=share_password_validator
+        example="8QLa$<w",
+        required=False,
+        allow_none=True,
+        validate=share_password_validator,
     )
 
     @post_load
@@ -119,7 +131,9 @@ class ShareCreationBodySchema(marshmallow.Schema):
 
 
 class ShareTokenWithFilenamePathSchema(marshmallow.Schema):
-    share_token = marshmallow.fields.String(required=True, description="valid share token")
+    share_token = marshmallow.fields.String(
+        required=True, description="valid share token"
+    )
     filename = marshmallow.fields.String()
 
     @post_load
@@ -157,9 +171,12 @@ class ContentShareInfoSchema(marshmallow.Schema):
 
 
 class ContentShareSchema(marshmallow.Schema):
-    email = RFCEmail(example="hello@tracim.fr", required=True, validate=share_email_validator)
+    email = RFCEmail(
+        example="hello@tracim.fr", required=True, validate=share_email_validator
+    )
     share_token = marshmallow.fields.String(
-        description="token of the content_share", example="444b026a068d42d6ab5e12fde08efb7b"
+        description="token of the content_share",
+        example="444b026a068d42d6ab5e12fde08efb7b",
     )
     has_password = marshmallow.fields.Boolean(required=True)
     share_group_uuid = marshmallow.fields.String(required=True)
@@ -174,11 +191,15 @@ class ContentShareSchema(marshmallow.Schema):
         validate=strictly_positive_int_validator,
         description="content id of the content shared.",
     )
-    created = marshmallow.fields.DateTime(format=DATETIME_FORMAT, description="Share creation date")
+    created = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, description="Share creation date"
+    )
     disabled = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="Share disabled date", allow_none=True
     )
-    is_disabled = marshmallow.fields.Boolean(required=True, description="is this share disabled ?")
+    is_disabled = marshmallow.fields.Boolean(
+        required=True, description="is this share disabled ?"
+    )
     url = marshmallow.fields.URL(
         example="http://localhost:6543/ui/guest-download/444b026a068d42d6ab5e12fde08efb7b"
     )

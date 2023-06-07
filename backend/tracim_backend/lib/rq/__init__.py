@@ -35,7 +35,9 @@ def get_rq_queue(
     :return: wanted queue
     """
 
-    return rq.Queue(name=queue_name.value, connection=redis_connection, is_async=is_async)
+    return rq.Queue(
+        name=queue_name.value, connection=redis_connection, is_async=is_async
+    )
 
 
 def get_rq_queue2(config: CFG, queue_name: RqQueueName) -> rq.job.Job:

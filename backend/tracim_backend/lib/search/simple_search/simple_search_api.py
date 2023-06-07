@@ -44,7 +44,9 @@ class SimpleSearchApi(SearchApi):
     def index_content(self, content: Content) -> None:
         pass
 
-    def get_keywords(self, search_string, search_string_separators=None) -> typing.List[str]:
+    def get_keywords(
+        self, search_string, search_string_separators=None
+    ) -> typing.List[str]:
         """
         :param search_string: a list of coma-separated keywords
         :return: a list of str (each keyword = 1 entry
@@ -55,7 +57,8 @@ class SimpleSearchApi(SearchApi):
         keywords = []
         if search_string:
             keywords = [
-                keyword.strip() for keyword in re.split(search_string_separators, search_string)
+                keyword.strip()
+                for keyword in re.split(search_string_separators, search_string)
             ]
 
         return keywords
@@ -130,10 +133,17 @@ class SimpleSearchApi(SearchApi):
         filter_group_raw_content = list(
             Content.raw_content.ilike("%{}%".format(keyword)) for keyword in keywords
         )
-        filter_group_tags = [Tag.tag_name.ilike("%{}%".format(keyword)) for keyword in keywords]
+        filter_group_tags = [
+            Tag.tag_name.ilike("%{}%".format(keyword)) for keyword in keywords
+        ]
         tags_subquery = (
             self._session.query(TagOnContent)
-            .filter(and_(or_(*filter_group_tags), TagOnContent.content_id == Content.content_id))
+            .filter(
+                and_(
+                    or_(*filter_group_tags),
+                    TagOnContent.content_id == Content.content_id,
+                )
+            )
             .join(Tag)
             .exists()
         )
@@ -153,18 +163,26 @@ class SimpleSearchApi(SearchApi):
             .options(joinedload("children_revisions"))
             .options(joinedload("parent"))
             .order_by(
-                desc(Content.updated), desc(Content.cached_revision_id), desc(Content.content_id)
+                desc(Content.updated),
+                desc(Content.cached_revision_id),
+                desc(Content.content_id),
             )
         )
 
         # INFO - G.M - 2019-06-13 - we add comment to content_types checked
         if content_types:
-            searched_content_types = set(content_types + [content_type_list.Comment.slug])
-            content_query = content_query.filter(Content.type.in_(searched_content_types))
+            searched_content_types = set(
+                content_types + [content_type_list.Comment.slug]
+            )
+            content_query = content_query.filter(
+                Content.type.in_(searched_content_types)
+            )
 
         return content_query
 
-    def search_content(self, search_parameters: ContentSearchQuery) -> ContentSearchResponse:
+    def search_content(
+        self, search_parameters: ContentSearchQuery
+    ) -> ContentSearchResponse:
         """
         Search content with sql
         - do no show archived/deleted content by default
@@ -183,7 +201,9 @@ class SimpleSearchApi(SearchApi):
         )
 
         keywords = self.get_keywords(search_parameters.search_string)
-        offset = self.offset_from_pagination(search_parameters.size, search_parameters.page_nb)
+        offset = self.offset_from_pagination(
+            search_parameters.size, search_parameters.page_nb
+        )
 
         return self.search(
             keywords=keywords,

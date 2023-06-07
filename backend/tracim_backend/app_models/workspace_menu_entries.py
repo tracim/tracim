@@ -3,7 +3,9 @@ class WorkspaceMenuEntry(object):
     Application class with data needed for frontend
     """
 
-    def __init__(self, label: str, slug: str, fa_icon: str, hexcolor: str, route: str) -> None:
+    def __init__(
+        self, label: str, slug: str, fa_icon: str, hexcolor: str, route: str
+    ) -> None:
         self.slug = slug
         self.label = label
         self.route = route

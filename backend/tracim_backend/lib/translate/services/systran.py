@@ -36,7 +36,9 @@ class SystranFormat:
 
 
 class SystranTranslationService(TranslationService):
-    def __init__(self, api_url: str, api_key: str, timeout: Optional[float] = None) -> None:
+    def __init__(
+        self, api_url: str, api_key: str, timeout: Optional[float] = None
+    ) -> None:
         self.api_url = api_url
         self.api_key = api_key
         self.timeout = timeout
@@ -80,12 +82,16 @@ class SystranTranslationService(TranslationService):
             # NOTE - S.G. - 2021-03-05 - Timeout is useful
             # as the systran API sometimes takes a very long time before returning an error.
             # Known cases: translation of an english file in english with some texts.
-            msg = "Translation response took more than {} seconds to arrive".format(self.timeout)
+            msg = "Translation response took more than {} seconds to arrive".format(
+                self.timeout
+            )
             raise TranslationServiceTimeout(msg)
         if response.status_code == HTTPStatus.OK:
             return response.raw
         elif response.status_code == HTTPStatus.FORBIDDEN:
-            raise TranslationServiceAccessRefused("access refused to systran translation service")
+            raise TranslationServiceAccessRefused(
+                "access refused to systran translation service"
+            )
         else:
             try:
                 error = response.json()["error"]
@@ -96,12 +102,16 @@ class SystranTranslationService(TranslationService):
 
             if error.get("statusCode") == HTTPStatus.BAD_REQUEST:
                 raise InvalidParametersForTranslationService(
-                    "Invalid parameters given for translation: {}".format(error["message"])
+                    "Invalid parameters given for translation: {}".format(
+                        error["message"]
+                    )
                 )
             elif error.get("statusCode") == HTTPStatus.INTERNAL_SERVER_ERROR:
                 # HACK - S.G. - 2021-03-05 - special error case
                 # when autodetected source is the same as the target language
-                regex = re.compile(".*Translate_(\\w+)_{}.*".format(language_pair.output_lang))
+                regex = re.compile(
+                    ".*Translate_(\\w+)_{}.*".format(language_pair.output_lang)
+                )
                 matches = regex.match(error.get("message", ""))
                 if matches:
                     if matches.group(1) == language_pair.output_lang:

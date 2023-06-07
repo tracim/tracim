@@ -54,13 +54,17 @@ class TestExternalTranslator:
 
 
 class TestTestTranslationService:
-    def test_unit___test_service__supported_mimetypes_pair__ok__nominal_case(self) -> None:
+    def test_unit___test_service__supported_mimetypes_pair__ok__nominal_case(
+        self,
+    ) -> None:
         translation_service = TestTranslationService()
         assert translation_service.supported_mimetype_pairs == [
             TranslationMimetypePair("text/html", "text/html")
         ]
 
-    def test_unit___test_service__supported_languages_pair__ok__nominal_case(self) -> None:
+    def test_unit___test_service__supported_languages_pair__ok__nominal_case(
+        self,
+    ) -> None:
         translation_service = TestTranslationService()
         assert translation_service.supported_language_pairs == [
             TranslationLanguagePair("test_source", "test_result")
@@ -102,7 +106,9 @@ class TestTestTranslationService:
 
 class TestSystranTranslationService:
     @responses.activate
-    def test_unit___systran_service__supported_languages_pair__ok__nominal_case(self) -> None:
+    def test_unit___systran_service__supported_languages_pair__ok__nominal_case(
+        self,
+    ) -> None:
         BASE_API_URL = "https://systran_fake_server.invalid:5050"
         API_KEY = "a super key"
         content_response_json = {
@@ -120,12 +126,14 @@ class TestSystranTranslationService:
             json=content_response_json,
             status=200,
         )
-        translation_service = SystranTranslationService(api_url=BASE_API_URL, api_key=API_KEY)
+        translation_service = SystranTranslationService(
+            api_url=BASE_API_URL, api_key=API_KEY
+        )
 
         assert len(translation_service.supported_language_pairs) == 1
-        assert translation_service.supported_language_pairs[0] == TranslationLanguagePair(
-            "en", "fr"
-        )
+        assert translation_service.supported_language_pairs[
+            0
+        ] == TranslationLanguagePair("en", "fr")
 
     @responses.activate
     def test_unit___systran_service__supported_mimetype_pairs__ok__nominal_case(self):
@@ -133,7 +141,10 @@ class TestSystranTranslationService:
         API_KEY = "a super key"
         content_response_json = {
             "formats": [
-                {"mimetypes": {"input": "text/input", "output": "text/output"}, "name": "sample"}
+                {
+                    "mimetypes": {"input": "text/input", "output": "text/output"},
+                    "name": "sample",
+                }
             ]
         }
         responses.add(
@@ -142,7 +153,9 @@ class TestSystranTranslationService:
             json=content_response_json,
             status=200,
         )
-        translation_service = SystranTranslationService(api_url=BASE_API_URL, api_key=API_KEY)
+        translation_service = SystranTranslationService(
+            api_url=BASE_API_URL, api_key=API_KEY
+        )
         mimetype_pair = TranslationMimetypePair("text/input", "text/output")
         assert len(translation_service.supported_formats) == 1
         format = translation_service.supported_formats[0]
@@ -166,7 +179,9 @@ class TestSystranTranslationService:
             content_type="text/plain",
             stream=True,
         )
-        translation_service = SystranTranslationService(api_url=BASE_API_URL, api_key=API_KEY)
+        translation_service = SystranTranslationService(
+            api_url=BASE_API_URL, api_key=API_KEY
+        )
         result = translation_service.translate_file(
             input_lang="fr",
             output_lang="en",

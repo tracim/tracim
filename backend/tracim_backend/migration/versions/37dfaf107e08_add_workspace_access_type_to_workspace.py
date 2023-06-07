@@ -18,7 +18,9 @@ def upgrade():
     enum.create(op.get_bind(), checkfirst=False)
     with op.batch_alter_table("workspaces") as batch_op:
         batch_op.add_column(
-            sa.Column("access_type", enum, server_default="CONFIDENTIAL", nullable=False)
+            sa.Column(
+                "access_type", enum, server_default="CONFIDENTIAL", nullable=False
+            )
         )
 
 

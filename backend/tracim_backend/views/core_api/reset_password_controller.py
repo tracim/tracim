@@ -24,8 +24,10 @@ from tracim_backend.views.core_api.schemas import ResetPasswordRequestSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__AUTHENTICATION_ENDPOINTS
 
 SWAGGER_TAG__RESET_PASSWORD_SECTION = "Reset Password"
-SWAGGER_TAG__AUTHENTICATION_RESET_PASSWORD_ENDPOINTS = generate_documentation_swagger_tag(
-    SWAGGER_TAG__AUTHENTICATION_ENDPOINTS, SWAGGER_TAG__RESET_PASSWORD_SECTION
+SWAGGER_TAG__AUTHENTICATION_RESET_PASSWORD_ENDPOINTS = (
+    generate_documentation_swagger_tag(
+        SWAGGER_TAG__AUTHENTICATION_ENDPOINTS, SWAGGER_TAG__RESET_PASSWORD_SECTION
+    )
 )
 
 
@@ -39,7 +41,9 @@ class ResetPasswordController(Controller):
         with a token to be used for password reset operation.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        uapi = UserApi(None, session=request.dbsession, config=app_config, show_deactivated=False)
+        uapi = UserApi(
+            None, session=request.dbsession, config=app_config, show_deactivated=False
+        )
         try:
             if hapic_data.body.username:
                 user = uapi.get_one_by_username(username=hapic_data.body.username)
@@ -66,7 +70,9 @@ class ResetPasswordController(Controller):
     @hapic.handle_exception(UserAuthTypeDisabled, http_code=HTTPStatus.BAD_REQUEST)
     @hapic.input_body(ResetPasswordCheckTokenSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def reset_password_check_token(self, context, request: TracimRequest, hapic_data=None):
+    def reset_password_check_token(
+        self, context, request: TracimRequest, hapic_data=None
+    ):
         """
         Check reset_password token. The token sent by email has a limited life duration,
         this API allow to check that the token is existing and still valid.
@@ -107,18 +113,28 @@ class ResetPasswordController(Controller):
     def bind(self, configurator: Configurator):
         # reset password request
         configurator.add_route(
-            "reset_password_request", "/auth/password/reset/request", request_method="POST"
+            "reset_password_request",
+            "/auth/password/reset/request",
+            request_method="POST",
         )
-        configurator.add_view(self.reset_password_request, route_name="reset_password_request")
+        configurator.add_view(
+            self.reset_password_request, route_name="reset_password_request"
+        )
         # check reset password token
         configurator.add_route(
-            "reset_password_check_token", "/auth/password/reset/token/check", request_method="POST"
+            "reset_password_check_token",
+            "/auth/password/reset/token/check",
+            request_method="POST",
         )
         configurator.add_view(
             self.reset_password_check_token, route_name="reset_password_check_token"
         )
         # reset password, set password
         configurator.add_route(
-            "reset_password_modify", "/auth/password/reset/modify", request_method="POST"
+            "reset_password_modify",
+            "/auth/password/reset/modify",
+            request_method="POST",
         )
-        configurator.add_view(self.reset_password_modify, route_name="reset_password_modify")
+        configurator.add_view(
+            self.reset_password_modify, route_name="reset_password_modify"
+        )

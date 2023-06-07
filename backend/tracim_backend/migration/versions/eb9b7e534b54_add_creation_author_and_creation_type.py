@@ -12,13 +12,17 @@ import sqlalchemy as sa
 revision = "eb9b7e534b54"
 down_revision = "44a268b2d39c"
 
-creation_type_enum = sa.Enum("ADMIN", "INVITATION", "REGISTER", "CLI", name="usercreationtype")
+creation_type_enum = sa.Enum(
+    "ADMIN", "INVITATION", "REGISTER", "CLI", name="usercreationtype"
+)
 
 
 def upgrade():
     creation_type_enum.create(op.get_bind(), checkfirst=False)
     with op.batch_alter_table("users") as batch_op:
-        batch_op.add_column(sa.Column("creation_author_id", sa.Integer(), nullable=True))
+        batch_op.add_column(
+            sa.Column("creation_author_id", sa.Integer(), nullable=True)
+        )
         batch_op.add_column(
             sa.Column(
                 "creation_type",
@@ -37,7 +41,9 @@ def upgrade():
 
 def downgrade():
     with op.batch_alter_table("users") as batch_op:
-        batch_op.drop_constraint(op.f("fk_users_creation_author_id_users"), type_="foreignkey")
+        batch_op.drop_constraint(
+            op.f("fk_users_creation_author_id_users"), type_="foreignkey"
+        )
         batch_op.drop_column("creation_type")
         batch_op.drop_column("creation_author_id")
     creation_type_enum.drop(op.get_bind(), checkfirst=False)

@@ -67,7 +67,11 @@ class Translator(object):
         }
         # global translations
         files = glob.glob(
-            str(pathlib.Path(app_config.BACKEND__I18N_FOLDER_PATH, TranslationSource.GLOBAL.value))
+            str(
+                pathlib.Path(
+                    app_config.BACKEND__I18N_FOLDER_PATH, TranslationSource.GLOBAL.value
+                )
+            )
         )
         global_backend_langs = []
         for file in files:
@@ -82,7 +86,10 @@ class Translator(object):
                 lang
             ] = cls._get_translation_from_file(file)
             global_backend_langs.append(lang)
-        logger.debug(cls, "Supported Backend language (Global): " + ",".join(global_backend_langs))
+        logger.debug(
+            cls,
+            "Supported Backend language (Global): " + ",".join(global_backend_langs),
+        )
 
         # custom_properties translations
         custom_properties_langs = []
@@ -101,7 +108,9 @@ class Translator(object):
                     is_file_readable(file)
                 except NotReadableFile as exc:
                     raise TranslationConfigurationError(
-                        'ERROR: translation file "{}" is not readable: {}'.format(file, str(exc))
+                        'ERROR: translation file "{}" is not readable: {}'.format(
+                            file, str(exc)
+                        )
                     ) from exc
                 app_config.TRANSLATIONS[TranslationSource.CUSTOM_PROPERTIES.name][
                     lang
@@ -109,12 +118,15 @@ class Translator(object):
                 custom_properties_langs.append(lang)
         logger.debug(
             cls,
-            "Supported Backend language (Custom Properties): " + ",".join(custom_properties_langs),
+            "Supported Backend language (Custom Properties): "
+            + ",".join(custom_properties_langs),
         )
         logger.debug(cls, "Translations Loaded")
 
     @classmethod
-    def _get_translation_from_file(self, filepath: str) -> typing.Optional[typing.Dict[str, str]]:
+    def _get_translation_from_file(
+        self, filepath: str
+    ) -> typing.Optional[typing.Dict[str, str]]:
         try:
             with open(filepath) as file:
                 trads = json.load(file)
@@ -137,7 +149,10 @@ class Translator(object):
         return message, False
 
     def get_translation(
-        self, message: str, lang: str = None, source: typing.Optional[TranslationSource] = None
+        self,
+        message: str,
+        lang: str = None,
+        source: typing.Optional[TranslationSource] = None,
     ) -> str:
         """
         Return translation according to lang
@@ -145,7 +160,9 @@ class Translator(object):
         source = source or self.default_source
         lang = lang or self.default_lang
         for l in (lang, self.fallback_lang):  # noqa: E741
-            translated_message, translation_found = self._get_translation(l, message, source=source)
+            translated_message, translation_found = self._get_translation(
+                l, message, source=source
+            )
             if translation_found:
                 return translated_message
         return message

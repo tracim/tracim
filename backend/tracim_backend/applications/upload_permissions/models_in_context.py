@@ -86,11 +86,17 @@ class UploadPermissionInContext(object):
 
     @property
     def workspace(self) -> WorkspaceInContext:
-        workspace_api = WorkspaceApi(config=self.config, session=self.dbsession, current_user=None)
-        return workspace_api.get_workspace_with_context(self.upload_permission.workspace)
+        workspace_api = WorkspaceApi(
+            config=self.config, session=self.dbsession, current_user=None
+        )
+        return workspace_api.get_workspace_with_context(
+            self.upload_permission.workspace
+        )
 
     @property
     def author(self) -> UserInContext:
         return UserInContext(
-            dbsession=self.dbsession, config=self.config, user=self.upload_permission.author
+            dbsession=self.dbsession,
+            config=self.config,
+            user=self.upload_permission.author,
         )

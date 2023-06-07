@@ -48,7 +48,9 @@ class UserCall(CreationDateMixin, UpdateDateMixin, DeclarativeBase):
         UserCallState.POSTPONED,
     )
 
-    call_id = Column(Integer, Sequence("seq__usercall__id"), autoincrement=True, primary_key=True)
+    call_id = Column(
+        Integer, Sequence("seq__usercall__id"), autoincrement=True, primary_key=True
+    )
     caller_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
     caller = relationship(User, remote_side=[User.user_id], foreign_keys=[caller_id])
     callee_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)

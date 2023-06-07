@@ -11,10 +11,18 @@ from tracim_backend.lib.search.elasticsearch_search.default_analyzers import und
 
 
 arabic_stop = analysis.token_filter("arabic_stop", type="stop", stopwords="_arabic_")
-arabic_stemmer = analysis.token_filter("arabic_stemmer", type="stemmer", language="arabic")
+arabic_stemmer = analysis.token_filter(
+    "arabic_stemmer", type="stemmer", language="arabic"
+)
 tracim_arabic_analyzer = analyzer(
     "tracim_arabic",
     tokenizer="standard",
-    filter=["lowercase", "decimal_digit", arabic_stop, "arabic_normalization", arabic_stemmer],
+    filter=[
+        "lowercase",
+        "decimal_digit",
+        arabic_stop,
+        "arabic_normalization",
+        arabic_stemmer,
+    ],
     char_filter=underscore_as_minus,
 )

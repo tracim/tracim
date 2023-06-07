@@ -36,7 +36,9 @@ from tracim_backend.exceptions import UnavailableURLPreview
 
 
 class URLPreview:
-    def __init__(self, title: Optional[str], description: Optional[str], image: Optional[str]):
+    def __init__(
+        self, title: Optional[str], description: Optional[str], image: Optional[str]
+    ):
         self.title = title
         self.description = description
         self.image = image
@@ -93,7 +95,9 @@ class URLPreviewLib(object):
             )
             # INFO - GM - 2022-02-22 - Default case: preview from html metadata
             if response.is_html:
-                title, description, image_url = web_preview(url=url, content=response.text_content)
+                title, description, image_url = web_preview(
+                    url=url, content=response.text_content
+                )
             # INFO - GM - 2022-02-22 - Small image case: preview is image itself
             elif response.is_image and response.allowed_content_length:
                 title = response.filename
@@ -107,6 +111,8 @@ class URLPreviewLib(object):
                 description = None
                 image_url = None
         except (WebpreviewException, InvalidURL) as exc:
-            raise UnavailableURLPreview('Can\'t generate URL preview for "{}"'.format(url)) from exc
+            raise UnavailableURLPreview(
+                'Can\'t generate URL preview for "{}"'.format(url)
+            ) from exc
         image_url = urljoin(url, image_url) if image_url else None
         return URLPreview(title=title, description=description, image=image_url)

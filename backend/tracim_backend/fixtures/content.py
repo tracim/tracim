@@ -18,10 +18,14 @@ class Content(Fixture):
     require = [Test]
 
     def insert(self):
-        admin = self._session.query(User).filter(User.email == "admin@admin.admin").one()
+        admin = (
+            self._session.query(User).filter(User.email == "admin@admin.admin").one()
+        )
         bob = self._session.query(User).filter(User.email == "bob@fsf.local").one()
         john_the_reader = (
-            self._session.query(User).filter(User.email == "john-the-reader@reader.local").one()
+            self._session.query(User)
+            .filter(User.email == "john-the-reader@reader.local")
+            .one()
         )
 
         admin_workspace_api = WorkspaceApi(
@@ -30,12 +34,18 @@ class Content(Fixture):
         bob_workspace_api = WorkspaceApi(
             current_user=bob, session=self._session, config=self._config
         )
-        content_api = ContentApi(current_user=admin, session=self._session, config=self._config)
-        bob_content_api = ContentApi(current_user=bob, session=self._session, config=self._config)
+        content_api = ContentApi(
+            current_user=admin, session=self._session, config=self._config
+        )
+        bob_content_api = ContentApi(
+            current_user=bob, session=self._session, config=self._config
+        )
         reader_content_api = ContentApi(
             current_user=john_the_reader, session=self._session, config=self._config
         )
-        role_api = RoleApi(current_user=admin, session=self._session, config=self._config)
+        role_api = RoleApi(
+            current_user=admin, session=self._session, config=self._config
+        )
 
         # Workspaces
         business_workspace = admin_workspace_api.create_workspace(
@@ -109,7 +119,9 @@ class Content(Fixture):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=self._session, tm=transaction.manager, content=tiramisu_page):
+        with new_revision(
+            session=self._session, tm=transaction.manager, content=tiramisu_page
+        ):
             content_api.update_content(
                 item=tiramisu_page,
                 new_raw_content="<p>To cook a greet Tiramisu, you need many ingredients.</p>",
@@ -136,7 +148,9 @@ class Content(Fixture):
             do_notify=False,
         )
         apple_pie_recipe.file_extension = ".txt"
-        apple_pie_recipe.depot_file = FileIntent(b"Apple pie Recipe", "apple_Pie.txt", "text/plain")
+        apple_pie_recipe.depot_file = FileIntent(
+            b"Apple pie Recipe", "apple_Pie.txt", "text/plain"
+        )
         self._session.add(apple_pie_recipe)
         brownie_recipe = content_api.create(
             content_type_slug=content_type_list.File.slug,
@@ -185,7 +199,9 @@ class Content(Fixture):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=self._session, tm=transaction.manager, content=old_fruit_salad):
+        with new_revision(
+            session=self._session, tm=transaction.manager, content=old_fruit_salad
+        ):
             content_api.archive(old_fruit_salad)
         content_api.save(old_fruit_salad, do_notify=False)
 
@@ -197,7 +213,9 @@ class Content(Fixture):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=self._session, tm=transaction.manager, content=bad_fruit_salad):
+        with new_revision(
+            session=self._session, tm=transaction.manager, content=bad_fruit_salad
+        ):
             content_api.delete(bad_fruit_salad)
         content_api.save(bad_fruit_salad, do_notify=False)
 
@@ -216,7 +234,9 @@ class Content(Fixture):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=self._session, tm=transaction.manager, content=old_fruit_salad):
+        with new_revision(
+            session=self._session, tm=transaction.manager, content=old_fruit_salad
+        ):
             content_api.archive(old_fruit_salad)
         content_api.save(old_fruit_salad, do_notify=False)
 
@@ -227,7 +247,9 @@ class Content(Fixture):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=self._session, tm=transaction.manager, content=bad_fruit_salad):
+        with new_revision(
+            session=self._session, tm=transaction.manager, content=bad_fruit_salad
+        ):
             content_api.delete(bad_fruit_salad)
         content_api.save(bad_fruit_salad, do_notify=False)
 
@@ -249,7 +271,9 @@ class Content(Fixture):
             do_save=True,
             do_notify=False,
         )
-        with new_revision(session=self._session, tm=transaction.manager, content=best_cake_thread):
+        with new_revision(
+            session=self._session, tm=transaction.manager, content=best_cake_thread
+        ):
             bob_content_api.update_content(
                 item=best_cake_thread,
                 new_raw_content="What is the best cake?",
@@ -257,7 +281,9 @@ class Content(Fixture):
             )
             bob_content_api.save(best_cake_thread, do_notify=False)
 
-        with new_revision(session=self._session, tm=transaction.manager, content=tiramisu_page):
+        with new_revision(
+            session=self._session, tm=transaction.manager, content=tiramisu_page
+        ):
             bob_content_api.update_content(
                 item=tiramisu_page,
                 new_raw_content="<p>To cook a great Tiramisu, you need many ingredients.</p>",

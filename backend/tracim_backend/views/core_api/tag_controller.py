@@ -77,7 +77,9 @@ class TagController(Controller):
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetTagByNameSchema())
     @hapic.output_body(TagSchema())
-    def add_content_tag_by_name(self, context, request: TracimRequest, hapic_data=None) -> Tag:
+    def add_content_tag_by_name(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> Tag:
         """
         Add new tag to content
         """
@@ -95,7 +97,9 @@ class TagController(Controller):
     @check_right(is_contributor)
     @hapic.input_path(ContentTagPathSchema())
     @hapic.output_body(TagSchema())
-    def add_content_tag_by_id(self, context, request: TracimRequest, hapic_data=None) -> Tag:
+    def add_content_tag_by_id(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> Tag:
         """
         Add new tag to content
         """
@@ -114,7 +118,9 @@ class TagController(Controller):
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_body(SetTagByNameSchema())
     @hapic.output_body(TagSchema())
-    def add_workspace_tag(self, context, request: TracimRequest, hapic_data=None) -> Tag:
+    def add_workspace_tag(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> Tag:
         """
         Add new tag to a workspace
         """
@@ -131,7 +137,9 @@ class TagController(Controller):
     @hapic.input_path(TagPathSchema())
     @hapic.handle_exception(TagNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def delete_workspace_tag(self, context, request: TracimRequest, hapic_data=None) -> None:
+    def delete_workspace_tag(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> None:
         """
         Delete a tag associated to a content
         """
@@ -144,7 +152,9 @@ class TagController(Controller):
     @hapic.input_path(ContentTagPathSchema())
     @hapic.handle_exception(TagNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def delete_content_tag(self, context, request: TracimRequest, hapic_data=None) -> None:
+    def delete_content_tag(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> None:
         """
         Delete a tag associated to a content
         """
@@ -156,7 +166,9 @@ class TagController(Controller):
     def bind(self, configurator: Configurator):
         # Get tags
         configurator.add_route(
-            "get_workspace_tags", "/workspaces/{workspace_id}/tags", request_method="GET"
+            "get_workspace_tags",
+            "/workspaces/{workspace_id}/tags",
+            request_method="GET",
         )
         configurator.add_view(self.get_workspace_tags, route_name="get_workspace_tags")
 
@@ -190,7 +202,9 @@ class TagController(Controller):
             "/workspaces/{workspace_id}/contents/{content_id}/tags",
             request_method="POST",
         )
-        configurator.add_view(self.add_content_tag_by_name, route_name="add_content_tag_by_name")
+        configurator.add_view(
+            self.add_content_tag_by_name, route_name="add_content_tag_by_name"
+        )
 
         # Put a tag to a content
         configurator.add_route(
@@ -198,7 +212,9 @@ class TagController(Controller):
             "/workspaces/{workspace_id}/contents/{content_id}/tags/{tag_id}",
             request_method="PUT",
         )
-        configurator.add_view(self.add_content_tag_by_id, route_name="add_content_tag_by_id")
+        configurator.add_view(
+            self.add_content_tag_by_id, route_name="add_content_tag_by_id"
+        )
 
         # delete a tag from a workspace
         configurator.add_route(
@@ -206,7 +222,9 @@ class TagController(Controller):
             "/workspaces/{workspace_id}/tags/{tag_id}",
             request_method="DELETE",
         )
-        configurator.add_view(self.delete_workspace_tag, route_name="delete_workspace_tag")
+        configurator.add_view(
+            self.delete_workspace_tag, route_name="delete_workspace_tag"
+        )
 
         # delete a tag from a content
         configurator.add_route(

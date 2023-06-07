@@ -54,11 +54,15 @@ def remove_allowed_content_property_in_all_but_folders_and_events():
     ).fetchall()
     for content_revision in content_revisions:
         properties_dict = json.loads(content_revision["properties"])
-        properties_dict = {k: v for k, v in properties_dict.items() if k != "allowed_content"}
+        properties_dict = {
+            k: v for k, v in properties_dict.items() if k != "allowed_content"
+        }
         properties_json = json.dumps(properties_dict)
         query = (
             content_revisions_table.update()
-            .where(content_revisions_table.c.revision_id == content_revision["revision_id"])
+            .where(
+                content_revisions_table.c.revision_id == content_revision["revision_id"]
+            )
             .values(properties=properties_json)
         )
         connection.execute(query)

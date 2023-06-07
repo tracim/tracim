@@ -47,7 +47,9 @@ class RoleApi(object):
         self, user_id: int, min_role: int = Profile.USER.id
     ) -> typing.List[int]:
         assert (
-            not self._user or self._user.profile == Profile.ADMIN or self._user.user_id == user_id
+            not self._user
+            or self._user.profile == Profile.ADMIN
+            or self._user.user_id == user_id
         )
         workspaces_ids_tuples = (
             self._base_query()
@@ -131,7 +133,9 @@ class RoleApi(object):
                 )
             role.role = role_level
         if email_notification_type_value != "":
-            role.email_notification_type = EmailNotificationType(email_notification_type_value)
+            role.email_notification_type = EmailNotificationType(
+                email_notification_type_value
+            )
         if save_now:
             self.save(role)
 
@@ -165,7 +169,9 @@ class RoleApi(object):
     def delete_one(self, user_id: int, workspace_id: int, flush=True) -> None:
         if self._is_last_workspace_manager(user_id, workspace_id):
             raise LastWorkspaceManagerRoleCantBeModified(
-                "last workspace manager {} can't remove their own role in workspace".format(user_id)
+                "last workspace manager {} can't remove their own role in workspace".format(
+                    user_id
+                )
             )
         role = self.get_one(user_id, workspace_id)
         self._session.delete(role)
@@ -198,7 +204,9 @@ class RoleApi(object):
         )
         return query
 
-    def get_all_for_workspace(self, workspace: Workspace) -> typing.List[UserRoleInWorkspace]:
+    def get_all_for_workspace(
+        self, workspace: Workspace
+    ) -> typing.List[UserRoleInWorkspace]:
         return self.get_all_for_workspace_query(workspace.workspace_id).all()
 
     def get_workspace_members(
@@ -246,9 +254,9 @@ class RoleApi(object):
         Return the workspace ids that the current user and the given user_id are member of.
         """
         assert self._user
-        user_workspaces_query = self._session.query(UserRoleInWorkspace.workspace_id).filter(
-            UserRoleInWorkspace.user_id == user_id
-        )
+        user_workspaces_query = self._session.query(
+            UserRoleInWorkspace.workspace_id
+        ).filter(UserRoleInWorkspace.user_id == user_id)
         current_user_workspaces_query = self._session.query(
             UserRoleInWorkspace.workspace_id
         ).filter(UserRoleInWorkspace.user_id == self._user.user_id)

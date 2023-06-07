@@ -25,7 +25,10 @@ class TestTemplates(object):
         """
         Check obtain workspace contents with defaults filters
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         workspace = workspace_api.create_workspace("test")
@@ -39,57 +42,76 @@ class TestTemplates(object):
         # default
         transaction.commit()
         res = web_testapp.get(
-            "/api/workspaces/1/html-documents/{}".format(test_html_document.content_id), status=200
+            "/api/workspaces/1/html-documents/{}".format(test_html_document.content_id),
+            status=200,
         )
         assert res.json_body["is_template"] is False
         res = web_testapp.get(
-            "/api/users/{}/template_contents?type=html-document".format(admin_user.user_id),
+            "/api/users/{}/template_contents?type=html-document".format(
+                admin_user.user_id
+            ),
             status=200,
         )
         assert len(res.json_body) == 0
         res = web_testapp.get(
-            "/api/users/{}/template_contents?type=html-document".format(riyad_user.user_id),
+            "/api/users/{}/template_contents?type=html-document".format(
+                riyad_user.user_id
+            ),
             status=200,
         )
         assert len(res.json_body) == 0
 
         # set
-        with new_revision(session=session, tm=transaction.manager, content=test_html_document):
+        with new_revision(
+            session=session, tm=transaction.manager, content=test_html_document
+        ):
             content_api.set_template(test_html_document, is_template=True)
         content_api.save(test_html_document)
         transaction.commit()
         res = web_testapp.get(
-            "/api/workspaces/1/html-documents/{}".format(test_html_document.content_id), status=200
+            "/api/workspaces/1/html-documents/{}".format(test_html_document.content_id),
+            status=200,
         )
         assert res.json_body["is_template"] is True
         res = web_testapp.get(
-            "/api/users/{}/template_contents?type=html-document".format(admin_user.user_id),
+            "/api/users/{}/template_contents?type=html-document".format(
+                admin_user.user_id
+            ),
             status=200,
         )
         assert len(res.json_body) == 1
         assert res.json_body[0]["content_id"] == 1
         res = web_testapp.get(
-            "/api/users/{}/template_contents?type=html-document".format(riyad_user.user_id),
+            "/api/users/{}/template_contents?type=html-document".format(
+                riyad_user.user_id
+            ),
             status=200,
         )
         assert len(res.json_body) == 0
 
         # unset
-        with new_revision(session=session, tm=transaction.manager, content=test_html_document):
+        with new_revision(
+            session=session, tm=transaction.manager, content=test_html_document
+        ):
             content_api.set_template(test_html_document, is_template=False)
         content_api.save(test_html_document)
         transaction.commit()
         res = web_testapp.get(
-            "/api/workspaces/1/html-documents/{}".format(test_html_document.content_id), status=200
+            "/api/workspaces/1/html-documents/{}".format(test_html_document.content_id),
+            status=200,
         )
         assert res.json_body["is_template"] is False
         res = web_testapp.get(
-            "/api/users/{}/template_contents?type=html-document".format(admin_user.user_id),
+            "/api/users/{}/template_contents?type=html-document".format(
+                admin_user.user_id
+            ),
             status=200,
         )
         assert len(res.json_body) == 0
         res = web_testapp.get(
-            "/api/users/{}/template_contents?type=html-document".format(riyad_user.user_id),
+            "/api/users/{}/template_contents?type=html-document".format(
+                riyad_user.user_id
+            ),
             status=200,
         )
         assert len(res.json_body) == 0
@@ -106,7 +128,10 @@ class TestTemplates(object):
         """
         Check obtain workspace contents with defaults filters
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         workspace = workspace_api.create_workspace("test")
@@ -120,28 +145,35 @@ class TestTemplates(object):
         # default
         transaction.commit()
         res = web_testapp.get(
-            "/api/workspaces/1/html-documents/{}".format(test_html_document.content_id), status=200
+            "/api/workspaces/1/html-documents/{}".format(test_html_document.content_id),
+            status=200,
         )
         assert res.json_body["is_template"] is False
 
         # set
         res = web_testapp.put_json(
-            "/api/workspaces/1/contents/{}/template".format(test_html_document.content_id),
+            "/api/workspaces/1/contents/{}/template".format(
+                test_html_document.content_id
+            ),
             params={"is_template": True},
             status=204,
         )
         res = web_testapp.get(
-            "/api/workspaces/1/html-documents/{}".format(test_html_document.content_id), status=200
+            "/api/workspaces/1/html-documents/{}".format(test_html_document.content_id),
+            status=200,
         )
         assert res.json_body["is_template"] is True
 
         # unset
         res = web_testapp.put_json(
-            "/api/workspaces/1/contents/{}/template".format(test_html_document.content_id),
+            "/api/workspaces/1/contents/{}/template".format(
+                test_html_document.content_id
+            ),
             params={"is_template": False},
             status=204,
         )
         res = web_testapp.get(
-            "/api/workspaces/1/html-documents/{}".format(test_html_document.content_id), status=200
+            "/api/workspaces/1/html-documents/{}".format(test_html_document.content_id),
+            status=200,
         )
         assert res.json_body["is_template"] is False

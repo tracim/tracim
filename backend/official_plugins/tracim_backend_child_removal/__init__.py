@@ -24,7 +24,9 @@ class ChildRemovalPlugin:
         """
         user = role.user
         parent_workspace = role.workspace
-        role_api = RoleApi(session=context.dbsession, config=context.app_config, current_user=None)
+        role_api = RoleApi(
+            session=context.dbsession, config=context.app_config, current_user=None
+        )
         for workspace in parent_workspace.recursive_children:
             try:
                 role_api.delete_one(

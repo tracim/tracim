@@ -49,7 +49,9 @@ class ThreadController(Controller):
     @check_right(is_thread_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(ContentSchema())
-    def get_thread(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
+    def get_thread(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> ContentInContext:
         """
         Get thread content
         """
@@ -61,7 +63,9 @@ class ThreadController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        content = api.get_one(
+            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
+        )
         return api.get_content_in_context(content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_THREAD_ENDPOINTS])
@@ -71,7 +75,9 @@ class ThreadController(Controller):
     @hapic.input_query(FileQuerySchema())
     @hapic.input_path(FilePathSchema())
     @hapic.output_file([])
-    def get_thread_preview(self, context, request: TracimRequest, hapic_data=None) -> HapicFile:
+    def get_thread_preview(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> HapicFile:
         """
         Download preview of html document
         Good pratice for filename is filename is `{label}{file_extension}` or `{filename}`.
@@ -85,11 +91,15 @@ class ThreadController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        content = api.get_one(
+            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
+        )
         first_comment = content.get_first_comment()
         if not first_comment:
             raise UnavailablePreview(
-                'No preview available for thread of content id "{}"'.format(content.content_id)
+                'No preview available for thread of content id "{}"'.format(
+                    content.content_id
+                )
             )
         file = BytesIO(first_comment.raw_content.encode("utf-8"))
         byte_size = len(file.getvalue())
@@ -117,7 +127,9 @@ class ThreadController(Controller):
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(ContentModifySchema())
     @hapic.output_body(ContentSchema())
-    def update_thread(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
+    def update_thread(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> ContentInContext:
         """
         update thread
         """
@@ -129,8 +141,12 @@ class ThreadController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
-        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
+        content = api.get_one(
+            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
+        )
+        with new_revision(
+            session=request.dbsession, tm=transaction.manager, content=content
+        ):
             api.update_content(
                 item=content,
                 new_label=hapic_data.body.label,
@@ -160,14 +176,17 @@ class ThreadController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        content = api.get_one(
+            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
+        )
         revisions_page = content.get_revisions(
             page_token=hapic_data.query["page_token"],
             count=hapic_data.query["count"],
             sort_order=hapic_data.query["sort"],
         )
         revisions = [
-            api.get_revision_in_context(revision, number) for revision, number in revisions_page
+            api.get_revision_in_context(revision, number)
+            for revision, number in revisions_page
         ]
         return PaginatedObject(revisions_page, revisions)
 
@@ -178,7 +197,9 @@ class ThreadController(Controller):
     @hapic.input_body(SetContentStatusSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     @hapic.handle_exception(ContentStatusException, HTTPStatus.BAD_REQUEST)
-    def set_thread_status(self, context, request: TracimRequest, hapic_data=None) -> None:
+    def set_thread_status(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> None:
         """
         set thread status
         """
@@ -190,12 +211,18 @@ class ThreadController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        content = api.get_one(
+            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
+        )
         if content.status == request.json_body.get("status"):
             raise ContentStatusException(
-                "Content id {} already have status {}".format(content.content_id, content.status)
+                "Content id {} already have status {}".format(
+                    content.content_id, content.status
+                )
             )
-        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
+        with new_revision(
+            session=request.dbsession, tm=transaction.manager, content=content
+        ):
             api.set_status(content, hapic_data.body.status)
             api.save(content)
         return
@@ -203,7 +230,9 @@ class ThreadController(Controller):
     def bind(self, configurator: Configurator) -> None:
         # Get thread
         configurator.add_route(
-            "thread", "/workspaces/{workspace_id}/threads/{content_id}", request_method="GET"
+            "thread",
+            "/workspaces/{workspace_id}/threads/{content_id}",
+            request_method="GET",
         )
         configurator.add_view(self.get_thread, route_name="thread")
 
@@ -217,7 +246,9 @@ class ThreadController(Controller):
 
         # update thread
         configurator.add_route(
-            "update_thread", "/workspaces/{workspace_id}/threads/{content_id}", request_method="PUT"
+            "update_thread",
+            "/workspaces/{workspace_id}/threads/{content_id}",
+            request_method="PUT",
         )
         configurator.add_view(self.update_thread, route_name="update_thread")
 

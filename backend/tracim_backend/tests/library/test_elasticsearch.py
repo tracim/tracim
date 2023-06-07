@@ -149,7 +149,9 @@ class TestElasticSearchContentIndexer:
     @pytest.mark.parametrize(
         "config_section", [{"name": "test_elasticsearch_search"}], indirect=True
     )
-    @pytest.mark.parametrize("content_type, indexed_count", [("comment", 1), ("file", 2)])
+    @pytest.mark.parametrize(
+        "content_type, indexed_count", [("comment", 1), ("file", 2)]
+    )
     def test_unit__on_content_modified__ok__content_with_child(
         self,
         test_context: TracimContext,
@@ -170,7 +172,8 @@ class TestElasticSearchContentIndexer:
         "config_section", [{"name": "test_elasticsearch_search"}], indirect=True
     )
     @pytest.mark.parametrize(
-        "workspace, indexed_count", [(Workspace(label="A workspace"), 1), (Workspace(), 0)]
+        "workspace, indexed_count",
+        [(Workspace(label="A workspace"), 1), (Workspace(), 0)],
     )
     def test_unit__on_workspace_modified__ok__nominal_cases(
         self,
@@ -239,7 +242,9 @@ class TestElasticSearchContentIndexer:
         content = html_document()
         (indexer, index_content_mock, _) = content_indexer_with_api_mock
         index_content_mock.side_effect = Exception("indexing error")
-        indexed_error_count = indexer.sync_index_contents([content], test_context_without_plugins)
+        indexed_error_count = indexer.sync_index_contents(
+            [content], test_context_without_plugins
+        )
         assert indexed_error_count == 1
 
     @pytest.mark.parametrize(
@@ -366,7 +371,10 @@ class TestElasticSearchWorkspaceIndexer:
         (indexer, index_workspace_mock, _) = workspace_indexer_with_api_mock
         event_hook(indexer, event_parameter, test_context)
         assert index_workspace_mock.call_count == 1
-        assert index_workspace_mock.call_args[0][0].workspace_id == a_workspace().workspace_id
+        assert (
+            index_workspace_mock.call_args[0][0].workspace_id
+            == a_workspace().workspace_id
+        )
 
     @pytest.mark.parametrize(
         "config_section", [{"name": "test_elasticsearch_search__async"}], indirect=True
@@ -408,13 +416,18 @@ class TestUtils:
                 es_dsl.Object(properties={"foo": SimpleText()}),
             ),
             (
-                {"type": "object", "properties": {"foo": {"type": "string", "format": "html"}}},
+                {
+                    "type": "object",
+                    "properties": {"foo": {"type": "string", "format": "html"}},
+                },
                 es_dsl.Object(properties={"foo": HtmlText()}),
             ),
             (
                 {
                     "type": "object",
-                    "properties": {"foo": {"type": "array", "items": {"type": "string"}}},
+                    "properties": {
+                        "foo": {"type": "array", "items": {"type": "string"}}
+                    },
                 },
                 es_dsl.Object(properties={"foo": SimpleText(multi=True)}),
             ),

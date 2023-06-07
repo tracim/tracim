@@ -45,7 +45,9 @@ def convert_if_string(value: typing.Any, translation_method) -> typing.Any:
 
 
 def translate_dict(
-    data: dict, keys_to_check: typing.List[str], translation_method: typing.Callable[[str], str]
+    data: dict,
+    keys_to_check: typing.List[str],
+    translation_method: typing.Callable[[str], str],
 ) -> dict:
     """
     Regenerate similar dict but
@@ -73,7 +75,9 @@ def translate_dict(
                 new_value = []
                 for v in value:
                     if isinstance(v, dict):
-                        new_value.append(translate_dict(v, keys_to_check, translation_method))
+                        new_value.append(
+                            translate_dict(v, keys_to_check, translation_method)
+                        )
                     else:
                         new_value.append(v)
         elif key in keys_to_check:
@@ -82,7 +86,9 @@ def translate_dict(
     return result
 
 
-def extract_translation_keys_from_dict(data: dict, keys_to_check: typing.List[str]) -> dict:
+def extract_translation_keys_from_dict(
+    data: dict, keys_to_check: typing.List[str]
+) -> dict:
     """
     Utility method to ease the generation of translation files
     :param data: original dict

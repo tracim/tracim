@@ -34,13 +34,16 @@ class ReactionController(Controller):
     @check_right(is_reader)
     @hapic.input_path(ReactionPathSchema())
     @hapic.output_body(ReactionSchema())
-    def content_reaction(self, context, request: TracimRequest, hapic_data=None) -> Reaction:
+    def content_reaction(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> Reaction:
         """
         Get one reaction related to a content
         """
         reaction_lib = ReactionLib(session=request.dbsession)
         return reaction_lib.get_one(
-            content_id=request.current_content.content_id, reaction_id=hapic_data.path.reaction_id
+            content_id=request.current_content.content_id,
+            reaction_id=hapic_data.path.reaction_id,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_REACTION_ENDPOINTS])
@@ -65,7 +68,9 @@ class ReactionController(Controller):
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetReactionSchema())
     @hapic.output_body(ReactionSchema())
-    def add_reaction(self, context, request: TracimRequest, hapic_data=None) -> Reaction:
+    def add_reaction(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> Reaction:
         """
         Add new reaction to content
         """

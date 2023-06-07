@@ -103,7 +103,9 @@ class ESSearchApi(SearchApi):
     - search in content file for file if ingest mode activated
     """
 
-    def __init__(self, session: Session, current_user: typing.Optional[User], config: CFG) -> None:
+    def __init__(
+        self, session: Session, current_user: typing.Optional[User], config: CFG
+    ) -> None:
         super().__init__(session, current_user, config)
         assert config.SEARCH__ENGINE == ELASTICSEARCH__SEARCH_ENGINE_SLUG
         # TODO - G.M - 2019-05-31 - we support only one elasticsearch server case here in config,
@@ -180,7 +182,9 @@ class ESSearchApi(SearchApi):
         # to be more specific here.
         for parameters in self._get_indices_parameters():
             index_pattern = self._get_index_pattern(parameters)
-            logger.info(self, "deleting indices whose name matches {}".format(index_pattern))
+            logger.info(
+                self, "deleting indices whose name matches {}".format(index_pattern)
+            )
             self.es.indices.delete(index_pattern, allow_no_indices=True)
             self.es.indices.delete(parameters.alias, ignore_unavailable=True)
             try:
@@ -209,11 +213,17 @@ class ESSearchApi(SearchApi):
             self.es.indices.create(index=new_index_name)
 
             logger.info(
-                self, 'reindex data from "{}" to "{}"'.format(parameters.alias, new_index_name)
+                self,
+                'reindex data from "{}" to "{}"'.format(
+                    parameters.alias, new_index_name
+                ),
             )
             # move data from current alias to the new index
             self.es.reindex(
-                body={"source": {"index": parameters.alias}, "dest": {"index": new_index_name}},
+                body={
+                    "source": {"index": parameters.alias},
+                    "dest": {"index": new_index_name},
+                },
                 request_timeout=3600,
             )
             # refresh the index to make the changes visible
@@ -251,7 +261,9 @@ class ESSearchApi(SearchApi):
         ]
         return {"comments": comments, "todos": todos}
 
-    def _create_digest_user_from_user(self, user_in_context: UserInContext) -> DigestUser:
+    def _create_digest_user_from_user(
+        self, user_in_context: UserInContext
+    ) -> DigestUser:
         return DigestUser(
             user_id=user_in_context.user_id,
             public_name=user_in_context.public_name,
@@ -263,10 +275,14 @@ class ESSearchApi(SearchApi):
         """
         Index/update a content into elastic_search engine
         """
-        content_in_context = ContentInContext(content, config=self._config, dbsession=self._session)
+        content_in_context = ContentInContext(
+            content, config=self._config, dbsession=self._session
+        )
         logger.info(self, "Indexing content {}".format(content_in_context.content_id))
         author = self._create_digest_user_from_user(content_in_context.author)
-        last_modifier = self._create_digest_user_from_user(content_in_context.last_modifier)
+        last_modifier = self._create_digest_user_from_user(
+            content_in_context.last_modifier
+        )
         workspace = DigestWorkspace(
             workspace_id=content_in_context.workspace.workspace_id,
             label=content_in_context.workspace.label,
@@ -342,9 +358,13 @@ class ESSearchApi(SearchApi):
 
     def index_user(self, user: User) -> None:
         """Index the given user in the appropriate index."""
-        user_in_context = UserInContext(user, dbsession=self._session, config=self._config)
+        user_in_context = UserInContext(
+            user, dbsession=self._session, config=self._config
+        )
 
-        role_api = RoleApi(config=self._config, session=self._session, current_user=None)
+        role_api = RoleApi(
+            config=self._config, session=self._session, current_user=None
+        )
         workspace_ids = role_api.get_user_workspaces_ids(user.user_id)
         capi = ContentApi(config=self._config, session=self._session, current_user=None)
         try:
@@ -381,7 +401,9 @@ class ESSearchApi(SearchApi):
 
     def index_workspace(self, workspace: Workspace) -> None:
         """Index the given worspace in the appropriate ES index."""
-        role_api = RoleApi(config=self._config, session=self._session, current_user=None)
+        role_api = RoleApi(
+            config=self._config, session=self._session, current_user=None
+        )
         capi = ContentApi(config=self._config, session=self._session, current_user=None)
         member_ids = role_api.get_workspace_member_ids(workspace.workspace_id)
         indexed_workspace = IndexedWorkspace(
@@ -447,7 +469,8 @@ class ESSearchApi(SearchApi):
         # INFO - G.M - 2019-06-24 - check mimetype validity
         if (
             self._config.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_BLACKLIST
-            and content.mimetype in self._config.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_BLACKLIST
+            and content.mimetype
+            in self._config.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_BLACKLIST
         ):
             logger.debug(
                 self,
@@ -460,7 +483,9 @@ class ESSearchApi(SearchApi):
         if content.size == 0:
             logger.debug(
                 self,
-                'Skip binary indexation of content "{}":  empty file'.format(content.content_id),
+                'Skip binary indexation of content "{}":  empty file'.format(
+                    content.content_id
+                ),
             )
             return False
 
@@ -503,7 +528,9 @@ class ESSearchApi(SearchApi):
 
         if not search_parameters.search_string:
             return ContentSearchResponse()
-        filtered_workspace_ids = self._get_user_workspaces_id(min_role=UserRoleInWorkspace.READER)
+        filtered_workspace_ids = self._get_user_workspaces_id(
+            min_role=UserRoleInWorkspace.READER
+        )
         es_search_fields = []
         search_fields = search_parameters.search_fields or DEFAULT_CONTENT_SEARCH_FIELDS
 
@@ -608,7 +635,9 @@ class ESSearchApi(SearchApi):
             search = search.filter("terms", workspace_id=filtered_workspace_ids)
 
         if search_parameters.content_types:
-            search = search.filter("terms", content_type=search_parameters.content_types)
+            search = search.filter(
+                "terms", content_type=search_parameters.content_types
+            )
 
         if search_parameters.workspace_names:
             search = search.filter(
@@ -617,7 +646,8 @@ class ESSearchApi(SearchApi):
 
         if search_parameters.author__public_names:
             search = search.filter(
-                "terms", author__public_name__exact=search_parameters.author__public_names
+                "terms",
+                author__public_name__exact=search_parameters.author__public_names,
             )
 
         if search_parameters.last_modifier__public_names:
@@ -627,7 +657,9 @@ class ESSearchApi(SearchApi):
             )
 
         if search_parameters.file_extensions:
-            search = search.filter("terms", file_extension__exact=search_parameters.file_extensions)
+            search = search.filter(
+                "terms", file_extension__exact=search_parameters.file_extensions
+            )
 
         if search_parameters.statuses:
             search = search.filter("terms", status=search_parameters.statuses)
@@ -649,7 +681,9 @@ class ESSearchApi(SearchApi):
         if search_parameters.tags:
             search = search.filter("terms", tags=search_parameters.tags)
 
-        search.aggs.bucket("content_types", "terms", field="content_type", size=DEFAULT_BUCKET_SIZE)
+        search.aggs.bucket(
+            "content_types", "terms", field="content_type", size=DEFAULT_BUCKET_SIZE
+        )
         search.aggs.bucket(
             "workspace_names",
             "terms",
@@ -674,7 +708,9 @@ class ESSearchApi(SearchApi):
             field="file_extension.{}".format(EXACT_FIELD),
             size=DEFAULT_BUCKET_SIZE,
         )
-        search.aggs.bucket("statuses", "terms", field="status", size=DEFAULT_BUCKET_SIZE)
+        search.aggs.bucket(
+            "statuses", "terms", field="status", size=DEFAULT_BUCKET_SIZE
+        )
         search.aggs.bucket("tags", "terms", field="tags", size=DEFAULT_BUCKET_SIZE)
         search.aggs.metric("created_from", "min", field="created")
         search.aggs.metric("created_to", "max", field="created")
@@ -709,7 +745,11 @@ class ESSearchApi(SearchApi):
         ]
 
         search_fields = search_fields or DEFAULT_USER_SEARCH_FIELDS
-        fields = [field for field in fields if name_starts_with_any_prefix(field, search_fields)]
+        fields = [
+            field
+            for field in fields
+            if name_starts_with_any_prefix(field, search_fields)
+        ]
         search = search.query("simple_query_string", query=search_string, fields=fields)
         known_user_ids = UserApi(
             current_user=None, session=self._session, config=self._config
@@ -730,7 +770,9 @@ class ESSearchApi(SearchApi):
             )
 
         if page_nb:
-            search = search.extra(from_=self.offset_from_pagination(size, page_nb), size=size)
+            search = search.extra(
+                from_=self.offset_from_pagination(size, page_nb), size=size
+            )
 
         search.aggs.bucket(
             "workspace_ids", "terms", field="workspace_ids", size=DEFAULT_BUCKET_SIZE
@@ -749,12 +791,16 @@ class ESSearchApi(SearchApi):
         known_workspaces = self._get_workspaces_known_to_user()
         facets = {
             "workspaces": self._create_filtered_facets(
-                "workspace_id", response.aggregations.workspace_ids.buckets, known_workspaces
+                "workspace_id",
+                response.aggregations.workspace_ids.buckets,
+                known_workspaces,
             )
         }
         try:
             newest_authored_content_date_from = parse(
-                response.aggregations.newest_authored_content_date_from["value_as_string"]
+                response.aggregations.newest_authored_content_date_from[
+                    "value_as_string"
+                ]
             )
         except KeyError:
             newest_authored_content_date_from = None
@@ -795,9 +841,15 @@ class ESSearchApi(SearchApi):
             "description^3",
         ]
         search_fields = search_fields or DEFAULT_WORKSPACE_SEARCH_FIELDS
-        fields = [field for field in fields if name_starts_with_any_prefix(field, search_fields)]
+        fields = [
+            field
+            for field in fields
+            if name_starts_with_any_prefix(field, search_fields)
+        ]
 
-        known_workspace_ids = [ws.workspace_id for ws in self._get_workspaces_known_to_user()]
+        known_workspace_ids = [
+            ws.workspace_id for ws in self._get_workspaces_known_to_user()
+        ]
         search = search.query("simple_query_string", query=search_string, fields=fields)
         search = search.filter("terms", workspace_id=known_workspace_ids)
         if member_ids:
@@ -807,9 +859,15 @@ class ESSearchApi(SearchApi):
         if not show_deleted:
             search = search.exclude("term", is_deleted=True)
         if page_nb:
-            search = search.extra(from_=self.offset_from_pagination(size, page_nb), size=size)
-        search.aggs.bucket("member_ids", "terms", field="member_ids", size=DEFAULT_BUCKET_SIZE)
-        search.aggs.bucket("owner_ids", "terms", field="owner_id", size=DEFAULT_BUCKET_SIZE)
+            search = search.extra(
+                from_=self.offset_from_pagination(size, page_nb), size=size
+            )
+        search.aggs.bucket(
+            "member_ids", "terms", field="member_ids", size=DEFAULT_BUCKET_SIZE
+        )
+        search.aggs.bucket(
+            "owner_ids", "terms", field="owner_id", size=DEFAULT_BUCKET_SIZE
+        )
         response = search.execute()
         known_users = UserApi(
             current_user=None, session=self._session, config=self._config
@@ -859,13 +917,17 @@ class ESSearchApi(SearchApi):
         return [
             IndexParameters(
                 alias=prefix + "-content",
-                index_name_template=template.format(index_alias=prefix + "-content", date="{date}"),
+                index_name_template=template.format(
+                    index_alias=prefix + "-content", date="{date}"
+                ),
                 document_class=IndexedContent,
                 indexer=ESContentIndexer(),
             ),
             IndexParameters(
                 alias=prefix + "-user",
-                index_name_template=template.format(index_alias=prefix + "-user", date="{date}"),
+                index_name_template=template.format(
+                    index_alias=prefix + "-user", date="{date}"
+                ),
                 document_class=self.IndexedUser,
                 indexer=ESUserIndexer(),
             ),
@@ -879,7 +941,9 @@ class ESSearchApi(SearchApi):
             ),
         ]
 
-    def _get_index_parameters(self, document_class: typing.Type[Document]) -> IndexParameters:
+    def _get_index_parameters(
+        self, document_class: typing.Type[Document]
+    ) -> IndexParameters:
         return next(
             parameters
             for parameters in self._get_indices_parameters()
@@ -916,7 +980,9 @@ class ESSearchApi(SearchApi):
                         "field": "{source}.content_{lang}".format(
                             source=FILE_PIPELINE_DESTINATION_FIELD, lang=lang
                         ),
-                        "value": "{{" + "{}.content".format(FILE_PIPELINE_DESTINATION_FIELD) + "}}",
+                        "value": "{{"
+                        + "{}.content".format(FILE_PIPELINE_DESTINATION_FIELD)
+                        + "}}",
                     }
                 }
             )
@@ -924,7 +990,9 @@ class ESSearchApi(SearchApi):
         processors.append(
             {
                 "remove": {
-                    "if": " || ".join(self.test_lang(lang) for lang in FILE_PIPELINE_LANGS),
+                    "if": " || ".join(
+                        self.test_lang(lang) for lang in FILE_PIPELINE_LANGS
+                    ),
                     "field": "{}.content".format(FILE_PIPELINE_DESTINATION_FIELD),
                 }
             }
@@ -932,12 +1000,19 @@ class ESSearchApi(SearchApi):
 
         p.put_pipeline(
             id=FILE_PIPELINE_ID,
-            body={"description": "Extract attachment information", "processors": processors},
+            body={
+                "description": "Extract attachment information",
+                "processors": processors,
+            },
         )
 
     def _get_workspaces_known_to_user(self) -> typing.List[Workspace]:
-        wapi = WorkspaceApi(current_user=None, session=self._session, config=self._config)
-        return wapi.get_all_accessible_by_user(self._user) + wapi.get_all_for_user(self._user)
+        wapi = WorkspaceApi(
+            current_user=None, session=self._session, config=self._config
+        )
+        return wapi.get_all_accessible_by_user(self._user) + wapi.get_all_for_user(
+            self._user
+        )
 
 
 class ESContentIndexer:
@@ -955,7 +1030,10 @@ class ESContentIndexer:
             self.index_contents([content], context)
         except IndexingError:
             logger.exception(
-                self, "Exception while indexing created content {}".format(content.content_id)
+                self,
+                "Exception while indexing created content {}".format(
+                    content.content_id
+                ),
             )
 
     @hookimpl
@@ -970,14 +1048,20 @@ class ESContentIndexer:
                 self.index_contents(content.recursive_children, context)
         except Exception:
             logger.exception(
-                self, "Exception while indexing modified content {}".format(content.content_id)
+                self,
+                "Exception while indexing modified content {}".format(
+                    content.content_id
+                ),
             )
 
     @hookimpl
-    def on_workspace_modified(self, workspace: Workspace, context: TracimContext) -> None:
+    def on_workspace_modified(
+        self, workspace: Workspace, context: TracimContext
+    ) -> None:
         """Index the contents of the given workspace
 
-        Contents are indexed only if the workspace has changes influencing their index."""
+        Contents are indexed only if the workspace has changes influencing their index.
+        """
         if not self._should_reindex_children(workspace):
             return
         content_api = ContentApi(
@@ -988,7 +1072,9 @@ class ESContentIndexer:
             show_archived=True,
         )
         try:
-            self.index_contents(content_api.get_all_query(workspaces=[workspace]), context)
+            self.index_contents(
+                content_api.get_all_query(workspaces=[workspace]), context
+            )
         except IndexingError:
             logger.exception(
                 self,
@@ -1023,11 +1109,15 @@ class ESContentIndexer:
             )
 
     @hookimpl
-    def on_content_tag_created(self, content_tag: TagOnContent, context: TracimContext) -> None:
+    def on_content_tag_created(
+        self, content_tag: TagOnContent, context: TracimContext
+    ) -> None:
         self.index_contents([content_tag.content], context)
 
     @hookimpl
-    def on_content_tag_deleted(self, content_tag: TagOnContent, context: TracimContext) -> None:
+    def on_content_tag_deleted(
+        self, content_tag: TagOnContent, context: TracimContext
+    ) -> None:
         self.index_contents([content_tag.content], context)
 
     @hookimpl
@@ -1035,11 +1125,14 @@ class ESContentIndexer:
         tag_lib = TagLib(context.dbsession)
         self.index_contents(tag_lib.get_contents(tag), context)
 
-    def index_contents(self, contents: typing.List[Content], context: TracimContext) -> None:
+    def index_contents(
+        self, contents: typing.List[Content], context: TracimContext
+    ) -> None:
         if context.app_config.JOBS__PROCESSING_MODE == CFG.CST.ASYNC:
             queue = get_rq_queue2(context.app_config, RqQueueName.ELASTICSEARCH_INDEXER)
             content_ids = [
-                content.content_id for content in self._filter_excluded_content_types(contents)
+                content.content_id
+                for content in self._filter_excluded_content_types(contents)
             ]
 
             def index_via_rq_worker(session: Session, flush_context=None) -> None:
@@ -1051,7 +1144,9 @@ class ESContentIndexer:
             if indexing_error_count:
                 raise IndexingError()
 
-    def sync_index_contents(self, contents: typing.List[Content], context: TracimContext) -> int:
+    def sync_index_contents(
+        self, contents: typing.List[Content], context: TracimContext
+    ) -> int:
         search_api = ESSearchApi(
             session=context.dbsession, config=context.app_config, current_user=None
         )
@@ -1061,7 +1156,8 @@ class ESContentIndexer:
                 search_api.index_content(content)
             except Exception:
                 logger.exception(
-                    self, "Exception while indexing content {}".format(content.content_id)
+                    self,
+                    "Exception while indexing content {}".format(content.content_id),
                 )
                 indexing_error_count += 1
         return indexing_error_count
@@ -1083,7 +1179,9 @@ class ESContentIndexer:
                     search_api.index_content(capi.get_one(content_id))
                 except Exception:
                     indexing_error_count += 1
-                    logger.exception(self, "Exception while indexing content {}".format(content_id))
+                    logger.exception(
+                        self, "Exception while indexing content {}".format(content_id)
+                    )
             if indexing_error_count:
                 raise IndexingError(
                     "Got error(s) while indexing content ids {}".format(content_ids)
@@ -1098,7 +1196,9 @@ class ESContentIndexer:
         return content
 
     @classmethod
-    def _should_reindex_children(cls, obj: typing.Union[ContentRevisionRO, Workspace]) -> bool:
+    def _should_reindex_children(
+        cls, obj: typing.Union[ContentRevisionRO, Workspace]
+    ) -> bool:
         """Changes on a content/workspace only have effect on their children if:
         - their 'label' has changed
         - their 'is_deleted' state has changed
@@ -1108,7 +1208,10 @@ class ESContentIndexer:
         return (
             attribute_state.label.history.has_changes()
             or attribute_state.is_deleted.history.has_changes()
-            or (isinstance(obj, Content) and attribute_state.is_archived.history.has_changes())
+            or (
+                isinstance(obj, Content)
+                and attribute_state.is_archived.history.has_changes()
+            )
         )
 
     @classmethod
@@ -1140,7 +1243,9 @@ class ESUserIndexer:
         try:
             search_api.delete_user(user)
         except Exception:
-            logger.exception(self, "Exception while deleting indexed user {}".format(user.user_id))
+            logger.exception(
+                self, "Exception while deleting indexed user {}".format(user.user_id)
+            )
 
     @hookimpl
     def on_content_created(self, content: Content, context: TracimContext) -> None:
@@ -1193,7 +1298,9 @@ class ESUserIndexer:
             try:
                 search_api.index_user(user)
             except Exception:
-                logger.exception(self, "Exception while indexing user {}".format(user.user_id))
+                logger.exception(
+                    self, "Exception while indexing user {}".format(user.user_id)
+                )
 
     def _index_user_from_id(self, user_id: int) -> None:
         """Index user whose id is given.
@@ -1213,22 +1320,30 @@ class ESWorkspaceIndexer:
     """Listen for events from database and trigger re-indexing of workspaces when needed."""
 
     @hookimpl
-    def on_workspace_created(self, workspace: Workspace, context: TracimContext) -> None:
+    def on_workspace_created(
+        self, workspace: Workspace, context: TracimContext
+    ) -> None:
         self.index_workspace(workspace, context)
 
     @hookimpl
-    def on_workspace_modified(self, workspace: Workspace, context: TracimContext) -> None:
+    def on_workspace_modified(
+        self, workspace: Workspace, context: TracimContext
+    ) -> None:
         self.index_workspace(workspace, context)
 
     @hookimpl
-    def on_workspace_deleted(self, workspace: Workspace, context: TracimContext) -> None:
+    def on_workspace_deleted(
+        self, workspace: Workspace, context: TracimContext
+    ) -> None:
         search_api = ESSearchApi(
             session=context.dbsession, config=context.app_config, current_user=None
         )
         try:
             search_api.delete_workspace(workspace)
         except Exception:
-            msg = "Exception while deleting indexed workspace {}".format(workspace.workspace_id)
+            msg = "Exception while deleting indexed workspace {}".format(
+                workspace.workspace_id
+            )
             logger.exception(self, msg)
 
     @hookimpl
@@ -1269,7 +1384,9 @@ class ESWorkspaceIndexer:
             try:
                 search_api.index_workspace(workspace)
             except Exception:
-                msg = "Exception while indexing workspace {}".format(workspace.workspace_id)
+                msg = "Exception while indexing workspace {}".format(
+                    workspace.workspace_id
+                )
                 logger.exception(self, msg)
 
     def _index_workspace_from_id(self, workspace_id: int) -> None:

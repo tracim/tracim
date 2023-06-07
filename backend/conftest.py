@@ -1,5 +1,7 @@
 def pytest_addoption(parser):
-    parser.addoption("--database", action="append", default=[], help="database to run tests with")
+    parser.addoption(
+        "--database", action="append", default=[], help="database to run tests with"
+    )
 
 
 def pytest_generate_tests(metafunc):

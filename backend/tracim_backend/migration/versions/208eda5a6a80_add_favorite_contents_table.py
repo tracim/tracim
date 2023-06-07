@@ -30,9 +30,13 @@ def upgrade():
             ondelete="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["user_id"], ["users.user_id"], name=op.f("fk_favorite_contents_user_id_users")
+            ["user_id"],
+            ["users.user_id"],
+            name=op.f("fk_favorite_contents_user_id_users"),
         ),
-        sa.PrimaryKeyConstraint("user_id", "content_id", name=op.f("pk_favorite_contents")),
+        sa.PrimaryKeyConstraint(
+            "user_id", "content_id", name=op.f("pk_favorite_contents")
+        ),
     )
     # ### end Alembic commands ###
 

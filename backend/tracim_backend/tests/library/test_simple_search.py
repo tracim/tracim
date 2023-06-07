@@ -25,7 +25,9 @@ class TestSimpleSearchApi(object):
 
         profile = Profile.ADMIN
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=profile, save_now=True
+        )
 
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
@@ -52,7 +54,9 @@ class TestSimpleSearchApi(object):
         api.save(p)
         original_id = a.content_id
 
-        simple_search_api = SimpleSearchApi(current_user=user, session=session, config=app_config)
+        simple_search_api = SimpleSearchApi(
+            current_user=user, session=session, config=app_config
+        )
         res = simple_search_api._search_query(["randomized"], content_api=api)
         assert 1 == len(res.all())
         item = res.all()[0]
@@ -71,7 +75,9 @@ class TestSimpleSearchApi(object):
 
         profile = Profile.ADMIN
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=profile, save_now=True
+        )
 
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
@@ -98,9 +104,13 @@ class TestSimpleSearchApi(object):
         api.save(p)
         original_id = a.content_id
 
-        simple_search_api = SimpleSearchApi(current_user=user, session=session, config=app_config)
+        simple_search_api = SimpleSearchApi(
+            current_user=user, session=session, config=app_config
+        )
 
-        res = simple_search_api._search_query(["this is randomized folder"], content_api=api)
+        res = simple_search_api._search_query(
+            ["this is randomized folder"], content_api=api
+        )
         assert 1 == len(res.all())
         item = res.all()[0]
         assert original_id == item.content_id

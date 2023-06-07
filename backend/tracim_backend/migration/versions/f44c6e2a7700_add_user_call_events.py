@@ -25,7 +25,9 @@ old_entity_type_enum_values = (
     "CONTENT_TAG",
 )
 old_entity_type_enum = sa.Enum(*old_entity_type_enum_values, name=enum_name)
-new_entity_type_enum = sa.Enum(*(old_entity_type_enum_values + ("USER_CALL",)), name=enum_name)
+new_entity_type_enum = sa.Enum(
+    *(old_entity_type_enum_values + ("USER_CALL",)), name=enum_name
+)
 
 
 def upgrade():

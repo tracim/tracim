@@ -50,7 +50,9 @@ class UploadDataForm(object):
     Simple parent_id object
     """
 
-    def __init__(self, message: str = "", username: str = "", password: str = "") -> None:
+    def __init__(
+        self, message: str = "", username: str = "", password: str = ""
+    ) -> None:
         self.message = message
         self.username = username
         self.password = password
@@ -100,7 +102,8 @@ class UploadPermissionListQuerySchema(marshmallow.Schema):
     show_disabled = marshmallow.fields.Int(
         example=0,
         default=0,
-        description="if set to 1, then show disabled share." " Default is 0 - hide disabled share",
+        description="if set to 1, then show disabled share."
+        " Default is 0 - hide disabled share",
         validate=bool_as_int_validator,
     )
 
@@ -151,7 +154,9 @@ class UploadPermissionCreationBody(object):
 
 class UploadPermissionCreationBodySchema(marshmallow.Schema):
     emails = marshmallow.fields.List(
-        RFCEmail(validate=upload_permission_email_validator), validate=Length(min=1), required=True
+        RFCEmail(validate=upload_permission_email_validator),
+        validate=Length(min=1),
+        required=True,
     )
     password = marshmallow.fields.String(
         example="8QLa$<w",
@@ -171,7 +176,9 @@ class UploadPermissionPublicInfoSchema(marshmallow.Schema):
 
 class UploadPermissionSchema(marshmallow.Schema):
     email = RFCEmail(
-        example="hello@tracim.fr", required=True, validate=upload_permission_email_validator
+        example="hello@tracim.fr",
+        required=True,
+        validate=upload_permission_email_validator,
     )
     has_password = marshmallow.fields.Boolean(required=True)
     upload_permission_group_uuid = marshmallow.fields.String(required=True)
@@ -191,7 +198,9 @@ class UploadPermissionSchema(marshmallow.Schema):
         format=DATETIME_FORMAT, description="Upload permission creation date"
     )
     disabled = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT, description="Upload permission disabled date", allow_none=True
+        format=DATETIME_FORMAT,
+        description="Upload permission disabled date",
+        allow_none=True,
     )
     is_disabled = marshmallow.fields.Boolean(
         required=True, description="is this upload permission disabled ?"

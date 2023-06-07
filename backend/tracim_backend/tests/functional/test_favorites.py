@@ -47,12 +47,16 @@ class TestFavoriteContent(object):
     ):
         workspace_api = workspace_api_factory.get(current_user=riyad_user)
         test_workspace = workspace_api.create_workspace("test_workspace", save_now=True)
-        content_api = content_api_factory.get(current_user=riyad_user)  # type: ContentApi
+        content_api = content_api_factory.get(
+            current_user=riyad_user
+        )  # type: ContentApi
         test_thread = create_content(content_api, test_workspace, set_as_favorite=True)
         transaction.commit()
         web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
         res = web_testapp.get(
-            "/api/users/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
+            "/api/users/{}/favorite-contents/{}".format(
+                riyad_user.user_id, test_thread.content_id
+            ),
             status=HTTPStatus.OK,
         )
         favorite_content = res.json_body
@@ -71,7 +75,9 @@ class TestFavoriteContent(object):
     ):
         workspace_api = workspace_api_factory.get(current_user=riyad_user)
         test_workspace = workspace_api.create_workspace("test_workspace", save_now=True)
-        content_api = content_api_factory.get(current_user=riyad_user)  # type: ContentApi
+        content_api = content_api_factory.get(
+            current_user=riyad_user
+        )  # type: ContentApi
         test_thread = create_content(content_api, test_workspace, set_as_favorite=True)
         with new_revision(session=session, tm=transaction.manager, content=test_thread):
             content_api.delete(test_thread)
@@ -79,7 +85,9 @@ class TestFavoriteContent(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
         res = web_testapp.get(
-            "/api/users/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
+            "/api/users/{}/favorite-contents/{}".format(
+                riyad_user.user_id, test_thread.content_id
+            ),
             status=HTTPStatus.OK,
         )
         favorite_content = res.json_body
@@ -100,7 +108,9 @@ class TestFavoriteContent(object):
     ):
         workspace_api = workspace_api_factory.get(current_user=admin_user)
         test_workspace = workspace_api.create_workspace("test_workspace", save_now=True)
-        content_api = content_api_factory.get(current_user=riyad_user)  # type: ContentApi
+        content_api = content_api_factory.get(
+            current_user=riyad_user
+        )  # type: ContentApi
         test_thread = create_content(content_api, test_workspace, set_as_favorite=True)
         with new_revision(session=session, tm=transaction.manager, content=test_thread):
             content_api.update_content(test_thread, "Test Thread (Updated)")
@@ -109,7 +119,9 @@ class TestFavoriteContent(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
         res = web_testapp.get(
-            "/api/users/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
+            "/api/users/{}/favorite-contents/{}".format(
+                riyad_user.user_id, test_thread.content_id
+            ),
             status=HTTPStatus.OK,
         )
         favorite_content = res.json_body
@@ -145,12 +157,16 @@ class TestFavoriteContent(object):
     ):
         workspace_api = workspace_api_factory.get(current_user=riyad_user)
         test_workspace = workspace_api.create_workspace("test_workspace", save_now=True)
-        content_api = content_api_factory.get(current_user=riyad_user)  # type: ContentApi
+        content_api = content_api_factory.get(
+            current_user=riyad_user
+        )  # type: ContentApi
         test_thread = create_content(content_api, test_workspace, set_as_favorite=False)
         transaction.commit()
         web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
         res = web_testapp.get(
-            "/api/users/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
+            "/api/users/{}/favorite-contents/{}".format(
+                riyad_user.user_id, test_thread.content_id
+            ),
             status=HTTPStatus.BAD_REQUEST,
         )
         assert res.json_body["code"] == ErrorCode.FAVORITE_CONTENT_NOT_FOUND
@@ -171,7 +187,9 @@ class TestFavoriteContent(object):
         confidential_space = workspace_api_admin.create_workspace(
             "confidential_space", save_now=True
         )
-        content_api = content_api_factory.get(current_user=riyad_user)  # type: ContentApi
+        content_api = content_api_factory.get(
+            current_user=riyad_user
+        )  # type: ContentApi
         # accessible and active content
         # not favorite content
         create_content(
@@ -197,7 +215,9 @@ class TestFavoriteContent(object):
             content_type=ContentTypeSlug.HTML_DOCUMENTS.value,
             label="Test Note3",
         )
-        with new_revision(session=session, tm=transaction.manager, content=note3_deleted):
+        with new_revision(
+            session=session, tm=transaction.manager, content=note3_deleted
+        ):
             content_api.delete(note3_deleted)
         transaction.commit()
         web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
@@ -231,7 +251,9 @@ class TestFavoriteContent(object):
     ):
         workspace_api = workspace_api_factory.get(current_user=riyad_user)
         test_workspace = workspace_api.create_workspace("test_workspace", save_now=True)
-        content_api = content_api_factory.get(current_user=riyad_user)  # type: ContentApi
+        content_api = content_api_factory.get(
+            current_user=riyad_user
+        )  # type: ContentApi
         test_thread = create_content(content_api, test_workspace, set_as_favorite=False)
         transaction.commit()
         with pytest.raises(FavoriteContentNotFound):
@@ -263,7 +285,9 @@ class TestFavoriteContent(object):
     ):
         workspace_api = workspace_api_factory.get(current_user=riyad_user)
         test_workspace = workspace_api.create_workspace("test_workspace", save_now=True)
-        content_api = content_api_factory.get(current_user=riyad_user)  # type: ContentApi
+        content_api = content_api_factory.get(
+            current_user=riyad_user
+        )  # type: ContentApi
         test_thread = create_content(content_api, test_workspace, set_as_favorite=True)
         transaction.commit()
         assert content_api.get_one_user_favorite_content(
@@ -271,7 +295,9 @@ class TestFavoriteContent(object):
         )
         web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
         web_testapp.delete(
-            "/api/users/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
+            "/api/users/{}/favorite-contents/{}".format(
+                riyad_user.user_id, test_thread.content_id
+            ),
             status=HTTPStatus.NO_CONTENT,
         )
         with pytest.raises(FavoriteContentNotFound):
@@ -299,7 +325,9 @@ class TestFavoriteContent(object):
             role_level=UserRoleInWorkspace.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        content_api = content_api_factory.get(current_user=riyad_user)  # type: ContentApi
+        content_api = content_api_factory.get(
+            current_user=riyad_user
+        )  # type: ContentApi
         test_thread = create_content(content_api, test_workspace, set_as_favorite=True)
         transaction.commit()
         assert content_api.get_one_user_favorite_content(
@@ -310,15 +338,21 @@ class TestFavoriteContent(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
         res = web_testapp.get(
-            "/api/users/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
+            "/api/users/{}/favorite-contents/{}".format(
+                riyad_user.user_id, test_thread.content_id
+            ),
             status=HTTPStatus.OK,
         )
         web_testapp.delete(
-            "/api/users/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
+            "/api/users/{}/favorite-contents/{}".format(
+                riyad_user.user_id, test_thread.content_id
+            ),
             status=HTTPStatus.NO_CONTENT,
         )
         res = web_testapp.get(
-            "/api/users/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
+            "/api/users/{}/favorite-contents/{}".format(
+                riyad_user.user_id, test_thread.content_id
+            ),
             status=HTTPStatus.BAD_REQUEST,
         )
         assert res.json_body["code"] == ErrorCode.FAVORITE_CONTENT_NOT_FOUND
@@ -343,7 +377,9 @@ class TestFavoriteContent(object):
             role_level=UserRoleInWorkspace.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        content_api = content_api_factory.get(current_user=riyad_user)  # type: ContentApi
+        content_api = content_api_factory.get(
+            current_user=riyad_user
+        )  # type: ContentApi
         test_thread = create_content(content_api, test_workspace, set_as_favorite=True)
         transaction.commit()
         assert content_api.get_one_user_favorite_content(
@@ -354,15 +390,21 @@ class TestFavoriteContent(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
         res = web_testapp.get(
-            "/api/users/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
+            "/api/users/{}/favorite-contents/{}".format(
+                riyad_user.user_id, test_thread.content_id
+            ),
             status=HTTPStatus.OK,
         )
         web_testapp.delete(
-            "/api/users/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
+            "/api/users/{}/favorite-contents/{}".format(
+                riyad_user.user_id, test_thread.content_id
+            ),
             status=HTTPStatus.NO_CONTENT,
         )
         res = web_testapp.get(
-            "/api/users/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
+            "/api/users/{}/favorite-contents/{}".format(
+                riyad_user.user_id, test_thread.content_id
+            ),
             status=HTTPStatus.BAD_REQUEST,
         )
         assert res.json_body["code"] == ErrorCode.FAVORITE_CONTENT_NOT_FOUND

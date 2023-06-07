@@ -10,7 +10,9 @@ from tracim_backend.lib.search.elasticsearch_search.default_analyzers import und
 # https://www.elastic.co/guide/en/elasticsearch/reference/7.13/analysis-lang-analyzer.html
 
 
-portuguese_stop = analysis.token_filter("portuguese_stop", type="stop", stopwords="_portuguese_")
+portuguese_stop = analysis.token_filter(
+    "portuguese_stop", type="stop", stopwords="_portuguese_"
+)
 portuguese_stemmer = analysis.token_filter(
     "portuguese_stemmer", type="stemmer", language="light_portuguese"
 )

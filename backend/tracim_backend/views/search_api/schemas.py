@@ -102,7 +102,9 @@ class ContentSearchQuerySchema(marshmallow.Schema):
         missing="",
         default_value="",
     )
-    size = marshmallow.fields.Int(required=False, default=10, validate=positive_int_validator)
+    size = marshmallow.fields.Int(
+        required=False, default=10, validate=positive_int_validator
+    )
     page_nb = marshmallow.fields.Int(
         required=False, default=1, validate=strictly_positive_int_validator
     )
@@ -200,7 +202,9 @@ class AdvancedContentSearchQuerySchema(ContentSearchQuerySchema):
 
 
 class WorkspaceSearchSchema(marshmallow.Schema):
-    workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
+    workspace_id = marshmallow.fields.Int(
+        example=4, validate=strictly_positive_int_validator
+    )
     slug = StrippedString(example="intranet")
     label = StrippedString(example="Intranet")
 
@@ -210,10 +214,14 @@ class ContentSearchSchema(ContentDigestSchema, UserInfoContentAbstractSchema):
     workspace = marshmallow.fields.Nested(WorkspaceSearchSchema)
     path = marshmallow.fields.List(marshmallow.fields.Nested(ContentMinimalSchema))
     is_active = marshmallow.fields.Boolean()
-    comment_count = marshmallow.fields.Integer(example=12, validate=positive_int_validator)
+    comment_count = marshmallow.fields.Integer(
+        example=12, validate=positive_int_validator
+    )
     todo_count = marshmallow.fields.Integer(example=5, validate=positive_int_validator)
     content_size = marshmallow.fields.Integer(
-        example=1200, description="Content size in bytes", validate=positive_int_validator
+        example=1200,
+        description="Content size in bytes",
+        validate=positive_int_validator,
     )
 
 
@@ -225,22 +233,33 @@ class ContentSearchResultSchema(marshmallow.Schema):
 
 class FacetCountSchema(marshmallow.Schema):
     value = marshmallow.fields.String(description="The value of this field")
-    count = marshmallow.fields.Int(description="The number of results matching this value")
+    count = marshmallow.fields.Int(
+        description="The number of results matching this value"
+    )
 
 
 class DateRangeSchema(marshmallow.Schema):
     date_from = marshmallow.fields.DateTime(
-        load_from="from", dump_to="from", format=DATETIME_FORMAT, required=False, missing=None
+        load_from="from",
+        dump_to="from",
+        format=DATETIME_FORMAT,
+        required=False,
+        missing=None,
     )
     date_to = marshmallow.fields.DateTime(
-        load_from="to", dump_to="to", format=DATETIME_FORMAT, required=False, missing=None
+        load_from="to",
+        dump_to="to",
+        format=DATETIME_FORMAT,
+        required=False,
+        missing=None,
     )
 
 
 class ContentFacetsSchema(marshmallow.Schema):
     workspace_names = marshmallow.fields.List(
         marshmallow.fields.Nested(
-            FacetCountSchema(), description="search matches contents in these workspaces"
+            FacetCountSchema(),
+            description="search matches contents in these workspaces",
         )
     )
     author__public_names = marshmallow.fields.List(
@@ -251,7 +270,8 @@ class ContentFacetsSchema(marshmallow.Schema):
     )
     content_types = marshmallow.fields.List(
         marshmallow.fields.Nested(
-            FacetCountSchema(), description="search matches contents with these content types"
+            FacetCountSchema(),
+            description="search matches contents with these content types",
         )
     )
     last_modifier__public_names = marshmallow.fields.List(
@@ -262,12 +282,14 @@ class ContentFacetsSchema(marshmallow.Schema):
     )
     file_extensions = marshmallow.fields.List(
         marshmallow.fields.Nested(
-            FacetCountSchema(), description="search matches contents with these file extensions"
+            FacetCountSchema(),
+            description="search matches contents with these file extensions",
         )
     )
     statuses = marshmallow.fields.List(
         marshmallow.fields.Nested(
-            FacetCountSchema(), description="search matches contents with these statuses"
+            FacetCountSchema(),
+            description="search matches contents with these statuses",
         )
     )
     tags = marshmallow.fields.List(
@@ -284,8 +306,12 @@ class AdvancedContentSearchResultSchema(ContentSearchResultSchema):
         required=False,
         missing=None,
     )
-    created_range = marshmallow.fields.Nested(DateRangeSchema(), required=False, missing=None)
-    modified_range = marshmallow.fields.Nested(DateRangeSchema(), required=False, missing=None)
+    created_range = marshmallow.fields.Nested(
+        DateRangeSchema(), required=False, missing=None
+    )
+    modified_range = marshmallow.fields.Nested(
+        DateRangeSchema(), required=False, missing=None
+    )
 
 
 class UserSearchQuerySchema(marshmallow.Schema):
@@ -310,7 +336,9 @@ class UserSearchQuerySchema(marshmallow.Schema):
     newest_authored_content_date_to = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, required=False, missing=None
     )
-    size = marshmallow.fields.Int(required=False, default=10, validate=positive_int_validator)
+    size = marshmallow.fields.Int(
+        required=False, default=10, validate=positive_int_validator
+    )
     page_nb = marshmallow.fields.Int(
         required=False, default=1, validate=strictly_positive_int_validator
     )
@@ -348,7 +376,9 @@ class WorkspaceFacetSchema(marshmallow.Schema):
 
 
 class UserSearchFacets(marshmallow.Schema):
-    workspaces = marshmallow.fields.List(marshmallow.fields.Nested(WorkspaceFacetSchema()))
+    workspaces = marshmallow.fields.List(
+        marshmallow.fields.Nested(WorkspaceFacetSchema())
+    )
 
 
 class UserSearchResultSchema(marshmallow.Schema):
@@ -382,7 +412,9 @@ class WorkspaceSearchQuerySchema(marshmallow.Schema):
         missing=None,
         description="if given only search in the given workspace fields",
     )
-    size = marshmallow.fields.Int(required=False, default=10, validate=positive_int_validator)
+    size = marshmallow.fields.Int(
+        required=False, default=10, validate=positive_int_validator
+    )
     page_nb = marshmallow.fields.Int(
         required=False, default=1, validate=strictly_positive_int_validator
     )
@@ -414,7 +446,9 @@ class WorkspaceSearchFacets(marshmallow.Schema):
 
 
 class WorkspaceSearchResultSchema(marshmallow.Schema):
-    workspaces = marshmallow.fields.List(marshmallow.fields.Nested(SearchedWorkspaceSchema()))
+    workspaces = marshmallow.fields.List(
+        marshmallow.fields.Nested(SearchedWorkspaceSchema())
+    )
     total_hits = marshmallow.fields.Integer()
     is_total_hits_accurate = marshmallow.fields.Boolean()
     facets = marshmallow.fields.Nested(WorkspaceSearchFacets())

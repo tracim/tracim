@@ -41,7 +41,9 @@ def upgrade():
             ondelete="CASCADE",
         ),
         sa.PrimaryKeyConstraint("tag_id", name=op.f("pk_tag")),
-        sa.UniqueConstraint("workspace_id", "tag_name", name=op.f("uq__tag__workspace_id")),
+        sa.UniqueConstraint(
+            "workspace_id", "tag_name", name=op.f("uq__tag__workspace_id")
+        ),
     )
 
     op.create_table(
@@ -51,7 +53,9 @@ def upgrade():
         sa.Column("author_id", sa.Integer(), nullable=False),
         sa.Column("created", sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(
-            ["author_id"], ["users.user_id"], name=op.f("fk_content_tag_author_id_users")
+            ["author_id"],
+            ["users.user_id"],
+            name=op.f("fk_content_tag_author_id_users"),
         ),
         sa.ForeignKeyConstraint(
             ["content_id"],
@@ -68,7 +72,9 @@ def upgrade():
             ondelete="CASCADE",
         ),
         sa.PrimaryKeyConstraint("tag_id", "content_id", name=op.f("pk_content_tag")),
-        sa.UniqueConstraint("tag_id", "content_id", name=op.f("uq__content_tag__tag_id")),
+        sa.UniqueConstraint(
+            "tag_id", "content_id", name=op.f("uq__content_tag__tag_id")
+        ),
     )
 
 

@@ -97,13 +97,17 @@ class ConfigModel(object):
         self.email_required = email_required
         self.search_engine = search_engine
         self.translation_service__enabled = translation_service__enabled
-        self.translation_service__target_languages = translation_service__target_languages
+        self.translation_service__target_languages = (
+            translation_service__target_languages
+        )
         self.user__self_registration__enabled = user__self_registration__enabled
         self.ui__spaces__creation__parent_space_choice__visible = (
             ui__spaces__creation__parent_space_choice__visible
         )
         self.ui__notes__code_sample_languages = ui__notes__code_sample_languages
-        self.limitation__maximum_online_users_message = limitation__maximum_online_users_message
+        self.limitation__maximum_online_users_message = (
+            limitation__maximum_online_users_message
+        )
         self.call__enabled = call__enabled
         self.call__unanswered_timeout = call__unanswered_timeout
 
@@ -154,7 +158,9 @@ class ResetPasswordRequest(object):
     Reset password : request to reset password of user
     """
 
-    def __init__(self, email: Optional[str] = None, username: Optional[str] = None) -> None:
+    def __init__(
+        self, email: Optional[str] = None, username: Optional[str] = None
+    ) -> None:
         self.email = email
         self.username = username
 
@@ -175,7 +181,11 @@ class ResetPasswordModify(object):
     """
 
     def __init__(
-        self, reset_password_token: str, email: str, new_password: str, new_password2: str
+        self,
+        reset_password_token: str,
+        email: str,
+        new_password: str,
+        new_password2: str,
     ) -> None:
         self.email = email
         self.reset_password_token = reset_password_token
@@ -231,7 +241,9 @@ class SetPassword(object):
     Just an password
     """
 
-    def __init__(self, loggedin_user_password: str, new_password: str, new_password2: str) -> None:
+    def __init__(
+        self, loggedin_user_password: str, new_password: str, new_password2: str
+    ) -> None:
         self.loggedin_user_password = loggedin_user_password
         self.new_password = new_password
         self.new_password2 = new_password2
@@ -354,7 +366,9 @@ class FilePath(object):
 
 
 class FileRevisionPath(object):
-    def __init__(self, workspace_id: int, content_id: int, revision_id: int, filename: str) -> None:
+    def __init__(
+        self, workspace_id: int, content_id: int, revision_id: int, filename: str
+    ) -> None:
         self.content_id = content_id
         self.workspace_id = workspace_id
         self.revision_id = revision_id
@@ -517,7 +531,9 @@ class TagPath(object):
     Paths params with workspace id and content_id and tag_id model
     """
 
-    def __init__(self, workspace_id: int, tag_id: int, content_id: Optional[int] = None) -> None:
+    def __init__(
+        self, workspace_id: int, tag_id: int, content_id: Optional[int] = None
+    ) -> None:
         self.workspace_id = workspace_id
         self.content_id = content_id
         self.tag_id = tag_id
@@ -529,7 +545,9 @@ class CommentPathFilename(object):
     and filename, useful to get preview/translation of a comment.
     """
 
-    def __init__(self, workspace_id: int, content_id: int, comment_id: int, filename: str) -> None:
+    def __init__(
+        self, workspace_id: int, content_id: int, comment_id: int, filename: str
+    ) -> None:
         self.content_id = content_id
         self.workspace_id = workspace_id
         self.comment_id = comment_id
@@ -575,7 +593,9 @@ class AgendaFilterQuery(object):
     Agenda filter query model
     """
 
-    def __init__(self, workspace_ids: str = "", agenda_types: str = "", resource_types: str = ""):
+    def __init__(
+        self, workspace_ids: str = "", agenda_types: str = "", resource_types: str = ""
+    ):
         self.workspace_ids = string_to_list(workspace_ids, ",", int) or None
         self.agenda_types = string_to_list(agenda_types, ",", str) or None
         self.resource_types = string_to_list(resource_types, ",", str) or None
@@ -622,7 +642,9 @@ class ContentFilter(object):
         count: Optional[int] = None,
     ) -> None:
         self.parent_ids = string_to_list(parent_ids, ",", int)
-        self.namespaces_filter = string_to_list(namespaces_filter, ",", ContentNamespaces)
+        self.namespaces_filter = string_to_list(
+            namespaces_filter, ",", ContentNamespaces
+        )
         self.complete_path_to_id = complete_path_to_id
         self.workspace_id = workspace_id
         self.show_archived = bool(show_archived)
@@ -690,7 +712,9 @@ class WorkspaceUpdate(object):
         self.public_download_enabled = public_download_enabled
         self.default_user_role = None
         if default_user_role:
-            self.default_user_role = WorkspaceRoles.get_role_from_slug(default_user_role)
+            self.default_user_role = WorkspaceRoles.get_role_from_slug(
+                default_user_role
+            )
         self.publication_enabled = publication_enabled
 
 
@@ -765,7 +789,9 @@ class TagCreation(object):
     tag creation model
     """
 
-    def __init__(self, tag_name: Optional[str] = None, tag_id: Optional[int] = None) -> None:
+    def __init__(
+        self, tag_name: Optional[str] = None, tag_id: Optional[int] = None
+    ) -> None:
         self.tag_name = tag_name
         self.tag_id = tag_id
 
@@ -1005,7 +1031,9 @@ class UserInContext(object):
     def used_space(self) -> int:
         from tracim_backend.lib.core.workspace import WorkspaceApi
 
-        wapi = WorkspaceApi(current_user=None, session=self.dbsession, config=self.config)
+        wapi = WorkspaceApi(
+            current_user=None, session=self.dbsession, config=self.config
+        )
         return wapi.get_user_used_space(self.user)
 
 
@@ -1449,7 +1477,9 @@ class ContentInContext(object):
     @property
     def author(self) -> UserInContext:
         return UserInContext(
-            dbsession=self.dbsession, config=self.config, user=self.content.first_revision.owner
+            dbsession=self.dbsession,
+            config=self.config,
+            user=self.content.first_revision.owner,
         )
 
     @property
@@ -1475,7 +1505,9 @@ class ContentInContext(object):
     @property
     def last_modifier(self) -> UserInContext:
         return UserInContext(
-            dbsession=self.dbsession, config=self.config, user=self.content.last_revision.owner
+            dbsession=self.dbsession,
+            config=self.config,
+            user=self.content.last_revision.owner,
         )
 
     # Context-related
@@ -1526,7 +1558,8 @@ class ContentInContext(object):
                 show_temporary=True,
             )
             return content_api.get_preview_page_nb(
-                self.content.cached_revision_id, file_extension=self.content.file_extension
+                self.content.cached_revision_id,
+                file_extension=self.content.file_extension,
             )
         else:
             return None
@@ -1549,11 +1582,15 @@ class ContentInContext(object):
             return self.content.depot_file.file.content_length
         except IOError:
             logger.warning(
-                self, "IO Exception Occured when trying to get content size", exc_info=True
+                self,
+                "IO Exception Occured when trying to get content size",
+                exc_info=True,
             )
         except Exception:
             logger.warning(
-                self, "Unknown Exception Occured when trying to get content size", exc_info=True
+                self,
+                "Unknown Exception Occured when trying to get content size",
+                exc_info=True,
             )
         # HACK - G.M - 2021-03-09 - properly handled the broken size case here to
         # avoid broken search (both simple and elasticsearch)
@@ -1632,7 +1669,9 @@ class ContentInContext(object):
         # not starting it there. see #2189
         from tracim_backend.applications.share.lib import ShareLib
 
-        api = ShareLib(config=self.config, session=self.dbsession, current_user=self._user)
+        api = ShareLib(
+            config=self.config, session=self.dbsession, current_user=self._user
+        )
         return len(api.get_content_shares(self.content))
 
     @property
@@ -1757,7 +1796,9 @@ class RevisionInContext(object):
 
     @property
     def author(self) -> UserInContext:
-        return UserInContext(dbsession=self.dbsession, config=self.config, user=self.revision.owner)
+        return UserInContext(
+            dbsession=self.dbsession, config=self.config, user=self.revision.owner
+        )
 
     @property
     def revision_id(self) -> int:
@@ -1785,11 +1826,15 @@ class RevisionInContext(object):
         # INFO - G.M - 2018-06-177 - Get revisions more recent that
         # current one
         next_revisions = [
-            revision for revision in revisions if revision.revision_id > self.revision.revision_id
+            revision
+            for revision in revisions
+            if revision.revision_id > self.revision.revision_id
         ]
         if next_revisions:
             # INFO - G.M - 2018-06-177 -sort revisions by date
-            sorted_next_revisions = sorted(next_revisions, key=lambda revision: revision.updated)
+            sorted_next_revisions = sorted(
+                next_revisions, key=lambda revision: revision.updated
+            )
             # INFO - G.M - 2018-06-177 - return only next revision
             return sorted_next_revisions[0]
         else:
@@ -1852,11 +1897,15 @@ class RevisionInContext(object):
             return self.revision.depot_file.file.content_length
         except IOError:
             logger.warning(
-                self, "IO Exception Occured when trying to get content size", exc_info=True
+                self,
+                "IO Exception Occured when trying to get content size",
+                exc_info=True,
             )
         except Exception:
             logger.warning(
-                self, "Unknown Exception Occured when trying to get content size", exc_info=True
+                self,
+                "Unknown Exception Occured when trying to get content size",
+                exc_info=True,
             )
         return None
 
@@ -1951,7 +2000,9 @@ class ListItemsObject(Generic[T]):
 
 
 class UserMessagesSummary(object):
-    def __init__(self, user: UserInContext, read_messages_count: int, unread_messages_count: int):
+    def __init__(
+        self, user: UserInContext, read_messages_count: int, unread_messages_count: int
+    ):
         self.read_messages_count = read_messages_count
         self.unread_messages_count = unread_messages_count
         self.messages_count = self.unread_messages_count + self.read_messages_count
@@ -1968,7 +2019,10 @@ class UserFollowQuery(BasePaginatedQuery):
     """
 
     def __init__(
-        self, count: int, page_token: Optional[str] = None, user_id: Optional[int] = None
+        self,
+        count: int,
+        page_token: Optional[str] = None,
+        user_id: Optional[int] = None,
     ) -> None:
         super().__init__(count=count, page_token=page_token)
         self.user_id = user_id
@@ -1995,7 +2049,9 @@ class AboutUser(object):
         self.leaders_count = leaders_count
         self.created = created
         self.authored_content_revisions_count = authored_content_revisions_count
-        self.authored_content_revisions_space_count = authored_content_revisions_space_count
+        self.authored_content_revisions_space_count = (
+            authored_content_revisions_space_count
+        )
         self.has_avatar = has_avatar
         self.has_cover = has_cover
 

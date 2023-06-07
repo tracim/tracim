@@ -53,27 +53,43 @@ class CollaborativeDocumentEditionController(Controller):
     @check_right(is_user)
     @hapic.output_body(CollaborativeDocumentEditionTokenSchema())
     def collaborative_document_edition_token(
-        self, context: DefaultRootFactory, request: TracimRequest, hapic_data: HapicData = None
+        self,
+        context: DefaultRootFactory,
+        request: TracimRequest,
+        hapic_data: HapicData = None,
     ) -> CollaborativeDocumentEditionToken:
         app_config = request.registry.settings["CFG"]  # type: CFG
-        collaborative_document_edition_lib = CollaborativeDocumentEditionFactory().get_lib(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+        collaborative_document_edition_lib = (
+            CollaborativeDocumentEditionFactory().get_lib(
+                current_user=request.current_user,
+                session=request.dbsession,
+                config=app_config,
+            )
         )
-        access_token = request.current_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY)
+        access_token = request.current_user.ensure_auth_token(
+            app_config.USER__AUTH_TOKEN__VALIDITY
+        )
         return collaborative_document_edition_lib.get_token(access_token=access_token)
 
     # File template infor
     @hapic.with_api_doc(tags=[SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS])
     @hapic.output_body(FileTemplateInfoSchema())
     def get_file_template_infos(
-        self, context: DefaultRootFactory, request: TracimRequest, hapic_data: HapicData = None
+        self,
+        context: DefaultRootFactory,
+        request: TracimRequest,
+        hapic_data: HapicData = None,
     ) -> FileTemplateList:
         """
         Get file template list
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        collaborative_document_edition_api = CollaborativeDocumentEditionFactory().get_lib(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+        collaborative_document_edition_api = (
+            CollaborativeDocumentEditionFactory().get_lib(
+                current_user=request.current_user,
+                session=request.dbsession,
+                config=app_config,
+            )
         )
         return collaborative_document_edition_api.get_file_template_list()
 
@@ -88,7 +104,10 @@ class CollaborativeDocumentEditionController(Controller):
     @hapic.output_body(ContentDigestSchema())
     @hapic.input_body(FileCreateFromTemplateSchema())
     def create_file_from_template(
-        self, context: DefaultRootFactory, request: TracimRequest, hapic_data: HapicData = None
+        self,
+        context: DefaultRootFactory,
+        request: TracimRequest,
+        hapic_data: HapicData = None,
     ) -> ContentInContext:
         """
         Create a file.
@@ -99,24 +118,33 @@ class CollaborativeDocumentEditionController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        collaborative_document_edition_api = CollaborativeDocumentEditionFactory().get_lib(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+        collaborative_document_edition_api = (
+            CollaborativeDocumentEditionFactory().get_lib(
+                current_user=request.current_user,
+                session=request.dbsession,
+                config=app_config,
+            )
         )
 
         content = None  # type: typing.Optional['Content']
         parent = None  # type: typing.Optional['Content']
 
         if not hapic_data.body.template_id:
-            collaborative_document_edition_api.check_template_available(hapic_data.body.template)
+            collaborative_document_edition_api.check_template_available(
+                hapic_data.body.template
+            )
 
         if hapic_data.body.parent_id:
             try:
                 parent = api.get_one(
-                    content_id=hapic_data.body.parent_id, content_type=ContentTypeSlug.ANY.value
+                    content_id=hapic_data.body.parent_id,
+                    content_type=ContentTypeSlug.ANY.value,
                 )
             except ContentNotFound as exc:
                 raise ParentNotFound(
-                    "Parent with content_id {} not found".format(hapic_data.body.parent_id)
+                    "Parent with content_id {} not found".format(
+                        hapic_data.body.parent_id
+                    )
                 ) from exc
 
         with request.dbsession.no_autoflush:
@@ -130,7 +158,9 @@ class CollaborativeDocumentEditionController(Controller):
             )
 
         if not hapic_data.body.template_id:
-            with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
+            with new_revision(
+                session=request.dbsession, tm=transaction.manager, content=content
+            ):
                 collaborative_document_edition_api.update_content_from_template(
                     content=content, template_filename=hapic_data.body.template
                 )
@@ -153,12 +183,15 @@ class CollaborativeDocumentEditionController(Controller):
             "/{}/templates".format(COLLABORATIVE_DOCUMENT_EDITION_BASE),
             request_method="GET",
         )
-        configurator.add_view(self.get_file_template_infos, route_name="file_template_info")
+        configurator.add_view(
+            self.get_file_template_infos, route_name="file_template_info"
+        )
 
         # Create file from template
         configurator.add_route(
             "create_file_from_template",
-            "/{}/".format(COLLABORATIVE_DOCUMENT_EDITION_BASE) + "workspaces/{workspace_id}/files",
+            "/{}/".format(COLLABORATIVE_DOCUMENT_EDITION_BASE)
+            + "workspaces/{workspace_id}/files",
             request_method="POST",
         )
         configurator.add_view(

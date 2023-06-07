@@ -22,7 +22,9 @@ class UserConnectionStateMonitorDaemon(FakeDaemon):
         self.burst = burst
 
     def append_thread_callback(self, callback: typing.Callable) -> None:
-        logger.warning("UserConnectionStateDaemon does not implement append_thread_callback")
+        logger.warning(
+            "UserConnectionStateDaemon does not implement append_thread_callback"
+        )
         pass
 
     def stop(self) -> None:
@@ -30,5 +32,7 @@ class UserConnectionStateMonitorDaemon(FakeDaemon):
             self._user_connection_state_monitor.stop()
 
     def run(self) -> None:
-        self._user_connection_state_monitor = UserConnectionStateMonitor(config=self.config)
+        self._user_connection_state_monitor = UserConnectionStateMonitor(
+            config=self.config
+        )
         self._user_connection_state_monitor.run()

@@ -25,7 +25,9 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F401
 from tracim_backend.tests.utils import TEST_CONFIG_FILE_PATH
 from tracim_backend.tests.utils import create_1000px_png_test_image
 
-COMMAND_CONFIG_PATH = dirname(dirname(dirname(dirname(__file__)))) + "/test_commands.ini"
+COMMAND_CONFIG_PATH = (
+    dirname(dirname(dirname(dirname(__file__)))) + "/test_commands.ini"
+)
 
 
 class TestCommandsList(object):
@@ -75,13 +77,17 @@ class TestCommandsList(object):
 
 
 @pytest.mark.usefixtures("base_fixture")
-@pytest.mark.parametrize("config_section", [{"name": "app:command_test"}], indirect=True)
+@pytest.mark.parametrize(
+    "config_section", [{"name": "app:command_test"}], indirect=True
+)
 class TestCommands(object):
     """
     Test tracimcli command line ui
     """
 
-    def test_func__user_create_command__ok__nominal_case(self, session, user_api_factory) -> None:
+    def test_func__user_create_command__ok__nominal_case(
+        self, session, user_api_factory
+    ) -> None:
         """
         Test User creation
         """
@@ -147,7 +153,9 @@ class TestCommands(object):
         assert new_user.validate_password("new_password")
         assert new_user.profile.slug == "administrators"
 
-    def test_func__user_create_command__err__in_unknown_profile(self, hapic, session) -> None:
+    def test_func__user_create_command__err__in_unknown_profile(
+        self, hapic, session
+    ) -> None:
         """
         Test User creation with an unknown profile
         """
@@ -172,7 +180,9 @@ class TestCommands(object):
         )
         assert res == 1
 
-    def test_func__user_create_command__err_user_already_exist(self, hapic, session) -> None:
+    def test_func__user_create_command__err_user_already_exist(
+        self, hapic, session
+    ) -> None:
         """
         Test User creation with existing user login
         """
@@ -340,7 +350,9 @@ class TestCommands(object):
         workspace_api = workspace_api_factory.get()
         test_workspace_parent = workspace_api.create_workspace("parent")
         session.add(test_workspace_parent)
-        test_workspace = workspace_api.create_workspace("child", parent=test_workspace_parent)
+        test_workspace = workspace_api.create_workspace(
+            "child", parent=test_workspace_parent
+        )
         session.add(test_workspace)
         test_workspace_new_parent = workspace_api.create_workspace("new_parent")
         session.add(test_workspace_new_parent)
@@ -379,7 +391,9 @@ class TestCommands(object):
         workspace_api = workspace_api_factory.get()
         test_workspace_parent = workspace_api.create_workspace("parent")
         session.add(test_workspace_parent)
-        test_workspace = workspace_api.create_workspace("child", parent=test_workspace_parent)
+        test_workspace = workspace_api.create_workspace(
+            "child", parent=test_workspace_parent
+        )
         session.add(test_workspace)
         test_workspace_new_parent = workspace_api.create_workspace("new_parent")
         session.add(test_workspace_new_parent)
@@ -417,7 +431,9 @@ class TestCommands(object):
         workspace_api = workspace_api_factory.get()
         test_workspace_parent = workspace_api.create_workspace("parent")
         session.add(test_workspace_parent)
-        test_workspace = workspace_api.create_workspace("child", parent=test_workspace_parent)
+        test_workspace = workspace_api.create_workspace(
+            "child", parent=test_workspace_parent
+        )
         session.add(test_workspace)
         test_workspace_new_parent = workspace_api.create_workspace("new_parent")
         session.add(test_workspace_new_parent)
@@ -458,7 +474,9 @@ class TestCommands(object):
         workspace_api = workspace_api_factory.get()
         test_workspace_parent = workspace_api.create_workspace("parent")
         session.add(test_workspace_parent)
-        test_workspace = workspace_api.create_workspace("child", parent=test_workspace_parent)
+        test_workspace = workspace_api.create_workspace(
+            "child", parent=test_workspace_parent
+        )
         session.add(test_workspace)
         test_workspace_new_parent = workspace_api.create_workspace("new_parent")
         session.add(test_workspace_new_parent)
@@ -497,7 +515,9 @@ class TestCommands(object):
         workspace_api = workspace_api_factory.get()
         test_workspace_parent = workspace_api.create_workspace("parent")
         session.add(test_workspace_parent)
-        test_workspace = workspace_api.create_workspace("child", parent=test_workspace_parent)
+        test_workspace = workspace_api.create_workspace(
+            "child", parent=test_workspace_parent
+        )
         session.add(test_workspace)
         test_workspace_new_parent = workspace_api.create_workspace("new_parent")
         session.add(test_workspace_new_parent)
@@ -623,9 +643,13 @@ class TestCommands(object):
         # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
-        res = app.run(["db", "delete", "-c", "{}#command_test".format(TEST_CONFIG_FILE_PATH)])
+        res = app.run(
+            ["db", "delete", "-c", "{}#command_test".format(TEST_CONFIG_FILE_PATH)]
+        )
         assert res == 1
-        result = app.run(["db", "delete", "-c", "{}#command_test".format(TEST_CONFIG_FILE_PATH)])
+        result = app.run(
+            ["db", "delete", "-c", "{}#command_test".format(TEST_CONFIG_FILE_PATH)]
+        )
         assert result == 1
 
     def test__delete__db__err_no_config_file(self, hapic, session, user_api_factory):
@@ -667,7 +691,11 @@ class TestCommands(object):
         session.flush()
         workspace_id = test_workspace.workspace_id
         transaction.commit()
-        assert session.query(Workspace).filter(Workspace.workspace_id == workspace_id).one()
+        assert (
+            session.query(Workspace)
+            .filter(Workspace.workspace_id == workspace_id)
+            .one()
+        )
         assert session.query(User).filter(User.user_id == user_id).one()
         assert session.query(UserConfig).filter(UserConfig.user_id == user_id).one()
         assert (
@@ -795,7 +823,11 @@ class TestCommands(object):
         )
         file_id = file_.content_id
         transaction.commit()
-        assert session.query(Workspace).filter(Workspace.workspace_id == workspace_id).one()
+        assert (
+            session.query(Workspace)
+            .filter(Workspace.workspace_id == workspace_id)
+            .one()
+        )
         assert session.query(Content).filter(Content.id == file_id).one()
         assert session.query(Content).filter(Content.id == folder_id).one()
         assert session.query(Content).filter(Content.id == folder2_id).one()
@@ -825,7 +857,9 @@ class TestCommands(object):
         )
         assert result == 0
         with pytest.raises(NoResultFound):
-            session.query(Workspace).filter(Workspace.workspace_id == workspace_id).one()
+            session.query(Workspace).filter(
+                Workspace.workspace_id == workspace_id
+            ).one()
         with pytest.raises(NoResultFound):
             session.query(Content).filter(Content.id == file_id).one()
         with pytest.raises(NoResultFound):
@@ -883,7 +917,10 @@ class TestCommands(object):
             email_notification_type=EmailNotificationType.NONE,
         )
         content_api = content_api_factory.get(
-            show_deleted=True, show_active=True, show_archived=True, current_user=test_user
+            show_deleted=True,
+            show_active=True,
+            show_archived=True,
+            current_user=test_user,
         )
         session.add(test_workspace)
         session.flush()
@@ -915,7 +952,11 @@ class TestCommands(object):
         )
         file_id = file_.content_id
         transaction.commit()
-        assert session.query(Workspace).filter(Workspace.workspace_id == workspace_id).one()
+        assert (
+            session.query(Workspace)
+            .filter(Workspace.workspace_id == workspace_id)
+            .one()
+        )
         assert session.query(Content).filter(Content.id == file_id).one()
         assert session.query(Content).filter(Content.id == folder_id).one()
         assert session.query(Content).filter(Content.id == folder2_id).one()
@@ -1000,7 +1041,10 @@ class TestCommands(object):
         user_workspace_id = user_workspace.workspace_id
         # INFO - G.M - 2019-12-20 - in user workspace
         content_api = content_api_factory.get(
-            show_deleted=True, show_active=True, show_archived=True, current_user=test_user
+            show_deleted=True,
+            show_active=True,
+            show_archived=True,
+            current_user=test_user,
         )
         folder2 = content_api.create(
             label="test-folder2",
@@ -1030,8 +1074,16 @@ class TestCommands(object):
         )
         file_id = file_.content_id
         transaction.commit()
-        assert session.query(Workspace).filter(Workspace.workspace_id == admin_workspace_id).one()
-        assert session.query(Workspace).filter(Workspace.workspace_id == user_workspace_id).one()
+        assert (
+            session.query(Workspace)
+            .filter(Workspace.workspace_id == admin_workspace_id)
+            .one()
+        )
+        assert (
+            session.query(Workspace)
+            .filter(Workspace.workspace_id == user_workspace_id)
+            .one()
+        )
         assert session.query(Content).filter(Content.id == file_id).one()
         assert session.query(Content).filter(Content.id == folder_id).one()
         assert session.query(Content).filter(Content.id == folder2_id).one()
@@ -1062,9 +1114,15 @@ class TestCommands(object):
         assert result == 0
         with pytest.raises(NoResultFound):
             assert (
-                session.query(Workspace).filter(Workspace.workspace_id == user_workspace_id).one()
+                session.query(Workspace)
+                .filter(Workspace.workspace_id == user_workspace_id)
+                .one()
             )
-        assert session.query(Workspace).filter(Workspace.workspace_id == admin_workspace_id).one()
+        assert (
+            session.query(Workspace)
+            .filter(Workspace.workspace_id == admin_workspace_id)
+            .one()
+        )
         assert session.query(Content).filter(Content.id == file_id).one()
         assert session.query(Content).filter(Content.id == folder_id).one()
         with pytest.raises(NoResultFound):
@@ -1126,7 +1184,10 @@ class TestCommands(object):
         user_workspace_id = user_workspace.workspace_id
         # INFO - G.M - 2019-12-20 - in user workspace
         content_api = content_api_factory.get(
-            show_deleted=True, show_active=True, show_archived=True, current_user=test_user
+            show_deleted=True,
+            show_active=True,
+            show_archived=True,
+            current_user=test_user,
         )
         folder2 = content_api.create(
             label="test-folder2",
@@ -1156,8 +1217,16 @@ class TestCommands(object):
         )
         file_id = file_.content_id
         transaction.commit()
-        assert session.query(Workspace).filter(Workspace.workspace_id == admin_workspace_id).one()
-        assert session.query(Workspace).filter(Workspace.workspace_id == user_workspace_id).one()
+        assert (
+            session.query(Workspace)
+            .filter(Workspace.workspace_id == admin_workspace_id)
+            .one()
+        )
+        assert (
+            session.query(Workspace)
+            .filter(Workspace.workspace_id == user_workspace_id)
+            .one()
+        )
         assert session.query(Content).filter(Content.id == file_id).one()
         assert session.query(Content).filter(Content.id == folder_id).one()
         assert session.query(Content).filter(Content.id == folder2_id).one()
@@ -1190,9 +1259,15 @@ class TestCommands(object):
         assert result == 0
         with pytest.raises(NoResultFound):
             assert (
-                session.query(Workspace).filter(Workspace.workspace_id == user_workspace_id).one()
+                session.query(Workspace)
+                .filter(Workspace.workspace_id == user_workspace_id)
+                .one()
             )
-        assert session.query(Workspace).filter(Workspace.workspace_id == admin_workspace_id).one()
+        assert (
+            session.query(Workspace)
+            .filter(Workspace.workspace_id == admin_workspace_id)
+            .one()
+        )
         assert session.query(Content).filter(Content.id == file_id).one()
         assert session.query(Content).filter(Content.id == folder_id).one()
         with pytest.raises(NoResultFound):
@@ -1256,7 +1331,10 @@ class TestCommands(object):
             email_notification_type=EmailNotificationType.NONE,
         )
         content_api = content_api_factory.get(
-            show_deleted=True, show_active=True, show_archived=True, current_user=test_user
+            show_deleted=True,
+            show_active=True,
+            show_archived=True,
+            current_user=test_user,
         )
         session.add(test_workspace)
         session.flush()
@@ -1288,7 +1366,11 @@ class TestCommands(object):
         )
         file_id = file_.content_id
         transaction.commit()
-        assert session.query(Workspace).filter(Workspace.workspace_id == workspace_id).one()
+        assert (
+            session.query(Workspace)
+            .filter(Workspace.workspace_id == workspace_id)
+            .one()
+        )
         assert session.query(Content).filter(Content.id == file_id).one()
         assert session.query(Content).filter(Content.id == folder_id).one()
         assert session.query(Content).filter(Content.id == folder2_id).one()
@@ -1318,13 +1400,21 @@ class TestCommands(object):
         )
         assert result == 0
 
-        assert session.query(Workspace).filter(Workspace.workspace_id == workspace_id).one()
         assert (
-            session.query(ContentRevisionRO).filter(ContentRevisionRO.content_id == file_id).all()
+            session.query(Workspace)
+            .filter(Workspace.workspace_id == workspace_id)
+            .one()
+        )
+        assert (
+            session.query(ContentRevisionRO)
+            .filter(ContentRevisionRO.content_id == file_id)
+            .all()
             == []
         )
         assert (
-            session.query(ContentRevisionRO).filter(ContentRevisionRO.content_id == folder_id).all()
+            session.query(ContentRevisionRO)
+            .filter(ContentRevisionRO.content_id == folder_id)
+            .all()
             == []
         )
         assert (
@@ -1374,7 +1464,10 @@ class TestCommands(object):
         session.add(test_workspace)
         session.flush()
         content_api = content_api_factory.get(
-            show_deleted=True, show_active=True, show_archived=True, current_user=test_user
+            show_deleted=True,
+            show_active=True,
+            show_archived=True,
+            current_user=test_user,
         )
         content = content_api.create(
             content_type_slug=content_type_list.File.slug,
@@ -1408,7 +1501,11 @@ class TestCommands(object):
         )
         assert result == 0
 
-    def test_func__delete_user__ok__dry_run(self, session, user_api_factory,) -> None:
+    def test_func__delete_user__ok__dry_run(
+        self,
+        session,
+        user_api_factory,
+    ) -> None:
         """
         Non-regression test for an error that occured with dry-run and user config.
         """

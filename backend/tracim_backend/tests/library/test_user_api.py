@@ -28,7 +28,9 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize(
-    "config_section", [{"name": "base_test_default_profile_trusted_user"}], indirect=True
+    "config_section",
+    [{"name": "base_test_default_profile_trusted_user"}],
+    indirect=True,
 )
 class TestUserApiWithCustomDefaultProfileForUser(object):
     def test_unit__create_minimal_user__ok__nominal_case(self, session, app_config):
@@ -97,14 +99,18 @@ class TestUserApi(object):
         assert u.display_name == "bob"
         assert u.profile.slug == "users"
 
-    def test_unit__create_minimal_user__ok__email_treated_as_lowercase(self, session, app_config):
+    def test_unit__create_minimal_user__ok__email_treated_as_lowercase(
+        self, session, app_config
+    ):
         api = UserApi(current_user=None, session=session, config=app_config)
         u = api.create_minimal_user("BOB@BOB")
         assert u.email == "bob@bob"
         assert u.display_name == "BOB"
 
     @pytest.mark.internal_auth
-    def test_unit__create_minimal_user_and_update__ok__nominal_case(self, session, app_config):
+    def test_unit__create_minimal_user_and_update__ok__nominal_case(
+        self, session, app_config
+    ):
         api = UserApi(current_user=None, session=session, config=app_config)
         u = api.create_minimal_user("bob@bob")
         api.update(u, "bob", "bob@bob", "password", do_save=True)
@@ -138,7 +144,9 @@ class TestUserApi(object):
         u = api.update(user=u, email="bib@bib")
         assert u.email == "bib@bib"
 
-    def test_unit__update_user_email__ok__email_treated_as_lowercase(self, session, app_config):
+    def test_unit__update_user_email__ok__email_treated_as_lowercase(
+        self, session, app_config
+    ):
         api = UserApi(current_user=None, session=session, config=app_config)
         u = api.create_minimal_user("bob@bob")
         assert u.email == "bob@bob"
@@ -181,7 +189,9 @@ class TestUserApi(object):
         assert u.email == email
 
     # username
-    def test_unit__create_minimal_user__ok__with_username_and_email(self, session, app_config):
+    def test_unit__create_minimal_user__ok__with_username_and_email(
+        self, session, app_config
+    ):
         api = UserApi(current_user=None, session=session, config=app_config)
         u = api.create_minimal_user("bob@bob", "boby")
         assert u.email == "bob@bob"
@@ -196,19 +206,28 @@ class TestUserApi(object):
         assert u.email is None
         assert u.username == "boby"
 
-    def test_unit__create_minimal_user__error__invalid_username(self, session, app_config):
+    def test_unit__create_minimal_user__error__invalid_username(
+        self, session, app_config
+    ):
         api = UserApi(current_user=None, session=session, config=app_config)
         with pytest.raises(InvalidUsernameFormat):
-            api.create_minimal_user(username="@boby", email="bob@boba.fet", save_now=True)
+            api.create_minimal_user(
+                username="@boby", email="bob@boba.fet", save_now=True
+            )
 
-    def test_unit__create_minimal_user__error__already_used_username(self, session, app_config):
+    def test_unit__create_minimal_user__error__already_used_username(
+        self, session, app_config
+    ):
         api = UserApi(current_user=None, session=session, config=app_config)
         api.create_minimal_user(username="boby", email="boby@boba.fet", save_now=True)
         with pytest.raises(UsernameAlreadyExists):
-            api.create_minimal_user(username="boby", email="boby2@boba.fet", save_now=True)
+            api.create_minimal_user(
+                username="boby", email="boby2@boba.fet", save_now=True
+            )
 
     @mock.patch(
-        "tracim_backend.lib.core.user.UserApi.get_reserved_usernames", return_value=tuple(["all"])
+        "tracim_backend.lib.core.user.UserApi.get_reserved_usernames",
+        return_value=tuple(["all"]),
     )
     @pytest.mark.parametrize("username", ["all"])
     def test_unit__create_minimal_user__error__reserved_username(
@@ -216,16 +235,22 @@ class TestUserApi(object):
     ):
         api = UserApi(current_user=None, session=session, config=app_config)
         with pytest.raises(ReservedUsernameError):
-            api.create_minimal_user(username=username, email="boby@boba.fet", save_now=True)
+            api.create_minimal_user(
+                username=username, email="boby@boba.fet", save_now=True
+            )
 
-    def test_unit__create_minimal_user__err__too_short_username(self, session, app_config):
+    def test_unit__create_minimal_user__err__too_short_username(
+        self, session, app_config
+    ):
         api = UserApi(current_user=None, session=session, config=app_config)
         with pytest.raises(InvalidUsernameFormat):
             api.create_minimal_user(
                 username="a" * (User.MIN_USERNAME_LENGTH - 1), email="boby2@boba.fet"
             )
 
-    def test_unit__create_minimal_user__err__too_long_username(self, session, app_config):
+    def test_unit__create_minimal_user__err__too_long_username(
+        self, session, app_config
+    ):
         api = UserApi(current_user=None, session=session, config=app_config)
         with pytest.raises(InvalidUsernameFormat):
             api.create_minimal_user(
@@ -262,20 +287,25 @@ class TestUserApi(object):
 
     def test_unit__update_user_username__error__already_used(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
-        u1 = api.create_minimal_user(username="boby", email="boby@boba.fet", save_now=True)
+        u1 = api.create_minimal_user(
+            username="boby", email="boby@boba.fet", save_now=True
+        )
         api.create_minimal_user(username="jean", email="boby2@boba.fet", save_now=True)
         with pytest.raises(UsernameAlreadyExists):
             api.update(user=u1, username="jean")
 
     @mock.patch(
-        "tracim_backend.lib.core.user.UserApi.get_reserved_usernames", return_value=tuple(["all"])
+        "tracim_backend.lib.core.user.UserApi.get_reserved_usernames",
+        return_value=tuple(["all"]),
     )
     @pytest.mark.parametrize("username", ["all"])
     def test_unit__update_user_username__error__reserved_username(
         self, get_reserved_usernames_mock, session, app_config, username: str
     ):
         api = UserApi(current_user=None, session=session, config=app_config)
-        u1 = api.create_minimal_user(username="boby", email="boby@boba.fet", save_now=True)
+        u1 = api.create_minimal_user(
+            username="boby", email="boby@boba.fet", save_now=True
+        )
         with pytest.raises(ReservedUsernameError):
             api.update(user=u1, username=username)
 
@@ -293,7 +323,9 @@ class TestUserApi(object):
         assert u.password
         assert u.validate_password("password" * 2)
 
-    def test_unit__update_user_password__err__too_short_password(self, session, app_config):
+    def test_unit__update_user_password__err__too_short_password(
+        self, session, app_config
+    ):
         api = UserApi(current_user=None, session=session, config=app_config)
         u = api.create_minimal_user("bob@bob")
         # 5 char
@@ -302,7 +334,9 @@ class TestUserApi(object):
         # 6 char
         api.update(user=u, password="passwo")
 
-    def test_unit__update_user_password__err__too_long_password(self, session, app_config):
+    def test_unit__update_user_password__err__too_long_password(
+        self, session, app_config
+    ):
         api = UserApi(current_user=None, session=session, config=app_config)
         u = api.create_minimal_user("bob@bob")
         with pytest.raises(TracimValidationFailed):
@@ -323,7 +357,9 @@ class TestUserApi(object):
         u = api.update(user=u, name="John Doe" * 2)
         assert u.display_name == "John Doe" * 2
 
-    def test_unit__update_user_public_name__err__too_short_public_name(self, session, app_config):
+    def test_unit__update_user_public_name__err__too_short_public_name(
+        self, session, app_config
+    ):
         api = UserApi(current_user=None, session=session, config=app_config)
         u = api.create_minimal_user("bob@bob")
         # 2 char
@@ -333,7 +369,9 @@ class TestUserApi(object):
         u = api.update(user=u, name="nnn")
         assert u.display_name == "nnn"
 
-    def test_unit__update_user_public_name__err__too_long_password(self, session, app_config):
+    def test_unit__update_user_public_name__err__too_long_password(
+        self, session, app_config
+    ):
         api = UserApi(current_user=None, session=session, config=app_config)
         u = api.create_minimal_user("bob@bob")
         with pytest.raises(TracimValidationFailed):
@@ -397,7 +435,9 @@ class TestUserApi(object):
         api = UserApi(current_user=None, session=session, config=app_config)
         u = api.create_minimal_user("bob@bob")
         with pytest.raises(UserAuthTypeDisabled):
-            api.update(u, name="bob", email="bob@bob", auth_type=AuthType.LDAP, do_save=True)
+            api.update(
+                u, name="bob", email="bob@bob", auth_type=AuthType.LDAP, do_save=True
+            )
 
     @pytest.mark.internal_auth
     def test_unit__create_minimal_user_and_set_password__ok__nominal_case(
@@ -418,7 +458,9 @@ class TestUserApi(object):
         assert not u.validate_password("pass")
 
     @pytest.mark.internal_auth
-    def test_unit__create_minimal_user_and_set_email__ok__nominal_case(self, session, app_config):
+    def test_unit__create_minimal_user_and_set_email__ok__nominal_case(
+        self, session, app_config
+    ):
         u = User()
         u.email = "bob@bob"
         u.password = "pass"
@@ -483,13 +525,17 @@ class TestUserApi(object):
 
     def test_get_one_by_username(self, session, app_config):
         api = UserApi(current_user=None, session=session, config=app_config)
-        u = api.create_minimal_user(username="boby", email="boby@boba.fet", save_now=True)
+        u = api.create_minimal_user(
+            username="boby", email="boby@boba.fet", save_now=True
+        )
         session.flush()
         transaction.commit()
 
         assert u.user_id == api.get_one_by_username("boby").user_id
 
-    def test_unit__get_one_by_email__err__user_does_not_exist(self, session, app_config):
+    def test_unit__get_one_by_email__err__user_does_not_exist(
+        self, session, app_config
+    ):
         api = UserApi(current_user=None, session=session, config=app_config)
         with pytest.raises(UserDoesNotExist):
             api.get_one_by_email("unknown")
@@ -508,18 +554,28 @@ class TestUserApi(object):
         with pytest.raises(TooShortAutocompleteString):
             api.get_known_users("e")
 
-    def test_unit__get_known_users__admin__by_email(self, session, app_config, admin_user):
+    def test_unit__get_known_users__admin__by_email(
+        self, session, app_config, admin_user
+    ):
         api = UserApi(current_user=admin_user, session=session, config=app_config)
-        u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
+        u1 = api.create_user(
+            email="email@email", name="name", do_notify=False, do_save=True
+        )
 
         users = api.get_known_users("email")
         assert len(users) == 1
         assert users[0] == u1
 
-    def test_unit__get_known_users__admin__by_username(self, session, app_config, admin_user):
+    def test_unit__get_known_users__admin__by_username(
+        self, session, app_config, admin_user
+    ):
         api = UserApi(current_user=admin_user, session=session, config=app_config)
         u1 = api.create_user(
-            name="name", username="FooBarBaz", email="boby@boba.fet", do_notify=False, do_save=True
+            name="name",
+            username="FooBarBaz",
+            email="boby@boba.fet",
+            do_notify=False,
+            do_save=True,
         )
 
         users = api.get_known_users("obar")
@@ -530,7 +586,9 @@ class TestUserApi(object):
         self, session, app_config, admin_user
     ):
         api = UserApi(current_user=admin_user, session=session, config=app_config)
-        u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
+        u1 = api.create_user(
+            email="email@email", name="name", do_notify=False, do_save=True
+        )
         api2 = UserApi(current_user=u1, session=session, config=app_config)
         users = api2.get_known_users("email")
         assert len(users) == 0
@@ -539,8 +597,12 @@ class TestUserApi(object):
         self, session, app_config, role_api_factory, workspace_api_factory, admin_user
     ):
         api = UserApi(current_user=None, session=session, config=app_config)
-        u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
-        u2 = api.create_user(email="email2@email2", name="name2", do_notify=False, do_save=True)
+        u1 = api.create_user(
+            email="email@email", name="name", do_notify=False, do_save=True
+        )
+        u2 = api.create_user(
+            email="email2@email2", name="name2", do_notify=False, do_save=True
+        )
         u3 = api.create_user(
             email="notfound@notfound", name="notfound", do_notify=False, do_save=True
         )
@@ -575,8 +637,12 @@ class TestUserApi(object):
         self, session, app_config, workspace_api_factory, role_api_factory, admin_user
     ):
         api = UserApi(current_user=admin_user, session=session, config=app_config)
-        u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
-        u2 = api.create_user(email="email2@email2", name="name2", do_notify=False, do_save=True)
+        u1 = api.create_user(
+            email="email@email", name="name", do_notify=False, do_save=True
+        )
+        u2 = api.create_user(
+            email="email2@email2", name="name2", do_notify=False, do_save=True
+        )
         u3 = api.create_user(
             email="notfound@notfound", name="notfound", do_notify=False, do_save=True
         )
@@ -610,7 +676,9 @@ class TestUserApi(object):
             email_notification_type=EmailNotificationType.NONE,
         )
         api2 = UserApi(current_user=u3, session=session, config=app_config)
-        users = api2.get_known_users("name", exclude_workspace_ids=[workspace.workspace_id])
+        users = api2.get_known_users(
+            "name", exclude_workspace_ids=[workspace.workspace_id]
+        )
         assert len(users) == 1
         assert users[0] == u2
 
@@ -620,7 +688,9 @@ class TestUserApi(object):
         api = UserApi(current_user=admin_user, session=session, config=app_config)
 
         with pytest.raises(CannotUseBothIncludeAndExcludeWorkspaceUsers):
-            api.get_known_users("name", exclude_workspace_ids=[1], include_workspace_ids=[2])
+            api.get_known_users(
+                "name", exclude_workspace_ids=[1], include_workspace_ids=[2]
+            )
 
     def test_unit__get_known_users__using_both_include_exclude_does_not_raise_if_one_empty(
         self, session, app_config, workspace_api_factory, role_api_factory, admin_user
@@ -633,89 +703,18 @@ class TestUserApi(object):
         self, session, app_config, workspace_api_factory, role_api_factory, admin_user
     ):
         api = UserApi(current_user=admin_user, session=session, config=app_config)
-        u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
-        u2 = api.create_user(email="email2@email2", name="name2", do_notify=False, do_save=True)
+        u1 = api.create_user(
+            email="email@email", name="name", do_notify=False, do_save=True
+        )
+        u2 = api.create_user(
+            email="email2@email2", name="name2", do_notify=False, do_save=True
+        )
         u3 = api.create_user(
             email="notfound@notfound", name="notfound", do_notify=False, do_save=True
         )
-        u4 = api.create_user(email="email3@email3", name="name3", do_notify=False, do_save=True)
-        wapi = workspace_api_factory.get()
-        workspace = wapi.create_workspace("test workspace n°1", save_now=True)
-        wapi = workspace_api_factory.get()
-        workspace_2 = wapi.create_workspace("test workspace n°2", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
-            u1,
-            workspace,
-            UserRoleInWorkspace.READER,
-            email_notification_type=EmailNotificationType.NONE,
+        u4 = api.create_user(
+            email="email3@email3", name="name3", do_notify=False, do_save=True
         )
-        role_api.create_one(
-            u2,
-            workspace_2,
-            UserRoleInWorkspace.READER,
-            email_notification_type=EmailNotificationType.NONE,
-        )
-        role_api.create_one(
-            u4,
-            workspace_2,
-            UserRoleInWorkspace.READER,
-            email_notification_type=EmailNotificationType.NONE,
-        )
-        role_api.create_one(
-            u3,
-            workspace,
-            UserRoleInWorkspace.READER,
-            email_notification_type=EmailNotificationType.NONE,
-        )
-        role_api.create_one(
-            u3,
-            workspace_2,
-            UserRoleInWorkspace.READER,
-            email_notification_type=EmailNotificationType.NONE,
-        )
-        api2 = UserApi(current_user=u3, session=session, config=app_config)
-        users = api2.get_known_users("name", include_workspace_ids=[workspace_2.workspace_id])
-        assert set(users) == set([u2, u4])
-
-    def test_unit__get_known_users__include_workspace_ids_short_acp_limit_ok(
-        self, session, app_config, workspace_api_factory, role_api_factory, admin_user
-    ):
-        api = UserApi(current_user=admin_user, session=session, config=app_config)
-        wapi = workspace_api_factory.get()
-        workspace = wapi.create_workspace("test workspace n°1", save_now=True)
-
-        u1 = None
-        for i in range(20):
-            u1 = api.create_user(
-                email="email{}@email".format(i),
-                name="name{}".format(i),
-                do_notify=False,
-                do_save=True,
-            )
-            role_api = role_api_factory.get()
-            role_api.create_one(
-                u1,
-                workspace,
-                UserRoleInWorkspace.READER,
-                email_notification_type=EmailNotificationType.NONE,
-            )
-
-        apiu1 = UserApi(current_user=u1, session=session, config=app_config)
-        users = apiu1.get_known_users("", include_workspace_ids=[workspace.workspace_id], limit=10)
-
-        assert len(users) == 10
-
-    def test_unit__get_known_users__distinct_workspaces_users_by_name__exclude_workspace_and_name(
-        self, session, app_config, workspace_api_factory, role_api_factory, admin_user
-    ):
-        api = UserApi(current_user=admin_user, session=session, config=app_config)
-        u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
-        u2 = api.create_user(email="email2@email2", name="name2", do_notify=False, do_save=True)
-        u3 = api.create_user(
-            email="notfound@notfound", name="notfound", do_notify=False, do_save=True
-        )
-        u4 = api.create_user(email="email3@email3", name="name3", do_notify=False, do_save=True)
         wapi = workspace_api_factory.get()
         workspace = wapi.create_workspace("test workspace n°1", save_now=True)
         wapi = workspace_api_factory.get()
@@ -753,7 +752,96 @@ class TestUserApi(object):
         )
         api2 = UserApi(current_user=u3, session=session, config=app_config)
         users = api2.get_known_users(
-            "name", exclude_workspace_ids=[workspace.workspace_id], exclude_user_ids=[u4.user_id]
+            "name", include_workspace_ids=[workspace_2.workspace_id]
+        )
+        assert set(users) == set([u2, u4])
+
+    def test_unit__get_known_users__include_workspace_ids_short_acp_limit_ok(
+        self, session, app_config, workspace_api_factory, role_api_factory, admin_user
+    ):
+        api = UserApi(current_user=admin_user, session=session, config=app_config)
+        wapi = workspace_api_factory.get()
+        workspace = wapi.create_workspace("test workspace n°1", save_now=True)
+
+        u1 = None
+        for i in range(20):
+            u1 = api.create_user(
+                email="email{}@email".format(i),
+                name="name{}".format(i),
+                do_notify=False,
+                do_save=True,
+            )
+            role_api = role_api_factory.get()
+            role_api.create_one(
+                u1,
+                workspace,
+                UserRoleInWorkspace.READER,
+                email_notification_type=EmailNotificationType.NONE,
+            )
+
+        apiu1 = UserApi(current_user=u1, session=session, config=app_config)
+        users = apiu1.get_known_users(
+            "", include_workspace_ids=[workspace.workspace_id], limit=10
+        )
+
+        assert len(users) == 10
+
+    def test_unit__get_known_users__distinct_workspaces_users_by_name__exclude_workspace_and_name(
+        self, session, app_config, workspace_api_factory, role_api_factory, admin_user
+    ):
+        api = UserApi(current_user=admin_user, session=session, config=app_config)
+        u1 = api.create_user(
+            email="email@email", name="name", do_notify=False, do_save=True
+        )
+        u2 = api.create_user(
+            email="email2@email2", name="name2", do_notify=False, do_save=True
+        )
+        u3 = api.create_user(
+            email="notfound@notfound", name="notfound", do_notify=False, do_save=True
+        )
+        u4 = api.create_user(
+            email="email3@email3", name="name3", do_notify=False, do_save=True
+        )
+        wapi = workspace_api_factory.get()
+        workspace = wapi.create_workspace("test workspace n°1", save_now=True)
+        wapi = workspace_api_factory.get()
+        workspace_2 = wapi.create_workspace("test workspace n°2", save_now=True)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            u1,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            u2,
+            workspace_2,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            u4,
+            workspace_2,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            u3,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            u3,
+            workspace_2,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        api2 = UserApi(current_user=u3, session=session, config=app_config)
+        users = api2.get_known_users(
+            "name",
+            exclude_workspace_ids=[workspace.workspace_id],
+            exclude_user_ids=[u4.user_id],
         )
         assert len(users) == 1
         assert users[0] == u2
@@ -762,8 +850,12 @@ class TestUserApi(object):
         self, session, app_config, workspace_api_factory, role_api_factory
     ):
         api = UserApi(current_user=None, session=session, config=app_config)
-        u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
-        u2 = api.create_user(email="email2@email2", name="name2", do_notify=False, do_save=True)
+        u1 = api.create_user(
+            email="email@email", name="name", do_notify=False, do_save=True
+        )
+        u2 = api.create_user(
+            email="email2@email2", name="name2", do_notify=False, do_save=True
+        )
         u3 = api.create_user(
             email="notfound@notfound", name="notfound", do_notify=False, do_save=True
         )
@@ -806,8 +898,12 @@ class TestUserApi(object):
         self, session, app_config, workspace_api_factory, role_api_factory, admin_user
     ):
         api = UserApi(current_user=admin_user, session=session, config=app_config)
-        u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
-        u2 = api.create_user(email="email2@email2", name="name2", do_notify=False, do_save=True)
+        u1 = api.create_user(
+            email="email@email", name="name", do_notify=False, do_save=True
+        )
+        u2 = api.create_user(
+            email="email2@email2", name="name2", do_notify=False, do_save=True
+        )
         u3 = api.create_user(
             email="notfound@notfound", name="notfound", do_notify=False, do_save=True
         )
@@ -841,8 +937,12 @@ class TestUserApi(object):
         self, session, app_config, workspace_api_factory, role_api_factory, admin_user
     ):
         api = UserApi(current_user=admin_user, session=session, config=app_config)
-        u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
-        u2 = api.create_user(email="email2@email2", name="name2", do_notify=False, do_save=True)
+        u1 = api.create_user(
+            email="email@email", name="name", do_notify=False, do_save=True
+        )
+        u2 = api.create_user(
+            email="email2@email2", name="name2", do_notify=False, do_save=True
+        )
         u3 = api.create_user(
             email="notfound@notfound", name="notfound", do_notify=False, do_save=True
         )
@@ -873,9 +973,13 @@ class TestUserApi(object):
         assert users[0] == u1
         assert users[1] == u2
 
-    def test_unit__get_known_users__admin__by_name(self, session, app_config, admin_user):
+    def test_unit__get_known_users__admin__by_name(
+        self, session, app_config, admin_user
+    ):
         api = UserApi(current_user=admin_user, session=session, config=app_config)
-        u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
+        u1 = api.create_user(
+            email="email@email", name="name", do_notify=False, do_save=True
+        )
 
         users = api.get_known_users("nam")
         assert len(users) == 1
@@ -996,7 +1100,9 @@ class TestUserApi(object):
         assert updated_user2.user_id == user2.user_id
         assert updated_user2.email == user2.email
 
-    def test_unit__disable_user___err__user_cant_disable_itself(self, session, app_config):
+    def test_unit__disable_user___err__user_cant_disable_itself(
+        self, session, app_config
+    ):
         api = UserApi(current_user=None, session=session, config=app_config)
 
         profile = Profile.USER
@@ -1020,7 +1126,6 @@ class TestUserApi(object):
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "base_test_ldap"}], indirect=True)
 class TestFakeLDAPUserApi(object):
-
     # NOTE - M.L - 2023-05-24 - disabled because not pertinent anymore
     # (connection w/ email is disabled if email is not mandatory)
     # @pytest.mark.ldap
@@ -1083,7 +1188,9 @@ class TestFakeLDAPUserApi(object):
     #     assert user.profile.slug == "users"
 
     @pytest.mark.ldap
-    def test__unit__create_user__err__external_auth_ldap_with_password(self, session, app_config):
+    def test__unit__create_user__err__external_auth_ldap_with_password(
+        self, session, app_config
+    ):
         api = UserApi(current_user=None, session=session, config=app_config)
         with pytest.raises(ExternalAuthUserPasswordModificationDisallowed):
             api.create_user(
@@ -1143,7 +1250,9 @@ class TestFakeLDAPUserApi(object):
         assert u.display_name == "bobi"
 
     @pytest.mark.ldap
-    def test_unit_update__err__external_auth_ldap_set_password(self, session, app_config):
+    def test_unit_update__err__external_auth_ldap_set_password(
+        self, session, app_config
+    ):
         api = UserApi(current_user=None, session=session, config=app_config)
         u = api.create_user(
             email="bob@bob",

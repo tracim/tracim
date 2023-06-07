@@ -85,7 +85,10 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
 
     __tablename__ = "workspaces"
     workspace_id = Column(
-        Integer, Sequence("seq__workspaces__workspace_id"), autoincrement=True, primary_key=True
+        Integer,
+        Sequence("seq__workspaces__workspace_id"),
+        autoincrement=True,
+        primary_key=True,
     )
 
     # TODO - G.M - 2018-10-30 - Make workspace label unique
@@ -93,7 +96,9 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
     # we should be sure at database level that workspace label are unique
     # nb: be careful about mysql compat with long unicode, forcing utf8 charset
     # for mysql will probably be needed, see fix in User sqlalchemy object
-    label = Column(Unicode(MAX_WORKSPACE_LABEL_LENGTH), unique=False, nullable=False, default="")
+    label = Column(
+        Unicode(MAX_WORKSPACE_LABEL_LENGTH), unique=False, nullable=False, default=""
+    )
     description = Column(Text(), unique=False, nullable=False, default="")
 
     is_deleted = Column(Boolean, unique=False, nullable=False, default=False)
@@ -130,7 +135,9 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
         nullable=False,
         server_default=WorkspaceRoles.READER.name,
     )
-    parent_id = Column(Integer, ForeignKey("workspaces.workspace_id"), nullable=True, default=None)
+    parent_id = Column(
+        Integer, ForeignKey("workspaces.workspace_id"), nullable=True, default=None
+    )
     children = relationship(
         "Workspace",
         backref=backref(
@@ -211,7 +218,9 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
 
         return contents
 
-    def get_size(self, include_deleted: bool = False, include_archived: bool = False) -> int:
+    def get_size(
+        self, include_deleted: bool = False, include_archived: bool = False
+    ) -> int:
         size = 0
         for revision in self.revisions:
             # INFO - G.M - 2019-09-02 - Don't count deleted and archived file.
@@ -224,7 +233,8 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
                     size += revision.depot_file.file.content_length
                 except IOError:
                     logger.warning(
-                        self, "Cannot get depot_file {}".format(revision.depot_file.file_id)
+                        self,
+                        "Cannot get depot_file {}".format(revision.depot_file.file_id),
                     )
         return size
 
@@ -243,7 +253,10 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
         return content_type_list.endpoint_allowed_types()
 
     def get_valid_children(
-        self, content_types: list = None, show_deleted: bool = False, show_archived: bool = False
+        self,
+        content_types: list = None,
+        show_deleted: bool = False,
+        show_archived: bool = False,
     ):
         for child in self.contents:
             # we search only direct children
@@ -258,7 +271,9 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
     def check_for_publication(self) -> None:
         if not self.publication_enabled:
             raise WorkspaceFeatureDisabled(
-                "Feature {} is disabled in workspace {}".format("publication", self.workspace_id)
+                "Feature {} is disabled in workspace {}".format(
+                    "publication", self.workspace_id
+                )
             )
 
 
@@ -269,7 +284,11 @@ class UserRoleInWorkspace(DeclarativeBase):
     __tablename__ = "user_workspace"
 
     user_id = Column(
-        Integer, ForeignKey("users.user_id"), nullable=False, default=None, primary_key=True
+        Integer,
+        ForeignKey("users.user_id"),
+        nullable=False,
+        default=None,
+        primary_key=True,
     )
     workspace_id = Column(
         Integer,
@@ -348,13 +367,19 @@ class WorkspaceSubscription(DeclarativeBase):
         default=None,
         primary_key=True,
     )
-    author_id = Column(Integer, ForeignKey("users.user_id"), nullable=False, primary_key=True)
+    author_id = Column(
+        Integer, ForeignKey("users.user_id"), nullable=False, primary_key=True
+    )
     evaluation_date = Column(DateTime, nullable=True)
-    evaluator_id = Column(Integer, ForeignKey("users.user_id"), nullable=True, default=None)
+    evaluator_id = Column(
+        Integer, ForeignKey("users.user_id"), nullable=True, default=None
+    )
     workspace = relationship(
         "Workspace", remote_side=[Workspace.workspace_id], backref="subscriptions"
     )
-    author = relationship("User", foreign_keys=[author_id], backref="workspace_subscriptions")
+    author = relationship(
+        "User", foreign_keys=[author_id], backref="workspace_subscriptions"
+    )
     evaluator = relationship(
         "User", foreign_keys=[evaluator_id], backref="workspace_evaluated_subscriptions"
     )
@@ -460,7 +485,9 @@ class ContentSortOrder(str, enum.Enum):
         return self.value.endswith(":asc")
 
 
-class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeBase):
+class ContentRevisionRO(
+    CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeBase
+):
     """
     Revision of Content. It's immutable, update or delete an existing ContentRevisionRO will throw
     ContentRevisionUpdateError errors.
@@ -489,12 +516,17 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
     owner = relationship("User", foreign_keys=[owner_id], remote_side=[User.user_id])
 
     assignee_id = Column(Integer, ForeignKey("users.user_id"), nullable=True)
-    assignee = relationship("User", foreign_keys=[assignee_id], remote_side=[User.user_id])
+    assignee = relationship(
+        "User", foreign_keys=[assignee_id], remote_side=[User.user_id]
+    )
 
     description = Column(Text(), unique=False, nullable=False, default="")
     raw_content = Column(Text(), unique=False, nullable=False, default="")
     file_extension = Column(
-        Unicode(MAX_FILE_EXTENSION_LENGTH), unique=False, nullable=False, server_default=""
+        Unicode(MAX_FILE_EXTENSION_LENGTH),
+        unique=False,
+        nullable=False,
+        server_default="",
     )
     file_mimetype = Column(
         Unicode(MAX_FILE_MIMETYPE_LENGTH), unique=False, nullable=False, default=""
@@ -528,11 +560,17 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
     workspace = relationship("Workspace", remote_side=[Workspace.workspace_id])
 
     parent_id = Column(Integer, ForeignKey("content.id"), nullable=True, default=None)
-    parent = relationship("Content", foreign_keys=[parent_id], back_populates="children_revisions")
+    parent = relationship(
+        "Content", foreign_keys=[parent_id], back_populates="children_revisions"
+    )
 
-    node = relationship("Content", foreign_keys=[content_id], back_populates="revisions")
+    node = relationship(
+        "Content", foreign_keys=[content_id], back_populates="revisions"
+    )
     content_namespace = Column(
-        Enum(ContentNamespaces), nullable=False, server_default=ContentNamespaces.CONTENT.name
+        Enum(ContentNamespaces),
+        nullable=False,
+        server_default=ContentNamespaces.CONTENT.name,
     )
 
     """ List of column copied when make a new revision from another """
@@ -783,7 +821,9 @@ class Content(DeclarativeBase):
         -0
     )  # This flag allow to serialize a given revision if required by the user
 
-    id = Column(Integer, Sequence("seq__content__id"), autoincrement=True, primary_key=True)
+    id = Column(
+        Integer, Sequence("seq__content__id"), autoincrement=True, primary_key=True
+    )
     cached_revision_id = Column(
         Integer, ForeignKey("content_revisions.revision_id", ondelete="RESTRICT")
     )
@@ -1182,7 +1222,10 @@ class Content(DeclarativeBase):
         return (
             object_session(self)
             .query(Content)
-            .join(ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id)
+            .join(
+                ContentRevisionRO,
+                Content.cached_revision_id == ContentRevisionRO.revision_id,
+            )
             .filter(ContentRevisionRO.parent_id == self.id)
             .order_by(ContentRevisionRO.content_id)
         )
@@ -1210,14 +1253,16 @@ class Content(DeclarativeBase):
             """
         )
         children_ids = [
-            elem[0] for elem in object_session(self).execute(statement, {"content_id": self.id})
+            elem[0]
+            for elem in object_session(self).execute(statement, {"content_id": self.id})
         ]
         if children_ids:
             return (
                 object_session(self)
                 .query(Content)
                 .join(
-                    ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id
+                    ContentRevisionRO,
+                    Content.cached_revision_id == ContentRevisionRO.revision_id,
                 )
                 .filter(Content.id.in_(children_ids))
                 .order_by(ContentRevisionRO.content_id)
@@ -1298,7 +1343,9 @@ class Content(DeclarativeBase):
         return new_rev
 
     def get_valid_children(self, content_types: List[str] = None) -> Query:
-        query = self.children.filter(ContentRevisionRO.is_deleted == False).filter(  # noqa: E712
+        query = self.children.filter(
+            ContentRevisionRO.is_deleted == False
+        ).filter(  # noqa: E712
             ContentRevisionRO.is_archived == False  # noqa: E712
         )
 
@@ -1317,9 +1364,9 @@ class Content(DeclarativeBase):
         else:
             properties = self.properties
         if "allowed_content" not in properties:
-            properties["allowed_content"] = content_type_list.default_allowed_content_properties(
-                self.type
-            )
+            properties[
+                "allowed_content"
+            ] = content_type_list.default_allowed_content_properties(self.type)
         return properties
 
     def created_as_delta(self, delta_from_datetime: datetime = None) -> timedelta:
@@ -1328,10 +1375,14 @@ class Content(DeclarativeBase):
 
         return format_timedelta(delta_from_datetime - self.created, locale=get_locale())
 
-    def datetime_as_delta(self, datetime_object, delta_from_datetime: datetime = None) -> timedelta:
+    def datetime_as_delta(
+        self, datetime_object, delta_from_datetime: datetime = None
+    ) -> timedelta:
         if not delta_from_datetime:
             delta_from_datetime = datetime.utcnow()
-        return format_timedelta(delta_from_datetime - datetime_object, locale=get_locale())
+        return format_timedelta(
+            delta_from_datetime - datetime_object, locale=get_locale()
+        )
 
     def get_label(self) -> str:
         return self.label or self.file_name or ""
@@ -1405,8 +1456,12 @@ class Content(DeclarativeBase):
         session = object_session(self)
         number_subquery = (
             session.query(func.count(ContentRevisionROForNumber.revision_id))
-            .filter(ContentRevisionROForNumber.revision_id <= ContentRevisionRO.revision_id)
-            .filter(ContentRevisionROForNumber.content_id == ContentRevisionRO.content_id)
+            .filter(
+                ContentRevisionROForNumber.revision_id <= ContentRevisionRO.revision_id
+            )
+            .filter(
+                ContentRevisionROForNumber.content_id == ContentRevisionRO.content_id
+            )
             .correlate(ContentRevisionRO)
             # NOTE - 2021/08/16 - S.G. - the label() transforms the query in a scalar subquery
             # which is properly generated as
@@ -1419,7 +1474,9 @@ class Content(DeclarativeBase):
         query = session.query(ContentRevisionRO, number_subquery).filter(
             ContentRevisionRO.content_id == self.content_id
         )
-        sort_clause = get_sort_expression(sort_order, ContentRevisionRO, {"modified": "updated"})
+        sort_clause = get_sort_expression(
+            sort_order, ContentRevisionRO, {"modified": "updated"}
+        )
         query = query.order_by(sort_clause)
         # INFO - 2021-08-17 - S.G. - Always add a sort on the revision id
         # in order to differenciate between revisions with the same modification date.
@@ -1563,7 +1620,9 @@ class RevisionReadStatus(DeclarativeBase):
 
     revision_id = Column(
         Integer,
-        ForeignKey("content_revisions.revision_id", ondelete="CASCADE", onupdate="CASCADE"),
+        ForeignKey(
+            "content_revisions.revision_id", ondelete="CASCADE", onupdate="CASCADE"
+        ),
         primary_key=True,
     )
     user_id = Column(
@@ -1572,7 +1631,9 @@ class RevisionReadStatus(DeclarativeBase):
         primary_key=True,
     )
     #  Default value datetime.utcnow, see: http://stackoverflow.com/a/13370382/801924 (or http://pastebin.com/VLyWktUn)
-    view_datetime = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
+    view_datetime = Column(
+        DateTime, unique=False, nullable=False, default=datetime.utcnow
+    )
 
     content_revision = relationship(
         "ContentRevisionRO",
@@ -1602,7 +1663,9 @@ class VirtualEvent(object):
             # TODO - G.M  - 10-04-2018 - [Cleanup] Remove label param
             # from this object ?
             # TODO - G.M - 2018-08-20 - [I18n] fix trad of this
-            label = "<strong>{}</strong> wrote:".format(content.owner.get_display_name())
+            label = "<strong>{}</strong> wrote:".format(
+                content.owner.get_display_name()
+            )
 
         return VirtualEvent(
             id=content.content_id,
@@ -1654,14 +1717,23 @@ class VirtualEvent(object):
 
         if delta.days > 0:
             if delta.days >= 365:
-                aff = "%d year%s ago" % (delta.days / 365, "s" if delta.days / 365 >= 2 else "")
+                aff = "%d year%s ago" % (
+                    delta.days / 365,
+                    "s" if delta.days / 365 >= 2 else "",
+                )
             elif delta.days >= 30:
-                aff = "%d month%s ago" % (delta.days / 30, "s" if delta.days / 30 >= 2 else "")
+                aff = "%d month%s ago" % (
+                    delta.days / 30,
+                    "s" if delta.days / 30 >= 2 else "",
+                )
             else:
                 aff = "%d day%s ago" % (delta.days, "s" if delta.days >= 2 else "")
         else:
             if delta.seconds < 60:
-                aff = "%d second%s ago" % (delta.seconds, "s" if delta.seconds > 1 else "")
+                aff = "%d second%s ago" % (
+                    delta.seconds,
+                    "s" if delta.seconds > 1 else "",
+                )
             elif delta.seconds / 60 < 60:
                 aff = "%d minute%s ago" % (
                     delta.seconds / 60,

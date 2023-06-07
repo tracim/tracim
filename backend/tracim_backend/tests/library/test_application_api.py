@@ -84,7 +84,9 @@ class TestApplicationApi(object):
         markdownpluspage.content_types.append(content_type)
         thread.is_active = True
         markdownpluspage.is_active = False
-        app_api = ApplicationApi(app_list=[thread, markdownpluspage], show_inactive=False)
+        app_api = ApplicationApi(
+            app_list=[thread, markdownpluspage], show_inactive=False
+        )
         workspace = Mock()
         workspace.workspace_id = 12
         workspace.agenda_enabled = True
@@ -107,7 +109,11 @@ class TestApplicationApi(object):
         app_config.APPS_COLORS["primary"] = "#fff"
 
         folder = DummyApp(
-            label="Folder", slug="contents/folder", fa_icon="folder-o", config={}, main_route=""
+            label="Folder",
+            slug="contents/folder",
+            fa_icon="folder-o",
+            config={},
+            main_route="",
         )
         content_type = TracimContentType(
             slug="folder",
@@ -183,7 +189,9 @@ class TestApplicationApi(object):
         assert default_workspace_menu_entry[1].label == publication_menu_entry.label
         assert default_workspace_menu_entry[2].label == all_content_menu_entry.label
 
-    def test_get_default_workspace_menu_entry__ok__publication_disabled_workspace_case(self):
+    def test_get_default_workspace_menu_entry__ok__publication_disabled_workspace_case(
+        self,
+    ):
         app_config = Mock()
         app_config.APPS_COLORS = {}
         app_config.APPS_COLORS["primary"] = "#fff"
@@ -196,4 +204,8 @@ class TestApplicationApi(object):
             workspace=workspace, app_config=app_config
         )
         with pytest.raises(StopIteration):
-            next(entry for entry in menu_entries if entry.slug == publication_menu_entry.slug)
+            next(
+                entry
+                for entry in menu_entries
+                if entry.slug == publication_menu_entry.slug
+            )

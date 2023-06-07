@@ -32,7 +32,9 @@ comment_without_mention = (
     "<p>et probablement plus utile, un g&eacute;n&eacute;rateur de cla: http://selector.harmonyagreements.org/</p>"
 )
 
-html_with_several_mentions = '<span id="mention-foo">@bar</span><span id="mention-bar">@foo</span>'
+html_with_several_mentions = (
+    '<span id="mention-foo">@bar</span><span id="mention-bar">@foo</span>'
+)
 
 
 def create_content(
@@ -50,7 +52,10 @@ def create_content(
             user = uapi.get_one_by_email(email="this.is@user")
         except Exception:
             user = uapi.create_minimal_user(
-                email="this.is@user", profile=Profile.ADMIN, save_now=True, username="bar"
+                email="this.is@user",
+                profile=Profile.ADMIN,
+                save_now=True,
+                username="bar",
             )
         if parent_content:
             workspace = parent_content.workspace
@@ -68,7 +73,9 @@ def create_content(
         )
 
         with new_revision(session=session, tm=transaction.manager, content=content):
-            api.update_content(content, new_label=content.label, new_raw_content=raw_content)
+            api.update_content(
+                content, new_label=content.label, new_raw_content=raw_content
+            )
             api.save(content)
     return content
 
@@ -203,7 +210,9 @@ def one_comment_with_a_mention(
 
 
 def pending_mention_events_count(context: TracimContext) -> bool:
-    return sum(event.entity_type == EntityType.MENTION for event in context.pending_events)
+    return sum(
+        event.entity_type == EntityType.MENTION for event in context.pending_events
+    )
 
 
 class TestMentionBuilder:
@@ -212,7 +221,10 @@ class TestMentionBuilder:
         [
             (html_with_one_mention_bar, [Mention("bar", "foo")]),
             (comment_without_mention, []),
-            (html_with_several_mentions, [Mention("bar", "foo"), Mention("foo", "bar")]),
+            (
+                html_with_several_mentions,
+                [Mention("bar", "foo"), Mention("foo", "bar")],
+            ),
         ],
     )
     def test_unit_get_mentions_from_html__ok__nominal_cases(
@@ -288,11 +300,16 @@ class TestMentionBuilder:
         assert pending_mention_events_count(test_context) == 0
 
     def test_unit_on_content_modified__ok__one_new_mention(
-        self, session_factory, app_config, one_updated_content_with_one_new_mention: Content
+        self,
+        session_factory,
+        app_config,
+        one_updated_content_with_one_new_mention: Content,
     ) -> None:
         builder = MentionBuilder()
         context = TracimTestContext(
-            app_config, session_factory, user=one_updated_content_with_one_new_mention.owner
+            app_config,
+            session_factory,
+            user=one_updated_content_with_one_new_mention.owner,
         )
         builder.on_content_modified(one_updated_content_with_one_new_mention, context)
         assert 1 == len(context.pending_events)
@@ -302,21 +319,31 @@ class TestMentionBuilder:
         assert {"id": "bar", "recipient": "bar"} == mention_event.fields["mention"]
 
     def test_unit_on_content_modified__ok__no_new_mention(
-        self, session_factory, app_config, one_updated_content_with_no_new_mention: Content
+        self,
+        session_factory,
+        app_config,
+        one_updated_content_with_no_new_mention: Content,
     ) -> None:
         builder = MentionBuilder()
         context = TracimTestContext(
-            app_config, session_factory, user=one_updated_content_with_no_new_mention.owner
+            app_config,
+            session_factory,
+            user=one_updated_content_with_no_new_mention.owner,
         )
         builder.on_content_modified(one_updated_content_with_no_new_mention, context)
         assert pending_mention_events_count(context) == 0
 
     def test_unit_on_content_modified__ok__new_mention_all(
-        self, session_factory, app_config, one_updated_content_with_new_mention_all: Content
+        self,
+        session_factory,
+        app_config,
+        one_updated_content_with_new_mention_all: Content,
     ) -> None:
         builder = MentionBuilder()
         context = TracimTestContext(
-            app_config, session_factory, user=one_updated_content_with_new_mention_all.owner
+            app_config,
+            session_factory,
+            user=one_updated_content_with_new_mention_all.owner,
         )
         builder.on_content_modified(one_updated_content_with_new_mention_all, context)
         assert pending_mention_events_count(context) == 1
@@ -339,12 +366,15 @@ class TestMentionBuilder:
             api.update_content(
                 content,
                 new_label=content.label,
-                new_raw_content=content.raw_content + '<span id="mention-nasty">@nasty</span>',
+                new_raw_content=content.raw_content
+                + '<span id="mention-nasty">@nasty</span>',
             )
             api.save(content)
         assert pending_mention_events_count(test_context) == 0
 
-    @pytest.mark.parametrize("recipient, receiver_ids", [("all", [2]), ("TheAdmin", [1])])
+    @pytest.mark.parametrize(
+        "recipient, receiver_ids", [("all", [2]), ("TheAdmin", [1])]
+    )
     def test_unit_get_receiver_ids(
         self,
         recipient: str,
@@ -358,7 +388,11 @@ class TestMentionBuilder:
             operation=OperationType.CREATED,
             fields={
                 "mention": {"recipient": recipient, "id": "foobar123"},
-                "workspace": {"workspace_id": one_content_with_a_mention.workspace.workspace_id},
+                "workspace": {
+                    "workspace_id": one_content_with_a_mention.workspace.workspace_id
+                },
             },
         )
-        assert receiver_ids == MentionBuilder.get_receiver_ids(event, session, app_config)
+        assert receiver_ids == MentionBuilder.get_receiver_ids(
+            event, session, app_config
+        )

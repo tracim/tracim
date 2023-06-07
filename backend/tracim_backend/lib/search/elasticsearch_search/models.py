@@ -85,7 +85,8 @@ class ESContentSearchResponse(ContentSearchResponse):
             try:
                 comments = [
                     SearchedDigestComment(
-                        content_id=comment["content_id"], parent_id=comment.get("parent_id")
+                        content_id=comment["content_id"],
+                        parent_id=comment.get("parent_id"),
                     )
                     for comment in source["comments"]
                 ]
@@ -104,7 +105,8 @@ class ESContentSearchResponse(ContentSearchResponse):
 
             dict_workspace = source["workspace"]
             workspace = SearchedDigestWorkspace(
-                workspace_id=dict_workspace["workspace_id"], label=dict_workspace["label"]
+                workspace_id=dict_workspace["workspace_id"],
+                label=dict_workspace["label"],
             )
             dict_last_modifier = source["last_modifier"]
             last_modifier = SearchedDigestUser(**dict_last_modifier)
@@ -131,8 +133,12 @@ class ESContentSearchResponse(ContentSearchResponse):
         facets = ContentFacets(
             workspace_names=facet_count(aggregations, "workspace_names"),
             author__public_names=facet_count(aggregations, "author__public_names"),
-            last_modifier__public_names=facet_count(aggregations, "last_modifier__public_names"),
-            file_extensions=facet_count(aggregations, "file_extensions", exclude_empty_values=True),
+            last_modifier__public_names=facet_count(
+                aggregations, "last_modifier__public_names"
+            ),
+            file_extensions=facet_count(
+                aggregations, "file_extensions", exclude_empty_values=True
+            ),
             statuses=facet_count(aggregations, "statuses"),
             content_types=facet_count(aggregations, "content_types"),
             tags=facet_count(aggregations, "tags"),
@@ -205,7 +211,12 @@ class UserSearchResponse:
 
 class SearchedWorkspace:
     def __init__(
-        self, workspace_id: int, label: str, access_type: str, member_count: int, content_count: int
+        self,
+        workspace_id: int,
+        label: str,
+        access_type: str,
+        member_count: int,
+        content_count: int,
     ) -> None:
         self.workspace_id = workspace_id
         self.label = label

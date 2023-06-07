@@ -41,7 +41,9 @@ class UploadPermission(CreationDateMixin, DeclarativeBase):
         autoincrement=True,
         primary_key=True,
     )
-    workspace_id = Column(Integer, ForeignKey("workspaces.workspace_id"), nullable=False)
+    workspace_id = Column(
+        Integer, ForeignKey("workspaces.workspace_id"), nullable=False
+    )
     author_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
     email = Column(Unicode(MAX_EMAIL_LENGTH), nullable=False)
     token = Column(Unicode(MAX_TOKEN_LENGTH), nullable=False)

@@ -39,15 +39,21 @@ class DatabaseCrudHookSpec:
         ...
 
     @hookspec
-    def on_workspace_created(self, workspace: Workspace, context: TracimContext) -> None:
+    def on_workspace_created(
+        self, workspace: Workspace, context: TracimContext
+    ) -> None:
         ...
 
     @hookspec
-    def on_workspace_modified(self, workspace: Workspace, context: TracimContext) -> None:
+    def on_workspace_modified(
+        self, workspace: Workspace, context: TracimContext
+    ) -> None:
         ...
 
     @hookspec
-    def on_workspace_deleted(self, workspace: Workspace, context: TracimContext) -> None:
+    def on_workspace_deleted(
+        self, workspace: Workspace, context: TracimContext
+    ) -> None:
         ...
 
     @hookspec
@@ -95,7 +101,9 @@ class DatabaseCrudHookSpec:
         ...
 
     @hookspec
-    def on_content_revision_created(self, content: Content, context: TracimContext) -> None:
+    def on_content_revision_created(
+        self, content: Content, context: TracimContext
+    ) -> None:
         ...
 
     @hookspec
@@ -141,11 +149,15 @@ class DatabaseCrudHookSpec:
         ...
 
     @hookspec
-    def on_content_tag_created(self, content_tag: TagOnContent, context: TracimContext) -> None:
+    def on_content_tag_created(
+        self, content_tag: TagOnContent, context: TracimContext
+    ) -> None:
         ...
 
     @hookspec
-    def on_content_tag_deleted(self, content_tag: TagOnContent, context: TracimContext) -> None:
+    def on_content_tag_deleted(
+        self, content_tag: TagOnContent, context: TracimContext
+    ) -> None:
         ...
 
     @hookspec
@@ -153,7 +165,9 @@ class DatabaseCrudHookSpec:
         ...
 
     @hookspec
-    def on_user_call_modified(self, user_call: UserCall, context: TracimContext) -> None:
+    def on_user_call_modified(
+        self, user_call: UserCall, context: TracimContext
+    ) -> None:
         ...
 
     @hookspec

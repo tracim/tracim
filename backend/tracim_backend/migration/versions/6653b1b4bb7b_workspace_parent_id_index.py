@@ -17,7 +17,9 @@ def upgrade():
     # INFO G.M - 2020-10-07 - mysql create automatically index on foreign key, do not need to update index
     # and it's very complicated to drop/delete index in a working way to be sure getting the correct index name here.
     if dialect.name != "mysql":
-        op.create_index("idx__workspaces__parent_id", "workspaces", ["parent_id"], unique=False)
+        op.create_index(
+            "idx__workspaces__parent_id", "workspaces", ["parent_id"], unique=False
+        )
 
 
 def downgrade():

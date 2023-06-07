@@ -92,7 +92,10 @@ class ParsedHTMLMail(object):
     def _process_elements(cls, elements: HtmlBodyMailParts) -> HtmlBodyMailParts:
         if len(elements) >= 2:
             # Case 1 and 2, only one main and one quote
-            if elements.get_nb_part_type("main") == 1 and elements.get_nb_part_type("quote") == 1:
+            if (
+                elements.get_nb_part_type("main") == 1
+                and elements.get_nb_part_type("quote") == 1
+            ):
                 # Case 1 : Main first
                 if elements[0].part_type == BodyMailPartType.Main:
                     cls._process_main_first_case(elements)

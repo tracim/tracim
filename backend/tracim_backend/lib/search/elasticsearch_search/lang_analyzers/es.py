@@ -11,7 +11,9 @@ from tracim_backend.lib.search.elasticsearch_search.default_analyzers import und
 
 
 spanish_stop = analysis.token_filter("spanish_stop", type="stop", stopwords="_spanish_")
-spanish_stemmer = analysis.token_filter("spanish_stemmer", type="stemmer", language="light_spanish")
+spanish_stemmer = analysis.token_filter(
+    "spanish_stemmer", type="stemmer", language="light_spanish"
+)
 tracim_spanish_analyzer = analyzer(
     "tracim_spanish",
     tokenizer="standard",

@@ -30,14 +30,22 @@ def upgrade():
             primary_key=True,
         ),
         sa.Column("content_id", sa.Integer(), ForeignKey("content.id"), nullable=False),
-        sa.Column("author_id", sa.Integer(), ForeignKey("users.user_id"), nullable=False),
+        sa.Column(
+            "author_id", sa.Integer(), ForeignKey("users.user_id"), nullable=False
+        ),
         sa.Column("email", sa.String(255), nullable=False),
         sa.Column("share_token", sa.Unicode(255), nullable=False),
         sa.Column("share_group_id", sa.Unicode(255), nullable=False),
         sa.Column("type", enum, nullable=False),
         sa.Column("password", sa.Unicode(128), nullable=False),
         sa.Column("enabled", sa.Boolean(), unique=False, nullable=False, default=None),
-        sa.Column("created", sa.DateTime(), unique=False, nullable=False, default=datetime.utcnow),
+        sa.Column(
+            "created",
+            sa.DateTime(),
+            unique=False,
+            nullable=False,
+            default=datetime.utcnow,
+        ),
         sa.Column("disabled", sa.DateTime(), unique=False, nullable=True, default=None),
     )
 

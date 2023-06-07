@@ -39,8 +39,12 @@ def rename_boolean_column(
 
 
 def upgrade():
-    rename_boolean_column("workspaces", "calendar_enabled", "agenda_enabled", "workspaces_chk_2")
+    rename_boolean_column(
+        "workspaces", "calendar_enabled", "agenda_enabled", "workspaces_chk_2"
+    )
 
 
 def downgrade():
-    rename_boolean_column("workspaces", "agenda_enabled", "calendar_enabled", "workspaces_chk_2")
+    rename_boolean_column(
+        "workspaces", "agenda_enabled", "calendar_enabled", "workspaces_chk_2"
+    )

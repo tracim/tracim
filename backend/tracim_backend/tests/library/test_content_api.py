@@ -37,7 +37,9 @@ class TestContentApi(object):
     ):
         uapi = user_api_factory.get()
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=Profile.ADMIN, save_now=True
+        )
         workspace = workspace_api_factory.get(user).create_workspace(
             "test workspace", save_now=True
         )
@@ -94,9 +96,13 @@ class TestContentApi(object):
             do_save=True,
         )
         with new_revision(session, transaction.manager, content=template):
-            api.update_content(template, "REPORT: UPDATED", new_description="Template description")
+            api.update_content(
+                template, "REPORT: UPDATED", new_description="Template description"
+            )
             api.save(
-                content=template, action_description=ActionDescription.EDITION, do_notify=False
+                content=template,
+                action_description=ActionDescription.EDITION,
+                do_notify=False,
             )
         transaction.commit()
         api = ContentApi(current_user=admin_user, session=session, config=app_config)
@@ -132,11 +138,18 @@ class TestContentApi(object):
         assert template.revision_type == ActionDescription.EDITION
 
     def test_unit__create_content__err_empty_label(
-        self, user_api_factory, session, app_config, workspace_api_factory, content_type_list
+        self,
+        user_api_factory,
+        session,
+        app_config,
+        workspace_api_factory,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=Profile.ADMIN, save_now=True
+        )
         workspace = workspace = workspace_api_factory.get(user).create_workspace(
             "test workspace", save_now=True
         )
@@ -151,11 +164,18 @@ class TestContentApi(object):
             )
 
     def test_unit__create_content__err_content_type_not_allowed_in_this_folder(
-        self, user_api_factory, session, app_config, workspace_api_factory, content_type_list
+        self,
+        user_api_factory,
+        session,
+        app_config,
+        workspace_api_factory,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=Profile.ADMIN, save_now=True
+        )
         workspace = workspace = workspace_api_factory.get(user).create_workspace(
             "test workspace", save_now=True
         )
@@ -193,11 +213,18 @@ class TestContentApi(object):
         )
 
     def test_unit__create_content__err_same_label_as_another_content(
-        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
         profile = Profile.ADMIN
-        user = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=profile, save_now=True
+        )
         workspace = workspace_api_factory.get(user).create_workspace(
             "test workspace", save_now=True
         )
@@ -219,18 +246,28 @@ class TestContentApi(object):
             )
 
     def test_unit__is_filename_available__ok__nominal_case(
-        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=Profile.ADMIN, save_now=True
+        )
         workspace = workspace_api_factory.get(user).create_workspace(
             "test workspace", save_now=True
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         assert (
             api._is_filename_available(
-                "test", workspace, parent=None, content_namespace=ContentNamespaces.CONTENT
+                "test",
+                workspace,
+                parent=None,
+                content_namespace=ContentNamespaces.CONTENT,
             )
             is True
         )
@@ -245,7 +282,10 @@ class TestContentApi(object):
         api.save(content, ActionDescription.CREATION, do_notify=False)
         assert (
             api._is_filename_available(
-                "test", workspace, parent=None, content_namespace=ContentNamespaces.CONTENT
+                "test",
+                workspace,
+                parent=None,
+                content_namespace=ContentNamespaces.CONTENT,
             )
             is False
         )
@@ -260,24 +300,37 @@ class TestContentApi(object):
         api.save(content, ActionDescription.CREATION, do_notify=False)
         assert (
             api._is_filename_available(
-                "test", workspace, parent=None, content_namespace=ContentNamespaces.CONTENT
+                "test",
+                workspace,
+                parent=None,
+                content_namespace=ContentNamespaces.CONTENT,
             )
             is False
         )
 
     def test_unit__is_filename_available__ok__different_namespace(
-        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=Profile.ADMIN, save_now=True
+        )
         workspace = workspace_api_factory.get(user).create_workspace(
             "test workspace", save_now=True
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         assert (
             api._is_filename_available(
-                "test", workspace, parent=None, content_namespace=ContentNamespaces.UPLOAD
+                "test",
+                workspace,
+                parent=None,
+                content_namespace=ContentNamespaces.UPLOAD,
             )
             is True
         )
@@ -293,17 +346,27 @@ class TestContentApi(object):
         api.save(content, ActionDescription.CREATION, do_notify=False)
         assert (
             api._is_filename_available(
-                "test", workspace, parent=None, content_namespace=ContentNamespaces.UPLOAD
+                "test",
+                workspace,
+                parent=None,
+                content_namespace=ContentNamespaces.UPLOAD,
             )
             is True
         )
 
     def test_unit__is_filename_available__ok__different_workspace(
-        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=Profile.ADMIN, save_now=True
+        )
         workspace = workspace_api_factory.get(user).create_workspace(
             "test workspace", save_now=True
         )
@@ -313,7 +376,10 @@ class TestContentApi(object):
         api = ContentApi(current_user=user, session=session, config=app_config)
         assert (
             api._is_filename_available(
-                "test", workspace, parent=None, content_namespace=ContentNamespaces.CONTENT
+                "test",
+                workspace,
+                parent=None,
+                content_namespace=ContentNamespaces.CONTENT,
             )
             is True
         )
@@ -328,17 +394,27 @@ class TestContentApi(object):
         api.save(content, ActionDescription.CREATION, do_notify=False)
         assert (
             api._is_filename_available(
-                "test", workspace, parent=None, content_namespace=ContentNamespaces.CONTENT
+                "test",
+                workspace,
+                parent=None,
+                content_namespace=ContentNamespaces.CONTENT,
             )
             is True
         )
 
     def test_unit__is_filename_available__ok__different_parent(
-        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=Profile.ADMIN, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -364,7 +440,10 @@ class TestContentApi(object):
         session.add(folder)
         assert (
             api._is_filename_available(
-                "test", workspace, parent=None, content_namespace=ContentNamespaces.CONTENT
+                "test",
+                workspace,
+                parent=None,
+                content_namespace=ContentNamespaces.CONTENT,
             )
             is True
         )
@@ -379,7 +458,10 @@ class TestContentApi(object):
         api.save(content, ActionDescription.CREATION, do_notify=False)
         assert (
             api._is_filename_available(
-                "test", workspace, parent=None, content_namespace=ContentNamespaces.CONTENT
+                "test",
+                workspace,
+                parent=None,
+                content_namespace=ContentNamespaces.CONTENT,
             )
             is True
         )
@@ -394,7 +476,10 @@ class TestContentApi(object):
         api.save(content, ActionDescription.CREATION, do_notify=False)
         assert (
             api._is_filename_available(
-                "test", workspace, parent=None, content_namespace=ContentNamespaces.CONTENT
+                "test",
+                workspace,
+                parent=None,
+                content_namespace=ContentNamespaces.CONTENT,
             )
             is True
         )
@@ -409,17 +494,27 @@ class TestContentApi(object):
         api.save(content, ActionDescription.CREATION, do_notify=False)
         assert (
             api._is_filename_available(
-                "test", workspace, parent=None, content_namespace=ContentNamespaces.CONTENT
+                "test",
+                workspace,
+                parent=None,
+                content_namespace=ContentNamespaces.CONTENT,
             )
             is False
         )
 
     def test_unit__set_allowed_content__ok__private_method(
-        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=Profile.ADMIN, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -443,11 +538,18 @@ class TestContentApi(object):
         }
 
     def test_unit__set_allowed_content__ok__nominal_case(
-        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=Profile.ADMIN, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -473,11 +575,18 @@ class TestContentApi(object):
         }
 
     def test_unit__get_allowed_content_type__ok__html_document(
-        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=Profile.ADMIN, save_now=True
+        )
         workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -485,14 +594,23 @@ class TestContentApi(object):
         allowed_content_type_dict = {"html-document": True, "file": False}
         allowed_content_types = api._get_allowed_content_type(allowed_content_type_dict)
         assert len(allowed_content_types) == 1
-        assert allowed_content_types[0] == content_type_list.get_one_by_slug("html-document")
+        assert allowed_content_types[0] == content_type_list.get_one_by_slug(
+            "html-document"
+        )
 
     def test_unit__get_allowed_content_type__ok__page_legacy_alias(
-        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=Profile.ADMIN, save_now=True
+        )
         workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -500,14 +618,23 @@ class TestContentApi(object):
         allowed_content_type_dict = {"page": True, "file": False}
         allowed_content_types = api._get_allowed_content_type(allowed_content_type_dict)
         assert len(allowed_content_types) == 1
-        assert allowed_content_types[0] == content_type_list.get_one_by_slug("html-document")
+        assert allowed_content_types[0] == content_type_list.get_one_by_slug(
+            "html-document"
+        )
 
     def test_unit___check_valid_content_type_in_dir__ok__nominal(
-        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=Profile.ADMIN, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -528,11 +655,18 @@ class TestContentApi(object):
         )
 
     def test_unit___check_valid_content_type_in_dir__err__not_valid_in_folder(
-        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=Profile.ADMIN, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -554,11 +688,18 @@ class TestContentApi(object):
             )
 
     def test_unit___check_valid_content_type_in_dir__err__not_valid_in_workspace(
-        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=Profile.ADMIN, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -581,11 +722,18 @@ class TestContentApi(object):
             )
 
     def test_delete(
-        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=Profile.ADMIN, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -634,16 +782,25 @@ class TestContentApi(object):
         # Refresh instances after commit
         user = uapi.get_one(uid)
         workspace_api = workspace_api_factory.get(current_user=user)
-        api = ContentApi(current_user=user, session=session, config=app_config, show_deleted=True)
+        api = ContentApi(
+            current_user=user, session=session, config=app_config, show_deleted=True
+        )
         items = api.get_all(None, ContentTypeSlug.ANY, [workspace])
         eq_(2, len(items))
 
     def test_unit__delete__ok__do_not_change_file_extension(
-        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=Profile.ADMIN, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -681,11 +838,18 @@ class TestContentApi(object):
         assert thread.file_extension == ".thread.html"
 
     def test_unit__archive__ok__do_not_change_file_extension(
-        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=Profile.ADMIN, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -723,11 +887,18 @@ class TestContentApi(object):
         assert thread.file_extension == ".thread.html"
 
     def test_archive(
-        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=Profile.ADMIN, save_now=True
+        )
         workspace_api = workspace_api_factory.get(current_user=user)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
         api = ContentApi(current_user=user, session=session, config=app_config)
@@ -778,16 +949,25 @@ class TestContentApi(object):
         api = ContentApi(current_user=user, session=session, config=app_config)
 
         # Test that the item is still available if "show deleted" is activated
-        api = ContentApi(current_user=None, session=session, config=app_config, show_archived=True)
+        api = ContentApi(
+            current_user=None, session=session, config=app_config, show_archived=True
+        )
         items = api.get_all(None, ContentTypeSlug.ANY, [workspace])
         eq_(2, len(items))
 
     def test_get_all_with_filter(
-        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=Profile.ADMIN, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -829,11 +1009,18 @@ class TestContentApi(object):
         eq_("thefolder", items3[0].label)
 
     def test_get_all_with_parent_id(
-        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=Profile.ADMIN, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -879,11 +1066,18 @@ class TestContentApi(object):
         eq_(child_id, items2[0].content_id)
 
     def test_set_status_unknown_status(
-        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=Profile.ADMIN, save_now=True
+        )
 
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
@@ -910,8 +1104,12 @@ class TestContentApi(object):
     ):
         uapi = user_api_factory.get()
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
-        user2 = uapi.create_minimal_user(email="another@user", profile=Profile.ADMIN, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=Profile.ADMIN, save_now=True
+        )
+        user2 = uapi.create_minimal_user(
+            email="another@user", profile=Profile.ADMIN, save_now=True
+        )
 
         workspace = workspace_api_factory.get(current_user=user2).create_workspace(
             "test workspace", save_now=True
@@ -958,7 +1156,9 @@ class TestContentApi(object):
     ):
         uapi = user_api_factory.get()
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=Profile.ADMIN, save_now=True
+        )
 
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
@@ -976,13 +1176,20 @@ class TestContentApi(object):
         assert p.content_namespace == ContentNamespaces.UPLOAD
 
     def test_create_comment_ok(
-        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
 
         profile = Profile.ADMIN
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=profile, save_now=True
+        )
 
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
@@ -1023,8 +1230,12 @@ class TestContentApi(object):
 
         profile = Profile.ADMIN
 
-        user = uapi.create_minimal_user(email="user1@user", profile=profile, save_now=True)
-        user2 = uapi.create_minimal_user(email="user2@user", profile=profile, save_now=True)
+        user = uapi.create_minimal_user(
+            email="user1@user", profile=profile, save_now=True
+        )
+        user2 = uapi.create_minimal_user(
+            email="user2@user", profile=profile, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -1052,7 +1263,11 @@ class TestContentApi(object):
             api.update_file_data(text_file, "test_file", "text/plain", b"test_content")
         api.save(text_file, ActionDescription.CREATION)
         api.create_comment(
-            workspace, parent=text_file, content="just a comment", do_save=True, do_notify=False
+            workspace,
+            parent=text_file,
+            content="just a comment",
+            do_save=True,
+            do_notify=False,
         )
         folderb = api.create(
             content_type_slug=content_type_list.Folder.slug,
@@ -1063,7 +1278,9 @@ class TestContentApi(object):
         comment_before_move_id = text_file.children[0].id
         api2 = ContentApi(current_user=user2, session=session, config=app_config)
         with new_revision(content=text_file, tm=transaction.manager, session=session):
-            api2.move(item=text_file, new_parent=folderb, new_workspace=text_file.workspace)
+            api2.move(
+                item=text_file, new_parent=folderb, new_workspace=text_file.workspace
+            )
             api2.save(text_file)
         transaction.commit()
         text_file_after_move = api2.get_one_by_label_and_parent("test_file", folderb)
@@ -1089,8 +1306,12 @@ class TestContentApi(object):
 
         profile = Profile.ADMIN
 
-        user = uapi.create_minimal_user(email="user1@user", profile=profile, save_now=True)
-        user2 = uapi.create_minimal_user(email="user2@user", profile=profile, save_now=True)
+        user = uapi.create_minimal_user(
+            email="user1@user", profile=profile, save_now=True
+        )
+        user2 = uapi.create_minimal_user(
+            email="user2@user", profile=profile, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -1118,7 +1339,11 @@ class TestContentApi(object):
             api.update_file_data(text_file, "test_file", "text/plain", b"test_content")
         api.save(text_file, ActionDescription.CREATION)
         api.create_comment(
-            workspace, parent=text_file, content="just a comment", do_save=True, do_notify=False
+            workspace,
+            parent=text_file,
+            content="just a comment",
+            do_save=True,
+            do_notify=False,
         )
         comment_before_move_id = text_file.children[0].id
         comment_before_move_workspace_id = text_file.children[0].workspace_id
@@ -1145,7 +1370,10 @@ class TestContentApi(object):
         text_file_after_move = api2.get_one_by_label_and_parent("test_file", folderb)
         assert text_file_after_move.children[0].raw_content == "just a comment"
         assert text_file_after_move.children[0].id == comment_before_move_id
-        assert text_file_after_move.children[0].workspace_id != comment_before_move_workspace_id
+        assert (
+            text_file_after_move.children[0].workspace_id
+            != comment_before_move_workspace_id
+        )
 
     def test_unit_move_file_with_comments__different_namespace(
         self,
@@ -1163,8 +1391,12 @@ class TestContentApi(object):
 
         profile = Profile.ADMIN
 
-        user = uapi.create_minimal_user(email="user1@user", profile=profile, save_now=True)
-        user2 = uapi.create_minimal_user(email="user2@user", profile=profile, save_now=True)
+        user = uapi.create_minimal_user(
+            email="user1@user", profile=profile, save_now=True
+        )
+        user2 = uapi.create_minimal_user(
+            email="user2@user", profile=profile, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -1193,7 +1425,11 @@ class TestContentApi(object):
             api.update_file_data(text_file, "test_file", "text/plain", b"test_content")
         api.save(text_file, ActionDescription.CREATION)
         api.create_comment(
-            workspace, parent=text_file, content="just a comment", do_save=True, do_notify=False
+            workspace,
+            parent=text_file,
+            content="just a comment",
+            do_save=True,
+            do_notify=False,
         )
 
         comment_before_move_id = text_file.children[0].id
@@ -1225,8 +1461,14 @@ class TestContentApi(object):
         assert text_file_after_move.content_namespace == ContentNamespaces.UPLOAD
         assert text_file_after_move.children[0].raw_content == "just a comment"
         assert text_file_after_move.children[0].id == comment_before_move_id
-        assert text_file_after_move.children[0].workspace_id != comment_before_move_workspace_id
-        assert text_file_after_move.children[0].workspace_id != comment_before_move_workspace_id
+        assert (
+            text_file_after_move.children[0].workspace_id
+            != comment_before_move_workspace_id
+        )
+        assert (
+            text_file_after_move.children[0].workspace_id
+            != comment_before_move_workspace_id
+        )
 
     def test_unit_copy_file_different_label_different_parent_ok(
         self,
@@ -1242,8 +1484,12 @@ class TestContentApi(object):
 
         profile = Profile.ADMIN
 
-        user = uapi.create_minimal_user(email="user1@user", profile=profile, save_now=True)
-        user2 = uapi.create_minimal_user(email="user2@user", profile=profile, save_now=True)
+        user = uapi.create_minimal_user(
+            email="user1@user", profile=profile, save_now=True
+        )
+        user2 = uapi.create_minimal_user(
+            email="user2@user", profile=profile, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -1287,7 +1533,10 @@ class TestContentApi(object):
         )
 
         api2.copy(
-            item=text_file, context=test_context, new_parent=folderb, new_label="test_file_copy"
+            item=text_file,
+            context=test_context,
+            new_parent=folderb,
+            new_label="test_file_copy",
         )
 
         transaction.commit()
@@ -1332,8 +1581,12 @@ class TestContentApi(object):
 
         profile = Profile.ADMIN
 
-        user = uapi.create_minimal_user(email="user1@user", profile=profile, save_now=True)
-        user2 = uapi.create_minimal_user(email="user2@user", profile=profile, save_now=True)
+        user = uapi.create_minimal_user(
+            email="user1@user", profile=profile, save_now=True
+        )
+        user2 = uapi.create_minimal_user(
+            email="user2@user", profile=profile, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -1401,8 +1654,12 @@ class TestContentApi(object):
 
         profile = Profile.ADMIN
 
-        user = uapi.create_minimal_user(email="user1@user", profile=profile, save_now=True)
-        user2 = uapi.create_minimal_user(email="user2@user", profile=profile, save_now=True)
+        user = uapi.create_minimal_user(
+            email="user1@user", profile=profile, save_now=True
+        )
+        user2 = uapi.create_minimal_user(
+            email="user2@user", profile=profile, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -1430,12 +1687,20 @@ class TestContentApi(object):
             api.update_file_data(text_file, "test_file", "text/plain", b"test_content")
         api.save(text_file, ActionDescription.CREATION)
         api.create_comment(
-            workspace, parent=text_file, content="just a comment", do_save=True, do_notify=False
+            workspace,
+            parent=text_file,
+            content="just a comment",
+            do_save=True,
+            do_notify=False,
         )
         with new_revision(session, transaction.manager, content=text_file):
-            api.update_content(text_file, text_file.label, new_description="just a description")
+            api.update_content(
+                text_file, text_file.label, new_description="just a description"
+            )
             api.save(
-                content=text_file, action_description=ActionDescription.EDITION, do_notify=False
+                content=text_file,
+                action_description=ActionDescription.EDITION,
+                do_notify=False,
             )
         api.create_comment(
             workspace,
@@ -1456,7 +1721,10 @@ class TestContentApi(object):
         )
 
         api2.copy(
-            item=text_file, context=test_context, new_parent=folderb, new_label="test_file_copy"
+            item=text_file,
+            context=test_context,
+            new_parent=folderb,
+            new_label="test_file_copy",
         )
 
         transaction.commit()
@@ -1465,17 +1733,24 @@ class TestContentApi(object):
         assert len(text_file.children.all()) == 2
         assert len(text_file_copy.children.all()) == 2
         assert text_file.children[0].raw_content == "just a comment"
-        assert text_file_copy.children[0].raw_content == text_file.children[0].raw_content
+        assert (
+            text_file_copy.children[0].raw_content == text_file.children[0].raw_content
+        )
         assert text_file_copy.children[0].id != text_file.children[0].id
         assert text_file_copy.children[0].created == text_file.children[0].created
 
         assert text_file.children[1].raw_content == "just another comment"
-        assert text_file_copy.children[1].raw_content == text_file.children[1].raw_content
+        assert (
+            text_file_copy.children[1].raw_content == text_file.children[1].raw_content
+        )
         assert text_file_copy.children[1].id != text_file.children[1].id
         assert text_file_copy.children[1].created == text_file.children[1].created
         # INFO - G.M - 2019-04-30 - check if both recursive
         # revision tree of content and copy are similar
-        assert len(text_file_copy.get_tree_revisions()) == len(text_file.get_tree_revisions()) + 3
+        assert (
+            len(text_file_copy.get_tree_revisions())
+            == len(text_file.get_tree_revisions()) + 3
+        )
         for num, revision in enumerate(text_file_copy.get_tree_revisions()[:-3]):
             assert (
                 text_file.get_tree_revisions()[num].revision_type
@@ -1499,8 +1774,12 @@ class TestContentApi(object):
 
         profile = Profile.ADMIN
 
-        user = uapi.create_minimal_user(email="user1@user", profile=profile, save_now=True)
-        user2 = uapi.create_minimal_user(email="user2@user", profile=profile, save_now=True)
+        user = uapi.create_minimal_user(
+            email="user1@user", profile=profile, save_now=True
+        )
+        user2 = uapi.create_minimal_user(
+            email="user2@user", profile=profile, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -1543,7 +1822,10 @@ class TestContentApi(object):
 
         with pytest.raises(UnallowedSubContent):
             api2.copy(
-                item=text_file, context=test_context, new_parent=folderb, new_label="test_file_copy"
+                item=text_file,
+                context=test_context,
+                new_parent=folderb,
+                new_label="test_file_copy",
             )
 
     def test_unit_copy_file__same_label_different_parent_ok(
@@ -1560,8 +1842,12 @@ class TestContentApi(object):
 
         profile = Profile.ADMIN
 
-        user = uapi.create_minimal_user(email="user1@user", profile=profile, save_now=True)
-        user2 = uapi.create_minimal_user(email="user2@user", profile=profile, save_now=True)
+        user = uapi.create_minimal_user(
+            email="user1@user", profile=profile, save_now=True
+        )
+        user2 = uapi.create_minimal_user(
+            email="user2@user", profile=profile, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -1633,8 +1919,12 @@ class TestContentApi(object):
 
         profile = Profile.ADMIN
 
-        user = uapi.create_minimal_user(email="user1@user", profile=profile, save_now=True)
-        user2 = uapi.create_minimal_user(email="user2@user", profile=profile, save_now=True)
+        user = uapi.create_minimal_user(
+            email="user1@user", profile=profile, save_now=True
+        )
+        user2 = uapi.create_minimal_user(
+            email="user2@user", profile=profile, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -1702,8 +1992,12 @@ class TestContentApi(object):
 
         profile = Profile.ADMIN
 
-        user = uapi.create_minimal_user(email="user1@user", profile=profile, save_now=True)
-        user2 = uapi.create_minimal_user(email="user2@user", profile=profile, save_now=True)
+        user = uapi.create_minimal_user(
+            email="user1@user", profile=profile, save_now=True
+        )
+        user2 = uapi.create_minimal_user(
+            email="user2@user", profile=profile, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -1753,8 +2047,12 @@ class TestContentApi(object):
 
         profile = Profile.ADMIN
 
-        user = uapi.create_minimal_user(email="user1@user", profile=profile, save_now=True)
-        user2 = uapi.create_minimal_user(email="user2@user", profile=profile, save_now=True)
+        user = uapi.create_minimal_user(
+            email="user1@user", profile=profile, save_now=True
+        )
+        user2 = uapi.create_minimal_user(
+            email="user2@user", profile=profile, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -1812,7 +2110,9 @@ class TestContentApi(object):
 
         profile = Profile.ADMIN
 
-        user_a = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
+        user_a = uapi.create_minimal_user(
+            email="this.is@user", profile=profile, save_now=True
+        )
         user_b = uapi.create_minimal_user(
             email="this.is@another.user", profile=profile, save_now=True
         )
@@ -1913,7 +2213,9 @@ class TestContentApi(object):
 
         profile = Profile.ADMIN
 
-        user_a = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
+        user_a = uapi.create_minimal_user(
+            email="this.is@user", profile=profile, save_now=True
+        )
         user_b = uapi.create_minimal_user(
             email="this.is@another.user", profile=profile, save_now=True
         )
@@ -1958,7 +2260,9 @@ class TestContentApi(object):
 
         profile = Profile.ADMIN
 
-        user_a = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
+        user_a = uapi.create_minimal_user(
+            email="this.is@user", profile=profile, save_now=True
+        )
         user_b = uapi.create_minimal_user(
             email="this.is@another.user", profile=profile, save_now=True
         )
@@ -2028,7 +2332,9 @@ class TestContentApi(object):
 
         profile = Profile.ADMIN
 
-        user1 = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
+        user1 = uapi.create_minimal_user(
+            email="this.is@user", profile=profile, save_now=True
+        )
 
         workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
@@ -2078,7 +2384,9 @@ class TestContentApi(object):
         api2 = ContentApi(current_user=u2, session=session, config=app_config)
         content2 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         with new_revision(session=session, tm=transaction.manager, content=content2):
-            api2.update_content(content2, "this is an updated page", new_raw_content="new content")
+            api2.update_content(
+                content2, "this is an updated page", new_raw_content="new content"
+            )
         api2.save(content2)
         transaction.commit()
 
@@ -2108,7 +2416,9 @@ class TestContentApi(object):
 
         profile = Profile.ADMIN
 
-        user1 = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
+        user1 = uapi.create_minimal_user(
+            email="this.is@user", profile=profile, save_now=True
+        )
 
         workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
@@ -2160,7 +2470,9 @@ class TestContentApi(object):
         content2 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         content2_nb_rev = len(content2.revisions)
         with pytest.raises(ContentInNotEditableState):
-            with new_revision(session=session, tm=transaction.manager, content=content2):
+            with new_revision(
+                session=session, tm=transaction.manager, content=content2
+            ):
                 api2.update_content(content2, "this is an updated page", "new content")
         content3 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         assert content3.label == "this_is_a_page"
@@ -2179,7 +2491,9 @@ class TestContentApi(object):
 
         profile = Profile.ADMIN
 
-        user1 = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
+        user1 = uapi.create_minimal_user(
+            email="this.is@user", profile=profile, save_now=True
+        )
 
         workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
@@ -2236,7 +2550,9 @@ class TestContentApi(object):
         content2 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         content2_nb_rev = len(content2.revisions)
         with pytest.raises(ContentFilenameAlreadyUsedInFolder):
-            with new_revision(session=session, tm=transaction.manager, content=content2):
+            with new_revision(
+                session=session, tm=transaction.manager, content=content2
+            ):
                 api2.update_content(content2, "this_is_a_page2", "new content")
             api2.save(content2)
         content3 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
@@ -2256,7 +2572,9 @@ class TestContentApi(object):
 
         profile = Profile.ADMIN
 
-        user1 = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
+        user1 = uapi.create_minimal_user(
+            email="this.is@user", profile=profile, save_now=True
+        )
 
         workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
@@ -2313,7 +2631,9 @@ class TestContentApi(object):
         content2 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         content2_nb_rev = len(content2.revisions)
         with pytest.raises(SameValueError):
-            with new_revision(session=session, tm=transaction.manager, content=content2):
+            with new_revision(
+                session=session, tm=transaction.manager, content=content2
+            ):
                 api2.update_content(content2, "this_is_a_page", "")
         api2.save(content2)
         content3 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
@@ -2333,7 +2653,9 @@ class TestContentApi(object):
 
         profile = Profile.ADMIN
 
-        user1 = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
+        user1 = uapi.create_minimal_user(
+            email="this.is@user", profile=profile, save_now=True
+        )
 
         workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
@@ -2382,7 +2704,9 @@ class TestContentApi(object):
         api2 = ContentApi(current_user=u2, session=session, config=app_config)
         content2 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         with new_revision(session=session, tm=transaction.manager, content=content2):
-            api2.update_file_data(content2, "index.html", "text/html", b"<html>hello world</html>")
+            api2.update_file_data(
+                content2, "index.html", "text/html", b"<html>hello world</html>"
+            )
         api2.save(content2)
         transaction.commit()
 
@@ -2414,7 +2738,9 @@ class TestContentApi(object):
 
         profile = Profile.ADMIN
 
-        user1 = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
+        user1 = uapi.create_minimal_user(
+            email="this.is@user", profile=profile, save_now=True
+        )
 
         workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
@@ -2466,7 +2792,9 @@ class TestContentApi(object):
         content2 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         content2_nb_rev = len(content2.revisions)
         with pytest.raises(ContentInNotEditableState):
-            with new_revision(session=session, tm=transaction.manager, content=content2):
+            with new_revision(
+                session=session, tm=transaction.manager, content=content2
+            ):
                 api2.update_file_data(
                     content2, "index.html", "text/html", b"<html>hello world</html>"
                 )
@@ -2487,7 +2815,9 @@ class TestContentApi(object):
 
         profile = Profile.ADMIN
 
-        user1 = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
+        user1 = uapi.create_minimal_user(
+            email="this.is@user", profile=profile, save_now=True
+        )
 
         workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
@@ -2505,7 +2835,9 @@ class TestContentApi(object):
         )
 
         # Test starts here
-        api = ContentApi(current_user=user1, session=session, config=app_config, show_archived=True)
+        api = ContentApi(
+            current_user=user1, session=session, config=app_config, show_archived=True
+        )
         p = api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=workspace,
@@ -2528,18 +2860,24 @@ class TestContentApi(object):
         user1 = uapi.get_one(u1id)
         workspace_api2 = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api2.get_one(wid)
-        api = ContentApi(current_user=user1, session=session, config=app_config, show_archived=True)
+        api = ContentApi(
+            current_user=user1, session=session, config=app_config, show_archived=True
+        )
 
         content = api.get_one(pcid, ContentTypeSlug.ANY, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
         u2 = uapi.get_one(u2id)
-        api2 = ContentApi(current_user=u2, session=session, config=app_config, show_archived=True)
+        api2 = ContentApi(
+            current_user=u2, session=session, config=app_config, show_archived=True
+        )
         content2 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         content2_nb_rev = len(content2.revisions)
         with pytest.raises(ContentInNotEditableState):
-            with new_revision(session=session, tm=transaction.manager, content=content2):
+            with new_revision(
+                session=session, tm=transaction.manager, content=content2
+            ):
                 api2.update_file_data(
                     content2, "index.html", "text/html", b"<html>hello world</html>"
                 )
@@ -2560,7 +2898,9 @@ class TestContentApi(object):
 
         profile = Profile.ADMIN
 
-        user1 = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
+        user1 = uapi.create_minimal_user(
+            email="this.is@user", profile=profile, save_now=True
+        )
 
         workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
@@ -2577,7 +2917,9 @@ class TestContentApi(object):
         )
 
         # Test starts here
-        api = ContentApi(current_user=user1, session=session, config=app_config, show_deleted=True)
+        api = ContentApi(
+            current_user=user1, session=session, config=app_config, show_deleted=True
+        )
         p = api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=workspace,
@@ -2600,18 +2942,24 @@ class TestContentApi(object):
         user1 = uapi.get_one(u1id)
         workspace_api2 = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api2.get_one(wid)
-        api = ContentApi(current_user=user1, session=session, config=app_config, show_deleted=True)
+        api = ContentApi(
+            current_user=user1, session=session, config=app_config, show_deleted=True
+        )
 
         content = api.get_one(pcid, ContentTypeSlug.ANY, workspace)
         eq_(u1id, content.owner_id)
         eq_(poid, content.owner_id)
 
         u2 = uapi.get_one(u2id)
-        api2 = ContentApi(current_user=u2, session=session, config=app_config, show_deleted=True)
+        api2 = ContentApi(
+            current_user=u2, session=session, config=app_config, show_deleted=True
+        )
         content2 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         content2_nb_rev = len(content2.revisions)
         with pytest.raises(ContentInNotEditableState):
-            with new_revision(session=session, tm=transaction.manager, content=content2):
+            with new_revision(
+                session=session, tm=transaction.manager, content=content2
+            ):
                 api2.update_file_data(
                     content2, "index.html", "text/html", b"<html>hello world</html>"
                 )
@@ -2633,7 +2981,9 @@ class TestContentApi(object):
 
         profile = Profile.ADMIN
 
-        user1 = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
+        user1 = uapi.create_minimal_user(
+            email="this.is@user", profile=profile, save_now=True
+        )
 
         workspace_api = workspace_api_factory.get(current_user=user1)
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
@@ -2656,7 +3006,9 @@ class TestContentApi(object):
                 label="same_content",
                 do_save=False,
             )
-            api.update_file_data(page, "index.html", "text/html", b"<html>Same Content Here</html>")
+            api.update_file_data(
+                page, "index.html", "text/html", b"<html>Same Content Here</html>"
+            )
         api.save(page, ActionDescription.CREATION, do_notify=True)
         transaction.commit()
 
@@ -2687,7 +3039,9 @@ class TestContentApi(object):
 
         profile = Profile.ADMIN
 
-        user1 = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
+        user1 = uapi.create_minimal_user(
+            email="this.is@user", profile=profile, save_now=True
+        )
         u1id = user1.user_id
 
         workspace_api = workspace_api_factory.get(current_user=user1)
@@ -2706,7 +3060,9 @@ class TestContentApi(object):
         )
 
         # show archived is used at the top end of the test
-        api = ContentApi(current_user=user1, session=session, show_archived=True, config=app_config)
+        api = ContentApi(
+            current_user=user1, session=session, show_archived=True, config=app_config
+        )
         p = api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=workspace,
@@ -2734,7 +3090,9 @@ class TestContentApi(object):
 
         u2api = user_api_factory.get()
         u2 = u2api.get_one(u2id)
-        api2 = ContentApi(current_user=u2, session=session, config=app_config, show_archived=True)
+        api2 = ContentApi(
+            current_user=u2, session=session, config=app_config, show_archived=True
+        )
         content2 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         with new_revision(session=session, tm=transaction.manager, content=content2):
             api2.archive(content2)
@@ -2745,8 +3103,12 @@ class TestContentApi(object):
         user1 = uapi.get_one(u1id)
         workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
         u2 = uapi.get_one(u2id)
-        api = ContentApi(current_user=user1, session=session, config=app_config, show_archived=True)
-        api2 = ContentApi(current_user=u2, session=session, config=app_config, show_archived=True)
+        api = ContentApi(
+            current_user=user1, session=session, config=app_config, show_archived=True
+        )
+        api2 = ContentApi(
+            current_user=u2, session=session, config=app_config, show_archived=True
+        )
 
         updated = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         eq_(
@@ -2780,7 +3142,9 @@ class TestContentApi(object):
 
         profile = Profile.ADMIN
 
-        user1 = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
+        user1 = uapi.create_minimal_user(
+            email="this.is@user", profile=profile, save_now=True
+        )
         u1id = user1.user_id
 
         workspace_api = workspace_api_factory.get(current_user=user1)
@@ -2799,7 +3163,9 @@ class TestContentApi(object):
         )
 
         # show archived is used at the top end of the test
-        api = ContentApi(current_user=user1, session=session, config=app_config, show_deleted=True)
+        api = ContentApi(
+            current_user=user1, session=session, config=app_config, show_deleted=True
+        )
         p = api.create(
             content_type_slug=content_type_list.File.slug,
             workspace=workspace,
@@ -2824,7 +3190,9 @@ class TestContentApi(object):
         eq_(poid, content.owner_id)
 
         u2 = uapi.get_one(u2id)
-        api2 = ContentApi(current_user=u2, session=session, config=app_config, show_deleted=True)
+        api2 = ContentApi(
+            current_user=u2, session=session, config=app_config, show_deleted=True
+        )
         content2 = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         with new_revision(session=session, tm=transaction.manager, content=content2):
             api2.delete(content2)
@@ -2836,9 +3204,13 @@ class TestContentApi(object):
         user1 = uapi.get_one(u1id)
         workspace = workspace_api_factory.get(current_user=user1).get_one(wid)
         # show archived is used at the top end of the test
-        api = ContentApi(current_user=user1, session=session, config=app_config, show_deleted=True)
+        api = ContentApi(
+            current_user=user1, session=session, config=app_config, show_deleted=True
+        )
         u2 = uapi.get_one(u2id)
-        api2 = ContentApi(current_user=u2, session=session, config=app_config, show_deleted=True)
+        api2 = ContentApi(
+            current_user=u2, session=session, config=app_config, show_deleted=True
+        )
 
         updated = api2.get_one(pcid, ContentTypeSlug.ANY, workspace)
         eq_(
@@ -2860,13 +3232,20 @@ class TestContentApi(object):
         eq_(u1id, updated2.owner_id)
 
     def test_unit__get_read_status__ok__nominal_case(
-        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
 
         profile = Profile.ADMIN
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=profile, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -2918,7 +3297,9 @@ class TestContentApi(object):
             do_save=True,
         )
         with new_revision(
-            session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
+            session=session,
+            tm=transaction.manager,
+            content=firstly_created_but_recently_updated,
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
@@ -2938,7 +3319,10 @@ class TestContentApi(object):
             do_save=True,
         )
         comment = api.create_comment(
-            workspace, firstly_created_but_recently_commented, "juste a super comment", True
+            workspace,
+            firstly_created_but_recently_commented,
+            "juste a super comment",
+            True,
         )
 
         content_workspace_2 = api.create(
@@ -2973,13 +3357,20 @@ class TestContentApi(object):
             parsed_elems.append(item)
 
     def test_unit__get_read_status__ok__do_no_show_deleted_archived(
-        self, session, workspace_api_factory, app_config, user_api_factory, content_type_list
+        self,
+        session,
+        workspace_api_factory,
+        app_config,
+        user_api_factory,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
 
         profile = Profile.ADMIN
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=profile, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -3075,13 +3466,20 @@ class TestContentApi(object):
             ]
 
     def test_unit__get_read_status__ok__workspace_filter_workspace_full(
-        self, user_api_factory, session, app_config, workspace_api_factory, content_type_list
+        self,
+        user_api_factory,
+        session,
+        app_config,
+        workspace_api_factory,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
 
         profile = Profile.ADMIN
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=profile, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -3124,7 +3522,9 @@ class TestContentApi(object):
             do_save=True,
         )
         with new_revision(
-            session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
+            session=session,
+            tm=transaction.manager,
+            content=firstly_created_but_recently_updated,
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
@@ -3144,7 +3544,10 @@ class TestContentApi(object):
             do_save=True,
         )
         comment = api.create_comment(
-            workspace, firstly_created_but_recently_commented, "juste a super comment", True
+            workspace,
+            firstly_created_but_recently_commented,
+            "juste a super comment",
+            True,
         )
 
         valid_content_ids = (
@@ -3173,13 +3576,20 @@ class TestContentApi(object):
         )
 
     def test_unit__get_read_status__ok__workspace_filter_workspace_content_ids(
-        self, session, user_api_factory, workspace_api_factory, app_config, content_type_list
+        self,
+        session,
+        user_api_factory,
+        workspace_api_factory,
+        app_config,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
 
         profile = Profile.ADMIN
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=profile, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -3222,7 +3632,9 @@ class TestContentApi(object):
             do_save=True,
         )
         with new_revision(
-            session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
+            session=session,
+            tm=transaction.manager,
+            content=firstly_created_but_recently_updated,
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
@@ -3241,7 +3653,10 @@ class TestContentApi(object):
             do_save=True,
         )
         api.create_comment(
-            workspace, firstly_created_but_recently_commented, "juste a super comment", True
+            workspace,
+            firstly_created_but_recently_commented,
+            "juste a super comment",
+            True,
         )
 
         selected_contents = [
@@ -3251,7 +3666,9 @@ class TestContentApi(object):
             main_folder,
         ]
         content_ids = [content.content_id for content in selected_contents]
-        read_status = api.get_read_status(user=user, workspace=workspace, content_ids=content_ids)
+        read_status = api.get_read_status(
+            user=user, workspace=workspace, content_ids=content_ids
+        )
         assert len(read_status) == 4
         parsed_elems = []
         for elem in read_status:
@@ -3269,13 +3686,20 @@ class TestContentApi(object):
             ]
 
     def test_unit__get_read_status__ok__workspace_filter_workspace_empty(
-        self, session, workspace_api_factory, app_config, user_api_factory, content_type_list
+        self,
+        session,
+        workspace_api_factory,
+        app_config,
+        user_api_factory,
+        content_type_list,
     ):
         uapi = user_api_factory.get()
 
         profile = Profile.ADMIN
 
-        user = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=profile, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -3320,7 +3744,9 @@ class TestContentApi(object):
             do_save=True,
         )
         with new_revision(
-            session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
+            session=session,
+            tm=transaction.manager,
+            content=firstly_created_but_recently_updated,
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
@@ -3340,7 +3766,10 @@ class TestContentApi(object):
             do_save=True,
         )
         api.create_comment(
-            workspace, firstly_created_but_recently_commented, "juste a super comment", True
+            workspace,
+            firstly_created_but_recently_commented,
+            "juste a super comment",
+            True,
         )
 
         read_status = api.get_read_status(user=user, workspace=workspace2)
@@ -3356,7 +3785,9 @@ class TestContentApi(object):
         admin_user,
     ) -> None:
         uapi = user_api_factory.get()
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.USER, save_now=True)
+        user = uapi.create_minimal_user(
+            email="this.is@user", profile=Profile.USER, save_now=True
+        )
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
@@ -3381,9 +3812,9 @@ class TestContentApiSecurity(object):
         bob_workspace = workspace_api_factory.get(current_user=bob).create_workspace(
             "bob_workspace", save_now=True
         )
-        admin_workspace = workspace_api_factory.get(current_user=admin_user).create_workspace(
-            "admin_workspace", save_now=True
-        )
+        admin_workspace = workspace_api_factory.get(
+            current_user=admin_user
+        ).create_workspace("admin_workspace", save_now=True)
 
         ContentApi(current_user=bob, session=session, config=app_config).create(
             content_type_slug=content_type_list.Page.slug,
@@ -3399,7 +3830,9 @@ class TestContentApiSecurity(object):
             do_save=True,
         )
 
-        bob_viewable = ContentApi(current_user=bob, session=session, config=app_config).get_all()
+        bob_viewable = ContentApi(
+            current_user=bob, session=session, config=app_config
+        ).get_all()
         eq_(1, len(bob_viewable), "Bob should view only one content")
         eq_(
             "bob_page",

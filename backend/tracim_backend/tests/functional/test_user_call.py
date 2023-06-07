@@ -14,7 +14,9 @@ from tracim_backend.tests.utils import EventHelper
 
 
 @pytest.fixture
-def one_call(bob_user: User, riyad_user: User, session: TracimSession, app_config: CFG) -> UserCall:
+def one_call(
+    bob_user: User, riyad_user: User, session: TracimSession, app_config: CFG
+) -> UserCall:
     bob_lib = CallLib(session, app_config, bob_user)
     call = bob_lib.create(riyad_user.user_id)
     transaction.commit()
@@ -23,7 +25,11 @@ def one_call(bob_user: User, riyad_user: User, session: TracimSession, app_confi
 
 @pytest.fixture
 def two_calls(
-    bob_user: User, riyad_user: User, admin_user: User, session: TracimSession, app_config: CFG
+    bob_user: User,
+    riyad_user: User,
+    admin_user: User,
+    session: TracimSession,
+    app_config: CFG,
 ) -> typing.Tuple[UserCall, UserCall]:
     """Create two calls."""
     bob_lib = CallLib(session, app_config, bob_user)
@@ -45,7 +51,9 @@ def three_users(
 
 
 @pytest.mark.usefixtures("base_fixture")
-@pytest.mark.parametrize("config_section", [{"name": "functional_test_with_call"}], indirect=True)
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_test_with_call"}], indirect=True
+)
 class TestUserCallEndpoint:
     """
     Tests for /api/users/{user_id}/outgoing_calls and /api/users/{user_id}/incoming_calls
@@ -67,7 +75,10 @@ class TestUserCallEndpoint:
     ) -> None:
         (call_1, call_2) = two_calls
         user = three_users[user_index]
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         url = "/api/users/{user_id}/outgoing_calls{query}"
         res = web_testapp.get(
             url.format(user_id=user.user_id, query=query),
@@ -75,7 +86,9 @@ class TestUserCallEndpoint:
         )
         assert len(res.json["items"]) == expected_item_count
 
-    @pytest.mark.parametrize("user_index,call_type", [(0, "outgoing_calls"), (1, "incoming_calls")])
+    @pytest.mark.parametrize(
+        "user_index,call_type", [(0, "outgoing_calls"), (1, "incoming_calls")]
+    )
     def test_api__get_call__ok_200__nominal_cases(
         self,
         web_testapp,
@@ -90,7 +103,9 @@ class TestUserCallEndpoint:
         web_testapp.authorization = ("Basic", (user.username, "password"))
         url = "/api/users/{user_id}/{call_type}/{call_id}"
         res = web_testapp.get(
-            url.format(user_id=user.user_id, call_type=call_type, call_id=call_1.call_id),
+            url.format(
+                user_id=user.user_id, call_type=call_type, call_id=call_1.call_id
+            ),
             status=200,
         )
         assert res.json["call_id"] == 1
@@ -128,7 +143,10 @@ class TestUserCallEndpoint:
     ) -> None:
         (call_1, call_2) = two_calls
         user = three_users[user_index]
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         url = "/api/users/{user_id}/incoming_calls{query}"
         res = web_testapp.get(
             url.format(user_id=user.user_id, query=query),
@@ -201,7 +219,9 @@ class TestUserCallEndpoint:
         web_testapp.authorization = ("Basic", (user.username, "password"))
         url = "/api/users/{user_id}/{put_name}/{call_id}/state"
         res = web_testapp.put_json(
-            url.format(user_id=user.user_id, call_id=one_call.call_id, put_name=put_name),
+            url.format(
+                user_id=user.user_id, call_id=one_call.call_id, put_name=put_name
+            ),
             params={"state": new_state},
             status=200,
         )
@@ -236,7 +256,9 @@ class TestUserCallEndpoint:
         web_testapp.authorization = ("Basic", (user.username, "password"))
         url = "/api/users/{user_id}/{put_name}/{call_id}/state"
         res = web_testapp.put_json(
-            url.format(user_id=user.user_id, call_id=one_call.call_id, put_name=put_name),
+            url.format(
+                user_id=user.user_id, call_id=one_call.call_id, put_name=put_name
+            ),
             params={"state": new_state},
             status=400,
         )
@@ -246,9 +268,19 @@ class TestUserCallEndpoint:
         "authorization, method, path, status",
         [
             (None, "GET", "/api/users/{user_id}/outgoing_calls", 401),
-            (("Basic", ("riyad", "password")), "GET", "/api/users/{user_id}/outgoing_calls", 403),
+            (
+                ("Basic", ("riyad", "password")),
+                "GET",
+                "/api/users/{user_id}/outgoing_calls",
+                403,
+            ),
             (None, "GET", "/api/users/{user_id}/incoming_calls", 401),
-            (("Basic", ("riyad", "password")), "GET", "/api/users/{user_id}/incoming_calls", 403),
+            (
+                ("Basic", ("riyad", "password")),
+                "GET",
+                "/api/users/{user_id}/incoming_calls",
+                403,
+            ),
             (None, "PUT", "/api/users/{user_id}/outgoing_calls/{call_id}/state", 401),
             (
                 ("Basic", ("riyad", "password")),

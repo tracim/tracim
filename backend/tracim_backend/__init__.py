@@ -137,7 +137,9 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
 
     configurator = Configurator(settings=settings, autocommit=True)
     # Add beaker session cookie
-    tracim_setting_for_beaker_session = sliced_dict(settings, beginning_key_string="session.")
+    tracim_setting_for_beaker_session = sliced_dict(
+        settings, beginning_key_string="session."
+    )
     tracim_setting_for_beaker_session["session.data_dir"] = app_config.SESSION__DATA_DIR
     tracim_setting_for_beaker_session["session.lock_dir"] = app_config.SESSION__LOCK_DIR
     tracim_setting_for_beaker_session["session.httponly"] = app_config.SESSION__HTTPONLY
@@ -162,7 +164,9 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     policies = []
     if app_config.REMOTE_USER_HEADER:
         policies.append(
-            RemoteAuthentificationPolicy(remote_user_login_header=app_config.REMOTE_USER_HEADER)
+            RemoteAuthentificationPolicy(
+                remote_user_login_header=app_config.REMOTE_USER_HEADER
+            )
         )
     policies.append(CookieSessionAuthentificationPolicy())
     policies.append(QueryTokenAuthentificationPolicy())
@@ -182,7 +186,9 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
         configurator.ldap_setup(
             app_config.LDAP_URL,
             bind=app_config.LDAP_BIND_DN if not app_config.LDAP_BIND_ANONYMOUS else "",
-            passwd=app_config.LDAP_BIND_PASS if not app_config.LDAP_BIND_ANONYMOUS else "",
+            passwd=app_config.LDAP_BIND_PASS
+            if not app_config.LDAP_BIND_ANONYMOUS
+            else "",
             use_tls=app_config.LDAP_TLS,
             use_pool=app_config.LDAP_USE_POOL,
             pool_size=app_config.LDAP_POOL_SIZE,
@@ -220,7 +226,9 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     init_models(configurator, app_config)
     # set Hapic
     context = TracimPyramidContext(
-        configurator=configurator, default_error_builder=ErrorSchema(), debug=app_config.DEBUG
+        configurator=configurator,
+        default_error_builder=ErrorSchema(),
+        debug=app_config.DEBUG,
     )
     # HACK - G.M - 2021-07-01 - Force reset of context if already set.
     # This case happened in some test now for unclear reasons.
@@ -293,7 +301,10 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     app_lib = ApplicationApi(app_list=app_list)
     for app in app_lib.get_all():
         app.load_controllers(
-            app_config=app_config, configurator=configurator, route_prefix=BASE_API, context=context
+            app_config=app_config,
+            configurator=configurator,
+            route_prefix=BASE_API,
+            context=context,
         )
         app.register_tracim_plugin(plugin_manager)
 

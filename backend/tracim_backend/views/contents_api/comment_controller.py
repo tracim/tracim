@@ -62,15 +62,21 @@ class CommentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        content = api.get_one(
+            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
+        )
         comment = api.get_one(
-            hapic_data.path.comment_id, parent=content, content_type=content_type_list.Comment.slug
+            hapic_data.path.comment_id,
+            parent=content,
+            content_type=content_type_list.Comment.slug,
         )
         return api.get_content_in_context(comment)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_COMMENT_ENDPOINTS])
     @hapic.handle_exception(TranslationServiceException, HTTPStatus.BAD_GATEWAY)
-    @hapic.handle_exception(InvalidParametersForTranslationService, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(
+        InvalidParametersForTranslationService, HTTPStatus.BAD_REQUEST
+    )
     @check_right(is_reader)
     @check_right(is_translation_service_enabled)
     @hapic.input_path(CommentsPathFilenameSchema())
@@ -81,7 +87,9 @@ class CommentController(Controller):
         Translate a comment
         """
         translation_lib = TranslationLib(
-            config=request.app_config, current_user=request.current_user, session=request.dbsession
+            config=request.app_config,
+            current_user=request.current_user,
+            session=request.dbsession,
         )
         comment_id = hapic_data.path.comment_id
         filename = hapic_data.path.filename
@@ -114,7 +122,9 @@ class CommentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        content = api.get_one(
+            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
+        )
         comments_page = content.get_subcontents(
             page_token=hapic_data.query["page_token"],
             count=hapic_data.query["count"],
@@ -144,7 +154,9 @@ class CommentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        content = api.get_one(
+            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
+        )
         comment = api.create_comment(
             content.workspace, content, hapic_data.body.raw_content, do_save=True
         )
@@ -170,11 +182,15 @@ class CommentController(Controller):
             config=request.app_config,
         )
         wapi = WorkspaceApi(
-            current_user=request.current_user, session=request.dbsession, config=request.app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=request.app_config,
         )
         workspace = wapi.get_one(hapic_data.path.workspace_id)
         parent = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value, workspace=workspace
+            hapic_data.path.content_id,
+            content_type=ContentTypeSlug.ANY.value,
+            workspace=workspace,
         )
         comment = api.get_one(
             hapic_data.path.comment_id,
@@ -182,7 +198,9 @@ class CommentController(Controller):
             workspace=workspace,
             parent=parent,
         )
-        with new_revision(session=request.dbsession, tm=transaction.manager, content=comment):
+        with new_revision(
+            session=request.dbsession, tm=transaction.manager, content=comment
+        ):
             api.update_content(comment, new_raw_content=hapic_data.body.raw_content)
             api.save(comment)
         return api.get_content_in_context(comment)
@@ -204,11 +222,15 @@ class CommentController(Controller):
             config=app_config,
         )
         wapi = WorkspaceApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
         workspace = wapi.get_one(hapic_data.path.workspace_id)
         parent = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value, workspace=workspace
+            hapic_data.path.content_id,
+            content_type=ContentTypeSlug.ANY.value,
+            workspace=workspace,
         )
         comment = api.get_one(
             hapic_data.path.comment_id,
@@ -216,7 +238,9 @@ class CommentController(Controller):
             workspace=workspace,
             parent=parent,
         )
-        with new_revision(session=request.dbsession, tm=transaction.manager, content=comment):
+        with new_revision(
+            session=request.dbsession, tm=transaction.manager, content=comment
+        ):
             api.delete(comment)
         return
 
@@ -241,7 +265,9 @@ class CommentController(Controller):
             "/workspaces/{workspace_id}/contents/{content_id}/comments/{comment_id}/translated/{filename:[^/]*}",
             request_method="GET",
         )
-        configurator.add_view(self.comment_translation, route_name="comment_translation")
+        configurator.add_view(
+            self.comment_translation, route_name="comment_translation"
+        )
 
         # Add comments
         configurator.add_route(
