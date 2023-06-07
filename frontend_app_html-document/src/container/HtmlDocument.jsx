@@ -1054,6 +1054,7 @@ export class HtmlDocument extends React.Component {
             onClickRefresh={this.handleClickRefresh}
             onClickLastVersion={this.handleClickLastVersion}
             workspaceId={state.content.workspace_id}
+            codeLanguageList={state.config.system.config.ui__notes__code_sample_languages}
           />
 
           <PopinFixedRightPart

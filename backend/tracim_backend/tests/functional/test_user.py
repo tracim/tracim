@@ -5370,7 +5370,7 @@ class TestUserEnpointsLDAPAuth(object):
     def test_api_set_user_password__err__400__setting_password_unallowed_for_ldap_user(
         self, web_testapp
     ):
-        web_testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
+        web_testapp.authorization = ("Basic", ("professor@planetexpress.com", "professor"))
         res = web_testapp.get("/api/auth/whoami", status=200)
         user_id = res.json_body["user_id"]
         # Set password
@@ -5388,7 +5388,7 @@ class TestUserEnpointsLDAPAuth(object):
 
     @pytest.mark.ldap
     def test_api_set_user_email__err__400__setting_email_unallowed_for_ldap_user(self, web_testapp):
-        web_testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
+        web_testapp.authorization = ("Basic", ("professor@planetexpress.com", "professor"))
         res = web_testapp.get("/api/auth/whoami", status=200)
         user_id = res.json_body["user_id"]
         # Set password
@@ -5403,10 +5403,10 @@ class TestUserEnpointsLDAPAuth(object):
 
     @pytest.mark.ldap
     def test_api__create_user__ok_200__full_admin(self, web_testapp, user_api_factory):
-        web_testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
+        web_testapp.authorization = ("Basic", ("professor@planetexpress.com", "professor"))
         web_testapp.get("/api/auth/whoami", status=200)
         api = user_api_factory.get(current_user=None)
-        user = api.get_one_by_email("hubert@planetexpress.com")
+        user = api.get_one_by_email("professor@planetexpress.com")
         api.update(user, auth_type=user.auth_type, profile=Profile.ADMIN)
         api.save(user)
         transaction.commit()

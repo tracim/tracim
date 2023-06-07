@@ -376,10 +376,10 @@ class TestResetPasswordExternalAuthUser(object):
     def test_api__reset_password_request__err__external_auth_ldap_cant_change_password(
         self, web_testapp
     ):
-        web_testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
+        web_testapp.authorization = ("Basic", ("professor@planetexpress.com", "professor"))
         web_testapp.get("/api/auth/whoami", status=200)
 
-        params = {"email": "hubert@planetexpress.com"}
+        params = {"email": "professor@planetexpress.com"}
         web_testapp.post_json("/api/auth/password/reset/request", status=204, params=params)
 
     @pytest.mark.email_notification
@@ -388,10 +388,10 @@ class TestResetPasswordExternalAuthUser(object):
         self, web_testapp
     ):
         # precreate user
-        web_testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
+        web_testapp.authorization = ("Basic", ("professor@planetexpress.com", "professor"))
         web_testapp.get("/api/auth/whoami", status=200)
 
-        params = {"email": "hubert@planetexpress.com", "reset_password_token": "unknown"}
+        params = {"email": "professor@planetexpress.com", "reset_password_token": "unknown"}
         res = web_testapp.post_json(
             "/api/auth/password/reset/token/check", status=400, params=params
         )
@@ -405,11 +405,11 @@ class TestResetPasswordExternalAuthUser(object):
         self, web_testapp
     ):
         # precreate user
-        web_testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
+        web_testapp.authorization = ("Basic", ("professor@planetexpress.com", "professor"))
         web_testapp.get("/api/auth/whoami", status=200)
 
         params = {
-            "email": "hubert@planetexpress.com",
+            "email": "professor@planetexpress.com",
             "reset_password_token": "unknown",
             "new_password": "mynewpassword",
             "new_password2": "mynewpassword",

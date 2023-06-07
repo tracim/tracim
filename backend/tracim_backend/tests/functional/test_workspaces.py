@@ -3088,11 +3088,11 @@ class TestUserInvitationWithMailActivatedSyncLDAPAuthOnly(object):
         Create workspace member role
         :return:
         """
-        web_testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
+        web_testapp.authorization = ("Basic", ("professor@planetexpress.com", "professor"))
         res = web_testapp.get("/api/auth/whoami", status=200)
 
         uapi = user_api_factory.get(current_user=None)
-        user = uapi.get_one_by_email("hubert@planetexpress.com")
+        user = uapi.get_one_by_email("professor@planetexpress.com")
         uapi.update(user, auth_type=user.auth_type, profile=Profile.ADMIN)
         uapi.save(user)
         transaction.commit()
