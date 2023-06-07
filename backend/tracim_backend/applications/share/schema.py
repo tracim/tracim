@@ -1,9 +1,8 @@
-import typing
-
 import marshmallow
 from marshmallow import post_load
 from marshmallow.validate import Length
 from marshmallow.validate import OneOf
+import typing
 
 from tracim_backend.app_models.validator import bool_as_int_validator
 from tracim_backend.app_models.validator import strictly_positive_int_validator

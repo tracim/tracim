@@ -1,7 +1,6 @@
 # coding: utf8
-from datetime import datetime
-
 from babel.dates import format_datetime
+from datetime import datetime
 
 from tracim_backend.lib.utils.translation import get_locale
 from tracim_backend.models import data
@@ -163,12 +162,10 @@ def create_readable_date(created, delta_from_datetime: datetime = None):
 
 
 def design_page(content: data.Content, content_revision: data.ContentRevisionRO) -> str:
-
     return content_revision.raw_content
 
 
 def design_thread(content: data.Content, content_revision: data.ContentRevisionRO, comments) -> str:
-
     if len(comments) == 0:
         return ""
 

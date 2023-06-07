@@ -40,7 +40,6 @@ class TestSimpleSearch(object):
         nb_content_result,
         first_search_result_content_name,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.TRUSTED_USER
@@ -111,7 +110,6 @@ class TestSimpleSearch(object):
         nb_content_result,
         first_search_result_content_name,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.TRUSTED_USER
@@ -198,7 +196,6 @@ class TestSimpleSearch(object):
         nb_content_result,
         first_search_result_content_name,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.TRUSTED_USER
@@ -293,7 +290,6 @@ class TestSimpleSearch(object):
         first_created_comment_content,
         second_created_comment_content,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.TRUSTED_USER
@@ -392,7 +388,6 @@ class TestSimpleSearch(object):
         first_created_todo_content,
         second_created_todo_content,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.TRUSTED_USER
@@ -420,10 +415,14 @@ class TestSimpleSearch(object):
             do_save=True,
         )
         api.create_todo(
-            parent=content, assignee=user, raw_content=first_created_todo_content,
+            parent=content,
+            assignee=user,
+            raw_content=first_created_todo_content,
         )
         api.create_todo(
-            parent=content, assignee=user, raw_content=second_created_todo_content,
+            parent=content,
+            assignee=user,
+            raw_content=second_created_todo_content,
         )
         api.create(
             content_type_slug="html-document", workspace=workspace, label="report", do_save=True
@@ -538,7 +537,6 @@ class TestSimpleSearch(object):
         content_api_factory,
         web_testapp,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.TRUSTED_USER
@@ -580,7 +578,6 @@ class TestSimpleSearch(object):
         workspace_api_factory,
         web_testapp,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.TRUSTED_USER
@@ -679,7 +676,6 @@ class TestSimpleSearch(object):
         session,
         web_testapp,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.TRUSTED_USER
@@ -822,7 +818,10 @@ class TestSimpleSearch(object):
         workspace = workspace_api.create_workspace("test", save_now=True)
         content_api = content_api_factory.get()
         content_api.create(
-            content_type_slug="html-document", workspace=workspace, label="Foo", do_save=True,
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="Foo",
+            do_save=True,
         )
         bar = content_api.create(
             content_type_slug="html-document", workspace=workspace, label="Bar", do_save=True

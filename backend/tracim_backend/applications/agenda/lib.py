@@ -1,15 +1,14 @@
-import contextlib
-from enum import Enum
-import os
-import typing
-from xml.sax.saxutils import escape
-
 import caldav
 from caldav.elements.base import ValuedBaseElement
 from caldav.lib.namespace import ns
 from colour import Color
+import contextlib
+from enum import Enum
+import os
 import requests
 from sqlalchemy.orm import Session
+import typing
+from xml.sax.saxutils import escape
 
 from tracim_backend import ApplicationApi
 from tracim_backend import app_list
@@ -119,7 +118,8 @@ class AgendaApi(object):
             )
         elif type == AgendaResourceType.addressbook:
             body = CREATE_ADDRESSBOOK_TEMPLATE.format(
-                addressbook_name=escape(name), addressbook_description=escape(description),
+                addressbook_name=escape(name),
+                addressbook_description=escape(description),
             )
         else:
             raise ()
@@ -394,7 +394,9 @@ class AgendaApi(object):
             user_id=dest_user_id
         )
         user_resource = self._config.RADICALE__USER_RESOURCE_PATTERN.format(
-            owner_type="user", owner_id=original_user_id, resource_type=resource_type.value,
+            owner_type="user",
+            owner_id=original_user_id,
+            resource_type=resource_type.value,
         )
         user_resource_path = self._config.RADICALE__USER_RESOURCE_PATH_PATTERN.format(
             user_resource_dir=user_resource_dir, user_resource=user_resource
@@ -419,7 +421,9 @@ class AgendaApi(object):
             user_id=dest_user_id
         )
         user_resource = self._config.RADICALE__USER_RESOURCE_PATTERN.format(
-            owner_type="user", owner_id=original_user_id, resource_type=resource_type.value,
+            owner_type="user",
+            owner_id=original_user_id,
+            resource_type=resource_type.value,
         )
         os.makedirs(
             "{local_path}/{user_resource_dir}".format(
@@ -430,7 +434,8 @@ class AgendaApi(object):
         )
 
         user_ressource_path = self._config.RADICALE__USER_RESOURCE_PATH_PATTERN.format(
-            user_resource_dir=user_resource_dir, user_resource=user_resource,
+            user_resource_dir=user_resource_dir,
+            user_resource=user_resource,
         )
         symlink_path = "{local_path}{user_resource_path}".format(
             local_path=self._config.RADICALE__LOCAL_PATH_STORAGE,
@@ -492,7 +497,9 @@ class AgendaApi(object):
             user_id=dest_user_id
         )
         user_resource = self._config.RADICALE__USER_RESOURCE_PATTERN.format(
-            owner_type="space", owner_id=workspace_id, resource_type=resource_type.value,
+            owner_type="space",
+            owner_id=workspace_id,
+            resource_type=resource_type.value,
         )
         user_resource_path = self._config.RADICALE__USER_RESOURCE_PATH_PATTERN.format(
             user_resource_dir=user_resource_dir, user_resource=user_resource
@@ -517,7 +524,9 @@ class AgendaApi(object):
             user_id=dest_user_id
         )
         user_resource = self._config.RADICALE__USER_RESOURCE_PATTERN.format(
-            owner_type="space", owner_id=workspace_id, resource_type=resource_type.value,
+            owner_type="space",
+            owner_id=workspace_id,
+            resource_type=resource_type.value,
         )
         os.makedirs(
             "{local_path}/{user_resource_dir}".format(
@@ -528,7 +537,8 @@ class AgendaApi(object):
         )
 
         user_ressource_path = self._config.RADICALE__USER_RESOURCE_PATH_PATTERN.format(
-            user_resource_dir=user_resource_dir, user_resource=user_resource,
+            user_resource_dir=user_resource_dir,
+            user_resource=user_resource,
         )
         symlink_path = "{local_path}{user_resource_path}".format(
             local_path=self._config.RADICALE__LOCAL_PATH_STORAGE,

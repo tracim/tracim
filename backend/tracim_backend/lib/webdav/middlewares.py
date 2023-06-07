@@ -1,20 +1,19 @@
 from datetime import datetime
-import os
-import sys
-import threading
-import time
-from xml.etree import ElementTree
-
 import ldap3
+import os
 from pyramid.registry import Registry
 from pyramid.threadlocal import get_current_registry
 from pyramid_ldap3 import ConnectionManager
 from pyramid_ldap3 import Connector
 from pyramid_ldap3 import _LDAPQuery
+import sys
+import threading
+import time
 import transaction
 from wsgidav import compat
 from wsgidav import util
 from wsgidav.middleware import BaseMiddleware
+from xml.etree import ElementTree
 import yaml
 
 from tracim_backend.config import CFG

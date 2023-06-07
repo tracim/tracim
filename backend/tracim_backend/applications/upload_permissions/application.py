@@ -1,6 +1,5 @@
-import os
-
 from hapic.ext.pyramid import PyramidContext
+import os
 from pyramid.config import Configurator
 
 from tracim_backend.config import CFG
@@ -15,17 +14,23 @@ class UploadPermissionApp(TracimApplication):
 
     def load_config(self, app_config: CFG) -> None:
         template_dir = app_config.here_macro_replace("%(here)s/tracim_backend/templates/mail")
-        app_config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__TEMPLATE__HTML = app_config.get_raw_config(
-            "email.notification.upload_permission_to_receiver.template.html",
-            "{}/{}".format(template_dir, "upload_permission_to_receiver_body_html.mak"),
+        app_config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__TEMPLATE__HTML = (
+            app_config.get_raw_config(
+                "email.notification.upload_permission_to_receiver.template.html",
+                "{}/{}".format(template_dir, "upload_permission_to_receiver_body_html.mak"),
+            )
         )
-        app_config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__SUBJECT = app_config.get_raw_config(
-            "email.notification.upload_permission_to_receiver.subject",
-            _('{emitter_name} invited you to upload files on "{website_title}"'),
+        app_config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_RECEIVER__SUBJECT = (
+            app_config.get_raw_config(
+                "email.notification.upload_permission_to_receiver.subject",
+                _('{emitter_name} invited you to upload files on "{website_title}"'),
+            )
         )
-        app_config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__TEMPLATE__HTML = app_config.get_raw_config(
-            "email.notification.upload_permission_to_emitter.template.html",
-            "{}/{}".format(template_dir, "upload_permission_to_emitter_body_html.mak"),
+        app_config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__TEMPLATE__HTML = (
+            app_config.get_raw_config(
+                "email.notification.upload_permission_to_emitter.template.html",
+                "{}/{}".format(template_dir, "upload_permission_to_emitter_body_html.mak"),
+            )
         )
         app_config.EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__SUBJECT = app_config.get_raw_config(
             "email.notification.upload_permission_to_emitter.subject",
@@ -33,9 +38,11 @@ class UploadPermissionApp(TracimApplication):
                 '[{website_title}] You invited {nb_receivers} people to upload files on "{workspace_name}"'
             ),
         )
-        app_config.EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML = app_config.get_raw_config(
-            "email.notification.new_upload_event.template.html",
-            "{}/{}".format(template_dir, "new_upload_event_body_html.mak"),
+        app_config.EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML = (
+            app_config.get_raw_config(
+                "email.notification.new_upload_event.template.html",
+                "{}/{}".format(template_dir, "new_upload_event_body_html.mak"),
+            )
         )
         app_config.EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT = app_config.get_raw_config(
             "email.notification.new_upload_event.subject",

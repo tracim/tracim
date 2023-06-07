@@ -1,8 +1,6 @@
 import enum
 from hashlib import sha256
 import os
-import typing
-
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import DateTime
@@ -13,6 +11,7 @@ from sqlalchemy import Sequence
 from sqlalchemy import Unicode
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import synonym
+import typing
 
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Workspace
@@ -26,7 +25,6 @@ class UploadPermissionType(enum.Enum):
 
 
 class UploadPermission(CreationDateMixin, DeclarativeBase):
-
     MIN_PASSWORD_LENGTH = 6
     MAX_PASSWORD_LENGTH = 512
     MIN_EMAIL_LENGTH = 3
@@ -61,7 +59,7 @@ class UploadPermission(CreationDateMixin, DeclarativeBase):
 
     @classmethod
     def _hash(cls, cleartext_password_or_token: str) -> str:
-        """ Hash method to create hash from string """
+        """Hash method to create hash from string"""
         salt = sha256()
         salt.update(os.urandom(60))
         salt = salt.hexdigest()

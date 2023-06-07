@@ -1,7 +1,6 @@
-import typing
-
 import pytest
 import transaction
+import typing
 
 from tracim_backend.config import CFG
 from tracim_backend.error import ErrorCode
@@ -26,8 +25,7 @@ def one_call(bob_user: User, riyad_user: User, session: TracimSession, app_confi
 def two_calls(
     bob_user: User, riyad_user: User, admin_user: User, session: TracimSession, app_config: CFG
 ) -> typing.Tuple[UserCall, UserCall]:
-    """Create two calls.
-    """
+    """Create two calls."""
     bob_lib = CallLib(session, app_config, bob_user)
     call_1 = bob_lib.create(riyad_user.user_id)
     call_2 = bob_lib.create(admin_user.user_id)
@@ -71,7 +69,10 @@ class TestUserCallEndpoint:
         user = three_users[user_index]
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         url = "/api/users/{user_id}/outgoing_calls{query}"
-        res = web_testapp.get(url.format(user_id=user.user_id, query=query), status=200,)
+        res = web_testapp.get(
+            url.format(user_id=user.user_id, query=query),
+            status=200,
+        )
         assert len(res.json["items"]) == expected_item_count
 
     @pytest.mark.parametrize("user_index,call_type", [(0, "outgoing_calls"), (1, "incoming_calls")])
@@ -129,7 +130,10 @@ class TestUserCallEndpoint:
         user = three_users[user_index]
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         url = "/api/users/{user_id}/incoming_calls{query}"
-        res = web_testapp.get(url.format(user_id=user.user_id, query=query), status=200,)
+        res = web_testapp.get(
+            url.format(user_id=user.user_id, query=query),
+            status=200,
+        )
         assert len(res.json["items"]) == expected_item_count
 
     def test_api__create_call__ok_200_nominal_case(
@@ -221,7 +225,12 @@ class TestUserCallEndpoint:
         ],
     )
     def test_api__update_call_state_ok__400__transition_not_allowed(
-        self, web_testapp, one_call: UserCall, user_attr: str, put_name: str, new_state: str,
+        self,
+        web_testapp,
+        one_call: UserCall,
+        user_attr: str,
+        put_name: str,
+        new_state: str,
     ) -> None:
         user = getattr(one_call, user_attr)
         web_testapp.authorization = ("Basic", (user.username, "password"))

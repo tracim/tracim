@@ -1,10 +1,9 @@
+import pluggy
 import re
 import time
-import typing
-
-import pluggy
 import tnetstring
 import transaction
+import typing
 import zmq
 
 from tracim_backend.config import CFG
@@ -84,7 +83,7 @@ class UserConnectionStateMonitor:
             return
 
         current_time = time.monotonic()
-        for (user_id, last_seen_time) in list(self.pending_offline_users.items()):
+        for user_id, last_seen_time in list(self.pending_offline_users.items()):
             if last_seen_time and last_seen_time + online_timeout <= current_time:
                 del self.pending_offline_users[user_id]
                 self.set_user_connection_status(user_id, UserConnectionStatus.OFFLINE)

@@ -1,6 +1,4 @@
 from datetime import datetime
-import typing
-
 from dateutil.parser import parse
 from elasticsearch import Elasticsearch
 from elasticsearch import NotFoundError
@@ -14,6 +12,7 @@ import pluggy
 from sqlalchemy import inspect
 from sqlalchemy.event import listen
 from sqlalchemy.orm import Session
+import typing
 
 # from tracim_backend.lib.search.models import UserSearchResponse
 from tracim_backend import CFG
@@ -29,12 +28,12 @@ from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.rq import RqQueueName
 from tracim_backend.lib.rq import get_rq_queue2
 from tracim_backend.lib.rq.worker import worker_context
-from tracim_backend.lib.search.elasticsearch_search.es_models import EXACT_FIELD
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestComments
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestContent
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestTodo
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestUser
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestWorkspace
+from tracim_backend.lib.search.elasticsearch_search.es_models import EXACT_FIELD
 from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedContent
 from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedWorkspace
 from tracim_backend.lib.search.elasticsearch_search.es_models import create_indexed_user_class
@@ -177,7 +176,6 @@ class ESSearchApi(SearchApi):
             self.es.indices.refresh(parameters.alias)
 
     def delete_indices(self) -> None:
-
         # TODO - G.M - 2019-05-31 - This code delete all index related to pattern, check if possible
         # to be more specific here.
         for parameters in self._get_indices_parameters():
@@ -564,7 +562,9 @@ class ESSearchApi(SearchApi):
             doc_type=IndexedContent,
             index=self._get_index_parameters(IndexedContent).alias,
         ).query(
-            "simple_query_string", query=search_parameters.search_string, fields=es_search_fields,
+            "simple_query_string",
+            query=search_parameters.search_string,
+            fields=es_search_fields,
         )
 
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default
@@ -736,10 +736,14 @@ class ESSearchApi(SearchApi):
             "workspace_ids", "terms", field="workspace_ids", size=DEFAULT_BUCKET_SIZE
         )
         search.aggs.metric(
-            "newest_authored_content_date_from", "min", field="newest_authored_content_date",
+            "newest_authored_content_date_from",
+            "min",
+            field="newest_authored_content_date",
         )
         search.aggs.metric(
-            "newest_authored_content_date_to", "max", field="newest_authored_content_date",
+            "newest_authored_content_date_to",
+            "max",
+            field="newest_authored_content_date",
         )
         response = search.execute()
         known_workspaces = self._get_workspaces_known_to_user()
@@ -1148,19 +1152,25 @@ class ESUserIndexer:
 
     @hookimpl
     def on_user_role_in_workspace_created(
-        self, role: UserRoleInWorkspace, context: TracimContext,
+        self,
+        role: UserRoleInWorkspace,
+        context: TracimContext,
     ) -> None:
         self.index_user(role.user, context)
 
     @hookimpl
     def on_user_role_in_workspace_modified(
-        self, role: UserRoleInWorkspace, context: TracimContext,
+        self,
+        role: UserRoleInWorkspace,
+        context: TracimContext,
     ) -> None:
         self.index_user(role.user, context)
 
     @hookimpl
     def on_user_role_in_workspace_deleted(
-        self, role: UserRoleInWorkspace, context: TracimContext,
+        self,
+        role: UserRoleInWorkspace,
+        context: TracimContext,
     ) -> None:
         self.index_user(role.user, context)
 

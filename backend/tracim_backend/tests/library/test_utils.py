@@ -4,8 +4,8 @@ from tracim_backend.exceptions import UnvalidCustomPropertiesSchema
 from tracim_backend.lib.mail_notifier.utils import EmailAddress
 from tracim_backend.lib.utils.dict_parsing import translate_dict
 from tracim_backend.lib.utils.utils import ALLOWED_AUTOGEN_PASSWORD_CHAR
-from tracim_backend.lib.utils.utils import DEFAULT_PASSWORD_GEN_CHAR_LENGTH
 from tracim_backend.lib.utils.utils import CustomPropertiesValidator
+from tracim_backend.lib.utils.utils import DEFAULT_PASSWORD_GEN_CHAR_LENGTH
 from tracim_backend.lib.utils.utils import ExtendedColor
 from tracim_backend.lib.utils.utils import clamp
 from tracim_backend.lib.utils.utils import password_generator

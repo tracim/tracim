@@ -4,16 +4,15 @@ from email.header import decode_header
 from email.header import make_header
 from email.message import Message
 from email.utils import parseaddr
-import socket
-import ssl
-import time
-import typing
-
 from email_reply_parser import EmailReplyParser
 import filelock
 import imapclient
 import markdown
 import requests
+import socket
+import ssl
+import time
+import typing
 
 from tracim_backend.exceptions import AutoReplyEmailNotAllowed
 from tracim_backend.exceptions import BadStatusCode
@@ -120,7 +119,6 @@ class DecodedMail(object):
         return part
 
     def get_key(self) -> typing.Optional[str]:
-
         """
         key is the string contain in some mail header we need to retrieve.
         First try checking special header, them check 'to' header
@@ -148,7 +146,7 @@ class DecodedMail(object):
     def find_key_from_mail_address(
         cls, mail_address: str, pattern: str, marker_str: str
     ) -> typing.Optional[str]:
-        """ Parse mail_adress-like string
+        """Parse mail_adress-like string
         to retrieve key.
         :param mail_address: mail_adress like user+key@something / key@something
         :param pattern: pattern like user+{marker_str}@something

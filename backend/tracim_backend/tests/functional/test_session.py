@@ -1,9 +1,8 @@
 # coding=utf-8
 import datetime
-from time import sleep
-
 from freezegun import freeze_time
 import pytest
+from time import sleep
 import transaction
 from webtest import TestApp
 
@@ -45,7 +44,8 @@ class TestLoginEndpoint(object):
         assert res.json_body["username"] == "TheAdmin"
 
     def test_api__try_login_enpoint__ok_200__with_username_basic_auth(
-        self, web_testapp: TestApp,
+        self,
+        web_testapp: TestApp,
     ) -> None:
         web_testapp.authorization = ("Basic", ("TheAdmin", "admin@admin.admin"))
         res = web_testapp.get("/api/auth/whoami", status=200)
@@ -69,7 +69,6 @@ class TestLoginEndpoint(object):
     def test_api__try_login_enpoint__err_401__user_not_activated(
         self, user_api_factory, web_testapp
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -656,7 +655,6 @@ class TestWhoamiEndpointWithApiKey(object):
     def test_api__try_whoami_enpoint__err_401__user_is_not_active(
         self, web_testapp, user_api_factory
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -711,7 +709,6 @@ class TestWhoamiEndpointWithRemoteHeader(object):
         assert res.json_body["email"] == "remoteuser@remoteuser.remoteuser"
 
     def test_api__try_whoami_enpoint_remote_user__ok_200__nominal_case(self, web_testapp):
-
         extra_environ = {"REMOTE_USER": "remoteuser@remoteuser.remoteuser"}
         res = web_testapp.get("/api/auth/whoami", status=200, extra_environ=extra_environ)
         assert res.json_body["public_name"] == "remoteuser"
@@ -738,7 +735,6 @@ class TestWhoamiEndpointWithRemoteHeader(object):
         assert res.json_body["user_id"] == user_id
 
     def test_api__try_whoami_enpoint_remote_user__ok_200__nominal_case_username(self, web_testapp):
-
         extra_environ = {"REMOTE_USER": "remoteuser"}
         res = web_testapp.get("/api/auth/whoami", status=200, extra_environ=extra_environ)
         assert res.json_body["public_name"] == "remoteuser"
@@ -767,7 +763,6 @@ class TestWhoamiEndpointWithRemoteHeader(object):
     def test_api__try_whoami_enpoint__err_401__remote_user_is_not_active(
         self, web_testapp, user_api_factory
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER

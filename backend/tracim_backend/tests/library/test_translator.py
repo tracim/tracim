@@ -1,8 +1,7 @@
 import io
+import responses
 from typing import BinaryIO
 from typing import List
-
-import responses
 
 from tracim_backend.lib.translate.services.systran import FILE_TRANSLATION_ENDPOINT
 from tracim_backend.lib.translate.services.systran import SUPPORTED_FORMAT_ENDPOINT
@@ -45,7 +44,12 @@ class TestExternalTranslator:
     def test__fake_translate_service_translate_file__nominal_case(self) -> None:
         translator = FakeTranslationService()
         base_content = io.BytesIO("Source content".encode("utf-8"))
-        result = translator.translate_file("fr", "en", base_content, "text/plain",)
+        result = translator.translate_file(
+            "fr",
+            "en",
+            base_content,
+            "text/plain",
+        )
         assert result.read().decode("utf-8") == "Translated"
 
 
@@ -164,6 +168,9 @@ class TestSystranTranslationService:
         )
         translation_service = SystranTranslationService(api_url=BASE_API_URL, api_key=API_KEY)
         result = translation_service.translate_file(
-            input_lang="fr", output_lang="en", binary_io=base_content, mimetype="text/plain",
+            input_lang="fr",
+            output_lang="en",
+            binary_io=base_content,
+            mimetype="text/plain",
         )
         assert result.read().decode("utf-8") == "Translated"

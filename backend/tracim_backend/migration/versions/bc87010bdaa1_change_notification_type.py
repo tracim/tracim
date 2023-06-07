@@ -56,7 +56,12 @@ def upgrade():
 
     with op.batch_alter_table("user_workspace") as batch_op:
         batch_op.add_column(
-            sa.Column("email_notification_type", enum, server_default="SUMMARY", nullable=False,)
+            sa.Column(
+                "email_notification_type",
+                enum,
+                server_default="SUMMARY",
+                nullable=False,
+            )
         )
 
     connection = op.get_bind()

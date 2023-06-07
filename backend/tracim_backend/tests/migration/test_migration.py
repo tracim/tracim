@@ -1,12 +1,11 @@
-import os
-import typing
-
 from alembic import command
 from alembic.config import Config
 from alembic.runtime.environment import EnvironmentContext
 from alembic.script import ScriptDirectory
+import os
 import pytest
 from sqlalchemy.engine import Engine
+import typing
 
 from tracim_backend.models.setup_models import *  # noqa: F403,F401
 from tracim_backend.tests.fixtures import *  # noqa: F403,F401

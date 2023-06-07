@@ -1,6 +1,5 @@
 from fractions import Fraction
 import typing
-
 from wand.image import Image
 
 

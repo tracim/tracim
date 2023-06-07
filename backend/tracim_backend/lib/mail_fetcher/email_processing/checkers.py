@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-import typing
-
 from bs4 import NavigableString
 from bs4 import Tag
+import typing
 
 
 class ProprietaryHTMLAttrValues(object):

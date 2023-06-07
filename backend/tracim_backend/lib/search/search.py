@@ -1,9 +1,8 @@
 from abc import ABC
 from abc import abstractmethod
-import typing
-
 import pluggy
 from sqlalchemy.orm import Session
+import typing
 
 from tracim_backend.config import CFG
 from tracim_backend.lib.core.content import ContentApi

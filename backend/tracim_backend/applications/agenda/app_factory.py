@@ -1,7 +1,6 @@
 # coding: utf-8
 from configparser import ConfigParser
 import os
-
 from radicale.config import Configuration as RadicaleConfiguration
 from radicale.config import load as load_radicale_config
 

@@ -1,7 +1,6 @@
 from datetime import datetime
-import typing
-
 from sqlalchemy.orm import Session
+import typing
 
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.applications.share.models import ContentShare

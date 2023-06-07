@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-import typing
-
 import pytest
 import transaction
+import typing
 
 from tracim_backend.app_models.contents import ContentTypeInContext
 from tracim_backend.app_models.contents import ContentTypeSlug

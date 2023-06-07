@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
+from depot.manager import DepotManager
 import os
 from os.path import dirname
-import subprocess
-
-from depot.manager import DepotManager
 import pytest
 from sqlalchemy.orm.exc import NoResultFound
+import subprocess
 import transaction
 
 import tracim_backend

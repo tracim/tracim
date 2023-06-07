@@ -1,8 +1,7 @@
 from datetime import datetime
-import typing
-
 import marshmallow
 from marshmallow import post_load
+import typing
 
 
 class WopiPutHeadersSchema(marshmallow.Schema):

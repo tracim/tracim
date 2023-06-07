@@ -1,16 +1,15 @@
 # coding=utf-8
-from unittest import mock
 from urllib.parse import quote
 
 from mock import patch
 import pytest
 import transaction
+from unittest import mock
 
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.utils.utils import get_timezones_list
 from tracim_backend.models.mention import TRANSLATED_GROUP_MENTIONS
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
-
 
 """
 Tests for /api/system subpath endpoints.
@@ -254,7 +253,6 @@ class TestConfigEndpointCollabora(object):
 
     @patch("requests.get")
     def test_api__get_config__ok_200__nominal_case(self, patched_get, web_testapp):
-
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         patched_get.return_value.text = """
         <wopi-discovery>

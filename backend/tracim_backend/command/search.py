@@ -1,5 +1,4 @@
 import argparse
-
 from pyramid.scripting import AppEnvironment
 
 from tracim_backend.app_models.contents import ContentTypeSlug

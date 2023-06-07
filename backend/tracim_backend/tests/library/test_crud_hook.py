@@ -1,7 +1,6 @@
-from unittest.mock import MagicMock
-
 import pytest
 import transaction
+from unittest.mock import MagicMock
 
 from tracim_backend.lib.core.plugins import hookimpl
 from tracim_backend.lib.utils.request import TracimContext
@@ -128,7 +127,6 @@ class TestDatabaseCrudHookCaller:
         hook.mock_hooks.assert_called_with("deleted", workspace=workspace, context=session.context)
 
     def test_unit__crud_caller__ok__user_role_in_workspace(self, session):
-
         hook = UserRoleInWorkspaceHookImpl()
         session.context.plugin_manager.register(hook)
 
@@ -173,7 +171,9 @@ class TestDatabaseCrudHookCaller:
         hook.mock_hooks.assert_called_with("created", content=content, context=session.context)
 
         with new_revision(
-            session=session, tm=transaction.manager, content=content,
+            session=session,
+            tm=transaction.manager,
+            content=content,
         ):
             content.label = "Bar"
 

@@ -1,9 +1,8 @@
 import abc
-import typing
-
 from bs4 import BeautifulSoup
 from bs4 import Tag
 from pluggy import PluginManager
+import typing
 
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.config import CFG
@@ -111,7 +110,7 @@ class DescriptionMentionParser(BaseMentionParser):
                 mentions.append(Mention(MentionType.ROLE, int(role_id), content_id))
                 continue
             raise InvalidMention(
-                f"The current mention is empty: no userid and no roleid specified."
+                f"The current mention is empty: no userid and no roleid specified."  # noqa: F541
             )
         return mentions
 
@@ -178,7 +177,8 @@ class MentionBuilder:
             parser = self._parsers[content.type]
         except KeyError:
             logger.info(
-                self, "No mention parser for '{}' content type, doing nothing".format(content.type),
+                self,
+                "No mention parser for '{}' content type, doing nothing".format(content.type),
             )
             return
 
@@ -193,7 +193,8 @@ class MentionBuilder:
             parser = self._parsers[content.type]
         except KeyError:
             logger.info(
-                self, "No mention parser for '{}' content type, doing nothing".format(content.type),
+                self,
+                "No mention parser for '{}' content type, doing nothing".format(content.type),
             )
             return
 

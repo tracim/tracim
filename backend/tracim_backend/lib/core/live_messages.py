@@ -1,10 +1,9 @@
 import enum
+from gripcontrol import GripPubControl
+from gripcontrol import HttpStreamFormat
 import json
 import threading
 import typing
-
-from gripcontrol import GripPubControl
-from gripcontrol import HttpStreamFormat
 
 # TODO - G.M - 2020-05-14 - Use default event "message" for TLM to be usable with
 # "onmessage" EventSource Object in javascript.
@@ -56,7 +55,10 @@ class LiveMessagesLib(object):
     # This avoids reinstanciating LiveMessageSchema each time we need to serialize a live message
     _message_schema = LiveMessageSchema()
 
-    def __init__(self, config: CFG,) -> None:
+    def __init__(
+        self,
+        config: CFG,
+    ) -> None:
         self._blocking_publish = config.LIVE_MESSAGES__BLOCKING_PUBLISH
         global _pub_control_create_lock
         global _grip_pub_control

@@ -1,26 +1,21 @@
 # -*- coding: utf-8 -*-
+from babel.dates import format_timedelta
+from bs4 import BeautifulSoup
 from collections import namedtuple
 from datetime import datetime
 from datetime import timedelta
-import enum
-import os
-import typing
-from typing import Any
-from typing import List
-from typing import Optional
-
-from babel.dates import format_timedelta
-from bs4 import BeautifulSoup
 from depot.fields.upload import UploadedFile
 from depot.io.utils import FileIntent
+import enum
+import os
 from sqlakeyset import Page
 from sqlakeyset import get_page
 import sqlalchemy
-from sqlalchemy import JSON
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import Index
+from sqlalchemy import JSON
 from sqlalchemy import Sequence
 from sqlalchemy import inspect
 from sqlalchemy import text
@@ -39,6 +34,10 @@ from sqlalchemy.types import DateTime
 from sqlalchemy.types import Integer
 from sqlalchemy.types import Text
 from sqlalchemy.types import Unicode
+import typing
+from typing import Any
+from typing import List
+from typing import Optional
 
 from tracim_backend.app_models.contents import ContentStatus
 from tracim_backend.app_models.contents import ContentTypeSlug
@@ -127,12 +126,18 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
         server_default=WorkspaceAccessType.CONFIDENTIAL.name,
     )
     default_user_role = Column(
-        Enum(WorkspaceRoles), nullable=False, server_default=WorkspaceRoles.READER.name,
+        Enum(WorkspaceRoles),
+        nullable=False,
+        server_default=WorkspaceRoles.READER.name,
     )
     parent_id = Column(Integer, ForeignKey("workspaces.workspace_id"), nullable=True, default=None)
     children = relationship(
         "Workspace",
-        backref=backref("parent", remote_side=[workspace_id], order_by="Workspace.workspace_id",),
+        backref=backref(
+            "parent",
+            remote_side=[workspace_id],
+            order_by="Workspace.workspace_id",
+        ),
         order_by="Workspace.workspace_id",
     )
 
@@ -230,7 +235,7 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
         return WorkspaceRoles.NOT_APPLICABLE.level
 
     def get_label(self):
-        """ this method is for interoperability with Content class"""
+        """this method is for interoperability with Content class"""
         return self.label
 
     def get_allowed_content_types(self) -> List[TracimContentType]:
@@ -281,7 +286,10 @@ class UserRoleInWorkspace(DeclarativeBase):
     )
 
     workspace = relationship(
-        "Workspace", remote_side=[Workspace.workspace_id], backref="roles", lazy="joined",
+        "Workspace",
+        remote_side=[Workspace.workspace_id],
+        backref="roles",
+        lazy="joined",
     )
     user = relationship("User", remote_side=[User.user_id], backref="roles")
 
@@ -623,7 +631,6 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
         new_content_namespace: ContentNamespaces,
         copy_as_template: bool = False,
     ) -> "ContentRevisionRO":
-
         copy_rev = cls()
         import copy
 
@@ -782,7 +789,10 @@ class Content(DeclarativeBase):
     )
 
     current_revision = relationship(
-        "ContentRevisionRO", uselist=False, foreign_keys=[cached_revision_id], post_update=True,
+        "ContentRevisionRO",
+        uselist=False,
+        foreign_keys=[cached_revision_id],
+        post_update=True,
     )
 
     # TODO - A.P - 2017-09-05 - revisions default sorting
@@ -1549,7 +1559,6 @@ Index("idx__content__cached_revision_id", Content.cached_revision_id)
 
 
 class RevisionReadStatus(DeclarativeBase):
-
     __tablename__ = "revision_read_status"
 
     revision_id = Column(
@@ -1588,7 +1597,6 @@ class VirtualEvent(object):
 
     @classmethod
     def create_from_content(cls, content: Content):
-
         label = content.get_label()
         if content.type == content_type_list.Comment.slug:
             # TODO - G.M  - 10-04-2018 - [Cleanup] Remove label param

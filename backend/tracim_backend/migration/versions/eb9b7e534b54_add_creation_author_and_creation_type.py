@@ -19,7 +19,13 @@ def upgrade():
     creation_type_enum.create(op.get_bind(), checkfirst=False)
     with op.batch_alter_table("users") as batch_op:
         batch_op.add_column(sa.Column("creation_author_id", sa.Integer(), nullable=True))
-        batch_op.add_column(sa.Column("creation_type", creation_type_enum, nullable=True,))
+        batch_op.add_column(
+            sa.Column(
+                "creation_type",
+                creation_type_enum,
+                nullable=True,
+            )
+        )
         batch_op.create_foreign_key(
             batch_op.f("fk_users_creation_author_id_users"),
             referent_table="users",

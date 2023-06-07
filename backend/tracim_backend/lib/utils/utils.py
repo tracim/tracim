@@ -1,37 +1,37 @@
 # -*- coding: utf-8 -*-
+from urllib.parse import urlencode
+from urllib.parse import urljoin
+
+from babel import UnknownLocaleError
+from babel.dates import format_date
 from collections import OrderedDict
+from colour import Color
 import datetime
 import email
 import importlib
 import json
-import os
-from os.path import normpath as base_normpath
-import pkgutil
-import random
-import string
-import sys
-import types
-import typing
-from typing import TYPE_CHECKING
-from typing import Any
-from typing import Callable
-from typing import Dict
-from typing import List
-from typing import Optional
-from urllib.parse import urlencode
-from urllib.parse import urljoin
-import uuid
-
-from babel import UnknownLocaleError
-from babel.dates import format_date
-from colour import Color
 import jsonschema
 from jsonschema import SchemaError
 from jsonschema import ValidationError as JsonSchemaValidationError
 from jsonschema.validators import validator_for
 from marshmallow import ValidationError as MarshmallowValidationError
+import os
+from os.path import normpath as base_normpath
+import pkgutil
 import pytz
+import random
 from sqlakeyset import unserialize_bookmark
+import string
+import sys
+import types
+import typing
+from typing import Any
+from typing import Callable
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import TYPE_CHECKING
+import uuid
 
 from tracim_backend.exceptions import NotAFileError
 from tracim_backend.exceptions import NotReadableDirectory
@@ -165,7 +165,7 @@ COLOR_LIGHTEN_SCALE_FACTOR = 1.15
 
 
 def clamp(val: float, minimum: float = 0.0, maximum: float = 1.0) -> float:
-    """ Fix value between min an max"""
+    """Fix value between min an max"""
     if val < minimum:
         return minimum
     if val > maximum:
@@ -220,7 +220,10 @@ def string_to_list(
 
 
 def string_to_unique_item_list(
-    base_string: str, separator: str, cast_func: Callable[[str], Any], do_strip: bool = False,
+    base_string: str,
+    separator: str,
+    cast_func: Callable[[str], Any],
+    do_strip: bool = False,
 ) -> List[Any]:
     """
     Convert a string to a list of separated item of one type according
@@ -245,14 +248,13 @@ def string_to_unique_item_list(
 
 
 def deprecated(func: Callable):
-    """ Dummy deprecated function"""
+    """Dummy deprecated function"""
     # TODO - G.M - 2018-12-04 - Replace this with a true deprecated function ?
     return func
 
 
 def core_convert_file_name_to_display(string: str) -> str:
-    """
-    """
+    """ """
     REPLACE_CHARS = {"/": "⧸", "\\": "⧹"}
 
     for key, value in REPLACE_CHARS.items():

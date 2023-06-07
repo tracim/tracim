@@ -5,7 +5,7 @@
 # here : https://groups.google.com/forum/#!topic/pylons-discuss/2Sw4OkOnZcE
 from pyramid.events import NewResponse
 
-from tracim_backend.config import CFG
+from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.lib.utils.authentification import CLIENT_TOKEN_HEADER
 
 

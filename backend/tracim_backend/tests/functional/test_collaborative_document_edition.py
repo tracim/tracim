@@ -81,9 +81,9 @@ class TestCollaborativeDocumentEdition(object):
         url = "/api/collaborative-document-edition/workspaces/{}/files".format(
             data_workspace.workspace_id
         )
-        template_filename = collaborative_document_edition_api.get_file_template_list().file_templates[
-            0
-        ]
+        template_filename = (
+            collaborative_document_edition_api.get_file_template_list().file_templates[0]
+        )
         res = web_testapp.post_json(
             url,
             params={

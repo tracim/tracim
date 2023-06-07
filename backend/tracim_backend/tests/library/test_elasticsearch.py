@@ -1,11 +1,10 @@
+import elasticsearch_dsl as es_dsl
+import pytest
+import transaction
 import typing
 from unittest.mock import MagicMock
 from unittest.mock import PropertyMock
 from unittest.mock import patch
-
-import elasticsearch_dsl as es_dsl
-import pytest
-import transaction
 
 from tracim_backend.lib.rq import RqQueueName
 from tracim_backend.lib.rq import get_rq_queue2

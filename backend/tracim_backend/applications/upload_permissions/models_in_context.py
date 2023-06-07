@@ -1,7 +1,6 @@
 from datetime import datetime
-import typing
-
 from sqlalchemy.orm import Session
+import typing
 
 from tracim_backend.applications.upload_permissions.models import UploadPermission
 from tracim_backend.config import CFG

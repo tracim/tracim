@@ -1,9 +1,8 @@
-import re
-import typing
-
 from pyramid.registry import Registry
 from pyramid.request import Request
 from pyramid.response import Response
+import re
+import typing
 
 from tracim_backend.lib.utils.logger import logger
 

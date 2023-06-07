@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from operator import or_
-import typing
-
 from sqlalchemy import func
 from sqlalchemy.orm import Query
 from sqlalchemy.orm.exc import NoResultFound
+import typing
 
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import DisallowedWorkspaceAccessType
@@ -240,7 +239,11 @@ class WorkspaceApi(object):
             raise WorkspaceNotFound(
                 "workspace {} does not exist or not visible for user".format(workspace_id)
             ) from exc
-        role_api = RoleApi(current_user=self._user, session=self._session, config=self._config,)
+        role_api = RoleApi(
+            current_user=self._user,
+            session=self._session,
+            config=self._config,
+        )
         role_api.create_one(
             self._user,
             workspace,
@@ -304,7 +307,7 @@ class WorkspaceApi(object):
         return query.order_by(Workspace.workspace_id)
 
     def _parent_id_filter(self, query: Query, parent_ids: typing.List[int]) -> Query:
-        """ Filtering result by parent ids"""
+        """Filtering result by parent ids"""
         if parent_ids == 0:
             return query.filter(Workspace.parent_id == None)  # noqa: E711
         if parent_ids is None or parent_ids == []:
@@ -321,7 +324,8 @@ class WorkspaceApi(object):
             if allow_root:
                 query = query.filter(
                     or_(
-                        Workspace.parent_id.in_(allowed_parent_ids), Workspace.parent_id == None
+                        Workspace.parent_id.in_(allowed_parent_ids),
+                        Workspace.parent_id == None,  # noqa: E712,E711
                     )  # noqa: E711
                 )
             else:

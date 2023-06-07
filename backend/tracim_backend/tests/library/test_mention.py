@@ -1,7 +1,6 @@
-import typing
-
 import pytest
 import transaction
+import typing
 
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.mention import DescriptionMentionParser
@@ -78,7 +77,11 @@ def one_content_with_a_mention(
     base_fixture, user_api_factory, workspace_api_factory, session, app_config
 ) -> Content:
     return create_content(
-        html_with_one_mention_bar, user_api_factory, workspace_api_factory, session, app_config,
+        html_with_one_mention_bar,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
     )
 
 
@@ -87,7 +90,11 @@ def one_content_without_mention(
     base_fixture, user_api_factory, workspace_api_factory, session, app_config
 ) -> Content:
     return create_content(
-        comment_without_mention, user_api_factory, workspace_api_factory, session, app_config,
+        comment_without_mention,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
     )
 
 
@@ -106,10 +113,18 @@ def one_content_with_a_mention_all(
 
 @pytest.fixture
 def one_updated_content_with_one_new_mention(
-    base_fixture, user_api_factory, workspace_api_factory, session, app_config,
+    base_fixture,
+    user_api_factory,
+    workspace_api_factory,
+    session,
+    app_config,
 ) -> Content:
     content = create_content(
-        "<p>Hello, world</p>", user_api_factory, workspace_api_factory, session, app_config,
+        "<p>Hello, world</p>",
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
     )
     with new_revision(session=session, tm=transaction.manager, content=content):
         api = ContentApi(current_user=content.owner, session=session, config=app_config)
@@ -149,7 +164,11 @@ def one_updated_content_with_new_mention_all(
     base_fixture, user_api_factory, workspace_api_factory, session, app_config
 ) -> Content:
     content = create_content(
-        "<p>Hello, world</p>", user_api_factory, workspace_api_factory, session, app_config,
+        "<p>Hello, world</p>",
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
     )
     with new_revision(session=session, tm=transaction.manager, content=content):
         api = ContentApi(current_user=content.owner, session=session, config=app_config)

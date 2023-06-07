@@ -1,12 +1,10 @@
 # coding=utf-8
 from http import HTTPStatus
-import typing
-
 from pyramid.config import Configurator
 import transaction
+import typing
 
 from tracim_backend.app_models.contents import ContentTypeSlug
-from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.extensions import hapic

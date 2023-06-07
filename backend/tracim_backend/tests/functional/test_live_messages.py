@@ -1,14 +1,13 @@
 import contextlib
 import json
 import os
-import subprocess
-import sys
-import typing
-
 import pytest
 import requests
 import sseclient
+import subprocess
+import sys
 import transaction
+import typing
 
 from tracim_backend.config import CFG
 from tracim_backend.error import ErrorCode
@@ -317,7 +316,6 @@ class TestLiveMessages(object):
     def test_api__user_live_messages_endpoint_with_GRIP_proxy__ok__user_update__async(
         self, pushpin, app_config, rq_database_worker
     ):
-
         with messages_stream_client() as client_events:
             params = {"public_name": "updated", "timezone": "Europe/London", "lang": "en"}
             update_user_request = requests.put(
@@ -392,7 +390,6 @@ class TestLiveMessages(object):
         big_html_document,
         rq_database_worker,
     ):
-
         with messages_stream_client() as client_events:
             status = put_document(big_html_document)
             assert status == 204

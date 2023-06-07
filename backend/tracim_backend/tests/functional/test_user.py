@@ -2,13 +2,12 @@
 """
 Tests for /api/users subpath endpoints.
 """
-import io
-import typing
-
 from PIL import Image
 from depot.io.utils import FileIntent
+import io
 import pytest
 import transaction
+import typing
 from webtest import TestApp
 
 from tracim_backend import AuthType
@@ -1652,7 +1651,6 @@ class TestUserSetWorkspaceAsRead(object):
         web_testapp.put(
             "/api/users/{user_id}/workspaces/{workspace_id}/read".format(
                 workspace_id=workspace.workspace_id,
-                content_id=firstly_created.content_id,
                 user_id=test_user.user_id,
             )
         )
@@ -1736,7 +1734,6 @@ class TestUserSetWorkspaceAsRead(object):
         web_testapp.put(
             "/api/users/{user_id}/workspaces/{workspace_id}/read".format(
                 workspace_id=workspace.workspace_id,
-                content_id=firstly_created.content_id,
                 user_id=test_user.user_id,
             )
         )
@@ -1811,7 +1808,6 @@ class TestUserSetWorkspaceAsRead(object):
         res = web_testapp.put(
             "/api/users/{user_id}/workspaces/{workspace_id}/read".format(
                 workspace_id=workspace.workspace_id,
-                content_id=firstly_created.content_id,
                 user_id=admin_user.user_id,
             ),
             status=403,
@@ -3942,7 +3938,11 @@ class TestKnownContent(object):
 
         # NOTE - RJ - 2021-06-11 - no request should return a comment
         comment = content_api.create_comment(
-            workspace=workspace2, parent=test_file, content="hello", do_save=True, do_notify=False,
+            workspace=workspace2,
+            parent=test_file,
+            content="hello",
+            do_save=True,
+            do_notify=False,
         )
 
         session.add(comment)
@@ -5904,7 +5904,8 @@ class TestUserAvatarEndpoints:
             status=204,
         )
         res = web_testapp.get(
-            "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, image.name), status=200,
+            "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, image.name),
+            status=200,
         )
         assert res.body == image.getvalue()
         assert res.content_type == "image/png"
@@ -5917,7 +5918,8 @@ class TestUserAvatarEndpoints:
             "/api/users/{}/avatar/raw/something.jpg".format(admin_user.user_id), status=200
         )
         res = web_testapp.get(
-            "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, "something.jpg"), status=200,
+            "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, "something.jpg"),
+            status=200,
         )
         assert res.content_type == "image/svg+xml"
 
@@ -6013,7 +6015,8 @@ class TestUserCoverEndpoints:
             status=204,
         )
         res = web_testapp.get(
-            "/api/users/{}/cover/raw/{}".format(admin_user.user_id, image.name), status=200,
+            "/api/users/{}/cover/raw/{}".format(admin_user.user_id, image.name),
+            status=200,
         )
         assert res.body == image.getvalue()
         assert res.content_type == "image/png"
@@ -6095,7 +6098,8 @@ class TestUserCoverEndpoints:
         assert 1300, 150 == new_image.size
 
         res2 = web_testapp.get(
-            "/api/users/{}/cover/preview/jpg/{}".format(bob_user.user_id, "image.jpg"), status=200,
+            "/api/users/{}/cover/preview/jpg/{}".format(bob_user.user_id, "image.jpg"),
+            status=200,
         )
         assert res2.body == res.body
         assert res2.content_type == "image/jpeg"

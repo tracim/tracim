@@ -3,7 +3,6 @@ from abc import ABC
 import argparse
 from datetime import datetime
 from datetime import timedelta
-
 from mako.template import Template
 from pyramid.scripting import AppEnvironment
 
@@ -112,7 +111,8 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
                 email_notification_type=EmailNotificationType.SUMMARY,
             )
             notification_summary = event_api.get_unread_messages_summary(
-                user.user_id, created_after=created_after,
+                user.user_id,
+                created_after=created_after,
             )
 
             if len(mentions) == 0 and len(notification_summary) == 0:

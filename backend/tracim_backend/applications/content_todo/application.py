@@ -42,5 +42,9 @@ class ContentTodoApp(TracimApplication):
 
 def create_app() -> TracimApplication:
     return ContentTodoApp(
-        label="Todo", slug="contents/todo", fa_icon="fas fa-check-square", config={}, main_route="",
+        label="Todo",
+        slug="contents/todo",
+        fa_icon="fas fa-check-square",
+        config={},
+        main_route="",
     )

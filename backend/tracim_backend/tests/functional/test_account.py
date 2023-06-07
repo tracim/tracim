@@ -34,7 +34,6 @@ class TestAccountEndpoint(object):
         session,
         web_testapp,
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -84,7 +83,6 @@ class TestAccountKnownMembersEndpoint(object):
         web_testapp,
         admin_user,
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -139,7 +137,6 @@ class TestAccountKnownMembersEndpoint(object):
         web_testapp,
         admin_user,
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -191,7 +188,6 @@ class TestAccountKnownMembersEndpoint(object):
         web_testapp,
         admin_user,
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -238,7 +234,6 @@ class TestAccountKnownMembersEndpoint(object):
         session,
         web_testapp,
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -335,7 +330,6 @@ class TestSetEmailEndpoint(object):
         session,
         web_testapp,
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -384,7 +378,6 @@ class TestSetEmailEndpoint(object):
         session,
         web_testapp,
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -433,7 +426,6 @@ class TestSetEmailEndpoint(object):
         session,
         web_testapp,
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER

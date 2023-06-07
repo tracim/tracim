@@ -1,9 +1,8 @@
-from http import HTTPStatus
-import typing
-
 from hapic.ext.pyramid import PyramidContext
+from http import HTTPStatus
 from pluggy import PluginManager
 from pyramid.config import Configurator
+import typing
 
 from tracim_backend.applications.agenda.authorization import add_www_authenticate_header_for_caldav
 from tracim_backend.applications.agenda.lib import AgendaHooks
@@ -32,7 +31,8 @@ class AgendaApp(TracimApplication):
         )
 
         app_config.CALDAV__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH = app_config.get_raw_config(
-            "caldav.pre_filled_event.description_file_path", "",
+            "caldav.pre_filled_event.description_file_path",
+            "",
         )
 
         # INFO - G.M - 2021-12-07 - internal config param to configure installed agenda hierarchy
@@ -105,7 +105,6 @@ class AgendaApp(TracimApplication):
         route_prefix: str,
         context: PyramidContext,
     ) -> None:
-
         # TODO - G.M - 2019-03-18 - check if possible to avoid this import here,
         # import is here because import AgendaController without adding it to
         # pyramid make trouble in hapic which try to get view related

@@ -4,9 +4,8 @@ The goal of this script is to produce a "big" space in order to test
 performance issue on it.
 """
 import random
-import string
-
 import requests
+import string
 
 base = "http://localhost:7999"
 

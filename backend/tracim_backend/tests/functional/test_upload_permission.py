@@ -1,11 +1,9 @@
-from unittest import mock
-
 import pytest
 from rq import SimpleWorker
 import transaction
+from unittest import mock
 
 from tracim_backend.applications.share.models import ContentShareType
-from tracim_backend.applications.upload_permissions.lib import UploadPermissionLib
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.rq import RqQueueName
 from tracim_backend.lib.rq import get_redis_connection
@@ -763,7 +761,7 @@ class TestGuestUploadEndpoints(object):
         admin_user,
         riyad_user,
     ) -> None:
-        """ Test guest upload content for connected user that has no access to the workspace"""
+        """Test guest upload content for connected user that has no access to the workspace"""
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
         upload_permission_lib = upload_permission_lib_factory.get()

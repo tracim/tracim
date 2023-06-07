@@ -1,9 +1,8 @@
 import datetime
-import tempfile
-import typing
-
 from hapic.data import HapicFile
 import pypandoc
+import tempfile
+import typing
 from weasyprint import CSS
 from weasyprint import HTML
 
@@ -23,12 +22,13 @@ class RichTextPreviewLib:
         last_modified: datetime.datetime,
         metadata: typing.Dict[str, typing.Any],
     ) -> HapicFile:
-
         with tempfile.NamedTemporaryFile(
             "w+b", prefix="tracim-notes-preview-", suffix=".pdf", delete=False
         ) as pdf_preview_path:
             with tempfile.NamedTemporaryFile(
-                "w+b", prefix="tracim-notes-preview-", suffix=".html",
+                "w+b",
+                prefix="tracim-notes-preview-",
+                suffix=".html",
             ) as html_preview_path:
                 metadata_args = []
                 for key, value in metadata.items():

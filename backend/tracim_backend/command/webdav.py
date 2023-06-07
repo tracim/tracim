@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import argparse
-
 import plaster
 
 from tracim_backend.command import AppContextCommand

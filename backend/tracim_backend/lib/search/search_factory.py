@@ -1,6 +1,5 @@
-import typing
-
 from sqlalchemy.orm import Session
+import typing
 
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import NoValidSearchEngine
@@ -57,7 +56,7 @@ class SearchFactory(object):
     @classmethod
     def get_search_lib(
         cls, session: Session, current_user: typing.Optional[User], config: CFG
-    ) -> typing.Union["ESSearchApi", "SimpleSearchApi"]:
+    ) -> typing.Union["ESSearchApi", "SimpleSearchApi"]:  # noqa: F821
         if config.SEARCH__ENGINE == ELASTICSEARCH__SEARCH_ENGINE_SLUG:
             return cls.get_elastic_search_api(session, current_user, config)
 

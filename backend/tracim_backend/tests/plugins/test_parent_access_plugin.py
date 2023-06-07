@@ -61,9 +61,9 @@ class TestParentAccessPlugin(object):
         load_parent_access_plugin,
     ):
         """
-            Test if new users are correctly added to open workspace with auto_invite_plugin enabled
-            Case when the user is already present in the child workspace
-            """
+        Test if new users are correctly added to open workspace with auto_invite_plugin enabled
+        Case when the user is already present in the child workspace
+        """
         wapi = workspace_api_factory.get()
         parent_workspace = wapi.create_workspace(
             label="parent", default_user_role=WorkspaceRoles.READER
@@ -117,7 +117,9 @@ class TestParentAccessPlugin(object):
             label="parent", default_user_role=WorkspaceRoles.READER
         )
         child2_workspace = wapi.create_workspace(
-            label="child2", parent=parent_workspace, default_user_role=WorkspaceRoles.CONTRIBUTOR,
+            label="child2",
+            parent=parent_workspace,
+            default_user_role=WorkspaceRoles.CONTRIBUTOR,
         )
         grandchild_workspace = wapi.create_workspace(
             label="grandchild",

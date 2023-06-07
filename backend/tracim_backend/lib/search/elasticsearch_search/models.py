@@ -1,9 +1,8 @@
 from datetime import datetime
-import typing
-
 from dateutil.parser import parse
 from elasticsearch_dsl import Search
 from elasticsearch_dsl.response import Response
+import typing
 
 from tracim_backend.lib.search.models import ContentSearchResponse
 from tracim_backend.lib.search.models import DateRange
@@ -217,7 +216,9 @@ class SearchedWorkspace:
 
 class WorkspaceSearchResponse:
     def __init__(
-        self, hits: typing.Dict[str, typing.Any], facets: typing.Dict[str, typing.List[FacetCount]],
+        self,
+        hits: typing.Dict[str, typing.Any],
+        facets: typing.Dict[str, typing.List[FacetCount]],
     ) -> None:
         self.workspaces = [
             SearchedWorkspace(

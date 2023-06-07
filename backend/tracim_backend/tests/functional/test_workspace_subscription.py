@@ -395,7 +395,8 @@ class TestWorkspaceSubscriptionEndpoint(object):
         )
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         web_testapp.get(
-            "/api/workspaces/{}".format(on_request_workspace.workspace_id), status=200,
+            "/api/workspaces/{}".format(on_request_workspace.workspace_id),
+            status=200,
         )
 
     def test__accept_workspace_subscription__err__400__already_in(
@@ -478,6 +479,7 @@ class TestWorkspaceSubscriptionEndpoint(object):
         )
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         res = web_testapp.get(
-            "/api/workspaces/{}".format(on_request_workspace.workspace_id), status=400,
+            "/api/workspaces/{}".format(on_request_workspace.workspace_id),
+            status=400,
         )
         assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND

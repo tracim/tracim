@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-from unittest.mock import MagicMock
-
 import pytest
+from unittest.mock import MagicMock
 
 from tracim_backend import WebdavAppFactory
 from tracim_backend.lib.core.notifications import DummyNotifier
@@ -59,7 +58,6 @@ class TestWebDav(object):
     def test_unit__list_workspaces_with_user__ok(
         self, app_config, webdav_provider, user_api_factory, webdav_environ_factory
     ):
-
         root = webdav_provider.getResourceInst(
             "/",
             webdav_environ_factory.get(user_api_factory.get().get_one_by_email("bob@fsf.local")),
@@ -85,7 +83,6 @@ class TestWebDav(object):
     def test_unit__list_workspaces_with_admin__ok(
         self, app_config, webdav_provider, user_api_factory, webdav_environ_factory
     ):
-
         root = webdav_provider.getResourceInst(
             "/",
             webdav_environ_factory.get(
@@ -113,7 +110,6 @@ class TestWebDav(object):
     def test_unit__list_workspace_folders__ok(
         self, app_config, webdav_provider, user_api_factory, webdav_environ_factory
     ):
-
         Recipes = webdav_provider.getResourceInst(
             "/Recipes.space/",
             webdav_environ_factory.get(user_api_factory.get().get_one_by_email("bob@fsf.local")),
@@ -209,7 +205,6 @@ class TestWebDav(object):
     def test_unit__create_content__ok(
         self, app_config, webdav_provider, webdav_environ_factory, user_api_factory
     ):
-
         environ = webdav_environ_factory.get(
             user_api_factory.get().get_one_by_email("bob@fsf.local")
         )
@@ -233,7 +228,6 @@ class TestWebDav(object):
     def test_unit__create_delete_and_create_file__ok(
         self, app_config, webdav_provider, webdav_environ_factory, user_api_factory, session
     ):
-
         environ = webdav_environ_factory.get(
             user_api_factory.get().get_one_by_email("bob@fsf.local")
         )
@@ -303,7 +297,6 @@ class TestWebDav(object):
     def test_unit__rename_content__ok(
         self, webdav_provider, webdav_environ_factory, app_config, session, user_api_factory
     ):
-
         environ = webdav_environ_factory.get(
             user_api_factory.get().get_one_by_email("admin@admin.admin")
         )
@@ -333,7 +326,6 @@ class TestWebDav(object):
     def test_unit__move_content__ok(
         self, webdav_provider, webdav_environ_factory, app_config, session, user_api_factory
     ):
-
         environ = webdav_environ_factory.get(
             user_api_factory.get().get_one_by_email("admin@admin.admin")
         )
@@ -364,7 +356,6 @@ class TestWebDav(object):
     def test_unit__move_and_rename_content__ok(
         self, webdav_provider, webdav_environ_factory, app_config, session, user_api_factory
     ):
-
         environ = webdav_environ_factory.get(
             user_api_factory.get().get_one_by_email("admin@admin.admin")
         )
@@ -397,7 +388,6 @@ class TestWebDav(object):
     def test_unit__move_content__ok__another_workspace(
         self, webdav_provider, webdav_environ_factory, app_config, session, user_api_factory
     ):
-
         environ = webdav_environ_factory.get(
             user_api_factory.get().get_one_by_email("admin@admin.admin")
         )
@@ -434,7 +424,6 @@ class TestWebDav(object):
     def test_unit__update_content__ok(
         self, webdav_provider, webdav_environ_factory, app_config, session, user_api_factory
     ):
-
         environ = webdav_environ_factory.get(
             user_api_factory.get().get_one_by_email("admin@admin.admin")
         )

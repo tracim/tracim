@@ -2,15 +2,14 @@
 import base64
 import cgi
 from datetime import datetime
+from slugify import slugify
+from sqlakeyset import Page
+from sqlalchemy.orm import Session
 from typing import Dict
 from typing import Generic
 from typing import List
 from typing import Optional
 from typing import TypeVar
-
-from slugify import slugify
-from sqlakeyset import Page
-from sqlalchemy.orm import Session
 
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
@@ -25,8 +24,8 @@ from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import CONTENT_FRONTEND_URL_SCHEMA
-from tracim_backend.lib.utils.utils import WORKSPACE_FRONTEND_URL_SCHEMA
 from tracim_backend.lib.utils.utils import EmailUser
+from tracim_backend.lib.utils.utils import WORKSPACE_FRONTEND_URL_SCHEMA
 from tracim_backend.lib.utils.utils import core_convert_file_name_to_display
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
 from tracim_backend.lib.utils.utils import string_to_list
@@ -562,7 +561,11 @@ class KnownContentsQuery(object):
     Content autocomplete query model
     """
 
-    def __init__(self, acp: str, limit: int = None,) -> None:
+    def __init__(
+        self,
+        acp: str,
+        limit: int = None,
+    ) -> None:
         self.acp = acp
         self.limit = limit
 
@@ -813,7 +816,10 @@ class BasePaginatedQuery(object):
 
 class TranslationQuery:
     def __init__(
-        self, source_language_code: str, target_language_code: str, force_download: int = 0,
+        self,
+        source_language_code: str,
+        target_language_code: str,
+        force_download: int = 0,
     ):
         self.source_language_code = source_language_code
         self.target_language_code = target_language_code
@@ -849,7 +855,11 @@ class LiveMessageQuery(BasePaginatedQuery):
 
 class UserMessagesMarkAsReadQuery(object):
     def __init__(
-        self, content_ids: str = "", event_ids: str = "", parent_ids: str = "", space_ids: str = "",
+        self,
+        content_ids: str = "",
+        event_ids: str = "",
+        parent_ids: str = "",
+        space_ids: str = "",
     ):
         self.content_ids = string_to_list(content_ids, ",", int)
         self.event_ids = string_to_list(event_ids, ",", int)
@@ -1629,7 +1639,10 @@ class ContentInContext(object):
     def content_path(self) -> List["ContentInContext"]:
         return [
             ContentInContext(
-                content=component, dbsession=self.dbsession, config=self.config, user=self._user,
+                content=component,
+                dbsession=self.dbsession,
+                config=self.config,
+                user=self._user,
             )
             for component in self.content.content_path
         ]

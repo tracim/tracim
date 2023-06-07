@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-import typing
-
 from sqlalchemy.orm import Query
 from sqlalchemy.orm.exc import NoResultFound
+import typing
 
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import LastWorkspaceManagerRoleCantBeModified
@@ -56,7 +55,7 @@ class RoleApi(object):
             .filter(UserRoleInWorkspace.user_id == user_id)
             .filter(UserRoleInWorkspace.role >= min_role)
             .join(Workspace)
-            .filter(Workspace.is_deleted == False)  # noqa: E711
+            .filter(Workspace.is_deleted == False)  # noqa: E712
             .all()
         )
         workspaces_ids = []
@@ -65,7 +64,9 @@ class RoleApi(object):
         return workspaces_ids
 
     def get_user_role_workspace_with_context(
-        self, user_role: UserRoleInWorkspace, newly_created: bool = None,
+        self,
+        user_role: UserRoleInWorkspace,
+        newly_created: bool = None,
     ) -> UserRoleWorkspaceInContext:
         """
         Return member (UserRoleWorkspaceInContext) object from UserRoleInWorkspace
@@ -213,7 +214,9 @@ class RoleApi(object):
         return query.all()
 
     def get_workspace_member_ids(
-        self, workspace_id: int, min_role: typing.Optional[WorkspaceRoles] = None,
+        self,
+        workspace_id: int,
+        min_role: typing.Optional[WorkspaceRoles] = None,
     ) -> typing.List[int]:
         """Get a list of user ids that are members of the workspace.
 
@@ -234,7 +237,8 @@ class RoleApi(object):
             return [r[0] for r in query.all()]
 
         return self._session.use_cache(
-            f"RoleApi.get_workspace_member_ids({workspace_id}, {min_role})", fetch_results_from_db,
+            f"RoleApi.get_workspace_member_ids({workspace_id}, {min_role})",
+            fetch_results_from_db,
         )
 
     def get_common_workspace_ids(self, user_id: int) -> typing.List[int]:

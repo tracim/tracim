@@ -1,9 +1,8 @@
 # coding=utf-8
 
 from http import HTTPStatus
-import typing
-
 from pyramid.config import Configurator
+import typing
 
 from tracim_backend.exceptions import TagAlreadyExistsError
 from tracim_backend.exceptions import TagNotFound
@@ -171,13 +170,17 @@ class TagController(Controller):
 
         # Get a tag
         configurator.add_route(
-            "get_tag", "/workspaces/{workspace_id}/tags/{tag_id}", request_method="GET",
+            "get_tag",
+            "/workspaces/{workspace_id}/tags/{tag_id}",
+            request_method="GET",
         )
         configurator.add_view(self.get_tag, route_name="get_tag")
 
         # Add a tag to a workspace
         configurator.add_route(
-            "add_workspace_tag", "/workspaces/{workspace_id}/tags", request_method="POST",
+            "add_workspace_tag",
+            "/workspaces/{workspace_id}/tags",
+            request_method="POST",
         )
         configurator.add_view(self.add_workspace_tag, route_name="add_workspace_tag")
 

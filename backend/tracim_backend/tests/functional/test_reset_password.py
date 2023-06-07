@@ -155,7 +155,6 @@ class TestResetPasswordCheckTokenEndpoint(object):
     def test_api__reset_password_check_token__ok_204__nominal_case(
         self, admin_user, user_api_factory, web_testapp
     ):
-
         uapi = user_api_factory.get()
         reset_password_token = uapi.reset_password_notification(admin_user, do_save=True)
         transaction.commit()
@@ -216,7 +215,6 @@ class TestResetPasswordModifyEndpoint(object):
     def test_api__reset_password_reset__ok_204__nominal_case(
         self, user_api_factory, admin_user, web_testapp
     ):
-
         uapi = user_api_factory.get()
         reset_password_token = uapi.reset_password_notification(admin_user, do_save=True)
         transaction.commit()
@@ -287,7 +285,6 @@ class TestResetPasswordModifyEndpoint(object):
     def test_api__reset_password_reset__err_400__expired_token(
         self, web_testapp, user_api_factory, admin_user
     ):
-
         uapi = user_api_factory.get()
         with freeze_time("1999-12-31 23:59:59"):
             reset_password_token = uapi.reset_password_notification(admin_user, do_save=True)
@@ -311,7 +308,6 @@ class TestResetPasswordModifyEndpoint(object):
     def test_api__reset_password_reset__err_400__password_does_not_match(
         self, admin_user, user_api_factory, web_testapp
     ):
-
         uapi = user_api_factory.get()
         reset_password_token = uapi.reset_password_notification(admin_user, do_save=True)
         transaction.commit()
