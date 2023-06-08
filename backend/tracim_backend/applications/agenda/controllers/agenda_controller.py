@@ -1,10 +1,10 @@
 from pyramid.config import Configurator
 
-from backend.tracim_backend.config import CFG  # noqa F401
 from tracim_backend.applications.agenda.lib import AgendaApi
 from tracim_backend.applications.agenda.schemas import AgendaFilterQuerySchema
 from tracim_backend.applications.agenda.schemas import AgendaSchema
 from tracim_backend.applications.agenda.schemas import PreFilledAgendaEventSchema
+from tracim_backend.config import CFG  # noqa F401
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import has_personal_access
