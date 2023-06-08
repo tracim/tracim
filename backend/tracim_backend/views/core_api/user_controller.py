@@ -205,9 +205,7 @@ class UserController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        workspace = wapi.add_current_user_as_member(
-            workspace_id=hapic_data.body["workspace_id"]
-        )
+        workspace = wapi.add_current_user_as_member(workspace_id=hapic_data.body["workspace_id"])
         return wapi.get_workspace_with_context(workspace)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
@@ -220,9 +218,7 @@ class UserController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=app_config,  # User
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         return uapi.get_user_with_context(request.candidate_user)
 
@@ -236,9 +232,7 @@ class UserController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=app_config,  # User
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         return uapi.get_user_with_context(request.candidate_user)
 
@@ -251,9 +245,7 @@ class UserController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=app_config,  # User
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         users = uapi.get_all()
         context_users = [uapi.get_user_with_context(user) for user in users]
@@ -264,9 +256,7 @@ class UserController(Controller):
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(KnownMembersQuerySchema())
     @hapic.output_body(UserDigestSchema(many=True))
-    @hapic.handle_exception(
-        CannotUseBothIncludeAndExcludeWorkspaceUsers, HTTPStatus.BAD_REQUEST
-    )
+    @hapic.handle_exception(CannotUseBothIncludeAndExcludeWorkspaceUsers, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(TooShortAutocompleteString, HTTPStatus.BAD_REQUEST)
     def known_members(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -295,9 +285,7 @@ class UserController(Controller):
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(KnownContentsQuerySchema())
     @hapic.output_body(ContentDigestSchema(many=True))
-    @hapic.handle_exception(
-        CannotUseBothIncludeAndExcludeWorkspaceUsers, HTTPStatus.BAD_REQUEST
-    )
+    @hapic.handle_exception(CannotUseBothIncludeAndExcludeWorkspaceUsers, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(TooShortAutocompleteString, HTTPStatus.BAD_REQUEST)
     def known_contents(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -318,9 +306,7 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(EmailAlreadyExists, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(
-        ExternalAuthUserEmailModificationDisallowed, HTTPStatus.BAD_REQUEST
-    )
+    @hapic.handle_exception(ExternalAuthUserEmailModificationDisallowed, HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_body(SetEmailSchema())
     @hapic.input_path(UserIdPathSchema())
@@ -331,9 +317,7 @@ class UserController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=app_config,  # User
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         user = uapi.set_email(
             request.candidate_user,
@@ -358,9 +342,7 @@ class UserController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=app_config,  # User
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         user = uapi.set_username(
             request.candidate_user,
@@ -373,9 +355,7 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(PasswordDoNotMatch, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(
-        ExternalAuthUserPasswordModificationDisallowed, HTTPStatus.BAD_REQUEST
-    )
+    @hapic.handle_exception(ExternalAuthUserPasswordModificationDisallowed, HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_body(SetPasswordSchema())
     @hapic.input_path(UserIdPathSchema())
@@ -386,9 +366,7 @@ class UserController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=app_config,  # User
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         uapi.set_password(
             request.candidate_user,
@@ -409,9 +387,7 @@ class UserController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=app_config,  # User
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         user = uapi.update(
             request.candidate_user,
@@ -437,9 +413,7 @@ class UserController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=app_config,  # User
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         if hapic_data.body.profile:
             profile = Profile.get_profile_from_slug(hapic_data.body.profile)
@@ -477,9 +451,7 @@ class UserController(Controller):
     @hapic.handle_exception(UsernameAlreadyExists, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ReservedUsernameError, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(TracimValidationFailed, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(
-        UserSelfRegistrationDisabledException, HTTPStatus.BAD_REQUEST
-    )
+    @hapic.handle_exception(UserSelfRegistrationDisabledException, HTTPStatus.BAD_REQUEST)
     @hapic.input_body(UserCreationSchema())
     @hapic.output_body(UserSchema())
     def register_user(self, context, request: TracimRequest, hapic_data=None):
@@ -489,9 +461,7 @@ class UserController(Controller):
         if not request.app_config.USER__SELF_REGISTRATION__ENABLED:
             raise UserSelfRegistrationDisabledException("Self registration is disabled")
         uapi = UserApi(
-            current_user=None,
-            session=request.dbsession,
-            config=request.app_config,  # User
+            current_user=None, session=request.dbsession, config=request.app_config  # User
         )
         do_notify = (
             request.app_config.EMAIL__NOTIFICATION__ACTIVATED
@@ -529,9 +499,7 @@ class UserController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=app_config,  # User
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         uapi.enable(user=request.candidate_user, do_save=True)
 
@@ -546,9 +514,7 @@ class UserController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=app_config,  # User
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         uapi.delete(user=request.candidate_user, do_save=True)
 
@@ -580,9 +546,7 @@ class UserController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=app_config,  # User
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         uapi.disable(user=request.candidate_user, do_save=True)
         return
@@ -599,9 +563,7 @@ class UserController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=app_config,  # User
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         profile = Profile.get_profile_from_slug(hapic_data.body.profile)
         uapi.update(
@@ -623,9 +585,7 @@ class UserController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         uapi = UserApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=app_config,  # User
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         uapi.update(
             user=request.candidate_user,
@@ -724,9 +684,7 @@ class UserController(Controller):
     @hapic.input_path(UserWorkspaceIdPathSchema())
     @hapic.input_body(EmailNotificationTypeSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def change_space_notification(
-        self, context, request: TracimRequest, hapic_data=None
-    ):
+    def change_space_notification(self, context, request: TracimRequest, hapic_data=None):
         """Change space notification"""
 
         app_config = request.registry.settings["CFG"]  # type: CFG
@@ -878,9 +836,7 @@ class UserController(Controller):
     @check_right(has_personal_access)
     @hapic.input_path(MessageIdsPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def set_message_as_read(
-        self, context, request: TracimRequest, hapic_data: HapicData
-    ) -> None:
+    def set_message_as_read(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
         """
         Read one message
         """
@@ -895,9 +851,7 @@ class UserController(Controller):
     @check_right(has_personal_access)
     @hapic.input_path(MessageIdsPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def set_message_as_unread(
-        self, context, request: TracimRequest, hapic_data: HapicData
-    ) -> None:
+    def set_message_as_unread(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
         """
         Unread one message
         """
@@ -912,9 +866,7 @@ class UserController(Controller):
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_headers(TracimLiveEventHeaderSchema())
     @hapic.input_query(TracimLiveEventQuerySchema())
-    def open_message_stream(
-        self, context, request: TracimRequest, hapic_data
-    ) -> Response:
+    def open_message_stream(self, context, request: TracimRequest, hapic_data) -> Response:
         """
         Open the message stream for the given user.
         return Tracim Live Message Events as [ServerSide Event Stream (SSE)](https://en.wikipedia.org/wiki/Server-sent_events).
@@ -930,9 +882,7 @@ class UserController(Controller):
 
         app_config = request.registry.settings["CFG"]  # type: CFG
         user_api = UserApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=app_config,  # User
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
 
         try:
@@ -945,9 +895,7 @@ class UserController(Controller):
                 "message": message,
             }
             response_body = LiveMessagesLib.get_server_side_event_string(
-                ServerSideEventType.STREAM_ERROR,
-                data=error,
-                comment="Too many online users",
+                ServerSideEventType.STREAM_ERROR, data=error, comment="Too many online users"
             )
             return Response(
                 headerlist=headers, charset="utf-8", status_code=200, body=response_body
@@ -956,9 +904,7 @@ class UserController(Controller):
         response_body = LiveMessagesLib.get_server_side_event_string(
             event_type=ServerSideEventType.STREAM_OPEN,
             data=None,
-            comment="Tracim Live Messages for user {}".format(
-                request.candidate_user.user_id
-            ),
+            comment="Tracim Live Messages for user {}".format(request.candidate_user.user_id),
         )
         after_event_id = hapic_data.query["after_event_id"]  # type: int
         if after_event_id:
@@ -970,17 +916,13 @@ class UserController(Controller):
 
             response_body += "".join(
                 [
-                    "data:"
-                    + json.dumps(LiveMessagesLib.message_as_dict(message))
-                    + "\n\n"
+                    "data:" + json.dumps(LiveMessagesLib.message_as_dict(message)) + "\n\n"
                     for message in messages
                 ]
             )
 
         escaped_keepalive_event = "event: keep-alive\\ndata:\\n\\n"
-        user_channel_name = LiveMessagesLib.user_grip_channel(
-            request.candidate_user.user_id
-        )
+        user_channel_name = LiveMessagesLib.user_grip_channel(request.candidate_user.user_id)
         headers.extend(
             (
                 # Here we ask push pin to keep the connection open
@@ -999,9 +941,7 @@ class UserController(Controller):
             )
         )
 
-        return Response(
-            headerlist=headers, charset="utf-8", status_code=200, body=response_body
-        )
+        return Response(headerlist=headers, charset="utf-8", status_code=200, body=response_body)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONFIG_ENDPOINTS])
     @check_right(has_personal_access)
@@ -1013,9 +953,7 @@ class UserController(Controller):
         """
         get all the configuration parameters for the given user
         """
-        config_api = UserConfigApi(
-            current_user=request.candidate_user, session=request.dbsession
-        )
+        config_api = UserConfigApi(current_user=request.candidate_user, session=request.dbsession)
         return {"parameters": config_api.get_all_params()}
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONFIG_ENDPOINTS])
@@ -1023,17 +961,13 @@ class UserController(Controller):
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_body(SetConfigSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def set_user_config(
-        self, context, request: TracimRequest, hapic_data: HapicData
-    ) -> None:
+    def set_user_config(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
         """
         Set or update the given configuration parameters for the given user
         The behavior of this endpoint is adding/updating key (patch-like) but not replacing the
         whole configuration, so it's not possible to remove keys through this endpoint.
         """
-        config_api = UserConfigApi(
-            current_user=request.candidate_user, session=request.dbsession
-        )
+        config_api = UserConfigApi(current_user=request.candidate_user, session=request.dbsession)
         config_api.set_params(params=hapic_data.body["parameters"])
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONFIG_ENDPOINTS])
@@ -1091,9 +1025,7 @@ class UserController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         wapi = WorkspaceApi(
-            current_user=request.candidate_user,
-            session=request.dbsession,
-            config=app_config,
+            current_user=request.candidate_user, session=request.dbsession, config=app_config
         )
 
         workspaces = wapi.get_all_accessible_by_user(request.candidate_user)
@@ -1107,9 +1039,7 @@ class UserController(Controller):
         self, context, request: TracimRequest, hapic_data: HapicData
     ) -> typing.List[WorkspaceSubscription]:
         subscription_lib = SubscriptionLib(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=request.app_config,
+            current_user=request.current_user, session=request.dbsession, config=request.app_config
         )
         return subscription_lib.get_user_subscription(request.candidate_user.user_id)
 
@@ -1126,9 +1056,7 @@ class UserController(Controller):
             current_user=None, session=request.dbsession, config=request.app_config
         ).get_one(hapic_data.body["workspace_id"])
         subscription_lib = SubscriptionLib(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=request.app_config,
+            current_user=request.current_user, session=request.dbsession, config=request.app_config
         )
         return subscription_lib.submit_subscription(workspace=workspace)
 
@@ -1137,17 +1065,13 @@ class UserController(Controller):
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(GetUserFollowQuerySchema())
     @hapic.output_body(FollowedUsersSchemaPage())
-    def following(
-        self, context, request: TracimRequest, hapic_data: HapicData
-    ) -> PaginatedObject:
+    def following(self, context, request: TracimRequest, hapic_data: HapicData) -> PaginatedObject:
         """
         For given user, get list of following user ids.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         user_api = UserApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=app_config,  # User
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         return PaginatedObject(
             user_api.get_paginated_leaders_for_user(
@@ -1164,9 +1088,7 @@ class UserController(Controller):
     @hapic.input_body(UserIdSchema())
     @hapic.handle_exception(UserFollowAlreadyDefined, http_code=HTTPStatus.BAD_REQUEST)
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.CREATED)
-    def create_following(
-        self, context, request: TracimRequest, hapic_data: HapicData
-    ) -> None:
+    def create_following(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
         """
         Declare given user follow an other user.
         If following already exist, return a 400 error with {error_code} error code.
@@ -1175,9 +1097,7 @@ class UserController(Controller):
         )
         app_config = request.registry.settings["CFG"]  # type: CFG
         user_api = UserApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=app_config,  # User
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         user_api.create_follower(
             follower_id=hapic_data.path["user_id"], leader_id=hapic_data.body["user_id"]
@@ -1188,21 +1108,16 @@ class UserController(Controller):
     @hapic.input_path(DeleteFollowedUserPathSchema())
     @hapic.handle_exception(NotFound, http_code=HTTPStatus.BAD_REQUEST)
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def delete_following(
-        self, context, request: TracimRequest, hapic_data: HapicData
-    ) -> None:
+    def delete_following(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
         """
         Delete given user following.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         user_api = UserApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=app_config,  # User
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         user_api.delete_follower(
-            follower_id=hapic_data.path["user_id"],
-            leader_id=hapic_data.path["leader_id"],
+            follower_id=hapic_data.path["user_id"], leader_id=hapic_data.path["leader_id"]
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
@@ -1210,17 +1125,13 @@ class UserController(Controller):
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(GetUserFollowQuerySchema())
     @hapic.output_body(FollowedUsersSchemaPage())
-    def followers(
-        self, context, request: TracimRequest, hapic_data: HapicData
-    ) -> PaginatedObject:
+    def followers(self, context, request: TracimRequest, hapic_data: HapicData) -> PaginatedObject:
         """
         For given user, get list of following user ids.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         user_api = UserApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=app_config,  # User
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         return PaginatedObject(
             user_api.get_paginated_followers_for_leader(
@@ -1235,17 +1146,13 @@ class UserController(Controller):
     @check_right(knows_candidate_user)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(AboutUserSchema())
-    def about_user(
-        self, context, request: TracimRequest, hapic_data: HapicData
-    ) -> AboutUser:
+    def about_user(self, context, request: TracimRequest, hapic_data: HapicData) -> AboutUser:
         """
         Return public user profile.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         user_api = UserApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=app_config,  # User
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         return user_api.get_about_user(hapic_data.path["user_id"])
 
@@ -1262,9 +1169,7 @@ class UserController(Controller):
         self, context, request: TracimRequest, hapic_data: HapicData
     ) -> HapicFile:
         user_api = UserApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=request.app_config,
+            current_user=request.current_user, session=request.dbsession, config=request.app_config
         )
         default_filename = "avatar_{width}x{height}.jpg".format(
             width=hapic_data.path.width,
@@ -1294,9 +1199,7 @@ class UserController(Controller):
         width = DEFAULT_AVATAR_SIZE.width
         height = DEFAULT_AVATAR_SIZE.height
         user_api = UserApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=request.app_config,
+            current_user=request.current_user, session=request.dbsession, config=request.app_config
         )
         default_filename = "avatar.jpg"
         return user_api.get_avatar_preview(
@@ -1314,9 +1217,7 @@ class UserController(Controller):
     @hapic.input_path(UserPicturePathSchema())
     @hapic.handle_exception(UserImageNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.output_file([])
-    def get_raw_avatar(
-        self, context, request: TracimRequest, hapic_data: HapicData
-    ) -> HapicFile:
+    def get_raw_avatar(self, context, request: TracimRequest, hapic_data: HapicData) -> HapicFile:
         try:
             user_api = UserApi(
                 current_user=request.current_user,
@@ -1332,9 +1233,7 @@ class UserController(Controller):
             )
         except CannotGetDepotFileDepotCorrupted as exc:
             raise TracimFileNotFound(
-                "avatar for user {} not found in depot.".format(
-                    request.candidate_user.user_id
-                )
+                "avatar for user {} not found in depot.".format(request.candidate_user.user_id)
             ) from exc
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
@@ -1344,24 +1243,16 @@ class UserController(Controller):
     @hapic.input_files(SimpleFileSchema())
     @hapic.input_path(UserPicturePathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def put_raw_avatar(
-        self, context, request: TracimRequest, hapic_data: HapicData
-    ) -> None:
+    def put_raw_avatar(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
         if hapic_data.files.files is None:
-            raise NoFileValidationError(
-                'No file "files" given at input, validation failed.'
-            )
+            raise NoFileValidationError('No file "files" given at input, validation failed.')
         if hapic_data.files.files.type not in ALLOWED__AVATAR_MIMETYPES:
             raise MimetypeNotAllowed(
-                "File mimetype {} is not allowed for avatar".format(
-                    hapic_data.files.files.type
-                )
+                "File mimetype {} is not allowed for avatar".format(hapic_data.files.files.type)
             )
 
         user_api = UserApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=request.app_config,
+            current_user=request.current_user, session=request.dbsession, config=request.app_config
         )
         user_api.set_avatar(
             user_id=request.candidate_user.user_id,
@@ -1383,9 +1274,7 @@ class UserController(Controller):
         self, context, request: TracimRequest, hapic_data: HapicData
     ) -> HapicFile:
         user_api = UserApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=request.app_config,
+            current_user=request.current_user, session=request.dbsession, config=request.app_config
         )
         default_filename = "cover_{width}x{height}.jpg".format(
             width=hapic_data.path.width,
@@ -1415,9 +1304,7 @@ class UserController(Controller):
         width = DEFAULT_COVER_SIZE.width
         height = DEFAULT_COVER_SIZE.height
         user_api = UserApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=request.app_config,
+            current_user=request.current_user, session=request.dbsession, config=request.app_config
         )
         default_filename = "cover.jpg"
         return user_api.get_cover_preview(
@@ -1435,9 +1322,7 @@ class UserController(Controller):
     @hapic.input_path(UserPicturePathSchema())
     @hapic.handle_exception(UserImageNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.output_file([])
-    def get_raw_cover(
-        self, context, request: TracimRequest, hapic_data: HapicData
-    ) -> HapicFile:
+    def get_raw_cover(self, context, request: TracimRequest, hapic_data: HapicData) -> HapicFile:
         try:
             user_api = UserApi(
                 current_user=request.current_user,
@@ -1453,9 +1338,7 @@ class UserController(Controller):
             )
         except CannotGetDepotFileDepotCorrupted as exc:
             raise TracimFileNotFound(
-                "cover for user {} not found in depot.".format(
-                    request.candidate_user.user_id
-                )
+                "cover for user {} not found in depot.".format(request.candidate_user.user_id)
             ) from exc
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
@@ -1465,24 +1348,16 @@ class UserController(Controller):
     @hapic.input_files(SimpleFileSchema())
     @hapic.input_path(UserPicturePathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def put_raw_cover(
-        self, context, request: TracimRequest, hapic_data: HapicData
-    ) -> None:
+    def put_raw_cover(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
         if hapic_data.files.files is None:
-            raise NoFileValidationError(
-                'No file "files" given at input, validation failed.'
-            )
+            raise NoFileValidationError('No file "files" given at input, validation failed.')
         if hapic_data.files.files.type not in ALLOWED__AVATAR_MIMETYPES:
             raise MimetypeNotAllowed(
-                "File mimetype {} is not allowed for cover".format(
-                    hapic_data.files.files.type
-                )
+                "File mimetype {} is not allowed for cover".format(hapic_data.files.files.type)
             )
 
         user_api = UserApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=request.app_config,
+            current_user=request.current_user, session=request.dbsession, config=request.app_config
         )
         user_api.set_cover(
             user_id=request.candidate_user.user_id,
@@ -1512,16 +1387,12 @@ class UserController(Controller):
         configurator.add_view(self.join_workspace, route_name="post_user_workspace")
 
         # user info
-        configurator.add_route(
-            "user", "/users/{user_id:\d+}", request_method="GET"
-        )  # noqa: W605
+        configurator.add_route("user", "/users/{user_id:\d+}", request_method="GET")  # noqa: W605
         configurator.add_view(self.user, route_name="user")
 
         # user space info
         configurator.add_route(
-            "user_disk_space",
-            "/users/{user_id:\d+}/disk_space",
-            request_method="GET",  # noqa: W605
+            "user_disk_space", "/users/{user_id:\d+}/disk_space", request_method="GET"  # noqa: W605
         )  # noqa: W605
         configurator.add_view(self.user_disk_space, route_name="user_disk_space")
 
@@ -1547,25 +1418,19 @@ class UserController(Controller):
 
         # set user email
         configurator.add_route(
-            "set_user_email",
-            "/users/{user_id:\d+}/email",
-            request_method="PUT",  # noqa: W605
+            "set_user_email", "/users/{user_id:\d+}/email", request_method="PUT"  # noqa: W605
         )  # noqa: W605
         configurator.add_view(self.set_user_email, route_name="set_user_email")
 
         # set user username
         configurator.add_route(
-            "set_user_username",
-            "/users/{user_id:\d+}/username",
-            request_method="PUT",  # noqa: W605
+            "set_user_username", "/users/{user_id:\d+}/username", request_method="PUT"  # noqa: W605
         )  # noqa: W605
         configurator.add_view(self.set_user_username, route_name="set_user_username")
 
         # set user password
         configurator.add_route(
-            "set_user_password",
-            "/users/{user_id:\d+}/password",
-            request_method="PUT",  # noqa: W605
+            "set_user_password", "/users/{user_id:\d+}/password", request_method="PUT"  # noqa: W605
         )
         configurator.add_view(self.set_user_password, route_name="set_user_password")
 
@@ -1580,32 +1445,24 @@ class UserController(Controller):
         configurator.add_view(self.create_user, route_name="create_user")
 
         # register user (public endpoint)
-        configurator.add_route(
-            "register_user", "/users/register", request_method="POST"
-        )
+        configurator.add_route("register_user", "/users/register", request_method="POST")
         configurator.add_view(self.register_user, route_name="register_user")
 
         # enable user
         configurator.add_route(
-            "enable_user",
-            "/users/{user_id:\d+}/enabled",
-            request_method="PUT",  # noqa: W605
+            "enable_user", "/users/{user_id:\d+}/enabled", request_method="PUT"  # noqa: W605
         )  # noqa: W605
         configurator.add_view(self.enable_user, route_name="enable_user")
 
         # disable user
         configurator.add_route(
-            "disable_user",
-            "/users/{user_id:\d+}/disabled",
-            request_method="PUT",  # noqa: W605
+            "disable_user", "/users/{user_id:\d+}/disabled", request_method="PUT"  # noqa: W605
         )
         configurator.add_view(self.disable_user, route_name="disable_user")
 
         # delete user
         configurator.add_route(
-            "delete_user",
-            "/users/{user_id:\d+}/trashed",
-            request_method="PUT",  # noqa: W605
+            "delete_user", "/users/{user_id:\d+}/trashed", request_method="PUT"  # noqa: W605
         )  # noqa: W605
         configurator.add_view(self.delete_user, route_name="delete_user")
 
@@ -1619,9 +1476,7 @@ class UserController(Controller):
 
         # set user profile
         configurator.add_route(
-            "set_user_profile",
-            "/users/{user_id:\d+}/profile",
-            request_method="PUT",  # noqa: W605
+            "set_user_profile", "/users/{user_id:\d+}/profile", request_method="PUT"  # noqa: W605
         )
         configurator.add_view(self.set_profile, route_name="set_user_profile")
 
@@ -1631,9 +1486,7 @@ class UserController(Controller):
             "/users/{user_id:\d+}/allowed_space",  # noqa: W605
             request_method="PUT",  # noqa: W605
         )
-        configurator.add_view(
-            self.set_allowed_space, route_name="set_user_allowed_space"
-        )
+        configurator.add_view(self.set_allowed_space, route_name="set_user_allowed_space")
 
         # user content
         configurator.add_route(
@@ -1641,9 +1494,7 @@ class UserController(Controller):
             "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/read_status",  # noqa: W605
             request_method="GET",
         )
-        configurator.add_view(
-            self.contents_read_status, route_name="contents_read_status"
-        )
+        configurator.add_view(self.contents_read_status, route_name="contents_read_status")
 
         # set content as read/unread
         configurator.add_route(
@@ -1687,9 +1538,7 @@ class UserController(Controller):
 
         # Tracim user messages
         configurator.add_route(
-            "messages",
-            "/users/{user_id:\d+}/messages",
-            request_method="GET",  # noqa: W605
+            "messages", "/users/{user_id:\d+}/messages", request_method="GET"  # noqa: W605
         )
         configurator.add_view(self.get_user_messages, route_name="messages")
 
@@ -1698,9 +1547,7 @@ class UserController(Controller):
             "/users/{user_id:\d+}/messages/summary",  # noqa: W605
             request_method="GET",  # noqa: W605
         )
-        configurator.add_view(
-            self.get_user_messages_summary, route_name="messages_summary"
-        )
+        configurator.add_view(self.get_user_messages_summary, route_name="messages_summary")
 
         # read a list of messages or every messages for a user
         configurator.add_route(
@@ -1708,9 +1555,7 @@ class UserController(Controller):
             "/users/{user_id:\d+}/messages/read",  # noqa: W605
             request_method="PUT",  # noqa: W605
         )
-        configurator.add_view(
-            self.set_user_messages_as_read, route_name="read_messages"
-        )
+        configurator.add_view(self.set_user_messages_as_read, route_name="read_messages")
 
         # unread a list of messages or every messages for a user
         configurator.add_route(
@@ -1718,9 +1563,7 @@ class UserController(Controller):
             "/users/{user_id:\d+}/messages/unread",  # noqa: W605
             request_method="PUT",  # noqa: W605
         )
-        configurator.add_view(
-            self.set_user_messages_as_unread, route_name="unread_messages"
-        )
+        configurator.add_view(self.set_user_messages_as_unread, route_name="unread_messages")
 
         # read one messages for user
         # DEPRECATED - MP - 2022-09-22 - https://github.com/tracim/tracim/issues/5941
@@ -1742,16 +1585,12 @@ class UserController(Controller):
 
         # User configuration
         configurator.add_route(
-            "config_get",
-            "/users/{user_id:\d+}/config",
-            request_method="GET",  # noqa: W605
+            "config_get", "/users/{user_id:\d+}/config", request_method="GET"  # noqa: W605
         )
         configurator.add_view(self.get_user_config, route_name="config_get")
 
         configurator.add_route(
-            "config_post",
-            "/users/{user_id:\d+}/config",
-            request_method="PUT",  # noqa: W605
+            "config_post", "/users/{user_id:\d+}/config", request_method="PUT"  # noqa: W605
         )
         configurator.add_view(self.set_user_config, route_name="config_post")
 
@@ -1761,18 +1600,14 @@ class UserController(Controller):
             "/users/{user_id:\d+}/custom-properties",  # noqa: W605
             request_method="GET",  # noqa: W605
         )
-        configurator.add_view(
-            self.get_user_custom_properties, route_name="custom_properties_get"
-        )
+        configurator.add_view(self.get_user_custom_properties, route_name="custom_properties_get")
 
         configurator.add_route(
             "custom_properties_post",
             "/users/{user_id:\d+}/custom-properties",  # noqa: W605
             request_method="PUT",  # noqa: W605
         )
-        configurator.add_view(
-            self.set_user_custom_properties, route_name="custom_properties_post"
-        )
+        configurator.add_view(self.set_user_custom_properties, route_name="custom_properties_post")
 
         # User accessible workspaces (not member of, but can see information about them to subscribe)
         configurator.add_route(
@@ -1801,9 +1636,7 @@ class UserController(Controller):
 
         # User following/followers
         configurator.add_route(
-            "following",
-            "/users/{user_id:\d+}/following",
-            request_method="GET",  # noqa: W605
+            "following", "/users/{user_id:\d+}/following", request_method="GET"  # noqa: W605
         )
         configurator.add_view(self.following, route_name="following")
 
@@ -1822,9 +1655,7 @@ class UserController(Controller):
         configurator.add_view(self.delete_following, route_name="delete_following")
 
         configurator.add_route(
-            "followers",
-            "/users/{user_id:\d+}/followers",
-            request_method="GET",  # noqa: W605
+            "followers", "/users/{user_id:\d+}/followers", request_method="GET"  # noqa: W605
         )
         configurator.add_view(self.followers, route_name="followers")
 
@@ -1840,9 +1671,7 @@ class UserController(Controller):
             "/users/{user_id:\d+}/avatar/preview/jpg/{width:\d+}x{height:\d+}/{filename:[^/]*}",  # noqa: W605
             request_method="GET",  # noqa: W605
         )
-        configurator.add_view(
-            self.sized_preview_avatar, route_name="sized_preview_avatar"
-        )
+        configurator.add_view(self.sized_preview_avatar, route_name="sized_preview_avatar")
 
         configurator.add_route(
             "get_preview_avatar",
@@ -1870,9 +1699,7 @@ class UserController(Controller):
             "/users/{user_id:\d+}/cover/preview/jpg/{width:\d+}x{height:\d+}/{filename:[^/]*}",  # noqa: W605
             request_method="GET",  # noqa: W605
         )
-        configurator.add_view(
-            self.sized_preview_cover, route_name="sized_preview_cover"
-        )
+        configurator.add_view(self.sized_preview_cover, route_name="sized_preview_cover")
 
         configurator.add_route(
             "get_preview_cover",
