@@ -75,7 +75,7 @@ class AgendaController(Controller):
         # INFO - G.M - 2019-04-01 - user agenda
         configurator.add_route(
             "user_agendas",
-            "/users/{user_id:\d+}/agenda",
+            "/users/{user_id:\d+}/agenda",  # noqa: W605
             request_method="GET",  # noqa: W605
         )  # noqa: W605
         configurator.add_view(self.user_agendas, route_name="user_agendas")
