@@ -1,5 +1,6 @@
 from pyramid.config import Configurator
 
+from backend.tracim_backend.config import CFG  # noqa F401
 from tracim_backend.applications.agenda.lib import AgendaApi
 from tracim_backend.applications.agenda.schemas import AgendaFilterQuerySchema
 from tracim_backend.applications.agenda.schemas import AgendaSchema

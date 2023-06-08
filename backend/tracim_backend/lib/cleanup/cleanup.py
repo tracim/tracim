@@ -218,7 +218,7 @@ class CleanupLib(object):
         for upload_permission in upload_permissions:
             logger.info(
                 self,
-                "delete upload_permission {} of workspace".format(
+                "delete upload_permission {} of workspace {}".format(
                     upload_permission.upload_permission_id, workspace.workspace_id
                 ),
             )
