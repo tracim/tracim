@@ -5,6 +5,7 @@ import transaction
 import typing
 
 from tracim_backend.app_models.contents import ContentTypeSlug
+from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.extensions import hapic

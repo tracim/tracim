@@ -4,6 +4,7 @@ import transaction
 from unittest import mock
 
 from tracim_backend.applications.share.models import ContentShareType
+from tracim_backend.applications.upload_permissions.lib import UploadPermissionLib  # noqa: F401
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.rq import RqQueueName
 from tracim_backend.lib.rq import get_redis_connection

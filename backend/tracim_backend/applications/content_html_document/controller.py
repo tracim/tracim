@@ -6,6 +6,7 @@ from pyramid.config import Configurator
 import transaction
 
 from tracim_backend.app_models.contents import ContentTypeSlug
+from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentStatusException
 from tracim_backend.exceptions import EmptyLabelNotAllowed

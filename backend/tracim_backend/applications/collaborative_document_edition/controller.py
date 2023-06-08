@@ -3,7 +3,9 @@ from http import HTTPStatus
 from pyramid.config import Configurator
 from pyramid.traversal import DefaultRootFactory
 import transaction
+import typing  # noqa: F401
 
+from backend.tracim_backend.config import CFG  # noqa: F401
 from tracim_backend import ContentNotFound
 from tracim_backend import TracimRequest
 from tracim_backend import hapic

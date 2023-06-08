@@ -3,6 +3,7 @@ import json
 from pyramid.scripting import AppEnvironment
 
 from tracim_backend.command import AppContextCommand
+from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.config import ConfigParam
 from tracim_backend.lib.core.live_messages import LiveMessagesLib
 from tracim_backend.lib.core.user_custom_properties import UserCustomPropertiesApi

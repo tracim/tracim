@@ -1,4 +1,5 @@
 # coding: utf8
+from sqlalchemy.orm import Session  # noqa: F401
 import transaction
 import typing
 

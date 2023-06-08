@@ -2,6 +2,7 @@ import pytest
 from rq import SimpleWorker
 import transaction
 
+from tracim_backend.applications.share.lib import ShareLib  # noqa: F401
 from tracim_backend.applications.share.models import ContentShareType
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.rq import RqQueueName
