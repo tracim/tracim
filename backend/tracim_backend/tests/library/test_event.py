@@ -109,9 +109,7 @@ class TestEventBuilder:
         self, user_api_factory, session, app_config, event_helper
     ) -> None:
         uapi = user_api_factory.get()
-        user = uapi.create_minimal_user(
-            email="this.is@user", profile=Profile.ADMIN, save_now=True
-        )
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
 
         uapi.delete(user, do_save=True)
         assert event_helper.last_event.event_type == "user.deleted"
@@ -194,13 +192,9 @@ class TestEventReceiver:
             .dump(user_api.get_user_with_context(event_initiator))
             .data,
         }
-        event = Event(
-            entity_type=EntityType.USER, operation=OperationType.MODIFIED, fields=fields
-        )
+        event = Event(entity_type=EntityType.USER, operation=OperationType.MODIFIED, fields=fields)
 
-        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(
-            event, session, app_config
-        )
+        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
         assert event_initiator.user_id in receivers_ids
         assert same_workspace_user.user_id in receivers_ids
         assert other_user.user_id not in receivers_ids
@@ -239,9 +233,7 @@ class TestEventReceiver:
             workspace_id=workspace_in_context.workspace_id,
         )
 
-        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(
-            event, session, app_config
-        )
+        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
         assert event_initiator.user_id in receivers_ids
         assert same_workspace_user.user_id in receivers_ids
         assert other_user.user_id not in receivers_ids
@@ -280,9 +272,7 @@ class TestEventReceiver:
             workspace_id=workspace_in_context.workspace_id,
         )
 
-        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(
-            event, session, app_config
-        )
+        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
         assert event_initiator.user_id in receivers_ids
         assert same_workspace_user.user_id in receivers_ids
         assert other_user.user_id in receivers_ids
@@ -307,9 +297,7 @@ class TestEventReceiver:
         workspace_api = workspace_api_factory.get()
         workspace_in_context = workspace_api.get_workspace_with_context(my_workspace)
         user_api = user_api_factory.get()
-        workspace_dict = (
-            WorkspaceSchema(exclude=("access_type",)).dump(workspace_in_context).data
-        )
+        workspace_dict = WorkspaceSchema(exclude=("access_type",)).dump(workspace_in_context).data
         fields = {
             Event.AUTHOR_FIELD: UserSchema()
             .dump(user_api.get_user_with_context(event_initiator))
@@ -324,9 +312,7 @@ class TestEventReceiver:
             workspace_id=workspace_dict.get("workspace_id"),
         )
 
-        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(
-            event, session, app_config
-        )
+        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
         assert event_initiator.user_id in receivers_ids
         assert same_workspace_user.user_id in receivers_ids
         assert other_user.user_id not in receivers_ids
@@ -363,9 +349,7 @@ class TestEventReceiver:
             .data,
             Event.CLIENT_TOKEN_FIELD: "test",
             Event.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context).data,
-            Event.MEMBER_FIELD: WorkspaceMemberDigestSchema()
-            .dump(role_in_context)
-            .data,
+            Event.MEMBER_FIELD: WorkspaceMemberDigestSchema().dump(role_in_context).data,
         }
         event = Event(
             entity_type=EntityType.WORKSPACE_MEMBER,
@@ -374,9 +358,7 @@ class TestEventReceiver:
             workspace_id=workspace_in_context.workspace_id,
         )
 
-        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(
-            event, session, app_config
-        )
+        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
         assert event_initiator.user_id in receivers_ids
         assert same_workspace_user.user_id in receivers_ids
         assert other_user.user_id not in receivers_ids
@@ -413,9 +395,7 @@ class TestEventReceiver:
             .data,
             Event.CLIENT_TOKEN_FIELD: "test",
             Event.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context).data,
-            Event.MEMBER_FIELD: WorkspaceMemberDigestSchema()
-            .dump(role_in_context)
-            .data,
+            Event.MEMBER_FIELD: WorkspaceMemberDigestSchema().dump(role_in_context).data,
         }
         event = Event(
             entity_type=EntityType.WORKSPACE_MEMBER,
@@ -424,9 +404,7 @@ class TestEventReceiver:
             workspace_id=workspace_in_context.workspace_id,
         )
 
-        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(
-            event, session, app_config
-        )
+        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
         assert event_initiator.user_id in receivers_ids
         assert same_workspace_user.user_id in receivers_ids
         assert other_user.user_id not in receivers_ids
@@ -479,9 +457,7 @@ class TestEventReceiver:
             workspace_id=workspace_in_context.workspace_id,
         )
 
-        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(
-            event, session, app_config
-        )
+        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
         assert event_initiator.user_id in receivers_ids
         assert same_workspace_user.user_id in receivers_ids
         assert other_user.user_id not in receivers_ids
@@ -549,13 +525,9 @@ class TestEventReceiver:
         subscription = subscription_lib.submit_subscription(my_workspace)
         transaction.commit()
         fields = {
-            Event.AUTHOR_FIELD: UserSchema()
-            .dump(user_api.get_user_with_context(subscriber))
-            .data,
+            Event.AUTHOR_FIELD: UserSchema().dump(user_api.get_user_with_context(subscriber)).data,
             Event.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context).data,
-            Event.SUBSCRIPTION_FIELD: WorkspaceSubscriptionSchema()
-            .dump(subscription)
-            .data,
+            Event.SUBSCRIPTION_FIELD: WorkspaceSubscriptionSchema().dump(subscription).data,
         }
         event = Event(
             entity_type=EntityType.WORKSPACE_SUBSCRIPTION,
@@ -564,9 +536,7 @@ class TestEventReceiver:
             workspace_id=workspace_in_context.workspace_id,
         )
 
-        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(
-            event, session, app_config
-        )
+        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
         assert subscriber.user_id in receivers_ids
         assert workspace_manager.user_id in receivers_ids
         assert admin_user.user_id in receivers_ids
@@ -636,13 +606,9 @@ class TestEventReceiver:
         subscription_lib.reject_subscription(subscription)
         transaction.commit()
         fields = {
-            Event.AUTHOR_FIELD: UserSchema()
-            .dump(user_api.get_user_with_context(admin_user))
-            .data,
+            Event.AUTHOR_FIELD: UserSchema().dump(user_api.get_user_with_context(admin_user)).data,
             Event.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context).data,
-            Event.SUBSCRIPTION_FIELD: WorkspaceSubscriptionSchema()
-            .dump(subscription)
-            .data,
+            Event.SUBSCRIPTION_FIELD: WorkspaceSubscriptionSchema().dump(subscription).data,
         }
         event = Event(
             entity_type=EntityType.WORKSPACE_SUBSCRIPTION,
@@ -651,9 +617,7 @@ class TestEventReceiver:
             workspace_id=workspace_in_context.workspace_id,
         )
 
-        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(
-            event, session, app_config
-        )
+        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
         assert subscriber.user_id in receivers_ids
         assert workspace_manager.user_id in receivers_ids
         assert admin_user.user_id in receivers_ids
@@ -844,14 +808,10 @@ class TestEventApi:
         )
         transaction.commit()
 
-        workspace_message_at_workspace_join = (
-            message_helper.last_user_workspace_messages(
-                100, my_workspace.workspace_id, other_user.user_id
-            )
+        workspace_message_at_workspace_join = message_helper.last_user_workspace_messages(
+            100, my_workspace.workspace_id, other_user.user_id
         )
-        assert len(workspace_message_at_workspace_join) > len(
-            default_workspace_messages
-        )
+        assert len(workspace_message_at_workspace_join) > len(default_workspace_messages)
         for message in workspace_message_at_workspace_join:
             assert message.sent is None
             assert message.receiver_id == other_user.user_id
@@ -893,9 +853,7 @@ class TestEventApi:
         assert default_workspace_messages == []
 
         # try generate workspace message: not in workspace, should return empty list
-        event_api = EventApi(
-            current_user=admin_user, session=session, config=app_config
-        )
+        event_api = EventApi(current_user=admin_user, session=session, config=app_config)
         generated_messages = event_api.create_messages_history_for_user(
             user_id=other_user.user_id,
             workspace_ids=[my_workspace.workspace_id],
@@ -928,9 +886,7 @@ class TestEventApi:
         assert last_messages == []
 
         # generate workspace message: should return a message list
-        event_api = EventApi(
-            current_user=admin_user, session=session, config=app_config
-        )
+        event_api = EventApi(current_user=admin_user, session=session, config=app_config)
         generated_messages = event_api.create_messages_history_for_user(
             user_id=other_user.user_id,
             workspace_ids=[my_workspace.workspace_id],
@@ -946,9 +902,7 @@ class TestEventApi:
         assert len(last_messages) <= max_message_generated
 
         # re-retry generate workspace message: should not create new message
-        event_api = EventApi(
-            current_user=admin_user, session=session, config=app_config
-        )
+        event_api = EventApi(current_user=admin_user, session=session, config=app_config)
         new_generated_messages = event_api.create_messages_history_for_user(
             user_id=other_user.user_id,
             workspace_ids=[my_workspace.workspace_id],
@@ -1012,9 +966,7 @@ class TestEventApi:
         assert last_messages == []
 
         # generate workspace message: should return message list
-        event_api = EventApi(
-            current_user=admin_user, session=session, config=app_config
-        )
+        event_api = EventApi(current_user=admin_user, session=session, config=app_config)
         event_api.create_messages_history_for_user(
             user_id=other_user.user_id,
             workspace_ids=[my_workspace.workspace_id],

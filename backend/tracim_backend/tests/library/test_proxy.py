@@ -20,9 +20,7 @@ class TestProxy(object):
             "Host": "localhost:80",
         }
         extra_header = {"Remote-User": "admin@admin.admin"}
-        new_headers = proxy._add_extra_headers(
-            headers=headers, extra_headers=extra_header
-        )
+        new_headers = proxy._add_extra_headers(headers=headers, extra_headers=extra_header)
         assert new_headers != headers
         assert new_headers != extra_header
         assert new_headers == {
@@ -33,9 +31,7 @@ class TestProxy(object):
         }
 
     def test_drop_request_headers__ok__nominal_case(self):
-        proxy = Proxy(
-            "http://localhost:8080", default_request_headers_to_drop=("connection")
-        )
+        proxy = Proxy("http://localhost:8080", default_request_headers_to_drop=("connection"))
 
         headers = {
             "Authorization": "Basic dGVzdEB0ZXN0LnRlc3Q6dGVzdEB0ZXN0LnRlc3Q=",
@@ -53,9 +49,7 @@ class TestProxy(object):
         }
 
     def test_drop_response_headers__ok__nominal_case(self):
-        proxy = Proxy(
-            "http://localhost:8080", default_response_headers_to_drop=("connection")
-        )
+        proxy = Proxy("http://localhost:8080", default_response_headers_to_drop=("connection"))
         headers = {
             "Authorization": "Basic dGVzdEB0ZXN0LnRlc3Q6dGVzdEB0ZXN0LnRlc3Q=",
             "Content-Length": "0",

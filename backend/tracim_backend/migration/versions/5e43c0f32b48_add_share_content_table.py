@@ -30,9 +30,7 @@ def upgrade():
             primary_key=True,
         ),
         sa.Column("content_id", sa.Integer(), ForeignKey("content.id"), nullable=False),
-        sa.Column(
-            "author_id", sa.Integer(), ForeignKey("users.user_id"), nullable=False
-        ),
+        sa.Column("author_id", sa.Integer(), ForeignKey("users.user_id"), nullable=False),
         sa.Column("email", sa.String(255), nullable=False),
         sa.Column("share_token", sa.Unicode(255), nullable=False),
         sa.Column("share_group_id", sa.Unicode(255), nullable=False),

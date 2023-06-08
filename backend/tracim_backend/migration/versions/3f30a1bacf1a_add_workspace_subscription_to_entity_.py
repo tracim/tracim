@@ -15,9 +15,7 @@ down_revision = "69ab7c047577"
 
 old_entity_types = ("USER", "WORKSPACE", "WORKSPACE_MEMBER", "CONTENT", "MENTION")
 old_entity_type_enum = sa.Enum(*old_entity_types, name="entitytype")
-new_entity_type_enum = sa.Enum(
-    *(old_entity_types + ("WORKSPACE_SUBSCRIPTION",)), name="entitytype"
-)
+new_entity_type_enum = sa.Enum(*(old_entity_types + ("WORKSPACE_SUBSCRIPTION",)), name="entitytype")
 
 
 def replace_enum(
@@ -28,12 +26,8 @@ def replace_enum(
     default_value: typing.Any,
 ) -> None:
     if op.get_context().dialect.name == "postgresql":
-        op.execute(
-            "ALTER TYPE {} RENAME TO {}_old".format(from_enum.name, from_enum.name)
-        )
-        op.execute(
-            "ALTER TABLE {} alter {} drop default".format(table_name, column_name)
-        )
+        op.execute("ALTER TYPE {} RENAME TO {}_old".format(from_enum.name, from_enum.name))
+        op.execute("ALTER TABLE {} alter {} drop default".format(table_name, column_name))
         to_enum.create(op.get_bind(), checkfirst=False)
         with op.batch_alter_table(table_name) as batch_op:
             batch_op.alter_column(
@@ -50,9 +44,7 @@ def replace_enum(
 
 
 def upgrade() -> None:
-    replace_enum(
-        "events", "entity_type", old_entity_type_enum, new_entity_type_enum, None
-    )
+    replace_enum("events", "entity_type", old_entity_type_enum, new_entity_type_enum, None)
 
 
 def downgrade() -> None:

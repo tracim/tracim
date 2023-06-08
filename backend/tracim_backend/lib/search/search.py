@@ -41,9 +41,7 @@ class IndexedContentsResults(object):
 
 
 class SearchApi(ABC):
-    def __init__(
-        self, session: Session, current_user: typing.Optional[User], config: CFG
-    ) -> None:
+    def __init__(self, session: Session, current_user: typing.Optional[User], config: CFG) -> None:
         self._user = current_user
         self._session = session
         self._config = config
@@ -98,26 +96,18 @@ class SearchApi(ABC):
             except Exception as exc:
                 logger.error(
                     self,
-                    "something went wrong while indexing content {}".format(
-                        content.content_id
-                    ),
+                    "something went wrong while indexing content {}".format(content.content_id),
                 )
                 logger.exception(self, exc)
                 errored_indexed_contents_ids.append(content.content_id)
-        return IndexedContentsResults(
-            content_ids_to_index, errored_indexed_contents_ids
-        )
+        return IndexedContentsResults(content_ids_to_index, errored_indexed_contents_ids)
 
-    def _get_user_workspaces_id(
-        self, min_role: int
-    ) -> typing.Optional[typing.List[int]]:
+    def _get_user_workspaces_id(self, min_role: int) -> typing.Optional[typing.List[int]]:
         """
         Get user workspace list or None if no user set
         """
         if self._user:
-            role_api = RoleApi(
-                config=self._config, session=self._session, current_user=self._user
-            )
+            role_api = RoleApi(config=self._config, session=self._session, current_user=self._user)
             return role_api.get_user_workspaces_ids(self._user.user_id, min_role)
         return None
 

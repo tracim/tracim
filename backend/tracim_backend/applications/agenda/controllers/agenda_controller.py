@@ -80,9 +80,7 @@ class AgendaController(Controller):
         configurator.add_view(self.user_agendas, route_name="user_agendas")
 
         # INFO - G.M - 2019-04-01 - own user agenda
-        configurator.add_route(
-            "account_agendas", "/users/me/agenda", request_method="GET"
-        )
+        configurator.add_route("account_agendas", "/users/me/agenda", request_method="GET")
         configurator.add_view(self.account_agendas, route_name="account_agendas")
 
         # pre-filled agenda event
@@ -91,6 +89,4 @@ class AgendaController(Controller):
             "/system/pre-filled-agenda-event",
             request_method="GET",
         )
-        configurator.add_view(
-            self.pre_filled_agenda_event, route_name="pre_filled_agenda_event"
-        )
+        configurator.add_view(self.pre_filled_agenda_event, route_name="pre_filled_agenda_event")

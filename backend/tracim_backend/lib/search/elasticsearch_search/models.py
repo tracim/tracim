@@ -133,12 +133,8 @@ class ESContentSearchResponse(ContentSearchResponse):
         facets = ContentFacets(
             workspace_names=facet_count(aggregations, "workspace_names"),
             author__public_names=facet_count(aggregations, "author__public_names"),
-            last_modifier__public_names=facet_count(
-                aggregations, "last_modifier__public_names"
-            ),
-            file_extensions=facet_count(
-                aggregations, "file_extensions", exclude_empty_values=True
-            ),
+            last_modifier__public_names=facet_count(aggregations, "last_modifier__public_names"),
+            file_extensions=facet_count(aggregations, "file_extensions", exclude_empty_values=True),
             statuses=facet_count(aggregations, "statuses"),
             content_types=facet_count(aggregations, "content_types"),
             tags=facet_count(aggregations, "tags"),

@@ -87,9 +87,7 @@ class UploadPermissionEmailManager(EmailManager):
         )
         from_header = self._get_sender()
         to_header = EmailAddress(receiver.display_name, receiver.email)
-        html_template_file_path = (
-            self.config.EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML
-        )
+        html_template_file_path = self.config.EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML
         context = {
             "receiver": receiver,
             "workspace": workspace_in_context,

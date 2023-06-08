@@ -29,9 +29,7 @@ def upgrade():
             ["users.user_id"],
             name=op.f("fk_user_followers_leader_id_users"),
         ),
-        sa.PrimaryKeyConstraint(
-            "follower_id", "leader_id", name=op.f("pk_user_followers")
-        ),
+        sa.PrimaryKeyConstraint("follower_id", "leader_id", name=op.f("pk_user_followers")),
     )
 
 

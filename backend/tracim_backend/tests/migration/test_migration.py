@@ -91,15 +91,11 @@ class TestMigration(object):
 
         # Stamp last_revision
         head_revision = get_revision(alembic_config, migration_engine, script, "head")
-        current_revision = get_revision(
-            alembic_config, migration_engine, script, "current"
-        )
+        current_revision = get_revision(alembic_config, migration_engine, script, "current")
         assert current_revision == tuple()
         head_revision = get_revision(alembic_config, migration_engine, script, "head")
         command.stamp(alembic_config, head_revision)
-        current_revision = get_revision(
-            alembic_config, migration_engine, script, "current"
-        )
+        current_revision = get_revision(alembic_config, migration_engine, script, "current")
         assert current_revision == tuple(head_revision)
 
         for path in paths:
@@ -107,15 +103,11 @@ class TestMigration(object):
             for revision in path:
                 command.downgrade(alembic_config, revision)
             command.downgrade(alembic_config, "-1")
-            current_revision = get_revision(
-                alembic_config, migration_engine, script, "current"
-            )
+            current_revision = get_revision(alembic_config, migration_engine, script, "current")
             assert current_revision == tuple()
 
             # Test upgrade
             for revision in reversed(path):
                 command.upgrade(alembic_config, revision)
-            current_revision = get_revision(
-                alembic_config, migration_engine, script, "current"
-            )
+            current_revision = get_revision(alembic_config, migration_engine, script, "current")
             assert current_revision == tuple(head_revision)

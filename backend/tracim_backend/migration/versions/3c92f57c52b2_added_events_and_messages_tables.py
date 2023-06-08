@@ -13,9 +13,7 @@ revision = "3c92f57c52b2"
 down_revision = "96e812178cec"
 
 operation_type_enum = sa.Enum("CREATED", "MODIFIED", "DELETED", name="operationtype")
-entity_type_enum = sa.Enum(
-    "USER", "WORKSPACE", "WORKSPACE_MEMBER", "CONTENT", name="entitytype"
-)
+entity_type_enum = sa.Enum("USER", "WORKSPACE", "WORKSPACE_MEMBER", "CONTENT", name="entitytype")
 
 
 def upgrade():
@@ -55,9 +53,7 @@ def upgrade():
     )
     with op.batch_alter_table("content_revisions") as batch_op:
         batch_op.alter_column("content_id", existing_type=sa.INTEGER(), nullable=True)
-        batch_op.drop_constraint(
-            "fk_content_revisions_content_id_content", type_="foreignkey"
-        )
+        batch_op.drop_constraint("fk_content_revisions_content_id_content", type_="foreignkey")
         batch_op.create_foreign_key(
             batch_op.f("fk_content_revisions_content_id_content"),
             "content",

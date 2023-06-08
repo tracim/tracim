@@ -39,9 +39,7 @@ class WOPICheckFileInfoSchema(marshmallow.Schema):
     OwnerId = marshmallow.fields.Int(
         description="Owner's database identifier", attribute="owner_id"
     )
-    UserId = marshmallow.fields.Int(
-        description="User's database identifier", attribute="user_id"
-    )
+    UserId = marshmallow.fields.Int(description="User's database identifier", attribute="user_id")
     UserFriendlyName = marshmallow.fields.String(
         description="User's display name", attribute="user_friendly_name"
     )

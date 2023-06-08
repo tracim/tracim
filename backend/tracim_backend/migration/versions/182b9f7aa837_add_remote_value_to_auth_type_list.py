@@ -49,9 +49,7 @@ def downgrade():
     # to avoid compatibility issue
     connection = op.get_bind()
     connection.execute(
-        users.update()
-        .where(users.c.auth_type.in_(new_elements))
-        .values(auth_type=default_type)
+        users.update().where(users.c.auth_type.in_(new_elements)).values(auth_type=default_type)
     )
     if op.get_context().dialect.name == "postgresql":
         # INFO - G.M - 2018-11-27 - TO modify type in postgresq, we should

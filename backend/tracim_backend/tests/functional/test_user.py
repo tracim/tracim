@@ -51,12 +51,8 @@ class TestUserReadStatusEndpoint(object):
     ):
         # init DB
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
-        workspace2 = workspace_api_factory.get().create_workspace(
-            "test workspace2", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -204,12 +200,8 @@ class TestUserReadStatusEndpoint(object):
     ):
         # init DB
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
-        workspace2 = workspace_api_factory.get().create_workspace(
-            "test workspace2", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -357,12 +349,8 @@ class TestUserReadStatusEndpoint(object):
     ):
         # init DB
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
-        workspace2 = workspace_api_factory.get().create_workspace(
-            "test workspace2", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -508,9 +496,7 @@ class TestUserSetContentAsRead(object):
     ):
         # init DB
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -607,9 +593,7 @@ class TestUserSetContentAsRead(object):
     ):
         # init DB
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -680,9 +664,7 @@ class TestUserSetContentAsRead(object):
     ):
         # init DB
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -753,9 +735,7 @@ class TestUserSetContentAsRead(object):
     ):
         # init DB
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -842,9 +822,7 @@ class TestUserSetContentAsRead(object):
     ):
         # init DB
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -913,9 +891,7 @@ class TestUserSetContentAsRead(object):
     ):
         # init DB
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -951,9 +927,7 @@ class TestUserSetContentAsRead(object):
             label="creation_order_test",
             do_save=True,
         )
-        comments = api.create_comment(
-            workspace, firstly_created, "juste a super comment", True
-        )
+        comments = api.create_comment(workspace, firstly_created, "juste a super comment", True)
         api.mark_unread(firstly_created)
         api.mark_unread(comments)
         session.flush()
@@ -1024,9 +998,7 @@ class TestUserSetContentAsRead(object):
         session,
     ):
         # init DB
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -1062,9 +1034,7 @@ class TestUserSetContentAsRead(object):
             label="creation_order_test",
             do_save=True,
         )
-        comments = api.create_comment(
-            workspace, firstly_created, "juste a super comment", True
-        )
+        comments = api.create_comment(workspace, firstly_created, "juste a super comment", True)
         api.mark_read(firstly_created)
         api.mark_unread(comments)
         session.flush()
@@ -1143,9 +1113,7 @@ class TestUserSetContentAsUnread(object):
     ):
         # init DB
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -1255,9 +1223,7 @@ class TestUserSetContentAsUnread(object):
     ):
         # init DB
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -1328,9 +1294,7 @@ class TestUserSetContentAsUnread(object):
     ):
         # init DB
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -1402,9 +1366,7 @@ class TestUserSetContentAsUnread(object):
     ):
         # init DB
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -1491,9 +1453,7 @@ class TestUserSetContentAsUnread(object):
     ):
         # init DB
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -1561,9 +1521,7 @@ class TestUserSetContentAsUnread(object):
     ):
         # init DB
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         api = content_api_factory.get()
         main_folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
@@ -1579,9 +1537,7 @@ class TestUserSetContentAsUnread(object):
             label="creation_order_test",
             do_save=True,
         )
-        comments = api.create_comment(
-            workspace, firstly_created, "juste a super comment", True
-        )
+        comments = api.create_comment(workspace, firstly_created, "juste a super comment", True)
         api.mark_read(firstly_created)
         api.mark_read(comments)
         session.flush()
@@ -1592,9 +1548,7 @@ class TestUserSetContentAsUnread(object):
             ("admin@admin.admin", "admin@admin.admin"),
         )
         res = web_testapp.get(
-            "/api/users/1/workspaces/{}/contents/read_status".format(
-                workspace.workspace_id
-            ),
+            "/api/users/1/workspaces/{}/contents/read_status".format(workspace.workspace_id),
             status=200,
             params=params,
         )
@@ -1608,9 +1562,7 @@ class TestUserSetContentAsUnread(object):
             )
         )
         res = web_testapp.get(
-            "/api/users/1/workspaces/{}/contents/read_status".format(
-                workspace.workspace_id
-            ),
+            "/api/users/1/workspaces/{}/contents/read_status".format(workspace.workspace_id),
             status=200,
             params=params,
         )
@@ -1628,9 +1580,7 @@ class TestUserSetContentAsUnread(object):
     ):
         # init DB
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         api = content_api_factory.get()
         main_folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
@@ -1646,9 +1596,7 @@ class TestUserSetContentAsUnread(object):
             label="creation_order_test",
             do_save=True,
         )
-        comments = api.create_comment(
-            workspace, firstly_created, "juste a super comment", True
-        )
+        comments = api.create_comment(workspace, firstly_created, "juste a super comment", True)
         api.mark_read(firstly_created)
         api.mark_read(comments)
         session.flush()
@@ -1660,9 +1608,7 @@ class TestUserSetContentAsUnread(object):
             ("admin@admin.admin", "admin@admin.admin"),
         )
         res = web_testapp.get(
-            "/api/users/1/workspaces/{}/contents/read_status".format(
-                workspace.workspace_id
-            ),
+            "/api/users/1/workspaces/{}/contents/read_status".format(workspace.workspace_id),
             status=200,
             params=params,
         )
@@ -1676,9 +1622,7 @@ class TestUserSetContentAsUnread(object):
             )
         )
         res = web_testapp.get(
-            "/api/users/1/workspaces/{}/contents/read_status".format(
-                workspace.workspace_id
-            ),
+            "/api/users/1/workspaces/{}/contents/read_status".format(workspace.workspace_id),
             status=200,
             params=params,
         )
@@ -1705,9 +1649,7 @@ class TestUserSetWorkspaceAsRead(object):
     ):
         # init DB
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -1762,10 +1704,7 @@ class TestUserSetWorkspaceAsRead(object):
             status=200,
         )
         for elem in res.json_body:
-            assert (
-                elem["content_id"] == firstly_created.content_id
-                or main_folder.content_id
-            )
+            assert elem["content_id"] == firstly_created.content_id or main_folder.content_id
             assert elem["read_by_user"] is False
 
         web_testapp.put(
@@ -1781,10 +1720,7 @@ class TestUserSetWorkspaceAsRead(object):
             status=200,
         )
         for elem in res.json_body:
-            assert (
-                elem["content_id"] == firstly_created.content_id
-                or main_folder.content_id
-            )
+            assert elem["content_id"] == firstly_created.content_id or main_folder.content_id
             assert elem["read_by_user"] is True
 
     def test_api_set_content_as_read__ok__200__user_itself(
@@ -1799,9 +1735,7 @@ class TestUserSetWorkspaceAsRead(object):
     ):
         # init DB
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -1853,10 +1787,7 @@ class TestUserSetWorkspaceAsRead(object):
             status=200,
         )
         for elem in res.json_body:
-            assert (
-                elem["content_id"] == firstly_created.content_id
-                or main_folder.content_id
-            )
+            assert elem["content_id"] == firstly_created.content_id or main_folder.content_id
             assert elem["read_by_user"] is False
 
         web_testapp.put(
@@ -1872,10 +1803,7 @@ class TestUserSetWorkspaceAsRead(object):
             status=200,
         )
         for elem in res.json_body:
-            assert (
-                elem["content_id"] == firstly_created.content_id
-                or main_folder.content_id
-            )
+            assert elem["content_id"] == firstly_created.content_id or main_folder.content_id
             assert elem["read_by_user"] is True
 
     def test_api_set_content_as_read__err__403__other_user(
@@ -1891,9 +1819,7 @@ class TestUserSetWorkspaceAsRead(object):
     ):
         # init DB
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -1968,9 +1894,7 @@ class TestUserChangeEmailNotification(object):
     ):
         # init DB
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -2024,9 +1948,7 @@ class TestUserChangeEmailNotification(object):
     ):
         # init DB
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -2077,9 +1999,7 @@ class TestUserChangeEmailNotification(object):
     ):
         # init DB
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -2156,9 +2076,7 @@ class TestUserWorkspaceEndpoint(object):
         """
 
         workspace_api = workspace_api_factory.get()
-        owned_and_role_workspace = workspace_api.create_workspace(
-            label="owned_and_role"
-        )
+        owned_and_role_workspace = workspace_api.create_workspace(label="owned_and_role")
         owned_only_workspace = workspace_api.create_workspace("owned_only")
         user_api = user_api_factory.get()
         user_api.create_user("toto@toto.toto", do_notify=False)
@@ -2174,9 +2092,7 @@ class TestUserWorkspaceEndpoint(object):
             do_notify=False,
         )
         workspace_api_test_user = workspace_api_factory.get(test_user)
-        role_only_workspace = workspace_api_test_user.create_workspace(
-            label="role_only"
-        )
+        role_only_workspace = workspace_api_test_user.create_workspace(label="role_only")
         role_api = role_api_factory.get()
         role_api.create_one(
             admin_user,
@@ -2271,9 +2187,7 @@ class TestUserWorkspaceEndpoint(object):
         """
 
         workspace_api = workspace_api_factory.get()
-        owned_and_role_workspace = workspace_api.create_workspace(
-            label="owned_and_role"
-        )
+        owned_and_role_workspace = workspace_api.create_workspace(label="owned_and_role")
         owned_only_workspace = workspace_api.create_workspace(
             "owned_only", parent=owned_and_role_workspace
         )
@@ -2416,9 +2330,7 @@ class TestUserWorkspaceEndpoint(object):
             "Basic",
             ("admin@admin.admin", "admin@admin.admin"),
         )
-        implicit_all = web_testapp.get(
-            "/api/users/{}/workspaces".format(user.user_id), status=200
-        )
+        implicit_all = web_testapp.get("/api/users/{}/workspaces".format(user.user_id), status=200)
         assert len(implicit_all.json_body) == 8
 
         parent_ids_list = [
@@ -2627,9 +2539,7 @@ class TestUserWorkspaceEndpoint(object):
         user_credentials = "foo@bar.par"
         with transaction.manager:
             uapi = user_api_factory.get()
-            uapi.create_user(
-                email=user_credentials, password=user_credentials, do_notify=False
-            )
+            uapi.create_user(email=user_credentials, password=user_credentials, do_notify=False)
 
         web_testapp.authorization = ("Basic", (user_credentials, user_credentials))
         web_testapp.get("/api/users/1/accessible_workspaces", status=403)
@@ -2670,9 +2580,7 @@ class TestUserWorkspaceEndpoint(object):
         assert result["workspace_id"] == workspace.workspace_id
         assert result["label"] == "Foo"
         member = web_testapp.get(
-            "/api/workspaces/{}/members/{}".format(
-                workspace.workspace_id, user.user_id
-            ),
+            "/api/workspaces/{}/members/{}".format(workspace.workspace_id, user.user_id),
             status=200,
         ).json_body
         assert member["role"] == default_user_role.label
@@ -2798,9 +2706,7 @@ class TestUserEndpointWithRegistrationActive(object):
     Tests for GET /api/users/{user_id}
     """
 
-    def test_api__register_user__ok_200__nominal_case(
-        self, web_testapp, user_api_factory, mailhog
-    ):
+    def test_api__register_user__ok_200__nominal_case(self, web_testapp, user_api_factory, mailhog):
         params = {
             "email": "test@test.test",
             "password": "mysuperpassword",
@@ -2860,9 +2766,7 @@ class TestUserEndpointWithRegistrationActive(object):
         assert res["lang"] is None
         assert res["allowed_space"] == 134217728
 
-    def test_api__register_user__ok_200__minimal_rfc_email(
-        self, web_testapp, user_api_factory
-    ):
+    def test_api__register_user__ok_200__minimal_rfc_email(self, web_testapp, user_api_factory):
         params = {
             "email": "test_user <test@test.test>",
             "password": "mysuperpassword",
@@ -2955,9 +2859,7 @@ class TestUserDiskSpace(object):
             do_notify=False,
         )
         uapi.save(test_user)
-        workspace_api = workspace_api_factory.get(
-            current_user=test_user, show_deleted=True
-        )
+        workspace_api = workspace_api_factory.get(current_user=test_user, show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         transaction.commit()
         user_id = int(test_user.user_id)
@@ -3050,9 +2952,7 @@ class TestUserEndpoint(object):
         assert res["is_deleted"] is False
         assert res["allowed_space"] == 0
 
-    def test_api__get_user__err_403__other_normal_user(
-        self, user_api_factory, web_testapp
-    ):
+    def test_api__get_user__err_403__other_normal_user(self, user_api_factory, web_testapp):
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3342,9 +3242,7 @@ class TestUserEndpoint(object):
         res = res.json_body
         assert res["code"] == ErrorCode.EMAIL_ALREADY_EXISTS
 
-    def test_api__create_user__ok_200__limited_admin(
-        self, web_testapp, user_api_factory
-    ):
+    def test_api__create_user__ok_200__limited_admin(self, web_testapp, user_api_factory):
         web_testapp.authorization = (
             "Basic",
             ("admin@admin.admin", "admin@admin.admin"),
@@ -3372,9 +3270,7 @@ class TestUserEndpoint(object):
         assert user.email == "test@test.test"
         assert user.password is None
 
-    def test_api__update_user__ok_200__infos(
-        self, web_testapp, user_api_factory, event_helper
-    ):
+    def test_api__update_user__ok_200__infos(self, web_testapp, user_api_factory, event_helper):
         web_testapp.authorization = (
             "Basic",
             ("admin@admin.admin", "admin@admin.admin"),
@@ -3407,9 +3303,7 @@ class TestUserEndpoint(object):
         assert last_event.event_type == "user.modified"
         assert last_event.fields["user"]["public_name"] == "John Doe"
 
-    def test_api__create_user__err_400__email_already_in_db(
-        self, user_api_factory, web_testapp
-    ):
+    def test_api__create_user__err_400__email_already_in_db(self, user_api_factory, web_testapp):
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3519,10 +3413,7 @@ class TestUserWithNotificationEndpoint(object):
         response = mailhog.get_mailhog_mails()
         assert len(response) == 1
         headers = response[0]["Content"]["Headers"]
-        assert (
-            headers["From"][0]
-            == "Global manager via Tracim <test_user_from+1@localhost>"
-        )
+        assert headers["From"][0] == "Global manager via Tracim <test_user_from+1@localhost>"
         assert headers["To"][0] == "test user <test@test.test>"
         assert headers["Subject"][0] == "[Tracim] Created account"
 
@@ -3556,16 +3447,11 @@ class TestUserWithNotificationEndpoint(object):
         response = mailhog.get_mailhog_mails()
         assert len(response) == 1
         headers = response[0]["Content"]["Headers"]
-        assert (
-            headers["From"][0]
-            == "Global manager via Tracim <test_user_from+1@localhost>"
-        )
+        assert headers["From"][0] == "Global manager via Tracim <test_user_from+1@localhost>"
         assert headers["To"][0] == "test <test@test.test>"
         assert headers["Subject"][0] == "[Tracim] Created account"
 
-    def test_api_delete_user__ok_200__admin(
-        sel, web_testapp, user_api_factory, event_helper
-    ):
+    def test_api_delete_user__ok_200__admin(sel, web_testapp, user_api_factory, event_helper):
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3597,13 +3483,9 @@ class TestUserWithNotificationEndpoint(object):
             "Basic",
             ("admin@admin.admin", "admin@admin.admin"),
         )
-        res = web_testapp.put(
-            "/api/users/{}/trashed".format(admin_user.user_id), status=400
-        )
+        res = web_testapp.put("/api/users/{}/trashed".format(admin_user.user_id), status=400)
         assert res.json_body["code"] == ErrorCode.USER_CANT_DELETE_HIMSELF
-        res = web_testapp.get(
-            "/api/users/{}".format(admin_user.user_id), status=200
-        ).json_body
+        res = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200).json_body
         assert res["is_deleted"] is False
 
 
@@ -3615,9 +3497,7 @@ class TestUsersEndpoint(object):
     Tests for GET /api/users/{user_id}
     """
 
-    def test_api__get_user__ok_200__admin(
-        self, user_api_factory, web_testapp, admin_user
-    ):
+    def test_api__get_user__ok_200__admin(self, user_api_factory, web_testapp, admin_user):
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3683,9 +3563,7 @@ class TestKnownMembersEndpoint(object):
     Tests for GET /api/users/{user_id}
     """
 
-    def test_api__get_user__ok_200__admin__by_name(
-        self, user_api_factory, admin_user, web_testapp
-    ):
+    def test_api__get_user__ok_200__admin__by_name(self, user_api_factory, admin_user, web_testapp):
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -3811,12 +3689,8 @@ class TestKnownMembersEndpoint(object):
             do_notify=False,
         )
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
-        workspace2 = workspace_api_factory.get().create_workspace(
-            "test workspace2", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
         role_api = role_api_factory.get()
         role_api.create_one(
             test_user,
@@ -3892,12 +3766,8 @@ class TestKnownMembersEndpoint(object):
             do_notify=False,
         )
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
-        workspace2 = workspace_api_factory.get().create_workspace(
-            "test workspace2", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
         role_api = role_api_factory.get()
         role_api.create_one(
             test_user,
@@ -3983,12 +3853,8 @@ class TestKnownMembersEndpoint(object):
             do_notify=False,
         )
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
-        workspace2 = workspace_api_factory.get().create_workspace(
-            "test workspace2", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
         role_api = role_api_factory.get()
         role_api.create_one(
             test_user,
@@ -4229,9 +4095,7 @@ class TestKnownMembersEndpoint(object):
         uapi.save(test_user2)
         uapi.save(test_user3)
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         role_api = role_api_factory.get()
         role_api.create_one(
             test_user,
@@ -4283,12 +4147,8 @@ class TestKnownContent(object):
         content_api_factory,
         content_type_list,
     ):
-        workspace1 = workspace_api_factory.get().create_workspace(
-            label="test1", save_now=True
-        )
-        workspace2 = workspace_api_factory.get().create_workspace(
-            label="test2", save_now=True
-        )
+        workspace1 = workspace_api_factory.get().create_workspace(label="test1", save_now=True)
+        workspace2 = workspace_api_factory.get().create_workspace(label="test2", save_now=True)
 
         content_api = content_api_factory.get()
 
@@ -4299,9 +4159,7 @@ class TestKnownContent(object):
             do_save=False,
             do_notify=False,
         )
-        test_file.depot_file = FileIntent(
-            b"Test file ananas", "Test file ananas.txt", "text/plain"
-        )
+        test_file.depot_file = FileIntent(b"Test file ananas", "Test file ananas.txt", "text/plain")
 
         session.add(test_file)
 
@@ -4312,9 +4170,7 @@ class TestKnownContent(object):
             do_save=False,
             do_notify=False,
         )
-        test_file.depot_file = FileIntent(
-            b"Test file ananas", "Test file ananas.txt", "text/plain"
-        )
+        test_file.depot_file = FileIntent(b"Test file ananas", "Test file ananas.txt", "text/plain")
 
         session.add(test_file)
 
@@ -4325,9 +4181,7 @@ class TestKnownContent(object):
             do_save=True,
             do_notify=False,
         )
-        test_file.depot_file = FileIntent(
-            b"Test file pomme", "Test file pomme.txt", "text/plain"
-        )
+        test_file.depot_file = FileIntent(b"Test file pomme", "Test file pomme.txt", "text/plain")
 
         session.add(test_file)
 
@@ -4433,9 +4287,7 @@ class TestKnownMembersEndpointKnownMembersFilterDisabled(object):
         uapi.save(test_user2)
         uapi.save(test_user3)
 
-        workspace = workspace_api_factory.get().create_workspace(
-            "test workspace", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         role_api = role_api_factory.get()
         role_api.create_one(
             test_user,
@@ -4488,9 +4340,7 @@ class TestSetEmailPasswordLdapEndpoint(object):
     for ldap user
     """
 
-    def test_api__set_user_email__ok_200__ldap_user(
-        self, user_api_factory, web_testapp
-    ):
+    def test_api__set_user_email__ok_200__ldap_user(self, user_api_factory, web_testapp):
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -4522,13 +4372,8 @@ class TestSetEmailPasswordLdapEndpoint(object):
             "email": "mysuperemail@email.fr",
             "loggedin_user_password": "admin@admin.admin",
         }
-        res = web_testapp.put_json(
-            "/api/users/{}/email".format(user_id), params=params, status=400
-        )
-        assert (
-            res.json_body["code"]
-            == ErrorCode.EXTERNAL_AUTH_USER_EMAIL_MODIFICATION_UNALLOWED
-        )
+        res = web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=400)
+        assert res.json_body["code"] == ErrorCode.EXTERNAL_AUTH_USER_EMAIL_MODIFICATION_UNALLOWED
         # Check After
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
@@ -4572,10 +4417,7 @@ class TestSetEmailPasswordLdapEndpoint(object):
         res = web_testapp.put_json(
             "/api/users/{}/password".format(user_id), params=params, status=400
         )
-        assert (
-            res.json_body["code"]
-            == ErrorCode.EXTERNAL_AUTH_USER_PASSWORD_MODIFICATION_UNALLOWED
-        )
+        assert res.json_body["code"] == ErrorCode.EXTERNAL_AUTH_USER_PASSWORD_MODIFICATION_UNALLOWED
         # Check After
 
         uapi = user_api_factory.get()
@@ -4622,17 +4464,13 @@ class TestSetEmailEndpoint(object):
             "email": "mysuperemail@email.fr",
             "loggedin_user_password": "admin@admin.admin",
         }
-        web_testapp.put_json(
-            "/api/users/{}/email".format(user_id), params=params, status=200
-        )
+        web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=200)
         # Check After
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["email"] == "mysuperemail@email.fr"
 
-    def test_api__set_user_email__err_400__admin_same_email(
-        self, user_api_factory, web_testapp
-    ):
+    def test_api__set_user_email__err_400__admin_same_email(self, user_api_factory, web_testapp):
         uapi = user_api_factory.get()
         profile = Profile.USER
         test_user = uapi.create_user(
@@ -4663,9 +4501,7 @@ class TestSetEmailEndpoint(object):
             "email": "admin@admin.admin",
             "loggedin_user_password": "admin@admin.admin",
         }
-        res = web_testapp.put_json(
-            "/api/users/{}/email".format(user_id), params=params, status=400
-        )
+        res = web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.EMAIL_ALREADY_EXISTS
@@ -4707,9 +4543,7 @@ class TestSetEmailEndpoint(object):
             "email": "mysuperemail@email.fr",
             "loggedin_user_password": "badpassword",
         }
-        res = web_testapp.put_json(
-            "/api/users/{}/email".format(user_id), params=params, status=403
-        )
+        res = web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=403)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.WRONG_USER_PASSWORD
@@ -4752,9 +4586,7 @@ class TestSetEmailEndpoint(object):
             "email": "thatisnotandemail",
             "loggedin_user_password": "admin@admin.admin",
         }
-        res = web_testapp.put_json(
-            "/api/users/{}/email".format(user_id), params=params, status=400
-        )
+        res = web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=400)
         # TODO - G.M - 2018-09-10 - Handled by marshmallow schema
         assert res.json_body
         assert "code" in res.json_body
@@ -4764,9 +4596,7 @@ class TestSetEmailEndpoint(object):
         res = res.json_body
         assert res["email"] == "test@test.test"
 
-    def test_api__set_user_email__ok_200__user_itself(
-        self, user_api_factory, web_testapp
-    ):
+    def test_api__set_user_email__ok_200__user_itself(self, user_api_factory, web_testapp):
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -4795,18 +4625,14 @@ class TestSetEmailEndpoint(object):
             "email": "mysuperemail@email.fr",
             "loggedin_user_password": "password",
         }
-        web_testapp.put_json(
-            "/api/users/{}/email".format(user_id), params=params, status=200
-        )
+        web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=200)
         web_testapp.authorization = ("Basic", ("mysuperemail@email.fr", "password"))
         # Check After
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["email"] == "mysuperemail@email.fr"
 
-    def test_api__set_user_email__err_403__other_normal_user(
-        self, user_api_factory, web_testapp
-    ):
+    def test_api__set_user_email__err_403__other_normal_user(self, user_api_factory, web_testapp):
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -4841,9 +4667,7 @@ class TestSetEmailEndpoint(object):
             "email": "mysuperemail@email.fr",
             "loggedin_user_password": "password",
         }
-        res = web_testapp.put_json(
-            "/api/users/{}/email".format(user_id), params=params, status=403
-        )
+        res = web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=403)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
@@ -4887,9 +4711,7 @@ class TestSetUsernameEndpoint(object):
 
         # Set username
         params = {"username": "MyHero", "loggedin_user_password": "admin@admin.admin"}
-        web_testapp.put_json(
-            "/api/users/{}/username".format(user_id), params=params, status=200
-        )
+        web_testapp.put_json("/api/users/{}/username".format(user_id), params=params, status=200)
         # Check After
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
@@ -5053,9 +4875,7 @@ class TestSetUsernameEndpoint(object):
 
         # Set password
         params = {"username": "TheNewTestUser", "loggedin_user_password": "password"}
-        web_testapp.put_json(
-            "/api/users/{}/username".format(user_id), params=params, status=200
-        )
+        web_testapp.put_json("/api/users/{}/username".format(user_id), params=params, status=200)
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         # Check After
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
@@ -5112,9 +4932,7 @@ class TestSetPasswordEndpoint(object):
     Tests for PUT /api/users/{user_id}/password
     """
 
-    def test_api__set_user_password__ok_200__admin(
-        self, user_api_factory, web_testapp, session
-    ):
+    def test_api__set_user_password__ok_200__admin(self, user_api_factory, web_testapp, session):
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -5147,9 +4965,7 @@ class TestSetPasswordEndpoint(object):
             "new_password2": "mynewpassword",
             "loggedin_user_password": "admin@admin.admin",
         }
-        web_testapp.put_json(
-            "/api/users/{}/password".format(user_id), params=params, status=204
-        )
+        web_testapp.put_json("/api/users/{}/password".format(user_id), params=params, status=204)
         # Check After
         uapi = user_api_factory.get()
         user = uapi.get_one(user_id)
@@ -5284,18 +5100,14 @@ class TestSetPasswordEndpoint(object):
             "new_password2": "mynewpassword",
             "loggedin_user_password": "password",
         }
-        web_testapp.put_json(
-            "/api/users/{}/password".format(user_id), params=params, status=204
-        )
+        web_testapp.put_json("/api/users/{}/password".format(user_id), params=params, status=204)
         # Check After
         uapi = user_api_factory.get()
         user = uapi.get_one(user_id)
         assert not user.validate_password("password")
         assert user.validate_password("mynewpassword")
 
-    def test_api__set_user_email__err_403__other_normal_user(
-        self, user_api_factory, web_testapp
-    ):
+    def test_api__set_user_email__err_403__other_normal_user(self, user_api_factory, web_testapp):
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -5330,9 +5142,7 @@ class TestSetPasswordEndpoint(object):
             "email": "mysuperemail@email.fr",
             "loggedin_user_password": "password",
         }
-        res = web_testapp.put_json(
-            "/api/users/{}/email".format(user_id), params=params, status=403
-        )
+        res = web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=403)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
@@ -5389,9 +5199,7 @@ class TestSetUserInfoEndpoint(object):
         assert res["timezone"] == "Europe/London"
         assert res["lang"] == "en"
 
-    def test_api__set_user_info__ok_200__user_itself(
-        self, user_api_factory, web_testapp
-    ):
+    def test_api__set_user_info__ok_200__user_itself(self, user_api_factory, web_testapp):
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -5431,9 +5239,7 @@ class TestSetUserInfoEndpoint(object):
         assert res["timezone"] == "Europe/London"
         assert res["lang"] == "en"
 
-    def test_api__set_user_info__err_403__other_normal_user(
-        self, user_api_factory, web_testapp
-    ):
+    def test_api__set_user_info__err_403__other_normal_user(self, user_api_factory, web_testapp):
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -5465,9 +5271,7 @@ class TestSetUserInfoEndpoint(object):
         web_testapp.authorization = ("Basic", ("test2@test2.test2", "password"))
         # Set params
         params = {"public_name": "updated", "timezone": "Europe/London", "lang": "en"}
-        res = web_testapp.put_json(
-            "/api/users/{}".format(user_id), params=params, status=403
-        )
+        res = web_testapp.put_json("/api/users/{}".format(user_id), params=params, status=403)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
@@ -5510,18 +5314,14 @@ class TestSetUserProfileEndpoint(object):
         assert res["profile"] == "users"
         # Set params
         params = {"profile": "administrators"}
-        web_testapp.put_json(
-            "/api/users/{}/profile".format(user_id), params=params, status=204
-        )
+        web_testapp.put_json("/api/users/{}/profile".format(user_id), params=params, status=204)
         # Check After
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["user_id"] == user_id
         assert res["profile"] == "administrators"
 
-    def test_api__set_user_profile__err_400__admin_itself(
-        self, web_testapp, admin_user
-    ):
+    def test_api__set_user_profile__err_400__admin_itself(self, web_testapp, admin_user):
         """
         Trying to set is own profile as user with admin right.
         Return 400 because of "not allow to set own profile check"
@@ -5552,9 +5352,7 @@ class TestSetUserProfileEndpoint(object):
         assert res["user_id"] == admin_user.user_id
         assert res["profile"] == "administrators"
 
-    def test_api__set_user_profile__err_403__other_normal_user(
-        self, user_api_factory, web_testapp
-    ):
+    def test_api__set_user_profile__err_403__other_normal_user(self, user_api_factory, web_testapp):
         """
         Set user profile of user normal user as normal user
         Return 403 error because of no right to do this as simple user
@@ -5607,9 +5405,7 @@ class TestSetUserAllowedSpaceEndpoint(object):
     Tests for PUT /api/users/{user_id}/allowed_space
     """
 
-    def test_api__set_user_allowed_space__ok_200__admin(
-        self, user_api_factory, web_testapp
-    ):
+    def test_api__set_user_allowed_space__ok_200__admin(self, user_api_factory, web_testapp):
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -5773,9 +5569,7 @@ class TestSetUserEnableDisableEndpoints(object):
         assert res["user_id"] == user_id
         assert res["is_active"] is False
 
-    def test_api_disable_user__err_400__cant_disable_myself_admin(
-        self, admin_user, web_testapp
-    ):
+    def test_api_disable_user__err_400__cant_disable_myself_admin(self, admin_user, web_testapp):
         user_id = int(admin_user.user_id)
 
         web_testapp.authorization = (
@@ -5796,9 +5590,7 @@ class TestSetUserEnableDisableEndpoints(object):
         assert res["user_id"] == user_id
         assert res["is_active"] is True
 
-    def test_api_enable_user__err_403__other_account(
-        self, user_api_factory, web_testapp
-    ):
+    def test_api_enable_user__err_403__other_account(self, user_api_factory, web_testapp):
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -5834,9 +5626,7 @@ class TestSetUserEnableDisableEndpoints(object):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
 
-    def test_api_disable_user__err_403__other_account(
-        self, user_api_factory, web_testapp
-    ):
+    def test_api_disable_user__err_403__other_account(self, user_api_factory, web_testapp):
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -5917,9 +5707,7 @@ class TestSetUserEnableDisableEndpoints(object):
 
 
 @pytest.mark.usefixtures("base_fixture")
-@pytest.mark.parametrize(
-    "config_section", [{"name": "functional_ldap_test"}], indirect=True
-)
+@pytest.mark.parametrize("config_section", [{"name": "functional_ldap_test"}], indirect=True)
 class TestUserEnpointsLDAPAuth(object):
     @pytest.mark.ldap
     def test_api_set_user_password__err__400__setting_password_unallowed_for_ldap_user(
@@ -5942,15 +5730,10 @@ class TestUserEnpointsLDAPAuth(object):
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert (
-            res.json_body["code"]
-            == ErrorCode.EXTERNAL_AUTH_USER_PASSWORD_MODIFICATION_UNALLOWED
-        )
+        assert res.json_body["code"] == ErrorCode.EXTERNAL_AUTH_USER_PASSWORD_MODIFICATION_UNALLOWED
 
     @pytest.mark.ldap
-    def test_api_set_user_email__err__400__setting_email_unallowed_for_ldap_user(
-        self, web_testapp
-    ):
+    def test_api_set_user_email__err__400__setting_email_unallowed_for_ldap_user(self, web_testapp):
         web_testapp.authorization = (
             "Basic",
             ("professor@planetexpress.com", "professor"),
@@ -5962,15 +5745,10 @@ class TestUserEnpointsLDAPAuth(object):
             "email": "hubertnewemail@planetexpress.com",
             "loggedin_user_password": "professor",
         }
-        res = web_testapp.put_json(
-            "/api/users/{}/email".format(user_id), params=params, status=400
-        )
+        res = web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=400)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
-        assert (
-            res.json_body["code"]
-            == ErrorCode.EXTERNAL_AUTH_USER_EMAIL_MODIFICATION_UNALLOWED
-        )
+        assert res.json_body["code"] == ErrorCode.EXTERNAL_AUTH_USER_EMAIL_MODIFICATION_UNALLOWED
 
     @pytest.mark.ldap
     def test_api__create_user__ok_200__full_admin(self, web_testapp, user_api_factory):
@@ -6092,9 +5870,7 @@ class TestUserFollowerEndpoint(object):
     ) -> None:
         # With
         user_api = user_api_factory.get()
-        user_api.create_follower(
-            follower_id=admin_user.user_id, leader_id=bob_user.user_id
-        )
+        user_api.create_follower(follower_id=admin_user.user_id, leader_id=bob_user.user_id)
         transaction.commit()
 
         # When
@@ -6128,12 +5904,8 @@ class TestUserFollowerEndpoint(object):
     ) -> None:
         # With
         user_api = user_api_factory.get()
-        user_api.create_follower(
-            follower_id=admin_user.user_id, leader_id=bob_user.user_id
-        )
-        user_api.create_follower(
-            follower_id=admin_user.user_id, leader_id=riyad_user.user_id
-        )
+        user_api.create_follower(follower_id=admin_user.user_id, leader_id=bob_user.user_id)
+        user_api.create_follower(follower_id=admin_user.user_id, leader_id=riyad_user.user_id)
         transaction.commit()
 
         # When
@@ -6214,9 +5986,7 @@ class TestUserFollowerEndpoint(object):
     ) -> None:
         # With bob follow riyad
         user_api = user_api_factory.get()
-        user_api.create_follower(
-            follower_id=bob_user.user_id, leader_id=riyad_user.user_id
-        )
+        user_api.create_follower(follower_id=bob_user.user_id, leader_id=riyad_user.user_id)
         transaction.commit()
 
         # When admin read api it is ok
@@ -6297,9 +6067,7 @@ class TestUserFollowerEndpoint(object):
     ) -> None:
         # With
         user_api = user_api_factory.get()
-        user_api.create_follower(
-            follower_id=admin_user.user_id, leader_id=bob_user.user_id
-        )
+        user_api.create_follower(follower_id=admin_user.user_id, leader_id=bob_user.user_id)
         transaction.commit()
 
         # When
@@ -6333,12 +6101,8 @@ class TestUserFollowerEndpoint(object):
     ) -> None:
         # With
         user_api = user_api_factory.get()
-        user_api.create_follower(
-            follower_id=admin_user.user_id, leader_id=bob_user.user_id
-        )
-        user_api.create_follower(
-            follower_id=riyad_user.user_id, leader_id=bob_user.user_id
-        )
+        user_api.create_follower(follower_id=admin_user.user_id, leader_id=bob_user.user_id)
+        user_api.create_follower(follower_id=riyad_user.user_id, leader_id=bob_user.user_id)
         transaction.commit()
 
         # When
@@ -6419,9 +6183,7 @@ class TestUserFollowerEndpoint(object):
     ) -> None:
         # With bob follow riyad
         user_api = user_api_factory.get()
-        user_api.create_follower(
-            follower_id=bob_user.user_id, leader_id=riyad_user.user_id
-        )
+        user_api.create_follower(follower_id=bob_user.user_id, leader_id=riyad_user.user_id)
         transaction.commit()
 
         # When admin read api it is ok
@@ -6470,15 +6232,9 @@ class TestAboutUserEndpoint(object):
     ) -> None:
         # With
         user_api = user_api_factory.get()
-        user_api.create_follower(
-            follower_id=bob_user.user_id, leader_id=admin_user.user_id
-        )
-        user_api.create_follower(
-            follower_id=riyad_user.user_id, leader_id=admin_user.user_id
-        )
-        user_api.create_follower(
-            follower_id=admin_user.user_id, leader_id=riyad_user.user_id
-        )
+        user_api.create_follower(follower_id=bob_user.user_id, leader_id=admin_user.user_id)
+        user_api.create_follower(follower_id=riyad_user.user_id, leader_id=admin_user.user_id)
+        user_api.create_follower(follower_id=admin_user.user_id, leader_id=riyad_user.user_id)
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
         content_api = content_api_factory.get()
@@ -6518,9 +6274,7 @@ class TestAboutUserEndpoint(object):
         assert res.json_body["authored_content_revisions_count"] == 3
         assert res.json_body["authored_content_revisions_space_count"] == 1
 
-    def test_api__get_about_user__err_user_not_existing(
-        self, web_testapp: TestApp
-    ) -> None:
+    def test_api__get_about_user__err_user_not_existing(self, web_testapp: TestApp) -> None:
         web_testapp.authorization = (
             "Basic",
             ("admin@admin.admin", "admin@admin.admin"),
@@ -6532,9 +6286,7 @@ class TestAboutUserEndpoint(object):
         self, admin_user: User, web_testapp: TestApp, riyad_user: User
     ) -> None:
         web_testapp.authorization = ("Basic", (riyad_user.email, "password"))
-        res = web_testapp.get(
-            "/api/users/{}/about".format(admin_user.user_id), status=400
-        )
+        res = web_testapp.get("/api/users/{}/about".format(admin_user.user_id), status=400)
         assert res.json_body["code"] == ErrorCode.USER_NOT_FOUND
 
 
@@ -6567,9 +6319,7 @@ class TestUserAvatarEndpoints:
         new_image = Image.open(io.BytesIO(res.body))
         assert 1000, 1000 == new_image.size
 
-    def test_api__get_user_avatar__ok__create_avatar(
-        self, admin_user: User, web_testapp
-    ) -> None:
+    def test_api__get_user_avatar__ok__create_avatar(self, admin_user: User, web_testapp) -> None:
         web_testapp.authorization = (
             "Basic",
             ("admin@admin.admin", "admin@admin.admin"),
@@ -6584,9 +6334,7 @@ class TestUserAvatarEndpoints:
         )
         assert res.content_type == "image/svg+xml"
 
-    def test_api__set_user_avatar__ok__nominal_case(
-        self, admin_user: User, web_testapp
-    ) -> None:
+    def test_api__set_user_avatar__ok__nominal_case(self, admin_user: User, web_testapp) -> None:
         web_testapp.authorization = (
             "Basic",
             ("admin@admin.admin", "admin@admin.admin"),
@@ -6607,9 +6355,7 @@ class TestUserAvatarEndpoints:
         res = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200)
         assert res.json_body["has_avatar"] is True
 
-    def test_api__set_user_avatar__err__no_file(
-        self, admin_user: User, web_testapp
-    ) -> None:
+    def test_api__set_user_avatar__err__no_file(self, admin_user: User, web_testapp) -> None:
         web_testapp.authorization = (
             "Basic",
             ("admin@admin.admin", "admin@admin.admin"),
@@ -6622,9 +6368,7 @@ class TestUserAvatarEndpoints:
         )
         assert res.json_body["code"] == ErrorCode.NO_FILE_VALIDATION_ERROR
 
-    def test_api__set_user_avatar__err__wrong_mimetype(
-        self, admin_user: User, web_testapp
-    ) -> None:
+    def test_api__set_user_avatar__err__wrong_mimetype(self, admin_user: User, web_testapp) -> None:
         web_testapp.authorization = (
             "Basic",
             ("admin@admin.admin", "admin@admin.admin"),
@@ -6657,9 +6401,7 @@ class TestUserAvatarEndpoints:
         ),
 
         res = web_testapp.get(
-            "/api/users/{}/avatar/preview/jpg/100x100/{}".format(
-                admin_user.user_id, "image.jpg"
-            ),
+            "/api/users/{}/avatar/preview/jpg/100x100/{}".format(admin_user.user_id, "image.jpg"),
             status=200,
         )
         assert res.body != image.getvalue()
@@ -6668,9 +6410,7 @@ class TestUserAvatarEndpoints:
         assert 100, 100 == new_image.size
 
         res2 = web_testapp.get(
-            "/api/users/{}/avatar/preview/jpg/{}".format(
-                admin_user.user_id, "image.jpg"
-            ),
+            "/api/users/{}/avatar/preview/jpg/{}".format(admin_user.user_id, "image.jpg"),
             status=200,
         )
         assert res2.body == res.body
@@ -6686,9 +6426,7 @@ class TestUserCoverEndpoints:
     Tests for /api/users/{user_id}/cover endpoints
     """
 
-    def test_api__get_user_cover__ok_200__nominal_case(
-        self, admin_user: User, web_testapp
-    ) -> None:
+    def test_api__get_user_cover__ok_200__nominal_case(self, admin_user: User, web_testapp) -> None:
         web_testapp.authorization = (
             "Basic",
             ("admin@admin.admin", "admin@admin.admin"),
@@ -6712,9 +6450,7 @@ class TestUserCoverEndpoints:
         new_image = Image.open(io.BytesIO(res.body))
         assert 1000, 1000 == new_image.size
 
-    def test_api__get_user_avatar__err_400__no_avatar(
-        self, admin_user: User, web_testapp
-    ) -> None:
+    def test_api__get_user_avatar__err_400__no_avatar(self, admin_user: User, web_testapp) -> None:
         web_testapp.authorization = (
             "Basic",
             ("admin@admin.admin", "admin@admin.admin"),
@@ -6725,9 +6461,7 @@ class TestUserCoverEndpoints:
         )
         assert res.json_body["code"] == ErrorCode.USER_IMAGE_NOT_FOUND
 
-    def test_api__set_user_cover__ok__nominal_case(
-        self, admin_user: User, web_testapp
-    ) -> None:
+    def test_api__set_user_cover__ok__nominal_case(self, admin_user: User, web_testapp) -> None:
         web_testapp.authorization = (
             "Basic",
             ("admin@admin.admin", "admin@admin.admin"),
@@ -6746,9 +6480,7 @@ class TestUserCoverEndpoints:
         res = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200)
         assert res.json_body["has_cover"] is True
 
-    def test_api__set_user_cover__err__no_file(
-        self, admin_user: User, web_testapp
-    ) -> None:
+    def test_api__set_user_cover__err__no_file(self, admin_user: User, web_testapp) -> None:
         web_testapp.authorization = (
             "Basic",
             ("admin@admin.admin", "admin@admin.admin"),
@@ -6761,9 +6493,7 @@ class TestUserCoverEndpoints:
         )
         assert res.json_body["code"] == ErrorCode.NO_FILE_VALIDATION_ERROR
 
-    def test_api__set_user_cover__err__wrong_mimetype(
-        self, admin_user: User, web_testapp
-    ) -> None:
+    def test_api__set_user_cover__err__wrong_mimetype(self, admin_user: User, web_testapp) -> None:
         web_testapp.authorization = (
             "Basic",
             ("admin@admin.admin", "admin@admin.admin"),
@@ -6789,9 +6519,7 @@ class TestUserCoverEndpoints:
         )
 
         res = web_testapp.get(
-            "/api/users/{}/cover/preview/jpg/256x256/something.jpg".format(
-                bob_user.user_id
-            ),
+            "/api/users/{}/cover/preview/jpg/256x256/something.jpg".format(bob_user.user_id),
             status=400,
         )
         assert res.json_body["code"] == ErrorCode.USER_IMAGE_NOT_FOUND
@@ -6804,9 +6532,7 @@ class TestUserCoverEndpoints:
         ),
 
         res = web_testapp.get(
-            "/api/users/{}/cover/preview/jpg/1300x150/{}".format(
-                bob_user.user_id, "image.jpg"
-            ),
+            "/api/users/{}/cover/preview/jpg/1300x150/{}".format(bob_user.user_id, "image.jpg"),
             status=200,
         )
         assert res.body != image.getvalue()

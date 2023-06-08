@@ -125,9 +125,7 @@ class FakeFileStream(object):
         Called when this is a new file; will create a new Content initialized with the correct content
         """
 
-        is_temporary = self._file_name.startswith(".~") or self._file_name.startswith(
-            "~"
-        )
+        is_temporary = self._file_name.startswith(".~") or self._file_name.startswith("~")
         try:
             with self._session.no_autoflush:
                 file = self._api.create(
@@ -153,9 +151,7 @@ class FakeFileStream(object):
         Called when we're updating an existing content; we create a new revision and update the file content
         """
         try:
-            with new_revision(
-                session=self._session, content=self._content, tm=transaction.manager
-            ):
+            with new_revision(session=self._session, content=self._content, tm=transaction.manager):
                 self._api.update_file_data(
                     self._content,
                     self._file_name,

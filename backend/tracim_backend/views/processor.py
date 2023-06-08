@@ -30,9 +30,7 @@ class TracimProcessor(MarshmallowProcessor):
 
         return dump_data
 
-    def dump_output(
-        self, output_data: typing.Any
-    ) -> typing.Union[typing.Dict, typing.List]:
+    def dump_output(self, output_data: typing.Any) -> typing.Union[typing.Dict, typing.List]:
         """
         Dump output data and raise OutputValidationException if validation error
         :param output_data: output data to validate
@@ -46,15 +44,11 @@ class TracimProcessor(MarshmallowProcessor):
             # Re-validate with dumped data
             errors = self.schema.load(dump_data).errors
         if errors:
-            raise OutputValidationException(
-                "Error when validate input: {}".format(str(errors))
-            )
+            raise OutputValidationException("Error when validate input: {}".format(str(errors)))
 
         return dump_data
 
-    def get_output_validation_error(
-        self, data_to_validate: typing.Any
-    ) -> ProcessValidationError:
+    def get_output_validation_error(self, data_to_validate: typing.Any) -> ProcessValidationError:
         """
         Return ProcessValidationError for given output data
         :param data_to_validate: output data to use
@@ -67,6 +61,4 @@ class TracimProcessor(MarshmallowProcessor):
         if not errors:
             # Re-validate with dumped data
             errors = self.schema.load(dump_data).errors
-        return ProcessValidationError(
-            message="Validation error of output data", details=errors
-        )
+        return ProcessValidationError(message="Validation error of output data", details=errors)

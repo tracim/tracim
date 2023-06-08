@@ -45,9 +45,7 @@ def upgrade():
 
     connection = op.get_bind()
     connection.execute(
-        user_configs_table.insert().from_select(
-            ["user_id"], sa.select([users_table.c.user_id])
-        )
+        user_configs_table.insert().from_select(["user_id"], sa.select([users_table.c.user_id]))
     )
 
 

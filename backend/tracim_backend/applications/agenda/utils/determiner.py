@@ -26,8 +26,6 @@ class CaldavAuthorizationDeterminer(object):
         else:
             logger.warning(
                 self,
-                'Unknown http method "{}" authorization will be MANAGER'.format(
-                    request.method
-                ),
+                'Unknown http method "{}" authorization will be MANAGER'.format(request.method),
             )
             return DavAuthorization.MANAGER

@@ -18,9 +18,7 @@ if typing.TYPE_CHECKING:
 
 
 class ApplicationApi(object):
-    def __init__(
-        self, app_list: List["TracimApplication"], show_inactive: bool = False
-    ) -> None:
+    def __init__(self, app_list: List["TracimApplication"], show_inactive: bool = False) -> None:
         """
         Lib to get information about applications in tracim.
 
@@ -102,8 +100,6 @@ class ApplicationApi(object):
                 menu_entries.append(new_entry)
 
         for entry in menu_entries:
-            entry.route = entry.route.replace(
-                "{workspace_id}", str(workspace.workspace_id)
-            )
+            entry.route = entry.route.replace("{workspace_id}", str(workspace.workspace_id))
 
         return menu_entries

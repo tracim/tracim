@@ -48,11 +48,9 @@ from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ContentIdPathSchema
 
 SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_WOPI_SECTION = "WOPI"
-SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_WOPI_ENDPOINTS = (
-    generate_documentation_swagger_tag(
-        SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS,
-        SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_WOPI_SECTION,
-    )
+SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_WOPI_ENDPOINTS = generate_documentation_swagger_tag(
+    SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS,
+    SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_WOPI_SECTION,
 )
 WOPI_BASE = COLLABORATIVE_DOCUMENT_EDITION_BASE + "/wopi"
 WOPI_FILES = WOPI_BASE + "/files/{content_id}"
@@ -63,9 +61,7 @@ class WOPIController(Controller):
     Endpoints for WOPI API
     """
 
-    @hapic.with_api_doc(
-        tags=[SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_WOPI_ENDPOINTS]
-    )
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_WOPI_ENDPOINTS])
     @check_right(is_current_content_reader)
     @hapic.input_path(ContentIdPathSchema())
     @hapic.input_query(WOPITokenQuerySchema())
@@ -97,9 +93,7 @@ class WOPIController(Controller):
                 )
             ) from exc
 
-    @hapic.with_api_doc(
-        tags=[SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_WOPI_ENDPOINTS]
-    )
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_WOPI_ENDPOINTS])
     @check_right(is_current_content_reader)
     @hapic.input_path(ContentIdPathSchema())
     @hapic.input_query(WOPITokenQuerySchema())
@@ -121,9 +115,7 @@ class WOPIController(Controller):
             config=app_config,
         ).check_file_info(request.current_content)
 
-    @hapic.with_api_doc(
-        tags=[SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_WOPI_ENDPOINTS]
-    )
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_WOPI_ENDPOINTS])
     @check_right(is_current_content_contributor)
     @hapic.input_path(ContentIdPathSchema())
     @hapic.input_query(WOPITokenQuerySchema())
@@ -147,23 +139,14 @@ class WOPIController(Controller):
         if hapic_data.headers.wopi_lool_timestamp:
             # INFO - G.M - 2019-08-01 - as libreoffice online return timezone aware datetime,
             # we need to be sure both datetime are compared with timezone, if none exist, use utc as default.
-            timezone_aware_wopi_lool_timestamp = (
-                hapic_data.headers.wopi_lool_timestamp.replace(
-                    tzinfo=hapic_data.headers.wopi_lool_timestamp.tzinfo or timezone.utc
-                )
+            timezone_aware_wopi_lool_timestamp = hapic_data.headers.wopi_lool_timestamp.replace(
+                tzinfo=hapic_data.headers.wopi_lool_timestamp.tzinfo or timezone.utc
             )
-            timezone_aware_current_content_updated = (
-                request.current_content.updated.replace(
-                    tzinfo=request.current_content.updated.tzinfo or timezone.utc
-                )
+            timezone_aware_current_content_updated = request.current_content.updated.replace(
+                tzinfo=request.current_content.updated.tzinfo or timezone.utc
             )
-            if (
-                timezone_aware_wopi_lool_timestamp
-                < timezone_aware_current_content_updated
-            ):
-                return Response(
-                    status=HTTPStatus.CONFLICT, json_body={"LOOLStatusCode": 1010}
-                )
+            if timezone_aware_wopi_lool_timestamp < timezone_aware_current_content_updated:
+                return Response(status=HTTPStatus.CONFLICT, json_body={"LOOLStatusCode": 1010})
 
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(

@@ -19,9 +19,7 @@ class TracimDomainController(object):
     def __init__(self, app_config: CFG, presetdomain=None, presetserver=None):
         self.app_config = app_config
 
-    def getDomainRealm(
-        self, inputURL: str, environ: typing.Dict[str, typing.Any]
-    ) -> str:
+    def getDomainRealm(self, inputURL: str, environ: typing.Dict[str, typing.Any]) -> str:
         return DEFAULT_TRACIM_WEBDAV_REALM
 
     def getRealmUserPassword(
@@ -34,9 +32,7 @@ class TracimDomainController(object):
         """
         raise DigestAuthNotImplemented
 
-    def requireAuthentication(
-        self, realmname: str, environ: typing.Dict[str, typing.Any]
-    ) -> bool:
+    def requireAuthentication(self, realmname: str, environ: typing.Dict[str, typing.Any]) -> bool:
         return True
 
     def isRealmUser(

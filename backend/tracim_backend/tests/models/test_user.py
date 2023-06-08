@@ -85,10 +85,7 @@ class TestUserModel(object):
 
         # NOTE BS 20200427: caught exception depend as database engine, but we expect
         # "unique" or "duplicate" string in exception message
-        assert (
-            "unique" in str(caught.value).lower()
-            or "duplicate" in str(caught.value).lower()
-        )
+        assert "unique" in str(caught.value).lower() or "duplicate" in str(caught.value).lower()
 
     def test_unit__create__error__no_username_and_no_email(self, session):
         session.flush()
@@ -192,10 +189,7 @@ class TestUserModel(object):
         user.display_name = name
         user.email = email
 
-        assert (
-            user.__repr__()
-            == "<User: email='tracim@trac.im', username=None display='Damien'>"
-        )
+        assert user.__repr__() == "<User: email='tracim@trac.im', username=None display='Damien'>"
 
     def test_unit__repr__ok__with_username(self):
         user = User()
@@ -203,10 +197,7 @@ class TestUserModel(object):
         user.email = "tracim@trac.im"
         user.username = "Dams"
 
-        assert (
-            user.__repr__()
-            == "<User: email='tracim@trac.im', username='Dams' display='Damien'>"
-        )
+        assert user.__repr__() == "<User: email='tracim@trac.im', username='Dams' display='Damien'>"
 
     def test_unit__unicode__ok__nominal_case(self):
         name = "Damien"

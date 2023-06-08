@@ -49,9 +49,7 @@ def html_document(
         do_notify=False,
     )
     with new_revision(session=session, tm=transaction.manager, content=html_document):
-        content_api.update_content(
-            html_document, new_raw_content=raw_content, new_label=label
-        )
+        content_api.update_content(html_document, new_raw_content=raw_content, new_label=label)
         content_api.save(html_document)
     transaction.commit()
     return html_document
@@ -71,9 +69,7 @@ def big_html_document(workspace_api_factory, content_api_factory, session) -> Co
     )
 
 
-def small_html_document(
-    workspace_api_factory, content_api_factory, session, name
-) -> Content:
+def small_html_document(workspace_api_factory, content_api_factory, session, name) -> Content:
     return html_document(
         workspace_api_factory,
         content_api_factory,
@@ -84,33 +80,24 @@ def small_html_document(
 
 
 @pytest.fixture
-def small_html_document_a(
-    workspace_api_factory, content_api_factory, session
-) -> Content:
+def small_html_document_a(workspace_api_factory, content_api_factory, session) -> Content:
     return small_html_document(workspace_api_factory, content_api_factory, session, "A")
 
 
 @pytest.fixture
-def small_html_document_b(
-    workspace_api_factory, content_api_factory, session
-) -> Content:
+def small_html_document_b(workspace_api_factory, content_api_factory, session) -> Content:
     return small_html_document(workspace_api_factory, content_api_factory, session, "B")
 
 
 @pytest.fixture
-def small_html_document_c(
-    workspace_api_factory, content_api_factory, session
-) -> Content:
+def small_html_document_c(workspace_api_factory, content_api_factory, session) -> Content:
     return small_html_document(workspace_api_factory, content_api_factory, session, "C")
 
 
 @pytest.fixture
 def connection_monitor_process():
     backend_path = os.path.dirname(__file__) + "/../../../"
-    env = {
-        "TRACIM_CONF_PATH": backend_path
-        + "tests_config_user_status_connection_monitor.ini"
-    }
+    env = {"TRACIM_CONF_PATH": backend_path + "tests_config_user_status_connection_monitor.ini"}
     env.update(os.environ)
     p = subprocess.Popen(
         [sys.executable, backend_path + "daemons/user_connection_state_monitor.py"],
@@ -133,9 +120,7 @@ def put_document(doc):
 
 
 @pytest.fixture
-def one_thread(
-    content_api_factory, content_type_list, workspace_api_factory, session
-) -> Content:
+def one_thread(content_api_factory, content_type_list, workspace_api_factory, session) -> Content:
     workspace_api = workspace_api_factory.get()
     workspace = workspace_api.create_workspace(label="test workspace", save_now=True)
     content_api = content_api_factory.get()
@@ -208,9 +193,7 @@ class TestLiveMessages(object):
             "Basic",
             ("admin@admin.admin", "admin@admin.admin"),
         )
-        res = web_testapp.get(
-            "/api/users/{}/live_messages".format(admin_user.user_id), status=400
-        )
+        res = web_testapp.get("/api/users/{}/live_messages".format(admin_user.user_id), status=400)
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
@@ -220,9 +203,7 @@ class TestLiveMessages(object):
         self, pushpin, app_config
     ):
         with messages_stream_client() as client_events:
-            LiveMessagesLib(config=app_config).publish_dict(
-                "user_1", {"test_message": "example"}
-            )
+            LiveMessagesLib(config=app_config).publish_dict("user_1", {"test_message": "example"})
             event = next(client_events)
         assert json.loads(event.data) == {"test_message": "example"}
         assert event.event == "message"
@@ -290,9 +271,7 @@ class TestLiveMessages(object):
             assert bob_event.event == "stream-open"
 
     @pytest.mark.pushpin
-    @pytest.mark.parametrize(
-        "config_section", [{"name": "functional_live_test"}], indirect=True
-    )
+    @pytest.mark.parametrize("config_section", [{"name": "functional_live_test"}], indirect=True)
     def test_api__user_live_messages_endpoint_with_GRIP_proxy__ok__user_update(
         self, pushpin, app_config
     ):
@@ -318,9 +297,7 @@ class TestLiveMessages(object):
         assert event.event == "message"
 
     @pytest.mark.pushpin
-    @pytest.mark.parametrize(
-        "config_section", [{"name": "functional_live_test"}], indirect=True
-    )
+    @pytest.mark.parametrize("config_section", [{"name": "functional_live_test"}], indirect=True)
     def test_api__user_live_messages_endpoint_with_GRIP_proxy__ok__user_update__check_email_leaked(
         self, pushpin, app_config
     ):
@@ -460,21 +437,13 @@ class TestLiveMessages(object):
         assert result1["fields"]["content"]["label"] == "Small document A"
         assert result2["fields"]["content"]["label"] == "Small document B"
 
-        with messages_stream_client(
-            after_event_id=result1["event_id"]
-        ) as client_events:
+        with messages_stream_client(after_event_id=result1["event_id"]) as client_events:
             event2 = next(client_events)
-            assert (
-                json.loads(event2.data)["fields"]["content"]["label"]
-                == "Small document B"
-            )
+            assert json.loads(event2.data)["fields"]["content"]["label"] == "Small document B"
             put_document(small_html_document_c)
 
             event3 = next(client_events)
-            assert (
-                json.loads(event3.data)["fields"]["content"]["label"]
-                == "Small document C"
-            )
+            assert json.loads(event3.data)["fields"]["content"]["label"] == "Small document C"
 
     @pytest.mark.pushpin
     def test_api__user_live_messages_endpoint_with_GRIP_proxy__ok__disconnect(

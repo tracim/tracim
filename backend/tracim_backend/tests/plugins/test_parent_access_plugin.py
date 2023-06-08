@@ -53,14 +53,8 @@ class TestParentAccessPlugin(object):
                 email_notification_type=EmailNotificationType.NONE,
             )
 
-            assert (
-                grandson_workspace.get_user_role(user_1)
-                == WorkspaceRoles.CONTENT_MANAGER.level
-            )
-            assert (
-                child_workspace.get_user_role(user_1)
-                == WorkspaceRoles.CONTRIBUTOR.level
-            )
+            assert grandson_workspace.get_user_role(user_1) == WorkspaceRoles.CONTENT_MANAGER.level
+            assert child_workspace.get_user_role(user_1) == WorkspaceRoles.CONTRIBUTOR.level
             assert parent_workspace.get_user_role(user_1) == WorkspaceRoles.READER.level
 
     def test__add_new_user_to_parent_workspaces__ok__user_in_child_space(
@@ -110,14 +104,8 @@ class TestParentAccessPlugin(object):
                 email_notification_type=EmailNotificationType.NONE,
             )
 
-            assert (
-                grandson_workspace.get_user_role(user_1)
-                == WorkspaceRoles.CONTENT_MANAGER.level
-            )
-            assert (
-                child_workspace.get_user_role(user_1)
-                == WorkspaceRoles.CONTRIBUTOR.level
-            )
+            assert grandson_workspace.get_user_role(user_1) == WorkspaceRoles.CONTENT_MANAGER.level
+            assert child_workspace.get_user_role(user_1) == WorkspaceRoles.CONTRIBUTOR.level
             assert parent_workspace.get_user_role(user_1) == WorkspaceRoles.READER.level
 
     def test__add_new_user_to_parent_workspaces__ok__several_child_workspaces(
@@ -165,17 +153,8 @@ class TestParentAccessPlugin(object):
                 do_notify=False,
             )
             session.flush()
-            assert (
-                grandchild_workspace.get_user_role(user_1)
-                == WorkspaceRoles.CONTRIBUTOR.level
-            )
-            assert (
-                child_workspace.get_user_role(user_1)
-                == WorkspaceRoles.CONTRIBUTOR.level
-            )
-            assert (
-                child2_workspace.get_user_role(user_1)
-                == WorkspaceRoles.CONTRIBUTOR.level
-            )
+            assert grandchild_workspace.get_user_role(user_1) == WorkspaceRoles.CONTRIBUTOR.level
+            assert child_workspace.get_user_role(user_1) == WorkspaceRoles.CONTRIBUTOR.level
+            assert child2_workspace.get_user_role(user_1) == WorkspaceRoles.CONTRIBUTOR.level
             assert parent_workspace.get_user_role(user_1) == WorkspaceRoles.READER.level
             transaction.commit()

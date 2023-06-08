@@ -93,10 +93,7 @@ class TestWorkspaceModel(object):
 
         parent_children = [child_1, child_2, child_3]
         rec_parent_children = sorted(
-            rec_child_1_children
-            + rec_child_2_children
-            + rec_child_3_children
-            + parent_children,
+            rec_child_1_children + rec_child_2_children + rec_child_3_children + parent_children,
             key=attrgetter("workspace_id"),
         )
         assert parent.get_children(recursively=False) == parent_children

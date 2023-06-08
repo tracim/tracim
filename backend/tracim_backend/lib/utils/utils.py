@@ -46,9 +46,7 @@ if TYPE_CHECKING:
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 DEFAULT_TRACIM_CONFIG_FILE = "development.ini"
-CONTENT_FRONTEND_URL_SCHEMA = (
-    "workspaces/{workspace_id}/contents/{content_type}/{content_id}"
-)
+CONTENT_FRONTEND_URL_SCHEMA = "workspaces/{workspace_id}/contents/{content_type}/{content_id}"
 WORKSPACE_FRONTEND_URL_SCHEMA = "workspaces/{workspace_id}"
 FRONTEND_UI_SUBPATH = "ui"
 LOGIN_SUBPATH = "login"
@@ -418,9 +416,7 @@ def find_direct_submodule_path(module: types.ModuleType) -> List[str]:
     :return: list of path of direct submodule
     """
     module_path_list = []
-    for importer, submodule_relative_path, is_package in pkgutil.iter_modules(
-        module.__path__
-    ):
+    for importer, submodule_relative_path, is_package in pkgutil.iter_modules(module.__path__):
         submodule_path = "{module_name}.{submodule_relative_path}".format(
             module_name=module.__name__, submodule_relative_path=submodule_relative_path
         )
@@ -438,9 +434,7 @@ def find_all_submodule_path(module: types.ModuleType) -> List[str]:
     """
     module_path_list = []
     module_spec_list = []
-    for importer, submodule_relative_path, is_package in pkgutil.walk_packages(
-        module.__path__
-    ):
+    for importer, submodule_relative_path, is_package in pkgutil.walk_packages(module.__path__):
         submodule_path = "{module_name}.{submodule_relative_path}".format(
             module_name=module.__name__, submodule_relative_path=submodule_relative_path
         )
@@ -516,9 +510,7 @@ class CustomPropertiesValidator:
         try:
             return validate_json(file_path)
         except json.JSONDecodeError as exc:
-            raise UnvalidJsonFile(
-                "{} is not a valid json file".format(file_path)
-            ) from exc
+            raise UnvalidJsonFile("{} is not a valid json file".format(file_path)) from exc
 
     def validate_json_schema(self, json_schema: Dict[str, Any]):
         # INFO - G.M - 2021-01-13 Check here schema with jsonschema meta-schema to:
@@ -533,9 +525,7 @@ class CustomPropertiesValidator:
 
         properties = json_schema.get("properties")
         if not properties:
-            raise UnvalidCustomPropertiesSchema(
-                'Missing "properties" key at json root.'
-            )
+            raise UnvalidCustomPropertiesSchema('Missing "properties" key at json root.')
 
         missing_or_empty_title_properties = []
         for property_name, value in properties.items():

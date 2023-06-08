@@ -33,9 +33,7 @@ class TestPrivateUploadPermissionEndpointsWithNotifications(object):
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
 
-        upload_permission_lib = (
-            upload_permission_lib_factory.get()
-        )  # type: UploadPermissionLib
+        upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
 
         if not with_email:
             # remove admin (emitter) email before share content
@@ -109,9 +107,7 @@ class TestPrivateUploadPermissionEndpoints(object):
     ) -> None:
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
-        upload_permission_lib = (
-            upload_permission_lib_factory.get()
-        )  # type: UploadPermissionLib
+        upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
         upload_permission_lib.add_permission_to_workspace(
             workspace, emails=["test@test.test", "test2@test2.test2"]
         )
@@ -137,8 +133,7 @@ class TestPrivateUploadPermissionEndpoints(object):
         assert content[0]["created"]
         assert content[0]["author"]
         assert (
-            content[0]["upload_permission_group_uuid"]
-            == content[1]["upload_permission_group_uuid"]
+            content[0]["upload_permission_group_uuid"] == content[1]["upload_permission_group_uuid"]
         )
         assert content[0]["created"] == content[1]["created"]
         assert content[0]["upload_permission_id"] != content[1]["upload_permission_id"]
@@ -157,9 +152,7 @@ class TestPrivateUploadPermissionEndpoints(object):
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
 
-        upload_permission_lib = (
-            upload_permission_lib_factory.get()
-        )  # type: UploadPermissionLib
+        upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
         upload_permission_lib.add_permission_to_workspace(
             workspace, emails=["thissharewill@notbe.presentinresponse"]
         )
@@ -196,8 +189,7 @@ class TestPrivateUploadPermissionEndpoints(object):
         assert content[0]["created"]
         assert content[0]["author"]
         assert (
-            content[0]["upload_permission_group_uuid"]
-            == content[1]["upload_permission_group_uuid"]
+            content[0]["upload_permission_group_uuid"] == content[1]["upload_permission_group_uuid"]
         )
         assert content[0]["created"] == content[1]["created"]
         assert content[0]["upload_permission_id"] != content[1]["upload_permission_id"]
@@ -223,9 +215,7 @@ class TestPrivateUploadPermissionEndpoints(object):
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
 
-        upload_permission_lib = (
-            upload_permission_lib_factory.get()
-        )  # type: UploadPermissionLib
+        upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
         upload_permission_lib.add_permission_to_workspace(workspace, emails=[])
         transaction.commit()
         web_testapp.authorization = (
@@ -255,9 +245,7 @@ class TestPrivateUploadPermissionEndpoints(object):
             "test workspace", public_upload_enabled=False, save_now=True
         )
 
-        upload_permission_lib = (
-            upload_permission_lib_factory.get()
-        )  # type: UploadPermissionLib
+        upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
         upload_permission_lib.add_permission_to_workspace(workspace, emails=[])
         transaction.commit()
         web_testapp.authorization = (
@@ -285,9 +273,7 @@ class TestPrivateUploadPermissionEndpoints(object):
     ) -> None:
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
-        upload_permission_lib = (
-            upload_permission_lib_factory.get()
-        )  # type: UploadPermissionLib
+        upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
         upload_permission_lib.add_permission_to_workspace(
             workspace, emails=["thissharewill@notbe.presentinresponse"]
         )
@@ -356,9 +342,7 @@ class TestPrivateUploadPermissionEndpoints(object):
         )
 
         res = web_testapp.delete(
-            "/api/workspaces/{}/upload_permissions/{}".format(
-                workspace.workspace_id, 1
-            ),
+            "/api/workspaces/{}/upload_permissions/{}".format(workspace.workspace_id, 1),
             status=400,
         )
         assert res.json_body["code"] == ErrorCode.UPLOAD_PERMISSION_NOT_FOUND
@@ -375,9 +359,7 @@ class TestPrivateUploadPermissionEndpoints(object):
         workspace = workspace_api.create_workspace(
             "test workspace", public_upload_enabled=False, save_now=True
         )
-        upload_permission_lib = (
-            upload_permission_lib_factory.get()
-        )  # type: UploadPermissionLib
+        upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
         upload_permissions = upload_permission_lib.add_permission_to_workspace(
             workspace, emails=["thissharewill@notbe.presentinresponse"]
         )
@@ -417,9 +399,7 @@ class TestUploadPermissionWithNotification(object):
     ) -> None:
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
-        upload_permission_lib = (
-            upload_permission_lib_factory.get()
-        )  # type: UploadPermissionLib
+        upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
         upload_permission_lib.add_permission_to_workspace(
             workspace,
             emails=["test@test.test", "toto <test2@test2.test2>"],
@@ -463,9 +443,7 @@ class TestUploadPermissionWithNotification(object):
     ) -> None:
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
-        upload_permission_lib = (
-            upload_permission_lib_factory.get()
-        )  # type: UploadPermissionLib
+        upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
         upload_permission_lib.add_permission_to_workspace(
             workspace,
             emails=["test@test.test", "toto <test2@test2.test2>"],
@@ -516,9 +494,7 @@ class TestUploadPermissionWithNotification(object):
     ) -> None:
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
-        upload_permission_lib = (
-            upload_permission_lib_factory.get()
-        )  # type: UploadPermissionLib
+        upload_permission_lib = upload_permission_lib_factory.get()  # type: UploadPermissionLib
         upload_permission_lib.add_permission_to_workspace(
             workspace,
             emails=["test@test.test", "toto <test2@test2.test2>"],
@@ -641,9 +617,7 @@ class TestGuestUploadEndpoints(object):
 
         params = {"namespaces_filter": "upload"}
         res = web_testapp.get(
-            "/api/workspaces/{workspace_id}/contents".format(
-                workspace_id=workspace.workspace_id
-            ),
+            "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             params=params,
         )
         res = res.json_body["items"]
@@ -684,9 +658,7 @@ class TestGuestUploadEndpoints(object):
         assert res.body == image.getvalue()
 
         res = web_testapp.get(
-            "/api/workspaces/{workspace_id}/contents".format(
-                workspace_id=workspace.workspace_id
-            ),
+            "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             status=200,
         )
         assert len(res.json_body["items"]) == 0
@@ -832,9 +804,7 @@ class TestGuestUploadEndpoints(object):
 
         params = {"namespaces_filter": "upload"}
         res = web_testapp.get(
-            "/api/workspaces/{workspace_id}/contents".format(
-                workspace_id=workspace.workspace_id
-            ),
+            "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             params=params,
         )
         res = res.json_body["items"]
@@ -875,9 +845,7 @@ class TestGuestUploadEndpoints(object):
         assert res.body == image.getvalue()
 
         res = web_testapp.get(
-            "/api/workspaces/{workspace_id}/contents".format(
-                workspace_id=workspace.workspace_id
-            ),
+            "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             status=200,
         )
         assert len(res.json_body["items"]) == 0
@@ -922,9 +890,7 @@ class TestGuestUploadEndpoints(object):
         )
         params = {"namespaces_filter": "upload"}
         res = web_testapp.get(
-            "/api/workspaces/{workspace_id}/contents".format(
-                workspace_id=workspace.workspace_id
-            ),
+            "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             params=params,
         )
         res = res.json_body["items"]
@@ -965,9 +931,7 @@ class TestGuestUploadEndpoints(object):
         assert res.body == image.getvalue()
 
         res = web_testapp.get(
-            "/api/workspaces/{workspace_id}/contents".format(
-                workspace_id=workspace.workspace_id
-            ),
+            "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             status=200,
         )
         assert len(res.json_body["items"]) == 0
@@ -1009,9 +973,7 @@ class TestGuestUploadEndpoints(object):
 
         params = {"namespaces_filter": "upload"}
         res = web_testapp.get(
-            "/api/workspaces/{workspace_id}/contents".format(
-                workspace_id=workspace.workspace_id
-            ),
+            "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             params=params,
         )
         res = res.json_body["items"]
@@ -1052,9 +1014,7 @@ class TestGuestUploadEndpoints(object):
         assert res.body == image.getvalue()
 
         res = web_testapp.get(
-            "/api/workspaces/{workspace_id}/contents".format(
-                workspace_id=workspace.workspace_id
-            ),
+            "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             status=200,
         )
         assert len(res.json_body["items"]) == 0
@@ -1107,9 +1067,7 @@ class TestGuestUploadEndpoints(object):
 
         params = {"namespaces_filter": "upload"}
         res = web_testapp.get(
-            "/api/workspaces/{workspace_id}/contents".format(
-                workspace_id=workspace.workspace_id
-            ),
+            "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             params=params,
         )
         res = res.json_body
@@ -1186,9 +1144,7 @@ class TestGuestUploadEndpoints(object):
 
         params = {"namespaces_filter": "upload"}
         res = web_testapp.get(
-            "/api/workspaces/{workspace_id}/contents".format(
-                workspace_id=workspace.workspace_id
-            ),
+            "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             params=params,
         )
         res = res.json_body["items"]
@@ -1312,9 +1268,7 @@ class TestGuestUploadEndpoints(object):
 
         params = {"namespaces_filter": "upload"}
         res = web_testapp.get(
-            "/api/workspaces/{workspace_id}/contents".format(
-                workspace_id=workspace.workspace_id
-            ),
+            "/api/workspaces/{workspace_id}/contents".format(workspace_id=workspace.workspace_id),
             params=params,
             status=200,
         )

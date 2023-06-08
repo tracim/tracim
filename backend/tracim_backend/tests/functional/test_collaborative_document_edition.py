@@ -21,10 +21,8 @@ class TestCollaborativeDocumentEdition(object):
         url = "/api/collaborative-document-edition/templates"
         res = web_testapp.get(url, status=200)
         content = res.json_body
-        collaborative_document_edition_api = (
-            CollaborativeDocumentEditionFactory().get_lib(
-                current_user=admin_user, session=session, config=app_config
-            )
+        collaborative_document_edition_api = CollaborativeDocumentEditionFactory().get_lib(
+            current_user=admin_user, session=session, config=app_config
         )
         assert (
             content["file_templates"]
@@ -71,10 +69,8 @@ class TestCollaborativeDocumentEdition(object):
         """
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
-        collaborative_document_edition_api = (
-            CollaborativeDocumentEditionFactory().get_lib(
-                current_user=admin_user, session=session, config=app_config
-            )
+        collaborative_document_edition_api = CollaborativeDocumentEditionFactory().get_lib(
+            current_user=admin_user, session=session, config=app_config
         )
         data_workspace = workspace_api.create_workspace(label="data")
         tool_folder = content_api.create(
@@ -95,9 +91,7 @@ class TestCollaborativeDocumentEdition(object):
             data_workspace.workspace_id
         )
         template_filename = (
-            collaborative_document_edition_api.get_file_template_list().file_templates[
-                0
-            ]
+            collaborative_document_edition_api.get_file_template_list().file_templates[0]
         )
         res = web_testapp.post_json(
             url,
@@ -119,15 +113,11 @@ class TestCollaborativeDocumentEdition(object):
         workspace_id = content["workspace_id"]
 
         res = web_testapp.get(
-            "/api/workspaces/{}/files/{}/raw/{}".format(
-                workspace_id, content_id, "test_file.ods"
-            ),
+            "/api/workspaces/{}/files/{}/raw/{}".format(workspace_id, content_id, "test_file.ods"),
             status=200,
         )
         with open(
-            collaborative_document_edition_api._get_file_template_path(
-                template_filename
-            ),
+            collaborative_document_edition_api._get_file_template_path(template_filename),
             "rb",
         ) as file:
             assert res.body == file.read()

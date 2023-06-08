@@ -56,8 +56,7 @@ def _load_spec(plugin_manager: pluggy.PluginManager) -> None:
         module_classes = [
             entry
             for entry in module.__dict__.values()
-            if isinstance(entry, type)
-            and entry.__name__.endswith(HOOKSPEC_CLASS_SUFFIX)
+            if isinstance(entry, type) and entry.__name__.endswith(HOOKSPEC_CLASS_SUFFIX)
         ]
         for class_ in module_classes:
             plugin_manager.add_hookspecs(class_)
@@ -123,9 +122,7 @@ def init_plugin_manager(app_config: CFG) -> pluggy.PluginManager:
     plugin_manager.register(EventPublisher(app_config))
     plugin_manager.register(MessageHooks())
     mention.register_tracim_plugin(plugin_manager)
-    search_api = SearchFactory.get_search_lib(
-        session=None, config=app_config, current_user=None
-    )
+    search_api = SearchFactory.get_search_lib(session=None, config=app_config, current_user=None)
     search_api.register_plugins(plugin_manager)
 
     # INFO - G.M - 2019-11-27 - if a plugin path is provided, load plugins from this path
@@ -138,9 +135,7 @@ def init_plugin_manager(app_config: CFG) -> pluggy.PluginManager:
         finally:
             sys.path.remove(plugin_path)
 
-    plugin_manager.hook.add_new_hooks.call_historic(
-        kwargs=dict(plugin_manager=plugin_manager)
-    )
+    plugin_manager.hook.add_new_hooks.call_historic(kwargs=dict(plugin_manager=plugin_manager))
     _register_all(plugin_manager, plugins)
     logger.info(
         init_plugin_manager,

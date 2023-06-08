@@ -55,9 +55,7 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
             config.EMAIL__NOTIFICATION__SMTP__AUTHENTICATION,
         )
         sender = EmailSender(config, smtp_config, True)
-        reply_to_address = config.EMAIL__NOTIFICATION__FROM__EMAIL.replace(
-            "{user_id}", "0"
-        )
+        reply_to_address = config.EMAIL__NOTIFICATION__FROM__EMAIL.replace("{user_id}", "0")
 
         msg = EmailNotificationMessage(
             subject=_("[{website_title}] Your daily summary").replace(
@@ -88,9 +86,7 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
         )
         return parser
 
-    def take_app_action(
-        self, parsed_args: argparse.Namespace, app_context: AppEnvironment
-    ) -> None:
+    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         session = app_context["request"].dbsession
         config: CFG = app_context["registry"].settings["CFG"]
 
@@ -113,9 +109,7 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
             mentions = event_api.get_messages_for_user(
                 user.user_id,
                 created_after=created_after,
-                event_type=EventTypeDatabaseParameters.from_event_type(
-                    "mention.created"
-                ),
+                event_type=EventTypeDatabaseParameters.from_event_type("mention.created"),
                 read_status=ReadStatus.UNREAD,
                 email_notification_type=EmailNotificationType.SUMMARY,
             )
@@ -138,9 +132,7 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
                     default_lang=user.lang,
                     fallback_lang=config.DEFAULT_LANG,
                 )
-                body = SendMailSummariesCommand._render_template(
-                    config, context, translator
-                )
+                body = SendMailSummariesCommand._render_template(config, context, translator)
                 SendMailSummariesCommand._send_mail(
                     config=config,
                     translator=translator,

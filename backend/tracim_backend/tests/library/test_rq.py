@@ -11,9 +11,7 @@ from tracim_backend.tests.fixtures import *  # noqa F403,F401
 
 def get_public_name(user_id: int) -> str:
     with worker_context() as context:
-        user_api = UserApi(
-            current_user=None, session=context.dbsession, config=context.app_config
-        )
+        user_api = UserApi(current_user=None, session=context.dbsession, config=context.app_config)
         return user_api.get_one(user_id).public_name
 
 

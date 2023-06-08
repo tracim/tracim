@@ -30,7 +30,9 @@ comment_without_mention = (
     "<p>et probablement plus utile, un g&eacute;n&eacute;rateur de cla: http://selector.harmonyagreements.org/</p>"
 )
 
-html_with_several_mentions = '<p><html-mention userid="2"></html-mention> <html-mention roleid="0"></html-mention></p>'
+html_with_several_mentions = (
+    '<p><html-mention userid="2"></html-mention> <html-mention roleid="0"></html-mention></p>'
+)
 
 
 def create_content(
@@ -68,9 +70,7 @@ def create_content(
         )
 
         with new_revision(session=session, tm=transaction.manager, content=content):
-            api.update_content(
-                content, new_label=content.label, new_raw_content=raw_content
-            )
+            api.update_content(content, new_label=content.label, new_raw_content=raw_content)
             api.save(content)
     return content
 
@@ -134,8 +134,7 @@ def one_updated_content_with_one_new_mention(
         api.update_content(
             content,
             new_label=content.label,
-            new_raw_content=content.raw_content
-            + '<html-mention userid="2"></html-mention>',
+            new_raw_content=content.raw_content + '<html-mention userid="2"></html-mention>',
         )
         api.save(content)
     return content
@@ -179,8 +178,7 @@ def one_updated_content_with_new_mention_all(
         api.update_content(
             content,
             new_label=content.label,
-            new_raw_content=content.raw_content
-            + '<html-mention roleid="0"></html-mention>',
+            new_raw_content=content.raw_content + '<html-mention roleid="0"></html-mention>',
         )
         api.save(content)
     return content
@@ -207,9 +205,7 @@ def one_comment_with_a_mention(
 
 
 def pending_mention_events_count(context: TracimContext) -> bool:
-    return sum(
-        event.entity_type == EntityType.MENTION for event in context.pending_events
-    )
+    return sum(event.entity_type == EntityType.MENTION for event in context.pending_events)
 
 
 class TestMentionBuilder:
@@ -227,9 +223,7 @@ class TestMentionBuilder:
     def test_unit_get_mentions_from_html__ok__nominal_cases(
         self, html: str, mentions: typing.List[Mention]
     ) -> None:
-        for idx, new_mention in enumerate(
-            DescriptionMentionParser.get_mentions_from_html(0, html)
-        ):
+        for idx, new_mention in enumerate(DescriptionMentionParser.get_mentions_from_html(0, html)):
             assert new_mention == mentions[idx]
 
     def test_unit_on_content_created__ok__nominal_case(
@@ -363,12 +357,8 @@ class TestMentionBuilder:
                     "recipient": recipient,
                     "content_id": "0",
                 },
-                "workspace": {
-                    "workspace_id": one_content_with_a_mention.workspace.workspace_id
-                },
+                "workspace": {"workspace_id": one_content_with_a_mention.workspace.workspace_id},
             },
             workspace_id=one_content_with_a_mention.workspace.workspace_id,
         )
-        assert receiver_ids == MentionBuilder.get_receiver_ids(
-            event, session, app_config
-        )
+        assert receiver_ids == MentionBuilder.get_receiver_ids(event, session, app_config)

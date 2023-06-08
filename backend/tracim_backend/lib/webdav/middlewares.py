@@ -95,10 +95,7 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
                     dumpResponse = True
                     break
             for litmusSubstring in self.break_after_litmus:
-                if (
-                    litmusSubstring in self.passedLitmus
-                    and litmusSubstring not in litmusTag
-                ):
+                if litmusSubstring in self.passedLitmus and litmusSubstring not in litmusTag:
                     print(" *** break after litmus %s" % litmusTag, file=self.out)
                     sys.exit(-1)
                 if litmusSubstring in litmusTag:
@@ -161,9 +158,7 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
                 )
                 headersdict = dict(sub_app_start_response.response_headers)
                 for envitem in headersdict.keys():
-                    print(
-                        "%s: %s" % (envitem, repr(headersdict[envitem])), file=self.out
-                    )
+                    print("%s: %s" % (envitem, repr(headersdict[envitem])), file=self.out)
                 print("", file=self.out)
 
             # Check, if response is a binary string, otherwise we probably have
@@ -224,9 +219,7 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
                 headers[header_tuple[0]] = header_tuple[1]
             dump_content["headers"] = headers
             if isinstance(drb, str):
-                dump_content["content"] = drb.replace(
-                    "PROPFIND XML response body:\n", ""
-                )
+                dump_content["content"] = drb.replace("PROPFIND XML response body:\n", "")
 
             f.write(yaml.dump(dump_content, default_flow_style=False))
 
@@ -284,9 +277,7 @@ class TracimEnv(BaseMiddleware):
         if AuthType.LDAP in self.app_config.AUTH_TYPES:
             registry = self.setup_ldap(registry, self.app_config)
         environ["tracim_registry"] = registry
-        tracim_context = WebdavTracimContext(
-            environ, self.app_config, self.plugin_manager
-        )
+        tracim_context = WebdavTracimContext(environ, self.app_config, self.plugin_manager)
         session = create_dbsession_for_context(
             self.session_factory, transaction.manager, tracim_context
         )
@@ -309,9 +300,7 @@ class TracimEnv(BaseMiddleware):
         manager = ConnectionManager(
             uri=app_config.LDAP_URL,
             bind=app_config.LDAP_BIND_DN if not app_config.LDAP_BIND_ANONYMOUS else "",
-            passwd=app_config.LDAP_BIND_PASS
-            if not app_config.LDAP_BIND_ANONYMOUS
-            else "",
+            passwd=app_config.LDAP_BIND_PASS if not app_config.LDAP_BIND_ANONYMOUS else "",
             tls=app_config.LDAP_TLS,
             use_pool=app_config.LDAP_USE_POOL,
             pool_size=app_config.LDAP_POOL_SIZE,

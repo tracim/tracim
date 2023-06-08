@@ -83,9 +83,7 @@ class TestStringToList(object):
         ) == ["one", "two", "three", "fo ur"]
 
     def test_unit__string_to_list__ok__list_of_int_(self):
-        assert string_to_list(
-            "1,2,3,4", separator=",", cast_func=int, do_strip=True
-        ) == [
+        assert string_to_list("1,2,3,4", separator=",", cast_func=int, do_strip=True) == [
             1,
             2,
             3,
@@ -199,9 +197,7 @@ class TestEmailAddress(object):
     def test_unit__email_address_address__ok__from_rfc_email_address__nominal_case(
         self,
     ):
-        john_address = EmailAddress.from_rfc_email_address(
-            "John Doe <john.doe@domainame.ndl>"
-        )
+        john_address = EmailAddress.from_rfc_email_address("John Doe <john.doe@domainame.ndl>")
         assert john_address.domain == "domainame.ndl"
         assert john_address.label == "John Doe"
         assert john_address.email == "john.doe@domainame.ndl"
@@ -211,9 +207,7 @@ class TestEmailAddress(object):
     def test_unit__email_address_address__ok__from_rfc_email_address__with_label_quotation(
         self,
     ):
-        john_address = EmailAddress.from_rfc_email_address(
-            '"John Doe" <john.doe@domainame.ndl>'
-        )
+        john_address = EmailAddress.from_rfc_email_address('"John Doe" <john.doe@domainame.ndl>')
         assert john_address.domain == "domainame.ndl"
         assert john_address.label == "John Doe"
         assert john_address.email == "john.doe@domainame.ndl"
@@ -242,9 +236,7 @@ class TestCustomPropertiesCheck(object):
             CustomPropertiesValidator().validate_json_schema(json_schema)
 
     def test_unit__validate_json_schema__err__empty_title(self):
-        json_schema = {
-            "properties": {"super": {"title": ""}, "something": {"title": "Something"}}
-        }
+        json_schema = {"properties": {"super": {"title": ""}, "something": {"title": "Something"}}}
         with pytest.raises(UnvalidCustomPropertiesSchema):
             CustomPropertiesValidator().validate_json_schema(json_schema)
 

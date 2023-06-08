@@ -16,9 +16,7 @@ class HasPublicDownloadEnabled(AuthorizationChecker):
             return True
         raise WorkspacePublicDownloadDisabledException(
             'Workspace "{}" has public '
-            "download feature disabled".format(
-                tracim_context.current_workspace.workspace_id
-            )
+            "download feature disabled".format(tracim_context.current_workspace.workspace_id)
         )
 
 

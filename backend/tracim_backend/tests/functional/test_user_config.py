@@ -40,9 +40,7 @@ class TestUserConfigEndpoint(object):
         transaction.commit()
         user_id = test_user.user_id
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
-        res = web_testapp.get(
-            "/api/users/{user_id}/config".format(user_id=user_id), status=200
-        )
+        res = web_testapp.get("/api/users/{user_id}/config".format(user_id=user_id), status=200)
 
         assert json.loads(res.body)["parameters"] == {}
 
@@ -77,9 +75,7 @@ class TestUserConfigEndpoint(object):
         )
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
-        res = web_testapp.get(
-            "/api/users/{user_id}/config".format(user_id=user_id), status=200
-        )
+        res = web_testapp.get("/api/users/{user_id}/config".format(user_id=user_id), status=200)
 
         assert json.loads(res.body)["parameters"] == fixture_params1
 
@@ -93,9 +89,7 @@ class TestUserConfigEndpoint(object):
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
-        res = web_testapp.get(
-            "/api/users/{user_id}/config".format(user_id=user_id), status=200
-        )
+        res = web_testapp.get("/api/users/{user_id}/config".format(user_id=user_id), status=200)
 
         assert json.loads(res.body)["parameters"] == expected_result
 

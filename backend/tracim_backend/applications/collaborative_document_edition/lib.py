@@ -57,16 +57,10 @@ class CollaborativeDocumentEditionLib(ABC):
         the config setting COLLABORATIVE_DOCUMENT_EDITION__ENABLED_EXTENSIONS.
         """
         file_types = self._get_supported_file_types()
-        enabled_extensions = (
-            self._config.COLLABORATIVE_DOCUMENT_EDITION__ENABLED_EXTENSIONS
-        )
+        enabled_extensions = self._config.COLLABORATIVE_DOCUMENT_EDITION__ENABLED_EXTENSIONS
         if not enabled_extensions:
             return file_types
-        return [
-            file_type
-            for file_type in file_types
-            if file_type.extension in enabled_extensions
-        ]
+        return [file_type for file_type in file_types if file_type.extension in enabled_extensions]
 
     @abstractmethod
     def _get_supported_file_types(
@@ -92,17 +86,13 @@ class CollaborativeDocumentEditionLib(ABC):
         """
         try:
             is_dir_exist(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR)
-            is_dir_readable(
-                self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR
-            )
+            is_dir_readable(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR)
         except NotADirectoryError as exc:
             raise FileTemplateNotAvailable from exc
 
         template_filenames = [
             entry
-            for entry in os.listdir(
-                self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR
-            )
+            for entry in os.listdir(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR)
             if isfile(
                 join(
                     self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR,
@@ -143,15 +133,11 @@ class CollaborativeDocumentEditionLib(ABC):
         """
         self._get_file_template_path(template_filename)
 
-    def update_content_from_template(
-        self, content: Content, template_filename: str
-    ) -> Content:
+    def update_content_from_template(self, content: Content, template_filename: str) -> Content:
         assert self._session
         template_path = self._get_file_template_path(template_filename)
         new_mimetype = mimetypes.guess_type(template_path)[0]
-        api = ContentApi(
-            config=self._config, session=self._session, current_user=self._user
-        )
+        api = ContentApi(config=self._config, session=self._session, current_user=self._user)
         with open(self._get_file_template_path(template_filename), "rb") as file:
             api.update_file_data(
                 content,

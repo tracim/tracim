@@ -51,9 +51,7 @@ class TestLoginEndpoint(object):
         res = web_testapp.get("/api/auth/whoami", status=200)
         assert res.json_body["public_name"] == "Global manager"
 
-    def test_api__try_login_enpoint__ok_200__without_username_and_email(
-        self, web_testapp
-    ):
+    def test_api__try_login_enpoint__ok_200__without_username_and_email(self, web_testapp):
         params = {"password": "admin@admin.admin"}
         res = web_testapp.post_json("/api/auth/login", params=params, status=400)
         assert "Validation error of input data" in res.json["message"]
@@ -131,9 +129,7 @@ class TestLDAPAuthOnlyEndpointAnonymous(object):
         "of side effect when reloading multiple LDAP configuration in a same test "
         "session"
     )
-    def test_api__try_login_enpoint_ldap_auth_anonymous__ok_200__valid_ldap_user(
-        self, web_testapp
-    ):
+    def test_api__try_login_enpoint_ldap_auth_anonymous__ok_200__valid_ldap_user(self, web_testapp):
         params = {"username": "professor@planetexpress.com", "password": "professor"}
         # user creation
         with freeze_time("1999-12-31 23:59:59"):
@@ -141,9 +137,7 @@ class TestLDAPAuthOnlyEndpointAnonymous(object):
             res = web_testapp.post_json("/api/auth/login", params=params, status=200)
             assert res.json_body["created"]
             assert (
-                datetime.datetime.strptime(
-                    res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ"
-                )
+                datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 == datetime.datetime.utcnow()
             )
             assert res.json_body["public_name"] == "Professor Farnsworth"
@@ -159,15 +153,11 @@ class TestLDAPAuthOnlyEndpointAnonymous(object):
             res = web_testapp.post_json("/api/auth/login", params=params, status=200)
             assert res.json_body["created"]
             assert (
-                datetime.datetime.strptime(
-                    res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ"
-                )
+                datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 == creation_date
             )
             assert (
-                datetime.datetime.strptime(
-                    res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ"
-                )
+                datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 != datetime.datetime.utcnow()
             )
             assert res.json_body["public_name"] == "Professor Farnsworth"
@@ -180,13 +170,9 @@ class TestLDAPAuthOnlyEndpointAnonymous(object):
 
 
 @pytest.mark.usefixtures("base_fixture")
-@pytest.mark.parametrize(
-    "config_section", [{"name": "functional_ldap_test"}], indirect=True
-)
+@pytest.mark.parametrize("config_section", [{"name": "functional_ldap_test"}], indirect=True)
 class TestLDAPAuthOnlyEndpoint(object):
-    def test_api__try_login_enpoint_ldap_auth__ok_200__valid_ldap_user(
-        self, web_testapp
-    ):
+    def test_api__try_login_enpoint_ldap_auth__ok_200__valid_ldap_user(self, web_testapp):
         params = {"username": "professor@planetexpress.com", "password": "professor"}
         # user creation
         with freeze_time("1999-12-31 23:59:59"):
@@ -194,9 +180,7 @@ class TestLDAPAuthOnlyEndpoint(object):
             res = web_testapp.post_json("/api/auth/login", params=params, status=200)
             assert res.json_body["created"]
             assert (
-                datetime.datetime.strptime(
-                    res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ"
-                )
+                datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 == datetime.datetime.utcnow()
             )
             assert res.json_body["public_name"] == "Professor Farnsworth"
@@ -212,15 +196,11 @@ class TestLDAPAuthOnlyEndpoint(object):
             res = web_testapp.post_json("/api/auth/login", params=params, status=200)
             assert res.json_body["created"]
             assert (
-                datetime.datetime.strptime(
-                    res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ"
-                )
+                datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 == creation_date
             )
             assert (
-                datetime.datetime.strptime(
-                    res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ"
-                )
+                datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 != datetime.datetime.utcnow()
             )
             assert res.json_body["public_name"] == "Professor Farnsworth"
@@ -231,9 +211,7 @@ class TestLDAPAuthOnlyEndpoint(object):
             assert res.json_body["has_avatar"] is True
             assert res.json_body["auth_type"] == "ldap"
 
-    def test_api__try_login_enpoint_ldap_auth__err_403__valid_internal_db_user(
-        self, web_testapp
-    ):
+    def test_api__try_login_enpoint_ldap_auth__err_403__valid_internal_db_user(self, web_testapp):
         params = {"email": "admin@admin.admin", "password": "admin@admin.admin"}
         res = web_testapp.post_json("/api/auth/login", params=params, status=403)
         assert isinstance(res.json, dict)
@@ -269,9 +247,7 @@ class TestLDAPAuthOnlyEndpoint(object):
             res = web_testapp.get("/api/auth/whoami", status=200)
             assert res.json_body["created"]
             assert (
-                datetime.datetime.strptime(
-                    res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ"
-                )
+                datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 == datetime.datetime.utcnow()
             )
             assert res.json_body["public_name"] == "Professor Farnsworth"
@@ -287,15 +263,11 @@ class TestLDAPAuthOnlyEndpoint(object):
             res = web_testapp.get("/api/auth/whoami", status=200)
             assert res.json_body["created"]
             assert (
-                datetime.datetime.strptime(
-                    res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ"
-                )
+                datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 == creation_date
             )
             assert (
-                datetime.datetime.strptime(
-                    res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ"
-                )
+                datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 != datetime.datetime.utcnow()
             )
             assert res.json_body["public_name"] == "Professor Farnsworth"
@@ -330,9 +302,7 @@ class TestLDAPAuthOnlyEndpoint(object):
     "config_section", [{"name": "functional_ldap_test_username"}], indirect=True
 )
 class TestLDAPAuthOnlyUsingUsernameLoginEndpoint(object):
-    def test_api__try_login_enpoint_ldap_auth__ok_200__valid_ldap_user(
-        self, web_testapp
-    ):
+    def test_api__try_login_enpoint_ldap_auth__ok_200__valid_ldap_user(self, web_testapp):
         params = {"username": "Hubert", "password": "professor"}
         # user creation
         with freeze_time("1999-12-31 23:59:59"):
@@ -340,9 +310,7 @@ class TestLDAPAuthOnlyUsingUsernameLoginEndpoint(object):
             res = web_testapp.post_json("/api/auth/login", params=params, status=200)
             assert res.json_body["created"]
             assert (
-                datetime.datetime.strptime(
-                    res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ"
-                )
+                datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 == datetime.datetime.utcnow()
             )
             assert res.json_body["public_name"] == "Professor Farnsworth"
@@ -359,15 +327,11 @@ class TestLDAPAuthOnlyUsingUsernameLoginEndpoint(object):
             res = web_testapp.post_json("/api/auth/login", params=params, status=200)
             assert res.json_body["created"]
             assert (
-                datetime.datetime.strptime(
-                    res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ"
-                )
+                datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 == creation_date
             )
             assert (
-                datetime.datetime.strptime(
-                    res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ"
-                )
+                datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 != datetime.datetime.utcnow()
             )
             assert res.json_body["public_name"] == "Professor Farnsworth"
@@ -378,9 +342,7 @@ class TestLDAPAuthOnlyUsingUsernameLoginEndpoint(object):
             assert res.json_body["has_avatar"] is True
             assert res.json_body["auth_type"] == "ldap"
 
-    def test_api__try_login_enpoint_ldap_auth__err_403__valid_internal_db_user(
-        self, web_testapp
-    ):
+    def test_api__try_login_enpoint_ldap_auth__err_403__valid_internal_db_user(self, web_testapp):
         params = {"username": "admin", "password": "admin@admin.admin"}
         res = web_testapp.post_json("/api/auth/login", params=params, status=403)
         assert isinstance(res.json, dict)
@@ -410,9 +372,7 @@ class TestLDAPAuthOnlyUsingUsernameLoginEndpoint(object):
             res = web_testapp.get("/api/auth/whoami", status=200)
             assert res.json_body["created"]
             assert (
-                datetime.datetime.strptime(
-                    res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ"
-                )
+                datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 == datetime.datetime.utcnow()
             )
             assert res.json_body["public_name"] == "Professor Farnsworth"
@@ -428,15 +388,11 @@ class TestLDAPAuthOnlyUsingUsernameLoginEndpoint(object):
             res = web_testapp.get("/api/auth/whoami", status=200)
             assert res.json_body["created"]
             assert (
-                datetime.datetime.strptime(
-                    res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ"
-                )
+                datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 == creation_date
             )
             assert (
-                datetime.datetime.strptime(
-                    res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ"
-                )
+                datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 != datetime.datetime.utcnow()
             )
             assert res.json_body["public_name"] == "Professor Farnsworth"
@@ -468,9 +424,7 @@ class TestLDAPAuthOnlyUsingUsernameLoginEndpoint(object):
     "config_section", [{"name": "functional_ldap_and_internal_test"}], indirect=True
 )
 class TestLDAPandInternalAuthOnlyEndpoint(object):
-    def test_api__try_login_enpoint_ldap_internal_auth__ok_200__valid_ldap_user(
-        self, web_testapp
-    ):
+    def test_api__try_login_enpoint_ldap_internal_auth__ok_200__valid_ldap_user(self, web_testapp):
         params = {"email": "professor@planetexpress.com", "password": "professor"}
         # user creation
         with freeze_time("1999-12-31 23:59:59"):
@@ -478,9 +432,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(object):
             res = web_testapp.post_json("/api/auth/login", params=params, status=200)
             assert res.json_body["created"]
             assert (
-                datetime.datetime.strptime(
-                    res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ"
-                )
+                datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 == datetime.datetime.utcnow()
             )
             assert res.json_body["public_name"] == "Professor Farnsworth"
@@ -496,15 +448,11 @@ class TestLDAPandInternalAuthOnlyEndpoint(object):
             res = web_testapp.post_json("/api/auth/login", params=params, status=200)
             assert res.json_body["created"]
             assert (
-                datetime.datetime.strptime(
-                    res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ"
-                )
+                datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 == creation_date
             )
             assert (
-                datetime.datetime.strptime(
-                    res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ"
-                )
+                datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 != datetime.datetime.utcnow()
             )
             assert res.json_body["public_name"] == "Professor Farnsworth"
@@ -531,9 +479,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(object):
         assert res.json_body["has_avatar"] is True
         assert res.json_body["auth_type"] == "internal"
 
-    def test_api__try_login_enpoint_ldap_internal_auth__err_403__unvalid_user(
-        self, web_testapp
-    ):
+    def test_api__try_login_enpoint_ldap_internal_auth__err_403__unvalid_user(self, web_testapp):
         params = {
             "email": "unknown@unknown.unknown",
             "password": "unknown@unknown.unknown",
@@ -559,9 +505,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(object):
             res = web_testapp.get("/api/auth/whoami", status=200)
             assert res.json_body["created"]
             assert (
-                datetime.datetime.strptime(
-                    res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ"
-                )
+                datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 == datetime.datetime.utcnow()
             )
             assert res.json_body["public_name"] == "Professor Farnsworth"
@@ -577,15 +521,11 @@ class TestLDAPandInternalAuthOnlyEndpoint(object):
             res = web_testapp.get("/api/auth/whoami", status=200)
             assert res.json_body["created"]
             assert (
-                datetime.datetime.strptime(
-                    res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ"
-                )
+                datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 == creation_date
             )
             assert (
-                datetime.datetime.strptime(
-                    res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ"
-                )
+                datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
                 != datetime.datetime.utcnow()
             )
             assert res.json_body["public_name"] == "Professor Farnsworth"
@@ -702,9 +642,7 @@ class TestWhoamiEndpoint(object):
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestWhoamiEndpointWithApiKey(object):
-    def test_api__try_whoami_enpoint_with_api_key__ok_200__nominal_case(
-        self, web_testapp
-    ):
+    def test_api__try_whoami_enpoint_with_api_key__ok_200__nominal_case(self, web_testapp):
         headers_auth = {
             "Tracim-Api-Key": "mysuperapikey",
             "Tracim-Api-Login": "admin@admin.admin",
@@ -796,44 +734,28 @@ class TestWhoamiEndpointWithApiKey(object):
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestWhoamiEndpointWithApiKeyNoKey(object):
-    def test_api__try_whoami_enpoint_with_api_key__err_401__no_api_key(
-        self, web_testapp
-    ):
+    def test_api__try_whoami_enpoint_with_api_key__err_401__no_api_key(self, web_testapp):
         headers_auth = {"Tracim-Api-Key": "", "Tracim-Api-Login": "admin@admin.admin"}
         web_testapp.get("/api/auth/whoami", status=401, headers=headers_auth)
 
 
 @pytest.mark.usefixtures("base_fixture")
-@pytest.mark.parametrize(
-    "config_section", [{"name": "functional_test_remote_auth"}], indirect=True
-)
+@pytest.mark.parametrize("config_section", [{"name": "functional_test_remote_auth"}], indirect=True)
 class TestWhoamiEndpointWithRemoteHeader(object):
-    def test_api__try_whoami_enpoint_remote_user__err_401__as_http_header(
-        self, web_testapp
-    ):
+    def test_api__try_whoami_enpoint_remote_user__err_401__as_http_header(self, web_testapp):
         headers_auth = {"REMOTE_USER": "remoteuser@remoteuser.remoteuser"}
         web_testapp.get("/api/auth/whoami", status=401, headers=headers_auth)
 
-    def test_api__try_whoami_enpoint_remote_user__ok_200__case_insensitive_email(
-        self, web_testapp
-    ):
+    def test_api__try_whoami_enpoint_remote_user__ok_200__case_insensitive_email(self, web_testapp):
         extra_environ = {"REMOTE_USER": "REMOTEUSER@REMOTEUSER.REMOTEUSER"}
-        res = web_testapp.get(
-            "/api/auth/whoami", status=200, extra_environ=extra_environ
-        )
+        res = web_testapp.get("/api/auth/whoami", status=200, extra_environ=extra_environ)
         extra_environ = {"REMOTE_USER": "ReMoTeUser@rEmoTEUSer.rEMoTeusEr"}
-        res = web_testapp.get(
-            "/api/auth/whoami", status=200, extra_environ=extra_environ
-        )
+        res = web_testapp.get("/api/auth/whoami", status=200, extra_environ=extra_environ)
         assert res.json_body["email"] == "remoteuser@remoteuser.remoteuser"
 
-    def test_api__try_whoami_enpoint_remote_user__ok_200__nominal_case(
-        self, web_testapp
-    ):
+    def test_api__try_whoami_enpoint_remote_user__ok_200__nominal_case(self, web_testapp):
         extra_environ = {"REMOTE_USER": "remoteuser@remoteuser.remoteuser"}
-        res = web_testapp.get(
-            "/api/auth/whoami", status=200, extra_environ=extra_environ
-        )
+        res = web_testapp.get("/api/auth/whoami", status=200, extra_environ=extra_environ)
         assert res.json_body["public_name"] == "remoteuser"
         assert res.json_body["email"] == "remoteuser@remoteuser.remoteuser"
         assert res.json_body["username"] is None
@@ -845,9 +767,7 @@ class TestWhoamiEndpointWithRemoteHeader(object):
         assert res.json_body["auth_type"] == "remote"
         user_id = res.json_body["user_id"]
 
-        res = web_testapp.get(
-            "/api/auth/whoami", status=200, extra_environ=extra_environ
-        )
+        res = web_testapp.get("/api/auth/whoami", status=200, extra_environ=extra_environ)
         assert res.json_body["public_name"] == "remoteuser"
         assert res.json_body["email"] == "remoteuser@remoteuser.remoteuser"
         assert res.json_body["username"] is None
@@ -859,13 +779,9 @@ class TestWhoamiEndpointWithRemoteHeader(object):
         assert res.json_body["auth_type"] == "remote"
         assert res.json_body["user_id"] == user_id
 
-    def test_api__try_whoami_enpoint_remote_user__ok_200__nominal_case_username(
-        self, web_testapp
-    ):
+    def test_api__try_whoami_enpoint_remote_user__ok_200__nominal_case_username(self, web_testapp):
         extra_environ = {"REMOTE_USER": "remoteuser"}
-        res = web_testapp.get(
-            "/api/auth/whoami", status=200, extra_environ=extra_environ
-        )
+        res = web_testapp.get("/api/auth/whoami", status=200, extra_environ=extra_environ)
         assert res.json_body["public_name"] == "remoteuser"
         assert res.json_body["email"] is None
         assert res.json_body["username"] == "remoteuser"
@@ -877,9 +793,7 @@ class TestWhoamiEndpointWithRemoteHeader(object):
         assert res.json_body["auth_type"] == "remote"
         user_id = res.json_body["user_id"]
 
-        res = web_testapp.get(
-            "/api/auth/whoami", status=200, extra_environ=extra_environ
-        )
+        res = web_testapp.get("/api/auth/whoami", status=200, extra_environ=extra_environ)
         assert res.json_body["public_name"] == "remoteuser"
         assert res.json_body["username"] == "remoteuser"
         assert res.json_body["email"] is None
@@ -910,16 +824,12 @@ class TestWhoamiEndpointWithRemoteHeader(object):
         uapi.disable(test_user)
         transaction.commit()
         extra_environ = {"REMOTE_USER": "test@test.test"}
-        res = web_testapp.get(
-            "/api/auth/whoami", status=401, extra_environ=extra_environ
-        )
+        res = web_testapp.get("/api/auth/whoami", status=401, extra_environ=extra_environ)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] is None
 
-    def test_api__try_whoami_enpoint__err_401__remote_user_unauthenticated(
-        self, web_testapp
-    ):
+    def test_api__try_whoami_enpoint__err_401__remote_user_unauthenticated(self, web_testapp):
         res = web_testapp.get("/api/auth/whoami", status=401)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
@@ -929,9 +839,7 @@ class TestWhoamiEndpointWithRemoteHeader(object):
 
     def test_api__try_whoami_enpoint__err_401__remote_user_bad_email(self, web_testapp):
         extra_environ = {"REMOTE_USER": ""}
-        res = web_testapp.get(
-            "/api/auth/whoami", status=401, extra_environ=extra_environ
-        )
+        res = web_testapp.get("/api/auth/whoami", status=401, extra_environ=extra_environ)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] is None

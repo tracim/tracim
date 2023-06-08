@@ -42,12 +42,8 @@ class Proxy(object):
     def __init__(
         self,
         base_address: str,
-        default_request_headers_to_drop: typing.List[
-            str
-        ] = DEFAULT_REQUEST_HEADER_TO_DROP,
-        default_response_headers_to_drop: typing.List[
-            str
-        ] = DEFAULT_RESPONSE_HEADER_TO_DROP,
+        default_request_headers_to_drop: typing.List[str] = DEFAULT_REQUEST_HEADER_TO_DROP,
+        default_response_headers_to_drop: typing.List[str] = DEFAULT_RESPONSE_HEADER_TO_DROP,
         auth: typing.Union[typing.Optional[typing.Tuple[str, str]], AuthBase] = None,
     ) -> None:
         """
@@ -115,9 +111,7 @@ class Proxy(object):
         extra_request_headers = extra_request_headers or {}
         request_headers = self._drop_request_headers(request_headers)
         if extra_request_headers:
-            request_headers = self._add_extra_headers(
-                request_headers, extra_request_headers
-            )
+            request_headers = self._add_extra_headers(request_headers, extra_request_headers)
         behind_url = urljoin(self._base_address, path)
 
         behind_response = self._get_behind_response(
@@ -132,9 +126,7 @@ class Proxy(object):
         response_headers = dict(behind_response.headers)
         response_headers = self._drop_response_headers(response_headers)
         if extra_response_headers:
-            response_headers = self._add_extra_headers(
-                request_headers, extra_response_headers
-            )
+            response_headers = self._add_extra_headers(request_headers, extra_response_headers)
 
         return self._generate_proxy_response(
             status=behind_response.status_code,

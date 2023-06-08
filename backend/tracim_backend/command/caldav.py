@@ -45,16 +45,12 @@ class CaldavSyncCommand(AppContextCommand):
         parser = super().get_parser(prog_name)
         return parser
 
-    def take_app_action(
-        self, parsed_args: argparse.Namespace, app_context: AppEnvironment
-    ) -> None:
+    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         # TODO - G.M - 05-04-2018 -Refactor this in order
         # to not setup object var outside of __init__ .
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]
-        self._user_api = UserApi(
-            current_user=None, session=self._session, config=self._app_config
-        )
+        self._user_api = UserApi(current_user=None, session=self._session, config=self._app_config)
         self._workspace_api = WorkspaceApi(
             current_user=None,
             force_role=True,
@@ -87,11 +83,7 @@ class CaldavSyncCommand(AppContextCommand):
                 logger.exception(self, exc)
         nb_user_agendas = len(users)
         nb_verified_user_agenda = len(users) - nb_error_agenda_access
-        print(
-            "{}/{} users agenda verified".format(
-                nb_verified_user_agenda, nb_user_agendas
-            )
-        )
+        print("{}/{} users agenda verified".format(nb_verified_user_agenda, nb_user_agendas))
 
         # INFO - G.M - 2019-03-13 - check workspaces agendas
         workspaces = self._workspace_api.get_all()
@@ -105,28 +97,16 @@ class CaldavSyncCommand(AppContextCommand):
                 if state in [AgendaSyncState.CREATED, AgendaSyncState.EXISTING]:
                     nb_agenda_enabled_workspace += 1
                 if state == AgendaSyncState.CREATED:
-                    print(
-                        "New created agenda for workspace {}".format(
-                            workspace.workspace_id
-                        )
-                    )
+                    print("New created agenda for workspace {}".format(workspace.workspace_id))
             except CannotCreateAgendaResource as exc:
-                print(
-                    "Cannot create agenda for workspace {}".format(
-                        workspace.workspace_id
-                    )
-                )
+                print("Cannot create agenda for workspace {}".format(workspace.workspace_id))
                 logger.exception(self, exc)
             except AgendaServerConnectionError as exc:
                 nb_error_agenda_access += 1
                 print("Cannot access to agenda server: connection error.")
                 logger.exception(self, exc)
-        nb_verified_workspace_agenda = (
-            nb_agenda_enabled_workspace - nb_error_agenda_access
-        )
-        nb_workspace_without_agenda_enabled = (
-            nb_workspaces - nb_agenda_enabled_workspace
-        )
+        nb_verified_workspace_agenda = nb_agenda_enabled_workspace - nb_error_agenda_access
+        nb_workspace_without_agenda_enabled = nb_workspaces - nb_agenda_enabled_workspace
         print(
             "{}/{} workspace agenda verified ({} workspace without agenda feature enabled)".format(
                 nb_verified_workspace_agenda,

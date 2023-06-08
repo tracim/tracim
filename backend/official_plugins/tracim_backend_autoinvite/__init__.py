@@ -26,9 +26,7 @@ class AutoInvitePlugin:
             current_user=None,
             access_types_filter=[WorkspaceAccessType.OPEN],
         ).get_all()
-        role_api = RoleApi(
-            session=context.dbsession, config=context.app_config, current_user=None
-        )
+        role_api = RoleApi(session=context.dbsession, config=context.app_config, current_user=None)
         for workspace in open_workspaces:
             try:
                 role_api.create_one(
@@ -42,9 +40,7 @@ class AutoInvitePlugin:
                 pass
 
     @hookimpl
-    def on_workspace_created(
-        self, workspace: Workspace, context: TracimContext
-    ) -> None:
+    def on_workspace_created(self, workspace: Workspace, context: TracimContext) -> None:
         """
         Set all users as members of new open workspaces using the default workspace role
         """

@@ -41,9 +41,7 @@ def upgrade():
             ondelete="CASCADE",
         ),
         sa.PrimaryKeyConstraint("tag_id", name=op.f("pk_tag")),
-        sa.UniqueConstraint(
-            "workspace_id", "tag_name", name=op.f("uq__tag__workspace_id")
-        ),
+        sa.UniqueConstraint("workspace_id", "tag_name", name=op.f("uq__tag__workspace_id")),
     )
 
     op.create_table(
@@ -72,9 +70,7 @@ def upgrade():
             ondelete="CASCADE",
         ),
         sa.PrimaryKeyConstraint("tag_id", "content_id", name=op.f("pk_content_tag")),
-        sa.UniqueConstraint(
-            "tag_id", "content_id", name=op.f("uq__content_tag__tag_id")
-        ),
+        sa.UniqueConstraint("tag_id", "content_id", name=op.f("uq__content_tag__tag_id")),
     )
 
 

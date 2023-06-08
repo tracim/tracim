@@ -232,9 +232,7 @@ class ContentTypeList(object):
         for item in content_types:
             if item.slug == slug or (item.slug_aliases and slug in item.slug_aliases):
                 return item
-        raise ContentTypeNotExist(
-            "Content-type does not exist/is disabled: {}".format(slug)
-        )
+        raise ContentTypeNotExist("Content-type does not exist/is disabled: {}".format(slug))
 
     def restricted_allowed_types_slug(self) -> typing.List[str]:
         """
@@ -242,9 +240,7 @@ class ContentTypeList(object):
         "any" slug, dont return content type slug alias , don't return event.
         Useful to restrict slug param in schema.
         """
-        allowed_type_slug = [
-            contents_type.slug for contents_type in self._content_types
-        ]
+        allowed_type_slug = [contents_type.slug for contents_type in self._content_types]
         return allowed_type_slug
 
     def endpoint_allowed_types(self) -> typing.List[TracimContentType]:

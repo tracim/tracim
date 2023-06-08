@@ -79,9 +79,7 @@ class DecodedMail(object):
     def get_special_key(self) -> typing.Optional[str]:
         return self._decode_header(TRACIM_SPECIAL_KEY_HEADER)
 
-    def get_body(
-        self, use_html_parsing=True, use_txt_parsing=True
-    ) -> typing.Optional[str]:
+    def get_body(self, use_html_parsing=True, use_txt_parsing=True) -> typing.Optional[str]:
         body_part = self._get_mime_body_message()
         body = None
         if body_part:
@@ -110,19 +108,13 @@ class DecodedMail(object):
         for part in self._message.walk():
             content_type = part.get_content_type()
             content_dispo = str(part.get("Content-Disposition"))
-            if (
-                content_type == CONTENT_TYPE_TEXT_HTML
-                and "attachment" not in content_dispo
-            ):
+            if content_type == CONTENT_TYPE_TEXT_HTML and "attachment" not in content_dispo:
                 return part
         # check for plain text
         for part in self._message.walk():
             content_type = part.get_content_type()
             content_dispo = str(part.get("Content-Disposition"))
-            if (
-                content_type == CONTENT_TYPE_TEXT_PLAIN
-                and "attachment" not in content_dispo
-            ):
+            if content_type == CONTENT_TYPE_TEXT_PLAIN and "attachment" not in content_dispo:
                 return part
         return part
 
@@ -173,15 +165,11 @@ class DecodedMail(object):
                     return key
                 logger.warning(
                     cls,
-                    "key found {} is not alphanumeric, cannot retrieve value".format(
-                        key
-                    ),
+                    "key found {} is not alphanumeric, cannot retrieve value".format(key),
                 )
             logger.warning(
                 cls,
-                "pattern {} does not match email address {} ".format(
-                    pattern, mail_address
-                ),
+                "pattern {} does not match email address {} ".format(pattern, mail_address),
             )
         return None
 
@@ -191,9 +179,7 @@ class DecodedMail(object):
         :return: None or raise Error
         """
         if self._check_if_auto_reply_mail():
-            raise AutoReplyEmailNotAllowed(
-                "Mail seems to be an auto-reply mail, skip it"
-            )
+            raise AutoReplyEmailNotAllowed("Mail seems to be an auto-reply mail, skip it")
 
     def _check_if_auto_reply_mail(self) -> bool:
         """
@@ -209,9 +195,7 @@ class DecodedMail(object):
             return True
 
         # INFO - G.M - 2019-06-28 - somes not standard check for autoreply
-        x_auto_response_suppress_raw_value = self._decode_header(
-            "X-Auto-Response-Suppress"
-        )
+        x_auto_response_suppress_raw_value = self._decode_header("X-Auto-Response-Suppress")
         if x_auto_response_suppress_raw_value:
             x_auto_response_suppress_values = []
             for value in x_auto_response_suppress_raw_value.split(","):
@@ -429,9 +413,7 @@ class MailFetcher(object):
         with self.lock.acquire(timeout=MAIL_FETCHER_FILELOCK_TIMEOUT):
             messages = self._fetch(imapc)
             cleaned_mails = [
-                DecodedMail(
-                    m.message, m.uid, self.reply_to_pattern, self.references_pattern
-                )
+                DecodedMail(m.message, m.uid, self.reply_to_pattern, self.references_pattern)
                 for m in messages
             ]
             self._notify_tracim(cleaned_mails, imapc)
@@ -473,9 +455,7 @@ class MailFetcher(object):
 
         return messages
 
-    def _notify_tracim(
-        self, mails: typing.List[DecodedMail], imapc: imapclient.IMAPClient
-    ) -> None:
+    def _notify_tracim(self, mails: typing.List[DecodedMail], imapc: imapclient.IMAPClient) -> None:
         """
         Send http request to tracim endpoint
         :param mails: list of mails to send
@@ -491,9 +471,7 @@ class MailFetcher(object):
             try:
                 method, endpoint, json_body_dict = self._create_comment_request(mail)
             except NoKeyFound:
-                log = (
-                    "Failed to create comment request due to missing specialkey in mail"
-                )
+                log = "Failed to create comment request due to missing specialkey in mail"
                 logger.exception(self, log)
                 continue
             except EmptyEmailBody:
@@ -542,9 +520,7 @@ class MailFetcher(object):
             raise BadStatusCode(msg)
         return result.json()
 
-    def _create_comment_request(
-        self, mail: DecodedMail
-    ) -> typing.Tuple[str, str, dict]:
+    def _create_comment_request(self, mail: DecodedMail) -> typing.Tuple[str, str, dict]:
         mail.check_validity_for_comment_content()
         content_id = mail.get_key()
         content_info = self._get_content_info(content_id, mail.get_from_address())

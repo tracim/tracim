@@ -38,9 +38,7 @@ class WebdavAppFactory(object):
 
         config["verbose"] = app_config.WEBDAV__VERBOSE__LEVEL
         config["dir_browser"]["enable"] = app_config.WEBDAV__DIR_BROWSER__ENABLED
-        config["dir_browser"][
-            "response_trailer"
-        ] = app_config.WEBDAV__DIR_BROWSER__FOOTER
+        config["dir_browser"]["response_trailer"] = app_config.WEBDAV__DIR_BROWSER__FOOTER
 
         if not useLxml and config["verbose"] >= 1:
             print(

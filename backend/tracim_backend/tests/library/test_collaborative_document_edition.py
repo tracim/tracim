@@ -55,13 +55,9 @@ class TestCollaborativeDocumentEdition(object):
         session: TracimSession,
         app_config: CFG,
         enabled_extensions: typing.List[str],
-        expected_supported_file_types: typing.List[
-            CollaborativeDocumentEditionFileType
-        ],
+        expected_supported_file_types: typing.List[CollaborativeDocumentEditionFileType],
     ):
-        app_config.COLLABORATIVE_DOCUMENT_EDITION__ENABLED_EXTENSIONS = (
-            enabled_extensions
-        )
+        app_config.COLLABORATIVE_DOCUMENT_EDITION__ENABLED_EXTENSIONS = enabled_extensions
         collaborative_document_edition_api = CollaborativeDocumentEditionLibForTest(
             current_user=admin_user, session=session, config=app_config
         )

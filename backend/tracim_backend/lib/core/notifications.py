@@ -12,9 +12,7 @@ class INotifier(object):
     Interface for Notifier instances
     """
 
-    def __init__(
-        self, config: CFG, session: Session, current_user: User = None
-    ) -> None:
+    def __init__(self, config: CFG, session: Session, current_user: User = None) -> None:
         pass
 
     def notify_content_update(self, content: Content):
@@ -34,9 +32,7 @@ class NotifierFactory(object):
 class DummyNotifier(INotifier):
     send_count = 0
 
-    def __init__(
-        self, config: CFG, session: Session, current_user: User = None
-    ) -> None:
+    def __init__(self, config: CFG, session: Session, current_user: User = None) -> None:
         INotifier.__init__(self, config, session, current_user)
         logger.info(self, "Instantiating Dummy Notifier")
 

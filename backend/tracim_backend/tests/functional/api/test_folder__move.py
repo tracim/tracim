@@ -11,9 +11,7 @@ class TestFolderMove(object):
     def test_api__move_folder_into_itself__err_400(
         self, content_api_factory, workspace_api_factory, web_testapp, content_type_list
     ) -> None:
-        workspace = workspace_api_factory.get().create_workspace(
-            label="test", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace(label="test", save_now=True)
         moved_folder = content_api_factory.get().create(
             label="test_folder",
             content_type_slug=content_type_list.Folder.slug,
@@ -39,9 +37,7 @@ class TestFolderMove(object):
     def test_api__move_folder_in_a_direct_child__err_400(
         self, workspace_api_factory, content_api_factory, web_testapp, content_type_list
     ) -> None:
-        workspace = workspace_api_factory.get().create_workspace(
-            label="test", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace(label="test", save_now=True)
 
         moved_folder = content_api_factory.get().create(
             label="test_folder",
@@ -76,9 +72,7 @@ class TestFolderMove(object):
     def test_api__move_folder_in_a_sub_child__err_400(
         self, content_api_factory, workspace_api_factory, web_testapp, content_type_list
     ) -> None:
-        workspace = workspace_api_factory.get().create_workspace(
-            label="test", save_now=True
-        )
+        workspace = workspace_api_factory.get().create_workspace(label="test", save_now=True)
         moved_folder = content_api_factory.get().create(
             label="test_folder",
             content_type_slug=content_type_list.Folder.slug,

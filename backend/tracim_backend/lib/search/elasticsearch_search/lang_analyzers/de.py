@@ -11,9 +11,7 @@ from tracim_backend.lib.search.elasticsearch_search.default_analyzers import und
 
 
 german_stop = analysis.token_filter("german_stop", type="stop", stopwords="_german_")
-german_stemmer = analysis.token_filter(
-    "german_stemmer", type="stemmer", language="light_german"
-)
+german_stemmer = analysis.token_filter("german_stemmer", type="stemmer", language="light_german")
 tracim_german_analyzer = analyzer(
     "tracim_german",
     tokenizer="standard",

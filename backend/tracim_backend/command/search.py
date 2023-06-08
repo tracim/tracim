@@ -22,9 +22,7 @@ class IndexingCommand(AppContextCommand):
         content_api = ContentApi(
             current_user=None, session=context.dbsession, config=context.app_config
         )
-        content = content_api.get_one(
-            content_id=content_id, content_type=ContentTypeSlug.ANY.value
-        )
+        content = content_api.get_one(content_id=content_id, content_type=ContentTypeSlug.ANY.value)
         ESContentIndexer().index_contents([content], context)
         print('content "{}" correctly indexed.'.format(content_id))
 
@@ -47,9 +45,7 @@ class IndexingCommand(AppContextCommand):
         print("Indexing all users")
         if context.app_config.SEARCH__ENGINE == "simple":
             return
-        user_api = UserApi(
-            current_user=None, session=context.dbsession, config=context.app_config
-        )
+        user_api = UserApi(current_user=None, session=context.dbsession, config=context.app_config)
         indexed_user_count = 0
         for user in user_api.get_all():
             ESUserIndexer().index_user(user, context)
@@ -91,9 +87,7 @@ class SearchIndexInitCommand(IndexingCommand):
         )
         return parser
 
-    def take_app_action(
-        self, parsed_args: argparse.Namespace, app_context: AppEnvironment
-    ) -> None:
+    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         # TODO - G.M - 05-04-2018 -Refactor this in order
         # to not setup object var outside of __init__ .
         self._session = app_context["request"].dbsession
@@ -111,9 +105,7 @@ class SearchIndexUpgradeCommand(AppContextCommand):
     def get_description(self) -> str:
         return "upgrade index: create a copy of current index with updated index template (useful for migration), set index alias to this new index (experimental)"
 
-    def take_app_action(
-        self, parsed_args: argparse.Namespace, app_context: AppEnvironment
-    ) -> None:
+    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         # TODO - G.M - 05-04-2018 -Refactor this in order
         # to not setup object var outside of __init__ .
         self._session = app_context["request"].dbsession
@@ -141,9 +133,7 @@ class SearchIndexIndexCommand(IndexingCommand):
         )
         return parser
 
-    def take_app_action(
-        self, parsed_args: argparse.Namespace, app_context: AppEnvironment
-    ) -> None:
+    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         # TODO - G.M - 05-04-2018 -Refactor this in order
         # to not setup object var outside of __init__ .
         self._session = app_context["request"].dbsession
@@ -165,9 +155,7 @@ class SearchIndexDeleteCommand(AppContextCommand):
     def get_description(self) -> str:
         return "Delete all index, alias and template of tracim document"
 
-    def take_app_action(
-        self, parsed_args: argparse.Namespace, app_context: AppEnvironment
-    ) -> None:
+    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]
         self.search_api = SearchFactory.get_search_lib(

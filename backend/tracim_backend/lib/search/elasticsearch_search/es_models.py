@@ -76,11 +76,7 @@ class HtmlText(Text):
 class KeywordWithText(Keyword):
     def __init__(self, **kwargs: dict) -> None:
         super().__init__(
-            fields={
-                "text": Text(
-                    analyzer=edge_ngram_folding, search_analyzer=folding, **kwargs
-                )
-            },
+            fields={"text": Text(analyzer=edge_ngram_folding, search_analyzer=folding, **kwargs)},
             ignore_above=UTF8_MAX_KEYWORD_SIZE,
         )
 

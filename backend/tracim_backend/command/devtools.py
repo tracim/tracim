@@ -31,9 +31,7 @@ class ParametersListCommand(AppContextCommand):
         )
         return parser
 
-    def take_app_action(
-        self, parsed_args: argparse.Namespace, app_context: AppEnvironment
-    ) -> None:
+    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         # TODO - G.M - 05-04-2018 -Refactor this in order
         # to not setup object var outside of __init__ .
         self._session = app_context["request"].dbsession
@@ -108,9 +106,7 @@ class ParametersValueCommand(AppContextCommand):
         )
         return parser
 
-    def take_app_action(
-        self, parsed_args: argparse.Namespace, app_context: AppEnvironment
-    ) -> None:
+    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         # TODO - G.M - 05-04-2018 -Refactor this in order
         # to not setup object var outside of __init__ .
         self._session = app_context["request"].dbsession
@@ -144,17 +140,11 @@ class ParametersValueCommand(AppContextCommand):
                     config_param.config_file_name,
                     config_param.env_var_name,
                 ]:
-                    self.print_config_parameter(
-                        config_param=config_param, parsed_args=parsed_args
-                    )
+                    self.print_config_parameter(config_param=config_param, parsed_args=parsed_args)
             else:
-                self.print_config_parameter(
-                    config_param=config_param, parsed_args=parsed_args
-                )
+                self.print_config_parameter(config_param=config_param, parsed_args=parsed_args)
 
-    def print_config_parameter(
-        self, parsed_args: argparse.Namespace, config_param: ConfigParam
-    ):
+    def print_config_parameter(self, parsed_args: argparse.Namespace, config_param: ConfigParam):
         if parsed_args.raw:
             print(config_param.config_value, end="")
         else:
@@ -189,9 +179,7 @@ class LiveMessageTesterCommand(AppContextCommand):
         )
         return parser
 
-    def take_app_action(
-        self, parsed_args: argparse.Namespace, app_context: AppEnvironment
-    ) -> None:
+    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         # TODO - G.M - 05-04-2018 -Refactor this in order
         # to not setup object var outside of __init__ .
         self._session = app_context["request"].dbsession
@@ -225,9 +213,7 @@ class SMTPMailCheckerCommand(AppContextCommand):
         )
         return parser
 
-    def take_app_action(
-        self, parsed_args: argparse.Namespace, app_context: AppEnvironment
-    ) -> None:
+    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         # TODO - G.M - 05-04-2018 -Refactor this in order
         # to not setup object var outside of __init__ .
         self._session = app_context["request"].dbsession
@@ -256,13 +242,9 @@ class SMTPMailCheckerCommand(AppContextCommand):
 
         msg = EmailNotificationMessage(
             subject="Test Email from Tracim",
-            from_header=EmailAddress(
-                "", self._app_config.EMAIL__NOTIFICATION__FROM__EMAIL
-            ),
+            from_header=EmailAddress("", self._app_config.EMAIL__NOTIFICATION__FROM__EMAIL),
             to_header=EmailAddress("", parsed_args.receiver),
-            reply_to=EmailAddress(
-                "", self._app_config.EMAIL__NOTIFICATION__FROM__EMAIL
-            ),
+            reply_to=EmailAddress("", self._app_config.EMAIL__NOTIFICATION__FROM__EMAIL),
             references=EmailAddress("", "references-test@localhost"),
             lang="en",
             body_html=html,
@@ -280,9 +262,7 @@ class ExtractCustomPropertiesTranslationsCommand(AppContextCommand):
     def get_description(self) -> str:
         return "create translation template for user custom properties"
 
-    def take_app_action(
-        self, parsed_args: argparse.Namespace, app_context: AppEnvironment
-    ) -> None:
+    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         # TODO - G.M - 05-04-2018 -Refactor this in order
         # to not setup object var outside of __init__ .
         self._session = app_context["request"].dbsession

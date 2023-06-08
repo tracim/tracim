@@ -31,9 +31,7 @@ class MoveSpaceCommand(AppContextCommand):
     def get_description(self) -> str:
         return """Move a space from a parent to another (use 0 to move to root)"""
 
-    def take_app_action(
-        self, parsed_args: argparse.Namespace, app_context: AppEnvironment
-    ) -> None:
+    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         # to not setup object var outside of __init__ .
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]
@@ -45,9 +43,7 @@ class MoveSpaceCommand(AppContextCommand):
             if parsed_args.parent_space_id == 0:
                 parent_workspace = None
             else:
-                parent_workspace = self._workspace_api.get_one(
-                    parsed_args.parent_space_id
-                )
+                parent_workspace = self._workspace_api.get_one(parsed_args.parent_space_id)
             self._workspace_api.move_workspace(workspace, parent_workspace)
         except TracimException as exc:
             self._session.rollback()

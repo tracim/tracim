@@ -105,19 +105,15 @@ SWAGGER_TAG__WORKSPACE_SUBSCRIPTION_ENDPOINTS = generate_documentation_swagger_t
 SWAGGER_TAG__WORKSPACE_TRASH_AND_RESTORE_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__WORKSPACE_ENDPOINTS, SWAGGER_TAG__TRASH_AND_RESTORE_SECTION
 )
-SWAGGER_TAG__CONTENT_ALL_TRASH_AND_RESTORE_ENDPOINTS = (
-    generate_documentation_swagger_tag(
-        SWAGGER_TAG__CONTENT_ENDPOINTS,
-        SWAGGER_TAG__ALL_SECTION,
-        SWAGGER_TAG__TRASH_AND_RESTORE_SECTION,
-    )
+SWAGGER_TAG__CONTENT_ALL_TRASH_AND_RESTORE_ENDPOINTS = generate_documentation_swagger_tag(
+    SWAGGER_TAG__CONTENT_ENDPOINTS,
+    SWAGGER_TAG__ALL_SECTION,
+    SWAGGER_TAG__TRASH_AND_RESTORE_SECTION,
 )
-SWAGGER_TAG__CONTENT_ALL_ARCHIVE_AND_RESTORE_ENDPOINTS = (
-    generate_documentation_swagger_tag(
-        SWAGGER_TAG__CONTENT_ENDPOINTS,
-        SWAGGER_TAG__ALL_SECTION,
-        SWAGGER_TAG__ARCHIVE_AND_RESTORE_SECTION,
-    )
+SWAGGER_TAG__CONTENT_ALL_ARCHIVE_AND_RESTORE_ENDPOINTS = generate_documentation_swagger_tag(
+    SWAGGER_TAG__CONTENT_ENDPOINTS,
+    SWAGGER_TAG__ALL_SECTION,
+    SWAGGER_TAG__ARCHIVE_AND_RESTORE_SECTION,
 )
 
 
@@ -298,10 +294,7 @@ class WorkspaceController(Controller):
         )
 
         roles = role_api.get_all_for_workspace(workspace=request.current_workspace)
-        return [
-            role_api.get_user_role_workspace_with_context(user_role)
-            for user_role in roles
-        ]
+        return [role_api.get_user_role_workspace_with_context(user_role) for user_role in roles]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
     @check_right(can_see_workspace_information)
@@ -328,9 +321,7 @@ class WorkspaceController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
     @hapic.handle_exception(UserRoleNotFound, HTTPStatus.BAD_REQUEST)
     @check_right(can_modify_workspace)
-    @hapic.handle_exception(
-        LastWorkspaceManagerRoleCantBeModified, HTTPStatus.BAD_REQUEST
-    )
+    @hapic.handle_exception(LastWorkspaceManagerRoleCantBeModified, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
     @hapic.input_body(RoleUpdateSchema())
     @hapic.output_body(WorkspaceMemberSchema())
@@ -357,9 +348,7 @@ class WorkspaceController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
     @check_right(can_leave_workspace)
     @hapic.handle_exception(UserRoleNotFound, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(
-        LastWorkspaceManagerRoleCantBeModified, HTTPStatus.BAD_REQUEST
-    )
+    @hapic.handle_exception(LastWorkspaceManagerRoleCantBeModified, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def delete_workspaces_members_role(
@@ -412,18 +401,10 @@ class WorkspaceController(Controller):
             show_deleted=True,
         )
 
-        email = (
-            hapic_data.body.user_email.email_address
-            if hapic_data.body.user_email
-            else None
-        )
+        email = hapic_data.body.user_email.email_address if hapic_data.body.user_email else None
         public_name = (
             hapic_data.body.user_username
-            or (
-                hapic_data.body.user_email.username
-                if hapic_data.body.user_email
-                else None
-            )
+            or (hapic_data.body.user_email.username if hapic_data.body.user_email else None)
             or None
         )
 
@@ -437,9 +418,7 @@ class WorkspaceController(Controller):
             if user.is_deleted:
                 raise UserIsDeleted("This user has been deleted. Unable to invite him.")
             if not user.is_active:
-                raise UserIsNotActive(
-                    "This user is not activated. Unable to invite him"
-                )
+                raise UserIsNotActive("This user is not activated. Unable to invite him")
         except UserDoesNotExist as exc:
             if not uapi.allowed_to_invite_new_user(email):
                 raise exc
@@ -475,9 +454,7 @@ class WorkspaceController(Controller):
             ),
             flush=True,
         )
-        return role_api.get_user_role_workspace_with_context(
-            role, newly_created=newly_created
-        )
+        return role_api.get_user_role_workspace_with_context(role, newly_created=newly_created)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_SUBSCRIPTION_ENDPOINTS])
     @check_right(can_modify_workspace)
@@ -491,9 +468,7 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=request.app_config,
         )
-        return subscription_lib.get_workspace_subscriptions(
-            request.current_workspace.workspace_id
-        )
+        return subscription_lib.get_workspace_subscriptions(request.current_workspace.workspace_id)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_SUBSCRIPTION_ENDPOINTS])
     @check_right(can_modify_workspace)
@@ -553,8 +528,7 @@ class WorkspaceController(Controller):
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
-            namespaces_filter=content_filter.namespaces_filter
-            or [ContentNamespaces.CONTENT],
+            namespaces_filter=content_filter.namespaces_filter or [ContentNamespaces.CONTENT],
             show_archived=content_filter.show_archived,
             show_deleted=content_filter.show_deleted,
             show_active=content_filter.show_active,
@@ -566,17 +540,13 @@ class WorkspaceController(Controller):
             content_type=content_filter.content_type or ContentTypeSlug.ANY.value,
             label=content_filter.label,
             order_by_properties=[
-                get_sort_expression(
-                    content_filter.sort, Content, {"modified": "updated"}
-                ),
+                get_sort_expression(content_filter.sort, Content, {"modified": "updated"}),
                 Content.content_id,
             ],
             count=content_filter.count,
             page_token=content_filter.page_token,
         )
-        contents = [
-            content_api.get_content_in_context(content) for content in contents_page
-        ]
+        contents = [content_api.get_content_in_context(content) for content in contents_page]
         return PaginatedObject(contents_page, contents)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
@@ -614,9 +584,7 @@ class WorkspaceController(Controller):
                 )
             except ContentNotFound as exc:
                 raise ParentNotFound(
-                    "Parent with content_id {} not found".format(
-                        creation_data.parent_id
-                    )
+                    "Parent with content_id {} not found".format(creation_data.parent_id)
                 ) from exc
 
         with request.dbsession.no_autoflush:
@@ -648,9 +616,7 @@ class WorkspaceController(Controller):
     @check_right(is_reader)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.FOUND)
-    def get_content_from_workspace(
-        self, context, request: TracimRequest, hapic_data=None
-    ) -> None:
+    def get_content_from_workspace(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
         Convenient route allowing to get detail about a content without knowing routes associated to its content type.
         This route generates a HTTP 302 with the right url
@@ -705,9 +671,7 @@ class WorkspaceController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
     @hapic.input_path(ContentIdPathSchema())
     @hapic.output_body(ContentPathInfoSchema())
-    def get_content_path(
-        self, context, request: TracimRequest, hapic_data=None
-    ) -> None:
+    def get_content_path(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
         Get Content Path : return all hierarchy of content from workspace root to content
         """
@@ -719,18 +683,13 @@ class WorkspaceController(Controller):
             config=app_config,
         )
         return ListItemsObject(
-            [
-                api.get_content_in_context(path_content)
-                for path_content in content.content_path
-            ]
+            [api.get_content_in_context(path_content) for path_content in content.content_path]
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.FOUND)
-    def get_workspace_content_path(
-        self, context, request: TracimRequest, hapic_data=None
-    ) -> None:
+    def get_workspace_content_path(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
         DEPRECATED. Here for retro-compatibility. get_content_path formerly required providing the
         workspace id. This route 302-redirects to the right URL.
@@ -754,9 +713,7 @@ class WorkspaceController(Controller):
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(ContentMoveSchema())
     @hapic.output_body(ContentDigestSchema())
-    def move_content(
-        self, context, request: TracimRequest, hapic_data=None
-    ) -> ContentInContext:
+    def move_content(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
         """
         Move a content to specified new place.
         This requires to be content manager in both input and output spaces (which may be the same)
@@ -772,18 +729,12 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            path_data.content_id, content_type=ContentTypeSlug.ANY.value
-        )
-        new_parent = api.get_one(
-            move_data.new_parent_id, content_type=ContentTypeSlug.ANY.value
-        )
+        content = api.get_one(path_data.content_id, content_type=ContentTypeSlug.ANY.value)
+        new_parent = api.get_one(move_data.new_parent_id, content_type=ContentTypeSlug.ANY.value)
 
         new_workspace = request.candidate_workspace
 
-        with new_revision(
-            session=request.dbsession, tm=transaction.manager, content=content
-        ):
+        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.move(
                 content,
                 new_parent=new_parent,
@@ -791,9 +742,7 @@ class WorkspaceController(Controller):
                 new_content_namespace=ContentNamespaces.CONTENT,
                 must_stay_in_same_workspace=False,
             )
-        updated_content = api.get_one(
-            path_data.content_id, content_type=ContentTypeSlug.ANY.value
-        )
+        updated_content = api.get_one(path_data.content_id, content_type=ContentTypeSlug.ANY.value)
         return api.get_content_in_context(updated_content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ALL_TRASH_AND_RESTORE_ENDPOINTS])
@@ -815,12 +764,8 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            path_data.content_id, content_type=ContentTypeSlug.ANY.value
-        )
-        with new_revision(
-            session=request.dbsession, tm=transaction.manager, content=content
-        ):
+        content = api.get_one(path_data.content_id, content_type=ContentTypeSlug.ANY.value)
+        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.delete(content)
         return
 
@@ -828,9 +773,7 @@ class WorkspaceController(Controller):
     @check_right(is_content_manager)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def undelete_content(
-        self, context, request: TracimRequest, hapic_data=None
-    ) -> None:
+    def undelete_content(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
         Restore a content from the trash. The content will be visible and editable again.
         """
@@ -843,12 +786,8 @@ class WorkspaceController(Controller):
             show_deleted=True,
             show_archived=True,
         )
-        content = api.get_one(
-            path_data.content_id, content_type=ContentTypeSlug.ANY.value
-        )
-        with new_revision(
-            session=request.dbsession, tm=transaction.manager, content=content
-        ):
+        content = api.get_one(path_data.content_id, content_type=ContentTypeSlug.ANY.value)
+        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.undelete(content)
         return
 
@@ -873,12 +812,8 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            path_data.content_id, content_type=ContentTypeSlug.ANY.value
-        )
-        with new_revision(
-            session=request.dbsession, tm=transaction.manager, content=content
-        ):
+        content = api.get_one(path_data.content_id, content_type=ContentTypeSlug.ANY.value)
+        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.archive(content)
         return
 
@@ -886,9 +821,7 @@ class WorkspaceController(Controller):
     @check_right(is_content_manager)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def unarchive_content(
-        self, context, request: TracimRequest, hapic_data=None
-    ) -> None:
+    def unarchive_content(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
         Restore a content from archive. The content will be visible and editable again.
         """
@@ -901,12 +834,8 @@ class WorkspaceController(Controller):
             show_archived=True,
             show_deleted=True,
         )
-        content = api.get_one(
-            path_data.content_id, content_type=ContentTypeSlug.ANY.value
-        )
-        with new_revision(
-            session=request.dbsession, tm=transaction.manager, content=content
-        ):
+        content = api.get_one(path_data.content_id, content_type=ContentTypeSlug.ANY.value)
+        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.unarchive(content)
         return
 
@@ -915,9 +844,7 @@ class WorkspaceController(Controller):
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetContentIsTemplateSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def set_content_template(
-        self, context, request: TracimRequest, hapic_data=None
-    ) -> None:
+    def set_content_template(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
         Set content as template
         """
@@ -929,12 +856,8 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
-        )
-        with new_revision(
-            session=request.dbsession, tm=transaction.manager, content=content
-        ):
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.set_template(content, hapic_data.body.is_template)
             api.save(content)
         return
@@ -958,9 +881,9 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        user = UserApi(
-            current_user=None, session=request.dbsession, config=app_config
-        ).get_one(hapic_data.path["user_id"])
+        user = UserApi(current_user=None, session=request.dbsession, config=app_config).get_one(
+            hapic_data.path["user_id"]
+        )
         return api.get_templates(user=user, template_type=hapic_data.query["type"])
 
     def bind(self, configurator: Configurator) -> None:
@@ -973,9 +896,7 @@ class WorkspaceController(Controller):
         configurator.add_route("workspaces", "/workspaces", request_method="GET")
         configurator.add_view(self.workspaces, route_name="workspaces")
         # Workspace
-        configurator.add_route(
-            "workspace", "/workspaces/{workspace_id}", request_method="GET"
-        )
+        configurator.add_route("workspace", "/workspaces/{workspace_id}", request_method="GET")
         configurator.add_view(self.workspace, route_name="workspace")
         # Workspace space
         configurator.add_route(
@@ -983,9 +904,7 @@ class WorkspaceController(Controller):
             "/workspaces/{workspace_id}/disk_space",
             request_method="GET",
         )
-        configurator.add_view(
-            self.workspace_disk_space, route_name="workspace_disk_space"
-        )
+        configurator.add_view(self.workspace_disk_space, route_name="workspace_disk_space")
         # Create workspace
         configurator.add_route("create_workspace", "/workspaces", request_method="POST")
         configurator.add_view(self.create_workspace, route_name="create_workspace")
@@ -1020,9 +939,7 @@ class WorkspaceController(Controller):
             "/workspaces/{workspace_id}/members/{user_id}",
             request_method="GET",
         )
-        configurator.add_view(
-            self.workspaces_member_role, route_name="workspace_member_role"
-        )
+        configurator.add_view(self.workspaces_member_role, route_name="workspace_member_role")
         # Update Workspace Members roles
         configurator.add_route(
             "update_workspace_member",
@@ -1067,9 +984,7 @@ class WorkspaceController(Controller):
             self.create_generic_empty_content, route_name="create_generic_content"
         )
         # Get Content
-        configurator.add_route(
-            "get_content", "/contents/{content_id}", request_method="GET"
-        )
+        configurator.add_route("get_content", "/contents/{content_id}", request_method="GET")
         configurator.add_view(self.get_content, route_name="get_content")
         # Get Content From workspace
         configurator.add_route(
@@ -1120,9 +1035,7 @@ class WorkspaceController(Controller):
             "/workspaces/{workspace_id}/contents/{content_id}/template",
             request_method="PUT",
         )
-        configurator.add_view(
-            self.set_content_template, route_name="set_content_template"
-        )
+        configurator.add_view(self.set_content_template, route_name="set_content_template")
 
         # Get every template
         configurator.add_route(
@@ -1136,17 +1049,13 @@ class WorkspaceController(Controller):
             "/workspaces/{workspace_id}/subscriptions",
             request_method="GET",
         )
-        configurator.add_view(
-            self.workspace_subscriptions, route_name="workspace_subscriptions"
-        )
+        configurator.add_view(self.workspace_subscriptions, route_name="workspace_subscriptions")
         configurator.add_route(
             "accept_subscription",
             "/workspaces/{workspace_id}/subscriptions/{user_id}/accept",
             request_method="PUT",
         )
-        configurator.add_view(
-            self.accept_subscription, route_name="accept_subscription"
-        )
+        configurator.add_view(self.accept_subscription, route_name="accept_subscription")
 
         configurator.add_route(
             "reject_subscription",
@@ -1154,9 +1063,7 @@ class WorkspaceController(Controller):
             request_method="PUT",
         )
 
-        configurator.add_view(
-            self.reject_subscription, route_name="reject_subscription"
-        )
+        configurator.add_view(self.reject_subscription, route_name="reject_subscription")
 
         # Content path
         configurator.add_route(

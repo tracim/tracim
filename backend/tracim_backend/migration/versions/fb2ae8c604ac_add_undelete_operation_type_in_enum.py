@@ -12,9 +12,7 @@ import sqlalchemy as sa
 revision = "fb2ae8c604ac"
 down_revision = "9d4621f59614"
 
-old_operation_type_enum = sa.Enum(
-    "CREATED", "MODIFIED", "DELETED", name="operationtype"
-)
+old_operation_type_enum = sa.Enum("CREATED", "MODIFIED", "DELETED", name="operationtype")
 new_operation_type_enum = sa.Enum(
     "CREATED", "MODIFIED", "DELETED", "UNDELETED", name="operationtype"
 )

@@ -16,9 +16,7 @@ class WopiLib(object):
     Manager providing methods to allow support of WOPI protocol
     """
 
-    def __init__(
-        self, current_user: typing.Optional[User], session: Session, config: CFG
-    ) -> None:
+    def __init__(self, current_user: typing.Optional[User], session: Session, config: CFG) -> None:
         self._session = session
         self._user = current_user
         self._config = config
@@ -28,8 +26,7 @@ class WopiLib(object):
         if content.depot_file.file:
             size = content.depot_file.file.content_length
         user_can_write = bool(
-            content.workspace.get_user_role(self._user)
-            >= WorkspaceRoles.CONTRIBUTOR.level
+            content.workspace.get_user_role(self._user) >= WorkspaceRoles.CONTRIBUTOR.level
         )
         return WopiCheckFileInfo(
             last_modified_time=content.updated,

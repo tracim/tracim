@@ -79,9 +79,7 @@ class TagLib:
         query = query.order_by(Tag.tag_id)
         return query.all()
 
-    def get_content_tag(
-        self, content: Content, tag: str
-    ) -> typing.Optional[TagOnContent]:
+    def get_content_tag(self, content: Content, tag: str) -> typing.Optional[TagOnContent]:
         query = self._session.query(TagOnContent).filter(
             and_(TagOnContent.tag == tag, TagOnContent.content == content)
         )
@@ -103,9 +101,7 @@ class TagLib:
             raise TracimException("Please provide either tag_name or tag_id")
 
         try:
-            tag = self.get_one(
-                workspace_id=content.workspace_id, tag_name=tag_name, tag_id=tag_id
-            )
+            tag = self.get_one(workspace_id=content.workspace_id, tag_name=tag_name, tag_id=tag_id)
             content_tag = self.get_content_tag(content=content, tag=tag)
 
             if content_tag:

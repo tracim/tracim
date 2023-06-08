@@ -60,9 +60,7 @@ class CallController(Controller):
             config=request.app_config,
             current_user=request.current_user,
         )
-        return call_lib.update_call_state(
-            hapic_data.path["call_id"], hapic_data.body["state"]
-        )
+        return call_lib.update_call_state(hapic_data.path["call_id"], hapic_data.body["state"])
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CALL_ENDPOINTS])
     @check_right(has_personal_access)
@@ -81,9 +79,7 @@ class CallController(Controller):
             config=request.app_config,
             current_user=request.current_user,
         )
-        return call_lib.update_call_state(
-            hapic_data.path["call_id"], hapic_data.body["state"]
-        )
+        return call_lib.update_call_state(hapic_data.path["call_id"], hapic_data.body["state"])
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CALL_ENDPOINTS])
     @check_right(has_personal_access)

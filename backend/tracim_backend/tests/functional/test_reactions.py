@@ -74,9 +74,7 @@ class TestReactionsEndpoint(object):
             ),
             status=200,
         )
-        assert len(res.json_body) == len(admin_reaction_values) + len(
-            ryiad_reaction_values
-        )
+        assert len(res.json_body) == len(admin_reaction_values) + len(ryiad_reaction_values)
         reactions = iter(res.json_body)
         for reaction_value in admin_reaction_values:
             reaction_res = next(reactions)
@@ -187,9 +185,7 @@ class TestReactionsEndpoint(object):
 
         last_event = event_helper.last_event
         assert last_event.event_type == "reaction.created"
-        author = web_testapp.get(
-            "/api/users/{}".format(admin_user.user_id), status=200
-        ).json_body
+        author = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200).json_body
         assert last_event.author == UserDigestSchema().dump(author).data
         web_testapp.authorization = (
             "Basic",
@@ -198,9 +194,7 @@ class TestReactionsEndpoint(object):
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(test_workspace.workspace_id), status=200
         ).json_body
-        assert last_event.workspace == {
-            k: v for k, v in workspace.items() if k != "description"
-        }
+        assert last_event.workspace == {k: v for k, v in workspace.items() if k != "description"}
         assert last_event.reaction["author"] == UserDigestSchema().dump(author).data
         assert last_event.reaction["content_id"] == folder.content_id
         assert last_event.reaction["reaction_id"] == reaction_id
@@ -323,9 +317,7 @@ class TestReactionsEndpoint(object):
 
         last_event = event_helper.last_event
         assert last_event.event_type == "reaction.deleted"
-        author = web_testapp.get(
-            "/api/users/{}".format(admin_user.user_id), status=200
-        ).json_body
+        author = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200).json_body
         assert last_event.author == UserDigestSchema().dump(author).data
         web_testapp.authorization = (
             "Basic",
@@ -334,9 +326,7 @@ class TestReactionsEndpoint(object):
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(test_workspace.workspace_id), status=200
         ).json_body
-        assert last_event.workspace == {
-            k: v for k, v in workspace.items() if k != "description"
-        }
+        assert last_event.workspace == {k: v for k, v in workspace.items() if k != "description"}
         assert last_event.reaction["author"] == UserDigestSchema().dump(author).data
         assert last_event.reaction["content_id"] == folder.content_id
         assert last_event.reaction["reaction_id"] == reaction_id

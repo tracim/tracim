@@ -87,9 +87,7 @@ class TestEmailSender(object):
         assert response[0]["MIME"]["Parts"][0]["Body"] == text
         assert response[0]["MIME"]["Parts"][1]["Body"] == html
 
-    def test__func__send_email_notification__ok__nominal_case(
-        self, app_config, mailhog
-    ):
+    def test__func__send_email_notification__ok__nominal_case(self, app_config, mailhog):
         smtp_config = SmtpConfiguration(
             app_config.EMAIL__NOTIFICATION__SMTP__SERVER,
             app_config.EMAIL__NOTIFICATION__SMTP__PORT,
@@ -166,10 +164,7 @@ class TestNotificationsSync(object):
         # check mail received
         response = mailhog.get_mailhog_mails()
         headers = response[0]["Content"]["Headers"]
-        assert (
-            headers["From"][0]
-            == "Global manager via Tracim <test_user_from+1@localhost>"
-        )
+        assert headers["From"][0] == "Global manager via Tracim <test_user_from+1@localhost>"
         assert headers["To"][0] == "bob <bob@bob>"
         assert headers["Subject"][0] == "[Tracim] Created account"
 
@@ -274,9 +269,7 @@ class TestNotificationsSync(object):
             do_save=True,
             do_notify=False,
         )
-        api.create_comment(
-            parent=item2, content="My super comment", do_save=True, do_notify=True
-        )
+        api.create_comment(parent=item2, content="My super comment", do_save=True, do_notify=True)
         transaction.commit()
 
         # check mail received
@@ -303,9 +296,7 @@ class TestNotificationsSync(object):
         assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"
         assert headers["To"][0] == "Global manager <admin@admin.admin>"
         assert headers["Subject"][0] == "[Tracim] A password reset has been requested"
-        message = email.message_from_string(
-            response[0]["Raw"]["Data"], policy=email.policy.default
-        )
+        message = email.message_from_string(response[0]["Raw"]["Data"], policy=email.policy.default)
         assert "The link is valid for 15 minutes" in message.get_body().get_content()
 
 
@@ -339,10 +330,7 @@ class TestNotificationsAsync(object):
         # check mail received
         response = mailhog.get_mailhog_mails()
         headers = response[0]["Content"]["Headers"]
-        assert (
-            headers["From"][0]
-            == "Global manager via Tracim <test_user_from+1@localhost>"
-        )
+        assert headers["From"][0] == "Global manager via Tracim <test_user_from+1@localhost>"
         assert headers["To"][0] == "bob <bob@bob>"
         assert headers["Subject"][0] == "[Tracim] Created account"
 
@@ -408,9 +396,7 @@ class TestNotificationsAsync(object):
             == '"Bob i. & all members of Recipes" <test_user_reply+22@localhost>'
         )
 
-    def test_func__reset_password__ok__nominal_case(
-        self, user_api_factory, mailhog, app_config
-    ):
+    def test_func__reset_password__ok__nominal_case(self, user_api_factory, mailhog, app_config):
         uapi = user_api_factory.get()
         current_user = uapi.get_one_by_email("admin@admin.admin")
         uapi.reset_password_notification(current_user, do_save=True)

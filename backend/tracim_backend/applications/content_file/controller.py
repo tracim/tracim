@@ -65,9 +65,7 @@ SWAGGER_TAG__CONTENT_FILE_SECTION = "Files"
 SWAGGER_TAG__CONTENT_FILE_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__CONTENT_ENDPOINTS, SWAGGER_TAG__CONTENT_FILE_SECTION
 )
-is_file_content = ContentTypeChecker(
-    [ContentTypeSlug.FILE.value, ContentTypeSlug.KANBAN.value]
-)
+is_file_content = ContentTypeChecker([ContentTypeSlug.FILE.value, ContentTypeSlug.KANBAN.value])
 can_create_file = OrAuthorizationChecker(
     ContentTypeCreationChecker(content_type_list, ContentTypeSlug.FILE.value),
     ContentTypeCreationChecker(content_type_list, ContentTypeSlug.KANBAN.value),
@@ -103,9 +101,7 @@ class FileController(Controller):
         # required doesn't work correctly with cgi_fieldstorage.
         # check is done with None because cgi_fieldstorage cannot be converted to bool
         if hapic_data.files.files is None:
-            raise NoFileValidationError(
-                'No file "files" given at input, validation failed.'
-            )
+            raise NoFileValidationError('No file "files" given at input, validation failed.')
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
@@ -120,9 +116,7 @@ class FileController(Controller):
         parent = None  # type: typing.Optional['Content']
         if parent_id:
             try:
-                parent = api.get_one(
-                    content_id=parent_id, content_type=ContentTypeSlug.ANY.value
-                )
+                parent = api.get_one(content_id=parent_id, content_type=ContentTypeSlug.ANY.value)
             except ContentNotFound as exc:
                 raise ParentNotFound(
                     "Parent with content_id {} not found".format(parent_id)
@@ -140,9 +134,7 @@ class FileController(Controller):
 
         if not hapic_data.forms.template_id:
             api.save(content, ActionDescription.CREATION)
-            with new_revision(
-                session=request.dbsession, tm=transaction.manager, content=content
-            ):
+            with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
                 api.update_file_data(
                     content,
                     new_filename=_file.filename,
@@ -183,9 +175,7 @@ class FileController(Controller):
         # required doesn't work correctly with cgi_fieldstorage.
         # check is done with None because cgi_fieldstorage cannot be converted to bool
         if hapic_data.files.files is None:
-            raise NoFileValidationError(
-                'No file "files" given at input, validation failed.'
-            )
+            raise NoFileValidationError('No file "files" given at input, validation failed.')
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
@@ -194,14 +184,10 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         api.check_upload_size(request.content_length, content.workspace)
         _file = hapic_data.files.files
-        with new_revision(
-            session=request.dbsession, tm=transaction.manager, content=content
-        ):
+        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.update_file_data(
                 content,
                 new_filename=_file.filename,
@@ -233,9 +219,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         try:
             return StorageLib(request.app_config).get_raw_file(
                 depot_file=content.depot_file,
@@ -272,12 +256,8 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
-        )
-        revision = api.get_one_revision(
-            revision_id=hapic_data.path.revision_id, content=content
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
 
         default_filename = "{label}_r{revision_id}{file_extension}".format(
             label=revision.file_name,
@@ -324,9 +304,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         default_filename = "{label}_page_{page_number}.pdf".format(
             label=content.label, page_number=hapic_data.query.page
         )
@@ -360,9 +338,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         default_filename = "{label}.pdf".format(label=content.label)
         return api.get_full_pdf_preview(
             revision=content.revision,
@@ -379,9 +355,7 @@ class FileController(Controller):
     @hapic.input_path(FileRevisionPathSchema())
     @hapic.input_query(FileQuerySchema())
     @hapic.output_file([])
-    def preview_pdf_full_revision(
-        self, context, request: TracimRequest, hapic_data=None
-    ):
+    def preview_pdf_full_revision(self, context, request: TracimRequest, hapic_data=None):
         """
         Obtain full pdf preview of a specific revision of content.
         Good pratice for filename is filename is `{label}_r{revision_id}.pdf`.
@@ -395,12 +369,8 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
-        )
-        revision = api.get_one_revision(
-            revision_id=hapic_data.path.revision_id, content=content
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
         default_filename = "{label}_r{revision_id}.pdf".format(
             revision_id=revision.revision_id, label=revision.label
         )
@@ -433,12 +403,8 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
-        )
-        revision = api.get_one_revision(
-            revision_id=hapic_data.path.revision_id, content=content
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
         default_filename = "{label}_page_{page_number}.pdf".format(
             label=content.label, page_number=hapic_data.query.page
         )
@@ -473,9 +439,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         allowed_dim = api.get_jpg_preview_allowed_dim()
         default_filename = "{label}_page_{page_number}.jpg".format(
             label=content.label, page_number=hapic_data.query.page
@@ -513,9 +477,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         default_filename = "{label}_page_{page_number}_{width}x{height}.jpg".format(
             label=content.label,
             page_number=hapic_data.query.page,
@@ -541,9 +503,7 @@ class FileController(Controller):
     @hapic.input_path(FileRevisionPreviewSizedPathSchema())
     @hapic.input_query(PageQuerySchema())
     @hapic.output_file([])
-    def sized_preview_jpg_revision(
-        self, context, request: TracimRequest, hapic_data=None
-    ):
+    def sized_preview_jpg_revision(self, context, request: TracimRequest, hapic_data=None):
         """
         Obtain resized jpg preview of a specific revision of content.
         Good pratice for filename is filename is `{label}_r{revision_id}_page_{page_number}_{width}x{height}.jpg`.
@@ -557,20 +517,14 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
-        )
-        revision = api.get_one_revision(
-            revision_id=hapic_data.path.revision_id, content=content
-        )
-        default_filename = (
-            "{label}_r{revision_id}_page_{page_number}_{width}x{height}.jpg".format(
-                revision_id=revision.revision_id,
-                label=revision.label,
-                page_number=hapic_data.query.page,
-                width=hapic_data.path.width,
-                height=hapic_data.path.height,
-            )
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
+        default_filename = "{label}_r{revision_id}_page_{page_number}_{width}x{height}.jpg".format(
+            revision_id=revision.revision_id,
+            label=revision.label,
+            page_number=hapic_data.query.page,
+            width=hapic_data.path.width,
+            height=hapic_data.path.height,
         )
         return api.get_jpeg_preview(
             revision=revision,
@@ -622,9 +576,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         return api.get_content_in_context(content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -649,12 +601,8 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
-        )
-        with new_revision(
-            session=request.dbsession, tm=transaction.manager, content=content
-        ):
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.update_content(
                 item=content,
                 new_label=hapic_data.body.label,
@@ -684,17 +632,14 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         revisions_page = content.get_revisions(
             page_token=hapic_data.query["page_token"],
             count=hapic_data.query["count"],
             sort_order=hapic_data.query["sort"],
         )
         revisions = [
-            api.get_revision_in_context(revision, number)
-            for revision, number in revisions_page
+            api.get_revision_in_context(revision, number) for revision, number in revisions_page
         ]
         return PaginatedObject(revisions_page, revisions)
 
@@ -718,18 +663,12 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         if content.status == request.json_body.get("status"):
             raise ContentStatusException(
-                "Content id {} already have status {}".format(
-                    content.content_id, content.status
-                )
+                "Content id {} already have status {}".format(content.content_id, content.status)
             )
-        with new_revision(
-            session=request.dbsession, tm=transaction.manager, content=content
-        ):
+        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.set_status(content, hapic_data.body.status)
             api.save(content)
         return
@@ -753,9 +692,7 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         return api.get_revision_in_context(content.current_revision)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -777,12 +714,8 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
-        )
-        revision = api.get_one_revision(
-            revision_id=hapic_data.path.revision_id, content=content
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
         return api.get_revision_in_context(revision)
 
     def bind(self, configurator: Configurator) -> None:
@@ -804,9 +737,7 @@ class FileController(Controller):
             "/workspaces/{workspace_id}/files/{content_id}",
             request_method="PUT",
         )
-        configurator.add_view(
-            self.update_file_content, route_name="update_file_content"
-        )
+        configurator.add_view(self.update_file_content, route_name="update_file_content")
 
         # raw file #
         # create file
@@ -835,9 +766,7 @@ class FileController(Controller):
             "/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/raw/{filename:[^/]*}",
             request_method="GET",
         )
-        configurator.add_view(
-            self.download_revisions_file, route_name="download_revision"
-        )
+        configurator.add_view(self.download_revisions_file, route_name="download_revision")
 
         # previews #
         # get preview pdf full
@@ -860,9 +789,7 @@ class FileController(Controller):
             "/workspaces/{workspace_id}/files/{content_id}/preview/jpg/allowed_dims",
             request_method="GET",
         )
-        configurator.add_view(
-            self.allowed_dim_preview_jpg, route_name="allowed_dim_preview_jpg"
-        )
+        configurator.add_view(self.allowed_dim_preview_jpg, route_name="allowed_dim_preview_jpg")
         # get preview jpg
         configurator.add_route(
             "preview_jpg",
@@ -908,9 +835,7 @@ class FileController(Controller):
             "/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview/pdf/{filename:[^/]*}",
             request_method="GET",
         )
-        configurator.add_view(
-            self.preview_pdf_revision, route_name="preview_pdf_revision"
-        )
+        configurator.add_view(self.preview_pdf_revision, route_name="preview_pdf_revision")
         # get preview info for revision
         configurator.add_route(
             "preview_info_revision",

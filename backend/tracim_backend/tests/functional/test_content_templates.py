@@ -47,24 +47,18 @@ class TestTemplates(object):
         )
         assert res.json_body["is_template"] is False
         res = web_testapp.get(
-            "/api/users/{}/template_contents?type=html-document".format(
-                admin_user.user_id
-            ),
+            "/api/users/{}/template_contents?type=html-document".format(admin_user.user_id),
             status=200,
         )
         assert len(res.json_body) == 0
         res = web_testapp.get(
-            "/api/users/{}/template_contents?type=html-document".format(
-                riyad_user.user_id
-            ),
+            "/api/users/{}/template_contents?type=html-document".format(riyad_user.user_id),
             status=200,
         )
         assert len(res.json_body) == 0
 
         # set
-        with new_revision(
-            session=session, tm=transaction.manager, content=test_html_document
-        ):
+        with new_revision(session=session, tm=transaction.manager, content=test_html_document):
             content_api.set_template(test_html_document, is_template=True)
         content_api.save(test_html_document)
         transaction.commit()
@@ -74,25 +68,19 @@ class TestTemplates(object):
         )
         assert res.json_body["is_template"] is True
         res = web_testapp.get(
-            "/api/users/{}/template_contents?type=html-document".format(
-                admin_user.user_id
-            ),
+            "/api/users/{}/template_contents?type=html-document".format(admin_user.user_id),
             status=200,
         )
         assert len(res.json_body) == 1
         assert res.json_body[0]["content_id"] == 1
         res = web_testapp.get(
-            "/api/users/{}/template_contents?type=html-document".format(
-                riyad_user.user_id
-            ),
+            "/api/users/{}/template_contents?type=html-document".format(riyad_user.user_id),
             status=200,
         )
         assert len(res.json_body) == 0
 
         # unset
-        with new_revision(
-            session=session, tm=transaction.manager, content=test_html_document
-        ):
+        with new_revision(session=session, tm=transaction.manager, content=test_html_document):
             content_api.set_template(test_html_document, is_template=False)
         content_api.save(test_html_document)
         transaction.commit()
@@ -102,16 +90,12 @@ class TestTemplates(object):
         )
         assert res.json_body["is_template"] is False
         res = web_testapp.get(
-            "/api/users/{}/template_contents?type=html-document".format(
-                admin_user.user_id
-            ),
+            "/api/users/{}/template_contents?type=html-document".format(admin_user.user_id),
             status=200,
         )
         assert len(res.json_body) == 0
         res = web_testapp.get(
-            "/api/users/{}/template_contents?type=html-document".format(
-                riyad_user.user_id
-            ),
+            "/api/users/{}/template_contents?type=html-document".format(riyad_user.user_id),
             status=200,
         )
         assert len(res.json_body) == 0
@@ -152,9 +136,7 @@ class TestTemplates(object):
 
         # set
         res = web_testapp.put_json(
-            "/api/workspaces/1/contents/{}/template".format(
-                test_html_document.content_id
-            ),
+            "/api/workspaces/1/contents/{}/template".format(test_html_document.content_id),
             params={"is_template": True},
             status=204,
         )
@@ -166,9 +148,7 @@ class TestTemplates(object):
 
         # unset
         res = web_testapp.put_json(
-            "/api/workspaces/1/contents/{}/template".format(
-                test_html_document.content_id
-            ),
+            "/api/workspaces/1/contents/{}/template".format(test_html_document.content_id),
             params={"is_template": False},
             status=204,
         )

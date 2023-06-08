@@ -35,21 +35,15 @@ class WorkspaceHookImpl:
         self.mock_hooks = MagicMock()
 
     @hookimpl
-    def on_workspace_created(
-        self, workspace: Workspace, context: TracimContext
-    ) -> None:
+    def on_workspace_created(self, workspace: Workspace, context: TracimContext) -> None:
         self.mock_hooks("created", workspace=workspace, context=context)
 
     @hookimpl
-    def on_workspace_modified(
-        self, workspace: Workspace, context: TracimContext
-    ) -> None:
+    def on_workspace_modified(self, workspace: Workspace, context: TracimContext) -> None:
         self.mock_hooks("modified", workspace=workspace, context=context)
 
     @hookimpl
-    def on_workspace_deleted(
-        self, workspace: Workspace, context: TracimContext
-    ) -> None:
+    def on_workspace_deleted(self, workspace: Workspace, context: TracimContext) -> None:
         self.mock_hooks("deleted", workspace=workspace, context=context)
 
 
@@ -101,21 +95,15 @@ class TestDatabaseCrudHookCaller:
         user = User(email="foo@bar")
         session.add(user)
         session.flush()
-        hook.mock_hooks.assert_called_with(
-            "created", user=user, context=session.context
-        )
+        hook.mock_hooks.assert_called_with("created", user=user, context=session.context)
 
         user.display_name = "John doe"
         session.flush()
-        hook.mock_hooks.assert_called_with(
-            "modified", user=user, context=session.context
-        )
+        hook.mock_hooks.assert_called_with("modified", user=user, context=session.context)
 
         session.delete(user)
         session.flush()
-        hook.mock_hooks.assert_called_with(
-            "deleted", user=user, context=session.context
-        )
+        hook.mock_hooks.assert_called_with("deleted", user=user, context=session.context)
 
     def test_unit__crud_caller__ok__workspace(self, session):
         hook = WorkspaceHookImpl()
@@ -128,21 +116,15 @@ class TestDatabaseCrudHookCaller:
         workspace = Workspace(label="Hello", owner_id=owner.user_id)
         session.add(workspace)
         session.flush()
-        hook.mock_hooks.assert_called_with(
-            "created", workspace=workspace, context=session.context
-        )
+        hook.mock_hooks.assert_called_with("created", workspace=workspace, context=session.context)
 
         workspace.label = "World"
         session.flush()
-        hook.mock_hooks.assert_called_with(
-            "modified", workspace=workspace, context=session.context
-        )
+        hook.mock_hooks.assert_called_with("modified", workspace=workspace, context=session.context)
 
         session.delete(workspace)
         session.flush()
-        hook.mock_hooks.assert_called_with(
-            "deleted", workspace=workspace, context=session.context
-        )
+        hook.mock_hooks.assert_called_with("deleted", workspace=workspace, context=session.context)
 
     def test_unit__crud_caller__ok__user_role_in_workspace(self, session):
         hook = UserRoleInWorkspaceHookImpl()
@@ -153,27 +135,19 @@ class TestDatabaseCrudHookCaller:
         session.add(workspace)
         session.flush()
 
-        role = UserRoleInWorkspace(
-            role=UserRoleInWorkspace.READER, user=owner, workspace=workspace
-        )
+        role = UserRoleInWorkspace(role=UserRoleInWorkspace.READER, user=owner, workspace=workspace)
         session.add(role)
         session.flush()
-        hook.mock_hooks.assert_called_with(
-            "created", role=role, context=session.context
-        )
+        hook.mock_hooks.assert_called_with("created", role=role, context=session.context)
 
         role.role = UserRoleInWorkspace.WORKSPACE_MANAGER
         session.add(role)
         session.flush()
-        hook.mock_hooks.assert_called_with(
-            "modified", role=role, context=session.context
-        )
+        hook.mock_hooks.assert_called_with("modified", role=role, context=session.context)
 
         session.delete(role)
         session.flush()
-        hook.mock_hooks.assert_called_with(
-            "deleted", role=role, context=session.context
-        )
+        hook.mock_hooks.assert_called_with("deleted", role=role, context=session.context)
 
     def test_unit__crud_caller__ok__content(self, session):
         hook = ContentHookImpl()
@@ -194,9 +168,7 @@ class TestDatabaseCrudHookCaller:
         )
         session.add(content)
         session.flush()
-        hook.mock_hooks.assert_called_with(
-            "created", content=content, context=session.context
-        )
+        hook.mock_hooks.assert_called_with("created", content=content, context=session.context)
 
         with new_revision(
             session=session,
@@ -207,13 +179,9 @@ class TestDatabaseCrudHookCaller:
 
         session.add(content)
         session.flush()
-        hook.mock_hooks.assert_called_with(
-            "modified", content=content, context=session.context
-        )
+        hook.mock_hooks.assert_called_with("modified", content=content, context=session.context)
 
         # TODO SGD 2020/05/06: add this test when deleting a Content is possible
         session.delete(content)
         session.flush()
-        hook.mock_hooks.assert_called_with(
-            "deleted", content=content, context=session.context
-        )
+        hook.mock_hooks.assert_called_with("deleted", content=content, context=session.context)

@@ -44,14 +44,10 @@ class Logger(object):
         self._logger.info(msg=self._msg(instance_or_class, message), exc_info=exc_info)
 
     def warning(self, instance_or_class, message: str, exc_info: bool = False):
-        self._logger.warning(
-            msg=self._msg(instance_or_class, message), exc_info=exc_info
-        )
+        self._logger.warning(msg=self._msg(instance_or_class, message), exc_info=exc_info)
 
     def critical(self, instance_or_class, message: str, exc_info: bool = False):
-        self._logger.critical(
-            msg=self._msg(instance_or_class, message), exc_info=exc_info
-        )
+        self._logger.critical(msg=self._msg(instance_or_class, message), exc_info=exc_info)
 
     def exception(self, instance_or_class, message: typing.Union[str, Exception]):
         self._logger.exception(

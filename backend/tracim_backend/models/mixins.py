@@ -11,9 +11,7 @@ class CreationDateMixin:
     def created(cls):
         #  Default value datetime.utcnow,
         # see: http://stackoverflow.com/a/13370382/801924 (or http://pastebin.com/VLyWktUn)
-        return Column(
-            "created", DateTime, unique=False, nullable=False, default=datetime.utcnow
-        )
+        return Column("created", DateTime, unique=False, nullable=False, default=datetime.utcnow)
 
 
 class UpdateDateMixin:
@@ -21,9 +19,7 @@ class UpdateDateMixin:
     def updated(cls):
         #  Default value datetime.utcnow,
         # see: http://stackoverflow.com/a/13370382/801924 (or http://pastebin.com/VLyWktUn)
-        return Column(
-            "updated", DateTime, unique=False, nullable=False, default=datetime.utcnow
-        )
+        return Column("updated", DateTime, unique=False, nullable=False, default=datetime.utcnow)
 
 
 class TrashableMixin:

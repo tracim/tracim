@@ -71,9 +71,7 @@ class HTMLDocumentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         return api.get_content_in_context(content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_HTML_DOCUMENT_ENDPOINTS])
@@ -98,9 +96,7 @@ class HTMLDocumentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         file = BytesIO(content.raw_content.encode("utf-8"))
         byte_size = len(file.getvalue())
         filename = hapic_data.path.filename
@@ -119,17 +115,13 @@ class HTMLDocumentController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_HTML_DOCUMENT_ENDPOINTS])
     @hapic.handle_exception(TranslationServiceException, HTTPStatus.BAD_GATEWAY)
-    @hapic.handle_exception(
-        InvalidParametersForTranslationService, HTTPStatus.BAD_REQUEST
-    )
+    @hapic.handle_exception(InvalidParametersForTranslationService, HTTPStatus.BAD_REQUEST)
     @check_right(is_reader)
     @check_right(is_translation_service_enabled)
     @hapic.input_path(FilePathSchema())
     @hapic.input_query(TranslationQuerySchema())
     @hapic.output_file([])
-    def get_html_document_translation(
-        self, context, request: TracimRequest, hapic_data=None
-    ):
+    def get_html_document_translation(self, context, request: TracimRequest, hapic_data=None):
         """
         Translate a html-document
         """
@@ -150,9 +142,7 @@ class HTMLDocumentController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_HTML_DOCUMENT_ENDPOINTS])
     @hapic.handle_exception(TranslationServiceException, HTTPStatus.BAD_GATEWAY)
-    @hapic.handle_exception(
-        InvalidParametersForTranslationService, HTTPStatus.BAD_REQUEST
-    )
+    @hapic.handle_exception(InvalidParametersForTranslationService, HTTPStatus.BAD_REQUEST)
     @check_right(is_reader)
     @check_right(is_translation_service_enabled)
     @hapic.input_path(FileRevisionPathSchema())
@@ -204,12 +194,8 @@ class HTMLDocumentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
-        )
-        with new_revision(
-            session=request.dbsession, tm=transaction.manager, content=content
-        ):
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.update_content(
                 item=content,
                 new_label=hapic_data.body.label,
@@ -238,12 +224,8 @@ class HTMLDocumentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
-        )
-        revision = api.get_one_revision(
-            revision_id=hapic_data.path.revision_id, content=content
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
         return api.get_revision_in_context(revision)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_HTML_DOCUMENT_ENDPOINTS])
@@ -266,17 +248,14 @@ class HTMLDocumentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         revisions_page = content.get_revisions(
             page_token=hapic_data.query["page_token"],
             count=hapic_data.query["count"],
             sort_order=hapic_data.query["sort"],
         )
         revisions = [
-            api.get_revision_in_context(revision, number)
-            for revision, number in revisions_page
+            api.get_revision_in_context(revision, number) for revision, number in revisions_page
         ]
         return PaginatedObject(revisions_page, revisions)
 
@@ -287,9 +266,7 @@ class HTMLDocumentController(Controller):
     @hapic.input_body(SetContentStatusSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     @hapic.handle_exception(ContentStatusException, HTTPStatus.BAD_REQUEST)
-    def set_html_document_status(
-        self, context, request: TracimRequest, hapic_data=None
-    ) -> None:
+    def set_html_document_status(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
         set html_document status
         """
@@ -301,18 +278,12 @@ class HTMLDocumentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         if content.status == request.json_body.get("status"):
             raise ContentStatusException(
-                "Content id {} already have status {}".format(
-                    content.content_id, content.status
-                )
+                "Content id {} already have status {}".format(content.content_id, content.status)
             )
-        with new_revision(
-            session=request.dbsession, tm=transaction.manager, content=content
-        ):
+        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.set_status(content, hapic_data.body.status)
             api.save(content)
         return
@@ -337,9 +308,7 @@ class HTMLDocumentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         default_filename = "{label}.pdf".format(label=content.label)
         result = api.get_full_pdf_preview_from_html_raw_content(
             revision=content.revision,
@@ -355,9 +324,7 @@ class HTMLDocumentController(Controller):
     @hapic.input_path(FileRevisionPathSchema())
     @hapic.input_query(FileQuerySchema())
     @hapic.output_file([])
-    def full_pdf_revision_preview(
-        self, context, request: TracimRequest, hapic_data=None
-    ):
+    def full_pdf_revision_preview(self, context, request: TracimRequest, hapic_data=None):
         """
         Obtain full pdf preview of a specific revision of content.
         Good pratice for filename is filename is `{label}_r{revision_id}.pdf`.
@@ -371,12 +338,8 @@ class HTMLDocumentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value
-        )
-        revision = api.get_one_revision(
-            revision_id=hapic_data.path.revision_id, content=content
-        )
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
         default_filename = "{label}_r{revision_id}.pdf".format(
             revision_id=revision.revision_id, label=revision.label
         )
@@ -410,9 +373,7 @@ class HTMLDocumentController(Controller):
             "/workspaces/{workspace_id}/html-documents/{content_id}",
             request_method="PUT",
         )
-        configurator.add_view(
-            self.update_html_document, route_name="update_html_document"
-        )
+        configurator.add_view(self.update_html_document, route_name="update_html_document")
 
         # get one html document revision
         configurator.add_route(
@@ -420,9 +381,7 @@ class HTMLDocumentController(Controller):
             "/workspaces/{workspace_id}/html-documents/{content_id}/revisions/{revision_id}",
             request_method="GET",
         )
-        configurator.add_view(
-            self.get_html_document_revision, route_name="html_document_revision"
-        )
+        configurator.add_view(self.get_html_document_revision, route_name="html_document_revision")
 
         # get html document revisions
         configurator.add_route(
@@ -440,9 +399,7 @@ class HTMLDocumentController(Controller):
             "/workspaces/{workspace_id}/html-documents/{content_id}/status",
             request_method="PUT",
         )
-        configurator.add_view(
-            self.set_html_document_status, route_name="set_html_document_status"
-        )
+        configurator.add_view(self.set_html_document_status, route_name="set_html_document_status")
 
         # get content translation
         configurator.add_route(

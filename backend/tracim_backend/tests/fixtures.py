@@ -246,10 +246,7 @@ def migration_engine(engine):
 
 @pytest.fixture()
 def official_plugin_folder():
-    return (
-        os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        + "/official_plugins"
-    )
+    return os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + "/official_plugins"
 
 
 @pytest.fixture()
@@ -280,9 +277,7 @@ def test_context(app_config, session_factory):
 
 @pytest.fixture
 def test_context_without_plugins(app_config, session_factory):
-    yield TracimTestContext(
-        app_config, session_factory=session_factory, init_plugins=False
-    )
+    yield TracimTestContext(app_config, session_factory=session_factory, init_plugins=False)
 
 
 @pytest.fixture
@@ -369,9 +364,7 @@ def share_lib_factory(session, app_config, admin_user) -> ShareLibFactory:
 
 
 @pytest.fixture
-def upload_permission_lib_factory(
-    session, app_config, admin_user
-) -> UploadPermissionLibFactory:
+def upload_permission_lib_factory(session, app_config, admin_user) -> UploadPermissionLibFactory:
     return UploadPermissionLibFactory(session, app_config, admin_user)
 
 

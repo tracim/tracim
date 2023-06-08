@@ -43,7 +43,9 @@ from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import WorkspaceAccessType
 
 ENV_VAR_PREFIX = "TRACIM_"
-CONFIG_LOG_TEMPLATE = "CONFIG: [ {config_source: <15} | {config_name} | {config_value} | {config_name_source} ]"
+CONFIG_LOG_TEMPLATE = (
+    "CONFIG: [ {config_source: <15} | {config_name} | {config_value} | {config_name_source} ]"
+)
 ID_SOURCE_ENV_VAR = "SOURCE_ENV_VAR"
 ID_SOURCE_CONFIG = "SOURCE_CONFIG"
 ID_SOURCE_DEFAULT = "SOURCE_DEFAULT"
@@ -117,9 +119,7 @@ class ConfigParam(object):
 
     @property
     def config_file_value(self):
-        return self._get_protected_value(
-            value=self._config_file_value, secret=self.secret
-        )
+        return self._get_protected_value(value=self._config_file_value, secret=self.secret)
 
     @property
     def env_var_value(self):
@@ -169,9 +169,7 @@ class CFG(object):
         self.load_enabled_apps()
         logger.debug(self, "CONFIG_PROCESS:3: Loading config from settings")
         self.load_config()
-        logger.debug(
-            self, "CONFIG_PROCESS:4: Checking the validity of the given config"
-        )
+        logger.debug(self, "CONFIG_PROCESS:4: Checking the validity of the given config")
         self._check_consistency()
         self.check_config_validity()
         logger.debug(self, "CONFIG_PROCESS:5: End of config process")
@@ -368,9 +366,7 @@ class CFG(object):
 
         app_lib = ApplicationApi(app_list=app_list)
         for app in app_lib.get_all():
-            self.log_config_header(
-                '"{label}" app config parameters:'.format(label=app.label)
-            )
+            self.log_config_header('"{label}" app config parameters:'.format(label=app.label))
             app.load_config(self)
 
     def here_macro_replace(self, value: str) -> str:
@@ -389,19 +385,13 @@ class CFG(object):
         ###
         # General
         ###
-        default_sqlalchemy_url = self.here_macro_replace(
-            "sqlite:///%(here)s/tracim.sqlite"
-        )
-        self.SQLALCHEMY__URL = self.get_raw_config(
-            "sqlalchemy.url", default_sqlalchemy_url
-        )
+        default_sqlalchemy_url = self.here_macro_replace("sqlite:///%(here)s/tracim.sqlite")
+        self.SQLALCHEMY__URL = self.get_raw_config("sqlalchemy.url", default_sqlalchemy_url)
         self.DEFAULT_LANG = self.get_raw_config("default_lang", DEFAULT_FALLBACK_LANG)
         backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         tracim_folder = os.path.dirname(backend_folder)
         default_preview_cache_dir = self.here_macro_replace("%(here)s/previews")
-        self.PREVIEW_CACHE_DIR = self.get_raw_config(
-            "preview_cache_dir", default_preview_cache_dir
-        )
+        self.PREVIEW_CACHE_DIR = self.get_raw_config("preview_cache_dir", default_preview_cache_dir)
 
         self.AUTH_TYPES = string_to_unique_item_list(
             self.get_raw_config("auth_types", "internal"),
@@ -416,12 +406,8 @@ class CFG(object):
         default_session_lock_dir = self.here_macro_replace("%(here)s/sessions_lock")
         self.SESSION__TYPE = self.get_raw_config("session.type", "file")
         self.SESSION__URL = self.get_raw_config("session.url")
-        self.SESSION__DATA_DIR = self.get_raw_config(
-            "session.data_dir", default_session_data_dir
-        )
-        self.SESSION__LOCK_DIR = self.get_raw_config(
-            "session.lock_dir", default_session_lock_dir
-        )
+        self.SESSION__DATA_DIR = self.get_raw_config("session.data_dir", default_session_data_dir)
+        self.SESSION__LOCK_DIR = self.get_raw_config("session.lock_dir", default_session_lock_dir)
         self.SESSION__HTTPONLY = asbool(self.get_raw_config("session.httponly", "True"))
         self.SESSION__SECURE = asbool(self.get_raw_config("session.secure", "False"))
         self.WEBSITE__TITLE = self.get_raw_config("website.title", "Tracim")
@@ -444,23 +430,17 @@ class CFG(object):
         )
 
         # base url of the frontend
-        self.WEBSITE__BASE_URL = self.get_raw_config(
-            "website.base_url", "http://localhost:7999"
-        )
+        self.WEBSITE__BASE_URL = self.get_raw_config("website.base_url", "http://localhost:7999")
 
         self.API__BASE_URL = self.get_raw_config("api.base_url", self.WEBSITE__BASE_URL)
 
         if self.API__BASE_URL != self.WEBSITE__BASE_URL:
-            default_cors_allowed_origin = "{},{}".format(
-                self.WEBSITE__BASE_URL, self.API__BASE_URL
-            )
+            default_cors_allowed_origin = "{},{}".format(self.WEBSITE__BASE_URL, self.API__BASE_URL)
         else:
             default_cors_allowed_origin = self.WEBSITE__BASE_URL
 
         self.CORS__ACCESS_CONTROL_ALLOWED_ORIGIN = string_to_unique_item_list(
-            self.get_raw_config(
-                "cors.access-control-allowed-origin", default_cors_allowed_origin
-            ),
+            self.get_raw_config("cors.access-control-allowed-origin", default_cors_allowed_origin),
             separator=",",
             cast_func=str,
             do_strip=True,
@@ -482,9 +462,7 @@ class CFG(object):
                 "user.reset_password.token_lifetime", defaut_reset_password_validity
             )
         )
-        self.USER__DEFAULT_PROFILE = self.get_raw_config(
-            "user.default_profile", Profile.USER.slug
-        )
+        self.USER__DEFAULT_PROFILE = self.get_raw_config("user.default_profile", Profile.USER.slug)
         self.USER__SELF_REGISTRATION__ENABLED = asbool(
             self.get_raw_config("user.self_registration.enabled", "False")
         )
@@ -507,9 +485,7 @@ class CFG(object):
         )
 
         self.WORKSPACE__ALLOWED_ACCESS_TYPES = string_to_unique_item_list(
-            self.get_raw_config(
-                "workspace.allowed_access_types", "confidential,on_request,open"
-            ),
+            self.get_raw_config("workspace.allowed_access_types", "confidential,on_request,open"),
             separator=",",
             cast_func=WorkspaceAccessType,
             do_strip=True,
@@ -517,9 +493,7 @@ class CFG(object):
         self.WORKSPACE__JOIN__MAX_MESSAGES_HISTORY_COUNT = int(
             self.get_raw_config("workspace.join.max_messages_history_count", "-1")
         )
-        self.KNOWN_MEMBERS__FILTER = asbool(
-            self.get_raw_config("known_members.filter", "True")
-        )
+        self.KNOWN_MEMBERS__FILTER = asbool(self.get_raw_config("known_members.filter", "True"))
         self.DEBUG = asbool(self.get_raw_config("debug", "False"))
         self.BUILD_VERSION = self.get_raw_config("build_version", get_build_version())
         self.PREVIEW__JPG__RESTRICTED_DIMS = asbool(
@@ -539,9 +513,7 @@ class CFG(object):
         tracim_folder = os.path.dirname(backend_folder)
         backend_i18n_folder = os.path.join(backend_folder, "tracim_backend", "locale")
 
-        self.FRONTEND__CACHE_TOKEN = self.get_raw_config(
-            "frontend.cache_token", get_cache_token()
-        )
+        self.FRONTEND__CACHE_TOKEN = self.get_raw_config("frontend.cache_token", get_cache_token())
 
         self.BACKEND__I18N_FOLDER_PATH = self.get_raw_config(
             "backend.i18n_folder_path", backend_i18n_folder
@@ -552,9 +524,7 @@ class CFG(object):
             "frontend.dist_folder_path", frontend_dist_folder
         )
 
-        default_color_config_file_path = os.path.join(
-            self.branding_folder_path, "color.json"
-        )
+        default_color_config_file_path = os.path.join(self.branding_folder_path, "color.json")
         self.COLOR__CONFIG_FILE_PATH = self.get_raw_config(
             "color.config_file_path", default_color_config_file_path
         )
@@ -591,9 +561,7 @@ class CFG(object):
         )
 
         self.UI__SPACES__CREATION__PARENT_SPACE_CHOICE__VISIBLE = asbool(
-            self.get_raw_config(
-                "ui.spaces.creation.parent_space_choice.visible", "True"
-            )
+            self.get_raw_config("ui.spaces.creation.parent_space_choice.visible", "True")
         )
 
         default_code_sample_languages = """
@@ -659,9 +627,7 @@ class CFG(object):
             wiki:Wiki markup
         """
         code_sample_languages = string_to_unique_item_list(
-            self.get_raw_config(
-                "ui.notes.code_sample_languages", default_code_sample_languages
-            ),
+            self.get_raw_config("ui.notes.code_sample_languages", default_code_sample_languages),
             separator=",",
             cast_func=create_code_sample_langage,
             do_strip=True,
@@ -671,9 +637,7 @@ class CFG(object):
                 {"value": value, "text": text} for value, text in code_sample_languages
             ]
         except ValueError:
-            raise ConfigurationError(
-                "The value of ui.notes.code_sample_languages is malformed"
-            )
+            raise ConfigurationError("The value of ui.notes.code_sample_languages is malformed")
 
     def __load_uploaded_files_config(self) -> None:
         default_depot_storage_path = self.here_macro_replace("%(here)s/depot")
@@ -735,9 +699,7 @@ class CFG(object):
         self.LIMITATION__CONTENT_LENGTH_FILE_SIZE = int(
             self.get_raw_config("limitation.content_length_file_size", "0")
         )
-        self.LIMITATION__WORKSPACE_SIZE = int(
-            self.get_raw_config("limitation.workspace_size", "0")
-        )
+        self.LIMITATION__WORKSPACE_SIZE = int(self.get_raw_config("limitation.workspace_size", "0"))
         self.LIMITATION__USER_DEFAULT_ALLOWED_SPACE = int(
             self.get_raw_config("limitation.user_default_allowed_space", "0")
         )
@@ -781,9 +743,7 @@ class CFG(object):
             # 'folder' --folder is skipped
         ]
 
-        self.EMAIL__NOTIFICATION__FROM__EMAIL = self.get_raw_config(
-            "email.notification.from.email"
-        )
+        self.EMAIL__NOTIFICATION__FROM__EMAIL = self.get_raw_config("email.notification.from.email")
 
         self.EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL = self.get_raw_config(
             "email.notification.from.default_label", "Tracim Notifications"
@@ -803,9 +763,7 @@ class CFG(object):
 
         self.EMAIL__NOTIFICATION__CONTENT_UPDATE__SUBJECT = self.get_raw_config(
             "email.notification.content_update.subject",
-            _(
-                "[{website_title}] [{workspace_label}] {content_label} ({content_status_label})"
-            ),
+            _("[{website_title}] [{workspace_label}] {content_label} ({content_status_label})"),
         )
         # Created account notification
         self.EMAIL__NOTIFICATION__CREATED_ACCOUNT__TEMPLATE__HTML = self.get_raw_config(
@@ -818,11 +776,9 @@ class CFG(object):
         )
 
         # Reset password notification
-        self.EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__TEMPLATE__HTML = (
-            self.get_raw_config(
-                "email.notification.reset_password_request.template.html",
-                "{}/{}".format(template_dir, "reset_password_body_html.mak"),
-            )
+        self.EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__TEMPLATE__HTML = self.get_raw_config(
+            "email.notification.reset_password_request.template.html",
+            "{}/{}".format(template_dir, "reset_password_body_html.mak"),
         )
         self.EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__SUBJECT = self.get_raw_config(
             "email.notification.reset_password_request.subject",
@@ -844,12 +800,8 @@ class CFG(object):
         self.EMAIL__NOTIFICATION__SMTP__SERVER = self.get_raw_config(
             "email.notification.smtp.server"
         )
-        self.EMAIL__NOTIFICATION__SMTP__PORT = self.get_raw_config(
-            "email.notification.smtp.port"
-        )
-        self.EMAIL__NOTIFICATION__SMTP__USER = self.get_raw_config(
-            "email.notification.smtp.user"
-        )
+        self.EMAIL__NOTIFICATION__SMTP__PORT = self.get_raw_config("email.notification.smtp.port")
+        self.EMAIL__NOTIFICATION__SMTP__USER = self.get_raw_config("email.notification.smtp.user")
         self.EMAIL__NOTIFICATION__SMTP__PASSWORD = self.get_raw_config(
             "email.notification.smtp.password", secret=True
         )
@@ -871,9 +823,7 @@ class CFG(object):
             "email.notification.smtp.encryption", default_smtp_encryption
         )
 
-        self.EMAIL__REPLY__ACTIVATED = asbool(
-            self.get_raw_config("email.reply.activated", "False")
-        )
+        self.EMAIL__REPLY__ACTIVATED = asbool(self.get_raw_config("email.reply.activated", "False"))
 
         self.EMAIL__REPLY__IMAP__SERVER = self.get_raw_config("email.reply.imap.server")
         self.EMAIL__REPLY__IMAP__PORT = self.get_raw_config("email.reply.imap.port")
@@ -881,9 +831,7 @@ class CFG(object):
         self.EMAIL__REPLY__IMAP__PASSWORD = self.get_raw_config(
             "email.reply.imap.password", secret=True
         )
-        self.EMAIL__REPLY__IMAP__FOLDER = self.get_raw_config(
-            "email.reply.imap.folder", "INBOX"
-        )
+        self.EMAIL__REPLY__IMAP__FOLDER = self.get_raw_config("email.reply.imap.folder", "INBOX")
         self.EMAIL__REPLY__CHECK__HEARTBEAT = int(
             self.get_raw_config("email.reply.check.heartbeat", "60")
         )
@@ -894,9 +842,7 @@ class CFG(object):
             self.get_raw_config("email.reply.imap.use_idle", "False")
         )
         self.EMAIL__REPLY__CONNECTION__MAX_LIFETIME = int(
-            self.get_raw_config(
-                "email.reply.connection.max_lifetime", "600"
-            )  # 10 minutes
+            self.get_raw_config("email.reply.connection.max_lifetime", "600")  # 10 minutes
         )
         self.EMAIL__REPLY__USE_HTML_PARSING = asbool(
             self.get_raw_config("email.reply.use_html_parsing", "True")
@@ -927,15 +873,9 @@ class CFG(object):
         wsgidav_website = "https://github.com/mar10/wsgidav/"
         wsgidav_name = "WsgiDAV"
 
-        self.WEBDAV__UI__ENABLED = asbool(
-            self.get_raw_config("webdav.ui.enabled", "True")
-        )
-        self.WEBDAV__BASE_URL = self.get_raw_config(
-            "webdav.base_url", "http://localhost:3030"
-        )
-        self.WEBDAV__VERBOSE__LEVEL = int(
-            self.get_raw_config("webdav.verbose.level", "1")
-        )
+        self.WEBDAV__UI__ENABLED = asbool(self.get_raw_config("webdav.ui.enabled", "True"))
+        self.WEBDAV__BASE_URL = self.get_raw_config("webdav.base_url", "http://localhost:3030")
+        self.WEBDAV__VERBOSE__LEVEL = int(self.get_raw_config("webdav.verbose.level", "1"))
         self.WEBDAV__ROOT_PATH = self.get_raw_config("webdav.root_path", "/")
         self.WEBDAV__BLOCK_SIZE = int(self.get_raw_config("webdav.block_size", "8192"))
         self.WEBDAV__DIR_BROWSER__ENABLED = asbool(
@@ -971,19 +911,13 @@ class CFG(object):
         self.LDAP_URL = self.get_raw_config("ldap_url", "ldap://localhost:389")
         self.LDAP_BIND_DN = self.get_raw_config("ldap_bind_dn")
         self.LDAP_BIND_PASS = self.get_raw_config("ldap_bind_pass", secret=True)
-        self.LDAP_BIND_ANONYMOUS = asbool(
-            self.get_raw_config("ldap_bind_anonymous", "False")
-        )
+        self.LDAP_BIND_ANONYMOUS = asbool(self.get_raw_config("ldap_bind_anonymous", "False"))
         self.LDAP_TLS = asbool(self.get_raw_config("ldap_tls", "False"))
         self.LDAP_USER_BASE_DN = self.get_raw_config("ldap_user_base_dn")
         self.LDAP_MAIL_ATTRIBUTE = self.get_raw_config("ldap_mail_attribute", "mail")
-        self.LDAP_USERNAME_ATTRIBUTE = self.get_raw_config(
-            "ldap_username_attribute", "givenName"
-        )
+        self.LDAP_USERNAME_ATTRIBUTE = self.get_raw_config("ldap_username_attribute", "givenName")
         # TODO - G.M - 16-11-2018 - Those prams are only use at account creation
-        self.LDAP_NAME_ATTRIBUTE = self.get_raw_config(
-            "ldap_name_attribute", "displayName"
-        )
+        self.LDAP_NAME_ATTRIBUTE = self.get_raw_config("ldap_name_attribute", "displayName")
         # TODO - G.M - 2018-12-05 - [ldap_profile]
         # support for profile attribute disabled
         # Should be reenabled later probably with a better code
@@ -1015,26 +949,20 @@ class CFG(object):
         )
         # FIXME - G.M - 2019-05-31 - limit default allowed mimetype to useful list instead of
         allowed_ingest_default_mimetype = ""
-        self.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST = (
-            string_to_unique_item_list(
-                self.get_raw_config(
-                    "search.elasticsearch.ingest.mimetype_whitelist",
-                    allowed_ingest_default_mimetype,
-                ),
-                separator=",",
-                cast_func=str,
-                do_strip=True,
-            )
+        self.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST = string_to_unique_item_list(
+            self.get_raw_config(
+                "search.elasticsearch.ingest.mimetype_whitelist",
+                allowed_ingest_default_mimetype,
+            ),
+            separator=",",
+            cast_func=str,
+            do_strip=True,
         )
-        self.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_BLACKLIST = (
-            string_to_unique_item_list(
-                self.get_raw_config(
-                    "search.elasticsearch.ingest.mimetype_blacklist", ""
-                ),
-                separator=",",
-                cast_func=str,
-                do_strip=True,
-            )
+        self.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_BLACKLIST = string_to_unique_item_list(
+            self.get_raw_config("search.elasticsearch.ingest.mimetype_blacklist", ""),
+            separator=",",
+            cast_func=str,
+            do_strip=True,
         )
         self.SEARCH__ELASTICSEARCH__INGEST__SIZE_LIMIT = int(
             self.get_raw_config("search.elasticsearch.ingest.size_limit", "52428800")
@@ -1050,18 +978,10 @@ class CFG(object):
         )
 
     def _load_jobs_config(self) -> None:
-        self.JOBS__PROCESSING_MODE = self.get_raw_config(
-            "jobs.processing_mode", "sync"
-        ).upper()
-        self.JOBS__ASYNC__REDIS__HOST = self.get_raw_config(
-            "jobs.async.redis.host", "localhost"
-        )
-        self.JOBS__ASYNC__REDIS__PORT = int(
-            self.get_raw_config("jobs.async.redis.port", "6379")
-        )
-        self.JOBS__ASYNC__REDIS__DB = int(
-            self.get_raw_config("jobs.async.redis.db", "0")
-        )
+        self.JOBS__PROCESSING_MODE = self.get_raw_config("jobs.processing_mode", "sync").upper()
+        self.JOBS__ASYNC__REDIS__HOST = self.get_raw_config("jobs.async.redis.host", "localhost")
+        self.JOBS__ASYNC__REDIS__PORT = int(self.get_raw_config("jobs.async.redis.port", "6379"))
+        self.JOBS__ASYNC__REDIS__DB = int(self.get_raw_config("jobs.async.redis.db", "0"))
 
     def _load_content_security_policy_config(self) -> None:
         prefix = "content_security_policy"
@@ -1086,9 +1006,7 @@ class CFG(object):
         self.TRANSLATION_SERVICE__TIMEOUT = (
             float(self.get_raw_config("{}.timeout".format(prefix), "0")) or None
         )
-        self.TRANSLATION_SERVICE__PROVIDER = self.get_raw_config(
-            "{}.provider".format(prefix)
-        )
+        self.TRANSLATION_SERVICE__PROVIDER = self.get_raw_config("{}.provider".format(prefix))
         self.TRANSLATION_SERVICE__SYSTRAN__API_URL = self.get_raw_config(
             "{}.systran.api_url".format(prefix)
         )
@@ -1105,38 +1023,28 @@ class CFG(object):
             nb_NO:Norsk
         """
         target_language_pairs = string_to_unique_item_list(
-            self.get_raw_config(
-                "{}.target_languages".format(prefix), default_target_languages
-            ),
+            self.get_raw_config("{}.target_languages".format(prefix), default_target_languages),
             separator=",",
             cast_func=create_target_langage,
             do_strip=True,
         )
         try:
             self.TRANSLATION_SERVICE__TARGET_LANGUAGES = [
-                {"code": code, "display": display}
-                for code, display in target_language_pairs
+                {"code": code, "display": display} for code, display in target_language_pairs
             ]
         except ValueError:
-            raise ConfigurationError(
-                "The value of {}.target_languages is malformed".format(prefix)
-            )
+            raise ConfigurationError("The value of {}.target_languages is malformed".format(prefix))
 
     def _load_call_config(self) -> None:
         prefix = "call"
         raw_call_provider = self.get_raw_config("{}.provider".format(prefix), "")
-        self.CALL__ENABLED = asbool(
-            self.get_raw_config("{}.enabled".format(prefix), "False")
-        )
-        self.CALL__JITSI_MEET__URL = self.get_raw_config(
-            "{}.jitsi_meet.url".format(prefix)
-        )
+        self.CALL__ENABLED = asbool(self.get_raw_config("{}.enabled".format(prefix), "False"))
+        self.CALL__JITSI_MEET__URL = self.get_raw_config("{}.jitsi_meet.url".format(prefix))
         self.CALL__PROVIDER = CallProvider(raw_call_provider)
         # NOTE - MP - 2021-11-17 - The value in the config file is in seconds. The frontend need the
         # timeout to be in miliseconds, so it's multiplied by 1000
         self.CALL__UNANSWERED_TIMEOUT = (
-            asint(self.get_raw_config("{}.unanswered_timeout".format(prefix), "30"))
-            * 1000
+            asint(self.get_raw_config("{}.unanswered_timeout".format(prefix), "30")) * 1000
         )
         if self.CALL__ENABLED:
             self.check_mandatory_param(
@@ -1201,9 +1109,7 @@ class CFG(object):
                 when_str="if session type is {}".format(self.SESSION__TYPE),
             )
         self.check_mandatory_param("SESSION__LOCK_DIR", self.SESSION__LOCK_DIR)
-        self.check_directory_path_param(
-            "SESSION__LOCK_DIR", self.SESSION__LOCK_DIR, writable=True
-        )
+        self.check_directory_path_param("SESSION__LOCK_DIR", self.SESSION__LOCK_DIR, writable=True)
 
         if not self.SESSION__SECURE and self.API__BASE_URL.startswith("https://"):
             logger.warning(
@@ -1217,9 +1123,7 @@ class CFG(object):
                 '"session.httponly" parameter disabled, this is unsafe. We strongly recommend to enable it.',
             )
         # INFO - G.M - 2019-04-03 - check color file validity
-        self.check_mandatory_param(
-            "COLOR__CONFIG_FILE_PATH", self.COLOR__CONFIG_FILE_PATH
-        )
+        self.check_mandatory_param("COLOR__CONFIG_FILE_PATH", self.COLOR__CONFIG_FILE_PATH)
         self.check_file_path_param(
             "COLOR__CONFIG_FILE_PATH", self.COLOR__CONFIG_FILE_PATH, readable=True
         )
@@ -1239,9 +1143,7 @@ class CFG(object):
                 ) from e
 
         self.check_mandatory_param("PREVIEW_CACHE_DIR", self.PREVIEW_CACHE_DIR)
-        self.check_directory_path_param(
-            "PREVIEW_CACHE_DIR", self.PREVIEW_CACHE_DIR, writable=True
-        )
+        self.check_directory_path_param("PREVIEW_CACHE_DIR", self.PREVIEW_CACHE_DIR, writable=True)
 
         if AuthType.REMOTE is self.AUTH_TYPES:
             raise ConfigurationError(
@@ -1253,9 +1155,7 @@ class CFG(object):
         self.check_https_url_path("WEBSITE__BASE_URL", self.WEBSITE__BASE_URL)
         self.check_mandatory_param("API__BASE_URL", self.API__BASE_URL)
         self.check_https_url_path("API__BASE_URL", self.API__BASE_URL)
-        self.check_mandatory_param(
-            "BACKEND__I18N_FOLDER_PATH", self.BACKEND__I18N_FOLDER_PATH
-        )
+        self.check_mandatory_param("BACKEND__I18N_FOLDER_PATH", self.BACKEND__I18N_FOLDER_PATH)
         self.check_directory_path_param(
             "BACKEND__I18N_FOLDER_PATH", self.BACKEND__I18N_FOLDER_PATH, readable=True
         )
@@ -1266,25 +1166,18 @@ class CFG(object):
         )
 
         for condition_file_name in self.WEBSITE__USAGE_CONDITIONS:
-            condition_file_path = os.path.join(
-                self.branding_folder_path, condition_file_name
-            )
+            condition_file_path = os.path.join(self.branding_folder_path, condition_file_name)
             self.check_file_path_param(
                 param_name="WEBSITE__USAGE_CONDITIONS", path=condition_file_path
             )
 
         if self.USER__DEFAULT_PROFILE not in Profile.get_all_valid_slugs():
             profile_str_list = ", ".join(
-                [
-                    '"{}"'.format(profile_name)
-                    for profile_name in Profile.get_all_valid_slugs()
-                ]
+                ['"{}"'.format(profile_name) for profile_name in Profile.get_all_valid_slugs()]
             )
             raise ConfigurationError(
                 'ERROR user.default_profile given "{}" is invalid,'
-                "valids values are {}.".format(
-                    self.USER__DEFAULT_PROFILE, profile_str_list
-                )
+                "valids values are {}.".format(self.USER__DEFAULT_PROFILE, profile_str_list)
             )
 
         json_schema = {}
@@ -1354,9 +1247,7 @@ class CFG(object):
             "UPLOADED_FILES__STORAGE__STORAGE_TYPE",
             self.UPLOADED_FILES__STORAGE__STORAGE_TYPE,
         )
-        file_storage_type_slugs = [
-            file_storage.slug for file_storage in list(DepotFileStorageType)
-        ]
+        file_storage_type_slugs = [file_storage.slug for file_storage in list(DepotFileStorageType)]
         if self.UPLOADED_FILES__STORAGE__STORAGE_TYPE not in file_storage_type_slugs:
             file_storage_str_list = ", ".join(
                 ['"{}"'.format(slug) for slug in file_storage_type_slugs]
@@ -1367,10 +1258,7 @@ class CFG(object):
                     self.UPLOADED_FILES__STORAGE__STORAGE_TYPE, file_storage_str_list
                 )
             )
-        if (
-            self.UPLOADED_FILES__STORAGE__STORAGE_TYPE
-            == DepotFileStorageType.LOCAL.slug
-        ):
+        if self.UPLOADED_FILES__STORAGE__STORAGE_TYPE == DepotFileStorageType.LOCAL.slug:
             self.check_mandatory_param(
                 "UPLOADED_FILES__STORAGE__STORAGE_PATH",
                 self.UPLOADED_FILES__STORAGE__LOCAL__STORAGE_PATH,
@@ -1478,10 +1366,7 @@ class CFG(object):
                     when_str="when email notification is activated and smtp config not set as anonymous",
                 )
 
-            if (
-                self.EMAIL__NOTIFICATION__SMTP__ENCRYPTION
-                not in SmtpEncryption.get_all_values()
-            ):
+            if self.EMAIL__NOTIFICATION__SMTP__ENCRYPTION not in SmtpEncryption.get_all_values():
                 smtp_encryption_str_list = ", ".join(
                     [
                         '"{}"'.format(smtp_connect_method_name)
@@ -1591,9 +1476,7 @@ class CFG(object):
                 '"{}"'.format(engine) for engine in search_engine_valid
             )
             raise ConfigurationError(
-                "ERROR: SEARCH__ENGINE valid values are {}.".format(
-                    search_engine_list_str
-                )
+                "ERROR: SEARCH__ENGINE valid values are {}.".format(search_engine_list_str)
             )
         # FIXME - G.M - 2019-06-07 - hack to force index document alias check validity
         # see https://github.com/tracim/tracim/issues/1835
@@ -1609,10 +1492,7 @@ class CFG(object):
         self.check_https_url_path("WEBDAV__BASE_URL", self.WEBDAV__BASE_URL)
 
     def _check_content_security_policy_validity(self) -> None:
-        if (
-            self.CONTENT_SECURITY_POLICY__ENABLED
-            and self.CONTENT_SECURITY_POLICY__REPORT_ONLY
-        ):
+        if self.CONTENT_SECURITY_POLICY__ENABLED and self.CONTENT_SECURITY_POLICY__REPORT_ONLY:
             self.check_mandatory_param(
                 "CONTENT_SECURITY_POLICY__REPORT_URI",
                 self.CONTENT_SECURITY_POLICY__REPORT_URI,
@@ -1670,10 +1550,7 @@ class CFG(object):
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
         # of tracim_backend, Be careful DepotManager is a Singleton!
 
-        if (
-            self.UPLOADED_FILES__STORAGE__STORAGE_TYPE
-            == DepotFileStorageType.LOCAL.slug
-        ):
+        if self.UPLOADED_FILES__STORAGE__STORAGE_TYPE == DepotFileStorageType.LOCAL.slug:
             uploaded_files_settings = {
                 "depot.backend": DepotFileStorageType.LOCAL.depot_storage_backend,
                 "depot.storage_path": self.UPLOADED_FILES__STORAGE__LOCAL__STORAGE_PATH,
@@ -1708,9 +1585,7 @@ class CFG(object):
         ASYNC = "ASYNC"
         SYNC = "SYNC"
 
-    def check_mandatory_param(
-        self, param_name: str, value: typing.Any, when_str: str = ""
-    ) -> None:
+    def check_mandatory_param(self, param_name: str, value: typing.Any, when_str: str = "") -> None:
         """
         Check if param value is not falsy value, if falsy, raise ConfigurationError
         :param param_name: name of the parameter
@@ -1731,9 +1606,7 @@ class CFG(object):
                 self,
                 'parameter "{}"  value "{}" is not set with an https url, this either mean a mistake '
                 "or a that you are running tracim with an unsafe configuration. HTTPS is strongly recommended "
-                "for tracim for security reasons.{}".format(
-                    param_name, value, extended_str
-                ),
+                "for tracim for security reasons.{}".format(param_name, value, extended_str),
             )
 
     def load_and_check_json_file_path_param(
@@ -1755,9 +1628,7 @@ class CFG(object):
                 'change "{}" content '
                 "to a valid json content."
             )
-            raise ConfigurationError(
-                not_a_valid_json_file_msg.format(path, param_name)
-            ) from exc
+            raise ConfigurationError(not_a_valid_json_file_msg.format(path, param_name)) from exc
 
     def check_file_path_param(
         self,
@@ -1791,9 +1662,7 @@ class CFG(object):
                 " change user running this code or change"
                 ' file path of parameter in config "{}" to solve this.'
             )
-            raise ConfigurationError(
-                file_not_writable_msg.format(path, param_name)
-            ) from exc
+            raise ConfigurationError(file_not_writable_msg.format(path, param_name)) from exc
 
     def check_directory_path_param(
         self, param_name: str, path: str, writable: bool = False, readable: bool = True
@@ -1818,9 +1687,7 @@ class CFG(object):
                 'create it or change "{}" value in config '
                 "to a valid directory path."
             )
-            raise ConfigurationError(
-                not_a_directory_msg.format(path, param_name)
-            ) from exc
+            raise ConfigurationError(not_a_directory_msg.format(path, param_name)) from exc
         except NotWritableDirectory as exc:
             directory_not_writable_msg = (
                 "ERROR: current user as not enough right to write and create file"
@@ -1829,9 +1696,7 @@ class CFG(object):
                 " change user running this code or change"
                 ' directory path of parameter in config "{}" to solve this.'
             )
-            raise ConfigurationError(
-                directory_not_writable_msg.format(path, param_name)
-            ) from exc
+            raise ConfigurationError(directory_not_writable_msg.format(path, param_name)) from exc
         except NotReadableDirectory as exc:
             directory_not_writable_msg = (
                 "ERROR: current user as not enough right to read and/or open"
@@ -1840,9 +1705,7 @@ class CFG(object):
                 " change user running this code or change"
                 ' directory path of parameter in config "{}" to solve this.'
             )
-            raise ConfigurationError(
-                directory_not_writable_msg.format(path, param_name)
-            ) from exc
+            raise ConfigurationError(directory_not_writable_msg.format(path, param_name)) from exc
 
 
 class PreviewDim(object):

@@ -25,29 +25,21 @@ class AgendaApp(TracimApplication):
         app_config.CALDAV__RADICALE_PROXY__BASE_URL = app_config.get_raw_config(
             "caldav.radicale_proxy.base_url", "http://localhost:5232"
         )
-        default_caldav_storage_dir = app_config.here_macro_replace(
-            "%(here)s/radicale_storage"
-        )
-        app_config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER = (
-            app_config.get_raw_config(
-                "caldav.radicale.storage.filesystem_folder", default_caldav_storage_dir
-            )
+        default_caldav_storage_dir = app_config.here_macro_replace("%(here)s/radicale_storage")
+        app_config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER = app_config.get_raw_config(
+            "caldav.radicale.storage.filesystem_folder", default_caldav_storage_dir
         )
 
-        app_config.CALDAV__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH = (
-            app_config.get_raw_config(
-                "caldav.pre_filled_event.description_file_path",
-                "",
-            )
+        app_config.CALDAV__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH = app_config.get_raw_config(
+            "caldav.pre_filled_event.description_file_path",
+            "",
         )
 
         # INFO - G.M - 2021-12-07 - internal config param to configure installed agenda hierarchy
         app_config.RADICALE__CALENDAR_DIR = "agenda"
         app_config.RADICALE__ADDRESSBOOK_DIR = "addressbook"
         app_config.RADICALE__USER_RESOURCE_DIR_PATTERN = "user_{user_id}"
-        app_config.RADICALE__USER_RESOURCE_PATTERN = (
-            "{owner_type}_{owner_id}_{resource_type}"
-        )
+        app_config.RADICALE__USER_RESOURCE_PATTERN = "{owner_type}_{owner_id}_{resource_type}"
         app_config.RADICALE__WORKSPACE_SUBDIR = "workspace"
         app_config.RADICALE__USER_SUBDIR = "user"
 
@@ -61,9 +53,7 @@ class AgendaApp(TracimApplication):
         app_config.RADICALE__USER_AGENDA_PATH_PATTERN = (
             "/{resource_type_dir}/{user_subdir}/{user_id}"
         )
-        app_config.RADICALE__USER_RESOURCE_PATH_PATTERN = (
-            "/{user_resource_dir}/{user_resource}"
-        )
+        app_config.RADICALE__USER_RESOURCE_PATH_PATTERN = "/{user_resource_dir}/{user_resource}"
 
     def check_config(self, app_config: CFG) -> None:
         """

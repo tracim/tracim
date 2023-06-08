@@ -198,9 +198,7 @@ class WorkspaceOnlyContainer(WebdavContainer):
         workspace_id = self.workspace.workspace_id if self.workspace else 0  # type: int
         workspace_children = list(self.workspace_api.get_all_children([workspace_id]))
         if self.list_orphan_workspaces:
-            workspace_children.extend(
-                self.workspace_api.get_user_orphan_workspaces(self.user)
-            )
+            workspace_children.extend(self.workspace_api.get_user_orphan_workspaces(self.user))
         for workspace in workspace_children:
             workspace_label = workspace.filemanager_filename
             if workspace_label in members_names:
@@ -217,9 +215,7 @@ class WorkspaceOnlyContainer(WebdavContainer):
     def _generate_child_workspace_resource(
         self, parent_path: str, child_workspace: Workspace
     ) -> "WorkspaceResource":
-        workspace_label = webdav_convert_file_name_to_display(
-            child_workspace.filemanager_filename
-        )
+        workspace_label = webdav_convert_file_name_to_display(child_workspace.filemanager_filename)
         path = add_trailing_slash(parent_path)
         workspace_path = "{}{}".format(path, workspace_label)
         return get_workspace_resource(
@@ -369,9 +365,7 @@ class ContentOnlyContainer(WebdavContainer):
         if resource:
             content = resource.content
         try:
-            self.content_api.check_upload_size(
-                int(self.environ["CONTENT_LENGTH"]), self.workspace
-            )
+            self.content_api.check_upload_size(int(self.environ["CONTENT_LENGTH"]), self.workspace)
         except (
             FileSizeOverMaxLimitation,
             FileSizeOverWorkspaceEmptySpace,
@@ -447,9 +441,7 @@ class ContentOnlyContainer(WebdavContainer):
         members = []
         for content in self._get_members():
             members.append(
-                self._generate_child_content_resource(
-                    parent_path=self.path, child_content=content
-                )
+                self._generate_child_content_resource(parent_path=self.path, child_content=content)
             )
         return members
 
@@ -586,9 +578,7 @@ class RootResource(DAVCollection):
         We don't allow to create new workspaces through
         webdav client.
         """
-        raise DAVError(
-            HTTP_FORBIDDEN, contextinfo="Not allowed to create item in the root dir"
-        )
+        raise DAVError(HTTP_FORBIDDEN, contextinfo="Not allowed to create item in the root dir")
 
 
 class WorkspaceResource(DAVCollection):
@@ -646,9 +636,7 @@ class WorkspaceResource(DAVCollection):
             can_delete_workspace.check(self.tracim_context)
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc))
-        raise DAVError(
-            HTTP_FORBIDDEN, "Workspace deletion is not allowed through webdav"
-        )
+        raise DAVError(HTTP_FORBIDDEN, "Workspace deletion is not allowed through webdav")
 
     def supportRecursiveMove(self, destpath):
         return True
@@ -734,9 +722,7 @@ class FolderResource(DAVCollection):
     @webdav_check_right(is_content_manager)
     def delete(self):
         try:
-            with new_revision(
-                session=self.session, tm=transaction.manager, content=self.content
-            ):
+            with new_revision(session=self.session, tm=transaction.manager, content=self.content):
                 self.content_api.delete(self.content)
                 self.content_api.save(self.content)
         except TracimException as exc:
@@ -796,9 +782,7 @@ class FolderResource(DAVCollection):
         except ContentNotFound:
             destination_parent = None
         try:
-            with new_revision(
-                content=self.content, tm=transaction.manager, session=self.session
-            ):
+            with new_revision(content=self.content, tm=transaction.manager, session=self.session):
                 # renaming file if needed
                 if basename(destpath) != self.getDisplayName():
                     self.content_api.update_content(
@@ -976,9 +960,7 @@ class FileResource(DAVNonCollection):
             raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc))
 
         try:
-            with new_revision(
-                content=self.content, tm=transaction.manager, session=self.session
-            ):
+            with new_revision(content=self.content, tm=transaction.manager, session=self.session):
                 # INFO - G.M - 2018-03-09 - First, renaming file if needed
                 if basename(destpath) != self.getDisplayName():
                     new_filename = webdav_convert_file_name_to_bdd(basename(destpath))
@@ -1036,9 +1018,7 @@ class FileResource(DAVNonCollection):
 
         content_in_context = self.content_api.get_content_in_context(self.content)
         try:
-            self.content_api.check_upload_size(
-                content_in_context.size or 0, self.content.workspace
-            )
+            self.content_api.check_upload_size(content_in_context.size or 0, self.content.workspace)
         except (
             FileSizeOverMaxLimitation,
             FileSizeOverWorkspaceEmptySpace,
@@ -1081,9 +1061,7 @@ class FileResource(DAVNonCollection):
     @webdav_check_right(is_content_manager)
     def delete(self):
         try:
-            with new_revision(
-                session=self.session, tm=transaction.manager, content=self.content
-            ):
+            with new_revision(session=self.session, tm=transaction.manager, content=self.content):
                 self.content_api.delete(self.content)
                 self.content_api.save(self.content)
         except TracimException as exc:
@@ -1143,20 +1121,12 @@ class OtherFileResource(FileResource):
     def design(self):
         # TODO - G.M - 2019-06-13 - find solution to handle properly big file here without having
         # big file in memory. see https://github.com/tracim/tracim/issues/1913
-        if (
-            content_type_list.get_one_by_slug(self.content.type)
-            == content_type_list.Page
-        ):
+        if content_type_list.get_one_by_slug(self.content.type) == content_type_list.Page:
             return design_page(self.content, self.content_revision)
-        if (
-            content_type_list.get_one_by_slug(self.content.type)
-            == content_type_list.Thread
-        ):
+        if content_type_list.get_one_by_slug(self.content.type) == content_type_list.Thread:
             return design_thread(
                 self.content,
                 self.content_revision,
-                self.content_api.get_all(
-                    [self.content.content_id], content_type_list.Comment.slug
-                ),
+                self.content_api.get_all([self.content.content_id], content_type_list.Comment.slug),
             )
         raise NotImplementedError()

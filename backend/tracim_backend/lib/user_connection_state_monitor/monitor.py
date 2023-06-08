@@ -60,9 +60,7 @@ class UserConnectionStateMonitor:
             pass
 
         context = CustomTracimContext(self.config)
-        session = create_dbsession_for_context(
-            self.session_factory, transaction.manager, context
-        )
+        session = create_dbsession_for_context(self.session_factory, transaction.manager, context)
 
         context._session = session
 
@@ -97,9 +95,7 @@ class UserConnectionStateMonitor:
         # We assume everybody is offline when starting the daemon. This is true when starting a
         # Tracim instance, at worst Pushpin will send events to the daemon for online users so we
         # will rapidly notice online users
-        self.set_user_connection_status(
-            user_id=None, status=UserConnectionStatus.OFFLINE
-        )
+        self.set_user_connection_status(user_id=None, status=UserConnectionStatus.OFFLINE)
 
         online_timeout = self.config.USER__ONLINE_TIMEOUT
 

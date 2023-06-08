@@ -23,9 +23,7 @@ class TestUploadPermissionLib(object):
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test", public_upload_enabled=True)
         transaction.commit()
-        api = UploadPermissionLib(
-            current_user=admin_user, session=session, config=app_config
-        )
+        api = UploadPermissionLib(current_user=admin_user, session=session, config=app_config)
         permissions = api.add_permission_to_workspace(workspace, ["test@test.test"])
         permission = permissions[0]
         with freeze_time("2000-01-01 00:00:05"):
@@ -104,9 +102,7 @@ class TestUploadPermissionLib(object):
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test", public_upload_enabled=True)
         transaction.commit()
-        api = UploadPermissionLib(
-            current_user=admin_user, session=session, config=app_config
-        )
+        api = UploadPermissionLib(current_user=admin_user, session=session, config=app_config)
         permissions = api.add_permission_to_workspace(workspace, ["test@test.test"])
         permission = permissions[0]
         with freeze_time("2000-01-01 00:00:05"):

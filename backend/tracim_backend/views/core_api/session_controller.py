@@ -28,9 +28,7 @@ class SessionController(Controller):
     @hapic.input_headers(LoginOutputHeaders())
     @hapic.input_body(BasicAuthSchema())
     @hapic.output_body(UserSchema())
-    def login(
-        self, context, request: TracimRequest, hapic_data: HapicData
-    ) -> UserInContext:
+    def login(self, context, request: TracimRequest, hapic_data: HapicData) -> UserInContext:
         """
         Logs the user into the system.
         In case of success, the JSON returned is the user profile.
@@ -91,9 +89,7 @@ class SessionController(Controller):
         This is the recommanded way to check if the user is already authenticated
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        uapi = UserApi(
-            request.current_user, session=request.dbsession, config=app_config
-        )
+        uapi = UserApi(request.current_user, session=request.dbsession, config=app_config)
         user = uapi.get_current_user()  # User
         return uapi.get_user_with_context(user)
 

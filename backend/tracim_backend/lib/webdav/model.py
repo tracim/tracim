@@ -12,21 +12,13 @@ class Lock(object):
     __tablename__ = "my_locks"
 
     token = Column(UnicodeText, primary_key=True, unique=True, nullable=False)
-    depth = Column(
-        Unicode(32), unique=False, nullable=False, default=to_unicode("infinity")
-    )
+    depth = Column(Unicode(32), unique=False, nullable=False, default=to_unicode("infinity"))
     root = Column(UnicodeText, unique=False, nullable=False)
-    type = Column(
-        Unicode(32), unique=False, nullable=False, default=to_unicode("write")
-    )
-    scope = Column(
-        Unicode(32), unique=False, nullable=False, default=to_unicode("exclusive")
-    )
+    type = Column(Unicode(32), unique=False, nullable=False, default=to_unicode("write"))
+    scope = Column(Unicode(32), unique=False, nullable=False, default=to_unicode("exclusive"))
     owner = Column(UnicodeText, unique=False, nullable=False)
     expire = Column(Float, unique=False, nullable=False)
-    principal = Column(
-        Unicode(255), ForeignKey("my_users.display_name", ondelete="CASCADE")
-    )
+    principal = Column(Unicode(255), ForeignKey("my_users.display_name", ondelete="CASCADE"))
     timeout = Column(Float, unique=False, nullable=False)
 
 

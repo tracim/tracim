@@ -137,9 +137,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
 
     configurator = Configurator(settings=settings, autocommit=True)
     # Add beaker session cookie
-    tracim_setting_for_beaker_session = sliced_dict(
-        settings, beginning_key_string="session."
-    )
+    tracim_setting_for_beaker_session = sliced_dict(settings, beginning_key_string="session.")
     tracim_setting_for_beaker_session["session.data_dir"] = app_config.SESSION__DATA_DIR
     tracim_setting_for_beaker_session["session.lock_dir"] = app_config.SESSION__LOCK_DIR
     tracim_setting_for_beaker_session["session.httponly"] = app_config.SESSION__HTTPONLY
@@ -164,9 +162,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     policies = []
     if app_config.REMOTE_USER_HEADER:
         policies.append(
-            RemoteAuthentificationPolicy(
-                remote_user_login_header=app_config.REMOTE_USER_HEADER
-            )
+            RemoteAuthentificationPolicy(remote_user_login_header=app_config.REMOTE_USER_HEADER)
         )
     policies.append(CookieSessionAuthentificationPolicy())
     policies.append(QueryTokenAuthentificationPolicy())
@@ -186,9 +182,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
         configurator.ldap_setup(
             app_config.LDAP_URL,
             bind=app_config.LDAP_BIND_DN if not app_config.LDAP_BIND_ANONYMOUS else "",
-            passwd=app_config.LDAP_BIND_PASS
-            if not app_config.LDAP_BIND_ANONYMOUS
-            else "",
+            passwd=app_config.LDAP_BIND_PASS if not app_config.LDAP_BIND_ANONYMOUS else "",
             use_tls=app_config.LDAP_TLS,
             use_pool=app_config.LDAP_USE_POOL,
             pool_size=app_config.LDAP_POOL_SIZE,

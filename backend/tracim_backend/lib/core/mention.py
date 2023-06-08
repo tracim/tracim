@@ -52,7 +52,9 @@ class Mention:
         )
 
     def __repr__(self) -> str:
-        return f"<Mention(type={self.type}, recipient={self.recipient}, content_id={self.content_id})>"
+        return (
+            f"<Mention(type={self.type}, recipient={self.recipient}, content_id={self.content_id})>"
+        )
 
     def __hash__(self) -> int:
         return hash((self.type, self.recipient, self.content_id))
@@ -91,9 +93,7 @@ class DescriptionMentionParser(BaseMentionParser):
 
     @classmethod
     def is_html_mention_tag(cls, tag: Tag) -> bool:
-        return cls.MENTION_TAG_NAME == tag.name and (
-            tag.has_attr(USER_ID) or tag.has_attr(ROLE_ID)
-        )
+        return cls.MENTION_TAG_NAME == tag.name and (tag.has_attr(USER_ID) or tag.has_attr(ROLE_ID))
 
     @classmethod
     def get_mentions_from_html(cls, content_id: int, html: str) -> typing.List[Mention]:
@@ -141,9 +141,7 @@ class DescriptionMentionParser(BaseMentionParser):
             user_id = mention_tag.attrs.get(USER_ID)
             role_id = mention_tag.attrs.get(ROLE_ID)
             if user_id and user_id != "":
-                user = UserApi(current_user=None, session=session, config=cfg).get_one(
-                    user_id
-                )
+                user = UserApi(current_user=None, session=session, config=cfg).get_one(user_id)
                 mention_tag.replaceWith(f"@{user.display_name}")
             elif role_id and role_id != "":
                 # TODO - MP - 2023-04-24 - Since we don't have any other role mention than "all"
@@ -170,9 +168,7 @@ class MentionBuilder:
     MENTION_FIELD = "mention"
 
     @classmethod
-    def register_content_type_parser(
-        cls, content_type: str, parser: BaseMentionParser
-    ) -> None:
+    def register_content_type_parser(cls, content_type: str, parser: BaseMentionParser) -> None:
         cls._parsers[content_type] = parser
 
     @hookimpl
@@ -182,9 +178,7 @@ class MentionBuilder:
         except KeyError:
             logger.info(
                 self,
-                "No mention parser for '{}' content type, doing nothing".format(
-                    content.type
-                ),
+                "No mention parser for '{}' content type, doing nothing".format(content.type),
             )
             return
 
@@ -200,9 +194,7 @@ class MentionBuilder:
         except KeyError:
             logger.info(
                 self,
-                "No mention parser for '{}' content type, doing nothing".format(
-                    content.type
-                ),
+                "No mention parser for '{}' content type, doing nothing".format(content.type),
             )
             return
 
@@ -241,9 +233,7 @@ class MentionBuilder:
         content: Content,
         context: TracimContext,
     ) -> None:
-        role_api = RoleApi(
-            session=context.dbsession, config=context.app_config, current_user=None
-        )
+        role_api = RoleApi(session=context.dbsession, config=context.app_config, current_user=None)
         space_members_ids = role_api.get_workspace_member_ids(content.workspace_id)
 
         for mention in mentions:
@@ -261,9 +251,7 @@ class MentionBuilder:
         current_user = context.safe_current_user()
         content_api = ContentApi(context.dbsession, current_user, context.app_config)
         content_in_context = content_api.get_content_in_context(content)
-        workspace_api = WorkspaceApi(
-            context.dbsession, current_user, context.app_config
-        )
+        workspace_api = WorkspaceApi(context.dbsession, current_user, context.app_config)
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(content_in_context.workspace.workspace_id)
         )
@@ -271,9 +259,7 @@ class MentionBuilder:
         content_dict = content_schema.dump(content_in_context).data
         common_fields = {
             Event.CONTENT_FIELD: content_dict,
-            Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(
-                workspace_in_context
-            ).data,
+            Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data,
         }
 
         event_api = EventApi(current_user, context.dbsession, context.app_config)
@@ -297,6 +283,4 @@ class MentionBuilder:
 def register_tracim_plugin(plugin_manager: PluginManager) -> None:
     """Entry point for this plugin."""
     plugin_manager.register(MentionBuilder())
-    BaseLiveMessageBuilder.register_entity_type(
-        EntityType.MENTION, MentionBuilder.get_receiver_ids
-    )
+    BaseLiveMessageBuilder.register_entity_type(EntityType.MENTION, MentionBuilder.get_receiver_ids)

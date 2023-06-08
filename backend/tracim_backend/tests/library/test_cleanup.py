@@ -48,9 +48,7 @@ class TestCleanupLib(object):
     @pytest.mark.parametrize(
         "config_section", [{"name": "base_test_optional_email"}], indirect=True
     )
-    def test_unit__anonymize_user__ok__with_only_username(
-        self, session, app_config
-    ) -> None:
+    def test_unit__anonymize_user__ok__with_only_username(self, session, app_config) -> None:
         api = UserApi(current_user=None, session=session, config=app_config)
         u = api.create_minimal_user(username="bob")
         assert u.display_name == "bob"
@@ -62,9 +60,7 @@ class TestCleanupLib(object):
         assert u.email.endswith("@anonymous.local")
         assert u.username is None
 
-    def test_unit__anonymize_user__ok__with_only_email(
-        self, session, app_config
-    ) -> None:
+    def test_unit__anonymize_user__ok__with_only_email(self, session, app_config) -> None:
         api = UserApi(current_user=None, session=session, config=app_config)
         u = api.create_minimal_user(email="bob@bob")
         assert u.display_name == "bob"
@@ -123,9 +119,7 @@ class TestCleanupLib(object):
         assert content_api.get_one(folder_id, content_type=ContentTypeSlug.ANY)
         assert content_api.get_one(file_id, content_type=ContentTypeSlug.ANY)
         assert content_api.get_one(comment_id, content_type=ContentTypeSlug.ANY)
-        assert (
-            session.query(ContentShare).filter(ContentShare.share_id == share_id).one()
-        )
+        assert session.query(ContentShare).filter(ContentShare.share_id == share_id).one()
 
         with unprotected_content_revision(session) as unprotected_session:
             cleanup_lib = CleanupLib(app_config=app_config, session=unprotected_session)
@@ -204,9 +198,7 @@ class TestCleanupLib(object):
         assert content_api.get_one(folder_id, content_type=ContentTypeSlug.ANY)
         assert content_api.get_one(file_id, content_type=ContentTypeSlug.ANY)
         assert content_api.get_one(comment_id, content_type=ContentTypeSlug.ANY)
-        assert (
-            session.query(ContentShare).filter(ContentShare.share_id == share_id).one()
-        )
+        assert session.query(ContentShare).filter(ContentShare.share_id == share_id).one()
         assert (
             session.query(UploadPermission)
             .filter(UploadPermission.upload_permission_id == upload_permission_id)
@@ -218,9 +210,7 @@ class TestCleanupLib(object):
             session.flush()
         transaction.commit()
         with pytest.raises(NoResultFound):
-            session.query(Workspace).filter(
-                Workspace.workspace_id == workspace_id
-            ).one()
+            session.query(Workspace).filter(Workspace.workspace_id == workspace_id).one()
         with pytest.raises(NoResultFound):
             session.query(UserRoleInWorkspace).filter(
                 UserRoleInWorkspace.workspace_id == workspace_id
@@ -310,9 +300,7 @@ class TestCleanupLib(object):
         assert content_api.get_one(folder_id, content_type=ContentTypeSlug.ANY)
         assert content_api.get_one(file_id, content_type=ContentTypeSlug.ANY)
         assert content_api.get_one(comment_id, content_type=ContentTypeSlug.ANY)
-        assert (
-            session.query(ContentShare).filter(ContentShare.share_id == share_id).one()
-        )
+        assert session.query(ContentShare).filter(ContentShare.share_id == share_id).one()
         assert (
             session.query(UploadPermission)
             .filter(UploadPermission.upload_permission_id == upload_permission_id)
@@ -556,13 +544,9 @@ class TestCleanupLib(object):
                 .one()
             )
 
-    def test_safe_update__ok__nominal_case(
-        self, session, app_config, admin_user
-    ) -> None:
+    def test_safe_update__ok__nominal_case(self, session, app_config, admin_user) -> None:
         assert session.query(Workspace).all() == []
-        cleanup_lib = CleanupLib(
-            app_config=app_config, session=session, dry_run_mode=False
-        )
+        cleanup_lib = CleanupLib(app_config=app_config, session=session, dry_run_mode=False)
         test_workspace = Workspace()
         test_workspace.owner_id = admin_user.user_id
         cleanup_lib.safe_update(test_workspace)
@@ -571,9 +555,7 @@ class TestCleanupLib(object):
 
     def test_safe_update__ok__dry_run(self, session, app_config, admin_user) -> None:
         assert session.query(Workspace).all() == []
-        cleanup_lib = CleanupLib(
-            app_config=app_config, session=session, dry_run_mode=True
-        )
+        cleanup_lib = CleanupLib(app_config=app_config, session=session, dry_run_mode=True)
         test_workspace = Workspace()
         test_workspace.owner_id = admin_user.user_id
         cleanup_lib.safe_update(test_workspace)
@@ -581,13 +563,9 @@ class TestCleanupLib(object):
         with pytest.raises(NoResultFound):
             assert session.query(Workspace).one() == test_workspace
 
-    def test_safe_delete__ok__nominal_case(
-        self, session, app_config, admin_user
-    ) -> None:
+    def test_safe_delete__ok__nominal_case(self, session, app_config, admin_user) -> None:
         assert session.query(Workspace).all() == []
-        cleanup_lib = CleanupLib(
-            app_config=app_config, session=session, dry_run_mode=False
-        )
+        cleanup_lib = CleanupLib(app_config=app_config, session=session, dry_run_mode=False)
         test_workspace = Workspace()
         test_workspace.owner_id = admin_user.user_id
         session.add(test_workspace)
@@ -599,9 +577,7 @@ class TestCleanupLib(object):
 
     def test_safe_delete__ok__dry_run(self, session, app_config, admin_user) -> None:
         assert session.query(Workspace).all() == []
-        cleanup_lib = CleanupLib(
-            app_config=app_config, session=session, dry_run_mode=True
-        )
+        cleanup_lib = CleanupLib(app_config=app_config, session=session, dry_run_mode=True)
         test_workspace = Workspace()
         test_workspace.owner_id = admin_user.user_id
         session.add(test_workspace)
@@ -610,13 +586,9 @@ class TestCleanupLib(object):
         transaction.commit()
         assert session.query(Workspace).one() == test_workspace
 
-    def test_safe_delete_dir__ok__nominal_case(
-        self, session, app_config, admin_user
-    ) -> None:
+    def test_safe_delete_dir__ok__nominal_case(self, session, app_config, admin_user) -> None:
         assert session.query(Workspace).all() == []
-        cleanup_lib = CleanupLib(
-            app_config=app_config, session=session, dry_run_mode=False
-        )
+        cleanup_lib = CleanupLib(app_config=app_config, session=session, dry_run_mode=False)
         dir_path = tempfile.mkdtemp()
         file_path = "{}/my_file.txt".format(dir_path)
         Path(file_path).touch()
@@ -626,13 +598,9 @@ class TestCleanupLib(object):
         assert not Path(dir_path).exists()
         assert not Path(file_path).exists()
 
-    def test_safe_delete_dir__ok__dry_run(
-        self, session, app_config, admin_user
-    ) -> None:
+    def test_safe_delete_dir__ok__dry_run(self, session, app_config, admin_user) -> None:
         assert session.query(Workspace).all() == []
-        cleanup_lib = CleanupLib(
-            app_config=app_config, session=session, dry_run_mode=True
-        )
+        cleanup_lib = CleanupLib(app_config=app_config, session=session, dry_run_mode=True)
         dir_path = tempfile.mkdtemp()
         file_path = "{}/my_file.txt".format(dir_path)
         Path(file_path).touch()

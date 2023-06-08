@@ -761,9 +761,7 @@ class TestSimpleSearch(object):
             label="stringtosearch deleted",
             do_save=True,
         )
-        with new_revision(
-            session=session, tm=transaction.manager, content=deleted_content
-        ):
+        with new_revision(session=session, tm=transaction.manager, content=deleted_content):
             api.delete(deleted_content)
         api.save(deleted_content)
         archived_content = api.create(
@@ -772,9 +770,7 @@ class TestSimpleSearch(object):
             label="stringtosearch archived",
             do_save=True,
         )
-        with new_revision(
-            session=session, tm=transaction.manager, content=archived_content
-        ):
+        with new_revision(session=session, tm=transaction.manager, content=archived_content):
             api.archive(archived_content)
         api.save(archived_content)
         transaction.commit()
@@ -803,9 +799,7 @@ class TestSimpleSearch(object):
         assert default_search_result["total_hits"] == 2
         assert default_search_result["is_total_hits_accurate"] is False
         assert len(default_search_result["contents"]) == 2
-        assert (
-            default_search_result["contents"][0]["label"] == "stringtosearch active 2"
-        )
+        assert default_search_result["contents"][0]["label"] == "stringtosearch active 2"
         assert default_search_result["contents"][1]["label"] == "stringtosearch active"
 
         params = {
@@ -832,9 +826,7 @@ class TestSimpleSearch(object):
         assert search_result["total_hits"] == 3
         assert search_result["is_total_hits_accurate"] is False
         assert len(search_result["contents"]) == 3
-        assert search_result["contents"][0]["label"].startswith(
-            "stringtosearch deleted"
-        )
+        assert search_result["contents"][0]["label"].startswith("stringtosearch deleted")
         assert search_result["contents"][1]["label"] == "stringtosearch active 2"
         assert search_result["contents"][2]["label"] == "stringtosearch active"
 
@@ -851,9 +843,7 @@ class TestSimpleSearch(object):
         assert search_result["total_hits"] == 1
         assert search_result["is_total_hits_accurate"] is False
         assert len(search_result["contents"]) == 1
-        assert search_result["contents"][0]["label"].startswith(
-            "stringtosearch archived"
-        )
+        assert search_result["contents"][0]["label"].startswith("stringtosearch archived")
 
     @pytest.mark.parametrize(
         "search_string,expected_results_count",

@@ -41,9 +41,7 @@ class RadicaleProxyController(Controller):
         self.proxy_base_address = proxy_base_address
         self._proxy = Proxy(
             base_address=proxy_base_address,
-            auth=HTTPBasicAuth(
-                RADICALE_HTTP_AUTH_USERNAME, RADICALE_HTTP_AUTH_PASSWORD
-            ),
+            auth=HTTPBasicAuth(RADICALE_HTTP_AUTH_USERNAME, RADICALE_HTTP_AUTH_PASSWORD),
         )
 
     @hapic.with_api_doc(disable_doc=True)
@@ -94,12 +92,10 @@ class RadicaleProxyController(Controller):
         proxy user agenda
         example: /dav/agenda/user/1/event.ics to radicale path /agenda/user/1/event.ics
         """
-        user_calendar_path = (
-            request.app_config.RADICALE__USER_AGENDA_PATH_PATTERN.format(
-                resource_type_dir=request.app_config.RADICALE__CALENDAR_DIR,
-                user_subdir=request.app_config.RADICALE__USER_SUBDIR,
-                user_id=request.candidate_user.user_id,
-            )
+        user_calendar_path = request.app_config.RADICALE__USER_AGENDA_PATH_PATTERN.format(
+            resource_type_dir=request.app_config.RADICALE__CALENDAR_DIR,
+            user_subdir=request.app_config.RADICALE__USER_SUBDIR,
+            user_id=request.candidate_user.user_id,
         )
         path = "{user_calendar_path}/{sub_item}/".format(
             user_calendar_path=user_calendar_path,
@@ -119,12 +115,10 @@ class RadicaleProxyController(Controller):
         proxy user agenda
         example: /dav/addressbook/user/1/event.ics to radicale path /addressbook/user/1/event.ics
         """
-        user_addressbook_path = (
-            request.app_config.RADICALE__USER_AGENDA_PATH_PATTERN.format(
-                resource_type_dir=request.app_config.RADICALE__ADDRESSBOOK_DIR,
-                user_subdir=request.app_config.RADICALE__USER_SUBDIR,
-                user_id=request.candidate_user.user_id,
-            )
+        user_addressbook_path = request.app_config.RADICALE__USER_AGENDA_PATH_PATTERN.format(
+            resource_type_dir=request.app_config.RADICALE__ADDRESSBOOK_DIR,
+            user_subdir=request.app_config.RADICALE__USER_SUBDIR,
+            user_id=request.candidate_user.user_id,
         )
         path = "{user_addressbook_path}/{sub_item}/".format(
             user_addressbook_path=user_addressbook_path,
@@ -144,10 +138,8 @@ class RadicaleProxyController(Controller):
         proxy user agenda
         example: /dav/user_1/ to radicale path /user_1/
         """
-        user_resource_dir_name = (
-            request.app_config.RADICALE__USER_RESOURCE_DIR_PATTERN.format(
-                user_id=request.candidate_user.user_id
-            )
+        user_resource_dir_name = request.app_config.RADICALE__USER_RESOURCE_DIR_PATTERN.format(
+            user_id=request.candidate_user.user_id
         )
         proxy = Proxy(
             base_address=self.proxy_base_address,
@@ -170,10 +162,8 @@ class RadicaleProxyController(Controller):
         example: /dav/user_1/user_1_addressbook/ to radicale path /user_1/user_1_addressbook/
         """
         assert hapic_data.path.dest_user_id == hapic_data.path.user_id
-        user_resource_dir_name = (
-            request.app_config.RADICALE__USER_RESOURCE_DIR_PATTERN.format(
-                user_id=request.candidate_user.user_id
-            )
+        user_resource_dir_name = request.app_config.RADICALE__USER_RESOURCE_DIR_PATTERN.format(
+            user_id=request.candidate_user.user_id
         )
         user_resource_name = request.app_config.RADICALE__USER_RESOURCE_PATTERN.format(
             owner_type="user",
@@ -202,10 +192,8 @@ class RadicaleProxyController(Controller):
         example: /dav/user_1/user_1_addressbook/.. to radicale path /user_1/user_1_addressbook/...
         """
         assert hapic_data.path.dest_user_id == hapic_data.path.user_id
-        user_resource_dir_name = (
-            request.app_config.RADICALE__USER_RESOURCE_DIR_PATTERN.format(
-                user_id=request.candidate_user.user_id
-            )
+        user_resource_dir_name = request.app_config.RADICALE__USER_RESOURCE_DIR_PATTERN.format(
+            user_id=request.candidate_user.user_id
         )
         user_resource_name = request.app_config.RADICALE__USER_RESOURCE_PATTERN.format(
             owner_type="user",
@@ -216,11 +204,9 @@ class RadicaleProxyController(Controller):
             base_address=self.proxy_base_address,
             auth=HTTPBasicAuth(user_resource_dir_name, "tracim"),
         )
-        user_resource_path = (
-            request.app_config.RADICALE__USER_RESOURCE_PATH_PATTERN.format(
-                user_resource_dir=user_resource_dir_name,
-                user_resource=user_resource_name,
-            )
+        user_resource_path = request.app_config.RADICALE__USER_RESOURCE_PATH_PATTERN.format(
+            user_resource_dir=user_resource_dir_name,
+            user_resource=user_resource_name,
         )
         path = "{user_resource_path}/{sub_item}/".format(
             user_resource_path=user_resource_path, sub_item=hapic_data.path.sub_item
@@ -230,9 +216,7 @@ class RadicaleProxyController(Controller):
         )
 
     @hapic.with_api_doc(disable_doc=True)
-    @hapic.handle_exception(
-        WorkspaceAgendaDisabledException, http_code=HTTPStatus.NOT_FOUND
-    )
+    @hapic.handle_exception(WorkspaceAgendaDisabledException, http_code=HTTPStatus.NOT_FOUND)
     @check_right(can_access_workspace_root_agenda)
     @hapic.input_path(RadicaleUserResourceWorkspaceSubItemPathSchema())
     def radicale_proxy__user_resource_workspace_subitems(
@@ -242,10 +226,8 @@ class RadicaleProxyController(Controller):
         proxy user agenda
         example: /dav/user_1/space_1_addressbook/ to radicale path /user_1/space_1_addressbook/
         """
-        user_resource_dir_name = (
-            request.app_config.RADICALE__USER_RESOURCE_DIR_PATTERN.format(
-                user_id=request.candidate_user.user_id
-            )
+        user_resource_dir_name = request.app_config.RADICALE__USER_RESOURCE_DIR_PATTERN.format(
+            user_id=request.candidate_user.user_id
         )
         user_resource_name = request.app_config.RADICALE__USER_RESOURCE_PATTERN.format(
             owner_type="space",
@@ -264,9 +246,7 @@ class RadicaleProxyController(Controller):
         )
 
     @hapic.with_api_doc(disable_doc=True)
-    @hapic.handle_exception(
-        WorkspaceAgendaDisabledException, http_code=HTTPStatus.NOT_FOUND
-    )
+    @hapic.handle_exception(WorkspaceAgendaDisabledException, http_code=HTTPStatus.NOT_FOUND)
     @check_right(can_access_workspace_event_agenda)
     @hapic.input_path(RadicaleUserResourceWorkspaceSubItemPathSchema())
     def radicale_proxy__user_resource_workspace_subitems_x(
@@ -276,10 +256,8 @@ class RadicaleProxyController(Controller):
         proxy user agenda
         example: /dav/user_1/space_1_addressbook/... to radicale path /user_1/space_1_addressbook/...
         """
-        user_resource_dir_name = (
-            request.app_config.RADICALE__USER_RESOURCE_DIR_PATTERN.format(
-                user_id=request.candidate_user.user_id
-            )
+        user_resource_dir_name = request.app_config.RADICALE__USER_RESOURCE_DIR_PATTERN.format(
+            user_id=request.candidate_user.user_id
         )
         user_resource_name = request.app_config.RADICALE__USER_RESOURCE_PATTERN.format(
             owner_type="space",
@@ -290,11 +268,9 @@ class RadicaleProxyController(Controller):
             base_address=self.proxy_base_address,
             auth=HTTPBasicAuth(user_resource_dir_name, "tracim"),
         )
-        user_resource_path = (
-            request.app_config.RADICALE__USER_RESOURCE_PATH_PATTERN.format(
-                user_resource_dir=user_resource_dir_name,
-                user_resource=user_resource_name,
-            )
+        user_resource_path = request.app_config.RADICALE__USER_RESOURCE_PATH_PATTERN.format(
+            user_resource_dir=user_resource_dir_name,
+            user_resource=user_resource_name,
         )
         path = "{user_resource_path}/{sub_item}/".format(
             user_resource_path=user_resource_path, sub_item=hapic_data.path.sub_item
@@ -304,9 +280,7 @@ class RadicaleProxyController(Controller):
         )
 
     @hapic.with_api_doc(disable_doc=True)
-    @hapic.handle_exception(
-        WorkspaceAgendaDisabledException, http_code=HTTPStatus.NOT_FOUND
-    )
+    @hapic.handle_exception(WorkspaceAgendaDisabledException, http_code=HTTPStatus.NOT_FOUND)
     @check_right(can_access_workspace_root_agenda)
     @hapic.input_path(WorkspaceIdPathSchema())
     def radicale_proxy__workspace_agenda(
@@ -326,9 +300,7 @@ class RadicaleProxyController(Controller):
         )
 
     @hapic.with_api_doc(disable_doc=True)
-    @hapic.handle_exception(
-        WorkspaceAgendaDisabledException, http_code=HTTPStatus.NOT_FOUND
-    )
+    @hapic.handle_exception(WorkspaceAgendaDisabledException, http_code=HTTPStatus.NOT_FOUND)
     @check_right(can_access_workspace_event_agenda)
     @hapic.input_path(RadicaleWorkspaceSubItemPathSchema())
     def radicale_proxy__workspace_agenda_subitems(
@@ -338,12 +310,10 @@ class RadicaleProxyController(Controller):
         proxy workspace agenda
         example: /dav/agenda/workspace/1/event.ics to radicale path /agenda/workspace/1/event.ics
         """
-        workspace_agenda_path = (
-            request.app_config.RADICALE__WORKSPACE_AGENDA_PATH_PATTERN.format(
-                resource_type_dir=request.app_config.RADICALE__CALENDAR_DIR,
-                workspace_subdir=request.app_config.RADICALE__WORKSPACE_SUBDIR,
-                workspace_id=request.current_workspace.workspace_id,
-            )
+        workspace_agenda_path = request.app_config.RADICALE__WORKSPACE_AGENDA_PATH_PATTERN.format(
+            resource_type_dir=request.app_config.RADICALE__CALENDAR_DIR,
+            workspace_subdir=request.app_config.RADICALE__WORKSPACE_SUBDIR,
+            workspace_id=request.current_workspace.workspace_id,
         )
         path = "{workspace_agenda_path}/{sub_item}".format(
             workspace_agenda_path=workspace_agenda_path,
@@ -354,9 +324,7 @@ class RadicaleProxyController(Controller):
         )
 
     @hapic.with_api_doc(disable_doc=True)
-    @hapic.handle_exception(
-        WorkspaceAgendaDisabledException, http_code=HTTPStatus.NOT_FOUND
-    )
+    @hapic.handle_exception(WorkspaceAgendaDisabledException, http_code=HTTPStatus.NOT_FOUND)
     @check_right(can_access_workspace_root_agenda)
     @hapic.input_path(WorkspaceIdPathSchema())
     def radicale_proxy__workspace_addressbook(
@@ -376,9 +344,7 @@ class RadicaleProxyController(Controller):
         )
 
     @hapic.with_api_doc(disable_doc=True)
-    @hapic.handle_exception(
-        WorkspaceAgendaDisabledException, http_code=HTTPStatus.NOT_FOUND
-    )
+    @hapic.handle_exception(WorkspaceAgendaDisabledException, http_code=HTTPStatus.NOT_FOUND)
     @check_right(can_access_workspace_event_agenda)
     @hapic.input_path(RadicaleWorkspaceSubItemPathSchema())
     def radicale_proxy__workspace_addressbook_subitems(
@@ -388,12 +354,10 @@ class RadicaleProxyController(Controller):
         proxy workspace agenda
         example: /dav/addressbook/workspace/1.ics/blabla.ics to radicale path /addressbook/workspace/1.ics/blabla.ics
         """
-        workspace_agenda_path = (
-            request.app_config.RADICALE__WORKSPACE_AGENDA_PATH_PATTERN.format(
-                resource_type_dir=request.app_config.RADICALE__ADDRESSBOOK_DIR,
-                workspace_subdir=request.app_config.RADICALE__WORKSPACE_SUBDIR,
-                workspace_id=request.current_workspace.workspace_id,
-            )
+        workspace_agenda_path = request.app_config.RADICALE__WORKSPACE_AGENDA_PATH_PATTERN.format(
+            resource_type_dir=request.app_config.RADICALE__ADDRESSBOOK_DIR,
+            workspace_subdir=request.app_config.RADICALE__WORKSPACE_SUBDIR,
+            workspace_id=request.current_workspace.workspace_id,
         )
         path = "{workspace_agenda_path}/{sub_item}".format(
             workspace_agenda_path=workspace_agenda_path,
@@ -410,10 +374,8 @@ class RadicaleProxyController(Controller):
         proxy root agenda path (propfind
         example: /dav/ to radicale path /
         """
-        user_resource_dir_name = (
-            request.app_config.RADICALE__USER_RESOURCE_DIR_PATTERN.format(
-                user_id=request.current_user.user_id
-            )
+        user_resource_dir_name = request.app_config.RADICALE__USER_RESOURCE_DIR_PATTERN.format(
+            user_id=request.current_user.user_id
         )
         proxy = Proxy(
             base_address=self.proxy_base_address,
@@ -425,15 +387,11 @@ class RadicaleProxyController(Controller):
 
     @hapic.with_api_doc(disable_doc=True)
     def well_known_caldav(self, context, request: TracimRequest) -> Response:
-        return HTTPMovedPermanently(
-            request.url.replace("/.well-known/caldav", "/dav/", 1)
-        )
+        return HTTPMovedPermanently(request.url.replace("/.well-known/caldav", "/dav/", 1))
 
     @hapic.with_api_doc(disable_doc=True)
     def well_known_carddav(self, context, request: TracimRequest) -> Response:
-        return HTTPMovedPermanently(
-            request.url.replace("/.well-known/carddav", "/dav/", 1)
-        )
+        return HTTPMovedPermanently(request.url.replace("/.well-known/carddav", "/dav/", 1))
 
     def bind(self, configurator: Configurator) -> None:
         """

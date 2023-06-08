@@ -71,9 +71,7 @@ def content_search_fixture(
         do_save=True,
     )
     with new_revision(session=session, tm=transaction.manager, content=content):
-        content = capi.update_content(
-            content, new_description="A wonderful description"
-        )
+        content = capi.update_content(content, new_description="A wonderful description")
     transaction.commit()
     elasticsearch.refresh_elasticsearch()
     return content
@@ -109,9 +107,7 @@ def content_with_tag(
 
 
 @pytest.mark.usefixtures("base_fixture")
-@pytest.mark.parametrize(
-    "config_section", [{"name": "test_elasticsearch_search"}], indirect=True
-)
+@pytest.mark.parametrize("config_section", [{"name": "test_elasticsearch_search"}], indirect=True)
 class TestElasticSearch(object):
     @pytest.mark.parametrize(
         "created_content_name, search_string, nb_content_result, first_search_result_content_name",
@@ -194,10 +190,7 @@ class TestElasticSearch(object):
         assert search_result["total_hits"] == nb_content_result
         assert search_result["is_total_hits_accurate"] is True
         if first_search_result_content_name:
-            assert (
-                search_result["contents"][0]["label"]
-                == first_search_result_content_name
-            )
+            assert search_result["contents"][0]["label"] == first_search_result_content_name
 
     @pytest.mark.parametrize(
         "created_content_name, search_string, nb_content_result, first_search_result_content_name",
@@ -273,10 +266,7 @@ class TestElasticSearch(object):
         assert search_result["total_hits"] == nb_content_result
         assert search_result["is_total_hits_accurate"] is True
         if first_search_result_content_name:
-            assert (
-                search_result["contents"][0]["label"]
-                == first_search_result_content_name
-            )
+            assert search_result["contents"][0]["label"] == first_search_result_content_name
 
     @pytest.mark.parametrize(
         "search_params, created_content_name, created_content_body, created_workspace_name, nb_content_result, first_search_result_content_name, author_public_name, last_modifier_public_name",
@@ -444,9 +434,7 @@ class TestElasticSearch(object):
             profile=profile,
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
-        workspace = workspace_api.create_workspace(
-            created_workspace_name, save_now=True
-        )
+        workspace = workspace_api.create_workspace(created_workspace_name, save_now=True)
         role_api = role_api_factory.get()
         role_api.create_one(
             user,
@@ -485,23 +473,15 @@ class TestElasticSearch(object):
         elasticsearch.refresh_elasticsearch()
 
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = web_testapp.get(
-            "/api/advanced_search/content", status=200, params=search_params
-        )
+        res = web_testapp.get("/api/advanced_search/content", status=200, params=search_params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == nb_content_result
         assert search_result["is_total_hits_accurate"] is True
 
         if nb_content_result:
-            assert (
-                search_result["contents"][0]["label"]
-                == first_search_result_content_name
-            )
-            assert (
-                search_result["created_range"]["from"]
-                == search_result["created_range"]["to"]
-            )
+            assert search_result["contents"][0]["label"] == first_search_result_content_name
+            assert search_result["created_range"]["from"] == search_result["created_range"]["to"]
             assert search_result["facets"]["file_extensions"] == [
                 {"value": ".document.html", "count": 1}
             ]
@@ -519,9 +499,7 @@ class TestElasticSearch(object):
             ]
             assert is_now(search_result["created_range"]["from"])
 
-    @pytest.mark.parametrize(
-        "search_string,expected_result_count", [("World", 1), ("Hello", 0)]
-    )
+    @pytest.mark.parametrize("search_string,expected_result_count", [("World", 1), ("Hello", 0)])
     def test_api___elasticsearch_search_ok__search_by_tags(
         self,
         web_testapp,
@@ -536,9 +514,7 @@ class TestElasticSearch(object):
             "Basic",
             ("admin@admin.admin", "admin@admin.admin"),
         )
-        res = web_testapp.get(
-            "/api/advanced_search/content".format(), status=200, params=params
-        )
+        res = web_testapp.get("/api/advanced_search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == expected_result_count
@@ -599,9 +575,7 @@ class TestElasticSearch(object):
         tag_lib.add_tag_to_content(user=user, content=content, tag_name="Hello")
         with new_revision(session=session, tm=transaction.manager, content=content):
             api = content_api_factory.get(current_user=user2)
-            api.update_content(
-                content, new_label="document", new_raw_content="just some content"
-            )
+            api.update_content(content, new_label="document", new_raw_content="just some content")
             api.save(content)
         api = content_api_factory.get(current_user=user)
         content2 = api.create(
@@ -760,19 +734,14 @@ class TestElasticSearch(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         params = {"search_string": search_string, "search_fields": search_fields}
-        res = web_testapp.get(
-            "/api/advanced_search/content".format(), status=200, params=params
-        )
+        res = web_testapp.get("/api/advanced_search/content".format(), status=200, params=params)
         search_result = res.json_body
 
         assert search_result
         assert search_result["total_hits"] == nb_content_result
         assert search_result["is_total_hits_accurate"] is True
         if nb_content_result:
-            assert (
-                search_result["contents"][0]["label"]
-                == first_search_result_content_name
-            )
+            assert search_result["contents"][0]["label"] == first_search_result_content_name
 
     @pytest.mark.parametrize(
         "search_fields, created_content_name, search_string, nb_content_result, first_search_result_content_name, first_created_todo_content, second_created_todo_content",
@@ -877,19 +846,14 @@ class TestElasticSearch(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         params = {"search_string": search_string, "search_fields": search_fields}
-        res = web_testapp.get(
-            "/api/advanced_search/content".format(), status=200, params=params
-        )
+        res = web_testapp.get("/api/advanced_search/content".format(), status=200, params=params)
         search_result = res.json_body
 
         assert search_result
         assert search_result["total_hits"] == nb_content_result
         assert search_result["is_total_hits_accurate"] is True
         if nb_content_result:
-            assert (
-                search_result["contents"][0]["label"]
-                == first_search_result_content_name
-            )
+            assert search_result["contents"][0]["label"] == first_search_result_content_name
 
     def test_api___elasticsearch_search_ok__no_search_string(
         self,
@@ -996,9 +960,7 @@ class TestElasticSearch(object):
         # get all
         params = {"search_string": "stringtosearch"}
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = web_testapp.get(
-            "/api/advanced_search/content".format(), status=200, params=params
-        )
+        res = web_testapp.get("/api/advanced_search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 4
@@ -1007,9 +969,7 @@ class TestElasticSearch(object):
 
         params = {"search_string": "stringtosearch", "content_types": "html-document"}
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = web_testapp.get(
-            "/api/advanced_search/content".format(), status=200, params=params
-        )
+        res = web_testapp.get("/api/advanced_search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 2
@@ -1024,9 +984,7 @@ class TestElasticSearch(object):
             "content_types": "html-document,thread",
         }
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = web_testapp.get(
-            "/api/advanced_search/content".format(), status=200, params=params
-        )
+        res = web_testapp.get("/api/advanced_search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 3
@@ -1040,9 +998,7 @@ class TestElasticSearch(object):
 
         params = {"search_string": "stringtosearch", "content_types": "folder"}
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = web_testapp.get(
-            "/api/advanced_search/content".format(), status=200, params=params
-        )
+        res = web_testapp.get("/api/advanced_search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 1
@@ -1050,9 +1006,7 @@ class TestElasticSearch(object):
         assert len(search_result["contents"]) == 1
         assert search_result["contents"][0]["label"] == "stringtosearch folder"
 
-    @pytest.mark.parametrize(
-        "search_tag,expected_result_count", [("World", 1), ("Hello", 0)]
-    )
+    @pytest.mark.parametrize("search_tag,expected_result_count", [("World", 1), ("Hello", 0)])
     def test_api___elasticsearch_search_ok__filter_by_tags(
         self,
         web_testapp,
@@ -1068,9 +1022,7 @@ class TestElasticSearch(object):
             "Basic",
             ("admin@admin.admin", "admin@admin.admin"),
         )
-        res = web_testapp.get(
-            "/api/advanced_search/content".format(), status=200, params=params
-        )
+        res = web_testapp.get("/api/advanced_search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == expected_result_count
@@ -1125,9 +1077,7 @@ class TestElasticSearch(object):
             label="stringtosearch deleted",
             do_save=True,
         )
-        with new_revision(
-            session=session, tm=transaction.manager, content=deleted_content
-        ):
+        with new_revision(session=session, tm=transaction.manager, content=deleted_content):
             api.delete(deleted_content)
         api.save(deleted_content)
         archived_content = api.create(
@@ -1136,9 +1086,7 @@ class TestElasticSearch(object):
             label="stringtosearch archived",
             do_save=True,
         )
-        with new_revision(
-            session=session, tm=transaction.manager, content=archived_content
-        ):
+        with new_revision(session=session, tm=transaction.manager, content=archived_content):
             api.archive(archived_content)
         api.save(archived_content)
         transaction.commit()
@@ -1151,9 +1099,7 @@ class TestElasticSearch(object):
             "show_active": 1,
         }
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = web_testapp.get(
-            "/api/advanced_search/content".format(), status=200, params=params
-        )
+        res = web_testapp.get("/api/advanced_search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 4
@@ -1163,9 +1109,7 @@ class TestElasticSearch(object):
         # get only active
         params = {"search_string": "stringtosearch"}
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = web_testapp.get(
-            "/api/advanced_search/content".format(), status=200, params=params
-        )
+        res = web_testapp.get("/api/advanced_search/content".format(), status=200, params=params)
         default_search_result = res.json_body
         assert default_search_result
         assert default_search_result["total_hits"] == 2
@@ -1182,9 +1126,7 @@ class TestElasticSearch(object):
             "show_archived": 0,
         }
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = web_testapp.get(
-            "/api/advanced_search/content".format(), status=200, params=params
-        )
+        res = web_testapp.get("/api/advanced_search/content".format(), status=200, params=params)
         only_active_search_result = res.json_body
         assert only_active_search_result == default_search_result
 
@@ -1195,9 +1137,7 @@ class TestElasticSearch(object):
             "show_archived": 0,
         }
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = web_testapp.get(
-            "/api/advanced_search/content".format(), status=200, params=params
-        )
+        res = web_testapp.get("/api/advanced_search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 3
@@ -1220,9 +1160,7 @@ class TestElasticSearch(object):
         assert search_result["total_hits"] == 1
         assert search_result["is_total_hits_accurate"] is True
         assert len(search_result["contents"]) == 1
-        assert search_result["contents"][0]["label"].startswith(
-            "stringtosearch archived"
-        )
+        assert search_result["contents"][0]["label"].startswith("stringtosearch archived")
 
     def test_api___elasticsearch_search_ok__by_description(
         self,
@@ -1303,9 +1241,7 @@ class TestElasticSearchSearchWithIngest(object):
 
         params = {"search_string": "stringtosearch"}
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        res = web_testapp.get(
-            "/api/advanced_search/content".format(), status=200, params=params
-        )
+        res = web_testapp.get("/api/advanced_search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
         assert search_result["total_hits"] == 1
@@ -1342,9 +1278,7 @@ def user_search_fixture(
 
 
 @pytest.mark.usefixtures("user_search_fixture")
-@pytest.mark.parametrize(
-    "config_section", [{"name": "test_elasticsearch_search"}], indirect=True
-)
+@pytest.mark.parametrize("config_section", [{"name": "test_elasticsearch_search"}], indirect=True)
 class TestElasticSearchUserSearch:
     def test_api__elasticsearch_user_search__ok__check_result(
         self,
@@ -1370,9 +1304,7 @@ class TestElasticSearchUserSearch:
         }
         facets = search_result["facets"]
         assert facets == {
-            "workspaces": [
-                {"count": 1, "value": {"workspace_id": 2, "label": "Bob & Riyad"}}
-            ]
+            "workspaces": [{"count": 1, "value": {"workspace_id": 2, "label": "Bob & Riyad"}}]
         }
         assert search_result["newest_authored_content_date_range"] == {
             "from": None,
@@ -1504,9 +1436,7 @@ class TestElasticSearchUserSearch:
 
 
 @pytest.mark.usefixtures("workspace_search_fixture")
-@pytest.mark.parametrize(
-    "config_section", [{"name": "test_elasticsearch_search"}], indirect=True
-)
+@pytest.mark.parametrize("config_section", [{"name": "test_elasticsearch_search"}], indirect=True)
 class TestElasticSearchWorkspaceSearch:
     def test_api__elasticsearch_workspace_search__ok__check_result(
         self,

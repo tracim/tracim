@@ -18,9 +18,7 @@ class TestContentRevision(object):
             "revision_read_statuses",
         )
         revision_columns = [
-            attr.key
-            for attr in inspect(revision).attrs
-            if attr.key not in excluded_columns
+            attr.key for attr in inspect(revision).attrs if attr.key not in excluded_columns
         ]
         new_revision = ContentRevisionRO()
 
@@ -67,9 +65,7 @@ class TestContentRevision(object):
         # columns mapping
         new_revision_by_test = self._new_from(html_document.revision)
 
-        new_revision_by_model_dict = self._get_dict_representation(
-            new_revision_by_model
-        )
+        new_revision_by_model_dict = self._get_dict_representation(new_revision_by_model)
         new_revision_by_test_dict = self._get_dict_representation(new_revision_by_test)
 
         # They must be identical

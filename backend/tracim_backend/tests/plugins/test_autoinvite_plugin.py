@@ -70,10 +70,7 @@ class TestAutoInvitePlugin(object):
                 do_notify=False,
             )
             uapi = user_api_factory.get()
-            assert (
-                workspace.get_user_role(admin_user)
-                == WorkspaceRoles.WORKSPACE_MANAGER.level
-            )
+            assert workspace.get_user_role(admin_user) == WorkspaceRoles.WORKSPACE_MANAGER.level
             assert workspace.get_user_role(user_1) == users_role.level
             assert workspace.get_user_role(user_2) == users_role.level
 
@@ -139,9 +136,6 @@ class TestAutoInvitePlugin(object):
                 access_type=workspace_access_type,
             )
             uapi = user_api_factory.get()
-            assert (
-                workspace.get_user_role(admin_user)
-                == WorkspaceRoles.WORKSPACE_MANAGER.level
-            )
+            assert workspace.get_user_role(admin_user) == WorkspaceRoles.WORKSPACE_MANAGER.level
             assert workspace.get_user_role(user_1) == users_role.level
             assert workspace.get_user_role(user_2) == users_role.level

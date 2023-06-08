@@ -177,9 +177,7 @@ def design_page(content: data.Content, content_revision: data.ContentRevisionRO)
     return content_revision.raw_content
 
 
-def design_thread(
-    content: data.Content, content_revision: data.ContentRevisionRO, comments
-) -> str:
+def design_thread(content: data.Content, content_revision: data.ContentRevisionRO, comments) -> str:
     if len(comments) == 0:
         return ""
 
@@ -194,7 +192,9 @@ def design_thread(
 
     thread_closing_tags = ""
     for comment in comments[1:]:
-        thread += '<blockquote style="border-left: solid 2px #999; margin-left: 1em; padding-left: 1em;">'
+        thread += (
+            '<blockquote style="border-left: solid 2px #999; margin-left: 1em; padding-left: 1em;">'
+        )
         thread += THREAD_MESSAGE.format(
             posting_time=format_datetime(comment.created, locale=get_locale()),
             comment_owner=comment.owner.display_name,

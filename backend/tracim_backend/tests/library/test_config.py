@@ -28,9 +28,7 @@ class TestCFG(object):
 
         fake_cfg = FakeCFG()
         assert (
-            fake_cfg.get_raw_config(
-                config_file_name="app.enabled", default_value="contents/thread"
-            )
+            fake_cfg.get_raw_config(config_file_name="app.enabled", default_value="contents/thread")
             == "contents/thread"
         )
 
@@ -42,16 +40,12 @@ class TestCFG(object):
 
         fake_cfg = FakeCFG()
         assert (
-            fake_cfg.get_raw_config(
-                config_file_name="app.enabled", default_value="contents/thread"
-            )
+            fake_cfg.get_raw_config(config_file_name="app.enabled", default_value="contents/thread")
             == "content/folder, contents/files"
         )
 
     def test_get_raw_config__ok__from_env_var(self):
-        with patch(
-            "os.environ", {"TRACIM_APP__ENABLED": "contents/html-document,agenda"}
-        ):
+        with patch("os.environ", {"TRACIM_APP__ENABLED": "contents/html-document,agenda"}):
 
             class FakeCFG(CFG):
                 def __init__(self):

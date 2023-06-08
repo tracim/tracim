@@ -19,24 +19,12 @@ from tracim_backend.tests.fixtures import *  # noqa:F401,F403
 
 @pytest.mark.usefixtures("base_fixture")
 class TestContent(object):
-    def test_unit__create_content__ok__nominal_case(
-        self, admin_user, session, content_type_list
-    ):
-        assert (
-            session.query(Workspace)
-            .filter(Workspace.label == "TEST_WORKSPACE_1")
-            .count()
-            == 0
-        )
+    def test_unit__create_content__ok__nominal_case(self, admin_user, session, content_type_list):
+        assert session.query(Workspace).filter(Workspace.label == "TEST_WORKSPACE_1").count() == 0
         workspace = Workspace(label="TEST_WORKSPACE_1", owner=admin_user)
         session.add(workspace)
         session.flush()
-        assert (
-            session.query(Workspace)
-            .filter(Workspace.label == "TEST_WORKSPACE_1")
-            .count()
-            == 1
-        )
+        assert session.query(Workspace).filter(Workspace.label == "TEST_WORKSPACE_1").count() == 1
         assert (
             session.query(ContentRevisionRO)
             .filter(ContentRevisionRO.label == "TEST_CONTENT_1")
@@ -68,9 +56,7 @@ class TestContent(object):
         )
         assert searched_content.label == content.label
 
-    def test_unit__update__ok__nominal_case(
-        self, admin_user, session, content_type_list
-    ):
+    def test_unit__update__ok__nominal_case(self, admin_user, session, content_type_list):
         workspace = Workspace(label="TEST_WORKSPACE_1", owner=admin_user)
         session.add(workspace)
         session.flush()
@@ -98,10 +84,7 @@ class TestContent(object):
             .count()
             == 1
         )
-        assert (
-            session.query(Content).filter(Content.id == searched_content.id).count()
-            == 1
-        )
+        assert session.query(Content).filter(Content.id == searched_content.id).count() == 1
         with freeze_time("2000-01-01 00:00:05"):
             with new_revision(session=session, tm=transaction.manager, content=content):
                 content.description = "TEST_CONTENT_DESCRIPTION_1_UPDATED"
@@ -112,10 +95,7 @@ class TestContent(object):
             .count()
             == 2
         )
-        assert (
-            session.query(Content).filter(Content.id == searched_content.id).count()
-            == 1
-        )
+        assert session.query(Content).filter(Content.id == searched_content.id).count() == 1
         with freeze_time("2003-12-31 23:59:59"):
             with new_revision(session=session, tm=transaction.manager, content=content):
                 content.description = "TEST_CONTENT_DESCRIPTION_1_UPDATED_2"
@@ -126,10 +106,7 @@ class TestContent(object):
             .count()
             == 3
         )
-        assert (
-            session.query(Content).filter(Content.id == searched_content.id).count()
-            == 1
-        )
+        assert session.query(Content).filter(Content.id == searched_content.id).count() == 1
 
         revision_1 = (
             session.query(ContentRevisionRO)
@@ -138,16 +115,12 @@ class TestContent(object):
         )
         revision_2 = (
             session.query(ContentRevisionRO)
-            .filter(
-                ContentRevisionRO.description == "TEST_CONTENT_DESCRIPTION_1_UPDATED"
-            )
+            .filter(ContentRevisionRO.description == "TEST_CONTENT_DESCRIPTION_1_UPDATED")
             .one()
         )
         revision_3 = (
             session.query(ContentRevisionRO)
-            .filter(
-                ContentRevisionRO.description == "TEST_CONTENT_DESCRIPTION_1_UPDATED_2"
-            )
+            .filter(ContentRevisionRO.description == "TEST_CONTENT_DESCRIPTION_1_UPDATED_2")
             .one()
         )
 
@@ -156,9 +129,7 @@ class TestContent(object):
         # Created dates must be equal
         assert revision_1.created == revision_2.created == revision_3.created
 
-    def test_unit__update__err__without_prepare(
-        self, admin_user, session, content_type_list
-    ):
+    def test_unit__update__err__without_prepare(self, admin_user, session, content_type_list):
         # file creation
         workspace = Workspace(label="TEST_WORKSPACE_1", owner=admin_user)
         session.add(workspace)
@@ -181,9 +152,7 @@ class TestContent(object):
             content.description = "FOO"
         # Raise ContentRevisionUpdateError because revision can't be updated
 
-    def test_unit__delete_revision__err__nominal_case(
-        self, admin_user, session, content_type_list
-    ):
+    def test_unit__delete_revision__err__nominal_case(self, admin_user, session, content_type_list):
         # file creation
         workspace = Workspace(label="TEST_WORKSPACE_1", owner=admin_user)
         session.add(workspace)
@@ -228,9 +197,7 @@ class TestContent(object):
             )
             unsafe_session.add(content)
             unsafe_session.flush()
-            with new_revision(
-                session=unsafe_session, tm=transaction.manager, content=content
-            ):
+            with new_revision(session=unsafe_session, tm=transaction.manager, content=content):
                 content.description = "TEST_CONTENT_DESCRIPTION_1_UPDATED"
             unsafe_session.add(content)
             unsafe_session.flush()
@@ -270,9 +237,7 @@ class TestContent(object):
         # using depot_file.file of type StoredFile to fetch content back
         assert content.depot_file.file.read() == b"test"
 
-    def test_unit__get_children__ok__nominal_case(
-        sel, admin_user, session, content_type_list
-    ):
+    def test_unit__get_children__ok__nominal_case(sel, admin_user, session, content_type_list):
         workspace = Workspace(label="TEST_WORKSPACE_1", owner=admin_user)
         session.add(workspace)
         session.flush()
@@ -305,16 +270,12 @@ class TestContent(object):
             children_folder.cached_revision_id
         ]
 
-        with new_revision(
-            session=session, tm=transaction.manager, content=children_folder
-        ):
+        with new_revision(session=session, tm=transaction.manager, content=children_folder):
             children_folder.parent = None
         session.flush()
         assert parent_folder.children.all() == []
 
-    def test_unit__query_content__ok__nominal_case(
-        self, admin_user, session, content_type_list
-    ):
+    def test_unit__query_content__ok__nominal_case(self, admin_user, session, content_type_list):
         workspace = Workspace(label="TEST_WORKSPACE_1", owner=admin_user)
         session.add(workspace)
         session.flush()
@@ -350,12 +311,8 @@ class TestContent(object):
             session.add(content2)
             session.flush()
 
-        workspace1 = (
-            session.query(Workspace).filter(Workspace.label == "TEST_WORKSPACE_1").one()
-        )
-        workspace2 = (
-            session.query(Workspace).filter(Workspace.label == "TEST_WORKSPACE_2").one()
-        )
+        workspace1 = session.query(Workspace).filter(Workspace.label == "TEST_WORKSPACE_1").one()
+        workspace2 = session.query(Workspace).filter(Workspace.label == "TEST_WORKSPACE_2").one()
 
         # To get Content in database
         # we have to join Content and ContentRevisionRO

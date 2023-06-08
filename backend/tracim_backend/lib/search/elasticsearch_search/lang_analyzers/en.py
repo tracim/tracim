@@ -11,9 +11,7 @@ from tracim_backend.lib.search.elasticsearch_search.default_analyzers import und
 
 
 english_stop = analysis.token_filter("english_stop", type="stop", stopwords="_english_")
-english_stemmer = analysis.token_filter(
-    "english_stemmer", type="stemmer", language="english"
-)
+english_stemmer = analysis.token_filter("english_stemmer", type="stemmer", language="english")
 english_possessive_stemmer = analysis.token_filter(
     "english_stemmer", type="stemmer", language="possessive_english"
 )

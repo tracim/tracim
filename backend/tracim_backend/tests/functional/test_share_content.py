@@ -88,9 +88,7 @@ class TestPrivateShareEndpoints(object):
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
-        share_api.share_content(
-            test_file, emails=["test@test.test", "test2@test2.test2"]
-        )
+        share_api.share_content(test_file, emails=["test@test.test", "test2@test2.test2"])
         transaction.commit()
         web_testapp.authorization = (
             "Basic",
@@ -152,9 +150,7 @@ class TestPrivateShareEndpoints(object):
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
-        share_api.share_content(
-            test_file, emails=["test@test.test", "test2@test2.test2"]
-        )
+        share_api.share_content(test_file, emails=["test@test.test", "test2@test2.test2"])
         transaction.commit()
         web_testapp.authorization = (
             "Basic",
@@ -217,9 +213,7 @@ class TestPrivateShareEndpoints(object):
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
-        share_api.share_content(
-            test_file, emails=["test@test.test", "test2@test2.test2"]
-        )
+        share_api.share_content(test_file, emails=["test@test.test", "test2@test2.test2"])
         transaction.commit()
         web_testapp.authorization = (
             "Basic",
@@ -262,9 +256,7 @@ class TestPrivateShareEndpoints(object):
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
-        share_api.share_content(
-            test_file, emails=["thissharewill@notbe.presentinresponse"]
-        )
+        share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         transaction.commit()
         web_testapp.authorization = (
             "Basic",
@@ -348,9 +340,7 @@ class TestPrivateShareEndpoints(object):
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
-        share_api.share_content(
-            test_file, emails=["thissharewill@notbe.presentinresponse"]
-        )
+        share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         transaction.commit()
         web_testapp.authorization = (
             "Basic",
@@ -388,9 +378,7 @@ class TestPrivateShareEndpoints(object):
         )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
-        share_api.share_content(
-            test_file, emails=["thissharewill@notbe.presentinresponse"]
-        )
+        share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         transaction.commit()
         web_testapp.authorization = (
             "Basic",
@@ -440,9 +428,7 @@ class TestPrivateShareEndpoints(object):
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
-        share_api.share_content(
-            test_file, emails=["thissharewill@notbe.presentinresponse"]
-        )
+        share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         transaction.commit()
         web_testapp.authorization = (
             "Basic",
@@ -490,9 +476,7 @@ class TestPrivateShareEndpoints(object):
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
-        share_api.share_content(
-            test_file, emails=["thissharewill@notbe.presentinresponse"]
-        )
+        share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         transaction.commit()
         web_testapp.authorization = (
             "Basic",
@@ -917,9 +901,7 @@ class TestGuestDownloadShareEndpoints(object):
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
-        share_api.share_content(
-            test_file, emails=["thissharewill@notbe.presentinresponse"]
-        )
+        share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         content_shares = share_api.get_content_shares(test_file)
         assert len(content_shares) == 1
         content_share = content_shares[0]
@@ -974,9 +956,7 @@ class TestGuestDownloadShareEndpoints(object):
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
-        share_api.share_content(
-            test_file, emails=["thissharewill@notbe.presentinresponse"]
-        )
+        share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         content_shares = share_api.get_content_shares(test_file)
         assert len(content_shares) == 1
         content_share = content_shares[0]
@@ -1011,9 +991,7 @@ class TestGuestDownloadShareEndpoints(object):
         )
         content_api.save(test_folder)
         share_api = share_lib_factory.get()  # type: ShareLib
-        share_api.share_content(
-            test_folder, emails=["thissharewill@notbe.presentinresponse"]
-        )
+        share_api.share_content(test_folder, emails=["thissharewill@notbe.presentinresponse"])
         content_shares = share_api.get_content_shares(test_folder)
         assert len(content_shares) == 1
         content_share = content_shares[0]
@@ -1037,9 +1015,7 @@ class TestGuestDownloadShareEndpoints(object):
         admin_user,
     ) -> None:
         res = web_testapp.get(
-            "/api/public/guest-download/{share_token}".format(
-                share_token="invalid-token"
-            ),
+            "/api/public/guest-download/{share_token}".format(share_token="invalid-token"),
             status=400,
         )
         assert res.json_body["code"] == ErrorCode.CONTENT_SHARE_NOT_FOUND
@@ -1073,9 +1049,7 @@ class TestGuestDownloadShareEndpoints(object):
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
-        share_api.share_content(
-            test_file, emails=["thissharewill@notbe.presentinresponse"]
-        )
+        share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         content_shares = share_api.get_content_shares(test_file)
         assert len(content_shares) == 1
         content_share = content_shares[0]
@@ -1090,9 +1064,7 @@ class TestGuestDownloadShareEndpoints(object):
         assert res.content_type == "plain/text"
         assert res.headers[
             "Content-Disposition"
-        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
-            "toto.txt", "toto.txt"
-        )
+        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format("toto.txt", "toto.txt")
 
         res2 = web_testapp.post(
             "/api/public/guest-download/{share_token}/toto.txt".format(
@@ -1133,9 +1105,7 @@ class TestGuestDownloadShareEndpoints(object):
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
-        share_api.share_content(
-            test_file, emails=["thissharewill@notbe.presentinresponse"]
-        )
+        share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         content_shares = share_api.get_content_shares(test_file)
         assert len(content_shares) == 1
         content_share = content_shares[0]
@@ -1167,9 +1137,7 @@ class TestGuestDownloadShareEndpoints(object):
         admin_user,
     ) -> None:
         res = web_testapp.get(
-            "/api/public/guest-download/{share_token}/toto.txt".format(
-                share_token="invalid-token"
-            ),
+            "/api/public/guest-download/{share_token}/toto.txt".format(share_token="invalid-token"),
             status=400,
         )
         assert res.json_body["code"] == ErrorCode.CONTENT_SHARE_NOT_FOUND
@@ -1196,9 +1164,7 @@ class TestGuestDownloadShareEndpoints(object):
         )
         content_api.save(test_folder)
         share_api = share_lib_factory.get()  # type: ShareLib
-        share_api.share_content(
-            test_folder, emails=["thissharewill@notbe.presentinresponse"]
-        )
+        share_api.share_content(test_folder, emails=["thissharewill@notbe.presentinresponse"])
         content_shares = share_api.get_content_shares(test_folder)
         assert len(content_shares) == 1
         content_share = content_shares[0]
@@ -1260,9 +1226,7 @@ class TestGuestDownloadShareEndpoints(object):
         assert res.content_type == "plain/text"
         assert res.headers[
             "Content-Disposition"
-        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format(
-            "toto.txt", "toto.txt"
-        )
+        ] == "attachment; filename=\"{}\"; filename*=UTF-8''{};".format("toto.txt", "toto.txt")
 
     def test_api__guest_download_content_file__err_403__no_password(
         self,
@@ -1390,9 +1354,7 @@ class TestGuestDownloadShareEndpoints(object):
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
-        share_api.share_content(
-            test_file, emails=["thissharewill@notbe.presentinresponse"]
-        )
+        share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         content_shares = share_api.get_content_shares(test_file)
         assert len(content_shares) == 1
         content_share = content_shares[0]
@@ -1435,9 +1397,7 @@ class TestGuestDownloadShareEndpoints(object):
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
-        share_api.share_content(
-            test_file, emails=["thissharewill@notbe.presentinresponse"]
-        )
+        share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         content_shares = share_api.get_content_shares(test_file)
         assert len(content_shares) == 1
         content_share = content_shares[0]
@@ -1461,9 +1421,7 @@ class TestGuestDownloadShareEndpoints(object):
         admin_user,
     ) -> None:
         res = web_testapp.post_json(
-            "/api/public/guest-download/{share_token}/check".format(
-                share_token="invalid-token"
-            ),
+            "/api/public/guest-download/{share_token}/check".format(share_token="invalid-token"),
             status=400,
         )
         assert res.json_body["code"] == ErrorCode.CONTENT_SHARE_NOT_FOUND
@@ -1499,9 +1457,7 @@ class TestGuestDownloadShareEndpoints(object):
             content_api.delete(test_file)
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
-        share_api.share_content(
-            test_file, emails=["thissharewill@notbe.presentinresponse"]
-        )
+        share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         content_shares = share_api.get_content_shares(test_file)
         assert len(content_shares) == 1
         content_share = content_shares[0]
@@ -1545,9 +1501,7 @@ class TestGuestDownloadShareEndpoints(object):
             content_api.archive(test_file)
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
-        share_api.share_content(
-            test_file, emails=["thissharewill@notbe.presentinresponse"]
-        )
+        share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         content_shares = share_api.get_content_shares(test_file)
         assert len(content_shares) == 1
         content_share = content_shares[0]
@@ -1582,9 +1536,7 @@ class TestGuestDownloadShareEndpoints(object):
         )
         content_api.save(test_folder)
         share_api = share_lib_factory.get()  # type: ShareLib
-        share_api.share_content(
-            test_folder, emails=["thissharewill@notbe.presentinresponse"]
-        )
+        share_api.share_content(test_folder, emails=["thissharewill@notbe.presentinresponse"])
         content_shares = share_api.get_content_shares(test_folder)
         assert len(content_shares) == 1
         content_share = content_shares[0]

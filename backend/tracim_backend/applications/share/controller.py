@@ -51,9 +51,7 @@ class ShareController(Controller):
     """
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
-    @hapic.handle_exception(
-        WorkspacePublicDownloadDisabledException, HTTPStatus.BAD_REQUEST
-    )
+    @hapic.handle_exception(WorkspacePublicDownloadDisabledException, HTTPStatus.BAD_REQUEST)
     @check_right(is_content_manager)
     @check_right(is_shareable_content_type)
     @check_right(has_public_download_enabled)
@@ -81,9 +79,7 @@ class ShareController(Controller):
         return api.get_content_shares_in_context(shares_content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
-    @hapic.handle_exception(
-        WorkspacePublicDownloadDisabledException, HTTPStatus.BAD_REQUEST
-    )
+    @hapic.handle_exception(WorkspacePublicDownloadDisabledException, HTTPStatus.BAD_REQUEST)
     @check_right(is_contributor)
     @check_right(is_shareable_content_type)
     @check_right(has_public_download_enabled)
@@ -108,17 +104,13 @@ class ShareController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @hapic.handle_exception(ContentShareNotFound, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(
-        WorkspacePublicDownloadDisabledException, HTTPStatus.BAD_REQUEST
-    )
+    @hapic.handle_exception(WorkspacePublicDownloadDisabledException, HTTPStatus.BAD_REQUEST)
     @check_right(is_content_manager)
     @check_right(is_shareable_content_type)
     @check_right(has_public_download_enabled)
     @hapic.input_path(ShareIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def disable_content_share(
-        self, context, request: TracimRequest, hapic_data=None
-    ) -> None:
+    def disable_content_share(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
         remove a file share
         """
@@ -132,9 +124,7 @@ class ShareController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
-    @hapic.handle_exception(
-        WorkspacePublicDownloadDisabledException, HTTPStatus.BAD_REQUEST
-    )
+    @hapic.handle_exception(WorkspacePublicDownloadDisabledException, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentShareNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(ShareTokenPathSchema())
     @hapic.output_body(ContentShareInfoSchema())
@@ -165,17 +155,13 @@ class ShareController(Controller):
         return api.get_content_share_in_context(content_share)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
-    @hapic.handle_exception(
-        WorkspacePublicDownloadDisabledException, HTTPStatus.BAD_REQUEST
-    )
+    @hapic.handle_exception(WorkspacePublicDownloadDisabledException, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentShareNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(WrongSharePassword, HTTPStatus.FORBIDDEN)
     @hapic.input_path(ShareTokenPathSchema())
     @hapic.input_body(SharePasswordBodySchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def guest_download_check(
-        self, context, request: TracimRequest, hapic_data=None
-    ) -> None:
+    def guest_download_check(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
         Check if share token is correct and password given valid
         """
@@ -200,9 +186,7 @@ class ShareController(Controller):
             raise ContentTypeNotAllowed()
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
-    @hapic.handle_exception(
-        WorkspacePublicDownloadDisabledException, HTTPStatus.BAD_REQUEST
-    )
+    @hapic.handle_exception(WorkspacePublicDownloadDisabledException, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentShareNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(WrongSharePassword, HTTPStatus.FORBIDDEN)
     @hapic.input_path(ShareTokenWithFilenamePathSchema())
@@ -216,9 +200,7 @@ class ShareController(Controller):
         return self.guest_download_file(context, request, hapic_data)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
-    @hapic.handle_exception(
-        WorkspacePublicDownloadDisabledException, HTTPStatus.BAD_REQUEST
-    )
+    @hapic.handle_exception(WorkspacePublicDownloadDisabledException, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentShareNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(WrongSharePassword, HTTPStatus.FORBIDDEN)
     @hapic.input_path(ShareTokenWithFilenamePathSchema())
@@ -232,9 +214,7 @@ class ShareController(Controller):
         """
         return self.guest_download_file(context, request, hapic_data)
 
-    def guest_download_file(
-        self, context, request: TracimRequest, hapic_data=None
-    ) -> HapicFile:
+    def guest_download_file(self, context, request: TracimRequest, hapic_data=None) -> HapicFile:
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ShareLib(current_user=None, session=request.dbsession, config=app_config)
         content_share = api.get_content_share_by_token(
@@ -297,9 +277,7 @@ class ShareController(Controller):
             "/workspaces/{workspace_id}/contents/{content_id}/shares/{share_id}",
             request_method="DELETE",
         )
-        configurator.add_view(
-            self.disable_content_share, route_name="delete_content_share"
-        )
+        configurator.add_view(self.disable_content_share, route_name="delete_content_share")
 
         # public download api
         configurator.add_route(
@@ -307,33 +285,25 @@ class ShareController(Controller):
             "/public/guest-download/{share_token}",
             request_method="GET",
         )
-        configurator.add_view(
-            self.guest_download_info, route_name="guest_download_info"
-        )
+        configurator.add_view(self.guest_download_info, route_name="guest_download_info")
 
         configurator.add_route(
             "guest_download_check",
             "/public/guest-download/{share_token}/check",
             request_method="POST",
         )
-        configurator.add_view(
-            self.guest_download_check, route_name="guest_download_check"
-        )
+        configurator.add_view(self.guest_download_check, route_name="guest_download_check")
 
         configurator.add_route(
             "guest_download_file_get",
             "/public/guest-download/{share_token}/{filename}",
             request_method="GET",
         )
-        configurator.add_view(
-            self.guest_download_file_get, route_name="guest_download_file_get"
-        )
+        configurator.add_view(self.guest_download_file_get, route_name="guest_download_file_get")
 
         configurator.add_route(
             "guest_download_file_post",
             "/public/guest-download/{share_token}/{filename}",
             request_method="POST",
         )
-        configurator.add_view(
-            self.guest_download_file_post, route_name="guest_download_file_post"
-        )
+        configurator.add_view(self.guest_download_file_post, route_name="guest_download_file_post")

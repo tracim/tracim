@@ -63,9 +63,7 @@ def upgrade():
                 if OLD_SLUG in allowed_content_properties:
                     if NEW_SLUG not in allowed_content_properties:
                         # add old value to new slug
-                        allowed_content_properties[
-                            NEW_SLUG
-                        ] = allowed_content_properties[OLD_SLUG]
+                        allowed_content_properties[NEW_SLUG] = allowed_content_properties[OLD_SLUG]
                     # remove old slug section
                     del allowed_content_properties[OLD_SLUG]
                     # convert to json and apply modification

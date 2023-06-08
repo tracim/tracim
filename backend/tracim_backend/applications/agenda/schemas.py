@@ -20,9 +20,7 @@ class AgendaSchema(marshmallow.Schema):
         description="true if auth with tracim is needed to access agenda, false"
         "if there is no authentication needed",
     )
-    agenda_type = StrippedString(
-        validate=agenda_type_validator, example=AgendaType.workspace.value
-    )
+    agenda_type = StrippedString(validate=agenda_type_validator, example=AgendaType.workspace.value)
     workspace_id = marshmallow.fields.Int(
         example=4,
         description="Workspace id if agenda is link to a workspace",

@@ -50,9 +50,7 @@ class UploadDataForm(object):
     Simple parent_id object
     """
 
-    def __init__(
-        self, message: str = "", username: str = "", password: str = ""
-    ) -> None:
+    def __init__(self, message: str = "", username: str = "", password: str = "") -> None:
         self.message = message
         self.username = username
         self.password = password
@@ -102,8 +100,7 @@ class UploadPermissionListQuerySchema(marshmallow.Schema):
     show_disabled = marshmallow.fields.Int(
         example=0,
         default=0,
-        description="if set to 1, then show disabled share."
-        " Default is 0 - hide disabled share",
+        description="if set to 1, then show disabled share." " Default is 0 - hide disabled share",
         validate=bool_as_int_validator,
     )
 

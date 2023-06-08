@@ -20,9 +20,7 @@ class Tag(CreationDateMixin, DeclarativeBase):
     __tablename__ = "tag"
     __table_args__ = (UniqueConstraint("workspace_id", "tag_name"),)
 
-    tag_id = Column(
-        Integer, Sequence("seq__tag__tag_id"), autoincrement=True, primary_key=True
-    )
+    tag_id = Column(Integer, Sequence("seq__tag__tag_id"), autoincrement=True, primary_key=True)
     workspace_id = Column(
         Integer,
         ForeignKey("workspaces.workspace_id", onupdate="CASCADE", ondelete="CASCADE"),
@@ -30,9 +28,7 @@ class Tag(CreationDateMixin, DeclarativeBase):
     )
     tag_name = Column(Unicode(length=MAX_TAG_NAME_LENGTH), nullable=False)
 
-    workspace = relationship(
-        "Workspace", remote_side=[Workspace.workspace_id], lazy="joined"
-    )
+    workspace = relationship("Workspace", remote_side=[Workspace.workspace_id], lazy="joined")
 
     author_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
     author = relationship("User", remote_side=[User.user_id])
@@ -68,9 +64,7 @@ class TagOnContent(CreationDateMixin, DeclarativeBase):
     author_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
     author = relationship("User", remote_side=[User.user_id])
 
-    content = relationship(
-        "Content", remote_side=[Content.id], lazy="joined", backref="tags"
-    )
+    content = relationship("Content", remote_side=[Content.id], lazy="joined", backref="tags")
     tag = relationship("Tag", remote_side=[Tag.tag_id], lazy="joined")
 
     def __repr__(self):

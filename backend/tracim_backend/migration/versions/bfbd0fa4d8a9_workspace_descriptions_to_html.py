@@ -61,9 +61,7 @@ def upgrade():
         if text_content == description:
             # if this condition is reached, the description is not in HTML
             # Otherwise, we have nothing to do
-            converted_description = newlines_to_html_br(
-                html.escape(description, quote=False)
-            )
+            converted_description = newlines_to_html_br(html.escape(description, quote=False))
             workspace.description = converted_description
             session.add(workspace)
     session.commit()

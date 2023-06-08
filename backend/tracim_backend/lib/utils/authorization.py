@@ -167,9 +167,7 @@ class CurrentContentRoleChecker(AuthorizationChecker):
 
     def check(self, tracim_context: TracimContext) -> bool:
         if (
-            tracim_context.current_content.workspace.get_user_role(
-                tracim_context.current_user
-            )
+            tracim_context.current_content.workspace.get_user_role(tracim_context.current_user)
             >= self.role_level
         ):
             return True
@@ -187,9 +185,7 @@ class CandidateWorkspaceRoleChecker(AuthorizationChecker):
 
     def check(self, tracim_context: TracimContext) -> bool:
         if (
-            tracim_context.candidate_workspace.get_user_role(
-                tracim_context.current_user
-            )
+            tracim_context.candidate_workspace.get_user_role(tracim_context.current_user)
             >= self.role_level
         ):
             return True
@@ -233,13 +229,9 @@ class ContentTypeCreationChecker(AuthorizationChecker):
         self.content_type_list = content_type_list
 
     def check(self, tracim_context: TracimContext) -> bool:
-        user_role = tracim_context.current_workspace.get_user_role(
-            tracim_context.current_user
-        )
+        user_role = tracim_context.current_workspace.get_user_role(tracim_context.current_user)
         if self.content_type_slug:
-            content_type = self.content_type_list.get_one_by_slug(
-                self.content_type_slug
-            )
+            content_type = self.content_type_list.get_one_by_slug(self.content_type_slug)
         else:
             content_type = tracim_context.candidate_content_type
         if user_role >= content_type.minimal_role_content_creation.level:
@@ -253,10 +245,7 @@ class CommentOwnerChecker(AuthorizationChecker):
     """
 
     def check(self, tracim_context: TracimContext) -> bool:
-        if (
-            tracim_context.current_comment.author.user_id
-            == tracim_context.current_user.user_id
-        ):
+        if tracim_context.current_comment.author.user_id == tracim_context.current_user.user_id:
             return True
         raise UserIsNotContentOwner(
             "user {} is not the original owner of the comment {}".format(
@@ -272,10 +261,7 @@ class TodoOwnerChecker(AuthorizationChecker):
     """
 
     def check(self, tracim_context: TracimContext) -> bool:
-        if (
-            tracim_context.current_todo.owner.user_id
-            == tracim_context.current_user.user_id
-        ):
+        if tracim_context.current_todo.owner.user_id == tracim_context.current_user.user_id:
             return True
         raise UserIsNotContentOwner(
             "user {} is not owner of todo {}".format(
@@ -291,10 +277,7 @@ class TodoAssigneeChecker(AuthorizationChecker):
     """
 
     def check(self, tracim_context: TracimContext) -> bool:
-        if (
-            tracim_context.current_todo.assignee_id
-            == tracim_context.current_user.user_id
-        ):
+        if tracim_context.current_todo.assignee_id == tracim_context.current_user.user_id:
             return True
         raise UserIsNotContentOwner(
             "user {} is not assigned to the todo {}".format(
@@ -310,10 +293,7 @@ class ReactionAuthorChecker(AuthorizationChecker):
     """
 
     def check(self, tracim_context: TracimContext) -> bool:
-        if (
-            tracim_context.current_reaction.author.user_id
-            == tracim_context.current_user.user_id
-        ):
+        if tracim_context.current_reaction.author.user_id == tracim_context.current_user.user_id:
             return True
         raise UserIsNotReactionAuthor(
             "user {} is not author of reaction {}".format(
@@ -389,9 +369,7 @@ class OneCommonWorkspaceUserChecker(AuthorizationChecker):
         )
         if not role_api.get_common_workspace_ids(tracim_context.candidate_user.user_id):
             raise UserDoesNotExist(
-                "User {} not found or not known".format(
-                    tracim_context.candidate_user.user_id
-                )
+                "User {} not found or not known".format(tracim_context.candidate_user.user_id)
             )
         return True
 
@@ -406,14 +384,10 @@ is_workspace_manager = RoleChecker(WorkspaceRoles.WORKSPACE_MANAGER.level)
 is_content_manager = RoleChecker(WorkspaceRoles.CONTENT_MANAGER.level)
 is_reader = RoleChecker(WorkspaceRoles.READER.level)
 is_current_content_reader = CurrentContentRoleChecker(WorkspaceRoles.READER.level)
-is_current_content_contributor = CurrentContentRoleChecker(
-    WorkspaceRoles.CONTRIBUTOR.level
-)
+is_current_content_contributor = CurrentContentRoleChecker(WorkspaceRoles.CONTRIBUTOR.level)
 is_contributor = RoleChecker(WorkspaceRoles.CONTRIBUTOR.level)
 # personal_access
-has_personal_access = OrAuthorizationChecker(
-    CandidateIsCurrentUserChecker(), is_administrator
-)
+has_personal_access = OrAuthorizationChecker(CandidateIsCurrentUserChecker(), is_administrator)
 # knows candidate user
 # INFO - G.M - 2021-01-28 - Warning! Rule access here should be consistent
 # with UserApi.get_known_users method.
@@ -436,9 +410,7 @@ can_see_workspace_information = OrAuthorizationChecker(
 can_modify_workspace = OrAuthorizationChecker(
     is_administrator, AndAuthorizationChecker(is_workspace_manager, is_user)
 )
-can_leave_workspace = OrAuthorizationChecker(
-    CandidateIsCurrentUserChecker(), can_modify_workspace
-)
+can_leave_workspace = OrAuthorizationChecker(CandidateIsCurrentUserChecker(), can_modify_workspace)
 can_delete_workspace = OrAuthorizationChecker(
     is_administrator, AndAuthorizationChecker(is_workspace_manager, is_trusted_user)
 )

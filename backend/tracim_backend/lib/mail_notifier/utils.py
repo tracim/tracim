@@ -75,9 +75,7 @@ class EmailAddress(object):
         return ".".join([p.encode("idna").decode("ascii") for p in part.split(".")])
 
     def _encode_idna(self, email: str):
-        username, domain = [
-            self._encode_idna_part(part) for part in email.rsplit("@", 1)
-        ]
+        username, domain = [self._encode_idna_part(part) for part in email.rsplit("@", 1)]
 
         username = self._encode_idna_part(username)
         domain = self._encode_idna_part(domain)

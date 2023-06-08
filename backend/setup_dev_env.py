@@ -24,9 +24,7 @@ def create_dir(path: str, description: str) -> None:
 def is_dir(path: Optional[str], description: str) -> None:
     print("> Checking whether {} is a directory ({})".format(path, description))
     if not path or not Path.is_dir(Path(path)):
-        print(
-            '/!\\ WARNING: folder {} does not exist! in "{}"'.format(description, path)
-        )
+        print('/!\\ WARNING: folder {} does not exist! in "{}"'.format(description, path))
 
 
 def is_file(path: Optional[str], description: str) -> None:

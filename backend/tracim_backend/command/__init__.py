@@ -84,9 +84,7 @@ class AppContextCommand(Command):
         parser.add_argument(
             "-c",
             "--config",
-            help="configuration file to use (default: {})".format(
-                DEFAULT_TRACIM_CONFIG_FILE
-            ),
+            help="configuration file to use (default: {})".format(DEFAULT_TRACIM_CONFIG_FILE),
             dest="config_file",
             default=DEFAULT_TRACIM_CONFIG_FILE,
         )

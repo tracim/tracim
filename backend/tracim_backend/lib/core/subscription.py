@@ -40,21 +40,15 @@ class SubscriptionLib(object):
         return (
             self._base_query()
             .filter(WorkspaceSubscription.author_id == author_id)
-            .order_by(
-                WorkspaceSubscription.workspace_id, WorkspaceSubscription.author_id
-            )
+            .order_by(WorkspaceSubscription.workspace_id, WorkspaceSubscription.author_id)
             .all()
         )
 
-    def get_workspace_subscriptions(
-        self, workspace_id: int
-    ) -> List[WorkspaceSubscription]:
+    def get_workspace_subscriptions(self, workspace_id: int) -> List[WorkspaceSubscription]:
         return (
             self._base_query()
             .filter(WorkspaceSubscription.workspace_id == workspace_id)
-            .order_by(
-                WorkspaceSubscription.workspace_id, WorkspaceSubscription.author_id
-            )
+            .order_by(WorkspaceSubscription.workspace_id, WorkspaceSubscription.author_id)
             .all()
         )
 
@@ -92,9 +86,7 @@ class SubscriptionLib(object):
         self._session.flush()
         return subscription
 
-    def accept_subscription(
-        self, subscription: WorkspaceSubscription, user_role: WorkspaceRoles
-    ):
+    def accept_subscription(self, subscription: WorkspaceSubscription, user_role: WorkspaceRoles):
         subscription.state = WorkspaceSubscriptionState.ACCEPTED
         subscription.evaluator = self._user
         subscription.evaluation_date = datetime.utcnow()

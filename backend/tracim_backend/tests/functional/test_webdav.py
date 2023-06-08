@@ -79,9 +79,7 @@ class TestFunctionWebdavRemoteUser(object):
 
 
 @pytest.mark.usefixtures("base_fixture")
-@pytest.mark.parametrize(
-    "config_section", [{"name": "functional_webdav_test"}], indirect=True
-)
+@pytest.mark.parametrize("config_section", [{"name": "functional_webdav_test"}], indirect=True)
 class TestFunctionalWebdavGet(object):
     """
     Test for all Webdav "GET" action in different case
@@ -146,9 +144,7 @@ class TestFunctionalWebdavGet(object):
             do_notify=False,
             profile=profile,
         )
-        workspace_api = workspace_api_factory.get(
-            current_user=admin_user, show_deleted=True
-        )
+        workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         role_api = role_api_factory.get()
         role_api.create_one(
@@ -163,9 +159,7 @@ class TestFunctionalWebdavGet(object):
         # convert to %encoded for valid_url
         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
         # check availability of new created content using webdav
-        res = webdav_testapp.get(
-            "/{}.space".format(urlencoded_webdav_workspace_label), status="*"
-        )
+        res = webdav_testapp.get("/{}.space".format(urlencoded_webdav_workspace_label), status="*")
         assert res.status_code == HTTPStatus.OK
 
     @pytest.mark.parametrize(
@@ -204,9 +198,7 @@ class TestFunctionalWebdavGet(object):
             do_notify=False,
             profile=profile,
         )
-        workspace_api = workspace_api_factory.get(
-            current_user=admin_user, show_deleted=True
-        )
+        workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace_parent = workspace_api.create_workspace("parent", save_now=True)
         workspace = workspace_api.create_workspace(
             workspace_label, save_now=True, parent=workspace_parent
@@ -271,9 +263,7 @@ class TestFunctionalWebdavGet(object):
             do_notify=False,
             profile=profile,
         )
-        workspace_api = workspace_api_factory.get(
-            current_user=admin_user, show_deleted=True
-        )
+        workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         other_workspace = workspace_api.create_workspace("other", save_now=True)
         workspace_parent = workspace_api.create_workspace("parent", save_now=True)
         workspace_children = workspace_api.create_workspace("children", save_now=True)
@@ -309,9 +299,7 @@ class TestFunctionalWebdavGet(object):
         webdav_testapp.get("/other.space", status=200)
         webdav_testapp.get("/parent.space", status=404)
         webdav_testapp.get("/children.space", status=200)
-        webdav_testapp.get(
-            "/{}.space".format(urlencoded_webdav_workspace_label), status=404
-        )
+        webdav_testapp.get("/{}.space".format(urlencoded_webdav_workspace_label), status=404)
         webdav_testapp.get(
             "/children.space/{}.space".format(urlencoded_webdav_workspace_label),
             status="*",
@@ -354,9 +342,7 @@ class TestFunctionalWebdavGet(object):
             do_notify=False,
             profile=profile,
         )
-        workspace_api = workspace_api_factory.get(
-            current_user=admin_user, show_deleted=True
-        )
+        workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace_parent = workspace_api.create_workspace("parent", save_now=True)
         workspace_child = workspace_api.create_workspace(
             "child", save_now=True, parent=workspace_parent
@@ -401,24 +387,18 @@ class TestFunctionalWebdavGet(object):
         webdav_testapp.get("/parent.space", status=200)
         webdav_testapp.get("/child.space", status=404)
         webdav_testapp.get("/grandson.space", status=404)
-        webdav_testapp.get(
-            "/{}.space".format(urlencoded_webdav_workspace_label), status=404
-        )
+        webdav_testapp.get("/{}.space".format(urlencoded_webdav_workspace_label), status=404)
 
         webdav_testapp.get("/parent.space/child.space", status=200)
         webdav_testapp.get("/parent.space/parent.space", status=404)
         webdav_testapp.get("/parent.space/grandson.space", status=404)
-        webdav_testapp.get(
-            "/parent/{}.space".format(urlencoded_webdav_workspace_label), status=404
-        )
+        webdav_testapp.get("/parent/{}.space".format(urlencoded_webdav_workspace_label), status=404)
 
         webdav_testapp.get("/parent.space/child.space/grandson.space", status=200)
         webdav_testapp.get("/parent.space/child.space/parent.space", status=404)
         webdav_testapp.get("/parent.space/child.space/child.space", status=404)
         webdav_testapp.get(
-            "/parent.space/child.space/{}.space".format(
-                urlencoded_webdav_workspace_label
-            ),
+            "/parent.space/child.space/{}.space".format(urlencoded_webdav_workspace_label),
             status=404,
         )
 
@@ -428,15 +408,9 @@ class TestFunctionalWebdavGet(object):
             ),
             status=200,
         )
-        webdav_testapp.get(
-            "/parent.space/child.space/grandson.space/child.space", status=404
-        )
-        webdav_testapp.get(
-            "/parent.space/child.space/grandson.space/grandson.space", status=404
-        )
-        webdav_testapp.get(
-            "/parent.space/child.space/grandson.space/parent.space", status=404
-        )
+        webdav_testapp.get("/parent.space/child.space/grandson.space/child.space", status=404)
+        webdav_testapp.get("/parent.space/child.space/grandson.space/grandson.space", status=404)
+        webdav_testapp.get("/parent.space/child.space/grandson.space/parent.space", status=404)
 
     def test_functional__webdav_access_to_workspace__no_role_in_workspace(
         self, user_api_factory, workspace_api_factory, webdav_testapp
@@ -541,9 +515,7 @@ class TestFunctionalWebdavGet(object):
         admin_user,
         webdav_testapp,
     ) -> None:
-        workspace_api = workspace_api_factory.get(
-            current_user=admin_user, show_deleted=True
-        )
+        workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         api = content_api_factory.get()
         with session.no_autoflush:
@@ -566,9 +538,7 @@ class TestFunctionalWebdavGet(object):
         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
         urlencoded_webdav_content_filename = quote(webdav_content_filename)
         # check availability of new created content using webdav
-        webdav_testapp.get(
-            "/{}.space".format(urlencoded_webdav_workspace_label), status=200
-        )
+        webdav_testapp.get("/{}.space".format(urlencoded_webdav_workspace_label), status=200)
         webdav_testapp.get(
             "/{}.space/{}".format(
                 urlencoded_webdav_workspace_label, urlencoded_webdav_content_filename
@@ -631,9 +601,7 @@ class TestFunctionalWebdavGet(object):
         session,
         webdav_testapp,
     ) -> None:
-        workspace_api = workspace_api_factory.get(
-            current_user=admin_user, show_deleted=True
-        )
+        workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         api = content_api_factory.get()
         folder = api.create(
@@ -665,13 +633,9 @@ class TestFunctionalWebdavGet(object):
         urlencoded_webdav_dir_label = quote(webdav_dir_label)
         urlencoded_webdav_content_filename = quote(webdav_content_filename)
         # check availability of new created content using webdav
+        webdav_testapp.get("/{}.space".format(urlencoded_webdav_workspace_label), status=200)
         webdav_testapp.get(
-            "/{}.space".format(urlencoded_webdav_workspace_label), status=200
-        )
-        webdav_testapp.get(
-            "/{}.space/{}".format(
-                urlencoded_webdav_workspace_label, urlencoded_webdav_dir_label
-            ),
+            "/{}.space/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir_label),
             status=200,
         )
         webdav_testapp.get(
@@ -714,9 +678,7 @@ class TestFunctionalWebdavGet(object):
 
 
 @pytest.mark.usefixtures("base_fixture")
-@pytest.mark.parametrize(
-    "config_section", [{"name": "functional_webdav_test"}], indirect=True
-)
+@pytest.mark.parametrize("config_section", [{"name": "functional_webdav_test"}], indirect=True)
 class TestFunctionalWebdavMoveSimpleFile(object):
     """
     Test for all Webdav "MOVE" action for simple file in different case
@@ -810,9 +772,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
             do_notify=False,
             profile=profile,
         )
-        workspace_api = workspace_api_factory.get(
-            current_user=admin_user, show_deleted=True
-        )
+        workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         role_api = role_api_factory.get()
         role_api.create_one(
@@ -861,9 +821,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
             "/{}.space".format(urlencoded_webdav_workspace_label).format(), status=200
         )
         webdav_testapp.get(
-            "/{}.space/{}".format(
-                urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label
-            ),
+            "/{}.space/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label),
             status=200,
         )
         webdav_testapp.get(
@@ -875,9 +833,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
             status=200,
         )
         webdav_testapp.get(
-            "/{}.space/{}".format(
-                urlencoded_webdav_workspace_label, urlencoded_webdav_dir2_label
-            ),
+            "/{}.space/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir2_label),
             status=200,
         )
         # do move
@@ -1067,13 +1023,9 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         urlencoded_webdav_content_filename = quote(webdav_content_filename)
         urlencoded_webdav_new_content_filename = quote(webdav_new_content_filename)
         # check availability of content
+        webdav_testapp.get("/{}.space".format(urlencoded_webdav_workspace_label), status=200)
         webdav_testapp.get(
-            "/{}.space".format(urlencoded_webdav_workspace_label), status=200
-        )
-        webdav_testapp.get(
-            "/{}.space/{}".format(
-                urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label
-            ),
+            "/{}.space/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label),
             status=200,
         )
         webdav_testapp.get(
@@ -1085,9 +1037,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
             status=200,
         )
         webdav_testapp.get(
-            "/{}.space/{}".format(
-                urlencoded_webdav_workspace2_label, urlencoded_webdav_dir2_label
-            ),
+            "/{}.space/{}".format(urlencoded_webdav_workspace2_label, urlencoded_webdav_dir2_label),
             status=200,
         )
         # do move
@@ -1204,9 +1154,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
             do_notify=False,
             profile=profile,
         )
-        workspace_api = workspace_api_factory.get(
-            current_user=admin_user, show_deleted=True
-        )
+        workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         role_api = role_api_factory.get()
         role_api.create_one(
@@ -1244,13 +1192,9 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         urlencoded_webdav_new_content_filename = quote(webdav_new_content_filename)
 
         # check availability of content
+        webdav_testapp.get("/{}.space".format(urlencoded_webdav_workspace_label), status=200)
         webdav_testapp.get(
-            "/{}.space".format(urlencoded_webdav_workspace_label), status=200
-        )
-        webdav_testapp.get(
-            "/{}.space/{}".format(
-                urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label
-            ),
+            "/{}.space/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label),
             status=200,
         )
         webdav_testapp.get(
@@ -1432,9 +1376,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         urlencoded_webdav_content_filename = quote(webdav_content_filename)
         urlencoded_webdav_new_content_filename = quote(webdav_new_content_filename)
         # check availability of content
-        webdav_testapp.get(
-            "/{}.space".format(urlencoded_webdav_workspace_label), status=200
-        )
+        webdav_testapp.get("/{}.space".format(urlencoded_webdav_workspace_label), status=200)
         webdav_testapp.get(
             "/{}.space/{}".format(
                 urlencoded_webdav_workspace_label, urlencoded_webdav_content_filename
@@ -1442,9 +1384,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
             status=200,
         )
         webdav_testapp.get(
-            "/{}.space/{}".format(
-                urlencoded_webdav_workspace2_label, urlencoded_webdav_dir2_label
-            ),
+            "/{}.space/{}".format(urlencoded_webdav_workspace2_label, urlencoded_webdav_dir2_label),
             status=200,
         )
         # do move
@@ -1554,9 +1494,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
             do_notify=False,
             profile=profile,
         )
-        workspace_api = workspace_api_factory.get(
-            current_user=admin_user, show_deleted=True
-        )
+        workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         role_api = role_api_factory.get()
         role_api.create_one(
@@ -1594,13 +1532,9 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         urlencoded_webdav_new_content_filename = quote(webdav_new_content_filename)
 
         # check availability of content
+        webdav_testapp.get("/{}.space".format(urlencoded_webdav_workspace_label), status=200)
         webdav_testapp.get(
-            "/{}.space".format(urlencoded_webdav_workspace_label), status=200
-        )
-        webdav_testapp.get(
-            "/{}.space/{}".format(
-                urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label
-            ),
+            "/{}.space/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label),
             status=200,
         )
         webdav_testapp.get(
@@ -1776,13 +1710,9 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         urlencoded_webdav_new_content_filename = quote(webdav_new_content_filename)
 
         # check availability of content
+        webdav_testapp.get("/{}.space".format(urlencoded_webdav_workspace_label), status=200)
         webdav_testapp.get(
-            "/{}.space".format(urlencoded_webdav_workspace_label), status=200
-        )
-        webdav_testapp.get(
-            "/{}.space/{}".format(
-                urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label
-            ),
+            "/{}.space/{}".format(urlencoded_webdav_workspace_label, urlencoded_webdav_dir1_label),
             status=200,
         )
         webdav_testapp.get(
@@ -1892,9 +1822,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
             do_notify=False,
             profile=profile,
         )
-        workspace_api = workspace_api_factory.get(
-            current_user=admin_user, show_deleted=True
-        )
+        workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         role_api = role_api_factory.get()
         role_api.create_one(
@@ -1924,9 +1852,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         urlencoded_webdav_new_content_filename = quote(webdav_new_content_filename)
 
         # check availability of content
-        webdav_testapp.get(
-            "/{}.space".format(urlencoded_webdav_workspace_label), status=200
-        )
+        webdav_testapp.get("/{}.space".format(urlencoded_webdav_workspace_label), status=200)
         webdav_testapp.get(
             "/{}.space/{}".format(
                 urlencoded_webdav_workspace_label, urlencoded_webdav_content_filename
@@ -2076,9 +2002,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         urlencoded_webdav_new_content_filename = quote(webdav_new_content_filename)
 
         # check availability of content
-        webdav_testapp.get(
-            "/{}.space".format(urlencoded_webdav_workspace_label), status=200
-        )
+        webdav_testapp.get("/{}.space".format(urlencoded_webdav_workspace_label), status=200)
         webdav_testapp.get(
             "/{}.space/{}".format(
                 urlencoded_webdav_workspace_label, urlencoded_webdav_content_filename

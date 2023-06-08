@@ -228,9 +228,7 @@ class MailHogHelper(object):
     MAILHOG_MESSAGES_ENDPOINT = "/api/v1/messages"
 
     def cleanup_mailhog(self) -> Response:
-        return requests.delete(
-            "{}{}".format(self.MAILHOG_BASE_URL, self.MAILHOG_MESSAGES_ENDPOINT)
-        )
+        return requests.delete("{}{}".format(self.MAILHOG_BASE_URL, self.MAILHOG_MESSAGES_ENDPOINT))
 
     def get_mailhog_mails(self) -> typing.List[typing.Any]:
         return requests.get(
@@ -242,9 +240,7 @@ class MailHogHelper(object):
 
 class ElasticSearchHelper(object):
     def __init__(self, app_config, session):
-        self.elastic_search_api = ESSearchApi(
-            config=app_config, current_user=None, session=session
-        )
+        self.elastic_search_api = ESSearchApi(config=app_config, current_user=None, session=session)
         self.delete_indices()
         self.elastic_search_api.create_indices()
 
@@ -277,12 +273,7 @@ class EventHelper(object):
         self._session = db_session
 
     def last_events(self, count: int) -> typing.List[Event]:
-        events = (
-            self._session.query(Event)
-            .order_by(Event.event_id.desc())
-            .limit(count)
-            .all()
-        )
+        events = self._session.query(Event).order_by(Event.event_id.desc()).limit(count).all()
         return sorted(events, key=lambda e: e.event_id)
 
     @property
@@ -328,9 +319,7 @@ class TracimTestContext(TracimContext):
             LiveMessagesLib.publish_message_to_user = mock.Mock()
         else:
             self._plugin_manager = create_plugin_manager()
-        self._dbsession = create_dbsession_for_context(
-            session_factory, transaction.manager, self
-        )
+        self._dbsession = create_dbsession_for_context(session_factory, transaction.manager, self)
         self._dbsession.set_context(self)
         self._current_user = user
 

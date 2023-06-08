@@ -144,9 +144,7 @@ class Event(CreationDateMixin, DeclarativeBase):
     )
     operation = Column(Enum(OperationType), nullable=False)
     entity_type = Column(Enum(EntityType), nullable=False)
-    entity_subtype = Column(
-        String(length=_ENTITY_SUBTYPE_LENGTH), nullable=True, default=None
-    )
+    entity_subtype = Column(String(length=_ENTITY_SUBTYPE_LENGTH), nullable=True, default=None)
     fields = Column(JSON, nullable=False)
 
     # easier access to values stored in fields
@@ -195,12 +193,8 @@ class Message(DeclarativeBase):
 
     __tablename__ = "messages"
 
-    receiver_id = Column(
-        Integer, ForeignKey("users.user_id", ondelete="CASCADE"), primary_key=True
-    )
-    event_id = Column(
-        Integer, ForeignKey("events.event_id", ondelete="CASCADE"), primary_key=True
-    )
+    receiver_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), primary_key=True)
+    event_id = Column(Integer, ForeignKey("events.event_id", ondelete="CASCADE"), primary_key=True)
     sent = Column(DateTime)
     read = Column(DateTime)
 

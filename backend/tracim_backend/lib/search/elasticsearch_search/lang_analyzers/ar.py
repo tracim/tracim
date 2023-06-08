@@ -11,9 +11,7 @@ from tracim_backend.lib.search.elasticsearch_search.default_analyzers import und
 
 
 arabic_stop = analysis.token_filter("arabic_stop", type="stop", stopwords="_arabic_")
-arabic_stemmer = analysis.token_filter(
-    "arabic_stemmer", type="stemmer", language="arabic"
-)
+arabic_stemmer = analysis.token_filter("arabic_stemmer", type="stemmer", language="arabic")
 tracim_arabic_analyzer = analyzer(
     "tracim_arabic",
     tokenizer="standard",

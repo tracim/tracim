@@ -332,9 +332,7 @@ class TestMailFetcher(object):
         mock = Mock()
         mock.return_value = auth_headers
         mf._get_auth_headers = mock
-        content_info = mf._get_content_info(
-            1, user_email="useremailaddress@mydomain.com"
-        )
+        content_info = mf._get_content_info(1, user_email="useremailaddress@mydomain.com")
         assert content_info == content_json
 
     def test_unit__create_comment_request__ok__nominal_test(self):

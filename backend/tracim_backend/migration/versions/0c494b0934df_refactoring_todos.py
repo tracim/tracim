@@ -90,8 +90,6 @@ def downgrade():
     op.drop_index("idx__content_revisions__assignee_id", table_name="content_revisions")
 
     with op.batch_alter_table("content_revisions") as batch_op:
-        batch_op.drop_constraint(
-            "fk_content_revisions_assignee_id_users", type_="foreignkey"
-        )
+        batch_op.drop_constraint("fk_content_revisions_assignee_id_users", type_="foreignkey")
         batch_op.drop_column("assignee_id")
     # ### end Alembic commands ###

@@ -37,9 +37,7 @@ class FileTemplateSchema(marshmallow.Schema):
     template_name = StrippedString(
         example="default.odt", description="template name you can use", required=True
     )
-    category = StrippedString(
-        example="calc", description="category of the template", required=True
-    )
+    category = StrippedString(example="calc", description="category of the template", required=True)
 
 
 class FileTemplateInfoSchema(marshmallow.Schema):

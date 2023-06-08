@@ -133,9 +133,7 @@ class User(TrashableMixin, DeclarativeBase):
     # TODO - G.M - 2021-03-10:  use CreationDateMixin instead
     created = Column(DateTime, default=datetime.utcnow)
 
-    user_id = Column(
-        Integer, Sequence("seq__users__user_id"), autoincrement=True, primary_key=True
-    )
+    user_id = Column(Integer, Sequence("seq__users__user_id"), autoincrement=True, primary_key=True)
     email = Column(Unicode(MAX_EMAIL_LENGTH), unique=True, nullable=True)
     username = Column(Unicode(MAX_USERNAME_LENGTH), unique=True, nullable=True)
     display_name = Column(Unicode(MAX_PUBLIC_NAME_LENGTH))
@@ -145,9 +143,7 @@ class User(TrashableMixin, DeclarativeBase):
     # timezone as tz database format
     timezone = Column(Unicode(MAX_TIMEZONE_LENGTH), nullable=False, server_default="")
     # lang in iso639 format
-    auth_type = Column(
-        Enum(AuthType), nullable=False, server_default=AuthType.INTERNAL.name
-    )
+    auth_type = Column(Enum(AuthType), nullable=False, server_default=AuthType.INTERNAL.name)
     lang = Column(Unicode(MAX_LANG_LENGTH), nullable=True, default=None)
     # TODO - G.M - 04-04-2018 - [auth] Check if this is already needed
     # with new auth system
@@ -158,9 +154,7 @@ class User(TrashableMixin, DeclarativeBase):
         Unicode(MAX_RESET_PASSWORD_TOKEN_HASH_LENGTH), nullable=True, default=None
     )
     reset_password_token_created = Column(DateTime, nullable=True, default=None)
-    allowed_space = Column(
-        BigInteger, nullable=False, server_default=str(DEFAULT_ALLOWED_SPACE)
-    )
+    allowed_space = Column(BigInteger, nullable=False, server_default=str(DEFAULT_ALLOWED_SPACE))
     profile = Column(Enum(Profile), nullable=False, server_default=Profile.NOBODY.name)
     is_avatar_default = Column(Boolean, default=False, nullable=False)
     avatar = Column(TracimUploadedFileField, unique=False, nullable=True)

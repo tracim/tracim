@@ -144,9 +144,7 @@ class UserApi(object):
         try:
             user = self.base_query().filter(User.user_id == user_id).one()
         except NoResultFound as exc:
-            raise UserDoesNotExist(
-                'User "{}" not found in database'.format(user_id)
-            ) from exc
+            raise UserDoesNotExist('User "{}" not found in database'.format(user_id)) from exc
         return user
 
     def get_one_by_login(self, login: str) -> User:
@@ -162,9 +160,7 @@ class UserApi(object):
         try:
             user = self.base_query().filter(User.auth_token == token).one()
         except NoResultFound as exc:
-            raise UserDoesNotExist(
-                "User with given token not found in database"
-            ) from exc
+            raise UserDoesNotExist("User with given token not found in database") from exc
         return user
 
     def get_one_by_email(self, email: typing.Optional[str]) -> User:
@@ -178,9 +174,7 @@ class UserApi(object):
         try:
             user = self.base_query().filter(User.email == email.lower()).one()
         except NoResultFound as exc:
-            raise UserDoesNotExist(
-                'User "{}" not found in database'.format(email)
-            ) from exc
+            raise UserDoesNotExist('User "{}" not found in database'.format(email)) from exc
         return user
 
     def get_one_by_username(self, username: str) -> User:
@@ -224,16 +218,12 @@ class UserApi(object):
             f"UserApi.get_user_ids_from_profile({profile})",
             lambda: [
                 r[0]
-                for r in self._session.query(User.user_id)
-                .filter(User.profile == profile)
-                .all()
+                for r in self._session.query(User.user_id).filter(User.profile == profile).all()
             ],
         )
         return ids
 
-    def get_members_of_workspaces(
-        self, workspace_ids: typing.List[int]
-    ) -> typing.List[int]:
+    def get_members_of_workspaces(self, workspace_ids: typing.List[int]) -> typing.List[int]:
         user_ids_in_workspaces_tuples = (
             self._session.query(UserRoleInWorkspace.user_id)
             .distinct(UserRoleInWorkspace.user_id)
@@ -292,9 +282,7 @@ class UserApi(object):
             if user_in_every_included_workspaces and limit:
                 nb_elems = limit
         elif include_workspace_ids:
-            include_user_ids = set(
-                self.get_members_of_workspaces(include_workspace_ids)
-            )
+            include_user_ids = set(self.get_members_of_workspaces(include_workspace_ids))
 
         # TODO - MP - 2022-12-06 - Theses are two separates errors.
         if not user_in_every_included_workspaces and len(acp) < 2:
@@ -309,9 +297,7 @@ need to be in every workspace you include."
                     "Parameters exclude_workspace_ids and include_workspace_ids cannot be both used at the same time"
                 )
 
-            user_ids_in_workspaces = self.get_members_of_workspaces(
-                exclude_workspace_ids
-            )
+            user_ids_in_workspaces = self.get_members_of_workspaces(exclude_workspace_ids)
             exclude_user_ids = (exclude_user_ids or []) + user_ids_in_workspaces
 
         query = self.base_query().order_by(User.display_name)
@@ -331,9 +317,7 @@ need to be in every workspace you include."
         #  - User is trusted-user (or more)
         #  - users have at least one common space
         if filter_results and self._user and self._user.profile.id <= Profile.USER.id:
-            users_in_workspaces = self._get_user_ids_in_same_workspace(
-                self._user.user_id
-            )
+            users_in_workspaces = self._get_user_ids_in_same_workspace(self._user.user_id)
             query = query.filter(User.user_id.in_(users_in_workspaces))
 
         if exclude_user_ids:
@@ -393,9 +377,7 @@ need to be in every workspace you include."
         if acp:
             query = query.filter(
                 or_(
-                    cast(Content.content_id, sqlalchemy.String).ilike(
-                        "%{}%".format(acp)
-                    ),
+                    cast(Content.content_id, sqlalchemy.String).ilike("%{}%".format(acp)),
                     Content.label.ilike("%{}%".format(acp)),
                 )
             )
@@ -435,11 +417,7 @@ need to be in every workspace you include."
         users_in_workspaces = (
             self._session.query(UserRoleInWorkspace.user_id)
             .distinct(UserRoleInWorkspace.user_id)
-            .filter(
-                UserRoleInWorkspace.workspace_id.in_(
-                    user_workspaces_id_query.subquery()
-                )
-            )
+            .filter(UserRoleInWorkspace.workspace_id.in_(user_workspaces_id_query.subquery()))
             .subquery()
         )
         return users_in_workspaces
@@ -512,10 +490,7 @@ need to be in every workspace you include."
             name = None
             mail = None
             username = None
-            if (
-                self._config.LDAP_NAME_ATTRIBUTE
-                and self._config.LDAP_NAME_ATTRIBUTE in ldap_data
-            ):
+            if self._config.LDAP_NAME_ATTRIBUTE and self._config.LDAP_NAME_ATTRIBUTE in ldap_data:
                 name = ldap_data[self._config.LDAP_NAME_ATTRIBUTE][0]
             if self._config.LDAP_MAIL_ATTRIBUTE:
                 mail = ldap_data[self._config.LDAP_MAIL_ATTRIBUTE][0]
@@ -581,9 +556,7 @@ need to be in every workspace you include."
             user.auth_type = auth_type
         return user
 
-    def _remote_user_authenticate(
-        self, user: typing.Optional[User], login: str
-    ) -> User:
+    def _remote_user_authenticate(self, user: typing.Optional[User], login: str) -> User:
         """
         Authenticate with remote_auth, return authenticated user
         or raise Exception like WrongAuthTypeForUser,
@@ -644,9 +617,7 @@ need to be in every workspace you include."
         except AuthenticationFailed as exc:
             raise exc
         except WrongAuthTypeForUser as exc:
-            raise AuthenticationFailed(
-                "Auth mechanism for this user is not activated"
-            ) from exc
+            raise AuthenticationFailed("Auth mechanism for this user is not activated") from exc
 
     def _remote_authenticate(self, login: str):
         """
@@ -672,13 +643,9 @@ need to be in every workspace you include."
             TracimValidationFailed,
             EmailRequired,
         ) as exc:
-            raise AuthenticationFailed(
-                'User "{}" authentication failed'.format(login)
-            ) from exc
+            raise AuthenticationFailed('User "{}" authentication failed'.format(login)) from exc
 
-    def authenticate(
-        self, password: str, login: str, ldap_connector: "Connector" = None
-    ) -> User:
+    def authenticate(self, password: str, login: str, ldap_connector: "Connector" = None) -> User:
         """
         Authenticate user with email/username and password, raise AuthenticationFailed
         if incorrect. try all auth available in order and raise issue of
@@ -727,9 +694,7 @@ need to be in every workspace you include."
         try:
             if auth_type == AuthType.LDAP:
                 if ldap_connector:
-                    return self._ldap_authenticate(
-                        user, login, password, ldap_connector
-                    )
+                    return self._ldap_authenticate(user, login, password, ldap_connector)
                 raise MissingLDAPConnector()
             elif auth_type == AuthType.INTERNAL:
                 return self._internal_db_authenticate(user, login, password)
@@ -744,9 +709,7 @@ need to be in every workspace you include."
             UserAuthenticatedIsNotActive,
             TracimValidationFailed,
         ) as exc:
-            raise AuthenticationFailed(
-                'User "{}" authentication failed'.format(login)
-            ) from exc
+            raise AuthenticationFailed('User "{}" authentication failed'.format(login)) from exc
 
     # Actions
     def set_password(
@@ -770,9 +733,7 @@ need to be in every workspace you include."
         """
 
         if not self._user:
-            raise NoUserSetted(
-                "Current User should be set in UserApi to use this method"
-            )
+            raise NoUserSetted("Current User should be set in UserApi to use this method")
 
         self._check_password_modification_allowed(self._user)
         if not self._user.validate_password(loggedin_user_password):
@@ -801,9 +762,7 @@ need to be in every workspace you include."
         :return:
         """
         if not self._user:
-            raise NoUserSetted(
-                "Current User should be set in UserApi to use this method"
-            )
+            raise NoUserSetted("Current User should be set in UserApi to use this method")
 
         self._check_email_modification_allowed(user)
 
@@ -831,9 +790,7 @@ need to be in every workspace you include."
         :return:
         """
         if not self._user:
-            raise NoUserSetted(
-                "Current User should be set in UserApi to use this method"
-            )
+            raise NoUserSetted("Current User should be set in UserApi to use this method")
 
         if not self._user.validate_password(loggedin_user_password):
             raise WrongUserPassword(
@@ -868,15 +825,11 @@ need to be in every workspace you include."
         """
         is_email_correct = self._check_email_correctness(email)
         if not is_email_correct:
-            raise EmailValidationFailed(
-                "Email given form {} is uncorrect".format(email)
-            )
+            raise EmailValidationFailed("Email given form {} is uncorrect".format(email))
         EMAIL_ALREADY_EXISTS = self.check_email_already_in_db(email)
         if EMAIL_ALREADY_EXISTS:
             raise EmailAlreadyExists(
-                "Email given {} already exist, please choose something else".format(
-                    email
-                )
+                "Email given {} already exist, please choose something else".format(email)
             )
         return True
 
@@ -893,9 +846,7 @@ need to be in every workspace you include."
 
         if self.check_username_already_in_db(username):
             raise UsernameAlreadyExists(
-                "Username given '{}' already exist, please choose something else".format(
-                    username
-                )
+                "Username given '{}' already exist, please choose something else".format(username)
             )
         if username in self.get_reserved_usernames():
             raise ReservedUsernameError("'{}' is a reserved username".format(username))
@@ -910,10 +861,7 @@ need to be in every workspace you include."
         """
         Verify if given username already used in db
         """
-        return (
-            self._session.query(User.username).filter(User.username == username).count()
-            != 0
-        )
+        return self._session.query(User.username).filter(User.username == username).count() != 0
 
     def _check_email_correctness(self, email: str) -> bool:
         """
@@ -928,16 +876,10 @@ need to be in every workspace you include."
             return False
 
     def _check_username_correctness(self, username: str) -> bool:
-        if (
-            len(username) < User.MIN_USERNAME_LENGTH
-            or len(username) > User.MAX_USERNAME_LENGTH
-        ):
+        if len(username) < User.MIN_USERNAME_LENGTH or len(username) > User.MAX_USERNAME_LENGTH:
             return False
         for char in username:
-            if (
-                char
-                not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_."
-            ):
+            if char not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.":
                 return False
         return True
 
@@ -1093,9 +1035,7 @@ need to be in every workspace you include."
         # TODO - G.M - 04-04-2018 - [auth]
         # Check if this is already needed with
         # new auth system
-        new_user.ensure_auth_token(
-            validity_seconds=self._config.USER__AUTH_TOKEN__VALIDITY
-        )
+        new_user.ensure_auth_token(validity_seconds=self._config.USER__AUTH_TOKEN__VALIDITY)
         # NOTE BS 20200428: #2829: Email no longer required for User
         if do_notify and new_user.email:
             try:
@@ -1134,9 +1074,7 @@ need to be in every workspace you include."
             if self._config.EMAIL__REQUIRED:
                 raise EmailRequired("Email is required to create an user")
             if not username:
-                raise EmailOrUsernameRequired(
-                    "Email or username is required to create an user"
-                )
+                raise EmailOrUsernameRequired("Email or username is required to create an user")
         lowercase_email = email.lower() if email is not None else None
         validator = TracimValidator()
         validator.add_validator("email", lowercase_email, user_email_validator)
@@ -1182,9 +1120,7 @@ need to be in every workspace you include."
         self._check_password_modification_allowed(user)
 
         if not user.email:
-            raise MissingEmailCantResetPassword(
-                "Can't reset password without an email address"
-            )
+            raise MissingEmailCantResetPassword("Can't reset password without an email address")
 
         if not self._config.EMAIL__NOTIFICATION__ACTIVATED:
             raise NotificationDisabledCantResetPassword(
@@ -1196,9 +1132,7 @@ need to be in every workspace you include."
             email_manager = get_email_manager(self._config, self._session)
             email_manager.notify_reset_password(user, token)
         except SMTPException as exc:
-            raise NotificationSendingFailed(
-                "SMTP error, can't send notification"
-            ) from exc
+            raise NotificationSendingFailed("SMTP error, can't send notification") from exc
         except EmailTemplateError as exc:
             raise exc
 
@@ -1221,9 +1155,7 @@ need to be in every workspace you include."
 
     def disable(self, user: User, do_save=False):
         if self._user and self._user == user:
-            raise UserCantDisableHimself(
-                "User {} can't disable himself".format(user.user_id)
-            )
+            raise UserCantDisableHimself("User {} can't disable himself".format(user.user_id))
 
         user.is_active = False
         if do_save:
@@ -1231,9 +1163,7 @@ need to be in every workspace you include."
 
     def delete(self, user: User, do_save=False):
         if self._user and self._user == user:
-            raise UserCantDeleteHimself(
-                "User {} can't delete himself".format(user.user_id)
-            )
+            raise UserCantDeleteHimself("User {} can't delete himself".format(user.user_id))
         user.is_deleted = True
         if do_save:
             self.save(user)
@@ -1257,9 +1187,7 @@ need to be in every workspace you include."
     def _check_user_auth_validity(self, user: User) -> None:
         if not self._user_can_authenticate(user):
             raise UserAuthTypeDisabled(
-                "user {} auth type {} is disabled".format(
-                    user.login, user.auth_type.value
-                )
+                "user {} auth type {} is disabled".format(user.login, user.auth_type.value)
             )
 
     def _user_can_authenticate(self, user: User) -> bool:
@@ -1372,18 +1300,10 @@ need to be in every workspace you include."
         return get_page(query, per_page=count, page=page_token or False)
 
     def get_followers_count(self, leader_id: int) -> int:
-        return (
-            self._session.query(UserFollower)
-            .filter(UserFollower.leader_id == leader_id)
-            .count()
-        )
+        return self._session.query(UserFollower).filter(UserFollower.leader_id == leader_id).count()
 
     def get_leaders_count(self, user_id: int) -> int:
-        return (
-            self._session.query(UserFollower)
-            .filter(UserFollower.follower_id == user_id)
-            .count()
-        )
+        return self._session.query(UserFollower).filter(UserFollower.follower_id == user_id).count()
 
     def get_about_user(self, user_id: int) -> AboutUser:
         """
@@ -1513,9 +1433,7 @@ need to be in every workspace you include."
     ) -> HapicFile:
         user = self.get_one(user_id)
         if not user.cropped_cover:
-            raise UserImageNotFound(
-                "cropped version of user {} cover not found".format(user_id)
-            )
+            raise UserImageNotFound("cropped version of user {} cover not found".format(user_id))
         _, original_file_extension = os.path.splitext(user.cropped_cover.filename)
         return StorageLib(self._config).get_jpeg_preview(
             depot_file=user.cropped_cover,
@@ -1600,13 +1518,9 @@ need to be in every workspace you include."
             color_string = "#f3f3f3"
             avatar_name = "?"
         else:
-            color_string = (
-                "#" + hashlib.blake2b(name.encode(), digest_size=3).hexdigest()
-            )
+            color_string = "#" + hashlib.blake2b(name.encode(), digest_size=3).hexdigest()
             parts = [p for p in re.split("[ -.]", name) if p != ""]
-            avatar_name = (
-                f"{parts[0][0]}{parts[1][0]}" if len(parts) >= 2 else name[0:2]
-            )
+            avatar_name = f"{parts[0][0]}{parts[1][0]}" if len(parts) >= 2 else name[0:2]
             avatar_name = avatar_name.upper()
 
         # INFO - SGD - 2023-01-25 - Create the avatar as an SVG file as this will allow proper resizing.

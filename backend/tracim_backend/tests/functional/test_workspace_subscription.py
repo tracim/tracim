@@ -64,9 +64,7 @@ class TestUserSubscriptionEndpoint(object):
             do_save=True,
             do_notify=False,
         )
-        subscription_lib_factory.get(test_user).submit_subscription(
-            workspace=on_request_workspace
-        )
+        subscription_lib_factory.get(test_user).submit_subscription(workspace=on_request_workspace)
         subscription = subscription_lib_factory.get(test_user).submit_subscription(
             workspace=on_request_workspace_2
         )
@@ -80,10 +78,7 @@ class TestUserSubscriptionEndpoint(object):
         assert len(res.json_body) == 2
         first_subscription = res.json_body[0]
         assert first_subscription["state"] == WorkspaceSubscriptionState.PENDING.value
-        assert (
-            first_subscription["workspace"]["workspace_id"]
-            == on_request_workspace.workspace_id
-        )
+        assert first_subscription["workspace"]["workspace_id"] == on_request_workspace.workspace_id
         assert first_subscription["author"]["user_id"] == test_user.user_id
         assert first_subscription["created_date"]
         assert first_subscription["evaluation_date"] is None
@@ -92,8 +87,7 @@ class TestUserSubscriptionEndpoint(object):
         second_subscription = res.json_body[1]
         assert second_subscription["state"] == WorkspaceSubscriptionState.REJECTED.value
         assert (
-            second_subscription["workspace"]["workspace_id"]
-            == on_request_workspace_2.workspace_id
+            second_subscription["workspace"]["workspace_id"] == on_request_workspace_2.workspace_id
         )
         assert second_subscription["author"]["user_id"] == test_user.user_id
         assert second_subscription["created_date"]
@@ -145,10 +139,7 @@ class TestUserSubscriptionEndpoint(object):
         )
         subscription = res.json_body
         assert subscription["state"] == WorkspaceSubscriptionState.PENDING.value
-        assert (
-            subscription["workspace"]["workspace_id"]
-            == on_request_workspace.workspace_id
-        )
+        assert subscription["workspace"]["workspace_id"] == on_request_workspace.workspace_id
         assert subscription["author"]["user_id"] == test_user.user_id
         assert subscription["created_date"]
         assert subscription["evaluation_date"] is None
@@ -162,9 +153,7 @@ class TestUserSubscriptionEndpoint(object):
         )
         last_event = event_helper.last_event
         assert last_event.event_type == "workspace_subscription.created"
-        author = web_testapp.get(
-            "/api/users/{}".format(test_user.user_id), status=200
-        ).json_body
+        author = web_testapp.get("/api/users/{}".format(test_user.user_id), status=200).json_body
         assert last_event.author == UserDigestSchema().dump(author).data
         web_testapp.authorization = (
             "Basic",
@@ -173,9 +162,7 @@ class TestUserSubscriptionEndpoint(object):
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(on_request_workspace.workspace_id), status=200
         ).json_body
-        assert last_event.workspace == {
-            k: v for k, v in workspace.items() if k != "description"
-        }
+        assert last_event.workspace == {k: v for k, v in workspace.items() if k != "description"}
         assert last_event.subscription["state"] == subscription["state"]
         assert last_event.subscription["workspace"] == subscription["workspace"]
         assert last_event.subscription["author"] == subscription["author"]
@@ -272,10 +259,7 @@ class TestUserSubscriptionEndpoint(object):
         assert len(res.json_body) == 1
         subscription = res.json_body[0]
         assert subscription["state"] == WorkspaceSubscriptionState.REJECTED.value
-        assert (
-            subscription["workspace"]["workspace_id"]
-            == on_request_workspace.workspace_id
-        )
+        assert subscription["workspace"]["workspace_id"] == on_request_workspace.workspace_id
         assert subscription["author"]["user_id"] == test_user.user_id
         assert subscription["created_date"]
         assert subscription["evaluation_date"]
@@ -290,10 +274,7 @@ class TestUserSubscriptionEndpoint(object):
         )
         subscription = res.json_body
         assert subscription["state"] == WorkspaceSubscriptionState.PENDING.value
-        assert (
-            subscription["workspace"]["workspace_id"]
-            == on_request_workspace.workspace_id
-        )
+        assert subscription["workspace"]["workspace_id"] == on_request_workspace.workspace_id
         assert subscription["author"]["user_id"] == test_user.user_id
         assert subscription["created_date"]
         assert subscription["evaluation_date"] is None
@@ -301,9 +282,7 @@ class TestUserSubscriptionEndpoint(object):
 
         last_event = event_helper.last_event
         assert last_event.event_type == "workspace_subscription.modified"
-        author = web_testapp.get(
-            "/api/users/{}".format(test_user.user_id), status=200
-        ).json_body
+        author = web_testapp.get("/api/users/{}".format(test_user.user_id), status=200).json_body
         assert last_event.author == UserDigestSchema().dump(author).data
         web_testapp.authorization = (
             "Basic",
@@ -312,9 +291,7 @@ class TestUserSubscriptionEndpoint(object):
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(on_request_workspace.workspace_id), status=200
         ).json_body
-        assert last_event.workspace == {
-            k: v for k, v in workspace.items() if k != "description"
-        }
+        assert last_event.workspace == {k: v for k, v in workspace.items() if k != "description"}
         assert last_event.subscription["state"] == subscription["state"]
         assert last_event.subscription["workspace"] == subscription["workspace"]
         assert last_event.subscription["author"] == subscription["author"]
@@ -328,10 +305,7 @@ class TestUserSubscriptionEndpoint(object):
         assert len(res.json_body) == 1
         subscription = res.json_body[0]
         assert subscription["state"] == WorkspaceSubscriptionState.PENDING.value
-        assert (
-            subscription["workspace"]["workspace_id"]
-            == on_request_workspace.workspace_id
-        )
+        assert subscription["workspace"]["workspace_id"] == on_request_workspace.workspace_id
         assert subscription["author"]["user_id"] == test_user.user_id
         assert subscription["created_date"]
         assert subscription["evaluation_date"] is None
@@ -339,9 +313,7 @@ class TestUserSubscriptionEndpoint(object):
 
         last_event = event_helper.last_event
         assert last_event.event_type == "workspace_subscription.modified"
-        author = web_testapp.get(
-            "/api/users/{}".format(test_user.user_id), status=200
-        ).json_body
+        author = web_testapp.get("/api/users/{}".format(test_user.user_id), status=200).json_body
         assert last_event.author == UserDigestSchema().dump(author).data
         web_testapp.authorization = (
             "Basic",
@@ -350,9 +322,7 @@ class TestUserSubscriptionEndpoint(object):
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(on_request_workspace.workspace_id), status=200
         ).json_body
-        assert last_event.workspace == {
-            k: v for k, v in workspace.items() if k != "description"
-        }
+        assert last_event.workspace == {k: v for k, v in workspace.items() if k != "description"}
         assert last_event.subscription["state"] == subscription["state"]
         assert last_event.subscription["workspace"] == subscription["workspace"]
         assert last_event.subscription["author"] == subscription["author"]
@@ -390,27 +360,20 @@ class TestWorkspaceSubscriptionEndpoint(object):
             do_save=True,
             do_notify=False,
         )
-        subscription_lib_factory.get(test_user).submit_subscription(
-            workspace=on_request_workspace
-        )
+        subscription_lib_factory.get(test_user).submit_subscription(workspace=on_request_workspace)
         transaction.commit()
         web_testapp.authorization = (
             "Basic",
             ("admin@admin.admin", "admin@admin.admin"),
         )
         res = web_testapp.get(
-            "/api/workspaces/{}/subscriptions".format(
-                on_request_workspace.workspace_id
-            ),
+            "/api/workspaces/{}/subscriptions".format(on_request_workspace.workspace_id),
             status=200,
         )
         assert len(res.json_body) == 1
         first_subscription = res.json_body[0]
         assert first_subscription["state"] == WorkspaceSubscriptionState.PENDING.value
-        assert (
-            first_subscription["workspace"]["workspace_id"]
-            == on_request_workspace.workspace_id
-        )
+        assert first_subscription["workspace"]["workspace_id"] == on_request_workspace.workspace_id
         assert first_subscription["author"]["user_id"] == test_user.user_id
         assert first_subscription["created_date"]
         assert first_subscription["evaluation_date"] is None
@@ -440,9 +403,7 @@ class TestWorkspaceSubscriptionEndpoint(object):
             do_save=True,
             do_notify=False,
         )
-        subscription_lib_factory.get(test_user).submit_subscription(
-            workspace=on_request_workspace
-        )
+        subscription_lib_factory.get(test_user).submit_subscription(workspace=on_request_workspace)
         transaction.commit()
         params = {"role": "contributor"}
         web_testapp.authorization = (
@@ -494,9 +455,7 @@ class TestWorkspaceSubscriptionEndpoint(object):
             UserRoleInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        subscription_lib_factory.get(test_user).submit_subscription(
-            workspace=on_request_workspace
-        )
+        subscription_lib_factory.get(test_user).submit_subscription(workspace=on_request_workspace)
         transaction.commit()
         params = {"role": "contributor"}
         web_testapp.authorization = (
@@ -536,9 +495,7 @@ class TestWorkspaceSubscriptionEndpoint(object):
             do_save=True,
             do_notify=False,
         )
-        subscription_lib_factory.get(test_user).submit_subscription(
-            workspace=on_request_workspace
-        )
+        subscription_lib_factory.get(test_user).submit_subscription(workspace=on_request_workspace)
         transaction.commit()
         web_testapp.authorization = (
             "Basic",

@@ -24,9 +24,7 @@ from tracim_backend.lib.utils.request import TracimRequest
 
 
 def add_www_authenticate_header_for_caldav(config):
-    config.add_subscriber(
-        add_www_authenticate_header_for_caldav_to_response, NewResponse
-    )
+    config.add_subscriber(add_www_authenticate_header_for_caldav_to_response, NewResponse)
 
 
 def add_www_authenticate_header_for_caldav_to_response(event: NewResponse) -> None:
@@ -41,9 +39,7 @@ def add_www_authenticate_header_for_caldav_to_response(event: NewResponse) -> No
         and hasattr(request.exception, "error_code")
         and request.exception.error_code == ErrorCode.CALDAV_NOT_AUTHENTICATED
     ):
-        response.headerlist.append(
-            ("WWW-Authenticate", 'Basic realm="Tracim credentials"')
-        )
+        response.headerlist.append(("WWW-Authenticate", 'Basic realm="Tracim credentials"'))
 
 
 class CanAccessWorkspaceRootAgendaChecker(AuthorizationChecker):
@@ -165,13 +161,9 @@ class CaldavChecker(AuthorizationChecker):
 
 
 can_access_workspace_root_agenda = CaldavChecker(CanAccessWorkspaceRootAgendaChecker())
-can_access_workspace_event_agenda = CaldavChecker(
-    CanAccessWorkspaceEventAgendaChecker()
-)
+can_access_workspace_event_agenda = CaldavChecker(CanAccessWorkspaceEventAgendaChecker())
 can_access_user_agenda_event = CaldavChecker(CandidateIsCurrentUserChecker())
 can_access_user_root_agenda = CaldavChecker(
-    AndAuthorizationChecker(
-        CandidateIsCurrentUserChecker(), CanAccessUserRootAgendaChecker()
-    )
+    AndAuthorizationChecker(CandidateIsCurrentUserChecker(), CanAccessUserRootAgendaChecker())
 )
 can_access_to_agenda_list = CaldavChecker(is_user)

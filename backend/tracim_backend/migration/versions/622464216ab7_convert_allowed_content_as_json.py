@@ -33,17 +33,13 @@ def upgrade():
         # INFO G.M - 2022-06-30 - ensure there is no more server_default value because such value
         # will break the type convertion
         batch_op.alter_column("properties", server_default=None)
-        batch_op.alter_column(
-            "properties", type_=sa.JSON, postgresql_using="properties::json"
-        )
+        batch_op.alter_column("properties", type_=sa.JSON, postgresql_using="properties::json")
     # ### end Alembic commands ###
 
 
 def downgrade():
     with op.batch_alter_table("content_revisions") as batch_op:
         batch_op.alter_column("properties", server_default=None)
-        batch_op.alter_column(
-            "properties", type_=sa.Text, postgresql_using="properties::text"
-        )
+        batch_op.alter_column("properties", type_=sa.Text, postgresql_using="properties::text")
     connection = op.get_bind()
     connection.execute(all_as_valid_text)

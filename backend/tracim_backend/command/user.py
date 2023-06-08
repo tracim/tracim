@@ -124,18 +124,14 @@ class CreateUserCommand(UserCommand):
         )
         return parser
 
-    def take_app_action(
-        self, parsed_args: argparse.Namespace, app_context: AppEnvironment
-    ) -> None:
+    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         # TODO - G.M - 05-04-2018 -Refactor this in order
         # to not setup object var outside of __init__ .
         if parsed_args.send_email and not parsed_args.email:
             print("Warning: No email provided, can not send email to user.")
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]
-        self._user_api = UserApi(
-            current_user=None, session=self._session, config=self._app_config
-        )
+        self._user_api = UserApi(current_user=None, session=self._session, config=self._app_config)
         profile = None
         if parsed_args.profile:
             profile = Profile.get_profile_from_slug(parsed_args.profile)
@@ -178,16 +174,12 @@ class UpdateUserCommand(UserCommand):
     def get_description(self) -> str:
         return """Edit the account of a user"""
 
-    def take_app_action(
-        self, parsed_args: argparse.Namespace, app_context: AppEnvironment
-    ) -> None:
+    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         # TODO - G.M - 05-04-2018 -Refactor this in order
         # to not setup object var outside of __init__ .
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]
-        self._user_api = UserApi(
-            current_user=None, session=self._session, config=self._app_config
-        )
+        self._user_api = UserApi(current_user=None, session=self._session, config=self._app_config)
         user = self._user_api.get_one_by_login(parsed_args.login)
         profile = None
         if parsed_args.profile:

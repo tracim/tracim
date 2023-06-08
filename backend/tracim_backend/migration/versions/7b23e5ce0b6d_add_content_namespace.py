@@ -19,9 +19,7 @@ def upgrade():
     enum.create(op.get_bind(), checkfirst=False)
     with op.batch_alter_table("content_revisions") as batch_op:
         batch_op.add_column(
-            sa.Column(
-                "content_namespace", enum, server_default="CONTENT", nullable=False
-            )
+            sa.Column("content_namespace", enum, server_default="CONTENT", nullable=False)
         )
     # ### end Alembic commands ###
 

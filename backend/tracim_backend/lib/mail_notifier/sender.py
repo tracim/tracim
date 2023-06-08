@@ -27,9 +27,7 @@ def send_email_through(
     :param message: The message who have to be sent
     """
     if config.JOBS__PROCESSING_MODE == config.CST.SYNC:
-        logger.info(
-            send_email_through, "send email to {} synchronously".format(message["To"])
-        )
+        logger.info(send_email_through, "send email to {} synchronously".format(message["To"]))
         sendmail_callable(message)
     elif config.JOBS__PROCESSING_MODE == config.CST.ASYNC:
         logger.info(
@@ -43,9 +41,7 @@ def send_email_through(
         queue.enqueue(sendmail_callable, message)
     else:
         raise NotImplementedError(
-            "Mail sender processing mode {} is not implemented".format(
-                config.JOBS__PROCESSING_MODE
-            )
+            "Mail sender processing mode {} is not implemented".format(config.JOBS__PROCESSING_MODE)
         )
 
 
@@ -57,9 +53,7 @@ class EmailSender(object):
     example, it has no dependencies on SQLAlchemy nor tg HTTP request.
     """
 
-    def __init__(
-        self, config: CFG, smtp_config: SmtpConfiguration, really_send_messages
-    ) -> None:
+    def __init__(self, config: CFG, smtp_config: SmtpConfiguration, really_send_messages) -> None:
         self._smtp_config = smtp_config
         self.config = config
         self._smtp_connection = None
@@ -89,15 +83,11 @@ class EmailSender(object):
                     log = "SMTP Start TLS return code: {} with message: {}"
                     logger.debug(
                         self,
-                        log.format(
-                            starttls_result[0], starttls_result[1].decode("utf-8")
-                        ),
+                        log.format(starttls_result[0], starttls_result[1].decode("utf-8")),
                     )
                 except smtplib.SMTPResponseException as exc:
                     log = "SMTP start TLS return error code: {} with message: {}"
-                    logger.error(
-                        self, log.format(exc.smtp_code, exc.smtp_error.decode("utf-8"))
-                    )
+                    logger.error(self, log.format(exc.smtp_code, exc.smtp_error.decode("utf-8")))
                 except Exception:
                     log = "Unexpected exception during SMTP start TLS process"
                     logger.exception(self, log)
@@ -114,24 +104,17 @@ class EmailSender(object):
                         logger.info(self, "SMTP Already Authenticated")
 
                     log = "SMTP login return code: {} with message: {}"
-                    logger.debug(
-                        self, log.format(login_res[0], login_res[1].decode("utf-8"))
-                    )
+                    logger.debug(self, log.format(login_res[0], login_res[1].decode("utf-8")))
                 except smtplib.SMTPAuthenticationError as exc:
                     log = "SMTP auth return error code: {} with message: {}"
-                    logger.error(
-                        self, log.format(exc.smtp_code, exc.smtp_error.decode("utf-8"))
-                    )
+                    logger.error(self, log.format(exc.smtp_code, exc.smtp_error.decode("utf-8")))
                     logger.error(
                         self,
-                        "check your auth params combinaison "
-                        "(login/password) for SMTP",
+                        "check your auth params combinaison " "(login/password) for SMTP",
                     )
                 except smtplib.SMTPResponseException as exc:
                     log = "SMTP login return error code: {} with message: {}"
-                    logger.error(
-                        self, log.format(exc.smtp_code, exc.smtp_error.decode("utf-8"))
-                    )
+                    logger.error(self, log.format(exc.smtp_code, exc.smtp_error.decode("utf-8")))
                 except Exception:
                     log = "Unexpected exception during SMTP login"
                     logger.exception(self, log)

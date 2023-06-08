@@ -84,9 +84,7 @@ class TestApplicationApi(object):
         markdownpluspage.content_types.append(content_type)
         thread.is_active = True
         markdownpluspage.is_active = False
-        app_api = ApplicationApi(
-            app_list=[thread, markdownpluspage], show_inactive=False
-        )
+        app_api = ApplicationApi(app_list=[thread, markdownpluspage], show_inactive=False)
         workspace = Mock()
         workspace.workspace_id = 12
         workspace.agenda_enabled = True
@@ -204,8 +202,4 @@ class TestApplicationApi(object):
             workspace=workspace, app_config=app_config
         )
         with pytest.raises(StopIteration):
-            next(
-                entry
-                for entry in menu_entries
-                if entry.slug == publication_menu_entry.slug
-            )
+            next(entry for entry in menu_entries if entry.slug == publication_menu_entry.slug)

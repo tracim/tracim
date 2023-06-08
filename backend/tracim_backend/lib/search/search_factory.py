@@ -51,9 +51,7 @@ class SearchFactory(object):
         # TODO - G.M - 2019-05-22 - fix circular import
         from tracim_backend.lib.search.simple_search.simple_search_api import SimpleSearchApi
 
-        return SimpleSearchApi(
-            session=session, current_user=current_user, config=config
-        )
+        return SimpleSearchApi(session=session, current_user=current_user, config=config)
 
     @classmethod
     def get_search_lib(

@@ -119,18 +119,14 @@ class FavoriteContentController(Controller):
             "/users/{user_id}/favorite-contents",
             request_method="GET",
         )
-        configurator.add_view(
-            self.user_favorite_contents, route_name="user_favorite_contents"
-        )
+        configurator.add_view(self.user_favorite_contents, route_name="user_favorite_contents")
 
         configurator.add_route(
             "user_content_favorite",
             "/users/{user_id}/favorite-contents/{content_id}",
             request_method="GET",
         )
-        configurator.add_view(
-            self.user_content_favorite, route_name="user_content_favorite"
-        )
+        configurator.add_view(self.user_content_favorite, route_name="user_content_favorite")
 
         # set content as favorite
         configurator.add_route(

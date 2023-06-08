@@ -22,9 +22,7 @@ old_entity_type_enum_values = (
     "MENTION",
 )
 old_entity_type_enum = sa.Enum(*old_entity_type_enum_values, name=enum_name)
-new_entity_type_enum = sa.Enum(
-    *(old_entity_type_enum_values + ("REACTION",)), name=enum_name
-)
+new_entity_type_enum = sa.Enum(*(old_entity_type_enum_values + ("REACTION",)), name=enum_name)
 
 
 def upgrade():

@@ -17,9 +17,7 @@ class CaldavAppFactory(object):
     def __init__(self, **settings):
         logger.info(self, "Add additional radicale config")
         radicale_config = load_radicale_config(())
-        additional_config = self._parse_additional_radicale_config(
-            radicale_config, settings
-        )
+        additional_config = self._parse_additional_radicale_config(radicale_config, settings)
         self.app_config = CFG(settings)
         additional_config["storage"][
             "filesystem_folder"
@@ -76,9 +74,7 @@ class CaldavAppFactory(object):
         update_config = {}
         radicales_params = sliced_dict(
             data=settings,
-            beginning_key_string="{}.{}.".format(
-                RADICALE_MAIN_SECTION, RADICALE_SUBMAIN_SECTION
-            ),
+            beginning_key_string="{}.{}.".format(RADICALE_MAIN_SECTION, RADICALE_SUBMAIN_SECTION),
         )
         for param_name, value in radicales_params.items():
             parameter_parts = param_name.split(".")

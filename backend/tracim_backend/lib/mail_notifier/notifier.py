@@ -56,10 +56,7 @@ class EmailNotifier(INotifier):
         )
 
     def notify_content_update(self, content: Content):
-        if (
-            content.get_last_action().id
-            not in self.config.EMAIL__NOTIFICATION__NOTIFIED_EVENTS
-        ):
+        if content.get_last_action().id not in self.config.EMAIL__NOTIFICATION__NOTIFIED_EVENTS:
             logger.info(
                 self,
                 "Skip email notification for update of content {}"
@@ -115,18 +112,14 @@ class EmailNotifier(INotifier):
             # TODO - D.A - 2014-11-06
             # This feature must be implemented in order to be able to scale to large communities
             if self.config.JOBS__PROCESSING_MODE == self.config.CST.ASYNC:
-                logger.warning(
-                    self, "Creating mails in SYNC mode as ASYNC is not supported yet."
-                )
+                logger.warning(self, "Creating mails in SYNC mode as ASYNC is not supported yet.")
             else:
                 logger.info(self, "Creating email in SYNC mode")
-            EmailManager(
-                self._smtp_config, self.config, self.session
-            ).notify_content_update(self._user.user_id, content.content_id)
-        except Exception:
-            logger.exception(
-                self, "Exception has been caught during email notification"
+            EmailManager(self._smtp_config, self.config, self.session).notify_content_update(
+                self._user.user_id, content.content_id
             )
+        except Exception:
+            logger.exception(self, "Exception has been caught during email notification")
 
 
 class EmailManager(object):
@@ -136,9 +129,7 @@ class EmailManager(object):
     update
     """
 
-    def __init__(
-        self, smtp_config: SmtpConfiguration, config: CFG, session: Session
-    ) -> None:
+    def __init__(self, smtp_config: SmtpConfiguration, config: CFG, session: Session) -> None:
         self._smtp_config = smtp_config
         self.config = config
         self.session = session
@@ -209,13 +200,9 @@ class EmailManager(object):
         from tracim_backend.lib.core.mention import DescriptionMentionParser
         from tracim_backend.lib.core.user import UserApi
 
-        user = UserApi(None, config=self.config, session=self.session).get_one(
-            event_actor_id
-        )
+        user = UserApi(None, config=self.config, session=self.session).get_one(event_actor_id)
         logger.debug(self, "Content: {}".format(event_content_id))
-        content_api = ContentApi(
-            current_user=user, session=self.session, config=self.config
-        )
+        content_api = ContentApi(current_user=user, session=self.session, config=self.config)
         content = ContentApi(
             session=self.session,
             current_user=user,
@@ -224,17 +211,11 @@ class EmailManager(object):
             show_archived=True,
             show_deleted=True,
         ).get_one(event_content_id, ContentTypeSlug.ANY.value)
-        workspace_api = WorkspaceApi(
-            session=self.session, current_user=user, config=self.config
-        )
+        workspace_api = WorkspaceApi(session=self.session, current_user=user, config=self.config)
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(content.workspace_id)
         )
-        main_content = (
-            content.parent
-            if content.type == content_type_list.Comment.slug
-            else content
-        )
+        main_content = content.parent if content.type == content_type_list.Comment.slug else content
         notifiable_roles = WorkspaceApi(
             current_user=user, session=self.session, config=self.config
         ).get_notifiable_roles(content.workspace)
@@ -294,9 +275,7 @@ class EmailManager(object):
             subject = translated_subject.replace(
                 EST.WEBSITE_TITLE, self.config.WEBSITE__TITLE.__str__()
             )
-            subject = subject.replace(
-                EST.WORKSPACE_LABEL, main_content.workspace.label.__str__()
-            )
+            subject = subject.replace(EST.WORKSPACE_LABEL, main_content.workspace.label.__str__())
             subject = subject.replace(EST.CONTENT_LABEL, main_content.label.__str__())
             subject = subject.replace(EST.CONTENT_STATUS_LABEL, content_status)
             reply_to_label = _("{username} & all members of {workspace}").format(
@@ -318,13 +297,11 @@ class EmailManager(object):
                 translator,
             )
 
-            body_html = (
-                DescriptionMentionParser.get_email_html_from_html_with_mention_tags(
-                    session=self.session,
-                    cfg=self.config,
-                    translator=translator,
-                    html=body_html,
-                )
+            body_html = DescriptionMentionParser.get_email_html_from_html_with_mention_tags(
+                session=self.session,
+                cfg=self.config,
+                translator=translator,
+                html=body_html,
             )
 
             message = EmailNotificationMessage(
@@ -376,14 +353,10 @@ class EmailManager(object):
         translated_subject = translator.get_translation(
             self.config.EMAIL__NOTIFICATION__CREATED_ACCOUNT__SUBJECT
         )
-        subject = translated_subject.replace(
-            EST.WEBSITE_TITLE, str(self.config.WEBSITE__TITLE)
-        )
+        subject = translated_subject.replace(EST.WEBSITE_TITLE, str(self.config.WEBSITE__TITLE))
         from_header = self._get_sender(origin_user)
         to_header = EmailAddress(user.get_display_name(), user.email)
-        html_template_file_path = (
-            self.config.EMAIL__NOTIFICATION__CREATED_ACCOUNT__TEMPLATE__HTML
-        )
+        html_template_file_path = self.config.EMAIL__NOTIFICATION__CREATED_ACCOUNT__TEMPLATE__HTML
 
         context = {
             "origin_user": origin_user,
@@ -427,9 +400,7 @@ class EmailManager(object):
         translated_subject = translator.get_translation(
             self.config.EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__SUBJECT
         )
-        subject = translated_subject.replace(
-            EST.WEBSITE_TITLE, str(self.config.WEBSITE__TITLE)
-        )
+        subject = translated_subject.replace(EST.WEBSITE_TITLE, str(self.config.WEBSITE__TITLE))
         from_header = self._get_sender()
         to_header = EmailAddress(user.get_display_name(), user.email)
 
@@ -553,9 +524,7 @@ class EmailManager(object):
         """
         logger.debug(
             self,
-            "Building email content from MAKO template {}".format(
-                mako_template_filepath
-            ),
+            "Building email content from MAKO template {}".format(mako_template_filepath),
         )
         context = self._build_context_for_content_update(
             role=role,

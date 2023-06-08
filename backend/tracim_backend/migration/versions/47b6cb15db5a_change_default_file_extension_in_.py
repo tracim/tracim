@@ -36,21 +36,15 @@ def upgrade():
         .values(file_extension=".document.html")
     )
     connection.execute(
-        revisions.update()
-        .where(revisions.c.type == "thread")
-        .values(file_extension=".thread.html")
+        revisions.update().where(revisions.c.type == "thread").values(file_extension=".thread.html")
     )
 
 
 def downgrade():
     connection = op.get_bind()
     connection.execute(
-        revisions.update()
-        .where(revisions.c.type == "html-document")
-        .values(file_extension=".html")
+        revisions.update().where(revisions.c.type == "html-document").values(file_extension=".html")
     )
     connection.execute(
-        revisions.update()
-        .where(revisions.c.type == "thread")
-        .values(file_extension=".html")
+        revisions.update().where(revisions.c.type == "thread").values(file_extension=".html")
     )

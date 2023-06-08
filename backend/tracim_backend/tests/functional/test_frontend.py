@@ -49,9 +49,7 @@ class TestContentSecurityPolicy:
         csp = res.headers.get("Content-Security-Policy")
         assert csp.startswith("frame-ancestors 'none'")
 
-    @pytest.mark.parametrize(
-        "config_section", [{"name": "collabora_test"}], indirect=True
-    )
+    @pytest.mark.parametrize("config_section", [{"name": "collabora_test"}], indirect=True)
     def test_api__csp_header__ok_200__with_collabora(self, web_testapp):
         res = web_testapp.get("/", status=200)
         csp = res.headers.get("Content-Security-Policy")
@@ -60,7 +58,5 @@ class TestContentSecurityPolicy:
 
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestFrontendDisabled(object):
-    def test_api__check_index_html_not_generated__err_404__nominal_case(
-        self, web_testapp
-    ):
+    def test_api__check_index_html_not_generated__err_404__nominal_case(self, web_testapp):
         web_testapp.get("/", status=404)

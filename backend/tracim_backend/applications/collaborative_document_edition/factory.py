@@ -24,10 +24,7 @@ class CollaborativeDocumentEditionFactory(object):
             CollaboraController,
         )
 
-        if (
-            config.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE
-            == COLLABORA_DOCUMENT_EDITION_SLUG
-        ):
+        if config.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE == COLLABORA_DOCUMENT_EDITION_SLUG:
             # TODO - G.M - 2019-05-22 - fix circular import
             return CollaboraController()
         else:
@@ -41,10 +38,7 @@ class CollaborativeDocumentEditionFactory(object):
     def get_lib(
         cls, session: Session, current_user: typing.Optional[User], config: "CFG"
     ) -> CollaborativeDocumentEditionLib:
-        if (
-            config.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE
-            == COLLABORA_DOCUMENT_EDITION_SLUG
-        ):
+        if config.COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE == COLLABORA_DOCUMENT_EDITION_SLUG:
             # TODO - G.M - 2019-05-22 - fix circular import
             from tracim_backend.applications.collaborative_document_edition.collabora.collabora import (
                 CollaboraCollaborativeDocumentEditionLib,
