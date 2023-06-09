@@ -68,7 +68,12 @@ class TracimApplication(ABC):
     """
 
     def __init__(
-        self, label: str, slug: str, fa_icon: str, config: typing.Dict[str, str], main_route: str
+        self,
+        label: str,
+        slug: str,
+        fa_icon: str,
+        config: typing.Dict[str, str],
+        main_route: str,
     ) -> None:
         """
 

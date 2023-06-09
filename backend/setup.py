@@ -178,6 +178,9 @@ setup(
         ],
     },
     message_extractors={
-        "tracim_backend": [("**.py", "python", None), ("templates/**.mak", "mako", None)]
+        "tracim_backend": [
+            ("**.py", "python", None),
+            ("templates/**.mak", "mako", None),
+        ]
     },
 )

@@ -56,7 +56,12 @@ class EST(object):
 
     @classmethod
     def all(cls):
-        return [cls.CONTENT_LABEL, cls.CONTENT_STATUS_LABEL, cls.WEBSITE_TITLE, cls.WORKSPACE_LABEL]
+        return [
+            cls.CONTENT_LABEL,
+            cls.CONTENT_STATUS_LABEL,
+            cls.WEBSITE_TITLE,
+            cls.WORKSPACE_LABEL,
+        ]
 
 
 class EmailAddress(object):

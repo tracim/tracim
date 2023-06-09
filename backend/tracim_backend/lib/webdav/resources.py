@@ -250,7 +250,8 @@ class WorkspaceOnlyContainer(WebdavContainer):
         Access to a specific members
         """
         return self.provider.getResourceInst(
-            "%s/%s" % (self.path, webdav_convert_file_name_to_display(label)), self.environ
+            "%s/%s" % (self.path, webdav_convert_file_name_to_display(label)),
+            self.environ,
         )
 
     def getMemberList(self):
@@ -429,7 +430,8 @@ class ContentOnlyContainer(WebdavContainer):
         Access to a specific members
         """
         return self.provider.getResourceInst(
-            "%s/%s" % (self.path, webdav_convert_file_name_to_display(label)), self.environ
+            "%s/%s" % (self.path, webdav_convert_file_name_to_display(label)),
+            self.environ,
         )
 
     def getMemberList(self) -> typing.List[_DAVResource]:
@@ -641,7 +643,8 @@ class WorkspaceResource(DAVCollection):
 
     def moveRecursive(self, destpath):
         raise DAVError(
-            HTTP_FORBIDDEN, contextinfo="Not allowed to rename or move workspace through webdav"
+            HTTP_FORBIDDEN,
+            contextinfo="Not allowed to rename or move workspace through webdav",
         )
 
     def getMemberNames(self) -> typing.List[str]:
@@ -783,7 +786,8 @@ class FolderResource(DAVCollection):
                 # renaming file if needed
                 if basename(destpath) != self.getDisplayName():
                     self.content_api.update_content(
-                        self.content, webdav_convert_file_name_to_bdd(basename(destpath))
+                        self.content,
+                        webdav_convert_file_name_to_bdd(basename(destpath)),
                     )
                     self.content_api.save(self.content)
                 # move file if needed
@@ -826,7 +830,11 @@ class FileResource(DAVNonCollection):
     """
 
     def __init__(
-        self, path: str, environ: dict, content: Content, tracim_context: "WebdavTracimContext"
+        self,
+        path: str,
+        environ: dict,
+        content: Content,
+        tracim_context: "WebdavTracimContext",
     ) -> None:
         super(FileResource, self).__init__(path, environ)
         self.tracim_context = tracim_context
@@ -1067,7 +1075,11 @@ class OtherFileResource(FileResource):
     """
 
     def __init__(
-        self, path: str, environ: dict, content: Content, tracim_context: "WebdavTracimContext"
+        self,
+        path: str,
+        environ: dict,
+        content: Content,
+        tracim_context: "WebdavTracimContext",
     ):
         super(OtherFileResource, self).__init__(
             path, environ, content, tracim_context=tracim_context

@@ -172,6 +172,7 @@ class TestFavoriteContent(object):
             "confidential_space", save_now=True
         )
         content_api = content_api_factory.get(current_user=riyad_user)  # type: ContentApi
+        create_content(content_api, test_workspace, set_as_favorite=True)
         # accessible and active content
         # not favorite content
         create_content(

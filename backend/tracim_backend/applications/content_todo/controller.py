@@ -62,7 +62,8 @@ class TodoController(Controller):
         )
 
         todos = content_api.get_all_query(
-            content_type_slug=content_type_list.Todo.slug, assignee_id=hapic_data.path["user_id"]
+            content_type_slug=content_type_list.Todo.slug,
+            assignee_id=hapic_data.path["user_id"],
         )
 
         todos_in_context = []
@@ -93,7 +94,8 @@ class TodoController(Controller):
         )
 
         todos = content_api.get_all(
-            parent_ids=[hapic_data.path.content_id], content_type=content_type_list.Todo.slug
+            parent_ids=[hapic_data.path.content_id],
+            content_type=content_type_list.Todo.slug,
         )
 
         todos_in_context = []
@@ -227,7 +229,8 @@ class TodoController(Controller):
 
         try:
             todo_content = content_api.get_one(
-                content_id=hapic_data.path.todo_id, content_type=content_type_list.Todo.slug
+                content_id=hapic_data.path.todo_id,
+                content_type=content_type_list.Todo.slug,
             )
         except ContentNotFound as exc:
             raise TodoNotFound(

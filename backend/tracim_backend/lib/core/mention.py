@@ -228,7 +228,10 @@ class MentionBuilder:
 
     @classmethod
     def _create_mention_events(
-        cls, mentions: typing.Iterable[Mention], content: Content, context: TracimContext
+        cls,
+        mentions: typing.Iterable[Mention],
+        content: Content,
+        context: TracimContext,
     ) -> None:
         role_api = RoleApi(session=context.dbsession, config=context.app_config, current_user=None)
         space_members_ids = role_api.get_workspace_member_ids(content.workspace_id)

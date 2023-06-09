@@ -73,7 +73,10 @@ class TestSimpleSearch(object):
             do_save=True,
         )
         api.create(
-            content_type_slug="html-document", workspace=workspace, label="test", do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="test",
+            do_save=True,
         )
         transaction.commit()
 
@@ -137,10 +140,16 @@ class TestSimpleSearch(object):
             do_save=True,
         )
         api.create(
-            content_type_slug="html-document", workspace=workspace, label="report", do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="report",
+            do_save=True,
         )
         api.create(
-            content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
+            content_type_slug="thread",
+            workspace=workspace,
+            label="discussion",
+            do_save=True,
         )
         transaction.commit()
 
@@ -224,14 +233,22 @@ class TestSimpleSearch(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=content):
             api.update_content(
-                content, new_label=created_content_name, new_raw_content=created_content_body
+                content,
+                new_label=created_content_name,
+                new_raw_content=created_content_body,
             )
             api.save(content)
         api.create(
-            content_type_slug="html-document", workspace=workspace, label="report", do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="report",
+            do_save=True,
         )
         api.create(
-            content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
+            content_type_slug="thread",
+            workspace=workspace,
+            label="discussion",
+            do_save=True,
         )
         transaction.commit()
 
@@ -317,7 +334,10 @@ class TestSimpleSearch(object):
             do_save=True,
         )
         api.create_comment(
-            workspace=workspace, parent=content, content=first_created_comment_content, do_save=True
+            workspace=workspace,
+            parent=content,
+            content=first_created_comment_content,
+            do_save=True,
         )
         api.create_comment(
             workspace=workspace,
@@ -326,10 +346,16 @@ class TestSimpleSearch(object):
             do_save=True,
         )
         api.create(
-            content_type_slug="html-document", workspace=workspace, label="report", do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="report",
+            do_save=True,
         )
         api.create(
-            content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
+            content_type_slug="thread",
+            workspace=workspace,
+            label="discussion",
+            do_save=True,
         )
         transaction.commit()
 
@@ -425,10 +451,16 @@ class TestSimpleSearch(object):
             raw_content=second_created_todo_content,
         )
         api.create(
-            content_type_slug="html-document", workspace=workspace, label="report", do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="report",
+            do_save=True,
         )
         api.create(
-            content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
+            content_type_slug="thread",
+            workspace=workspace,
+            label="discussion",
+            do_save=True,
         )
         transaction.commit()
 
@@ -495,7 +527,10 @@ class TestSimpleSearch(object):
             do_save=True,
         )
         api.create_comment(
-            workspace=workspace, parent=content, content=first_created_comment_content, do_save=True
+            workspace=workspace,
+            parent=content,
+            content=first_created_comment_content,
+            do_save=True,
         )
         api.create_comment(
             workspace=workspace,
@@ -504,10 +539,16 @@ class TestSimpleSearch(object):
             do_save=True,
         )
         api.create(
-            content_type_slug="html-document", workspace=workspace, label="report", do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="report",
+            do_save=True,
         )
         api.create(
-            content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
+            content_type_slug="thread",
+            workspace=workspace,
+            label="discussion",
+            do_save=True,
         )
         transaction.commit()
 
@@ -558,7 +599,10 @@ class TestSimpleSearch(object):
         )
         api = content_api_factory.get(current_user=user)
         api.create(
-            content_type_slug="html-document", workspace=workspace, label="test", do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="test",
+            do_save=True,
         )
         transaction.commit()
 
@@ -645,7 +689,10 @@ class TestSimpleSearch(object):
         assert search_result["contents"][0]["label"] == "stringtosearch doc 2"
         assert search_result["contents"][1]["label"] == "stringtosearch doc"
 
-        params = {"search_string": "stringtosearch", "content_types": "html-document,thread"}
+        params = {
+            "search_string": "stringtosearch",
+            "content_types": "html-document,thread",
+        }
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         res = web_testapp.get("/api/search/content".format(), status=200, params=params)
         search_result = res.json_body
@@ -824,13 +871,19 @@ class TestSimpleSearch(object):
             do_save=True,
         )
         bar = content_api.create(
-            content_type_slug="html-document", workspace=workspace, label="Bar", do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="Bar",
+            do_save=True,
         )
         tag_lib = TagLib(session)
         tag_lib.add_tag_to_content(user=admin_user, content=bar, tag_name="World")
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"search_string": search_string}
         res = web_testapp.get("/api/search/content".format(), status=200, params=params)
         search_result = res.json_body

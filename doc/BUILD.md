@@ -19,7 +19,7 @@
 
 ## Compatibility
 
-OS compatibility (tested with Python >= 3.6.14):
+OS compatibility (tested with Python >= 3.7.3):
 
 - Debian:
   - Buster (10)
@@ -28,7 +28,7 @@ OS compatibility (tested with Python >= 3.6.14):
   - Bionic (18.04)
   - Focal (20.04)
 
-Older versions of Debian (8, 9) and Ubuntu (16.04) should work as long as a python version >= 3.6 is used.
+Older versions of Debian (8, 9) and Ubuntu (16.04) should work as long as a python version >= 3.7 is used.
 
 ## Backend
 

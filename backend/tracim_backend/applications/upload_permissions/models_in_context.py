@@ -92,5 +92,7 @@ class UploadPermissionInContext(object):
     @property
     def author(self) -> UserInContext:
         return UserInContext(
-            dbsession=self.dbsession, config=self.config, user=self.upload_permission.author
+            dbsession=self.dbsession,
+            config=self.config,
+            user=self.upload_permission.author,
         )

@@ -36,7 +36,8 @@ class SimpleContentSearchResponse(ContentSearchResponse):
             ]
 
             workspace = SearchedDigestWorkspace(
-                workspace_id=content.workspace.workspace_id, label=content.workspace.label
+                workspace_id=content.workspace.workspace_id,
+                label=content.workspace.label,
             )
             last_modifier = SearchedDigestUser(
                 user_id=content.last_modifier.user_id,

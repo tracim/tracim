@@ -29,7 +29,9 @@ class UserCustomProperties(DeclarativeBase):
     )
 
     user = relationship(
-        "User", remote_side=[User.user_id], backref=backref("custom_properties", uselist=False)
+        "User",
+        remote_side=[User.user_id],
+        backref=backref("custom_properties", uselist=False),
     )
 
     fields = Column(JSON, nullable=False, default={})

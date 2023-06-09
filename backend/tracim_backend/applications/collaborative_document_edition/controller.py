@@ -3,7 +3,9 @@ from http import HTTPStatus
 from pyramid.config import Configurator
 from pyramid.traversal import DefaultRootFactory
 import transaction
+import typing  # noqa: F401
 
+from backend.tracim_backend.config import CFG  # noqa: F401
 from tracim_backend import ContentNotFound
 from tracim_backend import TracimRequest
 from tracim_backend import hapic
@@ -53,11 +55,16 @@ class CollaborativeDocumentEditionController(Controller):
     @check_right(is_user)
     @hapic.output_body(CollaborativeDocumentEditionTokenSchema())
     def collaborative_document_edition_token(
-        self, context: DefaultRootFactory, request: TracimRequest, hapic_data: HapicData = None
+        self,
+        context: DefaultRootFactory,
+        request: TracimRequest,
+        hapic_data: HapicData = None,
     ) -> CollaborativeDocumentEditionToken:
         app_config = request.registry.settings["CFG"]  # type: CFG
         collaborative_document_edition_lib = CollaborativeDocumentEditionFactory().get_lib(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
         access_token = request.current_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY)
         return collaborative_document_edition_lib.get_token(access_token=access_token)
@@ -66,14 +73,19 @@ class CollaborativeDocumentEditionController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS])
     @hapic.output_body(FileTemplateInfoSchema())
     def get_file_template_infos(
-        self, context: DefaultRootFactory, request: TracimRequest, hapic_data: HapicData = None
+        self,
+        context: DefaultRootFactory,
+        request: TracimRequest,
+        hapic_data: HapicData = None,
     ) -> FileTemplateList:
         """
         Get file template list
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         collaborative_document_edition_api = CollaborativeDocumentEditionFactory().get_lib(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
         return collaborative_document_edition_api.get_file_template_list()
 
@@ -88,7 +100,10 @@ class CollaborativeDocumentEditionController(Controller):
     @hapic.output_body(ContentDigestSchema())
     @hapic.input_body(FileCreateFromTemplateSchema())
     def create_file_from_template(
-        self, context: DefaultRootFactory, request: TracimRequest, hapic_data: HapicData = None
+        self,
+        context: DefaultRootFactory,
+        request: TracimRequest,
+        hapic_data: HapicData = None,
     ) -> ContentInContext:
         """
         Create a file.
@@ -100,7 +115,9 @@ class CollaborativeDocumentEditionController(Controller):
             config=app_config,
         )
         collaborative_document_edition_api = CollaborativeDocumentEditionFactory().get_lib(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
 
         content = None  # type: typing.Optional['Content']
@@ -112,7 +129,8 @@ class CollaborativeDocumentEditionController(Controller):
         if hapic_data.body.parent_id:
             try:
                 parent = api.get_one(
-                    content_id=hapic_data.body.parent_id, content_type=ContentTypeSlug.ANY.value
+                    content_id=hapic_data.body.parent_id,
+                    content_type=ContentTypeSlug.ANY.value,
                 )
             except ContentNotFound as exc:
                 raise ParentNotFound(

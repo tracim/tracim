@@ -165,7 +165,9 @@ class User(TrashableMixin, DeclarativeBase):
         Integer, ForeignKey("users.user_id", ondelete="SET NULL"), nullable=True
     )
     created_users = relationship(
-        "User", post_update=True, backref=backref("creation_author", remote_side=user_id)
+        "User",
+        post_update=True,
+        backref=backref("creation_author", remote_side=user_id),
     )
     creation_type = Column(Enum(UserCreationType), nullable=True)
     connection_status = Column(

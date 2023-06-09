@@ -66,6 +66,7 @@ from tracim_backend.models.context_models import PaginatedObject
 from tracim_backend.models.context_models import UserMessagesSummary
 from tracim_backend.models.context_models import WorkspaceInContext
 from tracim_backend.models.data import WorkspaceSubscription
+from tracim_backend.models.event import Message  # noqa: F401
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import AboutUserSchema

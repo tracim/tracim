@@ -40,7 +40,9 @@ class SearchController(Controller):
     ) -> ContentSearchResponse:
         app_config = request.registry.settings["CFG"]  # type: CFG
         search = SimpleSearchApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         ).search_content(ContentSearchQuery(**hapic_data.query))
         return search
 
@@ -102,7 +104,9 @@ class SearchController(Controller):
         configurator.add_view(self.advanced_search_user, route_name="advanced_search_user")
 
         configurator.add_route(
-            "advanced_search_workspace", "/advanced_search/workspace", request_method="GET"
+            "advanced_search_workspace",
+            "/advanced_search/workspace",
+            request_method="GET",
         )  # noqa: W605
         configurator.add_view(
             self.advanced_search_workspace, route_name="advanced_search_workspace"
@@ -113,5 +117,7 @@ class SearchController(Controller):
         if app_config.SEARCH__ENGINE != ELASTICSEARCH__SEARCH_ENGINE_SLUG:
             raise AdvancedSearchNotEnabled("Advanced search is not enabled on this instance")
         return ESSearchApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )

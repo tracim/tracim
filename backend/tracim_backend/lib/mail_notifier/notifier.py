@@ -298,7 +298,10 @@ class EmailManager(object):
             )
 
             body_html = DescriptionMentionParser.get_email_html_from_html_with_mention_tags(
-                session=self.session, cfg=self.config, translator=translator, html=body_html
+                session=self.session,
+                cfg=self.config,
+                translator=translator,
+                html=body_html,
             )
 
             message = EmailNotificationMessage(
@@ -330,7 +333,10 @@ class EmailManager(object):
             send_email_through(self.config, email_sender.send_mail, message)
 
     def notify_created_account(
-        self, user: User, password: typing.Optional[str], origin_user: typing.Optional[User] = None
+        self,
+        user: User,
+        password: typing.Optional[str],
+        origin_user: typing.Optional[User] = None,
     ) -> None:
         """
         Send created account email to given user.
@@ -361,7 +367,9 @@ class EmailManager(object):
         }
         translator = Translator(self.config, default_lang=user.lang)
         body_html = self._render_template(
-            mako_template_filepath=html_template_file_path, context=context, translator=translator
+            mako_template_filepath=html_template_file_path,
+            context=context,
+            translator=translator,
         )
         message = EmailNotificationMessage(
             subject=subject,
@@ -372,7 +380,9 @@ class EmailManager(object):
         )
 
         send_email_through(
-            config=self.config, sendmail_callable=email_sender.send_mail, message=message
+            config=self.config,
+            sendmail_callable=email_sender.send_mail,
+            message=message,
         )
 
     def notify_reset_password(self, user: User, reset_password_token: str) -> None:
@@ -407,7 +417,9 @@ class EmailManager(object):
         }
 
         body_html = self._render_template(
-            mako_template_filepath=html_template_file_path, context=context, translator=translator
+            mako_template_filepath=html_template_file_path,
+            context=context,
+            translator=translator,
         )
         message = EmailNotificationMessage(
             subject=subject,
@@ -417,7 +429,9 @@ class EmailManager(object):
             lang=translator.default_lang,
         )
         send_email_through(
-            config=self.config, sendmail_callable=email_sender.send_mail, message=message
+            config=self.config,
+            sendmail_callable=email_sender.send_mail,
+            message=message,
         )
 
     def _render_template(
@@ -509,7 +523,8 @@ class EmailManager(object):
          this method must be called one time for text and one time for html
         """
         logger.debug(
-            self, "Building email content from MAKO template {}".format(mako_template_filepath)
+            self,
+            "Building email content from MAKO template {}".format(mako_template_filepath),
         )
         context = self._build_context_for_content_update(
             role=role,
@@ -520,7 +535,9 @@ class EmailManager(object):
             translator=translator,
         )
         body_content = self._render_template(
-            mako_template_filepath=mako_template_filepath, context=context, translator=translator
+            mako_template_filepath=mako_template_filepath,
+            context=context,
+            translator=translator,
         )
         return body_content
 

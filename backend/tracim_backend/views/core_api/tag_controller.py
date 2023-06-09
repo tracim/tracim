@@ -156,7 +156,9 @@ class TagController(Controller):
     def bind(self, configurator: Configurator):
         # Get tags
         configurator.add_route(
-            "get_workspace_tags", "/workspaces/{workspace_id}/tags", request_method="GET"
+            "get_workspace_tags",
+            "/workspaces/{workspace_id}/tags",
+            request_method="GET",
         )
         configurator.add_view(self.get_workspace_tags, route_name="get_workspace_tags")
 

@@ -150,7 +150,8 @@ DEFAULT_PASSWORD_GEN_CHAR_LENGTH = 12
 
 
 def password_generator(
-    length: int = DEFAULT_PASSWORD_GEN_CHAR_LENGTH, chars: str = ALLOWED_AUTOGEN_PASSWORD_CHAR
+    length: int = DEFAULT_PASSWORD_GEN_CHAR_LENGTH,
+    chars: str = ALLOWED_AUTOGEN_PASSWORD_CHAR,
 ) -> str:
     """
     :param length: length of the new password
@@ -272,7 +273,15 @@ def webdav_convert_file_name_to_display(string: str) -> str:
     isn't limited in his naming choice
     """
     string = core_convert_file_name_to_display(string)
-    REPLACE_CHARS = {":": "∶", "*": "∗", "?": "ʔ", '"': "ʺ", "<": "❮", ">": "❯", "|": "∣"}
+    REPLACE_CHARS = {
+        ":": "∶",
+        "*": "∗",
+        "?": "ʔ",
+        '"': "ʺ",
+        "<": "❮",
+        ">": "❯",
+        "|": "∣",
+    }
 
     for key, value in REPLACE_CHARS.items():
         string = string.replace(key, value)
@@ -340,7 +349,10 @@ def is_dir_writable(path: str) -> bool:
     the process)
     """
     if not os.access(
-        path=path, mode=os.W_OK | os.X_OK, dir_fd=None, effective_ids=os.supports_effective_ids
+        path=path,
+        mode=os.W_OK | os.X_OK,
+        dir_fd=None,
+        effective_ids=os.supports_effective_ids,
     ):
         raise NotWritableDirectory("{} is not a writable directory".format(path))
     return True
@@ -352,7 +364,10 @@ def is_dir_readable(path: str) -> bool:
     the process)
     """
     if not os.access(
-        path=path, mode=os.R_OK | os.X_OK, dir_fd=None, effective_ids=os.supports_effective_ids
+        path=path,
+        mode=os.R_OK | os.X_OK,
+        dir_fd=None,
+        effective_ids=os.supports_effective_ids,
     ):
         raise NotReadableDirectory("{} is not a readable directory".format(path))
     return True

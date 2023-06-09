@@ -212,7 +212,9 @@ class SystemController(Controller):
 
         # Allowed Workspace access types
         configurator.add_route(
-            "workspace_access_type", "/system/workspace_access_types", request_method="GET"
+            "workspace_access_type",
+            "/system/workspace_access_types",
+            request_method="GET",
         )
         configurator.add_view(self.workspace_access_types, route_name="workspace_access_type")
 
@@ -222,7 +224,9 @@ class SystemController(Controller):
 
         # username availability
         configurator.add_route(
-            "username_availability", "/system/username-availability", request_method="GET"
+            "username_availability",
+            "/system/username-availability",
+            request_method="GET",
         )
         configurator.add_view(self.username_availability, route_name="username_availability")
 
@@ -237,7 +241,8 @@ class SystemController(Controller):
             request_method="GET",
         )
         configurator.add_view(
-            self.user_custom_properties_schema, route_name="user_custom_properties_schema"
+            self.user_custom_properties_schema,
+            route_name="user_custom_properties_schema",
         )
         configurator.add_route(
             "user_custom_properties_ui_schema",
@@ -245,7 +250,8 @@ class SystemController(Controller):
             request_method="GET",
         )
         configurator.add_view(
-            self.custom_user_properties_ui_schema, route_name="user_custom_properties_ui_schema"
+            self.custom_user_properties_ui_schema,
+            route_name="user_custom_properties_ui_schema",
         )
 
         # reserved usernames

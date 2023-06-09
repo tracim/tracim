@@ -29,7 +29,8 @@ class CollaborativeDocumentEditionApp(TracimApplication):
             "%(here)s/tracim_backend/templates/open_documents"
         )
         app_config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR = app_config.get_raw_config(
-            "collaborative_document_edition.file_template_dir", default_file_template_dir
+            "collaborative_document_edition.file_template_dir",
+            default_file_template_dir,
         )
         app_config.COLLABORATIVE_DOCUMENT_EDITION__ENABLED_EXTENSIONS = string_to_unique_item_list(
             app_config.get_raw_config(
@@ -74,7 +75,12 @@ class CollaborativeDocumentEditionApp(TracimApplication):
     def get_content_security_policy_directives(
         self, app_config: CFG
     ) -> typing.Tuple[typing.Tuple[str, str], ...]:
-        return (("frame-src", app_config.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL),)
+        return (
+            (
+                "frame-src",
+                app_config.COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL,
+            ),
+        )
 
 
 def create_app() -> TracimApplication:

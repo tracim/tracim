@@ -609,7 +609,7 @@ export const getCurrentContentVersionNumber = (appFeatureMode, content, timeline
 
 export const MINIMUM_CHARACTERS_USERNAME = 3
 export const MAXIMUM_CHARACTERS_USERNAME = 255
-export const ALLOWED_CHARACTERS_USERNAME = 'azAZ09-_'
+export const ALLOWED_CHARACTERS_USERNAME = 'azAZ09-_.'
 export const CHECK_USERNAME_DEBOUNCE_WAIT = 250
 
 export const NUMBER_RESULTS_BY_PAGE = 15
@@ -640,8 +640,8 @@ export const checkUsernameValidity = async (apiUrl, username, props) => {
     }
   }
 
-  // INFO - GB - 2020-06-08 The allowed characters are azAZ09-_
-  if (!(/^[A-Za-z0-9_-]*$/.test(username))) {
+  // INFO - GB - 2020-06-08 The allowed characters are azAZ09-_.
+  if (!(/^[A-Za-z0-9_.-]*$/.test(username))) {
     return {
       isUsernameValid: false,
       usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })

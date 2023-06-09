@@ -390,7 +390,13 @@ need to be in every workspace you include."
         return [content_api.get_content_in_context(content) for content in contents]
 
     def get_reserved_usernames(self) -> typing.Tuple[str, ...]:
-        reserved_usernames = ["all", "reader", "contributor", "content-manager", "space-manager"]
+        reserved_usernames = [
+            "all",
+            "reader",
+            "contributor",
+            "content-manager",
+            "space-manager",
+        ]
         for key in TRANSLATED_GROUP_MENTIONS.keys():
             translation_lang_dict = self._config.TRANSLATIONS["GLOBAL"]
             for lang in translation_lang_dict.keys():
@@ -432,7 +438,11 @@ need to be in every workspace you include."
             return False
 
     def _ldap_authenticate(
-        self, user: typing.Optional[User], login: str, password: str, ldap_connector: "Connector"
+        self,
+        user: typing.Optional[User],
+        login: str,
+        password: str,
+        ldap_connector: "Connector",
     ) -> User:
         """
         Authenticate with ldap, return authenticated user or raise Exception
@@ -478,15 +488,18 @@ need to be in every workspace you include."
             #             )
             #         )
             name = None
-            if self._config.LDAP_NAME_ATTRIBUTE:
+            mail = None
+            username = None
+            if self._config.LDAP_NAME_ATTRIBUTE and self._config.LDAP_NAME_ATTRIBUTE in ldap_data:
                 name = ldap_data[self._config.LDAP_NAME_ATTRIBUTE][0]
+            if self._config.LDAP_MAIL_ATTRIBUTE:
+                mail = ldap_data[self._config.LDAP_MAIL_ATTRIBUTE][0]
+            if self._config.LDAP_USERNAME_ATTRIBUTE:
+                username = ldap_data[self._config.LDAP_USERNAME_ATTRIBUTE][0]
             # INFO - G.M - 2018-11-08 - Create new user from ldap credentials
-            use_email = False
-            if "@" in login:
-                use_email = True
             user = self.create_user(
-                email=login if use_email else None,
-                username=login if not use_email else None,
+                email=mail,
+                username=username,
                 name=name,
                 profile=profile,
                 auth_type=AuthType.LDAP,
@@ -761,7 +774,11 @@ need to be in every workspace you include."
         return user
 
     def set_username(
-        self, user: User, loggedin_user_password: str, username: str, do_save: bool = True
+        self,
+        user: User,
+        loggedin_user_password: str,
+        username: str,
+        do_save: bool = True,
     ) -> User:
         """
         Set username of user if loggedin user password is correct
@@ -862,7 +879,7 @@ need to be in every workspace you include."
         if len(username) < User.MIN_USERNAME_LENGTH or len(username) > User.MAX_USERNAME_LENGTH:
             return False
         for char in username:
-            if char not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_":
+            if char not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.":
                 return False
         return True
 
@@ -954,7 +971,10 @@ need to be in every workspace you include."
         return user
 
     def _check_password_modification_allowed(self, user: User) -> bool:
-        if user.auth_type and user.auth_type not in [AuthType.INTERNAL, AuthType.UNKNOWN]:
+        if user.auth_type and user.auth_type not in [
+            AuthType.INTERNAL,
+            AuthType.UNKNOWN,
+        ]:
             raise ExternalAuthUserPasswordModificationDisallowed(
                 "user {} is link to external auth {},"
                 "password modification disallowed".format(user.login, user.auth_type)
@@ -962,7 +982,10 @@ need to be in every workspace you include."
         return True
 
     def _check_email_modification_allowed(self, user: User) -> bool:
-        if user.auth_type and user.auth_type not in [AuthType.INTERNAL, AuthType.UNKNOWN]:
+        if user.auth_type and user.auth_type not in [
+            AuthType.INTERNAL,
+            AuthType.UNKNOWN,
+        ]:
             raise ExternalAuthUserEmailModificationDisallowed(
                 "user {} is link to external auth {},"
                 "email modification disallowed".format(user.login, user.auth_type)
@@ -1121,7 +1144,8 @@ need to be in every workspace you include."
         self._check_user_auth_validity(user)
         self._check_password_modification_allowed(user)
         return user.validate_reset_password_token(
-            token=token, validity_seconds=self._config.USER__RESET_PASSWORD__TOKEN_LIFETIME
+            token=token,
+            validity_seconds=self._config.USER__RESET_PASSWORD__TOKEN_LIFETIME,
         )
 
     def enable(self, user: User, do_save=False):
@@ -1208,7 +1232,10 @@ need to be in every workspace you include."
         if (
             self._session.query(UserFollower)
             .filter(
-                and_(UserFollower.leader_id == leader_id, UserFollower.follower_id == follower_id)
+                and_(
+                    UserFollower.leader_id == leader_id,
+                    UserFollower.follower_id == follower_id,
+                )
             )
             .count()
         ):
@@ -1230,7 +1257,8 @@ need to be in every workspace you include."
                 self._session.query(UserFollower)
                 .filter(
                     and_(
-                        UserFollower.leader_id == leader_id, UserFollower.follower_id == follower_id
+                        UserFollower.leader_id == leader_id,
+                        UserFollower.follower_id == follower_id,
                     )
                 )
                 .one()
@@ -1419,7 +1447,11 @@ need to be in every workspace you include."
         )
 
     def set_cover(
-        self, user_id: int, new_filename: str, new_mimetype: str, new_content: typing.BinaryIO
+        self,
+        user_id: int,
+        new_filename: str,
+        new_mimetype: str,
+        new_content: typing.BinaryIO,
     ) -> None:
         user = self.get_one(user_id)
         (user.cover, user.cropped_cover) = self._crop_and_prepare_depot_storage(

@@ -23,7 +23,11 @@ def one_call(bob_user: User, riyad_user: User, session: TracimSession, app_confi
 
 @pytest.fixture
 def two_calls(
-    bob_user: User, riyad_user: User, admin_user: User, session: TracimSession, app_config: CFG
+    bob_user: User,
+    riyad_user: User,
+    admin_user: User,
+    session: TracimSession,
+    app_config: CFG,
 ) -> typing.Tuple[UserCall, UserCall]:
     """Create two calls."""
     bob_lib = CallLib(session, app_config, bob_user)
@@ -67,7 +71,10 @@ class TestUserCallEndpoint:
     ) -> None:
         (call_1, call_2) = two_calls
         user = three_users[user_index]
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         url = "/api/users/{user_id}/outgoing_calls{query}"
         res = web_testapp.get(
             url.format(user_id=user.user_id, query=query),
@@ -128,7 +135,10 @@ class TestUserCallEndpoint:
     ) -> None:
         (call_1, call_2) = two_calls
         user = three_users[user_index]
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         url = "/api/users/{user_id}/incoming_calls{query}"
         res = web_testapp.get(
             url.format(user_id=user.user_id, query=query),
@@ -246,9 +256,19 @@ class TestUserCallEndpoint:
         "authorization, method, path, status",
         [
             (None, "GET", "/api/users/{user_id}/outgoing_calls", 401),
-            (("Basic", ("riyad", "password")), "GET", "/api/users/{user_id}/outgoing_calls", 403),
+            (
+                ("Basic", ("riyad", "password")),
+                "GET",
+                "/api/users/{user_id}/outgoing_calls",
+                403,
+            ),
             (None, "GET", "/api/users/{user_id}/incoming_calls", 401),
-            (("Basic", ("riyad", "password")), "GET", "/api/users/{user_id}/incoming_calls", 403),
+            (
+                ("Basic", ("riyad", "password")),
+                "GET",
+                "/api/users/{user_id}/incoming_calls",
+                403,
+            ),
             (None, "PUT", "/api/users/{user_id}/outgoing_calls/{call_id}/state", 401),
             (
                 ("Basic", ("riyad", "password")),

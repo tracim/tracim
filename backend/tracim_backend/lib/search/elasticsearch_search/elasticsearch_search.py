@@ -209,11 +209,15 @@ class ESSearchApi(SearchApi):
             self.es.indices.create(index=new_index_name)
 
             logger.info(
-                self, 'reindex data from "{}" to "{}"'.format(parameters.alias, new_index_name)
+                self,
+                'reindex data from "{}" to "{}"'.format(parameters.alias, new_index_name),
             )
             # move data from current alias to the new index
             self.es.reindex(
-                body={"source": {"index": parameters.alias}, "dest": {"index": new_index_name}},
+                body={
+                    "source": {"index": parameters.alias},
+                    "dest": {"index": new_index_name},
+                },
                 request_timeout=3600,
             )
             # refresh the index to make the changes visible
@@ -617,7 +621,8 @@ class ESSearchApi(SearchApi):
 
         if search_parameters.author__public_names:
             search = search.filter(
-                "terms", author__public_name__exact=search_parameters.author__public_names
+                "terms",
+                author__public_name__exact=search_parameters.author__public_names,
             )
 
         if search_parameters.last_modifier__public_names:
@@ -749,7 +754,9 @@ class ESSearchApi(SearchApi):
         known_workspaces = self._get_workspaces_known_to_user()
         facets = {
             "workspaces": self._create_filtered_facets(
-                "workspace_id", response.aggregations.workspace_ids.buckets, known_workspaces
+                "workspace_id",
+                response.aggregations.workspace_ids.buckets,
+                known_workspaces,
             )
         }
         try:
@@ -932,7 +939,10 @@ class ESSearchApi(SearchApi):
 
         p.put_pipeline(
             id=FILE_PIPELINE_ID,
-            body={"description": "Extract attachment information", "processors": processors},
+            body={
+                "description": "Extract attachment information",
+                "processors": processors,
+            },
         )
 
     def _get_workspaces_known_to_user(self) -> typing.List[Workspace]:
@@ -955,7 +965,8 @@ class ESContentIndexer:
             self.index_contents([content], context)
         except IndexingError:
             logger.exception(
-                self, "Exception while indexing created content {}".format(content.content_id)
+                self,
+                "Exception while indexing created content {}".format(content.content_id),
             )
 
     @hookimpl
@@ -970,14 +981,16 @@ class ESContentIndexer:
                 self.index_contents(content.recursive_children, context)
         except Exception:
             logger.exception(
-                self, "Exception while indexing modified content {}".format(content.content_id)
+                self,
+                "Exception while indexing modified content {}".format(content.content_id),
             )
 
     @hookimpl
     def on_workspace_modified(self, workspace: Workspace, context: TracimContext) -> None:
         """Index the contents of the given workspace
 
-        Contents are indexed only if the workspace has changes influencing their index."""
+        Contents are indexed only if the workspace has changes influencing their index.
+        """
         if not self._should_reindex_children(workspace):
             return
         content_api = ContentApi(
@@ -1061,7 +1074,8 @@ class ESContentIndexer:
                 search_api.index_content(content)
             except Exception:
                 logger.exception(
-                    self, "Exception while indexing content {}".format(content.content_id)
+                    self,
+                    "Exception while indexing content {}".format(content.content_id),
                 )
                 indexing_error_count += 1
         return indexing_error_count

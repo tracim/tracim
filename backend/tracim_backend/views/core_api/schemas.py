@@ -437,11 +437,14 @@ class UserSchema(UserDigestSchema):
         " by an admin. Default is true",
     )
     is_deleted = marshmallow.fields.Bool(
-        example=False, description="true if the user account has been deleted. " "Default is false"
+        example=False,
+        description="true if the user account has been deleted. " "Default is false",
     )
     # TODO - G.M - 17-04-2018 - Restrict timezone values
     timezone = StrippedString(
-        description=FIELD_TIMEZONE_DESC, example="Europe/Paris", validate=user_timezone_validator
+        description=FIELD_TIMEZONE_DESC,
+        example="Europe/Paris",
+        validate=user_timezone_validator,
     )
     profile = StrippedString(
         attribute="profile",
@@ -501,7 +504,9 @@ class SetCustomPropertiesSchema(marshmallow.Schema):
     """
 
     parameters = marshmallow.fields.Dict(
-        required=True, example={"param1": "value1"}, description="custom_properties schema"
+        required=True,
+        example={"param1": "value1"},
+        description="custom_properties schema",
     )
 
 
@@ -542,7 +547,10 @@ class SetUserInfoSchema(marshmallow.Schema):
         description=FIELD_TIMEZONE_DESC, example="Europe/Paris", required=True
     )
     public_name = StrippedString(
-        example="John Doe", required=False, validate=user_public_name_validator, default=None
+        example="John Doe",
+        required=False,
+        validate=user_public_name_validator,
+        default=None,
     )
     lang = StrippedString(
         description=FIELD_LANG_DESC,
@@ -596,10 +604,16 @@ class SetUserAllowedSpaceSchema(marshmallow.Schema):
 
 class UserRegistrationSchema(marshmallow.Schema):
     email = TracimEmail(
-        required=True, example="hello@tracim.fr", validate=user_email_validator, allow_none=True
+        required=True,
+        example="hello@tracim.fr",
+        validate=user_email_validator,
+        allow_none=True,
     )
     username = String(
-        required=False, example="My-Power_User99", validate=user_username_validator, allow_none=True
+        required=False,
+        example="My-Power_User99",
+        validate=user_username_validator,
+        allow_none=True,
     )
     password = String(
         example="8QLa$<w",
@@ -616,7 +630,10 @@ class UserRegistrationSchema(marshmallow.Schema):
         validate=user_timezone_validator,
     )
     public_name = StrippedString(
-        example="John Doe", required=True, default=None, validate=user_public_name_validator
+        example="John Doe",
+        required=True,
+        default=None,
+        validate=user_public_name_validator,
     )
     lang = StrippedString(
         description=FIELD_LANG_DESC,
@@ -634,10 +651,16 @@ class UserRegistrationSchema(marshmallow.Schema):
 
 class UserCreationSchema(marshmallow.Schema):
     email = RFCEmail(
-        required=False, example="hello@tracim.fr", validate=user_email_validator, allow_none=True
+        required=False,
+        example="hello@tracim.fr",
+        validate=user_email_validator,
+        allow_none=True,
     )
     username = String(
-        required=False, example="My-Power_User99", validate=user_username_validator, allow_none=True
+        required=False,
+        example="My-Power_User99",
+        validate=user_username_validator,
+        allow_none=True,
     )
     password = String(
         example="8QLa$<w",
@@ -662,7 +685,10 @@ class UserCreationSchema(marshmallow.Schema):
         validate=user_timezone_validator,
     )
     public_name = StrippedString(
-        example="John Doe", required=False, default=None, validate=user_public_name_validator
+        example="John Doe",
+        required=False,
+        default=None,
+        validate=user_public_name_validator,
     )
     lang = StrippedString(
         description=FIELD_LANG_DESC,
@@ -953,7 +979,9 @@ class FilePreviewSizedPathSchema(
 
 
 class FileRevisionPreviewSizedPathSchema(
-    WorkspaceAndContentRevisionIdPathSchema, WidthAndHeightPathSchema, FilenamePathSchema
+    WorkspaceAndContentRevisionIdPathSchema,
+    WidthAndHeightPathSchema,
+    FilenamePathSchema,
 ):
     @post_load
     def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -1167,7 +1195,10 @@ class FilterContentQuerySchema(BaseOptionalPaginatedQuerySchema):
         validate=all_content_types_validator,
     )
     label = StrippedString(
-        example="myfilename", default=None, allow_none=True, description="Filter by content label"
+        example="myfilename",
+        default=None,
+        allow_none=True,
+        description="Filter by content label",
     )
     sort = EnumField(
         ContentSortOrder,
@@ -1207,10 +1238,16 @@ class WorkspaceMemberInviteSchema(marshmallow.Schema):
     role = StrippedString(example="contributor", validate=user_role_validator, required=True)
     user_id = marshmallow.fields.Int(example=5, default=None, allow_none=True)
     user_email = RFCEmail(
-        example="suri@cate.fr", default=None, allow_none=True, validate=user_email_validator
+        example="suri@cate.fr",
+        default=None,
+        allow_none=True,
+        validate=user_email_validator,
     )
     user_username = StrippedString(
-        example="The-John_Doe42", default=None, allow_none=True, validate=user_username_validator
+        example="The-John_Doe42",
+        default=None,
+        allow_none=True,
+        validate=user_username_validator,
     )
 
     @post_load
@@ -1229,11 +1266,17 @@ class WorkspaceMemberInviteSchema(marshmallow.Schema):
 
 class ResetPasswordRequestSchema(marshmallow.Schema):
     email = TracimEmail(
-        example="hello@tracim.fr", default=None, allow_none=True, validate=user_email_validator
+        example="hello@tracim.fr",
+        default=None,
+        allow_none=True,
+        validate=user_email_validator,
     )
 
     username = StrippedString(
-        example="The-John_Doe42", default=None, allow_none=True, validate=user_username_validator
+        example="The-John_Doe42",
+        default=None,
+        allow_none=True,
+        validate=user_username_validator,
     )
 
     @post_load
@@ -1273,13 +1316,22 @@ class ResetPasswordModifySchema(marshmallow.Schema):
 
 class BasicAuthSchema(marshmallow.Schema):
     email = TracimEmail(
-        example="hello@tracim.fr", required=False, validate=user_email_validator, allow_none=True
+        example="hello@tracim.fr",
+        required=False,
+        validate=user_email_validator,
+        allow_none=True,
     )
     username = String(
-        example="My-Power_User99", required=False, validate=user_username_validator, allow_none=True
+        example="My-Power_User99",
+        required=False,
+        validate=user_username_validator,
+        allow_none=True,
     )
     password = String(
-        example="8QLa$<w", required=True, load_only=True, validate=user_password_validator
+        example="8QLa$<w",
+        required=True,
+        load_only=True,
+        validate=user_password_validator,
     )
 
     class Meta:
@@ -1359,7 +1411,9 @@ class WorkspaceCreationSchema(marshmallow.Schema):
     )
     description = StrippedString(required=True, example="A super description of my workspace.")
     agenda_enabled = marshmallow.fields.Bool(
-        required=False, description="has workspace has an associated agenda ?", default=True
+        required=False,
+        description="has workspace has an associated agenda ?",
+        default=True,
     )
     access_type = StrippedString(
         example=WorkspaceAccessType.CONFIDENTIAL.value,
@@ -1502,13 +1556,17 @@ class UserConfigSchema(marshmallow.Schema):
 
 class UserCustomPropertiesSchema(marshmallow.Schema):
     json_schema = marshmallow.fields.Dict(
-        description="json schema used for user custom properties", required=True, allow_none=False
+        description="json schema used for user custom properties",
+        required=True,
+        allow_none=False,
     )
 
 
 class UserCustomPropertiesUiSchema(marshmallow.Schema):
     ui_schema = marshmallow.fields.Dict(
-        description="ui schema used for user custom properties", required=True, allow_none=False
+        description="ui schema used for user custom properties",
+        required=True,
+        allow_none=False,
     )
 
 
@@ -1720,7 +1778,10 @@ class UserInfoContentAbstractSchema(marshmallow.Schema):
 
 class ContentDigestSchema(UserInfoContentAbstractSchema):
     assignee_id = marshmallow.fields.Int(
-        example=42, allow_none=True, default=None, validate=strictly_positive_int_validator
+        example=42,
+        allow_none=True,
+        default=None,
+        validate=strictly_positive_int_validator,
     )
     content_namespace = EnumField(ContentNamespaces, example="content")
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
@@ -1840,7 +1901,9 @@ class PreviewInfoSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     revision_id = marshmallow.fields.Int(example=12, validate=strictly_positive_int_validator)
     page_nb = marshmallow.fields.Int(
-        description="number of pages, return null value if unaivalable", example=1, allow_none=True
+        description="number of pages, return null value if unaivalable",
+        example=1,
+        allow_none=True,
     )
     has_pdf_preview = marshmallow.fields.Bool(
         description="true if a pdf preview is available or false", example=True
@@ -2306,7 +2369,9 @@ class UserMessagesSummarySchema(marshmallow.Schema):
 
 class WorkspaceSubscriptionSchema(marshmallow.Schema):
     state = StrippedString(
-        example="pending", validate=workspace_subscription_state_validator, attribute="state_slug"
+        example="pending",
+        validate=workspace_subscription_state_validator,
+        attribute="state_slug",
     )
     created_date = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="subscription creation date"
@@ -2331,7 +2396,10 @@ class GetUserFollowQuerySchema(BasePaginatedQuerySchema):
     """Possible query parameters for the GET following and followers endpoint."""
 
     user_id = marshmallow.fields.Int(
-        example=42, validate=strictly_positive_int_validator, allow_none=True, default=None
+        example=42,
+        validate=strictly_positive_int_validator,
+        allow_none=True,
+        default=None,
     )
 
     @post_load

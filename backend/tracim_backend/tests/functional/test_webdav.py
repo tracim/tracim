@@ -225,7 +225,8 @@ class TestFunctionalWebdavGet(object):
         webdav_testapp.get("/parent.space", status=200)
         webdav_testapp.get("/{}.space", status=404)
         webdav_testapp.get(
-            "/parent.space/{}.space".format(urlencoded_webdav_workspace_label), status=200
+            "/parent.space/{}.space".format(urlencoded_webdav_workspace_label),
+            status=200,
         )
 
     def test_functional__webdav_access_to_workspace__orphan_space_access(
@@ -300,7 +301,8 @@ class TestFunctionalWebdavGet(object):
         webdav_testapp.get("/children.space", status=200)
         webdav_testapp.get("/{}.space".format(urlencoded_webdav_workspace_label), status=404)
         webdav_testapp.get(
-            "/children.space/{}.space".format(urlencoded_webdav_workspace_label), status="*"
+            "/children.space/{}.space".format(urlencoded_webdav_workspace_label),
+            status="*",
         )
 
     @pytest.mark.parametrize(
@@ -476,7 +478,13 @@ class TestFunctionalWebdavGet(object):
         [
             # workspace_label, webdav_workspace_label,
             # content_filename, webdav_content_filename
-            ("myworkspace", "myworkspace", ContentTypeSlug.FILE, "myfile.txt", "myfile.txt"),
+            (
+                "myworkspace",
+                "myworkspace",
+                ContentTypeSlug.FILE,
+                "myfile.txt",
+                "myfile.txt",
+            ),
             ("/?\\#*", "⧸ʔ⧹#∗", ContentTypeSlug.FILE, "/?\\#*.txt", "⧸ʔ⧹#∗.txt"),
             (
                 "Project Z",
@@ -485,7 +493,13 @@ class TestFunctionalWebdavGet(object):
                 "report product 47.txt",
                 "report product 47.txt",
             ),
-            ("myworkspace", "myworkspace", ContentTypeSlug.KANBAN, "foo.kanban", "foo.kanban"),
+            (
+                "myworkspace",
+                "myworkspace",
+                ContentTypeSlug.KANBAN,
+                "foo.kanban",
+                "foo.kanban",
+            ),
         ],
     )
     def test_functional__webdav_access_to_content__ok__nominal_case(
@@ -516,7 +530,10 @@ class TestFunctionalWebdavGet(object):
             api.save(file)
         transaction.commit()
 
-        webdav_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        webdav_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # convert to %encoded for valid_url
         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
         urlencoded_webdav_content_filename = quote(webdav_content_filename)
@@ -536,7 +553,10 @@ class TestFunctionalWebdavGet(object):
         workspace_api.create_workspace("workspace1", save_now=True)
         transaction.commit()
 
-        webdav_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        webdav_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # check availability of new created content using webdav
         webdav_testapp.get("/workspace1.space", status=200)
         webdav_testapp.get("/workspace1.space/report.txt", status=404)
@@ -547,7 +567,14 @@ class TestFunctionalWebdavGet(object):
             # workspace_label, webdav_workspace_label,
             # dir_label, webdav_dir_label
             # content_filename, webdav_content_filename
-            ("myworkspace", "myworkspace", "mydir", "mydir", "myfile.txt", "myfile.txt"),
+            (
+                "myworkspace",
+                "myworkspace",
+                "mydir",
+                "mydir",
+                "myfile.txt",
+                "myfile.txt",
+            ),
             ("/?\\#*", "⧸ʔ⧹#∗", "/?\\#*", "⧸ʔ⧹#∗", "/?\\#*.txt", "⧸ʔ⧹#∗.txt"),
             (
                 "Project Z",
@@ -597,7 +624,10 @@ class TestFunctionalWebdavGet(object):
             api.save(file)
         transaction.commit()
 
-        webdav_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        webdav_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # convert to %encoded for valid_url
         urlencoded_webdav_workspace_label = quote(webdav_workspace_label)
         urlencoded_webdav_dir_label = quote(webdav_dir_label)
@@ -618,7 +648,12 @@ class TestFunctionalWebdavGet(object):
         )
 
     def test_functional__webdav_access_to_subdir_content__err__file_not_exist(
-        self, session, workspace_api_factory, content_api_factory, content_type_list, webdav_testapp
+        self,
+        session,
+        workspace_api_factory,
+        content_api_factory,
+        content_type_list,
+        webdav_testapp,
     ) -> None:
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("workspace1", save_now=True)
@@ -632,7 +667,10 @@ class TestFunctionalWebdavGet(object):
         )
         transaction.commit()
 
-        webdav_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        webdav_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # check availability of new created content using webdav
         webdav_testapp.get("/workspace1.space", status=200)
         webdav_testapp.get("/workspace1.space/examples", status=200)
@@ -1517,7 +1555,8 @@ class TestFunctionalWebdavMoveSimpleFile(object):
             method="MOVE",
             headers={
                 "destination": "/{}.space/{}".format(
-                    urlencoded_webdav_workspace_label, urlencoded_webdav_new_content_filename
+                    urlencoded_webdav_workspace_label,
+                    urlencoded_webdav_new_content_filename,
                 )
             },
             status=201,
@@ -1533,7 +1572,8 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         )
         webdav_testapp.get(
             "/{}.space/{}".format(
-                urlencoded_webdav_workspace_label, urlencoded_webdav_new_content_filename
+                urlencoded_webdav_workspace_label,
+                urlencoded_webdav_new_content_filename,
             ),
             status=200,
         )
@@ -1693,7 +1733,8 @@ class TestFunctionalWebdavMoveSimpleFile(object):
             method="MOVE",
             headers={
                 "destination": "/{}.space/{}".format(
-                    urlencoded_webdav_workspace2_label, urlencoded_webdav_new_content_filename
+                    urlencoded_webdav_workspace2_label,
+                    urlencoded_webdav_new_content_filename,
                 )
             },
             status=201,
@@ -1709,7 +1750,8 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         )
         webdav_testapp.get(
             "/{}.space/{}".format(
-                urlencoded_webdav_workspace2_label, urlencoded_webdav_new_content_filename
+                urlencoded_webdav_workspace2_label,
+                urlencoded_webdav_new_content_filename,
             ),
             status=200,
         )
@@ -1825,7 +1867,8 @@ class TestFunctionalWebdavMoveSimpleFile(object):
             method="MOVE",
             headers={
                 "destination": "/{}.space/{}".format(
-                    urlencoded_webdav_workspace_label, urlencoded_webdav_new_content_filename
+                    urlencoded_webdav_workspace_label,
+                    urlencoded_webdav_new_content_filename,
                 )
             },
             status=201,
@@ -1839,7 +1882,8 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         )
         webdav_testapp.get(
             "/{}.space/{}".format(
-                urlencoded_webdav_workspace_label, urlencoded_webdav_new_content_filename
+                urlencoded_webdav_workspace_label,
+                urlencoded_webdav_new_content_filename,
             ),
             status=200,
         )
@@ -1973,7 +2017,8 @@ class TestFunctionalWebdavMoveSimpleFile(object):
             method="MOVE",
             headers={
                 "destination": "/{}.space/{}".format(
-                    urlencoded_webdav_workspace2_label, urlencoded_webdav_new_content_filename
+                    urlencoded_webdav_workspace2_label,
+                    urlencoded_webdav_new_content_filename,
                 )
             },
             status=201,
@@ -1987,7 +2032,8 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         )
         webdav_testapp.get(
             "/{}.space/{}".format(
-                urlencoded_webdav_workspace2_label, urlencoded_webdav_new_content_filename
+                urlencoded_webdav_workspace2_label,
+                urlencoded_webdav_new_content_filename,
             ),
             status=200,
         )

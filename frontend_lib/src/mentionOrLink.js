@@ -13,11 +13,9 @@ export const MENTION_CONSTANT = {
 }
 
 export const MENTION_ID_PREFIX = 'mention-'
-export const MENTION_CLASS = 'mention'
 export const MENTION_ME_CLASS = 'mention-me'
 export const MENTION_TAG_NAME = 'span'
-export const MENTION_REGEX = /@([a-zA-Z0-9\-_]+)(?=\s|$)/
-export const MENTION_REGEX_GLOBAL = /@([a-zA-Z0-9\-_]+)(?=\s|$)/g
+export const MENTION_REGEX_GLOBAL = /@([a-zA-Z0-9\-._]+)(?=\s|$)/g
 export const GROUP_MENTION_LIST = [
   {
     mention: 'all',
@@ -26,9 +24,6 @@ export const GROUP_MENTION_LIST = [
     isCommon: true
   }
 ]
-export const LINK_REGEX = /#([0-9]+)(?=\s|$)/
-export const LINK_TAG_NAME = 'a'
-export const LINK_CLASS = 'internal_link primaryColorFont'
 
 const GROUP_MENTION_TRANSLATION_LIST = ['all', 'tous', 'todos', 'alle', 'الكل']
 
@@ -105,7 +100,7 @@ export const searchMention = (text) => {
   // Regex explanation: https://regex101.com/r/hHosBa/11
   // Match (@XXX part): '@XXX', ' @XXX ', '@XXX-', ':@XXX:', '(@XXX)', '!@XXX!', ...
   // Don't match: 'XXX@XXX', '@<span>XXX</span>'
-  const mentionRegex = /(?:^|\s|\W)@([a-zA-Z0-9_-]+)\b/g
+  const mentionRegex = /(?:^|\s|\W)@([a-zA-Z0-9_.-]+)\b/g
   const mentionList = text.match(mentionRegex)
   return mentionList || []
 }

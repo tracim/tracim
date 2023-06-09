@@ -32,7 +32,10 @@ class ProprietaryHTMLAttrValues(object):
 class HtmlChecker(object):
     @classmethod
     def _has_attr_value(
-        cls, elem: typing.Union[Tag, NavigableString], attribute_name: str, attribute_value: str
+        cls,
+        elem: typing.Union[Tag, NavigableString],
+        attribute_name: str,
+        attribute_value: str,
     ) -> bool:
         """
         Check if elem contains attribute named attribute_name with

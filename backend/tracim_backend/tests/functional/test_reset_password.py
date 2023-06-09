@@ -80,7 +80,10 @@ class TestResetPasswordRequestEndpointMailSync(object):
     @pytest.mark.unknown_auth
     def test_api__reset_password_request__ok__unknown_auth(self, web_testapp, mailhog):
         # create new user without auth (default is unknown)
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "email": "test@test.test",
             "password": "mysuperpassword",
@@ -125,7 +128,10 @@ class TestResetPasswordRequestEndpointMailDisabled(object):
     @pytest.mark.unknown_auth
     def test_api__reset_password_request__ok__unknown_auth(self, web_testapp):
         # create new user without auth (default is unknown)
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "email": "test@test.test",
             "password": "mysuperpassword",
@@ -158,7 +164,10 @@ class TestResetPasswordCheckTokenEndpoint(object):
         uapi = user_api_factory.get()
         reset_password_token = uapi.reset_password_notification(admin_user, do_save=True)
         transaction.commit()
-        params = {"email": "admin@admin.admin", "reset_password_token": reset_password_token}
+        params = {
+            "email": "admin@admin.admin",
+            "reset_password_token": reset_password_token,
+        }
         web_testapp.post_json("/api/auth/password/reset/token/check", status=204, params=params)
 
     @pytest.mark.email_notification
@@ -167,7 +176,10 @@ class TestResetPasswordCheckTokenEndpoint(object):
         self, web_testapp, user_api_factory
     ):
         # create new user without auth (default is unknown)
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "email": "test@test.test",
             "password": "mysuperpassword",
@@ -188,7 +200,10 @@ class TestResetPasswordCheckTokenEndpoint(object):
         user = uapi.get_one_by_email("test@test.test")
         reset_password_token = uapi.reset_password_notification(user, do_save=True)
         transaction.commit()
-        params = {"email": "test@test.test", "reset_password_token": reset_password_token}
+        params = {
+            "email": "test@test.test",
+            "reset_password_token": reset_password_token,
+        }
         web_testapp.post_json("/api/auth/password/reset/token/check", status=204, params=params)
 
     @pytest.mark.email_notification
@@ -196,7 +211,10 @@ class TestResetPasswordCheckTokenEndpoint(object):
     def test_api__reset_password_check_token__err_400__invalid_token(self, web_testapp):
         reset_password_token = "wrong_token"
         transaction.commit()
-        params = {"email": "admin@admin.admin", "reset_password_token": reset_password_token}
+        params = {
+            "email": "admin@admin.admin",
+            "reset_password_token": reset_password_token,
+        }
         res = web_testapp.post_json(
             "/api/auth/password/reset/token/check", status=400, params=params
         )
@@ -233,7 +251,10 @@ class TestResetPasswordModifyEndpoint(object):
     @pytest.mark.unknown_auth
     def test_api__reset_password_reset__ok_204__unknown_auth(self, web_testapp, user_api_factory):
         # create new user without auth (default is unknown)
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "email": "test@test.test",
             "password": "mysuperpassword",
@@ -372,10 +393,13 @@ class TestResetPasswordExternalAuthUser(object):
     def test_api__reset_password_request__err__external_auth_ldap_cant_change_password(
         self, web_testapp
     ):
-        web_testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
+        web_testapp.authorization = (
+            "Basic",
+            ("professor@planetexpress.com", "professor"),
+        )
         web_testapp.get("/api/auth/whoami", status=200)
 
-        params = {"email": "hubert@planetexpress.com"}
+        params = {"email": "professor@planetexpress.com"}
         web_testapp.post_json("/api/auth/password/reset/request", status=204, params=params)
 
     @pytest.mark.email_notification
@@ -384,10 +408,16 @@ class TestResetPasswordExternalAuthUser(object):
         self, web_testapp
     ):
         # precreate user
-        web_testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
+        web_testapp.authorization = (
+            "Basic",
+            ("professor@planetexpress.com", "professor"),
+        )
         web_testapp.get("/api/auth/whoami", status=200)
 
-        params = {"email": "hubert@planetexpress.com", "reset_password_token": "unknown"}
+        params = {
+            "email": "professor@planetexpress.com",
+            "reset_password_token": "unknown",
+        }
         res = web_testapp.post_json(
             "/api/auth/password/reset/token/check", status=400, params=params
         )
@@ -401,11 +431,14 @@ class TestResetPasswordExternalAuthUser(object):
         self, web_testapp
     ):
         # precreate user
-        web_testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
+        web_testapp.authorization = (
+            "Basic",
+            ("professor@planetexpress.com", "professor"),
+        )
         web_testapp.get("/api/auth/whoami", status=200)
 
         params = {
-            "email": "hubert@planetexpress.com",
+            "email": "professor@planetexpress.com",
             "reset_password_token": "unknown",
             "new_password": "mynewpassword",
             "new_password2": "mynewpassword",

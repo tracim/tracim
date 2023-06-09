@@ -171,7 +171,10 @@ def create_content_messages(
         event = tracim_event.Event(
             entity_type=tracim_event.EntityType.CONTENT,
             operation=tracim_event.OperationType.CREATED,
-            fields={"author": {"user_id": 1}, "content": {"content_id": 1, "parent_id": None}},
+            fields={
+                "author": {"user_id": 1},
+                "content": {"content_id": 1, "parent_id": None},
+            },
             content_id=1,
             author_id=1,
         )
@@ -186,7 +189,10 @@ def create_content_messages(
         event = tracim_event.Event(
             entity_type=tracim_event.EntityType.CONTENT,
             operation=tracim_event.OperationType.CREATED,
-            fields={"author": {"user_id": 2}, "content": {"content_id": 2, "parent_id": 1}},
+            fields={
+                "author": {"user_id": 2},
+                "content": {"content_id": 2, "parent_id": 1},
+            },
             author_id=2,
             content_id=2,
             parent_id=1,
@@ -197,7 +203,10 @@ def create_content_messages(
         event = tracim_event.Event(
             entity_type=tracim_event.EntityType.WORKSPACE,
             operation=tracim_event.OperationType.CREATED,
-            fields={"author": {"user_id": 2}, "content": {"content_id": 3, "parent_id": None}},
+            fields={
+                "author": {"user_id": 2},
+                "content": {"content_id": 3, "parent_id": None},
+            },
             author_id=2,
             content_id=3,
         )
@@ -207,7 +216,10 @@ def create_content_messages(
         event = tracim_event.Event(
             entity_type=tracim_event.EntityType.CONTENT,
             operation=tracim_event.OperationType.CREATED,
-            fields={"author": {"user_id": 2}, "content": {"content_id": 4, "parent_id": 3}},
+            fields={
+                "author": {"user_id": 2},
+                "content": {"content_id": 4, "parent_id": 3},
+            },
             author_id=2,
             content_id=4,
             parent_id=3,
@@ -241,7 +253,10 @@ class TestMessages(object):
         elif read_status == "unread":
             messages = [m for m in messages if not m.read]
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         result = web_testapp.get(
             "/api/users/1/messages?read_status={}".format(read_status),
             status=200,
@@ -268,7 +283,10 @@ class TestMessages(object):
         if not include_not_sent:
             messages = []
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         result = web_testapp.get(
             "/api/users/1/messages?include_not_sent={}".format(str(int(include_not_sent))),
             status=200,
@@ -292,7 +310,10 @@ class TestMessages(object):
         """
         messages = create_user_messages(session, sent_date=datetime.datetime.utcnow())
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
 
         result = web_testapp.get(
             "/api/users/1/messages?exclude_author_ids=",
@@ -340,7 +361,10 @@ class TestMessages(object):
         if event_type:
             messages = [m for m in messages if m.event_type == event_type]
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         result = web_testapp.get(
             "/api/users/1/messages?include_event_types={}".format(event_type),
             status=200,
@@ -398,7 +422,12 @@ class TestMessages(object):
             pytest.param(
                 ("user.*", "workspace.*", "content.created"),
                 ("user.modified", "workspace.modified"),
-                ("content.created", "user.created", "content.created", "workspace.created"),
+                (
+                    "content.created",
+                    "user.created",
+                    "content.created",
+                    "workspace.created",
+                ),
                 id="include and exclude complex case",
             ),
             pytest.param(
@@ -436,16 +465,23 @@ class TestMessages(object):
         )
         messages.extend(
             create_content_messages(
-                session, sent_date=datetime.datetime.utcnow(), remove_existing_events=False
+                session,
+                sent_date=datetime.datetime.utcnow(),
+                remove_existing_events=False,
             )
         )
         messages.extend(
             create_space_messages(
-                session, sent_date=datetime.datetime.utcnow(), remove_existing_events=False
+                session,
+                sent_date=datetime.datetime.utcnow(),
+                remove_existing_events=False,
             )
         )
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         include_events_type_str = ",".join(include_event_types)
         exclude_events_type_str = ",".join(exclude_event_types)
         result = web_testapp.get(
@@ -472,7 +508,10 @@ class TestMessages(object):
                 if m.event.workspace_id and m.event.workspace_id in workspace_ids:
                     new_messages.append(m)
             messages = new_messages
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         workspace_ids_str = ",".join([str(wid) for wid in workspace_ids])
         result = web_testapp.get(
             "/api/users/1/messages?workspace_ids={}".format(workspace_ids_str),
@@ -506,7 +545,10 @@ class TestMessages(object):
                     elif m.event.content["parent_id"] in related_to_content_ids:
                         new_messages.append(m)
             messages = new_messages
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         related_to_content_ids_str = ",".join([str(wid) for wid in related_to_content_ids])
         result = web_testapp.get(
             "/api/users/1/messages?related_to_content_ids={}".format(related_to_content_ids_str),
@@ -525,7 +567,12 @@ class TestMessages(object):
 
     @pytest.mark.parametrize(
         "event_type",
-        ["something", "user.modified.subtype.subsubtype", "user.donothing", "nothing.deleted"],
+        [
+            "something",
+            "user.modified.subtype.subsubtype",
+            "user.donothing",
+            "nothing.deleted",
+        ],
     )
     def test_api__get_messages__err_400__invalid_event_type_filter(
         self, session, web_testapp, event_type: str
@@ -538,7 +585,10 @@ class TestMessages(object):
         if event_type:
             messages = [m for m in messages if m.event_type == event_type]
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         result = web_testapp.get(
             "/api/users/1/messages?include_event_types={}".format(event_type),
             status=400,
@@ -546,7 +596,10 @@ class TestMessages(object):
         assert result["code"] == 2001
         assert result["message"] == "Validation error of input data"
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         result = web_testapp.get(
             "/api/users/1/messages?exclude_event_types={}".format(event_type),
             status=400,
@@ -565,7 +618,10 @@ class TestMessages(object):
         """
         messages = create_user_messages(session, sent_date=datetime.datetime.utcnow())
         assert len(messages) == 3
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         message_dicts_0 = web_testapp.get(
             "/api/users/1/messages",
             status=200,
@@ -628,7 +684,10 @@ class TestMessages(object):
         """
         Check invalid count value
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         message_dicts = web_testapp.get(
             "/api/users/1/messages?count={}".format(count),
             status=400,
@@ -697,7 +756,10 @@ class TestMessages(object):
             sent_date=datetime.datetime.utcnow(),
         )
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
 
         end_url_str = "?"
         for param in params:
@@ -716,7 +778,10 @@ class TestMessages(object):
         )
         base_message_query = (
             session.query(tracim_event.Message)
-            .join(tracim_event.Event, tracim_event.Message.event_id == tracim_event.Event.event_id)
+            .join(
+                tracim_event.Event,
+                tracim_event.Message.event_id == tracim_event.Event.event_id,
+            )
             .filter(
                 and_(
                     tracim_event.Message.receiver_id == user_id,
@@ -749,7 +814,10 @@ class TestMessages(object):
         Read one message error message does not exist
         """
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         result = web_testapp.put("/api/users/1/messages/{}/read".format("1000"), status=400)
         assert result.json_body["code"] == 1009
 
@@ -760,7 +828,10 @@ class TestMessages(object):
         Unread one message error message does not exist
         """
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         result = web_testapp.put("/api/users/1/messages/{}/unread".format("1000"), status=400)
         assert result.json_body["code"] == 1009
 
@@ -770,7 +841,10 @@ class TestMessages(object):
         """
         create_user_messages(session, is_read=False, sent_date=datetime.datetime.utcnow())
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
 
         message_dicts = web_testapp.get(
             "/api/users/1/messages/summary",
@@ -808,7 +882,10 @@ class TestMessages(object):
         """
         create_user_messages(session, is_read=False, sent_date=datetime.datetime.utcnow())
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         event_type_filter = ",".join(event_types)
         message_dicts = web_testapp.get(
             "/api/users/1/messages/summary?{}_event_types={}".format(
@@ -831,7 +908,10 @@ class TestMessages(object):
         self, session, web_testapp, related_to_content_ids, nb_messages
     ) -> None:
         create_content_messages(session, sent_date=datetime.datetime.utcnow())
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         if not related_to_content_ids:
             related_to_content_ids_str = ""
         else:
@@ -851,7 +931,10 @@ class TestMessages(object):
         self, session, web_testapp, workspace_ids, nb_messages
     ) -> None:
         create_space_messages(session, sent_date=datetime.datetime.utcnow())
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         if not workspace_ids:
             workspace_ids_str = ""
         else:
@@ -871,7 +954,10 @@ class TestMessages(object):
         Check invalid event type case for summary
         """
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         result = web_testapp.get(
             "/api/users/1/messages/summary?include_event_types=unknown",
             status=400,
@@ -879,7 +965,10 @@ class TestMessages(object):
         assert result["code"] == 2001
         assert result["message"] == "Validation error of input data"
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         result = web_testapp.get(
             "/api/users/1/messages/summary?exclude_event_types=unknown",
             status=400,

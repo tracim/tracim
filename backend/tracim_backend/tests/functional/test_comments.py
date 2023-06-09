@@ -34,7 +34,12 @@ newest_comment = {
     "parent_content_namespace": "content",
     "parent_label": "Best Cakes?",
     "raw_content": "<p>You are right, but Kouign-amann are clearly better.</p>",
-    "author": {"user_id": 4, "has_avatar": True, "public_name": "John Reader", "username": None},
+    "author": {
+        "user_id": 4,
+        "has_avatar": True,
+        "public_name": "John Reader",
+        "username": None,
+    },
 }
 
 
@@ -66,7 +71,10 @@ class TestCommentsEndpoint(object):
         """
         Get all comments of a content with various sort order/pagination
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/workspaces/2/contents/7/comments{}".format(query), status=200)
         items = res.json_body["items"]
         assert len(items) == comment_count
@@ -85,7 +93,12 @@ class TestCommentsEndpoint(object):
         assert comment["author"]["username"] == first_comment["author"]["username"]
 
     def test_api__get_one_comment__ok_200__nominal_case(
-        self, web_testapp, session, workspace_api_factory, content_api_factory, content_type_list
+        self,
+        web_testapp,
+        session,
+        workspace_api_factory,
+        content_api_factory,
+        content_type_list,
     ) -> None:
         """
         Get one specific comment of a content
@@ -110,10 +123,15 @@ class TestCommentsEndpoint(object):
             do_notify=False,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/workspaces/{}/contents/{}/comments/{}".format(
-                workspace.workspace_id, test_html_document.content_id, comment_created.content_id
+                workspace.workspace_id,
+                test_html_document.content_id,
+                comment_created.content_id,
             ),
             status=200,
         )
@@ -157,10 +175,15 @@ class TestCommentsEndpoint(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_thread):
             content_api.update_content(
-                test_thread, new_label="test_thread_updated", new_raw_content="Just a test"
+                test_thread,
+                new_label="test_thread_updated",
+                new_raw_content="Just a test",
             )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"raw_content": "I strongly disagree, Tiramisu win!"}
         res = web_testapp.post_json(
             "/api/workspaces/{}/contents/{}/comments".format(
@@ -192,7 +215,12 @@ class TestCommentsEndpoint(object):
         assert created.workspace == {k: v for k, v in workspace.items() if k != "description"}
 
     def test_api__post_content_comment__err_400__content_not_editable(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Get all comments of a content
@@ -212,11 +240,16 @@ class TestCommentsEndpoint(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_thread):
             content_api.update_content(
-                test_thread, new_label="test_thread_updated", new_raw_content="Just a test"
+                test_thread,
+                new_label="test_thread_updated",
+                new_raw_content="Just a test",
             )
         content_api.set_status(test_thread, "closed-deprecated")
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"raw_content": "I strongly disagree, Tiramisu win!"}
         res = web_testapp.post_json(
             "/api/workspaces/{}/contents/{}/comments".format(
@@ -233,7 +266,10 @@ class TestCommentsEndpoint(object):
         """
         Get all comments of a content
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"raw_content": ""}
         res = web_testapp.post_json(
             "/api/workspaces/2/contents/7/comments", params=params, status=400
@@ -244,7 +280,10 @@ class TestCommentsEndpoint(object):
         assert res.json_body["code"] == ErrorCode.GENERIC_SCHEMA_VALIDATION_ERROR
 
     def test_api__post_content_comment__err_400__empty_simple_html(self, web_testapp) -> None:
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"raw_content": "<p></p>"}
         res = web_testapp.post_json(
             "/api/workspaces/2/contents/7/comments", params=params, status=400
@@ -254,7 +293,10 @@ class TestCommentsEndpoint(object):
         assert res.json_body["code"] == ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
 
     def test_api__post_content_comment__err_400__empty_nested_html(self, web_testapp) -> None:
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"raw_content": "<p><p></p><p><p></p></p></p>"}
         res = web_testapp.post_json(
             "/api/workspaces/2/contents/7/comments", params=params, status=400
@@ -266,7 +308,10 @@ class TestCommentsEndpoint(object):
     def test_api__post_content_comment__err_400__only_br_tags_nested_html(
         self, web_testapp
     ) -> None:
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"raw_content": "<p><p></p><p><p><br/><br/></p><br/></p></p>"}
         res = web_testapp.post_json(
             "/api/workspaces/2/contents/7/comments", params=params, status=400
@@ -281,7 +326,10 @@ class TestCommentsEndpoint(object):
         """
         delete comment (user is workspace_manager and owner)
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.delete("/api/workspaces/2/contents/7/comments/18", status=204)
         res = web_testapp.get("/api/workspaces/2/contents/7/comments", status=200)
         assert len(res.json_body["items"]) == 2
@@ -293,7 +341,10 @@ class TestCommentsEndpoint(object):
         """
         delete comment (user is workspace_manager)
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.delete("/api/workspaces/2/contents/7/comments/19", status=204)
         res = web_testapp.get("/api/workspaces/2/contents/7/comments", status=200)
         assert len(res.json_body["items"]) == 2
@@ -305,7 +356,10 @@ class TestCommentsEndpoint(object):
         """
         delete comment (user is content-manager and owner)
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.delete("/api/workspaces/2/contents/7/comments/19", status=204)
         res = web_testapp.get("/api/workspaces/2/contents/7/comments", status=200)
         assert len(res.json_body["items"]) == 2
@@ -346,7 +400,10 @@ class TestCommentsEndpoint(object):
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_ROLE_IN_WORKSPACE  # nopep8
 
     def test_api__post_content_comment__err_400__unclosed_empty_tag(self, web_testapp) -> None:
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"raw_content": "<p></i>"}
         res = web_testapp.post_json(
             "/api/workspaces/2/contents/7/comments", params=params, status=400
@@ -373,7 +430,10 @@ class TestCommentsEndpoint(object):
         """
         This test should raise an error as the html contains a mention to a user not member of the workspace
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"raw_content": request.getfixturevalue(comment_to_send)}
         res = web_testapp.post_json(
             "/api/workspaces/2/contents/7/comments", params=params, status=400
@@ -388,7 +448,10 @@ class TestCommentsEndpoint(object):
         """
         Test if the html sanityzer does not remove iframes
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "raw_content": '<p><p><iframe src="//www.youtube.com/embed/_TrVid1WuE8" width="560" height="314" allowfullscreen="allowfullscreen"></iframe></p></p>'
         }
@@ -403,7 +466,10 @@ class TestCommentsEndpoint(object):
         """
         Test if the html sanityzer does not remove images
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"raw_content": '<p><img src="data:images/jpeg,123456789=="/></p>'}
         response = web_testapp.post_json(
             "/api/workspaces/2/contents/7/comments", params=params, status=200
@@ -416,7 +482,10 @@ class TestCommentsEndpoint(object):
         """
         Test if the html sanityzer does not remove images
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"raw_content": '<p><span style="display: none;"><p>test</p></span></p>'}
         web_testapp.post_json("/api/workspaces/2/contents/7/comments", params=params, status=200)
 
@@ -424,7 +493,10 @@ class TestCommentsEndpoint(object):
         """
         Test if the html sanityzer removes script
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "raw_content": "<p>I have a script next to me <script>alert( 'Hello, world!' );</script></p>"
         }
@@ -439,7 +511,10 @@ class TestCommentsEndpoint(object):
         """
         Test if the html sanityzer removes script
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"raw_content": "<script>alert( 'Hello, world!' );</script>"}
         response = web_testapp.post_json(
             "/api/workspaces/2/contents/7/comments", params=params, status=400
@@ -492,7 +567,10 @@ class TestEditComment(object):
         workspace, test_html_document, comment = create_doc_and_comment(
             workspace_api, content_api, content_api
         )
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res_get = web_testapp.get(
             "/api/workspaces/{}/contents/{}/comments/{}".format(
                 workspace.workspace_id,
@@ -549,7 +627,10 @@ class TestEditComment(object):
         workspace, test_html_document, comment = create_doc_and_comment(
             workspace_api, content_api, content_api
         )
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res_get = web_testapp.get(
             "/api/workspaces/{}/contents/{}/comments/{}".format(
                 workspace.workspace_id,
@@ -589,7 +670,10 @@ class TestEditComment(object):
         workspace, test_html_document, comment = create_doc_and_comment(
             workspace_api, content_api, content_api
         )
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res_get = web_testapp.get(
             "/api/workspaces/{}/contents/{}/comments/{}".format(
                 workspace.workspace_id,
@@ -630,7 +714,10 @@ class TestEditComment(object):
             workspace_api, content_api, content_api
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res_get = web_testapp.get(
             "/api/workspaces/{}/contents/{}/comments/{}".format(
                 workspace.workspace_id,
@@ -798,7 +885,10 @@ class TestCommentTranslation(object):
             do_notify=False,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/workspaces/{}/contents/{}/comments/{}/translated/{}".format(
                 workspace.workspace_id,

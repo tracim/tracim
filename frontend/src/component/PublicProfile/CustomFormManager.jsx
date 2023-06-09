@@ -233,13 +233,13 @@ const SchemaAsView = props => {
   )
 }
 
-const TextRichWidget = connect(({ user }) => ({ user }))(props => {
+const TextRichWidget = connect(({ user, system }) => ({ user, system }))(props => {
   return (
     <TinyEditor
       apiUrl=''
       setContent={(text) => { props.onChange(text) }}
       // End of required props /////////////////////////////////////////////////
-      codeLanguageList={[]}
+      codeLanguageList={props.system.config.ui__notes__code_sample_languages}
       content={props.value}
       isAdvancedEdition
       isAutoResizeEnabled={false}

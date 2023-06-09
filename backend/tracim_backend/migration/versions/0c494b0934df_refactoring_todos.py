@@ -44,7 +44,10 @@ def upgrade():
         )
 
     op.create_index(
-        "idx__content_revisions__assignee_id", "content_revisions", ["assignee_id"], unique=False
+        "idx__content_revisions__assignee_id",
+        "content_revisions",
+        ["assignee_id"],
+        unique=False,
     )
 
     connection = op.get_bind()

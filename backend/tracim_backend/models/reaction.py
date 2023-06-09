@@ -18,7 +18,10 @@ class Reaction(CreationDateMixin, DeclarativeBase):
     MAX_REACTION_VALUE_LENGTH = 255
 
     reaction_id = Column(
-        Integer, Sequence("seq__reaction__reaction_id"), autoincrement=True, primary_key=True
+        Integer,
+        Sequence("seq__reaction__reaction_id"),
+        autoincrement=True,
+        primary_key=True,
     )
     content_id = Column(
         Integer,

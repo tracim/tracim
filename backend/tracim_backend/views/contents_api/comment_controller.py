@@ -64,7 +64,9 @@ class CommentController(Controller):
         )
         content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         comment = api.get_one(
-            hapic_data.path.comment_id, parent=content, content_type=content_type_list.Comment.slug
+            hapic_data.path.comment_id,
+            parent=content,
+            content_type=content_type_list.Comment.slug,
         )
         return api.get_content_in_context(comment)
 
@@ -81,7 +83,9 @@ class CommentController(Controller):
         Translate a comment
         """
         translation_lib = TranslationLib(
-            config=request.app_config, current_user=request.current_user, session=request.dbsession
+            config=request.app_config,
+            current_user=request.current_user,
+            session=request.dbsession,
         )
         comment_id = hapic_data.path.comment_id
         filename = hapic_data.path.filename
@@ -170,11 +174,15 @@ class CommentController(Controller):
             config=request.app_config,
         )
         wapi = WorkspaceApi(
-            current_user=request.current_user, session=request.dbsession, config=request.app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=request.app_config,
         )
         workspace = wapi.get_one(hapic_data.path.workspace_id)
         parent = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value, workspace=workspace
+            hapic_data.path.content_id,
+            content_type=ContentTypeSlug.ANY.value,
+            workspace=workspace,
         )
         comment = api.get_one(
             hapic_data.path.comment_id,
@@ -204,11 +212,15 @@ class CommentController(Controller):
             config=app_config,
         )
         wapi = WorkspaceApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
         workspace = wapi.get_one(hapic_data.path.workspace_id)
         parent = api.get_one(
-            hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value, workspace=workspace
+            hapic_data.path.content_id,
+            content_type=ContentTypeSlug.ANY.value,
+            workspace=workspace,
         )
         comment = api.get_one(
             hapic_data.path.comment_id,

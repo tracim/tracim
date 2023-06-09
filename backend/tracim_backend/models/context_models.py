@@ -175,7 +175,11 @@ class ResetPasswordModify(object):
     """
 
     def __init__(
-        self, reset_password_token: str, email: str, new_password: str, new_password2: str
+        self,
+        reset_password_token: str,
+        email: str,
+        new_password: str,
+        new_password2: str,
     ) -> None:
         self.email = email
         self.reset_password_token = reset_password_token
@@ -1449,7 +1453,9 @@ class ContentInContext(object):
     @property
     def author(self) -> UserInContext:
         return UserInContext(
-            dbsession=self.dbsession, config=self.config, user=self.content.first_revision.owner
+            dbsession=self.dbsession,
+            config=self.config,
+            user=self.content.first_revision.owner,
         )
 
     @property
@@ -1475,7 +1481,9 @@ class ContentInContext(object):
     @property
     def last_modifier(self) -> UserInContext:
         return UserInContext(
-            dbsession=self.dbsession, config=self.config, user=self.content.last_revision.owner
+            dbsession=self.dbsession,
+            config=self.config,
+            user=self.content.last_revision.owner,
         )
 
     # Context-related
@@ -1526,7 +1534,8 @@ class ContentInContext(object):
                 show_temporary=True,
             )
             return content_api.get_preview_page_nb(
-                self.content.cached_revision_id, file_extension=self.content.file_extension
+                self.content.cached_revision_id,
+                file_extension=self.content.file_extension,
             )
         else:
             return None
@@ -1549,11 +1558,15 @@ class ContentInContext(object):
             return self.content.depot_file.file.content_length
         except IOError:
             logger.warning(
-                self, "IO Exception Occured when trying to get content size", exc_info=True
+                self,
+                "IO Exception Occured when trying to get content size",
+                exc_info=True,
             )
         except Exception:
             logger.warning(
-                self, "Unknown Exception Occured when trying to get content size", exc_info=True
+                self,
+                "Unknown Exception Occured when trying to get content size",
+                exc_info=True,
             )
         # HACK - G.M - 2021-03-09 - properly handled the broken size case here to
         # avoid broken search (both simple and elasticsearch)
@@ -1852,11 +1865,15 @@ class RevisionInContext(object):
             return self.revision.depot_file.file.content_length
         except IOError:
             logger.warning(
-                self, "IO Exception Occured when trying to get content size", exc_info=True
+                self,
+                "IO Exception Occured when trying to get content size",
+                exc_info=True,
             )
         except Exception:
             logger.warning(
-                self, "Unknown Exception Occured when trying to get content size", exc_info=True
+                self,
+                "Unknown Exception Occured when trying to get content size",
+                exc_info=True,
             )
         return None
 
@@ -1968,7 +1985,10 @@ class UserFollowQuery(BasePaginatedQuery):
     """
 
     def __init__(
-        self, count: int, page_token: Optional[str] = None, user_id: Optional[int] = None
+        self,
+        count: int,
+        page_token: Optional[str] = None,
+        user_id: Optional[int] = None,
     ) -> None:
         super().__init__(count=count, page_token=page_token)
         self.user_id = user_id

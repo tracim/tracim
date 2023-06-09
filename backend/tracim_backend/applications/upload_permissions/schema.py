@@ -151,7 +151,9 @@ class UploadPermissionCreationBody(object):
 
 class UploadPermissionCreationBodySchema(marshmallow.Schema):
     emails = marshmallow.fields.List(
-        RFCEmail(validate=upload_permission_email_validator), validate=Length(min=1), required=True
+        RFCEmail(validate=upload_permission_email_validator),
+        validate=Length(min=1),
+        required=True,
     )
     password = marshmallow.fields.String(
         example="8QLa$<w",
@@ -171,7 +173,9 @@ class UploadPermissionPublicInfoSchema(marshmallow.Schema):
 
 class UploadPermissionSchema(marshmallow.Schema):
     email = RFCEmail(
-        example="hello@tracim.fr", required=True, validate=upload_permission_email_validator
+        example="hello@tracim.fr",
+        required=True,
+        validate=upload_permission_email_validator,
     )
     has_password = marshmallow.fields.Boolean(required=True)
     upload_permission_group_uuid = marshmallow.fields.String(required=True)
@@ -191,7 +195,9 @@ class UploadPermissionSchema(marshmallow.Schema):
         format=DATETIME_FORMAT, description="Upload permission creation date"
     )
     disabled = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT, description="Upload permission disabled date", allow_none=True
+        format=DATETIME_FORMAT,
+        description="Upload permission disabled date",
+        allow_none=True,
     )
     is_disabled = marshmallow.fields.Boolean(
         required=True, description="is this upload permission disabled ?"

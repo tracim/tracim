@@ -80,7 +80,13 @@ def rq_database_worker(config_uri, app_config):
     empty_event_queues()
     worker_env = os.environ.copy()
     worker_env["TRACIM_CONF_PATH"] = "{}#rq_worker_test".format(config_uri)
-    base_args = ["rq", "worker", "-q", "-w", "tracim_backend.lib.rq.worker.DatabaseWorker"]
+    base_args = [
+        "rq",
+        "worker",
+        "-q",
+        "-w",
+        "tracim_backend.lib.rq.worker.DatabaseWorker",
+    ]
     queue_name_args = [queue_name.value for queue_name in RqQueueName]
     worker_process = subprocess.Popen(
         base_args + queue_name_args,

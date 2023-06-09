@@ -81,7 +81,10 @@ def workspace_and_users(
     role_api_factory,
 ):
     return create_workspace_and_users(
-        WorkspaceAccessType.CONFIDENTIAL, user_api_factory, workspace_api_factory, role_api_factory
+        WorkspaceAccessType.CONFIDENTIAL,
+        user_api_factory,
+        workspace_api_factory,
+        role_api_factory,
     )
 
 
@@ -92,7 +95,10 @@ def accessible_workspace_and_users(
     role_api_factory,
 ):
     return create_workspace_and_users(
-        WorkspaceAccessType.OPEN, user_api_factory, workspace_api_factory, role_api_factory
+        WorkspaceAccessType.OPEN,
+        user_api_factory,
+        workspace_api_factory,
+        role_api_factory,
     )
 
 
@@ -169,7 +175,13 @@ class TestEventReceiver:
     def test_unit__get_receiver_ids_user_event__nominal_case(
         self, session, workspace_and_users, admin_user, user_api_factory, app_config
     ):
-        (my_workspace, same_workspace_user, _, other_user, event_initiator) = workspace_and_users
+        (
+            my_workspace,
+            same_workspace_user,
+            _,
+            other_user,
+            event_initiator,
+        ) = workspace_and_users
         user_api = user_api_factory.get()
         fields = {
             Event.AUTHOR_FIELD: UserSchema()
@@ -197,7 +209,13 @@ class TestEventReceiver:
         workspace_api_factory,
         app_config,
     ):
-        (my_workspace, same_workspace_user, _, other_user, event_initiator) = workspace_and_users
+        (
+            my_workspace,
+            same_workspace_user,
+            _,
+            other_user,
+            event_initiator,
+        ) = workspace_and_users
         workspace_api = workspace_api_factory.get()
         workspace_in_context = workspace_api.get_workspace_with_context(my_workspace)
         user_api = user_api_factory.get()
@@ -310,7 +328,13 @@ class TestEventReceiver:
         role_api_factory,
         app_config,
     ):
-        (my_workspace, same_workspace_user, role, other_user, event_initiator) = workspace_and_users
+        (
+            my_workspace,
+            same_workspace_user,
+            role,
+            other_user,
+            event_initiator,
+        ) = workspace_and_users
         workspace_api = workspace_api_factory.get()
         workspace_in_context = workspace_api.get_workspace_with_context(my_workspace)
         role_api = role_api_factory.get()
@@ -398,7 +422,13 @@ class TestEventReceiver:
         workspace_and_users,
         app_config,
     ):
-        (my_workspace, same_workspace_user, role, other_user, event_initiator) = workspace_and_users
+        (
+            my_workspace,
+            same_workspace_user,
+            role,
+            other_user,
+            event_initiator,
+        ) = workspace_and_users
         workspace_api = workspace_api_factory.get()
         user_api = user_api_factory.get()
         workspace_in_context = workspace_api.get_workspace_with_context(my_workspace)
@@ -615,7 +645,13 @@ class TestEventApi:
         Please notice that only those message are generated in this test, MessageBuilder is disabled
         in this test context, so only created message are historic one.
         """
-        (my_workspace, same_workspace_user, _, other_user, event_initiator) = workspace_and_users
+        (
+            my_workspace,
+            same_workspace_user,
+            _,
+            other_user,
+            event_initiator,
+        ) = workspace_and_users
         default_workspace_messages = message_helper.last_user_workspace_messages(
             100, my_workspace.workspace_id, other_user.user_id
         )
@@ -681,7 +717,13 @@ class TestEventApi:
         Please notice that only those message are generated in this test, MessageBuilder is disabled
         in this test context, so only created message are historic one.
         """
-        (my_workspace, same_workspace_user, _, other_user, event_initiator) = workspace_and_users
+        (
+            my_workspace,
+            same_workspace_user,
+            _,
+            other_user,
+            event_initiator,
+        ) = workspace_and_users
         default_workspace_messages = message_helper.last_user_workspace_messages(
             100, my_workspace.workspace_id, other_user.user_id
         )
@@ -740,7 +782,13 @@ class TestEventApi:
         Please notice that only those message are generated in this test, MessageBuilder is disabled
         in this test context, so only created message are historic one.
         """
-        (my_workspace, same_workspace_user, _, other_user, event_initiator) = workspace_and_users
+        (
+            my_workspace,
+            same_workspace_user,
+            _,
+            other_user,
+            event_initiator,
+        ) = workspace_and_users
         default_workspace_messages = message_helper.last_user_workspace_messages(
             100, my_workspace.workspace_id, other_user.user_id
         )
@@ -791,7 +839,13 @@ class TestEventApi:
         config parameter to 0 to avoid hook creating itself the required messages itself.
         Case where max_message_generated > 0
         """
-        (my_workspace, same_workspace_user, _, other_user, event_initiator) = workspace_and_users
+        (
+            my_workspace,
+            same_workspace_user,
+            _,
+            other_user,
+            event_initiator,
+        ) = workspace_and_users
         # default
         default_workspace_messages = message_helper.last_user_workspace_messages(
             100, my_workspace.workspace_id, other_user.user_id
@@ -884,7 +938,13 @@ class TestEventApi:
         config parameter to 0 to avoid hook creating itself the required messages itself.
         Case where max_message_generated == 0 or -1 (infinite)
         """
-        (my_workspace, same_workspace_user, _, other_user, event_initiator) = workspace_and_users
+        (
+            my_workspace,
+            same_workspace_user,
+            _,
+            other_user,
+            event_initiator,
+        ) = workspace_and_users
         # default
         default_workspace_messages = message_helper.last_user_workspace_messages(
             100, my_workspace.workspace_id, other_user.user_id

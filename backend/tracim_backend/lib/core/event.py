@@ -108,7 +108,10 @@ class EventApi:
         self._config = config
 
     def _filter_event_types(
-        self, query: Query, event_types: Optional[List[EventTypeDatabaseParameters]], exclude: bool
+        self,
+        query: Query,
+        event_types: Optional[List[EventTypeDatabaseParameters]],
+        exclude: bool,
     ) -> Query:
         if event_types:
             event_type_filters = []
@@ -229,7 +232,8 @@ class EventApi:
 
                 query = query.filter(
                     or_(
-                        Event.author_id != author_id, Event.author_id == None  # noqa: E711
+                        Event.author_id != author_id,
+                        Event.author_id == None,  # noqa: E711
                     )  # noqa: E712
                 )  # noqa: E711
 
@@ -745,7 +749,10 @@ class EventBuilder:
         self._create_role_event(OperationType.DELETED, role, context)
 
     def _create_role_event(
-        self, operation: OperationType, role: UserRoleInWorkspace, context: TracimContext
+        self,
+        operation: OperationType,
+        role: UserRoleInWorkspace,
+        context: TracimContext,
     ) -> None:
         current_user = context.safe_current_user()
         workspace_api = WorkspaceApi(
@@ -855,11 +862,16 @@ class EventBuilder:
         self._create_user_call_event(OperationType.DELETED, user_call, context)
 
     def _create_subscription_event(
-        self, operation: OperationType, subscription: WorkspaceSubscription, context: TracimContext
+        self,
+        operation: OperationType,
+        subscription: WorkspaceSubscription,
+        context: TracimContext,
     ) -> None:
         current_user = context.safe_current_user()
         workspace_api = WorkspaceApi(
-            session=context.dbsession, config=self._config, current_user=None, show_deleted=True
+            session=context.dbsession,
+            config=self._config,
+            current_user=None,
         )
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(subscription.workspace_id)
@@ -888,7 +900,9 @@ class EventBuilder:
     ) -> None:
         current_user = context.safe_current_user()
         workspace_api = WorkspaceApi(
-            session=context.dbsession, config=self._config, current_user=None, show_deleted=True
+            session=context.dbsession,
+            config=self._config,
+            current_user=None,
         )
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(reaction.content.workspace_id)
@@ -920,7 +934,9 @@ class EventBuilder:
         """Create an event for a tag operation (create/update/delete)."""
         current_user = context.safe_current_user()
         workspace_api = WorkspaceApi(
-            session=context.dbsession, config=self._config, current_user=None, show_deleted=True
+            session=context.dbsession,
+            config=self._config,
+            current_user=None,
         )
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(tag.workspace_id)
@@ -940,12 +956,17 @@ class EventBuilder:
         )
 
     def _create_content_tag_event(
-        self, operation: OperationType, content_tag: TagOnContent, context: TracimContext
+        self,
+        operation: OperationType,
+        content_tag: TagOnContent,
+        context: TracimContext,
     ) -> None:
         """Create an event for a tag operation on a content (add/remove)."""
         current_user = context.safe_current_user()
         workspace_api = WorkspaceApi(
-            session=context.dbsession, config=self._config, current_user=None, show_deleted=True
+            session=context.dbsession,
+            config=self._config,
+            current_user=None,
         )
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(content_tag.content.workspace_id)

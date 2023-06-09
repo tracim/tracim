@@ -2,9 +2,11 @@
 from http import HTTPStatus
 from pyramid.config import Configurator
 import transaction
+import typing  # noqa: F401
 
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentNotFound
@@ -145,8 +147,12 @@ class FileController(Controller):
             api.copy_tags(
                 destination=content,
                 source_content_id=hapic_data.forms.template_id,
+                destination=content,
+                source_content_id=hapic_data.forms.template_id,
             )
             api.copy_todos(
+                new_parent=content,
+                template_id=hapic_data.forms.template_id,
                 new_parent=content,
                 template_id=hapic_data.forms.template_id,
             )
@@ -726,7 +732,9 @@ class FileController(Controller):
         # file info #
         # Get file info
         configurator.add_route(
-            "file_content", "/workspaces/{workspace_id}/files/{content_id}", request_method="GET"
+            "file_content",
+            "/workspaces/{workspace_id}/files/{content_id}",
+            request_method="GET",
         )
         configurator.add_view(self.get_file_content, route_name="file_content")
         # update file

@@ -307,7 +307,9 @@ class UploadPermissionLib(object):
 
         if do_notify:
             workspace_lib = WorkspaceApi(
-                config=self._config, current_user=upload_permission.author, session=self._session
+                config=self._config,
+                current_user=upload_permission.author,
+                session=self._session,
             )
             self._notify_uploaded_contents(
                 uploader_username=uploader_username,

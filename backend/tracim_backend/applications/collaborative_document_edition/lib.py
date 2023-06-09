@@ -48,7 +48,9 @@ class CollaborativeDocumentEditionLib(ABC):
         self._user = current_user
         self._config = config
 
-    def get_supported_file_types(self) -> typing.List[CollaborativeDocumentEditionFileType]:
+    def get_supported_file_types(
+        self,
+    ) -> typing.List[CollaborativeDocumentEditionFileType]:
         """
         Get list of supported file type for collaborative editions.
         The list is obtained by calling _get_supported_file_types() then filtering it with
@@ -61,7 +63,9 @@ class CollaborativeDocumentEditionLib(ABC):
         return [file_type for file_type in file_types if file_type.extension in enabled_extensions]
 
     @abstractmethod
-    def _get_supported_file_types(self) -> typing.List[CollaborativeDocumentEditionFileType]:
+    def _get_supported_file_types(
+        self,
+    ) -> typing.List[CollaborativeDocumentEditionFileType]:
         """
         Get list of supported file type for collaborative editions
         """
@@ -89,7 +93,12 @@ class CollaborativeDocumentEditionLib(ABC):
         template_filenames = [
             entry
             for entry in os.listdir(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR)
-            if isfile(join(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR, entry))
+            if isfile(
+                join(
+                    self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR,
+                    entry,
+                )
+            )
         ]
 
         if not self._config.COLLABORATIVE_DOCUMENT_EDITION__ENABLED_EXTENSIONS:
@@ -131,7 +140,10 @@ class CollaborativeDocumentEditionLib(ABC):
         api = ContentApi(config=self._config, session=self._session, current_user=self._user)
         with open(self._get_file_template_path(template_filename), "rb") as file:
             api.update_file_data(
-                content, new_filename=content.file_name, new_mimetype=new_mimetype, new_content=file
+                content,
+                new_filename=content.file_name,
+                new_mimetype=new_mimetype,
+                new_content=file,
             )
         return content
 

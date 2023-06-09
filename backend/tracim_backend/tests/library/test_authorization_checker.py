@@ -278,7 +278,11 @@ class TestAuthorizationChecker(object):
 
         with pytest.raises(ContentTypeNotExist):
             assert ContentTypeChecker(
-                ["unexistent_type", content_type_list.File.slug, content_type_list.Comment.slug]
+                [
+                    "unexistent_type",
+                    content_type_list.File.slug,
+                    content_type_list.Comment.slug,
+                ]
             ).check(FakeBaseFakeTracimContext())
 
         with pytest.raises(ContentTypeNotExist):

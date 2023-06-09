@@ -36,7 +36,10 @@ class ContentShare(CreationDateMixin, DeclarativeBase):
     __tablename__ = "content_shares"
 
     share_id = Column(
-        Integer, Sequence("seq__content_shares__share_id"), autoincrement=True, primary_key=True
+        Integer,
+        Sequence("seq__content_shares__share_id"),
+        autoincrement=True,
+        primary_key=True,
     )
     content_id = Column(Integer, ForeignKey("content.id"), nullable=False)
     author_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)

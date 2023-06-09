@@ -204,7 +204,12 @@ class TestCaldavRadicaleProxyEndpoints(object):
         ],
     )
     def test_proxy_user_agenda__ok__on_sub_items(
-        self, radicale_server, sub_item_label, user_api_factory, web_testapp, test_context
+        self,
+        radicale_server,
+        sub_item_label,
+        user_api_factory,
+        web_testapp,
+        test_context,
     ) -> None:
         test_context.plugin_manager.register(AgendaHooks())
         uapi = user_api_factory.get()
@@ -243,10 +248,12 @@ class TestCaldavRadicaleProxyEndpoints(object):
             status=201,
         )
         web_testapp.get(
-            "/dav/agenda/user/{}/{}.ics".format(user.user_id, sub_item_label), status=200
+            "/dav/agenda/user/{}/{}.ics".format(user.user_id, sub_item_label),
+            status=200,
         )
         web_testapp.delete(
-            "/dav/agenda/user/{}/{}.ics".format(user.user_id, sub_item_label), status=200
+            "/dav/agenda/user/{}/{}.ics".format(user.user_id, sub_item_label),
+            status=200,
         )
         web_testapp.delete("/dav/agenda/user/{}/".format(user.user_id), status=403)
 
@@ -319,7 +326,12 @@ class TestCaldavRadicaleProxyEndpoints(object):
         web_testapp.delete("/dav/agenda/workspace/{}/".format(workspace.workspace_id), status=403)
 
     def test_proxy_workspace_agenda__err__other_workspace_agenda(
-        self, radicale_server, user_api_factory, workspace_api_factory, web_testapp, test_context
+        self,
+        radicale_server,
+        user_api_factory,
+        workspace_api_factory,
+        web_testapp,
+        test_context,
     ) -> None:
         test_context.plugin_manager.register(AgendaHooks())
         uapi = user_api_factory.get()
@@ -378,7 +390,12 @@ class TestCaldavRadicaleProxyEndpoints(object):
         ],
     )
     def test_proxy_user_addressbook__ok__on_sub_items(
-        self, radicale_server, sub_item_label, user_api_factory, web_testapp, test_context
+        self,
+        radicale_server,
+        sub_item_label,
+        user_api_factory,
+        web_testapp,
+        test_context,
     ) -> None:
         test_context.plugin_manager.register(AgendaHooks())
         uapi = user_api_factory.get()
@@ -394,7 +411,8 @@ class TestCaldavRadicaleProxyEndpoints(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         web_testapp.get(
-            "/dav/addressbook/user/{}/{}".format(user.user_id, sub_item_label), status=307
+            "/dav/addressbook/user/{}/{}".format(user.user_id, sub_item_label),
+            status=307,
         ).follow(status=404)
 
         addressbook = VALID_CARDDAV_BODY_PUT
@@ -411,10 +429,12 @@ class TestCaldavRadicaleProxyEndpoints(object):
             status="*",
         )
         web_testapp.get(
-            "/dav/addressbook/user/{}/{}.vcf".format(user.user_id, sub_item_label), status=307
+            "/dav/addressbook/user/{}/{}.vcf".format(user.user_id, sub_item_label),
+            status=307,
         )
         web_testapp.delete(
-            "/dav/addressbook/user/{}/{}.vcf".format(user.user_id, sub_item_label), status=200
+            "/dav/addressbook/user/{}/{}.vcf".format(user.user_id, sub_item_label),
+            status=200,
         )
         web_testapp.delete("/dav/addressbook/user/{}/".format(user.user_id), status=200)
 
@@ -491,7 +511,12 @@ class TestCaldavRadicaleProxyEndpoints(object):
         )
 
     def test_proxy_workspace_addressbook__err__other_workspace_agenda(
-        self, radicale_server, user_api_factory, workspace_api_factory, web_testapp, test_context
+        self,
+        radicale_server,
+        user_api_factory,
+        workspace_api_factory,
+        web_testapp,
+        test_context,
     ) -> None:
         test_context.plugin_manager.register(AgendaHooks())
         uapi = user_api_factory.get()
@@ -1313,23 +1338,35 @@ class TestPreFilledAgendaEventSchema(object):
     """
 
     @pytest.mark.parametrize(
-        "config_section", [{"name": "pre-filled-agenda-event_sample_test"}], indirect=True
+        "config_section",
+        [{"name": "pre-filled-agenda-event_sample_test"}],
+        indirect=True,
     )
     def test_api__get_prefilled_agenda_event_schema__ok_200__sample_data(self, web_testapp):
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/system/pre-filled-agenda-event", status=200)
         assert res.json_body["description"] == "Organizer:\n\nAttendees:\n\nProgram:\n - …\n - …\n"
 
     @pytest.mark.parametrize(
-        "config_section", [{"name": "functional_caldav_radicale_proxy_test"}], indirect=True
+        "config_section",
+        [{"name": "functional_caldav_radicale_proxy_test"}],
+        indirect=True,
     )
     def test_api__get_prefilled_agenda_event_schema__ok_200__no_data(self, web_testapp):
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/system/pre-filled-agenda-event", status=200)
         assert res.json_body["description"] is None
 
     @pytest.mark.parametrize(
-        "config_section", [{"name": "functional_caldav_radicale_proxy_test"}], indirect=True
+        "config_section",
+        [{"name": "functional_caldav_radicale_proxy_test"}],
+        indirect=True,
     )
     def test_api__get_prefilled_agenda_event_schema_err_401__unregistered_user(self, web_testapp):
         """

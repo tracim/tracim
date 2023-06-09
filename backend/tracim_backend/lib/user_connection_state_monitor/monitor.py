@@ -72,7 +72,10 @@ class UserConnectionStateMonitor:
 
         query.update({User.connection_status: status})
         transaction.commit()
-        logger.debug(self, "Set connection status of user {} to {}".format(user_id or "*", status))
+        logger.debug(
+            self,
+            "Set connection status of user {} to {}".format(user_id or "*", status),
+        )
 
     def add_to_pending_offline_users(self, user_id: int) -> None:
         logger.debug(self, "User {} left".format(user_id))

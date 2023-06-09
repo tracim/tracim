@@ -45,7 +45,9 @@ def convert_if_string(value: typing.Any, translation_method) -> typing.Any:
 
 
 def translate_dict(
-    data: dict, keys_to_check: typing.List[str], translation_method: typing.Callable[[str], str]
+    data: dict,
+    keys_to_check: typing.List[str],
+    translation_method: typing.Callable[[str], str],
 ) -> dict:
     """
     Regenerate similar dict but

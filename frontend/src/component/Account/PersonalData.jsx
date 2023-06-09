@@ -58,6 +58,7 @@ export class PersonalData extends React.Component {
 
   render () {
     const { props, state } = this
+    const shouldAllowEditionFromAuthType = editableUserAuthTypeList.includes(props.userAuthType)
     return (
       <div className='account__userpreference__setting__personaldata'>
         <div className='personaldata__sectiontitle subTitle'>
@@ -77,6 +78,7 @@ export class PersonalData extends React.Component {
               placeholder={props.userPublicName}
               value={state.newPublicName}
               onChange={this.handleChangePublicName}
+              disabled={!shouldAllowEditionFromAuthType}
             />
           </label>
 
@@ -90,6 +92,7 @@ export class PersonalData extends React.Component {
                 placeholder={props.userUsername}
                 value={state.newUsername}
                 onChange={this.handleChangeUserName}
+                disabled={!shouldAllowEditionFromAuthType}
               />
             </label>
             {!props.isUsernameValid && (
@@ -105,21 +108,20 @@ export class PersonalData extends React.Component {
             )}
           </div>
 
-          {editableUserAuthTypeList.includes(props.userAuthType) && (
-            <div>
-              <label>
-                {props.t('New email:')}
-                <input
-                  className='personaldata__form__txtinput withAdminMsg form-control'
-                  type='email'
-                  data-cy='personaldata__form__txtinput__email'
-                  placeholder={props.userEmail}
-                  value={state.newEmail}
-                  onChange={this.handleChangeEmail}
-                />
-              </label>
-            </div>
-          )}
+          <div>
+            <label>
+              {props.t('New email:')}
+              <input
+                className='personaldata__form__txtinput withAdminMsg form-control'
+                type='email'
+                data-cy='personaldata__form__txtinput__email'
+                placeholder={props.userEmail}
+                value={state.newEmail}
+                onChange={this.handleChangeEmail}
+                disabled={!shouldAllowEditionFromAuthType}
+              />
+            </label>
+          </div>
 
           {!props.displayAdminInfo && (
             <div>
@@ -141,7 +143,7 @@ export class PersonalData extends React.Component {
                   type='password'
                   value={state.checkPassword}
                   onChange={this.handleChangeCheckPassword}
-                  disabled={state.newEmail === '' && state.newUsername === ''}
+                  disabled={!shouldAllowEditionFromAuthType || (state.newEmail === '' && state.newUsername === '')}
                 />
               </label>
             </div>

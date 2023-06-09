@@ -53,7 +53,9 @@ class ReactionLib:
         return reaction
 
     def get_all(
-        self, content_id: typing.Optional[int] = None, user_id: typing.Optional[int] = None
+        self,
+        content_id: typing.Optional[int] = None,
+        user_id: typing.Optional[int] = None,
     ) -> typing.List[Reaction]:
         query = self.base_filter(self._base_query(), content_id=content_id, user_id=user_id)
         query = query.order_by(Reaction.reaction_id)

@@ -44,7 +44,9 @@ class StorageLib:
             return self.uploaded_file_depot.get(depot_file)
         except IOError as exc:
             logger.warning(
-                self, "Unable to get content filepath, depot is corrupted", exc_info=True
+                self,
+                "Unable to get content filepath, depot is corrupted",
+                exc_info=True,
             )
             raise CannotGetDepotFileDepotCorrupted(
                 "depot file {} is not accessible, depot seems corrupted".format(depot_file.file_id)
@@ -103,7 +105,9 @@ class StorageLib:
             yield from self._get_valid_content_filepath_legacy(depot_stored_file)
         else:
             yield from self._get_valid_content_filepath(
-                depot_stored_file, file_extension=file_extension, prefix=temporary_prefix
+                depot_stored_file,
+                file_extension=file_extension,
+                prefix=temporary_prefix,
             )
 
     @contextmanager
@@ -279,7 +283,8 @@ class StorageLib:
         ):
             raise PageOfPreviewNotFound(
                 "page {page_number} of depot_file {file_id} does not exist".format(
-                    page_number=preview_generator_page_number, file_id=depot_file.file_id
+                    page_number=preview_generator_page_number,
+                    file_id=depot_file.file_id,
                 )
             )
         return preview_generator_page_number

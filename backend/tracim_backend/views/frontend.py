@@ -22,7 +22,10 @@ BASE_CSP_DIRECTIVES = (
     # NOTE S.G - 2020-12-14 - unsafe-eval is needed for
     # custom forms app and user profile page
     # (react-jsonschema-form/ajv dependency)
-    ("script-src", "'unsafe-eval' 'nonce-{nonce}' {base_url}/assets/tinymce-5.10.3/js/"),
+    (
+        "script-src",
+        "'unsafe-eval' 'nonce-{nonce}' {base_url}/assets/tinymce-5.10.3/js/",
+    ),
     # NOTE S.G. - 2020-12-14 - unsafe-inline is needed for tinyMce
     ("style-src", "'unsafe-inline' 'self'"),
     ("connect-src", "'self'"),
@@ -146,7 +149,9 @@ class FrontendController(Controller):
         configurator.add_route("root", "/", request_method="GET")
         configurator.add_view(self.index, route_name="root")
         configurator.add_route(
-            "ui", "/{}{{ui_subpath:.*}}".format(FRONTEND_UI_SUBPATH), request_method="GET"
+            "ui",
+            "/{}{{ui_subpath:.*}}".format(FRONTEND_UI_SUBPATH),
+            request_method="GET",
         )
         configurator.add_view(self.ui, route_name="ui")
         configurator.add_route("index", INDEX_PAGE_NAME, request_method="GET")

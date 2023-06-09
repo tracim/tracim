@@ -1,4 +1,5 @@
 # coding: utf8
+from sqlalchemy.orm import Session  # noqa: F401
 import transaction
 import typing
 
@@ -53,7 +54,11 @@ class TracimDomainController(object):
             return False
 
     def authDomainUser(
-        self, realmname: str, username: str, password: str, environ: typing.Dict[str, typing.Any]
+        self,
+        realmname: str,
+        username: str,
+        password: str,
+        environ: typing.Dict[str, typing.Any],
     ) -> bool:
         """
         If you ever feel the need to send a request al-mano with a curl, this is the function that'll be called by

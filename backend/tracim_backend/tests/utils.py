@@ -160,7 +160,11 @@ class SubscriptionLibFactory(object):
 
 class WedavEnvironFactory(object):
     def __init__(
-        self, provider: TracimDavProvider, session: Session, app_config: CFG, admin_user: User
+        self,
+        provider: TracimDavProvider,
+        session: Session,
+        app_config: CFG,
+        admin_user: User,
     ):
         self.provider = provider
         self.session = session

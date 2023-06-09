@@ -82,7 +82,10 @@ class Translator(object):
                 lang
             ] = cls._get_translation_from_file(file)
             global_backend_langs.append(lang)
-        logger.debug(cls, "Supported Backend language (Global): " + ",".join(global_backend_langs))
+        logger.debug(
+            cls,
+            "Supported Backend language (Global): " + ",".join(global_backend_langs),
+        )
 
         # custom_properties translations
         custom_properties_langs = []
@@ -137,7 +140,10 @@ class Translator(object):
         return message, False
 
     def get_translation(
-        self, message: str, lang: str = None, source: typing.Optional[TranslationSource] = None
+        self,
+        message: str,
+        lang: str = None,
+        source: typing.Optional[TranslationSource] = None,
     ) -> str:
         """
         Return translation according to lang

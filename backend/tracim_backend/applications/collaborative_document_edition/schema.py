@@ -51,7 +51,9 @@ class FileCreateFromTemplateSchema(marshmallow.Schema):
         required=True,
     )
     filename = StrippedString(
-        required=True, example="test.odt", description="The file name, as saved in the workspace"
+        required=True,
+        example="test.odt",
+        description="The file name, as saved in the workspace",
     )
     parent_id = marshmallow.fields.Int(
         example=42,

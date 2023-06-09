@@ -79,7 +79,9 @@ class TemporaryUsers(DeclarativeBase):
     __tablename__ = "users"
     user_id = Column(Integer, Sequence("seq__users__user_id"), autoincrement=True, primary_key=True)
     profile = Column(
-        Enum(TemporaryProfileEnum), nullable=True, server_default=TemporaryProfileEnum.NOBODY.name
+        Enum(TemporaryProfileEnum),
+        nullable=True,
+        server_default=TemporaryProfileEnum.NOBODY.name,
     )
 
 

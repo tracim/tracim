@@ -36,14 +36,25 @@ class TestContentRevision(object):
         return dict_repr
 
     def test_new_revision(
-        self, session, admin_user, workspace_api_factory, content_api_factory, content_type_list
+        self,
+        session,
+        admin_user,
+        workspace_api_factory,
+        content_api_factory,
+        content_type_list,
     ):
         workspace = workspace_api_factory.get().create_workspace(label="workspace_1")
         folder = content_api_factory.get().create(
-            content_type_slug="folder", workspace=workspace, label="folder_1", do_save=True
+            content_type_slug="folder",
+            workspace=workspace,
+            label="folder_1",
+            do_save=True,
         )
         html_document = content_api_factory.get().create(
-            content_type_slug="html-document", workspace=workspace, label="file_1", parent=folder
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="file_1",
+            parent=folder,
         )
 
         session.flush()

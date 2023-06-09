@@ -44,7 +44,8 @@ class FavoriteContentController(Controller):
             show_archived=True,
         )
         favorite = api.get_one_user_favorite_content(
-            user_id=request.candidate_user.user_id, content_id=hapic_data.path.content_id
+            user_id=request.candidate_user.user_id,
+            content_id=hapic_data.path.content_id,
         )
         return api.get_one_user_favorite_content_in_context(favorite)
 
@@ -134,7 +135,8 @@ class FavoriteContentController(Controller):
             request_method="POST",
         )
         configurator.add_view(
-            self.add_content_in_user_favorites, route_name="add_content_in_user_favorites"
+            self.add_content_in_user_favorites,
+            route_name="add_content_in_user_favorites",
         )
 
         # remove content from favorites
@@ -144,5 +146,6 @@ class FavoriteContentController(Controller):
             request_method="DELETE",
         )
         configurator.add_view(
-            self.remove_content_from_user_favorites, route_name="remove_content_from_user_favorites"
+            self.remove_content_from_user_favorites,
+            route_name="remove_content_from_user_favorites",
         )

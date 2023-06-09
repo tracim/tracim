@@ -104,7 +104,11 @@ class TestCleanupLib(object):
         )
         file_id = file_.content_id
         comment = content_api.create_comment(
-            workspace=test_workspace, parent=file_, content="Toto", do_save=True, do_notify=False
+            workspace=test_workspace,
+            parent=file_,
+            content="Toto",
+            do_save=True,
+            do_notify=False,
         )
         comment_id = comment.content_id
         share_api = share_lib_factory.get()
@@ -174,7 +178,11 @@ class TestCleanupLib(object):
         )
         file_id = file_.content_id
         comment = content_api.create_comment(
-            workspace=test_workspace, parent=file_, content="Toto", do_save=True, do_notify=False
+            workspace=test_workspace,
+            parent=file_,
+            content="Toto",
+            do_save=True,
+            do_notify=False,
         )
         comment_id = comment.content_id
         share_api = share_lib_factory.get()
@@ -272,7 +280,11 @@ class TestCleanupLib(object):
         content_api.add_favorite(folder, do_save=True)
         file_id = file_.content_id
         comment = content_api.create_comment(
-            workspace=test_workspace, parent=file_, content="Toto", do_save=True, do_notify=False
+            workspace=test_workspace,
+            parent=file_,
+            content="Toto",
+            do_save=True,
+            do_notify=False,
         )
         comment_id = comment.content_id
         share_api = share_lib_factory.get()
@@ -364,7 +376,10 @@ class TestCleanupLib(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=file_):
             content_api.update_file_data(
-                file_, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                file_,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.mark_read(file_)
         file_id = file_.content_id
@@ -462,7 +477,10 @@ class TestCleanupLib(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=file_):
             content_api.update_file_data(
-                file_, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                file_,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.mark_read(file_)
         file_id = file_.content_id

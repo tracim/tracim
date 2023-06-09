@@ -34,7 +34,10 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
             ],
         )
         return template.render(
-            _=translator.get_translation, config=config, lang=translator.default_lang, **context
+            _=translator.get_translation,
+            config=config,
+            lang=translator.default_lang,
+            **context,
         )
 
     @staticmethod
@@ -125,7 +128,9 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
                     "notification_summary": notification_summary,
                 }
                 translator = Translator(
-                    app_config=config, default_lang=user.lang, fallback_lang=config.DEFAULT_LANG
+                    app_config=config,
+                    default_lang=user.lang,
+                    fallback_lang=config.DEFAULT_LANG,
                 )
                 body = SendMailSummariesCommand._render_template(config, context, translator)
                 SendMailSummariesCommand._send_mail(

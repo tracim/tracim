@@ -181,7 +181,8 @@ class ShareLib(object):
     def frontend_url(self, content_share: ContentShare) -> str:
         frontend_ui_base_url = get_frontend_ui_base_url(config=self._config)
         return FRONTEND_SHARED_CONTENT_LINK_PATTERN.format(
-            frontend_ui_base_url=frontend_ui_base_url, share_token=content_share.share_token
+            frontend_ui_base_url=frontend_ui_base_url,
+            share_token=content_share.share_token,
         )
 
     def direct_api_url(self, content_share: ContentShare) -> str:

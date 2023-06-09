@@ -23,7 +23,9 @@ class FileTemplateList(object):
 
 class CollaborativeDocumentEditionConfig(object):
     def __init__(
-        self, software: str, supported_file_types: typing.List[CollaborativeDocumentEditionFileType]
+        self,
+        software: str,
+        supported_file_types: typing.List[CollaborativeDocumentEditionFileType],
     ) -> None:
         self.software = software
         self.supported_file_types = supported_file_types

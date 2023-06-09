@@ -220,7 +220,9 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     init_models(configurator, app_config)
     # set Hapic
     context = TracimPyramidContext(
-        configurator=configurator, default_error_builder=ErrorSchema(), debug=app_config.DEBUG
+        configurator=configurator,
+        default_error_builder=ErrorSchema(),
+        debug=app_config.DEBUG,
     )
     # HACK - G.M - 2021-07-01 - Force reset of context if already set.
     # This case happened in some test now for unclear reasons.
@@ -293,7 +295,10 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     app_lib = ApplicationApi(app_list=app_list)
     for app in app_lib.get_all():
         app.load_controllers(
-            app_config=app_config, configurator=configurator, route_prefix=BASE_API, context=context
+            app_config=app_config,
+            configurator=configurator,
+            route_prefix=BASE_API,
+            context=context,
         )
         app.register_tracim_plugin(plugin_manager)
 

@@ -52,7 +52,10 @@ class CaldavSyncCommand(AppContextCommand):
         self._app_config = app_context["registry"].settings["CFG"]
         self._user_api = UserApi(current_user=None, session=self._session, config=self._app_config)
         self._workspace_api = WorkspaceApi(
-            current_user=None, force_role=True, session=self._session, config=self._app_config
+            current_user=None,
+            force_role=True,
+            session=self._session,
+            config=self._app_config,
         )
         self._agenda_api = AgendaApi(
             current_user=None, session=self._session, config=self._app_config

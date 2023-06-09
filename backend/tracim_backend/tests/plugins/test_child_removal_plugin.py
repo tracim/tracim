@@ -44,14 +44,21 @@ class TestChildRemovalPlugin(object):
                 label="parent", default_user_role=WorkspaceRoles.READER
             )
             child_workspace = wapi.create_workspace(
-                label="child", parent=parent_workspace, default_user_role=WorkspaceRoles.CONTRIBUTOR
+                label="child",
+                parent=parent_workspace,
+                default_user_role=WorkspaceRoles.CONTRIBUTOR,
             )
             grandson_workspace = wapi.create_workspace(
-                label="grandson", parent=child_workspace, default_user_role=WorkspaceRoles.READER
+                label="grandson",
+                parent=child_workspace,
+                default_user_role=WorkspaceRoles.READER,
             )
             uapi = user_api_factory.get()
             user_1 = uapi.create_user(
-                email="u.1@u.u", auth_type=AuthType.INTERNAL, do_save=True, do_notify=False
+                email="u.1@u.u",
+                auth_type=AuthType.INTERNAL,
+                do_save=True,
+                do_notify=False,
             )
             role_api = role_api_factory.get()
             for workspace in (parent_workspace, child_workspace, grandson_workspace):
@@ -88,14 +95,21 @@ class TestChildRemovalPlugin(object):
                 label="parent", default_user_role=WorkspaceRoles.READER
             )
             child_workspace = wapi.create_workspace(
-                label="child", parent=parent_workspace, default_user_role=WorkspaceRoles.CONTRIBUTOR
+                label="child",
+                parent=parent_workspace,
+                default_user_role=WorkspaceRoles.CONTRIBUTOR,
             )
             grandson_workspace = wapi.create_workspace(
-                label="grandson", parent=child_workspace, default_user_role=WorkspaceRoles.READER
+                label="grandson",
+                parent=child_workspace,
+                default_user_role=WorkspaceRoles.READER,
             )
             uapi = user_api_factory.get()
             user_1 = uapi.create_user(
-                email="u.1@u.u", auth_type=AuthType.INTERNAL, do_save=True, do_notify=False
+                email="u.1@u.u",
+                auth_type=AuthType.INTERNAL,
+                do_save=True,
+                do_notify=False,
             )
             role_api = role_api_factory.get()
             for workspace in (parent_workspace, child_workspace, grandson_workspace):

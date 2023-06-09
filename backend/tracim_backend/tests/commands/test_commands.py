@@ -890,7 +890,10 @@ class TestCommands(object):
             email_notification_type=EmailNotificationType.NONE,
         )
         content_api = content_api_factory.get(
-            show_deleted=True, show_active=True, show_archived=True, current_user=test_user
+            show_deleted=True,
+            show_active=True,
+            show_archived=True,
+            current_user=test_user,
         )
         session.add(test_workspace)
         session.flush()
@@ -1007,7 +1010,10 @@ class TestCommands(object):
         user_workspace_id = user_workspace.workspace_id
         # INFO - G.M - 2019-12-20 - in user workspace
         content_api = content_api_factory.get(
-            show_deleted=True, show_active=True, show_archived=True, current_user=test_user
+            show_deleted=True,
+            show_active=True,
+            show_archived=True,
+            current_user=test_user,
         )
         folder2 = content_api.create(
             label="test-folder2",
@@ -1133,7 +1139,10 @@ class TestCommands(object):
         user_workspace_id = user_workspace.workspace_id
         # INFO - G.M - 2019-12-20 - in user workspace
         content_api = content_api_factory.get(
-            show_deleted=True, show_active=True, show_archived=True, current_user=test_user
+            show_deleted=True,
+            show_active=True,
+            show_archived=True,
+            current_user=test_user,
         )
         folder2 = content_api.create(
             label="test-folder2",
@@ -1263,7 +1272,10 @@ class TestCommands(object):
             email_notification_type=EmailNotificationType.NONE,
         )
         content_api = content_api_factory.get(
-            show_deleted=True, show_active=True, show_archived=True, current_user=test_user
+            show_deleted=True,
+            show_active=True,
+            show_archived=True,
+            current_user=test_user,
         )
         session.add(test_workspace)
         session.flush()
@@ -1381,7 +1393,10 @@ class TestCommands(object):
         session.add(test_workspace)
         session.flush()
         content_api = content_api_factory.get(
-            show_deleted=True, show_active=True, show_archived=True, current_user=test_user
+            show_deleted=True,
+            show_active=True,
+            show_archived=True,
+            current_user=test_user,
         )
         content = content_api.create(
             content_type_slug=content_type_list.File.slug,

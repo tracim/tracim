@@ -48,7 +48,8 @@ class RichTextPreviewLib:
                     ],
                 )
                 HTML(html_preview_path).write_pdf(
-                    pdf_preview_path, stylesheets=[CSS(self.app_config.RICH_TEXT_PREVIEW__CSS_PATH)]
+                    pdf_preview_path,
+                    stylesheets=[CSS(self.app_config.RICH_TEXT_PREVIEW__CSS_PATH)],
                 )
 
             if not filename or filename == "raw":

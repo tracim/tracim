@@ -71,7 +71,11 @@ def big_html_document(workspace_api_factory, content_api_factory, session) -> Co
 
 def small_html_document(workspace_api_factory, content_api_factory, session, name) -> Content:
     return html_document(
-        workspace_api_factory, content_api_factory, session, "Small document " + name, name
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        "Small document " + name,
+        name,
     )
 
 
@@ -185,7 +189,10 @@ class TestLiveMessages(object):
     def test_api__user_live_messages_endpoint_without_GRIP_proxy__err_400__no_accept_header(
         self, user_api_factory, web_testapp, admin_user
     ):
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/users/{}/live_messages".format(admin_user.user_id), status=400)
         assert res.json_body
         assert "code" in res.json_body
@@ -295,7 +302,11 @@ class TestLiveMessages(object):
         self, pushpin, app_config
     ):
         with messages_stream_client() as client_events:
-            params = {"public_name": "updated", "timezone": "Europe/London", "lang": "en"}
+            params = {
+                "public_name": "updated",
+                "timezone": "Europe/London",
+                "lang": "en",
+            }
             update_user_request = requests.put(
                 "http://localhost:7999/api/users/1",
                 auth=("admin@admin.admin", "admin@admin.admin"),
@@ -317,7 +328,11 @@ class TestLiveMessages(object):
         self, pushpin, app_config, rq_database_worker
     ):
         with messages_stream_client() as client_events:
-            params = {"public_name": "updated", "timezone": "Europe/London", "lang": "en"}
+            params = {
+                "public_name": "updated",
+                "timezone": "Europe/London",
+                "lang": "en",
+            }
             update_user_request = requests.put(
                 "http://localhost:7999/api/users/1",
                 auth=("admin@admin.admin", "admin@admin.admin"),

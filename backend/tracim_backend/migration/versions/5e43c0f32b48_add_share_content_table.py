@@ -37,7 +37,13 @@ def upgrade():
         sa.Column("type", enum, nullable=False),
         sa.Column("password", sa.Unicode(128), nullable=False),
         sa.Column("enabled", sa.Boolean(), unique=False, nullable=False, default=None),
-        sa.Column("created", sa.DateTime(), unique=False, nullable=False, default=datetime.utcnow),
+        sa.Column(
+            "created",
+            sa.DateTime(),
+            unique=False,
+            nullable=False,
+            default=datetime.utcnow,
+        ),
         sa.Column("disabled", sa.DateTime(), unique=False, nullable=True, default=None),
     )
 

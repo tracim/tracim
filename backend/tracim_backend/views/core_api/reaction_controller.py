@@ -40,7 +40,8 @@ class ReactionController(Controller):
         """
         reaction_lib = ReactionLib(session=request.dbsession)
         return reaction_lib.get_one(
-            content_id=request.current_content.content_id, reaction_id=hapic_data.path.reaction_id
+            content_id=request.current_content.content_id,
+            reaction_id=hapic_data.path.reaction_id,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_REACTION_ENDPOINTS])

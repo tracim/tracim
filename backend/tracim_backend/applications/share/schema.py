@@ -24,7 +24,10 @@ class SharePassword(object):
 
 class SharePasswordFormSchema(marshmallow.Schema):
     password = marshmallow.fields.String(
-        required=False, allow_none=True, example="8QLa$<w", validate=share_password_validator
+        required=False,
+        allow_none=True,
+        example="8QLa$<w",
+        validate=share_password_validator,
     )
 
     @post_load
@@ -34,7 +37,10 @@ class SharePasswordFormSchema(marshmallow.Schema):
 
 class SharePasswordBodySchema(marshmallow.Schema):
     password = marshmallow.fields.String(
-        required=False, allow_none=True, example="8QLa$<w", validate=share_password_validator
+        required=False,
+        allow_none=True,
+        example="8QLa$<w",
+        validate=share_password_validator,
     )
 
     @post_load
@@ -110,7 +116,10 @@ class ShareCreationBodySchema(marshmallow.Schema):
         RFCEmail(validate=share_email_validator), validate=Length(min=1), required=True
     )
     password = marshmallow.fields.String(
-        example="8QLa$<w", required=False, allow_none=True, validate=share_password_validator
+        example="8QLa$<w",
+        required=False,
+        allow_none=True,
+        validate=share_password_validator,
     )
 
     @post_load
@@ -159,7 +168,8 @@ class ContentShareInfoSchema(marshmallow.Schema):
 class ContentShareSchema(marshmallow.Schema):
     email = RFCEmail(example="hello@tracim.fr", required=True, validate=share_email_validator)
     share_token = marshmallow.fields.String(
-        description="token of the content_share", example="444b026a068d42d6ab5e12fde08efb7b"
+        description="token of the content_share",
+        example="444b026a068d42d6ab5e12fde08efb7b",
     )
     has_password = marshmallow.fields.Boolean(required=True)
     share_group_uuid = marshmallow.fields.String(required=True)

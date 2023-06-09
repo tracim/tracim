@@ -539,7 +539,8 @@ class CFG(object):
             self.branding_folder_path, "rich_text_preview.template"
         )
         self.RICH_TEXT_PREVIEW__TEMPLATE_PATH = self.get_raw_config(
-            "rich_text_preview.template_path", default_rich_text_preview_template_file_path
+            "rich_text_preview.template_path",
+            default_rich_text_preview_template_file_path,
         )
 
         default_plugin_folder_path = self.here_macro_replace("%(here)s/plugins")
@@ -913,9 +914,10 @@ class CFG(object):
         self.LDAP_BIND_ANONYMOUS = asbool(self.get_raw_config("ldap_bind_anonymous", "False"))
         self.LDAP_TLS = asbool(self.get_raw_config("ldap_tls", "False"))
         self.LDAP_USER_BASE_DN = self.get_raw_config("ldap_user_base_dn")
-        self.LDAP_LOGIN_ATTRIBUTE = self.get_raw_config("ldap_login_attribute", "mail")
+        self.LDAP_MAIL_ATTRIBUTE = self.get_raw_config("ldap_mail_attribute", "mail")
+        self.LDAP_USERNAME_ATTRIBUTE = self.get_raw_config("ldap_username_attribute", "givenName")
         # TODO - G.M - 16-11-2018 - Those prams are only use at account creation
-        self.LDAP_NAME_ATTRIBUTE = self.get_raw_config("ldap_name_attribute", "givenName")
+        self.LDAP_NAME_ATTRIBUTE = self.get_raw_config("ldap_name_attribute", "displayName")
         # TODO - G.M - 2018-12-05 - [ldap_profile]
         # support for profile attribute disabled
         # Should be reenabled later probably with a better code
@@ -924,7 +926,9 @@ class CFG(object):
         # TODO - G.M - 2019-04-05 - keep as parameters
         # or set it as constant,
         # see https://github.com/tracim/tracim/issues/1569
-        self.LDAP_USER_FILTER = "({}=%(login)s)".format(self.LDAP_LOGIN_ATTRIBUTE)
+        self.LDAP_USER_FILTER = "({}=%(login)s)".format(self.LDAP_USERNAME_ATTRIBUTE)
+        if self.EMAIL__REQUIRED:
+            self.LDAP_USER_FILTER = "({}=%(login)s)".format(self.LDAP_MAIL_ATTRIBUTE)
         self.LDAP_USE_POOL = True
         self.LDAP_POOL_SIZE = 10 if self.LDAP_USE_POOL else None
         self.LDAP_POOL_LIFETIME = 3600 if self.LDAP_USE_POOL else None
@@ -1229,16 +1233,19 @@ class CFG(object):
         if self.URL_PREVIEW__MAX_CONTENT_LENGTH < 0:
             raise ConfigurationError(
                 'ERROR  "{}" should be a positive value (currently "{}")'.format(
-                    "URL_PREVIEW__MAX_CONTENT_LENGTH", self.URL_PREVIEW__MAX_CONTENT_LENGTH
+                    "URL_PREVIEW__MAX_CONTENT_LENGTH",
+                    self.URL_PREVIEW__MAX_CONTENT_LENGTH,
                 )
             )
 
     def _check_uploaded_files_config_validity(self) -> None:
         self.check_mandatory_param(
-            "UPLOADED_FILES__STORAGE__STORAGE_NAME", self.UPLOADED_FILES__STORAGE__STORAGE_NAME
+            "UPLOADED_FILES__STORAGE__STORAGE_NAME",
+            self.UPLOADED_FILES__STORAGE__STORAGE_NAME,
         )
         self.check_mandatory_param(
-            "UPLOADED_FILES__STORAGE__STORAGE_TYPE", self.UPLOADED_FILES__STORAGE__STORAGE_TYPE
+            "UPLOADED_FILES__STORAGE__STORAGE_TYPE",
+            self.UPLOADED_FILES__STORAGE__STORAGE_TYPE,
         )
         file_storage_type_slugs = [file_storage.slug for file_storage in list(DepotFileStorageType)]
         if self.UPLOADED_FILES__STORAGE__STORAGE_TYPE not in file_storage_type_slugs:
@@ -1369,7 +1376,8 @@ class CFG(object):
                 raise ConfigurationError(
                     'ERROR email.notification.smtp.encryption given "{}" is invalid,'
                     "valids values are {}.".format(
-                        self.EMAIL__NOTIFICATION__SMTP__ENCRYPTION, smtp_encryption_str_list
+                        self.EMAIL__NOTIFICATION__SMTP__ENCRYPTION,
+                        smtp_encryption_str_list,
                     )
                 )
 
@@ -1446,8 +1454,13 @@ class CFG(object):
                 when_str="when ldap is in available auth method",
             )
             self.check_mandatory_param(
-                "LDAP_LOGIN_ATTRIBUTE",
-                self.LDAP_LOGIN_ATTRIBUTE,
+                "LDAP_USERNAME_ATTRIBUTE",
+                self.LDAP_USERNAME_ATTRIBUTE,
+                when_str="when ldap is in available auth method",
+            )
+            self.check_mandatory_param(
+                "LDAP_MAIL_ATTRIBUTE",
+                self.LDAP_MAIL_ATTRIBUTE,
                 when_str="when ldap is in available auth method",
             )
             self.check_mandatory_param(

@@ -66,7 +66,8 @@ class UploadPermissionApp(TracimApplication):
                     raise ConfigurationError(
                         "ERROR: email template for {template_description} "
                         'not found at "{template_path}".'.format(
-                            template_description=template_description, template_path=template_path
+                            template_description=template_description,
+                            template_path=template_path,
                         )
                     )
 

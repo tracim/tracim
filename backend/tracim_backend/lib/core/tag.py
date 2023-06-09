@@ -113,7 +113,10 @@ class TagLib:
 
         except TagNotFound:
             tag = self.add(
-                user=user, workspace=content.workspace, tag_name=tag_name, do_save=do_save
+                user=user,
+                workspace=content.workspace,
+                tag_name=tag_name,
+                do_save=do_save,
             )
 
         content_tag = TagOnContent(author=user, tag=tag, content=content)

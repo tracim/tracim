@@ -70,14 +70,15 @@ Example of the LDAP config working with
 [rroemhild/docker-test-openldap](https://github.com/rroemhild/docker-test-openldap):
 
 ```ini
-auth_types = ldap
-ldap_url = ldap://localhost:389
+auth_types = ldap,internal
+ldap_url = ldap://localhost:10389
 ldap_bind_anonymous = False
 ldap_bind_dn = cn=admin,dc=planetexpress,dc=com
 ldap_bind_pass = GoodNewsEveryone
 ldap_user_base_dn = ou=people,dc=planetexpress,dc=com
-ldap_login_attribute = mail
-ldap_name_attribute = givenName
+ldap_mail_attribute = mail
+ldap_username_attribute = givenName
+ldap_name_attribute = displayName
 ldap_tls = False
 ```
 

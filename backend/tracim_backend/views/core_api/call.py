@@ -37,7 +37,9 @@ class CallController(Controller):
         Create a new call for the user given in the body.
         """
         call_lib = CallLib(
-            session=request.dbsession, config=request.app_config, current_user=request.current_user
+            session=request.dbsession,
+            config=request.app_config,
+            current_user=request.current_user,
         )
         return call_lib.create(hapic_data.body["callee_id"])
 
@@ -54,7 +56,9 @@ class CallController(Controller):
         Update the state of a call.
         """
         call_lib = CallLib(
-            session=request.dbsession, config=request.app_config, current_user=request.current_user
+            session=request.dbsession,
+            config=request.app_config,
+            current_user=request.current_user,
         )
         return call_lib.update_call_state(hapic_data.path["call_id"], hapic_data.body["state"])
 
@@ -71,7 +75,9 @@ class CallController(Controller):
         Update the state of a call.
         """
         call_lib = CallLib(
-            session=request.dbsession, config=request.app_config, current_user=request.current_user
+            session=request.dbsession,
+            config=request.app_config,
+            current_user=request.current_user,
         )
         return call_lib.update_call_state(hapic_data.path["call_id"], hapic_data.body["state"])
 
@@ -87,10 +93,14 @@ class CallController(Controller):
         Get the list of incoming calls.
         """
         call_lib = CallLib(
-            session=request.dbsession, config=request.app_config, current_user=request.current_user
+            session=request.dbsession,
+            config=request.app_config,
+            current_user=request.current_user,
         )
         calls = call_lib.get_all(
-            user_id=request.candidate_user.user_id, state=hapic_data.query["state"], caller=False
+            user_id=request.candidate_user.user_id,
+            state=hapic_data.query["state"],
+            caller=False,
         )
         return ListItemsObject(calls)
 
@@ -106,7 +116,9 @@ class CallController(Controller):
         Get one (incoming or outgoing) call.
         """
         call_lib = CallLib(
-            session=request.dbsession, config=request.app_config, current_user=request.current_user
+            session=request.dbsession,
+            config=request.app_config,
+            current_user=request.current_user,
         )
         call = call_lib.get_one(
             user_id=request.candidate_user.user_id, call_id=hapic_data.path["call_id"]
@@ -125,10 +137,14 @@ class CallController(Controller):
         Get the list of outgoing calls.
         """
         call_lib = CallLib(
-            session=request.dbsession, config=request.app_config, current_user=request.current_user
+            session=request.dbsession,
+            config=request.app_config,
+            current_user=request.current_user,
         )
         calls = call_lib.get_all(
-            user_id=request.candidate_user.user_id, state=hapic_data.query["state"], caller=True
+            user_id=request.candidate_user.user_id,
+            state=hapic_data.query["state"],
+            caller=True,
         )
         return ListItemsObject(calls)
 
@@ -144,7 +160,9 @@ class CallController(Controller):
         Get one (incoming or outgoing) call.
         """
         call_lib = CallLib(
-            session=request.dbsession, config=request.app_config, current_user=request.current_user
+            session=request.dbsession,
+            config=request.app_config,
+            current_user=request.current_user,
         )
         call = call_lib.get_one(
             user_id=request.candidate_user.user_id, call_id=hapic_data.path["call_id"]

@@ -28,7 +28,8 @@ class AgendaSchema(marshmallow.Schema):
         allow_none=True,
     )
     resource_type = StrippedString(
-        validate=agenda_resource_type_validator, example=AgendaResourceType.addressbook.value
+        validate=agenda_resource_type_validator,
+        example=AgendaResourceType.addressbook.value,
     )
 
     @post_load

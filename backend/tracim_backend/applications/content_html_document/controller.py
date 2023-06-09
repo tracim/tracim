@@ -6,6 +6,7 @@ from pyramid.config import Configurator
 import transaction
 
 from tracim_backend.app_models.contents import ContentTypeSlug
+from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentStatusException
 from tracim_backend.exceptions import EmptyLabelNotAllowed
@@ -126,7 +127,9 @@ class HTMLDocumentController(Controller):
         Translate a html-document
         """
         translation_lib = TranslationLib(
-            config=request.app_config, current_user=request.current_user, session=request.dbsession
+            config=request.app_config,
+            current_user=request.current_user,
+            session=request.dbsession,
         )
         content_id = hapic_data.path.content_id
         return translation_lib.translate_raw_content(
@@ -153,7 +156,9 @@ class HTMLDocumentController(Controller):
         Translate a html-document
         """
         translation_lib = TranslationLib(
-            config=request.app_config, current_user=request.current_user, session=request.dbsession
+            config=request.app_config,
+            current_user=request.current_user,
+            session=request.dbsession,
         )
         content_id = hapic_data.path.content_id
         return translation_lib.translate_raw_content(

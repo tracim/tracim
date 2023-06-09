@@ -407,7 +407,10 @@ class MigrateStorageCommand(AppContextCommand):
         new_storage_type = new_cfg.UPLOADED_FILES__STORAGE__STORAGE_TYPE
         print(
             "Migration of storage from {}({}) to {}({}) started".format(
-                original_storage_name, original_storage_type, new_storage_name, new_storage_type
+                original_storage_name,
+                original_storage_type,
+                new_storage_name,
+                new_storage_type,
             )
         )
 
@@ -436,6 +439,9 @@ class MigrateStorageCommand(AppContextCommand):
             transaction.commit()
         print(
             "Migration of storage finished from {}({}) to {}({})".format(
-                original_storage_name, original_storage_type, new_storage_name, new_storage_type
+                original_storage_name,
+                original_storage_type,
+                new_storage_name,
+                new_storage_type,
             )
         )

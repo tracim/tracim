@@ -164,10 +164,12 @@ class DecodedMail(object):
                 if key.isalnum():
                     return key
                 logger.warning(
-                    cls, "key found {} is not alphanumeric, cannot retrieve value".format(key)
+                    cls,
+                    "key found {} is not alphanumeric, cannot retrieve value".format(key),
                 )
             logger.warning(
-                cls, "pattern {} does not match email address {} ".format(pattern, mail_address)
+                cls,
+                "pattern {} does not match email address {} ".format(pattern, mail_address),
             )
         return None
 
@@ -291,7 +293,10 @@ class MailFetcher(object):
             sleep_after_connection = True
             try:
                 imapc = imapclient.IMAPClient(
-                    self.host, self.port, ssl=self.use_ssl, timeout=MAIL_FETCHER_CONNECTION_TIMEOUT
+                    self.host,
+                    self.port,
+                    ssl=self.use_ssl,
+                    timeout=MAIL_FETCHER_CONNECTION_TIMEOUT,
                 )
                 imapc.login(self.user, self.password)
 
@@ -498,7 +503,10 @@ class MailFetcher(object):
                 logger.exception(self, log)
 
     def _get_auth_headers(self, user_email) -> dict:
-        return {TRACIM_API_KEY_HEADER: self.api_key, TRACIM_API_USER_LOGIN_HEADER: user_email}
+        return {
+            TRACIM_API_KEY_HEADER: self.api_key,
+            TRACIM_API_USER_LOGIN_HEADER: user_email,
+        }
 
     def _get_content_info(self, content_id, user_email):
         endpoint = "{api_base_url}contents/{content_id}".format(

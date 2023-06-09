@@ -106,7 +106,9 @@ SWAGGER_TAG__WORKSPACE_TRASH_AND_RESTORE_ENDPOINTS = generate_documentation_swag
     SWAGGER_TAG__WORKSPACE_ENDPOINTS, SWAGGER_TAG__TRASH_AND_RESTORE_SECTION
 )
 SWAGGER_TAG__CONTENT_ALL_TRASH_AND_RESTORE_ENDPOINTS = generate_documentation_swagger_tag(
-    SWAGGER_TAG__CONTENT_ENDPOINTS, SWAGGER_TAG__ALL_SECTION, SWAGGER_TAG__TRASH_AND_RESTORE_SECTION
+    SWAGGER_TAG__CONTENT_ENDPOINTS,
+    SWAGGER_TAG__ALL_SECTION,
+    SWAGGER_TAG__TRASH_AND_RESTORE_SECTION,
 )
 SWAGGER_TAG__CONTENT_ALL_ARCHIVE_AND_RESTORE_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__CONTENT_ENDPOINTS,
@@ -126,7 +128,9 @@ class WorkspaceController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         wapi = WorkspaceApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,  # User
         )
         return wapi.get_workspace_with_context(request.current_workspace)
 
@@ -140,7 +144,9 @@ class WorkspaceController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         wapi = WorkspaceApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,  # User
         )
         return wapi.get_workspace_with_context(request.current_workspace)
 
@@ -156,7 +162,9 @@ class WorkspaceController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         wapi = WorkspaceApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,  # User
         )
 
         workspaces = wapi.get_all_children(parent_ids=hapic_data.query.parent_ids)
@@ -176,7 +184,9 @@ class WorkspaceController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         wapi = WorkspaceApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,  # User
         )
         wapi.update_workspace(
             request.current_workspace,
@@ -204,7 +214,9 @@ class WorkspaceController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         wapi = WorkspaceApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,  # User
         )
         parent = None
         if hapic_data.body.parent_id:
@@ -235,7 +247,9 @@ class WorkspaceController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         wapi = WorkspaceApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,  # User
         )
         wapi.delete(request.current_workspace, flush=True)
         return
@@ -294,7 +308,9 @@ class WorkspaceController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         role_api = RoleApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
 
         role = role_api.get_one(
@@ -318,7 +334,9 @@ class WorkspaceController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         role_api = RoleApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
 
         role = role_api.get_one(
@@ -343,7 +361,9 @@ class WorkspaceController(Controller):
 
         app_config = request.registry.settings["CFG"]  # type: CFG
         role_api = RoleApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
         role_api.delete_one(
             user_id=hapic_data.path.user_id, workspace_id=hapic_data.path.workspace_id
@@ -369,7 +389,9 @@ class WorkspaceController(Controller):
         newly_created = False
         app_config = request.registry.settings["CFG"]  # type: CFG
         role_api = RoleApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
         uapi = UserApi(
             current_user=request.current_user,
@@ -549,13 +571,16 @@ class WorkspaceController(Controller):
         app_config = request.registry.settings["CFG"]  # type: CFG
         creation_data = hapic_data.body
         api = ContentApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
         parent = None
         if creation_data.parent_id:
             try:
                 parent = api.get_one(
-                    content_id=creation_data.parent_id, content_type=ContentTypeSlug.ANY.value
+                    content_id=creation_data.parent_id,
+                    content_type=ContentTypeSlug.ANY.value,
                 )
             except ContentNotFound as exc:
                 raise ParentNotFound(
@@ -625,7 +650,8 @@ class WorkspaceController(Controller):
             config=app_config,
         )
         content = api.get_one(
-            content_id=hapic_data.path["content_id"], content_type=ContentTypeSlug.ANY.value
+            content_id=hapic_data.path["content_id"],
+            content_type=ContentTypeSlug.ANY.value,
         )
         content_type = content_type_list.get_one_by_slug(content.type).slug
 
@@ -652,7 +678,9 @@ class WorkspaceController(Controller):
         content = request.current_content
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
         return ListItemsObject(
             [api.get_content_in_context(path_content) for path_content in content.content_path]
@@ -872,7 +900,9 @@ class WorkspaceController(Controller):
         configurator.add_view(self.workspace, route_name="workspace")
         # Workspace space
         configurator.add_route(
-            "workspace_disk_space", "/workspaces/{workspace_id}/disk_space", request_method="GET"
+            "workspace_disk_space",
+            "/workspaces/{workspace_id}/disk_space",
+            request_method="GET",
         )
         configurator.add_view(self.workspace_disk_space, route_name="workspace_disk_space")
         # Create workspace
@@ -880,11 +910,15 @@ class WorkspaceController(Controller):
         configurator.add_view(self.create_workspace, route_name="create_workspace")
         # Delete/Undelete workpace
         configurator.add_route(
-            "delete_workspace", "/workspaces/{workspace_id}/trashed", request_method="PUT"
+            "delete_workspace",
+            "/workspaces/{workspace_id}/trashed",
+            request_method="PUT",
         )
         configurator.add_view(self.delete_workspace, route_name="delete_workspace")
         configurator.add_route(
-            "undelete_workspace", "/workspaces/{workspace_id}/trashed/restore", request_method="PUT"
+            "undelete_workspace",
+            "/workspaces/{workspace_id}/trashed/restore",
+            request_method="PUT",
         )
         configurator.add_view(self.undelete_workspace, route_name="undelete_workspace")
         # Update Workspace
@@ -894,7 +928,9 @@ class WorkspaceController(Controller):
         configurator.add_view(self.update_workspace, route_name="update_workspace")
         # Workspace Members (Roles)
         configurator.add_route(
-            "workspace_members", "/workspaces/{workspace_id}/members", request_method="GET"
+            "workspace_members",
+            "/workspaces/{workspace_id}/members",
+            request_method="GET",
         )
         configurator.add_view(self.workspaces_members, route_name="workspace_members")
         # Workspace Members (Role) Individual
@@ -915,7 +951,9 @@ class WorkspaceController(Controller):
         )
         # Create Workspace Members roles
         configurator.add_route(
-            "create_workspace_member", "/workspaces/{workspace_id}/members", request_method="POST"
+            "create_workspace_member",
+            "/workspaces/{workspace_id}/members",
+            request_method="POST",
         )
         configurator.add_view(
             self.create_workspaces_members_role, route_name="create_workspace_member"
@@ -931,12 +969,16 @@ class WorkspaceController(Controller):
         )
         # Workspace Content
         configurator.add_route(
-            "workspace_content", "/workspaces/{workspace_id}/contents", request_method="GET"
+            "workspace_content",
+            "/workspaces/{workspace_id}/contents",
+            request_method="GET",
         )
         configurator.add_view(self.workspace_content, route_name="workspace_content")
         # Create Generic Content
         configurator.add_route(
-            "create_generic_content", "/workspaces/{workspace_id}/contents", request_method="POST"
+            "create_generic_content",
+            "/workspaces/{workspace_id}/contents",
+            request_method="POST",
         )
         configurator.add_view(
             self.create_generic_empty_content, route_name="create_generic_content"
