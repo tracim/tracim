@@ -1867,7 +1867,7 @@ class TestCommands(object):
                 "{}".format(workspace_id),
             ]
         )
-        assert result == 1
+        assert result == 0
         assert len(session.query(Content).filter(Content.content_id == content_id).all()) == 1
         assert (
             len(
