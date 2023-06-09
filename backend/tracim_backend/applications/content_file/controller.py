@@ -147,12 +147,8 @@ class FileController(Controller):
             api.copy_tags(
                 destination=content,
                 source_content_id=hapic_data.forms.template_id,
-                destination=content,
-                source_content_id=hapic_data.forms.template_id,
             )
             api.copy_todos(
-                new_parent=content,
-                template_id=hapic_data.forms.template_id,
                 new_parent=content,
                 template_id=hapic_data.forms.template_id,
             )
