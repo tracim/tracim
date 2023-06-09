@@ -12,7 +12,6 @@ from tracim_backend.applications.upload_permissions.models_in_context import (
 from tracim_backend.applications.upload_permissions.schema import UploadDataFormSchema
 from tracim_backend.applications.upload_permissions.schema import UploadFileSchema
 from tracim_backend.applications.upload_permissions.schema import UploadFiles
-from tracim_backend.applications.upload_permissions.schema import UploadFiles
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionCreationBodySchema
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionIdPathSchema
 from tracim_backend.applications.upload_permissions.schema import UploadPermissionListQuerySchema

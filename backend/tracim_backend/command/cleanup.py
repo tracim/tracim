@@ -5,7 +5,6 @@ from sqlalchemy.event import listen
 import traceback
 import typing
 
-from tracim_backend import UserDoesNotExist
 from tracim_backend.applications.agenda.models import AgendaResourceType
 from tracim_backend.apps import AGENDA__APP_SLUG
 from tracim_backend.command import AppContextCommand
