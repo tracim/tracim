@@ -1,13 +1,13 @@
+from urllib.parse import quote
+
 from datetime import datetime
 from smtplib import SMTPException
 from smtplib import SMTPRecipientsRefused
-import typing
-from urllib.parse import quote
-import uuid
-
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
+import typing
+import uuid
 
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.applications.share.email_manager import ShareEmailManager
@@ -181,7 +181,8 @@ class ShareLib(object):
     def frontend_url(self, content_share: ContentShare) -> str:
         frontend_ui_base_url = get_frontend_ui_base_url(config=self._config)
         return FRONTEND_SHARED_CONTENT_LINK_PATTERN.format(
-            frontend_ui_base_url=frontend_ui_base_url, share_token=content_share.share_token
+            frontend_ui_base_url=frontend_ui_base_url,
+            share_token=content_share.share_token,
         )
 
     def direct_api_url(self, content_share: ContentShare) -> str:

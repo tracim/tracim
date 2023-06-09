@@ -5,10 +5,9 @@ Revises: 69ab7c047577
 Create Date: 2020-10-01 11:59:28.536056
 
 """
-import typing
-
 from alembic import op
 import sqlalchemy as sa
+import typing
 
 # revision identifiers, used by Alembic.
 revision = "3f30a1bacf1a"
@@ -50,5 +49,9 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     replace_enum(
-        "events", "entity_type", new_entity_type_enum, old_entity_type_enum, None,
+        "events",
+        "entity_type",
+        new_entity_type_enum,
+        old_entity_type_enum,
+        None,
     )

@@ -1,7 +1,6 @@
 from datetime import datetime
-import typing
-
 from sqlalchemy.orm import Session
+import typing
 
 from tracim_backend.applications.upload_permissions.models import UploadPermission
 from tracim_backend.config import CFG
@@ -93,5 +92,7 @@ class UploadPermissionInContext(object):
     @property
     def author(self) -> UserInContext:
         return UserInContext(
-            dbsession=self.dbsession, config=self.config, user=self.upload_permission.author
+            dbsession=self.dbsession,
+            config=self.config,
+            user=self.upload_permission.author,
         )

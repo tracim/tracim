@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
 from copy import deepcopy
-from http import HTTPStatus
-import sys
-import warnings
-
 from hapic.ext.pyramid import PyramidContext
+from http import HTTPStatus
 from pyramid.config import Configurator
 from pyramid.events import NewResponse
 from pyramid.request import Request
@@ -13,8 +10,10 @@ from pyramid.router import Router
 import pyramid_beaker
 from pyramid_multiauth import MultiAuthenticationPolicy
 from sqlalchemy.exc import OperationalError
+import sys
 from transaction._transaction import Status as TransactionStatus
 from transaction.interfaces import NoTransaction
+import warnings
 
 from tracim_backend.applications.agenda.app_factory import CaldavAppFactory
 from tracim_backend.config import CFG
@@ -41,16 +40,16 @@ from tracim_backend.extensions import app_list
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.plugins import init_plugin_manager
-from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
-from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
-from tracim_backend.lib.utils.authentification import TRACIM_API_USER_LOGIN_HEADER
 from tracim_backend.lib.utils.authentification import ApiTokenAuthentificationPolicy
+from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
 from tracim_backend.lib.utils.authentification import CookieSessionAuthentificationPolicy
 from tracim_backend.lib.utils.authentification import QueryTokenAuthentificationPolicy
 from tracim_backend.lib.utils.authentification import RemoteAuthentificationPolicy
+from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
+from tracim_backend.lib.utils.authentification import TRACIM_API_USER_LOGIN_HEADER
 from tracim_backend.lib.utils.authentification import TracimBasicAuthAuthenticationPolicy
-from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim_backend.lib.utils.authorization import AcceptAllAuthorizationPolicy
+from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim_backend.lib.utils.authorization import TracimSecurityPolicy
 from tracim_backend.lib.utils.cors import add_cors_support
 from tracim_backend.lib.utils.http_cache import default_to_cache_control_no_store
@@ -124,8 +123,7 @@ class TracimPyramidContext(PyramidContext):
 
 
 def web(global_config: OrderedDict, **local_settings) -> Router:
-    """ This function returns a Pyramid WSGI application.
-    """
+    """This function returns a Pyramid WSGI application."""
     settings = deepcopy(global_config)
     settings.update(local_settings)
     # set CFG object
@@ -222,7 +220,9 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     init_models(configurator, app_config)
     # set Hapic
     context = TracimPyramidContext(
-        configurator=configurator, default_error_builder=ErrorSchema(), debug=app_config.DEBUG
+        configurator=configurator,
+        default_error_builder=ErrorSchema(),
+        debug=app_config.DEBUG,
     )
     # HACK - G.M - 2021-07-01 - Force reset of context if already set.
     # This case happened in some test now for unclear reasons.
@@ -295,7 +295,10 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     app_lib = ApplicationApi(app_list=app_list)
     for app in app_lib.get_all():
         app.load_controllers(
-            app_config=app_config, configurator=configurator, route_prefix=BASE_API, context=context
+            app_config=app_config,
+            configurator=configurator,
+            route_prefix=BASE_API,
+            context=context,
         )
         app.register_tracim_plugin(plugin_manager)
 

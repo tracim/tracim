@@ -1,8 +1,7 @@
 from pathlib import Path
-import tempfile
-
 import pytest
 from sqlalchemy.orm.exc import NoResultFound
+import tempfile
 import transaction
 
 from tracim_backend import ContentNotFound
@@ -82,7 +81,6 @@ class TestCleanupLib(object):
         workspace_api_factory,
         share_lib_factory,
     ) -> None:
-
         content_api = content_api_factory.get(
             show_deleted=True, show_active=True, show_archived=True
         )
@@ -106,7 +104,11 @@ class TestCleanupLib(object):
         )
         file_id = file_.content_id
         comment = content_api.create_comment(
-            workspace=test_workspace, parent=file_, content="Toto", do_save=True, do_notify=False
+            workspace=test_workspace,
+            parent=file_,
+            content="Toto",
+            do_save=True,
+            do_notify=False,
         )
         comment_id = comment.content_id
         share_api = share_lib_factory.get()
@@ -143,7 +145,6 @@ class TestCleanupLib(object):
         share_lib_factory,
         upload_permission_lib_factory,
     ) -> None:
-
         content_api = content_api_factory.get(
             show_deleted=True, show_active=True, show_archived=True
         )
@@ -177,7 +178,11 @@ class TestCleanupLib(object):
         )
         file_id = file_.content_id
         comment = content_api.create_comment(
-            workspace=test_workspace, parent=file_, content="Toto", do_save=True, do_notify=False
+            workspace=test_workspace,
+            parent=file_,
+            content="Toto",
+            do_save=True,
+            do_notify=False,
         )
         comment_id = comment.content_id
         share_api = share_lib_factory.get()
@@ -240,7 +245,6 @@ class TestCleanupLib(object):
         share_lib_factory,
         upload_permission_lib_factory,
     ) -> None:
-
         content_api = content_api_factory.get(
             show_deleted=True, show_active=True, show_archived=True
         )
@@ -276,7 +280,11 @@ class TestCleanupLib(object):
         content_api.add_favorite(folder, do_save=True)
         file_id = file_.content_id
         comment = content_api.create_comment(
-            workspace=test_workspace, parent=file_, content="Toto", do_save=True, do_notify=False
+            workspace=test_workspace,
+            parent=file_,
+            content="Toto",
+            do_save=True,
+            do_notify=False,
         )
         comment_id = comment.content_id
         share_api = share_lib_factory.get()
@@ -345,7 +353,6 @@ class TestCleanupLib(object):
         share_lib_factory,
         upload_permission_lib_factory,
     ) -> None:
-
         content_api = content_api_factory.get(
             show_deleted=True, show_active=True, show_archived=True
         )
@@ -369,7 +376,10 @@ class TestCleanupLib(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=file_):
             content_api.update_file_data(
-                file_, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                file_,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.mark_read(file_)
         file_id = file_.content_id
@@ -444,7 +454,6 @@ class TestCleanupLib(object):
         share_lib_factory,
         upload_permission_lib_factory,
     ) -> None:
-
         content_api = content_api_factory.get(
             show_deleted=True, show_active=True, show_archived=True
         )
@@ -468,7 +477,10 @@ class TestCleanupLib(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=file_):
             content_api.update_file_data(
-                file_, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                file_,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.mark_read(file_)
         file_id = file_.content_id

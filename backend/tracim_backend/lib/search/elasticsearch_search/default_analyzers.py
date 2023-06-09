@@ -37,13 +37,23 @@ max_token_length_filter = analysis.token_filter(
 edge_ngram_folding = analyzer(
     "edge_ngram_folding",
     tokenizer="standard",
-    filter=[max_token_length_filter, "lowercase", "asciifolding", edge_ngram_token_filter],
+    filter=[
+        max_token_length_filter,
+        "lowercase",
+        "asciifolding",
+        edge_ngram_token_filter,
+    ],
     char_filter=underscore_as_minus,
 )
 html_folding = analyzer(
     "html_folding",
     tokenizer="standard",
-    filter=[max_token_length_filter, "lowercase", "asciifolding", edge_ngram_token_filter],
+    filter=[
+        max_token_length_filter,
+        "lowercase",
+        "asciifolding",
+        edge_ngram_token_filter,
+    ],
     char_filter=["html_strip", underscore_as_minus],
 )
 html_exact_folding = analyzer(

@@ -5,13 +5,12 @@ Revises: 8382e5a19f0d
 Create Date: 2022-05-23 12:09:17.112836
 
 """
-from copy import deepcopy
-
 # revision identifiers, used by Alembic.
 from alembic import op
-from sqlalchemy import JSON
+from copy import deepcopy
 from sqlalchemy import Column
 from sqlalchemy import Integer
+from sqlalchemy import JSON
 from sqlalchemy import MetaData
 from sqlalchemy import Sequence
 from sqlalchemy.ext.declarative import declarative_base
@@ -35,7 +34,7 @@ DeclarativeBase = declarative_base(metadata=metadata)
 
 
 class TemporaryEvents(DeclarativeBase):
-    """ temporary sqlalchemy object to help migration"""
+    """temporary sqlalchemy object to help migration"""
 
     __tablename__ = "events"
     event_id = Column(

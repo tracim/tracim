@@ -25,7 +25,6 @@ class Test(Fixture):
     require = [Base]
 
     def insert(self):
-
         lawrence = User()
         lawrence.display_name = "Lawrence L."
         lawrence.email = "lawrence-not-real-email@fsf.local"

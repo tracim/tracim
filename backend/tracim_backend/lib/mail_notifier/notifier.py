@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 import logging
-import typing
-
 from mako.template import Template
 from sqlalchemy.orm import Session
+import typing
 
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
@@ -57,7 +56,6 @@ class EmailNotifier(INotifier):
         )
 
     def notify_content_update(self, content: Content):
-
         if content.get_last_action().id not in self.config.EMAIL__NOTIFICATION__NOTIFIED_EVENTS:
             logger.info(
                 self,
@@ -199,8 +197,8 @@ class EmailManager(object):
         # FIXME - D.A. - 2014-11-05
         # Dirty import. It's here in order to avoid circular import
         from tracim_backend.lib.core.content import ContentApi
-        from tracim_backend.lib.core.user import UserApi
         from tracim_backend.lib.core.mention import DescriptionMentionParser
+        from tracim_backend.lib.core.user import UserApi
 
         user = UserApi(None, config=self.config, session=self.session).get_one(event_actor_id)
         logger.debug(self, "Content: {}".format(event_content_id))
@@ -300,7 +298,10 @@ class EmailManager(object):
             )
 
             body_html = DescriptionMentionParser.get_email_html_from_html_with_mention_tags(
-                session=self.session, cfg=self.config, translator=translator, html=body_html
+                session=self.session,
+                cfg=self.config,
+                translator=translator,
+                html=body_html,
             )
 
             message = EmailNotificationMessage(
@@ -332,7 +333,10 @@ class EmailManager(object):
             send_email_through(self.config, email_sender.send_mail, message)
 
     def notify_created_account(
-        self, user: User, password: typing.Optional[str], origin_user: typing.Optional[User] = None
+        self,
+        user: User,
+        password: typing.Optional[str],
+        origin_user: typing.Optional[User] = None,
     ) -> None:
         """
         Send created account email to given user.
@@ -363,7 +367,9 @@ class EmailManager(object):
         }
         translator = Translator(self.config, default_lang=user.lang)
         body_html = self._render_template(
-            mako_template_filepath=html_template_file_path, context=context, translator=translator
+            mako_template_filepath=html_template_file_path,
+            context=context,
+            translator=translator,
         )
         message = EmailNotificationMessage(
             subject=subject,
@@ -374,7 +380,9 @@ class EmailManager(object):
         )
 
         send_email_through(
-            config=self.config, sendmail_callable=email_sender.send_mail, message=message
+            config=self.config,
+            sendmail_callable=email_sender.send_mail,
+            message=message,
         )
 
     def notify_reset_password(self, user: User, reset_password_token: str) -> None:
@@ -409,7 +417,9 @@ class EmailManager(object):
         }
 
         body_html = self._render_template(
-            mako_template_filepath=html_template_file_path, context=context, translator=translator
+            mako_template_filepath=html_template_file_path,
+            context=context,
+            translator=translator,
         )
         message = EmailNotificationMessage(
             subject=subject,
@@ -419,7 +429,9 @@ class EmailManager(object):
             lang=translator.default_lang,
         )
         send_email_through(
-            config=self.config, sendmail_callable=email_sender.send_mail, message=message
+            config=self.config,
+            sendmail_callable=email_sender.send_mail,
+            message=message,
         )
 
     def _render_template(
@@ -461,7 +473,6 @@ class EmailManager(object):
         actor: User,
         translator: Translator,
     ):
-
         _ = translator.get_translation
         content = content_in_context.content
         action = content.get_last_action().id
@@ -512,7 +523,8 @@ class EmailManager(object):
          this method must be called one time for text and one time for html
         """
         logger.debug(
-            self, "Building email content from MAKO template {}".format(mako_template_filepath)
+            self,
+            "Building email content from MAKO template {}".format(mako_template_filepath),
         )
         context = self._build_context_for_content_update(
             role=role,
@@ -523,7 +535,9 @@ class EmailManager(object):
             translator=translator,
         )
         body_content = self._render_template(
-            mako_template_filepath=mako_template_filepath, context=context, translator=translator
+            mako_template_filepath=mako_template_filepath,
+            context=context,
+            translator=translator,
         )
         return body_content
 

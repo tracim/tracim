@@ -1,9 +1,8 @@
-import typing
-
 from rq import Connection as RQConnection
 from rq import Worker as BaseRQWorker
 from rq.dummy import do_nothing
 from rq.worker import StopRequested
+import typing
 
 from tracim_backend.config import CFG
 from tracim_backend.lib.rq import RqQueueName
@@ -40,7 +39,6 @@ class MailSenderDaemon(FakeDaemon):
         queue.enqueue(do_nothing)
 
     def run(self) -> None:
-
         with RQConnection(get_redis_connection(self.config)):
             self.worker = RQWorker([RqQueueName.MAIL_SENDER.value])
             self.worker.work(burst=self.burst)

@@ -2,8 +2,8 @@ from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
-from sqlalchemy.types import JSON
 from sqlalchemy.types import Integer
+from sqlalchemy.types import JSON
 
 from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
@@ -19,13 +19,19 @@ class UserCustomProperties(DeclarativeBase):
 
     user_id = Column(
         Integer,
-        ForeignKey("users.user_id", onupdate="CASCADE", ondelete="CASCADE",),
+        ForeignKey(
+            "users.user_id",
+            onupdate="CASCADE",
+            ondelete="CASCADE",
+        ),
         nullable=False,
         primary_key=True,
     )
 
     user = relationship(
-        "User", remote_side=[User.user_id], backref=backref("custom_properties", uselist=False)
+        "User",
+        remote_side=[User.user_id],
+        backref=backref("custom_properties", uselist=False),
     )
 
     fields = Column(JSON, nullable=False, default={})

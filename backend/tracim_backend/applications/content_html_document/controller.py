@@ -1,13 +1,12 @@
 # coding=utf-8
+from hapic.data import HapicFile
 from http import HTTPStatus
 from io import BytesIO
-
-from hapic.data import HapicFile
 from pyramid.config import Configurator
 import transaction
 
 from tracim_backend.app_models.contents import ContentTypeSlug
-from tracim_backend.config import CFG
+from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentStatusException
 from tracim_backend.exceptions import EmptyLabelNotAllowed
@@ -86,10 +85,10 @@ class HTMLDocumentController(Controller):
         self, context, request: TracimRequest, hapic_data=None
     ) -> HapicFile:
         """
-           Download preview of html document
-           Good pratice for filename is filename is `{label}{file_extension}` or `{filename}`.
-           Default filename value is 'raw' (without file extension) or nothing.
-           """
+        Download preview of html document
+        Good pratice for filename is filename is `{label}{file_extension}` or `{filename}`.
+        Default filename value is 'raw' (without file extension) or nothing.
+        """
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
@@ -128,7 +127,9 @@ class HTMLDocumentController(Controller):
         Translate a html-document
         """
         translation_lib = TranslationLib(
-            config=request.app_config, current_user=request.current_user, session=request.dbsession
+            config=request.app_config,
+            current_user=request.current_user,
+            session=request.dbsession,
         )
         content_id = hapic_data.path.content_id
         return translation_lib.translate_raw_content(
@@ -155,7 +156,9 @@ class HTMLDocumentController(Controller):
         Translate a html-document
         """
         translation_lib = TranslationLib(
-            config=request.app_config, current_user=request.current_user, session=request.dbsession
+            config=request.app_config,
+            current_user=request.current_user,
+            session=request.dbsession,
         )
         content_id = hapic_data.path.content_id
         return translation_lib.translate_raw_content(

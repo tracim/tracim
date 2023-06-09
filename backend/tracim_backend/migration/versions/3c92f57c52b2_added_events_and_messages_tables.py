@@ -20,8 +20,16 @@ def upgrade():
     op.create_table(
         "events",
         sa.Column("event_id", sa.Integer(), autoincrement=True, nullable=False),
-        sa.Column("operation", operation_type_enum, nullable=False,),
-        sa.Column("entity_type", entity_type_enum, nullable=False,),
+        sa.Column(
+            "operation",
+            operation_type_enum,
+            nullable=False,
+        ),
+        sa.Column(
+            "entity_type",
+            entity_type_enum,
+            nullable=False,
+        ),
         sa.Column("created", sa.DateTime(), nullable=False),
         sa.Column("fields", sa.JSON(), nullable=False),
         sa.PrimaryKeyConstraint("event_id", name=op.f("pk_events")),
@@ -58,10 +66,14 @@ def upgrade():
 def downgrade():
     with op.batch_alter_table("content_revisions") as batch_op:
         batch_op.drop_constraint(
-            batch_op.f("fk_content_revisions_content_id_content"), type_="foreignkey",
+            batch_op.f("fk_content_revisions_content_id_content"),
+            type_="foreignkey",
         )
         batch_op.create_foreign_key(
-            "fk_content_revisions_content_id_content", "content", ["content_id"], ["id"],
+            "fk_content_revisions_content_id_content",
+            "content",
+            ["content_id"],
+            ["id"],
         )
         batch_op.alter_column("content_id", existing_type=sa.INTEGER(), nullable=False)
     op.drop_table("messages")

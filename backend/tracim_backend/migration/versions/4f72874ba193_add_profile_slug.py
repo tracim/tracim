@@ -5,10 +5,9 @@ Revises: 3de3e7f2b049
 Create Date: 2020-01-24 16:30:16.365418
 
 """
+from alembic import op
 from datetime import datetime
 import enum
-
-from alembic import op
 import sqlalchemy as sa
 from sqlalchemy import Column
 from sqlalchemy import DateTime
@@ -75,12 +74,14 @@ class TemporaryProfileEnum(enum.Enum):
 
 
 class TemporaryUsers(DeclarativeBase):
-    """ temporary sqlalchemy object to help migration"""
+    """temporary sqlalchemy object to help migration"""
 
     __tablename__ = "users"
     user_id = Column(Integer, Sequence("seq__users__user_id"), autoincrement=True, primary_key=True)
     profile = Column(
-        Enum(TemporaryProfileEnum), nullable=True, server_default=TemporaryProfileEnum.NOBODY.name
+        Enum(TemporaryProfileEnum),
+        nullable=True,
+        server_default=TemporaryProfileEnum.NOBODY.name,
     )
 
 

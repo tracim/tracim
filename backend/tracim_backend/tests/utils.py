@@ -1,21 +1,20 @@
+from PIL import Image
 import contextlib
 import importlib
 from io import BytesIO
 import multiprocessing
 import os
-import sys
-import typing
-from typing import Any
-from typing import Optional
-from unittest import mock
-
-from PIL import Image
 import plaster
 import requests
 from requests import Response
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.session import sessionmaker
+import sys
 import transaction
+import typing
+from typing import Any
+from typing import Optional
+from unittest import mock
 from waitress import serve
 from wsgidav import util as wsgidav_util
 from wsgidav.dav_provider import _DAVResource
@@ -161,7 +160,11 @@ class SubscriptionLibFactory(object):
 
 class WedavEnvironFactory(object):
     def __init__(
-        self, provider: TracimDavProvider, session: Session, app_config: CFG, admin_user: User
+        self,
+        provider: TracimDavProvider,
+        session: Session,
+        app_config: CFG,
+        admin_user: User,
     ):
         self.provider = provider
         self.session = session
@@ -170,7 +173,6 @@ class WedavEnvironFactory(object):
         self.plugin_manager = create_plugin_manager()
 
     def get(self, user: typing.Optional[User] = None) -> typing.Dict[str, typing.Any]:
-
         environ = {
             "http_authenticator.username": user.email_address if user else None,
             "http_authenticator.realm": "/",
@@ -178,7 +180,9 @@ class WedavEnvironFactory(object):
             "tracim_user": user,
         }
         tracim_context = WebdavTracimContext(
-            app_config=self.app_config, environ=environ, plugin_manager=self.plugin_manager,
+            app_config=self.app_config,
+            environ=environ,
+            plugin_manager=self.plugin_manager,
         )
         tracim_context.dbsession = self.session
         environ["tracim_context"] = tracim_context
@@ -220,7 +224,6 @@ def webdav_put_new_test_file_helper(
 
 
 class MailHogHelper(object):
-
     MAILHOG_BASE_URL = "http://127.0.0.1:8025"
     MAILHOG_MESSAGES_ENDPOINT = "/api/v1/messages"
 

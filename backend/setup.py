@@ -1,7 +1,6 @@
-import sys
-
 from setuptools import find_packages
 from setuptools import setup
+import sys
 
 requires = [
     # pyramid
@@ -173,6 +172,9 @@ setup(
         ],
     },
     message_extractors={
-        "tracim_backend": [("**.py", "python", None), ("templates/**.mak", "mako", None)]
+        "tracim_backend": [
+            ("**.py", "python", None),
+            ("templates/**.mak", "mako", None),
+        ]
     },
 )

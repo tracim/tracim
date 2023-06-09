@@ -1,7 +1,6 @@
-import typing
-
 from defusedxml import ElementTree
 import requests
+import typing
 
 from tracim_backend.applications.collaborative_document_edition.lib import (
     CollaborativeDocumentEditionLib,
@@ -16,7 +15,9 @@ class CollaboraCollaborativeDocumentEditionLib(CollaborativeDocumentEditionLib):
     Collabora implementation of Collaborative Document Edition.
     """
 
-    def _get_supported_file_types(self) -> typing.List[CollaborativeDocumentEditionFileType]:
+    def _get_supported_file_types(
+        self,
+    ) -> typing.List[CollaborativeDocumentEditionFileType]:
         """
         Get list of supported file type for collaborative editions
         """

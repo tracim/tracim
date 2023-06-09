@@ -11,10 +11,10 @@ from tracim_backend.lib.utils.app import TracimApplication
 from tracim_backend.lib.utils.app import TracimContentType
 
 if typing.TYPE_CHECKING:
-    from tracim_backend.models.data import Workspace
-    from tracim_backend.config import CFG
     from tracim_backend.app_models.applications import TracimApplicationInContext  # noqa:F401
     from tracim_backend.app_models.contents import ContentTypeInContext  # noqa: F401
+    from tracim_backend.config import CFG
+    from tracim_backend.models.data import Workspace
 
 
 class ApplicationApi(object):
@@ -29,7 +29,7 @@ class ApplicationApi(object):
         self.show_inactive = show_inactive
 
     def exist(self, slug: str) -> bool:
-        """ Check if app with this slug does exist according to applicationApi configuration"""
+        """Check if app with this slug does exist according to applicationApi configuration"""
         try:
             self.get_one(slug)
             return True
@@ -37,7 +37,7 @@ class ApplicationApi(object):
             return False
 
     def get_one(self, slug: str) -> TracimApplication:
-        """ Get app with given slug if exist"""
+        """Get app with given slug if exist"""
         for app in self.apps:
             if app.slug == slug:
                 if self.show_inactive or app.is_active:

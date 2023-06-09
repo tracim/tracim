@@ -52,25 +52,33 @@ class DatabaseCrudHookSpec:
 
     @hookspec
     def on_user_role_in_workspace_created(
-        self, role: UserRoleInWorkspace, context: TracimContext,
+        self,
+        role: UserRoleInWorkspace,
+        context: TracimContext,
     ) -> None:
         ...
 
     @hookspec
     def on_user_role_in_workspaces_created(
-        self, roles: typing.List[UserRoleInWorkspace], context: TracimContext,
+        self,
+        roles: typing.List[UserRoleInWorkspace],
+        context: TracimContext,
     ) -> None:
         ...
 
     @hookspec
     def on_user_role_in_workspace_modified(
-        self, role: UserRoleInWorkspace, context: TracimContext,
+        self,
+        role: UserRoleInWorkspace,
+        context: TracimContext,
     ) -> None:
         ...
 
     @hookspec
     def on_user_role_in_workspace_deleted(
-        self, role: UserRoleInWorkspace, context: TracimContext,
+        self,
+        role: UserRoleInWorkspace,
+        context: TracimContext,
     ) -> None:
         ...
 

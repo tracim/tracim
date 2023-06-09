@@ -1,6 +1,5 @@
 from http import HTTPStatus
 import json
-
 from pyramid.config import Configurator
 
 from tracim_backend import PageNotFound

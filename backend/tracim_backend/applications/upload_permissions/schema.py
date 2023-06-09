@@ -1,10 +1,9 @@
 import cgi
-import typing
-
 import marshmallow
 from marshmallow import post_load
 from marshmallow.validate import Length
 from marshmallow.validate import OneOf
+import typing
 
 from tracim_backend import TracimRequest
 from tracim_backend.app_models.validator import bool_as_int_validator
@@ -38,7 +37,7 @@ class UploadFileSchema(marshmallow.Schema):
 
 class UploadFiles(object):
     def __init__(self, request: TracimRequest, prefix_pattern: str) -> None:
-        """ Hack to get list of uploaded file in a form given without using hapic"""
+        """Hack to get list of uploaded file in a form given without using hapic"""
         self.files = []  # type: typing.List[cgi.FieldStorage]
         for name, item in request.POST.items():
             if name.startswith(prefix_pattern) and isinstance(item, cgi.FieldStorage):
@@ -152,7 +151,9 @@ class UploadPermissionCreationBody(object):
 
 class UploadPermissionCreationBodySchema(marshmallow.Schema):
     emails = marshmallow.fields.List(
-        RFCEmail(validate=upload_permission_email_validator), validate=Length(min=1), required=True
+        RFCEmail(validate=upload_permission_email_validator),
+        validate=Length(min=1),
+        required=True,
     )
     password = marshmallow.fields.String(
         example="8QLa$<w",
@@ -172,7 +173,9 @@ class UploadPermissionPublicInfoSchema(marshmallow.Schema):
 
 class UploadPermissionSchema(marshmallow.Schema):
     email = RFCEmail(
-        example="hello@tracim.fr", required=True, validate=upload_permission_email_validator
+        example="hello@tracim.fr",
+        required=True,
+        validate=upload_permission_email_validator,
     )
     has_password = marshmallow.fields.Boolean(required=True)
     upload_permission_group_uuid = marshmallow.fields.String(required=True)
@@ -192,7 +195,9 @@ class UploadPermissionSchema(marshmallow.Schema):
         format=DATETIME_FORMAT, description="Upload permission creation date"
     )
     disabled = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT, description="Upload permission disabled date", allow_none=True
+        format=DATETIME_FORMAT,
+        description="Upload permission disabled date",
+        allow_none=True,
     )
     is_disabled = marshmallow.fields.Boolean(
         required=True, description="is this upload permission disabled ?"

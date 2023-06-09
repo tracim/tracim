@@ -1,12 +1,12 @@
 # coding: utf-8
-import copy
-import typing
 from urllib.parse import urljoin
 
+import copy
 from pyramid.response import Response as PyramidResponse
 import requests
 from requests import Response as RequestsResponse
 from requests.auth import AuthBase
+import typing
 
 from tracim_backend.lib.utils.request import TracimRequest
 

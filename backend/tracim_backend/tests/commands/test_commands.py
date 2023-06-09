@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
+from depot.manager import DepotManager
 import os
 from os.path import dirname
-import subprocess
-
-from depot.manager import DepotManager
 import pytest
 from sqlalchemy.orm.exc import NoResultFound
+import subprocess
 import transaction
 
 import tracim_backend
@@ -884,7 +883,10 @@ class TestCommands(object):
             email_notification_type=EmailNotificationType.NONE,
         )
         content_api = content_api_factory.get(
-            show_deleted=True, show_active=True, show_archived=True, current_user=test_user
+            show_deleted=True,
+            show_active=True,
+            show_archived=True,
+            current_user=test_user,
         )
         session.add(test_workspace)
         session.flush()
@@ -1001,7 +1003,10 @@ class TestCommands(object):
         user_workspace_id = user_workspace.workspace_id
         # INFO - G.M - 2019-12-20 - in user workspace
         content_api = content_api_factory.get(
-            show_deleted=True, show_active=True, show_archived=True, current_user=test_user
+            show_deleted=True,
+            show_active=True,
+            show_archived=True,
+            current_user=test_user,
         )
         folder2 = content_api.create(
             label="test-folder2",
@@ -1127,7 +1132,10 @@ class TestCommands(object):
         user_workspace_id = user_workspace.workspace_id
         # INFO - G.M - 2019-12-20 - in user workspace
         content_api = content_api_factory.get(
-            show_deleted=True, show_active=True, show_archived=True, current_user=test_user
+            show_deleted=True,
+            show_active=True,
+            show_archived=True,
+            current_user=test_user,
         )
         folder2 = content_api.create(
             label="test-folder2",
@@ -1257,7 +1265,10 @@ class TestCommands(object):
             email_notification_type=EmailNotificationType.NONE,
         )
         content_api = content_api_factory.get(
-            show_deleted=True, show_active=True, show_archived=True, current_user=test_user
+            show_deleted=True,
+            show_active=True,
+            show_archived=True,
+            current_user=test_user,
         )
         session.add(test_workspace)
         session.flush()
@@ -1375,7 +1386,10 @@ class TestCommands(object):
         session.add(test_workspace)
         session.flush()
         content_api = content_api_factory.get(
-            show_deleted=True, show_active=True, show_archived=True, current_user=test_user
+            show_deleted=True,
+            show_active=True,
+            show_archived=True,
+            current_user=test_user,
         )
         content = content_api.create(
             content_type_slug=content_type_list.File.slug,
@@ -1409,7 +1423,11 @@ class TestCommands(object):
         )
         assert result == 0
 
-    def test_func__delete_user__ok__dry_run(self, session, user_api_factory,) -> None:
+    def test_func__delete_user__ok__dry_run(
+        self,
+        session,
+        user_api_factory,
+    ) -> None:
         """
         Non-regression test for an error that occured with dry-run and user config.
         """

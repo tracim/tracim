@@ -1,8 +1,7 @@
 import argparse
+from pyramid.scripting import AppEnvironment
 import traceback
 import typing
-
-from pyramid.scripting import AppEnvironment
 
 from tracim_backend import UserDoesNotExist
 from tracim_backend.applications.agenda.models import AgendaResourceType
@@ -190,7 +189,8 @@ class DeleteUserCommand(AppContextCommand):
                                 workspace_id, resource_type=AgendaResourceType.calendar
                             )
                             cleanup_lib.delete_workspace_agenda(
-                                workspace_id, resource_type=AgendaResourceType.addressbook
+                                workspace_id,
+                                resource_type=AgendaResourceType.addressbook,
                             )
                         except AgendaNotFoundError:
                             print(
@@ -226,7 +226,10 @@ class DeleteUserCommand(AppContextCommand):
                 print("Finished")
 
     def should_anonymize(
-        self, user: User, owned_workspaces_will_be_deleted: bool, cleanup_lib: CleanupLib
+        self,
+        user: User,
+        owned_workspaces_will_be_deleted: bool,
+        cleanup_lib: CleanupLib,
     ) -> UserNeedAnonymization:
         # INFO - G.M - 2019-12-20 - check user revisions that need to be deleted for consistent database
         # if we do not want to anonymize user but delete him
@@ -268,7 +271,9 @@ class DeleteUserCommand(AppContextCommand):
         deleted_workspace_ids = []
         deleted_user_id = user.user_id
         should_anonymize = self.should_anonymize(
-            user, owned_workspaces_will_be_deleted=delete_owned_workspaces, cleanup_lib=cleanup_lib
+            user,
+            owned_workspaces_will_be_deleted=delete_owned_workspaces,
+            cleanup_lib=cleanup_lib,
         )
         force_delete_all_associated_data = (
             force_delete_all_user_revisions_and_reactions and delete_owned_workspaces

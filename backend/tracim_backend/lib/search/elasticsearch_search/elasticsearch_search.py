@@ -1,6 +1,4 @@
 from datetime import datetime
-import typing
-
 from dateutil.parser import parse
 from elasticsearch import Elasticsearch
 from elasticsearch import NotFoundError
@@ -14,6 +12,7 @@ import pluggy
 from sqlalchemy import inspect
 from sqlalchemy.event import listen
 from sqlalchemy.orm import Session
+import typing
 
 # from tracim_backend.lib.search.models import UserSearchResponse
 from tracim_backend import CFG
@@ -29,12 +28,12 @@ from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.rq import RqQueueName
 from tracim_backend.lib.rq import get_rq_queue2
 from tracim_backend.lib.rq.worker import worker_context
-from tracim_backend.lib.search.elasticsearch_search.es_models import EXACT_FIELD
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestComments
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestContent
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestTodo
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestUser
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestWorkspace
+from tracim_backend.lib.search.elasticsearch_search.es_models import EXACT_FIELD
 from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedContent
 from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedWorkspace
 from tracim_backend.lib.search.elasticsearch_search.es_models import create_indexed_user_class
@@ -177,7 +176,6 @@ class ESSearchApi(SearchApi):
             self.es.indices.refresh(parameters.alias)
 
     def delete_indices(self) -> None:
-
         # TODO - G.M - 2019-05-31 - This code delete all index related to pattern, check if possible
         # to be more specific here.
         for parameters in self._get_indices_parameters():
@@ -211,11 +209,15 @@ class ESSearchApi(SearchApi):
             self.es.indices.create(index=new_index_name)
 
             logger.info(
-                self, 'reindex data from "{}" to "{}"'.format(parameters.alias, new_index_name)
+                self,
+                'reindex data from "{}" to "{}"'.format(parameters.alias, new_index_name),
             )
             # move data from current alias to the new index
             self.es.reindex(
-                body={"source": {"index": parameters.alias}, "dest": {"index": new_index_name}},
+                body={
+                    "source": {"index": parameters.alias},
+                    "dest": {"index": new_index_name},
+                },
                 request_timeout=3600,
             )
             # refresh the index to make the changes visible
@@ -564,7 +566,9 @@ class ESSearchApi(SearchApi):
             doc_type=IndexedContent,
             index=self._get_index_parameters(IndexedContent).alias,
         ).query(
-            "simple_query_string", query=search_parameters.search_string, fields=es_search_fields,
+            "simple_query_string",
+            query=search_parameters.search_string,
+            fields=es_search_fields,
         )
 
         # INFO - G.M - 2019-05-14 - do not show deleted or archived content by default
@@ -617,7 +621,8 @@ class ESSearchApi(SearchApi):
 
         if search_parameters.author__public_names:
             search = search.filter(
-                "terms", author__public_name__exact=search_parameters.author__public_names
+                "terms",
+                author__public_name__exact=search_parameters.author__public_names,
             )
 
         if search_parameters.last_modifier__public_names:
@@ -736,16 +741,22 @@ class ESSearchApi(SearchApi):
             "workspace_ids", "terms", field="workspace_ids", size=DEFAULT_BUCKET_SIZE
         )
         search.aggs.metric(
-            "newest_authored_content_date_from", "min", field="newest_authored_content_date",
+            "newest_authored_content_date_from",
+            "min",
+            field="newest_authored_content_date",
         )
         search.aggs.metric(
-            "newest_authored_content_date_to", "max", field="newest_authored_content_date",
+            "newest_authored_content_date_to",
+            "max",
+            field="newest_authored_content_date",
         )
         response = search.execute()
         known_workspaces = self._get_workspaces_known_to_user()
         facets = {
             "workspaces": self._create_filtered_facets(
-                "workspace_id", response.aggregations.workspace_ids.buckets, known_workspaces
+                "workspace_id",
+                response.aggregations.workspace_ids.buckets,
+                known_workspaces,
             )
         }
         try:
@@ -928,7 +939,10 @@ class ESSearchApi(SearchApi):
 
         p.put_pipeline(
             id=FILE_PIPELINE_ID,
-            body={"description": "Extract attachment information", "processors": processors},
+            body={
+                "description": "Extract attachment information",
+                "processors": processors,
+            },
         )
 
     def _get_workspaces_known_to_user(self) -> typing.List[Workspace]:
@@ -951,7 +965,8 @@ class ESContentIndexer:
             self.index_contents([content], context)
         except IndexingError:
             logger.exception(
-                self, "Exception while indexing created content {}".format(content.content_id)
+                self,
+                "Exception while indexing created content {}".format(content.content_id),
             )
 
     @hookimpl
@@ -966,14 +981,16 @@ class ESContentIndexer:
                 self.index_contents(content.recursive_children, context)
         except Exception:
             logger.exception(
-                self, "Exception while indexing modified content {}".format(content.content_id)
+                self,
+                "Exception while indexing modified content {}".format(content.content_id),
             )
 
     @hookimpl
     def on_workspace_modified(self, workspace: Workspace, context: TracimContext) -> None:
         """Index the contents of the given workspace
 
-        Contents are indexed only if the workspace has changes influencing their index."""
+        Contents are indexed only if the workspace has changes influencing their index.
+        """
         if not self._should_reindex_children(workspace):
             return
         content_api = ContentApi(
@@ -1057,7 +1074,8 @@ class ESContentIndexer:
                 search_api.index_content(content)
             except Exception:
                 logger.exception(
-                    self, "Exception while indexing content {}".format(content.content_id)
+                    self,
+                    "Exception while indexing content {}".format(content.content_id),
                 )
                 indexing_error_count += 1
         return indexing_error_count
@@ -1148,19 +1166,25 @@ class ESUserIndexer:
 
     @hookimpl
     def on_user_role_in_workspace_created(
-        self, role: UserRoleInWorkspace, context: TracimContext,
+        self,
+        role: UserRoleInWorkspace,
+        context: TracimContext,
     ) -> None:
         self.index_user(role.user, context)
 
     @hookimpl
     def on_user_role_in_workspace_modified(
-        self, role: UserRoleInWorkspace, context: TracimContext,
+        self,
+        role: UserRoleInWorkspace,
+        context: TracimContext,
     ) -> None:
         self.index_user(role.user, context)
 
     @hookimpl
     def on_user_role_in_workspace_deleted(
-        self, role: UserRoleInWorkspace, context: TracimContext,
+        self,
+        role: UserRoleInWorkspace,
+        context: TracimContext,
     ) -> None:
         self.index_user(role.user, context)
 

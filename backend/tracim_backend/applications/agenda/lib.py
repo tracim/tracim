@@ -1,15 +1,14 @@
-import contextlib
-from enum import Enum
-import os
-import typing
-from xml.sax.saxutils import escape
-
 import caldav
 from caldav.elements.base import ValuedBaseElement
 from caldav.lib.namespace import ns
 from colour import Color
+import contextlib
+from enum import Enum
+import os
 import requests
 from sqlalchemy.orm import Session
+import typing
+from xml.sax.saxutils import escape
 
 from tracim_backend import ApplicationApi
 from tracim_backend import app_list
@@ -107,7 +106,8 @@ class AgendaApi(object):
 
     def create_collection(self, url, name, description, type: AgendaResourceType):
         logger.debug(
-            self, "create a new agenda collection of type {} at url {}".format(type.value, url)
+            self,
+            "create a new agenda collection of type {} at url {}".format(type.value, url),
         )
         # INFO - G.M - 2019-05-10 - we use str as pick key as it is determinist: same
         # result between run. default method use hash which use random hash for security concern
@@ -119,7 +119,8 @@ class AgendaApi(object):
             )
         elif type == AgendaResourceType.addressbook:
             body = CREATE_ADDRESSBOOK_TEMPLATE.format(
-                addressbook_name=escape(name), addressbook_description=escape(description),
+                addressbook_name=escape(name),
+                addressbook_description=escape(description),
             )
         else:
             raise ()
@@ -134,7 +135,8 @@ class AgendaApi(object):
                 )
             )
         logger.info(
-            self, "new agenda resource of type {} created at url {}".format(type.value, url)
+            self,
+            "new agenda resource of type {} created at url {}".format(type.value, url),
         )
 
     def update_collection_props(self, url, name, description, type: AgendaResourceType):
@@ -297,7 +299,8 @@ class AgendaApi(object):
         raise Exception if agenda cannot be created.
         """
         logger.debug(
-            self, "check for agenda existence of workspace {}".format(workspace.workspace_id)
+            self,
+            "check for agenda existence of workspace {}".format(workspace.workspace_id),
         )
         if not workspace.agenda_enabled:
             raise WorkspaceAgendaDisabledException()
@@ -388,13 +391,18 @@ class AgendaApi(object):
             return None
 
     def _delete_user_symlinks(
-        self, original_user_id: int, dest_user_id: int, resource_type: AgendaResourceType
+        self,
+        original_user_id: int,
+        dest_user_id: int,
+        resource_type: AgendaResourceType,
     ):
         user_resource_dir = self._config.RADICALE__USER_RESOURCE_DIR_PATTERN.format(
             user_id=dest_user_id
         )
         user_resource = self._config.RADICALE__USER_RESOURCE_PATTERN.format(
-            owner_type="user", owner_id=original_user_id, resource_type=resource_type.value,
+            owner_type="user",
+            owner_id=original_user_id,
+            resource_type=resource_type.value,
         )
         user_resource_path = self._config.RADICALE__USER_RESOURCE_PATH_PATTERN.format(
             user_resource_dir=user_resource_dir, user_resource=user_resource
@@ -407,7 +415,10 @@ class AgendaApi(object):
             os.remove(symlink_path)
 
     def _create_user_symlinks(
-        self, original_user_id: int, dest_user_id: int, resource_type: AgendaResourceType
+        self,
+        original_user_id: int,
+        dest_user_id: int,
+        resource_type: AgendaResourceType,
     ):
         resource_type_dir = self.get_resource_type_dir(resource_type)
         user_agenda_path = self._config.RADICALE__USER_AGENDA_PATH_PATTERN.format(
@@ -419,7 +430,9 @@ class AgendaApi(object):
             user_id=dest_user_id
         )
         user_resource = self._config.RADICALE__USER_RESOURCE_PATTERN.format(
-            owner_type="user", owner_id=original_user_id, resource_type=resource_type.value,
+            owner_type="user",
+            owner_id=original_user_id,
+            resource_type=resource_type.value,
         )
         os.makedirs(
             "{local_path}/{user_resource_dir}".format(
@@ -430,7 +443,8 @@ class AgendaApi(object):
         )
 
         user_ressource_path = self._config.RADICALE__USER_RESOURCE_PATH_PATTERN.format(
-            user_resource_dir=user_resource_dir, user_resource=user_resource,
+            user_resource_dir=user_resource_dir,
+            user_resource=user_resource,
         )
         symlink_path = "{local_path}{user_resource_path}".format(
             local_path=self._config.RADICALE__LOCAL_PATH_STORAGE,
@@ -492,7 +506,9 @@ class AgendaApi(object):
             user_id=dest_user_id
         )
         user_resource = self._config.RADICALE__USER_RESOURCE_PATTERN.format(
-            owner_type="space", owner_id=workspace_id, resource_type=resource_type.value,
+            owner_type="space",
+            owner_id=workspace_id,
+            resource_type=resource_type.value,
         )
         user_resource_path = self._config.RADICALE__USER_RESOURCE_PATH_PATTERN.format(
             user_resource_dir=user_resource_dir, user_resource=user_resource
@@ -517,7 +533,9 @@ class AgendaApi(object):
             user_id=dest_user_id
         )
         user_resource = self._config.RADICALE__USER_RESOURCE_PATTERN.format(
-            owner_type="space", owner_id=workspace_id, resource_type=resource_type.value,
+            owner_type="space",
+            owner_id=workspace_id,
+            resource_type=resource_type.value,
         )
         os.makedirs(
             "{local_path}/{user_resource_dir}".format(
@@ -528,7 +546,8 @@ class AgendaApi(object):
         )
 
         user_ressource_path = self._config.RADICALE__USER_RESOURCE_PATH_PATTERN.format(
-            user_resource_dir=user_resource_dir, user_resource=user_resource,
+            user_resource_dir=user_resource_dir,
+            user_resource=user_resource,
         )
         symlink_path = "{local_path}{user_resource_path}".format(
             local_path=self._config.RADICALE__LOCAL_PATH_STORAGE,

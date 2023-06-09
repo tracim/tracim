@@ -1,17 +1,6 @@
 import abc
 import contextlib
 from datetime import datetime
-import typing
-from typing import Any
-from typing import Callable
-from typing import Dict
-from typing import Generator
-from typing import Iterable
-from typing import List
-from typing import Optional
-from typing import Set
-from typing import Union
-
 from sqlakeyset import Page
 from sqlakeyset import get_page
 from sqlalchemy import and_
@@ -24,6 +13,16 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
+import typing
+from typing import Any
+from typing import Callable
+from typing import Dict
+from typing import Generator
+from typing import Iterable
+from typing import List
+from typing import Optional
+from typing import Set
+from typing import Union
 
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.config import CFG
@@ -109,7 +108,10 @@ class EventApi:
         self._config = config
 
     def _filter_event_types(
-        self, query: Query, event_types: Optional[List[EventTypeDatabaseParameters]], exclude: bool
+        self,
+        query: Query,
+        event_types: Optional[List[EventTypeDatabaseParameters]],
+        exclude: bool,
     ) -> Query:
         if event_types:
             event_type_filters = []
@@ -193,7 +195,10 @@ class EventApi:
             )
         elif parent_ids and content_ids:
             query = query.filter(
-                or_(Event.content_id.in_(content_ids), Event.parent_id.in_(parent_ids),)
+                or_(
+                    Event.content_id.in_(content_ids),
+                    Event.parent_id.in_(parent_ids),
+                )
             )
         elif content_ids:
             query = query.filter(Event.content_id.in_(content_ids))
@@ -226,7 +231,10 @@ class EventApi:
                 # PostgreSQL. See https://github.com/sqlalchemy/sqlalchemy/issues/5575
 
                 query = query.filter(
-                    or_(Event.author_id != author_id, Event.author_id == None)
+                    or_(
+                        Event.author_id != author_id,
+                        Event.author_id == None,  # noqa: E711
+                    )  # noqa: E712
                 )  # noqa: E711
 
         if after_event_id:
@@ -374,7 +382,6 @@ class EventApi:
         workspace_ids: Optional[List[int]] = None,
         related_to_content_ids: Optional[List[int]] = None,
     ) -> int:
-
         return self._base_query(
             user_id=user_id,
             include_event_types=include_event_types,
@@ -387,7 +394,9 @@ class EventApi:
         ).count()
 
     def get_unread_messages_summary(
-        self, user_id: int, created_after: datetime,
+        self,
+        user_id: int,
+        created_after: datetime,
     ) -> List[typing.Tuple[int, str]]:
         query = (
             self._session.query(
@@ -456,7 +465,10 @@ class EventApi:
         return event
 
     def create_messages_history_for_user(
-        self, user_id: int, workspace_ids: List[int], max_messages_count: int = -1,
+        self,
+        user_id: int,
+        workspace_ids: List[int],
+        max_messages_count: int = -1,
     ) -> List[Message]:
         """
         Generate up to max_messages_count missing messages to ensure the last max_messages_count event
@@ -500,7 +512,7 @@ class EventApi:
                 except Exception as exc:
                     # NOTE - 2021-02-03 - S.G.
                     # Safeguard easy mistakes due to changing JSON structure of fields
-                    msg = (
+                    msg = (  # noqa: F523
                         "Event {} is malformed " "ignoring it during historic messages creation"
                     ).format(event.event_id, exc)
                     logger.warning(self, msg, exc_info=True)
@@ -734,7 +746,10 @@ class EventBuilder:
         self._create_role_event(OperationType.DELETED, role, context)
 
     def _create_role_event(
-        self, operation: OperationType, role: UserRoleInWorkspace, context: TracimContext
+        self,
+        operation: OperationType,
+        role: UserRoleInWorkspace,
+        context: TracimContext,
     ) -> None:
         current_user = context.safe_current_user()
         workspace_api = WorkspaceApi(
@@ -844,11 +859,16 @@ class EventBuilder:
         self._create_user_call_event(OperationType.DELETED, user_call, context)
 
     def _create_subscription_event(
-        self, operation: OperationType, subscription: WorkspaceSubscription, context: TracimContext
+        self,
+        operation: OperationType,
+        subscription: WorkspaceSubscription,
+        context: TracimContext,
     ) -> None:
         current_user = context.safe_current_user()
         workspace_api = WorkspaceApi(
-            session=context.dbsession, config=self._config, current_user=None,
+            session=context.dbsession,
+            config=self._config,
+            current_user=None,
         )
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(subscription.workspace_id)
@@ -877,7 +897,9 @@ class EventBuilder:
     ) -> None:
         current_user = context.safe_current_user()
         workspace_api = WorkspaceApi(
-            session=context.dbsession, config=self._config, current_user=None,
+            session=context.dbsession,
+            config=self._config,
+            current_user=None,
         )
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(reaction.content.workspace_id)
@@ -909,7 +931,9 @@ class EventBuilder:
         """Create an event for a tag operation (create/update/delete)."""
         current_user = context.safe_current_user()
         workspace_api = WorkspaceApi(
-            session=context.dbsession, config=self._config, current_user=None,
+            session=context.dbsession,
+            config=self._config,
+            current_user=None,
         )
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(tag.workspace_id)
@@ -929,12 +953,17 @@ class EventBuilder:
         )
 
     def _create_content_tag_event(
-        self, operation: OperationType, content_tag: TagOnContent, context: TracimContext
+        self,
+        operation: OperationType,
+        content_tag: TagOnContent,
+        context: TracimContext,
     ) -> None:
         """Create an event for a tag operation on a content (add/remove)."""
         current_user = context.safe_current_user()
         workspace_api = WorkspaceApi(
-            session=context.dbsession, config=self._config, current_user=None,
+            session=context.dbsession,
+            config=self._config,
+            current_user=None,
         )
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(content_tag.content.workspace_id)
@@ -1005,7 +1034,7 @@ def get_event_user_id(session: TracimSession, event: Event) -> typing.Optional[i
             f"get_event_user_id({user_id})",
             lambda: session.query(User.user_id).filter(User.user_id == event.user["user_id"]).all(),
         )[0][0]
-    except (IndexError):
+    except IndexError:
         # no user in event or user does not exist anymore
         user_id = None
     return user_id
@@ -1104,7 +1133,6 @@ def _get_content_event_receiver_ids(event: Event, session: TracimSession, config
 def _get_user_call_event_receiver_ids(
     event: Event, session: TracimSession, config: CFG
 ) -> Set[int]:
-
     return {event.user_call["caller"]["user_id"], event.user_call["callee"]["user_id"]}
 
 
@@ -1112,7 +1140,7 @@ GetReceiverIdsCallable = Callable[[Event, TracimSession, CFG], Iterable[int]]
 
 
 class BaseLiveMessageBuilder(abc.ABC):
-    """"Base class for message building with most implementation."""
+    """ "Base class for message building with most implementation."""
 
     _event_schema = EventSchema()
 
@@ -1178,7 +1206,7 @@ class BaseLiveMessageBuilder(abc.ABC):
 
 
 class AsyncLiveMessageBuilder(BaseLiveMessageBuilder):
-    """"Live message building + sending executed in a RQ job."""
+    """ "Live message building + sending executed in a RQ job."""
 
     def __init__(self, context: TracimContext) -> None:
         super().__init__(context.app_config)
@@ -1201,7 +1229,7 @@ class AsyncLiveMessageBuilder(BaseLiveMessageBuilder):
 
 
 class SyncLiveMessageBuilder(BaseLiveMessageBuilder):
-    """"Live message building + sending executed in tracim web application."""
+    """ "Live message building + sending executed in tracim web application."""
 
     def __init__(self, context: TracimContext) -> None:
         super().__init__(context.app_config)

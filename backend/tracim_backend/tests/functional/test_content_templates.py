@@ -25,7 +25,10 @@ class TestTemplates(object):
         """
         Check obtain workspace contents with defaults filters
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         workspace = workspace_api.create_workspace("test")
@@ -39,7 +42,8 @@ class TestTemplates(object):
         # default
         transaction.commit()
         res = web_testapp.get(
-            "/api/workspaces/1/html-documents/{}".format(test_html_document.content_id), status=200
+            "/api/workspaces/1/html-documents/{}".format(test_html_document.content_id),
+            status=200,
         )
         assert res.json_body["is_template"] is False
         res = web_testapp.get(
@@ -59,7 +63,8 @@ class TestTemplates(object):
         content_api.save(test_html_document)
         transaction.commit()
         res = web_testapp.get(
-            "/api/workspaces/1/html-documents/{}".format(test_html_document.content_id), status=200
+            "/api/workspaces/1/html-documents/{}".format(test_html_document.content_id),
+            status=200,
         )
         assert res.json_body["is_template"] is True
         res = web_testapp.get(
@@ -80,7 +85,8 @@ class TestTemplates(object):
         content_api.save(test_html_document)
         transaction.commit()
         res = web_testapp.get(
-            "/api/workspaces/1/html-documents/{}".format(test_html_document.content_id), status=200
+            "/api/workspaces/1/html-documents/{}".format(test_html_document.content_id),
+            status=200,
         )
         assert res.json_body["is_template"] is False
         res = web_testapp.get(
@@ -106,7 +112,10 @@ class TestTemplates(object):
         """
         Check obtain workspace contents with defaults filters
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         workspace = workspace_api.create_workspace("test")
@@ -120,7 +129,8 @@ class TestTemplates(object):
         # default
         transaction.commit()
         res = web_testapp.get(
-            "/api/workspaces/1/html-documents/{}".format(test_html_document.content_id), status=200
+            "/api/workspaces/1/html-documents/{}".format(test_html_document.content_id),
+            status=200,
         )
         assert res.json_body["is_template"] is False
 
@@ -131,7 +141,8 @@ class TestTemplates(object):
             status=204,
         )
         res = web_testapp.get(
-            "/api/workspaces/1/html-documents/{}".format(test_html_document.content_id), status=200
+            "/api/workspaces/1/html-documents/{}".format(test_html_document.content_id),
+            status=200,
         )
         assert res.json_body["is_template"] is True
 
@@ -142,6 +153,7 @@ class TestTemplates(object):
             status=204,
         )
         res = web_testapp.get(
-            "/api/workspaces/1/html-documents/{}".format(test_html_document.content_id), status=200
+            "/api/workspaces/1/html-documents/{}".format(test_html_document.content_id),
+            status=200,
         )
         assert res.json_body["is_template"] is False

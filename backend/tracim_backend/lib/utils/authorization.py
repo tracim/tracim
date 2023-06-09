@@ -2,10 +2,9 @@
 from abc import ABC
 from abc import abstractmethod
 import functools
+from pyramid.interfaces import IAuthorizationPolicy
 import typing
 from typing import TYPE_CHECKING
-
-from pyramid.interfaces import IAuthorizationPolicy
 from zope.interface import implementer
 
 from tracim_backend.app_models.contents import ContentTypeList
@@ -215,7 +214,9 @@ class ContentTypeCreationChecker(AuthorizationChecker):
     """
 
     def __init__(
-        self, content_type_list: ContentTypeList, content_type_slug: typing.Optional[str] = None,
+        self,
+        content_type_list: ContentTypeList,
+        content_type_slug: typing.Optional[str] = None,
     ):
         """
         :param content_type_slug: force to check a content_type, if not provided,
@@ -244,12 +245,12 @@ class CommentOwnerChecker(AuthorizationChecker):
     """
 
     def check(self, tracim_context: TracimContext) -> bool:
-
         if tracim_context.current_comment.author.user_id == tracim_context.current_user.user_id:
             return True
         raise UserIsNotContentOwner(
             "user {} is not the original owner of the comment {}".format(
-                tracim_context.current_user.user_id, tracim_context.current_comment.content_id,
+                tracim_context.current_user.user_id,
+                tracim_context.current_comment.content_id,
             )
         )
 
@@ -260,12 +261,12 @@ class TodoOwnerChecker(AuthorizationChecker):
     """
 
     def check(self, tracim_context: TracimContext) -> bool:
-
         if tracim_context.current_todo.owner.user_id == tracim_context.current_user.user_id:
             return True
         raise UserIsNotContentOwner(
             "user {} is not owner of todo {}".format(
-                tracim_context.current_user.user_id, tracim_context.current_content.content_id,
+                tracim_context.current_user.user_id,
+                tracim_context.current_content.content_id,
             )
         )
 
@@ -276,12 +277,12 @@ class TodoAssigneeChecker(AuthorizationChecker):
     """
 
     def check(self, tracim_context: TracimContext) -> bool:
-
         if tracim_context.current_todo.assignee_id == tracim_context.current_user.user_id:
             return True
         raise UserIsNotContentOwner(
             "user {} is not assigned to the todo {}".format(
-                tracim_context.current_user.user_id, tracim_context.current_content.content_id,
+                tracim_context.current_user.user_id,
+                tracim_context.current_content.content_id,
             )
         )
 
@@ -292,12 +293,12 @@ class ReactionAuthorChecker(AuthorizationChecker):
     """
 
     def check(self, tracim_context: TracimContext) -> bool:
-
         if tracim_context.current_reaction.author.user_id == tracim_context.current_user.user_id:
             return True
         raise UserIsNotReactionAuthor(
             "user {} is not author of reaction {}".format(
-                tracim_context.current_user.user_id, tracim_context.current_reaction.reaction_id,
+                tracim_context.current_user.user_id,
+                tracim_context.current_reaction.reaction_id,
             )
         )
 
@@ -362,7 +363,9 @@ class OneCommonWorkspaceUserChecker(AuthorizationChecker):
 
     def check(self, tracim_context: TracimContext) -> bool:
         role_api = RoleApi(
-            tracim_context.dbsession, tracim_context.current_user, tracim_context.app_config,
+            tracim_context.dbsession,
+            tracim_context.current_user,
+            tracim_context.app_config,
         )
         if not role_api.get_common_workspace_ids(tracim_context.candidate_user.user_id):
             raise UserDoesNotExist(
@@ -413,13 +416,15 @@ can_delete_workspace = OrAuthorizationChecker(
 )
 # content
 can_move_content = AndAuthorizationChecker(
-    is_content_manager, CandidateWorkspaceRoleChecker(WorkspaceRoles.CONTENT_MANAGER.level),
+    is_content_manager,
+    CandidateWorkspaceRoleChecker(WorkspaceRoles.CONTENT_MANAGER.level),
 )
 can_create_content = ContentTypeCreationChecker(content_type_list)
 # comments
 is_comment_owner = CommentOwnerChecker()
 can_edit_comment = OrAuthorizationChecker(
-    AndAuthorizationChecker(is_contributor, is_comment_owner), is_workspace_manager,
+    AndAuthorizationChecker(is_contributor, is_comment_owner),
+    is_workspace_manager,
 )
 # todos
 is_todo_owner = TodoOwnerChecker()

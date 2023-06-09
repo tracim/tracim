@@ -1,10 +1,9 @@
+import pluggy
 import re
 import time
-import typing
-
-import pluggy
 import tnetstring
 import transaction
+import typing
 import zmq
 
 from tracim_backend.config import CFG
@@ -73,7 +72,10 @@ class UserConnectionStateMonitor:
 
         query.update({User.connection_status: status})
         transaction.commit()
-        logger.debug(self, "Set connection status of user {} to {}".format(user_id or "*", status))
+        logger.debug(
+            self,
+            "Set connection status of user {} to {}".format(user_id or "*", status),
+        )
 
     def add_to_pending_offline_users(self, user_id: int) -> None:
         logger.debug(self, "User {} left".format(user_id))
@@ -84,7 +86,7 @@ class UserConnectionStateMonitor:
             return
 
         current_time = time.monotonic()
-        for (user_id, last_seen_time) in list(self.pending_offline_users.items()):
+        for user_id, last_seen_time in list(self.pending_offline_users.items()):
             if last_seen_time and last_seen_time + online_timeout <= current_time:
                 del self.pending_offline_users[user_id]
                 self.set_user_connection_status(user_id, UserConnectionStatus.OFFLINE)

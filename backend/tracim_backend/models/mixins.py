@@ -1,5 +1,4 @@
 from datetime import datetime
-
 import sqlalchemy
 from sqlalchemy import Boolean
 from sqlalchemy import Column

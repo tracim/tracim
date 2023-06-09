@@ -1,10 +1,9 @@
 from datetime import datetime
 from datetime import timedelta
-import typing
-
 from dateutil.parser import parse
 import pytest
 import transaction
+import typing
 
 from tracim_backend.lib.core.tag import TagLib
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
@@ -141,7 +140,6 @@ class TestElasticSearch(object):
         nb_content_result,
         first_search_result_content_name,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.TRUSTED_USER
@@ -176,7 +174,10 @@ class TestElasticSearch(object):
         )
 
         api.create(
-            content_type_slug="html-document", workspace=workspace, label="test", do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="test",
+            do_save=True,
         )
         transaction.commit()
         elasticsearch.refresh_elasticsearch()
@@ -216,7 +217,6 @@ class TestElasticSearch(object):
         nb_content_result,
         first_search_result_content_name,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.TRUSTED_USER
@@ -244,10 +244,16 @@ class TestElasticSearch(object):
             do_save=True,
         )
         api.create(
-            content_type_slug="html-document", workspace=workspace, label="report", do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="report",
+            do_save=True,
         )
         api.create(
-            content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
+            content_type_slug="thread",
+            workspace=workspace,
+            label="discussion",
+            do_save=True,
         )
         transaction.commit()
         elasticsearch.refresh_elasticsearch()
@@ -316,7 +322,10 @@ class TestElasticSearch(object):
                 "Leslie",
             ),
             (
-                {"search_string": "subpart", "file_extensions": ".document.html,.dummy"},
+                {
+                    "search_string": "subpart",
+                    "file_extensions": ".document.html,.dummy",
+                },
                 "good practices",
                 "this a content body we search a subpart. We hope to find it.",
                 "Secret plans",
@@ -405,7 +414,6 @@ class TestElasticSearch(object):
         author_public_name,
         last_modifier_public_name,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.TRUSTED_USER
@@ -444,14 +452,22 @@ class TestElasticSearch(object):
         with new_revision(session=session, tm=transaction.manager, content=content):
             api = content_api_factory.get(current_user=last_modifier)
             api.update_content(
-                content, new_label=created_content_name, new_raw_content=created_content_body
+                content,
+                new_label=created_content_name,
+                new_raw_content=created_content_body,
             )
             api.save(content)
         api.create(
-            content_type_slug="html-document", workspace=workspace, label="report", do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="report",
+            do_save=True,
         )
         api.create(
-            content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
+            content_type_slug="thread",
+            workspace=workspace,
+            label="discussion",
+            do_save=True,
         )
         transaction.commit()
         elasticsearch.refresh_elasticsearch()
@@ -494,7 +510,10 @@ class TestElasticSearch(object):
     ) -> None:
         elasticsearch.refresh_elasticsearch()
         params = {"search_string": search_string}
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/advanced_search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
@@ -512,7 +531,6 @@ class TestElasticSearch(object):
         elasticsearch,
         session,
     ) -> None:
-
         user_public_name = "Claude"
         user2_public_name = "Leslie"
 
@@ -547,7 +565,10 @@ class TestElasticSearch(object):
         )
         api = content_api_factory.get(current_user=user)
         content = api.create(
-            content_type_slug="html-document", workspace=workspace, label="document", do_save=True,
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="document",
+            do_save=True,
         )
         tag_lib = TagLib(session)
         tag_lib.add_tag_to_content(user=user, content=content, tag_name="World")
@@ -558,18 +579,26 @@ class TestElasticSearch(object):
             api.save(content)
         api = content_api_factory.get(current_user=user)
         content2 = api.create(
-            content_type_slug="html-document", workspace=workspace, label="report", do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="report",
+            do_save=True,
         )
         tag_lib.add_tag_to_content(user=user, content=content2, tag_name="World")
         api.create(
-            content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
+            content_type_slug="thread",
+            workspace=workspace,
+            label="discussion",
+            do_save=True,
         )
         transaction.commit()
         elasticsearch.refresh_elasticsearch()
 
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         res = web_testapp.get(
-            "/api/advanced_search/content", status=200, params={"search_string": "*", "size": 0},
+            "/api/advanced_search/content",
+            status=200,
+            params={"search_string": "*", "size": 0},
         )
         search_result = res.json_body
         assert search_result
@@ -650,7 +679,6 @@ class TestElasticSearch(object):
         first_created_comment_content,
         second_created_comment_content,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.TRUSTED_USER
@@ -678,7 +706,10 @@ class TestElasticSearch(object):
             do_save=True,
         )
         api.create_comment(
-            workspace=workspace, parent=content, content=first_created_comment_content, do_save=True
+            workspace=workspace,
+            parent=content,
+            content=first_created_comment_content,
+            do_save=True,
         )
         api.create_comment(
             workspace=workspace,
@@ -687,10 +718,16 @@ class TestElasticSearch(object):
             do_save=True,
         )
         api.create(
-            content_type_slug="html-document", workspace=workspace, label="report", do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="report",
+            do_save=True,
         )
         api.create(
-            content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
+            content_type_slug="thread",
+            workspace=workspace,
+            label="discussion",
+            do_save=True,
         )
         transaction.commit()
         elasticsearch.refresh_elasticsearch()
@@ -756,7 +793,6 @@ class TestElasticSearch(object):
         first_created_todo_content,
         second_created_todo_content,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.TRUSTED_USER
@@ -784,16 +820,26 @@ class TestElasticSearch(object):
             do_save=True,
         )
         api.create_todo(
-            parent=content, assignee=user, raw_content=first_created_todo_content,
+            parent=content,
+            assignee=user,
+            raw_content=first_created_todo_content,
         )
         api.create_todo(
-            assignee=user, parent=content, raw_content=second_created_todo_content,
+            assignee=user,
+            parent=content,
+            raw_content=second_created_todo_content,
         )
         api.create(
-            content_type_slug="html-document", workspace=workspace, label="report", do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="report",
+            do_save=True,
         )
         api.create(
-            content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
+            content_type_slug="thread",
+            workspace=workspace,
+            label="discussion",
+            do_save=True,
         )
         transaction.commit()
         elasticsearch.refresh_elasticsearch()
@@ -818,7 +864,6 @@ class TestElasticSearch(object):
         web_testapp,
         elasticsearch,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.TRUSTED_USER
@@ -840,7 +885,10 @@ class TestElasticSearch(object):
         )
         api = content_api_factory.get(current_user=user)
         api.create(
-            content_type_slug="html-document", workspace=workspace, label="test", do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="test",
+            do_save=True,
         )
         elasticsearch.refresh_elasticsearch()
 
@@ -863,7 +911,6 @@ class TestElasticSearch(object):
         web_testapp,
         elasticsearch,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.TRUSTED_USER
@@ -932,7 +979,10 @@ class TestElasticSearch(object):
         assert "stringtosearch doc 2" in labels
         assert "stringtosearch doc" in labels
 
-        params = {"search_string": "stringtosearch", "content_types": "html-document,thread"}
+        params = {
+            "search_string": "stringtosearch",
+            "content_types": "html-document,thread",
+        }
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         res = web_testapp.get("/api/advanced_search/content".format(), status=200, params=params)
         search_result = res.json_body
@@ -968,7 +1018,10 @@ class TestElasticSearch(object):
         elasticsearch.refresh_elasticsearch()
         # get all
         params = {"search_string": "stringtosearch", "tags": search_tag}
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/advanced_search/content".format(), status=200, params=params)
         search_result = res.json_body
         assert search_result
@@ -986,7 +1039,6 @@ class TestElasticSearch(object):
         elasticsearch,
         session,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.TRUSTED_USER
@@ -1111,9 +1163,14 @@ class TestElasticSearch(object):
         assert search_result["contents"][0]["label"].startswith("stringtosearch archived")
 
     def test_api___elasticsearch_search_ok__by_description(
-        self, content_search_fixture: Content, web_testapp,
+        self,
+        content_search_fixture: Content,
+        web_testapp,
     ) -> None:
-        web_testapp.authorization = ("Basic", (content_search_fixture.owner.username, "password"))
+        web_testapp.authorization = (
+            "Basic",
+            (content_search_fixture.owner.username, "password"),
+        )
         search_result = web_testapp.get(
             "/api/advanced_search/content".format(),
             status=200,
@@ -1127,7 +1184,9 @@ class TestElasticSearch(object):
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize(
-    "config_section", [{"name": "functional_test_elasticsearch_ingest_search"}], indirect=True
+    "config_section",
+    [{"name": "functional_test_elasticsearch_ingest_search"}],
+    indirect=True,
 )
 class TestElasticSearchSearchWithIngest(object):
     @pytest.mark.xfail(reason="Need elasticsearch ingest plugin enabled")
@@ -1142,7 +1201,6 @@ class TestElasticSearchSearchWithIngest(object):
         session,
         content_type_list,
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.TRUSTED_USER
@@ -1171,7 +1229,10 @@ class TestElasticSearchSearchWithIngest(object):
                 do_save=False,
             )
             api.update_file_data(
-                text_file, "test_file", "text/plain", b"we need to find stringtosearch here !"
+                text_file,
+                "test_file",
+                "text/plain",
+                b"we need to find stringtosearch here !",
             )
             api.save(text_file)
         content_id = text_file.content_id
@@ -1220,7 +1281,9 @@ def user_search_fixture(
 @pytest.mark.parametrize("config_section", [{"name": "test_elasticsearch_search"}], indirect=True)
 class TestElasticSearchUserSearch:
     def test_api__elasticsearch_user_search__ok__check_result(
-        self, web_testapp, user_search_fixture: typing.Tuple[User, User],
+        self,
+        web_testapp,
+        user_search_fixture: typing.Tuple[User, User],
     ) -> None:
         (bob_user, riyad_user) = user_search_fixture
         web_testapp.authorization = ("Basic", (riyad_user.username, "password"))
@@ -1243,7 +1306,10 @@ class TestElasticSearchUserSearch:
         assert facets == {
             "workspaces": [{"count": 1, "value": {"workspace_id": 2, "label": "Bob & Riyad"}}]
         }
-        assert search_result["newest_authored_content_date_range"] == {"from": None, "to": None}
+        assert search_result["newest_authored_content_date_range"] == {
+            "from": None,
+            "to": None,
+        }
         assert search_result["total_hits"] == 1
         assert search_result["is_total_hits_accurate"] is True
 
@@ -1262,13 +1328,21 @@ class TestElasticSearchUserSearch:
             ),
             (
                 ("bob", "password"),
-                {"search_string": "bob", "newest_authored_content_date_to": "2020-12-13T00:00:00Z"},
+                {
+                    "search_string": "bob",
+                    "newest_authored_content_date_to": "2020-12-13T00:00:00Z",
+                },
                 [],
                 0,
             ),
             (("bob", "password"), {"search_string": "riyad"}, [3], 1),
             (("bob", "password"), {"search_string": "bob riyad"}, [2, 3], 2),
-            (("bob", "password"), {"search_string": "bob riyad", "workspace_ids": [1]}, [2], 1),
+            (
+                ("bob", "password"),
+                {"search_string": "bob riyad", "workspace_ids": [1]},
+                [2],
+                1,
+            ),
             (("bob", "password"), {"search_string": "riy"}, [3], 1),
             (
                 ("bob", "password"),
@@ -1287,8 +1361,18 @@ class TestElasticSearchUserSearch:
             (("riyad", "password"), {"search_string": "bob"}, [2], 1),
             (("riyad", "password"), {"search_string": "TheAdmin"}, [], 0),
             (("TheAdmin", "admin@admin.admin"), {"search_string": "bob"}, [2], 1),
-            (("bob", "password"), {"search_string": "bob riyad", "page_nb": 1, "size": 1}, [3], 2),
-            (("bob", "password"), {"search_string": "bob riyad", "page_nb": 2, "size": 1}, [2], 2),
+            (
+                ("bob", "password"),
+                {"search_string": "bob riyad", "page_nb": 1, "size": 1},
+                [3],
+                2,
+            ),
+            (
+                ("bob", "password"),
+                {"search_string": "bob riyad", "page_nb": 2, "size": 1},
+                [2],
+                2,
+            ),
             (("bob", "password"), {"search_string": "bob riyad", "size": 0}, [], 2),
         ],
     )
@@ -1355,7 +1439,9 @@ class TestElasticSearchUserSearch:
 @pytest.mark.parametrize("config_section", [{"name": "test_elasticsearch_search"}], indirect=True)
 class TestElasticSearchWorkspaceSearch:
     def test_api__elasticsearch_workspace_search__ok__check_result(
-        self, web_testapp, workspace_search_fixture: typing.Tuple[User, User],
+        self,
+        web_testapp,
+        workspace_search_fixture: typing.Tuple[User, User],
     ) -> None:
         (_, _, private_workspace) = workspace_search_fixture
         bob = private_workspace.owner
@@ -1411,13 +1497,38 @@ class TestElasticSearchWorkspaceSearch:
             (("bob", "password"), {"search_string": "bob", "member_ids": [3]}, [2], 1),
             (("bob", "password"), {"search_string": "bloody"}, [1], 1),
             (("bob", "password"), {"search_string": "img"}, [], 0),
-            (("bob", "password"), {"search_string": "bloody", "search_fields": ["label"]}, [], 0),
+            (
+                ("bob", "password"),
+                {"search_string": "bloody", "search_fields": ["label"]},
+                [],
+                0,
+            ),
             (("riyad", "password"), {"search_string": "bob"}, [2], 1),
-            (("bob", "password"), {"search_string": "bob", "page_nb": 1, "size": 1}, [1], 2),
-            (("bob", "password"), {"search_string": "bob", "page_nb": 2, "size": 1}, [2], 2),
+            (
+                ("bob", "password"),
+                {"search_string": "bob", "page_nb": 1, "size": 1},
+                [1],
+                2,
+            ),
+            (
+                ("bob", "password"),
+                {"search_string": "bob", "page_nb": 2, "size": 1},
+                [2],
+                2,
+            ),
             (("bob", "password"), {"search_string": "bob", "size": 0}, [], 2),
-            (("bob", "password"), {"search_string": "bob riyad", "owner_ids": [3]}, [], 0),
-            (("bob", "password"), {"search_string": "bob riyad", "owner_ids": [2]}, [2, 1], 2),
+            (
+                ("bob", "password"),
+                {"search_string": "bob riyad", "owner_ids": [3]},
+                [],
+                0,
+            ),
+            (
+                ("bob", "password"),
+                {"search_string": "bob riyad", "owner_ids": [2]},
+                [2, 1],
+                2,
+            ),
         ],
     )
     def test_api__elasticsearch_workspace_search__ok__nominal_cases(
@@ -1434,7 +1545,9 @@ class TestElasticSearchWorkspaceSearch:
         """
         web_testapp.authorization = ("Basic", authorization)
         search_result = web_testapp.get(
-            "/api/advanced_search/workspace".format(), status=200, params=query_parameters
+            "/api/advanced_search/workspace".format(),
+            status=200,
+            params=query_parameters,
         ).json_body
         assert search_result["total_hits"] == total_hits
         assert search_result["is_total_hits_accurate"] is True

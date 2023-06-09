@@ -1,9 +1,8 @@
 from abc import ABC
 from abc import abstractmethod
-import typing
-
 import pluggy
 from sqlalchemy.orm import Session
+import typing
 
 from tracim_backend.config import CFG
 from tracim_backend.lib.core.content import ContentApi
@@ -15,7 +14,9 @@ from tracim_backend.models.data import Content
 
 class IndexedContentsResults(object):
     def __init__(
-        self, content_ids_to_index: typing.List[int], errored_indexed_content_ids: typing.List[int]
+        self,
+        content_ids_to_index: typing.List[int],
+        errored_indexed_content_ids: typing.List[int],
     ) -> None:
         self.content_ids_to_index = content_ids_to_index
         self.errored_indexed_contents_ids = errored_indexed_content_ids

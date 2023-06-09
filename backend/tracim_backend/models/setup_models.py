@@ -1,7 +1,5 @@
 # import or define all models here to ensure they are attached to the
 # Base.metadata prior to any initialization routines
-import typing
-
 from pyramid.config import Configurator
 from sqlalchemy import engine_from_config
 from sqlalchemy.engine import Engine
@@ -10,6 +8,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm import configure_mappers
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
+import typing
 import zope.sqlalchemy
 
 from tracim_backend.applications.share.models import ContentShare  # noqa: F401

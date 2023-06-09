@@ -5,9 +5,8 @@ from email.utils import formatdate
 from email.utils import make_msgid
 from email.utils import parseaddr
 import enum
-import typing
-
 import html2text
+import typing
 
 from tracim_backend.lib.utils.sanitizer import HtmlSanitizer
 
@@ -57,7 +56,12 @@ class EST(object):
 
     @classmethod
     def all(cls):
-        return [cls.CONTENT_LABEL, cls.CONTENT_STATUS_LABEL, cls.WEBSITE_TITLE, cls.WORKSPACE_LABEL]
+        return [
+            cls.CONTENT_LABEL,
+            cls.CONTENT_STATUS_LABEL,
+            cls.WEBSITE_TITLE,
+            cls.WORKSPACE_LABEL,
+        ]
 
 
 class EmailAddress(object):

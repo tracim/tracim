@@ -75,7 +75,6 @@ closed_deprecated_status = ContentStatus(
 
 
 class ContentStatusList(object):
-
     OPEN = open_status
 
     def __init__(self, extend_content_status: typing.List[ContentStatus]):
@@ -89,11 +88,11 @@ class ContentStatusList(object):
         raise ContentStatusNotExist()
 
     def get_all_slugs_values(self) -> typing.List[str]:
-        """ Get all slugs"""
+        """Get all slugs"""
         return [item.slug for item in self._content_status]
 
     def get_all(self) -> typing.List[ContentStatus]:
-        """ Get all status"""
+        """Get all status"""
         return [item for item in self._content_status]
 
     def get_default_status(self) -> ContentStatus:

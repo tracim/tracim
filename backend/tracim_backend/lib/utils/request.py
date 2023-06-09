@@ -3,11 +3,10 @@ from abc import ABC
 from abc import abstractmethod
 import contextlib
 from json import JSONDecodeError
-import typing
-
 import pluggy
 from pyramid.request import Request
 from sqlalchemy.orm import Session
+import typing
 
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
@@ -192,7 +191,9 @@ class TracimContext(ABC):
         will be A but candidate workspace will be B.
         """
         return self._generate_if_none(
-            self._candidate_workspace, self._get_workspace, self._get_candidate_workspace_id
+            self._candidate_workspace,
+            self._get_workspace,
+            self._get_candidate_workspace_id,
         )
 
     @property
@@ -406,7 +407,10 @@ class TracimRequest(TracimContext, Request):
     # INFO - G.M - 2018-12-03 - Internal utils function to simplify ID fetching
 
     def _get_path_id(
-        self, name: str, exception_if_none: Exception, exception_if_invalid_id: Exception
+        self,
+        name: str,
+        exception_if_none: Exception,
+        exception_if_invalid_id: Exception,
     ) -> int:
         """
         Get id from pyramid path or raise one of the Exception
@@ -424,7 +428,10 @@ class TracimRequest(TracimContext, Request):
         return int(id_param_as_str)
 
     def _get_body_id(
-        self, name: str, exception_if_none: Exception, exception_if_invalid_id: Exception
+        self,
+        name: str,
+        exception_if_none: Exception,
+        exception_if_invalid_id: Exception,
     ) -> int:
         """
         Get id from pyramid json_body or raise one of the Exception

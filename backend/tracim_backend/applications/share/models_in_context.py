@@ -1,7 +1,6 @@
 from datetime import datetime
-import typing
-
 from sqlalchemy.orm import Session
+import typing
 
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.applications.share.models import ContentShare
@@ -14,7 +13,11 @@ from tracim_backend.models.context_models import UserInContext
 
 class ContentShareInContext(object):
     def __init__(
-        self, content_share: ContentShare, dbsession: Session, config: CFG, user: User = None
+        self,
+        content_share: ContentShare,
+        dbsession: Session,
+        config: CFG,
+        user: User = None,
     ) -> None:
         self.content_share = content_share
         self.dbsession = dbsession
@@ -94,7 +97,8 @@ class ContentShareInContext(object):
 
         content_api = ContentApi(config=self.config, session=self.dbsession, current_user=None)
         content = content_api.get_one(
-            content_id=self.content_share.content_id, content_type=ContentTypeSlug.ANY.value
+            content_id=self.content_share.content_id,
+            content_type=ContentTypeSlug.ANY.value,
         )
         return content_api.get_content_in_context(content)
 

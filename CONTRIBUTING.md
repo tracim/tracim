@@ -58,4 +58,4 @@ you can then install hooks with:
 
 Then, you will be able to notice the automatic checks when running `git commit`.
 
-Note: the pre-commit hook requires Python 3.6 or later to work.
+Note: the pre-commit hook requires Python 3.7 or later to work.

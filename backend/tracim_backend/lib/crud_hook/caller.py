@@ -26,7 +26,11 @@ class DatabaseCrudHookCaller:
         # values (primary key...) in the objects
         event.listen(session, "after_flush", self._call_hooks)
 
-    def _call_hooks(self, session: TracimSession, flush_context: UOWTransaction,) -> None:
+    def _call_hooks(
+        self,
+        session: TracimSession,
+        flush_context: UOWTransaction,
+    ) -> None:
         assert session.context, "session must have a context"
         assert session.context.dbsession
         roles = []
