@@ -298,7 +298,7 @@ Deleting a space mean deleting of all content in space too.
 
 ```
 $ tracimcli space delete -h
-usage: space delete [-h] [-c CONFIG_FILE] [-d] [--dry-run] -z SPACE_IDS
+usage: space delete [-h] [-c CONFIG_FILE] [-d] [--dry-run] -i SPACE_IDS
                     [SPACE_IDS ...]
 
 delete space from database
@@ -346,7 +346,7 @@ but information given should be enough to solve most of system administrator iss
 
 ```shell
 $ tracimcli content show -h
-usage: content show [-h] [-c CONFIG_FILE] [-d] -z CONTENT_ID
+usage: content show [-h] [-c CONFIG_FILE] [-d] -i CONTENT_ID
 
 show content Tree
 
@@ -398,7 +398,7 @@ UI which only hides data, this command does delete the content from database, so
 
 ```shell
 tracimcli content delete -h
-usage: content delete [-h] [-c CONFIG_FILE] [-d] [--dry-run] -z
+usage: content delete [-h] [-c CONFIG_FILE] [-d] [--dry-run] -i
                       CONTENT_IDS [CONTENT_IDS ...]
 
 delete content from database
@@ -431,7 +431,7 @@ usage: revision delete [-h]
                        [-c CONFIG_FILE]
                        [-d]
                        [--dry-run]
-                       -z
+                       -i
                        REVISION_IDS
                        [REVISION_IDS ...]
 
