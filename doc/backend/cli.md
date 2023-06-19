@@ -310,7 +310,7 @@ optional arguments:
                         development.ini)
   -d, --debug_mode      enable Tracim log for debug
   --dry-run             dry-run mode
-  -z SPACE_IDS [SPACE_IDS ...], --space-id SPACE_IDS [SPACE_IDS ...]
+  -i SPACE_IDS [SPACE_IDS ...], --space-id SPACE_IDS [SPACE_IDS ...]
                         space ids
 ```
 
@@ -356,7 +356,7 @@ optional arguments:
                         configuration file to use (default:
                         development.ini)
   -d, --debug_mode      enable Tracim log for debug
-  -z CONTENT_ID, --content_id CONTENT_ID
+  -i CONTENT_ID, --content_id CONTENT_ID
                         content_id
 ```
 
@@ -410,7 +410,7 @@ optional arguments:
                         development.ini)
   -d, --debug_mode      enable Tracim log for debug
   --dry-run             dry-run mode
-  -z CONTENT_IDS [CONTENT_IDS ...], --content-id CONTENT_IDS [CONTENT_IDS ...] content_ids
+  -i CONTENT_IDS [CONTENT_IDS ...], --content-id CONTENT_IDS [CONTENT_IDS ...] content_ids
 ```
 
 ## Content Revision ##
@@ -450,7 +450,7 @@ optional arguments:
              enable Tracim log
              for debug
   --dry-run  dry-run mode
-  -z REVISION_IDS [REVISION_IDS ...], --content-revision-id REVISION_IDS [REVISION_IDS ...]
+  -i REVISION_IDS [REVISION_IDS ...], --content-revision-id REVISION_IDS [REVISION_IDS ...]
              content revision ids
 ```
 

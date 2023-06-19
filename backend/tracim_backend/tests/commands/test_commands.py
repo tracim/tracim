@@ -47,6 +47,7 @@ class TestCommandsList(object):
 
         # space
         assert output.find("space move") > 0
+        assert output.find("space delete") > 0
         # user
         assert output.find("user create") > 0
         assert output.find("user update") > 0
@@ -1664,7 +1665,7 @@ class TestCommands(object):
                 "delete",
                 "-c",
                 "{}#command_test".format(TEST_CONFIG_FILE_PATH),
-                "-z",
+                "-i",
                 "{}".format(content_id),
             ]
         )
@@ -1688,7 +1689,7 @@ class TestCommands(object):
         content_type_list,
     ) -> None:
         """
-        Test Content deletion : content whith an under content and reaction delete by force
+        Test Content deletion : content whith an under content and reaction, delete by force
         """
         uapi = user_api_factory.get()
         user = uapi.get_one_by_email("admin@admin.admin")
@@ -1742,7 +1743,7 @@ class TestCommands(object):
                 "-c",
                 "{}#command_test".format(TEST_CONFIG_FILE_PATH),
                 "-f",
-                "-z",
+                "-i",
                 "{}".format(content_id),
             ]
         )
@@ -1770,7 +1771,7 @@ class TestCommands(object):
         content_type_list,
     ) -> None:
         """
-        Test Content deletion : nominal case, content whith a single revision
+        Test Content deletion : content whith a single revision not force and delete rejected
         """
         uapi = user_api_factory.get()
         user = uapi.get_one_by_email("admin@admin.admin")
@@ -1806,7 +1807,7 @@ class TestCommands(object):
                 "delete",
                 "-c",
                 "{}#command_test".format(TEST_CONFIG_FILE_PATH),
-                "-z",
+                "-i",
                 "{}".format(content_id),
             ]
         )
@@ -1863,7 +1864,7 @@ class TestCommands(object):
                 "delete",
                 "-c",
                 "{}#command_test".format(TEST_CONFIG_FILE_PATH),
-                "-z",
+                "-i",
                 "{}".format(workspace_id),
             ]
         )
@@ -1879,6 +1880,72 @@ class TestCommands(object):
         )
         assert (
             len(session.query(Workspace).filter(Workspace.workspace_id == workspace_id).all()) == 1
+        )
+
+    def test_func__delete_workspace__ok__input_yes_delete_case(
+        self,
+        session,
+        user_api_factory,
+        hapic,
+        content_api_factory,
+        workspace_api_factory,
+        content_type_list,
+        monkeypatch,
+    ) -> None:
+        """
+        Test Workspace deletion : Workspace whith content and revision didn't force and agree to delete
+        """
+        uapi = user_api_factory.get()
+        user = uapi.get_one_by_email("admin@admin.admin")
+
+        workspace_api = workspace_api_factory.get(current_user=user)
+        test_workspace = workspace_api.create_workspace("test_workspace")
+        session.add(test_workspace)
+        session.flush()
+        content_api = content_api_factory.get(
+            show_deleted=True, show_active=True, show_archived=True, current_user=user
+        )
+        content = content_api.create(
+            content_type_slug=content_type_list.File.slug,
+            workspace=test_workspace,
+            label="Test file",
+            do_save=True,
+            do_notify=False,
+        )
+        workspace_id = test_workspace.workspace_id
+        content_id = content.content_id
+        with new_revision(session=session, tm=transaction.manager, content=content):
+            content = content_api.update_file_data(
+                content, "foo.png", "image/png", create_1000px_png_test_image()
+            )
+        transaction.commit()
+        session.close()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI need reseted context when ran.
+        DepotManager._clear()
+        app = TracimCLI()
+        # NOTE - FS - 2023-06-05: Use monkeypatch to send the input to the second verification
+        monkeypatch.setattr("builtins.input", lambda: "yes")
+        result = app.run(
+            [
+                "space",
+                "delete",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-i",
+                "{}".format(workspace_id),
+            ]
+        )
+        assert result == 0
+        assert len(session.query(Content).filter(Content.content_id == content_id).all()) == 0
+        assert (
+            session.query(ContentRevisionRO)
+            .filter(ContentRevisionRO.content_id == content_id)
+            .all()
+            == []
+        )
+        assert (
+            len(session.query(Workspace).filter(Workspace.workspace_id == workspace_id).all()) == 0
         )
 
     def test_func__delete_workspace__ok__force_delete_case(
@@ -1929,7 +1996,7 @@ class TestCommands(object):
                 "-c",
                 "{}#command_test".format(TEST_CONFIG_FILE_PATH),
                 "-f",
-                "-z",
+                "-i",
                 "{}".format(workspace_id),
             ]
         )
@@ -1955,7 +2022,7 @@ class TestCommands(object):
         content_type_list,
     ) -> None:
         """
-        Test Revision deletion : nominal case, delete one of the 4 revision of a content
+        Test Revision deletion : nominal case, delete last of the 4 revision of a content
         """
         uapi = user_api_factory.get()
         user = uapi.get_one_by_email("admin@admin.admin")
@@ -2004,7 +2071,7 @@ class TestCommands(object):
                 "delete",
                 "-c",
                 "{}#command_test".format(TEST_CONFIG_FILE_PATH),
-                "-z",
+                "-i",
                 "{}".format(revision_id),
             ]
         )

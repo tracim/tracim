@@ -27,22 +27,16 @@ from tracim_backend.models.tracim_session import unprotected_content_revision
 
 
 # INFO - F.S - 2023-05-30 - Enable cascade delete on sqlite database
-def set_sqlite_pragma_on(dbapi_connection, connection_record):
+def enable_sqlite_foreign_keys(dbapi_connection, connection_record):
     cursor = dbapi_connection.cursor()
-    try:
-        cursor.execute("PRAGMA foreign_keys=ON")
-    except Exception:
-        pass
+    cursor.execute("PRAGMA foreign_keys=ON")
     cursor.close()
 
 
 # INFO - F.S - 2023-06-05 - Disable cascade delete on sqlite database
-def set_sqlite_pragma_off(dbapi_connection, connection_record):
+def disable_sqlite_foreign_keys(dbapi_connection, connection_record):
     cursor = dbapi_connection.cursor()
-    try:
-        cursor.execute("PRAGMA foreign_keys=OFF")
-    except Exception:
-        pass
+    cursor.execute("PRAGMA foreign_keys=OFF")
     cursor.close()
 
 
@@ -397,7 +391,7 @@ class DeleteContentRevisionCommand(AppContextCommand):
             action="store_true",
         )
         parser.add_argument(
-            "-z",
+            "-i",
             "--content-revision-id",
             nargs="+",
             help="content revision ids",
@@ -410,7 +404,7 @@ class DeleteContentRevisionCommand(AppContextCommand):
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]
         if self._session.bind.dialect.name == "sqlite":
-            listen(Engine, "connect", set_sqlite_pragma_on)
+            listen(Engine, "connect", enable_sqlite_foreign_keys)
 
         if parsed_args.dry_run_mode:
             print("(!) Running in dry-run mode, no change will be applied.")
@@ -449,7 +443,7 @@ class DeleteContentRevisionCommand(AppContextCommand):
                 print('revision "{}" deleted".'.format(revision.revision_id))
                 print("~~~~~~~~~~")
         if self._session.bind.dialect.name == "sqlite":
-            listen(Engine, "connect", set_sqlite_pragma_off)
+            listen(Engine, "connect", disable_sqlite_foreign_keys)
 
 
 class DeleteContentCommand(AppContextCommand):
@@ -474,7 +468,7 @@ class DeleteContentCommand(AppContextCommand):
             action="store_true",
         )
         parser.add_argument(
-            "-z", "--content-id", nargs="+", help="content ids", dest="content_ids", required=True
+            "-i", "--content-id", nargs="+", help="content ids", dest="content_ids", required=True
         )
         return parser
 
@@ -482,7 +476,7 @@ class DeleteContentCommand(AppContextCommand):
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]
         if self._session.bind.dialect.name == "sqlite":
-            listen(Engine, "connect", set_sqlite_pragma_on)
+            listen(Engine, "connect", enable_sqlite_foreign_keys)
 
         if parsed_args.dry_run_mode:
             print("(!) Running in dry-run mode, no change will be applied.")
@@ -528,7 +522,7 @@ class DeleteContentCommand(AppContextCommand):
                 )
             print("~~~~~~~~~~")
         if self._session.bind.dialect.name == "sqlite":
-            listen(Engine, "connect", set_sqlite_pragma_off)
+            listen(Engine, "connect", disable_sqlite_foreign_keys)
 
 
 class DeleteSpaceCommand(AppContextCommand):
@@ -553,7 +547,7 @@ class DeleteSpaceCommand(AppContextCommand):
             action="store_true",
         )
         parser.add_argument(
-            "-z", "--space-id", nargs="+", help="space ids", dest="space_ids", required=True
+            "-i", "--space-id", nargs="+", help="space ids", dest="space_ids", required=True
         )
         return parser
 
@@ -561,7 +555,7 @@ class DeleteSpaceCommand(AppContextCommand):
         self._session = app_context["request"].dbsession
         self._app_config = app_context["registry"].settings["CFG"]
         if self._session.bind.dialect.name == "sqlite":
-            listen(Engine, "connect", set_sqlite_pragma_on)
+            listen(Engine, "connect", enable_sqlite_foreign_keys)
 
         if parsed_args.dry_run_mode:
             print("(!) Running in dry-run mode, no change will be applied.")
@@ -622,7 +616,7 @@ class DeleteSpaceCommand(AppContextCommand):
                     )
                 print("~~~~~~~~~~")
         if self._session.bind.dialect.name == "sqlite":
-            listen(Engine, "connect", set_sqlite_pragma_off)
+            listen(Engine, "connect", disable_sqlite_foreign_keys)
 
 
 class AnonymizeUserCommand(AppContextCommand):

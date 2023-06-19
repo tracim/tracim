@@ -12,7 +12,7 @@ class ShowContentTreeCommand(AppContextCommand):
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super().get_parser(prog_name)
         parser.add_argument(
-            "-z",
+            "-i",
             "--content_id",
             help="content_id",
             dest="content_id",
