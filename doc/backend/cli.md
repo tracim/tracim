@@ -363,7 +363,7 @@ optional arguments:
 Example usage:
 
 ```shell
-$ content show -z 1
+$ content show -i 1
 
 ~~~~~~~~~~~
 General informations
