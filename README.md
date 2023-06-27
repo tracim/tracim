@@ -62,7 +62,7 @@ We are adding to Tracim interface every translations that once reached 50%.
 
 ## Licence
 
-See [LICENCE.md](./LICENCE.md)
+Tracim is distributed under the terms of 4 distinct licenses. See [LICENSE.md](./LICENSE.md) for details
 
 ## Support
 
