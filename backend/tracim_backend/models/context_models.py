@@ -1013,12 +1013,6 @@ class UserInContext(object):
         return wapi.get_user_used_space(self.user)
 
 
-class UserRoleInWorkspaceStat:
-    def __init__(self, role: WorkspaceRoles, count: int) -> None:
-        self.role = role.slug
-        self.count = count
-
-
 class WorkspaceInContext(object):
     """
     Interface to get Workspace data and Workspace data related to context.

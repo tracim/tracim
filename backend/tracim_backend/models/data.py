@@ -299,7 +299,7 @@ class UserRoleInWorkspace(DeclarativeBase):
     workspace = relationship(
         "Workspace",
         remote_side=[Workspace.workspace_id],
-        backref=backref("roles", lazy="selectin"),
+        backref="roles",
         lazy="joined",
     )
     user = relationship("User", remote_side=[User.user_id], backref="roles")
