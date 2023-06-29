@@ -11,10 +11,6 @@ from typing import List
 from typing import Optional
 from typing import TypeVar
 
-from slugify import slugify
-from sqlakeyset import Page
-from sqlalchemy.orm import Session
-
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.workspace_menu_entries import WorkspaceMenuEntry
@@ -1029,7 +1025,11 @@ class WorkspaceInContext(object):
     """
 
     def __init__(
-        self, workspace: Workspace, dbsession: Session, config: CFG, user: Optional[User] = None,
+        self,
+        workspace: Workspace,
+        dbsession: Session,
+        config: CFG,
+        user: Optional[User] = None,
     ) -> None:
         self.workspace = workspace
         self.dbsession = dbsession
@@ -1170,7 +1170,7 @@ class WorkspaceInContext(object):
         )
 
     @property
-    def members(self) -> List["UserRoleInWorkspaceInContext"]:
+    def members(self) -> List["UserRoleInWorkspaceInContext"]:  # noqa: F821
         return [
             UserRoleWorkspaceInContext(user_role, self.dbsession, self.config)
             for user_role in self.workspace.roles

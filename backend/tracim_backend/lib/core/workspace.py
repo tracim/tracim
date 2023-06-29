@@ -105,7 +105,10 @@ class WorkspaceApi(object):
         Return WorkspaceInContext object from Workspace
         """
         return WorkspaceInContext(
-            workspace=workspace, dbsession=self._session, config=self._config, user=user,
+            workspace=workspace,
+            dbsession=self._session,
+            config=self._config,
+            user=user,
         )
 
     def create_workspace(
