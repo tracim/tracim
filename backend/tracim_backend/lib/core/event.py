@@ -659,7 +659,10 @@ class EventBuilder:
     ) -> None:
         current_user = context.safe_current_user()
         api = WorkspaceApi(
-            current_user=current_user, session=context.dbsession, config=self._config
+            current_user=current_user,
+            session=context.dbsession,
+            config=self._config,
+            show_deleted=True,
         )
         workspace_in_context = api.get_workspace_with_context(workspace)
         fields = {Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data}
@@ -1187,7 +1190,11 @@ class BaseLiveMessageBuilder(abc.ABC):
     def _publish_messages_for_event(self, event_id: int) -> None:
         with self.context() as context:
             session = context.dbsession
-            event = session.query(Event).filter(Event.event_id == event_id).one()
+            try:
+                event = session.query(Event).filter(Event.event_id == event_id).one()
+            except NoResultFound:
+                logger.debug(self, f"Event {event_id} not found. Skipping.")
+                return
             receiver_ids = self.get_receiver_ids(event, session, self._config)
             logger.debug(self, f"Sending eventid: {event_id} to users: {receiver_ids}")
             messages = [

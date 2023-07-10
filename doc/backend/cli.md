@@ -287,6 +287,173 @@ optional arguments:
                         user logins (email or username)
 ```
 
+## Space ##
+
+### Delete Space(s)
+
+Theses commands allow deleting space from the database. Unlike deletion from the Tracim
+UI which only hides data, this command does delete the content from database, so be careful using this.
+
+Deleting a space mean deleting of all content in space too.
+
+```
+$ tracimcli space delete -h
+usage: space delete [-h] [-c CONFIG_FILE] [-d] [--dry-run] -i SPACE_IDS
+                    [SPACE_IDS ...]
+
+delete space from database
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -c CONFIG_FILE, --config CONFIG_FILE
+                        configuration file to use (default:
+                        development.ini)
+  -d, --debug_mode      enable Tracim log for debug
+  --dry-run             dry-run mode
+  -i SPACE_IDS [SPACE_IDS ...], --space-id SPACE_IDS [SPACE_IDS ...]
+                        space ids
+```
+
+### Move Space
+
+Theses commands allows you to move a space, which technically mean change the parent space of the chosen space.
+
+```shell
+$ tracimcli space move -h
+usage: space move [-h] [-c CONFIG_FILE] [-d] -s SPACE_ID
+                  [-p PARENT_SPACE_ID]
+
+Move a space from a parent to another (use 0 to move to root)
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -c CONFIG_FILE, --config CONFIG_FILE
+                        configuration file to use (default:
+                        development.ini)
+  -d, --debug_mode      enable Tracim log for debug
+  -s SPACE_ID, --space-id SPACE_ID
+                        Id of the space id to move
+  -p PARENT_SPACE_ID, --new-parent PARENT_SPACE_ID
+                        Id of the new parent of workspace id to move
+```
+
+## Content ##
+
+### Show content ###
+
+Show some content informations. This show only some metadata for privacy reason
+but information given should be enough to solve most of system administrator issues.
+
+```shell
+$ tracimcli content show -h
+usage: content show [-h] [-c CONFIG_FILE] [-d] -i CONTENT_ID
+
+show content Tree
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -c CONFIG_FILE, --config CONFIG_FILE
+                        configuration file to use (default:
+                        development.ini)
+  -d, --debug_mode      enable Tracim log for debug
+  -i CONTENT_ID, --content_id CONTENT_ID
+                        content_id
+```
+
+Example usage:
+
+```shell
+$ content show -i 1
+
+~~~~~~~~~~~
+General informations
+~~~~~~~~~~~
+content_id:     1
+workspace_id:   1
+namespace:      content
+last_revision_id:       2
+parent_id:      None
+deleted?:        False
+creation date:   2021-11-24 14:16:36.215519
+last update:     2021-11-24 14:16:36.226637
+type:    file
+~~~~~~~~~~~
+Revisions
+~~~~~~~~~~~
+revision_number revision_id     revision_creation_date  revision_type
+(1)     1       2021-11-24 14:16:36.215523      creation
+(2)     2       2021-11-24 14:16:36.226637      revision
+~~~~~~~~~~~
+Direct children content
+~~~~~~~~~~~
+content_id      type    last_revision_id        creation_date    deleted?
+~~~~~~~~~~~
+```
+
+
+### Delete Content ###
+
+Theses commands allow deleting content from the database. Unlike deletion from the Tracim
+UI which only hides data, this command does delete the content from database, so be careful using this.
+
+```shell
+tracimcli content delete -h
+usage: content delete [-h] [-c CONFIG_FILE] [-d] [--dry-run] -i
+                      CONTENT_IDS [CONTENT_IDS ...]
+
+delete content from database
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -c CONFIG_FILE, --config CONFIG_FILE
+                        configuration file to use (default:
+                        development.ini)
+  -d, --debug_mode      enable Tracim log for debug
+  --dry-run             dry-run mode
+  -i CONTENT_IDS [CONTENT_IDS ...], --content-id CONTENT_IDS [CONTENT_IDS ...] content_ids
+```
+
+## Content Revision ##
+
+
+### Delete revision ###
+
+
+Theses commands allow deleting content revision from the database. Unlike deletion from the Tracim
+UI which only hides data, this command does delete the revision from database, so be careful using this.
+
+This command is usable only for old revision, it's not possible to delete current revision of a content without deleting
+the whole content, so you should first create a new revision before trying to delete the last one if needed.
+
+```shell
+$ tracimcli revision delete -h
+usage: revision delete [-h]
+                       [-c CONFIG_FILE]
+                       [-d]
+                       [--dry-run]
+                       -i
+                       REVISION_IDS
+                       [REVISION_IDS ...]
+
+delete content_revision from
+database
+
+optional arguments:
+  -h, --help
+             show this help
+             message and exit
+  -c CONFIG_FILE, --config CONFIG_FILE
+             configuration file
+             to use (default:
+             development.ini)
+  -d, --debug_mode
+             enable Tracim log
+             for debug
+  --dry-run  dry-run mode
+  -i REVISION_IDS [REVISION_IDS ...], --content-revision-id REVISION_IDS [REVISION_IDS ...]
+             content revision ids
+```
+
 ## Caldav
 
 ### Run the Service
@@ -427,3 +594,27 @@ Commands:
 
 Theses 2 commands are related to user custom-properties, see
 [user custom properties doc](user_custom_properties.md).
+
+### Check of smtp configuration
+
+Command: `dev test smtp`
+
+Useful for checking smtp configuration by sending email with same configuraiton
+see [section "Enabling the Mail Notification Feature" in setting.md doc](setting.md) for
+more information.
+
+### Check of live messages
+
+Command: `dev test live-messages`
+
+Useful to check if live messages (TLM) does work.
+see [section Manually testing live messages in live_message_setup.md doc](live_message_setup.md).
+
+### Custom Properties checker/extract-translation source
+
+Commands:
+- `dev custom-properties checker`
+- `dev custom-properties extract-translation-source`
+
+
+Theses 2 commands are related to user custom-properties, see [user custom properties doc](user_custom_properties.md).

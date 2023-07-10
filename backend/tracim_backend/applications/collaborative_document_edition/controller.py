@@ -5,7 +5,6 @@ from pyramid.traversal import DefaultRootFactory
 import transaction
 import typing  # noqa: F401
 
-from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend import ContentNotFound
 from tracim_backend import TracimRequest
 from tracim_backend import hapic
@@ -31,6 +30,7 @@ from tracim_backend.applications.collaborative_document_edition.schema import (
 )
 from tracim_backend.applications.collaborative_document_edition.schema import FileTemplateInfoSchema
 from tracim_backend.applications.content_file.controller import can_create_file
+from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import FileTemplateNotAvailable
