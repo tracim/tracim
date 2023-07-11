@@ -33,7 +33,6 @@ export const serializeRoleListProps = {
   role: 'role',
   workspace_id: 'description',
   user_id: 'downloadEnabled',
-  workspace_id: 'id',
   workspace: 'workspace',
   user: 'user'
 }

@@ -1566,6 +1566,7 @@ class WorkspaceMemberSchema(WorkspaceMemberDigestSchema):
     workspace = marshmallow.fields.Nested(
         WorkspaceWithoutDescriptionSchema(exclude=("number_of_members",))
     )
+    workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
 
     class Meta:
         description = "Workspace Member information"
