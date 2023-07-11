@@ -1163,6 +1163,7 @@ class WorkspaceInContext(object):
             .count()
         )
 
+
 class UserRoleWorkspaceInContext(object):
     """
     Interface to get UserRoleInWorkspace data and related content
