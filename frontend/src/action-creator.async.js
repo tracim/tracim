@@ -63,7 +63,8 @@ import {
   USER_PUBLIC_PROFILE,
   FAVORITE_LIST,
   FAVORITE,
-  UNREAD_NOTIFICATION_COUNT
+  UNREAD_NOTIFICATION_COUNT,
+  ROLE_WORKSPACE_LIST
 } from './action-creator.sync.js'
 import {
   CONTENT_NAMESPACE,
@@ -276,7 +277,22 @@ export const getUserConfiguration = userId => dispatch => {
 
 export const getUserWorkspaceList = (userId, showOwnedWorkspace) => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspaces?show_owned_workspace=${showOwnedWorkspace ? 1 : 0}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/role_workspaces`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: USER_WORKSPACE_LIST,
+    dispatch
+  })
+}
+
+export const getUserRoleWorkspaceList = (userId) => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/role_workspaces`,
     param: {
       credentials: 'include',
       headers: {
@@ -518,7 +534,7 @@ export const putUserWorkspaceEmailNotificationType = (user, workspaceId, emailNo
 
 export const getMyselfWorkspaceList = (showOwnedWorkspace) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces?show_owned_workspace=${showOwnedWorkspace ? 1 : 0}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/me/role_workspaces`,
     param: {
       credentials: 'include',
       headers: {
@@ -526,7 +542,7 @@ export const getMyselfWorkspaceList = (showOwnedWorkspace) => dispatch => {
       },
       method: 'GET'
     },
-    actionName: WORKSPACE_LIST,
+    actionName: ROLE_WORKSPACE_LIST,
     dispatch
   })
 }

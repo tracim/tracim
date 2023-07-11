@@ -26,7 +26,7 @@ import {
 import { serializeWorkspace } from '../../reducer/workspaceList.js'
 import { serializeMember } from '../../reducer/currentWorkspace.js'
 import { newFlashMessage } from '../../action-creator.sync.js'
-import { deleteWorkspaceMember, getUserWorkspaceList } from '../../action-creator.async.js'
+import { deleteWorkspaceMember, getUserRoleWorkspaceList } from '../../action-creator.async.js'
 import AdminUserSpacesConfig from '../../container/AdminUserSpacesConfig.jsx'
 import UserSpacesConfigLine from './UserSpacesConfigLine.jsx'
 
@@ -169,7 +169,7 @@ export const UserSpacesConfig = (props) => {
 
   const getSpaceList = async () => {
     const fetchGetUserWorkspaceList = await props.dispatch(
-      getUserWorkspaceList(props.userToEditId, false)
+      getUserRoleWorkspaceList(props.userToEditId, false)
     )
 
     switch (fetchGetUserWorkspaceList.status) {

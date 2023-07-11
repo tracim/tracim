@@ -95,6 +95,13 @@ export const removeWorkspace = workspace => ({ type: `${REMOVE}/${WORKSPACE_LIST
 
 export const USER_WORKSPACE_LIST = `${USER}/${WORKSPACE_LIST}`
 
+export const ROLE_WORKSPACE_LIST = `${WORKSPACE}/List`
+export const setRoleWorkspaceList = workspaceList => ({ type: `${SET}/${ROLE_WORKSPACE_LIST}`, workspaceList })
+export const addRoleWorkspaceList = workspaceList => ({ type: `${ADD}/${ROLE_WORKSPACE_LIST}`, workspaceList })
+export const removeRoleWorkspace = workspace => ({ type: `${REMOVE}/${ROLE_WORKSPACE_LIST}`, workspace })
+
+export const USER_ROLE_WORKSPACE_LIST = `${USER}/${ROLE_WORKSPACE_LIST}`
+
 // workspace related const below is for currentWorkspace
 export const WORKSPACE_DETAIL = `${WORKSPACE}/Detail`
 export const setWorkspaceDetail = workspaceDetail => ({ type: `${SET}/${WORKSPACE_DETAIL}`, workspaceDetail })
