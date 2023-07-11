@@ -114,6 +114,7 @@ from tracim_backend.views.core_api.schemas import WorkspaceIdSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSubscriptionSchema
 from tracim_backend.views.core_api.schemas import WorkspaceWithUserMemberSchema
+from tracim_backend.views.core_api.schemas import WorkspaceMemberSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_EVENT_ENDPOINTS
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_USER_CONFIG_ENDPOINTS
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_USER_SUBSCRIPTIONS_SECTION
@@ -121,6 +122,7 @@ from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_EN
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ENABLE_AND_DISABLE_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__NOTIFICATION_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__TRASH_AND_RESTORE_SECTION
+from pyinstrument import Profiler
 
 SWAGGER_TAG__USER_ENDPOINTS = "Users"
 
@@ -189,6 +191,26 @@ class UserController(Controller):
         return [
             wapi.get_workspace_with_context(workspace, user=request.candidate_user)
             for workspace in workspaces
+        ]
+    
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_query(UserWorkspaceFilterQuerySchema())
+    @hapic.output_body(WorkspaceMemberSchema(many=True))
+    def user_role_workspace(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Get list of user role in workspace
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        wapi = RoleApi(
+            current_user=request.candidate_user,  # User
+            session=request.dbsession,
+            config=app_config,
+        )
+        return [
+            wapi.get_user_role_workspace_with_context(role)
+            for role in request.candidate_user.roles
         ]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
@@ -1390,6 +1412,14 @@ class UserController(Controller):
             request_method="POST",  # noqa: W605
         )
         configurator.add_view(self.join_workspace, route_name="post_user_workspace")
+        
+        #user role
+        configurator.add_route(
+            "get_user_role_workspace",
+            "/users/{user_id:\d+}/role_workspaces",  # noqa: W605
+            request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(self.user_role_workspace, route_name="get_user_role_workspace")
 
         # user info
         configurator.add_route("user", "/users/{user_id:\d+}", request_method="GET")  # noqa: W605

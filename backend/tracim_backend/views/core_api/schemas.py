@@ -1490,7 +1490,6 @@ class WorkspaceDigestSchema(marshmallow.Schema):
     slug = StrippedString(example="intranet")
     label = StrippedString(example="Intranet")
 
-
 # NOTE - SG - 2021-04-29 - Used to avoid transmitting description in all TLMs
 class WorkspaceWithoutDescriptionSchema(WorkspaceDigestSchema):
     access_type = StrippedString(
@@ -1540,7 +1539,6 @@ class WorkspaceWithoutDescriptionSchema(WorkspaceDigestSchema):
         validate=positive_int_validator,
     )
 
-
 class WorkspaceSchema(WorkspaceWithoutDescriptionSchema):
     description = StrippedString(example="All intranet data.")
 
@@ -1561,11 +1559,10 @@ class WorkspaceMemberDigestSchema(EmailNotificationTypeSchema):
 
 class WorkspaceMemberSchema(WorkspaceMemberDigestSchema):
     user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
-    workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
     is_active = marshmallow.fields.Bool()
     user = marshmallow.fields.Nested(UserDigestSchema())
-    workspace = marshmallow.fields.Nested(WorkspaceDigestSchema(exclude=("sidebar_entries",)))
-
+    workspace = marshmallow.fields.Nested(WorkspaceWithoutDescriptionSchema(exclude=("number_of_members",)))
+    
     class Meta:
         description = "Workspace Member information"
 

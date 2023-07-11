@@ -1163,14 +1163,6 @@ class WorkspaceInContext(object):
             .count()
         )
 
-    @property
-    def members(self) -> List["UserRoleInWorkspaceInContext"]:  # noqa: F821
-        return [
-            UserRoleWorkspaceInContext(user_role, self.dbsession, self.config)
-            for user_role in self.workspace.roles
-        ]
-
-
 class UserRoleWorkspaceInContext(object):
     """
     Interface to get UserRoleInWorkspace data and related content
