@@ -8,7 +8,6 @@ from pyramid.events import NewResponse
 from pyramid.request import Request
 from pyramid.router import Router
 import pyramid_beaker
-from pyramid_multiauth import MultiAuthenticationPolicy
 from sqlalchemy.exc import OperationalError
 import sys
 from transaction._transaction import Status as TransactionStatus
@@ -166,7 +165,6 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
         authorization_policy = AcceptAllAuthorizationPolicy()
         return SecurityPolicyAdaptor(authentication_policy, authorization_policy)
 
-    configurator.include("pyramid_multiauth")
     policies = []
     if app_config.REMOTE_USER_HEADER:
         policies.append(
