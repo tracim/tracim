@@ -29,7 +29,7 @@ CLIENT_TOKEN_HEADER = "X-Tracim-ClientToken"
 
 class TracimAuthenticationPolicy(ABC):
     """
-    Abstract class with some helper for Pyramid TracimAuthentificationPolicy
+    Abstract class with some helper for Pyramid TracimAuthenticationPolicy
     """
 
     def _get_user_api(self, request: Request) -> "UserApi":
@@ -134,7 +134,7 @@ class TracimBasicAuthAuthenticationPolicy(
 
 
 @implementer(IAuthenticationPolicy)
-class CookieSessionAuthentificationPolicy(TracimAuthenticationPolicy, SessionAuthenticationPolicy):
+class CookieSessionAuthenticationPolicy(TracimAuthenticationPolicy, SessionAuthenticationPolicy):
     COOKIE_LAST_SET_TIME = "cookie_last_set_time"
 
     def __init__(self, debug: bool = False):
@@ -198,7 +198,7 @@ class CookieSessionAuthentificationPolicy(TracimAuthenticationPolicy, SessionAut
 
 
 @implementer(IAuthenticationPolicy)
-class RemoteAuthentificationPolicy(TracimAuthenticationPolicy, CallbackAuthenticationPolicy):
+class RemoteAuthenticationPolicy(TracimAuthenticationPolicy, CallbackAuthenticationPolicy):
     def __init__(self, remote_user_login_header: str) -> None:
         self.remote_user_login_header = remote_user_login_header
         self.callback = None
@@ -234,7 +234,7 @@ class RemoteAuthentificationPolicy(TracimAuthenticationPolicy, CallbackAuthentic
 
 
 @implementer(IAuthenticationPolicy)
-class ApiTokenAuthentificationPolicy(TracimAuthenticationPolicy, CallbackAuthenticationPolicy):
+class ApiTokenAuthenticationPolicy(TracimAuthenticationPolicy, CallbackAuthenticationPolicy):
     def __init__(self, api_key_header: str, api_user_login_header: str) -> None:
         self.api_key_header = api_key_header
         self.api_user_login_header = api_user_login_header
@@ -282,7 +282,7 @@ class ApiTokenAuthentificationPolicy(TracimAuthenticationPolicy, CallbackAuthent
 
 
 @implementer(IAuthenticationPolicy)
-class QueryTokenAuthentificationPolicy(TracimAuthenticationPolicy, CallbackAuthenticationPolicy):
+class QueryTokenAuthenticationPolicy(TracimAuthenticationPolicy, CallbackAuthenticationPolicy):
     def __init__(self) -> None:
         self.callback = None
 

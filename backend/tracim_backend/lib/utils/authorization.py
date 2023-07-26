@@ -39,35 +39,35 @@ if TYPE_CHECKING:
 # Pyramid default permission/authorization mechanism
 
 # INFO - G.M - 12-04-2018 - Setiing a Default permission on view is
-#  needed to activate AuthentificationPolicy and
+#  needed to activate AuthenticationPolicy and
 # AuthorizationPolicy on pyramid request
 TRACIM_DEFAULT_PERM = "tracim"
 
 
 @implementer(ISecurityPolicy)
-class TracimSecurityPolicy:
+class SecurityPolicyAdaptor:
     """
-    Adapter to keep existing authentification method compatible with pyramid 2.0
+    Adaptor to keep existing authentication classes compatible with pyramid 2.0.
     source:
     https://docs.pylonsproject.org/projects/pyramid/en/latest/whatsnew-2.0.html#upgrading-from-third-party-policies
     """
 
-    def __init__(self, authentification_policy, authorization_policy):
-        self.authentification_policy = authentification_policy
+    def __init__(self, authentication_policy, authorization_policy):
+        self.authentication_policy = authentication_policy
         self.authorization_policy = authorization_policy
 
     def authenticated_userid(self, request):
-        return self.authentification_policy.authenticated_userid(request)
+        return self.authentication_policy.authenticated_userid(request)
 
     def permits(self, request, context, permission):
-        principals = self.authentification_policy.effective_principals(request)
+        principals = self.authentication_policy.effective_principals(request)
         return self.authorization_policy.permits(context, principals, permission)
 
     def remember(self, request, userid, **kw):
-        return self.authentification_policy.remember(request, userid, **kw)
+        return self.authentication_policy.remember(request, userid, **kw)
 
     def forget(self, request, **kw):
-        return self.authentification_policy.forget(request, **kw)
+        return self.authentication_policy.forget(request, **kw)
 
 
 @implementer(ISecurityPolicy)
@@ -127,9 +127,9 @@ class MultiSecurityPolicy:
 class AcceptAllAuthorizationPolicy(object):
     """
     Empty AuthorizationPolicy : Allow all request. As Pyramid need
-    a Authorization policy when we use AuthentificationPolicy, this
+    a Authorization policy when we use AuthenticationPolicy, this
     class permit use to disable pyramid authorization mechanism with
-    working a AuthentificationPolicy.
+    working a AuthenticationPolicy.
     """
 
     def permits(self, context, principals, permision):
