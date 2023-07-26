@@ -49,6 +49,7 @@ from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
 from tracim_backend.lib.utils.authentification import TRACIM_API_USER_LOGIN_HEADER
 from tracim_backend.lib.utils.authentification import TracimBasicAuthAuthenticationPolicy
 from tracim_backend.lib.utils.authorization import AcceptAllAuthorizationPolicy
+from tracim_backend.lib.utils.authorization import MultiSecurityPolicy
 from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim_backend.lib.utils.authorization import TracimSecurityPolicy
 from tracim_backend.lib.utils.cors import add_cors_support
@@ -157,23 +158,35 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     }
     pyramid_beaker.set_cache_regions_from_settings(cached_region_settings)
 
-    # Add AuthPolicy
+    # NOTE - SGD - 2023-07-26 - Authorization in Tracim is custom-made (see `AuthorizationChecker`)
+    # So use an AcceptAllAuthorizationPolicy() in Pyramid.
+    def adapt_auth_policy(authentification_policy):
+        """Adapter function for old-style authentication policies."""
+        authorization_policy = AcceptAllAuthorizationPolicy()
+        return TracimSecurityPolicy(authentification_policy, authorization_policy)
+
     configurator.include("pyramid_multiauth")
     policies = []
     if app_config.REMOTE_USER_HEADER:
         policies.append(
-            RemoteAuthentificationPolicy(remote_user_login_header=app_config.REMOTE_USER_HEADER)
-        )
-    policies.append(CookieSessionAuthentificationPolicy())
-    policies.append(QueryTokenAuthentificationPolicy())
-    if app_config.API__KEY:
-        policies.append(
-            ApiTokenAuthentificationPolicy(
-                api_key_header=TRACIM_API_KEY_HEADER,
-                api_user_login_header=TRACIM_API_USER_LOGIN_HEADER,
+            adapt_auth_policy(
+                RemoteAuthentificationPolicy(remote_user_login_header=app_config.REMOTE_USER_HEADER)
             )
         )
-    policies.append(TracimBasicAuthAuthenticationPolicy(realm=BASIC_AUTH_WEBUI_REALM))
+    policies.append(adapt_auth_policy(CookieSessionAuthentificationPolicy()))
+    policies.append(adapt_auth_policy(QueryTokenAuthentificationPolicy()))
+    if app_config.API__KEY:
+        policies.append(
+            adapt_auth_policy(
+                ApiTokenAuthentificationPolicy(
+                    api_key_header=TRACIM_API_KEY_HEADER,
+                    api_user_login_header=TRACIM_API_USER_LOGIN_HEADER,
+                )
+            )
+        )
+    policies.append(
+        adapt_auth_policy(TracimBasicAuthAuthenticationPolicy(realm=BASIC_AUTH_WEBUI_REALM))
+    )
     # Hack for ldap
     if AuthType.LDAP in app_config.AUTH_TYPES:
         import ldap3
@@ -202,13 +215,8 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     # Ensure a "Cache-Control: no-store" is setup by default on all responses
     # Avoid a bug with Firefox: https://github.com/tracim/tracim/issues/5334
     configurator.add_subscriber(default_to_cache_control_no_store, NewResponse)
-    # Default authorization : Accept anything.
-    configurator.set_security_policy(
-        TracimSecurityPolicy(
-            authentification_policy=MultiAuthenticationPolicy(policies),
-            authorization_policy=AcceptAllAuthorizationPolicy(),
-        )
-    )
+
+    configurator.set_security_policy(MultiSecurityPolicy(policies))
     # INFO - GM - 11-04-2018 - set default perm
     # setting default perm is needed to force authentification
     # mechanism in all views.
