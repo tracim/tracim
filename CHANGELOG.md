@@ -10,7 +10,6 @@
 ### 🐛 Fixed Issues
 
 - Frontend: [#4591](https://github.com/tracim/tracim/issues/4591)
-
 - Backend: [#6190](https://github.com/tracim/tracim/issues/6190),
   [#6201] (https://github.com/tracim/tracim/issues/6201)
 
