@@ -16,6 +16,7 @@ from tracim_backend.lib.mail_notifier.utils import EmailAddress
 from tracim_backend.lib.mail_notifier.utils import EmailNotificationMessage
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
 from tracim_backend.lib.utils.translation import Translator
+from tracim_backend.models.auth import AuthType
 from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.event import EventTypeDatabaseParameters
 from tracim_backend.models.event import ReadStatus
@@ -103,7 +104,12 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
         user_api = UserApi(current_user=None, session=session, config=config)
 
         for user in user_api.get_all():
-            if not user.email:
+            if (
+                not user.email
+                or not user.is_active
+                or user.is_deleted
+                or user.auth_type == AuthType.UNKNOWN
+            ):
                 continue
 
             mentions = event_api.get_messages_for_user(
