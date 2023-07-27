@@ -1,5 +1,21 @@
 # Changelog
 
+## 4.6.0 / 2023-07-26
+
+### ✨ New Features
+
+- Add command to really delete data in tracimcli
+- Increase size of emojis in TinyMCE
+- Upgrade pre-commit version to flacke8 6.0.0, trailing-whitespace v4.4.0, black 23.3.0, isort v5.10.1 and seed-isort-config v2.2.0
+
+### 🐛 Fixed Issues
+
+- Frontend: [#4591] https://github.com/tracim/tracim/issues/4591
+
+- Backend: [#6201] https://github.com/tracim/tracim/issues/6201 
+
+### 💥 Breaking/Important changes
+
 ## 4.5.1 / 2023-05-25
 
 💥 This release contains breaking changes related to LDAP integration. Please read it carefully.
