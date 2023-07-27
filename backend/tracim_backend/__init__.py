@@ -44,6 +44,7 @@ from tracim_backend.lib.utils.authentication import BASIC_AUTH_WEBUI_REALM
 from tracim_backend.lib.utils.authentication import CookieSessionAuthenticationPolicy
 from tracim_backend.lib.utils.authentication import QueryTokenAuthenticationPolicy
 from tracim_backend.lib.utils.authentication import RemoteAuthenticationPolicy
+from tracim_backend.lib.utils.authentication import SAMLSecurityPolicy
 from tracim_backend.lib.utils.authentication import TRACIM_API_KEY_HEADER
 from tracim_backend.lib.utils.authentication import TRACIM_API_USER_LOGIN_HEADER
 from tracim_backend.lib.utils.authentication import TracimBasicAuthAuthenticationPolicy
