@@ -3,10 +3,16 @@ from abc import abstractmethod
 import datetime
 from pyramid.authentication import BasicAuthAuthenticationPolicy
 from pyramid.authentication import CallbackAuthenticationPolicy
+from pyramid.authentication import SessionAuthenticationHelper
 from pyramid.authentication import SessionAuthenticationPolicy
 from pyramid.authentication import extract_http_basic_credentials
+from pyramid.config import Configurator
+from pyramid.httpexceptions import HTTPFound
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.request import Request
+from pyramid.response import Response
+from pyramid.security import Allowed
+from pyramid.security import Denied
 from pyramid_ldap3 import get_ldap_connector
 import time
 import typing
@@ -25,6 +31,74 @@ TRACIM_API_KEY_HEADER = "Tracim-Api-Key"
 TRACIM_API_USER_LOGIN_HEADER = "Tracim-Api-Login"
 AUTH_TOKEN_QUERY_PARAMETER = "access_token"
 CLIENT_TOKEN_HEADER = "X-Tracim-ClientToken"
+
+
+class SAMLSecurityPolicy:
+    def __init__(self, app_config: CFG, configurator: Configurator) -> None:
+        self.app_config = app_config
+        self._session_helper = SessionAuthenticationHelper()
+        # TODO - SGD - 2023-07-26 - Add views for sso/slo/acs/sls
+        # The routes could also be defined through a controller (see Controller class)
+        # even if it added-value is small.
+        configurator.add_forbidden_view(self._idp_chooser)
+
+        configurator.add_route("acs", "/saml/acs", request_method="POST")
+        configurator.add_view(self._acs, route_name="acs")
+
+    def authenticated_userid(
+        self, request: TracimRequest
+    ) -> typing.Optional[typing.Union[str, int]]:
+        # FIXME - SGD - 2023-07-26 - Return Tracim user id when SAML data is present in the session.
+        # By matching it with SAML ID attribute (in external_id, see https://github.com/tracim/tracim/issues/6209)
+        saml_user_id = request.session.get("saml_user_id")
+        if saml_user_id is None:
+            return None
+        user_api = UserApi(None, request.dbsession, self.app_config)
+        try:
+            user = user_api.get_one_by_login(saml_user_id)
+        except UserDoesNotExist:
+            user = user_api.create_minimal_user(
+                username=saml_user_id, email=f"{saml_user_id}@saml.test", save_now=True
+            )
+        self.remember(request, user.user_id)
+        request.set_user(user)
+        return user.user_id
+
+    def permits(self, request, context, permission):
+        if request.authenticated_userid is None and not request.path.startswith("/saml"):
+            return Denied("Nobody is allowed")
+        return Allowed("Allowed")
+
+    def remember(
+        self, request: TracimRequest, userid: typing.Union[str, int], **kw: typing.Any
+    ) -> typing.Iterable[str]:
+        self._session_helper.remember(request, userid)
+        return []
+
+    def forget(self, request: TracimRequest, **kw: typing.Any) -> typing.Iterable[str]:
+        del request.session["saml_user_id"]
+        self._session_helper.forget(request, **kw)
+        return []
+
+    def _idp_chooser(self, request: TracimRequest) -> Response:
+        # TODO - SGD - 2023-07-26 - This view should render an HTML form
+        # with the list of configured IdPs.
+        # The form should redirect to the chosen IdPs SSO endpoint when submitted.
+        # Maybe some JS will be needed here?
+        return Response(
+            f"""
+          <form action="{self.app_config.WEBSITE__BASE_URL}/saml/acs" method="POST">
+            <input name="saml_user_id" type="hidden" value="saml-user"/>
+            <input name="redirect_url" type="hidden" value="{request.path_url}" />
+            <button>Login</button>
+          </form>"""
+        )
+
+    def _acs(self, request: TracimRequest) -> Response:
+        saml_user_id = request.params.get("saml_user_id")
+        if saml_user_id is not None:
+            request.session["saml_user_id"] = saml_user_id
+        return HTTPFound(request.params["redirect_url"])
 
 
 class TracimAuthenticationPolicy(ABC):
