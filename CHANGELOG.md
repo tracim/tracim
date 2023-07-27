@@ -1,20 +1,18 @@
 # Changelog
 
-## 4.6.0 / 2023-07-26
+## 4.6.0 / 2023-07-28
 
 ### ✨ New Features
 
-- Add command to really delete data in tracimcli
+- Add command to really delete data with tracimcli command
 - Increase size of emojis in TinyMCE
-- Upgrade pre-commit version to flacke8 6.0.0, trailing-whitespace v4.4.0, black 23.3.0, isort v5.10.1 and seed-isort-config v2.2.0
 
 ### 🐛 Fixed Issues
 
-- Frontend: [#4591] https://github.com/tracim/tracim/issues/4591
+- Frontend: [#4591] (https://github.com/tracim/tracim/issues/4591)
 
-- Backend: [#6201] https://github.com/tracim/tracim/issues/6201 
-
-### 💥 Breaking/Important changes
+- Backend: [#6190] (https://github.com/tracim/tracim/issues/6190),
+  [#6201] (https://github.com/tracim/tracim/issues/6201)
 
 ## 4.5.1 / 2023-05-25
 
