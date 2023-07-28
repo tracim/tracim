@@ -3,7 +3,6 @@ from abc import ABC
 import argparse
 from datetime import datetime
 from datetime import timedelta
-
 from mako.template import Template
 from pyramid.scripting import AppEnvironment
 
@@ -35,7 +34,10 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
             ],
         )
         return template.render(
-            _=translator.get_translation, config=config, lang=translator.default_lang, **context
+            _=translator.get_translation,
+            config=config,
+            lang=translator.default_lang,
+            **context,
         )
 
     @staticmethod
@@ -112,7 +114,8 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
                 email_notification_type=EmailNotificationType.SUMMARY,
             )
             notification_summary = event_api.get_unread_messages_summary(
-                user.user_id, created_after=created_after,
+                user.user_id,
+                created_after=created_after,
             )
 
             if len(mentions) == 0 and len(notification_summary) == 0:
@@ -125,7 +128,9 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
                     "notification_summary": notification_summary,
                 }
                 translator = Translator(
-                    app_config=config, default_lang=user.lang, fallback_lang=config.DEFAULT_LANG
+                    app_config=config,
+                    default_lang=user.lang,
+                    fallback_lang=config.DEFAULT_LANG,
                 )
                 body = SendMailSummariesCommand._render_template(config, context, translator)
                 SendMailSummariesCommand._send_mail(

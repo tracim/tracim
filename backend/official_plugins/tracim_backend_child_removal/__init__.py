@@ -28,7 +28,9 @@ class ChildRemovalPlugin:
         for workspace in parent_workspace.recursive_children:
             try:
                 role_api.delete_one(
-                    user_id=user.user_id, workspace_id=workspace.workspace_id, flush=False,
+                    user_id=user.user_id,
+                    workspace_id=workspace.workspace_id,
+                    flush=False,
                 )
             except UserRoleNotFound:
                 pass

@@ -1,11 +1,10 @@
 import re
-import typing
-
 from sqlalchemy import and_
 from sqlalchemy import desc
 from sqlalchemy import or_
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import joinedload
+import typing
 
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
@@ -134,7 +133,12 @@ class SimpleSearchApi(SearchApi):
         filter_group_tags = [Tag.tag_name.ilike("%{}%".format(keyword)) for keyword in keywords]
         tags_subquery = (
             self._session.query(TagOnContent)
-            .filter(and_(or_(*filter_group_tags), TagOnContent.content_id == Content.content_id))
+            .filter(
+                and_(
+                    or_(*filter_group_tags),
+                    TagOnContent.content_id == Content.content_id,
+                )
+            )
             .join(Tag)
             .exists()
         )
@@ -154,7 +158,9 @@ class SimpleSearchApi(SearchApi):
             .options(joinedload("children_revisions"))
             .options(joinedload("parent"))
             .order_by(
-                desc(Content.updated), desc(Content.cached_revision_id), desc(Content.content_id)
+                desc(Content.updated),
+                desc(Content.cached_revision_id),
+                desc(Content.content_id),
             )
         )
 

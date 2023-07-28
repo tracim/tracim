@@ -32,7 +32,7 @@ def upgrade():
 
 
 def downgrade():
-    """ Downgrade is not able to retrieve content with old slug and content
+    """Downgrade is not able to retrieve content with old slug and content
     with new as both are valid before this. Stay with NEW_SLUG is better, so
     don't do anything
     """

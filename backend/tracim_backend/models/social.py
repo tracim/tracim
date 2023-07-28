@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from sqlalchemy import Column
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
@@ -21,6 +20,6 @@ class UserFollower(DeclarativeBase):
     created_date = Column(DateTime, unique=False, nullable=False, default=datetime.utcnow)
 
     def __repr__(self):
-        return "<UserFollower: follower_id=%s, leader_id=%s>".format(
+        return "<UserFollower: follower_id={}, leader_id={}>".format(
             self.follower_id, self.leader_id
         )

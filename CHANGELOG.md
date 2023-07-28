@@ -1,5 +1,41 @@
 # Changelog
 
+## 4.6.0 / 2023-07-28
+
+### ✨ New Features
+
+- Add command to really delete data with tracimcli command
+- Increase size of emojis in TinyMCE
+
+### 🐛 Fixed Issues
+
+- Frontend: [#4591](https://github.com/tracim/tracim/issues/4591)
+- Backend: [#6190](https://github.com/tracim/tracim/issues/6190),
+  [#6201](https://github.com/tracim/tracim/issues/6201)
+
+## 4.5.1 / 2023-05-25
+
+💥 This release contains breaking changes related to LDAP integration. Please read it carefully.
+
+### 💼 Functional Changes
+
+#### 🧑 Username
+
+The character dot "." is now allowed in the username
+
+### 🐛 Fixes
+
+#### 📝 Text Editor
+
+- The syntax coloration feature now properly list all available languages in app note and in public profile
+
+### 💥 Breaking/Important changes
+
+We had to do some breaking changes in this release. You will find a documentation about how to
+upgrade your Tracim instance in the [upgrade documentation](https://github.com/tracim/tracim/issues/6182).
+
+The breaking changes only concern LDAP configuration.
+
 ## 4.5.0 / 2023-04-28
 
 💥 This release contains breaking changes, please read it carefully.

@@ -1,9 +1,6 @@
 from abc import ABC
 from abc import abstractmethod
 import datetime
-import time
-import typing
-
 from pyramid.authentication import BasicAuthAuthenticationPolicy
 from pyramid.authentication import CallbackAuthenticationPolicy
 from pyramid.authentication import SessionAuthenticationPolicy
@@ -11,9 +8,11 @@ from pyramid.authentication import extract_http_basic_credentials
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.request import Request
 from pyramid_ldap3 import get_ldap_connector
+import time
+import typing
 from zope.interface import implementer
 
-from tracim_backend.config import CFG
+from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.user import UserApi
@@ -38,7 +37,10 @@ class TracimAuthenticationPolicy(ABC):
         return UserApi(None, session=request.dbsession, config=app_config)
 
     def _authenticate_user(
-        self, request: Request, login: typing.Optional[str], password: typing.Optional[str],
+        self,
+        request: Request,
+        login: typing.Optional[str],
+        password: typing.Optional[str],
     ) -> typing.Optional[User]:
         """
         Helper to authenticate user in pyramid request
@@ -52,7 +54,11 @@ class TracimAuthenticationPolicy(ABC):
         if AuthType.LDAP in app_config.AUTH_TYPES:
             ldap_connector = get_ldap_connector(request)
         try:
-            user = uapi.authenticate(login=login, password=password, ldap_connector=ldap_connector,)
+            user = uapi.authenticate(
+                login=login,
+                password=password,
+                ldap_connector=ldap_connector,
+            )
             return user
         except AuthenticationFailed:
             return None
@@ -129,7 +135,6 @@ class TracimBasicAuthAuthenticationPolicy(
 
 @implementer(IAuthenticationPolicy)
 class CookieSessionAuthentificationPolicy(TracimAuthenticationPolicy, SessionAuthenticationPolicy):
-
     COOKIE_LAST_SET_TIME = "cookie_last_set_time"
 
     def __init__(self, debug: bool = False):
@@ -181,7 +186,7 @@ class CookieSessionAuthentificationPolicy(TracimAuthenticationPolicy, SessionAut
         return user
 
     def forget(self, request: TracimRequest) -> typing.List[typing.Any]:
-        """ Remove the stored userid from the session."""
+        """Remove the stored userid from the session."""
         if self.helper.userid_key in request.session:
             request.session.delete()
         return []

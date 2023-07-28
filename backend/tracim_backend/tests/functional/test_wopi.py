@@ -1,6 +1,6 @@
-import datetime
 from urllib.parse import quote
 
+import datetime
 from depot.manager import DepotManager
 from freezegun import freeze_time
 import pytest
@@ -51,7 +51,10 @@ class TestWOPI(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
 
         access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
@@ -96,7 +99,10 @@ class TestWOPI(object):
         file_content = b"Test file"
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=file_content
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=file_content,
             )
         access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
         transaction.commit()
@@ -150,14 +156,19 @@ class TestWOPI(object):
             )
             with new_revision(session=session, tm=transaction.manager, content=test_file):
                 content_api.update_file_data(
-                    test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                    test_file,
+                    "Test_file.txt",
+                    new_mimetype="plain/text",
+                    new_content=b"Test file",
                 )
             transaction.commit()
         with freeze_time("2000-01-01 00:00:05"):
             access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
             transaction.commit()
-            url = "/api/collaborative-document-edition/wopi/files/{}/contents?access_token={}".format(
-                test_file.content_id, quote(access_token)
+            url = (
+                "/api/collaborative-document-edition/wopi/files/{}/contents?access_token={}".format(
+                    test_file.content_id, quote(access_token)
+                )
             )
             updated_at = test_file.updated
             new_content = b"content has been modified"
@@ -211,14 +222,19 @@ class TestWOPI(object):
             )
             with new_revision(session=session, tm=transaction.manager, content=test_file):
                 content_api.update_file_data(
-                    test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                    test_file,
+                    "Test_file.txt",
+                    new_mimetype="plain/text",
+                    new_content=b"Test file",
                 )
             transaction.commit()
         with freeze_time("2000-01-01 00:00:05"):
             access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
             transaction.commit()
-            url = "/api/collaborative-document-edition/wopi/files/{}/contents?access_token={}".format(
-                test_file.content_id, quote(access_token)
+            url = (
+                "/api/collaborative-document-edition/wopi/files/{}/contents?access_token={}".format(
+                    test_file.content_id, quote(access_token)
+                )
             )
             updated_at = test_file.updated
             new_content = b"content has been modified"
@@ -276,7 +292,10 @@ class TestWOPI(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
         transaction.commit()

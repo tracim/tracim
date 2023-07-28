@@ -1,12 +1,11 @@
 # coding=utf-8
 from http import HTTPStatus
-import typing
-
 from pyramid.config import Configurator
 import transaction
+import typing
 
 from tracim_backend.app_models.contents import ContentTypeSlug
-from tracim_backend.config import CFG
+from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.extensions import hapic
@@ -138,13 +137,17 @@ class FolderController(Controller):
     def bind(self, configurator: Configurator) -> None:
         # Get folder
         configurator.add_route(
-            "folder", "/workspaces/{workspace_id}/folders/{content_id}", request_method="GET"
+            "folder",
+            "/workspaces/{workspace_id}/folders/{content_id}",
+            request_method="GET",
         )
         configurator.add_view(self.get_folder, route_name="folder")
 
         # update folder
         configurator.add_route(
-            "update_folder", "/workspaces/{workspace_id}/folders/{content_id}", request_method="PUT"
+            "update_folder",
+            "/workspaces/{workspace_id}/folders/{content_id}",
+            request_method="PUT",
         )
         configurator.add_view(self.update_folder, route_name="update_folder")
 

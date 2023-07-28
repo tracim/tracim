@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-import typing
-from unittest import mock
-
 import pytest
 import transaction
+import typing
+from unittest import mock
 
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import CannotUseBothIncludeAndExcludeWorkspaceUsers
@@ -11,7 +10,6 @@ from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import InvalidUsernameFormat
-from tracim_backend.exceptions import MissingLDAPConnector
 from tracim_backend.exceptions import ReservedUsernameError
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import TracimValidationFailed
@@ -30,7 +28,9 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize(
-    "config_section", [{"name": "base_test_default_profile_trusted_user"}], indirect=True
+    "config_section",
+    [{"name": "base_test_default_profile_trusted_user"}],
+    indirect=True,
 )
 class TestUserApiWithCustomDefaultProfileForUser(object):
     def test_unit__create_minimal_user__ok__nominal_case(self, session, app_config):
@@ -70,7 +70,10 @@ class TestUserApiWithCustomDefaultProfileForUser(object):
 class TestUserApiWithNotifications:
     @pytest.mark.parametrize("email", ("bob@bob.local", None))
     def test__unit__create_user__ok__with_or_without_email(
-        self, session, app_config, email: typing.Optional[str],
+        self,
+        session,
+        app_config,
+        email: typing.Optional[str],
     ):
         api = UserApi(current_user=None, session=session, config=app_config)
         with mock.patch(
@@ -207,7 +210,8 @@ class TestUserApi(object):
             api.create_minimal_user(username="boby", email="boby2@boba.fet", save_now=True)
 
     @mock.patch(
-        "tracim_backend.lib.core.user.UserApi.get_reserved_usernames", return_value=tuple(["all"])
+        "tracim_backend.lib.core.user.UserApi.get_reserved_usernames",
+        return_value=tuple(["all"]),
     )
     @pytest.mark.parametrize("username", ["all"])
     def test_unit__create_minimal_user__error__reserved_username(
@@ -267,7 +271,8 @@ class TestUserApi(object):
             api.update(user=u1, username="jean")
 
     @mock.patch(
-        "tracim_backend.lib.core.user.UserApi.get_reserved_usernames", return_value=tuple(["all"])
+        "tracim_backend.lib.core.user.UserApi.get_reserved_usernames",
+        return_value=tuple(["all"]),
     )
     @pytest.mark.parametrize("username", ["all"])
     def test_unit__update_user_username__error__reserved_username(
@@ -518,7 +523,11 @@ class TestUserApi(object):
     def test_unit__get_known_users__admin__by_username(self, session, app_config, admin_user):
         api = UserApi(current_user=admin_user, session=session, config=app_config)
         u1 = api.create_user(
-            name="name", username="FooBarBaz", email="boby@boba.fet", do_notify=False, do_save=True
+            name="name",
+            username="FooBarBaz",
+            email="boby@boba.fet",
+            do_notify=False,
+            do_save=True,
         )
 
         users = api.get_known_users("obar")
@@ -528,7 +537,6 @@ class TestUserApi(object):
     def test_unit__get_known_users__user__no_workspace_empty_known_user(
         self, session, app_config, admin_user
     ):
-
         api = UserApi(current_user=admin_user, session=session, config=app_config)
         u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
         api2 = UserApi(current_user=u1, session=session, config=app_config)
@@ -753,7 +761,9 @@ class TestUserApi(object):
         )
         api2 = UserApi(current_user=u3, session=session, config=app_config)
         users = api2.get_known_users(
-            "name", exclude_workspace_ids=[workspace.workspace_id], exclude_user_ids=[u4.user_id]
+            "name",
+            exclude_workspace_ids=[workspace.workspace_id],
+            exclude_user_ids=[u4.user_id],
         )
         assert len(users) == 1
         assert users[0] == u2
@@ -1020,64 +1030,66 @@ class TestUserApi(object):
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "base_test_ldap"}], indirect=True)
 class TestFakeLDAPUserApi(object):
-    @pytest.mark.ldap
-    def test_unit__authenticate_user___err__no_ldap_connector(self, session, app_config):
-        api = UserApi(current_user=None, session=session, config=app_config)
-        with pytest.raises(MissingLDAPConnector):
-            api.authenticate(login="hubert@planetexpress.com", password="professor")
+    # NOTE - M.L - 2023-05-24 - disabled because not pertinent anymore
+    # (connection w/ email is disabled if email is not mandatory)
+    # @pytest.mark.ldap
+    # def test_unit__authenticate_user___err__no_ldap_connector(self, session, app_config):
+    #    api = UserApi(current_user=None, session=session, config=app_config)
+    #    with pytest.raises(MissingLDAPConnector):
+    #        api.authenticate(login="professor@planetexpress.com", password="professor")
 
-    @pytest.mark.xfail(reason="create account with specific profile ldap feature disabled")
-    @pytest.mark.ldap
-    def test_unit__authenticate_user___ok__new_user_ldap_auth_custom_profile(
-        self, session, app_config
-    ):
-        # TODO - G.M - 2018-12-05 - [ldap_profile]
-        # support for profile attribute disabled
-        # Should be reenabled later probably with a better code
-        class fake_ldap_connector(object):
-            def authenticate(self, email: str, password: str):
-                if not email == "hubert@planetexpress.com" and password == "professor":
-                    return None
-                return [
-                    None,
-                    {
-                        "mail": ["huber@planetepress.com"],
-                        "givenName": ["Hubert"],
-                        "profile": ["trusted-users"],
-                    },
-                ]
+    # @pytest.mark.xfail(reason="create account with specific profile ldap feature disabled")
+    # @pytest.mark.ldap
+    # def test_unit__authenticate_user___ok__new_user_ldap_auth_custom_profile(
+    #    self, session, app_config
+    # ):
+    #    # TODO - G.M - 2018-12-05 - [ldap_profile]
+    #    # support for profile attribute disabled
+    #    # Should be reenabled later probably with a better code
+    #    class fake_ldap_connector(object):
+    #        def authenticate(self, email: str, password: str):
+    #            if not email == "professor@planetexpress.com" and password == "professor":
+    #                return None
+    #            return [
+    #                None,
+    #                {
+    #                    "mail": ["huber@planetepress.com"],
+    #                    "givenName": ["Hubert"],
+    #                    "profile": ["trusted-users"],
+    #                },
+    #            ]
 
-        api = UserApi(current_user=None, session=session, config=app_config)
-        user = api.authenticate(
-            login="hubert@planetexpress.com",
-            password="professor",
-            ldap_connector=fake_ldap_connector(),
-        )
-        assert isinstance(user, User)
-        assert user.email == "hubert@planetexpress.com"
-        assert user.auth_type == AuthType.LDAP
-        assert user.display_name == "Hubert"
-        assert user.profile.slug == "trusted-users"
+    #    api = UserApi(current_user=None, session=session, config=app_config)
+    #    user = api.authenticate(
+    #        login="professor@planetexpress.com",
+    #        password="professor",
+    #        ldap_connector=fake_ldap_connector(),
+    #    )
+    #    assert isinstance(user, User)
+    #    assert user.email == "professor@planetexpress.com"
+    #    assert user.auth_type == AuthType.LDAP
+    #    assert user.display_name == "Hubert"
+    #    assert user.profile.slug == "trusted-users"
 
-    @pytest.mark.ldap
-    def test_unit__authenticate_user___ok__new_user_ldap_auth(self, session, app_config):
-        class fake_ldap_connector(object):
-            def authenticate(self, email: str, password: str):
-                if not email == "hubert@planetexpress.com" and password == "professor":
-                    return None
-                return [None, {"mail": ["huber@planetepress.com"], "givenName": ["Hubert"]}]
+    # @pytest.mark.ldap
+    # def test_unit__authenticate_user___ok__new_user_ldap_auth(self, session, app_config):
+    #     class fake_ldap_connector(object):
+    #         def authenticate(self, email: str, password: str):
+    #             if not email == "professor@planetexpress.com" and password == "professor":
+    #                 return None
+    #             return [None, {"mail": ["huber@planetepress.com"], "givenName": ["Hubert"]}]
 
-        api = UserApi(current_user=None, session=session, config=app_config)
-        user = api.authenticate(
-            login="hubert@planetexpress.com",
-            password="professor",
-            ldap_connector=fake_ldap_connector(),
-        )
-        assert isinstance(user, User)
-        assert user.email == "hubert@planetexpress.com"
-        assert user.auth_type == AuthType.LDAP
-        assert user.display_name == "Hubert"
-        assert user.profile.slug == "users"
+    #     api = UserApi(current_user=None, session=session, config=app_config)
+    #     user = api.authenticate(
+    #         login="professor@planetexpress.com",
+    #         password="professor",
+    #         ldap_connector=fake_ldap_connector(),
+    #     )
+    #     assert isinstance(user, User)
+    #     assert user.email == "professor@planetexpress.com"
+    #     assert user.auth_type == AuthType.LDAP
+    #     assert user.display_name == "Hubert"
+    #     assert user.profile.slug == "users"
 
     @pytest.mark.ldap
     def test__unit__create_user__err__external_auth_ldap_with_password(self, session, app_config):

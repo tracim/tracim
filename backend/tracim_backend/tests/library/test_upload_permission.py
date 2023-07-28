@@ -1,7 +1,6 @@
 import cgi
-from io import BytesIO
-
 from freezegun import freeze_time
+from io import BytesIO
 import pytest
 import transaction
 
@@ -30,11 +29,11 @@ class TestUploadPermissionLib(object):
         with freeze_time("2000-01-01 00:00:05"):
             content = "just text".encode("utf-8")
             headers = {
-                u"content-disposition": u'form-data; name="{}"; filename="{}"'.format(
+                "content-disposition": 'form-data; name="{}"; filename="{}"'.format(
                     "test", "test.txt"
                 ),
-                u"content-length": len(content),
-                u"content-type": "plain/text",
+                "content-length": len(content),
+                "content-type": "plain/text",
             }
             environ = {"REQUEST_METHOD": "POST"}
             fp = BytesIO(content)
@@ -50,11 +49,11 @@ class TestUploadPermissionLib(object):
 
             content = "some text".encode("utf-8")
             headers = {
-                u"content-disposition": u'form-data; name="{}"; filename="{}"'.format(
+                "content-disposition": 'form-data; name="{}"; filename="{}"'.format(
                     "test2", "test2.txt"
                 ),
-                u"content-length": len(content),
-                u"content-type": "plain/text",
+                "content-length": len(content),
+                "content-type": "plain/text",
             }
             environ = {"REQUEST_METHOD": "POST"}
             fp = BytesIO(content)
@@ -109,11 +108,11 @@ class TestUploadPermissionLib(object):
         with freeze_time("2000-01-01 00:00:05"):
             content = "just text".encode("utf-8")
             headers = {
-                u"content-disposition": u'form-data; name="{}"; filename="{}"'.format(
+                "content-disposition": 'form-data; name="{}"; filename="{}"'.format(
                     "test", "test.txt"
                 ),
-                u"content-length": len(content),
-                u"content-type": "plain/text",
+                "content-length": len(content),
+                "content-type": "plain/text",
             }
             environ = {"REQUEST_METHOD": "POST"}
             fp = BytesIO(content)
@@ -129,11 +128,11 @@ class TestUploadPermissionLib(object):
         with freeze_time("1999-12-31 23:59:59"):
             content = "some text".encode("utf-8")
             headers = {
-                u"content-disposition": u'form-data; name="{}"; filename="{}"'.format(
+                "content-disposition": 'form-data; name="{}"; filename="{}"'.format(
                     "test2", "test2.txt"
                 ),
-                u"content-length": len(content),
-                u"content-type": "plain/text",
+                "content-length": len(content),
+                "content-type": "plain/text",
             }
             environ = {"REQUEST_METHOD": "POST"}
             fp = BytesIO(content)

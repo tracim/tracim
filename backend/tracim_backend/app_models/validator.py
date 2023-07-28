@@ -1,11 +1,10 @@
-import re
-import typing
-
 from marshmallow import ValidationError
 from marshmallow.validate import Length
 from marshmallow.validate import OneOf
 from marshmallow.validate import Range
 from marshmallow.validate import Regexp
+import re
+import typing
 
 # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
 # of tracim_backend, Be careful all_content_types_validator is a global_var !
@@ -67,7 +66,6 @@ class TracimValidator(object):
         """
         errors = []
         for field, value in self.values.items():
-
             try:
                 self.validators[field](value)
             except ValidationError as e:

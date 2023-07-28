@@ -20,7 +20,7 @@ class WebdavAppFactory(object):
 
     def _initConfig(self, **settings):
         """Setup configuration dictionary from default,
-         command line and configuration file."""
+        command line and configuration file."""
 
         # Set config defaults
         config = DEFAULT_CONFIG.copy()
@@ -48,7 +48,8 @@ class WebdavAppFactory(object):
 
         config["provider_mapping"] = {
             app_config.WEBDAV__ROOT_PATH: TracimDavProvider(
-                manage_locks=app_config.WEBDAV_MANAGE_LOCK, app_config=app_config,
+                manage_locks=app_config.WEBDAV_MANAGE_LOCK,
+                app_config=app_config,
             )
         }
         config["block_size"] = app_config.WEBDAV__BLOCK_SIZE

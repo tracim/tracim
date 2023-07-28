@@ -26,7 +26,7 @@ class WorkspaceRoles(Enum):
 
     @property
     def label(self):
-        """ Return valid label associated to role"""
+        """Return valid label associated to role"""
         # TODO - G.M - 2018-06-180 - Make this work correctly
         return self.slug
 

@@ -1,7 +1,6 @@
-import typing
-
 import pytest
 import transaction
+import typing
 
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.mention import DescriptionMentionParser
@@ -51,7 +50,10 @@ def create_content(
             user = uapi.get_one_by_email(email="this.is@user")
         except Exception:
             user = uapi.create_minimal_user(
-                email="this.is@user", profile=Profile.ADMIN, save_now=True, username="bar"
+                email="this.is@user",
+                profile=Profile.ADMIN,
+                save_now=True,
+                username="bar",
             )
         if parent_content:
             workspace = parent_content.workspace
@@ -78,7 +80,11 @@ def one_content_with_a_mention(
     base_fixture, user_api_factory, workspace_api_factory, session, app_config
 ) -> Content:
     return create_content(
-        html_with_one_mention_bar, user_api_factory, workspace_api_factory, session, app_config,
+        html_with_one_mention_bar,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
     )
 
 
@@ -87,7 +93,11 @@ def one_content_without_mention(
     base_fixture, user_api_factory, workspace_api_factory, session, app_config
 ) -> Content:
     return create_content(
-        comment_without_mention, user_api_factory, workspace_api_factory, session, app_config,
+        comment_without_mention,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
     )
 
 
@@ -106,10 +116,18 @@ def one_content_with_a_mention_all(
 
 @pytest.fixture
 def one_updated_content_with_one_new_mention(
-    base_fixture, user_api_factory, workspace_api_factory, session, app_config,
+    base_fixture,
+    user_api_factory,
+    workspace_api_factory,
+    session,
+    app_config,
 ) -> Content:
     content = create_content(
-        "<p>Hello, world</p>", user_api_factory, workspace_api_factory, session, app_config,
+        "<p>Hello, world</p>",
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
     )
     with new_revision(session=session, tm=transaction.manager, content=content):
         api = ContentApi(current_user=content.owner, session=session, config=app_config)
@@ -149,7 +167,11 @@ def one_updated_content_with_new_mention_all(
     base_fixture, user_api_factory, workspace_api_factory, session, app_config
 ) -> Content:
     content = create_content(
-        "<p>Hello, world</p>", user_api_factory, workspace_api_factory, session, app_config,
+        "<p>Hello, world</p>",
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
     )
     with new_revision(session=session, tm=transaction.manager, content=content):
         api = ContentApi(current_user=content.owner, session=session, config=app_config)
@@ -220,9 +242,11 @@ class TestMentionBuilder:
         assert "client_token" in mention_event.fields
         assert "content" in mention_event.fields
         assert "workspace" in mention_event.fields
-        assert {"type": MentionType.USER, "recipient": 2, "content_id": 1} == mention_event.fields[
-            "mention"
-        ]
+        assert {
+            "type": MentionType.USER,
+            "recipient": 2,
+            "content_id": 1,
+        } == mention_event.fields["mention"]
 
     def test_unit_on_content_created__ok__comment(
         self, session_factory, app_config, one_comment_with_a_mention: Content
@@ -259,37 +283,54 @@ class TestMentionBuilder:
         assert pending_mention_events_count(context) == 1
 
     def test_unit_on_content_modified__ok__one_new_mention(
-        self, session_factory, app_config, one_updated_content_with_one_new_mention: Content
+        self,
+        session_factory,
+        app_config,
+        one_updated_content_with_one_new_mention: Content,
     ) -> None:
         builder = MentionBuilder()
         context = TracimTestContext(
-            app_config, session_factory, user=one_updated_content_with_one_new_mention.owner
+            app_config,
+            session_factory,
+            user=one_updated_content_with_one_new_mention.owner,
         )
         builder.on_content_modified(one_updated_content_with_one_new_mention, context)
         assert 1 == len(context.pending_events)
         mention_event = context.pending_events[0]
         assert EntityType.MENTION == mention_event.entity_type
         assert OperationType.CREATED == mention_event.operation
-        assert {"type": MentionType.USER, "recipient": 2, "content_id": 1} == mention_event.fields[
-            "mention"
-        ]
+        assert {
+            "type": MentionType.USER,
+            "recipient": 2,
+            "content_id": 1,
+        } == mention_event.fields["mention"]
 
     def test_unit_on_content_modified__ok__no_new_mention(
-        self, session_factory, app_config, one_updated_content_with_no_new_mention: Content
+        self,
+        session_factory,
+        app_config,
+        one_updated_content_with_no_new_mention: Content,
     ) -> None:
         builder = MentionBuilder()
         context = TracimTestContext(
-            app_config, session_factory, user=one_updated_content_with_no_new_mention.owner
+            app_config,
+            session_factory,
+            user=one_updated_content_with_no_new_mention.owner,
         )
         builder.on_content_modified(one_updated_content_with_no_new_mention, context)
         assert pending_mention_events_count(context) == 0
 
     def test_unit_on_content_modified__ok__new_mention_all(
-        self, session_factory, app_config, one_updated_content_with_new_mention_all: Content
+        self,
+        session_factory,
+        app_config,
+        one_updated_content_with_new_mention_all: Content,
     ) -> None:
         builder = MentionBuilder()
         context = TracimTestContext(
-            app_config, session_factory, user=one_updated_content_with_new_mention_all.owner
+            app_config,
+            session_factory,
+            user=one_updated_content_with_new_mention_all.owner,
         )
         builder.on_content_modified(one_updated_content_with_new_mention_all, context)
         assert pending_mention_events_count(context) == 1
@@ -311,7 +352,11 @@ class TestMentionBuilder:
             entity_type=EntityType.MENTION,
             operation=OperationType.CREATED,
             fields={
-                "mention": {"type": mention_type, "recipient": recipient, "content_id": "0"},
+                "mention": {
+                    "type": mention_type,
+                    "recipient": recipient,
+                    "content_id": "0",
+                },
                 "workspace": {"workspace_id": one_content_with_a_mention.workspace.workspace_id},
             },
             workspace_id=one_content_with_a_mention.workspace.workspace_id,

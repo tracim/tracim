@@ -17,3 +17,13 @@
 
 div.tox.tox-tinymce
   border-radius standardBorderRadius
+
+.tox
+  & .tox-collection--grid .tox-collection__group
+    font-size 24px
+// NOTE - FS - 2023-05-23 - 'important' is required as we want to override the default tinymce styles
+  & .tox-dialog__body-nav-item
+    font-size standardFontSize !important
+
+  & .tox-label, & .tox-toolbar-label
+    font-size standardFontSize !important

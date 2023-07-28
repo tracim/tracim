@@ -25,7 +25,10 @@ def upgrade():
     with op.batch_alter_table("events") as batch_op:
         batch_op.add_column(sa.Column("workspace_id", sa.Integer(), nullable=True))
     op.create_index(
-        "ix__events__event_id__workspace_id", "events", ["event_id", "workspace_id"], unique=False
+        "ix__events__event_id__workspace_id",
+        "events",
+        ["event_id", "workspace_id"],
+        unique=False,
     )
     connection = op.get_bind()
     connection.execute(

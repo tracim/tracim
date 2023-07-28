@@ -23,4 +23,8 @@ class TestConfigApi:
         uapiconfig.set_params({"param1": 1, "param2": "two"})
         assert uapiconfig.get_all_params() == {"param1": 1, "param2": "two"}
         uapiconfig.set_params({"param2": 2, "param3": "hello"})
-        assert uapiconfig.get_all_params() == {"param1": 1, "param2": 2, "param3": "hello"}
+        assert uapiconfig.get_all_params() == {
+            "param1": 1,
+            "param2": 2,
+            "param3": "hello",
+        }

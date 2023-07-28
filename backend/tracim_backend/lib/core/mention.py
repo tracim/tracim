@@ -1,9 +1,8 @@
 import abc
-import typing
-
 from bs4 import BeautifulSoup
 from bs4 import Tag
 from pluggy import PluginManager
+import typing
 
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.config import CFG
@@ -111,7 +110,7 @@ class DescriptionMentionParser(BaseMentionParser):
                 mentions.append(Mention(MentionType.ROLE, int(role_id), content_id))
                 continue
             raise InvalidMention(
-                f"The current mention is empty: no userid and no roleid specified."
+                f"The current mention is empty: no userid and no roleid specified."  # noqa: F541
             )
         return mentions
 
@@ -178,7 +177,8 @@ class MentionBuilder:
             parser = self._parsers[content.type]
         except KeyError:
             logger.info(
-                self, "No mention parser for '{}' content type, doing nothing".format(content.type),
+                self,
+                "No mention parser for '{}' content type, doing nothing".format(content.type),
             )
             return
 
@@ -193,7 +193,8 @@ class MentionBuilder:
             parser = self._parsers[content.type]
         except KeyError:
             logger.info(
-                self, "No mention parser for '{}' content type, doing nothing".format(content.type),
+                self,
+                "No mention parser for '{}' content type, doing nothing".format(content.type),
             )
             return
 
@@ -227,7 +228,10 @@ class MentionBuilder:
 
     @classmethod
     def _create_mention_events(
-        cls, mentions: typing.Iterable[Mention], content: Content, context: TracimContext
+        cls,
+        mentions: typing.Iterable[Mention],
+        content: Content,
+        context: TracimContext,
     ) -> None:
         role_api = RoleApi(session=context.dbsession, config=context.app_config, current_user=None)
         space_members_ids = role_api.get_workspace_member_ids(content.workspace_id)
@@ -247,7 +251,9 @@ class MentionBuilder:
         current_user = context.safe_current_user()
         content_api = ContentApi(context.dbsession, current_user, context.app_config)
         content_in_context = content_api.get_content_in_context(content)
-        workspace_api = WorkspaceApi(context.dbsession, current_user, context.app_config)
+        workspace_api = WorkspaceApi(
+            context.dbsession, current_user, context.app_config, show_deleted=True
+        )
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(content_in_context.workspace.workspace_id)
         )

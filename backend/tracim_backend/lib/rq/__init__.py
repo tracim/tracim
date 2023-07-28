@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import enum
-
 import redis
 import rq
 

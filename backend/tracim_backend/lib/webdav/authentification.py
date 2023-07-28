@@ -1,8 +1,7 @@
 # coding: utf8
-import typing
-
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session  # noqa: F401
 import transaction
+import typing
 
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AuthenticationFailed
@@ -55,7 +54,11 @@ class TracimDomainController(object):
             return False
 
     def authDomainUser(
-        self, realmname: str, username: str, password: str, environ: typing.Dict[str, typing.Any]
+        self,
+        realmname: str,
+        username: str,
+        password: str,
+        environ: typing.Dict[str, typing.Any],
     ) -> bool:
         """
         If you ever feel the need to send a request al-mano with a curl, this is the function that'll be called by

@@ -15,6 +15,12 @@ arabic_stemmer = analysis.token_filter("arabic_stemmer", type="stemmer", languag
 tracim_arabic_analyzer = analyzer(
     "tracim_arabic",
     tokenizer="standard",
-    filter=["lowercase", "decimal_digit", arabic_stop, "arabic_normalization", arabic_stemmer],
+    filter=[
+        "lowercase",
+        "decimal_digit",
+        arabic_stop,
+        "arabic_normalization",
+        arabic_stemmer,
+    ],
     char_filter=underscore_as_minus,
 )

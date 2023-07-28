@@ -1,8 +1,7 @@
 from contextlib import contextmanager
+from sqlalchemy.orm import Session
 import typing
 import weakref
-
-from sqlalchemy.orm import Session
 
 if typing.TYPE_CHECKING:
     from tracim_backend.lib.utils.request import TracimContext

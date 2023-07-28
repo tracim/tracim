@@ -1,11 +1,11 @@
-import datetime
-from pathlib import PurePath
-import typing
 from urllib.parse import quote
 from urllib.parse import urljoin
 
+import datetime
 from importlib_metadata import metadata
+from pathlib import PurePath
 from sqlalchemy.orm import Session
+import typing
 
 from tracim_backend.apps import COLLABORATIVE_DOCUMENT_EDITION__APP_SLUG
 from tracim_backend.config import CFG
@@ -26,7 +26,9 @@ from tracim_backend.models.database_version import MigrateVersion
 
 class SystemApi(object):
     def __init__(
-        self, config: CFG, session: Session,
+        self,
+        config: CFG,
+        session: Session,
     ):
         self._config = config
         self._session = session

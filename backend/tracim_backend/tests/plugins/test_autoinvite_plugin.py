@@ -12,13 +12,21 @@ class TestAutoInvitePlugin(object):
         "workspace_access_type,workspace_default_role, users_role",
         [
             (WorkspaceAccessType.OPEN, WorkspaceRoles.READER, WorkspaceRoles.READER),
-            (WorkspaceAccessType.OPEN, WorkspaceRoles.CONTRIBUTOR, WorkspaceRoles.CONTRIBUTOR),
+            (
+                WorkspaceAccessType.OPEN,
+                WorkspaceRoles.CONTRIBUTOR,
+                WorkspaceRoles.CONTRIBUTOR,
+            ),
             (
                 WorkspaceAccessType.OPEN,
                 WorkspaceRoles.WORKSPACE_MANAGER,
                 WorkspaceRoles.WORKSPACE_MANAGER,
             ),
-            (WorkspaceAccessType.ON_REQUEST, WorkspaceRoles.READER, WorkspaceRoles.NOT_APPLICABLE),
+            (
+                WorkspaceAccessType.ON_REQUEST,
+                WorkspaceRoles.READER,
+                WorkspaceRoles.NOT_APPLICABLE,
+            ),
             (
                 WorkspaceAccessType.CONFIDENTIAL,
                 WorkspaceRoles.CONTENT_MANAGER,
@@ -50,10 +58,16 @@ class TestAutoInvitePlugin(object):
             )
             uapi = user_api_factory.get()
             user_1 = uapi.create_user(
-                email="u.1@u.u", auth_type=AuthType.INTERNAL, do_save=True, do_notify=False
+                email="u.1@u.u",
+                auth_type=AuthType.INTERNAL,
+                do_save=True,
+                do_notify=False,
             )
             user_2 = uapi.create_user(
-                email="u.2@u.u", auth_type=AuthType.INTERNAL, do_save=True, do_notify=False
+                email="u.2@u.u",
+                auth_type=AuthType.INTERNAL,
+                do_save=True,
+                do_notify=False,
             )
             uapi = user_api_factory.get()
             assert workspace.get_user_role(admin_user) == WorkspaceRoles.WORKSPACE_MANAGER.level
@@ -64,13 +78,21 @@ class TestAutoInvitePlugin(object):
         "workspace_access_type,workspace_default_role, users_role",
         [
             (WorkspaceAccessType.OPEN, WorkspaceRoles.READER, WorkspaceRoles.READER),
-            (WorkspaceAccessType.OPEN, WorkspaceRoles.CONTRIBUTOR, WorkspaceRoles.CONTRIBUTOR),
+            (
+                WorkspaceAccessType.OPEN,
+                WorkspaceRoles.CONTRIBUTOR,
+                WorkspaceRoles.CONTRIBUTOR,
+            ),
             (
                 WorkspaceAccessType.OPEN,
                 WorkspaceRoles.WORKSPACE_MANAGER,
                 WorkspaceRoles.WORKSPACE_MANAGER,
             ),
-            (WorkspaceAccessType.ON_REQUEST, WorkspaceRoles.READER, WorkspaceRoles.NOT_APPLICABLE),
+            (
+                WorkspaceAccessType.ON_REQUEST,
+                WorkspaceRoles.READER,
+                WorkspaceRoles.NOT_APPLICABLE,
+            ),
             (
                 WorkspaceAccessType.CONFIDENTIAL,
                 WorkspaceRoles.CONTENT_MANAGER,
@@ -96,10 +118,16 @@ class TestAutoInvitePlugin(object):
         with load_auto_invite_plugin:
             uapi = user_api_factory.get()
             user_1 = uapi.create_user(
-                email="u.1@u.u", auth_type=AuthType.INTERNAL, do_save=True, do_notify=False
+                email="u.1@u.u",
+                auth_type=AuthType.INTERNAL,
+                do_save=True,
+                do_notify=False,
             )
             user_2 = uapi.create_user(
-                email="u.2@u.u", auth_type=AuthType.INTERNAL, do_save=True, do_notify=False
+                email="u.2@u.u",
+                auth_type=AuthType.INTERNAL,
+                do_save=True,
+                do_notify=False,
             )
             wapi = workspace_api_factory.get()
             workspace = wapi.create_workspace(

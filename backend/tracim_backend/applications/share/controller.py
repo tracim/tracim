@@ -1,13 +1,12 @@
-from http import HTTPStatus
-import typing
-
 from hapic.data import HapicFile
+from http import HTTPStatus
 from pyramid.config import Configurator
+import typing
 
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.applications.share.authorization import has_public_download_enabled
 from tracim_backend.applications.share.lib import ShareLib
-from tracim_backend.applications.share.models import ContentShare
+from tracim_backend.applications.share.models import ContentShare  # noqa: F401
 from tracim_backend.applications.share.models_in_context import ContentShareInContext
 from tracim_backend.applications.share.schema import ContentShareInfoSchema
 from tracim_backend.applications.share.schema import ContentShareSchema
@@ -18,7 +17,7 @@ from tracim_backend.applications.share.schema import SharePasswordBodySchema
 from tracim_backend.applications.share.schema import SharePasswordFormSchema
 from tracim_backend.applications.share.schema import ShareTokenPathSchema
 from tracim_backend.applications.share.schema import ShareTokenWithFilenamePathSchema
-from tracim_backend.config import CFG
+from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
 from tracim_backend.exceptions import ContentShareNotFound
 from tracim_backend.exceptions import ContentTypeNotAllowed
@@ -69,7 +68,9 @@ class ShareController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ShareLib(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
         shares_content = api.share_content(
             request.current_content,
@@ -117,7 +118,9 @@ class ShareController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ShareLib(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
         api.disable_content_share(request.current_content, hapic_data.path.share_id)
         return
@@ -280,7 +283,9 @@ class ShareController(Controller):
 
         # public download api
         configurator.add_route(
-            "guest_download_info", "/public/guest-download/{share_token}", request_method="GET"
+            "guest_download_info",
+            "/public/guest-download/{share_token}",
+            request_method="GET",
         )
         configurator.add_view(self.guest_download_info, route_name="guest_download_info")
 

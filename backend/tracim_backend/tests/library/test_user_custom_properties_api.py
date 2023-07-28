@@ -27,4 +27,7 @@ class TestUserCustomPropertiesApi:
         custom_properties_api.set_params({"param1": 1, "param2": "two"})
         assert custom_properties_api.get_all_params() == {"param1": 1, "param2": "two"}
         custom_properties_api.set_params({"param2": 2, "param3": "hello"})
-        assert custom_properties_api.get_all_params() == {"param2": 2, "param3": "hello"}
+        assert custom_properties_api.get_all_params() == {
+            "param2": 2,
+            "param3": "hello",
+        }

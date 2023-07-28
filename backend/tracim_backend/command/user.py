@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 from abc import ABC
 import argparse
-import typing
-
 from marshmallow import ValidationError
 from marshmallow.validate import Validator
 from pyramid.scripting import AppEnvironment
+import typing
 
 from tracim_backend.app_models.validator import user_email_validator
 from tracim_backend.app_models.validator import user_lang_validator
@@ -38,7 +37,6 @@ class ValidatorType:
 
 class UserCommand(AppContextCommand, ABC):
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
-
         parser = super().get_parser(prog_name)
         parser.add_argument(
             "-e",

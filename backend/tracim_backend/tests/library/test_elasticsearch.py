@@ -1,11 +1,10 @@
+import elasticsearch_dsl as es_dsl
+import pytest
+import transaction
 import typing
 from unittest.mock import MagicMock
 from unittest.mock import PropertyMock
 from unittest.mock import patch
-
-import elasticsearch_dsl as es_dsl
-import pytest
-import transaction
 
 from tracim_backend.lib.rq import RqQueueName
 from tracim_backend.lib.rq import get_rq_queue2
@@ -171,7 +170,8 @@ class TestElasticSearchContentIndexer:
         "config_section", [{"name": "test_elasticsearch_search"}], indirect=True
     )
     @pytest.mark.parametrize(
-        "workspace, indexed_count", [(Workspace(label="A workspace"), 1), (Workspace(), 0)]
+        "workspace, indexed_count",
+        [(Workspace(label="A workspace"), 1), (Workspace(), 0)],
     )
     def test_unit__on_workspace_modified__ok__nominal_cases(
         self,
@@ -409,7 +409,10 @@ class TestUtils:
                 es_dsl.Object(properties={"foo": SimpleText()}),
             ),
             (
-                {"type": "object", "properties": {"foo": {"type": "string", "format": "html"}}},
+                {
+                    "type": "object",
+                    "properties": {"foo": {"type": "string", "format": "html"}},
+                },
                 es_dsl.Object(properties={"foo": HtmlText()}),
             ),
             (

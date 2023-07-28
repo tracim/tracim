@@ -19,7 +19,10 @@ def upgrade():
     # and it's very complicated to drop/delete index in a working way to be sure getting the correct index name here.
     if dialect.name != "mysql":
         op.create_index(
-            "idx__content__cached_revision_id", "content", ["cached_revision_id"], unique=False
+            "idx__content__cached_revision_id",
+            "content",
+            ["cached_revision_id"],
+            unique=False,
         )
     # ### end Alembic commands ###
 

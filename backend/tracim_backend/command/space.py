@@ -1,5 +1,4 @@
 import argparse
-
 from pyramid.scripting import AppEnvironment
 
 from tracim_backend.command import AppContextCommand
@@ -60,7 +59,12 @@ class MoveSpaceCommand(AppContextCommand):
                 exit(1)
 
         if parsed_args.parent_space_id == 0:
-            print("Space {}({}) moved to root.".format(parsed_args.space_id, workspace.label,))
+            print(
+                "Space {}({}) moved to root.".format(
+                    parsed_args.space_id,
+                    workspace.label,
+                )
+            )
         else:
             print(
                 "Space {}({}) moved to {}({}).".format(

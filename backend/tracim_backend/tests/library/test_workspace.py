@@ -38,7 +38,6 @@ class TestThread(object):
     def test__unit__get_notifiable_roles__ok__nominal_case(
         self, admin_user, session, app_config, user_api_factory, role_api_factory
     ):
-
         wapi = WorkspaceApi(session=session, config=app_config, current_user=admin_user)
         workspace = wapi.create_workspace(label="workspace w", save_now=True)
         uapi = user_api_factory.get()
@@ -71,7 +70,6 @@ class TestThread(object):
     def test__unit__get_notifiable_roles__ok__do_not_show_inactive(
         self, admin_user, session, app_config, user_api_factory, role_api_factory
     ):
-
         wapi = WorkspaceApi(session=session, config=app_config, current_user=admin_user)
         workspace = wapi.create_workspace(label="workspace w", save_now=True)
         uapi = user_api_factory.get()
@@ -111,7 +109,6 @@ class TestThread(object):
     def test__unit__get_notifiable_roles__ok__do_not_show_deleted(
         self, admin_user, session, app_config, user_api_factory, role_api_factory
     ):
-
         wapi = WorkspaceApi(session=session, config=app_config, current_user=admin_user)
         workspace = wapi.create_workspace(label="workspace w", save_now=True)
         uapi = user_api_factory.get()
@@ -187,7 +184,6 @@ class TestThread(object):
     def test__unit__get_notifiable_roles__ok__do_not_show_unknown_auth(
         self, admin_user, session, app_config, user_api_factory, role_api_factory
     ):
-
         wapi = WorkspaceApi(session=session, config=app_config, current_user=admin_user)
         workspace = wapi.create_workspace(label="workspace w", save_now=True)
         uapi = user_api_factory.get()
@@ -232,7 +228,6 @@ class TestThread(object):
     def test_unit__get_all_manageable(
         self, admin_user, session, app_config, user_api_factory, role_api_factory
     ):
-
         uapi = user_api_factory.get()
         # Checks a case without workspaces.
         wapi = WorkspaceApi(session=session, current_user=admin_user, config=app_config)
@@ -287,7 +282,6 @@ class TestThread(object):
     def test__unit__workspace_deletion__ok__nominal_case(
         self, session, admin_user, app_config
     ) -> None:
-
         wapi = WorkspaceApi(session=session, current_user=admin_user, config=app_config)
         business_workspace = wapi.create_workspace(label="business")
         assert business_workspace.label == "business"
@@ -299,7 +293,6 @@ class TestThread(object):
     def test_unit__create_workspace_same__ok__same_workspace_name_allowed(
         self, admin_user, session, app_config
     ):
-
         wapi = WorkspaceApi(session=session, current_user=admin_user, config=app_config)
         wapi.create_workspace(label="business", save_now=True)
         wapi.create_workspace(label="business", save_now=True)
@@ -307,7 +300,6 @@ class TestThread(object):
     def test_unit__rename_workspace_same_workspace_same_name__ok__nominal_case(
         self, admin_user, session, app_config
     ):
-
         wapi = WorkspaceApi(session=session, current_user=admin_user, config=app_config)
         workspace1 = wapi.create_workspace(label="business", save_now=True)
         modified_datetime = workspace1.updated
@@ -317,7 +309,6 @@ class TestThread(object):
     def test_unit__rename_workspace_same_name_other_workspace__ok__same_workspace_name_allowed(
         self, session, admin_user, app_config
     ):
-
         wapi = WorkspaceApi(session=session, current_user=admin_user, config=app_config)
         wapi.create_workspace(label="business", save_now=True)
         workspace2 = wapi.create_workspace(label="meeting", save_now=True)

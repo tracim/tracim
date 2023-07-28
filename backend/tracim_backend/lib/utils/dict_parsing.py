@@ -1,8 +1,7 @@
-import re
-import typing
-
 from marshmallow import ValidationError
 from marshmallow.validate import Regexp
+import re
+import typing
 
 
 def validate_simple_dict(dict_: typing.Dict) -> None:
@@ -46,7 +45,9 @@ def convert_if_string(value: typing.Any, translation_method) -> typing.Any:
 
 
 def translate_dict(
-    data: dict, keys_to_check: typing.List[str], translation_method: typing.Callable[[str], str]
+    data: dict,
+    keys_to_check: typing.List[str],
+    translation_method: typing.Callable[[str], str],
 ) -> dict:
     """
     Regenerate similar dict but
@@ -63,7 +64,9 @@ def translate_dict(
         new_value = value
         if isinstance(value, dict):
             new_value = translate_dict(
-                data=value, keys_to_check=keys_to_check, translation_method=translation_method,
+                data=value,
+                keys_to_check=keys_to_check,
+                translation_method=translation_method,
             )
         elif isinstance(value, list):
             if key in keys_to_check:

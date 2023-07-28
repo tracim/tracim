@@ -1,9 +1,8 @@
 from datetime import datetime
-import typing
-
 from dateutil.parser import parse
 from elasticsearch_dsl import Search
 from elasticsearch_dsl.response import Response
+import typing
 
 from tracim_backend.lib.search.models import ContentSearchResponse
 from tracim_backend.lib.search.models import DateRange
@@ -86,7 +85,8 @@ class ESContentSearchResponse(ContentSearchResponse):
             try:
                 comments = [
                     SearchedDigestComment(
-                        content_id=comment["content_id"], parent_id=comment.get("parent_id")
+                        content_id=comment["content_id"],
+                        parent_id=comment.get("parent_id"),
                     )
                     for comment in source["comments"]
                 ]
@@ -105,7 +105,8 @@ class ESContentSearchResponse(ContentSearchResponse):
 
             dict_workspace = source["workspace"]
             workspace = SearchedDigestWorkspace(
-                workspace_id=dict_workspace["workspace_id"], label=dict_workspace["label"]
+                workspace_id=dict_workspace["workspace_id"],
+                label=dict_workspace["label"],
             )
             dict_last_modifier = source["last_modifier"]
             last_modifier = SearchedDigestUser(**dict_last_modifier)
@@ -206,7 +207,12 @@ class UserSearchResponse:
 
 class SearchedWorkspace:
     def __init__(
-        self, workspace_id: int, label: str, access_type: str, member_count: int, content_count: int
+        self,
+        workspace_id: int,
+        label: str,
+        access_type: str,
+        member_count: int,
+        content_count: int,
     ) -> None:
         self.workspace_id = workspace_id
         self.label = label
@@ -217,7 +223,9 @@ class SearchedWorkspace:
 
 class WorkspaceSearchResponse:
     def __init__(
-        self, hits: typing.Dict[str, typing.Any], facets: typing.Dict[str, typing.List[FacetCount]],
+        self,
+        hits: typing.Dict[str, typing.Any],
+        facets: typing.Dict[str, typing.List[FacetCount]],
     ) -> None:
         self.workspaces = [
             SearchedWorkspace(

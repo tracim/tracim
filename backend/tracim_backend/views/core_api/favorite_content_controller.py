@@ -1,6 +1,5 @@
 # coding=utf-8
 from http import HTTPStatus
-
 from pyramid.config import Configurator
 
 from tracim_backend.exceptions import FavoriteContentNotFound
@@ -45,7 +44,8 @@ class FavoriteContentController(Controller):
             show_archived=True,
         )
         favorite = api.get_one_user_favorite_content(
-            user_id=request.candidate_user.user_id, content_id=hapic_data.path.content_id
+            user_id=request.candidate_user.user_id,
+            content_id=hapic_data.path.content_id,
         )
         return api.get_one_user_favorite_content_in_context(favorite)
 
@@ -67,7 +67,8 @@ class FavoriteContentController(Controller):
             show_archived=True,
         )
         return api.get_user_favorite_contents(
-            user_id=request.candidate_user.user_id, order_by_properties=[FavoriteContent.created],
+            user_id=request.candidate_user.user_id,
+            order_by_properties=[FavoriteContent.created],
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_FAVORITE_ENDPOINTS])
@@ -114,7 +115,9 @@ class FavoriteContentController(Controller):
     def bind(self, configurator: Configurator):
         # Get Favorites content
         configurator.add_route(
-            "user_favorite_contents", "/users/{user_id}/favorite-contents", request_method="GET",
+            "user_favorite_contents",
+            "/users/{user_id}/favorite-contents",
+            request_method="GET",
         )
         configurator.add_view(self.user_favorite_contents, route_name="user_favorite_contents")
 
@@ -132,7 +135,8 @@ class FavoriteContentController(Controller):
             request_method="POST",
         )
         configurator.add_view(
-            self.add_content_in_user_favorites, route_name="add_content_in_user_favorites"
+            self.add_content_in_user_favorites,
+            route_name="add_content_in_user_favorites",
         )
 
         # remove content from favorites
@@ -142,5 +146,6 @@ class FavoriteContentController(Controller):
             request_method="DELETE",
         )
         configurator.add_view(
-            self.remove_content_from_user_favorites, route_name="remove_content_from_user_favorites"
+            self.remove_content_from_user_favorites,
+            route_name="remove_content_from_user_favorites",
         )

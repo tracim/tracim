@@ -1,26 +1,21 @@
 # -*- coding: utf-8 -*-
+from babel.dates import format_timedelta
+from bs4 import BeautifulSoup
 from collections import namedtuple
 from datetime import datetime
 from datetime import timedelta
-import enum
-import os
-import typing
-from typing import Any
-from typing import List
-from typing import Optional
-
-from babel.dates import format_timedelta
-from bs4 import BeautifulSoup
 from depot.fields.upload import UploadedFile
 from depot.io.utils import FileIntent
+import enum
+import os
 from sqlakeyset import Page
 from sqlakeyset import get_page
 import sqlalchemy
-from sqlalchemy import JSON
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import Index
+from sqlalchemy import JSON
 from sqlalchemy import Sequence
 from sqlalchemy import inspect
 from sqlalchemy import text
@@ -29,6 +24,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import backref
+from sqlalchemy.orm import deferred
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.attributes import InstrumentedAttribute
@@ -39,6 +35,10 @@ from sqlalchemy.types import DateTime
 from sqlalchemy.types import Integer
 from sqlalchemy.types import Text
 from sqlalchemy.types import Unicode
+import typing
+from typing import Any
+from typing import List
+from typing import Optional
 
 from tracim_backend.app_models.contents import ContentStatus
 from tracim_backend.app_models.contents import ContentTypeSlug
@@ -86,7 +86,10 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
 
     __tablename__ = "workspaces"
     workspace_id = Column(
-        Integer, Sequence("seq__workspaces__workspace_id"), autoincrement=True, primary_key=True
+        Integer,
+        Sequence("seq__workspaces__workspace_id"),
+        autoincrement=True,
+        primary_key=True,
     )
 
     # TODO - G.M - 2018-10-30 - Make workspace label unique
@@ -95,7 +98,7 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
     # nb: be careful about mysql compat with long unicode, forcing utf8 charset
     # for mysql will probably be needed, see fix in User sqlalchemy object
     label = Column(Unicode(MAX_WORKSPACE_LABEL_LENGTH), unique=False, nullable=False, default="")
-    description = Column(Text(), unique=False, nullable=False, default="")
+    description = deferred(Column(Text(), unique=False, nullable=False, default=""))
 
     is_deleted = Column(Boolean, unique=False, nullable=False, default=False)
     revisions = relationship("ContentRevisionRO")
@@ -127,12 +130,18 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
         server_default=WorkspaceAccessType.CONFIDENTIAL.name,
     )
     default_user_role = Column(
-        Enum(WorkspaceRoles), nullable=False, server_default=WorkspaceRoles.READER.name,
+        Enum(WorkspaceRoles),
+        nullable=False,
+        server_default=WorkspaceRoles.READER.name,
     )
     parent_id = Column(Integer, ForeignKey("workspaces.workspace_id"), nullable=True, default=None)
     children = relationship(
         "Workspace",
-        backref=backref("parent", remote_side=[workspace_id], order_by="Workspace.workspace_id",),
+        backref=backref(
+            "parent",
+            remote_side=[workspace_id],
+            order_by="Workspace.workspace_id",
+        ),
         order_by="Workspace.workspace_id",
     )
 
@@ -219,7 +228,8 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
                     size += revision.depot_file.file.content_length
                 except IOError:
                     logger.warning(
-                        self, "Cannot get depot_file {}".format(revision.depot_file.file_id)
+                        self,
+                        "Cannot get depot_file {}".format(revision.depot_file.file_id),
                     )
         return size
 
@@ -230,7 +240,7 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
         return WorkspaceRoles.NOT_APPLICABLE.level
 
     def get_label(self):
-        """ this method is for interoperability with Content class"""
+        """this method is for interoperability with Content class"""
         return self.label
 
     def get_allowed_content_types(self) -> List[TracimContentType]:
@@ -238,7 +248,10 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
         return content_type_list.endpoint_allowed_types()
 
     def get_valid_children(
-        self, content_types: list = None, show_deleted: bool = False, show_archived: bool = False
+        self,
+        content_types: list = None,
+        show_deleted: bool = False,
+        show_archived: bool = False,
     ):
         for child in self.contents:
             # we search only direct children
@@ -264,7 +277,11 @@ class UserRoleInWorkspace(DeclarativeBase):
     __tablename__ = "user_workspace"
 
     user_id = Column(
-        Integer, ForeignKey("users.user_id"), nullable=False, default=None, primary_key=True
+        Integer,
+        ForeignKey("users.user_id"),
+        nullable=False,
+        default=None,
+        primary_key=True,
     )
     workspace_id = Column(
         Integer,
@@ -281,7 +298,10 @@ class UserRoleInWorkspace(DeclarativeBase):
     )
 
     workspace = relationship(
-        "Workspace", remote_side=[Workspace.workspace_id], backref="roles", lazy="joined",
+        "Workspace",
+        remote_side=[Workspace.workspace_id],
+        backref="roles",
+        lazy="joined",
     )
     user = relationship("User", remote_side=[User.user_id], backref="roles")
 
@@ -486,7 +506,10 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
     description = Column(Text(), unique=False, nullable=False, default="")
     raw_content = Column(Text(), unique=False, nullable=False, default="")
     file_extension = Column(
-        Unicode(MAX_FILE_EXTENSION_LENGTH), unique=False, nullable=False, server_default=""
+        Unicode(MAX_FILE_EXTENSION_LENGTH),
+        unique=False,
+        nullable=False,
+        server_default="",
     )
     file_mimetype = Column(
         Unicode(MAX_FILE_MIMETYPE_LENGTH), unique=False, nullable=False, default=""
@@ -524,7 +547,9 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
 
     node = relationship("Content", foreign_keys=[content_id], back_populates="revisions")
     content_namespace = Column(
-        Enum(ContentNamespaces), nullable=False, server_default=ContentNamespaces.CONTENT.name
+        Enum(ContentNamespaces),
+        nullable=False,
+        server_default=ContentNamespaces.CONTENT.name,
     )
 
     """ List of column copied when make a new revision from another """
@@ -623,7 +648,6 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
         new_content_namespace: ContentNamespaces,
         copy_as_template: bool = False,
     ) -> "ContentRevisionRO":
-
         copy_rev = cls()
         import copy
 
@@ -782,7 +806,10 @@ class Content(DeclarativeBase):
     )
 
     current_revision = relationship(
-        "ContentRevisionRO", uselist=False, foreign_keys=[cached_revision_id], post_update=True,
+        "ContentRevisionRO",
+        uselist=False,
+        foreign_keys=[cached_revision_id],
+        post_update=True,
     )
 
     # TODO - A.P - 2017-09-05 - revisions default sorting
@@ -1172,7 +1199,10 @@ class Content(DeclarativeBase):
         return (
             object_session(self)
             .query(Content)
-            .join(ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id)
+            .join(
+                ContentRevisionRO,
+                Content.cached_revision_id == ContentRevisionRO.revision_id,
+            )
             .filter(ContentRevisionRO.parent_id == self.id)
             .order_by(ContentRevisionRO.content_id)
         )
@@ -1207,7 +1237,8 @@ class Content(DeclarativeBase):
                 object_session(self)
                 .query(Content)
                 .join(
-                    ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id
+                    ContentRevisionRO,
+                    Content.cached_revision_id == ContentRevisionRO.revision_id,
                 )
                 .filter(Content.id.in_(children_ids))
                 .order_by(ContentRevisionRO.content_id)
@@ -1549,7 +1580,6 @@ Index("idx__content__cached_revision_id", Content.cached_revision_id)
 
 
 class RevisionReadStatus(DeclarativeBase):
-
     __tablename__ = "revision_read_status"
 
     revision_id = Column(
@@ -1588,7 +1618,6 @@ class VirtualEvent(object):
 
     @classmethod
     def create_from_content(cls, content: Content):
-
         label = content.get_label()
         if content.type == content_type_list.Comment.slug:
             # TODO - G.M  - 10-04-2018 - [Cleanup] Remove label param
@@ -1646,14 +1675,23 @@ class VirtualEvent(object):
 
         if delta.days > 0:
             if delta.days >= 365:
-                aff = "%d year%s ago" % (delta.days / 365, "s" if delta.days / 365 >= 2 else "")
+                aff = "%d year%s ago" % (
+                    delta.days / 365,
+                    "s" if delta.days / 365 >= 2 else "",
+                )
             elif delta.days >= 30:
-                aff = "%d month%s ago" % (delta.days / 30, "s" if delta.days / 30 >= 2 else "")
+                aff = "%d month%s ago" % (
+                    delta.days / 30,
+                    "s" if delta.days / 30 >= 2 else "",
+                )
             else:
                 aff = "%d day%s ago" % (delta.days, "s" if delta.days >= 2 else "")
         else:
             if delta.seconds < 60:
-                aff = "%d second%s ago" % (delta.seconds, "s" if delta.seconds > 1 else "")
+                aff = "%d second%s ago" % (
+                    delta.seconds,
+                    "s" if delta.seconds > 1 else "",
+                )
             elif delta.seconds / 60 < 60:
                 aff = "%d minute%s ago" % (
                     delta.seconds / 60,

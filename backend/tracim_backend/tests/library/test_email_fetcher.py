@@ -1,5 +1,4 @@
 from email.message import Message
-
 from mock import MagicMock
 from mock import Mock
 import pytest
@@ -12,7 +11,9 @@ from tracim_backend.lib.mail_fetcher.email_fetcher import MailFetcher
 
 
 class TestDecodedMail(object):
-    def test_unit__decoded_mail__check_validity_for_comment_content__ok__nominal_case(self):
+    def test_unit__decoded_mail__check_validity_for_comment_content__ok__nominal_case(
+        self,
+    ):
         message = Message()
         uid = 1
         decodedmail = DecodedMail(message, uid)
@@ -117,7 +118,9 @@ class TestDecodedMail(object):
         mail_address = "key.reply.key@mydomainname.tld"
         assert (
             DecodedMail.find_key_from_mail_address(
-                mail_address, marker_str="{key}", pattern="{key}reply{key}@mydomainname.tld"
+                mail_address,
+                marker_str="{key}",
+                pattern="{key}reply{key}@mydomainname.tld",
             )
             is None
         )
@@ -144,7 +147,9 @@ class TestDecodedMail(object):
         mail_address = "reply+cid12@mydomainname.tld"
         assert (
             DecodedMail.find_key_from_mail_address(
-                mail_address, marker_str="{key}", pattern="reply+cid{key}@mydomainname.tld"
+                mail_address,
+                marker_str="{key}",
+                pattern="reply+cid{key}@mydomainname.tld",
             )
             == "12"
         )
@@ -162,7 +167,9 @@ class TestDecodedMail(object):
         mail_address = "cid12@reply.mydomainname.tld"
         assert (
             DecodedMail.find_key_from_mail_address(
-                mail_address, marker_str="{key}", pattern="cid{key}@reply.mydomainname.tld"
+                mail_address,
+                marker_str="{key}",
+                pattern="cid{key}@reply.mydomainname.tld",
             )
             == "12"
         )
@@ -221,10 +228,17 @@ class TestMailFetcher(object):
 
     @responses.activate
     def test_unit___get_content_info__err_403__no_right_to_see(self):
-        content_json = {"code": None, "details": {"error_detail": {}}, "message": "more info..."}
+        content_json = {
+            "code": None,
+            "details": {"error_detail": {}},
+            "message": "more info...",
+        }
 
         responses.add(
-            responses.GET, "http://127.0.0.1:6543/api/contents/1", json=content_json, status=403
+            responses.GET,
+            "http://127.0.0.1:6543/api/contents/1",
+            json=content_json,
+            status=403,
         )
         mf = MailFetcher(
             host="host_imap",
@@ -245,7 +259,10 @@ class TestMailFetcher(object):
             references_pattern="",
             user="imap_user",
         )
-        auth_headers = {"Tracim-Api-Key": "apikey", "Tracim-Api-Login": "mymailadress@mydomain.com"}
+        auth_headers = {
+            "Tracim-Api-Key": "apikey",
+            "Tracim-Api-Login": "mymailadress@mydomain.com",
+        }
         mock = Mock()
         mock.return_value = auth_headers
         mf._get_auth_headers = mock
@@ -256,7 +273,11 @@ class TestMailFetcher(object):
     @responses.activate
     def test_unit___get_content_info__ok__nominal_test(self):
         content_json = {
-            "author": {"has_avatar": True, "public_name": "Global manager", "user_id": 1},
+            "author": {
+                "has_avatar": True,
+                "public_name": "Global manager",
+                "user_id": 1,
+            },
             "content_id": 1,
             "content_type": "thread",
             "created": "2018-08-24T15:00:08Z",
@@ -264,7 +285,11 @@ class TestMailFetcher(object):
             "is_archived": False,
             "is_deleted": False,
             "label": "coucou",
-            "last_modifier": {"has_avatar": True, "public_name": "Global manager", "user_id": 1},
+            "last_modifier": {
+                "has_avatar": True,
+                "public_name": "Global manager",
+                "user_id": 1,
+            },
             "modified": "2018-08-24T15:00:08Z",
             "parent_id": None,
             "raw_content": "",
@@ -276,7 +301,10 @@ class TestMailFetcher(object):
         }
 
         responses.add(
-            responses.GET, "http://127.0.0.1:6543/api/contents/1", json=content_json, status=200
+            responses.GET,
+            "http://127.0.0.1:6543/api/contents/1",
+            json=content_json,
+            status=200,
         )
         mf = MailFetcher(
             host="host_imap",
@@ -297,7 +325,10 @@ class TestMailFetcher(object):
             references_pattern="",
             user="imap_user",
         )
-        auth_headers = {"Tracim-Api-Key": "apikey", "Tracim-Api-Login": "mymailadress@mydomain.com"}
+        auth_headers = {
+            "Tracim-Api-Key": "apikey",
+            "Tracim-Api-Login": "mymailadress@mydomain.com",
+        }
         mock = Mock()
         mock.return_value = auth_headers
         mf._get_auth_headers = mock
@@ -311,7 +342,11 @@ class TestMailFetcher(object):
         mail.get_from_address.return_value = "useremailaddress@mydomain.com"
 
         content_info = {
-            "author": {"has_avatar": True, "public_name": "Global manager", "user_id": 1},
+            "author": {
+                "has_avatar": True,
+                "public_name": "Global manager",
+                "user_id": 1,
+            },
             "content_id": 1,
             "content_type": "thread",
             "created": "2018-08-24T15:00:08Z",
@@ -319,7 +354,11 @@ class TestMailFetcher(object):
             "is_archived": False,
             "is_deleted": False,
             "label": "coucou",
-            "last_modifier": {"has_avatar": True, "public_name": "Global manager", "user_id": 1},
+            "last_modifier": {
+                "has_avatar": True,
+                "public_name": "Global manager",
+                "user_id": 1,
+            },
             "modified": "2018-08-24T15:00:08Z",
             "parent_id": None,
             "raw_content": "",
@@ -394,7 +433,10 @@ class TestMailFetcher(object):
         imapc_mock_add_flags = MagicMock()
         imapc_mock.add_flags = imapc_mock_add_flags
         email_mock = MagicMock()
-        auth_headers = {"Tracim-Api-Key": "apikey", "Tracim-Api-Login": "mymailadress@mydomain.com"}
+        auth_headers = {
+            "Tracim-Api-Key": "apikey",
+            "Tracim-Api-Login": "mymailadress@mydomain.com",
+        }
         header_mock = Mock()
         header_mock.return_value = auth_headers
         mf._get_auth_headers = header_mock

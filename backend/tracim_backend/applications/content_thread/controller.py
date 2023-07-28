@@ -1,13 +1,12 @@
 # coding=utf-8
+from hapic.data import HapicFile
 from http import HTTPStatus
 from io import BytesIO
-
-from hapic.data import HapicFile
 from pyramid.config import Configurator
 import transaction
 
 from tracim_backend.app_models.contents import ContentTypeSlug
-from tracim_backend.config import CFG
+from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentStatusException
 from tracim_backend.exceptions import EmptyLabelNotAllowed
@@ -75,10 +74,10 @@ class ThreadController(Controller):
     @hapic.output_file([])
     def get_thread_preview(self, context, request: TracimRequest, hapic_data=None) -> HapicFile:
         """
-           Download preview of html document
-           Good pratice for filename is filename is `{label}{file_extension}` or `{filename}`.
-           Default filename value is 'raw' (without file extension) or nothing.
-           """
+        Download preview of html document
+        Good pratice for filename is filename is `{label}{file_extension}` or `{filename}`.
+        Default filename value is 'raw' (without file extension) or nothing.
+        """
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
@@ -205,7 +204,9 @@ class ThreadController(Controller):
     def bind(self, configurator: Configurator) -> None:
         # Get thread
         configurator.add_route(
-            "thread", "/workspaces/{workspace_id}/threads/{content_id}", request_method="GET"
+            "thread",
+            "/workspaces/{workspace_id}/threads/{content_id}",
+            request_method="GET",
         )
         configurator.add_view(self.get_thread, route_name="thread")
 
@@ -219,7 +220,9 @@ class ThreadController(Controller):
 
         # update thread
         configurator.add_route(
-            "update_thread", "/workspaces/{workspace_id}/threads/{content_id}", request_method="PUT"
+            "update_thread",
+            "/workspaces/{workspace_id}/threads/{content_id}",
+            request_method="PUT",
         )
         configurator.add_view(self.update_thread, route_name="update_thread")
 

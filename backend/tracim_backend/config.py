@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
+from depot.manager import DepotManager
 from enum import Enum
 import json
-import os
-import typing
-
-from depot.manager import DepotManager
 from jsonschema import SchemaError
+import os
 from paste.deploy.converters import asbool
 from paste.deploy.converters import asint
+import typing
 
 from tracim_backend.app_models.validator import update_validators
 from tracim_backend.apps import load_apps
@@ -193,7 +192,10 @@ class CFG(object):
         return os.path.join(self.FRONTEND__DIST_FOLDER_PATH, "assets", "branding")
 
     def deprecate_parameter(
-        self, parameter_name: str, parameter_value: typing.Any, extended_information: str,
+        self,
+        parameter_name: str,
+        parameter_value: typing.Any,
+        extended_information: str,
     ) -> None:
         """
 
@@ -286,7 +288,6 @@ class CFG(object):
         enabled_app_slug_list: typing.List[str],
         loaded_apps: typing.Dict[str, TracimApplication],
     ) -> None:
-
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
         # of tracim_backend, Be careful app_list is a global_var
         app_list.clear()
@@ -538,7 +539,8 @@ class CFG(object):
             self.branding_folder_path, "rich_text_preview.template"
         )
         self.RICH_TEXT_PREVIEW__TEMPLATE_PATH = self.get_raw_config(
-            "rich_text_preview.template_path", default_rich_text_preview_template_file_path
+            "rich_text_preview.template_path",
+            default_rich_text_preview_template_file_path,
         )
 
         default_plugin_folder_path = self.here_macro_replace("%(here)s/plugins")
@@ -849,7 +851,8 @@ class CFG(object):
             self.get_raw_config("email.reply.use_txt_parsing", "True")
         )
         self.EMAIL__REPLY__LOCKFILE_PATH = self.get_raw_config(
-            "email.reply.lockfile_path", self.here_macro_replace("%(here)s/email_fetcher.lock"),
+            "email.reply.lockfile_path",
+            self.here_macro_replace("%(here)s/email_fetcher.lock"),
         )
         self.NEW_USER__INVITATION__DO_NOTIFY = asbool(
             self.get_raw_config("new_user.invitation.do_notify", "True")
@@ -911,9 +914,10 @@ class CFG(object):
         self.LDAP_BIND_ANONYMOUS = asbool(self.get_raw_config("ldap_bind_anonymous", "False"))
         self.LDAP_TLS = asbool(self.get_raw_config("ldap_tls", "False"))
         self.LDAP_USER_BASE_DN = self.get_raw_config("ldap_user_base_dn")
-        self.LDAP_LOGIN_ATTRIBUTE = self.get_raw_config("ldap_login_attribute", "mail")
+        self.LDAP_MAIL_ATTRIBUTE = self.get_raw_config("ldap_mail_attribute", "mail")
+        self.LDAP_USERNAME_ATTRIBUTE = self.get_raw_config("ldap_username_attribute", "givenName")
         # TODO - G.M - 16-11-2018 - Those prams are only use at account creation
-        self.LDAP_NAME_ATTRIBUTE = self.get_raw_config("ldap_name_attribute", "givenName")
+        self.LDAP_NAME_ATTRIBUTE = self.get_raw_config("ldap_name_attribute", "displayName")
         # TODO - G.M - 2018-12-05 - [ldap_profile]
         # support for profile attribute disabled
         # Should be reenabled later probably with a better code
@@ -922,7 +926,9 @@ class CFG(object):
         # TODO - G.M - 2019-04-05 - keep as parameters
         # or set it as constant,
         # see https://github.com/tracim/tracim/issues/1569
-        self.LDAP_USER_FILTER = "({}=%(login)s)".format(self.LDAP_LOGIN_ATTRIBUTE)
+        self.LDAP_USER_FILTER = "({}=%(login)s)".format(self.LDAP_USERNAME_ATTRIBUTE)
+        if self.EMAIL__REQUIRED:
+            self.LDAP_USER_FILTER = "({}=%(login)s)".format(self.LDAP_MAIL_ATTRIBUTE)
         self.LDAP_USE_POOL = True
         self.LDAP_POOL_SIZE = 10 if self.LDAP_USE_POOL else None
         self.LDAP_POOL_LIFETIME = 3600 if self.LDAP_USE_POOL else None
@@ -935,7 +941,8 @@ class CFG(object):
         )
         default_index_documents_pattern_template = "{index_alias}-{date}"
         self.SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE = self.get_raw_config(
-            "search.elasticsearch.index_pattern_template", default_index_documents_pattern_template,
+            "search.elasticsearch.index_pattern_template",
+            default_index_documents_pattern_template,
         )
         self.SEARCH__ELASTICSEARCH__USE_INGEST = asbool(
             self.get_raw_config("search.elasticsearch.use_ingest", "False")
@@ -944,7 +951,8 @@ class CFG(object):
         allowed_ingest_default_mimetype = ""
         self.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST = string_to_unique_item_list(
             self.get_raw_config(
-                "search.elasticsearch.ingest.mimetype_whitelist", allowed_ingest_default_mimetype,
+                "search.elasticsearch.ingest.mimetype_whitelist",
+                allowed_ingest_default_mimetype,
             ),
             separator=",",
             cast_func=str,
@@ -1040,7 +1048,9 @@ class CFG(object):
         )
         if self.CALL__ENABLED:
             self.check_mandatory_param(
-                "CALL__PROVIDER", raw_call_provider, when_str="when call is enabled",
+                "CALL__PROVIDER",
+                raw_call_provider,
+                when_str="when call is enabled",
             )
             if self.CALL__PROVIDER == CallProvider.JITSI_MEET:
                 self.check_mandatory_param(
@@ -1080,7 +1090,9 @@ class CFG(object):
         self.check_mandatory_param("SESSION__TYPE", self.SESSION__TYPE)
         if self.SESSION__TYPE == "file":
             self.check_mandatory_param(
-                "SESSION__DATA_DIR", self.SESSION__DATA_DIR, when_str="if session type is file",
+                "SESSION__DATA_DIR",
+                self.SESSION__DATA_DIR,
+                when_str="if session type is file",
             )
             self.check_directory_path_param(
                 "SESSION__DATA_DIR", self.SESSION__DATA_DIR, writable=True
@@ -1116,7 +1128,8 @@ class CFG(object):
             "COLOR__CONFIG_FILE_PATH", self.COLOR__CONFIG_FILE_PATH, readable=True
         )
         self.APPS_COLORS = self.load_and_check_json_file_path_param(
-            "COLOR__CONFIG_FILE_PATH", self.COLOR__CONFIG_FILE_PATH,
+            "COLOR__CONFIG_FILE_PATH",
+            self.COLOR__CONFIG_FILE_PATH,
         )
 
         for required_color in ("primary", "sidebar", "sidebar/font"):
@@ -1220,16 +1233,19 @@ class CFG(object):
         if self.URL_PREVIEW__MAX_CONTENT_LENGTH < 0:
             raise ConfigurationError(
                 'ERROR  "{}" should be a positive value (currently "{}")'.format(
-                    "URL_PREVIEW__MAX_CONTENT_LENGTH", self.URL_PREVIEW__MAX_CONTENT_LENGTH
+                    "URL_PREVIEW__MAX_CONTENT_LENGTH",
+                    self.URL_PREVIEW__MAX_CONTENT_LENGTH,
                 )
             )
 
     def _check_uploaded_files_config_validity(self) -> None:
         self.check_mandatory_param(
-            "UPLOADED_FILES__STORAGE__STORAGE_NAME", self.UPLOADED_FILES__STORAGE__STORAGE_NAME
+            "UPLOADED_FILES__STORAGE__STORAGE_NAME",
+            self.UPLOADED_FILES__STORAGE__STORAGE_NAME,
         )
         self.check_mandatory_param(
-            "UPLOADED_FILES__STORAGE__STORAGE_TYPE", self.UPLOADED_FILES__STORAGE__STORAGE_TYPE
+            "UPLOADED_FILES__STORAGE__STORAGE_TYPE",
+            self.UPLOADED_FILES__STORAGE__STORAGE_TYPE,
         )
         file_storage_type_slugs = [file_storage.slug for file_storage in list(DepotFileStorageType)]
         if self.UPLOADED_FILES__STORAGE__STORAGE_TYPE not in file_storage_type_slugs:
@@ -1360,7 +1376,8 @@ class CFG(object):
                 raise ConfigurationError(
                     'ERROR email.notification.smtp.encryption given "{}" is invalid,'
                     "valids values are {}.".format(
-                        self.EMAIL__NOTIFICATION__SMTP__ENCRYPTION, smtp_encryption_str_list
+                        self.EMAIL__NOTIFICATION__SMTP__ENCRYPTION,
+                        smtp_encryption_str_list,
                     )
                 )
 
@@ -1398,7 +1415,8 @@ class CFG(object):
                     raise ConfigurationError(
                         "ERROR: email template for {template_description} "
                         'not found at "{template_path}."'.format(
-                            template_description=template_description, template_path=template_path,
+                            template_description=template_description,
+                            template_path=template_path,
                         )
                     )
 
@@ -1415,7 +1433,9 @@ class CFG(object):
     def _check_ldap_config_validity(self):
         if AuthType.LDAP in self.AUTH_TYPES:
             self.check_mandatory_param(
-                "LDAP_URL", self.LDAP_URL, when_str="when ldap is in available auth method",
+                "LDAP_URL",
+                self.LDAP_URL,
+                when_str="when ldap is in available auth method",
             )
             if not self.LDAP_BIND_ANONYMOUS:
                 self.check_mandatory_param(
@@ -1434,8 +1454,13 @@ class CFG(object):
                 when_str="when ldap is in available auth method",
             )
             self.check_mandatory_param(
-                "LDAP_LOGIN_ATTRIBUTE",
-                self.LDAP_LOGIN_ATTRIBUTE,
+                "LDAP_USERNAME_ATTRIBUTE",
+                self.LDAP_USERNAME_ATTRIBUTE,
+                when_str="when ldap is in available auth method",
+            )
+            self.check_mandatory_param(
+                "LDAP_MAIL_ATTRIBUTE",
+                self.LDAP_MAIL_ATTRIBUTE,
                 when_str="when ldap is in available auth method",
             )
             self.check_mandatory_param(
@@ -1447,7 +1472,6 @@ class CFG(object):
     def _check_search_config_validity(self):
         search_engine_valid = ["elasticsearch", "simple"]
         if self.SEARCH__ENGINE not in search_engine_valid:
-
             search_engine_list_str = ", ".join(
                 '"{}"'.format(engine) for engine in search_engine_valid
             )
@@ -1523,7 +1547,6 @@ class CFG(object):
         Translator.init_translations(self)
 
     def configure_filedepot(self) -> None:
-
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
         # of tracim_backend, Be careful DepotManager is a Singleton!
 
@@ -1586,7 +1609,11 @@ class CFG(object):
                 "for tracim for security reasons.{}".format(param_name, value, extended_str),
             )
 
-    def load_and_check_json_file_path_param(self, param_name: str, path: str,) -> dict:
+    def load_and_check_json_file_path_param(
+        self,
+        param_name: str,
+        path: str,
+    ) -> dict:
         """
         Check if path is valid json file and load it
         :param param_name: name of parameter to check
@@ -1603,7 +1630,12 @@ class CFG(object):
             )
             raise ConfigurationError(not_a_valid_json_file_msg.format(path, param_name)) from exc
 
-    def check_file_path_param(self, param_name: str, path: str, readable: bool = True,) -> None:
+    def check_file_path_param(
+        self,
+        param_name: str,
+        path: str,
+        readable: bool = True,
+    ) -> None:
         """
         Check if path exist and if it is a readable file.
         if check fail, raise ConfigurationError

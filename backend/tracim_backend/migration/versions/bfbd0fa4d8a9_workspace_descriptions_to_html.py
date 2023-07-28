@@ -12,10 +12,9 @@ this behavior to make this work.
 
 Workspace descriptions need to always be sent as HTML code from now on.
 """
-import html
-
 from alembic import op
 from bs4 import BeautifulSoup
+import html
 import sqlalchemy as sa
 from sqlalchemy import MetaData
 from sqlalchemy.ext.declarative import declarative_base
@@ -39,7 +38,7 @@ down_revision = "208eda5a6a80"
 
 
 class TemporaryWorkspaces(DeclarativeBase):
-    """ temporary sqlalchemy object to help migration"""
+    """temporary sqlalchemy object to help migration"""
 
     __tablename__ = "workspaces"
 

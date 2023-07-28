@@ -1,9 +1,8 @@
 # coding=utf-8
 from http import HTTPStatus
-
 from pyramid.config import Configurator
 
-from tracim_backend.config import CFG
+from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import ExpiredResetPasswordToken
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import InvalidResetPasswordToken
@@ -108,18 +107,24 @@ class ResetPasswordController(Controller):
     def bind(self, configurator: Configurator):
         # reset password request
         configurator.add_route(
-            "reset_password_request", "/auth/password/reset/request", request_method="POST"
+            "reset_password_request",
+            "/auth/password/reset/request",
+            request_method="POST",
         )
         configurator.add_view(self.reset_password_request, route_name="reset_password_request")
         # check reset password token
         configurator.add_route(
-            "reset_password_check_token", "/auth/password/reset/token/check", request_method="POST"
+            "reset_password_check_token",
+            "/auth/password/reset/token/check",
+            request_method="POST",
         )
         configurator.add_view(
             self.reset_password_check_token, route_name="reset_password_check_token"
         )
         # reset password, set password
         configurator.add_route(
-            "reset_password_modify", "/auth/password/reset/modify", request_method="POST"
+            "reset_password_modify",
+            "/auth/password/reset/modify",
+            request_method="POST",
         )
         configurator.add_view(self.reset_password_modify, route_name="reset_password_modify")
