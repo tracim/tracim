@@ -20,14 +20,6 @@ import {
 
 // require('./TinyEditor.styl') // see https://github.com/tracim/tracim/issues/1156
 
-const htmlCodeToDocumentFragment = (htmlCode) => {
-  // NOTE - RJ - 2021-04-28 - <template> provides a convenient content property.
-  // See https://stackoverflow.com/questions/8202195/using-document-createdocumentfragment-and-innerhtml-to-manipulate-a-dom
-  const template = document.createElement('template')
-  template.innerHTML = htmlCode
-  return template.content
-}
-
 const advancedToolBar = [
   'formatselect alignleft aligncenter alignright alignjustify | ',
   'bold italic underline strikethrough | forecolor backcolor | ',
@@ -114,18 +106,6 @@ export const TinyEditor = props => {
   const editorRef = useRef(null)
   const inputRef = useRef(null)
 
-  // HACK - SGD - 2023-06-28 - This is a workaround for
-  // https://github.com/tracim/tracim/issues/5535
-  // Since the original hack for https://github.com/tracim/tracim/issues/5622
-  // has been restored as the improved hack is not applicable with react-tiny.
-  // See also https://github.com/tracim/tracim/issues/6200
-  React.useEffect(() => {
-    if (editorRef.current) {
-      if (document.activeElement) document.activeElement.blur()
-      editorRef.current.focus()
-    }
-  }, [])
-
   const toolbar = props.isAdvancedEdition ? advancedToolBar : simpleToolBar
   // NOTE - MP - 2023-01-10 - Changing the key allow reloading the Editor component this allows us
   // to change the toolbar
@@ -171,21 +151,6 @@ export const TinyEditor = props => {
           codesample_languages: props.codeLanguageList,
           paste_data_images: true,
           relative_urls: false,
-          init_instance_callback: function (editor) {
-            // NOTE - RJ - 2021-04-28 - appending the content of the textarea
-            // after initialization instead of using TinyMCE's own mechanism works
-            // around a performance issue in Chrome with big base64 images.
-            // See https://github.com/tracim/tracim/issues/4591
-            // And https://github.com/tracim/tracim/issues/6200
-            const body = editor.contentDocument.body
-            if (props.content !== '') {
-              body.removeAttribute('data-mce-placeholder')
-              body.removeAttribute('aria-placeholder')
-            }
-            body.textContent = ''
-            const contentFragment = htmlCodeToDocumentFragment(props.content)
-            body.appendChild(contentFragment)
-          },
           setup: (editor) => {
             editor.ui.registry.addMenuButton('insert', {
               icon: 'plus',
@@ -425,6 +390,7 @@ export const TinyEditor = props => {
             })
           }
         }}
+        value={props.content}
         onEditorChange={(newValue, editor) => props.setContent(newValue)}
         onDrop={e => base64EncodeAndTinyMceInsert(editorRef, e.dataTransfer.files)}
       />
