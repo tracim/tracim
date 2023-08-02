@@ -24,6 +24,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import backref
+from sqlalchemy.orm import deferred
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.attributes import InstrumentedAttribute
@@ -97,7 +98,7 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
     # nb: be careful about mysql compat with long unicode, forcing utf8 charset
     # for mysql will probably be needed, see fix in User sqlalchemy object
     label = Column(Unicode(MAX_WORKSPACE_LABEL_LENGTH), unique=False, nullable=False, default="")
-    description = Column(Text(), unique=False, nullable=False, default="")
+    description = deferred(Column(Text(), unique=False, nullable=False, default=""))
 
     is_deleted = Column(Boolean, unique=False, nullable=False, default=False)
     revisions = relationship("ContentRevisionRO")

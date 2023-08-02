@@ -137,8 +137,14 @@ setup(
         ],
         "console_scripts": ["tracimcli = tracim_backend.command:main"],
         "tracimcli": [
+            # content
+            "content_delete = tracim_backend.command.cleanup:DeleteContentCommand",
+            "content_show = tracim_backend.command.content:ShowContentTreeCommand",
+            # revision
+            "revision_delete = tracim_backend.command.cleanup:DeleteContentRevisionCommand",
             # workspace
             "space_move = tracim_backend.command.space:MoveSpaceCommand",
+            "space_delete = tracim_backend.command.cleanup:DeleteSpaceCommand",
             # user
             "user_create = tracim_backend.command.user:CreateUserCommand",
             "user_update = tracim_backend.command.user:UpdateUserCommand",

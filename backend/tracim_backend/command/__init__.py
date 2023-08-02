@@ -80,7 +80,6 @@ class AppContextCommand(Command):
 
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super(AppContextCommand, self).get_parser(prog_name)
-
         parser.add_argument(
             "-c",
             "--config",
