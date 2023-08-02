@@ -26,6 +26,7 @@ export const CommentArea = props => {
   const [invalidMentionList, setInvalidMentionList] = useState([])
   const [isAdvancedEdition, setIsAdvancedEdition] = useState(props.isAdvancedEdition)
   const [textToSend, setTextToSend] = useState('')
+  const [forceMountTinyMCE, setForceMountTinyMCE] = useState(0)
 
   useEffect(() => {
     if (props.newComment !== undefined && props.newComment !== '') {
@@ -100,6 +101,7 @@ export const CommentArea = props => {
     if (submitSuccessful) {
       setContent('')
       setFileListToUpload([])
+      setForceMountTinyMCE(forceMountTinyMCE + 1)
     }
   }
 
@@ -164,6 +166,7 @@ export const CommentArea = props => {
         minHeight={100}
         placeholder={props.placeholder}
         userList={props.memberList}
+        forceMountTinyMCE={forceMountTinyMCE}
       />
       <div
         className={
