@@ -27,16 +27,6 @@ export const serializeWorkspaceListProps = {
   members: 'memberList'
 }
 
-export const serializeRoleListProps = {
-  email_notification_type: 'emailNotificationType',
-  is_active: 'agendaEnabled',
-  role: 'role',
-  workspace_id: 'description',
-  user_id: 'downloadEnabled',
-  workspace: 'workspace',
-  user: 'user'
-}
-
 export const serializeWorkspace = workspace => {
   return {
     ...serialize(workspace, serializeWorkspaceListProps),

@@ -21,7 +21,7 @@ import {
   newFlashMessage,
   setUserConnected,
   setUserDisconnected,
-  setWorkspaceList,
+  setRoleWorkspaceList,
   setContentTypeList,
   setAppList,
   setConfig,
@@ -366,7 +366,7 @@ class Login extends React.Component {
 
     const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList(showOwnedWorkspace))
     if (fetchGetWorkspaceList.status === 200) {
-      props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
+      props.dispatch(setRoleWorkspaceList(fetchGetWorkspaceList.json))
     }
 
     const fetchAccessibleWorkspaceList = await props.dispatch(

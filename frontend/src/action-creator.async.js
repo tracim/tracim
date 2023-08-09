@@ -277,7 +277,7 @@ export const getUserConfiguration = userId => dispatch => {
 
 export const getUserWorkspaceList = (userId, showOwnedWorkspace) => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/role_workspaces`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspaces?show_owned_workspace=${showOwnedWorkspace ? 1 : 0}`,
     param: {
       credentials: 'include',
       headers: {

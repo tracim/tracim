@@ -16,13 +16,14 @@ import {
   FilterBar,
   stringIncludes
 } from 'tracim_frontend_lib'
-import { serializeWorkspace } from '../reducer/workspaceList.js'
+import { serializeWorkspace, serializeRole } from '../reducer/workspaceList.js'
 import { newFlashMessage } from '../action-creator.sync.js'
 import {
   deleteWorkspaceMember,
   getWorkspaceList,
   postWorkspaceMember,
-  updateWorkspaceMember
+  updateWorkspaceMember,
+  getUserRoleWorkspaceList
 } from '../action-creator.async.js'
 import AdminUserSpacesConfigItem from '../component/Account/AdminUserSpacesConfigItem.jsx'
 import { onlyManager } from '../component/Account/UserSpacesConfig.jsx'
@@ -62,19 +63,26 @@ export const AdminUserSpacesConfig = (props) => {
   }, [props.userToEditId])
 
   useEffect(() => {
-    const availableSpaces = []
-    const memberSpaces = []
+    if (props.userToEditId === props.user.userId) {
+      setMemberSpaceList(props.workspaceList)
+    } else {
+      getMemberSpacesList()
+    }
+  }, [props.userToEditId, props.workspaceList])
 
+  useEffect(() => {
+    const availableSpaces = []
     spaceList.forEach(space => {
-      if (!space.memberList || space.memberList.length <= 0) return
-      if (space.memberList.find(u => u.id === props.userToEditId)) memberSpaces.push(space)
-      else availableSpaces.push(space)
+      if (!memberSpaceList.find(element => {
+        return element.id === space.id
+      })) {
+        availableSpaces.push(space)
+      }
     })
     setAvailableSpaceList(availableSpaces)
     setDisplayedAvailableSpaceList(filterSpaceList(availableSpaces, availableSpaceListFilter))
-    setMemberSpaceList(memberSpaces)
-    setDisplayedMemberSpaceList(filterSpaceListWithUserRole(memberSpaces, memberSpaceListFilter))
-  }, [spaceList])
+    setDisplayedMemberSpaceList(filterSpaceListWithUserRole(memberSpaceList, memberSpaceListFilter))
+  }, [spaceList, memberSpaceList])
 
   useEffect(() => {
     setDisplayedAvailableSpaceList(filterSpaceList(availableSpaceList, availableSpaceListFilter))
@@ -104,6 +112,22 @@ export const AdminUserSpacesConfig = (props) => {
     })
   }
 
+  const getMemberSpacesList = async () => {
+    const fetchGetUserWorkspaceList = await props.dispatch(
+      getUserRoleWorkspaceList(props.userToEditId, false)
+    )
+    switch (fetchGetUserWorkspaceList.status) {
+      case 200: {
+        const userSpaceList = fetchGetUserWorkspaceList.json.map(
+          role => serializeRole(role)
+        )
+        setMemberSpaceList(userSpaceList)
+        break
+      }
+      default: props.dispatch(newFlashMessage(props.t('Error while loading user')))
+    }
+  }
+
   const getSpaceList = async () => {
     setIsLoading(true)
     const fetchGetSpaceList = await props.dispatch(getWorkspaceList())
@@ -120,7 +144,7 @@ export const AdminUserSpacesConfig = (props) => {
   }
 
   const handleMemberModified = (data) => {
-    setSpaceList(spaceList.map(space => {
+    setMemberSpaceList(memberSpaceList.map(space => {
       if (space.id === data.fields.workspace.workspace_id) {
         return {
           ...space,
@@ -139,37 +163,20 @@ export const AdminUserSpacesConfig = (props) => {
   }
 
   const handleMemberDeleted = async (data) => {
-    setSpaceList(spaceList.map(space => {
-      if (space.id === data.fields.workspace.workspace_id) {
-        return {
-          ...space,
-          memberList: space.memberList.filter(member => member.id !== data.fields.user.user_id)
-        }
-      } else {
-        return space
-      }
-    }))
+    setMemberSpaceList(memberSpaceList.filter(space => space.id !== data.fields.workspace.workspace_id))
   }
 
   const handleMemberCreated = async (data) => {
     const space = spaceList.find(space => space.id === data.fields.workspace.workspace_id)
-
-    if (space.memberList) {
-      setSpaceList(spaceList.map(space => {
-        if (space.id === data.fields.workspace.workspace_id) {
-          return {
-            ...space,
-            memberList: [
-              ...space.memberList,
-              serializeMember({ user: data.fields.user, ...data.fields.member })
-            ]
-          }
-        } else {
-          return space
-        }
-      }))
-    } else {
-      setSpaceList(sortListByMultipleCriteria([...spaceList, space], [SORT_BY.LABEL, SORT_BY.ID]))
+    if (!memberSpaceList.find(space => space.id === data.fields.workspace.workspace_id)) {
+      memberSpaceList.push({
+        ...space,
+        memberList: [
+          ...space.memberList,
+          serializeMember({ user: data.fields.user, ...data.fields.member })
+        ]
+      })
+      setMemberSpaceList(memberSpaceList)
     }
   }
 

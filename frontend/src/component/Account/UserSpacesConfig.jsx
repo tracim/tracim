@@ -21,9 +21,10 @@ import {
   TracimComponent,
   sortListBy,
   sortListByMultipleCriteria,
-  stringIncludes
+  stringIncludes,
+  serialize
 } from 'tracim_frontend_lib'
-import { serializeWorkspace } from '../../reducer/workspaceList.js'
+import { serializeRole, serializeWorkspaceListProps } from '../../reducer/workspaceList.js'
 import { serializeMember } from '../../reducer/currentWorkspace.js'
 import { newFlashMessage } from '../../action-creator.sync.js'
 import { deleteWorkspaceMember, getUserRoleWorkspaceList } from '../../action-creator.async.js'
@@ -59,39 +60,40 @@ export const UserSpacesConfig = (props) => {
 
   useEffect(() => {
     const filteredListWithMember = []
+    if (spaceList !== undefined) {
+      spaceList.forEach(space => {
+        const member = space.memberList.find(u => u.id === props.userToEditId)
+        if (space.memberList.length > 0 && member) {
+          filteredListWithMember.push({ ...space, member })
+        }
+      })
 
-    spaceList.forEach(space => {
-      const member = space.memberList.find(u => u.id === props.userToEditId)
-      if (space.memberList.length > 0 && member) {
-        filteredListWithMember.push({ ...space, member })
-      }
-    })
-
-    const sortedList = sortListBy(
-      filteredListWithMember,
-      selectedSortCriterion,
-      sortOrder,
-      props.user.lang
-    )
-
-    const filteredSpaceList = filterSpaceList(sortedList)
-
-    const entryList = filteredSpaceList.map(space => {
-      return (
-        <UserSpacesConfigLine
-          space={space}
-          key={space.id}
-          onChangeEmailNotificationType={
-            emailNotificationType => props.onChangeEmailNotificationType(space.id, emailNotificationType)
-          }
-          onLeaveSpace={handleLeaveSpace}
-          admin={props.admin}
-          system={props.system}
-          onlyManager={onlyManager(props.userToEditId, space.member, space.memberList)}
-        />
+      const sortedList = sortListBy(
+        filteredListWithMember,
+        selectedSortCriterion,
+        sortOrder,
+        props.user.lang
       )
-    })
-    setEntries(entryList)
+
+      const filteredSpaceList = filterSpaceList(sortedList)
+
+      const entryList = filteredSpaceList.map(space => {
+        return (
+          <UserSpacesConfigLine
+            space={space}
+            key={space.id}
+            onChangeEmailNotificationType={
+              emailNotificationType => props.onChangeEmailNotificationType(space.id, emailNotificationType)
+            }
+            onLeaveSpace={handleLeaveSpace}
+            admin={props.admin}
+            system={props.system}
+            onlyManager={onlyManager(props.userToEditId, space.member, space.memberList)}
+          />
+        )
+      })
+      setEntries(entryList)
+    }
   }, [spaceList, sortOrder, selectedSortCriterion, userFilter])
 
   const filterSpaceList = (list) => {
@@ -163,7 +165,7 @@ export const UserSpacesConfig = (props) => {
         }
       }))
     } else {
-      setSpaceList(sortListByMultipleCriteria([...spaceList, space], [SORT_BY.LABEL, SORT_BY.ID]))
+      setSpaceList(sortListByMultipleCriteria([...spaceList, { ...serialize(data.fields.workspace, serializeWorkspaceListProps), memberList: [serializeMember({ user: data.fields.user, ...data.fields.member })] }], [SORT_BY.LABEL, SORT_BY.ID]))
     }
   }
 
@@ -175,7 +177,7 @@ export const UserSpacesConfig = (props) => {
     switch (fetchGetUserWorkspaceList.status) {
       case 200: {
         const userSpaceList = fetchGetUserWorkspaceList.json.map(
-          space => serializeWorkspace(space)
+          role => serializeRole(role)
         )
         setSpaceList(userSpaceList)
         break
