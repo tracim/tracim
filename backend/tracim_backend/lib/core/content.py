@@ -1694,6 +1694,7 @@ class ContentApi(object):
         new_label: typing.Optional[str] = None,
         new_raw_content: typing.Optional[str] = None,
         new_description: typing.Optional[str] = None,
+        new_content_namespace: typing.Optional[str] = None,
         force_update=False,
     ) -> Content:
         """
@@ -1716,11 +1717,14 @@ class ContentApi(object):
             new_raw_content = item.raw_content
         if new_description is None:
             new_description = item.description
+        if new_content_namespace is None:
+            new_content_namespace = item.content_namespace
         if not force_update:
             if (
                 item.label == new_label
                 and item.raw_content == new_raw_content
                 and item.description == new_description
+                and item.content_namespace == new_content_namespace
             ):
                 # TODO - G.M - 20-03-2018 - Fix internatization for webdav access.
                 # Internatization disabled in libcontent for now.
@@ -1752,6 +1756,7 @@ class ContentApi(object):
         item.label = new_label
         item.raw_content = new_raw_content
         item.description = new_description
+        item.content_namespace = new_content_namespace
         item.revision_type = ActionDescription.EDITION
         return item
 
@@ -2378,3 +2383,38 @@ class ContentApi(object):
         self.save(item, ActionDescription.CREATION, do_notify=do_notify)
 
         return item
+
+    def set_content_namespace(
+        self, content_id: int, content_namespace: ContentNamespaces
+    ) -> Content:
+        """Change the content namespace of a content
+
+        Args:
+            content_id: Id of the content
+            content_namespace: content_namespace wanted for the content
+
+        Returns:
+            Content: The modified content.
+        """
+        content = self.get_one(content_id=content_id)
+        if (
+            content.content_namespace != ContentNamespaces.PUBLICATION
+            or content_namespace != ContentNamespaces.CONTENT
+        ):
+            return 0
+
+        with new_revision(session=self._session, tm=transaction.manager, content=content):
+            self.move(
+                content,
+                new_parent=None,
+                new_workspace=content.workspace,
+                new_content_namespace=content_namespace,
+                must_stay_in_same_workspace=False,
+            )
+            self.save(content)
+
+        self._move_children_content_to_new_workspace(
+            item=content, new_workspace=content.workspace, new_content_namespace=content_namespace
+        )
+
+        return content

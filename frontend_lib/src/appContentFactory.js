@@ -65,7 +65,8 @@ import {
   putContentTemplate,
   putEditContent,
   putEditStatus,
-  putToDo
+  putToDo,
+  putContentChangeType
 } from './action.async.js'
 
 import {
@@ -682,6 +683,51 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
+    appContentChangeType = async (content, setState) => {
+      this.checkApiUrl()
+      if (content.content_id === undefined) {
+        const response = await handleFetchResult(
+          await putContentChangeType(this.apiUrl, content.workspaceId, content.id, 'content')
+        )
+        switch (response.status) {
+          case 204:
+            setState({ mode: APP_FEATURE_MODE.VIEW })
+            break
+          default:
+            GLOBAL_dispatchEvent({
+              type: CUSTOM_EVENT.ADD_FLASH_MSG,
+              data: {
+                msg: i18n.t('Error while changing content type'),
+                type: 'warning',
+                delay: undefined
+              }
+            })
+            break
+        }
+        return response
+      } else {
+        const response = await handleFetchResult(
+          await putContentChangeType(this.apiUrl, content.workspace_id, content.content_id, 'content')
+        )
+        switch (response.status) {
+          case 204:
+            setState({ mode: APP_FEATURE_MODE.VIEW })
+            break
+          default:
+            GLOBAL_dispatchEvent({
+              type: CUSTOM_EVENT.ADD_FLASH_MSG,
+              data: {
+                msg: i18n.t('Error while changing content type'),
+                type: 'warning',
+                delay: undefined
+              }
+            })
+            break
+        }
+        return response
+      }
+    }
+
     appContentDelete = async (content, setState, appSlug) => {
       this.checkApiUrl()
 
@@ -1110,6 +1156,7 @@ export function appContentFactory (WrappedComponent) {
           appContentCustomEventHandlerAllAppChangeLanguage={this.appContentCustomEventHandlerAllAppChangeLanguage}
           appContentChangeTitle={this.appContentChangeTitle}
           appContentChangeComment={this.appContentChangeComment}
+          appContentChangeType={this.appContentChangeType}
           appContentDeleteComment={this.appContentDeleteComment}
           appContentDeleteToDo={this.appContentDeleteToDo}
           appContentEditComment={this.appContentEditComment}

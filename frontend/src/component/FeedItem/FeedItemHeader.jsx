@@ -5,16 +5,20 @@ import { Link } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import {
   Breadcrumbs,
+  CONTENT_NAMESPACE,
   CONTENT_TYPE,
   DropdownMenu,
   Icon,
   IconButton,
   PAGE,
+  ROLE,
+  ROLE_LIST,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   FilenameWithBadges,
   TimedEvent
 } from 'tracim_frontend_lib'
+import { findUserRoleIdInWorkspace } from '../../util/helper.js'
 
 require('./FeedItemHeader.styl')
 
@@ -64,6 +68,11 @@ export class FeedItemHeader extends React.Component {
       props.content.currentRevisionType &&
       props.lastModifier
     )
+    const shouldShowChangeTypeButton = findUserRoleIdInWorkspace(
+      props.user.userId,
+      (props.workspaceList.find(workspace => workspace.id === props.workspaceId) || {}).memberList || [],
+      ROLE_LIST
+    ) >= ROLE.contentManager.id && props.content.contentNamespace === CONTENT_NAMESPACE.PUBLICATION && props.onClickChangeType !== undefined
 
     return (
       <div className='feedItemHeader'>
@@ -139,6 +148,20 @@ export class FeedItemHeader extends React.Component {
               />
             )}
 
+            {shouldShowChangeTypeButton && (
+              <IconButton
+                customClass='feedItemHeader__actionMenu__item'
+                disabled={props.content.is_archived || props.content.is_deleted}
+                icon='fa-fw fas fa-fw fa-th'
+                text={props.t('Change into content')}
+                textMobile={props.t('Change into content')}
+                label={props.t('Change into content')}
+                key={`change-type-${contentId}`}
+                onClick={props.onClickChangeType}
+                dataCy='popinListItem__change_type'
+              />
+            )}
+
             <Link
               className='feedItemHeader__actionMenu__item'
               title={props.t('Open as content')}
@@ -155,7 +178,7 @@ export class FeedItemHeader extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user }) => ({ user })
+const mapStateToProps = ({ user, workspaceList }) => ({ user, workspaceList })
 export default connect(mapStateToProps)(translate()(FeedItemHeader))
 
 FeedItemHeader.propTypes = {
@@ -174,7 +197,8 @@ FeedItemHeader.propTypes = {
   modifiedDate: PropTypes.string,
   onEventClicked: PropTypes.func,
   onClickEdit: PropTypes.func,
-  titleLink: PropTypes.string
+  titleLink: PropTypes.string,
+  onClickChangeType: PropTypes.func
 }
 
 FeedItemHeader.defaultProps = {

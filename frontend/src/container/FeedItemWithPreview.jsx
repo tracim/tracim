@@ -317,6 +317,7 @@ export class FeedItemWithPreview extends React.Component {
           onClickEdit={props.onClickEdit}
           workspaceId={props.workspaceId}
           titleLink={props.titleLink}
+          onClickChangeType={props.onClickChangeType}
         />
         {props.contentAvailable && !isContentDeleted && (
           <>

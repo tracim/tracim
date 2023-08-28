@@ -424,6 +424,8 @@
   "Password:": "Mot de passe :",
   "Favorite": "Favori",
   "My favorites": "Mes favoris",
+  "Change into content": "Transformer en contenu",
+  "Error while changing content type": "Une erreur est survenue lors de la transformation en contenu",
   "An error has happened while fetching favorites": "Une erreur est survenue pendant la récupération des favoris",
   "An error has happened while removing the favorite": "Une erreur est survenue pendant la suppression du favori",
   "{{contentLabel}} has been removed from your favorites.": "{{contentLabel}} a été supprimé de vos favoris.",

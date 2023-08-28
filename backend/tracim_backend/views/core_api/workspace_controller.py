@@ -886,6 +886,29 @@ class WorkspaceController(Controller):
         )
         return api.get_templates(user=user, template_type=hapic_data.query["type"])
 
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
+    @check_right(is_content_manager)
+    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.input_body(ContentDigestSchema())
+    @hapic.output_body(ContentDigestSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def set_content_namespace(self, context, request: TracimRequest, hapic_data=None) -> None:
+        """
+        Change publication to content
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        contents = api.set_content_namespace(
+            hapic_data.path.content_id, hapic_data.body["content_namespace"]
+        )
+
+        return contents
+
     def bind(self, configurator: Configurator) -> None:
         """
         Create all routes and views using
@@ -1081,3 +1104,11 @@ class WorkspaceController(Controller):
         configurator.add_view(
             self.get_workspace_content_path, route_name="get_workspace_content_path"
         )
+
+        # Change publication to content
+        configurator.add_route(
+            "change_type",
+            "/workspaces/{workspace_id}/contents/{content_id}/type",
+            request_method="PUT",
+        )
+        configurator.add_view(self.set_content_namespace, route_name="change_type")

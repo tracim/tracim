@@ -12,6 +12,7 @@ import {
   handleFetchResult,
   PAGE,
   PopinFixed,
+  ConfirmPopup,
   PopinFixedHeader,
   PopinFixedContent,
   Timeline,
@@ -59,6 +60,7 @@ export class Thread extends React.Component {
         props.t('Start a topic')
       ],
       showRefreshWarning: false,
+      showChangeTypeContentPopup: false,
       editionAuthor: '',
       invalidMentionList: [],
       showInvalidMentionPopupInComment: false,
@@ -341,6 +343,22 @@ export class Thread extends React.Component {
     this.setState({ translationTargetLanguageCode })
   }
 
+  handleToggleContentChangeTypePopup = content => {
+    this.setState(prev => ({
+      showChangeTypeContentPopup: !prev.showChangeTypeContentPopup,
+      contentToChange: prev.showChangeTypeContentPopup ? null : content
+    }))
+  }
+
+  handleClickValidateChangeType = async () => {
+    const { props, state } = this
+    props.appContentChangeType(state.content, this.setState.bind(this))
+    this.setState({
+      showChangeTypeContentPopup: false,
+      contentToChange: null
+    })
+  }
+
   render () {
     const { props, state } = this
     const isPublication = state.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION
@@ -361,7 +379,30 @@ export class Thread extends React.Component {
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
           disableChangeTitle={!state.content.is_editable}
-          actionList={[
+          actionList={isPublication ? [
+            {
+              icon: 'fas fa-link',
+              label: props.t('Copy content link'),
+              onClick: this.handleClickCopyLink,
+              showAction: true,
+              dataCy: 'popinListItem__copyLink'
+            }, {
+              icon: 'fa-fw fas fa-fw fa-th',
+              label: props.t('Change into content'),
+              onClick: this.handleToggleContentChangeTypePopup,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              disabled: state.content.is_archived || state.content.is_deleted,
+              dataCy: 'popinListItem__change_type'
+            }, {
+              icon: 'far fa-trash-alt',
+              label: props.t('Delete'),
+              onClick: this.handleClickDelete,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              disabled: state.content.is_archived || state.content.is_deleted,
+              dataCy: 'popinListItem__delete'
+            }
+          ] :
+          [
             {
               icon: 'fas fa-link',
               label: props.t('Copy content link'),
@@ -376,7 +417,8 @@ export class Thread extends React.Component {
               disabled: state.content.is_archived || state.content.is_deleted,
               dataCy: 'popinListItem__delete'
             }
-          ]}
+          ]
+        }
           showReactions
           apiUrl={state.config.apiUrl}
           loggedUser={state.loggedUser}
@@ -392,6 +434,16 @@ export class Thread extends React.Component {
           )}
           breadcrumbsList={state.breadcrumbsList}
         />
+
+        {state.showChangeTypeContentPopup && (
+          <ConfirmPopup
+            customColor={props.customColor}
+            confirmLabel={props.t('Change into content')}
+            confirmIcon='fa-fw fas fa-fw fa-th'
+            onConfirm={this.handleClickValidateChangeType}
+            onCancel={this.handleToggleContentChangeTypePopup}
+          />
+        )}
 
         <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
           <div className='thread__contentpage'>
