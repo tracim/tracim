@@ -401,8 +401,7 @@ export class Thread extends React.Component {
               disabled: state.content.is_archived || state.content.is_deleted,
               dataCy: 'popinListItem__delete'
             }
-          ] :
-          [
+          ] : [
             {
               icon: 'fas fa-link',
               label: props.t('Copy content link'),
@@ -417,8 +416,7 @@ export class Thread extends React.Component {
               disabled: state.content.is_archived || state.content.is_deleted,
               dataCy: 'popinListItem__delete'
             }
-          ]
-        }
+          ]}
           showReactions
           apiUrl={state.config.apiUrl}
           loggedUser={state.loggedUser}
