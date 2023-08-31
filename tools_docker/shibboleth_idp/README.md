@@ -11,7 +11,7 @@ Configuration is set at build time, to apply a new configuration the image must 
 docker build --no-cache -t shibboleth-idp-test-image .
 ```
 
-To add a SP to shibboleth's know SPs, add the following line at the end of `shibboleth-idp/conf/metadata-providers.xml` before the closing `</MetadataProvider>` tag:
+To add a SP to shibboleth's known SPs, add the following line at the end of `shibboleth-idp/conf/metadata-providers.xml` before the closing `</MetadataProvider>` tag:
 ```xml
     <MetadataProvider id="MY_ID" xsi:type="FileBackedHTTPMetadataProvider" backingFile="%{idp.home}/metadata/MY_ID.xml" metadataURL="URL_TO_SP_METADATA"/>
 ```
