@@ -309,10 +309,29 @@ export class AdminWorkspaceUser extends React.Component {
   handleDeleteSpace = async () => {
     const { props, state } = this
 
+    const workspaceList = state.content.workspaceList
+    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === state.workspaceToDelete)
+
+
     const deleteSpaceResponse = await handleFetchResult(await deleteWorkspace(state.config.apiUrl, state.workspaceToDelete))
     if (deleteSpaceResponse.status !== 204) {
       sendGlobalFlashMessage(props.t('Error while deleting space'))
     }
+    else {
+
+      const newSpaceList = [
+        ...workspaceList.slice(0, workspaceIndex),
+        ...workspaceList.slice(workspaceIndex + 1)
+      ]
+
+      this.setState(prev => ({
+        content: {
+          ...prev.content,
+          workspaceList: newSpaceList
+        }
+      }))
+    }
+
     this.handleClosePopupDeleteSpace()
   }
 
