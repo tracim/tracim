@@ -148,6 +148,16 @@ export class FeedItemHeader extends React.Component {
               />
             )}
 
+            <Link
+              className='feedItemHeader__actionMenu__item'
+              title={props.t('Open as content')}
+              to={PAGE.WORKSPACE.CONTENT(props.workspaceId, props.content.type, contentId)}
+              key={`open-${contentId}`}
+            >
+              <i className={`fa-fw ${props.contentType.faIcon}`} />
+              {props.t('Open as content')}
+            </Link>
+
             {shouldShowChangeTypeButton && (
               <IconButton
                 customClass='feedItemHeader__actionMenu__item'
@@ -162,15 +172,6 @@ export class FeedItemHeader extends React.Component {
               />
             )}
 
-            <Link
-              className='feedItemHeader__actionMenu__item'
-              title={props.t('Open as content')}
-              to={PAGE.WORKSPACE.CONTENT(props.workspaceId, props.content.type, contentId)}
-              key={`open-${contentId}`}
-            >
-              <i className={`fa-fw ${props.contentType.faIcon}`} />
-              {props.t('Open as content')}
-            </Link>
           </DropdownMenu>
         )}
       </div>
