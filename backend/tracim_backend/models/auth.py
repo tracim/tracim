@@ -63,6 +63,7 @@ class UserCreationType(str, enum.Enum):
 class AuthType(enum.Enum):
     INTERNAL = "internal"
     LDAP = "ldap"
+    SAML = "saml"
     UNKNOWN = "unknown"
     REMOTE = "remote"
 

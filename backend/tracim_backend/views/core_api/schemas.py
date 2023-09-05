@@ -2167,6 +2167,7 @@ class ConfigSchema(marshmallow.Schema):
     limitation__maximum_online_users_message = marshmallow.fields.String()
     call__enabled = marshmallow.fields.Bool()
     call__unanswered_timeout = marshmallow.fields.Int()
+    auth_types = marshmallow.fields.List(marshmallow.fields.String())
 
 
 class ConditionFileSchema(marshmallow.Schema):
