@@ -7,6 +7,26 @@ import InputGroupText from '../common/Input/InputGroupText.jsx'
 import { IconButton, PAGE } from 'tracim_frontend_lib'
 
 const SignIn = props => {
+  const [authTypePassword, setAuthTypePassword] = React.useState(false)
+
+  // TODO - M.L - 2023/09/05 - remove this when config will provide the list of idp
+  const idpList = [
+    {
+      name: 'SamlTest',
+      url: '#SamlTest'
+    },
+    {
+      name: 'GenericIdP',
+      url: '#GenericIdP'
+    },
+    {
+      name: 'AnotherOne',
+      url: '#AnotherOne'
+    }
+  ]
+
+  const hasSaml = props.system.config.auth_types && props.system.config.auth_types.includes('saml')
+
   return (
     <div className='loginpage__main__wrapper'>
       <div className='loginpage__main__header'>
@@ -22,48 +42,83 @@ const SignIn = props => {
           />
         )}
       </div>
-      <form onSubmit={props.onClickSubmit} noValidate className='loginpage__main__form'>
-        <div>{props.t('Login:')}</div>
-        <InputGroupText
-          parentClassName='loginpage__main__form__groupelogin'
-          icon='fa-user'
-          type='email'
-          placeHolder={props.t('Email address or username')}
-          invalidMsg={props.t('Invalid email or username')}
-          maxLength={512}
-          name='login'
-        />
-        <div>{props.t('Password:')}</div>
-        <InputGroupText
-          parentClassName='loginpage__main__form__groupepw'
-          customClass=''
-          icon='fa-lock'
-          type='password'
-          placeHolder={props.t('Password')}
-          invalidMsg={props.t('Invalid password')}
-          maxLength={512}
-          name='password'
-        />
+      {!authTypePassword && hasSaml ? (
+        <div className='loginpage__main__form'>
+          <div>{props.t('Choose a login method:')}</div>
+          <li>
+            <Link
+              className='loginpage__main__form__forgot_password'
+              onClick={() => setAuthTypePassword(true)}
+            >
+              {props.t('Classic login')}
+            </Link>
+          </li>
+          {idpList.map((idp) =>
+            <li key={idp.name}>
+              <Link
+                className='loginpage__main__form__forgot_password'
+                to={idp.url}
+              >
+                {idp.name}
+              </Link>
+            </li>
+          )}
+        </div>
+      ) : (
+        <form onSubmit={props.onClickSubmit} noValidate className='loginpage__main__form'>
+          <div>{props.t('Login:')}</div>
+          <InputGroupText
+            parentClassName='loginpage__main__form__groupelogin'
+            icon='fa-user'
+            type='email'
+            placeHolder={props.t('Email address or username')}
+            invalidMsg={props.t('Invalid email or username')}
+            maxLength={512}
+            name='login'
+          />
+          <div>{props.t('Password:')}</div>
+          <InputGroupText
+            parentClassName='loginpage__main__form__groupepw'
+            customClass=''
+            icon='fa-lock'
+            type='password'
+            placeHolder={props.t('Password')}
+            invalidMsg={props.t('Invalid password')}
+            maxLength={512}
+            name='password'
+          />
 
-        <Link
-          className='loginpage__main__form__forgot_password'
-          to={props.system.config.email_notification_activated
-            ? PAGE.FORGOT_PASSWORD
-            : PAGE.FORGOT_PASSWORD_NO_EMAIL_NOTIF}
-        >
-          {props.t('Forgotten password?')}
-        </Link>
+          <Link
+            className='loginpage__main__form__forgot_password'
+            to={props.system.config.email_notification_activated
+              ? PAGE.FORGOT_PASSWORD
+              : PAGE.FORGOT_PASSWORD_NO_EMAIL_NOTIF}
+          >
+            {props.t('Forgotten password?')}
+          </Link>
 
-        <IconButton
-          customClass='loginpage__main__form__btnsubmit'
-          icon='fas fa-sign-in-alt'
-          intent='primary'
-          mode='light'
-          text={props.t('Connection')}
-          type='submit'
-          dataCy='connectButton'
-        />
-      </form>
+          <IconButton
+            customClass='loginpage__main__form__btnsubmit'
+            icon='fas fa-sign-in-alt'
+            intent='primary'
+            mode='light'
+            text={props.t('Connection')}
+            type='submit'
+            dataCy='connectButton'
+          />
+
+          {hasSaml && (
+            <IconButton
+              customClass='loginpage__main__form__btnback'
+              icon='fas fa-sign-in-alt'
+              intent='primary'
+              mode='light'
+              text={props.t('Back')}
+              onClick={() => setAuthTypePassword(false)}
+            />
+          )}
+        </form>
+      )}
     </div>
   )
 }
