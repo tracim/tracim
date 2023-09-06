@@ -42,7 +42,8 @@ const SignIn = props => {
               <a
                 className='loginpage__main__form__forgot_password'
                 href={'/saml/sso?target=' + encodeURIComponent(idp)}
-                rel='noopener noreferrer'>
+                rel='noopener noreferrer'
+              >
                 {idp}
               </a>
             </li>
