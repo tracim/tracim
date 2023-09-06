@@ -9,22 +9,6 @@ import { IconButton, PAGE } from 'tracim_frontend_lib'
 const SignIn = props => {
   const [authTypePassword, setAuthTypePassword] = React.useState(false)
 
-  // TODO - M.L - 2023/09/05 - remove this when config will provide the list of idp
-  const idpList = [
-    {
-      name: 'SamlTest',
-      url: '#SamlTest'
-    },
-    {
-      name: 'GenericIdP',
-      url: '#GenericIdP'
-    },
-    {
-      name: 'AnotherOne',
-      url: '#AnotherOne'
-    }
-  ]
-
   const hasSaml = props.system.config.auth_types && props.system.config.auth_types.includes('saml')
 
   return (
@@ -53,14 +37,14 @@ const SignIn = props => {
               {props.t('Classic login')}
             </Link>
           </li>
-          {idpList.map((idp) =>
-            <li key={idp.name}>
-              <Link
+          {props.system.config.idp_list.map((idp) =>
+            <li key={idp}>
+              <a
                 className='loginpage__main__form__forgot_password'
-                to={idp.url}
-              >
-                {idp.name}
-              </Link>
+                href={'/saml/sso?target=' + encodeURIComponent(idp)}
+                rel='noopener noreferrer'>
+                {idp}
+              </a>
             </li>
           )}
         </div>
