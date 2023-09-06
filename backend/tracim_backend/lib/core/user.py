@@ -645,7 +645,14 @@ need to be in every workspace you include."
         ) as exc:
             raise AuthenticationFailed('User "{}" authentication failed'.format(login)) from exc
 
-    def authenticate(self, password: str, login: str, ldap_connector: "Connector" = None) -> User:
+    def authenticate(
+        self,
+        password: str,
+        login: str,
+        ldap_connector: "Connector" = None,
+        saml_name: str = "",
+        saml_mail: str = ""
+    ) -> User:
         """
         Authenticate user with email/username and password, raise AuthenticationFailed
         if incorrect. try all auth available in order and raise issue of
@@ -653,6 +660,8 @@ need to be in every workspace you include."
         :param login: login or username of the user
         :param password: plaintext password of the user
         :param ldap_connector: ldap connector, enable ldap auth if provided
+        :param saml_mail: mail extracted from saml attributes
+        :param saml_name: name extracted from saml attributes
         :return: User who was authenticated.
         """
         for auth_type in self._config.AUTH_TYPES:
@@ -662,6 +671,8 @@ need to be in every workspace you include."
                     password=password,
                     ldap_connector=ldap_connector,
                     auth_type=auth_type,
+                    saml_name=saml_name,
+                    saml_mail=saml_mail
                 )
             except AuthenticationFailed as exc:
                 raise exc
@@ -670,12 +681,66 @@ need to be in every workspace you include."
 
         raise AuthenticationFailed("Auth mechanism for this user is not activated")
 
+    def saml_authenticate(
+        self,
+        user: typing.Optional[User],
+        user_id: str,
+        name: str,
+        mail: str,
+    ) -> User:
+        """
+        Authenticate with ldap, return authenticated user or raise Exception
+        like WrongAuthTypeForUser, WrongLDAPCredentials, UserDoesNotExist
+        or UserAuthenticatedIsNotActive
+        :param user: user to check,, can be none if user not found, will try
+         to create new user if none but ldap auth succeed
+        :param user_id: user_id of the user
+        :param name: name extracted from saml attributes
+        :param mail: mail extracted from saml attributes
+        """
+        auth_type = AuthType.SAML
+
+        # TODO - M.L - 2023/09/06 - Change this to get saml response and isolate attributes
+
+        if not user:
+            try:
+                user = self.get_one_by_login(user_id)
+            except UserDoesNotExist:
+                _ = self.create_user(
+                    email=mail,
+                    username=user_id,
+                    name=name,
+                    auth_type=AuthType.SAML,
+                    do_save=True,
+                    do_notify=False,
+                )
+                transaction.commit()
+                user = self.get_one_by_login(user_id)
+        if user and user.auth_type not in [auth_type, AuthType.UNKNOWN]:
+            raise WrongAuthTypeForUser(
+                'User "{}" auth_type is {} not {}'.format(
+                    user_id, user.auth_type.value, auth_type.value
+                )
+            )
+
+        if user.is_deleted:
+            raise UserDoesNotExist("This user has been deleted")
+
+        if not user.is_active:
+            raise UserAuthenticatedIsNotActive("This user is not activated")
+
+        if user.auth_type == AuthType.UNKNOWN:
+            user.auth_type = auth_type
+        return user
+
     def _authenticate(
         self,
         password: str,
         login: str,
         ldap_connector: "Connector" = None,
         auth_type: AuthType = AuthType.INTERNAL,
+        saml_name: str = "",
+        saml_mail: str = "",
     ) -> User:
         """
         Authenticate user with email/username and password, raise AuthenticationFailed
@@ -684,6 +749,8 @@ need to be in every workspace you include."
         :param password: plaintext password of the user
         :param ldap_connector: ldap connector, enable ldap auth if provided
         :param auth_type: auth type to test.
+        :param saml_mail: mail extracted from saml attributes
+        :param saml_name: name extracted from saml attributes
         :return: User who was authenticated.
         """
         user = None
@@ -698,6 +765,8 @@ need to be in every workspace you include."
                 raise MissingLDAPConnector()
             elif auth_type == AuthType.INTERNAL:
                 return self._internal_db_authenticate(user, login, password)
+            elif auth_type == AuthType.SAML:
+                return self.saml_authenticate(user, login, saml_name, saml_mail)
             else:
                 raise UnknownAuthType()
         except (

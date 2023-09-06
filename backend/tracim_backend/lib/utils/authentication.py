@@ -33,7 +33,6 @@ from saml2.metadata import create_metadata_string
 from saml2 import BINDING_HTTP_POST
 from saml2.client import Saml2Client
 from saml2.validate import ResponseLifetimeExceed
-from saml2.saml import NameID
 
 BASIC_AUTH_WEBUI_REALM = "tracim"
 TRACIM_API_KEY_HEADER = "Tracim-Api-Key"
@@ -57,6 +56,14 @@ class SAMLSecurityPolicy:
             config_data = json.load(config_file)
             self.saml_config = Saml2Config()
             self.saml_config.load(config_data)
+            attribute_map = {
+                "EmailAddress": "user_email",
+                "UserID": "user_id",
+                "FirstName": "first_name",
+                "LastName": "last_name",
+            }
+            self.saml_config.allow_unknown_attributes = True
+            self.saml_config.attribute_map = attribute_map
         self._metadata_response = Response(content_type='application/xml')
         self._metadata_response.text = create_metadata_string(config=self.saml_config,
                                                               configfile=None).decode()
@@ -111,18 +118,21 @@ class SAMLSecurityPolicy:
         saml_user_id = request.session.get("saml_user_id")
         if saml_user_id is None:
             return None
+
         user_api = UserApi(None, request.dbsession, self.app_config)
-        try:
-            user = user_api.get_one_by_login(saml_user_id)
-        except UserDoesNotExist:
-            user = user_api.create_minimal_user(
-                username=saml_user_id, email=f"{saml_user_id}@saml.test", save_now=True
-            )
+
+        user = user_api.saml_authenticate(
+            user=None,
+            user_id=saml_user_id,
+            name=request.session.get("saml_name"),
+            mail=request.session.get("saml_mail"),
+        )
         self.remember(request, user.user_id)
         request.set_user(user)
         return user.user_id
 
     def permits(self, request, context, permission):
+        # TODO - M.L - 2023/09/06 - Maybe check for session lifetime or validity
         # if request.authenticated_userid is None \
         #     and not request.path.startswith("/saml") \
         #     and not request.path.startswith("/saml") \
@@ -137,7 +147,10 @@ class SAMLSecurityPolicy:
         return []
 
     def forget(self, request: TracimRequest, **kw: typing.Any) -> typing.Iterable[str]:
-        del request.session["saml_user_id"]
+        if "saml_user_id" in request.session:
+            del request.session["saml_user_id"]
+            del request.session["saml_mail"]
+            del request.session["saml_name"]
         self._session_helper.forget(request, **kw)
         return []
 
@@ -164,14 +177,17 @@ class SAMLSecurityPolicy:
             )
         except ResponseLifetimeExceed as e:
             return Response(e.__str__())
-        user_id = authn_response.get_identity()
-        # sbj: NameID = authn_response.get_subject()
-        # idp_name = None
-        # if sbj.name_qualifier in self.saml_client.config.vorg:
-        #     idp_name = self.saml_client.config.vorg.get(sbj.name_qualifier).common_identifier
-        if user_id is not None:
-            request.session["saml_user_id"] = user_id
-        return Response("It works!")
+        identity = authn_response.get_identity()
+        if identity is None or "UserID" not in identity:
+            return HTTPBadRequest()
+
+        # TODO - M.L - 2023/09/06 - Associate response / expiry date to session
+        request.session["saml_user_id"] = ''.join(identity["UserID"])
+        request.session["saml_mail"] = ''.join(identity["EmailAddress"])
+        request.session[
+            "saml_name"] = f'{"".join(identity["FirstName"])} {"".join(identity["LastName"])}'
+
+        return HTTPFound("/")
 
     def _sso(self, request: TracimRequest) -> Response:
         if "target" not in request.params:

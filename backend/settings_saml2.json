@@ -1,10 +1,13 @@
     {
-        "entityid": "http://127.0.0.1:6543/saml2/metadata/",
+        "entityid": "http://localhost:7999/saml/metadata",
         "metadata": {
             "local": [],
             "remote": [
                 {
                     "url": "https://samltest.id/saml/idp"
+                },
+                {
+                    "url": "https://idp.ssocircle.com"
                 }
             ]
         },
@@ -13,17 +16,17 @@
                 "endpoints": {
                     "assertion_consumer_service": [
                         [
-                            "http://127.0.0.1:6543/saml2/acs",
+                            "http://localhost:7999/saml/acs",
                             "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
                         ]
                     ],
                     "single_logout_service": [
                         [
-                            "http://127.0.0.1:6543/saml2/slo/post",
+                            "http://localhost:7999/saml/slo/redirect",
                             "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
                         ],
                         [
-                            "http://127.0.0.1:6543/saml2/slo/redirect",
+                            "http://localhost:7999/saml/slo/post",
                             "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
                         ]
                     ]
@@ -46,7 +49,10 @@
         },
         "virtual_organization": {
             "https://samltest.id/saml/idp": {
-                "common_identifier": "idp_0"
+                "common_identifier": "saml_test"
+            },
+            "https://idp.ssocircle.com": {
+                "common_identifier": "sso_circle"
             }
         }
     }
