@@ -327,6 +327,7 @@ zope-interface==5.4.0
     #   zope-sqlalchemy
 zope-sqlalchemy==1.6
     # via tracim-backend (setup.py)
+pysaml2==7.4.2
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
