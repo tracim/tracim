@@ -187,6 +187,10 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     policies.append(
         adapt_auth_policy(TracimBasicAuthAuthenticationPolicy(realm=BASIC_AUTH_WEBUI_REALM))
     )
+
+    if AuthType.SAML in app_config.AUTH_TYPES:
+        policies.append(SAMLSecurityPolicy(app_config, configurator))
+
     # Hack for ldap
     if AuthType.LDAP in app_config.AUTH_TYPES:
         import ldap3

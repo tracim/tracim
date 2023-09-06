@@ -1,3 +1,5 @@
+import json
+import os
 from abc import ABC
 from abc import abstractmethod
 import datetime
@@ -7,7 +9,7 @@ from pyramid.authentication import SessionAuthenticationHelper
 from pyramid.authentication import SessionAuthenticationPolicy
 from pyramid.authentication import extract_http_basic_credentials
 from pyramid.config import Configurator
-from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPFound, HTTPBadRequest, HTTPNotFound
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.request import Request
 from pyramid.response import Response
@@ -26,6 +28,13 @@ from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import User
 
+from saml2.config import Config as Saml2Config
+from saml2.metadata import create_metadata_string
+from saml2 import BINDING_HTTP_POST
+from saml2.client import Saml2Client
+from saml2.validate import ResponseLifetimeExceed
+from saml2.saml import NameID
+
 BASIC_AUTH_WEBUI_REALM = "tracim"
 TRACIM_API_KEY_HEADER = "Tracim-Api-Key"
 TRACIM_API_USER_LOGIN_HEADER = "Tracim-Api-Login"
@@ -38,18 +47,65 @@ class SAMLSecurityPolicy:
         self.app_config = app_config
         self._session_helper = SessionAuthenticationHelper()
         # TODO - SGD - 2023-07-26 - Add views for sso/slo/acs/sls
-        # The routes could also be defined through a controller (see Controller class)
-        # even if it added-value is small.
-        configurator.add_forbidden_view(self._idp_chooser)
+        #  The routes could also be defined through a controller (see Controller class)
+        #  even if it added-value is small.
 
+        # TODO - M.L - 2023/09/05 - Change this to proper config loading
+        self._load_settings(configurator)
+        _config = configurator.get_settings().get('pyramid_saml')
+        with open(_config.get('saml_path'), 'r') as config_file:
+            config_data = json.load(config_file)
+            self.saml_config = Saml2Config()
+            self.saml_config.load(config_data)
+        self._metadata_response = Response(content_type='application/xml')
+        self._metadata_response.text = create_metadata_string(config=self.saml_config,
+                                                              configfile=None).decode()
+        self.saml_client = Saml2Client(config=self.saml_config)
+
+        for _, data in self.saml_client.config.vorg.items():
+            if data.common_identifier not in app_config.IDP_LIST:
+                app_config.IDP_LIST.append(data.common_identifier)
+
+        configurator.add_forbidden_view(self._idp_chooser)
         configurator.add_route("acs", "/saml/acs", request_method="POST")
+        configurator.add_route("sso", "/saml/sso", request_method="GET")
         configurator.add_view(self._acs, route_name="acs")
+        configurator.add_view(self._sso, route_name="sso")
+
+    def _load_settings(self, config: Configurator):
+        # TODO - M.L - 2023/09/05 - Change this to proper config loading
+        """Parse and validate SAML configuration.
+
+        Args:
+            config (pyramid.config.Configurator): The configuration of the
+                existing Pyramid application.
+        """
+
+        if 'PYRAMID_SAML_PATH' in os.environ:
+            if 'pyramid_saml' not in config.get_settings():
+                config.get_settings().update({
+                    'pyramid_saml': {}
+                })
+            config.get_settings().get('pyramid_saml').update({
+                'saml_path': os.environ.get('PYRAMID_SAML_PATH')
+            })
+
+        if 'pyramid_saml' not in config.get_settings():
+            msg = 'Missing \'pyramid_saml\' configuration in settings'
+            raise AssertionError(msg)
+        else:
+            settings = config.get_settings().get('pyramid_saml')
+
+        if 'saml_path' not in settings:
+            msg = 'Missing \'saml_path\' in settings'
+            raise AssertionError(msg)
 
     def authenticated_userid(
         self, request: TracimRequest
     ) -> typing.Optional[typing.Union[str, int]]:
-        # FIXME - SGD - 2023-07-26 - Return Tracim user id when SAML data is present in the session.
-        # By matching it with SAML ID attribute (in external_id, see https://github.com/tracim/tracim/issues/6209)
+        # FIXME - SGD - 2023-07-26 - Return Tracim user id when SAML data is present in the
+        #  session. By matching it with SAML ID attribute (in external_id,
+        #  see https://github.com/tracim/tracim/issues/6209)
         saml_user_id = request.session.get("saml_user_id")
         if saml_user_id is None:
             return None
@@ -65,8 +121,11 @@ class SAMLSecurityPolicy:
         return user.user_id
 
     def permits(self, request, context, permission):
-        if request.authenticated_userid is None and not request.path.startswith("/saml"):
-            return Denied("Nobody is allowed")
+        # if request.authenticated_userid is None \
+        #     and not request.path.startswith("/saml") \
+        #     and not request.path.startswith("/saml") \
+        #     and not request.path is "/ui/login":
+        #     return Denied("Nobody is allowed")
         return Allowed("Allowed")
 
     def remember(
@@ -95,10 +154,43 @@ class SAMLSecurityPolicy:
         )
 
     def _acs(self, request: TracimRequest) -> Response:
-        saml_user_id = request.params.get("saml_user_id")
-        if saml_user_id is not None:
-            request.session["saml_user_id"] = saml_user_id
-        return HTTPFound(request.params["redirect_url"])
+        response = request.POST['SAMLResponse']
+        try:
+            authn_response = self.saml_client.parse_authn_request_response(
+                response,
+                binding=BINDING_HTTP_POST,
+            )
+        except ResponseLifetimeExceed as e:
+            return Response(e.__str__())
+        user_id = authn_response.get_identity()
+        # sbj: NameID = authn_response.get_subject()
+        # idp_name = None
+        # if sbj.name_qualifier in self.saml_client.config.vorg:
+        #     idp_name = self.saml_client.config.vorg.get(sbj.name_qualifier).common_identifier
+        if user_id is not None:
+            request.session["saml_user_id"] = user_id
+        return Response("It works!")
+
+    def _sso(self, request: TracimRequest) -> Response:
+        if "target" not in request.params:
+            return HTTPBadRequest("Missing target parameter")
+
+        target = None
+        for entity_id, data in self.saml_client.config.vorg.items():
+            if request.params["target"] == data.common_identifier:
+                target = entity_id
+
+        if target is None:
+            return HTTPNotFound("This IdP doesn't exist")
+        _, info = self.saml_client.prepare_for_authenticate(
+            entityid=target,
+        )
+
+        redirect_url = None
+        for key, value in info['headers']:
+            if key == 'Location':
+                redirect_url = value
+        return HTTPFound(redirect_url)
 
 
 class TracimAuthenticationPolicy(ABC):
