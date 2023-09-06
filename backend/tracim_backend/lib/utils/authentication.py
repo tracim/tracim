@@ -69,8 +69,10 @@ class SAMLSecurityPolicy:
         configurator.add_forbidden_view(self._idp_chooser)
         configurator.add_route("acs", "/saml/acs", request_method="POST")
         configurator.add_route("sso", "/saml/sso", request_method="GET")
+        configurator.add_route("metadata", "/saml/metadata", request_method="GET")
         configurator.add_view(self._acs, route_name="acs")
         configurator.add_view(self._sso, route_name="sso")
+        configurator.add_view(self._metadata, route_name="metadata")
 
     def _load_settings(self, config: Configurator):
         # TODO - M.L - 2023/09/05 - Change this to proper config loading
@@ -191,6 +193,9 @@ class SAMLSecurityPolicy:
             if key == 'Location':
                 redirect_url = value
         return HTTPFound(redirect_url)
+
+    def _metadata(self, request: TracimRequest) -> Response:
+        return self._metadata_response
 
 
 class TracimAuthenticationPolicy(ABC):
