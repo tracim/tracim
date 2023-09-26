@@ -49,7 +49,7 @@ class SAMLSecurityPolicy:
         #  The routes could also be defined through a controller (see Controller class)
         #  even if it added-value is small.
 
-        # TODO - M.L - 2023/09/05 - Change this to proper config loading
+        # FIXME - M.L - 2023/09/05 - Change this to proper config loading
         self._load_settings(configurator)
         _config = configurator.get_settings().get('pyramid_saml')
         with open(_config.get('saml_path'), 'r') as config_file:
@@ -82,7 +82,7 @@ class SAMLSecurityPolicy:
         configurator.add_view(self._metadata, route_name="metadata")
 
     def _load_settings(self, config: Configurator):
-        # TODO - M.L - 2023/09/05 - Change this to proper config loading
+        # FIXME - M.L - 2023/09/05 - Change this to proper config loading
         """Parse and validate SAML configuration.
 
         Args:
@@ -181,7 +181,7 @@ class SAMLSecurityPolicy:
         if identity is None or "UserID" not in identity:
             return HTTPBadRequest()
 
-        # TODO - M.L - 2023/09/06 - Associate response / expiry date to session
+        # FIXME - M.L - 2023/09/06 - Associate response / expiry date to session
         request.session["saml_user_id"] = ''.join(identity["UserID"])
         request.session["saml_mail"] = ''.join(identity["EmailAddress"])
         request.session[
@@ -201,7 +201,7 @@ class SAMLSecurityPolicy:
         if target is None:
             return HTTPNotFound("This IdP doesn't exist")
         _, info = self.saml_client.prepare_for_authenticate(
-            entityid=target,
+            entityid=self.saml_config.metadata.metadata[target].entity_descr.entity_id,
         )
 
         redirect_url = None
