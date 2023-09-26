@@ -602,5 +602,6 @@
   "Unknown comment": "",
   "Please set a name, an email or a username": "",
   "Error in the URL": "",
-  "Publish": ""
+  "Publish": "",
+  "UnknownRole": ""
 }
