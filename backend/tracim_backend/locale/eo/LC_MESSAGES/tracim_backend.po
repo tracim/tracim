@@ -1,0 +1,99 @@
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2023-07-10 18:51+0000\n"
+"Last-Translator: inkhey <mail@inkey-art.net>\n"
+"Language-Team: Esperanto <https://hosted.weblate.org/projects/tracim/backend/"
+"eo/>\n"
+"Language: eo\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.0-dev\n"
+
+#: tracim_backend/applications/upload_permissions/lib.py:281
+#, fuzzy
+msgid "Message from {username}: {message}"
+msgstr "Mesaĝo de {username} : {message}"
+
+#: tracim_backend/app_models/contents.py:47
+msgid "Opened"
+msgstr "Malfermita"
+
+#: tracim_backend/app_models/contents.py:55
+msgid "Validated"
+msgstr "Validigita"
+
+#: tracim_backend/models/mention.py:6
+msgid "reader"
+msgstr "leganto"
+
+#: tracim_backend/config.py:764
+msgid ""
+"[{website_title}] [{workspace_label}] {content_label} "
+"({content_status_label})"
+msgstr ""
+"[{website_title}] [{workspace_label}] {content_label} "
+"({content_status_label})"
+
+#: tracim_backend/app_models/contents.py:71
+#, fuzzy
+msgid "Deprecated"
+msgstr "malrekomendita"
+
+#: tracim_backend/lib/core/mention.py:144 tracim_backend/models/mention.py:5
+msgid "all"
+msgstr "ĉiuj"
+
+#: tracim_backend/lib/core/workspace.py:495
+msgid "Space"
+msgstr "Spaco"
+
+#: tracim_backend/lib/core/content.py:753
+msgid "Space {workspace_name}"
+msgstr "Spaco {workspace_name}"
+
+#: tracim_backend/lib/core/content.py:2108
+msgid "New folder"
+msgstr "Nova dosierujo"
+
+#: tracim_backend/models/mention.py:7
+msgid "contributor"
+msgstr "kontribuanto"
+
+#: tracim_backend/models/mention.py:8
+#, fuzzy
+msgid "content-manager"
+msgstr "mastrumanto de enhavo"
+
+#: tracim_backend/lib/core/workspace.py:498
+msgid "Space {}"
+msgstr "Space {}"
+
+#: tracim_backend/app_models/contents.py:63
+#, fuzzy
+msgid "Cancelled"
+msgstr "nuligita"
+
+#: tracim_backend/models/mention.py:9
+#, fuzzy
+msgid "space-manager"
+msgstr "mastrumanto de spaco"
+
+#: tracim_backend/templates/mail/new_upload_event_body_html.mak:12
+#, fuzzy
+msgid "Message:"
+msgstr "Mesaĝo:"
+
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:7
+#: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:7
+msgid "Hello,"
+msgstr "Saluton,"
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:17
+msgid "password: {password}"
+msgstr "pasvorto: {password}"
+
+#: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:10
+msgid "Upload files"
+msgstr "alŝuti"
