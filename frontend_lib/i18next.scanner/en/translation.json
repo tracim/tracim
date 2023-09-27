@@ -259,7 +259,7 @@
   "Image": "Image",
   "Fullscreen": "Fullscreen",
   "Please notice that I did an important update on this content.": "Please notice that I did an important update on this content.",
-  "Nothing matches you filter": "Nothing matches you filter",
+  "Nothing matches you filter": "Nothing matches your filter",
   "This list is empty": "This list is empty",
   "Warning": "Warning",
   "content is not available": "content is not available",
@@ -271,5 +271,5 @@
   "moved": "moved",
   "copied": "copied",
   "unknown": "unknown",
-  "UnknownRole": "UnknownRole"
+  "UnknownRole": "Unknown Role"
 }
