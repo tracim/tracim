@@ -1,25 +1,31 @@
-import json
-import os
 from abc import ABC
 from abc import abstractmethod
 import datetime
+import json
+import os
+import time
+import typing
+
 from pyramid.authentication import BasicAuthAuthenticationPolicy
 from pyramid.authentication import CallbackAuthenticationPolicy
 from pyramid.authentication import SessionAuthenticationHelper
 from pyramid.authentication import SessionAuthenticationPolicy
 from pyramid.authentication import extract_http_basic_credentials
 from pyramid.config import Configurator
+from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.httpexceptions import HTTPFound
-from pyramid.config import Configurator
-from pyramid.httpexceptions import HTTPFound, HTTPBadRequest, HTTPNotFound
+from pyramid.httpexceptions import HTTPNotFound
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.request import Request
 from pyramid.response import Response
 from pyramid.security import Allowed
 from pyramid.security import Denied
 from pyramid_ldap3 import get_ldap_connector
-import time
-import typing
+from saml2 import BINDING_HTTP_POST
+from saml2.client import Saml2Client
+from saml2.config import Config as Saml2Config
+from saml2.metadata import create_metadata_string
+from saml2.validate import ResponseLifetimeExceed
 from zope.interface import implementer
 
 from tracim_backend.config import CFG  # noqa: F401
@@ -29,12 +35,6 @@ from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import User
-
-from saml2.config import Config as Saml2Config
-from saml2.metadata import create_metadata_string
-from saml2 import BINDING_HTTP_POST
-from saml2.client import Saml2Client
-from saml2.validate import ResponseLifetimeExceed
 
 BASIC_AUTH_WEBUI_REALM = "tracim"
 TRACIM_API_KEY_HEADER = "Tracim-Api-Key"
@@ -53,8 +53,8 @@ class SAMLSecurityPolicy:
 
         # FIXME - M.L - 2023/09/05 - Change this to proper config loading
         self._load_settings(configurator)
-        _config = configurator.get_settings().get('pyramid_saml')
-        with open(_config.get('saml_path'), 'r') as config_file:
+        _config = configurator.get_settings().get("pyramid_saml")
+        with open(_config.get("saml_path"), "r") as config_file:
             config_data = json.load(config_file)
             self.saml_config = Saml2Config()
             self.saml_config.load(config_data)
@@ -66,9 +66,10 @@ class SAMLSecurityPolicy:
             }
             self.saml_config.allow_unknown_attributes = True
             self.saml_config.attribute_map = attribute_map
-        self._metadata_response = Response(content_type='application/xml')
-        self._metadata_response.text = create_metadata_string(config=self.saml_config,
-                                                              configfile=None).decode()
+        self._metadata_response = Response(content_type="application/xml")
+        self._metadata_response.text = create_metadata_string(
+            config=self.saml_config, configfile=None
+        ).decode()
         self.saml_client = Saml2Client(config=self.saml_config)
 
         for _, data in self.saml_client.config.vorg.items():
@@ -92,23 +93,21 @@ class SAMLSecurityPolicy:
                 existing Pyramid application.
         """
 
-        if 'PYRAMID_SAML_PATH' in os.environ:
-            if 'pyramid_saml' not in config.get_settings():
-                config.get_settings().update({
-                    'pyramid_saml': {}
-                })
-            config.get_settings().get('pyramid_saml').update({
-                'saml_path': os.environ.get('PYRAMID_SAML_PATH')
-            })
+        if "PYRAMID_SAML_PATH" in os.environ:
+            if "pyramid_saml" not in config.get_settings():
+                config.get_settings().update({"pyramid_saml": {}})
+            config.get_settings().get("pyramid_saml").update(
+                {"saml_path": os.environ.get("PYRAMID_SAML_PATH")}
+            )
 
-        if 'pyramid_saml' not in config.get_settings():
-            msg = 'Missing \'pyramid_saml\' configuration in settings'
+        if "pyramid_saml" not in config.get_settings():
+            msg = "Missing 'pyramid_saml' configuration in settings"
             raise AssertionError(msg)
         else:
-            settings = config.get_settings().get('pyramid_saml')
+            settings = config.get_settings().get("pyramid_saml")
 
-        if 'saml_path' not in settings:
-            msg = 'Missing \'saml_path\' in settings'
+        if "saml_path" not in settings:
+            msg = "Missing 'saml_path' in settings"
             raise AssertionError(msg)
 
     def authenticated_userid(
@@ -171,11 +170,10 @@ class SAMLSecurityPolicy:
         )
 
     def _acs(self, request: TracimRequest) -> Response:
-        response = request.POST['SAMLResponse']
+        response = request.POST["SAMLResponse"]
         try:
             authn_response = self.saml_client.parse_authn_request_response(
-                response,
-                binding=BINDING_HTTP_POST,
+                response, binding=BINDING_HTTP_POST,
             )
         except ResponseLifetimeExceed as e:
             return Response(e.__str__())
@@ -184,10 +182,11 @@ class SAMLSecurityPolicy:
             return HTTPBadRequest()
 
         # FIXME - M.L - 2023/09/06 - Associate response / expiry date to session
-        request.session["saml_user_id"] = ''.join(identity["UserID"])
-        request.session["saml_mail"] = ''.join(identity["EmailAddress"])
+        request.session["saml_user_id"] = "".join(identity["UserID"])
+        request.session["saml_mail"] = "".join(identity["EmailAddress"])
         request.session[
-            "saml_name"] = f'{"".join(identity["FirstName"])} {"".join(identity["LastName"])}'
+            "saml_name"
+        ] = f'{"".join(identity["FirstName"])} {"".join(identity["LastName"])}'
 
         return HTTPFound("/")
 
@@ -207,8 +206,8 @@ class SAMLSecurityPolicy:
         )
 
         redirect_url = None
-        for key, value in info['headers']:
-            if key == 'Location':
+        for key, value in info["headers"]:
+            if key == "Location":
                 redirect_url = value
         return HTTPFound(redirect_url)
 
@@ -226,10 +225,7 @@ class TracimAuthenticationPolicy(ABC):
         return UserApi(None, session=request.dbsession, config=app_config)
 
     def _authenticate_user(
-        self,
-        request: Request,
-        login: typing.Optional[str],
-        password: typing.Optional[str],
+        self, request: Request, login: typing.Optional[str], password: typing.Optional[str],
     ) -> typing.Optional[User]:
         """
         Helper to authenticate user in pyramid request
@@ -243,11 +239,7 @@ class TracimAuthenticationPolicy(ABC):
         if AuthType.LDAP in app_config.AUTH_TYPES:
             ldap_connector = get_ldap_connector(request)
         try:
-            user = uapi.authenticate(
-                login=login,
-                password=password,
-                ldap_connector=ldap_connector,
-            )
+            user = uapi.authenticate(login=login, password=password, ldap_connector=ldap_connector,)
             return user
         except AuthenticationFailed:
             return None

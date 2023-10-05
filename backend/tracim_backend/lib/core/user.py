@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 import datetime
-from depot.io.utils import FileIntent
-from hapic.data import HapicFile
 import hashlib
 import io
-from marshmallow import ValidationError
 import os
-from pyramid_ldap3 import Connector
 import re
 from smtplib import SMTPException
 from smtplib import SMTPRecipientsRefused
+import typing as typing
+
+from depot.io.utils import FileIntent
+from hapic.data import HapicFile
+from marshmallow import ValidationError
+from pyramid_ldap3 import Connector
 from sqlakeyset import Page
 from sqlakeyset import get_page
 import sqlalchemy
@@ -20,7 +22,6 @@ from sqlalchemy.orm import Query
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.expression import cast
 import transaction
-import typing as typing
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.email_validators import TracimEmailValidator
@@ -44,11 +45,11 @@ from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisall
 from tracim_backend.exceptions import InvalidUsernameFormat
 from tracim_backend.exceptions import MissingEmailCantResetPassword
 from tracim_backend.exceptions import MissingLDAPConnector
-from tracim_backend.exceptions import NoUserSetted
 from tracim_backend.exceptions import NotFound
 from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation
 from tracim_backend.exceptions import NotificationDisabledCantResetPassword
 from tracim_backend.exceptions import NotificationSendingFailed
+from tracim_backend.exceptions import NoUserSetted
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import RemoteUserAuthDisabled
 from tracim_backend.exceptions import ReservedUsernameError
@@ -56,9 +57,9 @@ from tracim_backend.exceptions import TooManyOnlineUsersError
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UnknownAuthType
-from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.exceptions import UserAuthenticatedIsDeleted
 from tracim_backend.exceptions import UserAuthenticatedIsNotActive
+from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
@@ -366,9 +367,7 @@ need to be in every workspace you include."
             limit = KNOWN_CONTENT_ITEMS_DEFAULT_LIMIT
 
         content_api = ContentApi(
-            session=self._session,
-            current_user=self._user,
-            config=self._config,
+            session=self._session, current_user=self._user, config=self._config,
         )
 
         query = content_api.get_base_query(workspaces=self.get_user_workspaces())
@@ -438,11 +437,7 @@ need to be in every workspace you include."
             return False
 
     def _ldap_authenticate(
-        self,
-        user: typing.Optional[User],
-        login: str,
-        password: str,
-        ldap_connector: "Connector",
+        self, user: typing.Optional[User], login: str, password: str, ldap_connector: "Connector",
     ) -> User:
         """
         Authenticate with ldap, return authenticated user or raise Exception
@@ -651,7 +646,7 @@ need to be in every workspace you include."
         login: str,
         ldap_connector: "Connector" = None,
         saml_name: str = "",
-        saml_mail: str = ""
+        saml_mail: str = "",
     ) -> User:
         """
         Authenticate user with email/username and password, raise AuthenticationFailed
@@ -672,7 +667,7 @@ need to be in every workspace you include."
                     ldap_connector=ldap_connector,
                     auth_type=auth_type,
                     saml_name=saml_name,
-                    saml_mail=saml_mail
+                    saml_mail=saml_mail,
                 )
             except AuthenticationFailed as exc:
                 raise exc
@@ -682,11 +677,7 @@ need to be in every workspace you include."
         raise AuthenticationFailed("Auth mechanism for this user is not activated")
 
     def saml_authenticate(
-        self,
-        user: typing.Optional[User],
-        user_id: str,
-        name: str,
-        mail: str,
+        self, user: typing.Optional[User], user_id: str, name: str, mail: str,
     ) -> User:
         """
         Authenticate with ldap, return authenticated user or raise Exception
@@ -843,11 +834,7 @@ need to be in every workspace you include."
         return user
 
     def set_username(
-        self,
-        user: User,
-        loggedin_user_password: str,
-        username: str,
-        do_save: bool = True,
+        self, user: User, loggedin_user_password: str, username: str, do_save: bool = True,
     ) -> User:
         """
         Set username of user if loggedin user password is correct
@@ -1213,8 +1200,7 @@ need to be in every workspace you include."
         self._check_user_auth_validity(user)
         self._check_password_modification_allowed(user)
         return user.validate_reset_password_token(
-            token=token,
-            validity_seconds=self._config.USER__RESET_PASSWORD__TOKEN_LIFETIME,
+            token=token, validity_seconds=self._config.USER__RESET_PASSWORD__TOKEN_LIFETIME,
         )
 
     def enable(self, user: User, do_save=False):
@@ -1301,10 +1287,7 @@ need to be in every workspace you include."
         if (
             self._session.query(UserFollower)
             .filter(
-                and_(
-                    UserFollower.leader_id == leader_id,
-                    UserFollower.follower_id == follower_id,
-                )
+                and_(UserFollower.leader_id == leader_id, UserFollower.follower_id == follower_id,)
             )
             .count()
         ):
@@ -1400,11 +1383,7 @@ need to be in every workspace you include."
         )
 
     def get_avatar(
-        self,
-        user_id: int,
-        filename: str,
-        default_filename: str,
-        force_download: bool = False,
+        self, user_id: int, filename: str, default_filename: str, force_download: bool = False,
     ) -> HapicFile:
         user = self.get_one(user_id)
         if not user.avatar:
@@ -1475,11 +1454,7 @@ need to be in every workspace you include."
             self._session.flush()
 
     def get_cover(
-        self,
-        user_id: int,
-        filename: str,
-        default_filename: str,
-        force_download: bool = False,
+        self, user_id: int, filename: str, default_filename: str, force_download: bool = False,
     ) -> HapicFile:
         user = self.get_one(user_id)
         if not user.cover:
@@ -1516,11 +1491,7 @@ need to be in every workspace you include."
         )
 
     def set_cover(
-        self,
-        user_id: int,
-        new_filename: str,
-        new_mimetype: str,
-        new_content: typing.BinaryIO,
+        self, user_id: int, new_filename: str, new_mimetype: str, new_content: typing.BinaryIO,
     ) -> None:
         user = self.get_one(user_id)
         (user.cover, user.cropped_cover) = self._crop_and_prepare_depot_storage(

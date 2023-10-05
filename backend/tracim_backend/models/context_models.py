@@ -2,14 +2,15 @@
 import base64
 import cgi
 from datetime import datetime
-from slugify import slugify
-from sqlakeyset import Page
-from sqlalchemy.orm import Session
 from typing import Dict
 from typing import Generic
 from typing import List
 from typing import Optional
 from typing import TypeVar
+
+from slugify import slugify
+from sqlakeyset import Page
+from sqlalchemy.orm import Session
 
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
@@ -24,8 +25,8 @@ from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import CONTENT_FRONTEND_URL_SCHEMA
-from tracim_backend.lib.utils.utils import EmailUser
 from tracim_backend.lib.utils.utils import WORKSPACE_FRONTEND_URL_SCHEMA
+from tracim_backend.lib.utils.utils import EmailUser
 from tracim_backend.lib.utils.utils import core_convert_file_name_to_display
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
 from tracim_backend.lib.utils.utils import string_to_list
@@ -85,8 +86,7 @@ class ConfigModel(object):
         call__enabled: bool,
         call__unanswered_timeout: int,
         auth_types: List[str],
-        idp_list: List[str]
-
+        idp_list: List[str],
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
@@ -180,11 +180,7 @@ class ResetPasswordModify(object):
     """
 
     def __init__(
-        self,
-        reset_password_token: str,
-        email: str,
-        new_password: str,
-        new_password2: str,
+        self, reset_password_token: str, email: str, new_password: str, new_password2: str,
     ) -> None:
         self.email = email
         self.reset_password_token = reset_password_token
@@ -570,11 +566,7 @@ class KnownContentsQuery(object):
     Content autocomplete query model
     """
 
-    def __init__(
-        self,
-        acp: str,
-        limit: int = None,
-    ) -> None:
+    def __init__(self, acp: str, limit: int = None,) -> None:
         self.acp = acp
         self.limit = limit
 
@@ -825,10 +817,7 @@ class BasePaginatedQuery(object):
 
 class TranslationQuery:
     def __init__(
-        self,
-        source_language_code: str,
-        target_language_code: str,
-        force_download: int = 0,
+        self, source_language_code: str, target_language_code: str, force_download: int = 0,
     ):
         self.source_language_code = source_language_code
         self.target_language_code = target_language_code
@@ -864,11 +853,7 @@ class LiveMessageQuery(BasePaginatedQuery):
 
 class UserMessagesMarkAsReadQuery(object):
     def __init__(
-        self,
-        content_ids: str = "",
-        event_ids: str = "",
-        parent_ids: str = "",
-        space_ids: str = "",
+        self, content_ids: str = "", event_ids: str = "", parent_ids: str = "", space_ids: str = "",
     ):
         self.content_ids = string_to_list(content_ids, ",", int)
         self.event_ids = string_to_list(event_ids, ",", int)
@@ -1458,9 +1443,7 @@ class ContentInContext(object):
     @property
     def author(self) -> UserInContext:
         return UserInContext(
-            dbsession=self.dbsession,
-            config=self.config,
-            user=self.content.first_revision.owner,
+            dbsession=self.dbsession, config=self.config, user=self.content.first_revision.owner,
         )
 
     @property
@@ -1486,9 +1469,7 @@ class ContentInContext(object):
     @property
     def last_modifier(self) -> UserInContext:
         return UserInContext(
-            dbsession=self.dbsession,
-            config=self.config,
-            user=self.content.last_revision.owner,
+            dbsession=self.dbsession, config=self.config, user=self.content.last_revision.owner,
         )
 
     # Context-related
@@ -1539,8 +1520,7 @@ class ContentInContext(object):
                 show_temporary=True,
             )
             return content_api.get_preview_page_nb(
-                self.content.cached_revision_id,
-                file_extension=self.content.file_extension,
+                self.content.cached_revision_id, file_extension=self.content.file_extension,
             )
         else:
             return None
@@ -1563,15 +1543,11 @@ class ContentInContext(object):
             return self.content.depot_file.file.content_length
         except IOError:
             logger.warning(
-                self,
-                "IO Exception Occured when trying to get content size",
-                exc_info=True,
+                self, "IO Exception Occured when trying to get content size", exc_info=True,
             )
         except Exception:
             logger.warning(
-                self,
-                "Unknown Exception Occured when trying to get content size",
-                exc_info=True,
+                self, "Unknown Exception Occured when trying to get content size", exc_info=True,
             )
         # HACK - G.M - 2021-03-09 - properly handled the broken size case here to
         # avoid broken search (both simple and elasticsearch)
@@ -1657,10 +1633,7 @@ class ContentInContext(object):
     def content_path(self) -> List["ContentInContext"]:
         return [
             ContentInContext(
-                content=component,
-                dbsession=self.dbsession,
-                config=self.config,
-                user=self._user,
+                content=component, dbsession=self.dbsession, config=self.config, user=self._user,
             )
             for component in self.content.content_path
         ]
@@ -1870,15 +1843,11 @@ class RevisionInContext(object):
             return self.revision.depot_file.file.content_length
         except IOError:
             logger.warning(
-                self,
-                "IO Exception Occured when trying to get content size",
-                exc_info=True,
+                self, "IO Exception Occured when trying to get content size", exc_info=True,
             )
         except Exception:
             logger.warning(
-                self,
-                "Unknown Exception Occured when trying to get content size",
-                exc_info=True,
+                self, "Unknown Exception Occured when trying to get content size", exc_info=True,
             )
         return None
 
@@ -1990,10 +1959,7 @@ class UserFollowQuery(BasePaginatedQuery):
     """
 
     def __init__(
-        self,
-        count: int,
-        page_token: Optional[str] = None,
-        user_id: Optional[int] = None,
+        self, count: int, page_token: Optional[str] = None, user_id: Optional[int] = None,
     ) -> None:
         super().__init__(count=count, page_token=page_token)
         self.user_id = user_id
