@@ -16,7 +16,6 @@ from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.request import Request
 from pyramid.response import Response
 from pyramid.security import Allowed
-from pyramid.security import Denied
 from pyramid_ldap3 import get_ldap_connector
 from saml2 import BINDING_HTTP_POST
 from saml2.client import Saml2Client
