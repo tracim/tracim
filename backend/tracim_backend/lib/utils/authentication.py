@@ -9,6 +9,8 @@ from pyramid.authentication import SessionAuthenticationHelper
 from pyramid.authentication import SessionAuthenticationPolicy
 from pyramid.authentication import extract_http_basic_credentials
 from pyramid.config import Configurator
+from pyramid.httpexceptions import HTTPFound
+from pyramid.config import Configurator
 from pyramid.httpexceptions import HTTPFound, HTTPBadRequest, HTTPNotFound
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.request import Request
