@@ -3,9 +3,6 @@ from abc import abstractmethod
 import datetime
 import json
 import os
-import time
-import typing
-
 from pyramid.authentication import BasicAuthAuthenticationPolicy
 from pyramid.authentication import CallbackAuthenticationPolicy
 from pyramid.authentication import SessionAuthenticationHelper
@@ -26,6 +23,8 @@ from saml2.client import Saml2Client
 from saml2.config import Config as Saml2Config
 from saml2.metadata import create_metadata_string
 from saml2.validate import ResponseLifetimeExceed
+import time
+import typing
 from zope.interface import implementer
 
 from tracim_backend.config import CFG  # noqa: F401
@@ -173,7 +172,8 @@ class SAMLSecurityPolicy:
         response = request.POST["SAMLResponse"]
         try:
             authn_response = self.saml_client.parse_authn_request_response(
-                response, binding=BINDING_HTTP_POST,
+                response,
+                binding=BINDING_HTTP_POST,
             )
         except ResponseLifetimeExceed as e:
             return Response(e.__str__())
@@ -225,7 +225,10 @@ class TracimAuthenticationPolicy(ABC):
         return UserApi(None, session=request.dbsession, config=app_config)
 
     def _authenticate_user(
-        self, request: Request, login: typing.Optional[str], password: typing.Optional[str],
+        self,
+        request: Request,
+        login: typing.Optional[str],
+        password: typing.Optional[str],
     ) -> typing.Optional[User]:
         """
         Helper to authenticate user in pyramid request
@@ -239,7 +242,11 @@ class TracimAuthenticationPolicy(ABC):
         if AuthType.LDAP in app_config.AUTH_TYPES:
             ldap_connector = get_ldap_connector(request)
         try:
-            user = uapi.authenticate(login=login, password=password, ldap_connector=ldap_connector,)
+            user = uapi.authenticate(
+                login=login,
+                password=password,
+                ldap_connector=ldap_connector,
+            )
             return user
         except AuthenticationFailed:
             return None
