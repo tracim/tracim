@@ -7,7 +7,7 @@ from wsgidav.wsgidav_app import WsgiDAVApp
 from wsgidav.xml_tools import useLxml
 
 from tracim_backend.config import CFG
-from tracim_backend.lib.webdav.authentification import TracimDomainController
+from tracim_backend.lib.webdav.authentication import TracimDomainController
 from tracim_backend.lib.webdav.dav_provider import TracimDavProvider
 from tracim_backend.lib.webdav.middlewares import TracimEnforceHTTPS
 from tracim_backend.lib.webdav.middlewares import TracimEnv
