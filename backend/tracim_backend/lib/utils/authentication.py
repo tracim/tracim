@@ -17,6 +17,7 @@ from pyramid.request import Request
 from pyramid.response import Response
 from pyramid.security import Allowed
 from pyramid_ldap3 import get_ldap_connector
+import re
 from saml2 import BINDING_HTTP_POST
 from saml2.client import Saml2Client
 from saml2.config import Config as Saml2Config
@@ -27,6 +28,7 @@ import typing
 from zope.interface import implementer
 
 from tracim_backend.config import CFG  # noqa: F401
+from tracim_backend.config import IdPConfig
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.user import UserApi
@@ -56,23 +58,32 @@ class SAMLSecurityPolicy:
             config_data = json.load(config_file)
             self.saml_config = Saml2Config()
             self.saml_config.load(config_data)
-            attribute_map = {
-                "EmailAddress": "user_email",
-                "UserID": "user_id",
-                "FirstName": "first_name",
-                "LastName": "last_name",
-            }
-            self.saml_config.allow_unknown_attributes = True
-            self.saml_config.attribute_map = attribute_map
         self._metadata_response = Response(content_type="application/xml")
         self._metadata_response.text = create_metadata_string(
             config=self.saml_config, configfile=None
         ).decode()
         self.saml_client = Saml2Client(config=self.saml_config)
 
-        for _, data in self.saml_client.config.vorg.items():
+        self.saml_idp_config = {
+            "default": {
+                "logo_url": "url_of_logo",
+                "displayed_name": "NaN",
+                "attribute_map": {
+                    "user_id": "${mail}",
+                    "email": "${eduPersonUniqueId}",
+                    "username": "${commonName}",
+                    "display_name": "${surName} ${givenName}"
+                }
+            }
+        }
+
+        for url, data in self.saml_client.config.vorg.items():
             if data.common_identifier not in app_config.IDP_LIST:
                 app_config.IDP_LIST.append(data.common_identifier)
+                idp_config = config_data["virtual_organization"][url]
+                merged_config = self.saml_idp_config["default"].copy()
+                merged_config.update(idp_config)
+                self.saml_idp_config[data.common_identifier] = merged_config
 
         configurator.add_forbidden_view(self._idp_chooser)
         configurator.add_route("acs", "/saml/acs", request_method="POST")
@@ -123,8 +134,8 @@ class SAMLSecurityPolicy:
         user = user_api.saml_authenticate(
             user=None,
             user_id=saml_user_id,
-            name=request.session.get("saml_name"),
-            mail=request.session.get("saml_mail"),
+            name=request.session.get("saml_display_name"),
+            mail=request.session.get("saml_email"),
         )
         self.remember(request, user.user_id)
         request.set_user(user)
@@ -147,9 +158,12 @@ class SAMLSecurityPolicy:
 
     def forget(self, request: TracimRequest, **kw: typing.Any) -> typing.Iterable[str]:
         if "saml_user_id" in request.session:
-            del request.session["saml_user_id"]
-            del request.session["saml_mail"]
-            del request.session["saml_name"]
+            try:
+                del request.session["saml_user_id"]
+                del request.session["saml_email"]
+                del request.session["saml_display_name"]
+            except Exception:
+                pass
         self._session_helper.forget(request, **kw)
         return []
 
@@ -168,6 +182,8 @@ class SAMLSecurityPolicy:
         )
 
     def _acs(self, request: TracimRequest) -> Response:
+        if 'RelayState' not in request.POST or "SAMLResponse" not in request.POST:
+            return HTTPBadRequest()
         response = request.POST["SAMLResponse"]
         try:
             authn_response = self.saml_client.parse_authn_request_response(
@@ -177,15 +193,28 @@ class SAMLSecurityPolicy:
         except ResponseLifetimeExceed as e:
             return Response(e.__str__())
         identity = authn_response.get_identity()
-        if identity is None or "UserID" not in identity:
+        if identity is None:
             return HTTPBadRequest()
+        idp_name = request.POST.get('RelayState')
+
+        formatted_attributes = {}
+        for key, value in self.saml_idp_config[idp_name]["attribute_map"].items():
+            placeholders = re.findall(r'\${(.*?)}', value)
+            formatted_value = value
+            for placeholder in placeholders:
+                if placeholder in identity:
+                    formatted_value = formatted_value.replace(f"${{{placeholder}}}",
+                                                              "".join(identity[placeholder]))
+            formatted_attributes[key] = formatted_value
 
         # FIXME - M.L - 2023/09/06 - Associate response / expiry date to session
-        request.session["saml_user_id"] = "".join(identity["UserID"])
-        request.session["saml_mail"] = "".join(identity["EmailAddress"])
-        request.session[
-            "saml_name"
-        ] = f'{"".join(identity["FirstName"])} {"".join(identity["LastName"])}'
+        if "user_id" not in formatted_attributes:
+            return HTTPBadRequest()
+        request.session["saml_user_id"] = formatted_attributes["user_id"]
+        if "email" in formatted_attributes:
+            request.session["saml_email"] = formatted_attributes["email"]
+        if "display_name" in formatted_attributes:
+            request.session["saml_display_name"] = formatted_attributes["display_name"]
 
         return HTTPFound("/")
 
@@ -194,13 +223,16 @@ class SAMLSecurityPolicy:
             return HTTPBadRequest("Missing target parameter")
 
         target = None
+        target_identifier = None
         for entity_id, data in self.saml_client.config.vorg.items():
             if request.params["target"] == data.common_identifier:
+                target_identifier = data.common_identifier
                 target = entity_id
 
         if target is None:
             return HTTPNotFound("This IdP doesn't exist")
-        _, info = self.saml_client.prepare_for_authenticate(
+        req_id, info = self.saml_client.prepare_for_authenticate(
+            relay_state=target_identifier,
             entityid=self.saml_config.metadata.metadata[target].entity_descr.entity_id,
         )
 
