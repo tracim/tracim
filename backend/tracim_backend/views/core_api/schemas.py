@@ -2174,9 +2174,7 @@ class ConfigSchema(marshmallow.Schema):
     call__enabled = marshmallow.fields.Bool()
     call__unanswered_timeout = marshmallow.fields.Int()
     auth_types = marshmallow.fields.List(marshmallow.fields.String())
-    idp_list = marshmallow.fields.Nested(
-        IdPConfigSchema, many=True
-    )
+    idp_list = marshmallow.fields.Nested(IdPConfigSchema, many=True)
 
 
 class ConditionFileSchema(marshmallow.Schema):

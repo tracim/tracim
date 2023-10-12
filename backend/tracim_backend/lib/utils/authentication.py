@@ -72,8 +72,8 @@ class SAMLSecurityPolicy:
                     "user_id": "${mail}",
                     "email": "${eduPersonUniqueId}",
                     "username": "${commonName}",
-                    "display_name": "${surName} ${givenName}"
-                }
+                    "display_name": "${surName} ${givenName}",
+                },
             }
         }
 
@@ -83,11 +83,13 @@ class SAMLSecurityPolicy:
                 merged_config = self.saml_idp_config["default"].copy()
                 merged_config.update(idp_config)
                 self.saml_idp_config[data.common_identifier] = merged_config
-                app_config.IDP_LIST.append(IdPConfig(
-                    displayed_name=merged_config.get("displayed_name"),
-                    identifier=data.common_identifier,
-                    logo_url=merged_config.get("logo_url"),
-                ))
+                app_config.IDP_LIST.append(
+                    IdPConfig(
+                        displayed_name=merged_config.get("displayed_name"),
+                        identifier=data.common_identifier,
+                        logo_url=merged_config.get("logo_url"),
+                    )
+                )
 
         configurator.add_forbidden_view(self._idp_chooser)
         configurator.add_route("acs", "/saml/acs", request_method="POST")
@@ -186,7 +188,7 @@ class SAMLSecurityPolicy:
         )
 
     def _acs(self, request: TracimRequest) -> Response:
-        if 'RelayState' not in request.POST or "SAMLResponse" not in request.POST:
+        if "RelayState" not in request.POST or "SAMLResponse" not in request.POST:
             return HTTPBadRequest()
         response = request.POST["SAMLResponse"]
         try:
@@ -199,16 +201,17 @@ class SAMLSecurityPolicy:
         identity = authn_response.get_identity()
         if identity is None:
             return HTTPBadRequest()
-        idp_name = request.POST.get('RelayState')
+        idp_name = request.POST.get("RelayState")
 
         formatted_attributes = {}
         for key, value in self.saml_idp_config[idp_name]["attribute_map"].items():
-            placeholders = re.findall(r'\${(.*?)}', value)
+            placeholders = re.findall(r"\${(.*?)}", value)
             formatted_value = value
             for placeholder in placeholders:
                 if placeholder in identity:
-                    formatted_value = formatted_value.replace(f"${{{placeholder}}}",
-                                                              "".join(identity[placeholder]))
+                    formatted_value = formatted_value.replace(
+                        f"${{{placeholder}}}", "".join(identity[placeholder])
+                    )
             formatted_attributes[key] = formatted_value
 
         # FIXME - M.L - 2023/09/06 - Associate response / expiry date to session

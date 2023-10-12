@@ -63,7 +63,9 @@ class SystemApi(object):
             collaborative_document_edition_config = collaborative_document_edition_api.get_config()
 
         auth_types: typing.List[str] = [auth_type.value for auth_type in self._config.AUTH_TYPES]
-        idp_list: typing.List[typing.Dict[str, str]] = [idp.to_dict() for idp in self._config.IDP_LIST]
+        idp_list: typing.List[typing.Dict[str, str]] = [
+            idp.to_dict() for idp in self._config.IDP_LIST
+        ]
 
         return ConfigModel(
             email_notification_activated=self._config.EMAIL__NOTIFICATION__ACTIVATED,

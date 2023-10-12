@@ -166,7 +166,7 @@ class IdPConfig(object):
         return {
             "displayed_name": self.displayed_name,
             "identifier": self.identifier,
-            "logo_url": self.logo_url
+            "logo_url": self.logo_url,
         }
 
 

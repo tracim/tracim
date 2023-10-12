@@ -18,7 +18,6 @@ from tracim_backend.applications.collaborative_document_edition.models import (
     CollaborativeDocumentEditionConfig,
 )
 from tracim_backend.config import CFG
-from tracim_backend.config import IdPConfig
 from tracim_backend.config import PreviewDim
 from tracim_backend.error import ErrorCode
 from tracim_backend.extensions import app_list
