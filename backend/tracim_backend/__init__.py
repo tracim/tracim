@@ -44,6 +44,7 @@ from tracim_backend.lib.utils.authentication import BASIC_AUTH_WEBUI_REALM
 from tracim_backend.lib.utils.authentication import CookieSessionAuthenticationPolicy
 from tracim_backend.lib.utils.authentication import QueryTokenAuthenticationPolicy
 from tracim_backend.lib.utils.authentication import RemoteAuthenticationPolicy
+from tracim_backend.lib.utils.authentication import SAMLSecurityPolicy
 from tracim_backend.lib.utils.authentication import TRACIM_API_KEY_HEADER
 from tracim_backend.lib.utils.authentication import TRACIM_API_USER_LOGIN_HEADER
 from tracim_backend.lib.utils.authentication import TracimBasicAuthAuthenticationPolicy
@@ -186,6 +187,10 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     policies.append(
         adapt_auth_policy(TracimBasicAuthAuthenticationPolicy(realm=BASIC_AUTH_WEBUI_REALM))
     )
+
+    if AuthType.SAML in app_config.AUTH_TYPES:
+        policies.append(SAMLSecurityPolicy(app_config, configurator))
+
     # Hack for ldap
     if AuthType.LDAP in app_config.AUTH_TYPES:
         import ldap3
