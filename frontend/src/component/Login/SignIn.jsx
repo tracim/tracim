@@ -38,13 +38,19 @@ const SignIn = props => {
             </Link>
           </li>
           {props.system.config.idp_list.map((idp) =>
-            <li key={idp}>
+            <li key={idp.identifier}>
               <a
-                className='loginpage__main__form__forgot_password'
-                href={'/saml/sso?target=' + encodeURIComponent(idp)}
+                className='loginpage__main__form__saml'
+                href={'/saml/sso?target=' + encodeURIComponent(idp.identifier)}
                 rel='noopener noreferrer'
               >
-                {idp}
+                <img
+                className='loginpage__main__form__saml__logo'
+                src={idp.logo_url}
+                />
+                <span className='loginpage__main__form__saml__link'>
+                  {idp.displayed_name}
+                </span>
               </a>
             </li>
           )}

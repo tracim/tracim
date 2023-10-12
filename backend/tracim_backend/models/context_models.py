@@ -18,6 +18,7 @@ from tracim_backend.applications.collaborative_document_edition.models import (
     CollaborativeDocumentEditionConfig,
 )
 from tracim_backend.config import CFG
+from tracim_backend.config import IdPConfig
 from tracim_backend.config import PreviewDim
 from tracim_backend.error import ErrorCode
 from tracim_backend.extensions import app_list
@@ -85,7 +86,7 @@ class ConfigModel(object):
         call__enabled: bool,
         call__unanswered_timeout: int,
         auth_types: List[str],
-        idp_list: List[str],
+        idp_list: List[Dict[str, str]],
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify

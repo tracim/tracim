@@ -53,8 +53,9 @@
                 "common_identifier": "saml_test"
             },
             "https://idp.ssocircle.com": {
-                "common_identifier": "sso_circle"
                 "common_identifier": "sso_circle",
+                "logo_url": "https://idp.ssocircle.com/logo.png",
+                "displayed_name": "[Test] SSO Circle",
                 "attribute_map": {
                   "user_id": "${UserID}",
                   "email": "${EmailAddress}",

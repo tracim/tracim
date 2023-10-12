@@ -79,11 +79,15 @@ class SAMLSecurityPolicy:
 
         for url, data in self.saml_client.config.vorg.items():
             if data.common_identifier not in app_config.IDP_LIST:
-                app_config.IDP_LIST.append(data.common_identifier)
                 idp_config = config_data["virtual_organization"][url]
                 merged_config = self.saml_idp_config["default"].copy()
                 merged_config.update(idp_config)
                 self.saml_idp_config[data.common_identifier] = merged_config
+                app_config.IDP_LIST.append(IdPConfig(
+                    displayed_name=merged_config.get("displayed_name"),
+                    identifier=data.common_identifier,
+                    logo_url=merged_config.get("logo_url"),
+                ))
 
         configurator.add_forbidden_view(self._idp_chooser)
         configurator.add_route("acs", "/saml/acs", request_method="POST")
