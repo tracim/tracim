@@ -131,11 +131,13 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     app_config.configure_filedepot()
     settings["CFG"] = app_config
 
+    configurator = Configurator(settings=settings, autocommit=True)
+    configurator.begin()
+
     # Init plugin manager
     plugin_manager = init_plugin_manager(app_config)
-    settings["plugin_manager"] = plugin_manager
+    configurator.registry.settings["plugin_manager"] = plugin_manager
 
-    configurator = Configurator(settings=settings, autocommit=True)
     # Add beaker session cookie
     tracim_setting_for_beaker_session = sliced_dict(settings, beginning_key_string="session.")
     tracim_setting_for_beaker_session["session.data_dir"] = app_config.SESSION__DATA_DIR
@@ -333,6 +335,8 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     plugin_manager.hook.web_include(configurator=configurator, app_config=app_config)
 
     hapic.add_documentation_view("/api/doc", "Tracim API", "API of Tracim")
+
+    configurator.end()
     return configurator.make_wsgi_app()
 
 
