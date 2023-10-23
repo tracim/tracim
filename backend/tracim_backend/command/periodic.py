@@ -104,12 +104,7 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
         user_api = UserApi(current_user=None, session=session, config=config)
 
         for user in user_api.get_all():
-            if (
-                not user.email
-                or not user.is_active
-                or user.is_deleted
-                or user.auth_type == AuthType.UNKNOWN
-            ):
+            if not user.can_receive_summary_mail():
                 continue
 
             mentions = event_api.get_messages_for_user(
