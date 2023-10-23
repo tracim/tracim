@@ -45,8 +45,9 @@ const SignIn = props => {
                 rel='noopener noreferrer'
               >
                 <img
-                className='loginpage__main__form__saml__logo'
-                src={idp.logo_url}
+                  className='loginpage__main__form__saml__logo'
+                  src={idp.logo_url}
+                  alt={idp.displayed_name}
                 />
                 <span className='loginpage__main__form__saml__link'>
                   {idp.displayed_name}
