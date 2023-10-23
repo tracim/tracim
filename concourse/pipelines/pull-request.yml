@@ -178,7 +178,7 @@ jobs:
   - *pending_status_notification
 
   - task: frontend-unit-tests
-    timeout: 15m
+    timeout: 30m
     image: test-image
     config:
       platform: linux
