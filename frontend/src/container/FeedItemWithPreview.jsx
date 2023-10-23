@@ -415,7 +415,7 @@ export class FeedItemWithPreview extends React.Component {
                 customColor={contentType.hexcolor}
                 id={props.content.id}
                 invalidMentionList={state.invalidMentionList}
-                memberList={props.memberList}
+                memberList={spaceMemberList}
                 onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
                 onClickDeleteComment={this.handleClickDeleteComment}
                 onClickEditComment={this.handleClickEditComment}
@@ -461,7 +461,6 @@ FeedItemWithPreview.propTypes = {
   lastModificationSubEntityType: PropTypes.string,
   lastModificationType: PropTypes.string,
   lastModifier: PropTypes.object,
-  memberList: PropTypes.array,
   modifiedDate: PropTypes.string,
   onEventClicked: PropTypes.func,
   onClickEdit: PropTypes.func,
@@ -483,7 +482,6 @@ FeedItemWithPreview.defaultProps = {
   lastModificationSubEntityType: '',
   lastModificationType: '',
   lastModifier: {},
-  memberList: [],
   modifiedDate: '',
   onClickEdit: () => { },
   reactionList: [],
