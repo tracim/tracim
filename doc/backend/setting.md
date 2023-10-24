@@ -42,6 +42,7 @@ Tracim comes with several authentication methods:
 
 - internal database
 - LDAP
+- SAML
 - Special authentifications mechanisms like Api-Key
 - REMOTE AUTH, like Apache Auth, later explained in the documentation.
 
@@ -84,6 +85,132 @@ ldap_tls = False
 
 ⚠ When logging in Tracim, if a valid LDAP user doesn't
 exist in Tracim, it will be created as a standard user.
+
+## SAML Authentication
+
+SAML authentication relies on a different settings file.
+The path of the settings file is provided to tracim through the `PYRAMID_SAML_PATH`
+
+e.g.
+```
+PYRAMID_SAML_PATH=/etc/tracim/backend/settings_saml2.json
+```
+
+See below for details about the configuration format.
+
+A sample configuration file can be found at `.../backend/settings_saml2.json`.
+
+When SAML auth is activated, a list of configurated IdPs is displayed instead of the standard login form on the login page.
+If other login methods are available, the login form can be found in the list as `Classic Login`.
+
+The different SAML endpoints are
+
+- **metadata**: `/saml/metadata`
+- **slo**: `/saml/slo?target=<vorg.common_identifier of the IdP>`
+- **acs**: `/saml/acs`
+
+⚠ When logging in Tracim, if a valid user doesn't
+exist in Tracim, it will be created as a standard user.
+
+### Configuration Explanation
+
+This file is a JSON file following [pysaml2's settings format](https://pysaml2.readthedocs.io/en/latest/howto/config.html).
+Additional fields specific to tracim can be found in the `virtual_organization` field.
+
+```json
+{
+    "entityid": "http://localhost:7999/saml/metadata",
+    "metadata": {
+        "local": [],
+        "remote": [
+            {
+                "url": "https://samltest.id/saml/idp"
+            },
+            {
+                "url": "https://idp.ssocircle.com"
+            }
+        ]
+    },
+    "service": {
+        "sp": {
+            "endpoints": {
+                "assertion_consumer_service": [
+                    [
+                        "http://localhost:7999/saml/acs",
+                        "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                    ]
+                ],
+                "single_logout_service": [
+                    [
+                        "http://localhost:7999/saml/slo/redirect",
+                        "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+                    ],
+                    [
+                        "http://localhost:7999/saml/slo/post",
+                        "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                    ]
+                ]
+            },
+            "allow_unsolicited": true,
+            "authn_requests_signed": false,
+            "logout_requests_signed": false,
+            "want_assertions_signed": false,
+            "want_response_signed": false,
+            "name_id_format": "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
+            "name_id_format_allow_create": true,
+            "want_name_id": true
+        }
+    },
+    "allow_unknown_attributes": true,
+    "key_file": "<path_to_key>",
+    "cert_file": "<path_to_cert>",
+    "xmlsec_binary": "/usr/bin/xmlsec1",
+    "metadata_cache_duration": {
+        "default": 86400
+    },
+    "virtual_organization": {
+        "https://samltest.id/saml/idp": {
+            "common_identifier": "saml_test"
+        },
+        "https://idp.ssocircle.com": {
+            "common_identifier": "sso_circle",
+            "logo_url": "https://idp.ssocircle.com/logo.png",
+            "displayed_name": "[Test] SSO Circle",
+            "attribute_map": {
+                "user_id": "${UserID}",
+                "email": "${EmailAddress}",
+                "display_name": "${FirstName} ${LastName}"
+            }
+        }
+    }
+}
+```
+
+- `entityid`: This is the Entity ID of the Service Provider (SP). It uniquely identifies your service.
+- `metadata`: Metadata settings for the SAML configuration. local and remote are arrays for defining metadata sources. In this example, two remote identity providers (IdPs) are configured.
+- `service`: Service-related settings for the SP.
+  - `sp`: Service Provider-specific settings.
+    - `endpoints`: Configuration for various endpoints, such as Assertion Consumer Service (ACS) and Single Logout Service (SLO).
+      - `allow_unsolicited`: Whether unsolicited responses are allowed from the IdP.
+      - `authn_requests_signed`: Specifies whether authentication requests should be signed.
+    - `logout_requests_signed`: Specifies whether logout requests should be signed.
+    - `want_assertions_signed`: Specifies whether the SP wants signed assertions.
+    - `want_response_signed`: Specifies whether the SP wants signed responses.
+    - `name_id_format`: The format for the NameID.
+    - `name_id_format_allow_create`: Whether to allow the IdP to create a new NameID if it doesn't exist.
+    - `want_name_id`: Whether the SP wants the NameID in the response.
+    - `allow_unknown_attributes`: Allows processing of unknown attributes received from the IdP.
+- key_file: Path to the key file used for signing.
+- cert_file: Path to the certificate file used for signing.
+- xmlsec_binary: Path to the xmlsec1 binary for XML security operations.
+- metadata_cache_duration: Cache duration for remote metadata. In this example, the default cache duration is set to 86,400 seconds (1 day). 
+- `virtual_organization`: Configuration for virtual organizations associated with IdPs. This is where you will define per-IdP settings. Each IdP is identified by its metadata URL.
+  - `common_identifier`: A common identifier for the virtual organization associated with the IdP.
+  - `logo_url`: URL to the organization's logo on the selection screen.
+  - `displayed_name`: The displayed name of the organization on the selection screen.
+  - `attribute_map`: Mapping of SAML attributes to specific names used within the SP.
+
+Example: `user_id` maps to `${UserID}` received from the IdP.
 
 ### Special Authentication Mechanism
 
