@@ -19,7 +19,8 @@ from pyramid.response import Response
 from pyramid.security import Allowed
 from pyramid_ldap3 import get_ldap_connector
 import re
-from saml2 import BINDING_HTTP_POST, BINDING_HTTP_REDIRECT
+from saml2 import BINDING_HTTP_POST
+from saml2 import BINDING_HTTP_REDIRECT
 from saml2.client import Saml2Client
 from saml2.config import Config as Saml2Config
 from saml2.metadata import create_metadata_string
@@ -252,8 +253,8 @@ class SAMLSecurityPolicy:
         return HTTPFound(redirect_url)
 
     def _slo(self, request: TracimRequest) -> Response:
-        http_args = request.GET if request.method == 'GET' else request.POST
-        saml_request = http_args.get('SAMLRequest', None)
+        http_args = request.GET if request.method == "GET" else request.POST
+        saml_request = http_args.get("SAMLRequest", None)
 
         if not saml_request:
             return HTTPBadRequest("Missing SAMLRequest parameter")
@@ -263,7 +264,7 @@ class SAMLSecurityPolicy:
             return HTTPBadRequest("Invalid SLO request")
 
         self.forget(request, from_slo=True)
-        return HTTPFound('/')
+        return HTTPFound("/")
 
     def _metadata(self, request: TracimRequest) -> Response:
         return self._metadata_response
