@@ -156,7 +156,7 @@ class ConfigParam(object):
             return value
 
 
-class IdPConfig(object):
+class SamLIdPConfig(object):
     def __init__(self, displayed_name: str, identifier: str, logo_url: str):
         self.displayed_name = displayed_name
         self.identifier = identifier
@@ -187,7 +187,7 @@ class CFG(object):
         self._check_consistency()
         self.check_config_validity()
         logger.debug(self, "CONFIG_PROCESS:5: End of config process")
-        self.IDP_LIST: typing.List[IdPConfig] = []
+        self.SAML_IDP_LIST: typing.List[SamLIdPConfig] = []
 
         app_lib = ApplicationApi(app_list=app_list, show_inactive=True)
         for app in app_lib.get_all():
