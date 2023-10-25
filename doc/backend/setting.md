@@ -186,8 +186,13 @@ If other login methods are available, the login form can be found in the list as
 The different SAML endpoints are
 
 - **metadata**: `/saml/metadata`
-- **slo**: `/saml/slo?target=<vorg.common_identifier of the IdP>`
+- **sso**: `/saml/sso?target=<vorg.common_identifier of the IdP>`
 - **acs**: `/saml/acs`
+- **slo**: `/saml/slo/redirect` (for redirect based SLO)
+- **slo**: `/saml/slo/post` (for post based SLO)
+
+See [SSO Glossary](https://help.akana.com/content/current/cm/saml/08_glossary.htm) and 
+[SLO Article](https://uit.stanford.edu/service/saml/logout) for more details about the employed terms
 
 ⚠ When logging in Tracim, if a valid user doesn't
 exist in Tracim, it will be created as a standard user.
