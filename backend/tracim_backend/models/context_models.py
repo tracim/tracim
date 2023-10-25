@@ -85,7 +85,7 @@ class ConfigModel(object):
         call__enabled: bool,
         call__unanswered_timeout: int,
         auth_types: List[str],
-        idp_list: List[Dict[str, str]],
+        saml_idp_list: List[Dict[str, str]],
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
@@ -109,7 +109,7 @@ class ConfigModel(object):
         self.call__enabled = call__enabled
         self.call__unanswered_timeout = call__unanswered_timeout
         self.auth_types = auth_types
-        self.idp_list = idp_list
+        self.saml_idp_list = saml_idp_list
 
 
 class ErrorCodeModel(object):

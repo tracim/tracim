@@ -28,7 +28,7 @@ import typing
 from zope.interface import implementer
 
 from tracim_backend.config import CFG  # noqa: F401
-from tracim_backend.config import IdPConfig
+from tracim_backend.config import SamLIdPConfig
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.user import UserApi
@@ -41,6 +41,19 @@ TRACIM_API_KEY_HEADER = "Tracim-Api-Key"
 TRACIM_API_USER_LOGIN_HEADER = "Tracim-Api-Login"
 AUTH_TOKEN_QUERY_PARAMETER = "access_token"
 CLIENT_TOKEN_HEADER = "X-Tracim-ClientToken"
+
+SAML_IDP_DEFAULT_CONFIG = {
+    "default": {
+        "logo_url": "url_of_logo",
+        "displayed_name": "NaN",
+        "attribute_map": {
+            "user_id": "${mail}",
+            "email": "${eduPersonUniqueId}",
+            "username": "${commonName}",
+            "display_name": "${surName} ${givenName}",
+        },
+    }
+}
 
 
 class SAMLSecurityPolicy:
@@ -64,27 +77,14 @@ class SAMLSecurityPolicy:
         ).decode()
         self.saml_client = Saml2Client(config=self.saml_config)
 
-        self.saml_idp_config = {
-            "default": {
-                "logo_url": "url_of_logo",
-                "displayed_name": "NaN",
-                "attribute_map": {
-                    "user_id": "${mail}",
-                    "email": "${eduPersonUniqueId}",
-                    "username": "${commonName}",
-                    "display_name": "${surName} ${givenName}",
-                },
-            }
-        }
-
         for url, data in self.saml_client.config.vorg.items():
-            if data.common_identifier not in app_config.IDP_LIST:
+            if data.common_identifier not in app_config.SAML_IDP_LIST:
                 idp_config = config_data["virtual_organization"][url]
-                merged_config = self.saml_idp_config["default"].copy()
+                merged_config = SAML_IDP_DEFAULT_CONFIG["default"].copy()
                 merged_config.update(idp_config)
-                self.saml_idp_config[data.common_identifier] = merged_config
-                app_config.IDP_LIST.append(
-                    IdPConfig(
+                SAML_IDP_DEFAULT_CONFIG[data.common_identifier] = merged_config
+                app_config.SAML_IDP_LIST.append(
+                    SamLIdPConfig(
                         displayed_name=merged_config.get("displayed_name"),
                         identifier=data.common_identifier,
                         logo_url=merged_config.get("logo_url"),
@@ -187,6 +187,8 @@ class SAMLSecurityPolicy:
           </form>"""
         )
 
+    # NOTE - M.L - 2023-10-25 - ACS (Assertion Consumer Service) is where the response
+    #  sent by the SAML IdP is processed and consumed
     def _acs(self, request: TracimRequest) -> Response:
         if "RelayState" not in request.POST or "SAMLResponse" not in request.POST:
             return HTTPBadRequest()
@@ -201,10 +203,18 @@ class SAMLSecurityPolicy:
         identity = authn_response.get_identity()
         if identity is None:
             return HTTPBadRequest()
+        # NOTE - M.L - 2023-10-25 - RelayState is information conveyed through the auth process,
+        #  this is here to keep info about at which idp the user authenticated
         idp_name = request.POST.get("RelayState")
 
         formatted_attributes = {}
-        for key, value in self.saml_idp_config[idp_name]["attribute_map"].items():
+        for key, value in SAML_IDP_DEFAULT_CONFIG[idp_name]["attribute_map"].items():
+            # NOTE - M.L - 2023-10-25 - This regex parses the ${xxx} formatted attribute mapping
+            #  it permits to find and replace multiple patterns in a same string
+            #  \$ Matches the '$' character
+            #  {(.*?)} matches this pattern {xxx} and captures and isolate in a group
+            #  anything between the "{}", it matches between zero and unlimited times,
+            #  as few times as possible, meaning that if it meets a '}', it will not be matched
             placeholders = re.findall(r"\${(.*?)}", value)
             formatted_value = value
             for placeholder in placeholders:
@@ -238,6 +248,8 @@ class SAMLSecurityPolicy:
 
         if target is None:
             return HTTPNotFound("This IdP doesn't exist")
+        # NOTE - M.L - 2023-10-25 - RelayState is information conveyed through the auth process,
+        #  this is here to keep info about at which idp the user authenticated
         req_id, info = self.saml_client.prepare_for_authenticate(
             relay_state=target_identifier,
             entityid=self.saml_config.metadata.metadata[target].entity_descr.entity_id,
