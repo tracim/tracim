@@ -1,5 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
+import { isEqual } from 'lodash'
 import Radium from 'radium'
 import debounce from 'lodash/debounce'
 import i18n from '../i18n.js'
@@ -163,8 +164,8 @@ export class AdminWorkspaceUser extends React.Component {
     if (prevState.config.type !== state.config.type) {
       await this.refreshAll()
     }
-    if (state.content.workspaceList !== prevState.content.workspaceList) this.setDisplayedSpaceList()
-    if (state.content.userList !== prevState.content.userList) this.setDisplayedUserList()
+    if (!isEqual(state.content.workspaceList, prevState.content.workspaceList)) this.setDisplayedSpaceList()
+    if (!isEqual(state.content.userList, prevState.content.userList)) this.setDisplayedUserList()
   }
 
   setDisplayedSpaceList = () => {

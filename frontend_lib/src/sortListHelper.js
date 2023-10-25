@@ -241,7 +241,7 @@ const compareStrings = (a, b, lang) => {
   return stringA.localeCompare(stringB, locale, { numeric: true })
 }
 
-export const putFoldersAtListBeginning = (list) => {
+export const sortWithFoldersAtListBeginning = (list) => {
   return list.sort((a, b) => {
     if (a.type === CONTENT_TYPE.FOLDER && b.type !== CONTENT_TYPE.FOLDER) return -1
     if (b.type === CONTENT_TYPE.FOLDER && a.type !== CONTENT_TYPE.FOLDER) return 1
