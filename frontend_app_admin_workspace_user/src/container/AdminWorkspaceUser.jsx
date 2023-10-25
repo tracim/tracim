@@ -62,7 +62,6 @@ export class AdminWorkspaceUser extends React.Component {
       usernameInvalidMsg: '',
       popupDeleteWorkspaceDisplay: false,
       workspaceToDelete: null,
-      workspaceIdOpened: null,
       loaded: false,
       selectedSpaceSortCriteria: SORT_BY.ID,
       selectedUserSortCriteria: SORT_BY.PUBLIC_NAME,
@@ -575,15 +574,6 @@ export class AdminWorkspaceUser extends React.Component {
     }))
   }
 
-  handleClickSpace = workspaceId => {
-    const { state } = this
-    if (state.workspaceIdOpened === null) {
-      state.config.history.push(PAGE.WORKSPACE.ADVANCED_DASHBOARD(workspaceId), { from: 'adminSpaceList' })
-    } else GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_CONTENT('workspace_advanced'), data: { workspace_id: workspaceId } })
-
-    this.setState({ workspaceIdOpened: workspaceId })
-  }
-
   handleClickNewSpace = () => {
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP, data: {} })
   }
@@ -615,7 +605,6 @@ export class AdminWorkspaceUser extends React.Component {
           <AdminWorkspace
             loaded={state.loaded}
             workspaceList={state.displayedSpaceList}
-            onClickWorkspace={this.handleClickSpace}
             onClickNewWorkspace={this.handleClickNewSpace}
             onClickDeleteWorkspace={this.handleOpenPopupDeleteSpace}
             breadcrumbsList={state.breadcrumbsList}
