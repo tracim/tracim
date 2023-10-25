@@ -86,6 +86,86 @@ ldap_tls = False
 ⚠ When logging in Tracim, if a valid LDAP user doesn't
 exist in Tracim, it will be created as a standard user.
 
+## Special Authentication Mechanism
+
+Those special authentication mechanisms are not linked to `auth_types` in the configuration.
+
+#### API-Key Authentification
+
+⚠ Unlike other authentication mechanism, this mechanism is not built
+for normal user authentication.
+It is aimed at administrators or daemons (e.g. an email reply daemon).
+This authentication mechanism is the only one that bypasses the authentication mechanism check (user are linked to
+one specific mechanism and can't connect with another one).
+As a consequence, you can impersonate any user linked to any authentication mechanisms.
+
+API key is an authentication mechanism of Tracim which allows user with a key to have a superadmin right on the Tracim API.
+This allow user with the key to act as anyone and to do anything possible with the right of these people.
+
+It relies on 2 HTTP headers:
+
+- `Tracim-Api-Key` : Tracim api key, as marked in config in `api.key`
+- `Tracim-Api-Login` : User's login (either an email or a username), in order to act as the given user
+
+If `api.key` is empty, the API key authentication will be disabled.
+
+#### Remote Auth Authentification (e.g. apache authentication)
+
+It is possible to connect to Tracim using remote authentification (e.g. the Apache authentication method).
+The idea is that the webserver authenticates the user and then pass the login of the authenticated user through uWSGI environment variables or an HTTP header.
+
+⚠ When logging in Tracim, if a valid remote user doesn't
+exist in Tracim, it will be created as a standard user.
+
+To do this, you need to properly configure your webserver in order to do
+authentication and to correctly pass the uWSGI environment variable or the HTTP header.
+
+In Tracim, you just need to change value of `remote_user_header` in the INI configuration
+file. The value should be an CGI-like environment variable name, so the `Remote-User` HTTP header
+becomes `HTTP-REMOTE-USER`.
+
+⚠ You should be very careful using this feature with the HTTP header, your
+webserver should be properly configured to prevent someone from setting a custom
+remote user header. You should also make sure that, if you use the web server as a proxy,
+no one can bypass this proxy and access Tracim in a way that lets
+them authenticate as anyone without password.
+
+#### Example of remote_user with basic auth using apache as http proxy
+
+In the Tracim INI configuration file:
+
+```ini
+auth_remote_user_header = HTTP_X_REMOTE_USER
+```
+
+Apache virtual host configuration (Tracim should be listening on port 6543, pushpin on 7999):
+
+```xml
+Listen 6544
+<VirtualHost *:6544>
+  ServerAdmin webmaster@localhost
+  ServerName localhost
+
+  <Location "/">
+    AuthType Basic
+    AuthName "Restricted Content"
+    AuthUserFile /etc/apache2/password
+    Require valid-user
+  </Location>
+
+  RequestHeader set X-Remote-User expr=%{REMOTE_USER}
+  # SSL
+  # RequestHeader set X-Remote-User %{REMOTE_USER}s
+
+  ProxyPreserveHost On
+  ProxyPassMatch ^/api/users/([0-9]+/live_messages)$ http://127.0.0.1:7999/api/users/$1
+  ProxyPassReverse ^/api/users/([0-9]+/live_messages)$ http://127.0.0.1:7999/api/users/$1
+
+  ProxyPass / http://127.0.0.1:6543/
+  ProxyPassReverse / http://127.0.0.1:6543/
+</VirtualHost>
+```
+
 ## SAML Authentication
 
 SAML authentication relies on a different settings file.
@@ -211,86 +291,6 @@ Additional fields specific to tracim can be found in the `virtual_organization` 
   - `attribute_map`: Mapping of SAML attributes to specific names used within the SP.
 
 Example: `user_id` maps to `${UserID}` received from the IdP.
-
-### Special Authentication Mechanism
-
-Those special authentication mechanisms are not linked to `auth_types` in the configuration.
-
-#### API-Key Authentification
-
-⚠ Unlike other authentication mechanism, this mechanism is not built
-for normal user authentication.
-It is aimed at administrators or daemons (e.g. an email reply daemon).
-This authentication mechanism is the only one that bypasses the authentication mechanism check (user are linked to
-one specific mechanism and can't connect with another one).
-As a consequence, you can impersonate any user linked to any authentication mechanisms.
-
-API key is an authentication mechanism of Tracim which allows user with a key to have a superadmin right on the Tracim API.
-This allow user with the key to act as anyone and to do anything possible with the right of these people.
-
-It relies on 2 HTTP headers:
-
-- `Tracim-Api-Key` : Tracim api key, as marked in config in `api.key`
-- `Tracim-Api-Login` : User's login (either an email or a username), in order to act as the given user
-
-If `api.key` is empty, the API key authentication will be disabled.
-
-#### Remote Auth Authentification (e.g. apache authentication)
-
-It is possible to connect to Tracim using remote authentification (e.g. the Apache authentication method).
-The idea is that the webserver authenticates the user and then pass the login of the authenticated user through uWSGI environment variables or an HTTP header.
-
-⚠ When logging in Tracim, if a valid remote user doesn't
-exist in Tracim, it will be created as a standard user.
-
-To do this, you need to properly configure your webserver in order to do
-authentication and to correctly pass the uWSGI environment variable or the HTTP header.
-
-In Tracim, you just need to change value of `remote_user_header` in the INI configuration
-file. The value should be an CGI-like environment variable name, so the `Remote-User` HTTP header
-becomes `HTTP-REMOTE-USER`.
-
-⚠ You should be very careful using this feature with the HTTP header, your
-webserver should be properly configured to prevent someone from setting a custom
-remote user header. You should also make sure that, if you use the web server as a proxy,
-no one can bypass this proxy and access Tracim in a way that lets
-them authenticate as anyone without password.
-
-#### Example of remote_user with basic auth using apache as http proxy
-
-In the Tracim INI configuration file:
-
-```ini
-auth_remote_user_header = HTTP_X_REMOTE_USER
-```
-
-Apache virtual host configuration (Tracim should be listening on port 6543, pushpin on 7999):
-
-```xml
-Listen 6544
-<VirtualHost *:6544>
-  ServerAdmin webmaster@localhost
-  ServerName localhost
-
-  <Location "/">
-    AuthType Basic
-    AuthName "Restricted Content"
-    AuthUserFile /etc/apache2/password
-    Require valid-user
-  </Location>
-
-  RequestHeader set X-Remote-User expr=%{REMOTE_USER}
-  # SSL
-  # RequestHeader set X-Remote-User %{REMOTE_USER}s
-
-  ProxyPreserveHost On
-  ProxyPassMatch ^/api/users/([0-9]+/live_messages)$ http://127.0.0.1:7999/api/users/$1
-  ProxyPassReverse ^/api/users/([0-9]+/live_messages)$ http://127.0.0.1:7999/api/users/$1
-
-  ProxyPass / http://127.0.0.1:6543/
-  ProxyPassReverse / http://127.0.0.1:6543/
-</VirtualHost>
-```
 
 ## User sessions in Tracim
 
