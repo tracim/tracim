@@ -62,8 +62,6 @@ class SystemApi(object):
             )
             collaborative_document_edition_config = collaborative_document_edition_api.get_config()
 
-        auth_types: typing.List[str] = [auth_type.value for auth_type in self._config.AUTH_TYPES]
-
         return ConfigModel(
             email_notification_activated=self._config.EMAIL__NOTIFICATION__ACTIVATED,
             new_user_invitation_do_notify=self._config.NEW_USER__INVITATION__DO_NOTIFY,
@@ -84,8 +82,8 @@ class SystemApi(object):
             limitation__maximum_online_users_message=self._config.LIMITATION__MAXIMUM_ONLINE_USERS_MESSAGE,
             call__enabled=self._config.CALL__ENABLED,
             call__unanswered_timeout=self._config.CALL__UNANSWERED_TIMEOUT,
-            auth_types=auth_types,
-            idp_list=self._config.IDP_LIST,
+            auth_types=[auth_type.value for auth_type in self._config.AUTH_TYPES],
+            saml_idp_list=[idp.to_dict() for idp in self._config.SAML_IDP_LIST],
         )
 
     def get_usage_conditions_files(self) -> typing.List[UsageConditionModel]:

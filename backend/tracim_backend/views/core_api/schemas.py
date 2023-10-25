@@ -2139,6 +2139,12 @@ class RoleSchema(marshmallow.Schema):
     label = marshmallow.fields.String(required=True, example="Reader")
 
 
+class SamLIdPConfigSchema(marshmallow.Schema):
+    logo_url = marshmallow.fields.String(required=True)
+    displayed_name = marshmallow.fields.String(required=True)
+    identifier = marshmallow.fields.String(required=True)
+
+
 class ConfigSchema(marshmallow.Schema):
     email_notification_activated = marshmallow.fields.Bool()
     new_user_invitation_do_notify = marshmallow.fields.Bool()
@@ -2168,7 +2174,7 @@ class ConfigSchema(marshmallow.Schema):
     call__enabled = marshmallow.fields.Bool()
     call__unanswered_timeout = marshmallow.fields.Int()
     auth_types = marshmallow.fields.List(marshmallow.fields.String())
-    idp_list = marshmallow.fields.List(marshmallow.fields.String())
+    saml_idp_list = marshmallow.fields.Nested(SamLIdPConfigSchema, many=True)
 
 
 class ConditionFileSchema(marshmallow.Schema):

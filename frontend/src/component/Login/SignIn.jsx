@@ -37,14 +37,21 @@ const SignIn = props => {
               {props.t('Classic login')}
             </Link>
           </li>
-          {props.system.config.idp_list.map((idp) =>
-            <li key={idp}>
+          {props.system.config.saml_idp_list.map((samlIdp) =>
+            <li key={samlIdp.identifier}>
               <a
-                className='loginpage__main__form__forgot_password'
-                href={'/saml/sso?target=' + encodeURIComponent(idp)}
+                className='loginpage__main__form__saml'
+                href={'/saml/sso?target=' + encodeURIComponent(samlIdp.identifier)}
                 rel='noopener noreferrer'
               >
-                {idp}
+                <img
+                  className='loginpage__main__form__saml__logo'
+                  src={samlIdp.logo_url}
+                  alt={samlIdp.displayed_name}
+                />
+                <span className='loginpage__main__form__saml__link'>
+                  {samlIdp.displayed_name}
+                </span>
               </a>
             </li>
           )}

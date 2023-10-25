@@ -41,6 +41,7 @@
                 "want_name_id": true
             }
         },
+        "allow_unknown_attributes": true,
         "key_file": "./sp.key",
         "cert_file": "./sp.crt",
         "xmlsec_binary": "/usr/bin/xmlsec1",
@@ -52,7 +53,14 @@
                 "common_identifier": "saml_test"
             },
             "https://idp.ssocircle.com": {
-                "common_identifier": "sso_circle"
+                "common_identifier": "sso_circle",
+                "logo_url": "https://idp.ssocircle.com/logo.png",
+                "displayed_name": "[Test] SSO Circle",
+                "attribute_map": {
+                  "user_id": "${UserID}",
+                  "email": "${EmailAddress}",
+                  "display_name": "${FirstName} ${LastName}"
+                }
             }
         }
     }
