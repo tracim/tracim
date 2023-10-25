@@ -155,21 +155,8 @@ class ConfigParam(object):
         else:
             return value
 
+
 # INFO - M.L - 2023-10-25 - Using naming SamLIdPConfig instead of SAMLIdpConfig or SamlIdPConfig for readability
-class SamLIdPConfig(object):
-    def __init__(self, displayed_name: str, identifier: str, logo_url: str):
-        self.displayed_name = displayed_name
-        self.identifier = identifier
-        self.logo_url = logo_url
-
-    def to_dict(self):
-        return {
-            "displayed_name": self.displayed_name,
-            "identifier": self.identifier,
-            "logo_url": self.logo_url,
-        }
-
-
 class SamLIdPConfig(object):
     def __init__(self, displayed_name: str, identifier: str, logo_url: str):
         self.displayed_name = displayed_name
