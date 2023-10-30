@@ -14,8 +14,6 @@ import {
   PageContent,
   PageTitle,
   PageWrapper,
-  SPACE_TYPE_LIST,
-  SORT_BY,
   PAGE,
   TitleListHeader,
   htmlToText,

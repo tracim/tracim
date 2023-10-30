@@ -58,7 +58,7 @@ import {
   getAppList,
   getConfig,
   getContentTypeList,
-  getMyselfWorkspaceList,
+  getMyselfUserRoleWorkspaceList,
   getUserConfiguration,
   getUserIsConnected,
   putUserLang,
@@ -443,8 +443,7 @@ export class Tracim extends React.Component {
 
   loadWorkspaceLists = async () => {
     const { props } = this
-    const showOwnedWorkspace = false
-    const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList(showOwnedWorkspace))
+    const fetchGetWorkspaceList = await props.dispatch(getMyselfUserRoleWorkspaceList())
 
     if (fetchGetWorkspaceList.status !== 200) return false
     props.dispatch(setRoleWorkspaceList(fetchGetWorkspaceList.json))

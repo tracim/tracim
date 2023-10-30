@@ -110,9 +110,7 @@ export class Dashboard extends React.Component {
 
     const requestMemberList = handleFetchResult(await getSpaceMemberList(FETCH_CONFIG.apiUrl, props.currentWorkspace.id))
 
-    const [responseMemberList] = await Promise.all([
-      requestMemberList
-    ])
+    const responseMemberList = await requestMemberList
 
     if (responseMemberList.apiResponse.status === 200) {
       props.dispatch(setWorkspaceMemberList(responseMemberList.body))

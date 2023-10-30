@@ -223,8 +223,6 @@ export const AdminUserSpacesConfig = (props) => {
     }
   }
 
-  console.log('memberSpaceList before return', memberSpaceList, memberSpaceList.length)
-
   return (
     <CardPopup
       onClose={props.onClose}

@@ -532,7 +532,7 @@ export const putUserWorkspaceEmailNotificationType = (user, workspaceId, emailNo
   })
 }
 
-export const getMyselfWorkspaceList = (showOwnedWorkspace) => dispatch => {
+export const getMyselfUserRoleWorkspaceList = () => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/me/role_workspaces`,
     param: {

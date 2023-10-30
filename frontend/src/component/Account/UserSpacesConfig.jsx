@@ -60,40 +60,41 @@ export const UserSpacesConfig = (props) => {
 
   useEffect(() => {
     const filteredListWithMember = []
-    if (spaceList !== undefined) {
-      spaceList.forEach(space => {
-        const member = space.memberList.find(u => u.id === props.userToEditId)
-        if (space.memberList.length > 0 && member) {
-          filteredListWithMember.push({ ...space, member })
-        }
-      })
-
-      const sortedList = sortListBy(
-        filteredListWithMember,
-        selectedSortCriterion,
-        sortOrder,
-        props.user.lang
-      )
-
-      const filteredSpaceList = filterSpaceList(sortedList)
-
-      const entryList = filteredSpaceList.map(space => {
-        return (
-          <UserSpacesConfigLine
-            space={space}
-            key={space.id}
-            onChangeEmailNotificationType={
-              emailNotificationType => props.onChangeEmailNotificationType(space.id, emailNotificationType)
-            }
-            onLeaveSpace={handleLeaveSpace}
-            admin={props.admin}
-            system={props.system}
-            onlyManager={onlyManager(props.userToEditId, space.member, space.memberList)}
-          />
-        )
-      })
-      setEntries(entryList)
+    if (spaceList === undefined) {
+      return
     }
+    spaceList.forEach(space => {
+      const member = space.memberList.find(u => u.id === props.userToEditId)
+      if (space.memberList.length > 0 && member) {
+        filteredListWithMember.push({ ...space, member })
+      }
+    })
+
+    const sortedList = sortListBy(
+      filteredListWithMember,
+      selectedSortCriterion,
+      sortOrder,
+      props.user.lang
+    )
+
+    const filteredSpaceList = filterSpaceList(sortedList)
+
+    const entryList = filteredSpaceList.map(space => {
+      return (
+        <UserSpacesConfigLine
+          space={space}
+          key={space.id}
+          onChangeEmailNotificationType={
+            emailNotificationType => props.onChangeEmailNotificationType(space.id, emailNotificationType)
+          }
+          onLeaveSpace={handleLeaveSpace}
+          admin={props.admin}
+          system={props.system}
+          onlyManager={onlyManager(props.userToEditId, space.member, space.memberList)}
+        />
+      )
+    })
+    setEntries(entryList)
   }, [spaceList, sortOrder, selectedSortCriterion, userFilter])
 
   const filterSpaceList = (list) => {

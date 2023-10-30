@@ -37,7 +37,7 @@ import {
   getAppList,
   getConfig,
   getContentTypeList,
-  getMyselfWorkspaceList,
+  getMyselfUserRoleWorkspaceList,
   getUsageConditions,
   getUserConfiguration,
   getUserMessagesSummary,
@@ -362,9 +362,8 @@ class Login extends React.Component {
 
   loadWorkspaceLists = async () => {
     const { props } = this
-    const showOwnedWorkspace = false
 
-    const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList(showOwnedWorkspace))
+    const fetchGetWorkspaceList = await props.dispatch(getMyselfUserRoleWorkspaceList())
     if (fetchGetWorkspaceList.status === 200) {
       props.dispatch(setRoleWorkspaceList(fetchGetWorkspaceList.json))
     }
