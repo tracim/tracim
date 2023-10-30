@@ -1,22 +1,5 @@
 # Changelog
 
-## 4.6.2 / 2023-07-27
-
-### 🐛 Fixed Issues
-
-- Frontend: [#6192](https://github.com/tracim/tracim/issues/6192)
-- Backend: [#6219](https://github.com/tracim/tracim/issues/6219)
-
-## 4.6.1 / 2023-07-31
-
-### 🐛 Fixed Issues
-
-- Frontend: [#6224](https://github.com/tracim/tracim/issues/6224)
-
-### Known Issues
-
-- Chrome performance issue for images in advanced edition, see [#5622](https://github.com/tracim/tracim/issues/5622)
-
 ## 4.6.0 / 2023-07-28
 
 ### ✨ New Features

@@ -285,14 +285,6 @@ class User(TrashableMixin, DeclarativeBase):
                 roles.append(role)
         return roles
 
-    def can_receive_summary_mail(self) -> bool:
-        return (
-            self.email
-            and self.is_active
-            and not self.is_deleted
-            and self.auth_type != AuthType.UNKNOWN
-        )
-
     # Tokens ###
 
     def reset_tokens(self):
