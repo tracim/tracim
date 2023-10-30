@@ -14,9 +14,10 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TracimComponent,
   FilterBar,
-  stringIncludes
+  stringIncludes,
+  serialize
 } from 'tracim_frontend_lib'
-import { serializeWorkspace, serializeRole } from '../reducer/workspaceList.js'
+import { serializeWorkspace, serializeRole, serializeWorkspaceListProps } from '../reducer/workspaceList.js'
 import { newFlashMessage } from '../action-creator.sync.js'
 import {
   deleteWorkspaceMember,
@@ -52,7 +53,12 @@ export const AdminUserSpacesConfig = (props) => {
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: handleMemberModified },
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: handleMemberDeleted }
     ])
-  }, [spaceList])
+    if (props.userToEditId === props.user.userId) {
+      setMemberSpaceList(props.workspaceList)
+    } else {
+      getMemberSpacesList()
+    }
+  }, [])
 
   useEffect(() => {
     if (props.user.profile !== PROFILE.administrator.slug) props.onClose()
@@ -63,24 +69,9 @@ export const AdminUserSpacesConfig = (props) => {
   }, [props.userToEditId])
 
   useEffect(() => {
-    if (props.userToEditId === props.user.userId) {
-      setMemberSpaceList(props.workspaceList)
-    } else {
-      getMemberSpacesList()
-    }
-  }, [props.userToEditId, props.workspaceList])
-
-  useEffect(() => {
-    const availableSpaces = []
-    spaceList.forEach(space => {
-      if (!memberSpaceList.find(element => {
-        return element.id === space.id
-      })) {
-        availableSpaces.push(space)
-      }
-    })
-    setAvailableSpaceList(availableSpaces)
-    setDisplayedAvailableSpaceList(filterSpaceList(availableSpaces, availableSpaceListFilter))
+    const availableSpaceList = spaceList.filter(s => memberSpaceList.some(ms => ms.id === s.id) === false)
+    setAvailableSpaceList(availableSpaceList)
+    setDisplayedAvailableSpaceList(filterSpaceList(availableSpaceList, availableSpaceListFilter))
     setDisplayedMemberSpaceList(filterSpaceListWithUserRole(memberSpaceList, memberSpaceListFilter))
   }, [spaceList, memberSpaceList])
 
@@ -144,39 +135,49 @@ export const AdminUserSpacesConfig = (props) => {
   }
 
   const handleMemberModified = (data) => {
-    setMemberSpaceList(memberSpaceList.map(space => {
-      if (space.id === data.fields.workspace.workspace_id) {
-        return {
-          ...space,
-          memberList: space.memberList.map(member => {
-            if (member.id === data.fields.user.user_id) {
-              return { ...member, ...serializeMember({ user: data.fields.user, ...data.fields.member }) }
-            } else {
-              return member
-            }
-          })
+    if (data.fields.user.user_id === props.userToEditId) {
+      setMemberSpaceList(m => m.map(space => {
+        if (space.id === data.fields.workspace.workspace_id) {
+          return {
+            ...space,
+            memberList: space.memberList.map(member => {
+              if (member.id === data.fields.user.user_id) {
+                return { ...member, ...serializeMember({ user: data.fields.user, ...data.fields.member }) }
+              } else {
+                return member
+              }
+            })
+          }
+        } else {
+          return space
         }
-      } else {
-        return space
-      }
-    }))
+      }))
+    }
   }
 
-  const handleMemberDeleted = async (data) => {
-    setMemberSpaceList(memberSpaceList.filter(space => space.id !== data.fields.workspace.workspace_id))
+  const handleMemberDeleted = (data) => {
+    if (data.fields.user.user_id === props.userToEditId) {
+      setMemberSpaceList(m => m.filter(space => space.id !== data.fields.workspace.workspace_id))
+    }
   }
 
-  const handleMemberCreated = async (data) => {
-    const space = spaceList.find(space => space.id === data.fields.workspace.workspace_id)
-    if (!memberSpaceList.find(space => space.id === data.fields.workspace.workspace_id)) {
-      memberSpaceList.push({
-        ...space,
-        memberList: [
-          ...space.memberList,
-          serializeMember({ user: data.fields.user, ...data.fields.member })
-        ]
+  const handleMemberCreated = (data) => {
+    if (data.fields.user.user_id === props.userToEditId) {
+      setMemberSpaceList(m => {
+        if (!m.find(space => space.id === data.fields.workspace.workspace_id)) {
+          return [
+            ...m,
+            {
+              ...serialize(data.fields.workspace, serializeWorkspaceListProps),
+              memberList: [
+                serializeMember({ user: data.fields.user, ...data.fields.member })
+              ]
+            }
+          ]
+        } else {
+          return m
+        }
       })
-      setMemberSpaceList(memberSpaceList)
     }
   }
 
@@ -221,6 +222,8 @@ export const AdminUserSpacesConfig = (props) => {
         , 'warning'))
     }
   }
+
+  console.log('memberSpaceList before return', memberSpaceList, memberSpaceList.length)
 
   return (
     <CardPopup

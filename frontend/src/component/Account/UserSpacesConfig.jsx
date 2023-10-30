@@ -56,7 +56,7 @@ export const UserSpacesConfig = (props) => {
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: handleMemberModified },
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: handleMemberDeleted }
     ])
-  }, [spaceList])
+  })
 
   useEffect(() => {
     const filteredListWithMember = []
@@ -124,48 +124,44 @@ export const UserSpacesConfig = (props) => {
   }, [props.userToEditId, props.workspaceList])
 
   const handleMemberModified = (data) => {
-    const newSpaceList = spaceList.map(space => space.id === data.fields.workspace.workspace_id
-      ? {
-        ...space,
-        memberList: space.memberList.map(member => member.id === data.fields.user.user_id
-          ? { ...member, ...serializeMember({ user: data.fields.user, ...data.fields.member }) }
-          : member
-        )
-      }
-      : space
-    )
-    setSpaceList(newSpaceList)
-  }
-
-  const handleMemberDeleted = async (data) => {
-    setSpaceList(spaceList.map(space => {
-      if (space.id === data.fields.workspace.workspace_id) {
-        return {
+    if (data.fields.user.user_id === props.userToEditId) {
+      setSpaceList(s => s.map(space => space.id === data.fields.workspace.workspace_id
+        ? {
           ...space,
-          memberList: space.memberList.filter(member => member.id !== data.fields.user.user_id)
+          memberList: space.memberList.map(member => member.id === data.fields.user.user_id
+            ? { ...member, ...serializeMember({ user: data.fields.user, ...data.fields.member }) }
+            : member
+          )
         }
-      } else {
-        return space
-      }
-    }))
+        : space
+      ))
+    }
   }
 
-  const handleMemberCreated = async (data) => {
-    const space = spaceList.find(space => space.id === data.fields.workspace.workspace_id)
+  const handleMemberDeleted = (data) => {
+    if (data.fields.user.user_id === props.userToEditId) {
+      setSpaceList(s => s.filter(space => space.id !== data.fields.workspace.workspace_id))
+    }
+  }
 
-    if (space) {
-      setSpaceList(spaceList.map(s => {
-        if (s === space.id) {
-          return {
+  const handleMemberCreated = (data) => {
+    if (data.fields.user.user_id === props.userToEditId && !spaceList.find(space => space.id === data.fields.workspace.workspace_id)) {
+      setSpaceList(s => {
+        if (!s.find(space => space.id === data.fields.workspace.workspace_id)) {
+          const newMemberSpaceList = [
             ...s,
-            memberList: [...space.memberList, serializeMember({ user: data.fields.user, ...data.fields.member })]
-          }
+            {
+              ...serialize(data.fields.workspace, serializeWorkspaceListProps),
+              memberList: [
+                serializeMember({ user: data.fields.user, ...data.fields.member })
+              ]
+            }
+          ]
+          return sortListByMultipleCriteria(newMemberSpaceList, [SORT_BY.LABEL, SORT_BY.ID])
         } else {
-          return space
+          return s
         }
-      }))
-    } else {
-      setSpaceList(sortListByMultipleCriteria([...spaceList, { ...serialize(data.fields.workspace, serializeWorkspaceListProps), memberList: [serializeMember({ user: data.fields.user, ...data.fields.member })] }], [SORT_BY.LABEL, SORT_BY.ID]))
+      })
     }
   }
 

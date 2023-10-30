@@ -20,7 +20,9 @@ import {
   TracimComponent,
   buildHeadTitle,
   removeAtInUsername,
-  addExternalLinksIcons
+  addExternalLinksIcons,
+  getSpaceMemberList,
+  handleFetchResult
 } from 'tracim_frontend_lib'
 import {
   getMyselfKnownMember,
@@ -32,7 +34,8 @@ import {
 import {
   newFlashMessage,
   setBreadcrumbs,
-  setHeadTitle
+  setHeadTitle,
+  setWorkspaceMemberList
 } from '../action-creator.sync.js'
 import appFactory from '../util/appFactory.js'
 import {
@@ -97,6 +100,29 @@ export class Dashboard extends React.Component {
     this.setHeadTitle()
     this.loadNewRequestNumber()
     this.buildBreadcrumbs()
+    if (this.currentWorkspace !== undefined && this.currentWorkspace.memberList === undefined) {
+      this.updateWorkspaceList()
+    }
+  }
+
+  async updateWorkspaceList () {
+    const { props } = this
+
+    const requestMemberList = handleFetchResult(await getSpaceMemberList(FETCH_CONFIG.apiUrl, props.currentWorkspace.id))
+
+    const [responseMemberList] = await Promise.all([
+      requestMemberList
+    ])
+
+    if (responseMemberList.apiResponse.status === 200) {
+      props.dispatch(setWorkspaceMemberList(responseMemberList.body))
+    } else {
+      switch (responseMemberList.apiResponse.status) {
+        case 200: break
+        case 400: break
+        default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('member list')}`, 'warning')); break
+      }
+    }
   }
 
   async componentDidUpdate (prevProps) {
@@ -109,6 +135,9 @@ export class Dashboard extends React.Component {
 
     if (prevProps.currentWorkspace.defaultRole !== '' && props.currentWorkspace.defaultRole === '') {
       this.setState(prev => ({ newMember: { ...prev.newMember, role: props.currentWorkspace.defaultRole } }))
+    }
+    if (props.currentWorkspace !== undefined && props.currentWorkspace.memberList === undefined) {
+      this.updateWorkspaceList()
     }
 
     if (!prevProps.match || !props.match || prevProps.currentWorkspace.id === props.currentWorkspace.id) return
