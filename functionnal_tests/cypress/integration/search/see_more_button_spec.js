@@ -68,8 +68,7 @@ describe('Searching keywords', () => {
       cy.get('.tracim__content-scrollview').scrollTo('bottom')
 
       cy.get(seeMoreButton).should('be.visible').click().then(test => {
-        cy.wait(500)
-        cy.get('[data-cy=content__item]').its('length').should('gt', 15)
+        cy.get('[data-cy=content__item]').should('have.length', 16)
       })
     })
     describe('with a search with 5 results per page by changing it in the url', () => {
