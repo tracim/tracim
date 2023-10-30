@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import { Link } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import {
   SORT_BY,
@@ -13,6 +14,9 @@ import {
   PageContent,
   PageTitle,
   PageWrapper,
+  SPACE_TYPE_LIST,
+  SORT_BY,
+  PAGE,
   TitleListHeader,
   htmlToText,
   stringIncludes
@@ -158,9 +162,13 @@ const AdminWorkspace = props => {
                         </td>
                         <td
                           className='table__sharedSpace adminWorkspace__workspaceTable__tr__td-link primaryColorFontHover'
-                          onClick={() => props.onClickWorkspace(ws.workspace_id)}
                         >
-                          {ws.label}
+                          <Link
+                            to={PAGE.WORKSPACE.ADVANCED_DASHBOARD(ws.workspace_id)}
+                            className='adminWorkspace__workspaceTable__tr__td-link__link primaryColorFontHover'
+                          >
+                            {ws.label}
+                          </Link>
                         </td>
                         <td className='table__description adminWorkspace__workspaceTable__tr__td-description'>{descriptionText}</td>
                         <td className='table__memberCount'>{ws.number_of_members}</td>

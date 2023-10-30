@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-
+import { isEqual } from 'lodash'
 import {
   PageWrapper,
   PageTitle,
@@ -36,7 +36,7 @@ export class JoinWorkspace extends React.Component {
     super(props)
 
     this.state = {
-      displayedFavoritesList: [],
+      displayedSpaceList: [],
       filter: '',
       selectedSortCriterion: SORT_BY.LABEL,
       sortOrder: SORT_ORDER.ASCENDING
@@ -54,16 +54,16 @@ export class JoinWorkspace extends React.Component {
     if (props.history.location.state && props.history.location.state.fromSearch) {
       this.setState({ filter: props.spaceSearch.searchString })
     }
-    this.setDisplayedFavoritesList()
+    this.setDisplayedSpaceList()
   }
 
   componentDidUpdate (prevProps) {
-    if (this.props.accessibleWorkspaceList !== prevProps.accessibleWorkspaceList) {
-      this.setDisplayedFavoritesList()
+    if (!isEqual(this.props.accessibleWorkspaceList, prevProps.accessibleWorkspaceList)) {
+      this.setDisplayedSpaceList()
     }
   }
 
-  setDisplayedFavoritesList = () => {
+  setDisplayedSpaceList = () => {
     const { props, state } = this
 
     const sortedList = sortListBy(
@@ -73,7 +73,7 @@ export class JoinWorkspace extends React.Component {
       props.user.lang
     )
 
-    this.setState({ displayedFavoritesList: sortedList })
+    this.setState({ displayedSpaceList: sortedList })
   }
 
   handleClickTitleToSort = (criterion) => {
@@ -82,7 +82,7 @@ export class JoinWorkspace extends React.Component {
         ? SORT_ORDER.DESCENDING
         : SORT_ORDER.ASCENDING
       return {
-        displayedFavoritesList: sortListBy(prev.displayedFavoritesList, criterion, sortOrder, this.props.user.lang),
+        displayedSpaceList: sortListBy(prev.displayedSpaceList, criterion, sortOrder, this.props.user.lang),
         selectedSortCriterion: criterion,
         sortOrder: sortOrder
       }
@@ -203,9 +203,9 @@ export class JoinWorkspace extends React.Component {
   }
 
   filterWorkspaces () {
-    if (this.state.filter === '') return this.state.displayedFavoritesList
+    if (this.state.filter === '') return this.state.displayedSpaceList
 
-    return this.state.displayedFavoritesList.filter(workspace => {
+    return this.state.displayedSpaceList.filter(workspace => {
       const spaceType = SPACE_TYPE_LIST.find(type => type.slug === workspace.accessType) || { label: '' }
 
       const includesFilter = stringIncludes(this.state.filter)
