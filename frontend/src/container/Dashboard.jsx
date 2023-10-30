@@ -108,9 +108,9 @@ export class Dashboard extends React.Component {
   async updateWorkspaceList () {
     const { props } = this
 
-    const requestMemberList = handleFetchResult(await getSpaceMemberList(FETCH_CONFIG.apiUrl, props.currentWorkspace.id))
+    const requestMemberList = await getSpaceMemberList(FETCH_CONFIG.apiUrl, props.currentWorkspace.id)
 
-    const responseMemberList = await requestMemberList
+    const responseMemberList = await handleFetchResult(requestMemberList)
 
     if (responseMemberList.apiResponse.status === 200) {
       props.dispatch(setWorkspaceMemberList(responseMemberList.body))
