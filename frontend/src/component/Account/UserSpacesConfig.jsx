@@ -56,7 +56,7 @@ export const UserSpacesConfig = (props) => {
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: handleMemberModified },
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: handleMemberDeleted }
     ])
-  })
+  }, [])
 
   useEffect(() => {
     const filteredListWithMember = []
