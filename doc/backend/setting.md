@@ -168,8 +168,13 @@ Listen 6544
 
 ## SAML Authentication
 
+SAML Authentication needs the `xmlsec1` system package and the `pysaml2` python package
+to be installed.
+
 SAML authentication relies on a different settings file.
-The path of the settings file is provided to tracim through the `PYRAMID_SAML_PATH`
+The path of the settings file is provided to tracim through the `PYRAMID_SAML_PATH` environment variable.
+
+Note: `PYRAMID_SAML_PATH` needs to be an absolute path.
 
 e.g.
 ```
