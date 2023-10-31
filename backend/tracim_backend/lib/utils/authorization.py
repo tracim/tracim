@@ -3,6 +3,9 @@ from abc import ABC
 from abc import abstractmethod
 import functools
 from pyramid.interfaces import IAuthorizationPolicy
+from pyramid.interfaces import ISecurityPolicy
+from pyramid.security import Allowed
+from pyramid.security import Denied
 import typing
 from typing import TYPE_CHECKING
 from zope.interface import implementer
@@ -36,47 +39,101 @@ if TYPE_CHECKING:
 # Pyramid default permission/authorization mechanism
 
 # INFO - G.M - 12-04-2018 - Setiing a Default permission on view is
-#  needed to activate AuthentificationPolicy and
+#  needed to activate AuthenticationPolicy and
 # AuthorizationPolicy on pyramid request
 TRACIM_DEFAULT_PERM = "tracim"
 
 
-class TracimSecurityPolicy:
+@implementer(ISecurityPolicy)
+class SecurityPolicyAdaptor:
     """
-    Adapter to keep existing authentification method compatible with pyramid 2.0
+    Adaptor to keep existing authentication classes compatible with pyramid 2.0.
     source:
     https://docs.pylonsproject.org/projects/pyramid/en/latest/whatsnew-2.0.html#upgrading-from-third-party-policies
     """
 
-    def __init__(self, authentification_policy, authorization_policy):
-        self.authentification_policy = authentification_policy
+    def __init__(self, authentication_policy, authorization_policy):
+        self.authentication_policy = authentication_policy
         self.authorization_policy = authorization_policy
 
     def authenticated_userid(self, request):
-        return self.authentification_policy.authenticated_userid(request)
+        return self.authentication_policy.authenticated_userid(request)
 
     def permits(self, request, context, permission):
-        principals = self.authentification_policy.effective_principals(request)
+        principals = self.authentication_policy.effective_principals(request)
         return self.authorization_policy.permits(context, principals, permission)
 
     def remember(self, request, userid, **kw):
-        return self.authentification_policy.remember(request, userid, **kw)
+        return self.authentication_policy.remember(request, userid, **kw)
 
     def forget(self, request, **kw):
-        return self.authentification_policy.forget(request, **kw)
+        return self.authentication_policy.forget(request, **kw)
+
+
+@implementer(ISecurityPolicy)
+class MultiSecurityPolicy:
+    """
+    A wrapper for multiple Pyramid 2.0-style "security policies", which replace
+    Pyramid 1.0's separate AuthN and AuthZ APIs.
+    Security policies are checked in the order provided during initialization,
+    with the following semantics:
+    * `identity`: Selected from the first policy to return non-`None`
+    * `authenticated_userid`: Selected from the first policy to return non-`None`
+    * `forget`: Combined from all policies
+    * `remember`: Combined from all policies
+    * `permits`: Denied if any policy returns Denied.
+    These semantics mostly mirror those of `pyramid-multiauth`.
+    """
+
+    def __init__(self, policies: typing.Iterable[ISecurityPolicy]) -> None:
+        assert policies, "policies must contain at least one policy"
+        self._policies = policies
+
+    def identity(self, request) -> typing.Optional[typing.Any]:
+        for policy in self._policies:
+            ident = policy.identity(request)
+            if ident is not None:
+                return ident
+        return None
+
+    def authenticated_userid(self, request) -> typing.Optional[int]:
+        for policy in self._policies:
+            user_id = policy.authenticated_userid(request)
+            if user_id is not None:
+                return user_id
+        return None
+
+    def forget(self, request, **kw):
+        headers = []
+        for policy in self._policies:
+            headers.extend(policy.forget(request, **kw))
+        return headers
+
+    def remember(self, request, userid, **kw):
+        headers = []
+        for policy in self._policies:
+            headers.extend(policy.remember(request, userid, **kw))
+        return headers
+
+    def permits(self, request, context, permission):
+        for policy in self._policies:
+            permit = policy.permits(request, context, permission)
+            if isinstance(permit, Denied):
+                return permit
+        return permit
 
 
 @implementer(IAuthorizationPolicy)
 class AcceptAllAuthorizationPolicy(object):
     """
     Empty AuthorizationPolicy : Allow all request. As Pyramid need
-    a Authorization policy when we use AuthentificationPolicy, this
+    a Authorization policy when we use AuthenticationPolicy, this
     class permit use to disable pyramid authorization mechanism with
-    working a AuthentificationPolicy.
+    working a AuthenticationPolicy.
     """
 
     def permits(self, context, principals, permision):
-        return True
+        return Allowed("Allowed")
 
     def principals_allowed_by_permission(self, context, permission):
         raise NotImplementedError()

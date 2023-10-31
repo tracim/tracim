@@ -48,8 +48,6 @@ requires = [
     "filelock",
     "imapclient",
     "beautifulsoup4",
-    # auth
-    "pyramid_multiauth",
     # beaker 1.11 is broken: fix does exist but no new release since:
     # https://github.com/bbangert/beaker/commit/889d3055a4ca31b55a0b0681b00f2973b3250d88
     "beaker<1.11.0",

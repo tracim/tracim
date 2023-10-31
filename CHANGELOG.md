@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.6.2 / 2023-10-27
+
+### 🐛 Fixed Issues
+
+- Frontend: [#6192](https://github.com/tracim/tracim/issues/6192)
+- Backend: [#6219](https://github.com/tracim/tracim/issues/6219)
+
 ## 4.6.1 / 2023-07-31
 
 ### 🐛 Fixed Issues
