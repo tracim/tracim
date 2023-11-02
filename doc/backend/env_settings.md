@@ -172,6 +172,10 @@ To update the list below you will need to:
 | TRACIM_CALDAV__RADICALE_PROXY__BASE_URL                                   | caldav.radicale_proxy.base_url                                 | CALDAV__RADICALE_PROXY__BASE_URL                                   |
 | TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER                       | caldav.radicale.storage.filesystem_folder                      | CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER                       |
 | TRACIM_CALDAV__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH                    | caldav.pre_filled_event.description_file_path                  | CALDAV__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH                    |
+| TRACIM_COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE                           | collaborative_document_edition.software                        | COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE                           |
+| TRACIM_COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL                | collaborative_document_edition.collabora.base_url              | COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL                |
+| TRACIM_COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR                  | collaborative_document_edition.file_template_dir               | COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR                  |
+| TRACIM_COLLABORATIVE_DOCUMENT_EDITION__ENABLED_EXTENSIONS                 | collaborative_document_edition.enabled_extensions              | COLLABORATIVE_DOCUMENT_EDITION__ENABLED_EXTENSIONS                 |
 | TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__TEMPLATE__HTML     | email.notification.share_content_to_receiver.template.html     | EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__TEMPLATE__HTML     |
 | TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__SUBJECT            | email.notification.share_content_to_receiver.subject           | EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__SUBJECT            |
 | TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__TEMPLATE__HTML      | email.notification.share_content_to_emitter.template.html      | EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__TEMPLATE__HTML      |

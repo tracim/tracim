@@ -163,13 +163,16 @@ ALLOWED__AVATAR_MIMETYPES = [
 ]
 
 
-def has_write_rights(field: str, app_config: CFG, request: TracimRequest):
+def has_write_rights(field: str, app_config: CFG, request: TracimRequest) -> bool:
+    """
+    Check if user can write provided field (is admin or field is writable)
+    """
     read_only_fields = app_config.USER__READ_ONLY_FIELDS.get(request.candidate_user.auth_type.value)
-    return not (
-        request.current_user.profile.name != "ADMIN"
-        and read_only_fields is not None
-        and field in read_only_fields
-    )
+    if request.current_user.profile.name != "ADMIN":
+        if read_only_fields is not None:
+            if field in read_only_fields:
+                return False
+    return True
 
 
 class UserController(Controller):

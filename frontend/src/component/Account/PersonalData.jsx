@@ -23,11 +23,11 @@ export class PersonalData extends React.Component {
     }
   }
 
-  isFieldWritable = field => {
-    return !this.props.displayAdminInfo &&
-      this.props.system.config.user__read_only_fields &&
-      this.props.system.config.user__read_only_fields[this.props.userAuthType] &&
-      this.props.system.config.user__read_only_fields[this.props.userAuthType].includes(field)
+  isEditable = field => {
+    return (
+      !this.props.displayAdminInfo &&
+      this.props.system.config?.user__read_only_fields[this.props.userAuthType]?.includes(field)
+    )
   }
 
   handleChangePublicName = e => this.setState({ newPublicName: e.target.value })
