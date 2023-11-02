@@ -38,6 +38,8 @@ export const serializeWorkspace = workspace => {
 }
 
 export const serializeRole = role => {
+  // TODO - CH - 2023-11-02 - This function should use serializeWorkspace
+  // and be renamed according to this issue: https://github.com/tracim/tracim/issues/6252
   return {
     ...serialize(role.workspace, serializeWorkspaceListProps),
     sidebarEntryList: role.workspace.sidebar_entries.map(

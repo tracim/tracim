@@ -199,7 +199,7 @@ class UserController(Controller):
     @hapic.output_body(WorkspaceMemberSchema(many=True))
     def user_role_workspace(self, context, request: TracimRequest, hapic_data=None):
         """
-        Get list of user role in workspace
+        Get list of all roles of the given user
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         wapi = RoleApi(

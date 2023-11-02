@@ -517,6 +517,8 @@ export const putUserWorkspaceEmailNotificationType = (user, workspaceId, emailNo
   })
 }
 
+// TODO - CH - 2023-11-02 - this function should be renamed according to:
+// https://github.com/tracim/tracim/issues/6252
 export const getMyselfUserRoleWorkspaceList = () => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/me/role_workspaces`,
