@@ -2174,6 +2174,10 @@ class ConfigSchema(marshmallow.Schema):
     call__enabled = marshmallow.fields.Bool()
     call__unanswered_timeout = marshmallow.fields.Int()
     auth_types = marshmallow.fields.List(marshmallow.fields.String())
+    user__read_only_fields = marshmallow.fields.Dict(
+        keys=marshmallow.fields.String(),
+        values=marshmallow.fields.List(marshmallow.fields.String()),
+    )
     saml_idp_list = marshmallow.fields.Nested(SamLIdPConfigSchema, many=True)
 
 

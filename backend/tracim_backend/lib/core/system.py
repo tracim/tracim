@@ -84,6 +84,7 @@ class SystemApi(object):
             call__unanswered_timeout=self._config.CALL__UNANSWERED_TIMEOUT,
             auth_types=[auth_type.value for auth_type in self._config.AUTH_TYPES],
             saml_idp_list=[idp.to_dict() for idp in self._config.SAML_IDP_LIST],
+            user__read_only_fields=self._config.USER__READ_ONLY_FIELDS,
         )
 
     def get_usage_conditions_files(self) -> typing.List[UsageConditionModel]:

@@ -155,6 +155,7 @@ class ConfigParam(object):
         else:
             return value
 
+
 # INFO - M.L - 2023-10-25 - Using naming SamLIdPConfig instead of SAMLIdpConfig or SamlIdPConfig for readability
 class SamLIdPConfig(object):
     def __init__(self, displayed_name: str, identifier: str, logo_url: str):
@@ -414,6 +415,21 @@ class CFG(object):
             cast_func=AuthType,
             do_strip=True,
         )
+        self.USER__READ_ONLY_FIELDS: typing.Dict[str, typing.List[str]] = {}
+        for auth_type in self.AUTH_TYPES:
+            read_only = string_to_unique_item_list(
+                self.get_raw_config(f"user.profile.read_only_fields.{auth_type.value}"),
+                separator=",",
+                cast_func=str,
+                do_strip=True,
+            )
+            # HACK - M.L - 2023-10-30 - This is to satisfy CFG._check_consistency despite being
+            #  poorly usable
+            self.__setattr__(
+                f"USER__PROFILE__READ_ONLY_FIELDS__{auth_type.value.upper()}", read_only
+            )
+            self.USER__READ_ONLY_FIELDS[auth_type.value] = read_only
+
         self.REMOTE_USER_HEADER = self.get_raw_config("remote_user_header", None)
 
         self.API__KEY = self.get_raw_config("api.key", "", secret=True)

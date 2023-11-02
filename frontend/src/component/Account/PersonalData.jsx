@@ -8,7 +8,6 @@ import {
   IconButton
 } from 'tracim_frontend_lib'
 import DropdownLang from '../DropdownLang.jsx'
-import { editableUserAuthTypeList } from '../../util/helper.js'
 
 require('./PersonalData.styl')
 
@@ -22,6 +21,13 @@ export class PersonalData extends React.Component {
       newLang: props.user ? props.user.lang : '',
       checkPassword: ''
     }
+  }
+
+  isFieldWritable = field => {
+    return !this.props.displayAdminInfo &&
+      this.props.system.config.user__read_only_fields &&
+      this.props.system.config.user__read_only_fields[this.props.userAuthType] &&
+      this.props.system.config.user__read_only_fields[this.props.userAuthType].includes(field)
   }
 
   handleChangePublicName = e => this.setState({ newPublicName: e.target.value })
@@ -58,7 +64,6 @@ export class PersonalData extends React.Component {
 
   render () {
     const { props, state } = this
-    const shouldAllowEditionFromAuthType = editableUserAuthTypeList.includes(props.userAuthType)
     return (
       <div className='account__userpreference__setting__personaldata'>
         <div className='personaldata__sectiontitle subTitle'>
@@ -78,7 +83,7 @@ export class PersonalData extends React.Component {
               placeholder={props.userPublicName}
               value={state.newPublicName}
               onChange={this.handleChangePublicName}
-              disabled={!shouldAllowEditionFromAuthType}
+              disabled={this.isFieldWritable('public_name')}
             />
           </label>
 
@@ -92,7 +97,7 @@ export class PersonalData extends React.Component {
                 placeholder={props.userUsername}
                 value={state.newUsername}
                 onChange={this.handleChangeUserName}
-                disabled={!shouldAllowEditionFromAuthType}
+                disabled={this.isFieldWritable('username')}
               />
             </label>
             {!props.isUsernameValid && (
@@ -118,7 +123,7 @@ export class PersonalData extends React.Component {
                 placeholder={props.userEmail}
                 value={state.newEmail}
                 onChange={this.handleChangeEmail}
-                disabled={!shouldAllowEditionFromAuthType}
+                disabled={this.isFieldWritable('email')}
               />
             </label>
           </div>
@@ -143,7 +148,7 @@ export class PersonalData extends React.Component {
                   type='password'
                   value={state.checkPassword}
                   onChange={this.handleChangeCheckPassword}
-                  disabled={!shouldAllowEditionFromAuthType || (state.newEmail === '' && state.newUsername === '')}
+                  disabled={(this.isFieldWritable('email') || this.isFieldWritable('username')) || (state.newEmail === '' && state.newUsername === '')}
                 />
               </label>
             </div>
@@ -188,5 +193,5 @@ PersonalData.defaultProps = {
   langList: [{ id: '', label: '' }]
 }
 
-const mapStateToProps = ({ user }) => ({ user })
+const mapStateToProps = ({ user, system }) => ({ user, system })
 export default connect(mapStateToProps)(translate()(PersonalData))

@@ -376,6 +376,12 @@ api.key = %(basic_setup.api_key)s
 ## TLS usage to communicate with your LDAP server
 ; ldap_tls = False
 
+## Read only fields per auth_type, parameter name is user.profile.read_only_fields.{auth_type}
+# value is a comma separated list of read-only fields.
+# example:
+# user.profile.read_only_fields.saml=username,email,public_name
+# user.profile.read_only_fields.ldap=username,password,email,public_name
+
 ## User auth token validity in seconds (used to interfaces like web calendars)
 ; user.auth_token.validity = 604800
 ## user reset_password token lifetime (default to 900s -> 15 minutes)
@@ -385,6 +391,8 @@ api.key = %(basic_setup.api_key)s
 ## Allow people to register/create an account themselves without authentication.
 ## The profile of those users will be user.default_profile
 ; user.self_registration.enabled = False
+
+
 
 # The delay in seconds after which a user is considered offline after all
 # connections to live messages are closed.

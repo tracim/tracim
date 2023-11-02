@@ -3,6 +3,7 @@ from hapic.data import HapicFile
 from http import HTTPStatus
 import json
 from pyramid.config import Configurator
+from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.response import Response
 import typing
 
@@ -160,6 +161,15 @@ ALLOWED__AVATAR_MIMETYPES = [
     "image/gif",
     "image/svg+xml",
 ]
+
+
+def has_write_rights(field: str, app_config: CFG, request: TracimRequest):
+    read_only_fields = app_config.USER__READ_ONLY_FIELDS.get(request.candidate_user.auth_type.value)
+    return not (
+        request.current_user.profile.name != "ADMIN"
+        and read_only_fields is not None
+        and field in read_only_fields
+    )
 
 
 class UserController(Controller):
@@ -320,6 +330,8 @@ class UserController(Controller):
         uapi = UserApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
+        if not has_write_rights("email", app_config, request):
+            return HTTPBadRequest()
         user = uapi.set_email(
             request.candidate_user,
             hapic_data.body.loggedin_user_password,
@@ -345,6 +357,8 @@ class UserController(Controller):
         uapi = UserApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
+        if not has_write_rights("username", app_config, request):
+            return HTTPBadRequest()
         user = uapi.set_username(
             request.candidate_user,
             hapic_data.body.loggedin_user_password,
@@ -369,6 +383,8 @@ class UserController(Controller):
         uapi = UserApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
+        if not has_write_rights("password", app_config, request):
+            return HTTPBadRequest()
         uapi.set_password(
             request.candidate_user,
             hapic_data.body.loggedin_user_password,
@@ -387,6 +403,8 @@ class UserController(Controller):
         Set user info data
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
+        if not has_write_rights("public_name", app_config, request):
+            hapic_data.body.public_name = request.candidate_user.public_name
         uapi = UserApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
@@ -1500,13 +1518,15 @@ class UserController(Controller):
         # set content as read/unread
         configurator.add_route(
             "read_content",
-            "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/{content_id}/read",  # noqa: W605
+            "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/{content_id}/read",
+            # noqa: W605
             request_method="PUT",
         )
         configurator.add_view(self.set_content_as_read, route_name="read_content")
         configurator.add_route(
             "unread_content",
-            "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/{content_id}/unread",  # noqa: W605
+            "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/{content_id}/unread",
+            # noqa: W605
             request_method="PUT",
         )
         configurator.add_view(self.set_content_as_unread, route_name="unread_content")
@@ -1669,7 +1689,8 @@ class UserController(Controller):
 
         configurator.add_route(
             "sized_preview_avatar",
-            "/users/{user_id:\d+}/avatar/preview/jpg/{width:\d+}x{height:\d+}/{filename:[^/]*}",  # noqa: W605
+            "/users/{user_id:\d+}/avatar/preview/jpg/{width:\d+}x{height:\d+}/{filename:[^/]*}",
+            # noqa: W605
             request_method="GET",  # noqa: W605
         )
         configurator.add_view(self.sized_preview_avatar, route_name="sized_preview_avatar")
@@ -1697,7 +1718,8 @@ class UserController(Controller):
 
         configurator.add_route(
             "sized_preview_cover",
-            "/users/{user_id:\d+}/cover/preview/jpg/{width:\d+}x{height:\d+}/{filename:[^/]*}",  # noqa: W605
+            "/users/{user_id:\d+}/cover/preview/jpg/{width:\d+}x{height:\d+}/{filename:[^/]*}",
+            # noqa: W605
             request_method="GET",  # noqa: W605
         )
         configurator.add_view(self.sized_preview_cover, route_name="sized_preview_cover")
