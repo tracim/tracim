@@ -21,7 +21,9 @@ To update the list below you will need to:
 | TRACIM_DEFAULT_LANG                                                       | default_lang                                                   | DEFAULT_LANG                                                       |
 | TRACIM_PREVIEW_CACHE_DIR                                                  | preview_cache_dir                                              | PREVIEW_CACHE_DIR                                                  |
 | TRACIM_AUTH_TYPES                                                         | auth_types                                                     | AUTH_TYPES                                                         |
-| TRACIM_USER__PROFILE__READ_ONLY_FIELDS_XYZ                                | user.profile.read_only_fields.xyz                              | USER__PROFILE__READ_ONLY_FIELDS__XYZ                               |
+| TRACIM_USER__PROFILE__READ_ONLY_FIELDS_SAML                               | user.profile.read_only_fields.saml                             | USER__PROFILE__READ_ONLY_FIELDS__SAML                              |
+| TRACIM_USER__PROFILE__READ_ONLY_FIELDS_LDAP                               | user.profile.read_only_fields.ldap                             | USER__PROFILE__READ_ONLY_FIELDS__LDAP                              |
+| TRACIM_USER__PROFILE__READ_ONLY_FIELDS_INTERNAL                           | user.profile.read_only_fields.internal                         | USER__PROFILE__READ_ONLY_FIELDS__INTERNAL                          |
 | TRACIM_REMOTE_USER_HEADER                                                 | remote_user_header                                             | REMOTE_USER_HEADER                                                 |
 | TRACIM_API__KEY                                                           | api.key                                                        | API__KEY                                                           |
 | TRACIM_SESSION__TYPE                                                      | session.type                                                   | SESSION__TYPE                                                      |

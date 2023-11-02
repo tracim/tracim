@@ -1528,8 +1528,7 @@ class UserController(Controller):
         configurator.add_view(self.set_content_as_read, route_name="read_content")
         configurator.add_route(
             "unread_content",
-            "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/{content_id}/unread",
-            # noqa: W605
+            "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/{content_id}/unread",  # noqa: W605
             request_method="PUT",
         )
         configurator.add_view(self.set_content_as_unread, route_name="unread_content")
@@ -1692,8 +1691,7 @@ class UserController(Controller):
 
         configurator.add_route(
             "sized_preview_avatar",
-            "/users/{user_id:\d+}/avatar/preview/jpg/{width:\d+}x{height:\d+}/{filename:[^/]*}",
-            # noqa: W605
+            "/users/{user_id:\d+}/avatar/preview/jpg/{width:\d+}x{height:\d+}/{filename:[^/]*}",  # noqa: W605
             request_method="GET",  # noqa: W605
         )
         configurator.add_view(self.sized_preview_avatar, route_name="sized_preview_avatar")

@@ -380,9 +380,15 @@ api.key = %(basic_setup.api_key)s
 # value is a comma separated list of read-only fields.
 # this option is important when settings fields with SAML or LDAP auth. Since provided attributes
 # can not and should not be modified by tracim
+# available fields are the following: "public_name", "username", "email" and "password"
 # example:
 # user.profile.read_only_fields.saml=username,email,public_name
 # user.profile.read_only_fields.ldap=username,password,email,public_name
+# By default, read_only_fields for all auth_types are empty
+
+; user.profile.read_only_fields.saml=
+; user.profile.read_only_fields.ldap=
+; user.profile.read_only_fields.internal=
 
 ## User auth token validity in seconds (used to interfaces like web calendars)
 ; user.auth_token.validity = 604800
