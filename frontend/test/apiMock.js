@@ -155,13 +155,13 @@ const mockGetContentType200 = (apiUrl, contentTypes) => {
 
 const mockGetMyselfWorkspaceList200 = (apiUrl, showOwnedWorkspace, workspaceList) => {
   return nock(apiUrl)
-    .get('/users/me/role_workspaces')
+    .get('/users/me/workspaces/all/settings')
     .reply(200, workspaceList)
 }
 
 const mockGetUserWorkspaceList200 = (apiUrl, userId, showOwnedWorkspace, workspaceList) => {
   return nock(apiUrl)
-    .get(`/users/${userId}/role_workspaces`)
+    .get(`/users/${userId}/workspaces/all/settings`)
     .reply(200, workspaceList)
 }
 

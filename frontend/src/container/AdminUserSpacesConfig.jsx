@@ -53,11 +53,7 @@ export const AdminUserSpacesConfig = (props) => {
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: handleMemberModified },
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: handleMemberDeleted }
     ])
-    if (props.userToEditId === props.user.userId) {
-      setMemberSpaceList(props.workspaceList)
-    } else {
-      getMemberSpacesList()
-    }
+    getMemberSpacesList()
   }, [])
 
   useEffect(() => {

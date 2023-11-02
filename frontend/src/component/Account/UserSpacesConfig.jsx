@@ -56,6 +56,7 @@ export const UserSpacesConfig = (props) => {
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: handleMemberModified },
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: handleMemberDeleted }
     ])
+    getSpaceList()
   }, [])
 
   useEffect(() => {
@@ -114,15 +115,6 @@ export const UserSpacesConfig = (props) => {
       )
     })
   }
-
-  useEffect(() => {
-    if (props.userToEditId === props.user.userId) {
-      setSpaceList(props.workspaceList)
-      setIsLoading(false)
-    } else {
-      getSpaceList()
-    }
-  }, [props.userToEditId, props.workspaceList])
 
   const handleMemberModified = (data) => {
     if (data.fields.user.user_id === props.userToEditId) {
