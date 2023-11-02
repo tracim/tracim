@@ -24,6 +24,7 @@ export class PersonalData extends React.Component {
   }
 
   isDisabled = field => {
+    if (!this.props.system || !this.props.system.config) return false
     if (!this.props.system.config.user__read_only_fields[this.props.userAuthType]) return false
 
     return (
@@ -150,7 +151,7 @@ export class PersonalData extends React.Component {
                   type='password'
                   value={state.checkPassword}
                   onChange={this.handleChangeCheckPassword}
-                  disabled={(this.isDisabled('email') || this.isDisabled('username')) || (state.newEmail === '' && state.newUsername === '')}
+                  disabled={(this.isDisabled('email') && this.isDisabled('username')) || (state.newEmail === '' && state.newUsername === '')}
                 />
               </label>
             </div>

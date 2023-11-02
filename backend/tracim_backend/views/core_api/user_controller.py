@@ -334,7 +334,9 @@ class UserController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         if not has_write_rights("email", app_config, request):
-            return HTTPBadRequest()
+            return HTTPBadRequest(
+                f"Error {UserCantChangeIsOwnProfile.error_code}: email is read-only"
+            )
         user = uapi.set_email(
             request.candidate_user,
             hapic_data.body.loggedin_user_password,
@@ -361,7 +363,9 @@ class UserController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         if not has_write_rights("username", app_config, request):
-            return HTTPBadRequest()
+            return HTTPBadRequest(
+                f"Error {UserCantChangeIsOwnProfile.error_code}: username is read-only"
+            )
         user = uapi.set_username(
             request.candidate_user,
             hapic_data.body.loggedin_user_password,
@@ -387,7 +391,9 @@ class UserController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
         if not has_write_rights("password", app_config, request):
-            return HTTPBadRequest()
+            return HTTPBadRequest(
+                f"Error {UserCantChangeIsOwnProfile.error_code}: password is read-only"
+            )
         uapi.set_password(
             request.candidate_user,
             hapic_data.body.loggedin_user_password,
@@ -1521,8 +1527,7 @@ class UserController(Controller):
         # set content as read/unread
         configurator.add_route(
             "read_content",
-            "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/{content_id}/read",
-            # noqa: W605
+            "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/{content_id}/read",  # noqa: W605
             request_method="PUT",
         )
         configurator.add_view(self.set_content_as_read, route_name="read_content")
@@ -1719,8 +1724,7 @@ class UserController(Controller):
 
         configurator.add_route(
             "sized_preview_cover",
-            "/users/{user_id:\d+}/cover/preview/jpg/{width:\d+}x{height:\d+}/{filename:[^/]*}",
-            # noqa: W605
+            "/users/{user_id:\d+}/cover/preview/jpg/{width:\d+}x{height:\d+}/{filename:[^/]*}",  # noqa: W605
             request_method="GET",  # noqa: W605
         )
         configurator.add_view(self.sized_preview_cover, route_name="sized_preview_cover")
