@@ -83,7 +83,7 @@ export class PersonalData extends React.Component {
               placeholder={props.userPublicName}
               value={state.newPublicName}
               onChange={this.handleChangePublicName}
-              disabled={this.isFieldWritable('public_name')}
+              disabled={this.isEditable('public_name')}
             />
           </label>
 
@@ -97,7 +97,7 @@ export class PersonalData extends React.Component {
                 placeholder={props.userUsername}
                 value={state.newUsername}
                 onChange={this.handleChangeUserName}
-                disabled={this.isFieldWritable('username')}
+                disabled={this.isEditable('username')}
               />
             </label>
             {!props.isUsernameValid && (
@@ -123,7 +123,7 @@ export class PersonalData extends React.Component {
                 placeholder={props.userEmail}
                 value={state.newEmail}
                 onChange={this.handleChangeEmail}
-                disabled={this.isFieldWritable('email')}
+                disabled={this.isEditable('email')}
               />
             </label>
           </div>
@@ -148,7 +148,7 @@ export class PersonalData extends React.Component {
                   type='password'
                   value={state.checkPassword}
                   onChange={this.handleChangeCheckPassword}
-                  disabled={(this.isFieldWritable('email') || this.isFieldWritable('username')) || (state.newEmail === '' && state.newUsername === '')}
+                  disabled={(this.isEditable('email') || this.isEditable('username')) || (state.newEmail === '' && state.newUsername === '')}
                 />
               </label>
             </div>
