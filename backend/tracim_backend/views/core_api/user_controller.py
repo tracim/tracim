@@ -1414,7 +1414,7 @@ class UserController(Controller):
         # user role
         configurator.add_route(
             "get_user_role_workspace",
-            "/users/{user_id:\d+}/role_workspaces",  # noqa: W605
+            "/users/{user_id:\d+}/workspaces/all/settings",  # noqa: W605
             request_method="GET",  # noqa: W605
         )
         configurator.add_view(self.user_role_workspace, route_name="get_user_role_workspace")

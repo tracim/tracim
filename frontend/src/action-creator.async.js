@@ -275,9 +275,11 @@ export const getUserConfiguration = userId => dispatch => {
   })
 }
 
+// TODO - CH - 2023-11-02 - this function should be renamed according to:
+// https://github.com/tracim/tracim/issues/6252
 export const getUserRoleWorkspaceList = (userId) => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/role_workspaces`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspaces/all/settings`,
     param: {
       credentials: 'include',
       headers: {
@@ -521,7 +523,7 @@ export const putUserWorkspaceEmailNotificationType = (user, workspaceId, emailNo
 // https://github.com/tracim/tracim/issues/6252
 export const getMyselfUserRoleWorkspaceList = () => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/role_workspaces`,
+    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/all/settings`,
     param: {
       credentials: 'include',
       headers: {
