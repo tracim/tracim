@@ -173,10 +173,9 @@ def check_has_write_rights(
     :raise ReadOnlyFieldException if the field is not writable
     """
     read_only_fields = app_config.USER__READ_ONLY_FIELDS.get(request.candidate_user.auth_type)
-    if request.current_user.profile != Profile.ADMIN:
-        if read_only_fields is not None:
-            if field in read_only_fields:
-                raise ReadOnlyFieldException(f"You can't modify the field {field.value}")
+    if read_only_fields is not None:
+        if field in read_only_fields:
+            raise ReadOnlyFieldException(f"You can't modify the field {field.value}")
     return True
 
 

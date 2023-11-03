@@ -27,11 +27,7 @@ export class PersonalData extends React.Component {
   isDisabled = field => {
     if (!this.props.system || !this.props.system.config) return false
     if (!this.props.system.config.user__read_only_fields[this.props.userAuthType]) return false
-
-    return (
-      !this.props.isAdmin &&
-      this.props.system.config.user__read_only_fields[this.props.userAuthType].includes(field)
-    )
+    return this.props.system.config.user__read_only_fields[this.props.userAuthType].includes(field)
   }
 
   handleChangePublicName = e => this.setState({ newPublicName: e.target.value })
