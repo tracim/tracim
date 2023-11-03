@@ -3,7 +3,6 @@ from hapic.data import HapicFile
 from http import HTTPStatus
 import json
 from pyramid.config import Configurator
-from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.response import Response
 import typing
 
