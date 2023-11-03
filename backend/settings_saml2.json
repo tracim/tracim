@@ -1,66 +1,76 @@
-    {
-        "entityid": "http://localhost:7999/saml/metadata",
-        "metadata": {
-            "local": [],
-            "remote": [
-                {
-                    "url": "https://samltest.id/saml/idp"
-                },
-                {
-                    "url": "https://idp.ssocircle.com"
-                }
+{
+  "entityid": "http://localhost:7999/saml/metadata",
+  "metadata": {
+    "local": [],
+    "remote": [
+      {
+        "url": "https://samltest.id/saml/idp"
+      },
+      {
+        "url": "https://idp.ssocircle.com"
+      }
+    ]
+  },
+  "service": {
+      "sp": {
+        "endpoints": {
+          "assertion_consumer_service": [
+            [
+              "http://localhost:7999/saml/acs",
+              "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
             ]
+          ],
+          "single_logout_service": [
+            [
+              "http://localhost:7999/saml/slo/redirect",
+              "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+            ],
+            [
+              "http://localhost:7999/saml/slo/post",
+              "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+            ]
+          ]
         },
-        "service": {
-            "sp": {
-                "endpoints": {
-                    "assertion_consumer_service": [
-                        [
-                            "http://localhost:7999/saml/acs",
-                            "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-                        ]
-                    ],
-                    "single_logout_service": [
-                        [
-                            "http://localhost:7999/saml/slo/redirect",
-                            "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
-                        ],
-                        [
-                            "http://localhost:7999/saml/slo/post",
-                            "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-                        ]
-                    ]
-                },
-                "allow_unsolicited": true,
-                "authn_requests_signed": false,
-                "logout_requests_signed": false,
-                "want_assertions_signed": false,
-                "want_response_signed": false,
-                "name_id_format": "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
-                "name_id_format_allow_create": true,
-                "want_name_id": true
-            }
-        },
-        "allow_unknown_attributes": true,
-        "key_file": "./sp.key",
-        "cert_file": "./sp.crt",
-        "xmlsec_binary": "/usr/bin/xmlsec1",
-        "metadata_cache_duration": {
-            "default": 86400
-        },
-        "virtual_organization": {
-            "https://samltest.id/saml/idp": {
-                "common_identifier": "saml_test"
-            },
-            "https://idp.ssocircle.com": {
-                "common_identifier": "sso_circle",
-                "logo_url": "https://idp.ssocircle.com/logo.png",
-                "displayed_name": "[Test] SSO Circle",
-                "attribute_map": {
-                  "user_id": "${UserID}",
-                  "email": "${EmailAddress}",
-                  "display_name": "${FirstName} ${LastName}"
-                }
-            }
+      "allow_unsolicited": true,
+      "authn_requests_signed": false,
+      "logout_requests_signed": false,
+      "want_assertions_signed": false,
+      "want_response_signed": false,
+      "name_id_format": "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
+      "name_id_format_allow_create": true,
+      "want_name_id": true
+    }
+  },
+  "allow_unknown_attributes": true,
+  "key_file": "./sp.key",
+  "cert_file": "./sp.crt",
+  "xmlsec_binary": "/usr/bin/xmlsec1",
+  "metadata_cache_duration": {
+    "default": 86400
+  },
+  "virtual_organization": {
+    "https://samltest.id/saml/idp": {
+      "common_identifier": "saml_test"
+    },
+    "https://idp.ssocircle.com": {
+      "common_identifier": "sso_circle",
+      "logo_url": "https://idp.ssocircle.com/logo.png",
+      "displayed_name": "[Test] SSO Circle",
+      "attribute_map": {
+        "user_id": "${UserID}",
+        "email": "${EmailAddress}",
+        "display_name": "${FirstName} ${LastName}"
+      },
+      "profile_map": {
+          "trusted-users": {
+            "value": "${UserID}",
+            "match": "damien|millefeuille"
+          },
+          "administrators": {
+            "value": "${UserID}",
+            "match": "aaa"
+          }
         }
     }
+  }
+}

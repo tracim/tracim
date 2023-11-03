@@ -687,16 +687,18 @@ need to be in every workspace you include."
         user_id: str,
         name: str,
         mail: str,
+        profile: Profile
     ) -> User:
         """
         Authenticate with ldap, return authenticated user or raise Exception
         like WrongAuthTypeForUser, WrongLDAPCredentials, UserDoesNotExist
         or UserAuthenticatedIsNotActive
-        :param user: user to check,, can be none if user not found, will try
+        :param user to check, can be none if user not found, will try
          to create new user if none but ldap auth succeed
         :param user_id: user_id of the user
-        :param name: name extracted from saml attributes
-        :param mail: mail extracted from saml attributes
+        :param name extracted from saml attributes
+        :param mail extracted from saml attributes
+        :param profile: user Profile extracted from saml attributes
         """
         auth_type = AuthType.SAML
 
@@ -713,6 +715,7 @@ need to be in every workspace you include."
                     auth_type=AuthType.SAML,
                     do_save=True,
                     do_notify=False,
+                    profile=profile
                 )
                 transaction.commit()
                 user = self.get_one_by_login(user_id)
