@@ -74,7 +74,10 @@ The `register_tracim_plugin` function is used to register the plugin with the `P
 To register routes in a plugin, use the following snippet in the `on_plugins_loaded` hook:
 
 ```python
+from pyramid.config import Configurator
+from pluggy import PluginManager
 from pyramid.threadlocal import get_current_registry
+from tracim_backend.lib.core.plugins import hookimpl
 
 @hookimpl
 def on_plugins_loaded(self, plugin_manager: PluginManager) -> None:
@@ -97,29 +100,38 @@ Adding this snippet to the HelloWorld plugin:
 This is just a sample of Tracim backend plugin using pluggy hook
 """
 from pluggy import PluginManager
-from pyramid.httpexceptions import HTTPOk
+from pyramid.config import Configurator
 from pyramid.threadlocal import get_current_registry
+from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.plugins import hookimpl
-from tracim_backend.lib.utils.request import TracimContext
-from tracim_backend.models.auth import User
+from tracim_backend.lib.utils.request import TracimRequest
+from tracim_backend.lib.core.user import UserApi
+from tracim_backend.views.core_api.schemas import UserSchema
 
 
 class HelloWorldPlugin:
-    """Needs a registration using 'register_tracim_plugin' function."""
-
-    def my_view(self, request):
-        return HTTPOk()
+    """
+    This plugin adds a comment to video contents when created if they are not a mp4 file.
+    Needs a registration using 'register_tracim_plugin' function.
+    """
+    @hapic.output_body(UserSchema())
+    def get_user(self, request: TracimRequest):
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        uapi = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
+        )
+        user = uapi.get_current_user()
+        return uapi.get_user_with_context(user)
 
     @hookimpl
     def on_plugins_loaded(self, plugin_manager: PluginManager) -> None:
+        """
+        This method is called when the plugin is loaded.
+        """
         registry = get_current_registry()
         config = Configurator(registry=registry)
-        config.add_route("my_route", "/plugins/hello_world/my_route", request_method="GET")
-        config.add_view(self.my_view, route_name="my_route")
-
-    @hookimpl
-    def on_user_created(self, user: User, context: TracimContext) -> None:
-        print("created user {}".format(user.public_name))
+        config.add_route("rss_messages", "/plugins/hello_world/user", request_method="GET")
+        config.add_view(self.get_user, route_name="hello_world_user")
 
 
 def register_tracim_plugin(plugin_manager: PluginManager):
@@ -127,3 +139,21 @@ def register_tracim_plugin(plugin_manager: PluginManager):
 ```
 
 Now the `my_view` function will be called when accessing the `/plugins/hello_world/my_route` route.
+
+## Technical information
+
+`Configurator` is accessed through `pyramid.threadlocal` registry. It is accessible because 
+`Configurator` has been pushed on the `threadlocal` stack before registering the plugins.
+It is the popped from the stack once the configuration is over. Meaning that the `Configurator`
+is not accessible outside and after the `on_plugins_loaded` hook.
+
+The `on_plugins_loaded` is run before the app is split into threads. Meaning this operation is
+thread safe, that the modification are propagated to all the future threads and are not duplicated.
+
+For example, running tracim with `uswgi` and the following configuration will only run the hook once.
+```ini
+workers = 4
+threads = 4
+```
+
+For more information see [pyramid's official documentation](https://docs.pylonsproject.org/projects/pyramid/en/latest/api/config.html#pyramid.config.Configurator.begin).
