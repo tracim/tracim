@@ -9,6 +9,7 @@ from pyramid.authentication import SessionAuthenticationHelper
 from pyramid.authentication import SessionAuthenticationPolicy
 from pyramid.authentication import extract_http_basic_credentials
 from pyramid.config import Configurator
+from pyramid.exceptions import Forbidden
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.httpexceptions import HTTPFound
 from pyramid.httpexceptions import HTTPNotFound
@@ -19,6 +20,7 @@ from pyramid.security import Allowed
 from pyramid_ldap3 import get_ldap_connector
 import re
 from saml2 import BINDING_HTTP_POST
+from saml2 import BINDING_HTTP_REDIRECT
 from saml2.client import Saml2Client
 from saml2.config import Config as Saml2Config
 from saml2.metadata import create_metadata_string
@@ -91,7 +93,10 @@ class SAMLSecurityPolicy:
         #  The routes could also be defined through a controller (see Controller class)
         #  even if it added-value is small.
 
-        # FIXME - M.L - 2023/09/05 - Change this to proper config loading
+        # TODO - M.L - 2023-11-03 - Add documentation through swagger
+        #  (currently is in the doc/setting.md file) or upgrade the way swagger generates
+        #  documentation to ease the addition of non conventional routes
+
         self._load_settings(configurator)
         _config = configurator.get_settings().get("pyramid_saml")
         with open(_config.get("saml_path"), "r") as config_file:
@@ -118,16 +123,18 @@ class SAMLSecurityPolicy:
                     )
                 )
 
-        configurator.add_forbidden_view(self._idp_chooser)
         configurator.add_route("acs", "/saml/acs", request_method="POST")
         configurator.add_route("sso", "/saml/sso", request_method="GET")
+        configurator.add_route("slo_redirect", "/saml/slo/redirect", request_method="GET")
+        configurator.add_route("slo_post", "/saml/slo/post", request_method="POST")
         configurator.add_route("metadata", "/saml/metadata", request_method="GET")
         configurator.add_view(self._acs, route_name="acs")
         configurator.add_view(self._sso, route_name="sso")
+        configurator.add_view(self._slo, route_name="slo_redirect")
+        configurator.add_view(self._slo, route_name="slo_post")
         configurator.add_view(self._metadata, route_name="metadata")
 
     def _load_settings(self, config: Configurator):
-        # FIXME - M.L - 2023/09/05 - Change this to proper config loading
         """Parse and validate SAML configuration.
 
         Args:
@@ -155,11 +162,11 @@ class SAMLSecurityPolicy:
     def authenticated_userid(
         self, request: TracimRequest
     ) -> typing.Optional[typing.Union[str, int]]:
-        # FIXME - SGD - 2023-07-26 - Return Tracim user id when SAML data is present in the
-        #  session. By matching it with SAML ID attribute (in external_id,
-        #  see https://github.com/tracim/tracim/issues/6209)
         saml_user_id = request.session.get("saml_user_id")
         if saml_user_id is None:
+            return None
+        saml_expiry = request.session.get("saml_expiry")
+        if saml_expiry is None or saml_expiry <= int(time.time()):
             return None
 
         user_api = UserApi(None, request.dbsession, self.app_config)
@@ -176,12 +183,10 @@ class SAMLSecurityPolicy:
         return user.user_id
 
     def permits(self, request, context, permission):
-        # TODO - M.L - 2023/09/06 - Maybe check for session lifetime or validity
-        # if request.authenticated_userid is None \
-        #     and not request.path.startswith("/saml") \
-        #     and not request.path.startswith("/saml") \
-        #     and not request.path is "/ui/login":
-        #     return Denied("Nobody is allowed")
+        saml_expiry = request.session.get("saml_expiry")
+        if saml_expiry is not None and saml_expiry <= int(time.time()):
+            self.forget(request, context=context)
+            return Forbidden("Session Expired")
         return Allowed("Allowed")
 
     def remember(
@@ -197,24 +202,11 @@ class SAMLSecurityPolicy:
                 del request.session["saml_email"]
                 del request.session["saml_display_name"]
                 del request.session["saml_user_profile"]
+                del request.session["saml_expiry"]
             except Exception:
                 pass
         self._session_helper.forget(request, **kw)
         return []
-
-    def _idp_chooser(self, request: TracimRequest) -> Response:
-        # TODO - SGD - 2023-07-26 - This view should render an HTML form
-        # with the list of configured IdPs.
-        # The form should redirect to the chosen IdPs SSO endpoint when submitted.
-        # Maybe some JS will be needed here?
-        return Response(
-            f"""
-          <form action="{self.app_config.WEBSITE__BASE_URL}/saml/acs" method="POST">
-            <input name="saml_user_id" type="hidden" value="saml-user"/>
-            <input name="redirect_url" type="hidden" value="{request.path_url}" />
-            <button>Login</button>
-          </form>"""
-        )
 
     # NOTE - M.L - 2023-10-25 - ACS (Assertion Consumer Service) is where the response
     #  sent by the SAML IdP is processed and consumed
@@ -229,6 +221,8 @@ class SAMLSecurityPolicy:
             )
         except ResponseLifetimeExceed as e:
             return Response(e.__str__())
+        if authn_response.not_on_or_after <= int(time.time()):
+            return HTTPBadRequest()
         identity = authn_response.get_identity()
         if identity is None:
             return HTTPBadRequest()
@@ -249,7 +243,6 @@ class SAMLSecurityPolicy:
             if match is not None:
                 user_profile = Profile.get_profile_from_slug(key)
 
-        # FIXME - M.L - 2023/09/06 - Associate response / expiry date to session
         if "user_id" not in formatted_attributes:
             return HTTPBadRequest()
         request.session["saml_user_id"] = formatted_attributes["user_id"]
@@ -258,7 +251,7 @@ class SAMLSecurityPolicy:
         if "display_name" in formatted_attributes:
             request.session["saml_display_name"] = formatted_attributes["display_name"]
         request.session["saml_user_profile"] = user_profile
-
+        request.session["saml_expiry"] = authn_response.not_on_or_after
         return HTTPFound("/")
 
     def _sso(self, request: TracimRequest) -> Response:
@@ -286,6 +279,20 @@ class SAMLSecurityPolicy:
             if key == "Location":
                 redirect_url = value
         return HTTPFound(redirect_url)
+
+    def _slo(self, request: TracimRequest) -> Response:
+        http_args = request.GET if request.method == "GET" else request.POST
+        saml_request = http_args.get("SAMLRequest", None)
+
+        if not saml_request:
+            return HTTPBadRequest("Missing SAMLRequest parameter")
+
+        result = self.saml_client.parse_logout_request(saml_request, BINDING_HTTP_REDIRECT)
+        if not result:
+            return HTTPBadRequest("Invalid SLO request")
+
+        self.forget(request, from_slo=True)
+        return HTTPFound("/")
 
     def _metadata(self, request: TracimRequest) -> Response:
         return self._metadata_response
