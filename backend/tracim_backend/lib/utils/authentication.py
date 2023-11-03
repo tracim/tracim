@@ -35,7 +35,8 @@ from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.utils.request import TracimRequest
-from tracim_backend.models.auth import AuthType, Profile
+from tracim_backend.models.auth import AuthType
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 
 BASIC_AUTH_WEBUI_REALM = "tracim"
@@ -55,15 +56,9 @@ SAML_IDP_DEFAULT_CONFIG = {
             "display_name": "${surName} ${givenName}",
         },
         "profile_map": {
-            "trusted-users": {
-                "value": "${eduPersonPrimaryAffiliation}",
-                "match": "teacher|member"
-            },
-            "administrators": {
-                "value": "${eduPersonPrimaryAffiliation}",
-                "match": "employee"
-            }
-        }
+            "trusted-users": {"value": "${eduPersonPrimaryAffiliation}", "match": "teacher|member"},
+            "administrators": {"value": "${eduPersonPrimaryAffiliation}", "match": "employee"},
+        },
     }
 }
 
@@ -176,7 +171,7 @@ class SAMLSecurityPolicy:
             user_id=saml_user_id,
             name=request.session.get("saml_display_name"),
             mail=request.session.get("saml_email"),
-            profile=request.session.get("saml_user_profile")
+            profile=request.session.get("saml_user_profile"),
         )
         self.remember(request, user.user_id)
         request.set_user(user)
@@ -237,8 +232,7 @@ class SAMLSecurityPolicy:
         user_profile = Profile.USER
         for key, profile_mapping in SAML_IDP_DEFAULT_CONFIG[idp_name]["profile_map"].items():
             match = re.match(
-                profile_mapping["match"],
-                format_attribute(profile_mapping["value"], identity)
+                profile_mapping["match"], format_attribute(profile_mapping["value"], identity)
             )
             if match is not None:
                 user_profile = Profile.get_profile_from_slug(key)
