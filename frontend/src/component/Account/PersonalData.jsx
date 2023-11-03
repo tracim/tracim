@@ -8,6 +8,7 @@ import {
   IconButton
 } from 'tracim_frontend_lib'
 import DropdownLang from '../DropdownLang.jsx'
+import { UserReadOnlyFields } from '../../util/helper'
 
 require('./PersonalData.styl')
 
@@ -86,7 +87,7 @@ export class PersonalData extends React.Component {
               placeholder={props.userPublicName}
               value={state.newPublicName}
               onChange={this.handleChangePublicName}
-              disabled={this.isDisabled('public_name')}
+              disabled={this.isDisabled(UserReadOnlyFields.PUBLIC_NAME)}
             />
           </label>
 
@@ -100,7 +101,7 @@ export class PersonalData extends React.Component {
                 placeholder={props.userUsername}
                 value={state.newUsername}
                 onChange={this.handleChangeUserName}
-                disabled={this.isDisabled('username')}
+                disabled={this.isDisabled(UserReadOnlyFields.USERNAME)}
               />
             </label>
             {!props.isUsernameValid && (
@@ -126,7 +127,7 @@ export class PersonalData extends React.Component {
                 placeholder={props.userEmail}
                 value={state.newEmail}
                 onChange={this.handleChangeEmail}
-                disabled={this.isDisabled('email')}
+                disabled={this.isDisabled(UserReadOnlyFields.EMAIL)}
               />
             </label>
           </div>
@@ -151,7 +152,10 @@ export class PersonalData extends React.Component {
                   type='password'
                   value={state.checkPassword}
                   onChange={this.handleChangeCheckPassword}
-                  disabled={(this.isDisabled('email') && this.isDisabled('username')) || (state.newEmail === '' && state.newUsername === '')}
+                  disabled={
+                    (this.isDisabled(UserReadOnlyFields.EMAIL) && this.isDisabled(UserReadOnlyFields.USERNAME)) ||
+                    (state.newEmail === '' && state.newUsername === '')
+                  }
                 />
               </label>
             </div>

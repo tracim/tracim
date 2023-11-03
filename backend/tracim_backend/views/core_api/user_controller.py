@@ -8,6 +8,7 @@ from pyramid.response import Response
 import typing
 
 from tracim_backend.config import CFG  # noqa: F401
+from tracim_backend.config import UserReadOnlyFields
 from tracim_backend.error import ErrorCode
 from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
 from tracim_backend.exceptions import CannotUseBothIncludeAndExcludeWorkspaceUsers
@@ -22,6 +23,7 @@ from tracim_backend.exceptions import NotFound
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import PreviewDimNotAllowed
+from tracim_backend.exceptions import ReadOnlyFieldException
 from tracim_backend.exceptions import ReservedUsernameError
 from tracim_backend.exceptions import RoleAlreadyExistError
 from tracim_backend.exceptions import TooManyOnlineUsersError
@@ -163,15 +165,18 @@ ALLOWED__AVATAR_MIMETYPES = [
 ]
 
 
-def has_write_rights(field: str, app_config: CFG, request: TracimRequest) -> bool:
+def check_has_write_rights(
+    field: UserReadOnlyFields, app_config: CFG, request: TracimRequest
+) -> bool:
     """
     Check if user can write provided field (is admin or field is writable)
+    :raise ReadOnlyFieldException if the field is not writable
     """
-    read_only_fields = app_config.USER__READ_ONLY_FIELDS.get(request.candidate_user.auth_type.value)
-    if request.current_user.profile.name != "ADMIN":
+    read_only_fields = app_config.USER__READ_ONLY_FIELDS.get(request.candidate_user.auth_type)
+    if request.current_user.profile != Profile.ADMIN:
         if read_only_fields is not None:
             if field in read_only_fields:
-                return False
+                raise ReadOnlyFieldException(f"You can't modify the field {field.value}")
     return True
 
 
@@ -321,6 +326,7 @@ class UserController(Controller):
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(EmailAlreadyExists, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ExternalAuthUserEmailModificationDisallowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ReadOnlyFieldException, HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_body(SetEmailSchema())
     @hapic.input_path(UserIdPathSchema())
@@ -333,10 +339,7 @@ class UserController(Controller):
         uapi = UserApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
-        if not has_write_rights("email", app_config, request):
-            return HTTPBadRequest(
-                f"Error {UserCantChangeIsOwnProfile.error_code}: email is read-only"
-            )
+        check_has_write_rights(UserReadOnlyFields.EMAIL, app_config, request)
         user = uapi.set_email(
             request.candidate_user,
             hapic_data.body.loggedin_user_password,
@@ -350,6 +353,7 @@ class UserController(Controller):
     @hapic.handle_exception(UsernameAlreadyExists, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ReservedUsernameError, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(TracimValidationFailed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ReadOnlyFieldException, HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_body(SetUsernameSchema())
     @hapic.input_path(UserIdPathSchema())
@@ -362,10 +366,7 @@ class UserController(Controller):
         uapi = UserApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
-        if not has_write_rights("username", app_config, request):
-            return HTTPBadRequest(
-                f"Error {UserCantChangeIsOwnProfile.error_code}: username is read-only"
-            )
+        check_has_write_rights(UserReadOnlyFields.USERNAME, app_config, request)
         user = uapi.set_username(
             request.candidate_user,
             hapic_data.body.loggedin_user_password,
@@ -378,6 +379,7 @@ class UserController(Controller):
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(PasswordDoNotMatch, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ExternalAuthUserPasswordModificationDisallowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ReadOnlyFieldException, HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_body(SetPasswordSchema())
     @hapic.input_path(UserIdPathSchema())
@@ -390,10 +392,7 @@ class UserController(Controller):
         uapi = UserApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
-        if not has_write_rights("password", app_config, request):
-            return HTTPBadRequest(
-                f"Error {UserCantChangeIsOwnProfile.error_code}: password is read-only"
-            )
+        check_has_write_rights(UserReadOnlyFields.PASSWORD, app_config, request)
         uapi.set_password(
             request.candidate_user,
             hapic_data.body.loggedin_user_password,
@@ -412,7 +411,9 @@ class UserController(Controller):
         Set user info data
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        if not has_write_rights("public_name", app_config, request):
+        try:
+            check_has_write_rights(UserReadOnlyFields.PUBLIC_NAME, app_config, request)
+        except ReadOnlyFieldException:
             hapic_data.body.public_name = request.candidate_user.public_name
         uapi = UserApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User

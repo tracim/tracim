@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from depot.manager import DepotManager
+import enum
 from enum import Enum
 import json
 from jsonschema import SchemaError
@@ -74,6 +75,13 @@ def create_target_langage(value: str) -> typing.Tuple[str, str]:
 def create_code_sample_langage(language: str) -> typing.Tuple[str, str]:
     value, text = language.split(":")
     return (value, text)
+
+
+class UserReadOnlyFields(enum.Enum):
+    PUBLIC_NAME = "public_name"
+    USERNAME = "username"
+    EMAIL = "email"
+    PASSWORD = "password"
 
 
 class ConfigParam(object):
@@ -415,20 +423,20 @@ class CFG(object):
             cast_func=AuthType,
             do_strip=True,
         )
-        self.USER__READ_ONLY_FIELDS: typing.Dict[str, typing.List[str]] = {}
+        self.USER__READ_ONLY_FIELDS: typing.Dict[AuthType, typing.List[UserReadOnlyFields]] = {}
         for auth_type in self.AUTH_TYPES:
-            read_only = string_to_unique_item_list(
+            readonly_field_list = string_to_unique_item_list(
                 self.get_raw_config(f"user.profile.read_only_fields.{auth_type.value}"),
                 separator=",",
-                cast_func=str,
+                cast_func=UserReadOnlyFields,
                 do_strip=True,
             )
             # HACK - M.L - 2023-10-30 - This is to satisfy CFG._check_consistency despite being
             #  poorly usable
             self.__setattr__(
-                f"USER__PROFILE__READ_ONLY_FIELDS__{auth_type.value.upper()}", read_only
+                f"USER__PROFILE__READ_ONLY_FIELDS__{auth_type.value.upper()}", readonly_field_list
             )
-            self.USER__READ_ONLY_FIELDS[auth_type.value] = read_only
+            self.USER__READ_ONLY_FIELDS[auth_type] = readonly_field_list
 
         self.REMOTE_USER_HEADER = self.get_raw_config("remote_user_header", None)
 
