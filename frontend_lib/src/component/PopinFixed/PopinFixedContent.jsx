@@ -64,6 +64,7 @@ class PopinFixedContent extends React.Component {
               showMarkedAsTemplate={props.showMarkedAsTemplate}
               showReactions={props.showReactions}
               userRoleIdInWorkspace={props.loggedUser.userRoleIdInWorkspace}
+              systemConfigActionList={props.systemConfigActionList}
             />
             <div className={classnames('wsContentGeneric__content__left__top', `${props.customClass}__content__left__top`)}>
               {!props.loading && (

@@ -101,7 +101,18 @@ export const PopinFixedHeader = (props) => {
     },
     ...actionList
   ]
-  const filteredActionList = actionListWithEditTitle.filter(action => action.showAction)
+
+  const filteredActionList = [
+    ...props.systemConfigActionList
+      ? props.systemConfigActionList.map(a => ({
+        downloadLink: a.link,
+        icon: a.icon,
+        label: a.label,
+        dataCy: '',
+      }))
+      : [],
+    ...actionListWithEditTitle.filter(action => action.showAction)
+  ]
   const filteredHeaderButtons = headerButtons ? headerButtons.filter(action => action.showAction) : []
 
   return (

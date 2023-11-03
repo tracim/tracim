@@ -64,6 +64,44 @@ import FileProperties from '../component/FileProperties.jsx'
 
 const ACTION_EDIT = 'edit'
 
+// INFO - CH - 20231103 - this object should come from api system.config.
+const HACK_FAKE_SYSTEM_CONFIG = JSON.parse(`
+{
+  "app-file-header-dropdown": [
+    {
+      "icon": "fas fa-lightbulb",
+      "hex-color": "#FF00DD",
+      "link": "http://algoo.fr/?label={content.label}&content={content.content}",
+      "label": "Share on algoo.fr",
+      "workspace_filter": [123, 456, 1],
+      "content_extension_filter": [".txt", ".cpp", ".jpg"],
+      "content_label_regex": ".*source.*",
+      "content_label_match": "jpg",
+      "user_role_filter": ["administrators", "content-manager"],
+      "user_profile_filter": "administrators"
+    }
+  ]
+}
+`)
+console.log('HACK_FAKE_SYSTEM_CONFIG', HACK_FAKE_SYSTEM_CONFIG)
+
+// INFO - CH - 20231103 - this function should be in frontend_lib
+const filterSystemConfigAction = (systemConfigActionList, space, content, loggedUser) => {
+  console.log('filterSystemConfigAction', systemConfigActionList, space, content, loggedUser)
+  const rez = systemConfigActionList.filter(a => {
+    if (space && a.workspace_filter.includes(space.workspace_id) === false) return false
+    if (content && a.workspace_filter.includes(content.workspace_id) === false) return false
+    if (content && a.content_extension_filter.includes(content.file_extension) === false) return false
+    // content_label_regex
+    // content_label_match
+    // user_role_filter
+    if (loggedUser && a.user_profile_filter.includes(loggedUser.profile) === false) return false
+    return true
+  })
+  console.log('rez', rez)
+  return rez
+}
+
 export class File extends React.Component {
   constructor (props) {
     super(props)
@@ -1270,6 +1308,12 @@ export class File extends React.Component {
           )}
           onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
             state.content, state.loggedUser, this.setState.bind(this)
+          )}
+          systemConfigActionList={filterSystemConfigAction(
+            HACK_FAKE_SYSTEM_CONFIG['app-file-header-dropdown'],
+            undefined,
+            state.content,
+            state.loggedUser,
           )}
         >
           {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
