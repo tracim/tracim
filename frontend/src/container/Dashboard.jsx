@@ -3,23 +3,26 @@ import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import { withRouter } from 'react-router-dom'
 import {
-  TracimComponent,
-  TLM_ENTITY_TYPE as TLM_ET,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  PageWrapper,
-  PageContent,
-  IconButton,
   BREADCRUMBS_TYPE,
   COLORS,
   CUSTOM_EVENT,
+  PAGE,
+  PROFILE,
   ROLE,
   ROLE_LIST,
-  PROFILE,
-  buildHeadTitle,
-  PAGE,
-  removeAtInUsername,
   SPACE_TYPE,
-  addExternalLinksIcons
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  IconButton,
+  Loading,
+  PageContent,
+  PageWrapper,
+  TracimComponent,
+  buildHeadTitle,
+  removeAtInUsername,
+  addExternalLinksIcons,
+  getSpaceMemberList,
+  handleFetchResult
 } from 'tracim_frontend_lib'
 import {
   getMyselfKnownMember,
@@ -31,7 +34,8 @@ import {
 import {
   newFlashMessage,
   setBreadcrumbs,
-  setHeadTitle
+  setHeadTitle,
+  setWorkspaceMemberList
 } from '../action-creator.sync.js'
 import appFactory from '../util/appFactory.js'
 import {
@@ -96,6 +100,27 @@ export class Dashboard extends React.Component {
     this.setHeadTitle()
     this.loadNewRequestNumber()
     this.buildBreadcrumbs()
+    if (this.currentWorkspace !== undefined && this.currentWorkspace.memberList === undefined) {
+      this.updateWorkspaceList()
+    }
+  }
+
+  async updateWorkspaceList () {
+    const { props } = this
+
+    const requestMemberList = await getSpaceMemberList(FETCH_CONFIG.apiUrl, props.currentWorkspace.id)
+
+    const responseMemberList = await handleFetchResult(requestMemberList)
+
+    if (responseMemberList.apiResponse.status === 200) {
+      props.dispatch(setWorkspaceMemberList(responseMemberList.body))
+    } else {
+      switch (responseMemberList.apiResponse.status) {
+        case 200: break
+        case 400: break
+        default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('member list')}`, 'warning')); break
+      }
+    }
   }
 
   async componentDidUpdate (prevProps) {
@@ -108,6 +133,9 @@ export class Dashboard extends React.Component {
 
     if (prevProps.currentWorkspace.defaultRole !== '' && props.currentWorkspace.defaultRole === '') {
       this.setState(prev => ({ newMember: { ...prev.newMember, role: props.currentWorkspace.defaultRole } }))
+    }
+    if (props.currentWorkspace !== undefined && props.currentWorkspace.memberList === undefined) {
+      this.updateWorkspaceList()
     }
 
     if (!prevProps.match || !props.match || prevProps.currentWorkspace.id === props.currentWorkspace.id) return
@@ -137,8 +165,11 @@ export class Dashboard extends React.Component {
 
   loadNewRequestNumber = async () => {
     const { props } = this
+    const spaceMemberList = props.currentWorkspace.memberList || []
+    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(
+      props.user.userId, spaceMemberList, ROLE_LIST
+    )
 
-    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
     if (userRoleIdInWorkspace < ROLE.workspaceManager.id) return
 
     const fetchGetWorkspaceSubscriptions = await props.dispatch(getSubscriptions(props.currentWorkspace.id))
@@ -373,7 +404,18 @@ export class Dashboard extends React.Component {
   render () {
     const { props, state } = this
 
-    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
+    if (props.currentWorkspace.memberList === undefined) {
+      return (
+        <Loading
+          height={100}
+          width={100}
+        />
+      )
+    }
+
+    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(
+      props.user.userId, props.currentWorkspace.memberList, ROLE_LIST
+    )
 
     // INFO - GB - 2019-08-29 - these filters are made temporarily by the frontend, but may change to have all the intelligence in the backend
     // https://github.com/tracim/tracim/issues/2326

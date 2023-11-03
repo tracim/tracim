@@ -74,6 +74,9 @@ describe('App File', () => {
         cy.get('[data-cy="revision_data_1"]').should('be.visible')
         cy.get('[data-cy="revision_data_4"]').should('be.visible')
         cy.get('.timeline__comment__body__content__text').contains(comment)
+        // INFO - FS - 2023-10-26 - adding wait() here because without it, the test randomly fails because of an error related
+        // to tinymce. The same error seems to happend in publication/options_spec.js too
+        cy.wait(3000)
       })
     })
   })

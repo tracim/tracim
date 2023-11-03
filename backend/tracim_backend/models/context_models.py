@@ -1018,10 +1018,17 @@ class WorkspaceInContext(object):
     Interface to get Workspace data and Workspace data related to context.
     """
 
-    def __init__(self, workspace: Workspace, dbsession: Session, config: CFG) -> None:
+    def __init__(
+        self,
+        workspace: Workspace,
+        dbsession: Session,
+        config: CFG,
+        user: Optional[User] = None,
+    ) -> None:
         self.workspace = workspace
         self.dbsession = dbsession
         self.config = config
+        self.user = user
 
     @property
     def workspace_in_context(self) -> "WorkspaceInContext":

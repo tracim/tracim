@@ -51,15 +51,16 @@ describe('reducer currentWorkspace.js', () => {
       it('should return an object (in camelCase)', () => {
         expect(rez).to.deep.equal({
           accessType: firstWorkspaceFromApi.access_type,
-          defaultRole: firstWorkspaceFromApi.default_user_role,
-          id: firstWorkspaceFromApi.workspace_id,
-          slug: firstWorkspaceFromApi.slug,
-          label: firstWorkspaceFromApi.label,
-          description: firstWorkspaceFromApi.description,
           agendaEnabled: firstWorkspaceFromApi.agenda_enabled,
+          defaultRole: firstWorkspaceFromApi.default_user_role,
+          description: firstWorkspaceFromApi.description,
           downloadEnabled: firstWorkspaceFromApi.public_download_enabled,
-          uploadEnabled: firstWorkspaceFromApi.public_upload_enabled,
-          publicationEnabled: firstWorkspaceFromApi.publication_enabled
+          id: firstWorkspaceFromApi.workspace_id,
+          label: firstWorkspaceFromApi.label,
+          memberList: firstWorkspaceFromApi.members,
+          publicationEnabled: firstWorkspaceFromApi.publication_enabled,
+          slug: firstWorkspaceFromApi.slug,
+          uploadEnabled: firstWorkspaceFromApi.public_upload_enabled
         })
       })
     })

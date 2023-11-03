@@ -74,7 +74,7 @@ describe('Favorites', function () {
     })
 
     it('should list contents available as favorites', () => {
-      cy.get('[data-cy=favorites__item]').its('length').should('be.equal', numberOfFavorites)
+      cy.get('[data-cy=favorites__item]').should('have.length', numberOfFavorites)
       cy.get('[data-cy=favorites__item]').first().should('contain', `${contentName}File`)
     })
 
@@ -111,10 +111,10 @@ describe('Favorites', function () {
     })
 
     it('clicking on a favorite button should remove it from the page', () => {
-      cy.get('[data-cy=favorites__item]').its('length').should('be.equal', numberOfFavorites)
+      cy.get('[data-cy=favorites__item]').should('have.length', numberOfFavorites)
       cy.get('[title="TitleFile"][data-cy="favorites__item"] [data-cy=favoriteButton]').click()
       cy.contains('[data-cy=flashmessage]', 'has been removed from your favourites.').should('be.visible')
-      cy.get('[data-cy=favorites__item]').its('length').should('be.equal', numberOfFavorites - 1)
+      cy.get('[data-cy=favorites__item]').should('have.length', numberOfFavorites - 1)
       cy.get('[title="TitleNote"][data-cy="favorites__item"] > .favoriteTable__row__link').should('be.visible')
       cy.get('[title="TitleFile"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.be.visible')
     })
@@ -125,7 +125,7 @@ describe('Favorites', function () {
     })
 
     it('clicking on a favorite should open the content in app', () => {
-      cy.get('[data-cy=favorites__item]').its('length').should('be.equal', numberOfFavorites - 1)
+      cy.get('[data-cy=favorites__item]').should('have.length', numberOfFavorites - 1)
       cy.get('[title="TitleNote"][data-cy="favorites__item"]').click()
       cy.location('pathname')
         .should('equal', `/ui/workspaces/${workspaceId}/contents/html-document/${noteContentId}`)

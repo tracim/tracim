@@ -37,11 +37,10 @@ import {
   CardPopup,
   IconButton,
   LiveMessageManager,
+  Loading,
   TracimComponent,
   buildHeadTitle,
   formatAbsoluteDate,
-  getSpaceMemberList,
-  handleFetchResult,
   serialize
 } from 'tracim_frontend_lib'
 import {
@@ -59,7 +58,7 @@ import {
   getAppList,
   getConfig,
   getContentTypeList,
-  getMyselfWorkspaceList,
+  getMyselfUserRoleWorkspaceList,
   getUserConfiguration,
   getUserIsConnected,
   putUserLang,
@@ -77,10 +76,9 @@ import {
   setContentTypeList,
   setUserConfiguration,
   setUserConnected,
-  setWorkspaceList,
+  setRoleWorkspaceList,
   setBreadcrumbs,
   appendBreadcrumbs,
-  setWorkspaceListMemberList,
   setUnreadMentionCount,
   setUnreadNotificationCount,
   setHeadTitle,
@@ -445,42 +443,19 @@ export class Tracim extends React.Component {
 
   loadWorkspaceLists = async () => {
     const { props } = this
-
-    const showOwnedWorkspace = false
-
-    const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList(showOwnedWorkspace))
+    const fetchGetWorkspaceList = await props.dispatch(getMyselfUserRoleWorkspaceList())
 
     if (fetchGetWorkspaceList.status !== 200) return false
-
-    props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
-    this.loadWorkspaceListMemberList(fetchGetWorkspaceList.json)
-    this.setState({ workspaceListLoaded: true })
-
-    const fetchAccessibleWorkspaceList = await props.dispatch(getAccessibleWorkspaces(props.user.userId))
+    props.dispatch(setRoleWorkspaceList(fetchGetWorkspaceList.json))
+    const fetchAccessibleWorkspaceList = await props.dispatch(
+      getAccessibleWorkspaces(props.user.userId)
+    )
 
     if (fetchAccessibleWorkspaceList.status !== 200) return false
 
     props.dispatch(setAccessibleWorkspaceList(fetchAccessibleWorkspaceList.json))
 
     return true
-  }
-
-  loadWorkspaceListMemberList = async workspaceList => {
-    const { props } = this
-
-    const fetchWorkspaceListMemberList = await Promise.all(
-      workspaceList.map(async ws => ({
-        workspaceId: ws.workspace_id,
-        fetchMemberList: await handleFetchResult(await getSpaceMemberList(FETCH_CONFIG.apiUrl, ws.workspace_id))
-      }))
-    )
-
-    const workspaceListMemberList = fetchWorkspaceListMemberList.map(memberList => ({
-      workspaceId: memberList.workspaceId,
-      memberList: memberList.fetchMemberList.apiResponse.status === 200 ? memberList.fetchMemberList.body : []
-    }))
-
-    props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
   }
 
   loadNotificationNotRead = async (userId) => {
@@ -562,17 +537,26 @@ export class Tracim extends React.Component {
       )
     }
 
+    // INFO - MP - 2023-03-31 - Displaying a loader here make the loading page flicker
     if (props.user.logged === null) return null // @TODO show loader
 
     if (!props.location.pathname.includes('/ui')) return <Redirect to={PAGE.HOME} />
 
     if (
       !unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url)) && (
-        !props.system.workspaceListLoaded ||
         !props.system.appListLoaded ||
         !props.system.contentTypeListLoaded
       )
-    ) return null // @TODO Côme - 2018/08/22 - should show loader here
+    ) {
+      return (
+        <div className='tracim fullWidthFullHeight' dir={i18next.dir()}>
+          <Loading
+            height={48}
+            width={48}
+          />
+        </div>
+      )
+    }
 
     return (
       <div className='tracim fullWidthFullHeight' dir={i18next.dir()}>
@@ -742,10 +726,11 @@ export class Tracim extends React.Component {
           <Route
             render={() => (
               <Sidebar
-                onClickNotification={this.handleClickNotificationButton}
-                unreadNotificationCount={props.notificationPage.unreadNotificationCount}
-                unreadMentionCount={props.notificationPage.unreadMentionCount}
                 isNotificationWallOpen={state.isNotificationWallOpen}
+                onClickNotification={this.handleClickNotificationButton}
+                unreadMentionCount={props.notificationPage.unreadMentionCount}
+                unreadNotificationCount={props.notificationPage.unreadNotificationCount}
+                isSpaceListLoaded={props.system.workspaceListLoaded}
               />
             )}
           />

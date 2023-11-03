@@ -2,11 +2,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import {
-  createSpaceTree,
-  Icon,
-  IconButton,
   ROLE_LIST,
   SORT_BY,
+  Icon,
+  IconButton,
+  Loading,
+  createSpaceTree,
   sortListByMultipleCriteria
 } from 'tracim_frontend_lib'
 import {
@@ -99,18 +100,27 @@ const SidebarSpaceList = (props) => {
           />
         )}
       </div>
+      {props.isSpaceListLoaded ? (
+        <>
+          {props.showSpaceList && props.spaceList.length !== 0 && (
+            <div className='sidebar__spaces'>
+              {displaySpace(0, createSpaceTree(sortListByMultipleCriteria(props.spaceList, [SORT_BY.LABEL, SORT_BY.ID])))}
+            </div>
+          )}
 
-      {props.showSpaceList && props.spaceList.length !== 0 && (
-        <div className='sidebar__spaces'>
-          {displaySpace(0, createSpaceTree(sortListByMultipleCriteria(props.spaceList, [SORT_BY.LABEL, SORT_BY.ID])))}
-        </div>
+          {!props.isSidebarClosed && props.spaceList && props.spaceList.length === 0 && (
+            <div className='sidebar__spaces__empty'>
+              {props.t("You aren't member of any space yet")}
+            </div>
+          )}
+        </>
+      ) : (
+        <Loading
+          height={48}
+          width={48}
+        />
       )}
 
-      {!props.isSidebarClosed && props.spaceList && props.spaceList.length === 0 && (
-        <div className='sidebar__spaces__empty'>
-          {props.t("You aren't member of any space yet")}
-        </div>
-      )}
     </>
   )
 }
@@ -122,6 +132,7 @@ SidebarSpaceList.propTypes = {
   foldedSpaceList: PropTypes.array,
   isNotificationWallOpen: PropTypes.bool,
   isSidebarClosed: PropTypes.bool,
+  isSpaceListLoaded: PropTypes.bool,
   onClickToggleSpaceList: PropTypes.func,
   onToggleFoldChildren: PropTypes.func,
   showSpaceList: PropTypes.bool,
@@ -133,6 +144,7 @@ SidebarSpaceList.defaultProps = {
   foldedSpaceList: [],
   isNotificationWallOpen: false,
   isSidebarClosed: false,
+  isSpaceListLoaded: false,
   onClickToggleSpaceList: () => { },
   onToggleFoldChildren: () => { },
   showSpaceList: true,

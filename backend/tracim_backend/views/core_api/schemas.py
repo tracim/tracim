@@ -799,7 +799,7 @@ class UserWorkspaceFilterQuerySchema(WorkspaceFilterQuerySchema):
     show_workspace_with_role = marshmallow.fields.Int(
         example=1,
         default=1,
-        description="if set to 1, then show workspace were user as a role in list"
+        description="if set to 1, then show workspace were user has a role in list"
         " Default is 1, else do no show them",
         validate=bool_as_int_validator,
     )
@@ -1548,6 +1548,34 @@ class WorkspaceSchema(WorkspaceWithoutDescriptionSchema):
         description = "Full workspace information"
 
 
+class EmailNotificationTypeSchema(marshmallow.Schema):
+    email_notification_type = StrippedString(
+        example=EmailNotificationType.SUMMARY.name,
+        description="Type of email notification for a specific space",
+    )
+
+
+class WorkspaceMemberDigestSchema(EmailNotificationTypeSchema):
+    role = StrippedString(example="contributor", validate=user_role_validator)
+
+
+class WorkspaceMemberSchema(WorkspaceMemberDigestSchema):
+    user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
+    is_active = marshmallow.fields.Bool()
+    user = marshmallow.fields.Nested(UserDigestSchema())
+    workspace = marshmallow.fields.Nested(
+        WorkspaceWithoutDescriptionSchema(exclude=("number_of_members",))
+    )
+    workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
+
+    class Meta:
+        description = "Workspace Member information"
+
+
+class WorkspaceWithUserMemberSchema(WorkspaceSchema):
+    members = marshmallow.fields.Nested(WorkspaceMemberSchema(many=True))
+
+
 class UserConfigSchema(marshmallow.Schema):
     parameters = marshmallow.fields.Dict(
         description="parameters present in the user's configuration."
@@ -1583,28 +1611,6 @@ class WorkspaceDiskSpaceSchema(marshmallow.Schema):
         "in any user owned workspaces. 0 mean no limit."
     )
     workspace = marshmallow.fields.Nested(WorkspaceDigestSchema(), attribute="workspace_in_context")
-
-
-class EmailNotificationTypeSchema(marshmallow.Schema):
-    email_notification_type = StrippedString(
-        example=EmailNotificationType.SUMMARY.name,
-        description="Type of email notification for a specific space",
-    )
-
-
-class WorkspaceMemberDigestSchema(EmailNotificationTypeSchema):
-    role = StrippedString(example="contributor", validate=user_role_validator)
-
-
-class WorkspaceMemberSchema(WorkspaceMemberDigestSchema):
-    user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
-    workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
-    is_active = marshmallow.fields.Bool()
-    user = marshmallow.fields.Nested(UserDigestSchema())
-    workspace = marshmallow.fields.Nested(WorkspaceDigestSchema(exclude=("sidebar_entries",)))
-
-    class Meta:
-        description = "Workspace Member information"
 
 
 class WorkspaceMemberCreationSchema(WorkspaceMemberSchema):
