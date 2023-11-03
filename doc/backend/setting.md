@@ -191,6 +191,15 @@ The different SAML endpoints are
 - **slo**: `/saml/slo/redirect` (for redirect based SLO)
 - **slo**: `/saml/slo/post` (for post based SLO)
 
+These endpoints are conventional to the SAML protocol, only the `saml/sso` route is non-standard.
+It is designed to redirect the user to the proper IdP depending on what `target` is provided.
+This is for multi IdP support.
+
+The `saml/metadata` is automatically managed by `pysaml2`. Changes must be done on the SAML settings file
+to change the metadata.
+
+For more details about the standard routes and the protocol, see ["SAML Explained in Plain English"](https://www.onelogin.com/learn/saml)
+
 See [SSO Glossary](https://help.akana.com/content/current/cm/saml/08_glossary.htm) and 
 [SLO Article](https://uit.stanford.edu/service/saml/logout) for more details about the employed terms
 

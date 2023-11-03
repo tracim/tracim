@@ -66,6 +66,10 @@ class SAMLSecurityPolicy:
         #  The routes could also be defined through a controller (see Controller class)
         #  even if it added-value is small.
 
+        # TODO - M.L - 2023-11-03 - Add documentation through swagger
+        #  (currently is in the doc/setting.md file) or upgrade the way swagger generates
+        #  documentation to ease the addition of non conventional routes
+
         self._load_settings(configurator)
         _config = configurator.get_settings().get("pyramid_saml")
         with open(_config.get("saml_path"), "r") as config_file:
