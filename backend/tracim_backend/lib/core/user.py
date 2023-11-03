@@ -687,7 +687,7 @@ need to be in every workspace you include."
         user_id: str,
         name: str,
         mail: str,
-        profile: Profile
+        profile: Profile = Profile.USER
     ) -> User:
         """
         Authenticate with ldap, return authenticated user or raise Exception

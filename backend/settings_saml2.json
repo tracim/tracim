@@ -64,11 +64,11 @@
       "profile_map": {
           "trusted-users": {
             "value": "${UserID}",
-            "match": "damien|millefeuille"
+            "match": "any_regex_pattern"
           },
           "administrators": {
             "value": "${UserID}",
-            "match": "aaa"
+            "match": "value|other_value"
           }
         }
     }
