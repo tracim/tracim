@@ -687,7 +687,7 @@ need to be in every workspace you include."
         user_id: str,
         name: str,
         mail: str,
-        profile: Profile = Profile.USER
+        profile: Profile = Profile.USER,
     ) -> User:
         """
         Authenticate with ldap, return authenticated user or raise Exception
@@ -715,7 +715,7 @@ need to be in every workspace you include."
                     auth_type=AuthType.SAML,
                     do_save=True,
                     do_notify=False,
-                    profile=profile
+                    profile=profile,
                 )
                 transaction.commit()
                 user = self.get_one_by_login(user_id)
