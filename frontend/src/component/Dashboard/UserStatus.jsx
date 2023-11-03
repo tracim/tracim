@@ -39,7 +39,7 @@ export const UserStatus = props => {
         {props.displaySubscriptionRequestsInformation && (
           <Link
             className='userstatus__informations__requests'
-            to={PAGE.WORKSPACE.ADVANCED_DASHBOARD(props.currentWorkspace.id)}
+            to={PAGE.WORKSPACE.ADVANCED_DASHBOARD(props.workspaceSetting.id)}
           >
             <Icon
               icon='fas fa-sign-in-alt'

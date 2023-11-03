@@ -17,18 +17,17 @@ import {
   stringIncludes,
   serialize
 } from 'tracim_frontend_lib'
-import { serializeWorkspace, serializeRole, serializeWorkspaceListProps } from '../reducer/workspaceList.js'
+import { serializeWorkspace, serializeUserWorkspaceSetting, serializeWorkspaceListProps, serializeUserSetting } from '../reducer/workspaceList.js'
 import { newFlashMessage } from '../action-creator.sync.js'
 import {
   deleteWorkspaceMember,
   getWorkspaceList,
   postWorkspaceMember,
   updateWorkspaceMember,
-  getUserRoleWorkspaceList
+  getUserWorkspaceSettingList
 } from '../action-creator.async.js'
 import AdminUserSpacesConfigItem from '../component/Account/AdminUserSpacesConfigItem.jsx'
 import { onlyManager } from '../component/Account/UserSpacesConfig.jsx'
-import { serializeMember } from '../reducer/currentWorkspace.js'
 
 const filterSpaceList = (list, filterList) => {
   return list.filter(space =>
@@ -100,13 +99,13 @@ export const AdminUserSpacesConfig = (props) => {
   }
 
   const getMemberSpacesList = async () => {
-    const fetchGetUserWorkspaceList = await props.dispatch(
-      getUserRoleWorkspaceList(props.userToEditId, false)
+    const fetchGetUserWorkspaceSettingList = await props.dispatch(
+      getUserWorkspaceSettingList(props.userToEditId, false)
     )
-    switch (fetchGetUserWorkspaceList.status) {
+    switch (fetchGetUserWorkspaceSettingList.status) {
       case 200: {
-        const userSpaceList = fetchGetUserWorkspaceList.json.map(
-          role => serializeRole(role)
+        const userSpaceList = fetchGetUserWorkspaceSettingList.json.map(
+          setting => serializeUserWorkspaceSetting(setting)
         )
         setMemberSpaceList(userSpaceList)
         break
@@ -138,7 +137,7 @@ export const AdminUserSpacesConfig = (props) => {
             ...space,
             memberList: space.memberList.map(member => {
               if (member.id === data.fields.user.user_id) {
-                return { ...member, ...serializeMember({ user: data.fields.user, ...data.fields.member }) }
+                return { ...member, ...serializeUserSetting({ user: data.fields.user, ...data.fields.member }) }
               } else {
                 return member
               }
@@ -166,7 +165,7 @@ export const AdminUserSpacesConfig = (props) => {
             {
               ...serialize(data.fields.workspace, serializeWorkspaceListProps),
               memberList: [
-                serializeMember({ user: data.fields.user, ...data.fields.member })
+                serializeUserSetting({ user: data.fields.user, ...data.fields.member })
               ]
             }
           ]

@@ -4,10 +4,10 @@ import {
   ADD,
   REMOVE,
   WORKSPACE_DETAIL,
-  WORKSPACE_MEMBER_LIST,
+  WORKSPACE_ROLE_LIST,
   WORKSPACE_READ_STATUS,
   WORKSPACE_READ_STATUS_LIST,
-  WORKSPACE_MEMBER,
+  WORKSPACE_ROLE,
   UPDATE,
   USER,
   USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
@@ -18,7 +18,6 @@ import {
   WORKSPACE_LOADED
 } from '../action-creator.sync.js'
 import { serializeContentProps } from './workspaceContentList.js'
-import { EMAIL_NOTIFICATION_TYPE } from '../util/helper.js'
 import { serialize } from 'tracim_frontend_lib'
 
 const defaultWorkspace = {
@@ -63,13 +62,12 @@ export const serializeSidebarEntryProps = {
   label: 'label'
 }
 
-export const serializeMember = m => {
+export const serializeRole = m => {
   return {
     id: m.user.user_id,
     publicName: m.user.public_name,
     username: m.user.username,
     role: m.role,
-    emailNotificationType: m.email_notification_type || EMAIL_NOTIFICATION_TYPE.NONE,
     hasAvatar: m.user.has_avatar || true,
     hasCover: m.user.has_cover || false
   }
@@ -96,33 +94,33 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         sidebarEntryList: action.workspaceDetail.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps))
       }
 
-    case `${SET}/${WORKSPACE_MEMBER_LIST}`:
+    case `${SET}/${WORKSPACE_ROLE_LIST}`:
       return {
         ...state,
-        memberList: action.workspaceMemberList.map(m => serializeMember(m))
+        memberList: action.workspaceMemberList.map(m => serializeRole(m))
       }
 
-    case `${ADD}/${WORKSPACE_MEMBER}`:
+    case `${ADD}/${WORKSPACE_ROLE}`:
       if (state.id !== action.workspaceId) return state
       return {
         ...state,
         memberList: uniqBy([
           ...state.memberList,
-          serializeMember(action.newMember)
+          serializeRole(action.newMember)
         ], 'id')
       }
 
-    case `${UPDATE}/${WORKSPACE_MEMBER}`:
+    case `${UPDATE}/${WORKSPACE_ROLE}`:
       if (state.id !== action.workspaceId) return state
       return {
         ...state,
         memberList: state.memberList.map(m => m.id === action.member.user.user_id
-          ? { ...m, ...serializeMember(action.member) }
+          ? { ...m, ...serializeRole(action.member) }
           : m
         )
       }
 
-    case `${REMOVE}/${WORKSPACE_MEMBER}`:
+    case `${REMOVE}/${WORKSPACE_ROLE}`:
       if (state.id !== action.workspaceId) return state
       return {
         ...state,
@@ -198,7 +196,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         ]
       }
 
-    case `${UPDATE}/${USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE}`:
+    case `${UPDATE}/${USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE}`: {
       return action.workspaceId === state.id
         ? {
           ...state,
@@ -208,6 +206,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
           )
         }
         : state
+    }
 
     case `${SET}/${FOLDER_READ}`:
       return state.contentReadStatusList.includes(action.folderId)
@@ -229,7 +228,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       return {
         ...state,
         memberList: state.memberList.map(member => member.id === action.newUser.user_id
-          ? serializeMember({ ...member, user: action.newUser })
+          ? serializeRole({ ...member, user: action.newUser })
           : member
         )
       }

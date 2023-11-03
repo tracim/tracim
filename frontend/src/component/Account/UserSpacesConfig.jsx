@@ -24,10 +24,9 @@ import {
   stringIncludes,
   serialize
 } from 'tracim_frontend_lib'
-import { serializeRole, serializeWorkspaceListProps } from '../../reducer/workspaceList.js'
-import { serializeMember } from '../../reducer/currentWorkspace.js'
+import { serializeUserWorkspaceSetting, serializeWorkspaceListProps, serializeUserSetting } from '../../reducer/workspaceList.js'
 import { newFlashMessage } from '../../action-creator.sync.js'
-import { deleteWorkspaceMember, getUserRoleWorkspaceList } from '../../action-creator.async.js'
+import { deleteWorkspaceMember, getUserWorkspaceSettingList } from '../../action-creator.async.js'
 import AdminUserSpacesConfig from '../../container/AdminUserSpacesConfig.jsx'
 import UserSpacesConfigLine from './UserSpacesConfigLine.jsx'
 
@@ -122,7 +121,7 @@ export const UserSpacesConfig = (props) => {
         ? {
           ...space,
           memberList: space.memberList.map(member => member.id === data.fields.user.user_id
-            ? { ...member, ...serializeMember({ user: data.fields.user, ...data.fields.member }) }
+            ? { ...member, ...serializeUserSetting({ user: data.fields.user, ...data.fields.member }) }
             : member
           )
         }
@@ -146,7 +145,7 @@ export const UserSpacesConfig = (props) => {
             {
               ...serialize(data.fields.workspace, serializeWorkspaceListProps),
               memberList: [
-                serializeMember({ user: data.fields.user, ...data.fields.member })
+                serializeUserSetting({ user: data.fields.user, ...data.fields.member })
               ]
             }
           ]
@@ -159,14 +158,14 @@ export const UserSpacesConfig = (props) => {
   }
 
   const getSpaceList = async () => {
-    const fetchGetUserWorkspaceList = await props.dispatch(
-      getUserRoleWorkspaceList(props.userToEditId, false)
+    const fetchGetUserWorkspaceSettingList = await props.dispatch(
+      getUserWorkspaceSettingList(props.userToEditId, false)
     )
 
-    switch (fetchGetUserWorkspaceList.status) {
+    switch (fetchGetUserWorkspaceSettingList.status) {
       case 200: {
-        const userSpaceList = fetchGetUserWorkspaceList.json.map(
-          role => serializeRole(role)
+        const userSpaceList = fetchGetUserWorkspaceSettingList.json.map(
+          setting => serializeUserWorkspaceSetting(setting)
         )
         setSpaceList(userSpaceList)
         break

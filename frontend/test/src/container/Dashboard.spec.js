@@ -15,7 +15,7 @@ import { mockGetWorkspaceDetail200 } from '../../apiMock.js'
 import { Dashboard as DashboardWithoutHOC } from '../../../src/container/Dashboard.jsx'
 import { FETCH_CONFIG } from '../../../src/util/helper.js'
 import {
-  ADD, REMOVE, SET, UPDATE, WORKSPACE_CONTENT, WORKSPACE_DETAIL, WORKSPACE_MEMBER, WORKSPACE_READ_STATUS
+  ADD, REMOVE, SET, UPDATE, WORKSPACE_CONTENT, WORKSPACE_DETAIL, WORKSPACE_ROLE, WORKSPACE_READ_STATUS
 } from '../../../src/action-creator.sync.js'
 
 describe('<Dashboard />', () => {
@@ -33,9 +33,9 @@ describe('<Dashboard />', () => {
     const { type } = params
     switch (type) {
       case `${SET}/${WORKSPACE_DETAIL}`: setWorkspaceDetailSpy(); break
-      case `${ADD}/${WORKSPACE_MEMBER}`: addWorkspaceMemberSpy(); break
-      case `${UPDATE}/${WORKSPACE_MEMBER}`: updateWorkspaceMemberSpy(); break
-      case `${REMOVE}/${WORKSPACE_MEMBER}`: removeWorkspaceMemberSpy(); break
+      case `${ADD}/${WORKSPACE_ROLE}`: addWorkspaceMemberSpy(); break
+      case `${UPDATE}/${WORKSPACE_ROLE}`: updateWorkspaceMemberSpy(); break
+      case `${REMOVE}/${WORKSPACE_ROLE}`: removeWorkspaceMemberSpy(); break
       case `${ADD}/${WORKSPACE_CONTENT}`: addWorkspaceContentListSpy(); break
       case `${REMOVE}/${WORKSPACE_READ_STATUS}`: removeWorkspaceReadStatusSpy(); break
       case `${UPDATE}/${WORKSPACE_CONTENT}`: updateWorkspaceContentListSpy(); break
@@ -56,6 +56,9 @@ describe('<Dashboard />', () => {
     user: user,
     contentType: contentType,
     appList: appList,
+    workspaceList: [{
+      ...firstWorkspace
+    }],
     currentWorkspace: {
       ...firstWorkspace,
       recentActivityList: []

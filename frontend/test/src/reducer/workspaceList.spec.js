@@ -11,12 +11,12 @@ import {
   updateWorkspaceDetail,
   updateWorkspaceMember,
   WORKSPACE_DETAIL,
-  WORKSPACE_LIST, WORKSPACE_MEMBER
+  WORKSPACE_LIST, WORKSPACE_ROLE
 } from '../../../src/action-creator.sync'
 import { ROLE, serialize } from 'tracim_frontend_lib'
 import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace'
 import {
-  serializeMember,
+  serializeRole,
   serializeSidebarEntryProps
 } from '../../../src/reducer/currentWorkspace'
 import { globalManagerFromApi } from '../../fixture/user/globalManagerFromApi'
@@ -55,7 +55,7 @@ describe('workspaceList reducer', () => {
               sbe => serialize(sbe, serializeSidebarEntryProps)
             ),
             memberList: firstWorkspaceFromApi.members.map(
-              m => serializeMember(m)
+              m => serializeRole(m)
             )
           }
         ])
@@ -73,7 +73,7 @@ describe('workspaceList reducer', () => {
               sbe => serialize(sbe, serializeSidebarEntryProps)
             ),
             memberList: firstWorkspaceFromApi.members.map(
-              m => serializeMember(m)
+              m => serializeRole(m)
             )
           },
           ...initialState
@@ -105,14 +105,14 @@ describe('workspaceList reducer', () => {
               sbe => serialize(sbe, serializeSidebarEntryProps)
             ),
             memberList: firstWorkspaceFromApi.members.map(
-              m => serializeMember(m)
+              m => serializeRole(m)
             )
           }
         ])
       })
     })
 
-    describe(`${ADD}/${WORKSPACE_MEMBER}`, () => {
+    describe(`${ADD}/${WORKSPACE_ROLE}`, () => {
       it('should return a workspace list with the member correctly added in the right workspace', () => {
         const rez = workspaceList(
           [
@@ -156,7 +156,7 @@ describe('workspaceList reducer', () => {
       })
     })
 
-    describe(`${UPDATE}/${WORKSPACE_MEMBER}`, () => {
+    describe(`${UPDATE}/${WORKSPACE_ROLE}`, () => {
       const rez = workspaceList(
         [
           ...initialState,
@@ -177,7 +177,7 @@ describe('workspaceList reducer', () => {
       })
     })
 
-    describe(`${REMOVE}/${WORKSPACE_MEMBER}`, () => {
+    describe(`${REMOVE}/${WORKSPACE_ROLE}`, () => {
       const rez = workspaceList(
         [
           ...initialState,

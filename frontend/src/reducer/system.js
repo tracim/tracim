@@ -3,7 +3,7 @@ import {
   APP_LIST,
   CONTENT_TYPE_LIST,
   SET,
-  ROLE_WORKSPACE_LIST,
+  WORKSPACE_SETTING_LIST,
   CONFIG,
   LOGIN,
   HEAD_TITLE
@@ -24,7 +24,7 @@ export function system (state = defaultSystem, action) {
     case `${SET}/${LOGIN}/Redirect`:
       return { ...state, redirectLogin: action.url }
 
-    case `${SET}/${ROLE_WORKSPACE_LIST}`:
+    case `${SET}/${WORKSPACE_SETTING_LIST}`:
       return { ...state, workspaceListLoaded: true }
 
     case `${SET}/${APP_LIST}`:
