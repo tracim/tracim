@@ -44,8 +44,8 @@ CLIENT_TOKEN_HEADER = "X-Tracim-ClientToken"
 
 SAML_IDP_DEFAULT_CONFIG = {
     "default": {
-        "logo_url": "url_of_logo",
-        "displayed_name": "NaN",
+        "logo_url": "",
+        "displayed_name": "",
         "attribute_map": {
             "user_id": "${mail}",
             "email": "${eduPersonUniqueId}",
