@@ -16,6 +16,13 @@ export const NO_ACTIVE_SPACE_ID = -1
 
 export const history = require('history').createBrowserHistory()
 
+export const UserReadOnlyFields = {
+  PUBLIC_NAME: 'public_name',
+  USERNAME: 'username',
+  EMAIL: 'email',
+  PASSWORD: 'password'
+}
+
 export const FETCH_CONFIG = {
   headers: LIB_FETCH_CONFIG.headers,
   apiUrl: configEnv.apiUrl

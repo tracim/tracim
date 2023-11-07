@@ -205,7 +205,7 @@ to change the metadata.
 
 For more details about the standard routes and the protocol, see ["SAML Explained in Plain English"](https://www.onelogin.com/learn/saml)
 
-See [SSO Glossary](https://help.akana.com/content/current/cm/saml/08_glossary.htm) and
+See [SSO Glossary](https://help.akana.com/content/current/cm/saml/08_glossary.htm) and 
 [SLO Article](https://uit.stanford.edu/service/saml/logout) for more details about the employed terms
 
 ⚠ When logging in Tracim, if a valid user doesn't

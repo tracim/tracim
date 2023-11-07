@@ -1,0 +1,29 @@
+@import '~tracim_frontend_lib/src/css/Variable.styl'
+
+.SamlAuthForm
+  font-size standardFontSize
+  overflow-y auto
+  overflow-x visible
+  margin-bottom 15px
+  &__title
+    font-size 20px
+  &__authTypeList
+    display flex
+    flex-direction column
+    justify-content center
+    &__item
+      display flex
+      align-items center
+      &__logo
+        flex 1
+        height 50px
+        margin 5px
+        img
+          max-width 100px
+          max-height 50px
+      &__link
+        width calc(100% - 110px)
+        font-size metadataFontSize
+  &__classicalLogin
+    display block
+    margin-top 25px
