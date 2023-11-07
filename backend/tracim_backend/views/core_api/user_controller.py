@@ -412,6 +412,9 @@ class UserController(Controller):
         try:
             check_has_write_rights(UserReadOnlyFields.PUBLIC_NAME, app_config, request)
         except ReadOnlyFieldException:
+            # NOTE - M.L. - 07/11/2023 - Since public_name is always sent,
+            #  even when only changing the language, this request will fail all the time.
+            #  This allows to make sure the public_name is not modified without blocking the request
             hapic_data.body.public_name = request.candidate_user.public_name
         uapi = UserApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
