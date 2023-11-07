@@ -31,7 +31,7 @@ describe('Login after a disconnection ', function () {
       .type(login)
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
-      .find('.loginpage__main__form__btnsubmit')
+      .find('.classicLoginAuthForm__btnsubmit')
       .click()
   })
 
