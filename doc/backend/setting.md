@@ -320,7 +320,7 @@ Additional fields specific to tracim can be found in the `virtual_organization` 
   - `attribute_map`: Mapping of SAML attributes to specific names used within the SP.
   - `profile_map`: Mapping of SAML attributes to tracim's user profile.
     - `value`: Mapping of SAML attributes to the value that will be tested.
-    - `match`: Regex pattern that will be tested against value, if there is a match profile is set.
+    - `match`: Regex pattern that will be tested against value, if there is a match profile is set. The regex syntax is the one processed by python's `re` module.
 
 Example: `user_id` maps to `${UserID}` received from the IdP.
 
