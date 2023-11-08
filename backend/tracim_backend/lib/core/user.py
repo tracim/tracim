@@ -148,8 +148,7 @@ class UserApi(object):
         return user
 
     def get_one_by_external_id(self, external_id: str) -> User:
-        """Return the user identified by the given external_id.
-        """
+        """Return the user identified by the given external_id."""
         try:
             user = self.base_query().filter(User.external_id == external_id).one()
         except NoResultFound as exc:
@@ -719,11 +718,7 @@ need to be in every workspace you include."
             try:
                 user = self.get_one_by_external_id(external_id)
                 self.update(
-                    user=user,
-                    email=mail,
-                    username=username,
-                    name=public_name,
-                    do_save=False
+                    user=user, email=mail, username=username, name=public_name, do_save=False
                 )
             except UserDoesNotExist:
                 _ = self.create_user(
