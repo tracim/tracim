@@ -279,6 +279,16 @@ Additional fields specific to tracim can be found in the `virtual_organization` 
                 "user_id": "${UserID}",
                 "email": "${EmailAddress}",
                 "display_name": "${FirstName} ${LastName}"
+            },
+            "profile_map": {
+                "trusted-users": {
+                  "value": "${UserID}",
+                  "match": "any_regex_pattern"
+                },
+                "administrators": {
+                  "value": "${UserID}",
+                  "match": "value|other_value"
+                }
             }
         }
     }
@@ -302,14 +312,19 @@ Additional fields specific to tracim can be found in the `virtual_organization` 
 - key_file: Path to the key file used for signing.
 - cert_file: Path to the certificate file used for signing.
 - xmlsec_binary: Path to the xmlsec1 binary for XML security operations.
-- metadata_cache_duration: Cache duration for remote metadata. In this example, the default cache duration is set to 86,400 seconds (1 day). 
+- metadata_cache_duration: Cache duration for remote metadata. In this example, the default cache duration is set to 86,400 seconds (1 day).
 - `virtual_organization`: Configuration for virtual organizations associated with IdPs. This is where you will define per-IdP settings. Each IdP is identified by its metadata URL.
   - `common_identifier`: A common identifier for the virtual organization associated with the IdP.
   - `logo_url`: URL to the organization's logo on the selection screen.
   - `displayed_name`: The displayed name of the organization on the selection screen.
   - `attribute_map`: Mapping of SAML attributes to specific names used within the SP.
+  - `profile_map`: Mapping of SAML attributes to tracim's user profile.
+    - `value`: Mapping of SAML attributes to the value that will be tested.
+    - `match`: Regex pattern that will be tested against value, if there is a match profile is set. The regex syntax is the one processed by python's `re` module.
 
 Example: `user_id` maps to `${UserID}` received from the IdP.
+
+⚠ Since users can't have two profiles, matching a user against to profiles is undefined behaviour.
 
 ## User sessions in Tracim
 

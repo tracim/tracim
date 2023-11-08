@@ -36,6 +36,7 @@ from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models.auth import AuthType
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 
 BASIC_AUTH_WEBUI_REALM = "tracim"
@@ -54,8 +55,29 @@ SAML_IDP_DEFAULT_CONFIG = {
             "username": "${commonName}",
             "display_name": "${surName} ${givenName}",
         },
+        "profile_map": {
+            "trusted-users": {"value": "${eduPersonPrimaryAffiliation}", "match": "teacher|member"},
+            "administrators": {"value": "${eduPersonPrimaryAffiliation}", "match": "employee"},
+        },
     }
 }
+
+
+def format_attribute(pattern: str, attributes: typing.Dict) -> str:
+    # NOTE - M.L - 2023-10-25 - This regex parses the ${xxx} formatted attribute mapping
+    #  it permits to find and replace multiple patterns in a same string
+    #  \$ Matches the '$' character
+    #  {(.*?)} matches this pattern {xxx} and captures and isolate in a group
+    #  anything between the "{}", it matches between zero and unlimited times
+    #  as few times as possible, meaning that if it meets a '}', it will not be matched
+    placeholders = re.findall(r"\${(.*?)}", pattern)
+    formatted_value = pattern
+    for placeholder in placeholders:
+        if placeholder in attributes:
+            formatted_value = formatted_value.replace(
+                f"${{{placeholder}}}", "".join(attributes[placeholder])
+            )
+    return formatted_value
 
 
 class SAMLSecurityPolicy:
@@ -149,6 +171,7 @@ class SAMLSecurityPolicy:
             user_id=saml_user_id,
             name=request.session.get("saml_display_name"),
             mail=request.session.get("saml_email"),
+            profile=request.session.get("saml_user_profile"),
         )
         self.remember(request, user.user_id)
         request.set_user(user)
@@ -173,6 +196,7 @@ class SAMLSecurityPolicy:
                 del request.session["saml_user_id"]
                 del request.session["saml_email"]
                 del request.session["saml_display_name"]
+                del request.session["saml_user_profile"]
                 del request.session["saml_expiry"]
             except Exception:
                 pass
@@ -203,20 +227,15 @@ class SAMLSecurityPolicy:
 
         formatted_attributes = {}
         for key, value in SAML_IDP_DEFAULT_CONFIG[idp_name]["attribute_map"].items():
-            # NOTE - M.L - 2023-10-25 - This regex parses the ${xxx} formatted attribute mapping
-            #  it permits to find and replace multiple patterns in a same string
-            #  \$ Matches the '$' character
-            #  {(.*?)} matches this pattern {xxx} and captures and isolate in a group
-            #  anything between the "{}", it matches between zero and unlimited times,
-            #  as few times as possible, meaning that if it meets a '}', it will not be matched
-            placeholders = re.findall(r"\${(.*?)}", value)
-            formatted_value = value
-            for placeholder in placeholders:
-                if placeholder in identity:
-                    formatted_value = formatted_value.replace(
-                        f"${{{placeholder}}}", "".join(identity[placeholder])
-                    )
-            formatted_attributes[key] = formatted_value
+            formatted_attributes[key] = format_attribute(value, identity)
+
+        user_profile = Profile.USER
+        for key, profile_mapping in SAML_IDP_DEFAULT_CONFIG[idp_name]["profile_map"].items():
+            match = re.match(
+                profile_mapping["match"], format_attribute(profile_mapping["value"], identity)
+            )
+            if match is not None:
+                user_profile = Profile.get_profile_from_slug(key)
 
         if "user_id" not in formatted_attributes:
             return HTTPBadRequest()
@@ -225,9 +244,8 @@ class SAMLSecurityPolicy:
             request.session["saml_email"] = formatted_attributes["email"]
         if "display_name" in formatted_attributes:
             request.session["saml_display_name"] = formatted_attributes["display_name"]
+        request.session["saml_user_profile"] = user_profile
         request.session["saml_expiry"] = authn_response.not_on_or_after
-        request.session["saml_name_id"] = authn_response.name_id.text
-
         return HTTPFound("/")
 
     def _sso(self, request: TracimRequest) -> Response:
