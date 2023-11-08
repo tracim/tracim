@@ -53,7 +53,7 @@ SAML_IDP_DEFAULT_CONFIG = {
             "user_id": "${mail}",
             "email": "${eduPersonUniqueId}",
             "username": "${commonName}",
-            "display_name": "${surName} ${givenName}",
+            "public_name": "${surName} ${givenName}",
         },
         "profile_map": {
             "trusted-users": {"value": "${eduPersonPrimaryAffiliation}", "match": "teacher|member"},
@@ -168,8 +168,9 @@ class SAMLSecurityPolicy:
 
         user = user_api.saml_authenticate(
             user=None,
-            user_id=saml_user_id,
-            name=request.session.get("saml_display_name"),
+            external_id=saml_user_id,
+            username=request.session.get("saml_username"),
+            public_name=request.session.get("saml_public_name"),
             mail=request.session.get("saml_email"),
             profile=request.session.get("saml_user_profile"),
         )
@@ -194,8 +195,9 @@ class SAMLSecurityPolicy:
         if "saml_user_id" in request.session:
             try:
                 del request.session["saml_user_id"]
+                del request.session["saml_username"]
                 del request.session["saml_email"]
-                del request.session["saml_display_name"]
+                del request.session["saml_public_name"]
                 del request.session["saml_user_profile"]
                 del request.session["saml_expiry"]
             except Exception:
@@ -240,10 +242,12 @@ class SAMLSecurityPolicy:
         if "user_id" not in formatted_attributes:
             return HTTPBadRequest()
         request.session["saml_user_id"] = formatted_attributes["user_id"]
+        if "username" in formatted_attributes:
+            request.session["saml_username"] = formatted_attributes["username"]
         if "email" in formatted_attributes:
             request.session["saml_email"] = formatted_attributes["email"]
-        if "display_name" in formatted_attributes:
-            request.session["saml_display_name"] = formatted_attributes["display_name"]
+        if "public_name" in formatted_attributes:
+            request.session["saml_public_name"] = formatted_attributes["public_name"]
         request.session["saml_user_profile"] = user_profile
         request.session["saml_expiry"] = authn_response.not_on_or_after
         return HTTPFound("/")

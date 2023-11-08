@@ -147,6 +147,17 @@ class UserApi(object):
             raise UserDoesNotExist('User "{}" not found in database'.format(user_id)) from exc
         return user
 
+    def get_one_by_external_id(self, external_id: str) -> User:
+        """Return the user identified by the given external_id.
+        """
+        try:
+            user = self.base_query().filter(User.external_id == external_id).one()
+        except NoResultFound as exc:
+            raise UserDoesNotExist(
+                'User for external_id "{}" not found in database'.format(external_id)
+            ) from exc
+        return user
+
     def get_one_by_login(self, login: str) -> User:
         """Return the user identified by the given login.
         User's email is searched if the login is an email
@@ -684,8 +695,9 @@ need to be in every workspace you include."
     def saml_authenticate(
         self,
         user: typing.Optional[User],
-        user_id: str,
-        name: str,
+        external_id: str,
+        username: str,
+        public_name: str,
         mail: str,
         profile: Profile = Profile.USER,
     ) -> User:
@@ -695,34 +707,41 @@ need to be in every workspace you include."
         or UserAuthenticatedIsNotActive
         :param user to check, can be none if user not found, will try
          to create new user if none but ldap auth succeed
-        :param user_id: user_id of the user
-        :param name extracted from saml attributes
+        :param external_id
+        :param username of the user
+        :param public_name extracted from saml attributes
         :param mail extracted from saml attributes
         :param profile: user Profile extracted from saml attributes
         """
         auth_type = AuthType.SAML
 
-        # TODO - M.L - 2023/09/06 - Change this to get saml response and isolate attributes
-
         if not user:
             try:
-                user = self.get_one_by_login(user_id)
+                user = self.get_one_by_external_id(external_id)
+                self.update(
+                    user=user,
+                    email=mail,
+                    username=username,
+                    name=public_name,
+                    do_save=False
+                )
             except UserDoesNotExist:
                 _ = self.create_user(
+                    external_id=external_id,
                     email=mail,
-                    username=user_id,
-                    name=name,
+                    username=username,
+                    name=public_name,
                     auth_type=AuthType.SAML,
                     do_save=True,
                     do_notify=False,
                     profile=profile,
                 )
-                transaction.commit()
-                user = self.get_one_by_login(user_id)
+                # transaction.commit()
+                user = self.get_one_by_external_id(external_id)
         if user and user.auth_type not in [auth_type, AuthType.UNKNOWN]:
             raise WrongAuthTypeForUser(
                 'User "{}" auth_type is {} not {}'.format(
-                    user_id, user.auth_type.value, auth_type.value
+                    username, user.auth_type.value, auth_type.value
                 )
             )
 
@@ -958,6 +977,7 @@ need to be in every workspace you include."
     def update(
         self,
         user: User,
+        external_id: typing.Optional[str] = None,
         name: str = None,
         email: str = None,
         password: str = None,
@@ -1024,6 +1044,9 @@ need to be in every workspace you include."
         if timezone is not None:
             user.timezone = timezone
 
+        if external_id is not None:
+            user.external_id = external_id
+
         if lang is not None:
             user.lang = lang
 
@@ -1070,6 +1093,7 @@ need to be in every workspace you include."
         username: typing.Optional[str] = None,
         password: typing.Optional[str] = None,
         name: typing.Optional[str] = None,
+        external_id: typing.Optional[str] = None,
         timezone: str = "",
         lang: typing.Optional[str] = None,
         auth_type: AuthType = AuthType.UNKNOWN,
@@ -1085,12 +1109,15 @@ need to be in every workspace you include."
                 "Can't create user with invitation mail because notification are disabled."
             )
         new_user = self.create_minimal_user(email, username, profile, save_now=False)
+        if external_id is None:
+            external_id = new_user.user_id
         if allowed_space is None:
             allowed_space = self._config.LIMITATION__USER_DEFAULT_ALLOWED_SPACE
         self.update(
             user=new_user,
             name=name,
             username=username,
+            external_id=external_id,
             email=email,
             auth_type=auth_type,
             password=password,
