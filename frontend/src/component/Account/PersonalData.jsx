@@ -8,7 +8,7 @@ import {
   IconButton
 } from 'tracim_frontend_lib'
 import DropdownLang from '../DropdownLang.jsx'
-import { UserReadOnlyFields } from '../../util/helper'
+import { serializeUserProps, UserReadOnlyFields } from '../../reducer/user.js'
 
 require('./PersonalData.styl')
 
@@ -25,9 +25,15 @@ export class PersonalData extends React.Component {
   }
 
   isDisabled = field => {
-    if (!this.props.system || !this.props.system.config) return false
-    if (!this.props.system.config.user__read_only_fields[this.props.userAuthType]) return false
-    return this.props.system.config.user__read_only_fields[this.props.userAuthType].includes(field)
+    if (this.props.system?.config?.user__read_only_fields?.[this.props.userAuthType] === undefined) {
+      return false
+    }
+
+    const serializedSystemConfigReadOnlyFieldList =
+      this.props.system.config.user__read_only_fields[this.props.userAuthType]
+        .map(p => serializeUserProps[p])
+
+    return serializedSystemConfigReadOnlyFieldList.includes(field)
   }
 
   handleChangePublicName = e => this.setState({ newPublicName: e.target.value })

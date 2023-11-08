@@ -101,3 +101,14 @@ export default function user (state = defaultUser, action) {
       return state
   }
 }
+
+// INFO - CH - 2023-11-08 - Attributes bellow are possibly read only depending on auth type
+// Whether they are read only will be set by reducer system.config.user__read_only_fields[auth_type]
+// which value comes from backend (/api/system/config)
+// This object must stay synced with backend/tracim_backend/config.py class UserReadOnlyFields
+export const UserReadOnlyFields = {
+  PUBLIC_NAME: 'publicName',
+  USERNAME: 'username',
+  EMAIL: 'email',
+  PASSWORD: 'password'
+}
