@@ -660,8 +660,6 @@ need to be in every workspace you include."
         password: str,
         login: str,
         ldap_connector: "Connector" = None,
-        saml_name: str = "",
-        saml_mail: str = "",
     ) -> User:
         """
         Authenticate user with email/username and password, raise AuthenticationFailed
@@ -670,19 +668,17 @@ need to be in every workspace you include."
         :param login: login or username of the user
         :param password: plaintext password of the user
         :param ldap_connector: ldap connector, enable ldap auth if provided
-        :param saml_mail: mail extracted from saml attributes
-        :param saml_name: name extracted from saml attributes
         :return: User who was authenticated.
         """
         for auth_type in self._config.AUTH_TYPES:
+            if auth_type == AuthType.SAML:
+                continue
             try:
                 return self._authenticate(
                     login=login,
                     password=password,
                     ldap_connector=ldap_connector,
                     auth_type=auth_type,
-                    saml_name=saml_name,
-                    saml_mail=saml_mail,
                 )
             except AuthenticationFailed as exc:
                 raise exc
@@ -756,8 +752,6 @@ need to be in every workspace you include."
         login: str,
         ldap_connector: "Connector" = None,
         auth_type: AuthType = AuthType.INTERNAL,
-        saml_name: str = "",
-        saml_mail: str = "",
     ) -> User:
         """
         Authenticate user with email/username and password, raise AuthenticationFailed
@@ -766,8 +760,6 @@ need to be in every workspace you include."
         :param password: plaintext password of the user
         :param ldap_connector: ldap connector, enable ldap auth if provided
         :param auth_type: auth type to test.
-        :param saml_mail: mail extracted from saml attributes
-        :param saml_name: name extracted from saml attributes
         :return: User who was authenticated.
         """
         user = None
@@ -782,8 +774,6 @@ need to be in every workspace you include."
                 raise MissingLDAPConnector()
             elif auth_type == AuthType.INTERNAL:
                 return self._internal_db_authenticate(user, login, password)
-            elif auth_type == AuthType.SAML:
-                return self.saml_authenticate(user, login, saml_name, saml_mail)
             else:
                 raise UnknownAuthType()
         except (
