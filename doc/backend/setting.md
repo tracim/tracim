@@ -218,6 +218,53 @@ session.type = ext:redis
 session.url = redis://localhost:6379/0
 ```
 
+#### Connecting to a Redis cluster
+
+tracim doesn't support Redis clusters natively. To circumvent this, it is possible to deploy a 
+[Redis cluster proxy](https://github.com/RedisLabs/redis-cluster-proxy) and configure tracim to interact with it
+instead of a Redis instance. It will act as a single Redis instance, but will make use of the Redis cluster it is
+connected to.
+
+There is two ways to deploy it:
+
+- As a Docker container
+- As a service on the server
+
+Since there is no official Docker images for Redis cluster proxy, it is required to build it.
+
+Either it is as a service or a Docker container, the steps for building the proxy are the following:
+
+- Install C compiling tools (`apt install gcc make`)
+- Clone and go into the Redis Cluster Proxy git repository 
+(`git clone https://github.com/RedisLabs/redis-cluster-proxy.git && cd redis-cluster-proxy`)
+- Compile and install (`make && make install`), more details about compiling on the repository's README
+
+To run the proxy, simply provide the IPs of the cluster nodes. It will automatically resolve missing nodes,
+but it is recommended to provide all of them (only one will serve as an entrypoint, but in case of failure,
+it will try another one from the list)
+
+Example:
+```bash
+redis-cluster-proxy 192.168.1.10:6379 192.168.1.11:6379 192.168.1.12:6379 192.168.1.13:6379
+```
+
+Here is a basic Dockerfile for the proxy:
+
+```Dockerfile
+FROM debian:buster-slim as builder
+
+RUN apt update && apt -y upgrade && apt -y install gcc make git
+RUN git clone https://github.com/RedisLabs/redis-cluster-proxy.git
+
+WORKDIR redis-cluster-proxy
+RUN make
+
+FROM debian:buster-slim as runner
+COPY --from=builder /redis-cluster-proxy/src/redis-cluster-proxy /redis-cluster-proxy
+
+CMD ./redis-cluster-proxy <cluster_nodes_ips>
+```
+
 #### delete the existing sessions (redis storage)
 
 ```bash
