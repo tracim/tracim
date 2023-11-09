@@ -110,11 +110,10 @@ class ESSearchApi(SearchApi):
         # check how to support more complex case.
         self.es = Elasticsearch(
             hosts=[
-                (
-                    {
-                        "host": self._config.SEARCH__ELASTICSEARCH__HOST,
-                        "port": self._config.SEARCH__ELASTICSEARCH__PORT,
-                    }
+                ({"host": host, "port": port})
+                for host, port in zip(
+                    self._config.SEARCH__ELASTICSEARCH__HOST,
+                    self._config.SEARCH__ELASTICSEARCH__PORT,
                 )
             ]
         )
