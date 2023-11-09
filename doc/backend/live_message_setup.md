@@ -17,7 +17,7 @@ you need to set tracim config like this to use default pushpin port:
 
 ```ini
 basic_setup.website_base_url = http://localhost:7999
-live_messages.control_zmq_uri = tcp://localhost:5563
+live_messages.control_zmq_uri = tcp://localhost:5563,
 ```
 
 Several pushpin instances can be provided, as a comma separated list:
@@ -31,8 +31,8 @@ live_messages.control_zmq_uri = tcp://localhost:5563,tcp://remote.example.com:55
 Make sure to fill these variables too, since tracim won't be able to resolve them automatically.
 
 ```ini
-live_messages.pub_zmq_uri = tcp://localhost:5562
-live_messages.push_zmq_uri = tcp://localhost:5560
+live_messages.pub_zmq_uri = tcp://localhost:5562,
+live_messages.push_zmq_uri = tcp://localhost:5560,
 ```
 
 ## Run tracim with Pushpin (dev)
