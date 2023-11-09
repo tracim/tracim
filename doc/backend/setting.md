@@ -295,36 +295,35 @@ Additional fields specific to tracim can be found in the `virtual_organization` 
 }
 ```
 
-- `entityid`: This is the Entity ID of the Service Provider (SP). It uniquely identifies your service.
-- `metadata`: Metadata settings for the SAML configuration. local and remote are arrays for defining metadata sources. In this example, two remote identity providers (IdPs) are configured.
+- `entityid`: String: The Entity ID of the Service Provider (SP). It uniquely identifies your service.
+- `metadata`: Metadata settings for the SAML configuration. local and remote are arrays of strings for defining metadata sources. In this example, two remote identity providers (IdPs) are configured.
 - `service`: Service-related settings for the SP.
   - `sp`: Service Provider-specific settings.
     - `endpoints`: Configuration for various endpoints, such as Assertion Consumer Service (ACS) and Single Logout Service (SLO).
-      - `allow_unsolicited`: Whether unsolicited responses are allowed from the IdP.
-      - `authn_requests_signed`: Specifies whether authentication requests should be signed.
-    - `logout_requests_signed`: Specifies whether logout requests should be signed.
-    - `want_assertions_signed`: Specifies whether the SP wants signed assertions.
-    - `want_response_signed`: Specifies whether the SP wants signed responses.
-    - `name_id_format`: The format for the NameID.
-    - `name_id_format_allow_create`: Whether to allow the IdP to create a new NameID if it doesn't exist.
-    - `want_name_id`: Whether the SP wants the NameID in the response.
-    - `allow_unknown_attributes`: Allows processing of unknown attributes received from the IdP.
-- key_file: Path to the key file used for signing.
-- cert_file: Path to the certificate file used for signing.
-- xmlsec_binary: Path to the xmlsec1 binary for XML security operations.
-- metadata_cache_duration: Cache duration for remote metadata. In this example, the default cache duration is set to 86,400 seconds (1 day).
+    - `allow_unsolicited`: Bool: Whether unsolicited responses are allowed from the IdP.
+    - `authn_requests_signed`: Bool: Specifies whether authentication requests should be signed.
+    - `logout_requests_signed`: Bool: Specifies whether logout requests should be signed.
+    - `want_assertions_signed`: Bool: Specifies whether the SP wants signed assertions.
+    - `want_response_signed`: Bool: Specifies whether the SP wants signed responses.
+    - `name_id_format`: String: The format for the NameID.
+    - `name_id_format_allow_create`: Bool: Whether to allow the IdP to create a new NameID if it doesn't exist.
+    - `want_name_id`: Bool: Whether the SP wants the NameID in the response.
+- `allow_unknown_attributes`: Bool: Allows processing of unknown attributes received from the IdP.
+- `key_file`: String: Path to the key file used for signing.
+- `cert_file`: String: Path to the certificate file used for signing.
+- `xmlsec_binary`: String: Path to the xmlsec1 binary for XML security operations.
+- `metadata_cache_duration`: Cache duration for remote metadata. In this example, the default cache duration is set to 86,400 seconds (1 day).
 - `virtual_organization`: Configuration for virtual organizations associated with IdPs. This is where you will define per-IdP settings. Each IdP is identified by its metadata URL.
   - `common_identifier`: A common identifier for the virtual organization associated with the IdP.
   - `logo_url`: URL to the organization's logo on the selection screen.
-  - `displayed_name`: The displayed name of the organization on the selection screen.
+  - `displayed_name`: The displayed name of the organization on the login page.
   - `attribute_map`: Mapping of SAML attributes to specific names used within the SP.
   - `profile_map`: Mapping of SAML attributes to tracim's user profile.
     - `value`: Mapping of SAML attributes to the value that will be tested.
-    - `match`: Regex pattern that will be tested against value, if there is a match profile is set. The regex syntax is the one processed by python's `re` module.
+    - `match`: Regex pattern that will be tested against value, if there is a match, profile is set. The regex syntax is the one processed by python's `re` module. If no regex match, profile "user" is set.
+      - ⚠ Since users can't have two profiles in tracim, be careful to not have values that can match multiple regexes
 
 Example: `user_id` maps to `${UserID}` received from the IdP.
-
-⚠ Since users can't have two profiles, matching a user against to profiles is undefined behaviour.
 
 ## User sessions in Tracim
 
