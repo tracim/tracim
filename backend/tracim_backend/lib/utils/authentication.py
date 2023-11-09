@@ -2,6 +2,7 @@ from abc import ABC
 from abc import abstractmethod
 import datetime
 import json
+import logging
 import os
 from pyramid.authentication import BasicAuthAuthenticationPolicy
 from pyramid.authentication import CallbackAuthenticationPolicy
@@ -166,13 +167,18 @@ class SAMLSecurityPolicy:
 
         user_api = UserApi(None, request.dbsession, self.app_config)
 
-        user = user_api.saml_authenticate(
-            user=None,
-            user_id=saml_user_id,
-            name=request.session.get("saml_display_name"),
-            mail=request.session.get("saml_email"),
-            profile=request.session.get("saml_user_profile"),
-        )
+        try:
+            user = user_api.saml_authenticate(
+                user=None,
+                user_id=saml_user_id,
+                name=request.session.get("saml_display_name"),
+                mail=request.session.get("saml_email"),
+                profile=request.session.get("saml_user_profile"),
+            )
+        except Exception as e:
+            logging.getLogger().warning("An error occurred: ", exc_info=e)
+            self.forget(request)
+            return None
         self.remember(request, user.user_id)
         request.set_user(user)
         return user.user_id
