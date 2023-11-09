@@ -974,7 +974,7 @@ class CFG(object):
             separator=",",
         )
         self.SEARCH__ELASTICSEARCH__PORT = string_to_list(
-            self.get_raw_config("search.elasticsearch.port", "port"),
+            self.get_raw_config("search.elasticsearch.port", "9200"),
             cast_func=int,
             separator=",",
         )
