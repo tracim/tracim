@@ -34,6 +34,7 @@ from tracim_backend.lib.utils.utils import is_dir_readable
 from tracim_backend.lib.utils.utils import is_dir_writable
 from tracim_backend.lib.utils.utils import is_file_exist
 from tracim_backend.lib.utils.utils import is_file_readable
+from tracim_backend.lib.utils.utils import string_to_list
 from tracim_backend.lib.utils.utils import string_to_unique_item_list
 from tracim_backend.lib.utils.utils import validate_json
 from tracim_backend.models.auth import AuthType
@@ -681,9 +682,22 @@ class CFG(object):
         )
 
     def _load_live_messages_config(self) -> None:
-        self.LIVE_MESSAGES__CONTROL_ZMQ_URI = self.get_raw_config(
-            "live_messages.control_zmq_uri", "tcp://localhost:5563"
+        self.LIVE_MESSAGES__CONTROL_ZMQ_URI = string_to_list(
+            self.get_raw_config("live_messages.control_zmq_uri", "tcp://localhost:5563"),
+            cast_func=str,
+            separator=",",
         )
+        self.LIVE_MESSAGES__PUSH_ZMQ_URI = string_to_list(
+            self.get_raw_config("live_messages.push_zmq_uri"),
+            cast_func=str,
+            separator=",",
+        )
+        self.LIVE_MESSAGES__PUB_ZMQ_URI = string_to_list(
+            self.get_raw_config("live_messages.pub_zmq_uri"),
+            cast_func=str,
+            separator=",",
+        )
+
         self.LIVE_MESSAGES__STATS_ZMQ_URI = self.get_raw_config(
             "live_messages.stats_zmq_uri", "ipc:///var/run/pushpin/pushpin-stats"
         )

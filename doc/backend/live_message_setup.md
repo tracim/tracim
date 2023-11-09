@@ -20,7 +20,20 @@ basic_setup.website_base_url = http://localhost:7999
 live_messages.control_zmq_uri = tcp://localhost:5563
 ```
 
+Several pushpin instances can be provided, as a comma separated list:
+```ini
+live_messages.control_zmq_uri = tcp://localhost:5563,tcp://remote.example.com:5563
+```
+
 ⚠️  Temporary, you also need to ensure "jobs.processing_mode" parameter is unset or set to "sync".
+
+⚠️  If Pushpin's accessible ports are not the same as the ports in the configuration (like with docker port mappings).
+Make sure to fill these variables too, since tracim won't be able to resolve them automatically.
+
+```ini
+live_messages.pub_zmq_uri = tcp://localhost:5562
+live_messages.push_zmq_uri = tcp://localhost:5560
+```
 
 ## Run tracim with Pushpin (dev)
 
