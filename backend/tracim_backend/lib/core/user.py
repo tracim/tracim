@@ -735,8 +735,8 @@ need to be in every workspace you include."
                 user = self.get_one_by_external_id(external_id)
         if user and user.auth_type not in [auth_type, AuthType.UNKNOWN]:
             raise WrongAuthTypeForUser(
-                'User "{}" auth_type is {} not {}'.format(
-                    username, user.auth_type.value, auth_type.value
+                'User with external_id "{}" auth_type is {} not {}'.format(
+                    external_id, user.auth_type.value, auth_type.value
                 )
             )
 
@@ -972,7 +972,6 @@ need to be in every workspace you include."
     def update(
         self,
         user: User,
-        external_id: typing.Optional[str] = None,
         name: str = None,
         email: str = None,
         password: str = None,
@@ -983,6 +982,7 @@ need to be in every workspace you include."
         allowed_space: typing.Optional[int] = None,
         username: str = None,
         do_save=True,
+        external_id: typing.Optional[str] = None,
     ) -> User:
         """Update given user instance with given parameters"""
         validator = TracimValidator()
