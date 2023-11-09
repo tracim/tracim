@@ -180,8 +180,10 @@ class SAMLSecurityPolicy:
             logging.getLogger().warning("An error occurred: ", exc_info=e)
             self.forget(request)
             return None
+        print(f"### BEFORE SESSION USERNAME IS {user.user_id}-{user.username}")
         self.remember(request, user.user_id)
         request.set_user(user)
+        print(f"### AFTER SESSION USERNAME IS {user.user_id}-{user.username}")
         return user.user_id
 
     def permits(self, request, context, permission):

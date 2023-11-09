@@ -16,6 +16,7 @@ import sqlalchemy
 from sqlalchemy import and_
 from sqlalchemy import func
 from sqlalchemy import or_
+from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import Query
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.expression import cast
@@ -713,9 +714,12 @@ need to be in every workspace you include."
         if not user:
             try:
                 user = self.get_one_by_external_id(external_id)
-                self.update(
-                    user=user, email=mail, username=username, name=public_name, do_save=False
-                )
+                try:
+                    user = self.update(
+                        user=user, email=mail, username=username, name=public_name, do_save=True
+                    )
+                except InvalidRequestError:
+                    pass
             except UserDoesNotExist:
                 _ = self.create_user(
                     external_id=external_id,
@@ -727,7 +731,6 @@ need to be in every workspace you include."
                     do_notify=False,
                     profile=profile,
                 )
-                # transaction.commit()
                 user = self.get_one_by_external_id(external_id)
         if user and user.auth_type not in [auth_type, AuthType.UNKNOWN]:
             raise WrongAuthTypeForUser(
@@ -1046,7 +1049,9 @@ need to be in every workspace you include."
             user.allowed_space = allowed_space
 
         if do_save:
+            print(f"### BEFORE SAVE USERNAME IS {user.user_id}-{user.username}")
             self.save(user)
+            print(f"### AFTER SAVE USERNAME IS {user.user_id}-{user.username}")
 
         return user
 
@@ -1065,6 +1070,7 @@ need to be in every workspace you include."
         if user.auth_type and user.auth_type not in [
             AuthType.INTERNAL,
             AuthType.UNKNOWN,
+            AuthType.SAML,
         ]:
             raise ExternalAuthUserEmailModificationDisallowed(
                 "user {} is link to external auth {},"
