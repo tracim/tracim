@@ -407,7 +407,7 @@ export class Account extends React.Component {
                             onChangeUsername={this.handleChangeUsername}
                             isUsernameValid={state.userToEdit.isUsernameValid}
                             usernameInvalidMsg={state.userToEdit.usernameInvalidMsg}
-                            displayAdminInfo
+                            isAdmin
                           />
                         )
 

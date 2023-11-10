@@ -1,5 +1,6 @@
 import React from 'react'
 import i18next from 'i18next'
+import classnames from 'classnames'
 import { connect } from 'react-redux'
 import { translate, Trans } from 'react-i18next'
 import * as Cookies from 'js-cookie'
@@ -561,6 +562,7 @@ export class Tracim extends React.Component {
     return (
       <div className='tracim fullWidthFullHeight' dir={i18next.dir()}>
         <Header />
+
         {state.displayConnectionError && (
           <FlashMessage
             className='connection_error'
@@ -722,7 +724,9 @@ export class Tracim extends React.Component {
 
         <ReduxTlmDispatcher />
 
-        <div className='sidebarpagecontainer'>
+        {/* INFO - CH - 2023-11-07 - notLoggedIn based on user.logged is used to reduce height because
+        when not logged in, we display a 60px header. See Header.jsx */}
+        <div className={classnames('sidebarpagecontainer', { notLoggedIn: props.user.logged === false })}>
           <Route
             render={() => (
               <Sidebar

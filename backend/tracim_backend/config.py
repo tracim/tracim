@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from depot.manager import DepotManager
+import enum
 from enum import Enum
 import json
 from jsonschema import SchemaError
@@ -75,6 +76,13 @@ def create_target_langage(value: str) -> typing.Tuple[str, str]:
 def create_code_sample_langage(language: str) -> typing.Tuple[str, str]:
     value, text = language.split(":")
     return (value, text)
+
+
+class UserReadOnlyFields(enum.Enum):
+    PUBLIC_NAME = "public_name"
+    USERNAME = "username"
+    EMAIL = "email"
+    PASSWORD = "password"
 
 
 class ConfigParam(object):
@@ -157,6 +165,21 @@ class ConfigParam(object):
             return value
 
 
+# INFO - M.L - 2023-10-25 - Using naming SamLIdPConfig instead of SAMLIdpConfig or SamlIdPConfig for readability
+class SamLIdPConfig(object):
+    def __init__(self, displayed_name: str, identifier: str, logo_url: str):
+        self.displayed_name = displayed_name
+        self.identifier = identifier
+        self.logo_url = logo_url
+
+    def to_dict(self):
+        return {
+            "displayed_name": self.displayed_name,
+            "identifier": self.identifier,
+            "logo_url": self.logo_url,
+        }
+
+
 class CFG(object):
     """Object used for easy access to config file parameters."""
 
@@ -174,6 +197,7 @@ class CFG(object):
         self._check_consistency()
         self.check_config_validity()
         logger.debug(self, "CONFIG_PROCESS:5: End of config process")
+        self.SAML_IDP_LIST: typing.List[SamLIdPConfig] = []
 
         app_lib = ApplicationApi(app_list=app_list, show_inactive=True)
         for app in app_lib.get_all():
@@ -400,6 +424,21 @@ class CFG(object):
             cast_func=AuthType,
             do_strip=True,
         )
+        self.USER__READ_ONLY_FIELDS: typing.Dict[AuthType, typing.List[UserReadOnlyFields]] = {}
+        for auth_type in self.AUTH_TYPES:
+            readonly_field_list = string_to_unique_item_list(
+                self.get_raw_config(f"user.profile.read_only_fields.{auth_type.value}"),
+                separator=",",
+                cast_func=UserReadOnlyFields,
+                do_strip=True,
+            )
+            # HACK - M.L - 2023-10-30 - This is to satisfy CFG._check_consistency despite being
+            #  poorly usable
+            self.__setattr__(
+                f"USER__PROFILE__READ_ONLY_FIELDS__{auth_type.value.upper()}", readonly_field_list
+            )
+            self.USER__READ_ONLY_FIELDS[auth_type] = readonly_field_list
+
         self.REMOTE_USER_HEADER = self.get_raw_config("remote_user_header", None)
 
         self.API__KEY = self.get_raw_config("api.key", "", secret=True)

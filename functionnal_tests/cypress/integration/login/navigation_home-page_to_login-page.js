@@ -32,11 +32,11 @@ describe('Login page', function () {
       .type(defaultAdmin.password)
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
-      .find('.loginpage__main__form__btnsubmit')
+      .find('.classicLoginAuthForm__btnsubmit')
       .should('be.visible')
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
-      .find('.loginpage__main__form__btnsubmit')
+      .find('.classicLoginAuthForm__btnsubmit')
       .click()
 
     cy.get('.sidebar__item__menu').first().should('be.visible').click()
@@ -64,11 +64,11 @@ describe('Login page', function () {
       .type(defaultAdmin.password)
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
-      .find('.loginpage__main__form__btnsubmit')
+      .find('.classicLoginAuthForm__btnsubmit')
       .should('be.visible')
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
-      .find('.loginpage__main__form__btnsubmit')
+      .find('.classicLoginAuthForm__btnsubmit')
       .click()
 
     cy.get('.sidebar__item__menu').first().should('be.visible').click()

@@ -84,6 +84,9 @@ class ConfigModel(object):
         limitation__maximum_online_users_message: str,
         call__enabled: bool,
         call__unanswered_timeout: int,
+        auth_types: List[str],
+        saml_idp_list: List[Dict[str, str]],
+        user__read_only_fields: Dict[str, List[str]],
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
@@ -106,6 +109,9 @@ class ConfigModel(object):
         self.limitation__maximum_online_users_message = limitation__maximum_online_users_message
         self.call__enabled = call__enabled
         self.call__unanswered_timeout = call__unanswered_timeout
+        self.auth_types = auth_types
+        self.saml_idp_list = saml_idp_list
+        self.user__read_only_fields = user__read_only_fields
 
 
 class ErrorCodeModel(object):
