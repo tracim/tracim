@@ -101,7 +101,7 @@ COVER_RATIO = ImageRatio(35, 4)
 DEFAULT_AVATAR_SIZE = ImageSize(100, 100)
 DEFAULT_COVER_SIZE = ImageSize(1300, 150)
 SVG_MIMETYPE = "image/svg+xml"
-ALLOWED_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_."
+USERNAME_ALLOWED_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_."
 
 
 class UserApi(object):
@@ -724,7 +724,7 @@ need to be in every workspace you include."
                 #  to make sure it fits username restrictions
                 if username is not None:
                     username = "".join(
-                        char if char in ALLOWED_CHARACTERS else "_" for char in username
+                        char if char in USERNAME_ALLOWED_CHARACTERS else "_" for char in username
                     )
                     username = username[: User.MAX_USERNAME_LENGTH].ljust(
                         User.MIN_USERNAME_LENGTH, "_"
@@ -970,7 +970,7 @@ need to be in every workspace you include."
         if len(username) < User.MIN_USERNAME_LENGTH or len(username) > User.MAX_USERNAME_LENGTH:
             return False
         for char in username:
-            if char not in ALLOWED_CHARACTERS:
+            if char not in USERNAME_ALLOWED_CHARACTERS:
                 return False
         return True
 

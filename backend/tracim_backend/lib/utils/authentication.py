@@ -38,7 +38,6 @@ from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UserAuthenticatedIsNotActive
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import WrongAuthTypeForUser
-from tracim_backend.lib.core.user import ALLOWED_CHARACTERS
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models.auth import AuthType
