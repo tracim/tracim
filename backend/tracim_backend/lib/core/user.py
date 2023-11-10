@@ -715,9 +715,20 @@ need to be in every workspace you include."
             try:
                 user = self.get_one_by_external_id(external_id)
                 # FIXME - BS - 2023-11-10 - Update must be moved in SAMLSecurityPolicy._acs
-                # The saml_authenticate method (through SAMLSecurityPolicy.authenticated_userid) is called
-                # every times Request.authenticated_userid property is called. So, this updated can be (and is)
-                # called when original code already flushed the session. And result "session already flushed" error.
+                #  The saml_authenticate method (through SAMLSecurityPolicy.authenticated_userid)
+                #  is called every times Request.authenticated_userid property is called.
+                #  So, this updated can be (and is) called when original code already flushed
+                #  the session. And result "session already flushed" error.
+
+                # NOTE - M.L. - 23-11-10 - Processing the username
+                #  to make sure it fits username restrictions
+                if username is not None:
+                    username = "".join(
+                        char if char in ALLOWED_CHARACTERS else "_" for char in username
+                    )
+                    username = username[: User.MAX_USERNAME_LENGTH].ljust(
+                        User.MIN_USERNAME_LENGTH, "_"
+                    )
                 user = self.update(
                     user=user, email=mail, username=username, name=public_name, do_save=True
                 )

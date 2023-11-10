@@ -170,24 +170,19 @@ class SAMLSecurityPolicy:
         if saml_expiry is None or saml_expiry <= int(time.time()):
             return None
 
-        # NOTE - M.L. - 23-11-10 - Processing the username
-        #  to make sure it fits username restrictions
-        username = request.session.get("saml_username")
-        if username is not None:
-            username = "".join(char if char in ALLOWED_CHARACTERS else "_" for char in username)
-            username = username[: User.MAX_USERNAME_LENGTH].ljust(User.MIN_USERNAME_LENGTH, "_")
         user_api = UserApi(None, request.dbsession, self.app_config)
-
         try:
-            # FIXME - BS - 2023-11-10 - Remove this noautoflush when UserApi.update moved in SAMLSecurityPolicy._acs
-            # The saml_authenticate method (through SAMLSecurityPolicy.authenticated_userid) is called
-            # every times Request.authenticated_userid property is called. So, this updated can be (and is)
-            # called when original code already flushed the session. And result "session already flushed" error.
+            # FIXME - BS - 2023-11-10 - Remove this noautoflush when
+            #  UserApi.update moved in SAMLSecurityPolicy._acs
+            #  The saml_authenticate method (through SAMLSecurityPolicy.authenticated_userid)
+            #  is called every times Request.authenticated_userid property is called.
+            #  So, this updated can be (and is) called when original code
+            #  already flushed the session. And result "session already flushed" error.
             with request.dbsession.no_autoflush:
                 user = user_api.saml_authenticate(
                     user=None,
                     external_id=saml_user_id,
-                    username=username,
+                    username=request.session.get("saml_username"),
                     public_name=request.session.get("saml_public_name"),
                     mail=request.session.get("saml_email"),
                     profile=request.session.get("saml_user_profile"),
