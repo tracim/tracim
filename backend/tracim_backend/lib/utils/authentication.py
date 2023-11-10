@@ -170,7 +170,8 @@ class SAMLSecurityPolicy:
         if saml_expiry is None or saml_expiry <= int(time.time()):
             return None
 
-        # NOTE - M.L. - 23-11-10 - Processing the username to make sure it fits username restrictions
+        # NOTE - M.L. - 23-11-10 - Processing the username
+        #  to make sure it fits username restrictions
         username = request.session.get("saml_username")
         if username is not None:
             username = "".join(char if char in ALLOWED_CHARACTERS else "_" for char in username)

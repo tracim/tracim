@@ -16,7 +16,6 @@ import sqlalchemy
 from sqlalchemy import and_
 from sqlalchemy import func
 from sqlalchemy import or_
-from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import Query
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.expression import cast
