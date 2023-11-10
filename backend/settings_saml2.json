@@ -57,9 +57,10 @@
       "logo_url": "https://idp.ssocircle.com/logo.png",
       "displayed_name": "[Test] SSO Circle",
       "attribute_map": {
+        "username": "${UserID}",
         "user_id": "${UserID}",
         "email": "${EmailAddress}",
-        "display_name": "${FirstName} ${LastName}"
+        "public_name": "${FirstName} ${LastName}"
       },
       "profile_map": {
           "trusted-users": {

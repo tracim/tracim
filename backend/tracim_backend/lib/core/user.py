@@ -101,6 +101,7 @@ COVER_RATIO = ImageRatio(35, 4)
 DEFAULT_AVATAR_SIZE = ImageSize(100, 100)
 DEFAULT_COVER_SIZE = ImageSize(1300, 150)
 SVG_MIMETYPE = "image/svg+xml"
+USERNAME_ALLOWED_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_."
 
 
 class UserApi(object):
@@ -145,6 +146,16 @@ class UserApi(object):
             user = self.base_query().filter(User.user_id == user_id).one()
         except NoResultFound as exc:
             raise UserDoesNotExist('User "{}" not found in database'.format(user_id)) from exc
+        return user
+
+    def get_one_by_external_id(self, external_id: str) -> User:
+        """Return the user identified by the given external_id."""
+        try:
+            user = self.base_query().filter(User.external_id == external_id).one()
+        except NoResultFound as exc:
+            raise UserDoesNotExist(
+                'User for external_id "{}" not found in database'.format(external_id)
+            ) from exc
         return user
 
     def get_one_by_login(self, login: str) -> User:
@@ -650,8 +661,6 @@ need to be in every workspace you include."
         password: str,
         login: str,
         ldap_connector: "Connector" = None,
-        saml_name: str = "",
-        saml_mail: str = "",
     ) -> User:
         """
         Authenticate user with email/username and password, raise AuthenticationFailed
@@ -660,19 +669,17 @@ need to be in every workspace you include."
         :param login: login or username of the user
         :param password: plaintext password of the user
         :param ldap_connector: ldap connector, enable ldap auth if provided
-        :param saml_mail: mail extracted from saml attributes
-        :param saml_name: name extracted from saml attributes
         :return: User who was authenticated.
         """
         for auth_type in self._config.AUTH_TYPES:
+            if auth_type == AuthType.SAML:
+                continue
             try:
                 return self._authenticate(
                     login=login,
                     password=password,
                     ldap_connector=ldap_connector,
                     auth_type=auth_type,
-                    saml_name=saml_name,
-                    saml_mail=saml_mail,
                 )
             except AuthenticationFailed as exc:
                 raise exc
@@ -684,8 +691,9 @@ need to be in every workspace you include."
     def saml_authenticate(
         self,
         user: typing.Optional[User],
-        user_id: str,
-        name: str,
+        external_id: str,
+        username: str,
+        public_name: str,
         mail: str,
         profile: Profile = Profile.USER,
     ) -> User:
@@ -695,34 +703,51 @@ need to be in every workspace you include."
         or UserAuthenticatedIsNotActive
         :param user to check, can be none if user not found, will try
          to create new user if none but ldap auth succeed
-        :param user_id: user_id of the user
-        :param name extracted from saml attributes
+        :param external_id
+        :param username of the user
+        :param public_name extracted from saml attributes
         :param mail extracted from saml attributes
         :param profile: user Profile extracted from saml attributes
         """
         auth_type = AuthType.SAML
 
-        # TODO - M.L - 2023/09/06 - Change this to get saml response and isolate attributes
-
         if not user:
             try:
-                user = self.get_one_by_login(user_id)
+                user = self.get_one_by_external_id(external_id)
+                # TODO - BS - 2023-11-10 - Update must be moved in SAMLSecurityPolicy._acs
+                #  The saml_authenticate method (through SAMLSecurityPolicy.authenticated_userid)
+                #  is called every times Request.authenticated_userid property is called.
+                #  So, this updated can be (and is) called when original code already flushed
+                #  the session. And result "session already flushed" error. See #6266
+
+                # NOTE - M.L. - 23-11-10 - Processing the username
+                #  to make sure it fits username restrictions
+                if username is not None:
+                    username = "".join(
+                        char if char in USERNAME_ALLOWED_CHARACTERS else "_" for char in username
+                    )
+                    username = username[: User.MAX_USERNAME_LENGTH].ljust(
+                        User.MIN_USERNAME_LENGTH, "_"
+                    )
+                user = self.update(
+                    user=user, email=mail, username=username, name=public_name, do_save=True
+                )
             except UserDoesNotExist:
                 _ = self.create_user(
+                    external_id=external_id,
                     email=mail,
-                    username=user_id,
-                    name=name,
+                    username=username,
+                    name=public_name,
                     auth_type=AuthType.SAML,
                     do_save=True,
                     do_notify=False,
                     profile=profile,
                 )
-                transaction.commit()
-                user = self.get_one_by_login(user_id)
+                user = self.get_one_by_external_id(external_id)
         if user and user.auth_type not in [auth_type, AuthType.UNKNOWN]:
             raise WrongAuthTypeForUser(
-                'User "{}" auth_type is {} not {}'.format(
-                    user_id, user.auth_type.value, auth_type.value
+                'User with external_id "{}" auth_type is {} not {}'.format(
+                    external_id, user.auth_type.value, auth_type.value
                 )
             )
 
@@ -742,8 +767,6 @@ need to be in every workspace you include."
         login: str,
         ldap_connector: "Connector" = None,
         auth_type: AuthType = AuthType.INTERNAL,
-        saml_name: str = "",
-        saml_mail: str = "",
     ) -> User:
         """
         Authenticate user with email/username and password, raise AuthenticationFailed
@@ -752,8 +775,6 @@ need to be in every workspace you include."
         :param password: plaintext password of the user
         :param ldap_connector: ldap connector, enable ldap auth if provided
         :param auth_type: auth type to test.
-        :param saml_mail: mail extracted from saml attributes
-        :param saml_name: name extracted from saml attributes
         :return: User who was authenticated.
         """
         user = None
@@ -768,8 +789,6 @@ need to be in every workspace you include."
                 raise MissingLDAPConnector()
             elif auth_type == AuthType.INTERNAL:
                 return self._internal_db_authenticate(user, login, password)
-            elif auth_type == AuthType.SAML:
-                return self.saml_authenticate(user, login, saml_name, saml_mail)
             else:
                 raise UnknownAuthType()
         except (
@@ -951,7 +970,7 @@ need to be in every workspace you include."
         if len(username) < User.MIN_USERNAME_LENGTH or len(username) > User.MAX_USERNAME_LENGTH:
             return False
         for char in username:
-            if char not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.":
+            if char not in USERNAME_ALLOWED_CHARACTERS:
                 return False
         return True
 
@@ -968,6 +987,7 @@ need to be in every workspace you include."
         allowed_space: typing.Optional[int] = None,
         username: str = None,
         do_save=True,
+        external_id: typing.Optional[str] = None,
     ) -> User:
         """Update given user instance with given parameters"""
         validator = TracimValidator()
@@ -1024,6 +1044,9 @@ need to be in every workspace you include."
         if timezone is not None:
             user.timezone = timezone
 
+        if external_id is not None:
+            user.external_id = external_id
+
         if lang is not None:
             user.lang = lang
 
@@ -1057,6 +1080,7 @@ need to be in every workspace you include."
         if user.auth_type and user.auth_type not in [
             AuthType.INTERNAL,
             AuthType.UNKNOWN,
+            AuthType.SAML,
         ]:
             raise ExternalAuthUserEmailModificationDisallowed(
                 "user {} is link to external auth {},"
@@ -1070,6 +1094,7 @@ need to be in every workspace you include."
         username: typing.Optional[str] = None,
         password: typing.Optional[str] = None,
         name: typing.Optional[str] = None,
+        external_id: typing.Optional[str] = None,
         timezone: str = "",
         lang: typing.Optional[str] = None,
         auth_type: AuthType = AuthType.UNKNOWN,
@@ -1085,12 +1110,15 @@ need to be in every workspace you include."
                 "Can't create user with invitation mail because notification are disabled."
             )
         new_user = self.create_minimal_user(email, username, profile, save_now=False)
+        if external_id is None:
+            external_id = new_user.user_id
         if allowed_space is None:
             allowed_space = self._config.LIMITATION__USER_DEFAULT_ALLOWED_SPACE
         self.update(
             user=new_user,
             name=name,
             username=username,
+            external_id=external_id,
             email=email,
             auth_type=auth_type,
             password=password,

@@ -277,8 +277,9 @@ Additional fields specific to tracim can be found in the `virtual_organization` 
             "displayed_name": "[Test] SSO Circle",
             "attribute_map": {
                 "user_id": "${UserID}",
+                "username": "${FirstName}",
                 "email": "${EmailAddress}",
-                "display_name": "${FirstName} ${LastName}"
+                "public_name": "${FirstName} ${LastName}"
             },
             "profile_map": {
                 "trusted-users": {
@@ -323,7 +324,7 @@ Additional fields specific to tracim can be found in the `virtual_organization` 
     - `match`: Regex pattern that will be tested against value, if there is a match, profile is set. The regex syntax is the one processed by python's `re` module. If no regex match, profile "user" is set.
       - ⚠ Since users can't have two profiles in tracim, be careful to not have values that can match multiple regexes
 
-Example: `user_id` maps to `${UserID}` received from the IdP.
+Example: `username` maps to `${FirstName}` received from the IdP.
 
 ## User sessions in Tracim
 
