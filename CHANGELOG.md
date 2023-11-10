@@ -1,5 +1,28 @@
 # Changelog
 
+## 4.7.0 / 2023-11-10
+
+### ✨ New Features
+
+- Support of SAML authentication
+- Editable user properties can now be read-only
+- Improve support of distributed deployment (redis, pushpin, elastic search)
+
+### ⚡️ Performance
+
+- Improvement in loading spaces and members in frontend
+
+### 🐛 Fixed Issues
+
+- Frontend:
+  - [#5676](https://github.com/tracim/tracim/issues/5676)
+  - [#3953](https://github.com/tracim/tracim/issues/3953)
+- Backend:
+  - [#6169](https://github.com/tracim/tracim/issues/6169)
+  - [#6233](https://github.com/tracim/tracim/issues/6233)
+- Backend/Frontend:
+  - [#6122](https://github.com/tracim/tracim/issues/6122)
+
 ## 4.6.2 / 2023-10-27
 
 ### 🐛 Fixed Issues
