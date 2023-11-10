@@ -796,8 +796,9 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 # elasticsearch is more effective but need an elasticsearch/opensearch server.
 ; search.engine = simple
 # elasticsearch configuration
-; search.elasticsearch.host = localhost
-; search.elasticsearch.port = 9200
+# to connect to a cluster, it is possible to provided multiple hosts/ports as a comma separated list
+; search.elasticsearch.host = localhost,
+; search.elasticsearch.port = 9200,
 # global elasticsearch timeout in seconds
 ; search.elasticsearch.request_timeout = 60
 

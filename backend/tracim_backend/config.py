@@ -34,6 +34,7 @@ from tracim_backend.lib.utils.utils import is_dir_readable
 from tracim_backend.lib.utils.utils import is_dir_writable
 from tracim_backend.lib.utils.utils import is_file_exist
 from tracim_backend.lib.utils.utils import is_file_readable
+from tracim_backend.lib.utils.utils import string_to_list
 from tracim_backend.lib.utils.utils import string_to_unique_item_list
 from tracim_backend.lib.utils.utils import validate_json
 from tracim_backend.models.auth import AuthType
@@ -967,11 +968,15 @@ class CFG(object):
         self.SEARCH__ELASTICSEARCH__INGEST__SIZE_LIMIT = int(
             self.get_raw_config("search.elasticsearch.ingest.size_limit", "52428800")
         )
-        self.SEARCH__ELASTICSEARCH__HOST = self.get_raw_config(
-            "search.elasticsearch.host", "localhost"
+        self.SEARCH__ELASTICSEARCH__HOST = string_to_list(
+            self.get_raw_config("search.elasticsearch.host", "localhost"),
+            cast_func=str,
+            separator=",",
         )
-        self.SEARCH__ELASTICSEARCH__PORT = int(
-            self.get_raw_config("search.elasticsearch.port", "9200")
+        self.SEARCH__ELASTICSEARCH__PORT = string_to_list(
+            self.get_raw_config("search.elasticsearch.port", "9200"),
+            cast_func=int,
+            separator=",",
         )
         self.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT = int(
             self.get_raw_config("search.elasticsearch.request_timeout", "60")
@@ -1486,6 +1491,9 @@ class CFG(object):
                 self.SEARCH__ELASTICSEARCH__INDEX_ALIAS_PREFIX,
                 when_str="if elasticsearch search feature is enabled",
             )
+            assert len(self.SEARCH__ELASTICSEARCH__HOST) == len(
+                self.SEARCH__ELASTICSEARCH__PORT
+            ), "There must be the same number of elasticsearch hosts and elasticsearch ports"
 
     def _check_webdav_config_validity(self):
         self.check_mandatory_param("WEBDAV__BASE_URL", self.WEBDAV__BASE_URL)
