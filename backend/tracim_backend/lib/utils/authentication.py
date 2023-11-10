@@ -26,6 +26,7 @@ from saml2.client import Saml2Client
 from saml2.config import Config as Saml2Config
 from saml2.metadata import create_metadata_string
 from saml2.validate import ResponseLifetimeExceed
+from sqlalchemy.exc import InvalidRequestError
 import time
 import typing
 from zope.interface import implementer
@@ -33,7 +34,10 @@ from zope.interface import implementer
 from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.config import SamLIdPConfig
 from tracim_backend.exceptions import AuthenticationFailed
+from tracim_backend.exceptions import TracimValidationFailed
+from tracim_backend.exceptions import UserAuthenticatedIsNotActive
 from tracim_backend.exceptions import UserDoesNotExist
+from tracim_backend.exceptions import WrongAuthTypeForUser
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models.auth import AuthType
@@ -168,23 +172,40 @@ class SAMLSecurityPolicy:
         user_api = UserApi(None, request.dbsession, self.app_config)
 
         try:
-            user = user_api.saml_authenticate(
-                user=None,
-                external_id=saml_user_id,
-                username=request.session.get("saml_username"),
-                public_name=request.session.get("saml_public_name"),
-                mail=request.session.get("saml_email"),
-                profile=request.session.get("saml_user_profile"),
-            )
+            # FIXME - BS - 2023-11-10 - Remove this noautoflush when UserApi.update moved in SAMLSecurityPolicy._acs
+            # The saml_authenticate method (through SAMLSecurityPolicy.authenticated_userid) is called
+            # every times Request.authenticated_userid property is called. So, this updated can be (and is)
+            # called when original code already flushed the session. And result "session already flushed" error.
+            with request.dbsession.no_autoflush:
+                user = user_api.saml_authenticate(
+                    user=None,
+                    external_id=saml_user_id,
+                    username=request.session.get("saml_username"),
+                    public_name=request.session.get("saml_public_name"),
+                    mail=request.session.get("saml_email"),
+                    profile=request.session.get("saml_user_profile"),
+                )
+
+            self.remember(request, user.user_id)
+            request.set_user(user)
+            return user.user_id
+        except (
+            UserDoesNotExist,
+            WrongAuthTypeForUser,
+            UserAuthenticatedIsNotActive,
+            TracimValidationFailed,
+        ) as e:
+            logging.getLogger().warning(f"An error occurred during saml auth: {e}")
+        except InvalidRequestError as e:
+            # FIXME - BS - 2023-11-10 - Remove this except when UserApi.update moved in SAMLSecurityPolicy._acs
+            # The saml_authenticate method (through SAMLSecurityPolicy.authenticated_userid) is called
+            # every times Request.authenticated_userid property is called. So, this updated can be (and is)
+            # called when original code already flushed the session. And result "session already flushed" error.
+            logging.getLogger().warning(f"An error occurred during saml auth: {e}")
         except Exception as e:
-            logging.getLogger().warning("An error occurred: ", exc_info=e)
-            self.forget(request)
-            return None
-        print(f"### BEFORE SESSION USERNAME IS {user.user_id}-{user.username}")
-        self.remember(request, user.user_id)
-        request.set_user(user)
-        print(f"### AFTER SESSION USERNAME IS {user.user_id}-{user.username}")
-        return user.user_id
+            logging.getLogger().error("An error occurred: ", exc_info=e)
+
+        self.forget(request)
 
     def permits(self, request, context, permission):
         saml_expiry = request.session.get("saml_expiry")
@@ -208,7 +229,7 @@ class SAMLSecurityPolicy:
                 del request.session["saml_public_name"]
                 del request.session["saml_user_profile"]
                 del request.session["saml_expiry"]
-            except Exception:
+            except KeyError:
                 pass
         self._session_helper.forget(request, **kw)
         return []

@@ -714,12 +714,13 @@ need to be in every workspace you include."
         if not user:
             try:
                 user = self.get_one_by_external_id(external_id)
-                try:
-                    user = self.update(
-                        user=user, email=mail, username=username, name=public_name, do_save=True
-                    )
-                except InvalidRequestError:
-                    pass
+                # FIXME - BS - 2023-11-10 - Update must be moved in SAMLSecurityPolicy._acs
+                # The saml_authenticate method (through SAMLSecurityPolicy.authenticated_userid) is called
+                # every times Request.authenticated_userid property is called. So, this updated can be (and is)
+                # called when original code already flushed the session. And result "session already flushed" error.
+                user = self.update(
+                    user=user, email=mail, username=username, name=public_name, do_save=True
+                )
             except UserDoesNotExist:
                 _ = self.create_user(
                     external_id=external_id,
@@ -1049,9 +1050,7 @@ need to be in every workspace you include."
             user.allowed_space = allowed_space
 
         if do_save:
-            print(f"### BEFORE SAVE USERNAME IS {user.user_id}-{user.username}")
             self.save(user)
-            print(f"### AFTER SAVE USERNAME IS {user.user_id}-{user.username}")
 
         return user
 
