@@ -714,11 +714,11 @@ need to be in every workspace you include."
         if not user:
             try:
                 user = self.get_one_by_external_id(external_id)
-                # FIXME - BS - 2023-11-10 - Update must be moved in SAMLSecurityPolicy._acs
+                # TODO - BS - 2023-11-10 - Update must be moved in SAMLSecurityPolicy._acs
                 #  The saml_authenticate method (through SAMLSecurityPolicy.authenticated_userid)
                 #  is called every times Request.authenticated_userid property is called.
                 #  So, this updated can be (and is) called when original code already flushed
-                #  the session. And result "session already flushed" error.
+                #  the session. And result "session already flushed" error. See #6266
 
                 # NOTE - M.L. - 23-11-10 - Processing the username
                 #  to make sure it fits username restrictions

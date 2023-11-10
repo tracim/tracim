@@ -172,12 +172,12 @@ class SAMLSecurityPolicy:
 
         user_api = UserApi(None, request.dbsession, self.app_config)
         try:
-            # FIXME - BS - 2023-11-10 - Remove this noautoflush when
+            # TODO - BS - 2023-11-10 - Remove this noautoflush when
             #  UserApi.update moved in SAMLSecurityPolicy._acs
             #  The saml_authenticate method (through SAMLSecurityPolicy.authenticated_userid)
             #  is called every times Request.authenticated_userid property is called.
             #  So, this updated can be (and is) called when original code
-            #  already flushed the session. And result "session already flushed" error.
+            #  already flushed the session. And result "session already flushed" error. See #6266
             with request.dbsession.no_autoflush:
                 user = user_api.saml_authenticate(
                     user=None,
@@ -199,10 +199,12 @@ class SAMLSecurityPolicy:
         ) as e:
             logging.getLogger().warning(f"An error occurred during saml auth: {e}")
         except InvalidRequestError as e:
-            # FIXME - BS - 2023-11-10 - Remove this except when UserApi.update moved in SAMLSecurityPolicy._acs
-            # The saml_authenticate method (through SAMLSecurityPolicy.authenticated_userid) is called
-            # every times Request.authenticated_userid property is called. So, this updated can be (and is)
-            # called when original code already flushed the session. And result "session already flushed" error.
+            # TODO - BS - 2023-11-10 - Remove this except when UserApi.update moved in
+            #  SAMLSecurityPolicy._acs The saml_authenticate method (through
+            #  SAMLSecurityPolicy.authenticated_userid) is called every times
+            #  Request.authenticated_userid property is called. So, this updated can be (and is)
+            #  called when original code already flushed the session. And result "session already
+            #  flushed" error. See #6266
             logging.getLogger().warning(f"An error occurred during saml auth: {e}")
         except Exception as e:
             logging.getLogger().error("An error occurred: ", exc_info=e)
