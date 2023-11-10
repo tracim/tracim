@@ -1306,6 +1306,15 @@ class CFG(object):
             "LIVE_MESSAGES__CONTROL_ZMQ_URI", self.LIVE_MESSAGES__CONTROL_ZMQ_URI
         )
 
+        if len(self.LIVE_MESSAGES__PUSH_ZMQ_URI) > 0:
+            assert len(self.LIVE_MESSAGES__PUSH_ZMQ_URI) == len(
+                self.LIVE_MESSAGES__CONTROL_ZMQ_URI
+            ), "PUSH ZMQ URI must either be empty or of the same length as CONTROL ZMQ URI"
+        if len(self.LIVE_MESSAGES__PUB_ZMQ_URI) > 0:
+            assert len(self.LIVE_MESSAGES__PUB_ZMQ_URI) == len(
+                self.LIVE_MESSAGES__CONTROL_ZMQ_URI
+            ), "PUB ZMQ URI must either be empty or of the same length as CONTROL ZMQ URI"
+
         self.check_mandatory_param(
             "LIVE_MESSAGES__STATS_ZMQ_URI", self.LIVE_MESSAGES__STATS_ZMQ_URI
         )
