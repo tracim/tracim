@@ -38,6 +38,7 @@ from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UserAuthenticatedIsNotActive
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import WrongAuthTypeForUser
+from tracim_backend.lib.core.user import ALLOWED_CHARACTERS
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models.auth import AuthType
@@ -169,6 +170,11 @@ class SAMLSecurityPolicy:
         if saml_expiry is None or saml_expiry <= int(time.time()):
             return None
 
+        # NOTE - M.L. - 23-11-10 - Processing the username to make sure it fits username restrictions
+        username = request.session.get("saml_username")
+        if username is not None:
+            username = "".join(char if char in ALLOWED_CHARACTERS else "_" for char in username)
+            username = username[: User.MAX_USERNAME_LENGTH].ljust(User.MIN_USERNAME_LENGTH, "_")
         user_api = UserApi(None, request.dbsession, self.app_config)
 
         try:
@@ -180,7 +186,7 @@ class SAMLSecurityPolicy:
                 user = user_api.saml_authenticate(
                     user=None,
                     external_id=saml_user_id,
-                    username=request.session.get("saml_username"),
+                    username=username,
                     public_name=request.session.get("saml_public_name"),
                     mail=request.session.get("saml_email"),
                     profile=request.session.get("saml_user_profile"),
