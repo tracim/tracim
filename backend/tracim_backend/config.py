@@ -1491,6 +1491,9 @@ class CFG(object):
                 self.SEARCH__ELASTICSEARCH__INDEX_ALIAS_PREFIX,
                 when_str="if elasticsearch search feature is enabled",
             )
+            assert len(self.SEARCH__ELASTICSEARCH__HOST) == len(
+                self.SEARCH__ELASTICSEARCH__PORT
+            ), "There must be the same number of elasticsearch hosts and elasticsearch ports"
 
     def _check_webdav_config_validity(self):
         self.check_mandatory_param("WEBDAV__BASE_URL", self.WEBDAV__BASE_URL)
