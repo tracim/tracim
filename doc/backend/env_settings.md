@@ -90,6 +90,8 @@ To update the list below you will need to:
 | TRACIM_JOBS__ASYNC__REDIS__PORT                                           | jobs.async.redis.port                                          | JOBS__ASYNC__REDIS__PORT                                           |
 | TRACIM_JOBS__ASYNC__REDIS__DB                                             | jobs.async.redis.db                                            | JOBS__ASYNC__REDIS__DB                                             |
 | TRACIM_LIVE_MESSAGES__CONTROL_ZMQ_URI                                     | live_messages.control_zmq_uri                                  | LIVE_MESSAGES__CONTROL_ZMQ_URI                                     |
+| TRACIM_LIVE_MESSAGES__PUSH_ZMQ_URI                                        | live_messages.push_zmq_uri                                     | LIVE_MESSAGES__PUSH_ZMQ_URI                                        |
+| TRACIM_LIVE_MESSAGES__PUB_ZMQ_URI                                         | live_messages.pub_zmq_uri                                      | LIVE_MESSAGES__PUB_ZMQ_URI                                         |
 | TRACIM_LIVE_MESSAGES__STATS_ZMQ_URI                                       | live_messages.stats_zmq_uri                                    | LIVE_MESSAGES__STATS_ZMQ_URI                                       |
 | TRACIM_LIVE_MESSAGES__BLOCKING_PUBLISH                                    | live_messages.blocking_publish                                 | LIVE_MESSAGES__BLOCKING_PUBLISH                                    |
 | TRACIM_EMAIL__NOTIFICATION__TYPE_ON_INVITATION                            | email.notification.type_on_invitation                          | EMAIL__NOTIFICATION__TYPE_ON_INVITATION                            |
