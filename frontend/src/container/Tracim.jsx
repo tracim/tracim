@@ -118,7 +118,7 @@ export class Tracim extends React.Component {
       displayedUserId: 0,
       userCall: undefined,
       unansweredCallTimeoutId: -1
-    };
+    }
 
     initializeCustomElements('html-mention', HTMLMention)
 

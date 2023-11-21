@@ -5,10 +5,6 @@ import classnames from 'classnames'
 import { DEFAULT_ROLE_LIST } from 'tracim_frontend_lib'
 import { store } from '../../store.js'
 
-import {
-  getUser
-} from '../../action-creator.async.js'
-
 const MentionWrapped = props => {
   return (
     <Provider store={store}>

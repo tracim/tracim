@@ -10,7 +10,7 @@ import { serialize } from 'tracim_frontend_lib'
 import { serializeUserProps } from './user.js'
 const initialState = []
 
-export function knownMemberList (state=initialState, action) {
+export function knownMemberList (state = initialState, action) {
   switch (action.type) {
     case SET_KNOWN_MEMBER_LIST:
       return action.knownMemberList.map(km => serialize(km, serializeUserProps))
@@ -23,7 +23,7 @@ export function knownMemberList (state=initialState, action) {
 
     case `${UPDATE}/${USER}`:
       return state.map(km => km.userId === action.newUser.user_id
-        ? {...km, ...serialize(action.newUser, serializeUserProps)}
+        ? { ...km, ...serialize(action.newUser, serializeUserProps) }
         : km
       )
 
