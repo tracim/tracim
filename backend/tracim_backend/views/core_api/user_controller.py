@@ -224,7 +224,8 @@ class UserController(Controller):
             config=app_config,
         )
         return [
-            wapi.get_user_role_workspace_with_context(role) for role in request.candidate_user.roles
+            wapi.get_user_role_workspace_with_context(role)
+            for role in request.candidate_user.get_active_roles()
         ]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
