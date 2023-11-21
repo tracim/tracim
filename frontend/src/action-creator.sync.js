@@ -9,6 +9,8 @@ export const APPEND = 'Append'
 export const RESET = 'Reset'
 export const MOVE = 'Move'
 
+export const LIST = 'LIST'
+
 export const TIMEZONE = 'Timezone'
 export const setTimezone = timezone => ({ type: `${SET}/${TIMEZONE}`, timezone })
 
@@ -113,7 +115,8 @@ export const updateWorkspaceDetail = workspaceDetail => ({ type: `${UPDATE}/${WO
 export const WORKSPACE_LOADED = `${WORKSPACE}/Loaded`
 export const setWorkspaceLoaded = () => ({ type: `${SET}/${WORKSPACE_LOADED}` })
 
-export const WORKSPACE_MEMBER = `${WORKSPACE}/Member`
+const MEMBER = 'Member'
+export const WORKSPACE_MEMBER = `${WORKSPACE}/${MEMBER}`
 export const WORKSPACE_MEMBER_LIST = `${WORKSPACE_MEMBER}/List`
 export const setWorkspaceMemberList = workspaceMemberList => ({ type: `${SET}/${WORKSPACE_MEMBER_LIST}`, workspaceMemberList })
 export const WORKSPACE_MEMBER_ADD = `${WORKSPACE_MEMBER}/${ADD}`
@@ -129,7 +132,15 @@ export const updateWorkspaceMember = (user, workspaceId, member) => ({
   member: { user: user, ...member },
   workspaceId
 })
-export const removeWorkspaceMember = (memberId, workspaceId) => ({ type: `${REMOVE}/${WORKSPACE_MEMBER}`, memberId, workspaceId })
+export const removeWorkspaceMember = (memberId, workspaceId) => ({
+  type: `${REMOVE}/${WORKSPACE_MEMBER}`,
+  memberId,
+  workspaceId
+})
+
+export const KNOWN_MEMBER = `Known${MEMBER}`
+export const SET_KNOWN_MEMBER_LIST = `${SET}/${KNOWN_MEMBER}/${LIST}`
+export const setKnownMemberList = knownMemberList => ({ type: SET_KNOWN_MEMBER_LIST, knownMemberList })
 
 export const WORKSPACE_READ_STATUS = `${WORKSPACE}/ReadStatus`
 export const WORKSPACE_READ_STATUS_LIST = `${WORKSPACE_READ_STATUS}/List`
@@ -249,7 +260,6 @@ export const removeWorkspaceSubscription = subscription => ({ type: `${REMOVE}/$
 export const updateWorkspaceSubscription = subscription => ({ type: `${UPDATE}/${WORKSPACE_SUBSCRIPTION}`, subscription })
 
 export const WORKSPACE_ACTIVITY = `${WORKSPACE}/Activity`
-export const LIST = 'LIST'
 export const EVENT_LIST = 'EVENT_LIST'
 export const setWorkspaceActivityList = activityList => ({ type: `${SET}/${WORKSPACE_ACTIVITY}/${LIST}`, activityList })
 export const setWorkspaceActivityNextPage = (hasNextPage, nextPageToken) => ({

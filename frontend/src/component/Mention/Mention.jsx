@@ -31,8 +31,15 @@ const calculateUserMention = (props) => {
     return mention
   }
 
+  let user
+  user = props.knownMemberList.find(km => km.userId === userId)
+  if (user) {
+    mention.text = user.username
+    return mention
+  }
+
   // Fetch from current space
-  const user = props.currentWorkspace.memberList.find(m => m.id === userId)
+  user = props.currentWorkspace.memberList.find(m => m.id === userId)
   if (user) {
     mention.text = user.username
     return mention
@@ -47,18 +54,20 @@ const calculateUserMention = (props) => {
     }
   }
 
+  // DEPRECATED - CH - 2023-11-21 - I don't think this is doing anything since when the async function executes
+  // its callback, the parent function has already returned
   // Fetch from API (can't use async since it's used to render)
-  props.dispatch(getUser(userId)).then(
-    (response) => {
-      if (response.status === 200) {
-        const user = response.json
-        mention.text = user.username
-      }
-    },
-    (error) => {
-      console.error('Error in Mention.jsx, fetching from API went wrong: ', error.message)
-    }
-  )
+  // props.dispatch(getUser(userId)).then(
+  //   (response) => {
+  //     if (response.status === 200) {
+  //       const user = response.json
+  //       mention.text = user.username
+  //     }
+  //   },
+  //   (error) => {
+  //     console.error('Error in Mention.jsx, fetching from API went wrong: ', error.message)
+  //   }
+  // )
   return mention
 }
 
@@ -121,9 +130,9 @@ export const Mention = props => {
 }
 
 const mapStateToProps = (
-  { currentWorkspace, system, user, workspaceList }
+  { currentWorkspace, system, user, workspaceList, knownMemberList }
 ) => (
-  { currentWorkspace, system, user, workspaceList }
+  { currentWorkspace, system, user, workspaceList, knownMemberList }
 )
 const ConnectedMention = translate()(connect(mapStateToProps)(Mention))
 

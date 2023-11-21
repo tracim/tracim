@@ -25,7 +25,7 @@ import {
   handleFetchResult
 } from 'tracim_frontend_lib'
 import {
-  getMyselfKnownMember,
+  getMyselfKnownMemberExclusive,
   getSubscriptions,
   postWorkspaceMember,
   deleteWorkspaceMember,
@@ -231,7 +231,7 @@ export class Dashboard extends React.Component {
 
   handleSearchUser = async personalDataToSearch => {
     const { props } = this
-    const fetchUserKnownMemberList = await props.dispatch(getMyselfKnownMember(personalDataToSearch, props.currentWorkspace.id))
+    const fetchUserKnownMemberList = await props.dispatch(getMyselfKnownMemberExclusive(personalDataToSearch, props.currentWorkspace.id))
     switch (fetchUserKnownMemberList.status) {
       case 200: this.setState({ searchedKnownMemberList: fetchUserKnownMemberList.json }); break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('known members list')}`, 'warning')); break

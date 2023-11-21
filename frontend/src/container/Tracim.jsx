@@ -67,7 +67,8 @@ import {
   getAccessibleWorkspaces,
   putSetIncomingUserCallState,
   putSetOutgoingUserCallState,
-  postCreateUserCall
+  postCreateUserCall,
+  getMyselfKnownMemberInclusive
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -83,7 +84,8 @@ import {
   setUnreadMentionCount,
   setUnreadNotificationCount,
   setHeadTitle,
-  setAccessibleWorkspaceList
+  setAccessibleWorkspaceList,
+  setKnownMemberList
 } from '../action-creator.sync.js'
 import HTMLMention from '../component/Mention/HTMLMention.js'
 import NotificationWall from './NotificationWall.jsx'
@@ -116,7 +118,7 @@ export class Tracim extends React.Component {
       displayedUserId: 0,
       userCall: undefined,
       unansweredCallTimeoutId: -1
-    }
+    };
 
     initializeCustomElements('html-mention', HTMLMention)
 
@@ -340,7 +342,7 @@ export class Tracim extends React.Component {
   }
 
   handleRefreshWorkspaceListThenRedirect = async data => { // Côme - 2018/09/28 - @fixme this is a hack to force the redirection AFTER the workspaceList is loaded
-    await this.loadWorkspaceLists()
+    await this.loadWorkspaceList()
     this.props.history.push(data.url)
   }
 
@@ -380,7 +382,7 @@ export class Tracim extends React.Component {
         i18n.changeLanguage(fetchUser.lang)
 
         this.loadAppConfig()
-        this.loadWorkspaceLists()
+        this.loadWorkspaceList()
         this.loadNotificationNotRead(fetchUser.user_id)
         this.loadUserConfiguration(fetchUser.user_id)
 
@@ -442,12 +444,15 @@ export class Tracim extends React.Component {
     }
   }
 
-  loadWorkspaceLists = async () => {
+  loadWorkspaceList = async () => {
     const { props } = this
     const fetchGetWorkspaceList = await props.dispatch(getMyselfUserRoleWorkspaceList())
 
     if (fetchGetWorkspaceList.status !== 200) return false
     props.dispatch(setRoleWorkspaceList(fetchGetWorkspaceList.json))
+
+    this.loadKnownMemberList(fetchGetWorkspaceList.json)
+
     const fetchAccessibleWorkspaceList = await props.dispatch(
       getAccessibleWorkspaces(props.user.userId)
     )
@@ -456,6 +461,24 @@ export class Tracim extends React.Component {
 
     props.dispatch(setAccessibleWorkspaceList(fetchAccessibleWorkspaceList.json))
 
+    return true
+  }
+
+  loadKnownMemberList = async (workspaceList) => {
+    const { props } = this
+    try {
+      const fetchGetKnownMemberList = await props.dispatch(getMyselfKnownMemberInclusive(
+        '',
+        workspaceList.map(s => s.workspace_id)
+      ))
+
+      if (fetchGetKnownMemberList.status !== 200) return false
+
+      props.dispatch(setKnownMemberList(fetchGetKnownMemberList.json))
+    } catch (e) {
+      console.error('Error in loadKnownMemberList', e)
+      return false
+    }
     return true
   }
 
