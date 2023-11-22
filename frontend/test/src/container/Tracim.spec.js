@@ -160,10 +160,10 @@ describe('<Tracim />', () => {
       })
     })
 
-    describe('loadWorkspaceLists', () => {
-      it('setWorkspaceListCallBack should be called when loadWorkspaceLists() is called', (done) => {
+    describe('loadWorkspaceList', () => {
+      it('setWorkspaceListCallBack should be called when loadWorkspaceList() is called', (done) => {
         mockGetMyselfWorkspaceList200(FETCH_CONFIG.apiUrl, false, workspaceList.workspaceList)
-        wrapperInstance.loadWorkspaceLists().then(() => {
+        wrapperInstance.loadWorkspaceList().then(() => {
           expect(setWorkspaceListCallBack.called).to.equal(true)
         }).then(done, done)
       })
