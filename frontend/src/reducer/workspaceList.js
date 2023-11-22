@@ -48,6 +48,20 @@ export const serializeRole = role => {
     memberList: [role].map(serializeMember)
   }
 }
+function addWorkspaceSetting (setting, user, workspace, workspaceList) {
+  const settings = {
+    ...setting,
+    workspace: workspace,
+    workspace_id: workspace.workspace_id,
+    user: user,
+    user_id: user.user_id
+  }
+  const spaceList = [
+    ...workspaceList,
+    serializeRole(settings)
+  ]
+  return spaceList
+}
 
 export function workspaceList (state = [], action, lang) {
   switch (action.type) {
@@ -58,18 +72,13 @@ export function workspaceList (state = [], action, lang) {
       return action.workspaceList.map(serializeWorkspace)
 
     case `${ADD}/${ROLE_WORKSPACE_LIST}` : {
-      const setting = {
-        ...action.setting,
-        workspace: action.workspace,
-        workspace_id: action.workspace.workspace_id,
-        user: action.user,
-        user_id: action.user.user_id
-      }
-      const spaceList = [
-        ...state,
-        serializeRole(setting)
-      ]
-      return sortListByMultipleCriteria(spaceList, [SORT_BY.LABEL, SORT_BY.ID], SORT_ORDER.ASCENDING, lang)
+      const newWorkspaceList = addWorkspaceSetting(action.setting, action.user, action.workspace, state)
+      return sortListByMultipleCriteria(newWorkspaceList, [SORT_BY.LABEL, SORT_BY.ID], SORT_ORDER.ASCENDING, lang)
+    }
+
+    case `${UPDATE}/${ROLE_WORKSPACE_LIST}` : {
+      const newWorkspaceList = addWorkspaceSetting(action.setting, action.user, action.workspace, state.filter(ws => ws.id !== action.workspace.workspace_id))
+      return sortListByMultipleCriteria(newWorkspaceList, [SORT_BY.LABEL, SORT_BY.ID], SORT_ORDER.ASCENDING, lang)
     }
 
     case `${REMOVE}/${WORKSPACE_LIST}`:

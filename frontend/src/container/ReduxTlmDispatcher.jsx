@@ -16,8 +16,8 @@ import {
   newFlashMessage,
   addNotification,
   addWorkspaceContentList,
-  addWorkspaceList,
   addRoleWorkspaceList,
+  updateRoleWorkspaceList,
   addWorkspaceMember,
   deleteWorkspaceContentList,
   removeWorkspaceMember,
@@ -164,27 +164,21 @@ export class ReduxTlmDispatcher extends React.Component {
 
   handleMemberCreated = data => {
     const { props } = this
-    if (props.user.userId === data.fields.user.user_id || props.workspaceList.find(space => space.id === data.fields.workspace.workspace_id)) {
-      // NOTE - RJ & MP - 2022-02-18
-      // When receiving a member created TLM, it is possible that we haven't added the workspace itself yet
-      // In this case, addWorkspaceMember does nothing.
-      // We actually noticed that the member created TLM arrives before the workspace created TLM.
-      // Let's add the workpace first to avoid this.
-      // See https://github.com/tracim/tracim/issues/5451
-      props.dispatch(addWorkspaceList([data.fields.workspace]))
 
-      props.dispatch(addWorkspaceMember(data.fields.user, data.fields.workspace.workspace_id, data.fields.member))
-      if (props.user.userId === data.fields.user.user_id) {
-        props.dispatch(addRoleWorkspaceList(data.fields.user, data.fields.member, data.fields.workspace))
-        props.dispatch(removeAccessibleWorkspace(data.fields.workspace))
-      }
-      this.handleNotification(data)
-    }
+    if (props.user.userId === data.fields.user.user_id) {
+      props.dispatch(addRoleWorkspaceList(data.fields.user, data.fields.member, data.fields.workspace))
+      props.dispatch(removeAccessibleWorkspace(data.fields.workspace))
+    } else if (!props.workspaceList.find(space => space.id === data.fields.workspace.workspace_id)) { return }
+
+    props.dispatch(addWorkspaceMember(data.fields.user, data.fields.workspace.workspace_id, data.fields.member))
+    this.handleNotification(data)
   }
 
   handleMemberModified = data => {
     const { props } = this
-    props.dispatch(addWorkspaceList([data.fields.workspace]))
+    if (props.user.userId === data.fields.user.user_id) {
+      props.dispatch(updateRoleWorkspaceList(data.fields.user, data.fields.member, data.fields.workspace))
+    }
     props.dispatch(updateWorkspaceMember(data.fields.user, data.fields.workspace.workspace_id, data.fields.member))
     this.handleNotification(data)
   }

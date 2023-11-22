@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import workspaceList, { serializeWorkspaceListProps } from '../../../src/reducer/workspaceList.js'
 import {
   ADD,
-  addWorkspaceList, addWorkspaceMember,
+  addWorkspaceMember,
   REMOVE,
   removeWorkspace, removeWorkspaceMember,
   SET,
@@ -10,6 +10,8 @@ import {
   UPDATE,
   updateWorkspaceDetail,
   updateWorkspaceMember,
+  ROLE_WORKSPACE_LIST,
+  addRoleWorkspaceList,
   WORKSPACE_DETAIL,
   WORKSPACE_LIST, WORKSPACE_MEMBER
 } from '../../../src/action-creator.sync'
@@ -20,6 +22,7 @@ import {
   serializeSidebarEntryProps
 } from '../../../src/reducer/currentWorkspace'
 import { globalManagerFromApi } from '../../fixture/user/globalManagerFromApi'
+import { globalSetting } from '../../fixture/user/globalSetting'
 
 describe('workspaceList reducer', () => {
   describe('actions', () => {
@@ -62,8 +65,8 @@ describe('workspaceList reducer', () => {
       })
     })
 
-    describe(`${ADD}/${WORKSPACE_LIST}`, () => {
-      const rez = workspaceList(initialState, addWorkspaceList([firstWorkspaceFromApi]))
+    describe(`${ADD}/${ROLE_WORKSPACE_LIST}`, () => {
+      const rez = workspaceList(initialState, addRoleWorkspaceList(globalManagerFromApi, globalSetting, firstWorkspaceFromApi))
 
       it('should return a workspace list with the workspace added', () => {
         expect(rez).to.deep.equal([
