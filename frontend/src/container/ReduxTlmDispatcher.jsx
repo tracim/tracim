@@ -17,6 +17,7 @@ import {
   addNotification,
   addWorkspaceContentList,
   addWorkspaceList,
+  addRoleWorkspaceList,
   addWorkspaceMember,
   deleteWorkspaceContentList,
   removeWorkspaceMember,
@@ -174,6 +175,7 @@ export class ReduxTlmDispatcher extends React.Component {
 
       props.dispatch(addWorkspaceMember(data.fields.user, data.fields.workspace.workspace_id, data.fields.member))
       if (props.user.userId === data.fields.user.user_id) {
+        props.dispatch(addRoleWorkspaceList(data.fields.user, data.fields.member, data.fields.workspace))
         props.dispatch(removeAccessibleWorkspace(data.fields.workspace))
       }
       this.handleNotification(data)

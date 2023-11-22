@@ -100,7 +100,7 @@ const ROLE = 'Role'
 // See: https://github.com/tracim/tracim/issues/6252
 export const ROLE_WORKSPACE_LIST = `${ROLE}/${WORKSPACE}/List`
 export const setRoleWorkspaceList = workspaceList => ({ type: `${SET}/${ROLE_WORKSPACE_LIST}`, workspaceList })
-export const addRoleWorkspaceList = workspaceList => ({ type: `${ADD}/${ROLE_WORKSPACE_LIST}`, workspaceList })
+export const addRoleWorkspaceList = (user, setting, workspace) => ({ type: `${ADD}/${ROLE_WORKSPACE_LIST}`, user, setting, workspace })
 export const removeRoleWorkspace = workspace => ({ type: `${REMOVE}/${ROLE_WORKSPACE_LIST}`, workspace })
 
 export const USER_ROLE_WORKSPACE_LIST = `${USER}/${ROLE_WORKSPACE_LIST}`

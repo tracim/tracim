@@ -57,12 +57,17 @@ export function workspaceList (state = [], action, lang) {
     case `${SET}/${WORKSPACE_LIST}`:
       return action.workspaceList.map(serializeWorkspace)
 
-    case `${ADD}/${WORKSPACE_LIST}`: {
+    case `${ADD}/${ROLE_WORKSPACE_LIST}` : {
+      const setting = {
+        ...action.setting,
+        workspace: action.workspace,
+        workspace_id: action.workspace.workspace_id,
+        user: action.user,
+        user_id: action.user.user_id
+      }
       const spaceList = [
         ...state,
-        ...action.workspaceList
-          .filter(w => !state.some(s => s.id === w.workspace_id))
-          .map(serializeWorkspace)
+        serializeRole(setting)
       ]
       return sortListByMultipleCriteria(spaceList, [SORT_BY.LABEL, SORT_BY.ID], SORT_ORDER.ASCENDING, lang)
     }
@@ -74,7 +79,7 @@ export function workspaceList (state = [], action, lang) {
       if (!state.some(ws => ws.id === action.workspaceDetail.workspace_id)) return state
       const spaceList = state.map(
         ws => ws.id === action.workspaceDetail.workspace_id
-          ? serializeWorkspace(action.workspaceDetail) // Error here ; members is undefined
+          ? serializeWorkspace(action.workspaceDetail)
           : ws
       )
       return sortListByMultipleCriteria(spaceList, [SORT_BY.LABEL, SORT_BY.ID], SORT_ORDER.ASCENDING, lang)
