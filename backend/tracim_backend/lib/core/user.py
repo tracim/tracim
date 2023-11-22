@@ -718,9 +718,7 @@ need to be in every workspace you include."
                 username = "".join(
                     char if char in USERNAME_ALLOWED_CHARACTERS else "_" for char in username
                 )
-                username = username[: User.MAX_USERNAME_LENGTH].ljust(
-                    User.MIN_USERNAME_LENGTH, "_"
-                )
+                username = username[: User.MAX_USERNAME_LENGTH].ljust(User.MIN_USERNAME_LENGTH, "_")
             try:
                 user = self.get_one_by_external_id(external_id)
                 # TODO - BS - 2023-11-10 - Update must be moved in SAMLSecurityPolicy._acs
