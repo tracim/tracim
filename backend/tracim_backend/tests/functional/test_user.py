@@ -4129,6 +4129,100 @@ class TestKnownMembersEndpoint(object):
         assert res[1]["public_name"] == test_user2.display_name
         assert res[1]["has_avatar"] is True
 
+    def test_api__get_known_users__ok_200__no_query_parameters(
+        self, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
+    ):
+        uapi = user_api_factory.get()
+        profile = Profile.USER
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        test_user2 = uapi.create_user(
+            email="test2@test2.test2",
+            password="password",
+            name="bob2",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        test_user3 = uapi.create_user(
+            email="test3@test3.test3",
+            password="password",
+            name="bob3",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        uapi.save(test_user2)
+        uapi.save(test_user3)
+
+        workspace1 = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            test_user,
+            workspace1,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            test_user2,
+            workspace1,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        transaction.commit()
+        workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
+        role_api = role_api_factory.get()
+        role_api.create_one(
+            test_user,
+            workspace2,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            test_user3,
+            workspace2,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        transaction.commit()
+
+        user_id = int(test_user3.user_id)
+
+        web_testapp.authorization = ("Basic", (test_user3.email, "password"))
+        res = web_testapp.get(
+            "/api/users/{user_id}/known_members".format(user_id=user_id),
+            status=200,
+        )
+        res = res.json_body
+
+        print(res)
+        assert len(res) == 3
+
+        assert res[1]["user_id"] == test_user.user_id
+        assert res[1]["public_name"] == test_user.display_name
+        assert res[1]["has_avatar"] is True
+        assert len(res[1]["workspace_ids"]) == 1
+        assert workspace2.workspace_id in res[1]["workspace_ids"]
+
+        assert res[2]["user_id"] == test_user3.user_id
+        assert res[2]["public_name"] == test_user3.display_name
+        assert res[2]["has_avatar"] is True
+        assert len(res[2]["workspace_ids"]) == 1
+        assert workspace2.workspace_id in res[2]["workspace_ids"]
+
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
