@@ -318,8 +318,7 @@ class UserController(Controller):
             limit=hapic_data.query.limit,
             filter_results=app_config.KNOWN_MEMBERS__FILTER,
         )
-        context_users = [uapi.get_user_with_context(user) for user in users]
-        return context_users
+        return [uapi.get_user_with_context(user) for user in users]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @check_right(has_personal_access)

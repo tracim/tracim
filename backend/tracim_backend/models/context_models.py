@@ -553,7 +553,7 @@ class KnownMembersQuery(object):
 
     def __init__(
         self,
-        acp: str,
+        acp: str = "",
         exclude_user_ids: str = None,
         exclude_workspace_ids: str = None,
         include_workspace_ids: str = None,
@@ -1010,6 +1010,10 @@ class UserInContext(object):
     @property
     def allowed_space(self) -> int:
         return self.user.allowed_space
+
+    @property
+    def workspace_ids(self) -> List[int]:
+        return self.user.workspace_ids
 
     @property
     def used_space(self) -> int:

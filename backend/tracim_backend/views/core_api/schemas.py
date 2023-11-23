@@ -406,6 +406,7 @@ class UserDigestSchema(marshmallow.Schema):
     username = StrippedString(
         example="My-Power_User99", required=False, default=None, allow_none=True
     )
+    workspace_ids = marshmallow.fields.List(marshmallow.fields.Int(example=3))
 
 
 class UserDiskSpaceSchema(UserDigestSchema):
@@ -1058,7 +1059,7 @@ class CommentsPathFilenameSchema(CommentsPathSchema, FilenamePathSchema):
 
 
 class KnownMembersQuerySchema(marshmallow.Schema):
-    acp = StrippedString(example="test", description="search text to query", required=True)
+    acp = StrippedString(example="test", description="search text to query", required=False)
 
     exclude_user_ids = StrippedString(
         validate=regex_string_as_list_of_int,
