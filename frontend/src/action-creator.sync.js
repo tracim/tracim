@@ -121,10 +121,10 @@ export const WORKSPACE_MEMBER = `${WORKSPACE}/${MEMBER}`
 export const WORKSPACE_MEMBER_LIST = `${WORKSPACE_MEMBER}/List`
 export const setWorkspaceMemberList = workspaceMemberList => ({ type: `${SET}/${WORKSPACE_MEMBER_LIST}`, workspaceMemberList })
 // INFO - CH - 2023-11-22 - WORKSPACE_MEMBER_ADD is used by api function postWorkspaceMember()
-// but nothing in bind to it
+// but nothing is bound to it
 export const WORKSPACE_MEMBER_ADD = `${WORKSPACE_MEMBER}/${ADD}`
 // INFO - CH - 2023-11-22 - WORKSPACE_MEMBER_ADD is used by api function deleteWorkspaceMember()
-// but nothing in bind to it
+// but nothing is bound to it
 export const WORKSPACE_MEMBER_REMOVE = `${WORKSPACE_MEMBER}/${REMOVE}`
 export const WORKSPACE_MEMBER_UPDATE = `${WORKSPACE_MEMBER}/${UPDATE}`
 export const ADD_WORKSPACE_MEMBER = `${ADD}/${WORKSPACE_MEMBER}`
