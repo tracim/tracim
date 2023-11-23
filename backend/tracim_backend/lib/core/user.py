@@ -282,7 +282,7 @@ class UserApi(object):
         :return: List of found users, with a list of shared workspaces per user
         """
 
-        user_workspace_settings = self.get_common_user_workspaces_for_user(user_id)
+        user_workspace_settings = self.get_users_in_common_with_user_workspace(user_id)
 
         if user_workspace_settings is None:
             return []
