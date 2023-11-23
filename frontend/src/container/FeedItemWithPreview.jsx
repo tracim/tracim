@@ -272,9 +272,9 @@ export class FeedItemWithPreview extends React.Component {
 
     const commentList = this.getTimelineData()
 
-    const spaceMemberList = (
-      props.workspaceList.find(workspace => workspace.id === props.content.workspaceId) || { memberList: [] }
-    ).memberList
+    const spaceMemberList = props.knownMemberList.filter(
+      km => km.spaceList.includes(props.content.workspaceId)
+    ).map(km => ({ ...km, id: km.userId }))
 
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(
       props.user.userId,
@@ -435,8 +435,9 @@ const mapStateToProps = ({
   system,
   user,
   currentWorkspace,
-  workspaceList
-}) => ({ appList, system, user, currentWorkspace, workspaceList })
+  workspaceList,
+  knownMemberList
+}) => ({ appList, system, user, currentWorkspace, workspaceList, knownMemberList })
 const FeedItemWithPreviewWithoutRef = translate()(appContentFactory(withRouter(TracimComponent(connect(mapStateToProps)(FeedItemWithPreview)))))
 const FeedItemWithPreviewWithRef = React.forwardRef((props, ref) => {
   return <FeedItemWithPreviewWithoutRef innerRef={ref} {...props} />
