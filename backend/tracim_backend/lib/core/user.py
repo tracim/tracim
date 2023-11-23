@@ -310,7 +310,7 @@ class UserApi(object):
                 prev_user_id = user.user_id
                 continue
             # If the user_id is the same as the precedent one, add the workspace
-            #  to the list of their workspaces
+            #  to the list of the user's workspaces
             users[current_index].workspace_ids.append(user_workspace_setting[3])
         return users
 
