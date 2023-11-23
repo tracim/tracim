@@ -272,6 +272,8 @@ export class FeedItemWithPreview extends React.Component {
 
     const commentList = this.getTimelineData()
 
+    // HACK - M.L. - 2032-11-23 - mapping id to userId since both are used later in the code
+    //  this needs to be changed someday
     const spaceMemberList = props.knownMemberList.filter(
       km => km.spaceList.includes(props.content.workspaceId)
     ).map(km => ({ ...km, id: km.userId }))
