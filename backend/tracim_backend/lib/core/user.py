@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import datetime
-from typing import List, Tuple, Any
-
 from depot.io.utils import FileIntent
 from hapic.data import HapicFile
 import hashlib
@@ -23,6 +21,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.expression import cast
 import transaction
 import typing as typing
+from typing import Any
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.email_validators import TracimEmailValidator
@@ -252,6 +251,7 @@ class UserApi(object):
         :return: List of found UserRoleInWorkspace in common with the provided user
         """
         from sqlalchemy.orm import aliased
+
         s1 = aliased(UserRoleInWorkspace)
         s2 = aliased(UserRoleInWorkspace)
 
