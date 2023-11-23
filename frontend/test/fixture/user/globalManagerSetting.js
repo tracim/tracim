@@ -5,7 +5,7 @@ export const globalManagerSetting = {
   email_notification_type: 'summary'
 }
 
-export const globalManagerSettingUpdated = {
+export const globalManagerSettingReader = {
   role: ROLE.reader.slug,
   email_notification_type: 'summary'
 }

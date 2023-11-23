@@ -76,7 +76,8 @@ export function workspaceList (state = [], action, lang) {
       return sortListByMultipleCriteria(
         addWorkspaceSetting(action.setting, action.user, action.workspace, state),
         [SORT_BY.LABEL, SORT_BY.ID],
-        SORT_ORDER.ASCENDING, lang
+        SORT_ORDER.ASCENDING,
+        lang
       )
 
     case UPDATE_ROLE_WORKSPACE_LIST :
@@ -87,7 +88,10 @@ export function workspaceList (state = [], action, lang) {
           action.workspace,
           state.filter(ws => ws.id !== action.workspace.workspace_id)
         ),
-        [SORT_BY.LABEL, SORT_BY.ID], SORT_ORDER.ASCENDING, lang)
+        [SORT_BY.LABEL, SORT_BY.ID],
+        SORT_ORDER.ASCENDING,
+        lang
+      )
 
     case `${REMOVE}/${WORKSPACE_LIST}`:
       return state.filter(ws => ws.id !== action.workspace.workspace_id)

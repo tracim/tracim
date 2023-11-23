@@ -24,7 +24,7 @@ import {
   serializeSidebarEntryProps
 } from '../../../src/reducer/currentWorkspace'
 import { globalManagerFromApi } from '../../fixture/user/globalManagerFromApi'
-import { globalManagerSetting, globalManagerSettingUpdated } from '../../fixture/user/globalManagerSetting.js'
+import { globalManagerSetting, globalManagerSettingReader } from '../../fixture/user/globalManagerSetting.js'
 
 describe('workspaceList reducer', () => {
   describe('actions', () => {
@@ -91,7 +91,7 @@ describe('workspaceList reducer', () => {
         [...initialState, serializedFirstWorkspaceFromApi],
         updateRoleWorkspaceList(
           globalManagerFromApi,
-          globalManagerSettingUpdated,
+          globalManagerSettingReader,
           firstWorkspaceFromApi
         )
       )
