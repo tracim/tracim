@@ -68,7 +68,7 @@ import {
   putSetIncomingUserCallState,
   putSetOutgoingUserCallState,
   postCreateUserCall,
-  getMyselfKnownMemberInclusive
+  getMyselfAllKnownMember
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -383,6 +383,7 @@ export class Tracim extends React.Component {
 
         this.loadAppConfig()
         this.loadWorkspaceList()
+        this.loadKnownMemberList()
         this.loadNotificationNotRead(fetchUser.user_id)
         this.loadUserConfiguration(fetchUser.user_id)
 
@@ -451,8 +452,6 @@ export class Tracim extends React.Component {
     if (fetchGetWorkspaceList.status !== 200) return false
     props.dispatch(setRoleWorkspaceList(fetchGetWorkspaceList.json))
 
-    this.loadKnownMemberList(fetchGetWorkspaceList.json)
-
     const fetchAccessibleWorkspaceList = await props.dispatch(
       getAccessibleWorkspaces(props.user.userId)
     )
@@ -464,13 +463,10 @@ export class Tracim extends React.Component {
     return true
   }
 
-  loadKnownMemberList = async (workspaceList) => {
+  loadKnownMemberList = async () => {
     const { props } = this
     try {
-      const fetchGetKnownMemberList = await props.dispatch(getMyselfKnownMemberInclusive(
-        '',
-        workspaceList.map(s => s.workspace_id)
-      ))
+      const fetchGetKnownMemberList = await props.dispatch(getMyselfAllKnownMember())
 
       if (fetchGetKnownMemberList.status !== 200) return false
 
