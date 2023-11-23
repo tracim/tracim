@@ -22,6 +22,8 @@ from sqlalchemy.sql.expression import cast
 import transaction
 import typing as typing
 from typing import Any
+from typing import List
+from typing import Tuple
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.email_validators import TracimEmailValidator
@@ -244,7 +246,7 @@ class UserApi(object):
         )
         return [item[0] for item in user_ids_in_workspaces_tuples]
 
-    def get_common_user_workspaces_for_user(self, user_id: int) -> list[tuple[Any, ...]]:
+    def get_common_user_workspaces_for_user(self, user_id: int) -> List[Tuple[Any, ...]]:
         """
         Return list of UserRoleInWorkspace that are in common with the provided user
         :param user_id: id of the user to get data from
