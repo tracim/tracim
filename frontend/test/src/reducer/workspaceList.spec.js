@@ -87,8 +87,14 @@ describe('workspaceList reducer', () => {
     })
 
     describe(UPDATE_ROLE_WORKSPACE_LIST, () => {
-      const rez = workspaceList([...initialState, serializedFirstWorkspaceFromApi],
-        updateRoleWorkspaceList(globalManagerFromApi, globalManagerSettingUpdated, firstWorkspaceFromApi))
+      const rez = workspaceList(
+        [...initialState, serializedFirstWorkspaceFromApi],
+        updateRoleWorkspaceList(
+          globalManagerFromApi,
+          globalManagerSettingUpdated,
+          firstWorkspaceFromApi
+        )
+      )
 
       it('should return a workspace list with the workspace updated', () => {
         expect(rez).to.deep.equal([

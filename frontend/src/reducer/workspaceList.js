@@ -73,12 +73,20 @@ export function workspaceList (state = [], action, lang) {
       return action.workspaceList.map(serializeWorkspace)
 
     case ADD_ROLE_WORKSPACE_LIST :
-      return sortListByMultipleCriteria(addWorkspaceSetting(action.setting, action.user, action.workspace, state),
-        [SORT_BY.LABEL, SORT_BY.ID], SORT_ORDER.ASCENDING, lang)
+      return sortListByMultipleCriteria(
+        addWorkspaceSetting(action.setting, action.user, action.workspace, state),
+        [SORT_BY.LABEL, SORT_BY.ID],
+        SORT_ORDER.ASCENDING, lang
+      )
 
     case UPDATE_ROLE_WORKSPACE_LIST :
       return sortListByMultipleCriteria(
-        addWorkspaceSetting(action.setting, action.user, action.workspace, state.filter(ws => ws.id !== action.workspace.workspace_id)),
+        addWorkspaceSetting(
+          action.setting,
+          action.user,
+          action.workspace,
+          state.filter(ws => ws.id !== action.workspace.workspace_id)
+        ),
         [SORT_BY.LABEL, SORT_BY.ID], SORT_ORDER.ASCENDING, lang)
 
     case `${REMOVE}/${WORKSPACE_LIST}`:
