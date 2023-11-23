@@ -90,7 +90,6 @@ export const moveWorkspaceContent = (source, destination) => ({ type: `${MOVE}/$
 
 export const WORKSPACE_LIST = `${WORKSPACE}/List`
 export const setWorkspaceList = workspaceList => ({ type: `${SET}/${WORKSPACE_LIST}`, workspaceList })
-export const addWorkspaceList = workspaceList => ({ type: `${ADD}/${WORKSPACE_LIST}`, workspaceList })
 export const removeWorkspace = workspace => ({ type: `${REMOVE}/${WORKSPACE_LIST}`, workspace })
 
 export const USER_WORKSPACE_LIST = `${USER}/${WORKSPACE_LIST}`
@@ -99,9 +98,11 @@ const ROLE = 'Role'
 // TODO - CH - 2023-11-02 - The const bellow should be rename
 // See: https://github.com/tracim/tracim/issues/6252
 export const ROLE_WORKSPACE_LIST = `${ROLE}/${WORKSPACE}/List`
+export const ADD_ROLE_WORKSPACE_LIST = `${ADD}/${ROLE_WORKSPACE_LIST}`
+export const UPDATE_ROLE_WORKSPACE_LIST = `${UPDATE}/${ROLE_WORKSPACE_LIST}`
 export const setRoleWorkspaceList = workspaceList => ({ type: `${SET}/${ROLE_WORKSPACE_LIST}`, workspaceList })
-export const addRoleWorkspaceList = (user, setting, workspace) => ({ type: `${ADD}/${ROLE_WORKSPACE_LIST}`, user, setting, workspace })
-export const updateRoleWorkspaceList = (user, setting, workspace) => ({ type: `${UPDATE}/${ROLE_WORKSPACE_LIST}`, user, setting, workspace })
+export const addRoleWorkspaceList = (user, setting, workspace) => ({ type: ADD_ROLE_WORKSPACE_LIST, user, setting, workspace })
+export const updateRoleWorkspaceList = (user, setting, workspace) => ({ type: UPDATE_ROLE_WORKSPACE_LIST, user, setting, workspace })
 export const removeRoleWorkspace = workspace => ({ type: `${REMOVE}/${ROLE_WORKSPACE_LIST}`, workspace })
 
 export const USER_ROLE_WORKSPACE_LIST = `${USER}/${ROLE_WORKSPACE_LIST}`
