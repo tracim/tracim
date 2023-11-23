@@ -272,9 +272,9 @@ export class FeedItemWithPreview extends React.Component {
 
     const commentList = this.getTimelineData()
 
-    const spaceMemberList = (
-      props.workspaceList.find(workspace => workspace.id === props.content.workspaceId) || { memberList: [] }
-    ).memberList
+    const spaceMemberList = props.workspaceList.find(
+      workspace => workspace.id === props.content.workspaceId
+    )?.memberList || []
 
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(
       props.user.userId,
