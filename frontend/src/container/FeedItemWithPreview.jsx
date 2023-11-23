@@ -264,18 +264,17 @@ export class FeedItemWithPreview extends React.Component {
     }
 
     const shouldShowComment = props.content.type === CONTENT_TYPE.THREAD
-    const commentToShow = (
-      shouldShowComment
-        ? this.getFirstComment()
-        : null
-    )
+    const commentToShow = shouldShowComment ? this.getFirstComment() : null
+
     if (shouldShowComment && props.inRecentActivities) {
       props.content.firstComment = commentToShow
     }
 
     const commentList = this.getTimelineData()
 
-    const spaceMemberList = (props.workspaceList.find(workspace => workspace.id === props.content.workspaceId) || { memberList: [] }).memberList
+    const spaceMemberList = (
+      props.workspaceList.find(workspace => workspace.id === props.content.workspaceId) || { memberList: [] }
+    ).memberList
 
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(
       props.user.userId,

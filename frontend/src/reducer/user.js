@@ -1,14 +1,13 @@
 import {
   SET,
-  UPDATE,
-  USER,
   USER_CONFIGURATION,
   USER_CONNECTED,
   USER_DISCONNECTED,
   USER_LANG,
   USER_AGENDA_URL,
   USER_PROFILE_AVATAR_NAME,
-  USER_PROFILE_COVER_NAME
+  USER_PROFILE_COVER_NAME,
+  UPDATE_USER
 } from '../action-creator.sync.js'
 import {
   getBrowserLang,
@@ -77,7 +76,7 @@ export default function user (state = defaultUser, action) {
     case `${SET}/${USER_LANG}`:
       return { ...state, lang: action.lang }
 
-    case `${UPDATE}/${USER}`:
+    case UPDATE_USER:
       if (action.newUser.user_id !== state.userId) return state
       return {
         ...state,
