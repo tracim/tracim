@@ -248,9 +248,16 @@ class UserApi(object):
 
     def get_common_user_workspaces_for_user(self, user_id: int) -> List[Tuple[Any, ...]]:
         """
-        Return list of UserRoleInWorkspace that are in common with the provided user
+        Returns a list of found user data in common with the provided user as a tuple
         :param user_id: id of the user to get data from
-        :return: List of found UserRoleInWorkspace in common with the provided user
+        :return: List of found user data in common with the provided user as a tuple
+            of the following format
+            (
+                0 -> user_id
+                1 -> username
+                2 -> display_name
+                3 -> workspace_ids
+            )
         """
         from sqlalchemy.orm import aliased
 
@@ -302,7 +309,7 @@ class UserApi(object):
                 users.append(user)
                 prev_user_id = user.user_id
                 continue
-            # If the user_id is the same as the precedent one, simply add the workspace
+            # If the user_id is the same as the precedent one, add the workspace
             #  to the list of their workspaces
             users[current_index].workspace_ids.append(user_workspace_setting[3])
         return users
