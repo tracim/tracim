@@ -246,7 +246,7 @@ class UserApi(object):
         )
         return [item[0] for item in user_ids_in_workspaces_tuples]
 
-    def get_common_user_workspaces_for_user(self, user_id: int) -> List[Tuple[Any, ...]]:
+    def get_users_in_common_with_user_workspace(self, user_id: int) -> List[Tuple[Any, ...]]:
         """
         Return list of UserRoleInWorkspace that are in common with the provided user
         :param user_id: id of the user to get data from
