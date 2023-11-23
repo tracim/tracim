@@ -43,7 +43,8 @@ export const setUserLang = lang => ({ type: `${SET}/${USER}/Lang`, lang })
 export const USER_KNOWN_MEMBER = `${USER}/KnownMember`
 export const USER_KNOWN_MEMBER_LIST = `${USER_KNOWN_MEMBER}/List`
 
-export const updateUser = newUser => ({ type: `${UPDATE}/${USER}`, newUser })
+export const UPDATE_USER = `${UPDATE}/${USER}`
+export const updateUser = newUser => ({ type: UPDATE_USER, newUser })
 export const USER_PUBLIC_NAME = `${USER}/PublicName`
 export const USER_USERNAME = `${USER}/Username`
 export const USER_EMAIL = `${USER}/Email`
@@ -119,11 +120,16 @@ const MEMBER = 'Member'
 export const WORKSPACE_MEMBER = `${WORKSPACE}/${MEMBER}`
 export const WORKSPACE_MEMBER_LIST = `${WORKSPACE_MEMBER}/List`
 export const setWorkspaceMemberList = workspaceMemberList => ({ type: `${SET}/${WORKSPACE_MEMBER_LIST}`, workspaceMemberList })
+// INFO - CH - 2023-11-22 - WORKSPACE_MEMBER_ADD is used by api function postWorkspaceMember()
+// but nothing in bind to it
 export const WORKSPACE_MEMBER_ADD = `${WORKSPACE_MEMBER}/${ADD}`
+// INFO - CH - 2023-11-22 - WORKSPACE_MEMBER_ADD is used by api function deleteWorkspaceMember()
+// but nothing in bind to it
 export const WORKSPACE_MEMBER_REMOVE = `${WORKSPACE_MEMBER}/${REMOVE}`
 export const WORKSPACE_MEMBER_UPDATE = `${WORKSPACE_MEMBER}/${UPDATE}`
+export const ADD_WORKSPACE_MEMBER = `${ADD}/${WORKSPACE_MEMBER}`
 export const addWorkspaceMember = (user, workspaceId, member) => ({
-  type: `${ADD}/${WORKSPACE_MEMBER}`,
+  type: ADD_WORKSPACE_MEMBER,
   newMember: { user: user, ...member },
   workspaceId
 })
@@ -132,8 +138,9 @@ export const updateWorkspaceMember = (user, workspaceId, member) => ({
   member: { user: user, ...member },
   workspaceId
 })
+export const REMOVE_WORKSPACE_MEMBER = `${REMOVE}/${WORKSPACE_MEMBER}`
 export const removeWorkspaceMember = (memberId, workspaceId) => ({
-  type: `${REMOVE}/${WORKSPACE_MEMBER}`,
+  type: REMOVE_WORKSPACE_MEMBER,
   memberId,
   workspaceId
 })

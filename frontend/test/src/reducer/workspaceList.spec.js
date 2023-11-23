@@ -4,14 +4,17 @@ import {
   ADD,
   addWorkspaceList, addWorkspaceMember,
   REMOVE,
-  removeWorkspace, removeWorkspaceMember,
+  REMOVE_WORKSPACE_MEMBER,
+  removeWorkspace,
+  removeWorkspaceMember,
   SET,
   setWorkspaceList,
   UPDATE,
   updateWorkspaceDetail,
   updateWorkspaceMember,
   WORKSPACE_DETAIL,
-  WORKSPACE_LIST, WORKSPACE_MEMBER
+  WORKSPACE_LIST,
+  WORKSPACE_MEMBER
 } from '../../../src/action-creator.sync'
 import { ROLE, serialize } from 'tracim_frontend_lib'
 import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace'
@@ -177,7 +180,7 @@ describe('workspaceList reducer', () => {
       })
     })
 
-    describe(`${REMOVE}/${WORKSPACE_MEMBER}`, () => {
+    describe(REMOVE_WORKSPACE_MEMBER, () => {
       const rez = workspaceList(
         [
           ...initialState,

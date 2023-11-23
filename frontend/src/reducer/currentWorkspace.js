@@ -9,13 +9,15 @@ import {
   WORKSPACE_READ_STATUS_LIST,
   WORKSPACE_MEMBER,
   UPDATE,
-  USER,
   USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
   FOLDER_READ,
   WORKSPACE_AGENDA_URL,
   WORKSPACE_CONTENT,
   RESTORE,
-  WORKSPACE_LOADED
+  WORKSPACE_LOADED,
+  REMOVE_WORKSPACE_MEMBER,
+  UPDATE_USER,
+  ADD_WORKSPACE_MEMBER
 } from '../action-creator.sync.js'
 import { serializeContentProps } from './workspaceContentList.js'
 import { EMAIL_NOTIFICATION_TYPE } from '../util/helper.js'
@@ -102,7 +104,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         memberList: action.workspaceMemberList.map(m => serializeMember(m))
       }
 
-    case `${ADD}/${WORKSPACE_MEMBER}`:
+    case ADD_WORKSPACE_MEMBER:
       if (state.id !== action.workspaceId) return state
       return {
         ...state,
@@ -122,7 +124,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         )
       }
 
-    case `${REMOVE}/${WORKSPACE_MEMBER}`:
+    case REMOVE_WORKSPACE_MEMBER:
       if (state.id !== action.workspaceId) return state
       return {
         ...state,
@@ -223,7 +225,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
     case `${SET}/${WORKSPACE_LOADED}`:
       return { ...state, workspaceLoaded: true }
 
-    case `${UPDATE}/${USER}`:
+    case UPDATE_USER:
       if (!state.memberList.some(member => member.id === action.newUser.user_id)) return state
 
       return {

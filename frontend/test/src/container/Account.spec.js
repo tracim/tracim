@@ -13,12 +13,12 @@ import {
   BREADCRUMBS,
   SET,
   UPDATE,
-  USER,
   USER_AGENDA_URL,
   USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
   ADD,
   FLASH_MESSAGE,
-  REMOVE
+  REMOVE,
+  UPDATE_USER
 } from '../../../src/action-creator.sync.js'
 import { FETCH_CONFIG } from '../../../src/util/helper.js'
 import {
@@ -50,7 +50,7 @@ describe('In <Account />', () => {
 
     const { type } = params
     switch (type) {
-      case `${UPDATE}/${USER}`: updateUserCallBack(); break
+      case UPDATE_USER: updateUserCallBack(); break
       case `${SET}/${USER_AGENDA_URL}`: updateUserAgendaUrlCallBack(); break
       case `${UPDATE}/${USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE}`: updateUserWorkspaceSubscriptionNotifCallBack(); break
       case `${SET}/${BREADCRUMBS}`: setBreadcrumbsCallBack(); break
