@@ -1,5 +1,6 @@
 import {
-  ADD,
+  ADD_ROLE_WORKSPACE_LIST,
+  UPDATE_ROLE_WORKSPACE_LIST,
   REMOVE,
   SET,
   UPDATE,
@@ -48,6 +49,20 @@ export const serializeRole = role => {
     memberList: [role].map(serializeMember)
   }
 }
+function addWorkspaceSetting (setting, user, workspace, workspaceList) {
+  const settings = {
+    ...setting,
+    workspace: workspace,
+    workspace_id: workspace.workspace_id,
+    user: user,
+    user_id: user.user_id
+  }
+  const spaceList = [
+    ...workspaceList,
+    serializeRole(settings)
+  ]
+  return spaceList
+}
 
 export function workspaceList (state = [], action, lang) {
   switch (action.type) {
@@ -57,15 +72,26 @@ export function workspaceList (state = [], action, lang) {
     case `${SET}/${WORKSPACE_LIST}`:
       return action.workspaceList.map(serializeWorkspace)
 
-    case `${ADD}/${WORKSPACE_LIST}`: {
-      const spaceList = [
-        ...state,
-        ...action.workspaceList
-          .filter(w => !state.some(s => s.id === w.workspace_id))
-          .map(serializeWorkspace)
-      ]
-      return sortListByMultipleCriteria(spaceList, [SORT_BY.LABEL, SORT_BY.ID], SORT_ORDER.ASCENDING, lang)
-    }
+    case ADD_ROLE_WORKSPACE_LIST :
+      return sortListByMultipleCriteria(
+        addWorkspaceSetting(action.setting, action.user, action.workspace, state),
+        [SORT_BY.LABEL, SORT_BY.ID],
+        SORT_ORDER.ASCENDING,
+        lang
+      )
+
+    case UPDATE_ROLE_WORKSPACE_LIST :
+      return sortListByMultipleCriteria(
+        addWorkspaceSetting(
+          action.setting,
+          action.user,
+          action.workspace,
+          state.filter(ws => ws.id !== action.workspace.workspace_id)
+        ),
+        [SORT_BY.LABEL, SORT_BY.ID],
+        SORT_ORDER.ASCENDING,
+        lang
+      )
 
     case `${REMOVE}/${WORKSPACE_LIST}`:
       return state.filter(ws => ws.id !== action.workspace.workspace_id)
@@ -74,7 +100,7 @@ export function workspaceList (state = [], action, lang) {
       if (!state.some(ws => ws.id === action.workspaceDetail.workspace_id)) return state
       const spaceList = state.map(
         ws => ws.id === action.workspaceDetail.workspace_id
-          ? serializeWorkspace(action.workspaceDetail) // Error here ; members is undefined
+          ? serializeWorkspace(action.workspaceDetail)
           : ws
       )
       return sortListByMultipleCriteria(spaceList, [SORT_BY.LABEL, SORT_BY.ID], SORT_ORDER.ASCENDING, lang)

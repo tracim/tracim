@@ -2,7 +2,8 @@ import { expect } from 'chai'
 import workspaceList, { serializeWorkspaceListProps } from '../../../src/reducer/workspaceList.js'
 import {
   ADD,
-  addWorkspaceList, addWorkspaceMember,
+  ADD_ROLE_WORKSPACE_LIST,
+  addWorkspaceMember,
   REMOVE,
   removeWorkspace, removeWorkspaceMember,
   SET,
@@ -10,6 +11,9 @@ import {
   UPDATE,
   updateWorkspaceDetail,
   updateWorkspaceMember,
+  UPDATE_ROLE_WORKSPACE_LIST,
+  addRoleWorkspaceList,
+  updateRoleWorkspaceList,
   WORKSPACE_DETAIL,
   WORKSPACE_LIST, WORKSPACE_MEMBER
 } from '../../../src/action-creator.sync'
@@ -20,6 +24,7 @@ import {
   serializeSidebarEntryProps
 } from '../../../src/reducer/currentWorkspace'
 import { globalManagerFromApi } from '../../fixture/user/globalManagerFromApi'
+import { globalManagerSetting, globalManagerSettingReader } from '../../fixture/user/globalManagerSetting.js'
 
 describe('workspaceList reducer', () => {
   describe('actions', () => {
@@ -62,8 +67,8 @@ describe('workspaceList reducer', () => {
       })
     })
 
-    describe(`${ADD}/${WORKSPACE_LIST}`, () => {
-      const rez = workspaceList(initialState, addWorkspaceList([firstWorkspaceFromApi]))
+    describe(ADD_ROLE_WORKSPACE_LIST, () => {
+      const rez = workspaceList(initialState, addRoleWorkspaceList(globalManagerFromApi, globalManagerSetting, firstWorkspaceFromApi))
 
       it('should return a workspace list with the workspace added', () => {
         expect(rez).to.deep.equal([
@@ -75,6 +80,33 @@ describe('workspaceList reducer', () => {
             memberList: firstWorkspaceFromApi.members.map(
               m => serializeMember(m)
             )
+          },
+          ...initialState
+        ])
+      })
+    })
+
+    describe(UPDATE_ROLE_WORKSPACE_LIST, () => {
+      const rez = workspaceList(
+        [...initialState, serializedFirstWorkspaceFromApi],
+        updateRoleWorkspaceList(
+          globalManagerFromApi,
+          globalManagerSettingReader,
+          firstWorkspaceFromApi
+        )
+      )
+
+      it('should return a workspace list with the workspace updated', () => {
+        expect(rez).to.deep.equal([
+          {
+            ...serializedFirstWorkspaceFromApi,
+            sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(
+              sbe => serialize(sbe, serializeSidebarEntryProps)
+            ),
+            memberList: [{
+              ...serializeMember(firstWorkspaceFromApi.members[0]),
+              role: ROLE.reader.slug
+            }]
           },
           ...initialState
         ])

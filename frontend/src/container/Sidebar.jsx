@@ -11,8 +11,6 @@ import {
   PAGE,
   PROFILE,
   scrollIntoViewIfNeeded,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_ENTITY_TYPE as TLM_ET,
   TracimComponent,
   withUsePublishLifecycle
 } from 'tracim_frontend_lib'
@@ -25,7 +23,6 @@ import {
   unLoggedAllowedPageList,
   workspaceConfig
 } from '../util/helper.js'
-import { addWorkspaceList } from '../action-creator.sync.js'
 import { logoutUser } from '../action-creator.async.js'
 import appFactory from '../util/appFactory.js'
 import Logo from '../component/Logo.jsx'
@@ -57,20 +54,7 @@ export class Sidebar extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.CREATED, handler: this.handleTlmMemberCreated }
     ])
-  }
-
-  handleTlmMemberCreated = tlmFieldObject => {
-    const { props } = this
-
-    const tlmUser = tlmFieldObject.fields.user
-    const tlmWorkspace = tlmFieldObject.fields.workspace
-    const loggedUserId = props.user.userId
-
-    if (loggedUserId === tlmUser.user_id) {
-      props.dispatch(addWorkspaceList([tlmWorkspace]))
-    }
   }
 
   handleClickSearch = async (searchString) => {
