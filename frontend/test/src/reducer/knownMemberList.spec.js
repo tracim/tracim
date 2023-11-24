@@ -51,7 +51,6 @@ describe('reducer knownMemberList.js', () => {
     expect(knownMemberReducer([globalManagerAsDigestSchemaFromApi], fakeAction)).to.deep.equal([])
   })
 
-
   it.skip('should handle UPDATE_USER action', () => {
 
   })
