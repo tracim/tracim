@@ -25,9 +25,25 @@ export function knownMemberList (state = initialState, action) {
         serialize(apiKnownMember, serializeKnownMemberProps)
       )
 
-    case ADD_WORKSPACE_MEMBER:
-      if (state.some(km => km.userId === action.newMember.user.user_id)) return state
-      return [...state, ...serialize(action.newMember.user, serializeKnownMemberProps)]
+    case ADD_WORKSPACE_MEMBER: {
+      const isNewMemberAlreadyInKnownMemberList = state
+        .some(km => km.userId === action.newMember.user.user_id)
+
+      if (isNewMemberAlreadyInKnownMemberList) {
+        return state.map(km => km.userId === action.newMember.user.user_id
+          ? ({ ...km, spaceList: [...km.spaceList, action.workspaceId] })
+          : km
+        )
+      }
+
+      return [
+        ...state,
+        {
+          ...serialize(action.newMember.user, serializeKnownMemberProps),
+          spaceList: [action.workspaceId]
+        }
+      ]
+    }
 
     case REMOVE_WORKSPACE_MEMBER:
       knownMemberToRemove = state.find(km => km.userId === action.memberId)
