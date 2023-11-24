@@ -274,9 +274,18 @@ export class FeedItemWithPreview extends React.Component {
 
     // HACK - M.L. - 2032-11-23 - mapping id to userId since both are used later in the code
     //  this needs to be changed someday
-    const spaceMemberList = props.knownMemberList.filter(
-      km => km.spaceList.includes(props.content.workspaceId)
-    ).map(km => ({ ...km, id: km.userId }))
+    //  it should be done in https://github.com/tracim/tracim/issues/6252
+    const spaceMemberList = props.knownMemberList
+      .filter(km => km.spaceList.includes(props.content.workspaceId))
+      .map(km => ({
+        ...km,
+        id: km.userId,
+        role: props.workspaceList
+          // HACK - CH - 2023-11-24 - This will change in the refactor required by
+          // https://github.com/tracim/tracim/issues/6252
+          .find(w => w.id === props.content.workspaceId)?.memberList
+          .find(m => m.id === props.user.userId)?.role
+      }))
 
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(
       props.user.userId,
