@@ -275,7 +275,7 @@ class Login extends React.Component {
 
         this.loadAppList()
         this.loadContentTypeList()
-        this.loadWorkspaceLists()
+        this.loadWorkspaceList()
         this.loadNotificationNotRead(loggedUser.user_id)
         this.loadUserConfiguration(loggedUser.user_id)
         break
@@ -360,7 +360,7 @@ class Login extends React.Component {
     if (fetchGetContentTypeList.status === 200) props.dispatch(setContentTypeList(fetchGetContentTypeList.json))
   }
 
-  loadWorkspaceLists = async () => {
+  loadWorkspaceList = async () => {
     const { props } = this
 
     const fetchGetWorkspaceList = await props.dispatch(getMyselfUserRoleWorkspaceList())

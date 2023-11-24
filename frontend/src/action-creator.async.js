@@ -307,9 +307,9 @@ export const getUserIsConnected = () => async dispatch => {
   })
 }
 
-export const getMyselfKnownMember = (userNameToSearch, workspaceIdToExclude) => dispatch => {
+export const getMyselfAllKnownMember = () => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/known_members?acp=${userNameToSearch}&exclude_workspace_ids=${workspaceIdToExclude}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/me/known_members`,
     param: {
       credentials: 'include',
       headers: {

@@ -3,6 +3,7 @@ import lang from './lang.js'
 import breadcrumbs from './breadcrumbs.js'
 import flashMessage from './flashMessage.js'
 import user from './user.js'
+import knownMemberList from './knownMemberList.js'
 import currentWorkspace from './currentWorkspace.js'
 import workspaceContentList from './workspaceContentList.js'
 import workspaceShareFolderContentList from './workspaceShareFolderContentList.js'
@@ -26,6 +27,7 @@ const rootReducer = combineReducers({
   breadcrumbs,
   flashMessage,
   user,
+  knownMemberList,
   currentWorkspace,
   workspaceContentList,
   workspaceShareFolderContentList,

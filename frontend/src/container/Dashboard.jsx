@@ -13,6 +13,8 @@ import {
   SPACE_TYPE,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
+  getMyselfKnownMember,
+  handleFetchResult,
   IconButton,
   Loading,
   PageContent,
@@ -21,11 +23,9 @@ import {
   buildHeadTitle,
   removeAtInUsername,
   addExternalLinksIcons,
-  getSpaceMemberList,
-  handleFetchResult
+  getSpaceMemberList
 } from 'tracim_frontend_lib'
 import {
-  getMyselfKnownMember,
   getSubscriptions,
   postWorkspaceMember,
   deleteWorkspaceMember,
@@ -231,10 +231,23 @@ export class Dashboard extends React.Component {
 
   handleSearchUser = async personalDataToSearch => {
     const { props } = this
-    const fetchUserKnownMemberList = await props.dispatch(getMyselfKnownMember(personalDataToSearch, props.currentWorkspace.id))
-    switch (fetchUserKnownMemberList.status) {
-      case 200: this.setState({ searchedKnownMemberList: fetchUserKnownMemberList.json }); break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('known members list')}`, 'warning')); break
+    // INFO - CH - 2023-11-23 - getMyselfKnownMember is an async function from frontend_lib. It doesn't return
+    // the same objects as async function in frontend/. This explains the handleFetchResult, the .apiResponse
+    // and the .body
+    const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(
+      FETCH_CONFIG.apiUrl,
+      personalDataToSearch,
+      null,
+      props.currentWorkspace.id
+    ))
+    switch (fetchUserKnownMemberList.apiResponse.status) {
+      case 200: this.setState({ searchedKnownMemberList: fetchUserKnownMemberList.body }); break
+      default:
+        props.dispatch(newFlashMessage(
+          `${props.t('An error has happened while getting')} ${props.t('known members list')}`,
+          'warning'
+        ))
+        break
     }
   }
 
@@ -596,7 +609,7 @@ export class Dashboard extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, contentType, appList, currentWorkspace, system }) => ({
-  breadcrumbs, user, contentType, appList, currentWorkspace, system
+const mapStateToProps = ({ breadcrumbs, user, knownMemberList, contentType, appList, currentWorkspace, system }) => ({
+  breadcrumbs, user, knownMemberList, contentType, appList, currentWorkspace, system
 })
 export default connect(mapStateToProps)(withRouter(appFactory(translate()(TracimComponent(Dashboard)))))

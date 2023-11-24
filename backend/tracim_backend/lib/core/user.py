@@ -21,6 +21,9 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.expression import cast
 import transaction
 import typing as typing
+from typing import Any
+from typing import List
+from typing import Tuple
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.email_validators import TracimEmailValidator
@@ -243,9 +246,77 @@ class UserApi(object):
         )
         return [item[0] for item in user_ids_in_workspaces_tuples]
 
+    def get_users_in_common_with_user_workspace(self, user_id: int) -> List[Tuple[Any, ...]]:
+        """
+        Returns a list of found user data in common with the provided user as a tuple
+        :param user_id: id of the user to get data from
+        :return: List of found user data in common with the provided user as a tuple
+            of the following format
+            (
+                0 -> user_id
+                1 -> username
+                2 -> display_name
+                3 -> workspace_ids
+            )
+        """
+        from sqlalchemy.orm import aliased
+
+        s1 = aliased(UserRoleInWorkspace)
+        s2 = aliased(UserRoleInWorkspace)
+
+        return (
+            self._session.query(s2.user_id, User.username, User.display_name, s2.workspace_id)
+            .join(s1, s1.workspace_id == s2.workspace_id)
+            .join(User, User.user_id == s2.user_id)
+            .filter(s1.user_id == user_id)
+            .order_by(s2.user_id)
+            .all()
+        )
+
+    def get_all_known_users_of_user(self, user_id: int) -> typing.List[User]:
+        """
+        Return list of known users of the provided users.
+        This list includes all users that share a same workspace with the user.
+        It also adds a list of shared workspaces per user to the user model.
+        :param user_id: user_id to get know_users of
+        :return: List of found users, with a list of shared workspaces per user
+        """
+
+        user_workspace_settings = self.get_users_in_common_with_user_workspace(user_id)
+
+        if user_workspace_settings is None:
+            return []
+
+        # INFO- M.L. - 2023-11-23 - This loop relies on the above query
+        #  that returns an ordered list of users and their associated workspaces
+        #  with one entry per user/workspace relationship.
+        users = []
+        prev_user_id = None
+        # Initialises index to -1 to prevent initialisation snippet before the loop
+        current_index = -1
+        for user_workspace_setting in user_workspace_settings:
+            # Since the list is ordered, when the previous user_id is different
+            #  from the current one, initialise a new entry containing minimum user_info
+            #  and add the workspace of the current relationship into the list of the
+            #  user's workspaces
+            if prev_user_id is not user_workspace_setting[0]:
+                current_index += 1
+                user = User()
+                user.user_id = user_workspace_setting[0]
+                user.username = user_workspace_setting[1]
+                user.display_name = user_workspace_setting[2]
+                user.workspace_ids = [user_workspace_setting[3]]
+                users.append(user)
+                prev_user_id = user.user_id
+                continue
+            # If the user_id is the same as the precedent one, add the workspace
+            #  to the list of the user's workspaces
+            users[current_index].workspace_ids.append(user_workspace_setting[3])
+        return users
+
     def get_known_users(
         self,
-        acp: str,
+        acp: str = "",
         exclude_user_ids: typing.List[int] = None,
         exclude_workspace_ids: typing.List[int] = None,
         include_workspace_ids: typing.List[int] = None,
@@ -254,16 +325,22 @@ class UserApi(object):
     ) -> typing.List[User]:
         """
         Return list of known users by current UserApi user.
+        If no parameter is provided, return a list of all known users
         :param acp: autocomplete filter by name/email
         :param exclude_user_ids: user id to exclude from result
         :param exclude_workspace_ids: workspace user to exclude from result
         :param include_workspace_ids: only include users from these workspaces
-        :limit: maximum number of users to return. This value will be capped to
+        :param limit: maximum number of users to return. This value will be capped to
                 KNOWN_MEMBERS_ITEMS_LIMIT if requesting users from workspaces that
                 the requester is not part of.
-        :filter_results: If true, do filter result according to user workspace if user is provided
+        :param filter_results: If true, do filter result according to user workspace if user is provided
         :return: List of found users
         """
+
+        # INFO- M.L. - 2023-11-23 - If no crucial parameter is provided,
+        #  return the result of get_all_known_users_of_user
+        if len(acp) <= 0 and not exclude_workspace_ids and not include_workspace_ids:
+            return self.get_all_known_users_of_user(self._user.user_id)
 
         nb_elems = KNOWN_MEMBERS_ITEMS_LIMIT
 
