@@ -15,13 +15,13 @@
 ### 🐛 Fixed Issues
 
 - Frontend:
-  - [#5676](https://github.com/tracim/tracim/issues/5676)
-  - [#3953](https://github.com/tracim/tracim/issues/3953)
+  - Fix loader not appearing on some cases [#5676](https://github.com/tracim/tracim/issues/5676)
+  - In space admin page, space link is now a html link [#3953](https://github.com/tracim/tracim/issues/3953)
 - Backend:
-  - [#6169](https://github.com/tracim/tracim/issues/6169)
-  - [#6233](https://github.com/tracim/tracim/issues/6233)
+  - In notification email, display user's username instead of public name [#6169](https://github.com/tracim/tracim/issues/6169)
+  - Update security policies [#6233](https://github.com/tracim/tracim/issues/6233)
 - Backend/Frontend:
-  - [#6122](https://github.com/tracim/tracim/issues/6122)
+  - Improve performance by reducing the amount of data downloaded on first load [#6122](https://github.com/tracim/tracim/issues/6122)
 
 ## 4.6.2 / 2023-10-27
 
