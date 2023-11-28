@@ -399,7 +399,7 @@ need to be in every workspace you include."
                 User.email.ilike(f"%{acp}%"),
                 User.username.ilike(f"%{acp}%"),
             )
-        ).filter(and_(User.is_active, not_(User.is_deleted)))
+        )
 
         assert not (filter_results and not self._user)
         # INFO - G.M - 2021-01-28 - Warning! Rule access here should be consistent
