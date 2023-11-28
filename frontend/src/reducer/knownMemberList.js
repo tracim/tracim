@@ -2,7 +2,9 @@ import {
   SET_KNOWN_MEMBER_LIST,
   ADD_WORKSPACE_MEMBER,
   REMOVE_WORKSPACE_MEMBER,
-  UPDATE_USER
+  UPDATE_USER,
+  REMOVE,
+  WORKSPACE_LIST
 } from '../action-creator.sync.js'
 import { serialize } from 'tracim_frontend_lib'
 const initialState = []
@@ -48,7 +50,7 @@ export function knownMemberList (state = initialState, action) {
     case REMOVE_WORKSPACE_MEMBER:
       knownMemberToRemove = state.find(km => km.userId === action.memberId)
       if (knownMemberToRemove.spaceList.length > 1) {
-        return state.map(km => km.userId === action.action.memberId
+        return state.map(km => km.userId === action.memberId
           ? { ...km, spaceList: km.spaceList.filter(spaceId => spaceId !== action.workspaceId) }
           : km
         )
@@ -60,6 +62,11 @@ export function knownMemberList (state = initialState, action) {
         ? { ...km, ...serialize(action.newUser, serializeKnownMemberProps) }
         : km
       )
+
+    case `${REMOVE}/${WORKSPACE_LIST}`:
+      return state.map(km => {
+        return { ...km, spaceList: km.spaceList.filter(spaceId => spaceId !== action.workspace.workspace_id) }
+      })
 
     default:
       return state
