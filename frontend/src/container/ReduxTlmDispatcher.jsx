@@ -169,6 +169,7 @@ export class ReduxTlmDispatcher extends React.Component {
     if (props.user.userId === data.fields.user.user_id) {
       props.dispatch(addRoleWorkspaceList(data.fields.user, data.fields.member, data.fields.workspace))
       props.dispatch(removeAccessibleWorkspace(data.fields.workspace))
+      // FIXME - FS - 2023-11-28 - https://github.com/tracim/tracim/issues/6292
       const fetchGetKnownMemberList = await props.dispatch(getMyselfAllKnownMember())
       if (fetchGetKnownMemberList.status === 200) {
         props.dispatch(setKnownMemberList(fetchGetKnownMemberList.json))
