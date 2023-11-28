@@ -15,6 +15,7 @@ from sqlakeyset import get_page
 import sqlalchemy
 from sqlalchemy import and_
 from sqlalchemy import func
+from sqlalchemy import not_
 from sqlalchemy import or_
 from sqlalchemy.orm import Query
 from sqlalchemy.orm.exc import NoResultFound
@@ -256,7 +257,7 @@ class UserApi(object):
                 0 -> user_id
                 1 -> username
                 2 -> display_name
-                3 -> workspace_ids
+                3 -> workspace_id
             )
         """
         from sqlalchemy.orm import aliased
@@ -267,7 +268,11 @@ class UserApi(object):
         return (
             self._session.query(s2.user_id, User.username, User.display_name, s2.workspace_id)
             .join(s1, s1.workspace_id == s2.workspace_id)
-            .join(User, User.user_id == s2.user_id)
+            .join(User, and_(User.user_id == s2.user_id, User.is_active, not_(User.is_deleted)))
+            .join(
+                Workspace,
+                and_(Workspace.workspace_id == s1.workspace_id, not_(Workspace.is_deleted)),
+            )
             .filter(s1.user_id == user_id)
             .order_by(s2.user_id)
             .all()
@@ -395,7 +400,7 @@ need to be in every workspace you include."
                 User.email.ilike(f"%{acp}%"),
                 User.username.ilike(f"%{acp}%"),
             )
-        )
+        ).filter(and_(User.is_active, not_(User.is_deleted)))
 
         assert not (filter_results and not self._user)
         # INFO - G.M - 2021-01-28 - Warning! Rule access here should be consistent
