@@ -247,7 +247,9 @@ class UserApi(object):
         )
         return [item[0] for item in user_ids_in_workspaces_tuples]
 
-    def get_users_in_common_with_user_workspace(self, user_id: int) -> List[Tuple[Any, ...]]:
+    def get_users_in_common_with_user_workspace(
+        self, user_id: int
+    ) -> List[Tuple[int, str, str, int]]:
         """
         Returns a list of found user data in common with the provided user as a tuple
         :param user_id: id of the user to get data from
@@ -268,7 +270,7 @@ class UserApi(object):
         return (
             self._session.query(s2.user_id, User.username, User.display_name, s2.workspace_id)
             .join(s1, and_(s1.workspace_id == s2.workspace_id, s1.user_id == user_id))
-            .join(User, and_(User.user_id == s2.user_id, User.is_active, not_(User.is_deleted)))
+            .join(User, User.user_id == s2.user_id)
             .join(
                 Workspace,
                 and_(Workspace.workspace_id == s1.workspace_id, not_(Workspace.is_deleted)),
