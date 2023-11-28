@@ -170,6 +170,7 @@ export class ReduxTlmDispatcher extends React.Component {
       props.dispatch(addRoleWorkspaceList(data.fields.user, data.fields.member, data.fields.workspace))
       props.dispatch(removeAccessibleWorkspace(data.fields.workspace))
       // FIXME - FS - 2023-11-28 - https://github.com/tracim/tracim/issues/6292
+      // use KnownMember to only get the member of the new space joined
       const fetchGetKnownMemberList = await props.dispatch(getMyselfAllKnownMember())
       if (fetchGetKnownMemberList.status === 200) {
         props.dispatch(setKnownMemberList(fetchGetKnownMemberList.json))
