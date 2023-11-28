@@ -267,13 +267,12 @@ class UserApi(object):
 
         return (
             self._session.query(s2.user_id, User.username, User.display_name, s2.workspace_id)
-            .join(s1, s1.workspace_id == s2.workspace_id)
+            .join(s1, and_(s1.workspace_id == s2.workspace_id, s1.user_id == user_id))
             .join(User, and_(User.user_id == s2.user_id, User.is_active, not_(User.is_deleted)))
             .join(
                 Workspace,
                 and_(Workspace.workspace_id == s1.workspace_id, not_(Workspace.is_deleted)),
             )
-            .filter(s1.user_id == user_id)
             .order_by(s2.user_id)
             .all()
         )
