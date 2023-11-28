@@ -22,7 +22,6 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.expression import cast
 import transaction
 import typing as typing
-from typing import Any
 from typing import List
 from typing import Tuple
 
