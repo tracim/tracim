@@ -58,7 +58,6 @@ describe('reducer currentWorkspace.js', () => {
           downloadEnabled: firstWorkspaceFromApi.public_download_enabled,
           id: firstWorkspaceFromApi.workspace_id,
           label: firstWorkspaceFromApi.label,
-          memberList: firstWorkspaceFromApi.members,
           publicationEnabled: firstWorkspaceFromApi.publication_enabled,
           slug: firstWorkspaceFromApi.slug,
           uploadEnabled: firstWorkspaceFromApi.public_upload_enabled
@@ -83,7 +82,7 @@ describe('reducer currentWorkspace.js', () => {
   })
 
   describe('actions', () => {
-    const initialState = { id: 42, dummyProperty: 'nothing' }
+    const initialState = { id: 42, dummyProperty: 'nothing', memberList: [{ id: 1 }] }
 
     it('should return the initial state when no action given', () => {
       const rez = currentWorkspace(initialState, { type: 'nothing that will match', action: {} })

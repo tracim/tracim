@@ -28,6 +28,7 @@ import {
 } from '../../../src/reducer/currentWorkspace'
 import { globalManagerFromApi } from '../../fixture/user/globalManagerFromApi'
 import { globalManagerSetting, globalManagerSettingReader } from '../../fixture/user/globalManagerSetting.js'
+import { globalManagerAsMemberFromApi } from '../../fixture/user/globalManagerAsMember'
 
 describe('workspaceList reducer', () => {
   describe('actions', () => {
@@ -61,9 +62,6 @@ describe('workspaceList reducer', () => {
             ...serializedFirstWorkspaceFromApi,
             sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(
               sbe => serialize(sbe, serializeSidebarEntryProps)
-            ),
-            memberList: firstWorkspaceFromApi.members.map(
-              m => serializeMember(m)
             )
           }
         ])
@@ -71,7 +69,10 @@ describe('workspaceList reducer', () => {
     })
 
     describe(ADD_ROLE_WORKSPACE_LIST, () => {
-      const rez = workspaceList(initialState, addRoleWorkspaceList(globalManagerFromApi, globalManagerSetting, firstWorkspaceFromApi))
+      const rez = workspaceList(
+        initialState,
+        addRoleWorkspaceList(globalManagerFromApi, globalManagerSetting, firstWorkspaceFromApi)
+      )
 
       it('should return a workspace list with the workspace added', () => {
         expect(rez).to.deep.equal([
@@ -80,9 +81,7 @@ describe('workspaceList reducer', () => {
             sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(
               sbe => serialize(sbe, serializeSidebarEntryProps)
             ),
-            memberList: firstWorkspaceFromApi.members.map(
-              m => serializeMember(m)
-            )
+            memberList: [serializeMember(globalManagerAsMemberFromApi)]
           },
           ...initialState
         ])
@@ -107,7 +106,7 @@ describe('workspaceList reducer', () => {
               sbe => serialize(sbe, serializeSidebarEntryProps)
             ),
             memberList: [{
-              ...serializeMember(firstWorkspaceFromApi.members[0]),
+              ...serializeMember(globalManagerAsMemberFromApi),
               role: ROLE.reader.slug
             }]
           },
@@ -138,9 +137,6 @@ describe('workspaceList reducer', () => {
             label: 'labelChanged',
             sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(
               sbe => serialize(sbe, serializeSidebarEntryProps)
-            ),
-            memberList: firstWorkspaceFromApi.members.map(
-              m => serializeMember(m)
             )
           }
         ])

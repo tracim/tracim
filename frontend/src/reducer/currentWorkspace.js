@@ -50,7 +50,6 @@ export const serializeWorkspace = ws => {
     downloadEnabled: ws.public_download_enabled,
     id: ws.workspace_id,
     label: ws.label,
-    memberList: ws.members,
     publicationEnabled: ws.publication_enabled,
     slug: ws.slug,
     uploadEnabled: ws.public_upload_enabled
