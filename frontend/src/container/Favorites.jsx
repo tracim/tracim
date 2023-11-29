@@ -77,7 +77,7 @@ export class Favorites extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    if (prevProps.workspaceList.length === 0 && this.props.workspaceList.length > 0){
+    if (prevProps.workspaceList.length === 0 && this.props.workspaceList.length > 0) {
       this.addWorkspaceToBreadcrumbsPath()
     }
   }
