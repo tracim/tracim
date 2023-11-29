@@ -54,6 +54,9 @@ export const serializeWorkspace = ws => {
     slug: ws.slug,
     uploadEnabled: ws.public_upload_enabled
   }
+  // FIXME - CH - 2023-11-29 - Improper way of serializing. We should use serialize() from
+  //  frontend_lid
+  // To refactor in: https://github.com/tracim/tracim/issues/6252
   if (ws.members) {
     workspace.memberList = ws.member
   }
