@@ -34,9 +34,10 @@ import {
   updateAccessibleWorkspace,
   addWorkspaceSubscription,
   removeWorkspaceSubscription,
-  updateWorkspaceSubscription
+  updateWorkspaceSubscription,
+  setKnownMemberList
 } from '../action-creator.sync.js'
-import { getUser } from '../action-creator.async.js'
+import { getUser, getMyselfAllKnownMember } from '../action-creator.async.js'
 import { FETCH_CONFIG } from '../util/helper.js'
 import { cloneDeep } from 'lodash'
 
@@ -162,12 +163,18 @@ export class ReduxTlmDispatcher extends React.Component {
     this.handleNotification(data)
   }
 
-  handleMemberCreated = data => {
+  handleMemberCreated = async data => {
     const { props } = this
 
     if (props.user.userId === data.fields.user.user_id) {
       props.dispatch(addRoleWorkspaceList(data.fields.user, data.fields.member, data.fields.workspace))
       props.dispatch(removeAccessibleWorkspace(data.fields.workspace))
+      // FIXME - FS - 2023-11-28 - https://github.com/tracim/tracim/issues/6292
+      // use KnownMember to only get the member of the new space joined
+      const fetchGetKnownMemberList = await props.dispatch(getMyselfAllKnownMember())
+      if (fetchGetKnownMemberList.status === 200) {
+        props.dispatch(setKnownMemberList(fetchGetKnownMemberList.json))
+      }
     } else if (!props.workspaceList.some(space => space.id === data.fields.workspace.workspace_id)) return
 
     props.dispatch(addWorkspaceMember(data.fields.user, data.fields.workspace.workspace_id, data.fields.member))
