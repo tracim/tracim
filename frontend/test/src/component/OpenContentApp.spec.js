@@ -12,7 +12,7 @@ import { appList } from '../../hocMock/redux/appList/appList.js'
 import { mockPutContentNotificationAsRead204 } from '../../apiMock.js'
 import { FETCH_CONFIG } from '../../../src/util/helper.js'
 import { isFunction } from '../../hocMock/helper'
-import { globalManagerAsMember } from '../../fixture/user/globalManagerAsMember.jsx'
+import { globalManagerAsMember } from '../../fixture/user/globalManagerAsMember.js'
 
 describe('<OpenContentApp />', () => {
   const dispatchCustomEventSpy = sinon.spy()
