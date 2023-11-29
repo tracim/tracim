@@ -15,13 +15,13 @@ from sqlakeyset import get_page
 import sqlalchemy
 from sqlalchemy import and_
 from sqlalchemy import func
+from sqlalchemy import not_
 from sqlalchemy import or_
 from sqlalchemy.orm import Query
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.expression import cast
 import transaction
 import typing as typing
-from typing import Any
 from typing import List
 from typing import Tuple
 
@@ -246,7 +246,9 @@ class UserApi(object):
         )
         return [item[0] for item in user_ids_in_workspaces_tuples]
 
-    def get_users_in_common_with_user_workspace(self, user_id: int) -> List[Tuple[Any, ...]]:
+    def get_users_in_common_with_user_workspace(
+        self, user_id: int
+    ) -> List[Tuple[int, str, str, int]]:
         """
         Returns a list of found user data in common with the provided user as a tuple
         :param user_id: id of the user to get data from
@@ -256,7 +258,7 @@ class UserApi(object):
                 0 -> user_id
                 1 -> username
                 2 -> display_name
-                3 -> workspace_ids
+                3 -> workspace_id
             )
         """
         from sqlalchemy.orm import aliased
@@ -266,9 +268,12 @@ class UserApi(object):
 
         return (
             self._session.query(s2.user_id, User.username, User.display_name, s2.workspace_id)
-            .join(s1, s1.workspace_id == s2.workspace_id)
+            .join(s1, and_(s1.workspace_id == s2.workspace_id, s1.user_id == user_id))
             .join(User, User.user_id == s2.user_id)
-            .filter(s1.user_id == user_id)
+            .join(
+                Workspace,
+                and_(Workspace.workspace_id == s1.workspace_id, not_(Workspace.is_deleted)),
+            )
             .order_by(s2.user_id)
             .all()
         )
