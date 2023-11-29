@@ -15,8 +15,7 @@ export const firstWorkspaceFromApi = {
   public_upload_enabled: true,
   is_deleted: false,
   created: '2019-03-24T08:58:57Z',
-  publication_enabled: true,
-  members: [globalManagerAsMemberFromApi]
+  publication_enabled: true
 }
 
 export const firstWorkspace = {
