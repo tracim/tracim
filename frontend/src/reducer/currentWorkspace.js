@@ -58,7 +58,7 @@ export const serializeWorkspace = ws => {
   //  frontend_lid
   // To refactor in: https://github.com/tracim/tracim/issues/6252
   if (ws.members) {
-    workspace.memberList = ws.member
+    workspace.memberList = ws.members
   }
   return workspace
 }
