@@ -76,23 +76,27 @@ export class Favorites extends React.Component {
     this.loadFavoriteList()
   }
 
-  componentDidUpdate (prevProps, prevState) {
-    if (prevProps.workspaceList.length === 0) this.addWorkspaceToBreadcrumbsPath()
+  componentDidUpdate (prevProps) {
+    if (prevProps.workspaceList.length === 0 && this.props.workspaceList.length > 0){
+      this.addWorkspaceToBreadcrumbsPath()
+    }
   }
 
   addWorkspaceToBreadcrumbsPath () {
-    const { props } = this
+    const { props, state } = this
     if (props.workspaceList.length === 0) return
-    const { favoriteList } = this.state
 
-    favoriteList.map(async favorite => {
-      if (!favorite.content) return null
-      const workspace = props.workspaceList.find(ws => ws.id === favorite.content.workspace_id)
-      favorite.breadcrumbs = [{ label: workspace.label }].concat(favorite.breadcrumbs)
-    })
+    const favoriteWithFullBreadcrumbsList = state.favoriteList
+      .map(favorite => {
+        const workspace = props.workspaceList.find(ws => ws.id === favorite.content.workspace_id)
+        return {
+          ...favorite,
+          breadcrumbs: [{ label: workspace.label }].concat(favorite.breadcrumbs)
+        }
+      })
 
     this.setState({ isLoading: false })
-    props.dispatch(setFavoriteList([...favoriteList]))
+    props.dispatch(setFavoriteList(favoriteWithFullBreadcrumbsList))
   }
 
   loadFavoriteList = async () => {
@@ -107,19 +111,22 @@ export class Favorites extends React.Component {
       return
     }
 
-    const favoriteList = fetchFavoriteList.json.items
-    // Get the contents' paths (for breadcrumbs)
-    await Promise.all(favoriteList.map(async favorite => {
-      if (!favorite.content) return null
-      // NOTE - S.G. - 2021-04-01 - here we have the favorite as returned by the backend
-      // hence the snake-case properties
-      const response = await handleFetchResult(
-        await getContentPath(FETCH_CONFIG.apiUrl, favorite.content_id)
-      )
-      favorite.breadcrumbs = response.body.items
-    }))
+    // INFO - Ch - 2023-11-29 - Get the contents' paths (for breadcrumbs)
+    const favoriteWithIncompleteBreadcrumbsList = await Promise.all(fetchFavoriteList.json.items
+      .filter(f => f.content !== null && f.content !== undefined)
+      .map(async favorite => {
+        try {
+          const response = await handleFetchResult(
+            await getContentPath(FETCH_CONFIG.apiUrl, favorite.content_id)
+          )
+          return { ...favorite, breadcrumbs: response.body.items }
+        } catch (e) {
+          console.error('Error in loadFavoriteList', favorite, e)
+          return { ...favorite, breadcrumbs: [] }
+        }
+      }))
 
-    this.setState({ favoriteList })
+    this.setState({ favoriteList: favoriteWithIncompleteBreadcrumbsList })
     this.addWorkspaceToBreadcrumbsPath()
   }
 
