@@ -42,7 +42,7 @@ const defaultWorkspace = {
 }
 
 export const serializeWorkspace = ws => {
-  return {
+  const workspace = {
     accessType: ws.access_type,
     agendaEnabled: ws.agenda_enabled,
     defaultRole: ws.default_user_role,
@@ -50,11 +50,14 @@ export const serializeWorkspace = ws => {
     downloadEnabled: ws.public_download_enabled,
     id: ws.workspace_id,
     label: ws.label,
-    memberList: ws.members,
     publicationEnabled: ws.publication_enabled,
     slug: ws.slug,
     uploadEnabled: ws.public_upload_enabled
   }
+  if (ws.members) {
+    workspace.memberList = ws.member
+  }
+  return workspace
 }
 
 export const serializeSidebarEntryProps = {
