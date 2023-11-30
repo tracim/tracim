@@ -4,13 +4,13 @@
 
 ### ✨ New Features
 
-- Support of SAML authentication
-- Editable user properties can now be read-only
-- Improve support of distributed deployment (redis, pushpin, elastic search)
+- SAML authentication is now supported
+- User properties, previously always editable, can now be set as read-only
+- Support of distributed deployment (redis, pushpin, elastic search) has been improved
 
 ### ⚡️ Performance
 
-- Improvement in loading spaces and members in frontend
+- Loading of spaces and members in frontend has been improved
 
 ### 🐛 Fixed Issues
 
