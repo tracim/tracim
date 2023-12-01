@@ -40,6 +40,13 @@ export class PersonalRecentActivities extends React.Component {
     this.buildBreadcrumbs()
   }
 
+  componentDidUpdate (prevProps) {
+    if (this.props.system.workspaceListLoaded && !prevProps.system.workspaceListLoaded) {
+      this.props.cancelCurrentLoadActivities()
+      this.props.loadActivities(ACTIVITY_COUNT_PER_PAGE, true)
+    }
+  }
+
   /**
    * Function to handle TLM which will be triggered on every global TLM
    *

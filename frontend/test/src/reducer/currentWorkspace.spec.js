@@ -26,7 +26,6 @@ import {
   updateWorkspaceDetail,
   updateWorkspaceMember,
   addWorkspaceReadStatus,
-  USER,
   USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
   WORKSPACE_AGENDA_URL,
   WORKSPACE_CONTENT,
@@ -35,7 +34,9 @@ import {
   WORKSPACE_MEMBER_LIST,
   WORKSPACE_READ_STATUS,
   WORKSPACE_READ_STATUS_LIST,
-  WORKSPACE_CONTENT_SHARE_FOLDER
+  WORKSPACE_CONTENT_SHARE_FOLDER,
+  REMOVE_WORKSPACE_MEMBER,
+  UPDATE_USER
 } from '../../../src/action-creator.sync.js'
 import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
 import { globalManagerAsMember, globalManagerAsMemberFromApi } from '../../fixture/user/globalManagerAsMember.js'
@@ -51,15 +52,15 @@ describe('reducer currentWorkspace.js', () => {
       it('should return an object (in camelCase)', () => {
         expect(rez).to.deep.equal({
           accessType: firstWorkspaceFromApi.access_type,
-          defaultRole: firstWorkspaceFromApi.default_user_role,
-          id: firstWorkspaceFromApi.workspace_id,
-          slug: firstWorkspaceFromApi.slug,
-          label: firstWorkspaceFromApi.label,
-          description: firstWorkspaceFromApi.description,
           agendaEnabled: firstWorkspaceFromApi.agenda_enabled,
+          defaultRole: firstWorkspaceFromApi.default_user_role,
+          description: firstWorkspaceFromApi.description,
           downloadEnabled: firstWorkspaceFromApi.public_download_enabled,
-          uploadEnabled: firstWorkspaceFromApi.public_upload_enabled,
-          publicationEnabled: firstWorkspaceFromApi.publication_enabled
+          id: firstWorkspaceFromApi.workspace_id,
+          label: firstWorkspaceFromApi.label,
+          publicationEnabled: firstWorkspaceFromApi.publication_enabled,
+          slug: firstWorkspaceFromApi.slug,
+          uploadEnabled: firstWorkspaceFromApi.public_upload_enabled
         })
       })
     })
@@ -81,7 +82,7 @@ describe('reducer currentWorkspace.js', () => {
   })
 
   describe('actions', () => {
-    const initialState = { id: 42, dummyProperty: 'nothing' }
+    const initialState = { id: 42, dummyProperty: 'nothing', memberList: [{ id: 1 }] }
 
     it('should return the initial state when no action given', () => {
       const rez = currentWorkspace(initialState, { type: 'nothing that will match', action: {} })
@@ -193,7 +194,7 @@ describe('reducer currentWorkspace.js', () => {
       })
     })
 
-    describe(`${REMOVE}/${WORKSPACE_MEMBER}`, () => {
+    describe(REMOVE_WORKSPACE_MEMBER, () => {
       const initialStateWithMember = { ...initialState, memberList: [globalManagerAsMember] }
       const rez = currentWorkspace(
         initialStateWithMember,
@@ -469,7 +470,7 @@ describe('reducer currentWorkspace.js', () => {
       })
     })
 
-    describe(`${UPDATE}/${USER}`, () => {
+    describe(UPDATE_USER, () => {
       const newInitialState = {
         ...initialState,
         memberList: [{

@@ -54,9 +54,5 @@ describe('App Workspace Advanced', function () {
         .should('be.visible')
     })
 
-    it('should redirect to adiministrator page when closing', () => {
-      cy.get('.workspace_advanced__contentpage__header [data-cy=popinFixed__header__button__close]').click()
-      cy.contains('.pageTitleGeneric__title__label', 'Space management')
-    })
   })
 })

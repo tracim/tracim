@@ -1,6 +1,7 @@
 import enum
 from gripcontrol import GripPubControl
 from gripcontrol import HttpStreamFormat
+from itertools import zip_longest
 import json
 import threading
 import typing
@@ -66,9 +67,21 @@ class LiveMessagesLib(object):
             if not _grip_pub_control:
                 # NOTE S.G. - 2020-08-06 - publishing using ZMQ to avoid
                 # low maximum (1Mbytes) message size when using HTTP transport (#3415)
-                _grip_pub_control = GripPubControl(
-                    {"control_zmq_uri": config.LIVE_MESSAGES__CONTROL_ZMQ_URI}
-                )
+                _grip_pub_control = GripPubControl()
+
+                for zmq_control_uri, zmq_push_uri, zmq_pub_uri in zip_longest(
+                    config.LIVE_MESSAGES__CONTROL_ZMQ_URI,
+                    config.LIVE_MESSAGES__PUSH_ZMQ_URI,
+                    config.LIVE_MESSAGES__PUB_ZMQ_URI,
+                    fillvalue=None,
+                ):
+                    _grip_pub_control.apply_config(
+                        {
+                            "zmq_uri": zmq_control_uri,
+                            "zmq_push_uri": zmq_push_uri,
+                            "zmq_pub_uri": zmq_pub_uri,
+                        }
+                    )
 
     @classmethod
     def message_as_dict(cls, message: Message):

@@ -7,6 +7,7 @@ from pyramid.response import Response
 import typing
 
 from tracim_backend.config import CFG  # noqa: F401
+from tracim_backend.config import UserReadOnlyFields
 from tracim_backend.error import ErrorCode
 from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
 from tracim_backend.exceptions import CannotUseBothIncludeAndExcludeWorkspaceUsers
@@ -21,6 +22,7 @@ from tracim_backend.exceptions import NotFound
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import PreviewDimNotAllowed
+from tracim_backend.exceptions import ReadOnlyFieldException
 from tracim_backend.exceptions import ReservedUsernameError
 from tracim_backend.exceptions import RoleAlreadyExistError
 from tracim_backend.exceptions import TooManyOnlineUsersError
@@ -111,8 +113,10 @@ from tracim_backend.views.core_api.schemas import UserWorkspaceAndContentIdPathS
 from tracim_backend.views.core_api.schemas import UserWorkspaceFilterQuerySchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdSchema
+from tracim_backend.views.core_api.schemas import WorkspaceMemberSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSubscriptionSchema
+from tracim_backend.views.core_api.schemas import WorkspaceWithUserMemberSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_EVENT_ENDPOINTS
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_USER_CONFIG_ENDPOINTS
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_USER_SUBSCRIPTIONS_SECTION
@@ -162,12 +166,26 @@ ALLOWED__AVATAR_MIMETYPES = [
 ]
 
 
+def check_has_write_rights(
+    field: UserReadOnlyFields, app_config: CFG, request: TracimRequest
+) -> bool:
+    """
+    Check if user can write provided field (is admin or field is writable)
+    :raise ReadOnlyFieldException if the field is not writable
+    """
+    read_only_fields = app_config.USER__READ_ONLY_FIELDS.get(request.candidate_user.auth_type)
+    if read_only_fields is not None:
+        if field in read_only_fields:
+            raise ReadOnlyFieldException(f"You can't modify the field {field.value}")
+    return True
+
+
 class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(UserWorkspaceFilterQuerySchema())
-    @hapic.output_body(WorkspaceSchema(many=True))
+    @hapic.output_body(WorkspaceWithUserMemberSchema(many=True))
     def user_workspace(self, context, request: TracimRequest, hapic_data=None):
         """
         Get list of user workspaces
@@ -185,7 +203,30 @@ class UserController(Controller):
             include_with_role=hapic_data.query.show_workspace_with_role,
             parents_ids=hapic_data.query.parent_ids,
         )
-        return [wapi.get_workspace_with_context(workspace) for workspace in workspaces]
+        return [
+            wapi.get_workspace_with_context(workspace, user=request.candidate_user)
+            for workspace in workspaces
+        ]
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_query(UserWorkspaceFilterQuerySchema())
+    @hapic.output_body(WorkspaceMemberSchema(many=True))
+    def user_role_workspace(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Get list of all roles of the given user
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        wapi = RoleApi(
+            current_user=request.candidate_user,  # User
+            session=request.dbsession,
+            config=app_config,
+        )
+        return [
+            wapi.get_user_role_workspace_with_context(role)
+            for role in request.candidate_user.get_active_roles()
+        ]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.BAD_REQUEST)
@@ -278,8 +319,7 @@ class UserController(Controller):
             limit=hapic_data.query.limit,
             filter_results=app_config.KNOWN_MEMBERS__FILTER,
         )
-        context_users = [uapi.get_user_with_context(user) for user in users]
-        return context_users
+        return [uapi.get_user_with_context(user) for user in users]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @check_right(has_personal_access)
@@ -308,6 +348,7 @@ class UserController(Controller):
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(EmailAlreadyExists, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ExternalAuthUserEmailModificationDisallowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ReadOnlyFieldException, HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_body(SetEmailSchema())
     @hapic.input_path(UserIdPathSchema())
@@ -320,6 +361,7 @@ class UserController(Controller):
         uapi = UserApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
+        check_has_write_rights(UserReadOnlyFields.EMAIL, app_config, request)
         user = uapi.set_email(
             request.candidate_user,
             hapic_data.body.loggedin_user_password,
@@ -333,6 +375,7 @@ class UserController(Controller):
     @hapic.handle_exception(UsernameAlreadyExists, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ReservedUsernameError, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(TracimValidationFailed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ReadOnlyFieldException, HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_body(SetUsernameSchema())
     @hapic.input_path(UserIdPathSchema())
@@ -345,6 +388,7 @@ class UserController(Controller):
         uapi = UserApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
+        check_has_write_rights(UserReadOnlyFields.USERNAME, app_config, request)
         user = uapi.set_username(
             request.candidate_user,
             hapic_data.body.loggedin_user_password,
@@ -357,6 +401,7 @@ class UserController(Controller):
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(PasswordDoNotMatch, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ExternalAuthUserPasswordModificationDisallowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ReadOnlyFieldException, HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_body(SetPasswordSchema())
     @hapic.input_path(UserIdPathSchema())
@@ -369,6 +414,7 @@ class UserController(Controller):
         uapi = UserApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
+        check_has_write_rights(UserReadOnlyFields.PASSWORD, app_config, request)
         uapi.set_password(
             request.candidate_user,
             hapic_data.body.loggedin_user_password,
@@ -387,6 +433,13 @@ class UserController(Controller):
         Set user info data
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
+        try:
+            check_has_write_rights(UserReadOnlyFields.PUBLIC_NAME, app_config, request)
+        except ReadOnlyFieldException:
+            # NOTE - M.L. - 07/11/2023 - Since public_name is always sent,
+            #  even when only changing the language, this request will fail all the time.
+            #  This allows to make sure the public_name is not modified without blocking the request
+            hapic_data.body.public_name = request.candidate_user.public_name
         uapi = UserApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
@@ -1386,6 +1439,14 @@ class UserController(Controller):
             request_method="POST",  # noqa: W605
         )
         configurator.add_view(self.join_workspace, route_name="post_user_workspace")
+
+        # user role
+        configurator.add_route(
+            "get_user_role_workspace",
+            "/users/{user_id:\d+}/workspaces/all/settings",  # noqa: W605
+            request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(self.user_role_workspace, route_name="get_user_role_workspace")
 
         # user info
         configurator.add_route("user", "/users/{user_id:\d+}", request_method="GET")  # noqa: W605

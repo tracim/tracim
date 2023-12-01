@@ -71,7 +71,7 @@ import {
 import {
   SORT_BY,
   SORT_ORDER,
-  putFoldersAtListBeginning,
+  sortWithFoldersAtListBeginning,
   sortListBy,
   sortListByMultipleCriteria,
   sortTimelineByDate
@@ -484,7 +484,6 @@ export {
   putEditStatus,
   putFileDescription,
   putFileIsDeleted,
-  putFoldersAtListBeginning,
   putMyselfFileRead,
   putRawFileContent,
   putToDo,
@@ -502,6 +501,7 @@ export {
   sortListBy,
   sortListByMultipleCriteria,
   sortTimelineByDate,
+  sortWithFoldersAtListBeginning,
   splitFilenameExtension,
   stringIncludes,
   updateTLMUser,

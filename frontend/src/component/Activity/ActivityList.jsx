@@ -2,13 +2,15 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import {
-  CONTENT_NAMESPACE,
   BREADCRUMBS_TYPE,
+  CONTENT_NAMESPACE,
   CONTENT_TYPE,
-  IconButton,
   PAGE,
-  serialize,
-  TLM_ENTITY_TYPE as TLM_ET
+  TLM_ENTITY_TYPE as TLM_ET,
+  EmptyListMessage,
+  IconButton,
+  Loading,
+  serialize
 } from 'tracim_frontend_lib'
 import { serializeContentProps } from '../../reducer/workspaceContentList.js'
 import FeedItemWithPreview from '../../container/FeedItemWithPreview.jsx'
@@ -141,7 +143,17 @@ const ActivityList = (props) => {
           ? activityList
           : (
             <div className='activityList__placeholder'>
-              {props.activity.hasNextPage ? props.t('Loading recent activities…') : props.t('No activity')}
+              {props.activity.hasNextPage ? (
+                <Loading
+                  height={100}
+                  text={props.t('Loading recent activities…')}
+                  width={100}
+                />
+              ) : (
+                <EmptyListMessage>
+                  {props.t('No activity')}
+                </EmptyListMessage>
+              )}
             </div>
           )
         )}

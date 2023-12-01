@@ -42,6 +42,7 @@ Tracim comes with several authentication methods:
 
 - internal database
 - LDAP
+- SAML
 - Special authentifications mechanisms like Api-Key
 - REMOTE AUTH, like Apache Auth, later explained in the documentation.
 
@@ -85,7 +86,7 @@ ldap_tls = False
 ⚠ When logging in Tracim, if a valid LDAP user doesn't
 exist in Tracim, it will be created as a standard user.
 
-### Special Authentication Mechanism
+## Special Authentication Mechanism
 
 Those special authentication mechanisms are not linked to `auth_types` in the configuration.
 
@@ -165,6 +166,166 @@ Listen 6544
 </VirtualHost>
 ```
 
+## SAML Authentication
+
+SAML Authentication needs the `xmlsec1` system package and the `pysaml2` python package
+to be installed.
+
+SAML authentication relies on a different settings file.
+The path of the settings file is provided to tracim through the `PYRAMID_SAML_PATH` environment variable.
+
+Note: `PYRAMID_SAML_PATH` needs to be an absolute path.
+
+e.g.
+```
+PYRAMID_SAML_PATH=/etc/tracim/backend/settings_saml2.json
+```
+
+See below for details about the configuration format.
+
+A sample configuration file can be found at `.../backend/settings_saml2.json`.
+
+When SAML auth is activated, a list of configurated IdPs is displayed instead of the standard login form on the login page.
+If other login methods are available, the login form can be found in the list as `Classic Login`.
+
+The different SAML endpoints are
+
+- **metadata**: `/saml/metadata`
+- **sso**: `/saml/sso?target=<vorg.common_identifier of the IdP>`
+- **acs**: `/saml/acs`
+- **slo**: `/saml/slo/redirect` (for redirect based SLO)
+- **slo**: `/saml/slo/post` (for post based SLO)
+
+These endpoints are conventional to the SAML protocol, only the `saml/sso` route is non-standard.
+It is designed to redirect the user to the proper IdP depending on what `target` is provided.
+This is for multi IdP support.
+
+The `saml/metadata` is automatically managed by `pysaml2`. Changes must be done on the SAML settings file
+to change the metadata.
+
+For more details about the standard routes and the protocol, see ["SAML Explained in Plain English"](https://www.onelogin.com/learn/saml)
+
+See [SSO Glossary](https://help.akana.com/content/current/cm/saml/08_glossary.htm) and 
+[SLO Article](https://uit.stanford.edu/service/saml/logout) for more details about the employed terms
+
+⚠ When logging in Tracim, if a valid user doesn't
+exist in Tracim, it will be created as a standard user.
+
+### Configuration Explanation
+
+This file is a JSON file following [pysaml2's settings format](https://pysaml2.readthedocs.io/en/latest/howto/config.html).
+Additional fields specific to tracim can be found in the `virtual_organization` field.
+
+```json
+{
+    "entityid": "http://localhost:7999/saml/metadata",
+    "metadata": {
+        "local": [],
+        "remote": [
+            {
+                "url": "https://samltest.id/saml/idp"
+            },
+            {
+                "url": "https://idp.ssocircle.com"
+            }
+        ]
+    },
+    "service": {
+        "sp": {
+            "endpoints": {
+                "assertion_consumer_service": [
+                    [
+                        "http://localhost:7999/saml/acs",
+                        "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                    ]
+                ],
+                "single_logout_service": [
+                    [
+                        "http://localhost:7999/saml/slo/redirect",
+                        "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+                    ],
+                    [
+                        "http://localhost:7999/saml/slo/post",
+                        "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                    ]
+                ]
+            },
+            "allow_unsolicited": true,
+            "authn_requests_signed": false,
+            "logout_requests_signed": false,
+            "want_assertions_signed": false,
+            "want_response_signed": false,
+            "name_id_format": "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
+            "name_id_format_allow_create": true,
+            "want_name_id": true
+        }
+    },
+    "allow_unknown_attributes": true,
+    "key_file": "<path_to_key>",
+    "cert_file": "<path_to_cert>",
+    "xmlsec_binary": "/usr/bin/xmlsec1",
+    "metadata_cache_duration": {
+        "default": 86400
+    },
+    "virtual_organization": {
+        "https://samltest.id/saml/idp": {
+            "common_identifier": "saml_test"
+        },
+        "https://idp.ssocircle.com": {
+            "common_identifier": "sso_circle",
+            "logo_url": "https://idp.ssocircle.com/logo.png",
+            "displayed_name": "[Test] SSO Circle",
+            "attribute_map": {
+                "user_id": "${UserID}",
+                "username": "${FirstName}",
+                "email": "${EmailAddress}",
+                "public_name": "${FirstName} ${LastName}"
+            },
+            "profile_map": {
+                "trusted-users": {
+                  "value": "${UserID}",
+                  "match": "any_regex_pattern"
+                },
+                "administrators": {
+                  "value": "${UserID}",
+                  "match": "value|other_value"
+                }
+            }
+        }
+    }
+}
+```
+
+- `entityid`: String: The Entity ID of the Service Provider (SP). It uniquely identifies your service.
+- `metadata`: Metadata settings for the SAML configuration. local and remote are arrays of strings for defining metadata sources. In this example, two remote identity providers (IdPs) are configured.
+- `service`: Service-related settings for the SP.
+  - `sp`: Service Provider-specific settings.
+    - `endpoints`: Configuration for various endpoints, such as Assertion Consumer Service (ACS) and Single Logout Service (SLO).
+    - `allow_unsolicited`: Bool: Whether unsolicited responses are allowed from the IdP.
+    - `authn_requests_signed`: Bool: Specifies whether authentication requests should be signed.
+    - `logout_requests_signed`: Bool: Specifies whether logout requests should be signed.
+    - `want_assertions_signed`: Bool: Specifies whether the SP wants signed assertions.
+    - `want_response_signed`: Bool: Specifies whether the SP wants signed responses.
+    - `name_id_format`: String: The format for the NameID.
+    - `name_id_format_allow_create`: Bool: Whether to allow the IdP to create a new NameID if it doesn't exist.
+    - `want_name_id`: Bool: Whether the SP wants the NameID in the response.
+- `allow_unknown_attributes`: Bool: Allows processing of unknown attributes received from the IdP.
+- `key_file`: String: Path to the key file used for signing.
+- `cert_file`: String: Path to the certificate file used for signing.
+- `xmlsec_binary`: String: Path to the xmlsec1 binary for XML security operations.
+- `metadata_cache_duration`: Cache duration for remote metadata. In this example, the default cache duration is set to 86,400 seconds (1 day).
+- `virtual_organization`: Configuration for virtual organizations associated with IdPs. This is where you will define per-IdP settings. Each IdP is identified by its metadata URL.
+  - `common_identifier`: A common identifier for the virtual organization associated with the IdP.
+  - `logo_url`: URL to the organization's logo on the selection screen.
+  - `displayed_name`: The displayed name of the organization on the login page.
+  - `attribute_map`: Mapping of SAML attributes to specific names used within the SP.
+  - `profile_map`: Mapping of SAML attributes to tracim's user profile.
+    - `value`: Mapping of SAML attributes to the value that will be tested.
+    - `match`: Regex pattern that will be tested against value, if there is a match, profile is set. The regex syntax is the one processed by python's `re` module. If no regex match, profile "user" is set.
+      - ⚠ Since users can't have two profiles in tracim, be careful to not have values that can match multiple regexes
+
+Example: `username` maps to `${FirstName}` received from the IdP.
+
 ## User sessions in Tracim
 
 Authenticated users have a server-stored session which is identified by an HTTP Cookie.
@@ -216,6 +377,53 @@ Then you'll need to set those parameters for redis backend:
 basic_setup.sessions_data_root_dir = an_existing_session_path
 session.type = ext:redis
 session.url = redis://localhost:6379/0
+```
+
+#### Connecting to a Redis cluster
+
+tracim doesn't support Redis clusters natively. To circumvent this, it is possible to deploy a 
+[Redis cluster proxy](https://github.com/RedisLabs/redis-cluster-proxy) and configure tracim to interact with it
+instead of a Redis instance. It will act as a single Redis instance, but will make use of the Redis cluster it is
+connected to.
+
+There is two ways to deploy it:
+
+- As a Docker container
+- As a service on the server
+
+Since there is no official Docker images for Redis cluster proxy, it is required to build it.
+
+Either it is as a service or a Docker container, the steps for building the proxy are the following:
+
+- Install C compiling tools (`apt install gcc make`)
+- Clone and go into the Redis Cluster Proxy git repository 
+(`git clone https://github.com/RedisLabs/redis-cluster-proxy.git && cd redis-cluster-proxy`)
+- Compile and install (`make && make install`), more details about compiling on the repository's README
+
+To run the proxy, simply provide the IPs of the cluster nodes. It will automatically resolve missing nodes,
+but it is recommended to provide all of them (only one will serve as an entrypoint, but in case of failure,
+it will try another one from the list)
+
+Example:
+```bash
+redis-cluster-proxy 192.168.1.10:6379 192.168.1.11:6379 192.168.1.12:6379 192.168.1.13:6379
+```
+
+Here is a basic Dockerfile for the proxy:
+
+```Dockerfile
+FROM debian:buster-slim as builder
+
+RUN apt update && apt -y upgrade && apt -y install gcc make git
+RUN git clone https://github.com/RedisLabs/redis-cluster-proxy.git
+
+WORKDIR redis-cluster-proxy
+RUN make
+
+FROM debian:buster-slim as runner
+COPY --from=builder /redis-cluster-proxy/src/redis-cluster-proxy /redis-cluster-proxy
+
+CMD ./redis-cluster-proxy <cluster_nodes_ips>
 ```
 
 #### delete the existing sessions (redis storage)

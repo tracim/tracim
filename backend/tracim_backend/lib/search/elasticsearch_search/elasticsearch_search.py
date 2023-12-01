@@ -106,15 +106,12 @@ class ESSearchApi(SearchApi):
     def __init__(self, session: Session, current_user: typing.Optional[User], config: CFG) -> None:
         super().__init__(session, current_user, config)
         assert config.SEARCH__ENGINE == ELASTICSEARCH__SEARCH_ENGINE_SLUG
-        # TODO - G.M - 2019-05-31 - we support only one elasticsearch server case here in config,
-        # check how to support more complex case.
         self.es = Elasticsearch(
             hosts=[
-                (
-                    {
-                        "host": self._config.SEARCH__ELASTICSEARCH__HOST,
-                        "port": self._config.SEARCH__ELASTICSEARCH__PORT,
-                    }
+                ({"host": host, "port": port})
+                for host, port in zip(
+                    self._config.SEARCH__ELASTICSEARCH__HOST,
+                    self._config.SEARCH__ELASTICSEARCH__PORT,
                 )
             ]
         )

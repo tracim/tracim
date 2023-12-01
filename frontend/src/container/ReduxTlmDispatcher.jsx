@@ -16,7 +16,8 @@ import {
   newFlashMessage,
   addNotification,
   addWorkspaceContentList,
-  addWorkspaceList,
+  addRoleWorkspaceList,
+  updateRoleWorkspaceList,
   addWorkspaceMember,
   deleteWorkspaceContentList,
   removeWorkspaceMember,
@@ -33,9 +34,10 @@ import {
   updateAccessibleWorkspace,
   addWorkspaceSubscription,
   removeWorkspaceSubscription,
-  updateWorkspaceSubscription
+  updateWorkspaceSubscription,
+  setKnownMemberList
 } from '../action-creator.sync.js'
-import { getUser } from '../action-creator.async.js'
+import { getUser, getMyselfAllKnownMember } from '../action-creator.async.js'
 import { FETCH_CONFIG } from '../util/helper.js'
 import { cloneDeep } from 'lodash'
 
@@ -161,28 +163,29 @@ export class ReduxTlmDispatcher extends React.Component {
     this.handleNotification(data)
   }
 
-  handleMemberCreated = data => {
+  handleMemberCreated = async data => {
     const { props } = this
-    if (props.user.userId === data.fields.user.user_id || props.workspaceList.find(space => space.id === data.fields.workspace.workspace_id)) {
-      // NOTE - RJ & MP - 2022-02-18
-      // When receiving a member created TLM, it is possible that we haven't added the workspace itself yet
-      // In this case, addWorkspaceMember does nothing.
-      // We actually noticed that the member created TLM arrives before the workspace created TLM.
-      // Let's add the workpace first to avoid this.
-      // See https://github.com/tracim/tracim/issues/5451
-      props.dispatch(addWorkspaceList([data.fields.workspace]))
 
-      props.dispatch(addWorkspaceMember(data.fields.user, data.fields.workspace.workspace_id, data.fields.member))
-      if (props.user.userId === data.fields.user.user_id) {
-        props.dispatch(removeAccessibleWorkspace(data.fields.workspace))
+    if (props.user.userId === data.fields.user.user_id) {
+      props.dispatch(addRoleWorkspaceList(data.fields.user, data.fields.member, data.fields.workspace))
+      props.dispatch(removeAccessibleWorkspace(data.fields.workspace))
+      // FIXME - FS - 2023-11-28 - https://github.com/tracim/tracim/issues/6292
+      // use KnownMember to only get the member of the new space joined
+      const fetchGetKnownMemberList = await props.dispatch(getMyselfAllKnownMember())
+      if (fetchGetKnownMemberList.status === 200) {
+        props.dispatch(setKnownMemberList(fetchGetKnownMemberList.json))
       }
-      this.handleNotification(data)
-    }
+    } else if (!props.workspaceList.some(space => space.id === data.fields.workspace.workspace_id)) return
+
+    props.dispatch(addWorkspaceMember(data.fields.user, data.fields.workspace.workspace_id, data.fields.member))
+    this.handleNotification(data)
   }
 
   handleMemberModified = data => {
     const { props } = this
-    props.dispatch(addWorkspaceList([data.fields.workspace]))
+    if (props.user.userId === data.fields.user.user_id) {
+      props.dispatch(updateRoleWorkspaceList(data.fields.user, data.fields.member, data.fields.workspace))
+    }
     props.dispatch(updateWorkspaceMember(data.fields.user, data.fields.workspace.workspace_id, data.fields.member))
     this.handleNotification(data)
   }

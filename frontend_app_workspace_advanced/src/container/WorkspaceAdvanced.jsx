@@ -372,7 +372,16 @@ export class WorkspaceAdvanced extends React.Component {
 
     switch (fetchPutDefaultRole.apiResponse.status) {
       case 200:
-        sendGlobalFlashMessage(props.t('Save successful'), 'info'); break
+      {
+        sendGlobalFlashMessage(props.t('Save successful'), 'info')
+        this.setState(prev => ({
+          newMember: {
+            ...prev.newMember,
+            role: state.content.default_user_role
+          }
+        }))
+        break
+      }
       default: sendGlobalFlashMessage(props.t('Error while saving new default role'))
     }
   }

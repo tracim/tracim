@@ -63,6 +63,7 @@ class UserCreationType(str, enum.Enum):
 class AuthType(enum.Enum):
     INTERNAL = "internal"
     LDAP = "ldap"
+    SAML = "saml"
     UNKNOWN = "unknown"
     REMOTE = "remote"
 
@@ -134,6 +135,7 @@ class User(TrashableMixin, DeclarativeBase):
     created = Column(DateTime, default=datetime.utcnow)
 
     user_id = Column(Integer, Sequence("seq__users__user_id"), autoincrement=True, primary_key=True)
+    external_id = Column(Unicode(1024), nullable=True, unique=True)
     email = Column(Unicode(MAX_EMAIL_LENGTH), unique=True, nullable=True)
     username = Column(Unicode(MAX_USERNAME_LENGTH), unique=True, nullable=True)
     display_name = Column(Unicode(MAX_PUBLIC_NAME_LENGTH))
@@ -284,6 +286,14 @@ class User(TrashableMixin, DeclarativeBase):
             if not role.workspace.is_deleted:
                 roles.append(role)
         return roles
+
+    def can_receive_summary_mail(self) -> bool:
+        return (
+            self.email
+            and self.is_active
+            and not self.is_deleted
+            and self.auth_type != AuthType.UNKNOWN
+        )
 
     # Tokens ###
 

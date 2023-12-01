@@ -142,7 +142,7 @@ class DescriptionMentionParser(BaseMentionParser):
             role_id = mention_tag.attrs.get(ROLE_ID)
             if user_id and user_id != "":
                 user = UserApi(current_user=None, session=session, config=cfg).get_one(user_id)
-                mention_tag.replaceWith(f"@{user.display_name}")
+                mention_tag.replaceWith(f"@{user.username}")
             elif role_id and role_id != "":
                 # TODO - MP - 2023-04-24 - Since we don't have any other role mention than "all"
                 # we can hardcode it for now. We should find a way to handle other roles

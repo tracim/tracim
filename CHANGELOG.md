@@ -1,5 +1,45 @@
 # Changelog
 
+## 4.7.0 / 2023-12-01
+
+### ✨ New Features
+
+- SAML authentication is now supported
+- User properties, previously always editable, can now be set as read-only
+- Support of distributed deployment (redis, pushpin, elastic search) has been improved
+
+### ⚡️ Performance
+
+- Loading of spaces and members in frontend has been improved
+
+### 🐛 Fixed Issues
+
+- Frontend:
+  - Fix loader not appearing on some cases [#5676](https://github.com/tracim/tracim/issues/5676)
+  - In space admin page, space link is now a html link [#3953](https://github.com/tracim/tracim/issues/3953)
+- Backend:
+  - In notification email, display user's username instead of public name [#6169](https://github.com/tracim/tracim/issues/6169)
+  - Update security policies [#6233](https://github.com/tracim/tracim/issues/6233)
+- Backend/Frontend:
+  - Improve performance by reducing the amount of data downloaded on first load [#6122](https://github.com/tracim/tracim/issues/6122)
+
+## 4.6.2 / 2023-10-27
+
+### 🐛 Fixed Issues
+
+- Frontend: [#6192](https://github.com/tracim/tracim/issues/6192)
+- Backend: [#6219](https://github.com/tracim/tracim/issues/6219)
+
+## 4.6.1 / 2023-07-31
+
+### 🐛 Fixed Issues
+
+- Frontend: [#6224](https://github.com/tracim/tracim/issues/6224)
+
+### Known Issues
+
+- Chrome performance issue for images in advanced edition, see [#5622](https://github.com/tracim/tracim/issues/5622)
+
 ## 4.6.0 / 2023-07-28
 
 ### ✨ New Features

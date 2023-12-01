@@ -63,7 +63,8 @@ import {
   USER_PUBLIC_PROFILE,
   FAVORITE_LIST,
   FAVORITE,
-  UNREAD_NOTIFICATION_COUNT
+  UNREAD_NOTIFICATION_COUNT,
+  ROLE_WORKSPACE_LIST
 } from './action-creator.sync.js'
 import {
   CONTENT_NAMESPACE,
@@ -274,9 +275,11 @@ export const getUserConfiguration = userId => dispatch => {
   })
 }
 
-export const getUserWorkspaceList = (userId, showOwnedWorkspace) => async dispatch => {
+// TODO - CH - 2023-11-02 - this function should be renamed according to:
+// https://github.com/tracim/tracim/issues/6252
+export const getUserRoleWorkspaceList = (userId) => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspaces?show_owned_workspace=${showOwnedWorkspace ? 1 : 0}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspaces/all/settings`,
     param: {
       credentials: 'include',
       headers: {
@@ -304,9 +307,9 @@ export const getUserIsConnected = () => async dispatch => {
   })
 }
 
-export const getMyselfKnownMember = (userNameToSearch, workspaceIdToExclude) => dispatch => {
+export const getMyselfAllKnownMember = () => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/known_members?acp=${userNameToSearch}&exclude_workspace_ids=${workspaceIdToExclude}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/me/known_members`,
     param: {
       credentials: 'include',
       headers: {
@@ -516,9 +519,11 @@ export const putUserWorkspaceEmailNotificationType = (user, workspaceId, emailNo
   })
 }
 
-export const getMyselfWorkspaceList = (showOwnedWorkspace) => dispatch => {
+// TODO - CH - 2023-11-02 - this function should be renamed according to:
+// https://github.com/tracim/tracim/issues/6252
+export const getMyselfUserRoleWorkspaceList = () => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces?show_owned_workspace=${showOwnedWorkspace ? 1 : 0}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/all/settings`,
     param: {
       credentials: 'include',
       headers: {
@@ -526,7 +531,7 @@ export const getMyselfWorkspaceList = (showOwnedWorkspace) => dispatch => {
       },
       method: 'GET'
     },
-    actionName: WORKSPACE_LIST,
+    actionName: ROLE_WORKSPACE_LIST,
     dispatch
   })
 }

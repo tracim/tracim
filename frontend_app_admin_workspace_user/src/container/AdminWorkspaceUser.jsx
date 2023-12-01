@@ -1,5 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
+import { isEqual } from 'lodash'
 import Radium from 'radium'
 import debounce from 'lodash/debounce'
 import i18n from '../i18n.js'
@@ -62,7 +63,6 @@ export class AdminWorkspaceUser extends React.Component {
       usernameInvalidMsg: '',
       popupDeleteWorkspaceDisplay: false,
       workspaceToDelete: null,
-      workspaceIdOpened: null,
       loaded: false,
       selectedSpaceSortCriteria: SORT_BY.ID,
       selectedUserSortCriteria: SORT_BY.PUBLIC_NAME,
@@ -164,8 +164,8 @@ export class AdminWorkspaceUser extends React.Component {
     if (prevState.config.type !== state.config.type) {
       await this.refreshAll()
     }
-    if (state.content.workspaceList !== prevState.content.workspaceList) this.setDisplayedSpaceList()
-    if (state.content.userList !== prevState.content.userList) this.setDisplayedUserList()
+    if (!isEqual(state.content.workspaceList, prevState.content.workspaceList)) this.setDisplayedSpaceList()
+    if (!isEqual(state.content.userList, prevState.content.userList)) this.setDisplayedUserList()
   }
 
   setDisplayedSpaceList = () => {
@@ -309,10 +309,26 @@ export class AdminWorkspaceUser extends React.Component {
   handleDeleteSpace = async () => {
     const { props, state } = this
 
+    const workspaceList = state.content.workspaceList
+    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === state.workspaceToDelete)
+
     const deleteSpaceResponse = await handleFetchResult(await deleteWorkspace(state.config.apiUrl, state.workspaceToDelete))
     if (deleteSpaceResponse.status !== 204) {
       sendGlobalFlashMessage(props.t('Error while deleting space'))
+    } else {
+      const newSpaceList = [
+        ...workspaceList.slice(0, workspaceIndex),
+        ...workspaceList.slice(workspaceIndex + 1)
+      ]
+
+      this.setState(prev => ({
+        content: {
+          ...prev.content,
+          workspaceList: newSpaceList
+        }
+      }))
     }
+
     this.handleClosePopupDeleteSpace()
   }
 
@@ -575,15 +591,6 @@ export class AdminWorkspaceUser extends React.Component {
     }))
   }
 
-  handleClickSpace = workspaceId => {
-    const { state } = this
-    if (state.workspaceIdOpened === null) {
-      state.config.history.push(PAGE.WORKSPACE.ADVANCED_DASHBOARD(workspaceId), { from: 'adminSpaceList' })
-    } else GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_CONTENT('workspace_advanced'), data: { workspace_id: workspaceId } })
-
-    this.setState({ workspaceIdOpened: workspaceId })
-  }
-
   handleClickNewSpace = () => {
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP, data: {} })
   }
@@ -615,7 +622,6 @@ export class AdminWorkspaceUser extends React.Component {
           <AdminWorkspace
             loaded={state.loaded}
             workspaceList={state.displayedSpaceList}
-            onClickWorkspace={this.handleClickSpace}
             onClickNewWorkspace={this.handleClickNewSpace}
             onClickDeleteWorkspace={this.handleOpenPopupDeleteSpace}
             breadcrumbsList={state.breadcrumbsList}

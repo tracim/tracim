@@ -84,6 +84,9 @@ class ConfigModel(object):
         limitation__maximum_online_users_message: str,
         call__enabled: bool,
         call__unanswered_timeout: int,
+        auth_types: List[str],
+        saml_idp_list: List[Dict[str, str]],
+        user__read_only_fields: Dict[str, List[str]],
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
@@ -106,6 +109,9 @@ class ConfigModel(object):
         self.limitation__maximum_online_users_message = limitation__maximum_online_users_message
         self.call__enabled = call__enabled
         self.call__unanswered_timeout = call__unanswered_timeout
+        self.auth_types = auth_types
+        self.saml_idp_list = saml_idp_list
+        self.user__read_only_fields = user__read_only_fields
 
 
 class ErrorCodeModel(object):
@@ -547,7 +553,7 @@ class KnownMembersQuery(object):
 
     def __init__(
         self,
-        acp: str,
+        acp: str = "",
         exclude_user_ids: str = None,
         exclude_workspace_ids: str = None,
         include_workspace_ids: str = None,
@@ -1006,6 +1012,10 @@ class UserInContext(object):
         return self.user.allowed_space
 
     @property
+    def workspace_ids(self) -> List[int]:
+        return self.user.workspace_ids
+
+    @property
     def used_space(self) -> int:
         from tracim_backend.lib.core.workspace import WorkspaceApi
 
@@ -1018,10 +1028,17 @@ class WorkspaceInContext(object):
     Interface to get Workspace data and Workspace data related to context.
     """
 
-    def __init__(self, workspace: Workspace, dbsession: Session, config: CFG) -> None:
+    def __init__(
+        self,
+        workspace: Workspace,
+        dbsession: Session,
+        config: CFG,
+        user: Optional[User] = None,
+    ) -> None:
         self.workspace = workspace
         self.dbsession = dbsession
         self.config = config
+        self.user = user
 
     @property
     def workspace_in_context(self) -> "WorkspaceInContext":

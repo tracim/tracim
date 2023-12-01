@@ -36,7 +36,7 @@ describe('content :: admin > workspace', function () {
     // Delete
     cy.get('.adminWorkspace__workspaceTable tbody tr:first .adminWorkspace__table__delete__icon').click()
     cy.get('[data-cy=confirm_popup__button_confirm]').click()
-    cy.contains('.adminWorkspace__workspaceTable tbody tr:first td:nth-child(2)', 'There is no space yet')
+    cy.contains('.emptyListMessage__text', 'There is no space yet')
   })
 
   it('checks the create space button', function () {

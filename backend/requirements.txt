@@ -202,8 +202,6 @@ pyramid-mako==1.1.0
     # via
     #   pyramid-debugtoolbar
     #   tracim-backend (setup.py)
-pyramid-multiauth==0.9.0
-    # via tracim-backend (setup.py)
 pyramid-tm==2.4
     # via tracim-backend (setup.py)
 pyrsistent==0.18.0
@@ -329,6 +327,7 @@ zope-interface==5.4.0
     #   zope-sqlalchemy
 zope-sqlalchemy==1.6
     # via tracim-backend (setup.py)
+pysaml2==7.3.1
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { CONTENT_TYPE } from '../src/helper.js'
 import {
-  putFoldersAtListBeginning,
+  sortWithFoldersAtListBeginning,
   SORT_BY,
   SORT_ORDER,
   sortListBy,
@@ -208,7 +208,7 @@ describe('sortListHelper.js', () => {
     })
   })
 
-  describe('Function putFoldersAtListBeginning()', () => {
+  describe('Function sortWithFoldersAtListBeginning()', () => {
     it('should put the folders in the benning of the array', () => {
       const spaceList = [
         { modified: 1, type: CONTENT_TYPE.COMMENT },
@@ -230,7 +230,7 @@ describe('sortListHelper.js', () => {
         { modified: 29, type: CONTENT_TYPE.THREAD }
       ]
 
-      expect(putFoldersAtListBeginning(spaceList)).to.deep.equal(spaceListSorted)
+      expect(sortWithFoldersAtListBeginning(spaceList)).to.deep.equal(spaceListSorted)
     })
   })
 
