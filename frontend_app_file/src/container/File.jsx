@@ -1269,11 +1269,11 @@ export class File extends React.Component {
             icon: ca.icon,
             image: ca.image,
             label: ca.label[state.translationTargetLanguageCode],
-            downloadLink: (function buildCustomActionLink () {
-              return ca.link
-                .replace('{content.label}', state.content.label)
-                .replace('{content.id}', state.content.content_id)
-                .replace('{content.workspace_id}', state.content.workspace_id)
+            downloadLink: (function buildCustomActionLink (customAction, content) {
+              return customAction.link
+                .replace('{content.label}', content.label)
+                .replace('{content.id}', content.content_id)
+                .replace('{content.workspace_id}', content.workspace_id)
             })(ca, state.content),
             showAction: state.loggedUser.userRoleIdInWorkspace >= ca.minimumRole,
             dataCy: 'popinListItem__customAction'
