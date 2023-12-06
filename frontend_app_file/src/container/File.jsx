@@ -65,6 +65,29 @@ import FileProperties from '../component/FileProperties.jsx'
 
 const ACTION_EDIT = 'edit'
 
+// FIXME - CH - 2023-12-06 - This is hardcoded data for the POC of custom element in app's dropdown action list
+// It will be deleted
+// see https://github.com/tracim/tracim/issues/6315
+const pocCustomActionList = [{
+  icon: 'fab fa-google',
+  image: '',
+  label: {
+    fr: 'Chercher sur google',
+    en: 'Search on google'
+  },
+  link: 'https://www.google.com/search?q={content.label}',
+  minimumRole: ROLE.reader.id
+}, {
+  icon: '',
+  image: 'https://upload.wikimedia.org/wikipedia/en/thumb/9/90/The_DuckDuckGo_Duck.png/600px-The_DuckDuckGo_Duck.png?20211207123706',
+  label: {
+    fr: 'Chercher sur DuckDuckGo',
+    en: 'Search on DuckDuckGo'
+  },
+  link: 'https://duckduckgo.com/?q=spaceId:{content.workspace_id}-contentId:{content.id}',
+  minimumRole: ROLE.reader.id
+}]
+
 export class File extends React.Component {
   constructor (props) {
     super(props)
@@ -1235,6 +1258,19 @@ export class File extends React.Component {
               dataCy: 'popinListItem__permanentlyDelete'
             }
           ]}
+          customActionList={pocCustomActionList.map(ca => ({
+            icon: ca.icon,
+            image: ca.image,
+            label: ca.label[state.translationTargetLanguageCode],
+            downloadLink: (function buildCustomActionLink () {
+              return ca.link
+                .replace('{content.label}', state.content.label)
+                .replace('{content.id}', state.content.content_id)
+                .replace('{content.workspace_id}', state.content.workspace_id)
+            })(ca, state.content),
+            showAction: state.loggedUser.userRoleIdInWorkspace >= ca.minimumRole,
+            dataCy: 'popinListItem__customAction'
+          }))}
           appMode={state.mode}
           availableStatuses={state.config.availableStatuses}
           breadcrumbsList={state.breadcrumbsList}

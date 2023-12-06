@@ -47,6 +47,8 @@ class PopinFixedContent extends React.Component {
           <div className={classnames('wsContentGeneric__content__left', `${props.customClass}__content__left`)}>
             <PopinFixedHeader
               actionList={props.actionList}
+              customActionList={props.customActionList}
+              apiUrl={props.config.apiUrl}
               breadcrumbsList={props.breadcrumbsList}
               componentTitle={props.componentTitle}
               content={props.content}
@@ -64,9 +66,11 @@ class PopinFixedContent extends React.Component {
               onClickRemoveFromFavoriteList={props.onClickRemoveFromFavoriteList}
               onValidateChangeTitle={props.onValidateChangeTitle}
               loading={props.loading}
+              loggedUser={props.loggedUser}
               rawTitle={props.content.label}
               showChangeTitleButton={props.showChangeTitleButton}
               showMarkedAsTemplate={props.showMarkedAsTemplate}
+              showReactions={props.showReactions}
               userRoleIdInWorkspace={props.loggedUser.userRoleIdInWorkspace}
             />
             <div className={classnames('wsContentGeneric__content__left__top', `${props.customClass}__content__left__top`)}>
@@ -170,6 +174,7 @@ export default translate()(PopinFixedContent)
 PopinFixedContent.propTypes = {
   loading: PropTypes.bool,
   actionList: PropTypes.array,
+  customActionList: PropTypes.array,
   appMode: PropTypes.string,
   availableStatuses: PropTypes.array,
   breadcrumbsList: PropTypes.array,
@@ -202,6 +207,7 @@ PopinFixedContent.propTypes = {
   onValidateChangeTitle: PropTypes.func,
   showChangeTitleButton: PropTypes.bool,
   showMarkedAsTemplate: PropTypes.bool,
+  showReactions: PropTypes.bool,
   showTranslateButton: PropTypes.bool,
   contentVersionNumber: PropTypes.number,
   translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object),
@@ -211,6 +217,7 @@ PopinFixedContent.propTypes = {
 
 PopinFixedContent.defaultProps = {
   actionList: [],
+  customActionList: [],
   appMode: APP_FEATURE_MODE.VIEW,
   availableStatuses: [],
   breadcrumbsList: [],
@@ -245,5 +252,6 @@ PopinFixedContent.defaultProps = {
   onValidateChangeTitle: () => {},
   showChangeTitleButton: true,
   showMarkedAsTemplate: false,
+  showReactions: false,
   showTranslateButton: false
 }

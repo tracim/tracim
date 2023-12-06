@@ -12,6 +12,7 @@ import Breadcrumbs from '../Breadcrumbs/Breadcrumbs.jsx'
 import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import Icon from '../Icon/Icon.jsx'
+import EmojiReactions from '../../container/EmojiReactions.jsx'
 import FavoriteButton from '../Button/FavoriteButton.jsx'
 import Popover from '../Popover/Popover.jsx'
 
@@ -73,10 +74,13 @@ export const PopinFixedHeader = (props) => {
     showChangeTitleButton,
     t,
     actionList,
+    apiUrl,
     content,
     favoriteState,
+    loggedUser,
     onClickAddToFavoriteList,
-    onClickRemoveFromFavoriteList
+    onClickRemoveFromFavoriteList,
+    showReactions
   } = props
 
   const actionListWithEditTitle = [
@@ -99,6 +103,15 @@ export const PopinFixedHeader = (props) => {
   ]
   const filteredActionList = actionListWithEditTitle.filter(action => action.showAction)
   const filteredHeaderButtons = headerButtons ? headerButtons.filter(action => action.showAction) : []
+
+  const mergedActionList = [
+    ...actionListWithEditTitle
+      .filter(a => a.showAction === true)
+      .map(a => ({ ...a, isCustomAction: false, addSeparator: false })),
+    ...props.customActionList
+      .filter(a => a.showAction === true)
+      .map((a, i) => ({ ...a, isCustomAction: true, addSeparator: i === 0 }))
+  ]
 
   return (
     <div className={classnames(
@@ -173,6 +186,17 @@ export const PopinFixedHeader = (props) => {
         />
       </div>
 
+      {!props.loading && showReactions && (
+        <div className='wsContentGeneric__header__reactions'>
+          <EmojiReactions
+            apiUrl={apiUrl}
+            loggedUser={loggedUser}
+            contentId={content.content_id}
+            workspaceId={content.workspace_id}
+          />
+        </div>
+      )}
+
       {!props.loading && favoriteState && (
         <FavoriteButton
           favoriteState={favoriteState}
@@ -225,21 +249,39 @@ export const PopinFixedHeader = (props) => {
           buttonTooltip={t('Actions')}
           buttonDataCy='dropdownContentButton'
         >
-          {filteredActionList.map((action) => action.downloadLink
-            ? (
-              <a
-                href={action.downloadLink}
-                target='_blank'
-                rel='noopener noreferrer'
-                download
-                title={action.label}
-                key={action.label}
-                data-cy={action.dataCy}
-              >
-                <i className={`fa-fw fa-fw ${action.icon}`} />
-                {action.label}
-              </a>
-            ) : (
+          {mergedActionList.map(action => {
+            if (action.downloadLink && action.downloadLink !== '') {
+              const isImage = action.icon === '' && action.image !== ''
+              return (
+                <a
+                  href={action.downloadLink}
+                  className={classnames(
+                    'wsContentGeneric__header__actions__item',
+                    { addSeparator: action.addSeparator === true, isImage: isImage }
+                  )}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  download
+                  title={action.label}
+                  key={action.label}
+                  data-cy={action.dataCy}
+                >
+                  {(isImage
+                    ? (
+                      <img
+                        src={action.image}
+                        className='wsContentGeneric__header__actions__item__image'
+                        alt=''
+                      />
+                    )
+                    : <i className={`fa-fw ${action.icon}`} />
+                  )}
+                  {action.label}
+                </a>
+              )
+            }
+
+            return (
               <IconButton
                 disabled={action.disabled}
                 icon={action.icon}
@@ -252,7 +294,8 @@ export const PopinFixedHeader = (props) => {
                 showAction={action.showAction}
                 dataCy={action.dataCy}
               />
-            ))}
+            )
+          })}
         </DropdownMenu>
       )}
 
@@ -272,6 +315,8 @@ export default translate()(PopinFixedHeader)
 
 PopinFixedHeader.propTypes = {
   actionList: PropTypes.array,
+  customActionList: PropTypes.array,
+  apiUrl: PropTypes.string,
   breadcrumbsList: PropTypes.array,
   componentTitle: PropTypes.element,
   content: PropTypes.object,
@@ -284,6 +329,7 @@ PopinFixedHeader.propTypes = {
   headerButtons: PropTypes.array,
   isTemplate: PropTypes.bool,
   loading: PropTypes.bool,
+  loggedUser: PropTypes.object,
   onClickAddToFavoriteList: PropTypes.func,
   onClickChangeMarkedTemplate: PropTypes.func,
   onClickCloseBtn: PropTypes.func.isRequired,
@@ -292,11 +338,14 @@ PopinFixedHeader.propTypes = {
   rawTitle: PropTypes.string,
   showChangeTitleButton: PropTypes.bool,
   showMarkedAsTemplate: PropTypes.bool,
+  showReactions: PropTypes.bool,
   userRoleIdInWorkspace: PropTypes.number
 }
 
 PopinFixedHeader.defaultProps = {
   actionList: [],
+  customActionList: [],
+  apiUrl: '',
   breadcrumbsList: [],
   componentTitle: <div />,
   content: {
@@ -311,6 +360,7 @@ PopinFixedHeader.defaultProps = {
   headerButtons: [],
   isTemplate: false,
   loading: false,
+  loggedUser: {},
   onChangeTitle: () => { },
   onClickAddToFavoriteList: () => { },
   onClickChangeMarkedTemplate: () => { },
@@ -318,5 +368,6 @@ PopinFixedHeader.defaultProps = {
   rawTitle: '',
   showChangeTitleButton: true,
   showMarkedAsTemplate: false,
+  showReactions: false,
   userRoleIdInWorkspace: ROLE.reader.id
 }
