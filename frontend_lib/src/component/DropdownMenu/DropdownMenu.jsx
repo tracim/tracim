@@ -37,8 +37,16 @@ const DropdownMenu = props => {
         data-cy='dropdownMenu_items'
       >
         {(props.children.length > 1
-          ? props.children.map(child => child && <DropdownMenuItem key={child.key} customClass={props.itemCustomClass}> {child} </DropdownMenuItem>)
-          : <DropdownMenuItem customClass={props.itemCustomClass}> {props.children} </DropdownMenuItem>
+          ? props.children.map(child => child && (
+            <DropdownMenuItem key={child.key} customClass={props.itemCustomClass}>
+              {child}
+            </DropdownMenuItem>
+          ))
+          : (
+            <DropdownMenuItem customClass={props.itemCustomClass}>
+              {props.children}
+            </DropdownMenuItem>
+          )
         )}
       </div>
     </div>

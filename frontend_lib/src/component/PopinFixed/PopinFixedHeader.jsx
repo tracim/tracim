@@ -101,8 +101,16 @@ export const PopinFixedHeader = (props) => {
     },
     ...actionList
   ]
-  const filteredActionList = actionListWithEditTitle.filter(action => action.showAction)
   const filteredHeaderButtons = headerButtons ? headerButtons.filter(action => action.showAction) : []
+
+  const mergedActionList = [
+    ...actionListWithEditTitle
+      .filter(a => a.showAction === true)
+      .map(a => ({ ...a, isCustomAction: false, addSeparator: false })),
+    ...props.customActionList
+      .filter(a => a.showAction === true)
+      .map((a, i) => ({ ...a, isCustomAction: true, addSeparator: i === 0 }))
+  ]
 
   return (
     <div className={classnames('wsContentGeneric__header', `${customClass}__header`)}>
@@ -226,28 +234,46 @@ export const PopinFixedHeader = (props) => {
 
       {!props.loading && props.children}
 
-      {!props.loading && filteredActionList.length > 0 && (
+      {!props.loading && mergedActionList.length > 0 && (
         <DropdownMenu
           buttonCustomClass='wsContentGeneric__header__actions'
           buttonIcon='fa-fw fas fa-ellipsis-v'
           buttonTooltip={t('Actions')}
           buttonDataCy='dropdownContentButton'
         >
-          {filteredActionList.map((action) => action.downloadLink
-            ? (
-              <a
-                href={action.downloadLink}
-                target='_blank'
-                rel='noopener noreferrer'
-                download
-                title={action.label}
-                key={action.label}
-                data-cy={action.dataCy}
-              >
-                <i className={`fa-fw fa-fw ${action.icon}`} />
-                {action.label}
-              </a>
-            ) : (
+          {mergedActionList.map(action => {
+            if (action.downloadLink && action.downloadLink !== '') {
+              const isImage = action.icon === '' && action.image !== ''
+              return (
+                <a
+                  href={action.downloadLink}
+                  className={classnames(
+                    'wsContentGeneric__header__actions__item',
+                    { addSeparator: action.addSeparator === true, isImage: isImage }
+                  )}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  download
+                  title={action.label}
+                  key={action.label}
+                  data-cy={action.dataCy}
+                >
+                  {(isImage
+                    ? (
+                      <img
+                        src={action.image}
+                        className='wsContentGeneric__header__actions__item__image'
+                        alt=''
+                      />
+                    )
+                    : <i className={`fa-fw ${action.icon}`} />
+                  )}
+                  {action.label}
+                </a>
+              )
+            }
+
+            return (
               <IconButton
                 disabled={action.disabled}
                 icon={action.icon}
@@ -260,7 +286,8 @@ export const PopinFixedHeader = (props) => {
                 showAction={action.showAction}
                 dataCy={action.dataCy}
               />
-            ))}
+            )
+          })}
         </DropdownMenu>
       )}
 
@@ -280,6 +307,7 @@ export default translate()(PopinFixedHeader)
 
 PopinFixedHeader.propTypes = {
   actionList: PropTypes.array,
+  customActionList: PropTypes.array,
   apiUrl: PropTypes.string,
   breadcrumbsList: PropTypes.array,
   componentTitle: PropTypes.element,
@@ -308,6 +336,7 @@ PopinFixedHeader.propTypes = {
 
 PopinFixedHeader.defaultProps = {
   actionList: [],
+  customActionList: [],
   apiUrl: '',
   breadcrumbsList: [],
   componentTitle: <div />,
