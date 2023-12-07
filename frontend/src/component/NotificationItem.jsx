@@ -31,7 +31,10 @@ export const NotificationItem = props => {
 
   if (props.filterInput !== '') {
     const haystack = new DOMParser().parseFromString(notificationDetails.text, 'text/html')
-    if (!isPatternIncludedInString(haystack.body.textContent, props.filterInput)) return null
+    if (
+      !isPatternIncludedInString(haystack.body.textContent, props.filterInput) &&
+      !isPatternIncludedInString(notification.workspace?.label, props.filterInput)
+    ) return null
   }
 
   const handleClickNotification = async (e, notificationId, notificationDetails) => {
