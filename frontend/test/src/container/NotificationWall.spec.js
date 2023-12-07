@@ -26,11 +26,14 @@ describe('<NotificationWall />', () => {
       })
     })
     describe('if pattern has multiple words', () => {
-      it('should return true if pattern has one word in string', () => {
-        expect(isPatternIncludedInString('abcde fghij', 'b zz')).to.equal(true)
+      it('should return true if pattern is in string', () => {
+        expect(isPatternIncludedInString('abcde fghij', 'de fg')).to.equal(true)
       })
-      it('should return true if pattern has many words in string', () => {
-        expect(isPatternIncludedInString('abcde fghij', 'b bc ghij')).to.equal(true)
+      it('should return false if pattern has only one word in string', () => {
+        expect(isPatternIncludedInString('abcde fghij', 'bc zz')).to.equal(false)
+      })
+      it('should return false if pattern has many words in string but not the entire pattern', () => {
+        expect(isPatternIncludedInString('abcde fghij', 'b bc ghij')).to.equal(false)
       })
       it('should return false if pattern does not have any words in string', () => {
         expect(isPatternIncludedInString('abcde fghij', 'x yy zzz')).to.equal(false)
@@ -41,8 +44,8 @@ describe('<NotificationWall />', () => {
           expect(isPatternIncludedInString('abcde fghij', 'x yy zzz ')).to.equal(false)
         }
       )
-      it('should return true if pattern has one word in string and finish with a space', () => {
-        expect(isPatternIncludedInString('abcde fghij', 'b zz ')).to.equal(true)
+      it('should return false if pattern has one word in string and finish with a space', () => {
+        expect(isPatternIncludedInString('abcde fghij', 'b zz ')).to.equal(false)
       })
     })
   })
