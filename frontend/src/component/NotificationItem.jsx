@@ -22,10 +22,17 @@ import {
   formatAbsoluteDate
 } from 'tracim_frontend_lib'
 import { escape as escapeHtml } from 'lodash'
+import { isPatternIncludedInString } from '../container/NotificationWall.jsx'
 
 export const NotificationItem = props => {
   const { notification, user } = props
+
   const notificationDetails = props.getNotificationDetails(notification)
+
+  if (props.filterInput !== '') {
+    const haystack = new DOMParser().parseFromString(notificationDetails.text, 'text/html')
+    if (!isPatternIncludedInString(haystack.body.textContent, props.filterInput)) return null
+  }
 
   const handleClickNotification = async (e, notificationId, notificationDetails) => {
     if (!notificationDetails.url) {
@@ -114,5 +121,10 @@ export default connect(mapStateToProps)(translate()(TracimComponent(Notification
 NotificationItem.propTypes = {
   onCloseNotificationWall: PropTypes.func.isRequired,
   getNotificationDetails: PropTypes.func.isRequired,
-  notification: PropTypes.object.isRequired
+  notification: PropTypes.object.isRequired,
+  filterInput: PropTypes.string
+}
+
+NotificationItem.defaultProps = {
+  filterInput: ''
 }

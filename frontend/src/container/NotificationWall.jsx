@@ -39,11 +39,24 @@ import {
 } from 'tracim_frontend_lib'
 import { escape as escapeHtml, uniqBy } from 'lodash'
 import NotificationItem from '../component/NotificationItem.jsx'
+import FilterNotificationButton from '../component/NotificationWall/FilterNotificationButton.jsx'
 import GroupedNotificationItem from './GroupedNotificationItem.jsx'
 
 const NUMBER_OF_CRITERIA = {
   ONE: 1,
   TWO: 2
+}
+
+export const isPatternIncludedInString = (string, pattern) => {
+  if (string === undefined || string === null) return false
+  if (pattern === '') return true
+
+  // INFO - CH - 2023-12-07 - Implementation to match any words in pattern
+  // const patternList = pattern.trim().split(' ')
+  // return patternList.some(p => string.toLowerCase().includes(p) === true)
+
+  // INFO - CH - 2023-12-07 - Implementation to match the whole pattern
+  return string.toLowerCase().includes(pattern) === true
 }
 
 const getMainContentId = (notification) => {
@@ -162,21 +175,21 @@ const createNotificationListWithGroupsFromFlatNotificationList = (notificationLi
   let groupedNotificationList = []
 
   notificationList.forEach((notification, index) => {
-    const listLenght = groupedNotificationList.length
+    const listLength = groupedNotificationList.length
     // INFO - MP - 2022-07-05 - We can't group less than 3 notifications and can't group mention
     if (notification.type.includes(TLM_ENTITY.MENTION) || index < minimumOfNotificationsToGroup - 1) {
       groupedNotificationList.push(notification)
       return
     }
 
-    const previousNotification = groupedNotificationList[listLenght - 1]
+    const previousNotification = groupedNotificationList[listLength - 1]
     // INFO - MP - 2022-07-05 - If there is a group, I check if I can add it to the existing group
-    // overwise I'm trying to create a group with the three or six last notifications
+    // otherwise I'm trying to create a group with the three or six last notifications
     if (previousNotification.group) {
       // INFO - MP - 2022-05-25 - Because it's a group I can check if the first notification is groupable
       // to my current notification
       if (canBeGrouped([previousNotification.group[0], notification])) {
-        groupedNotificationList[listLenght - 1] = {
+        groupedNotificationList[listLength - 1] = {
           ...previousNotification,
           group: [...previousNotification.group, notification]
         }
@@ -202,6 +215,7 @@ export const NotificationWall = props => {
   const [folderPath, setFolderPath] = useState({}) // eslint-disable-line no-unused-vars
   const [isFolderPathLoading, setIsFolderPathLoading] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [filterInput, setFilterInput] = useState('')
 
   // INFO - MP - 2022-05-20 - If we change the height, we need to change the
   // height of notification item in the css.
@@ -654,6 +668,10 @@ export const NotificationWall = props => {
     }
   }
 
+  const handleChangeFilterInput = newFilter => {
+    setFilterInput(newFilter)
+  }
+
   return (
     isFolderPathLoading
       ? <Loading />
@@ -666,6 +684,11 @@ export const NotificationWall = props => {
             componentTitle={<span className='componentTitle'>{props.t('Notifications')}</span>}
             onClickCloseBtn={props.onCloseNotificationWall}
           >
+            <FilterNotificationButton
+              filterInputValue={filterInput}
+              onChangeFilterInput={handleChangeFilterInput}
+            />
+
             <IconButton
               mode='dark'
               onClick={handleClickMarkAllAsRead}
@@ -688,6 +711,7 @@ export const NotificationWall = props => {
                     key={notification.id}
                     onCloseNotificationWall={props.onCloseNotificationWall}
                     read={false}
+                    filterInput={filterInput}
                   />
                 )
               } else {
@@ -702,6 +726,7 @@ export const NotificationWall = props => {
                       onCloseNotificationWall={props.onCloseNotificationWall}
                       getNotificationDetails={getNotificationDetails}
                       notification={notification}
+                      filterInput={filterInput}
                     />
                   </ListItemWrapper>
                 )
