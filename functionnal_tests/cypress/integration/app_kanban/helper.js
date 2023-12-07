@@ -24,7 +24,7 @@ export const createKanbanBoard = (title) => {
  */
 export const createKanbanColumn = (title) => {
   cy.get('.kanban__columnAdder:not(.disabled)').should('be.visible').click()
-  cy.get('.kanban__KanbanPopup__title .textinput__text').should('be.visible').type(title)
+  cy.get('.kanban__KanbanPopup__title .textInputComponent__text').should('be.visible').type(title)
   cy.get('.kanban__KanbanPopup__form_buttons .iconbutton').last().should('be.visible').click()
   cy.contains('.kanban__contentpage__wrapper__board__column__title', title)
   cy.get('[data-cy=revision_data_3]')
@@ -39,7 +39,7 @@ export const createKanbanCard = (title) => {
   cy.get('[data-cy=kanban_addCard]').first().should('be.visible').click()
   cy.waitForTinyMCELoaded()
   cy.contains('.cardPopup__header', 'New Card')
-  cy.get('.kanban__KanbanPopup__title .textinput__text').type(title)
+  cy.get('.kanban__KanbanPopup__title .textInputComponent__text').type(title)
   cy.get('.kanban__KanbanPopup__form_buttons .iconbutton').last().should('be.visible').click()
   cy.contains('.kanban__contentpage__wrapper__board__card__title', title)
 }

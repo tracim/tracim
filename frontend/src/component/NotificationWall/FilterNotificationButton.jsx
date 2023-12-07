@@ -1,7 +1,10 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import { IconButton, TextInput } from 'tracim_frontend_lib'
+import {
+  IconButton,
+  FilterBar
+} from 'tracim_frontend_lib'
 
 require('./FilterNotificationButton.styl')
 
@@ -16,8 +19,8 @@ export const FilterNotificationButton = props => {
   return (
     <>
       {isInputOpen && (
-        <TextInput
-          className='FilterNotificationButton__input'
+        <FilterBar
+          customClass='FilterNotificationButton'
           onChange={e => props.onChangeFilterInput(e.target.value)}
           value={props.filterInputValue}
           placeholder={props.t('Filter...')}
@@ -27,7 +30,7 @@ export const FilterNotificationButton = props => {
       <IconButton
         icon={isInputOpen ? 'fas fa-times' : 'fas fa-filter'}
         onClick={onClickFilterButton}
-        title={props.t('Filter notifications')}
+        title={isInputOpen ? props.t('Close filter') : props.t('Filter notifications')}
       />
     </>
   )

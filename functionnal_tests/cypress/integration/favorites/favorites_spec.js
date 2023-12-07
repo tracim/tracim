@@ -79,13 +79,13 @@ describe('Favorites', function () {
     })
 
     it('should filter contents by type', () => {
-      cy.get('.textinput__text').type('note')
+      cy.get('.textInputComponent__text').type('note')
       cy.get('[title="TitleNote"][data-cy="favorites__item"] > .favoriteTable__row__link').should('be.visible')
       cy.get('[title="TitleFile"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.be.visible')
     })
 
     it('should filter contents by name', () => {
-      cy.get('.textinput__text').type('Note2')
+      cy.get('.textInputComponent__text').type('Note2')
       cy.get('[title="TitleNote2"][data-cy="favorites__item"] > .favoriteTable__row__link').should('be.visible')
       cy.get('[title="TitleNote"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.be.visible')
       cy.get('[title="TitleFile2"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.be.visible')
@@ -93,7 +93,7 @@ describe('Favorites', function () {
     })
 
     it('should filter contents by path', () => {
-      cy.get('.textinput__text').type('my open')
+      cy.get('.textInputComponent__text').type('my open')
       cy.get('[title="TitleNote2"][data-cy="favorites__item"] > .favoriteTable__row__link').should('be.visible')
       cy.get('[title="TitleNote"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.be.visible')
       cy.get('[title="TitleFile2"][data-cy="favorites__item"] > .favoriteTable__row__link').should('be.visible')
