@@ -56,7 +56,7 @@ export const isPatternIncludedInString = (string, pattern) => {
   // return patternList.some(p => string.toLowerCase().includes(p) === true)
 
   // INFO - CH - 2023-12-07 - Implementation to match the whole pattern
-  return string.toLowerCase().includes(pattern) === true
+  return string.toLowerCase().includes(pattern.toLowerCase()) === true
 }
 
 const getMainContentId = (notification) => {

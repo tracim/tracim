@@ -24,6 +24,12 @@ describe('<NotificationWall />', () => {
       it('should return false if string null', () => {
         expect(isPatternIncludedInString(null, '')).to.equal(false)
       })
+      it('should be case insensitive', () => {
+        expect(isPatternIncludedInString('My First Note', 'My First Note')).to.equal(true)
+        expect(isPatternIncludedInString('My First Note', 'my first note')).to.equal(true)
+        expect(isPatternIncludedInString('my first note', 'my first note')).to.equal(true)
+        expect(isPatternIncludedInString('my first note', 'My First Note')).to.equal(true)
+      })
     })
     describe('if pattern has multiple words', () => {
       it('should return true if pattern is in string', () => {

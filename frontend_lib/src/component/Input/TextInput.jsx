@@ -27,6 +27,7 @@ export class TextInput extends React.Component {
           placeholder={props.placeholder}
           onKeyPress={this.handleValidateIfEnterKey}
           value={props.value}
+          data-cy='textInputComponent__text'
         />
         {props.icon && (
           <i className={`fas fa-fw fa-${props.icon} textInputComponent__icon`} />

@@ -31,6 +31,7 @@ export const FilterNotificationButton = props => {
         icon={isInputOpen ? 'fas fa-times' : 'fas fa-filter'}
         onClick={onClickFilterButton}
         title={isInputOpen ? props.t('Close filter') : props.t('Filter notifications')}
+        dataCy='FilterNotificationButton'
       />
     </>
   )
