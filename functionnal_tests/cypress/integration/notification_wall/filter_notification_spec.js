@@ -28,40 +28,39 @@ describe('Notification Wall', () => {
 
   describe('The filter input', () => {
     it('should filter the results when typing inside it', () => {
-      cy.get('[data-cy=FilterNotificationButton]').click()
-      cy.get('[data-cy=textInputComponent__text]').should('be.visible')
+      cy.get('.notification__filterInput [data-cy=textInputComponent__text]').should('be.visible')
 
-      cy.get('[data-cy=textInputComponent__text]')
+      cy.get('.notification__filterInput [data-cy=textInputComponent__text]')
         .type('made 8 contributions')
       cy.get('.notification__list .notification__list__item')
         .should('have.length', 1)
         // INFO - CH - 2023-12-07 - Clicking on the group to open it
         .click()
 
-      cy.get('[data-cy=textInputComponent__text]')
+      cy.get('.notification__filterInput [data-cy=textInputComponent__text]')
         .clear()
       cy.get('.notification__list .notification__list__item')
         .should('have.length', 8)
 
-      cy.get('[data-cy=textInputComponent__text]')
+      cy.get('.notification__filterInput [data-cy=textInputComponent__text]')
         .clear()
         .type('Global manager commented on My first note is nice')
       cy.get('.notification__list .notification__list__item')
         .should('have.length', 4)
 
-      cy.get('[data-cy=textInputComponent__text]')
+      cy.get('.notification__filterInput [data-cy=textInputComponent__text]')
         .clear()
         .type('my first note')
       cy.get('.notification__list .notification__list__item')
         .should('have.length', 5)
 
-      cy.get('[data-cy=textInputComponent__text]')
+      cy.get('.notification__filterInput [data-cy=textInputComponent__text]')
         .clear()
         .type('My space')
       cy.get('.notification__list .notification__list__item')
         .should('have.length', 8)
 
-      cy.get('[data-cy=textInputComponent__text]')
+      cy.get('.notification__filterInput [data-cy=textInputComponent__text]')
         .clear()
         .type('no match for this string')
       cy.get('.notification__list .notification__list__item')

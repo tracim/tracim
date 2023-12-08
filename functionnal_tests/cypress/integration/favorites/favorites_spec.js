@@ -16,7 +16,7 @@ const contentIdByType = {}
 const addContentToFavorites = (userId, contentId) => {
   const url = `/api/users/${userId}/favorite-contents`
   const data = { content_id: contentId }
-  cy.request('POST', url, data)
+  return cy.request('POST', url, data)
 }
 
 describe('Favorites', function () {
@@ -37,14 +37,14 @@ describe('Favorites', function () {
         .then(({ content_id: contentId }) => {
           contentIdByType['html-document'] = contentId
           noteContentId = contentId
-          addContentToFavorites(defaultAdmin.user_id, contentId)
+          return addContentToFavorites(defaultAdmin.user_id, contentId)
         })
 
       cy.createFile(fullFilename, mimeType, `${contentName}File`, workspaceId)
         .then(({ content_id: contentId }) => {
           contentIdByType['file'] = contentId
           fileContentId = contentId
-          addContentToFavorites(defaultAdmin.user_id, contentId)
+          return addContentToFavorites(defaultAdmin.user_id, contentId)
         })
 
       cy.createFolder(`${contentName}Folder`, workspaceId)
@@ -56,12 +56,12 @@ describe('Favorites', function () {
     cy.fixture('openWorkspace').as('workspace').then(workspace => {
       cy.createHtmlDocument(`${contentName}Note2`, workspace.workspace_id)
         .then(({ content_id: contentId }) => {
-          addContentToFavorites(defaultAdmin.user_id, contentId)
+          return addContentToFavorites(defaultAdmin.user_id, contentId)
         })
 
       cy.createFile(fullFilename, mimeType, `${contentName}File2`, workspace.workspace_id)
         .then(({ content_id: contentId }) => {
-          addContentToFavorites(defaultAdmin.user_id, contentId)
+          return addContentToFavorites(defaultAdmin.user_id, contentId)
         })
     })
     numberOfFavorites = 4
@@ -79,13 +79,13 @@ describe('Favorites', function () {
     })
 
     it('should filter contents by type', () => {
-      cy.get('.textInputComponent__text').type('note')
+      cy.get('.favorites__wrapper [data-cy=textInputComponent__text]').type('note')
       cy.get('[title="TitleNote"][data-cy="favorites__item"] > .favoriteTable__row__link').should('be.visible')
       cy.get('[title="TitleFile"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.be.visible')
     })
 
     it('should filter contents by name', () => {
-      cy.get('.textInputComponent__text').type('Note2')
+      cy.get('.favorites__wrapper [data-cy=textInputComponent__text]').type('Note2')
       cy.get('[title="TitleNote2"][data-cy="favorites__item"] > .favoriteTable__row__link').should('be.visible')
       cy.get('[title="TitleNote"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.be.visible')
       cy.get('[title="TitleFile2"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.be.visible')
@@ -93,7 +93,7 @@ describe('Favorites', function () {
     })
 
     it('should filter contents by path', () => {
-      cy.get('.textInputComponent__text').type('my open')
+      cy.get('.favorites__wrapper [data-cy=textInputComponent__text]').type('my open')
       cy.get('[title="TitleNote2"][data-cy="favorites__item"] > .favoriteTable__row__link').should('be.visible')
       cy.get('[title="TitleNote"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.be.visible')
       cy.get('[title="TitleFile2"][data-cy="favorites__item"] > .favoriteTable__row__link').should('be.visible')
