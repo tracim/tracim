@@ -605,5 +605,7 @@
   "Sort by role": "Ordenar por função",
   "Sort by status": "Ordenar por status",
   "Space information": "Informações do espaço",
-  "If your email address exists in our database, you will receive there a password recovery link shortly. If it doesn’t appear check your spam folder.": "Se o seu endereço de email existir na nossa base de dados, receberá um link de recuperação de senha em breve. Se não aparecer, verifique a sua caixa de spam."
+  "If your email address exists in our database, you will receive there a password recovery link shortly. If it doesn’t appear check your spam folder.": "Se o seu endereço de email existir na nossa base de dados, receberá um link de recuperação de senha em breve. Se não aparecer, verifique a sua caixa de spam.",
+  "Filter...": "",
+  "or use classical login": ""
 }
