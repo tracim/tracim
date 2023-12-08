@@ -28,6 +28,7 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_EVENT,
   TLM_ENTITY_TYPE as TLM_ENTITY,
   TLM_SUB_TYPE as TLM_SUB,
+  FilterBar,
   IconButton,
   ListItemWrapper,
   Loading,
@@ -39,7 +40,6 @@ import {
 } from 'tracim_frontend_lib'
 import { escape as escapeHtml, uniqBy } from 'lodash'
 import NotificationItem from '../component/NotificationItem.jsx'
-import FilterNotificationButton from '../component/NotificationWall/FilterNotificationButton.jsx'
 import GroupedNotificationItem from './GroupedNotificationItem.jsx'
 
 const NUMBER_OF_CRITERIA = {
@@ -56,7 +56,7 @@ export const isPatternIncludedInString = (string, pattern) => {
   // return patternList.some(p => string.toLowerCase().includes(p) === true)
 
   // INFO - CH - 2023-12-07 - Implementation to match the whole pattern
-  return string.toLowerCase().includes(pattern.toLowerCase()) === true
+  return string.toLowerCase().includes(pattern.trim().toLowerCase()) === true
 }
 
 const getMainContentId = (notification) => {
@@ -210,9 +210,9 @@ const linkToParentContent = (notification) => {
 }
 
 export const NotificationWall = props => {
+  const folderPath = {}
+
   const [notificationList, setNotificationList] = useState([])
-  // INFO - GB -2022-06-05 - The no set below is not used because folderPath is a dictionary and the manipulations are done directly
-  const [folderPath, setFolderPath] = useState({}) // eslint-disable-line no-unused-vars
   const [isFolderPathLoading, setIsFolderPathLoading] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [filterInput, setFilterInput] = useState('')
@@ -255,6 +255,17 @@ export const NotificationWall = props => {
       loadNotifications()
     }
   }, [notificationList])
+
+  useEffect(() => {
+    // INFO - CH - 2023-11-08 - Manually give focus to filter input since the component is already mounted
+    // autoFocus props cannot work
+    if (props.isNotificationWallOpen === true) {
+      const inputTextHtml = document.querySelector(
+        '.notification__filterInput [data-cy=textInputComponent__text]'
+      )
+      if (inputTextHtml !== null) inputTextHtml.focus()
+    }
+  }, [props.isNotificationWallOpen])
 
   const handleClickMarkAllAsRead = async () => {
     const fetchAllPutNotificationAsRead = await props.dispatch(putAllNotificationAsRead(props.user.userId))
@@ -684,16 +695,18 @@ export const NotificationWall = props => {
             componentTitle={<span className='componentTitle'>{props.t('Notifications')}</span>}
             onClickCloseBtn={props.onCloseNotificationWall}
           >
-            <FilterNotificationButton
-              filterInputValue={filterInput}
-              onChangeFilterInput={handleChangeFilterInput}
+            <FilterBar
+              customClass='notification__filterInput'
+              onChange={e => handleChangeFilterInput(e.target.value)}
+              value={filterInput}
+              placeholder={props.t('Filter...')}
+              autoFocus
             />
 
             <IconButton
               mode='dark'
               onClick={handleClickMarkAllAsRead}
               icon='far fa-envelope-open'
-              text={props.t('Mark all as read')}
               dataCy='markAllAsReadButton'
             />
           </PopinFixedHeader>
