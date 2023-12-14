@@ -220,7 +220,9 @@ Additional fields specific to tracim can be found in the `virtual_organization` 
 {
     "entityid": "http://localhost:7999/saml/metadata",
     "metadata": {
-        "local": [],
+        "local": [
+            "/etc/tracim/local_idp/example_idp_metadata.xml"
+        ],
         "remote": [
             {
                 "url": "https://samltest.id/saml/idp"
@@ -268,6 +270,11 @@ Additional fields specific to tracim can be found in the `virtual_organization` 
         "default": 86400
     },
     "virtual_organization": {
+        "/etc/tracim/local_idp/sso_circle_metadata.xml": {
+          "common_identifier": "sso_example",
+          "logo_url": "https://idp.ssocircle.com/logo.png",
+          "displayed_name": "[Test] SSO Circle",
+        },
         "https://samltest.id/saml/idp": {
             "common_identifier": "saml_test"
         },
@@ -297,7 +304,9 @@ Additional fields specific to tracim can be found in the `virtual_organization` 
 ```
 
 - `entityid`: String: The Entity ID of the Service Provider (SP). It uniquely identifies your service.
-- `metadata`: Metadata settings for the SAML configuration. local and remote are arrays of strings for defining metadata sources. In this example, two remote identity providers (IdPs) are configured.
+- `metadata`: Metadata settings for the SAML configuration.
+  - `local`: Array[string]: List of absolute path to local xml metadata files for idp configuration.
+  - `remote`: Array[Object]: List of objects containing a property `url` with the url of the remote xml metadata file for idp configuration.
 - `service`: Service-related settings for the SP.
   - `sp`: Service Provider-specific settings.
     - `endpoints`: Configuration for various endpoints, such as Assertion Consumer Service (ACS) and Single Logout Service (SLO).
