@@ -263,13 +263,15 @@ class SAMLSecurityPolicy:
         for key, value in SAML_IDP_DEFAULT_CONFIG[idp_name]["attribute_map"].items():
             formatted_attributes[key] = format_attribute(value, identity)
 
-        user_profile = Profile.USER
+        user_profile = None
         for key, profile_mapping in SAML_IDP_DEFAULT_CONFIG[idp_name]["profile_map"].items():
             match = re.match(
                 profile_mapping["match"], format_attribute(profile_mapping["value"], identity)
             )
             if match is not None:
                 user_profile = Profile.get_profile_from_slug(key)
+        if user_profile is None:
+            return HTTPFound("/")
 
         if "user_id" not in formatted_attributes:
             return HTTPBadRequest()
