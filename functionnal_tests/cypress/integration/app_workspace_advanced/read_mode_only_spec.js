@@ -15,7 +15,7 @@ describe('Space settings in reader mode', () => {
       cy.visitPage({ pageName: p.ADVANCED_DASHBOARD, params: { workspaceId } })
 
       // INFO - MP - 2021-11-05 - Test the tag manipulation
-      cy.get('[data-cy=popin_right_part_tag').click()
+      cy.get('[data-cy=popin_right_part_tag]').click()
       cy.get('[data-cy=add_tag]').type('Tag')
       cy.get('[data-cy=validate_tag]').click()
 

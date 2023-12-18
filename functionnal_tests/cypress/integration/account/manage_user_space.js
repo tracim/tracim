@@ -53,7 +53,7 @@ describe('Account page', () => {
       })
 
       it('Filter spaces', () => {
-        cy.get('.textinput__text.form-control').first().should('be.visible').type('2')
+        cy.get('.textInputComponent__text.form-control').first().should('be.visible').type('2')
         cy.get('[data-cy=spaceconfig__add_to_space]').should('have.length', 2)
       })
 

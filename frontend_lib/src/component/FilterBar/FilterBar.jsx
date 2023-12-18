@@ -2,8 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import TextInput from '../Input/TextInput.jsx'
 
-require('./FilterBar.styl')
-
 const FilterBar = (props) => {
   return (
     <div className={`filterBar ${props.customClass}`}>
