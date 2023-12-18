@@ -173,14 +173,14 @@ to be installed.
 
 SAML authentication relies on a different settings file.
 The path of the settings file is provided to tracim through the `TRACIM_PYRAMID_SAML_PATH` environment variable.
+Note: that environment variable cannot be set from development.ini. It has to be an environment variable.
 
 Note: `TRACIM_PYRAMID_SAML_PATH` needs to be an absolute path.
 
-e.g.
-```
+```bash
 mkdir -p /<absolute_path_to_tracim_repo>/backend/saml/
 cp /<absolute_path_to_tracim_repo>/backend/settings_saml2.json.sample /<absolute_path_to_tracim_repo>/backend/saml/settings_saml2.json
-TRACIM_PYRAMID_SAML_PATH=/<absolute_path_to_tracim_repo>/backend/saml/settings_saml2.json
+export TRACIM_PYRAMID_SAML_PATH=/<absolute_path_to_tracim_repo>/backend/saml/settings_saml2.json
 ```
 
 See below for details about the configuration format.
@@ -217,88 +217,91 @@ Additional fields specific to tracim can be found in the `virtual_organization` 
 
 ```json
 {
-    "entityid": "http://localhost:7999/saml/metadata",
-    "metadata": {
-        "local": [
-            "/<absolute_path_to_tracim_repo>/backend/saml/example_idp_metadata.xml"
+  "entityid": "http://localhost:7999/saml/metadata",
+  "metadata": {
+    "local": ["/<absolute_path_to_tracim_repo>/backend/saml/example_idp_metadata.xml"],
+    "remote": [{"url": "https://samltest.id/saml/idp"},{"url": "https://idp.ssocircle.com"}]
+  },
+  "service": {
+    "sp": {
+      "endpoints": {
+        "assertion_consumer_service": [
+          ["http://localhost:7999/saml/acs","urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"]
         ],
-        "remote": [
-            {
-                "url": "https://samltest.id/saml/idp"
-            },
-            {
-                "url": "https://idp.ssocircle.com"
-            }
+        "single_logout_service": [
+          ["http://localhost:7999/saml/slo/redirect","urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"],
+          ["http://localhost:7999/saml/slo/post","urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"]
         ]
-    },
-    "service": {
-        "sp": {
-            "endpoints": {
-                "assertion_consumer_service": [
-                    [
-                        "http://localhost:7999/saml/acs",
-                        "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-                    ]
-                ],
-                "single_logout_service": [
-                    [
-                        "http://localhost:7999/saml/slo/redirect",
-                        "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
-                    ],
-                    [
-                        "http://localhost:7999/saml/slo/post",
-                        "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-                    ]
-                ]
-            },
-            "allow_unsolicited": true,
-            "authn_requests_signed": false,
-            "logout_requests_signed": false,
-            "want_assertions_signed": false,
-            "want_response_signed": false,
-            "name_id_format": "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
-            "name_id_format_allow_create": true,
-            "want_name_id": true
-        }
-    },
-    "allow_unknown_attributes": true,
-    "key_file": "/<absolute_path_to_tracim_repo>/backend/saml/cert.key",
-    "cert_file": "/<absolute_path_to_tracim_repo>/backend/saml/cert.crt",
-    "xmlsec_binary": "/usr/bin/xmlsec1",
-    "metadata_cache_duration": {
-        "default": 86400
-    },
-    "virtual_organization": {
-        "/<absolute_path_to_tracim_repo>/backend/saml/example_idp_metadata.xml": {
-          "common_identifier": "idp_example",
-          "logo_url": "https://idp.ssocircle.com/logo.png",
-          "displayed_name": "[Test] Sample idp"
-        },
-        "https://samltest.id/saml/idp": {
-            "common_identifier": "saml_test"
-        },
-        "https://idp.ssocircle.com": {
-            "common_identifier": "sso_circle",
-            "logo_url": "https://idp.ssocircle.com/logo.png",
-            "displayed_name": "[Test] SSO Circle",
-            "attribute_map": {
-                "user_id": "${UserID}",
-                "username": "${FirstName}",
-                "email": "${EmailAddress}",
-                "public_name": "${FirstName} ${LastName}"
-            },
-            "profile_map": {
-                "trusted-users": {
-                  "value": "${UserID}",
-                  "match": "any_regex_pattern"
-                },
-                "administrators": {
-                  "value": "${UserID}",
-                  "match": "value|other_value"
-                }
-            }
-        }
+      },
+      "name_id_format": "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
+      "sp_type_in_metadata": false,
+      "sp_type": "private",
+      "encrypt_assertion": false,
+      "allow_unsolicited": true,
+      "allow_unknown_attributes": false,
+      "authn_requests_signed": false,
+      "logout_requests_signed": false,
+      "logout_responses_signed": false,
+      "want_assertions_signed": false,
+      "want_response_signed": false,
+      "name_id_format_allow_create": true,
+      "want_name_id": true,
+      "validate_certificate": false,
+      "required_attributes": [
+        "eduPersonPrincipalName",
+        "eduPersonPrimaryAffiliation",
+        "email",
+        "displayName"
+      ]
     }
+  },
+  "allow_unknown_attributes": true,
+  "key_file": "/<absolute_path_to_tracim_repo>/backend/saml/cert.key",
+  "cert_file": "/<absolute_path_to_tracim_repo>/backend/saml/cert.crt",
+  "encryption_keypairs": [
+    {
+      "key_file": "/<absolute_path_to_tracim_repo>/backend/saml/cert.key",
+      "cert_file": "/<absolute_path_to_tracim_repo>/backend/saml/cert.crt"
+    }
+  ],
+  "verify_ssl_cert": false,
+  "generate_cert_info": false,
+  "additional_cert_files": ["/<absolute_path_to_tracim_repo>/backend/saml/intermediate_chain.bundle.crt"],
+  "xmlsec_binary": "/usr/bin/xmlsec1",
+  "metadata_cache_duration": {
+    "default": 86400
+  },
+  "virtual_organization": {
+    "/<absolute_path_to_tracim_repo>/backend/saml/example_idp_metadata.xml": {
+      "common_identifier": "idp_example",
+      "logo_url": "https://idp.ssocircle.com/logo.png",
+      "displayed_name": "[Test] Sample idp"
+    },
+    "https://samltest.id/saml/idp": {
+      "common_identifier": "saml_test"
+    },
+    "https://idp.ssocircle.com": {
+      "common_identifier": "sso_circle",
+      "logo_url": "https://idp.ssocircle.com/logo.png",
+      "displayed_name": "[Test] SSO Circle",
+      "attribute_map": {
+        "user_id": "${UserID}",
+        "username": "${FirstName}",
+        "email": "${EmailAddress}",
+        "public_name": "${FirstName} ${LastName}"
+      },
+      "profile_map": {
+        "trusted-users": {
+          "value": "${UserID}",
+          "match": "any_regex_pattern"
+        },
+        "administrators": {
+          "value": "${UserID}",
+          "match": "value|other_value"
+        }
+      }
+    }
+  }
 }
 ```
 #### List of parameters be specific to your SP
@@ -356,86 +359,79 @@ docker cp <tracim_container_name>:/tracim/backend/settings_saml2.json.sample ~/t
 {
   "entityid": "https://mytracim.url/saml/metadata",
   "metadata": {
-        "local": [
-            "/etc/tracim/saml/example_idp_metadata.xml"
+    "local": ["/etc/tracim/saml/example_idp_metadata.xml"],
+    "remote": [{"url": "https://samltest.id/saml/idp"},{"url": "https://idp.ssocircle.com"}]
+  },
+  "service": {
+    "sp": {
+      "endpoints": {
+        "assertion_consumer_service": [
+          ["https://mytracim.url/saml/acs","urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"]
         ],
-        "remote": [
-            {
-                "url": "https://samltest.id/saml/idp"
-            },
-            {
-                "url": "https://idp.ssocircle.com"
-            }
+        "single_logout_service": [
+          ["https://mytracim.url/saml/slo/redirect","urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"],
+          ["https://mytracim.url/saml/slo/post","urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"]
         ]
-    },
-    "service": {
-        "sp": {
-            "endpoints": {
-                "assertion_consumer_service": [
-                    [
-                        "https://mytracim.url/saml/acs",
-                        "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-                    ]
-                ],
-                "single_logout_service": [
-                    [
-                        "https://mytracim.url/saml/slo/redirect",
-                        "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
-                    ],
-                    [
-                        "https://mytracim.url/saml/slo/post",
-                        "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-                    ]
-                ]
-            },
-            "allow_unsolicited": true,
-            "authn_requests_signed": false,
-            "logout_requests_signed": false,
-            "want_assertions_signed": false,
-            "want_response_signed": false,
-            "name_id_format": "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
-            "name_id_format_allow_create": true,
-            "want_name_id": true
-        }
-    },
-    "allow_unknown_attributes": true,
-    "key_file": "/etc/tracim/saml/cert.key",
-    "cert_file": "/etc/tracim/saml/cert.crt",
-    "xmlsec_binary": "/usr/bin/xmlsec1",
-    "metadata_cache_duration": {
-        "default": 86400
-    },
-    "virtual_organization": {
-        "/etc/tracim/saml/example_idp_metadata.xml": {
-          "common_identifier": "idp_example",
-          "logo_url": "https://idp.ssocircle.com/logo.png",
-          "displayed_name": "[Test] Sample idp"
-        },
-        "https://samltest.id/saml/idp": {
-            "common_identifier": "saml_test"
-        },
-        "https://idp.ssocircle.com": {
-            "common_identifier": "sso_circle",
-            "logo_url": "https://idp.ssocircle.com/logo.png",
-            "displayed_name": "[Test] SSO Circle",
-            "attribute_map": {
-                "user_id": "${UserID}",
-                "username": "${FirstName}",
-                "email": "${EmailAddress}",
-                "public_name": "${FirstName} ${LastName}"
-            },
-            "profile_map": {
-                "trusted-users": {
-                  "value": "${UserID}",
-                  "match": "any_regex_pattern"
-                },
-                "administrators": {
-                  "value": "${UserID}",
-                  "match": "value|other_value"
-                }
-            }
-        }
+      },
+      "name_id_format": "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
+      "sp_type_in_metadata": true,
+      "sp_type": "private",
+      "encrypt_assertion": true,
+      "allow_unsolicited": true,
+      "allow_unknown_attributes": true,
+      "authn_requests_signed": true,
+      "logout_requests_signed": true,
+      "logout_responses_signed": true,
+      "want_assertions_signed": true,
+      "want_response_signed": true,
+      "name_id_format_allow_create": true,
+      "want_name_id": true,
+      "validate_certificate": true,
+      "required_attributes": ["eduPersonPrincipalName","eduPersonPrimaryAffiliation","email","displayName"]
     }
+  },
+  "allow_unknown_attributes": true,
+  "key_file": "/etc/tracim/saml/cert.key",
+  "cert_file": "/etc/tracim/saml/cert.crt",
+  "encryption_keypairs": [{"key_file": "/etc/tracim/saml/cert.key","cert_file": "/etc/tracim/saml/cert.crt"}],
+  "verify_ssl_cert": false,
+  "generate_cert_info": false,
+  "additional_cert_files": ["/etc/tracim/saml/intermediate_chain.bundle.crt"],
+  "xmlsec_binary": "/usr/bin/xmlsec1",
+  "metadata_cache_duration": {
+    "default": 86400
+  },
+  "virtual_organization": {
+    "/etc/tracim/saml/example_idp_metadata.xml": {
+      "common_identifier": "idp_example",
+      "logo_url": "https://idp.ssocircle.com/logo.png",
+      "displayed_name": "[Test] Sample idp"
+    },
+    "https://samltest.id/saml/idp": {
+      "common_identifier": "saml_test"
+    },
+    "https://idp.ssocircle.com": {
+      "common_identifier": "sso_circle",
+      "logo_url": "https://idp.ssocircle.com/logo.png",
+      "displayed_name": "[Test] SSO Circle",
+      "attribute_map": {
+        "user_id": "${UserID}",
+        "username": "${FirstName}",
+        "email": "${EmailAddress}",
+        "public_name": "${FirstName} ${LastName}"
+      },
+      "profile_map": {
+        "trusted-users": {
+          "value": "${UserID}",
+          "match": "any_regex_pattern"
+        },
+        "administrators": {
+          "value": "${UserID}",
+          "match": "value|other_value"
+        }
+      }
+    }
+  }
 }
 ```
 
