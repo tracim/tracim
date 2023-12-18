@@ -178,14 +178,16 @@ Note: `TRACIM_PYRAMID_SAML_PATH` needs to be an absolute path.
 
 e.g.
 ```
-TRACIM_PYRAMID_SAML_PATH=/etc/tracim/backend/settings_saml2.json
+mkdir -p /<absolute_path_to_tracim_repo>/backend/saml/
+cp /<absolute_path_to_tracim_repo>/backend/settings_saml2.json.sample /<absolute_path_to_tracim_repo>/backend/saml/settings_saml2.json
+TRACIM_PYRAMID_SAML_PATH=/<absolute_path_to_tracim_repo>/backend/saml/settings_saml2.json
 ```
 
 See below for details about the configuration format.
 
-A sample configuration file can be found at `.../backend/settings_saml2.json`.
+A sample configuration file can be found at `/<absolute_path_to_tracim_repo>/backend/settings_saml2.json.sample`.
 
-When SAML auth is activated, a list of configurated IdPs is displayed instead of the standard login form on the login page.
+When SAML auth is activated, a list of configured IdPs is displayed instead of the standard login form on the login page.
 If other login methods are available, the login form can be found in the list as `Classic Login`.
 
 The different SAML endpoints are
@@ -208,9 +210,6 @@ For more details about the standard routes and the protocol, see ["SAML Explaine
 See [SSO Glossary](https://help.akana.com/content/current/cm/saml/08_glossary.htm) and 
 [SLO Article](https://uit.stanford.edu/service/saml/logout) for more details about the employed terms
 
-⚠ When logging in Tracim, if a valid user doesn't
-exist in Tracim, it will be created as a standard user.
-
 ### Configuration Explanation
 
 This file is a JSON file following [pysaml2's settings format](https://pysaml2.readthedocs.io/en/latest/howto/config.html).
@@ -221,7 +220,7 @@ Additional fields specific to tracim can be found in the `virtual_organization` 
     "entityid": "http://localhost:7999/saml/metadata",
     "metadata": {
         "local": [
-            "/etc/tracim/local_idp/example_idp_metadata.xml"
+            "/<absolute_path_to_tracim_repo>/backend/saml/example_idp_metadata.xml"
         ],
         "remote": [
             {
@@ -263,17 +262,17 @@ Additional fields specific to tracim can be found in the `virtual_organization` 
         }
     },
     "allow_unknown_attributes": true,
-    "key_file": "<path_to_key>",
-    "cert_file": "<path_to_cert>",
+    "key_file": "/<absolute_path_to_tracim_repo>/backend/saml/cert.key",
+    "cert_file": "/<absolute_path_to_tracim_repo>/backend/saml/cert.crt",
     "xmlsec_binary": "/usr/bin/xmlsec1",
     "metadata_cache_duration": {
         "default": 86400
     },
     "virtual_organization": {
-        "/etc/tracim/local_idp/sso_circle_metadata.xml": {
-          "common_identifier": "sso_example",
+        "/<absolute_path_to_tracim_repo>/backend/saml/example_idp_metadata.xml": {
+          "common_identifier": "idp_example",
           "logo_url": "https://idp.ssocircle.com/logo.png",
-          "displayed_name": "[Test] SSO Circle",
+          "displayed_name": "[Test] Sample idp"
         },
         "https://samltest.id/saml/idp": {
             "common_identifier": "saml_test"
@@ -302,11 +301,11 @@ Additional fields specific to tracim can be found in the `virtual_organization` 
     }
 }
 ```
-
+#### List of parameters be specific to your SP
 - `entityid`: String: The Entity ID of the Service Provider (SP). It uniquely identifies your service.
 - `metadata`: Metadata settings for the SAML configuration.
-  - `local`: Array[string]: List of absolute path to local xml metadata files for idp configuration.
-  - `remote`: Array[Object]: List of objects containing a property `url` with the url of the remote xml metadata file for idp configuration.
+  - `local`: Array[string]: List of absolute path to local xml metadata files for idp configuration. Can be empty.
+  - `remote`: Array[Object]: List of objects containing a property `url` with the url of the remote xml metadata file for idp configuration. Can be empty.
 - `service`: Service-related settings for the SP.
   - `sp`: Service Provider-specific settings.
     - `endpoints`: Configuration for various endpoints, such as Assertion Consumer Service (ACS) and Single Logout Service (SLO).
@@ -323,6 +322,8 @@ Additional fields specific to tracim can be found in the `virtual_organization` 
 - `cert_file`: String: Path to the certificate file used for signing.
 - `xmlsec_binary`: String: Path to the xmlsec1 binary for XML security operations.
 - `metadata_cache_duration`: Cache duration for remote metadata. In this example, the default cache duration is set to 86,400 seconds (1 day).
+
+#### List of parameters specific to your IdPs
 - `virtual_organization`: Configuration for virtual organizations associated with IdPs. This is where you will define per-IdP settings. Each IdP is identified by its metadata URL.
   - `common_identifier`: A common identifier for the virtual organization associated with the IdP.
   - `logo_url`: URL to the organization's logo on the selection screen.
@@ -334,6 +335,9 @@ Additional fields specific to tracim can be found in the `virtual_organization` 
       - ⚠ Since users can't have two profiles in tracim, be careful to not have values that can match multiple regexes
 
 Example: `username` maps to `${FirstName}` received from the IdP.
+
+### [beta] create your own shibboleth idp locally
+See [tools_docker/shibboleth_idp/README.md](../../tools_docker/shibboleth_idp/README.md)
 
 ## User sessions in Tracim
 
