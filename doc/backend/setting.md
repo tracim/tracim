@@ -188,7 +188,7 @@ See below for details about the configuration format.
 A sample configuration file can be found at `/<absolute_path_to_tracim_repo>/backend/settings_saml2.json.sample`.
 
 When SAML auth is activated, a list of configured IdPs is displayed instead of the standard login form on the login page.
-If other login methods are available, the login form can be found in the list as `Classic Login`.
+If other login methods are available, the login form can be found in the list as `or use classical Login`.
 
 The different SAML endpoints are
 
@@ -210,7 +210,7 @@ For more details about the standard routes and the protocol, see ["SAML Explaine
 See [SSO Glossary](https://help.akana.com/content/current/cm/saml/08_glossary.htm) and 
 [SLO Article](https://uit.stanford.edu/service/saml/logout) for more details about the employed terms
 
-### Configuration Explanation
+### Configuration Explanation for local test
 
 This file is a JSON file following [pysaml2's settings format](https://pysaml2.readthedocs.io/en/latest/howto/config.html).
 Additional fields specific to tracim can be found in the `virtual_organization` field.
@@ -335,6 +335,109 @@ Additional fields specific to tracim can be found in the `virtual_organization` 
       - ⚠ Since users can't have two profiles in tracim, be careful to not have values that can match multiple regexes
 
 Example: `username` maps to `${FirstName}` received from the IdP.
+
+#### [beta] settings_saml2.json example in a docker context for production
+
+Add these variables in your docker-compose.yml file
+```yaml
+- "TRACIM_PYRAMID_SAML_PATH=/etc/tracim/saml/settings_saml2.json"
+- "TRACIM_AUTH_TYPES=saml,internal"
+```
+
+You need to create the folder `saml/` in your docker volume.
+And add all necessary files (settings_saml2.json, certificate files, local xml metadata config, ...)
+
+```bash
+mkdir -p ~/tracim/etc/saml/
+docker cp <tracim_container_name>:/tracim/backend/settings_saml2.json.sample ~/tracim/etc/saml/settings_saml2.json
+```
+
+```json
+{
+  "entityid": "https://mytracim.url/saml/metadata",
+  "metadata": {
+        "local": [
+            "/etc/tracim/saml/example_idp_metadata.xml"
+        ],
+        "remote": [
+            {
+                "url": "https://samltest.id/saml/idp"
+            },
+            {
+                "url": "https://idp.ssocircle.com"
+            }
+        ]
+    },
+    "service": {
+        "sp": {
+            "endpoints": {
+                "assertion_consumer_service": [
+                    [
+                        "https://mytracim.url/saml/acs",
+                        "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                    ]
+                ],
+                "single_logout_service": [
+                    [
+                        "https://mytracim.url/saml/slo/redirect",
+                        "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+                    ],
+                    [
+                        "https://mytracim.url/saml/slo/post",
+                        "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                    ]
+                ]
+            },
+            "allow_unsolicited": true,
+            "authn_requests_signed": false,
+            "logout_requests_signed": false,
+            "want_assertions_signed": false,
+            "want_response_signed": false,
+            "name_id_format": "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
+            "name_id_format_allow_create": true,
+            "want_name_id": true
+        }
+    },
+    "allow_unknown_attributes": true,
+    "key_file": "/etc/tracim/saml/cert.key",
+    "cert_file": "/etc/tracim/saml/cert.crt",
+    "xmlsec_binary": "/usr/bin/xmlsec1",
+    "metadata_cache_duration": {
+        "default": 86400
+    },
+    "virtual_organization": {
+        "/etc/tracim/saml/example_idp_metadata.xml": {
+          "common_identifier": "idp_example",
+          "logo_url": "https://idp.ssocircle.com/logo.png",
+          "displayed_name": "[Test] Sample idp"
+        },
+        "https://samltest.id/saml/idp": {
+            "common_identifier": "saml_test"
+        },
+        "https://idp.ssocircle.com": {
+            "common_identifier": "sso_circle",
+            "logo_url": "https://idp.ssocircle.com/logo.png",
+            "displayed_name": "[Test] SSO Circle",
+            "attribute_map": {
+                "user_id": "${UserID}",
+                "username": "${FirstName}",
+                "email": "${EmailAddress}",
+                "public_name": "${FirstName} ${LastName}"
+            },
+            "profile_map": {
+                "trusted-users": {
+                  "value": "${UserID}",
+                  "match": "any_regex_pattern"
+                },
+                "administrators": {
+                  "value": "${UserID}",
+                  "match": "value|other_value"
+                }
+            }
+        }
+    }
+}
+```
 
 ### [beta] create your own shibboleth idp locally
 See [tools_docker/shibboleth_idp/README.md](../../tools_docker/shibboleth_idp/README.md)

@@ -26,9 +26,9 @@ Shibboleth is now accessible at `http://localhost:8080`, and it's metadata URL (
 
 ## Caveats
 
-For now shibboleth doesn't require encryption from the SP, this is obviously not fit for production.
+For now shibboleth doesn't require encryption from the SP, this is not fit for production.
 
 ## Note
 
-Some certificates are included in the repo. They are not used but here in order to fill 
+Some certificates are included in the shibboleth-idp folder. They are not used but here in order to fill
 configuration because they are technically required (even if not used).
