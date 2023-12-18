@@ -172,21 +172,23 @@ SAML Authentication needs the `xmlsec1` system package and the `pysaml2` python 
 to be installed.
 
 SAML authentication relies on a different settings file.
-The path of the settings file is provided to tracim through the `PYRAMID_SAML_PATH` environment variable.
+The path of the settings file is provided to tracim through the `TRACIM_PYRAMID_SAML_PATH` environment variable.
+Note: that environment variable cannot be set from development.ini. It has to be an environment variable.
 
-Note: `PYRAMID_SAML_PATH` needs to be an absolute path.
+Note: `TRACIM_PYRAMID_SAML_PATH` needs to be an absolute path.
 
-e.g.
-```
-PYRAMID_SAML_PATH=/etc/tracim/backend/settings_saml2.json
+```bash
+mkdir -p /<absolute_path_to_tracim_repo>/backend/saml/
+cp /<absolute_path_to_tracim_repo>/backend/settings_saml2.json.sample /<absolute_path_to_tracim_repo>/backend/saml/settings_saml2.json
+export TRACIM_PYRAMID_SAML_PATH=/<absolute_path_to_tracim_repo>/backend/saml/settings_saml2.json
 ```
 
 See below for details about the configuration format.
 
-A sample configuration file can be found at `.../backend/settings_saml2.json`.
+A sample configuration file can be found at `/<absolute_path_to_tracim_repo>/backend/settings_saml2.json.sample`.
 
-When SAML auth is activated, a list of configurated IdPs is displayed instead of the standard login form on the login page.
-If other login methods are available, the login form can be found in the list as `Classic Login`.
+When SAML auth is activated, a list of configured IdPs is displayed instead of the standard login form on the login page.
+If other login methods are available, the login form can be found in the list as `or use classical Login`.
 
 The different SAML endpoints are
 
@@ -208,105 +210,105 @@ For more details about the standard routes and the protocol, see ["SAML Explaine
 See [SSO Glossary](https://help.akana.com/content/current/cm/saml/08_glossary.htm) and 
 [SLO Article](https://uit.stanford.edu/service/saml/logout) for more details about the employed terms
 
-⚠ When logging in Tracim, if a valid user doesn't
-exist in Tracim, it will be created as a standard user.
-
-### Configuration Explanation
+### Configuration Explanation for local test
 
 This file is a JSON file following [pysaml2's settings format](https://pysaml2.readthedocs.io/en/latest/howto/config.html).
 Additional fields specific to tracim can be found in the `virtual_organization` field.
 
 ```json
 {
-    "entityid": "http://localhost:7999/saml/metadata",
-    "metadata": {
-        "local": [
-            "/etc/tracim/local_idp/example_idp_metadata.xml"
+  "entityid": "http://localhost:7999/saml/metadata",
+  "metadata": {
+    "local": ["/<absolute_path_to_tracim_repo>/backend/saml/example_idp_metadata.xml"],
+    "remote": [{"url": "https://samltest.id/saml/idp"},{"url": "https://idp.ssocircle.com"}]
+  },
+  "service": {
+    "sp": {
+      "endpoints": {
+        "assertion_consumer_service": [
+          ["http://localhost:7999/saml/acs","urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"]
         ],
-        "remote": [
-            {
-                "url": "https://samltest.id/saml/idp"
-            },
-            {
-                "url": "https://idp.ssocircle.com"
-            }
+        "single_logout_service": [
+          ["http://localhost:7999/saml/slo/redirect","urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"],
+          ["http://localhost:7999/saml/slo/post","urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"]
         ]
-    },
-    "service": {
-        "sp": {
-            "endpoints": {
-                "assertion_consumer_service": [
-                    [
-                        "http://localhost:7999/saml/acs",
-                        "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-                    ]
-                ],
-                "single_logout_service": [
-                    [
-                        "http://localhost:7999/saml/slo/redirect",
-                        "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
-                    ],
-                    [
-                        "http://localhost:7999/saml/slo/post",
-                        "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-                    ]
-                ]
-            },
-            "allow_unsolicited": true,
-            "authn_requests_signed": false,
-            "logout_requests_signed": false,
-            "want_assertions_signed": false,
-            "want_response_signed": false,
-            "name_id_format": "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
-            "name_id_format_allow_create": true,
-            "want_name_id": true
-        }
-    },
-    "allow_unknown_attributes": true,
-    "key_file": "<path_to_key>",
-    "cert_file": "<path_to_cert>",
-    "xmlsec_binary": "/usr/bin/xmlsec1",
-    "metadata_cache_duration": {
-        "default": 86400
-    },
-    "virtual_organization": {
-        "/etc/tracim/local_idp/sso_circle_metadata.xml": {
-          "common_identifier": "sso_example",
-          "logo_url": "https://idp.ssocircle.com/logo.png",
-          "displayed_name": "[Test] SSO Circle",
-        },
-        "https://samltest.id/saml/idp": {
-            "common_identifier": "saml_test"
-        },
-        "https://idp.ssocircle.com": {
-            "common_identifier": "sso_circle",
-            "logo_url": "https://idp.ssocircle.com/logo.png",
-            "displayed_name": "[Test] SSO Circle",
-            "attribute_map": {
-                "user_id": "${UserID}",
-                "username": "${FirstName}",
-                "email": "${EmailAddress}",
-                "public_name": "${FirstName} ${LastName}"
-            },
-            "profile_map": {
-                "trusted-users": {
-                  "value": "${UserID}",
-                  "match": "any_regex_pattern"
-                },
-                "administrators": {
-                  "value": "${UserID}",
-                  "match": "value|other_value"
-                }
-            }
-        }
+      },
+      "name_id_format": "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
+      "sp_type_in_metadata": false,
+      "sp_type": "private",
+      "encrypt_assertion": false,
+      "allow_unsolicited": true,
+      "allow_unknown_attributes": false,
+      "authn_requests_signed": false,
+      "logout_requests_signed": false,
+      "logout_responses_signed": false,
+      "want_assertions_signed": false,
+      "want_response_signed": false,
+      "name_id_format_allow_create": true,
+      "want_name_id": true,
+      "validate_certificate": false,
+      "required_attributes": [
+        "eduPersonPrincipalName",
+        "eduPersonPrimaryAffiliation",
+        "email",
+        "displayName"
+      ]
     }
+  },
+  "allow_unknown_attributes": true,
+  "key_file": "/<absolute_path_to_tracim_repo>/backend/saml/cert.key",
+  "cert_file": "/<absolute_path_to_tracim_repo>/backend/saml/cert.crt",
+  "encryption_keypairs": [
+    {
+      "key_file": "/<absolute_path_to_tracim_repo>/backend/saml/cert.key",
+      "cert_file": "/<absolute_path_to_tracim_repo>/backend/saml/cert.crt"
+    }
+  ],
+  "verify_ssl_cert": false,
+  "generate_cert_info": false,
+  "additional_cert_files": ["/<absolute_path_to_tracim_repo>/backend/saml/intermediate_chain.bundle.crt"],
+  "xmlsec_binary": "/usr/bin/xmlsec1",
+  "metadata_cache_duration": {
+    "default": 86400
+  },
+  "virtual_organization": {
+    "/<absolute_path_to_tracim_repo>/backend/saml/example_idp_metadata.xml": {
+      "common_identifier": "idp_example",
+      "logo_url": "https://idp.ssocircle.com/logo.png",
+      "displayed_name": "[Test] Sample idp"
+    },
+    "https://samltest.id/saml/idp": {
+      "common_identifier": "saml_test"
+    },
+    "https://idp.ssocircle.com": {
+      "common_identifier": "sso_circle",
+      "logo_url": "https://idp.ssocircle.com/logo.png",
+      "displayed_name": "[Test] SSO Circle",
+      "attribute_map": {
+        "user_id": "${UserID}",
+        "username": "${FirstName}",
+        "email": "${EmailAddress}",
+        "public_name": "${FirstName} ${LastName}"
+      },
+      "profile_map": {
+        "trusted-users": {
+          "value": "${UserID}",
+          "match": "any_regex_pattern"
+        },
+        "administrators": {
+          "value": "${UserID}",
+          "match": "value|other_value"
+        }
+      }
+    }
+  }
 }
 ```
-
+#### List of parameters be specific to your SP
 - `entityid`: String: The Entity ID of the Service Provider (SP). It uniquely identifies your service.
 - `metadata`: Metadata settings for the SAML configuration.
-  - `local`: Array[string]: List of absolute path to local xml metadata files for idp configuration.
-  - `remote`: Array[Object]: List of objects containing a property `url` with the url of the remote xml metadata file for idp configuration.
+  - `local`: Array[string]: List of absolute path to local xml metadata files for idp configuration. Can be empty.
+  - `remote`: Array[Object]: List of objects containing a property `url` with the url of the remote xml metadata file for idp configuration. Can be empty.
 - `service`: Service-related settings for the SP.
   - `sp`: Service Provider-specific settings.
     - `endpoints`: Configuration for various endpoints, such as Assertion Consumer Service (ACS) and Single Logout Service (SLO).
@@ -323,6 +325,8 @@ Additional fields specific to tracim can be found in the `virtual_organization` 
 - `cert_file`: String: Path to the certificate file used for signing.
 - `xmlsec_binary`: String: Path to the xmlsec1 binary for XML security operations.
 - `metadata_cache_duration`: Cache duration for remote metadata. In this example, the default cache duration is set to 86,400 seconds (1 day).
+
+#### List of parameters specific to your IdPs
 - `virtual_organization`: Configuration for virtual organizations associated with IdPs. This is where you will define per-IdP settings. Each IdP is identified by its metadata URL.
   - `common_identifier`: A common identifier for the virtual organization associated with the IdP.
   - `logo_url`: URL to the organization's logo on the selection screen.
@@ -334,6 +338,105 @@ Additional fields specific to tracim can be found in the `virtual_organization` 
       - ⚠ Since users can't have two profiles in tracim, be careful to not have values that can match multiple regexes
 
 Example: `username` maps to `${FirstName}` received from the IdP.
+
+#### [beta] settings_saml2.json example in a docker context for production
+
+Add these variables in your docker-compose.yml file
+```yaml
+- "TRACIM_PYRAMID_SAML_PATH=/etc/tracim/saml/settings_saml2.json"
+- "TRACIM_AUTH_TYPES=saml,internal"
+```
+
+You need to create the folder `saml/` in your docker volume.
+And add all necessary files (settings_saml2.json, certificate files, local xml metadata config, ...)
+
+```bash
+mkdir -p ~/tracim/etc/saml/
+docker cp <tracim_container_name>:/tracim/backend/settings_saml2.json.sample ~/tracim/etc/saml/settings_saml2.json
+```
+
+```json
+{
+  "entityid": "https://mytracim.url/saml/metadata",
+  "metadata": {
+    "local": ["/etc/tracim/saml/example_idp_metadata.xml"],
+    "remote": [{"url": "https://samltest.id/saml/idp"},{"url": "https://idp.ssocircle.com"}]
+  },
+  "service": {
+    "sp": {
+      "endpoints": {
+        "assertion_consumer_service": [
+          ["https://mytracim.url/saml/acs","urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"]
+        ],
+        "single_logout_service": [
+          ["https://mytracim.url/saml/slo/redirect","urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"],
+          ["https://mytracim.url/saml/slo/post","urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"]
+        ]
+      },
+      "name_id_format": "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
+      "sp_type_in_metadata": true,
+      "sp_type": "private",
+      "encrypt_assertion": true,
+      "allow_unsolicited": true,
+      "allow_unknown_attributes": true,
+      "authn_requests_signed": true,
+      "logout_requests_signed": true,
+      "logout_responses_signed": true,
+      "want_assertions_signed": true,
+      "want_response_signed": true,
+      "name_id_format_allow_create": true,
+      "want_name_id": true,
+      "validate_certificate": true,
+      "required_attributes": ["eduPersonPrincipalName","eduPersonPrimaryAffiliation","email","displayName"]
+    }
+  },
+  "allow_unknown_attributes": true,
+  "key_file": "/etc/tracim/saml/cert.key",
+  "cert_file": "/etc/tracim/saml/cert.crt",
+  "encryption_keypairs": [{"key_file": "/etc/tracim/saml/cert.key","cert_file": "/etc/tracim/saml/cert.crt"}],
+  "verify_ssl_cert": false,
+  "generate_cert_info": false,
+  "additional_cert_files": ["/etc/tracim/saml/intermediate_chain.bundle.crt"],
+  "xmlsec_binary": "/usr/bin/xmlsec1",
+  "metadata_cache_duration": {
+    "default": 86400
+  },
+  "virtual_organization": {
+    "/etc/tracim/saml/example_idp_metadata.xml": {
+      "common_identifier": "idp_example",
+      "logo_url": "https://idp.ssocircle.com/logo.png",
+      "displayed_name": "[Test] Sample idp"
+    },
+    "https://samltest.id/saml/idp": {
+      "common_identifier": "saml_test"
+    },
+    "https://idp.ssocircle.com": {
+      "common_identifier": "sso_circle",
+      "logo_url": "https://idp.ssocircle.com/logo.png",
+      "displayed_name": "[Test] SSO Circle",
+      "attribute_map": {
+        "user_id": "${UserID}",
+        "username": "${FirstName}",
+        "email": "${EmailAddress}",
+        "public_name": "${FirstName} ${LastName}"
+      },
+      "profile_map": {
+        "trusted-users": {
+          "value": "${UserID}",
+          "match": "any_regex_pattern"
+        },
+        "administrators": {
+          "value": "${UserID}",
+          "match": "value|other_value"
+        }
+      }
+    }
+  }
+}
+```
+
+### [beta] create your own shibboleth idp locally
+See [tools_docker/shibboleth_idp/README.md](../../tools_docker/shibboleth_idp/README.md)
 
 ## User sessions in Tracim
 
