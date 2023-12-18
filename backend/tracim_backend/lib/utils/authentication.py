@@ -142,11 +142,11 @@ class SAMLSecurityPolicy:
                 existing Pyramid application.
         """
 
-        if "PYRAMID_SAML_PATH" in os.environ:
+        if "TRACIM_PYRAMID_SAML_PATH" in os.environ:
             if "pyramid_saml" not in config.get_settings():
                 config.get_settings().update({"pyramid_saml": {}})
             config.get_settings().get("pyramid_saml").update(
-                {"saml_path": os.environ.get("PYRAMID_SAML_PATH")}
+                {"saml_path": os.environ.get("TRACIM_PYRAMID_SAML_PATH")}
             )
 
         if "pyramid_saml" not in config.get_settings():

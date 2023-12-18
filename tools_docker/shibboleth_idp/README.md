@@ -4,8 +4,6 @@ This container is a shibboleth SAML IdP designed to test SAML SPs (as tracim).
 
 ## Configuration
 
-[//] # TODO - M.L - 2023-10-25 - Edit Dockerfile to set configuration at runtime
-
 Configuration is set at build time, to apply a new configuration the image must be re-built:
 ```sh
 docker build --no-cache -t shibboleth-idp-test-image .
@@ -28,11 +26,9 @@ Shibboleth is now accessible at `http://localhost:8080`, and it's metadata URL (
 
 ## Caveats
 
-[//] # TODO - M.L - 2023-10-25 - Permit test environnement to work with SSL
-
-For now shibboleth doesn't require encryption from the SP, this is obviously not fit for production.
+For now shibboleth doesn't require encryption from the SP, this is not fit for production.
 
 ## Note
 
-Some certificates are included in the repo. They are not used but here in order to fill 
+Some certificates are included in the shibboleth-idp folder. They are not used but here in order to fill
 configuration because they are technically required (even if not used).
