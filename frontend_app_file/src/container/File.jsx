@@ -69,22 +69,13 @@ const ACTION_EDIT = 'edit'
 // It will be deleted
 // see https://github.com/tracim/tracim/issues/6315
 const pocCustomActionList = [{
-  icon: 'fab fa-google',
-  image: '',
-  label: {
-    fr: 'Chercher sur google',
-    en: 'Search on google'
-  },
-  link: 'https://www.google.com/search?q={content.label}',
-  minimumRole: ROLE.reader.id
-}, {
   icon: '',
-  image: 'https://upload.wikimedia.org/wikipedia/en/thumb/9/90/The_DuckDuckGo_Duck.png/600px-The_DuckDuckGo_Duck.png?20211207123706',
+  image: 'https://www.datbim.com/wp-content/uploads/2021/09/connecteur-25.png',
   label: {
-    fr: 'Chercher sur DuckDuckGo',
-    en: 'Search on DuckDuckGo'
+    fr: 'Ouvrir la maquette dans CiQo',
+    en: 'Open mockup in CiQo'
   },
-  link: 'https://duckduckgo.com/?q=spaceId:{content.workspace_id}-contentId:{content.id}',
+  link: 'https://alliance-batiment.ciqo.eu/link-from-tracim?content_id={content.id}&space_id={content.workspace_id}',
   minimumRole: ROLE.reader.id
 }]
 
