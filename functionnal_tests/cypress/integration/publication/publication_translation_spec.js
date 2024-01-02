@@ -1,4 +1,5 @@
 import { PAGES } from '../../support/urls_commands'
+import { SELECTORS } from '../../support/generic_selector_commands'
 
 const publishButton = '.commentArea__submit__btn'
 const text = 'Hello, world'
@@ -16,6 +17,9 @@ describe('Publications', () => {
       })
       cy.inputInTinyMCE(text)
       cy.contains(publishButton, 'Publish').click()
+      cy.getTag({ selectorName: SELECTORS.CARD_POPUP_BODY })
+          .get('[data-cy=popup__createcontent__form__button]')
+          .click()
     })
   })
 

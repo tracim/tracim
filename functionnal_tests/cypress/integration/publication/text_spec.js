@@ -1,4 +1,5 @@
 import { PAGES } from '../../support/urls_commands'
+import { SELECTORS } from '../../support/generic_selector_commands'
 import defaultAdmin from '../../fixtures/defaultAdmin.json'
 
 const fakeLink = 'https://awesomearticle.invalid/littletest.html'
@@ -57,6 +58,9 @@ describe('Publications', () => {
     it('should show the first message as preview ', function () {
       cy.inputInTinyMCE(exampleText)
       cy.contains(publishButton, 'Publish').click()
+      cy.getTag({ selectorName: SELECTORS.CARD_POPUP_BODY })
+          .get('[data-cy=popup__createcontent__form__button]')
+          .click()
       cy.contains('.timeline__comment__body__content__textAndPreview', exampleText)
         .should('be.visible')
     })
@@ -64,6 +68,9 @@ describe('Publications', () => {
     it('should preview links', function () {
       cy.inputInTinyMCE(fakeLink)
       cy.contains(publishButton, 'Publish').click()
+      cy.getTag({ selectorName: SELECTORS.CARD_POPUP_BODY })
+          .get('[data-cy=popup__createcontent__form__button]')
+          .click()
       cy.contains('.linkPreview__content__title', fakePreview.title)
       cy.contains('.linkPreview__content__description', fakePreview.description)
       cy.get(`.linkPreview__img[src="${fakePreview.image}"]`).should('be.visible')

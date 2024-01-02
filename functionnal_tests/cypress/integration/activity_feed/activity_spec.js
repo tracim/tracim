@@ -1,5 +1,6 @@
 import { PAGES, URLS } from '../../support/urls_commands.js'
 import user from '../../fixtures/defaultAdmin.json'
+import { SELECTORS } from '../../support/generic_selector_commands'
 
 let workspaceId
 let fileId
@@ -47,6 +48,9 @@ describe('At the space recent activities page', () => {
       cy.dropFixtureInDropZone(fullFilename, 'image/png', '.filecontent__form', `${fileTitle}.png`)
       cy.get('[data-cy=popup__createcontent__form__button]').click()
       cy.get('[data-cy=commentArea__comment__send]').click()
+      cy.getTag({ selectorName: SELECTORS.CARD_POPUP_BODY })
+          .get('[data-cy=popup__createcontent__form__button]')
+          .click()
       cy.get('.attachedFile').should('be.visible')
       cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, params: { workspaceId }, waitForTlm: true })
       cy.get('.CommentFilePreview > .attachedFile').should('be.visible')

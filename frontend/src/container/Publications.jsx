@@ -436,7 +436,7 @@ export class Publications extends React.Component {
     const { props, state } = this
 
     const spaceId = props.currentWorkspace.id
-    const title = state.newPublicationTitle + ' -' + this.buildPublicationName(props.user.publicName, props.user.lang)
+    const title = state.newPublicationTitle + ' - ' + this.buildPublicationName(props.user.publicName, props.user.lang)
     const fetchPostPublication = await props.dispatch(postThreadPublication(spaceId, title))
 
     switch (fetchPostPublication.status) {
@@ -630,6 +630,7 @@ export class Publications extends React.Component {
             onChangeContentName={this.handleChangeNewPublicationTitle}
             btnValidateLabel={this.props.t('Publish')}
             inputPlaceholder={this.props.t("Topic's subject")}
+            isPublication={true}
           />
         )}
       </ScrollToBottomWrapper>

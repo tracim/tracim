@@ -73,7 +73,7 @@ export const PopupCreateContent = (props) => {
                     backgroundColor: color(props.customColor).darken(0.15).hex()
                   }
                 }}
-                disabled={!props.contentName || props.contentName.length === 0}
+                disabled={(!props.contentName || props.contentName.length === 0) && !props.isPublication}
               >
                 {props.btnValidateLabel}
               </button>
@@ -97,6 +97,7 @@ PopupCreateContent.propTypes = {
   onClose: PropTypes.func.isRequired,
   onValidate: PropTypes.func.isRequired,
   label: PropTypes.string,
+  isPublication: PropTypes.bool,
   templateList: PropTypes.array
 }
 
@@ -108,6 +109,7 @@ PopupCreateContent.defaultProps = {
   inputPlaceHolder: '',
   label: '',
   onChangeTemplate: () => {},
+  isPublication: false,
   templateList: []
 }
 
