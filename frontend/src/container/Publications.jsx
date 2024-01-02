@@ -104,6 +104,7 @@ export class Publications extends React.Component {
       showPublicationTitlePopup: false,
       publication: '',
       newPublicationTitle: '',
+      commentReset: () => {},
       publicationAsFileList: [],
       showEditPopup: false,
       showReorderButton: false
@@ -192,8 +193,8 @@ export class Publications extends React.Component {
     console.log('after the setter:' + e.target.value)
   }
 
-  handleTogglePublicationTitlePopup = (publication, publicationAsFileList) => {
-    const { props } = this
+  handleTogglePublicationTitlePopup = (publication, publicationAsFileList, commentReset) => {
+    const { props, state } = this
 
     console.log(this.buildPublicationName(props.user.publicName, props.user.lang))
 
@@ -203,10 +204,13 @@ export class Publications extends React.Component {
     this.setState(prev => ({
       showPublicationTitlePopup: !prev.showPublicationTitlePopup,
       publication: publication,
-      publicationAsFileList: publicationAsFileList
+      publicationAsFileList: publicationAsFileList,
+      commentReset: commentReset || state.commentReset
     }))
     // this.waitToExitPublicationTitlePopup()
-    return true // (publication !== '' && publicationAsFileList.length === 0)
+
+    // INFO - M.L - 2024-01-02 - Returning false so the reset mechanism of the CommentArea is not triggered early
+    return false // (publication !== '' && publicationAsFileList.length === 0)
   }
 
   /* waitToExitPublicationTitlePopup () {
@@ -222,10 +226,12 @@ export class Publications extends React.Component {
   handleClickValidatePublicationTitle = async () => {
     const { state } = this
     this.handleSaveThreadPublication(state.publication, state.publicationAsFileList)
+    state.commentReset()
     this.setState({
       showPublicationTitlePopup: false,
       publication: '',
-      publicationAsFileList: []
+      publicationAsFileList: [],
+      commentReset: () => {}
     })
   }
 
