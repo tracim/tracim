@@ -18,6 +18,7 @@ import {
   TLM_SUB_TYPE as TLM_ST,
   TRANSLATION_STATE,
   CommentArea,
+  CardPopupCreateContent,
   EditCommentPopup,
   EmptyListMessage,
   IconButton,
@@ -100,6 +101,10 @@ export class Publications extends React.Component {
       newCurrentPublication: !!this.props.match.params.idcts,
       isLastItemAddedFromCurrentToken: false,
       invalidMentionList: [],
+      showPublicationTitlePopup: false,
+      publication: '',
+      newPublicationTitle: '',
+      publicationAsFileList: [],
       showEditPopup: false,
       showReorderButton: false
     }
@@ -180,6 +185,48 @@ export class Publications extends React.Component {
         props.dispatch(newFlashMessage(props.t('Unknown content')))
         break
     }
+  }
+
+  handleChangeNewPublicationTitle = e => {
+    this.setState({ newPublicationTitle: e.target.value })
+    console.log('after the setter:' + e.target.value)
+  }
+
+  handleTogglePublicationTitlePopup = (publication, publicationAsFileList) => {
+    const { props } = this
+
+    console.log(this.buildPublicationName(props.user.publicName, props.user.lang))
+
+    this.handleChangeNewPublicationTitle({ target: { value: this.buildPublicationName(props.user.publicName, props.user.lang) } })
+    console.log('fist change: ' + { target: this.buildPublicationName(props.user.publicName, props.user.lang) })
+    console.log({ target: this.buildPublicationName(props.user.publicName, props.user.lang) })
+    this.setState(prev => ({
+      showPublicationTitlePopup: !prev.showPublicationTitlePopup,
+      publication: publication,
+      publicationAsFileList: publicationAsFileList
+    }))
+    // this.waitToExitPublicationTitlePopup()
+    return true // (publication !== '' && publicationAsFileList.length === 0)
+  }
+
+  /* waitToExitPublicationTitlePopup () {
+    const { state } = this
+
+    if (state.showPublicationTitlePopup === false) {
+      return true
+    } else {
+      setTimeout(this.waitToExitPublicationTitlePopup, 250)
+    }
+  } */
+
+  handleClickValidatePublicationTitle = async () => {
+    const { state } = this
+    this.handleSaveThreadPublication(state.publication, state.publicationAsFileList)
+    this.setState({
+      showPublicationTitlePopup: false,
+      publication: '',
+      publicationAsFileList: []
+    })
   }
 
   handleContentCommentDeleted = (data) => {
@@ -398,12 +445,24 @@ export class Publications extends React.Component {
   }
 
   handleSaveThreadPublication = async (publication, publicationAsFileList) => {
-    const { props } = this
+    const { props, state } = this
 
     const spaceId = props.currentWorkspace.id
-    const publicationName = this.buildPublicationName(props.user.publicName, props.user.lang)
+    const fetchPostPublication = await props.dispatch(postThreadPublication(spaceId, state.newPublicationTitle))
 
-    const fetchPostPublication = await props.dispatch(postThreadPublication(spaceId, publicationName))
+    switch (fetchPostPublication.status) {
+      case 200:
+        break
+      case 400:
+        switch (fetchPostPublication.json.code) {
+          case 3002:
+            props.dispatch(newFlashMessage(`${props.t('A news with the same title already exists')}`, 'warning'))
+            break
+        }
+        break
+      default:
+        props.dispatch(newFlashMessage(`${props.t('Error while saving new news')}`, 'warning'))
+    }
 
     if (fetchPostPublication.status !== 200) {
       props.dispatch(newFlashMessage(`${props.t('Error while saving new news')}`, 'warning'))
@@ -488,7 +547,7 @@ export class Publications extends React.Component {
               apiUrl={FETCH_CONFIG.apiUrl}
               contentId={newPublicationId}
               contentType={CONTENT_TYPE.THREAD}
-              onClickSubmit={this.handleSaveThreadPublication}
+              onClickSubmit={this.handleTogglePublicationTitlePopup}
               workspaceId={parseInt(props.match.params.idws)}
               // End of required props /////////////////////////////////////////
               codeLanguageList={props.system.config.ui__notes__code_sample_languages}
@@ -569,6 +628,19 @@ export class Publications extends React.Component {
             dataCy='showMorePublicationItemsBtn'
             customClass='publications__showMoreButton'
             onClick={() => this.getPublicationPage(props.publicationPage.nextPageToken)}
+          />
+        )}
+        {state.showPublicationTitlePopup && (
+          <CardPopupCreateContent
+            onClose={this.handleTogglePublicationTitlePopup}
+            onValidate={this.handleClickValidatePublicationTitle}
+            label={this.props.t('New publication')}
+            customColor={COLORS.PUBLICATION}
+            faIcon='far fa-paper-plane'
+            contentName={this.state.newPublicationTitle !== undefined ? this.state.newPublicationTitle : this.buildPublicationName(props.user.publicName, props.user.lang)}
+            onChangeContentName={this.handleChangeNewPublicationTitle}
+            btnValidateLabel={this.props.t('Publish')}
+            inputPlaceholder={this.props.t("Topic's subject")}
           />
         )}
       </ScrollToBottomWrapper>
