@@ -193,7 +193,7 @@ export class Publications extends React.Component {
   }
 
   handleTogglePublicationTitlePopup = (publication, publicationAsFileList, commentReset) => {
-    const { props, state } = this
+    const { state } = this
 
     this.handleChangeNewPublicationTitle({ target: { value: '' } })
     this.setState(prev => ({
