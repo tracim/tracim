@@ -190,38 +190,20 @@ export class Publications extends React.Component {
 
   handleChangeNewPublicationTitle = e => {
     this.setState({ newPublicationTitle: e.target.value })
-    console.log('after the setter:' + e.target.value)
   }
 
   handleTogglePublicationTitlePopup = (publication, publicationAsFileList, commentReset) => {
     const { props, state } = this
 
-    console.log(this.buildPublicationName(props.user.publicName, props.user.lang))
-
-    this.handleChangeNewPublicationTitle({ target: { value: this.buildPublicationName(props.user.publicName, props.user.lang) } })
-    console.log('fist change: ' + { target: this.buildPublicationName(props.user.publicName, props.user.lang) })
-    console.log({ target: this.buildPublicationName(props.user.publicName, props.user.lang) })
+    this.handleChangeNewPublicationTitle({ target: { value: '' } })
     this.setState(prev => ({
       showPublicationTitlePopup: !prev.showPublicationTitlePopup,
       publication: publication,
       publicationAsFileList: publicationAsFileList,
       commentReset: commentReset || state.commentReset
     }))
-    // this.waitToExitPublicationTitlePopup()
-
-    // INFO - M.L - 2024-01-02 - Returning false so the reset mechanism of the CommentArea is not triggered early
-    return false // (publication !== '' && publicationAsFileList.length === 0)
+    return false
   }
-
-  /* waitToExitPublicationTitlePopup () {
-    const { state } = this
-
-    if (state.showPublicationTitlePopup === false) {
-      return true
-    } else {
-      setTimeout(this.waitToExitPublicationTitlePopup, 250)
-    }
-  } */
 
   handleClickValidatePublicationTitle = async () => {
     const { state } = this
@@ -454,7 +436,8 @@ export class Publications extends React.Component {
     const { props, state } = this
 
     const spaceId = props.currentWorkspace.id
-    const fetchPostPublication = await props.dispatch(postThreadPublication(spaceId, state.newPublicationTitle))
+    const title = state.newPublicationTitle + ' -' + this.buildPublicationName(props.user.publicName, props.user.lang)
+    const fetchPostPublication = await props.dispatch(postThreadPublication(spaceId, title))
 
     switch (fetchPostPublication.status) {
       case 200:
@@ -643,7 +626,7 @@ export class Publications extends React.Component {
             label={this.props.t('New publication')}
             customColor={COLORS.PUBLICATION}
             faIcon='far fa-paper-plane'
-            contentName={this.state.newPublicationTitle !== undefined ? this.state.newPublicationTitle : this.buildPublicationName(props.user.publicName, props.user.lang)}
+            contentName={this.state.newPublicationTitle !== undefined ? this.state.newPublicationTitle : ''}
             onChangeContentName={this.handleChangeNewPublicationTitle}
             btnValidateLabel={this.props.t('Publish')}
             inputPlaceholder={this.props.t("Topic's subject")}
