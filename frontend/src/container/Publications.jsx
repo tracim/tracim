@@ -630,7 +630,7 @@ export class Publications extends React.Component {
             onChangeContentName={this.handleChangeNewPublicationTitle}
             btnValidateLabel={this.props.t('Publish')}
             inputPlaceholder={this.props.t("Topic's subject")}
-            isPublication={true}
+            isPublication
           />
         )}
       </ScrollToBottomWrapper>
