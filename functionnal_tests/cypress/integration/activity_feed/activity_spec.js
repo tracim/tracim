@@ -1,6 +1,6 @@
 import { PAGES, URLS } from '../../support/urls_commands.js'
 import user from '../../fixtures/defaultAdmin.json'
-import { SELECTORS } from '../../support/generic_selector_commands'
+import { SELECTORS } from '../../support/generic_selector_commands.js'
 
 let workspaceId
 let fileId

@@ -617,5 +617,6 @@
   "Space information": "Information de l'espace",
   "If your email address exists in our database, you will receive there a password recovery link shortly. If it doesn’t appear check your spam folder.": "Si votre adresse email existe dans notre base de données, vous y recevrez un lien de récupération de mot de passe. Si vous ne le recevez pas, vérifiez votre dossier des indésirables.",
   "Filter...": "Filtrer",
-  "or use classical login": "ou utiliser l'authentification classique"
+  "or use classical login": "ou utiliser l'authentification classique",
+  "News title": "Titre de l'actualité"
 }

@@ -192,16 +192,18 @@ export class Publications extends React.Component {
     this.setState({ newPublicationTitle: e.target.value })
   }
 
-  handleTogglePublicationTitlePopup = (publication, publicationAsFileList, commentReset) => {
+  handleTogglePublicationTitlePopup = (publication, publicationAsFileList, commentReset = undefined) => {
     const { state } = this
 
-    this.handleChangeNewPublicationTitle({ target: { value: '' } })
+    const fakeEvent = { target: { value: '' } }
+    this.handleChangeNewPublicationTitle(fakeEvent)
     this.setState(prev => ({
       showPublicationTitlePopup: !prev.showPublicationTitlePopup,
       publication: publication,
       publicationAsFileList: publicationAsFileList,
       commentReset: commentReset || state.commentReset
     }))
+    // INFO - M.L - 2024-01-02 - Returning false so the reset mechanism of the CommentArea is not triggered early
     return false
   }
 
@@ -436,7 +438,10 @@ export class Publications extends React.Component {
     const { props, state } = this
 
     const spaceId = props.currentWorkspace.id
-    const title = state.newPublicationTitle + ' - ' + this.buildPublicationName(props.user.publicName, props.user.lang)
+    let title = `${state.newPublicationTitle} - ${this.buildPublicationName(props.user.publicName, props.user.lang)}`
+    if (state.newPublicationTitle === '') {
+      title = this.buildPublicationName(props.user.publicName, props.user.lang)
+    }
     const fetchPostPublication = await props.dispatch(postThreadPublication(spaceId, title))
 
     switch (fetchPostPublication.status) {
@@ -623,14 +628,14 @@ export class Publications extends React.Component {
           <CardPopupCreateContent
             onClose={this.handleTogglePublicationTitlePopup}
             onValidate={this.handleClickValidatePublicationTitle}
-            label={this.props.t('New publication')}
+            label={props.t('New publication')}
             customColor={COLORS.PUBLICATION}
             faIcon='far fa-paper-plane'
-            contentName={this.state.newPublicationTitle !== undefined ? this.state.newPublicationTitle : ''}
+            contentName={state.newPublicationTitle !== undefined ? state.newPublicationTitle : ''}
             onChangeContentName={this.handleChangeNewPublicationTitle}
-            btnValidateLabel={this.props.t('Publish')}
-            inputPlaceholder={this.props.t("Topic's subject")}
-            isPublication
+            btnValidateLabel={props.t('Publish')}
+            inputPlaceholder={props.t('News title')}
+            allowEmptyTitle
           />
         )}
       </ScrollToBottomWrapper>

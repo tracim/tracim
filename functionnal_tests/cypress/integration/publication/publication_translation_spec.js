@@ -1,5 +1,5 @@
-import { PAGES } from '../../support/urls_commands'
-import { SELECTORS } from '../../support/generic_selector_commands'
+import { PAGES } from '../../support/urls_commands.js'
+import { SELECTORS } from '../../support/generic_selector_commands.js'
 
 const publishButton = '.commentArea__submit__btn'
 const text = 'Hello, world'
