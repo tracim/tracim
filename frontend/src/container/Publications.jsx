@@ -630,7 +630,7 @@ export class Publications extends React.Component {
             onValidate={this.handleClickValidatePublicationTitle}
             label={props.t('New publication')}
             customColor={COLORS.PUBLICATION}
-            faIcon='far fa-paper-plane'
+            faIcon='fas fa-fw fa-stream'
             contentName={state.newPublicationTitle !== undefined ? state.newPublicationTitle : ''}
             onChangeContentName={this.handleChangeNewPublicationTitle}
             btnValidateLabel={props.t('Publish')}
