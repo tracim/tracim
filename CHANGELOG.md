@@ -1,16 +1,27 @@
 # Changelog
 
-## 4.7.0 / 2023-11-10
+## 4.7.1 / 2023-12-18
+
+### 🐛 Fixed Issues
+
+- Backend:
+  - Prevent account creation from SAML auth if profile doesn't match [#6248](https://github.com/tracim/tracim/issues/6248)
+
+### 📝 Documentation
+
+- Improve documentation for authentication through SAML protocol
+
+## 4.7.0 / 2023-12-01
 
 ### ✨ New Features
 
-- Support of SAML authentication
-- Editable user properties can now be read-only
-- Improve support of distributed deployment (redis, pushpin, elastic search)
+- SAML authentication is now supported
+- User properties, previously always editable, can now be set as read-only
+- Support of distributed deployment (redis, pushpin, elastic search) has been improved
 
 ### ⚡️ Performance
 
-- Improvement in loading spaces and members in frontend
+- Loading of spaces and members in frontend has been improved
 
 ### 🐛 Fixed Issues
 

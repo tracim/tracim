@@ -165,7 +165,7 @@ export class Dashboard extends React.Component {
 
   loadNewRequestNumber = async () => {
     const { props } = this
-    const spaceMemberList = props.currentWorkspace.memberList || []
+    const spaceMemberList = (props.workspaceList.find(workspace => workspace.id === props.currentWorkspace.id) || {}).memberList || []
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(
       props.user.userId, spaceMemberList, ROLE_LIST
     )

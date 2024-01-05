@@ -11,6 +11,7 @@ import {
 import NotificationItem from '../component/NotificationItem.jsx'
 import GroupRender from '../component/GroupedNotificationItem/GroupRender.jsx'
 import { escape as escapeHtml, uniqBy } from 'lodash'
+import { isPatternIncludedInString } from './NotificationWall.jsx'
 
 export const GroupedNotificationItem = props => {
   const [isGrouped, setIsGrouped] = useState(true)
@@ -131,26 +132,27 @@ export const GroupedNotificationItem = props => {
   const notificationDetails = getGroupedNotificationDetails(props.groupedNotifications)
   if (Object.keys(notificationDetails).length === 0) return null
 
-  const listRender =
-    props.groupedNotifications.group.map((notification, i) => {
-      return (
-        <ListItemWrapper
-          isLast={props.isLast && i === props.groupedNotifications.group.length - 1}
-          isFirst={props.isFirst && i === 0}
-          read={props.read}
-          key={notification.id}
-        >
-          <NotificationItem
-            onCloseNotificationWall={props.onCloseNotificationWall}
-            getNotificationDetails={props.getNotificationDetails}
-            notification={notification}
-          />
-        </ListItemWrapper>
+  if (isGrouped) {
+    if (props.filterInput !== '') {
+      const groupHaystack = new DOMParser().parseFromString(notificationDetails.text, 'text/html')
+      const isMatchGroupNotification = isPatternIncludedInString(
+        groupHaystack.body.textContent, props.filterInput
       )
-    })
 
-  return isGrouped
-    ? (
+      if (isMatchGroupNotification === false) {
+        const isAnyMatchInGroupedNotification = props.groupedNotifications.group.some(n => {
+          const haystack = [
+            n.author?.publicName || '',
+            n.content?.label || '',
+            n.workspace?.label || ''
+          ].join(' ')
+          return isPatternIncludedInString(haystack, props.filterInput)
+        })
+        if (isAnyMatchInGroupedNotification === false) return null
+      }
+    }
+
+    return (
       <ListItemWrapper
         isLast={props.isLast}
         isFirst={props.isFirst}
@@ -163,7 +165,23 @@ export const GroupedNotificationItem = props => {
         />
       </ListItemWrapper>
     )
-    : listRender
+  }
+
+  return props.groupedNotifications.group.map((notification, i) => (
+    <ListItemWrapper
+      isLast={props.isLast && i === props.groupedNotifications.group.length - 1}
+      isFirst={props.isFirst && i === 0}
+      read={props.read}
+      key={notification.id}
+    >
+      <NotificationItem
+        onCloseNotificationWall={props.onCloseNotificationWall}
+        getNotificationDetails={props.getNotificationDetails}
+        notification={notification}
+        filterInput={props.filterInput}
+      />
+    </ListItemWrapper>
+  ))
 }
 
 const mapStateToProps = ({ user }) => ({ user })
@@ -175,11 +193,13 @@ GroupedNotificationItem.propTypes = {
   isFirst: PropTypes.bool,
   isLast: PropTypes.bool,
   onCloseNotificationWall: PropTypes.func.isRequired,
-  read: PropTypes.bool
+  read: PropTypes.bool,
+  filterInput: PropTypes.string
 }
 
 GroupedNotificationItem.defaultProps = {
   isFirst: false,
   isLast: false,
-  read: false
+  read: false,
+  filterInput: ''
 }
