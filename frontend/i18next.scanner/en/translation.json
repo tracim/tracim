@@ -597,5 +597,8 @@
   "Space information": "Space information",
   "If your email address exists in our database, you will receive there a password recovery link shortly. If it doesn’t appear check your spam folder.": "If your email address exists in our database, you will receive there a password recovery link shortly. If it doesn’t appear check your spam folder.",
   "Filter...": "Filter...",
-  "or use classical login": "or use classical login"
+  "or use classical login": "or use classical login",
+  "A news with the same title already exists": "A news with the same title already exists",
+  "Set news title": "Set news title",
+  "News title": "News title"
 }

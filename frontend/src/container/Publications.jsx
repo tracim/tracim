@@ -628,7 +628,7 @@ export class Publications extends React.Component {
           <CardPopupCreateContent
             onClose={this.handleTogglePublicationTitlePopup}
             onValidate={this.handleClickValidatePublicationTitle}
-            label={props.t('New publication')}
+            label={props.t('Set news title')}
             customColor={COLORS.PUBLICATION}
             faIcon='fas fa-fw fa-stream'
             contentName={state.newPublicationTitle !== undefined ? state.newPublicationTitle : ''}

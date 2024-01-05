@@ -597,5 +597,8 @@
   "Space information": "Bereichsinformationen",
   "If your email address exists in our database, you will receive there a password recovery link shortly. If it doesn’t appear check your spam folder.": "Wenn Ihre Emailadresse in unserer Datenbank existiert, erhalten Sie in Kürze einen Link zum Zurücksetzen Ihres Passworts. Falls der Link nicht ankommt, überprüfen Sie bitte Ihren Spamordner.",
   "Filter...": "",
-  "or use classical login": ""
+  "or use classical login": "",
+  "A news with the same title already exists": "",
+  "Set news title": "",
+  "News title": ""
 }
