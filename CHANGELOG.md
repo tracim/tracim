@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.2 / TBD
+
+### ✨ New Features
+
+- News now opens a popup on submit to define a title for the news
+
 ## 4.7.1 / 2023-12-18
 
 ### 🐛 Fixed Issues
