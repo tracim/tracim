@@ -1,6 +1,6 @@
 # Changelog
 
-## 4.7.2 / TBD
+## 4.8.0 / TBD
 
 ### ✨ New Features
 
