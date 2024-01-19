@@ -708,6 +708,7 @@ export const NotificationWall = props => {
               onClick={handleClickMarkAllAsRead}
               icon='far fa-envelope-open'
               dataCy='markAllAsReadButton'
+              text={props.t('Mark all as read')}
             />
           </PopinFixedHeader>
 
