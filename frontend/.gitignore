@@ -6,5 +6,6 @@ dist/assets/tracim.app.js
 dist/assets/tracim.vendors~app.js
 dist/assets/tracim.main.optimized.js
 dist/assets/tracim.vendors~main.optimized.js*
+dist/assets/tracim.*.LICENSE.txt
 dist/assets/custom_toolbox/
 configEnv.json
