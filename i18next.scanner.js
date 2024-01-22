@@ -15,7 +15,7 @@ const options = {
     extensions: ['.js', '.jsx'],
     fallbackKey: (ns, value) => value,
     acorn: {
-      ecmaVersion: 10, // defaults to 10
+      ecmaVersion: 11, // defaults to 10
       sourceType: 'module' // defaults to 'module'
       // Check out https://github.com/acornjs/acorn/tree/master/acorn#interface for additional options
     }
