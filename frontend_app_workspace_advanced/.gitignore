@@ -7,3 +7,4 @@ test/fixture/defaultProps.js
 dist/workspace_advanced.app.js
 dist/workspace_advanced.app.standalone.js
 dist/workspace_advanced.app.optimized.js
+dist/*.LICENSE.txt

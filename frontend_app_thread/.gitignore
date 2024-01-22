@@ -9,3 +9,4 @@ dist/thread.app.js.map
 dist/thread.app.standalone.js
 dist/thread.app.optimized.js
 dist/thread.app.standalone.js.map
+dist/*.LICENSE.txt
