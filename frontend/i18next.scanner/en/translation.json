@@ -592,8 +592,14 @@
   "All": "All",
   "Tracim doesn't support the current version of your browser. Please upgrade your browser.": "Tracim doesn't support the current version of your browser. Please upgrade your browser.",
   "UnknownUser": "UnknownUser",
-  "UnknownRole": "UnknownRole",
+  "UnknownRole": "Unknown Role",
   "Sort by status": "Sort by status",
   "Space information": "Space information",
-  "If your email address exists in our database, you will receive there a password recovery link shortly. If it doesn’t appear check your spam folder.": "If your email address exists in our database, you will receive there a password recovery link shortly. If it doesn’t appear check your spam folder."
+  "If your email address exists in our database, you will receive there a password recovery link shortly. If it doesn’t appear check your spam folder.": "If your email address exists in our database, you will receive there a password recovery link shortly. If it doesn’t appear check your spam folder.",
+  "Filter...": "Filter...",
+  "or use classical login": "or use classical login",
+  "A news with the same title already exists": "A news with the same title already exists",
+  "Labeling the news": "Labeling the news",
+  "Publish without title": "Publish without title",
+  "News title": "News title"
 }

@@ -1,4 +1,4 @@
-import { PAGES } from '../../support/urls_commands'
+import { PAGES } from '../../support/urls_commands.js'
 
 const markAllAsReadButton = '[data-cy=markAllAsReadButton]'
 

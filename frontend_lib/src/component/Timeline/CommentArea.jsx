@@ -63,6 +63,11 @@ export const CommentArea = props => {
     }
   }, [content])
 
+  const resetComment = () => {
+    setContent('')
+    setFileListToUpload([])
+  }
+
   /**
    * Send the comment to the backend
    * @param {string} comment The comment to send
@@ -95,11 +100,11 @@ export const CommentArea = props => {
 
     const submitSuccessful = await props.onClickSubmit(
       parsedContentCommentObject.html,
-      fileListToUpload
+      fileListToUpload,
+      resetComment
     )
     if (submitSuccessful) {
-      setContent('')
-      setFileListToUpload([])
+      resetComment()
     }
   }
 

@@ -7,5 +7,6 @@ dist/workspace.app.js.map
 dist/workspace.app.standalone.js
 dist/workspace.app.optimized.js
 dist/workspace.app.standalone.js.map
+dist/*.LICENSE.txt
 src/debug.js
 test/fixture/defaultProps.js

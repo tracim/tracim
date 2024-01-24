@@ -142,11 +142,11 @@ class SAMLSecurityPolicy:
                 existing Pyramid application.
         """
 
-        if "PYRAMID_SAML_PATH" in os.environ:
+        if "TRACIM_PYRAMID_SAML_PATH" in os.environ:
             if "pyramid_saml" not in config.get_settings():
                 config.get_settings().update({"pyramid_saml": {}})
             config.get_settings().get("pyramid_saml").update(
-                {"saml_path": os.environ.get("PYRAMID_SAML_PATH")}
+                {"saml_path": os.environ.get("TRACIM_PYRAMID_SAML_PATH")}
             )
 
         if "pyramid_saml" not in config.get_settings():
@@ -263,17 +263,29 @@ class SAMLSecurityPolicy:
         for key, value in SAML_IDP_DEFAULT_CONFIG[idp_name]["attribute_map"].items():
             formatted_attributes[key] = format_attribute(value, identity)
 
-        user_profile = Profile.USER
+        user_id = formatted_attributes["user_id"]
+
+        user_profile = None
         for key, profile_mapping in SAML_IDP_DEFAULT_CONFIG[idp_name]["profile_map"].items():
-            match = re.match(
-                profile_mapping["match"], format_attribute(profile_mapping["value"], identity)
+            profile_mapping_value = format_attribute(profile_mapping["value"], identity)
+            profile_mapping_match = profile_mapping["match"]
+            logging.getLogger().debug(
+                f"User profile level test for '{user_id}': "
+                f"test if given value '{profile_mapping_value}' == '{profile_mapping_match}'"
             )
-            if match is not None:
+            if re.match(profile_mapping_match, profile_mapping_value) is not None:
                 user_profile = Profile.get_profile_from_slug(key)
+                break
+
+        if user_profile is None:
+            logging.getLogger().warning(f"User profile level not found for '{user_id}'")
+            return HTTPFound("/")
+        logging.getLogger().debug(f"User profile level found for '{user_id}': '{user_profile}'")
 
         if "user_id" not in formatted_attributes:
             return HTTPBadRequest()
-        request.session["saml_user_id"] = formatted_attributes["user_id"]
+
+        request.session["saml_user_id"] = user_id
         if "username" in formatted_attributes:
             request.session["saml_username"] = formatted_attributes["username"]
         if "email" in formatted_attributes:

@@ -1,6 +1,7 @@
 {
-  "{{count}} files selected": "{{count}} archivo seleccionado",
-  "{{count}} files selected_plural": "{{count}} archivos seleccionados",
+  "{{count}} files selected_0": "{{count}} archivo seleccionado",
+  "{{count}} files selected_1": "{{count}} archivos seleccionados",
+  "{{count}} files selected_2": "{{count}} archivos seleccionados",
   "{{count}} tasks performed on {{numberOfTasks}}_0": "{{count}} tarea realizada en {{numberOfTasks}}",
   "{{count}} tasks performed on {{numberOfTasks}}_1": "{{count}} tareas realizadas en {{numberOfTasks}}",
   "{{count}} tasks performed on {{numberOfTasks}}_2": "{{count}} tareas realizadas en {{numberOfTasks}}",

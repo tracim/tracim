@@ -7,3 +7,4 @@ test/fixture/defaultProps.js
 dist/folder.app.js
 dist/folder.app.standalone.js
 dist/folder.app.optimized.js
+dist/*.LICENSE.txt

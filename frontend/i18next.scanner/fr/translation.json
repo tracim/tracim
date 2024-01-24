@@ -607,7 +607,7 @@
   "All": "Tous",
   "Tracim doesn't support the current version of your browser. Please upgrade your browser.": "Tracim ne supporte pas la version de votre navigateur. Merci de le mettre à jour.",
   "UnknownUser": "UtilisateurInconnu",
-  "UnknownRole": "RoleInconnu",
+  "UnknownRole": "RôleInconnu",
   "Sort by type": "Trier par type",
   "Sort by title": "Trier par titre",
   "Sort by last modification": "Trier par dernière modification",
@@ -615,5 +615,11 @@
   "Sort by role": "Trier par rôle",
   "Sort by status": "Trier par statut",
   "Space information": "Information de l'espace",
-  "If your email address exists in our database, you will receive there a password recovery link shortly. If it doesn’t appear check your spam folder.": "Si votre adresse email existe dans notre base de données, vous y recevrez un lien de récupération de mot de passe. Si vous ne le recevez pas, vérifiez votre dossier des indésirables."
+  "If your email address exists in our database, you will receive there a password recovery link shortly. If it doesn’t appear check your spam folder.": "Si votre adresse email existe dans notre base de données, vous y recevrez un lien de récupération de mot de passe. Si vous ne le recevez pas, vérifiez votre dossier des indésirables.",
+  "Filter...": "Filtrer",
+  "or use classical login": "ou utiliser l'authentification classique",
+  "News title": "Titre de l'actualité",
+  "A news with the same title already exists": "Une actualité avec le même titre existe déjà",
+  "Labeling the news": "Nommer l'actualité",
+  "Publish without title": "Publier sans titre"
 }

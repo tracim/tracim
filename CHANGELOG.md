@@ -1,5 +1,23 @@
 # Changelog
 
+## 4.8.0 / 2024-01-24
+
+### ✨ New Features
+
+- News now opens a popup on submit to define a title for the news
+- Notifications in the notification wall can now be filtered
+
+## 4.7.1 / 2023-12-18
+
+### 🐛 Fixed Issues
+
+- Backend:
+  - Prevent account creation from SAML auth if profile doesn't match [#6248](https://github.com/tracim/tracim/issues/6248)
+
+### 📝 Documentation
+
+- Improve documentation for authentication through SAML protocol
+
 ## 4.7.0 / 2023-12-01
 
 ### ✨ New Features
