@@ -1,6 +1,6 @@
 # Changelog
 
-## 4.8.0 / TBD
+## 4.8.0 / 2024-01-24
 
 ### ✨ New Features
 
