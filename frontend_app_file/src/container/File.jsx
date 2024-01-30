@@ -74,7 +74,7 @@ const pocCustomActionList = [{
     fr: 'Ouvrir la maquette dans CiQo',
     en: 'Open mockup in CiQo'
   },
-  link: 'https://alliance-batiment.ciqo.eu/link-from-tracim?content_id={content.id}&space_id={content.workspace_id}',
+  link: 'https://alliance-batiment.ciqo.eu/link-from-tracim?content_id={content.id}&space_id={content.workspace_id}&user_id={user.user_id}',
   minimumRole: ROLE.reader.id
 }]
 
@@ -1232,12 +1232,13 @@ export class File extends React.Component {
             icon: ca.icon,
             image: ca.image,
             label: ca.label[state.translationTargetLanguageCode],
-            downloadLink: (function buildCustomActionLink (customAction, content) {
+            downloadLink: (function buildCustomActionLink (customAction, content, user) {
               return customAction.link
                 .replace('{content.label}', content.label)
                 .replace('{content.id}', content.content_id)
                 .replace('{content.workspace_id}', content.workspace_id)
-            })(ca, state.content),
+                .replace('{user.user_id}', user.userId)
+            })(ca, state.content, state.loggedUser),
             showAction: state.loggedUser.userRoleIdInWorkspace >= ca.minimumRole,
             dataCy: 'popinListItem__customAction'
           }))}
