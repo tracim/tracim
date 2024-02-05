@@ -9,7 +9,8 @@ import {
   WORKSPACE_DETAIL
 } from '../action-creator.sync.js'
 import { serialize, sortListByMultipleCriteria, SORT_BY, SORT_ORDER } from 'tracim_frontend_lib'
-import { serializeMember, serializeSidebarEntryProps } from './currentWorkspace.js'
+import { serializeSidebarEntryProps } from './currentWorkspace.js'
+import { EMAIL_NOTIFICATION_TYPE } from '../util/helper.js'
 
 export const serializeWorkspaceListProps = {
   access_type: 'accessType',
@@ -28,24 +29,25 @@ export const serializeWorkspaceListProps = {
   members: 'memberList'
 }
 
-export const serializeWorkspace = workspace => {
+export const serializeUserConfig = m => {
   return {
-    ...serialize(workspace, serializeWorkspaceListProps),
-    sidebarEntryList: workspace.sidebar_entries.map(
-      sbe => serialize(sbe, serializeSidebarEntryProps)
-    )
+    id: m.user.user_id,
+    publicName: m.user.public_name,
+    username: m.user.username,
+    role: m.role,
+    emailNotificationType: m.email_notification_type || EMAIL_NOTIFICATION_TYPE.NONE,
+    hasAvatar: m.user.has_avatar || true,
+    hasCover: m.user.has_cover || false
   }
 }
 
-export const serializeRole = role => {
-  // TODO - CH - 2023-11-02 - This function should use serializeWorkspace
-  // and be renamed according to this issue: https://github.com/tracim/tracim/issues/6252
+export const serializeUserWorkspaceConfig = role => {
   return {
     ...serialize(role.workspace, serializeWorkspaceListProps),
     sidebarEntryList: role.workspace.sidebar_entries.map(
       sbe => serialize(sbe, serializeSidebarEntryProps)
     ),
-    memberList: [role].map(serializeMember)
+    memberList: [role].map(serializeUserConfig)
   }
 }
 function addWorkspaceSetting (setting, user, workspace, workspaceList) {
@@ -58,18 +60,16 @@ function addWorkspaceSetting (setting, user, workspace, workspaceList) {
   }
   const spaceList = [
     ...workspaceList,
-    serializeRole(settings)
+    serializeUserWorkspaceConfig(settings)
   ]
   return spaceList
 }
 
 export function workspaceList (state = [], action, lang) {
   switch (action.type) {
+    // FIXME - F.S. - 2023-11-27 - change test of `${SET}/${WORKSPACE_LIST}` to test `${SET}/${ROLE_WORKSPACE_LIST}`
     case `${SET}/${ROLE_WORKSPACE_LIST}`:
-      return action.workspaceList.map(serializeRole)
-
-    case `${SET}/${WORKSPACE_LIST}`:
-      return action.workspaceList.map(serializeWorkspace)
+      return action.workspaceList.map(serializeUserWorkspaceConfig)
 
     case ADD_ROLE_WORKSPACE_LIST :
       return sortListByMultipleCriteria(
@@ -99,7 +99,7 @@ export function workspaceList (state = [], action, lang) {
       if (!state.some(ws => ws.id === action.workspaceDetail.workspace_id)) return state
       const spaceList = state.map(
         ws => ws.id === action.workspaceDetail.workspace_id
-          ? { ...ws, ...serializeWorkspace(action.workspaceDetail) }
+          ? { ...ws, ...serializeUserWorkspaceConfig(action.workspaceDetail) }
           : ws
       )
       return sortListByMultipleCriteria(spaceList, [SORT_BY.LABEL, SORT_BY.ID], SORT_ORDER.ASCENDING, lang)

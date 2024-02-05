@@ -92,7 +92,6 @@ export const WORKSPACE_CONTENT_MOVE = `${MOVE}/${WORKSPACE_CONTENT}`
 export const moveWorkspaceContent = (source, destination) => ({ type: `${MOVE}/${WORKSPACE_CONTENT}`, source, destination })
 
 export const WORKSPACE_LIST = `${WORKSPACE}/List`
-export const setWorkspaceList = workspaceList => ({ type: `${SET}/${WORKSPACE_LIST}`, workspaceList })
 export const removeWorkspace = workspace => ({ type: `${REMOVE}/${WORKSPACE_LIST}`, workspace })
 
 export const USER_WORKSPACE_LIST = `${USER}/${WORKSPACE_LIST}`

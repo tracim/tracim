@@ -532,7 +532,7 @@ export class Dashboard extends React.Component {
                 <div className='dashboard__workspace__rightMenu'>
                   <UserStatus
                     user={props.user}
-                    currentWorkspace={props.currentWorkspace}
+                    currentWorkspace={props.workspaceList.find(workspace => workspace.id === props.currentWorkspace.id)}
                     displayNotifBtn={props.system.config.email_notification_activated}
                     displaySubscriptionRequestsInformation={
                       userRoleIdInWorkspace >= ROLE.workspaceManager.id &&

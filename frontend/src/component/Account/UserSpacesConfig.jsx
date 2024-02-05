@@ -24,8 +24,7 @@ import {
   stringIncludes,
   serialize
 } from 'tracim_frontend_lib'
-import { serializeRole, serializeWorkspaceListProps } from '../../reducer/workspaceList.js'
-import { serializeMember } from '../../reducer/currentWorkspace.js'
+import { serializeUserConfig, serializeUserWorkspaceConfig, serializeWorkspaceListProps } from '../../reducer/workspaceList.js'
 import { newFlashMessage } from '../../action-creator.sync.js'
 import { deleteWorkspaceMember, getUserRoleWorkspaceList } from '../../action-creator.async.js'
 import AdminUserSpacesConfig from '../../container/AdminUserSpacesConfig.jsx'
@@ -122,7 +121,7 @@ export const UserSpacesConfig = (props) => {
         ? {
           ...space,
           memberList: space.memberList.map(member => member.id === data.fields.user.user_id
-            ? { ...member, ...serializeMember({ user: data.fields.user, ...data.fields.member }) }
+            ? { ...member, ...serializeUserConfig({ user: data.fields.user, ...data.fields.member }) }
             : member
           )
         }
@@ -146,7 +145,7 @@ export const UserSpacesConfig = (props) => {
             {
               ...serialize(data.fields.workspace, serializeWorkspaceListProps),
               memberList: [
-                serializeMember({ user: data.fields.user, ...data.fields.member })
+                serializeUserConfig({ user: data.fields.user, ...data.fields.member })
               ]
             }
           ]
@@ -166,7 +165,7 @@ export const UserSpacesConfig = (props) => {
     switch (fetchGetUserWorkspaceList.status) {
       case 200: {
         const userSpaceList = fetchGetUserWorkspaceList.json.map(
-          role => serializeRole(role)
+          config => serializeUserWorkspaceConfig(config)
         )
         setSpaceList(userSpaceList)
         break
