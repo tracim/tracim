@@ -32,7 +32,7 @@ from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.live_messages import LiveMessagesLib
 from tracim_backend.lib.core.plugins import hookimpl
 from tracim_backend.lib.core.user import UserApi
-from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.rq import RqQueueName
 from tracim_backend.lib.rq import get_redis_connection
@@ -768,7 +768,7 @@ class EventBuilder:
             workspace_api.get_one(role.workspace_id)
         )
         user_api = UserApi(current_user, context.dbsession, self._config, show_deleted=True)
-        role_api = RoleApi(
+        user_workspace_config_api = UserWorkspaceConfigApi(
             current_user=current_user, session=context.dbsession, config=self._config
         )
         try:
@@ -779,7 +779,7 @@ class EventBuilder:
             # It is possible to have an already deleted user when deleting his roles.
             user_field = None
 
-        role_in_context = role_api.get_user_role_workspace_with_context(role)
+        role_in_context = user_workspace_config_api.get_user_role_workspace_with_context(role)
         fields = {
             Event.USER_FIELD: user_field,
             Event.WORKSPACE_FIELD: EventApi.workspace_without_description_schema.dump(
@@ -1069,8 +1069,10 @@ def _get_members_and_administrators_ids(
     """
     user_api = UserApi(current_user=None, session=session, config=config)
     administrators = user_api.get_user_ids_from_profile(Profile.ADMIN)
-    role_api = RoleApi(current_user=None, session=session, config=config)
-    workspace_members = role_api.get_workspace_member_ids(event.workspace_id)
+    user_workspace_config_api = UserWorkspaceConfigApi(
+        current_user=None, session=session, config=config
+    )
+    workspace_members = user_workspace_config_api.get_workspace_member_ids(event.workspace_id)
     receiver_ids = set(administrators + workspace_members)
     event_user_id = get_event_user_id(session, event)
     if event_user_id:
@@ -1109,8 +1111,10 @@ def _get_workspace_subscription_event_receiver_ids(
     user_api = UserApi(current_user=None, session=session, config=config)
     administrators = user_api.get_user_ids_from_profile(Profile.ADMIN)
     author = event.subscription["author"]["user_id"]
-    role_api = RoleApi(current_user=None, session=session, config=config)
-    workspace_managers = role_api.get_workspace_member_ids(
+    user_workspace_config_api = UserWorkspaceConfigApi(
+        current_user=None, session=session, config=config
+    )
+    workspace_managers = user_workspace_config_api.get_workspace_member_ids(
         event.workspace_id, min_role=WorkspaceRoles.WORKSPACE_MANAGER
     )
     return set(administrators + workspace_managers + [author])
@@ -1128,8 +1132,10 @@ def _get_content_event_receiver_ids(event: Event, session: TracimSession, config
     Returns:
         Set[int]: List of user id that will receive the event
     """
-    role_api = RoleApi(current_user=None, session=session, config=config)
-    workspace_members = role_api.get_workspace_member_ids(event.workspace_id)
+    user_workspace_config_api = UserWorkspaceConfigApi(
+        current_user=None, session=session, config=config
+    )
+    workspace_members = user_workspace_config_api.get_workspace_member_ids(event.workspace_id)
     return set(workspace_members)
 
 

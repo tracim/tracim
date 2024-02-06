@@ -29,7 +29,7 @@ from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.subscription import SubscriptionLib
 from tracim_backend.lib.core.user import UserApi
-from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import can_create_content
 from tracim_backend.lib.utils.authorization import can_delete_workspace
@@ -286,15 +286,20 @@ class WorkspaceController(Controller):
         Returns the list of space members with their role, avatar, etc.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        role_api = RoleApi(
+        user_workspace_config_api = UserWorkspaceConfigApi(
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
             show_disabled_user=hapic_data.query.show_disabled_user,
         )
 
-        roles = role_api.get_all_for_workspace(workspace=request.current_workspace)
-        return [role_api.get_user_role_workspace_with_context(user_role) for user_role in roles]
+        configs = user_workspace_config_api.get_all_for_workspace(
+            workspace=request.current_workspace
+        )
+        return [
+            user_workspace_config_api.get_user_role_workspace_with_context(user_config)
+            for user_config in configs
+        ]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
     @check_right(can_see_workspace_information)
@@ -307,16 +312,16 @@ class WorkspaceController(Controller):
         Returns given space member with its role, avatar, etc.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        role_api = RoleApi(
+        user_workspace_config_api = UserWorkspaceConfigApi(
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
         )
 
-        role = role_api.get_one(
+        config = user_workspace_config_api.get_one(
             user_id=hapic_data.path.user_id, workspace_id=hapic_data.path.workspace_id
         )
-        return role_api.get_user_role_workspace_with_context(role)
+        return user_workspace_config_api.get_user_role_workspace_with_context(config)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
     @hapic.handle_exception(UserRoleNotFound, HTTPStatus.BAD_REQUEST)
@@ -333,17 +338,17 @@ class WorkspaceController(Controller):
         This feature is for workspace managers, trusted users and administrators.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        role_api = RoleApi(
+        user_workspace_config_api = UserWorkspaceConfigApi(
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
         )
 
-        role = role_api.get_one(
+        role = user_workspace_config_api.get_one(
             user_id=hapic_data.path.user_id, workspace_id=hapic_data.path.workspace_id
         )
-        role = role_api.update_role(role, role_level=hapic_data.body.role.level)
-        return role_api.get_user_role_workspace_with_context(role)
+        role = user_workspace_config_api.update_role(role, role_level=hapic_data.body.role.level)
+        return user_workspace_config_api.get_user_role_workspace_with_context(role)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
     @check_right(can_leave_workspace)
@@ -360,12 +365,12 @@ class WorkspaceController(Controller):
         """
 
         app_config = request.registry.settings["CFG"]  # type: CFG
-        role_api = RoleApi(
+        user_workspace_config_api = UserWorkspaceConfigApi(
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
         )
-        role_api.delete_one(
+        user_workspace_config_api.delete_one(
             user_id=hapic_data.path.user_id, workspace_id=hapic_data.path.workspace_id
         )
         return
@@ -388,7 +393,7 @@ class WorkspaceController(Controller):
         """
         newly_created = False
         app_config = request.registry.settings["CFG"]  # type: CFG
-        role_api = RoleApi(
+        user_workspace_config_api = UserWorkspaceConfigApi(
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
@@ -445,7 +450,7 @@ class WorkspaceController(Controller):
                 )
             newly_created = True
 
-        role = role_api.create_one(
+        config = user_workspace_config_api.create_one(
             user=user,
             workspace=request.current_workspace,
             role_level=WorkspaceRoles.get_role_from_slug(hapic_data.body.role).level,
@@ -454,7 +459,9 @@ class WorkspaceController(Controller):
             ),
             flush=True,
         )
-        return role_api.get_user_role_workspace_with_context(role, newly_created=newly_created)
+        return user_workspace_config_api.get_user_role_workspace_with_context(
+            config, newly_created=newly_created
+        )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_SUBSCRIPTION_ENDPOINTS])
     @check_right(can_modify_workspace)

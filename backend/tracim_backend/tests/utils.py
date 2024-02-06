@@ -30,7 +30,7 @@ from tracim_backend.lib.core.plugins import create_plugin_manager
 from tracim_backend.lib.core.plugins import init_plugin_manager
 from tracim_backend.lib.core.subscription import SubscriptionLib
 from tracim_backend.lib.core.user import UserApi
-from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import ESSearchApi
 from tracim_backend.lib.utils.request import TracimContext
@@ -136,8 +136,8 @@ class RoleApiFactory(object):
         self.app_config = app_config
         self.admin_user = admin_user
 
-    def get(self, current_user: typing.Optional[User] = None) -> RoleApi:
-        return RoleApi(
+    def get(self, current_user: typing.Optional[User] = None) -> UserWorkspaceConfigApi:
+        return UserWorkspaceConfigApi(
             session=self.session,
             config=self.app_config,
             current_user=current_user or self.admin_user,

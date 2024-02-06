@@ -66,14 +66,14 @@ def content_indexer_with_api_mock() -> typing.Iterator[ContentIndexerWithApiMock
 
 @pytest.fixture
 def user_indexer_with_api_mock() -> typing.Iterator[UserIndexerWithApiMock]:
-    """Create an ESUserIndexer instance with mocked ESSearchApi and RoleApi.
+    """Create an ESUserIndexer instance with mocked ESSearchApi and UserWorkspaceConfigApi.
 
     Return a (ESUserIndexer, ESSearchApi.index_user_mock, RoleApi_mock) tuple.
     """
     with patch(
         "tracim_backend.lib.search.elasticsearch_search.elasticsearch_search.ESSearchApi.index_user"
     ) as index_user_mock, patch(
-        "tracim_backend.lib.search.elasticsearch_search.elasticsearch_search.RoleApi"
+        "tracim_backend.lib.search.elasticsearch_search.elasticsearch_search.UserWorkspaceConfigApi"
     ) as role_api_class_mock:
         role_api_mock = MagicMock()
         role_api_class_mock.return_value = role_api_mock
@@ -82,14 +82,14 @@ def user_indexer_with_api_mock() -> typing.Iterator[UserIndexerWithApiMock]:
 
 @pytest.fixture
 def workspace_indexer_with_api_mock() -> typing.Iterator[WorkspaceIndexerWithApiMock]:
-    """Create an ESUserIndexer instance with mocked ESSearchApi and RoleApi.
+    """Create an ESUserIndexer instance with mocked ESSearchApi and UserWorkspaceConfigApi.
 
     Return a (ESWorkspaceIndexer, ESSearchApi.index_workspace_mock, RoleApi_mock) tuple.
     """
     with patch(
         "tracim_backend.lib.search.elasticsearch_search.elasticsearch_search.ESSearchApi.index_workspace"
     ) as index_workspace_mock, patch(
-        "tracim_backend.lib.search.elasticsearch_search.elasticsearch_search.RoleApi"
+        "tracim_backend.lib.search.elasticsearch_search.elasticsearch_search.UserWorkspaceConfigApi"
     ) as role_api_class_mock:
         role_api_mock = MagicMock()
         role_api_class_mock.return_value = role_api_mock

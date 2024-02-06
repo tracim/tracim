@@ -50,7 +50,7 @@ from tracim_backend.lib.core.user import DEFAULT_COVER_SIZE
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.user_custom_properties import UserCustomPropertiesApi
 from tracim_backend.lib.core.userconfig import UserConfigApi
-from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import has_personal_access
@@ -218,7 +218,7 @@ class UserController(Controller):
         Get list of all roles of the given user
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        wapi = RoleApi(
+        wapi = UserWorkspaceConfigApi(
             current_user=request.candidate_user,  # User
             session=request.dbsession,
             config=app_config,
@@ -744,13 +744,13 @@ class UserController(Controller):
         app_config = request.registry.settings["CFG"]  # type: CFG
         user_id = request.candidate_user.user_id
         space_id = hapic_data.path.workspace_id
-        role_api = RoleApi(
+        user_workspace_config_api = UserWorkspaceConfigApi(
             current_user=request.candidate_user,  # User
             session=request.dbsession,
             config=app_config,
         )
-        role_in_space = role_api.get_one(user_id=user_id, workspace_id=space_id)
-        role_api.update_role(
+        role_in_space = user_workspace_config_api.get_one(user_id=user_id, workspace_id=space_id)
+        user_workspace_config_api.update_role(
             role=role_in_space,
             email_notification_type_value=hapic_data.body["email_notification_type"],
             save_now=True,

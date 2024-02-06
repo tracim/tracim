@@ -3,7 +3,7 @@ import pytest
 from tracim_backend import AuthType
 from tracim_backend.exceptions import UserRoleNotFound
 from tracim_backend.lib.core.plugins import hookimpl
-from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.data import EmailNotificationType
@@ -18,9 +18,13 @@ class RemoveFromAllSpacesPlugin:
         self, role: UserRoleInWorkspace, context: TracimContext
     ) -> None:
         wapi = WorkspaceApi(context.dbsession, None, context.app_config)
-        role_api = RoleApi(context.dbsession, None, context.app_config)
+        user_workspace_config_api = UserWorkspaceConfigApi(
+            context.dbsession, None, context.app_config
+        )
         for workspace in wapi.get_all_for_user(role.user):
-            role_api.delete_one(role.user.user_id, workspace.workspace_id, flush=False)
+            user_workspace_config_api.delete_one(
+                role.user.user_id, workspace.workspace_id, flush=False
+            )
 
 
 @pytest.mark.usefixtures("base_fixture")

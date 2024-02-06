@@ -19,7 +19,7 @@ from tracim_backend.models.tracim_session import TracimSession
 __author__ = "damien"
 
 
-class RoleApi(object):
+class UserWorkspaceConfigApi(object):
     def __init__(
         self,
         session: TracimSession,
@@ -237,7 +237,7 @@ class RoleApi(object):
             return [r[0] for r in query.all()]
 
         return self._session.use_cache(
-            f"RoleApi.get_workspace_member_ids({workspace_id}, {min_role})",
+            f"UserWorkspaceConfigApi.get_workspace_member_ids({workspace_id}, {min_role})",
             fetch_results_from_db,
         )
 

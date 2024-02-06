@@ -13,7 +13,7 @@ from tracim_backend.exceptions import UserNotAllowedToCreateMoreWorkspace
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.exceptions import WorkspacePublicDownloadDisabledException
 from tracim_backend.exceptions import WorkspacePublicUploadDisabledException
-from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.utils import current_date_for_filename
 from tracim_backend.models.auth import AuthType
@@ -147,9 +147,11 @@ class WorkspaceApi(object):
         workspace.publication_enabled = publication_enabled
         # By default, we force the current user to be the workspace manager
         # And to receive email notifications
-        role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
+        user_workspace_config_api = UserWorkspaceConfigApi(
+            session=self._session, current_user=self._user, config=self._config
+        )
         with self._session.no_autoflush:
-            role = role_api.create_one(
+            config = user_workspace_config_api.create_one(
                 self._user,
                 workspace,
                 UserRoleInWorkspace.WORKSPACE_MANAGER,
@@ -157,7 +159,7 @@ class WorkspaceApi(object):
                 flush=False,
             )
         self._session.add(workspace)
-        self._session.add(role)
+        self._session.add(config)
         if save_now:
             self._session.flush()
         return workspace
@@ -246,12 +248,12 @@ class WorkspaceApi(object):
             raise WorkspaceNotFound(
                 "workspace {} does not exist or not visible for user".format(workspace_id)
             ) from exc
-        role_api = RoleApi(
+        user_workspace_config_api = UserWorkspaceConfigApi(
             current_user=self._user,
             session=self._session,
             config=self._config,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             self._user,
             workspace,
             workspace.default_user_role.level,
@@ -288,8 +290,10 @@ class WorkspaceApi(object):
         if parent:
             query = query.filter(Workspace.parent_id == parent.workspace_id)
         else:
-            role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
-            workspace_ids = role_api.get_user_workspaces_ids(
+            user_workspace_config_api = UserWorkspaceConfigApi(
+                session=self._session, current_user=self._user, config=self._config
+            )
+            workspace_ids = user_workspace_config_api.get_user_workspaces_ids(
                 user_id=self._user.user_id, min_role=UserRoleInWorkspace.READER
             )
             query = query.filter(
@@ -372,10 +376,12 @@ class WorkspaceApi(object):
         """
         query = self._base_query()
         workspace_ids = []
-        role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
+        user_workspace_config_api = UserWorkspaceConfigApi(
+            session=self._session, current_user=self._user, config=self._config
+        )
         if include_with_role:
             workspace_ids.extend(
-                role_api.get_user_workspaces_ids(
+                user_workspace_config_api.get_user_workspaces_ids(
                     user_id=user.user_id, min_role=UserRoleInWorkspace.READER
                 )
             )
@@ -392,9 +398,11 @@ class WorkspaceApi(object):
         """Get all user workspaces where the users is not member of the parent and parent exists"""
         query = self._base_query()
         workspace_ids = []
-        role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
+        user_workspace_config_api = UserWorkspaceConfigApi(
+            session=self._session, current_user=self._user, config=self._config
+        )
         workspace_ids.extend(
-            role_api.get_user_workspaces_ids(
+            user_workspace_config_api.get_user_workspaces_ids(
                 user_id=user.user_id, min_role=UserRoleInWorkspace.READER
             )
         )

@@ -51,7 +51,7 @@ from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.core.notifications import NotifierFactory
 from tracim_backend.lib.core.storage import StorageLib
 from tracim_backend.lib.core.tag import TagLib
-from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.rich_text_preview.html_preview import RichTextPreviewLib
 from tracim_backend.lib.utils.app import TracimContentType
@@ -223,7 +223,7 @@ class ContentApi(object):
         # with user workspaces privileges
         if self._user and not self._disable_user_workspaces_filter:
             # Filter according to user workspaces
-            workspace_ids = RoleApi(
+            workspace_ids = UserWorkspaceConfigApi(
                 session=self._session, current_user=self._user, config=self._config
             ).get_user_workspaces_ids(self._user_id, UserRoleInWorkspace.READER)
             result = result.filter(
