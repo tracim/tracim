@@ -16,11 +16,11 @@ import {
   newFlashMessage,
   addNotification,
   addWorkspaceContentList,
-  addRoleWorkspaceList,
-  updateRoleWorkspaceList,
+  addUserWorkspaceConfigList,
+  updateUserWorkspaceConfigList,
   addWorkspaceMember,
   deleteWorkspaceContentList,
-  removeWorkspaceMember,
+  removeUserRole,
   removeWorkspaceReadStatus,
   unDeleteWorkspaceContentList,
   updateUser,
@@ -167,7 +167,7 @@ export class ReduxTlmDispatcher extends React.Component {
     const { props } = this
 
     if (props.user.userId === data.fields.user.user_id) {
-      props.dispatch(addRoleWorkspaceList(data.fields.user, data.fields.member, data.fields.workspace))
+      props.dispatch(addUserWorkspaceConfigList(data.fields.user, data.fields.member, data.fields.workspace))
       props.dispatch(removeAccessibleWorkspace(data.fields.workspace))
       // FIXME - FS - 2023-11-28 - https://github.com/tracim/tracim/issues/6292
       // use KnownMember to only get the member of the new space joined
@@ -184,7 +184,7 @@ export class ReduxTlmDispatcher extends React.Component {
   handleMemberModified = data => {
     const { props } = this
     if (props.user.userId === data.fields.user.user_id) {
-      props.dispatch(updateRoleWorkspaceList(data.fields.user, data.fields.member, data.fields.workspace))
+      props.dispatch(updateUserWorkspaceConfigList(data.fields.user, data.fields.member, data.fields.workspace))
     }
     props.dispatch(updateWorkspaceMember(data.fields.user, data.fields.workspace.workspace_id, data.fields.member))
     this.handleNotification(data)
@@ -192,7 +192,7 @@ export class ReduxTlmDispatcher extends React.Component {
 
   handleMemberDeleted = data => {
     const { props } = this
-    props.dispatch(removeWorkspaceMember(data.fields.user.user_id, data.fields.workspace.workspace_id))
+    props.dispatch(removeUserRole(data.fields.user.user_id, data.fields.workspace.workspace_id))
     if (props.user.userId === data.fields.user.user_id) {
       props.dispatch(removeWorkspace(data.fields.workspace))
       if (ACCESSIBLE_SPACE_TYPE_LIST.some(s => s.slug === data.fields.workspace.access_type)) {

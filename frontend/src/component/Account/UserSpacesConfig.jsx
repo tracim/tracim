@@ -26,7 +26,7 @@ import {
 } from 'tracim_frontend_lib'
 import { serializeUserConfig, serializeUserWorkspaceConfig, serializeWorkspaceListProps } from '../../reducer/workspaceList.js'
 import { newFlashMessage } from '../../action-creator.sync.js'
-import { deleteWorkspaceMember, getUserRoleWorkspaceList } from '../../action-creator.async.js'
+import { deleteWorkspaceMember, getUserWorkspaceConfigList } from '../../action-creator.async.js'
 import AdminUserSpacesConfig from '../../container/AdminUserSpacesConfig.jsx'
 import UserSpacesConfigLine from './UserSpacesConfigLine.jsx'
 
@@ -159,7 +159,7 @@ export const UserSpacesConfig = (props) => {
 
   const getSpaceList = async () => {
     const fetchGetUserWorkspaceList = await props.dispatch(
-      getUserRoleWorkspaceList(props.userToEditId, false)
+      getUserWorkspaceConfigList(props.userToEditId, false)
     )
 
     switch (fetchGetUserWorkspaceList.status) {

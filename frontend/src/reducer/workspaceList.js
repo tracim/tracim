@@ -1,15 +1,16 @@
 import {
-  ADD_ROLE_WORKSPACE_LIST,
-  UPDATE_ROLE_WORKSPACE_LIST,
+  ADD_USER_WORKSPACE_CONFIG_LIST,
+  UPDATE_USER_WORKSPACE_CONFIG_LIST,
+  USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
   REMOVE,
   SET,
   UPDATE,
   WORKSPACE_LIST,
-  ROLE_WORKSPACE_LIST,
+  USER_WORKSPACE_CONFIG_LIST,
   WORKSPACE_DETAIL
 } from '../action-creator.sync.js'
 import { serialize, sortListByMultipleCriteria, SORT_BY, SORT_ORDER } from 'tracim_frontend_lib'
-import { serializeSidebarEntryProps } from './currentWorkspace.js'
+import { serializeSidebarEntryProps, serializeWorkspace } from './currentWorkspace.js'
 import { EMAIL_NOTIFICATION_TYPE } from '../util/helper.js'
 
 export const serializeWorkspaceListProps = {
@@ -41,13 +42,13 @@ export const serializeUserConfig = m => {
   }
 }
 
-export const serializeUserWorkspaceConfig = role => {
+export const serializeUserWorkspaceConfig = config => {
   return {
-    ...serialize(role.workspace, serializeWorkspaceListProps),
-    sidebarEntryList: role.workspace.sidebar_entries.map(
+    ...serialize(config.workspace, serializeWorkspaceListProps),
+    sidebarEntryList: config.workspace.sidebar_entries.map(
       sbe => serialize(sbe, serializeSidebarEntryProps)
     ),
-    memberList: [role].map(serializeUserConfig)
+    memberList: [config].map(serializeUserConfig)
   }
 }
 function addWorkspaceSetting (setting, user, workspace, workspaceList) {
@@ -67,11 +68,11 @@ function addWorkspaceSetting (setting, user, workspace, workspaceList) {
 
 export function workspaceList (state = [], action, lang) {
   switch (action.type) {
-    // FIXME - F.S. - 2023-11-27 - change test of `${SET}/${WORKSPACE_LIST}` to test `${SET}/${ROLE_WORKSPACE_LIST}`
-    case `${SET}/${ROLE_WORKSPACE_LIST}`:
+    // FIXME - F.S. - 2023-11-27 - change test of `${SET}/${WORKSPACE_LIST}` to test `${SET}/${USER_WORKSPACE_CONFIG_LIST}`
+    case `${SET}/${USER_WORKSPACE_CONFIG_LIST}`:
       return action.workspaceList.map(serializeUserWorkspaceConfig)
 
-    case ADD_ROLE_WORKSPACE_LIST :
+    case ADD_USER_WORKSPACE_CONFIG_LIST :
       return sortListByMultipleCriteria(
         addWorkspaceSetting(action.setting, action.user, action.workspace, state),
         [SORT_BY.LABEL, SORT_BY.ID],
@@ -79,7 +80,7 @@ export function workspaceList (state = [], action, lang) {
         lang
       )
 
-    case UPDATE_ROLE_WORKSPACE_LIST :
+    case UPDATE_USER_WORKSPACE_CONFIG_LIST :
       return sortListByMultipleCriteria(
         addWorkspaceSetting(
           action.setting,
@@ -99,11 +100,19 @@ export function workspaceList (state = [], action, lang) {
       if (!state.some(ws => ws.id === action.workspaceDetail.workspace_id)) return state
       const spaceList = state.map(
         ws => ws.id === action.workspaceDetail.workspace_id
-          ? { ...ws, ...serializeUserWorkspaceConfig(action.workspaceDetail) }
+          ? { ...ws, ...serializeWorkspace(action.workspaceDetail) }
           : ws
       )
       return sortListByMultipleCriteria(spaceList, [SORT_BY.LABEL, SORT_BY.ID], SORT_ORDER.ASCENDING, lang)
     }
+
+    case `${UPDATE}/${USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE}`:
+      if (!state.some(ws => ws.id === action.workspaceId)) return state
+      return state.map(
+        ws => ws.id === action.workspaceId
+          ? { ...ws, memberList: [{ ...ws.memberList[0], emailNotificationType: action.emailNotificationType }] }
+          : ws
+      )
 
     default:
       return state

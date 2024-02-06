@@ -4,19 +4,19 @@ import {
   ADD,
   REMOVE,
   WORKSPACE_DETAIL,
-  WORKSPACE_MEMBER_LIST,
+  USER_ROLE_LIST,
   WORKSPACE_READ_STATUS,
   WORKSPACE_READ_STATUS_LIST,
-  WORKSPACE_MEMBER,
+  USER_ROLE,
   UPDATE,
   FOLDER_READ,
   WORKSPACE_AGENDA_URL,
   WORKSPACE_CONTENT,
   RESTORE,
   WORKSPACE_LOADED,
-  REMOVE_WORKSPACE_MEMBER,
+  REMOVE_USER_ROLE,
   UPDATE_USER,
-  ADD_WORKSPACE_MEMBER
+  ADD_USER_ROLE
 } from '../action-creator.sync.js'
 import { serializeContentProps } from './workspaceContentList.js'
 import { serialize } from 'tracim_frontend_lib'
@@ -62,7 +62,7 @@ export const serializeSidebarEntryProps = {
   label: 'label'
 }
 
-export const serializeMember = m => {
+export const serializeRole = m => {
   return {
     id: m.user.user_id,
     publicName: m.user.public_name,
@@ -94,37 +94,37 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         sidebarEntryList: action.workspaceDetail.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps))
       }
 
-    case `${SET}/${WORKSPACE_MEMBER_LIST}`:
+    case `${SET}/${USER_ROLE_LIST}`:
       return {
         ...state,
-        memberList: action.workspaceMemberList.map(m => serializeMember(m))
+        memberList: action.workspaceMemberList.map(m => serializeRole(m))
       }
 
-    case ADD_WORKSPACE_MEMBER:
+    case ADD_USER_ROLE:
       if (state.id !== action.workspaceId) return state
       return {
         ...state,
         memberList: uniqBy([
           ...state.memberList,
-          serializeMember(action.newMember)
+          serializeRole(action.newMember)
         ], 'id')
       }
 
-    case `${UPDATE}/${WORKSPACE_MEMBER}`:
+    case `${UPDATE}/${USER_ROLE}`:
       if (state.id !== action.workspaceId) return state
       return {
         ...state,
         memberList: state.memberList.map(m => m.id === action.member.user.user_id
-          ? { ...m, ...serializeMember(action.member) }
+          ? { ...m, ...serializeRole(action.member) }
           : m
         )
       }
 
-    case REMOVE_WORKSPACE_MEMBER:
+    case REMOVE_USER_ROLE:
       if (state.id !== action.workspaceId) return state
       return {
         ...state,
-        memberList: state.memberList.filter(m => m.id !== action.memberId)
+        memberList: state.memberList.filter(m => m.id !== action.userId)
       }
 
     case `${ADD}/${WORKSPACE_CONTENT}`:
@@ -216,7 +216,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       return {
         ...state,
         memberList: state.memberList.map(member => member.id === action.newUser.user_id
-          ? serializeMember({ ...member, user: action.newUser })
+          ? serializeRole({ ...member, user: action.newUser })
           : member
         )
       }

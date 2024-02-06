@@ -24,7 +24,7 @@ import {
   getWorkspaceList,
   postWorkspaceMember,
   updateWorkspaceMember,
-  getUserRoleWorkspaceList
+  getUserWorkspaceConfigList
 } from '../action-creator.async.js'
 import AdminUserSpacesConfigItem from '../component/Account/AdminUserSpacesConfigItem.jsx'
 import { onlyManager } from '../component/Account/UserSpacesConfig.jsx'
@@ -101,7 +101,7 @@ export const AdminUserSpacesConfig = (props) => {
 
   const getMemberSpacesList = async () => {
     const fetchGetUserWorkspaceList = await props.dispatch(
-      getUserRoleWorkspaceList(props.userToEditId, false)
+      getUserWorkspaceConfigList(props.userToEditId, false)
     )
     switch (fetchGetUserWorkspaceList.status) {
       case 200: {

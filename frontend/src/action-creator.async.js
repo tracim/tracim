@@ -50,9 +50,9 @@ import {
   WORKSPACE_CONTENT_SHARE_FOLDER,
   WORKSPACE_DETAIL,
   WORKSPACE_LIST,
-  WORKSPACE_MEMBER_ADD,
-  WORKSPACE_MEMBER_REMOVE,
-  WORKSPACE_MEMBER_UPDATE,
+  USER_ROLE_ADD,
+  USER_ROLE_REMOVE,
+  USER_ROLE_UPDATE,
   WORKSPACE_PUBLICATION_LIST,
   WORKSPACE_READ_STATUS,
   ACCESSIBLE_WORKSPACE_LIST,
@@ -64,7 +64,7 @@ import {
   FAVORITE_LIST,
   FAVORITE,
   UNREAD_NOTIFICATION_COUNT,
-  ROLE_WORKSPACE_LIST
+  USER_WORKSPACE_CONFIG_LIST
 } from './action-creator.sync.js'
 import {
   CONTENT_NAMESPACE,
@@ -275,9 +275,7 @@ export const getUserConfiguration = userId => dispatch => {
   })
 }
 
-// TODO - CH - 2023-11-02 - this function should be renamed according to:
-// https://github.com/tracim/tracim/issues/6252
-export const getUserRoleWorkspaceList = (userId) => async dispatch => {
+export const getUserWorkspaceConfigList = (userId) => async dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspaces/all/settings`,
     param: {
@@ -519,9 +517,7 @@ export const putUserWorkspaceEmailNotificationType = (user, workspaceId, emailNo
   })
 }
 
-// TODO - CH - 2023-11-02 - this function should be renamed according to:
-// https://github.com/tracim/tracim/issues/6252
-export const getMyselfUserRoleWorkspaceList = () => dispatch => {
+export const getMyselfWorkspaceConfigList = () => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/all/settings`,
     param: {
@@ -531,7 +527,7 @@ export const getMyselfUserRoleWorkspaceList = () => dispatch => {
       },
       method: 'GET'
     },
-    actionName: ROLE_WORKSPACE_LIST,
+    actionName: USER_WORKSPACE_CONFIG_LIST,
     dispatch
   })
 }
@@ -672,7 +668,7 @@ export const postWorkspaceMember = (workspaceId, newMember) => dispatch => {
         role: newMember.role
       })
     },
-    actionName: WORKSPACE_MEMBER_ADD,
+    actionName: USER_ROLE_ADD,
     dispatch
   })
 }
@@ -685,7 +681,7 @@ export const deleteWorkspaceMember = (workspaceId, memberId) => dispatch => {
       headers: { ...FETCH_CONFIG.headers },
       method: 'DELETE'
     },
-    actionName: WORKSPACE_MEMBER_REMOVE,
+    actionName: USER_ROLE_REMOVE,
     dispatch
   })
 }
@@ -701,7 +697,7 @@ export const updateWorkspaceMember = (workspaceId, memberId, newRole) => dispatc
         role: newRole
       })
     },
-    actionName: WORKSPACE_MEMBER_UPDATE,
+    actionName: USER_ROLE_UPDATE,
     dispatch
   })
 }
