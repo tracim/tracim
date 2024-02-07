@@ -20,7 +20,7 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import RevisionReadStatus
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserConfigInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.favorites import FavoriteContent
 from tracim_backend.models.meta import DeclarativeBase
@@ -231,8 +231,8 @@ class CleanupLib(object):
         """
 
         # INFO - G.M - 2019-12-11 - delete role on workspace
-        roles = self.session.query(UserRoleInWorkspace).filter(
-            UserRoleInWorkspace.workspace_id == workspace.workspace_id
+        roles = self.session.query(UserConfigInWorkspace).filter(
+            UserConfigInWorkspace.workspace_id == workspace.workspace_id
         )
         for role in roles:
             logger.info(
@@ -336,8 +336,8 @@ class CleanupLib(object):
             self.safe_delete(share)
 
         # INFO - G.M - 2019-12-11 - User role
-        roles = self.session.query(UserRoleInWorkspace).filter(
-            UserRoleInWorkspace.user_id == user.user_id
+        roles = self.session.query(UserConfigInWorkspace).filter(
+            UserConfigInWorkspace.user_id == user.user_id
         )
         for role in roles:
             logger.info(

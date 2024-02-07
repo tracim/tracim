@@ -6,7 +6,7 @@ from tracim_backend.lib.core.event import EventApi
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import EmailNotificationType
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserConfigInWorkspace
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import Event
@@ -67,7 +67,7 @@ def create_workspace_and_users(
     role = role_api.create_one(
         same_workspace_user,
         my_workspace,
-        UserRoleInWorkspace.WORKSPACE_MANAGER,
+        UserConfigInWorkspace.WORKSPACE_MANAGER,
         email_notification_type=EmailNotificationType.NONE,
     )
     transaction.commit()
@@ -513,13 +513,13 @@ class TestEventReceiver:
         role_api.create_one(
             workspace_content_manager,
             my_workspace,
-            UserRoleInWorkspace.CONTENT_MANAGER,
+            UserConfigInWorkspace.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             workspace_manager,
             my_workspace,
-            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            UserConfigInWorkspace.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         subscription = subscription_lib.submit_subscription(my_workspace)
@@ -593,13 +593,13 @@ class TestEventReceiver:
         role_api.create_one(
             workspace_content_manager,
             my_workspace,
-            UserRoleInWorkspace.CONTENT_MANAGER,
+            UserConfigInWorkspace.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             workspace_manager,
             my_workspace,
-            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            UserConfigInWorkspace.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         subscription = subscription_lib.submit_subscription(my_workspace)
@@ -666,7 +666,7 @@ class TestEventApi:
         role_api.create_one(
             other_user,
             my_workspace,
-            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            UserConfigInWorkspace.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -688,7 +688,7 @@ class TestEventApi:
         role_api.create_one(
             other_user,
             my_workspace,
-            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            UserConfigInWorkspace.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -738,7 +738,7 @@ class TestEventApi:
         role_api.create_one(
             other_user,
             my_workspace,
-            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            UserConfigInWorkspace.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -803,7 +803,7 @@ class TestEventApi:
         role_api.create_one(
             other_user,
             my_workspace,
-            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            UserConfigInWorkspace.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -876,7 +876,7 @@ class TestEventApi:
         role_api.create_one(
             other_user,
             my_workspace,
-            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            UserConfigInWorkspace.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -956,7 +956,7 @@ class TestEventApi:
         role_api.create_one(
             other_user,
             my_workspace,
-            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            UserConfigInWorkspace.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()

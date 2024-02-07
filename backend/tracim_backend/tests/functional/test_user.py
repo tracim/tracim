@@ -17,7 +17,7 @@ from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import EmailNotificationType
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserConfigInWorkspace
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.roles import WorkspaceRoles
@@ -70,7 +70,7 @@ class TestUserReadStatusEndpoint(object):
         role_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get()
@@ -218,7 +218,7 @@ class TestUserReadStatusEndpoint(object):
         role_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get()
@@ -368,7 +368,7 @@ class TestUserReadStatusEndpoint(object):
         role_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get()
@@ -513,7 +513,7 @@ class TestUserSetContentAsRead(object):
         role_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get()
@@ -611,7 +611,7 @@ class TestUserSetContentAsRead(object):
         role_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get()
@@ -682,7 +682,7 @@ class TestUserSetContentAsRead(object):
         role_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get()
@@ -753,7 +753,7 @@ class TestUserSetContentAsRead(object):
         role_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get()
@@ -840,7 +840,7 @@ class TestUserSetContentAsRead(object):
         role_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get()
@@ -909,7 +909,7 @@ class TestUserSetContentAsRead(object):
         role_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get()
@@ -1016,7 +1016,7 @@ class TestUserSetContentAsRead(object):
         role_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get()
@@ -1131,7 +1131,7 @@ class TestUserSetContentAsUnread(object):
         role_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get()
@@ -1241,7 +1241,7 @@ class TestUserSetContentAsUnread(object):
         role_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get()
@@ -1312,7 +1312,7 @@ class TestUserSetContentAsUnread(object):
         role_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get()
@@ -1384,7 +1384,7 @@ class TestUserSetContentAsUnread(object):
         role_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get()
@@ -1471,7 +1471,7 @@ class TestUserSetContentAsUnread(object):
         role_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get()
@@ -1667,7 +1667,7 @@ class TestUserSetWorkspaceAsRead(object):
         role_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get()
@@ -1753,7 +1753,7 @@ class TestUserSetWorkspaceAsRead(object):
         role_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get()
@@ -1837,7 +1837,7 @@ class TestUserSetWorkspaceAsRead(object):
         role_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get()
@@ -1912,7 +1912,7 @@ class TestUserChangeEmailNotification(object):
         role_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -1966,7 +1966,7 @@ class TestUserChangeEmailNotification(object):
         role_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -2027,13 +2027,13 @@ class TestUserChangeEmailNotification(object):
         role_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             test_user2,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -2097,13 +2097,13 @@ class TestUserWorkspaceEndpoint(object):
         role_api.create_one(
             admin_user,
             role_only_workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             test_user,
             owned_only_workspace,
-            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            UserConfigInWorkspace.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -2212,13 +2212,13 @@ class TestUserWorkspaceEndpoint(object):
         role_api.create_one(
             admin_user,
             role_only_workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             test_user,
             owned_only_workspace,
-            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            UserConfigInWorkspace.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -3695,13 +3695,13 @@ class TestKnownMembersEndpoint(object):
         role_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             test_user2,
             workspace2,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         uapi.save(test_user)
@@ -3772,19 +3772,19 @@ class TestKnownMembersEndpoint(object):
         role_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             test_user2,
             workspace2,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             test_user3,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         uapi.save(test_user)
@@ -3859,19 +3859,19 @@ class TestKnownMembersEndpoint(object):
         role_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             test_user2,
             workspace2,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             test_user3,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         uapi.save(test_user)
@@ -4100,13 +4100,13 @@ class TestKnownMembersEndpoint(object):
         role_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             test_user2,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -4173,13 +4173,13 @@ class TestKnownMembersEndpoint(object):
         role_api.create_one(
             test_user,
             workspace1,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             test_user2,
             workspace1,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -4188,13 +4188,13 @@ class TestKnownMembersEndpoint(object):
         role_api.create_one(
             test_user,
             workspace2,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             test_user3,
             workspace2,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -4386,13 +4386,13 @@ class TestKnownMembersEndpointKnownMembersFilterDisabled(object):
         role_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             test_user2,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()

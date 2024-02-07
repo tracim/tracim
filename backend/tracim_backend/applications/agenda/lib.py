@@ -26,7 +26,7 @@ from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import Agenda
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserConfigInWorkspace
 from tracim_backend.models.data import Workspace
 
 CREATE_CALENDAR_TEMPLATE = """<?xml version="1.0" encoding="UTF-8" ?>
@@ -696,7 +696,7 @@ class AgendaHooks:
                 logger.exception(self, exc)
 
     def sync_workspace_symlinks(
-        self, role: UserRoleInWorkspace, context: TracimContext, role_deletion=False
+        self, role: UserConfigInWorkspace, context: TracimContext, role_deletion=False
     ):
         app_lib = ApplicationApi(app_list=app_list)
         if app_lib.exist(AGENDA__APP_SLUG):
@@ -738,19 +738,19 @@ class AgendaHooks:
             self.sync_workspace_symlinks(role, context)
 
     @hookimpl
-    def on_user_role_in_workspace_deleted(
-        self, role: UserRoleInWorkspace, context: TracimContext
+    def on_user_config_in_workspace_deleted(
+        self, config: UserConfigInWorkspace, context: TracimContext
     ) -> None:
-        self.sync_workspace_symlinks(role=role, context=context, role_deletion=True)
+        self.sync_workspace_symlinks(role=config, context=context, role_deletion=True)
 
     @hookimpl
-    def on_user_role_in_workspace_modified(
-        self, role: UserRoleInWorkspace, context: TracimContext
+    def on_user_config_in_workspace_modified(
+        self, config: UserConfigInWorkspace, context: TracimContext
     ) -> None:
-        self.sync_workspace_symlinks(role=role, context=context)
+        self.sync_workspace_symlinks(role=config, context=context)
 
     @hookimpl
-    def on_user_role_in_workspace_created(
-        self, role: UserRoleInWorkspace, context: TracimContext
+    def on_user_config_in_workspace_created(
+        self, config: UserConfigInWorkspace, context: TracimContext
     ) -> None:
-        self.sync_workspace_symlinks(role=role, context=context)
+        self.sync_workspace_symlinks(role=config, context=context)

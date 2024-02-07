@@ -22,7 +22,7 @@ from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import EmailNotificationType
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserConfigInWorkspace
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
@@ -558,19 +558,19 @@ class TestUserApi(object):
         role_api.create_one(
             u1,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             u2,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             u3,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api2 = UserApi(current_user=u1, session=session, config=app_config)
@@ -596,25 +596,25 @@ class TestUserApi(object):
         role_api.create_one(
             u1,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             u2,
             workspace_2,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             u3,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             u3,
             workspace_2,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api2 = UserApi(current_user=u3, session=session, config=app_config)
@@ -655,31 +655,31 @@ class TestUserApi(object):
         role_api.create_one(
             u1,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             u2,
             workspace_2,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             u4,
             workspace_2,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             u3,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             u3,
             workspace_2,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api2 = UserApi(current_user=u3, session=session, config=app_config)
@@ -705,7 +705,7 @@ class TestUserApi(object):
             role_api.create_one(
                 u1,
                 workspace,
-                UserRoleInWorkspace.READER,
+                UserConfigInWorkspace.READER,
                 email_notification_type=EmailNotificationType.NONE,
             )
 
@@ -732,31 +732,31 @@ class TestUserApi(object):
         role_api.create_one(
             u1,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             u2,
             workspace_2,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             u4,
             workspace_2,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             u3,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             u3,
             workspace_2,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api2 = UserApi(current_user=u3, session=session, config=app_config)
@@ -785,25 +785,25 @@ class TestUserApi(object):
         role_api.create_one(
             u1,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             u2,
             workspace_2,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             u3,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             u3,
             workspace_2,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api2 = UserApi(current_user=u3, session=session, config=app_config)
@@ -827,19 +827,19 @@ class TestUserApi(object):
         role_api.create_one(
             u1,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             u2,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             u3,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api2 = UserApi(current_user=u1, session=session, config=app_config)
@@ -862,19 +862,19 @@ class TestUserApi(object):
         role_api.create_one(
             u1,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             u2,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         role_api.create_one(
             u3,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api2 = UserApi(current_user=u1, session=session, config=app_config)

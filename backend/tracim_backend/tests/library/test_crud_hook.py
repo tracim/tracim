@@ -7,7 +7,7 @@ from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserConfigInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
@@ -69,22 +69,22 @@ class UserRoleInWorkspaceHookImpl:
         self.mock_hooks = MagicMock()
 
     @hookimpl
-    def on_user_role_in_workspace_created(
-        self, role: UserRoleInWorkspace, context: TracimContext
+    def on_user_config_in_workspace_created(
+        self, config: UserConfigInWorkspace, context: TracimContext
     ) -> None:
-        self.mock_hooks("created", role=role, context=context)
+        self.mock_hooks("created", config=config, context=context)
 
     @hookimpl
-    def on_user_role_in_workspace_modified(
-        self, role: UserRoleInWorkspace, context: TracimContext
+    def on_user_config_in_workspace_modified(
+        self, config: UserConfigInWorkspace, context: TracimContext
     ) -> None:
-        self.mock_hooks("modified", role=role, context=context)
+        self.mock_hooks("modified", config=config, context=context)
 
     @hookimpl
-    def on_user_role_in_workspace_deleted(
-        self, role: UserRoleInWorkspace, context: TracimContext
+    def on_user_config_in_workspace_deleted(
+        self, config: UserConfigInWorkspace, context: TracimContext
     ) -> None:
-        self.mock_hooks("deleted", role=role, context=context)
+        self.mock_hooks("deleted", config=config, context=context)
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -135,12 +135,14 @@ class TestDatabaseCrudHookCaller:
         session.add(workspace)
         session.flush()
 
-        role = UserRoleInWorkspace(role=UserRoleInWorkspace.READER, user=owner, workspace=workspace)
+        role = UserConfigInWorkspace(
+            role=UserConfigInWorkspace.READER, user=owner, workspace=workspace
+        )
         session.add(role)
         session.flush()
         hook.mock_hooks.assert_called_with("created", role=role, context=session.context)
 
-        role.role = UserRoleInWorkspace.WORKSPACE_MANAGER
+        role.role = UserConfigInWorkspace.WORKSPACE_MANAGER
         session.add(role)
         session.flush()
         hook.mock_hooks.assert_called_with("modified", role=role, context=session.context)

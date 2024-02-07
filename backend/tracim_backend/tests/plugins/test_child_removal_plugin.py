@@ -7,23 +7,23 @@ from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.data import EmailNotificationType
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserConfigInWorkspace
 from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.tests.fixtures import *  # noqa:F401,F403
 
 
 class RemoveFromAllSpacesPlugin:
     @hookimpl
-    def on_user_role_in_workspace_deleted(
-        self, role: UserRoleInWorkspace, context: TracimContext
+    def on_user_config_in_workspace_deleted(
+        self, config: UserConfigInWorkspace, context: TracimContext
     ) -> None:
         wapi = WorkspaceApi(context.dbsession, None, context.app_config)
         user_workspace_config_api = UserWorkspaceConfigApi(
             context.dbsession, None, context.app_config
         )
-        for workspace in wapi.get_all_for_user(role.user):
+        for workspace in wapi.get_all_for_user(config.user):
             user_workspace_config_api.delete_one(
-                role.user.user_id, workspace.workspace_id, flush=False
+                config.user.user_id, workspace.workspace_id, flush=False
             )
 
 

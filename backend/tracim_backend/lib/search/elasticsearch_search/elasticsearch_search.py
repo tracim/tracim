@@ -54,7 +54,7 @@ from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserConfigInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.tag import Tag
 from tracim_backend.models.tag import TagOnContent
@@ -508,7 +508,7 @@ class ESSearchApi(SearchApi):
 
         if not search_parameters.search_string:
             return ContentSearchResponse()
-        filtered_workspace_ids = self._get_user_workspaces_id(min_role=UserRoleInWorkspace.READER)
+        filtered_workspace_ids = self._get_user_workspaces_id(min_role=UserConfigInWorkspace.READER)
         es_search_fields = []
         search_fields = search_parameters.search_fields or DEFAULT_CONTENT_SEARCH_FIELDS
 
@@ -1166,28 +1166,28 @@ class ESUserIndexer:
         self.index_user(content.current_revision.owner, context)
 
     @hookimpl
-    def on_user_role_in_workspace_created(
+    def on_user_config_in_workspace_created(
         self,
-        role: UserRoleInWorkspace,
+        config: UserConfigInWorkspace,
         context: TracimContext,
     ) -> None:
-        self.index_user(role.user, context)
+        self.index_user(config.user, context)
 
     @hookimpl
-    def on_user_role_in_workspace_modified(
+    def on_user_config_in_workspace_modified(
         self,
-        role: UserRoleInWorkspace,
+        config: UserConfigInWorkspace,
         context: TracimContext,
     ) -> None:
-        self.index_user(role.user, context)
+        self.index_user(config.user, context)
 
     @hookimpl
-    def on_user_role_in_workspace_deleted(
+    def on_user_config_in_workspace_deleted(
         self,
-        role: UserRoleInWorkspace,
+        config: UserConfigInWorkspace,
         context: TracimContext,
     ) -> None:
-        self.index_user(role.user, context)
+        self.index_user(config.user, context)
 
     def index_user(self, user: User, context: TracimContext) -> None:
         """Index the given user in the corresponding ES index.
@@ -1247,22 +1247,22 @@ class ESWorkspaceIndexer:
             logger.exception(self, msg)
 
     @hookimpl
-    def on_user_role_in_workspace_created(
-        self, role: UserRoleInWorkspace, context: TracimContext
+    def on_user_config_in_workspace_created(
+        self, config: UserConfigInWorkspace, context: TracimContext
     ) -> None:
-        self.index_workspace(role.workspace, context)
+        self.index_workspace(config.workspace, context)
 
     @hookimpl
-    def on_user_role_in_workspace_modified(
-        self, role: UserRoleInWorkspace, context: TracimContext
+    def on_user_config_in_workspace_modified(
+        self, config: UserConfigInWorkspace, context: TracimContext
     ) -> None:
-        self.index_workspace(role.workspace, context)
+        self.index_workspace(config.workspace, context)
 
     @hookimpl
-    def on_user_role_in_workspace_deleted(
-        self, role: UserRoleInWorkspace, context: TracimContext
+    def on_user_config_in_workspace_deleted(
+        self, config: UserConfigInWorkspace, context: TracimContext
     ) -> None:
-        self.index_workspace(role.workspace, context)
+        self.index_workspace(config.workspace, context)
 
     def index_workspace(self, workspace: Workspace, context: TracimContext) -> None:
         """Index the given workpace in the corresponding ES index.

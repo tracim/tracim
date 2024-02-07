@@ -11,7 +11,7 @@ from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
 from tracim_backend.models.data import EmailNotificationType
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserConfigInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.models.tracim_session import TracimSession
@@ -41,7 +41,7 @@ class UserWorkspaceConfigApi(object):
         return query
 
     def _base_query(self):
-        return self._apply_base_filters(self._session.query(UserRoleInWorkspace))
+        return self._apply_base_filters(self._session.query(UserConfigInWorkspace))
 
     def get_user_workspaces_ids(
         self, user_id: int, min_role: int = Profile.USER.id
@@ -51,9 +51,9 @@ class UserWorkspaceConfigApi(object):
         )
         workspaces_ids_tuples = (
             self._base_query()
-            .with_entities(UserRoleInWorkspace.workspace_id)
-            .filter(UserRoleInWorkspace.user_id == user_id)
-            .filter(UserRoleInWorkspace.role >= min_role)
+            .with_entities(UserConfigInWorkspace.workspace_id)
+            .filter(UserConfigInWorkspace.user_id == user_id)
+            .filter(UserConfigInWorkspace.role >= min_role)
             .join(Workspace)
             .filter(Workspace.is_deleted == False)  # noqa: E712
             .all()
@@ -65,11 +65,11 @@ class UserWorkspaceConfigApi(object):
 
     def get_user_role_workspace_with_context(
         self,
-        user_role: UserRoleInWorkspace,
+        user_role: UserConfigInWorkspace,
         newly_created: bool = None,
     ) -> UserRoleWorkspaceInContext:
         """
-        Return member (UserRoleWorkspaceInContext) object from UserRoleInWorkspace
+        Return member (UserRoleWorkspaceInContext) object from UserConfigInWorkspace
         """
         assert self._config
         member = UserRoleWorkspaceInContext(
@@ -87,12 +87,12 @@ class UserWorkspaceConfigApi(object):
         :return: a Query object, filtered query but without fetching the object.
         """
         return (
-            self._session.query(UserRoleInWorkspace)
-            .filter(UserRoleInWorkspace.workspace_id == workspace_id)
-            .filter(UserRoleInWorkspace.user_id == user_id)
+            self._session.query(UserConfigInWorkspace)
+            .filter(UserConfigInWorkspace.workspace_id == workspace_id)
+            .filter(UserConfigInWorkspace.user_id == user_id)
         )
 
-    def get_one(self, user_id: int, workspace_id: int) -> UserRoleInWorkspace:
+    def get_one(self, user_id: int, workspace_id: int) -> UserConfigInWorkspace:
         try:
             user_role = self._get_one_rsc(user_id, workspace_id).one()
         except NoResultFound:
@@ -106,14 +106,14 @@ class UserWorkspaceConfigApi(object):
 
     def update_role(
         self,
-        role: UserRoleInWorkspace,
+        role: UserConfigInWorkspace,
         role_level: typing.Optional[int] = None,
         email_notification_type_value: str = "",
         save_now: bool = False,
     ):
         """
         Update role of user in this workspace
-        :param role: UserRoleInWorkspace object
+        :param role: UserConfigInWorkspace object
         :param role_level: level of new role wanted
         :param email_notification_type_value: mail notification type value
         :param save_now: database flush
@@ -144,7 +144,7 @@ class UserWorkspaceConfigApi(object):
         role_level: int,
         email_notification_type: EmailNotificationType,
         flush: bool = True,
-    ) -> UserRoleInWorkspace:
+    ) -> UserConfigInWorkspace:
         # INFO - G.M - 2018-10-29 - Check if role already exists
         query = self._get_one_rsc(user.user_id, workspace.workspace_id)
         if query.count() > 0:
@@ -153,22 +153,22 @@ class UserWorkspaceConfigApi(object):
                     user.user_id, workspace.workspace_id
                 )
             )
-        role = UserRoleInWorkspace()
-        role.user = user
-        role.workspace = workspace
-        role.role = role_level
-        role.email_notification_type = email_notification_type
+        setting = UserConfigInWorkspace()
+        setting.user = user
+        setting.workspace = workspace
+        setting.role = role_level
+        setting.email_notification_type = email_notification_type
         if flush:
             self._session.flush()
-        return role
+        return setting
 
     def delete_one(self, user_id: int, workspace_id: int, flush=True) -> None:
         if self._is_last_workspace_manager(user_id, workspace_id):
             raise LastWorkspaceManagerRoleCantBeModified(
                 "last workspace manager {} can't remove their own role in workspace".format(user_id)
             )
-        role = self.get_one(user_id, workspace_id)
-        self._session.delete(role)
+        setting = self.get_one(user_id, workspace_id)
+        self._session.delete(setting)
         if flush:
             self._session.flush()
 
@@ -176,16 +176,16 @@ class UserWorkspaceConfigApi(object):
         # INFO - G.M - 2020-17-09 - check if user is workspace_manager of workspace
         try:
             self.get_all_for_workspace_query(workspace_id).filter(
-                UserRoleInWorkspace.role == WorkspaceRoles.WORKSPACE_MANAGER.level
-            ).filter(UserRoleInWorkspace.user_id == user_id).one()
+                UserConfigInWorkspace.role == WorkspaceRoles.WORKSPACE_MANAGER.level
+            ).filter(UserConfigInWorkspace.user_id == user_id).one()
         except NoResultFound:
             return False
 
         # INFO - G.M - 2020-17-09 - check other potential workspace_manager of workspace
         return (
             self.get_all_for_workspace_query(workspace_id)
-            .filter(UserRoleInWorkspace.role == WorkspaceRoles.WORKSPACE_MANAGER.level)
-            .filter(UserRoleInWorkspace.user_id != user_id)
+            .filter(UserConfigInWorkspace.role == WorkspaceRoles.WORKSPACE_MANAGER.level)
+            .filter(UserConfigInWorkspace.user_id != user_id)
             .count()
             == 0
         )
@@ -193,12 +193,12 @@ class UserWorkspaceConfigApi(object):
     def get_all_for_workspace_query(self, workspace_id: int) -> Query:
         query = (
             self._base_query()
-            .filter(UserRoleInWorkspace.workspace_id == workspace_id)
-            .order_by(UserRoleInWorkspace.user_id)
+            .filter(UserConfigInWorkspace.workspace_id == workspace_id)
+            .order_by(UserConfigInWorkspace.user_id)
         )
         return query
 
-    def get_all_for_workspace(self, workspace: Workspace) -> typing.List[UserRoleInWorkspace]:
+    def get_all_for_workspace(self, workspace: Workspace) -> typing.List[UserConfigInWorkspace]:
         return self.get_all_for_workspace_query(workspace.workspace_id).all()
 
     def get_workspace_members(
@@ -206,11 +206,11 @@ class UserWorkspaceConfigApi(object):
     ) -> typing.List[User]:
         query = self._apply_base_filters(
             self._session.query(User)
-            .join(UserRoleInWorkspace)
-            .filter(UserRoleInWorkspace.workspace_id == workspace_id)
+            .join(UserConfigInWorkspace)
+            .filter(UserConfigInWorkspace.workspace_id == workspace_id)
         )
         if min_role:
-            query = query.filter(UserRoleInWorkspace.role >= min_role.level)
+            query = query.filter(UserConfigInWorkspace.role >= min_role.level)
         return query.all()
 
     def get_workspace_member_ids(
@@ -230,10 +230,10 @@ class UserWorkspaceConfigApi(object):
 
         def fetch_results_from_db():
             query = self._apply_base_filters(
-                self._session.query(UserRoleInWorkspace.user_id)
-            ).filter(UserRoleInWorkspace.workspace_id == workspace_id)
+                self._session.query(UserConfigInWorkspace.user_id)
+            ).filter(UserConfigInWorkspace.workspace_id == workspace_id)
             if min_role is not None:
-                query = query.filter(UserRoleInWorkspace.role >= min_role.level)
+                query = query.filter(UserConfigInWorkspace.role >= min_role.level)
             return [r[0] for r in query.all()]
 
         return self._session.use_cache(
@@ -246,16 +246,16 @@ class UserWorkspaceConfigApi(object):
         Return the workspace ids that the current user and the given user_id are member of.
         """
         assert self._user
-        user_workspaces_query = self._session.query(UserRoleInWorkspace.workspace_id).filter(
-            UserRoleInWorkspace.user_id == user_id
+        user_workspaces_query = self._session.query(UserConfigInWorkspace.workspace_id).filter(
+            UserConfigInWorkspace.user_id == user_id
         )
         current_user_workspaces_query = self._session.query(
-            UserRoleInWorkspace.workspace_id
-        ).filter(UserRoleInWorkspace.user_id == self._user.user_id)
+            UserConfigInWorkspace.workspace_id
+        ).filter(UserConfigInWorkspace.user_id == self._user.user_id)
         common_workspaces_ids_query = user_workspaces_query.filter(
-            UserRoleInWorkspace.workspace_id.in_(current_user_workspaces_query)
+            UserConfigInWorkspace.workspace_id.in_(current_user_workspaces_query)
         )
         return common_workspaces_ids_query.all()
 
-    def save(self, role: UserRoleInWorkspace) -> None:
+    def save(self, role: UserConfigInWorkspace) -> None:
         self._session.flush()
