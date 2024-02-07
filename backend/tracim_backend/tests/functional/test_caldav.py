@@ -799,7 +799,9 @@ class TestCaldavRadicaleSync(object):
         # Links are created
         assert os.path.islink(workspace_addressbook_symlink_path)
         assert os.path.islink(workspace_calendar_symlink_path)
-        role_api.delete_one(user_id=user.user_id, workspace_id=workspace.workspace_id, flush=True)
+        user_workspace_config_api.delete_one(
+            user_id=user.user_id, workspace_id=workspace.workspace_id, flush=True
+        )
         transaction.commit()
         assert os.path.isdir(workspace_agenda_path)
         assert os.path.isdir(workspace_addressbook_path)
@@ -807,7 +809,7 @@ class TestCaldavRadicaleSync(object):
         assert not os.path.islink(workspace_addressbook_symlink_path)
         assert not os.path.islink(workspace_calendar_symlink_path)
 
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.READER,
