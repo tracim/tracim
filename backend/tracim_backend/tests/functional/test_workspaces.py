@@ -299,7 +299,7 @@ class TestWorkspaceDiskSpaceEndpoint(object):
         web_testapp,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         application_api_factory,
         content_type_list,
         content_api_factory,
@@ -319,8 +319,8 @@ class TestWorkspaceDiskSpaceEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.CONTRIBUTOR,
@@ -360,7 +360,7 @@ class TestWorkspaceEndpoint(object):
         web_testapp,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         application_api_factory,
         app_config,
     ) -> None:
@@ -379,8 +379,8 @@ class TestWorkspaceEndpoint(object):
         workspace_api = workspace_api_factory.get(show_deleted=True)
         parent_workspace = workspace_api.create_workspace("test_parent", save_now=True)
         workspace = workspace_api.create_workspace("test", parent=parent_workspace, save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.READER,
@@ -415,7 +415,7 @@ class TestWorkspaceEndpoint(object):
 
     def test_api__get_workspace__ok_200__admin_and_not_in_workspace(
         self,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         admin_user,
         user_api_factory,
@@ -954,7 +954,11 @@ class TestWorkspaceEndpoint(object):
         assert last_event.client_token is None
 
     def test_api__delete_workspace__ok_200__manager_workspace_manager(
-        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
     ) -> None:
         """
         Test delete workspace as global manager and workspace manager
@@ -975,8 +979,8 @@ class TestWorkspaceEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -992,7 +996,11 @@ class TestWorkspaceEndpoint(object):
         assert workspace["is_deleted"] is True
 
     def test_api__delete_workspace__err_403__user_workspace_manager(
-        self, web_testapp, user_api_factory, role_api_factory, workspace_api_factory
+        self,
+        web_testapp,
+        user_api_factory,
+        user_workspace_config_api_factory,
+        workspace_api_factory,
     ) -> None:
         """
         Test delete workspace as simple user and workspace manager
@@ -1013,8 +1021,8 @@ class TestWorkspaceEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -1033,7 +1041,11 @@ class TestWorkspaceEndpoint(object):
         assert workspace["is_deleted"] is False
 
     def test_api__delete_workspace__err_403__manager_reader(
-        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
     ) -> None:
         """
         Test delete workspace as manager and reader of the workspace
@@ -1049,8 +1061,8 @@ class TestWorkspaceEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.READER,
@@ -1069,7 +1081,11 @@ class TestWorkspaceEndpoint(object):
         assert workspace["is_deleted"] is False
 
     def test_api__delete_workspace__err_400__manager(
-        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
     ) -> None:
         """
         Test delete workspace as global manager without having any role in the
@@ -1084,7 +1100,7 @@ class TestWorkspaceEndpoint(object):
         uapi.create_user("test@test.test", password="test@test.test", do_save=True, do_notify=False)
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api_factory.get()
+        user_workspace_config_api_factory.get()
         transaction.commit()
         workspace_id = int(workspace.workspace_id)
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -1139,7 +1155,11 @@ class TestWorkspaceEndpoint(object):
         assert workspace["is_deleted"] is False
 
     def test_api__undelete_workspace__ok_200__manager_workspace_manager(
-        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
     ) -> None:
         """
         Test undelete workspace as global manager and workspace manager
@@ -1160,8 +1180,8 @@ class TestWorkspaceEndpoint(object):
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         workspace_api.delete(workspace, flush=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -1177,7 +1197,11 @@ class TestWorkspaceEndpoint(object):
         assert workspace["is_deleted"] is False
 
     def test_api__undelete_workspace__err_403__user_workspace_manager(
-        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
     ) -> None:
         """
         Test undelete workspace as simple user and workspace manager
@@ -1198,8 +1222,8 @@ class TestWorkspaceEndpoint(object):
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         workspace_api.delete(workspace, flush=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -1218,7 +1242,11 @@ class TestWorkspaceEndpoint(object):
         assert workspace["is_deleted"] is True
 
     def test_api__undelete_workspace__err_403__manager_reader(
-        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
     ) -> None:
         """
         Test undelete workspace as manager and reader of the workspace
@@ -1235,8 +1263,8 @@ class TestWorkspaceEndpoint(object):
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         workspace_api.delete(workspace, flush=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.READER,
@@ -1361,7 +1389,11 @@ class TestWorkspacesEndpoints(object):
         assert workspace["slug"] == "test3"
 
     def test_api__get_workspaces__ok_200__number_of_members(
-        self, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
+        web_testapp,
     ):
         """
         Check the number of members of a space
@@ -1384,8 +1416,8 @@ class TestWorkspacesEndpoints(object):
         workspace_api.create_workspace("test", save_now=True)
         space2 = workspace_api.create_workspace("test2", save_now=True)
 
-        role_api = role_api_factory.get(current_user=admin2)
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=admin2)
+        user_workspace_config_api.create_one(
             user,
             space2,
             UserConfigInWorkspace.READER,
@@ -1549,7 +1581,7 @@ class TestWorkspaceMembersEndpoint(object):
         web_testapp,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         admin_user,
     ):
         """
@@ -1565,9 +1597,9 @@ class TestWorkspaceMembersEndpoint(object):
         )
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test_2", save_now=True)
-        role_api = role_api_factory.get(current_user=admin_user)
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=admin_user)
         uapi.disable(user, do_save=True)
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.READER,
@@ -1597,7 +1629,7 @@ class TestWorkspaceMembersEndpoint(object):
         web_testapp,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         admin_user,
     ):
         """
@@ -1613,9 +1645,9 @@ class TestWorkspaceMembersEndpoint(object):
         )
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test_2", save_now=True)
-        role_api = role_api_factory.get(current_user=admin_user)
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=admin_user)
         uapi.disable(user, do_save=True)
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.READER,
@@ -1643,7 +1675,7 @@ class TestWorkspaceMembersEndpoint(object):
         web_testapp,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         admin_user,
     ):
         """
@@ -1664,8 +1696,8 @@ class TestWorkspaceMembersEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(current_user=admin2)
         workspace = workspace_api.create_workspace("test_2", save_now=True)
-        role_api = role_api_factory.get(current_user=admin2)
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=admin2)
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.READER,
@@ -1747,7 +1779,7 @@ class TestWorkspaceMembersEndpoint(object):
         web_testapp,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         admin_user,
     ):
         """
@@ -1768,8 +1800,8 @@ class TestWorkspaceMembersEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(current_user=admin2)
         workspace = workspace_api.create_workspace("test_2", save_now=True)
-        role_api = role_api_factory.get(current_user=admin2)
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=admin2)
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.READER,
@@ -1796,7 +1828,7 @@ class TestWorkspaceMembersEndpoint(object):
         self,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         admin_user,
         web_testapp,
     ):
@@ -1814,8 +1846,8 @@ class TestWorkspaceMembersEndpoint(object):
         )
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("test_2", save_now=True)
-        role_api = role_api_factory.get(current_user=None)
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=None)
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.READER,
@@ -1947,7 +1979,7 @@ class TestWorkspaceMembersEndpoint(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         admin_user,
         web_testapp,
     ):
@@ -1998,7 +2030,7 @@ class TestWorkspaceMembersEndpoint(object):
         admin_user,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         web_testapp,
     ):
         """
@@ -2021,15 +2053,15 @@ class TestWorkspaceMembersEndpoint(object):
         admin2 = uapi.create_user(
             email="admin2@admin2.admin2", profile=Profile.ADMIN, do_notify=False
         )
-        role_api = role_api_factory.get(current_user=admin2)
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=admin2)
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
-        role_api.delete_one(admin_user.user_id, workspace.workspace_id)
+        user_workspace_config_api.delete_one(admin_user.user_id, workspace.workspace_id)
         transaction.commit()
         user_id = user.user_id
         workspace_id = workspace.workspace_id
@@ -2256,7 +2288,7 @@ class TestWorkspaceMembersEndpoint(object):
         web_testapp,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         admin_user,
         event_helper,
     ):
@@ -2287,21 +2319,21 @@ class TestWorkspaceMembersEndpoint(object):
 
         profile = Profile.ADMIN
         admin2 = uapi.create_user(email="admin2@admin2.admin2", profile=profile, do_notify=False)
-        role_api = role_api_factory.get(current_user=admin2)
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=admin2)
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user2,
             workspace,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
-        role_api.delete_one(admin_user.user_id, workspace.workspace_id)
+        user_workspace_config_api.delete_one(admin_user.user_id, workspace.workspace_id)
         transaction.commit()
         # before
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
@@ -2366,7 +2398,7 @@ class TestWorkspaceMembersEndpoint(object):
         web_testapp,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         admin_user,
     ):
         """
@@ -2420,7 +2452,7 @@ class TestWorkspaceMembersEndpoint(object):
         web_testapp,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         admin_user,
     ):
         """
@@ -2454,14 +2486,14 @@ class TestWorkspaceMembersEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(current_user=admin2, show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get(current_user=admin2)
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=admin2)
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.CONTRIBUTOR,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user2,
             workspace,
             UserConfigInWorkspace.READER,
@@ -2490,7 +2522,7 @@ class TestWorkspaceMembersEndpoint(object):
         web_testapp,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         admin_user,
     ):
         """
@@ -2525,14 +2557,14 @@ class TestWorkspaceMembersEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(current_user=admin2, show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get(current_user=admin2)
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=admin2)
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user2,
             workspace,
             UserConfigInWorkspace.READER,
@@ -2563,7 +2595,7 @@ class TestWorkspaceMembersEndpoint(object):
         web_testapp,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         admin_user,
     ):
         """
@@ -2593,21 +2625,21 @@ class TestWorkspaceMembersEndpoint(object):
 
         profile = Profile.ADMIN
         admin2 = uapi.create_user(email="admin2@admin2.admin2", profile=profile, do_notify=False)
-        role_api = role_api_factory.get(current_user=admin2)
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=admin2)
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user2,
             workspace,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
-        role_api.delete_one(admin_user.user_id, workspace.workspace_id)
+        user_workspace_config_api.delete_one(admin_user.user_id, workspace.workspace_id)
         transaction.commit()
         # before
         web_testapp.authorization = (
@@ -2651,7 +2683,7 @@ class TestWorkspaceMembersEndpoint(object):
         web_testapp,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         event_helper,
     ):
         """
@@ -2670,8 +2702,8 @@ class TestWorkspaceMembersEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -2719,7 +2751,11 @@ class TestWorkspaceMembersEndpoint(object):
             assert role["user_id"] != user.user_id
 
     def test_api__delete_workspace_member_role__ok_200__nominal_case(
-        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
     ):
         """
         Delete worskpace member role
@@ -2744,14 +2780,14 @@ class TestWorkspaceMembersEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user2,
             workspace,
             UserConfigInWorkspace.READER,
@@ -2816,7 +2852,11 @@ class TestWorkspaceMembersEndpoint(object):
         assert res.json_body["code"] == ErrorCode.USER_ROLE_NOT_FOUND
 
     def test_api__delete_workspace_member_role__err_400__last_workspace_manager(
-        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
     ):
         """
         Delete self worskpace member role.
@@ -2842,8 +2882,8 @@ class TestWorkspaceMembersEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(current_user=user2, show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.READER,
@@ -2869,7 +2909,11 @@ class TestWorkspaceMembersEndpoint(object):
         assert user2.user_id in [role["user_id"] for role in roles]
 
     def test_api__delete_workspace_member_role__ok_200__not_last_workspace_manager(
-        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
     ):
         """
         Delete self worskpace member role.
@@ -2895,8 +2939,8 @@ class TestWorkspaceMembersEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(current_user=user2, show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -2929,7 +2973,11 @@ class TestWorkspaceMembersEndpoint(object):
         assert user2.user_id not in [role["user_id"] for role in roles]
 
     def test_api__delete_workspace_member_role__ok_200__self_role_simple_user(
-        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
     ):
         """
         Delete self worskpace member role.
@@ -2955,8 +3003,8 @@ class TestWorkspaceMembersEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(current_user=user2, show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -2989,7 +3037,11 @@ class TestWorkspaceMembersEndpoint(object):
         assert user2.user_id not in [role["user_id"] for role in roles]
 
     def test_api__delete_workspace_member_role__err_400__simple_user(
-        self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
     ):
         """
         Delete worskpace member role
@@ -3015,14 +3067,14 @@ class TestWorkspaceMembersEndpoint(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user2,
             workspace,
             UserConfigInWorkspace.READER,
@@ -3063,7 +3115,7 @@ class TestUserInvitationWithMailActivatedSyncDefaultProfileTrustedUser(object):
         self,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         web_testapp,
         mailhog,
     ):
@@ -3084,8 +3136,8 @@ class TestUserInvitationWithMailActivatedSyncDefaultProfileTrustedUser(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -3139,7 +3191,7 @@ class TestUserInvitationWithMailActivatedSync(object):
         self,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         web_testapp,
         mailhog,
     ):
@@ -3160,8 +3212,8 @@ class TestUserInvitationWithMailActivatedSync(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -3208,7 +3260,7 @@ class TestUserInvitationWithMailActivatedSync(object):
         self,
         user_api_factory,
         web_testapp,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         mailhog,
     ):
@@ -3229,8 +3281,8 @@ class TestUserInvitationWithMailActivatedSync(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -3269,7 +3321,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
         mailhog,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_api_factory,
     ):
         """
@@ -3289,8 +3341,8 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -5344,7 +5396,7 @@ class TestWorkspaceContentsWithFixture(object):
         user_api_factory,
         workspace_api_factory,
         admin_user,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_api_factory,
         web_testapp,
         content_type_list,
@@ -5365,8 +5417,8 @@ class TestWorkspaceContentsWithFixture(object):
         )
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.CONTRIBUTOR,
@@ -5405,7 +5457,7 @@ class TestWorkspaceContentsWithFixture(object):
         admin_user,
         content_api_factory,
         web_testapp,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
     ) -> None:
         """
@@ -5424,8 +5476,8 @@ class TestWorkspaceContentsWithFixture(object):
         )
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.CONTENT_MANAGER,
@@ -5461,7 +5513,7 @@ class TestWorkspaceContentsWithFixture(object):
         user_api_factory,
         workspace_api_factory,
         admin_user,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_api_factory,
     ):
         """
@@ -5480,8 +5532,8 @@ class TestWorkspaceContentsWithFixture(object):
         )
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.CONTENT_MANAGER,
@@ -5531,7 +5583,7 @@ class TestWorkspaceContentsWithFixture(object):
         user_api_factory,
         workspace_api_factory,
         admin_user,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_api_factory,
     ):
         """
@@ -5550,8 +5602,8 @@ class TestWorkspaceContentsWithFixture(object):
         )
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.CONTENT_MANAGER,
@@ -5790,7 +5842,7 @@ class TestWorkspaceContentsWithFixture(object):
         session,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         admin_user,
         content_api_factory,
     ):
@@ -5819,14 +5871,14 @@ class TestWorkspaceContentsWithFixture(object):
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         projectA_workspace = workspace_api.create_workspace("projectA", save_now=True)
         projectB_workspace = workspace_api.create_workspace("projectB", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             projectA_workspace,
             UserConfigInWorkspace.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user,
             projectB_workspace,
             UserConfigInWorkspace.CONTENT_MANAGER,
@@ -6163,7 +6215,7 @@ class TestWorkspaceContents(object):
         user_api_factory,
         workspace_api_factory,
         admin_user,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_api_factory,
         web_testapp,
         content_type_list,
@@ -6210,8 +6262,8 @@ class TestWorkspaceContents(object):
             do_notify=False,
             profile=profile,
         )
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.READER,
@@ -6264,7 +6316,7 @@ class TestWorkspaceContents(object):
         user_api_factory,
         workspace_api_factory,
         admin_user,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_api_factory,
         web_testapp,
         content_type_list,

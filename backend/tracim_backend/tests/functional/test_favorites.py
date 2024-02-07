@@ -285,16 +285,16 @@ class TestFavoriteContent(object):
         web_testapp,
         workspace_api_factory,
         content_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         riyad_user,
         admin_user,
         session,
     ):
         workspace_api = workspace_api_factory.get(current_user=admin_user)
-        role_api = role_api_factory.get(current_user=riyad_user)
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=riyad_user)
         test_workspace = workspace_api.create_workspace("test_workspace", save_now=True)
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             riyad_user,
             test_workspace,
             role_level=UserConfigInWorkspace.CONTENT_MANAGER,
@@ -307,7 +307,7 @@ class TestFavoriteContent(object):
             user_id=riyad_user.user_id, content_id=test_thread.content_id
         )
 
-        role_api.delete_one(riyad_user.user_id, test_workspace.workspace_id)
+        user_workspace_config_api.delete_one(riyad_user.user_id, test_workspace.workspace_id)
         transaction.commit()
         web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
         res = web_testapp.get(
@@ -329,16 +329,16 @@ class TestFavoriteContent(object):
         web_testapp,
         workspace_api_factory,
         content_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         riyad_user,
         admin_user,
         session,
     ):
         workspace_api = workspace_api_factory.get(current_user=admin_user)
-        role_api = role_api_factory.get(current_user=riyad_user)
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=riyad_user)
         test_workspace = workspace_api.create_workspace("test_workspace", save_now=True)
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             riyad_user,
             test_workspace,
             role_level=UserConfigInWorkspace.CONTENT_MANAGER,

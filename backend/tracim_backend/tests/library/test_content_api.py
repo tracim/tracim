@@ -55,7 +55,7 @@ class TestContentApi(object):
         self,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         admin_user,
         session,
         app_config,
@@ -72,7 +72,7 @@ class TestContentApi(object):
         workspace = workspace_api_factory.get(admin_user).create_workspace(
             "template_workspace", save_now=True
         )
-        role_api_factory.get().create_one(
+        user_workspace_config_api_factory.get().create_one(
             user=admin_user,
             workspace=template_workspace,
             role_level=WorkspaceRoles.CONTRIBUTOR.level,
@@ -1042,7 +1042,7 @@ class TestContentApi(object):
     def test_unit__set_status__ok__nominal_case(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         session,
         app_config,
@@ -1056,8 +1056,8 @@ class TestContentApi(object):
         workspace = workspace_api_factory.get(current_user=user2).create_workspace(
             "test workspace", save_now=True
         )
-        role_api = role_api_factory.get(current_user=user2)
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=user2)
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.CONTENT_MANAGER,
@@ -1159,7 +1159,7 @@ class TestContentApi(object):
         session,
         app_config,
         content_type_list,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ):
         """
         Check if move of content does proper copy of subcontent.
@@ -1173,7 +1173,7 @@ class TestContentApi(object):
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
-        role_api_factory.get().create_one(
+        user_workspace_config_api_factory.get().create_one(
             user=user2,
             workspace=workspace,
             role_level=WorkspaceRoles.WORKSPACE_MANAGER.level,
@@ -1229,7 +1229,7 @@ class TestContentApi(object):
         session,
         app_config,
         content_type_list,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ):
         """
         Check if copy of content does proper copy of subcontent.
@@ -1243,7 +1243,7 @@ class TestContentApi(object):
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
-        role_api_factory.get().create_one(
+        user_workspace_config_api_factory.get().create_one(
             user=user2,
             workspace=workspace,
             role_level=WorkspaceRoles.WORKSPACE_MANAGER.level,
@@ -1307,7 +1307,7 @@ class TestContentApi(object):
         session,
         app_config,
         content_type_list,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ):
         """
         Check if copy of content does proper copy of subcontent.
@@ -1321,7 +1321,7 @@ class TestContentApi(object):
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
-        role_api_factory.get().create_one(
+        user_workspace_config_api_factory.get().create_one(
             user=user2,
             workspace=workspace,
             role_level=WorkspaceRoles.WORKSPACE_MANAGER.level,
@@ -1393,7 +1393,7 @@ class TestContentApi(object):
         test_context,
         app_config,
         content_type_list,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ):
         uapi = user_api_factory.get()
 
@@ -1404,7 +1404,7 @@ class TestContentApi(object):
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
-        role_api_factory.get().create_one(
+        user_workspace_config_api_factory.get().create_one(
             user=user2,
             workspace=workspace,
             role_level=WorkspaceRoles.WORKSPACE_MANAGER.level,
@@ -1486,7 +1486,7 @@ class TestContentApi(object):
         test_context,
         app_config,
         content_type_list,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ):
         uapi = user_api_factory.get()
 
@@ -1497,7 +1497,7 @@ class TestContentApi(object):
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
-        role_api_factory.get().create_one(
+        user_workspace_config_api_factory.get().create_one(
             user=user2,
             workspace=workspace,
             role_level=WorkspaceRoles.WORKSPACE_MANAGER.level,
@@ -1552,7 +1552,7 @@ class TestContentApi(object):
         test_context,
         app_config,
         content_type_list,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ):
         """
         Check if copy of content does proper copy of subcontent.
@@ -1566,7 +1566,7 @@ class TestContentApi(object):
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
-        role_api_factory.get().create_one(
+        user_workspace_config_api_factory.get().create_one(
             user=user2,
             workspace=workspace,
             role_level=WorkspaceRoles.WORKSPACE_MANAGER.level,
@@ -1662,7 +1662,7 @@ class TestContentApi(object):
         test_context,
         app_config,
         content_type_list,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ):
         uapi = user_api_factory.get()
 
@@ -1673,7 +1673,7 @@ class TestContentApi(object):
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
-        role_api_factory.get().create_one(
+        user_workspace_config_api_factory.get().create_one(
             user=user2,
             workspace=workspace,
             role_level=WorkspaceRoles.WORKSPACE_MANAGER.level,
@@ -1726,7 +1726,7 @@ class TestContentApi(object):
         test_context,
         app_config,
         content_type_list,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ):
         uapi = user_api_factory.get()
 
@@ -1737,7 +1737,7 @@ class TestContentApi(object):
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
-        role_api_factory.get().create_one(
+        user_workspace_config_api_factory.get().create_one(
             user=user2,
             workspace=workspace,
             role_level=WorkspaceRoles.WORKSPACE_MANAGER.level,
@@ -1799,7 +1799,7 @@ class TestContentApi(object):
         test_context,
         app_config,
         content_type_list,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ):
         uapi = user_api_factory.get()
 
@@ -1810,7 +1810,7 @@ class TestContentApi(object):
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
-        role_api_factory.get().create_one(
+        user_workspace_config_api_factory.get().create_one(
             user=user2,
             workspace=workspace,
             role_level=WorkspaceRoles.WORKSPACE_MANAGER.level,
@@ -1864,7 +1864,7 @@ class TestContentApi(object):
         test_context,
         app_config,
         content_type_list,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ):
         """
         re
@@ -1879,7 +1879,7 @@ class TestContentApi(object):
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
-        role_api_factory.get().create_one(
+        user_workspace_config_api_factory.get().create_one(
             user=user2,
             workspace=workspace,
             role_level=WorkspaceRoles.WORKSPACE_MANAGER.level,
@@ -1919,7 +1919,7 @@ class TestContentApi(object):
         test_context,
         app_config,
         content_type_list,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ):
         uapi = user_api_factory.get()
 
@@ -1930,7 +1930,7 @@ class TestContentApi(object):
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace", save_now=True
         )
-        role_api_factory.get().create_one(
+        user_workspace_config_api_factory.get().create_one(
             user=user2,
             workspace=workspace,
             role_level=WorkspaceRoles.WORKSPACE_MANAGER.level,
@@ -1978,7 +1978,7 @@ class TestContentApi(object):
         session,
         app_config,
         content_type_list,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ):
         uapi = user_api_factory.get()
 
@@ -1993,16 +1993,16 @@ class TestContentApi(object):
         workspace1 = workspace_api.create_workspace("test workspace n°1", save_now=True)
         workspace2 = workspace_api.create_workspace("test workspace n°2", save_now=True)
 
-        role_api_1 = role_api_factory.get(current_user=user_a)
-        role_api_1.create_one(
+        user_workspace_config_api_1 = user_workspace_config_api_factory.get(current_user=user_a)
+        user_workspace_config_api_1.create_one(
             user=user_b,
             workspace=workspace1,
             role_level=UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
 
-        role_api_2 = role_api_factory.get(current_user=user_b)
-        role_api_2.create_one(
+        user_workspace_config_api_2 = user_workspace_config_api_factory.get(current_user=user_b)
+        user_workspace_config_api_2.create_one(
             user=user_b,
             workspace=workspace2,
             role_level=UserConfigInWorkspace.READER,
@@ -2079,7 +2079,7 @@ class TestContentApi(object):
         session,
         app_config,
         content_type_list,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ):
         uapi = user_api_factory.get()
 
@@ -2093,8 +2093,8 @@ class TestContentApi(object):
         wapi = workspace_api_factory.get(current_user=user_a)
         workspace = wapi.create_workspace("test workspace", save_now=True)
 
-        role_api = role_api_factory.get(current_user=user_a)
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=user_a)
+        user_workspace_config_api.create_one(
             user=user_b,
             workspace=workspace,
             role_level=UserConfigInWorkspace.READER,
@@ -2124,7 +2124,7 @@ class TestContentApi(object):
         session,
         app_config,
         content_type_list,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ):
         uapi = user_api_factory.get()
 
@@ -2138,8 +2138,8 @@ class TestContentApi(object):
         wapi = workspace_api_factory.get(current_user=user_a)
         workspace = wapi.create_workspace("test workspace", save_now=True)
 
-        role_api = role_api_factory.get(current_user=user_a)
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=user_a)
+        user_workspace_config_api.create_one(
             user=user_b,
             workspace=workspace,
             role_level=UserConfigInWorkspace.READER,
@@ -2191,7 +2191,7 @@ class TestContentApi(object):
         self,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         session,
         app_config,
         content_type_list,
@@ -2210,7 +2210,7 @@ class TestContentApi(object):
         user2 = uapi.create_minimal_user("this.is@another.user")
         uapi.save(user2)
 
-        role_api_factory.get(current_user=user1).create_one(
+        user_workspace_config_api_factory.get(current_user=user1).create_one(
             user2,
             workspace,
             UserConfigInWorkspace.CONTENT_MANAGER,
@@ -2274,7 +2274,7 @@ class TestContentApi(object):
         session,
         app_config,
         content_type_list,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ):
         uapi = user_api_factory.get()
 
@@ -2290,7 +2290,7 @@ class TestContentApi(object):
         user2 = uapi.create_minimal_user("this.is@another.user")
         uapi.save(user2)
 
-        role_api_factory.get(current_user=user1).create_one(
+        user_workspace_config_api_factory.get(current_user=user1).create_one(
             user2,
             workspace,
             UserConfigInWorkspace.CONTENT_MANAGER,
@@ -2345,7 +2345,7 @@ class TestContentApi(object):
         session,
         app_config,
         content_type_list,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ):
         uapi = user_api_factory.get()
 
@@ -2361,7 +2361,7 @@ class TestContentApi(object):
         user2 = uapi.create_minimal_user("this.is@another.user")
         uapi.save(user2)
 
-        role_api_factory.get(current_user=user1).create_one(
+        user_workspace_config_api_factory.get(current_user=user1).create_one(
             user2,
             workspace,
             UserConfigInWorkspace.CONTENT_MANAGER,
@@ -2422,7 +2422,7 @@ class TestContentApi(object):
         session,
         app_config,
         content_type_list,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ):
         uapi = user_api_factory.get()
 
@@ -2438,7 +2438,7 @@ class TestContentApi(object):
         user2 = uapi.create_minimal_user("this.is@another.user")
         uapi.save(user2)
 
-        role_api_factory.get(current_user=user1).create_one(
+        user_workspace_config_api_factory.get(current_user=user1).create_one(
             user2,
             workspace,
             UserConfigInWorkspace.CONTENT_MANAGER,
@@ -2499,7 +2499,7 @@ class TestContentApi(object):
         session,
         app_config,
         content_type_list,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ):
         uapi = user_api_factory.get()
 
@@ -2514,7 +2514,7 @@ class TestContentApi(object):
         user2 = uapi.create_minimal_user("this.is@another.user")
         uapi.save(user2)
 
-        role_api_factory.get(current_user=user1).create_one(
+        user_workspace_config_api_factory.get(current_user=user1).create_one(
             user2,
             workspace,
             UserConfigInWorkspace.CONTENT_MANAGER,
@@ -2576,7 +2576,7 @@ class TestContentApi(object):
     def test_update_file_data__err__content_status_closed(
         self,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         session,
         app_config,
         content_type_list,
@@ -2595,7 +2595,7 @@ class TestContentApi(object):
         user2 = uapi.create_minimal_user("this.is@another.user")
         uapi.save(user2)
 
-        role_api_factory.get(current_user=user1).create_one(
+        user_workspace_config_api_factory.get(current_user=user1).create_one(
             user2,
             workspace,
             UserConfigInWorkspace.CONTENT_MANAGER,
@@ -2652,7 +2652,7 @@ class TestContentApi(object):
         workspace_api_factory,
         app_config,
         session,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
     ):
         uapi = user_api_factory.get()
@@ -2668,7 +2668,7 @@ class TestContentApi(object):
         user2 = uapi.create_minimal_user("this.is@another.user")
         uapi.save(user2)
 
-        role_api_factory.get(current_user=user1).create_one(
+        user_workspace_config_api_factory.get(current_user=user1).create_one(
             user2,
             workspace,
             UserConfigInWorkspace.CONTENT_MANAGER,
@@ -2726,7 +2726,7 @@ class TestContentApi(object):
         session,
         app_config,
         content_type_list,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ):
         uapi = user_api_factory.get()
 
@@ -2740,7 +2740,7 @@ class TestContentApi(object):
 
         user2 = uapi.create_minimal_user("this.is@another.user")
         uapi.save(user2)
-        role_api_factory.get(current_user=user1).create_one(
+        user_workspace_config_api_factory.get(current_user=user1).create_one(
             user2,
             workspace,
             UserConfigInWorkspace.CONTENT_MANAGER,
@@ -2796,7 +2796,7 @@ class TestContentApi(object):
         self,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         session,
         app_config,
         content_type_list,
@@ -2813,7 +2813,7 @@ class TestContentApi(object):
         user2 = uapi.create_minimal_user("this.is@another.user")
         uapi.save(user2)
 
-        role_api_factory.get(current_user=user1).create_one(
+        user_workspace_config_api_factory.get(current_user=user1).create_one(
             user2,
             workspace,
             UserConfigInWorkspace.CONTENT_MANAGER,
@@ -2853,7 +2853,7 @@ class TestContentApi(object):
         session,
         app_config,
         content_type_list,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ):
         uapi = user_api_factory.get()
 
@@ -2869,7 +2869,7 @@ class TestContentApi(object):
         user2 = uapi.create_minimal_user("this.is@another.user")
         uapi.save(user2)
 
-        role_api_factory.get(current_user=user1).create_one(
+        user_workspace_config_api_factory.get(current_user=user1).create_one(
             user2,
             workspace,
             UserConfigInWorkspace.CONTENT_MANAGER,
@@ -2943,7 +2943,7 @@ class TestContentApi(object):
         self,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         session,
         app_config,
         content_type_list,
@@ -2962,7 +2962,7 @@ class TestContentApi(object):
         user2 = uapi.create_minimal_user("this.is@another.user")
         uapi.save(user2)
 
-        role_api_factory.get(current_user=user1).create_one(
+        user_workspace_config_api_factory.get(current_user=user1).create_one(
             user2,
             workspace,
             UserConfigInWorkspace.CONTENT_MANAGER,

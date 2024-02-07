@@ -31,7 +31,7 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__by_label(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         web_testapp,
         content_api_factory,
@@ -52,8 +52,8 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -104,7 +104,7 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__by_filename(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         content_api_factory,
         web_testapp,
@@ -125,8 +125,8 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -194,7 +194,7 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__by_content(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         content_api_factory,
         web_testapp,
@@ -217,8 +217,8 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -296,7 +296,7 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__by_comment_content(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         content_api_factory,
         web_testapp,
@@ -319,8 +319,8 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -403,7 +403,7 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__by_todo_content(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         content_api_factory,
         web_testapp,
@@ -426,8 +426,8 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -490,7 +490,7 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__avoid_duplicate_content(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         content_api_factory,
         created_content_name,
@@ -512,8 +512,8 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -573,7 +573,7 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__no_search_string(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         content_api_factory,
         web_testapp,
@@ -590,8 +590,8 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -617,7 +617,7 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__filter_by_content_type(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_api_factory,
         workspace_api_factory,
         web_testapp,
@@ -634,8 +634,8 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -717,7 +717,7 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__filter_by_deleted_archived_active(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         content_api_factory,
         session,
@@ -735,8 +735,8 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -852,7 +852,7 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__by_tags(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         content_api_factory,
         web_testapp,

@@ -338,7 +338,7 @@ class TestReactionsEndpoint(object):
         self,
         workspace_api_factory,
         content_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         session,
         web_testapp,
         admin_user,
@@ -352,8 +352,8 @@ class TestReactionsEndpoint(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             riyad_user,
             test_workspace,
             UserConfigInWorkspace.CONTRIBUTOR,

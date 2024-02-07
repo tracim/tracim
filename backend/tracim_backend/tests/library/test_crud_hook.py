@@ -135,21 +135,21 @@ class TestDatabaseCrudHookCaller:
         session.add(workspace)
         session.flush()
 
-        role = UserConfigInWorkspace(
-            role=UserConfigInWorkspace.READER, user=owner, workspace=workspace
+        config = UserConfigInWorkspace(
+            config=UserConfigInWorkspace.READER, user=owner, workspace=workspace
         )
-        session.add(role)
+        session.add(config)
         session.flush()
-        hook.mock_hooks.assert_called_with("created", role=role, context=session.context)
+        hook.mock_hooks.assert_called_with("created", config=config, context=session.context)
 
-        role.role = UserConfigInWorkspace.WORKSPACE_MANAGER
-        session.add(role)
+        config.role = UserConfigInWorkspace.WORKSPACE_MANAGER
+        session.add(config)
         session.flush()
-        hook.mock_hooks.assert_called_with("modified", role=role, context=session.context)
+        hook.mock_hooks.assert_called_with("modified", config=config, context=session.context)
 
-        session.delete(role)
+        session.delete(config)
         session.flush()
-        hook.mock_hooks.assert_called_with("deleted", role=role, context=session.context)
+        hook.mock_hooks.assert_called_with("deleted", config=config, context=session.context)
 
     def test_unit__crud_caller__ok__content(self, session):
         hook = ContentHookImpl()

@@ -544,7 +544,12 @@ class TestUserApi(object):
         assert len(users) == 0
 
     def test_unit__get_known_users__same_workspaces_users_by_name(
-        self, session, app_config, role_api_factory, workspace_api_factory, admin_user
+        self,
+        session,
+        app_config,
+        user_workspace_config_api_factory,
+        workspace_api_factory,
+        admin_user,
     ):
         api = UserApi(current_user=None, session=session, config=app_config)
         u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
@@ -554,20 +559,20 @@ class TestUserApi(object):
         )
         wapi = workspace_api_factory.get()
         workspace = wapi.create_workspace("test workspace n°1", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             u1,
             workspace,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             u2,
             workspace,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             u3,
             workspace,
             UserConfigInWorkspace.READER,
@@ -580,7 +585,12 @@ class TestUserApi(object):
         assert users[1] == u2
 
     def test_unit__get_known_users__distinct_workspaces_users_by_name__exclude_workspace(
-        self, session, app_config, workspace_api_factory, role_api_factory, admin_user
+        self,
+        session,
+        app_config,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
+        admin_user,
     ):
         api = UserApi(current_user=admin_user, session=session, config=app_config)
         u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
@@ -592,26 +602,26 @@ class TestUserApi(object):
         workspace = wapi.create_workspace("test workspace n°1", save_now=True)
         wapi = workspace_api_factory.get()
         workspace_2 = wapi.create_workspace("test workspace n°2", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             u1,
             workspace,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             u2,
             workspace_2,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             u3,
             workspace,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             u3,
             workspace_2,
             UserConfigInWorkspace.READER,
@@ -623,7 +633,12 @@ class TestUserApi(object):
         assert users[0] == u2
 
     def test_unit__get_known_users__using_both_include_exclude_raises(
-        self, session, app_config, workspace_api_factory, role_api_factory, admin_user
+        self,
+        session,
+        app_config,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
+        admin_user,
     ):
         api = UserApi(current_user=admin_user, session=session, config=app_config)
 
@@ -631,14 +646,24 @@ class TestUserApi(object):
             api.get_known_users("name", exclude_workspace_ids=[1], include_workspace_ids=[2])
 
     def test_unit__get_known_users__using_both_include_exclude_does_not_raise_if_one_empty(
-        self, session, app_config, workspace_api_factory, role_api_factory, admin_user
+        self,
+        session,
+        app_config,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
+        admin_user,
     ):
         api = UserApi(current_user=admin_user, session=session, config=app_config)
         api.get_known_users("name", exclude_workspace_ids=[1], include_workspace_ids=[])
         api.get_known_users("name", exclude_workspace_ids=[], include_workspace_ids=[1])
 
     def test_unit__get_known_users__include_workspace_ids(
-        self, session, app_config, workspace_api_factory, role_api_factory, admin_user
+        self,
+        session,
+        app_config,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
+        admin_user,
     ):
         api = UserApi(current_user=admin_user, session=session, config=app_config)
         u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
@@ -651,32 +676,32 @@ class TestUserApi(object):
         workspace = wapi.create_workspace("test workspace n°1", save_now=True)
         wapi = workspace_api_factory.get()
         workspace_2 = wapi.create_workspace("test workspace n°2", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             u1,
             workspace,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             u2,
             workspace_2,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             u4,
             workspace_2,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             u3,
             workspace,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             u3,
             workspace_2,
             UserConfigInWorkspace.READER,
@@ -687,7 +712,12 @@ class TestUserApi(object):
         assert set(users) == set([u2, u4])
 
     def test_unit__get_known_users__include_workspace_ids_short_acp_limit_ok(
-        self, session, app_config, workspace_api_factory, role_api_factory, admin_user
+        self,
+        session,
+        app_config,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
+        admin_user,
     ):
         api = UserApi(current_user=admin_user, session=session, config=app_config)
         wapi = workspace_api_factory.get()
@@ -701,8 +731,8 @@ class TestUserApi(object):
                 do_notify=False,
                 do_save=True,
             )
-            role_api = role_api_factory.get()
-            role_api.create_one(
+            user_workspace_config_api = user_workspace_config_api_factory.get()
+            user_workspace_config_api.create_one(
                 u1,
                 workspace,
                 UserConfigInWorkspace.READER,
@@ -715,7 +745,12 @@ class TestUserApi(object):
         assert len(users) == 10
 
     def test_unit__get_known_users__distinct_workspaces_users_by_name__exclude_workspace_and_name(
-        self, session, app_config, workspace_api_factory, role_api_factory, admin_user
+        self,
+        session,
+        app_config,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
+        admin_user,
     ):
         api = UserApi(current_user=admin_user, session=session, config=app_config)
         u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
@@ -728,32 +763,32 @@ class TestUserApi(object):
         workspace = wapi.create_workspace("test workspace n°1", save_now=True)
         wapi = workspace_api_factory.get()
         workspace_2 = wapi.create_workspace("test workspace n°2", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             u1,
             workspace,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             u2,
             workspace_2,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             u4,
             workspace_2,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             u3,
             workspace,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             u3,
             workspace_2,
             UserConfigInWorkspace.READER,
@@ -769,7 +804,7 @@ class TestUserApi(object):
         assert users[0] == u2
 
     def test_unit__get_known_users__distinct_workspaces_users_by_name(
-        self, session, app_config, workspace_api_factory, role_api_factory
+        self, session, app_config, workspace_api_factory, user_workspace_config_api_factory
     ):
         api = UserApi(current_user=None, session=session, config=app_config)
         u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
@@ -781,26 +816,26 @@ class TestUserApi(object):
         workspace = wapi.create_workspace("test workspace n°1", save_now=True)
         wapi = workspace_api_factory.get()
         workspace_2 = wapi.create_workspace("test workspace n°2", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             u1,
             workspace,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             u2,
             workspace_2,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             u3,
             workspace,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             u3,
             workspace_2,
             UserConfigInWorkspace.READER,
@@ -813,7 +848,12 @@ class TestUserApi(object):
         assert users[1] == u2
 
     def test_unit__get_known_users__same_workspaces_users_by_name__exclude_user(
-        self, session, app_config, workspace_api_factory, role_api_factory, admin_user
+        self,
+        session,
+        app_config,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
+        admin_user,
     ):
         api = UserApi(current_user=admin_user, session=session, config=app_config)
         u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
@@ -823,20 +863,20 @@ class TestUserApi(object):
         )
         wapi = workspace_api_factory.get()
         workspace = wapi.create_workspace("test workspace n°1", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             u1,
             workspace,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             u2,
             workspace,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             u3,
             workspace,
             UserConfigInWorkspace.READER,
@@ -848,7 +888,12 @@ class TestUserApi(object):
         assert users[0] == u2
 
     def test_unit__get_known_users__same_workspaces_users_by_email(
-        self, session, app_config, workspace_api_factory, role_api_factory, admin_user
+        self,
+        session,
+        app_config,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
+        admin_user,
     ):
         api = UserApi(current_user=admin_user, session=session, config=app_config)
         u1 = api.create_user(email="email@email", name="name", do_notify=False, do_save=True)
@@ -858,20 +903,20 @@ class TestUserApi(object):
         )
         wapi = workspace_api_factory.get()
         workspace = wapi.create_workspace("test workspace n°1", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             u1,
             workspace,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             u2,
             workspace,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             u3,
             workspace,
             UserConfigInWorkspace.READER,

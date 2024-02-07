@@ -17,7 +17,7 @@ from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.tag import Tag
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.tests.utils import ContentApiFactory
-from tracim_backend.tests.utils import RoleApiFactory
+from tracim_backend.tests.utils import UserWorkspaceConfigApiFactory
 from tracim_backend.tests.utils import WorkspaceApiFactory
 
 in_a_year = (datetime.now() + timedelta(days=365)).strftime(DATETIME_FORMAT)
@@ -35,15 +35,15 @@ def workspace_search_fixture(
     bob_user: User,
     riyad_user: User,
     workspace_api_factory: WorkspaceApiFactory,
-    role_api_factory: RoleApiFactory,
+    user_workspace_config_api_factory: UserWorkspaceConfigApiFactory,
 ) -> typing.Tuple[Workspace, Workspace]:
     wapi = workspace_api_factory.get(bob_user)
     bob_only = wapi.create_workspace(
         label="Bob_only", description='A bloody workspace<img src="foo.png"/>'
     )
     bob_and_riyad = wapi.create_workspace("Bob & Riyad")
-    role_api = role_api_factory.get(bob_user)
-    role_api.create_one(
+    user_workspace_config_api = user_workspace_config_api_factory.get(bob_user)
+    user_workspace_config_api.create_one(
         riyad_user,
         bob_and_riyad,
         role_level=UserConfigInWorkspace.CONTRIBUTOR,
@@ -130,7 +130,7 @@ class TestElasticSearch(object):
     def test_api___elasticsearch_search_ok__by_label(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         content_api_factory,
         web_testapp,
@@ -152,8 +152,8 @@ class TestElasticSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -207,7 +207,7 @@ class TestElasticSearch(object):
     def test_api___elasticsearch_search_ok__by_filename(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         content_api_factory,
         web_testapp,
@@ -229,8 +229,8 @@ class TestElasticSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -400,7 +400,7 @@ class TestElasticSearch(object):
         self,
         search_params,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         content_api_factory,
         web_testapp,
@@ -435,8 +435,8 @@ class TestElasticSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace(created_workspace_name, save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -524,7 +524,7 @@ class TestElasticSearch(object):
     def test_api___elasticsearch_search_ok__wildcard__facet_only(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         content_api_factory,
         web_testapp,
@@ -556,8 +556,8 @@ class TestElasticSearch(object):
         workspace_name = "test"
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_name, save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -667,7 +667,7 @@ class TestElasticSearch(object):
         self,
         search_fields,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         content_api_factory,
         web_testapp,
@@ -691,8 +691,8 @@ class TestElasticSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -781,7 +781,7 @@ class TestElasticSearch(object):
         self,
         search_fields,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         content_api_factory,
         web_testapp,
@@ -805,8 +805,8 @@ class TestElasticSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -858,7 +858,7 @@ class TestElasticSearch(object):
     def test_api___elasticsearch_search_ok__no_search_string(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         content_api_factory,
         web_testapp,
@@ -876,8 +876,8 @@ class TestElasticSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -905,7 +905,7 @@ class TestElasticSearch(object):
     def test_api___elasticsearch_search_ok__filter_by_content_type(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         content_api_factory,
         web_testapp,
@@ -923,8 +923,8 @@ class TestElasticSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -1032,7 +1032,7 @@ class TestElasticSearch(object):
     def test_api___elasticsearch_search_ok__filter_by_deleted_archived_active(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         content_api_factory,
         web_testapp,
@@ -1051,8 +1051,8 @@ class TestElasticSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -1193,7 +1193,7 @@ class TestElasticSearchSearchWithIngest(object):
     def test_api__elasticsearch_search__ok__in_file_ingest_search(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         content_api_factory,
         web_testapp,
@@ -1213,8 +1213,8 @@ class TestElasticSearchSearchWithIngest(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -1257,13 +1257,13 @@ def user_search_fixture(
     bob_user: User,
     riyad_user: User,
     workspace_api_factory: WorkspaceApiFactory,
-    role_api_factory: RoleApiFactory,
+    user_workspace_config_api_factory: UserWorkspaceConfigApiFactory,
 ) -> typing.Tuple[User, User]:
     wapi = workspace_api_factory.get(bob_user)
     wapi.create_workspace("Bob only")
     bob_and_riyad = wapi.create_workspace("Bob & Riyad")
-    role_api = role_api_factory.get(bob_user)
-    role_api.create_one(
+    user_workspace_config_api = user_workspace_config_api_factory.get(bob_user)
+    user_workspace_config_api.create_one(
         riyad_user,
         bob_and_riyad,
         role_level=UserConfigInWorkspace.CONTRIBUTOR,

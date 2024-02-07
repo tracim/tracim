@@ -16,7 +16,7 @@ class TestParentAccessPlugin(object):
         session,
         app_config,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         user_api_factory,
         load_parent_access_plugin,
     ):
@@ -45,8 +45,8 @@ class TestParentAccessPlugin(object):
                 do_save=True,
                 do_notify=False,
             )
-            role_api = role_api_factory.get()
-            role_api.create_one(
+            user_workspace_config_api = user_workspace_config_api_factory.get()
+            user_workspace_config_api.create_one(
                 user_1,
                 grandson_workspace,
                 WorkspaceRoles.CONTENT_MANAGER.level,
@@ -63,7 +63,7 @@ class TestParentAccessPlugin(object):
         session,
         app_config,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         user_api_factory,
         load_parent_access_plugin,
     ):
@@ -89,15 +89,15 @@ class TestParentAccessPlugin(object):
         user_1 = uapi.create_user(
             email="u.1@u.u", auth_type=AuthType.INTERNAL, do_save=True, do_notify=False
         )
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user_1,
             child_workspace,
             WorkspaceRoles.CONTRIBUTOR.level,
             email_notification_type=EmailNotificationType.NONE,
         )
         with load_parent_access_plugin:
-            role_api.create_one(
+            user_workspace_config_api.create_one(
                 user_1,
                 grandson_workspace,
                 WorkspaceRoles.CONTENT_MANAGER.level,
@@ -114,7 +114,7 @@ class TestParentAccessPlugin(object):
         session,
         app_config,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         user_api_factory,
         load_parent_access_plugin,
         load_auto_invite_plugin,

@@ -40,13 +40,13 @@ from tracim_backend.tests.utils import EventHelper
 from tracim_backend.tests.utils import MailHogHelper
 from tracim_backend.tests.utils import MessageHelper
 from tracim_backend.tests.utils import RadicaleServerHelper
-from tracim_backend.tests.utils import RoleApiFactory
 from tracim_backend.tests.utils import ShareLibFactory
 from tracim_backend.tests.utils import SubscriptionLibFactory
 from tracim_backend.tests.utils import TEST_CONFIG_FILE_PATH
 from tracim_backend.tests.utils import TracimTestContext
 from tracim_backend.tests.utils import UploadPermissionLibFactory
 from tracim_backend.tests.utils import UserApiFactory
+from tracim_backend.tests.utils import UserWorkspaceConfigApiFactory
 from tracim_backend.tests.utils import WedavEnvironFactory
 from tracim_backend.tests.utils import WorkspaceApiFactory
 from tracim_backend.tests.utils import tracim_plugin_loader
@@ -369,8 +369,10 @@ def upload_permission_lib_factory(session, app_config, admin_user) -> UploadPerm
 
 
 @pytest.fixture
-def role_api_factory(session, app_config, admin_user) -> RoleApiFactory:
-    return RoleApiFactory(session, app_config, admin_user)
+def user_workspace_config_api_factory(
+    session, app_config, admin_user
+) -> UserWorkspaceConfigApiFactory:
+    return UserWorkspaceConfigApiFactory(session, app_config, admin_user)
 
 
 @pytest.fixture

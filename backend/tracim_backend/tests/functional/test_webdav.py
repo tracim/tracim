@@ -131,7 +131,7 @@ class TestFunctionalWebdavGet(object):
         user_api_factory,
         workspace_api_factory,
         admin_user,
-        role_api_factory,
+        user_workspace_config_api_factory,
         webdav_testapp,
     ) -> None:
         uapi = user_api_factory.get()
@@ -146,8 +146,8 @@ class TestFunctionalWebdavGet(object):
         )
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.READER,
@@ -179,7 +179,7 @@ class TestFunctionalWebdavGet(object):
         user_api_factory,
         workspace_api_factory,
         admin_user,
-        role_api_factory,
+        user_workspace_config_api_factory,
         webdav_testapp,
     ) -> None:
         """
@@ -203,14 +203,14 @@ class TestFunctionalWebdavGet(object):
         workspace = workspace_api.create_workspace(
             workspace_label, save_now=True, parent=workspace_parent
         )
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace_parent,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.READER,
@@ -235,7 +235,7 @@ class TestFunctionalWebdavGet(object):
         user_api_factory,
         workspace_api_factory,
         admin_user,
-        role_api_factory,
+        user_workspace_config_api_factory,
         webdav_testapp,
     ) -> None:
         """
@@ -271,20 +271,20 @@ class TestFunctionalWebdavGet(object):
         workspace = workspace_api.create_workspace(
             webdav_workspace_label, save_now=True, parent=workspace_parent
         )
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             other_workspace,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user,
             workspace_children,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.READER,
@@ -322,7 +322,7 @@ class TestFunctionalWebdavGet(object):
         user_api_factory,
         workspace_api_factory,
         admin_user,
-        role_api_factory,
+        user_workspace_config_api_factory,
         webdav_testapp,
     ) -> None:
         """
@@ -353,26 +353,26 @@ class TestFunctionalWebdavGet(object):
         workspace = workspace_api.create_workspace(
             workspace_label, save_now=True, parent=workspace_grandson
         )
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace_parent,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user,
             workspace_child,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user,
             workspace_grandson,
             UserConfigInWorkspace.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.READER,
@@ -756,7 +756,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         user_api_factory,
         admin_user,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_api_factory,
         content_type_list,
         webdav_testapp,
@@ -774,8 +774,8 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         )
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.CONTENT_MANAGER,
@@ -953,7 +953,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         webdav_new_content_filename,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_api_factory,
         content_type_list,
         session,
@@ -973,14 +973,14 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         workspace2 = workspace_api.create_workspace(workspace2_label, save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user,
             workspace2,
             UserConfigInWorkspace.CONTENT_MANAGER,
@@ -1138,7 +1138,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         user_api_factory,
         workspace_api_factory,
         admin_user,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         content_api_factory,
         webdav_testapp,
@@ -1156,8 +1156,8 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         )
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.CONTENT_MANAGER,
@@ -1315,7 +1315,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         webdav_new_content_filename,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_api_factory,
         content_type_list,
         session,
@@ -1334,14 +1334,14 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         workspace2 = workspace_api.create_workspace(workspace2_label, save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user,
             workspace2,
             UserConfigInWorkspace.CONTENT_MANAGER,
@@ -1478,7 +1478,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         user_api_factory,
         workspace_api_factory,
         admin_user,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         content_api_factory,
         session,
@@ -1496,8 +1496,8 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         )
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.CONTENT_MANAGER,
@@ -1648,7 +1648,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         webdav_new_content_filename,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_api_factory,
         content_type_list,
         session,
@@ -1667,14 +1667,14 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         workspace2 = workspace_api.create_workspace(workspace2_label, save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user,
             workspace2,
             UserConfigInWorkspace.CONTENT_MANAGER,
@@ -1806,7 +1806,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         user_api_factory,
         workspace_api_factory,
         admin_user,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_api_factory,
         content_type_list,
         webdav_testapp,
@@ -1824,8 +1824,8 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         )
         workspace_api = workspace_api_factory.get(current_user=admin_user, show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.CONTENT_MANAGER,
@@ -1947,7 +1947,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         webdav_new_content_filename,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_api_factory,
         session,
         content_type_list,
@@ -1966,14 +1966,14 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         workspace2 = workspace_api.create_workspace(workspace2_label, save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
             UserConfigInWorkspace.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user,
             workspace2,
             UserConfigInWorkspace.CONTENT_MANAGER,

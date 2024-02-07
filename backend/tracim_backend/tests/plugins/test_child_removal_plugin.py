@@ -35,7 +35,7 @@ class TestChildRemovalPlugin(object):
         session,
         app_config,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         user_api_factory,
         load_child_removal_plugin,
     ):
@@ -64,19 +64,23 @@ class TestChildRemovalPlugin(object):
                 do_save=True,
                 do_notify=False,
             )
-            role_api = role_api_factory.get()
+            user_workspace_config_api = user_workspace_config_api_factory.get()
             for workspace in (parent_workspace, child_workspace, grandson_workspace):
-                role_api.create_one(
+                user_workspace_config_api.create_one(
                     user_1,
                     workspace,
                     WorkspaceRoles.CONTENT_MANAGER.level,
                     email_notification_type=EmailNotificationType.NONE,
                 )
-            role_api.delete_one(user_1.user_id, parent_workspace.workspace_id)
+            user_workspace_config_api.delete_one(user_1.user_id, parent_workspace.workspace_id)
             with pytest.raises(UserRoleNotFound):
-                assert role_api.get_one(user_1.user_id, child_workspace.workspace_id)
+                assert user_workspace_config_api.get_one(
+                    user_1.user_id, child_workspace.workspace_id
+                )
             with pytest.raises(UserRoleNotFound):
-                assert role_api.get_one(user_1.user_id, grandson_workspace.workspace_id)
+                assert user_workspace_config_api.get_one(
+                    user_1.user_id, grandson_workspace.workspace_id
+                )
 
     def test__remove_user_from_descendant_workspaces__ok__also_removed_in_another_plugin(
         self,
@@ -84,7 +88,7 @@ class TestChildRemovalPlugin(object):
         session,
         app_config,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         user_api_factory,
         load_child_removal_plugin,
         test_context,
@@ -115,16 +119,20 @@ class TestChildRemovalPlugin(object):
                 do_save=True,
                 do_notify=False,
             )
-            role_api = role_api_factory.get()
+            user_workspace_config_api = user_workspace_config_api_factory.get()
             for workspace in (parent_workspace, child_workspace, grandson_workspace):
-                role_api.create_one(
+                user_workspace_config_api.create_one(
                     user_1,
                     workspace,
                     WorkspaceRoles.CONTENT_MANAGER.level,
                     email_notification_type=EmailNotificationType.NONE,
                 )
-            role_api.delete_one(user_1.user_id, parent_workspace.workspace_id)
+            user_workspace_config_api.delete_one(user_1.user_id, parent_workspace.workspace_id)
             with pytest.raises(UserRoleNotFound):
-                assert role_api.get_one(user_1.user_id, child_workspace.workspace_id)
+                assert user_workspace_config_api.get_one(
+                    user_1.user_id, child_workspace.workspace_id
+                )
             with pytest.raises(UserRoleNotFound):
-                assert role_api.get_one(user_1.user_id, grandson_workspace.workspace_id)
+                assert user_workspace_config_api.get_one(
+                    user_1.user_id, grandson_workspace.workspace_id
+                )
