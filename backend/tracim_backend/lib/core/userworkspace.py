@@ -9,7 +9,7 @@ from tracim_backend.exceptions import RoleAlreadyExistError
 from tracim_backend.exceptions import UserRoleNotFound
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
-from tracim_backend.models.context_models import UserRoleWorkspaceInContext
+from tracim_backend.models.context_models import UserConfigWorkspaceInContext
 from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import UserConfigInWorkspace
 from tracim_backend.models.data import Workspace
@@ -67,12 +67,12 @@ class UserWorkspaceConfigApi(object):
         self,
         user_config: UserConfigInWorkspace,
         newly_created: bool = None,
-    ) -> UserRoleWorkspaceInContext:
+    ) -> UserConfigWorkspaceInContext:
         """
-        Return member (UserRoleWorkspaceInContext) object from UserConfigInWorkspace
+        Return member (UserConfigWorkspaceInContext) object from UserConfigInWorkspace
         """
         assert self._config
-        member = UserRoleWorkspaceInContext(
+        member = UserConfigWorkspaceInContext(
             user_role=user_config,
             dbsession=self._session,
             config=self._config,

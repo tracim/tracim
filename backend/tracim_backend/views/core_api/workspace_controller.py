@@ -52,7 +52,7 @@ from tracim_backend.models.auth import UserCreationType
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import ListItemsObject
 from tracim_backend.models.context_models import PaginatedObject
-from tracim_backend.models.context_models import UserRoleWorkspaceInContext
+from tracim_backend.models.context_models import UserConfigWorkspaceInContext
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import EmailNotificationType
@@ -281,7 +281,7 @@ class WorkspaceController(Controller):
     @hapic.output_body(UserWorkspaceConfigSchema(many=True))
     def workspaces_members(
         self, context, request: TracimRequest, hapic_data=None
-    ) -> typing.List[UserRoleWorkspaceInContext]:
+    ) -> typing.List[UserConfigWorkspaceInContext]:
         """
         Returns the list of space members with their role, avatar, etc.
         """
@@ -307,7 +307,7 @@ class WorkspaceController(Controller):
     @hapic.output_body(UserWorkspaceConfigSchema())
     def workspaces_member_role(
         self, context, request: TracimRequest, hapic_data=None
-    ) -> UserRoleWorkspaceInContext:
+    ) -> UserConfigWorkspaceInContext:
         """
         Returns given space member with its role, avatar, etc.
         """
@@ -332,7 +332,7 @@ class WorkspaceController(Controller):
     @hapic.output_body(UserWorkspaceConfigSchema())
     def update_workspaces_members_role(
         self, context, request: TracimRequest, hapic_data=None
-    ) -> UserRoleWorkspaceInContext:
+    ) -> UserConfigWorkspaceInContext:
         """
         Update role of the given space member.
         This feature is for workspace managers, trusted users and administrators.
@@ -386,7 +386,7 @@ class WorkspaceController(Controller):
     @hapic.output_body(WorkspaceMemberCreationSchema())
     def create_workspaces_members_role(
         self, context, request: TracimRequest, hapic_data=None
-    ) -> UserRoleWorkspaceInContext:
+    ) -> UserConfigWorkspaceInContext:
         """
         Add a member to this workspace.
         This feature is for workspace managers and administrators.
