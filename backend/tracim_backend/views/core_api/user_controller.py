@@ -110,10 +110,10 @@ from tracim_backend.views.core_api.schemas import UserPicturePathSchema
 from tracim_backend.views.core_api.schemas import UserPreviewPicturePathSchema
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceAndContentIdPathSchema
+from tracim_backend.views.core_api.schemas import UserWorkspaceConfigSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceFilterQuerySchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdSchema
-from tracim_backend.views.core_api.schemas import WorkspaceMemberSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSubscriptionSchema
 from tracim_backend.views.core_api.schemas import WorkspaceWithUserMemberSchema
@@ -212,7 +212,7 @@ class UserController(Controller):
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(UserWorkspaceFilterQuerySchema())
-    @hapic.output_body(WorkspaceMemberSchema(many=True))
+    @hapic.output_body(UserWorkspaceConfigSchema(many=True))
     def user_role_workspace(self, context, request: TracimRequest, hapic_data=None):
         """
         Get list of all roles of the given user
@@ -224,7 +224,7 @@ class UserController(Controller):
             config=app_config,
         )
         return [
-            wapi.get_user_role_workspace_with_context(role)
+            wapi.get_user_config_workspace_with_context(role)
             for role in request.candidate_user.get_active_roles()
         ]
 

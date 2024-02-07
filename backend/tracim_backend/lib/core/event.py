@@ -779,13 +779,13 @@ class EventBuilder:
             # It is possible to have an already deleted user when deleting his roles.
             user_field = None
 
-        role_in_context = user_workspace_config_api.get_user_role_workspace_with_context(config)
+        config_in_context = user_workspace_config_api.get_user_config_workspace_with_context(config)
         fields = {
             Event.USER_FIELD: user_field,
             Event.WORKSPACE_FIELD: EventApi.workspace_without_description_schema.dump(
                 workspace_in_context
             ).data,
-            Event.MEMBER_FIELD: EventApi.workspace_user_role_schema.dump(role_in_context).data,
+            Event.MEMBER_FIELD: EventApi.workspace_user_role_schema.dump(config_in_context).data,
         }
         event_api = EventApi(current_user, context.dbsession, self._config)
         event_api.create_event(

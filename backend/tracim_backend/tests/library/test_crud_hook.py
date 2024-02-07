@@ -136,7 +136,7 @@ class TestDatabaseCrudHookCaller:
         session.flush()
 
         config = UserConfigInWorkspace(
-            config=UserConfigInWorkspace.READER, user=owner, workspace=workspace
+            role=UserConfigInWorkspace.READER, user=owner, workspace=workspace
         )
         session.add(config)
         session.flush()

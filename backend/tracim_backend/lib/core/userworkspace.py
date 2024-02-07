@@ -63,9 +63,9 @@ class UserWorkspaceConfigApi(object):
             workspaces_ids.append(workspace_tuple[0])
         return workspaces_ids
 
-    def get_user_role_workspace_with_context(
+    def get_user_config_workspace_with_context(
         self,
-        user_role: UserConfigInWorkspace,
+        user_config: UserConfigInWorkspace,
         newly_created: bool = None,
     ) -> UserRoleWorkspaceInContext:
         """
@@ -73,7 +73,7 @@ class UserWorkspaceConfigApi(object):
         """
         assert self._config
         member = UserRoleWorkspaceInContext(
-            user_role=user_role,
+            user_role=user_config,
             dbsession=self._session,
             config=self._config,
             newly_created=newly_created,

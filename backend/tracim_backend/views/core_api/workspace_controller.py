@@ -74,6 +74,7 @@ from tracim_backend.views.core_api.schemas import RoleUpdateSchema
 from tracim_backend.views.core_api.schemas import SetContentIsTemplateSchema
 from tracim_backend.views.core_api.schemas import TemplateQuerySchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
+from tracim_backend.views.core_api.schemas import UserWorkspaceConfigSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndUserIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceCreationSchema
@@ -83,7 +84,6 @@ from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberCreationSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberFilterQuerySchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberInviteSchema
-from tracim_backend.views.core_api.schemas import WorkspaceMemberSchema
 from tracim_backend.views.core_api.schemas import WorkspaceModifySchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSubscriptionSchema
@@ -278,7 +278,7 @@ class WorkspaceController(Controller):
     @check_right(can_see_workspace_information)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_query(WorkspaceMemberFilterQuerySchema())
-    @hapic.output_body(WorkspaceMemberSchema(many=True))
+    @hapic.output_body(UserWorkspaceConfigSchema(many=True))
     def workspaces_members(
         self, context, request: TracimRequest, hapic_data=None
     ) -> typing.List[UserRoleWorkspaceInContext]:
@@ -297,14 +297,14 @@ class WorkspaceController(Controller):
             workspace=request.current_workspace
         )
         return [
-            user_workspace_config_api.get_user_role_workspace_with_context(user_config)
+            user_workspace_config_api.get_user_config_workspace_with_context(user_config)
             for user_config in configs
         ]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
     @check_right(can_see_workspace_information)
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
-    @hapic.output_body(WorkspaceMemberSchema())
+    @hapic.output_body(UserWorkspaceConfigSchema())
     def workspaces_member_role(
         self, context, request: TracimRequest, hapic_data=None
     ) -> UserRoleWorkspaceInContext:
@@ -321,7 +321,7 @@ class WorkspaceController(Controller):
         config = user_workspace_config_api.get_one(
             user_id=hapic_data.path.user_id, workspace_id=hapic_data.path.workspace_id
         )
-        return user_workspace_config_api.get_user_role_workspace_with_context(config)
+        return user_workspace_config_api.get_user_config_workspace_with_context(config)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
     @hapic.handle_exception(UserRoleNotFound, HTTPStatus.BAD_REQUEST)
@@ -329,7 +329,7 @@ class WorkspaceController(Controller):
     @hapic.handle_exception(LastWorkspaceManagerRoleCantBeModified, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
     @hapic.input_body(RoleUpdateSchema())
-    @hapic.output_body(WorkspaceMemberSchema())
+    @hapic.output_body(UserWorkspaceConfigSchema())
     def update_workspaces_members_role(
         self, context, request: TracimRequest, hapic_data=None
     ) -> UserRoleWorkspaceInContext:
@@ -348,7 +348,7 @@ class WorkspaceController(Controller):
             user_id=hapic_data.path.user_id, workspace_id=hapic_data.path.workspace_id
         )
         role = user_workspace_config_api.update_role(role, role_level=hapic_data.body.role.level)
-        return user_workspace_config_api.get_user_role_workspace_with_context(role)
+        return user_workspace_config_api.get_user_config_workspace_with_context(role)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
     @check_right(can_leave_workspace)
@@ -459,7 +459,7 @@ class WorkspaceController(Controller):
             ),
             flush=True,
         )
-        return user_workspace_config_api.get_user_role_workspace_with_context(
+        return user_workspace_config_api.get_user_config_workspace_with_context(
             config, newly_created=newly_created
         )
 

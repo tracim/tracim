@@ -339,7 +339,7 @@ class TestEventReceiver:
         workspace_in_context = workspace_api.get_workspace_with_context(my_workspace)
         user_workspace_config_api = user_workspace_config_api_factory.get()
         user_api = user_api_factory.get()
-        role_in_context = user_workspace_config_api.get_user_role_workspace_with_context(role)
+        config_in_context = user_workspace_config_api.get_user_config_workspace_with_context(role)
         fields = {
             Event.AUTHOR_FIELD: UserSchema()
             .dump(user_api.get_user_with_context(event_initiator))
@@ -349,7 +349,7 @@ class TestEventReceiver:
             .data,
             Event.CLIENT_TOKEN_FIELD: "test",
             Event.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context).data,
-            Event.MEMBER_FIELD: WorkspaceMemberDigestSchema().dump(role_in_context).data,
+            Event.MEMBER_FIELD: WorkspaceMemberDigestSchema().dump(config_in_context).data,
         }
         event = Event(
             entity_type=EntityType.WORKSPACE_MEMBER,
@@ -385,7 +385,7 @@ class TestEventReceiver:
         workspace_in_context = workspace_api.get_workspace_with_context(my_workspace)
         user_workspace_config_api = user_workspace_config_api_factory.get()
         user_api = user_api_factory.get()
-        role_in_context = user_workspace_config_api.get_user_role_workspace_with_context(role)
+        config_in_context = user_workspace_config_api.get_user_config_workspace_with_context(role)
         fields = {
             Event.AUTHOR_FIELD: UserSchema()
             .dump(user_api.get_user_with_context(event_initiator))
@@ -395,7 +395,7 @@ class TestEventReceiver:
             .data,
             Event.CLIENT_TOKEN_FIELD: "test",
             Event.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context).data,
-            Event.MEMBER_FIELD: WorkspaceMemberDigestSchema().dump(role_in_context).data,
+            Event.MEMBER_FIELD: WorkspaceMemberDigestSchema().dump(config_in_context).data,
         }
         event = Event(
             entity_type=EntityType.WORKSPACE_MEMBER,
