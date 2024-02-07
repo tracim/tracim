@@ -148,7 +148,7 @@ export const getWorkspaceDetail = (apiUrl, workspaceId) =>
 export const getSpaceMemberList = (apiUrl, spaceId, showDisabledUser = false) =>
   baseFetch(
     'GET',
-    `${apiUrl}/workspaces/${spaceId}/members${showDisabledUser ? '?show_disabled_user=1' : ''}`
+    `${apiUrl}/workspaces/${spaceId}/role${showDisabledUser ? '?show_disabled_user=1' : ''}`
   )
 
 export const getSpaceMemberFromId = (apiUrl, spaceId, userId) =>

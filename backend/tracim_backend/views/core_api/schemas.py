@@ -1573,6 +1573,17 @@ class UserWorkspaceConfigSchema(WorkspaceMemberDigestSchema):
         description = "Workspace Member information"
 
 
+class WorkspaceRoleDigestSchema(marshmallow.Schema):
+    role = StrippedString(example="contributor", validate=user_role_validator)
+
+
+class UserWorkspaceRoleSchema(WorkspaceRoleDigestSchema):
+    user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
+    is_active = marshmallow.fields.Bool()
+    user = marshmallow.fields.Nested(UserDigestSchema())
+    workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
+
+
 class WorkspaceWithUserMemberSchema(WorkspaceSchema):
     members = marshmallow.fields.Nested(UserWorkspaceConfigSchema(many=True))
 

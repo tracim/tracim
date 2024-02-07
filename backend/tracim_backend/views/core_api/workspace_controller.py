@@ -75,6 +75,7 @@ from tracim_backend.views.core_api.schemas import SetContentIsTemplateSchema
 from tracim_backend.views.core_api.schemas import TemplateQuerySchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceConfigSchema
+from tracim_backend.views.core_api.schemas import UserWorkspaceRoleSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndUserIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceCreationSchema
@@ -284,6 +285,33 @@ class WorkspaceController(Controller):
     ) -> typing.List[UserConfigWorkspaceInContext]:
         """
         Returns the list of space members with their role, avatar, etc.
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        user_workspace_config_api = UserWorkspaceConfigApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+            show_disabled_user=hapic_data.query.show_disabled_user,
+        )
+
+        configs = user_workspace_config_api.get_all_for_workspace(
+            workspace=request.current_workspace
+        )
+        return [
+            user_workspace_config_api.get_user_config_workspace_with_context(user_config)
+            for user_config in configs
+        ]
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
+    @check_right(can_see_workspace_information)
+    @hapic.input_path(WorkspaceIdPathSchema())
+    @hapic.input_query(WorkspaceMemberFilterQuerySchema())
+    @hapic.output_body(UserWorkspaceRoleSchema(many=True))
+    def workspaces_role(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> typing.List[UserConfigWorkspaceInContext]:
+        """
+        Returns the list of space user with their role, avatar, etc.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         user_workspace_config_api = UserWorkspaceConfigApi(
@@ -940,6 +968,13 @@ class WorkspaceController(Controller):
             request_method="GET",
         )
         configurator.add_view(self.workspaces_members, route_name="workspace_members")
+        # Workspace Roles
+        configurator.add_route(
+            "workspaces_role",
+            "/workspaces/{workspace_id}/role",
+            request_method="GET",
+        )
+        configurator.add_view(self.workspaces_role, route_name="workspaces_role")
         # Workspace Members (Role) Individual
         configurator.add_route(
             "workspace_member_role",
