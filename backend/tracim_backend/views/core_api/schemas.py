@@ -406,6 +406,7 @@ class UserDigestSchema(marshmallow.Schema):
     username = StrippedString(
         example="My-Power_User99", required=False, default=None, allow_none=True
     )
+    workspace_ids = marshmallow.fields.List(marshmallow.fields.Int(example=3))
 
 
 class UserDiskSpaceSchema(UserDigestSchema):
@@ -799,7 +800,7 @@ class UserWorkspaceFilterQuerySchema(WorkspaceFilterQuerySchema):
     show_workspace_with_role = marshmallow.fields.Int(
         example=1,
         default=1,
-        description="if set to 1, then show workspace were user as a role in list"
+        description="if set to 1, then show workspace were user has a role in list"
         " Default is 1, else do no show them",
         validate=bool_as_int_validator,
     )
@@ -1058,7 +1059,7 @@ class CommentsPathFilenameSchema(CommentsPathSchema, FilenamePathSchema):
 
 
 class KnownMembersQuerySchema(marshmallow.Schema):
-    acp = StrippedString(example="test", description="search text to query", required=True)
+    acp = StrippedString(example="test", description="search text to query", required=False)
 
     exclude_user_ids = StrippedString(
         validate=regex_string_as_list_of_int,
@@ -1548,6 +1549,34 @@ class WorkspaceSchema(WorkspaceWithoutDescriptionSchema):
         description = "Full workspace information"
 
 
+class EmailNotificationTypeSchema(marshmallow.Schema):
+    email_notification_type = StrippedString(
+        example=EmailNotificationType.SUMMARY.name,
+        description="Type of email notification for a specific space",
+    )
+
+
+class WorkspaceMemberDigestSchema(EmailNotificationTypeSchema):
+    role = StrippedString(example="contributor", validate=user_role_validator)
+
+
+class WorkspaceMemberSchema(WorkspaceMemberDigestSchema):
+    user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
+    is_active = marshmallow.fields.Bool()
+    user = marshmallow.fields.Nested(UserDigestSchema())
+    workspace = marshmallow.fields.Nested(
+        WorkspaceWithoutDescriptionSchema(exclude=("number_of_members",))
+    )
+    workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
+
+    class Meta:
+        description = "Workspace Member information"
+
+
+class WorkspaceWithUserMemberSchema(WorkspaceSchema):
+    members = marshmallow.fields.Nested(WorkspaceMemberSchema(many=True))
+
+
 class UserConfigSchema(marshmallow.Schema):
     parameters = marshmallow.fields.Dict(
         description="parameters present in the user's configuration."
@@ -1583,28 +1612,6 @@ class WorkspaceDiskSpaceSchema(marshmallow.Schema):
         "in any user owned workspaces. 0 mean no limit."
     )
     workspace = marshmallow.fields.Nested(WorkspaceDigestSchema(), attribute="workspace_in_context")
-
-
-class EmailNotificationTypeSchema(marshmallow.Schema):
-    email_notification_type = StrippedString(
-        example=EmailNotificationType.SUMMARY.name,
-        description="Type of email notification for a specific space",
-    )
-
-
-class WorkspaceMemberDigestSchema(EmailNotificationTypeSchema):
-    role = StrippedString(example="contributor", validate=user_role_validator)
-
-
-class WorkspaceMemberSchema(WorkspaceMemberDigestSchema):
-    user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
-    workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
-    is_active = marshmallow.fields.Bool()
-    user = marshmallow.fields.Nested(UserDigestSchema())
-    workspace = marshmallow.fields.Nested(WorkspaceDigestSchema(exclude=("sidebar_entries",)))
-
-    class Meta:
-        description = "Workspace Member information"
 
 
 class WorkspaceMemberCreationSchema(WorkspaceMemberSchema):
@@ -2143,6 +2150,12 @@ class RoleSchema(marshmallow.Schema):
     label = marshmallow.fields.String(required=True, example="Reader")
 
 
+class SamLIdPConfigSchema(marshmallow.Schema):
+    logo_url = marshmallow.fields.String(required=True)
+    displayed_name = marshmallow.fields.String(required=True)
+    identifier = marshmallow.fields.String(required=True)
+
+
 class ConfigSchema(marshmallow.Schema):
     email_notification_activated = marshmallow.fields.Bool()
     new_user_invitation_do_notify = marshmallow.fields.Bool()
@@ -2171,6 +2184,12 @@ class ConfigSchema(marshmallow.Schema):
     limitation__maximum_online_users_message = marshmallow.fields.String()
     call__enabled = marshmallow.fields.Bool()
     call__unanswered_timeout = marshmallow.fields.Int()
+    auth_types = marshmallow.fields.List(marshmallow.fields.String())
+    user__read_only_fields = marshmallow.fields.Dict(
+        keys=marshmallow.fields.String(),
+        values=marshmallow.fields.List(marshmallow.fields.String()),
+    )
+    saml_idp_list = marshmallow.fields.Nested(SamLIdPConfigSchema, many=True)
 
 
 class ConditionFileSchema(marshmallow.Schema):

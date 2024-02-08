@@ -8,7 +8,7 @@ import {
   IconButton
 } from 'tracim_frontend_lib'
 import DropdownLang from '../DropdownLang.jsx'
-import { editableUserAuthTypeList } from '../../util/helper.js'
+import { serializeUserProps, UserReadOnlyFields } from '../../reducer/user.js'
 
 require('./PersonalData.styl')
 
@@ -22,6 +22,18 @@ export class PersonalData extends React.Component {
       newLang: props.user ? props.user.lang : '',
       checkPassword: ''
     }
+  }
+
+  isDisabled = field => {
+    if (this.props.system?.config?.user__read_only_fields?.[this.props.userAuthType] === undefined) {
+      return false
+    }
+
+    const serializedSystemConfigReadOnlyFieldList =
+      this.props.system.config.user__read_only_fields[this.props.userAuthType]
+        .map(p => serializeUserProps[p])
+
+    return serializedSystemConfigReadOnlyFieldList.includes(field)
   }
 
   handleChangePublicName = e => this.setState({ newPublicName: e.target.value })
@@ -58,11 +70,10 @@ export class PersonalData extends React.Component {
 
   render () {
     const { props, state } = this
-    const shouldAllowEditionFromAuthType = editableUserAuthTypeList.includes(props.userAuthType)
     return (
       <div className='account__userpreference__setting__personaldata'>
         <div className='personaldata__sectiontitle subTitle'>
-          {(props.displayAdminInfo
+          {(props.isAdmin
             ? props.t('Change the account settings')
             : props.t('Change my account settings')
           )}
@@ -78,7 +89,7 @@ export class PersonalData extends React.Component {
               placeholder={props.userPublicName}
               value={state.newPublicName}
               onChange={this.handleChangePublicName}
-              disabled={!shouldAllowEditionFromAuthType}
+              disabled={this.isDisabled(UserReadOnlyFields.PUBLIC_NAME)}
             />
           </label>
 
@@ -92,7 +103,7 @@ export class PersonalData extends React.Component {
                 placeholder={props.userUsername}
                 value={state.newUsername}
                 onChange={this.handleChangeUserName}
-                disabled={!shouldAllowEditionFromAuthType}
+                disabled={this.isDisabled(UserReadOnlyFields.USERNAME)}
               />
             </label>
             {!props.isUsernameValid && (
@@ -118,12 +129,12 @@ export class PersonalData extends React.Component {
                 placeholder={props.userEmail}
                 value={state.newEmail}
                 onChange={this.handleChangeEmail}
-                disabled={!shouldAllowEditionFromAuthType}
+                disabled={this.isDisabled(UserReadOnlyFields.EMAIL)}
               />
             </label>
           </div>
 
-          {!props.displayAdminInfo && (
+          {!props.isAdmin && (
             <div>
               {props.t('New language:')}
               <DropdownLang
@@ -137,13 +148,16 @@ export class PersonalData extends React.Component {
           {(state.newEmail !== '' || state.newUsername !== '') && (
             <div>
               <label>
-                {props.displayAdminInfo ? props.t("Administrator's password:") : props.t('Type your password:')}
+                {props.isAdmin ? props.t("Administrator's password:") : props.t('Type your password:')}
                 <input
                   className='personaldata__form__txtinput checkPassword form-control'
                   type='password'
                   value={state.checkPassword}
                   onChange={this.handleChangeCheckPassword}
-                  disabled={!shouldAllowEditionFromAuthType || (state.newEmail === '' && state.newUsername === '')}
+                  disabled={
+                    (this.isDisabled(UserReadOnlyFields.EMAIL) && this.isDisabled(UserReadOnlyFields.USERNAME)) ||
+                    (state.newEmail === '' && state.newUsername === '')
+                  }
                 />
               </label>
             </div>
@@ -172,7 +186,7 @@ PersonalData.propTypes = {
   onClickSubmit: PropTypes.func,
   onChangeUsername: PropTypes.func,
   isUsernameValid: PropTypes.bool,
-  displayAdminInfo: PropTypes.bool,
+  isAdmin: PropTypes.bool,
   langList: PropTypes.array
 }
 
@@ -184,9 +198,9 @@ PersonalData.defaultProps = {
   userAuthType: '',
   onClickSubmit: () => { },
   onChangeUsername: () => { },
-  displayAdminInfo: false,
+  isAdmin: false,
   langList: [{ id: '', label: '' }]
 }
 
-const mapStateToProps = ({ user }) => ({ user })
+const mapStateToProps = ({ user, system }) => ({ user, system })
 export default connect(mapStateToProps)(translate()(PersonalData))

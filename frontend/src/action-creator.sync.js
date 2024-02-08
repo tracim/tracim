@@ -9,6 +9,8 @@ export const APPEND = 'Append'
 export const RESET = 'Reset'
 export const MOVE = 'Move'
 
+export const LIST = 'LIST'
+
 export const TIMEZONE = 'Timezone'
 export const setTimezone = timezone => ({ type: `${SET}/${TIMEZONE}`, timezone })
 
@@ -41,7 +43,8 @@ export const setUserLang = lang => ({ type: `${SET}/${USER}/Lang`, lang })
 export const USER_KNOWN_MEMBER = `${USER}/KnownMember`
 export const USER_KNOWN_MEMBER_LIST = `${USER_KNOWN_MEMBER}/List`
 
-export const updateUser = newUser => ({ type: `${UPDATE}/${USER}`, newUser })
+export const UPDATE_USER = `${UPDATE}/${USER}`
+export const updateUser = newUser => ({ type: UPDATE_USER, newUser })
 export const USER_PUBLIC_NAME = `${USER}/PublicName`
 export const USER_USERNAME = `${USER}/Username`
 export const USER_EMAIL = `${USER}/Email`
@@ -90,13 +93,22 @@ export const moveWorkspaceContent = (source, destination) => ({ type: `${MOVE}/$
 
 export const WORKSPACE_LIST = `${WORKSPACE}/List`
 export const setWorkspaceList = workspaceList => ({ type: `${SET}/${WORKSPACE_LIST}`, workspaceList })
-export const addWorkspaceList = workspaceList => ({ type: `${ADD}/${WORKSPACE_LIST}`, workspaceList })
 export const removeWorkspace = workspace => ({ type: `${REMOVE}/${WORKSPACE_LIST}`, workspace })
 
 export const USER_WORKSPACE_LIST = `${USER}/${WORKSPACE_LIST}`
 
-export const WORKSPACE_LIST_MEMBER = `${WORKSPACE_LIST}/Member/List`
-export const setWorkspaceListMemberList = workspaceListMemberList => ({ type: `${SET}/${WORKSPACE_LIST_MEMBER}`, workspaceListMemberList })
+const ROLE = 'Role'
+// TODO - CH - 2023-11-02 - The const bellow should be rename
+// See: https://github.com/tracim/tracim/issues/6252
+export const ROLE_WORKSPACE_LIST = `${ROLE}/${WORKSPACE}/List`
+export const ADD_ROLE_WORKSPACE_LIST = `${ADD}/${ROLE_WORKSPACE_LIST}`
+export const UPDATE_ROLE_WORKSPACE_LIST = `${UPDATE}/${ROLE_WORKSPACE_LIST}`
+export const setRoleWorkspaceList = workspaceList => ({ type: `${SET}/${ROLE_WORKSPACE_LIST}`, workspaceList })
+export const addRoleWorkspaceList = (user, setting, workspace) => ({ type: ADD_ROLE_WORKSPACE_LIST, user, setting, workspace })
+export const updateRoleWorkspaceList = (user, setting, workspace) => ({ type: UPDATE_ROLE_WORKSPACE_LIST, user, setting, workspace })
+export const removeRoleWorkspace = workspace => ({ type: `${REMOVE}/${ROLE_WORKSPACE_LIST}`, workspace })
+
+export const USER_ROLE_WORKSPACE_LIST = `${USER}/${ROLE_WORKSPACE_LIST}`
 
 // workspace related const below is for currentWorkspace
 export const WORKSPACE_DETAIL = `${WORKSPACE}/Detail`
@@ -106,14 +118,20 @@ export const updateWorkspaceDetail = workspaceDetail => ({ type: `${UPDATE}/${WO
 export const WORKSPACE_LOADED = `${WORKSPACE}/Loaded`
 export const setWorkspaceLoaded = () => ({ type: `${SET}/${WORKSPACE_LOADED}` })
 
-export const WORKSPACE_MEMBER = `${WORKSPACE}/Member`
+const MEMBER = 'Member'
+export const WORKSPACE_MEMBER = `${WORKSPACE}/${MEMBER}`
 export const WORKSPACE_MEMBER_LIST = `${WORKSPACE_MEMBER}/List`
 export const setWorkspaceMemberList = workspaceMemberList => ({ type: `${SET}/${WORKSPACE_MEMBER_LIST}`, workspaceMemberList })
+// INFO - CH - 2023-11-22 - WORKSPACE_MEMBER_ADD is used by api function postWorkspaceMember()
+// but nothing is bound to it
 export const WORKSPACE_MEMBER_ADD = `${WORKSPACE_MEMBER}/${ADD}`
+// INFO - CH - 2023-11-22 - WORKSPACE_MEMBER_ADD is used by api function deleteWorkspaceMember()
+// but nothing is bound to it
 export const WORKSPACE_MEMBER_REMOVE = `${WORKSPACE_MEMBER}/${REMOVE}`
 export const WORKSPACE_MEMBER_UPDATE = `${WORKSPACE_MEMBER}/${UPDATE}`
+export const ADD_WORKSPACE_MEMBER = `${ADD}/${WORKSPACE_MEMBER}`
 export const addWorkspaceMember = (user, workspaceId, member) => ({
-  type: `${ADD}/${WORKSPACE_MEMBER}`,
+  type: ADD_WORKSPACE_MEMBER,
   newMember: { user: user, ...member },
   workspaceId
 })
@@ -122,7 +140,16 @@ export const updateWorkspaceMember = (user, workspaceId, member) => ({
   member: { user: user, ...member },
   workspaceId
 })
-export const removeWorkspaceMember = (memberId, workspaceId) => ({ type: `${REMOVE}/${WORKSPACE_MEMBER}`, memberId, workspaceId })
+export const REMOVE_WORKSPACE_MEMBER = `${REMOVE}/${WORKSPACE_MEMBER}`
+export const removeWorkspaceMember = (memberId, workspaceId) => ({
+  type: REMOVE_WORKSPACE_MEMBER,
+  memberId,
+  workspaceId
+})
+
+export const KNOWN_MEMBER = `Known${MEMBER}`
+export const SET_KNOWN_MEMBER_LIST = `${SET}/${KNOWN_MEMBER}/${LIST}`
+export const setKnownMemberList = knownMemberList => ({ type: SET_KNOWN_MEMBER_LIST, knownMemberList })
 
 export const WORKSPACE_READ_STATUS = `${WORKSPACE}/ReadStatus`
 export const WORKSPACE_READ_STATUS_LIST = `${WORKSPACE_READ_STATUS}/List`
@@ -242,7 +269,6 @@ export const removeWorkspaceSubscription = subscription => ({ type: `${REMOVE}/$
 export const updateWorkspaceSubscription = subscription => ({ type: `${UPDATE}/${WORKSPACE_SUBSCRIPTION}`, subscription })
 
 export const WORKSPACE_ACTIVITY = `${WORKSPACE}/Activity`
-export const LIST = 'LIST'
 export const EVENT_LIST = 'EVENT_LIST'
 export const setWorkspaceActivityList = activityList => ({ type: `${SET}/${WORKSPACE_ACTIVITY}/${LIST}`, activityList })
 export const setWorkspaceActivityNextPage = (hasNextPage, nextPageToken) => ({

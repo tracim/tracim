@@ -39,8 +39,8 @@ class WorkspacePage extends React.Component {
     ])
 
     if (responseMemberList.apiResponse.status === 200 && responseWorkspaceDetail.status === 200) {
-      props.dispatch(setWorkspaceMemberList(responseMemberList.body))
       props.dispatch(setWorkspaceDetail(responseWorkspaceDetail.json))
+      props.dispatch(setWorkspaceMemberList(responseMemberList.body))
       props.dispatch(setWorkspaceLoaded())
 
       if (props.appList.some(a => a.slug === 'agenda') && responseWorkspaceDetail.json.agenda_enabled) {

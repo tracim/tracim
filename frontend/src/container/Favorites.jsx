@@ -10,7 +10,6 @@ import {
   PageTitle,
   PageWrapper,
   TracimComponent,
-  getContentComment,
   getContentPath,
   Loading,
   handleFetchResult
@@ -40,8 +39,8 @@ export class Favorites extends React.Component {
     super(props)
 
     this.state = {
-      contentCommentsCountList: [],
-      isLoading: true
+      isLoading: true,
+      favoriteList: []
     }
 
     props.registerCustomEventHandlerList([
@@ -77,6 +76,29 @@ export class Favorites extends React.Component {
     this.loadFavoriteList()
   }
 
+  componentDidUpdate (prevProps) {
+    if (prevProps.workspaceList.length === 0 && this.props.workspaceList.length > 0) {
+      this.addWorkspaceToBreadcrumbsPath()
+    }
+  }
+
+  addWorkspaceToBreadcrumbsPath () {
+    const { props, state } = this
+    if (props.workspaceList.length === 0) return
+
+    const favoriteWithFullBreadcrumbsList = state.favoriteList
+      .map(favorite => {
+        const workspace = props.workspaceList.find(ws => ws.id === favorite.content.workspace_id)
+        return {
+          ...favorite,
+          breadcrumbs: [{ label: workspace.label }].concat(favorite.breadcrumbs)
+        }
+      })
+
+    this.setState({ isLoading: false })
+    props.dispatch(setFavoriteList(favoriteWithFullBreadcrumbsList))
+  }
+
   loadFavoriteList = async () => {
     const { props } = this
 
@@ -88,37 +110,24 @@ export class Favorites extends React.Component {
       props.dispatch(newFlashMessage(props.t('An error has happened while fetching favorites'), 'warning'))
       return
     }
-    const favoriteList = fetchFavoriteList.json.items
-    // Get comments (for their count in info)
-    const commentsFetchList = favoriteList.map(async favorite => {
-      if (!favorite.content) return null
-      // NOTE - S.G. - 2021-04-01 - here we have the favorite as returned by the backend
-      // hence the snake-case properties
-      const response = await getContentComment(
-        FETCH_CONFIG.apiUrl,
-        favorite.content.workspace_id,
-        favorite.content_id
-      )
-      if (!response.ok) return null
-      return (await response.json()).length
-    })
-    const contentCommentsCountList = await Promise.all(commentsFetchList)
 
-    // Get the contents' paths (for breadcrumbs)
-    await Promise.all(favoriteList.map(async favorite => {
-      if (!favorite.content) return null
-      // NOTE - S.G. - 2021-04-01 - here we have the favorite as returned by the backend
-      // hence the snake-case properties
-      const response = await handleFetchResult(
-        await getContentPath(FETCH_CONFIG.apiUrl, favorite.content_id)
-      )
-      const workspace = props.workspaceList.find(ws => ws.id === favorite.content.workspace_id)
+    // INFO - Ch - 2023-11-29 - Get the contents' paths (for breadcrumbs)
+    const favoriteWithIncompleteBreadcrumbsList = await Promise.all(fetchFavoriteList.json.items
+      .filter(f => f.content !== null && f.content !== undefined)
+      .map(async favorite => {
+        try {
+          const response = await handleFetchResult(
+            await getContentPath(FETCH_CONFIG.apiUrl, favorite.content_id)
+          )
+          return { ...favorite, breadcrumbs: response.body.items }
+        } catch (e) {
+          console.error('Error in loadFavoriteList', favorite, e)
+          return { ...favorite, breadcrumbs: [] }
+        }
+      }))
 
-      favorite.breadcrumbs = [{ label: workspace.label }].concat(response.body.items)
-    }))
-
-    this.setState({ contentCommentsCountList, isLoading: false })
-    props.dispatch(setFavoriteList([...favoriteList]))
+    this.setState({ favoriteList: favoriteWithIncompleteBreadcrumbsList })
+    this.addWorkspaceToBreadcrumbsPath()
   }
 
   handleClickRemoveFromFavoriteList = async (favorite) => {

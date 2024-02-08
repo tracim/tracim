@@ -1,5 +1,46 @@
 # Changelog
 
+## 4.8.0 / 2024-01-24
+
+### ✨ New Features
+
+- News now opens a popup on submit to define a title for the news
+- Notifications in the notification wall can now be filtered
+
+## 4.7.1 / 2023-12-18
+
+### 🐛 Fixed Issues
+
+- Backend:
+  - Prevent account creation from SAML auth if profile doesn't match [#6248](https://github.com/tracim/tracim/issues/6248)
+
+### 📝 Documentation
+
+- Improve documentation for authentication through SAML protocol
+
+## 4.7.0 / 2023-12-01
+
+### ✨ New Features
+
+- SAML authentication is now supported
+- User properties, previously always editable, can now be set as read-only
+- Support of distributed deployment (redis, pushpin, elastic search) has been improved
+
+### ⚡️ Performance
+
+- Loading of spaces and members in frontend has been improved
+
+### 🐛 Fixed Issues
+
+- Frontend:
+  - Fix loader not appearing on some cases [#5676](https://github.com/tracim/tracim/issues/5676)
+  - In space admin page, space link is now a html link [#3953](https://github.com/tracim/tracim/issues/3953)
+- Backend:
+  - In notification email, display user's username instead of public name [#6169](https://github.com/tracim/tracim/issues/6169)
+  - Update security policies [#6233](https://github.com/tracim/tracim/issues/6233)
+- Backend/Frontend:
+  - Improve performance by reducing the amount of data downloaded on first load [#6122](https://github.com/tracim/tracim/issues/6122)
+
 ## 4.6.2 / 2023-10-27
 
 ### 🐛 Fixed Issues

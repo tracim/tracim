@@ -39,6 +39,7 @@ export const EmailNotificationTypeButton = props => {
             name={props.formName}
             value='all'
             checked={props.currentEmailNotificationType === EMAIL_NOTIFICATION_TYPE.INDIVIDUAL}
+            onChange={() => {}}
           />
           {props.t('All')}
         </label>
@@ -61,6 +62,7 @@ export const EmailNotificationTypeButton = props => {
             name={props.formName}
             value='daily'
             checked={props.currentEmailNotificationType === EMAIL_NOTIFICATION_TYPE.SUMMARY}
+            onChange={() => {}}
           />
           {props.t('Daily')}
         </label>
@@ -83,6 +85,7 @@ export const EmailNotificationTypeButton = props => {
             name={props.formName}
             value='no'
             checked={props.currentEmailNotificationType === EMAIL_NOTIFICATION_TYPE.NONE}
+            onChange={() => {}}
           />
           {props.t('None')}
         </label>

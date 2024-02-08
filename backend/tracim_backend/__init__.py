@@ -44,6 +44,7 @@ from tracim_backend.lib.utils.authentication import BASIC_AUTH_WEBUI_REALM
 from tracim_backend.lib.utils.authentication import CookieSessionAuthenticationPolicy
 from tracim_backend.lib.utils.authentication import QueryTokenAuthenticationPolicy
 from tracim_backend.lib.utils.authentication import RemoteAuthenticationPolicy
+from tracim_backend.lib.utils.authentication import SAMLSecurityPolicy
 from tracim_backend.lib.utils.authentication import TRACIM_API_KEY_HEADER
 from tracim_backend.lib.utils.authentication import TRACIM_API_USER_LOGIN_HEADER
 from tracim_backend.lib.utils.authentication import TracimBasicAuthAuthenticationPolicy
@@ -131,11 +132,13 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     app_config.configure_filedepot()
     settings["CFG"] = app_config
 
+    configurator = Configurator(settings=settings, autocommit=True)
+    configurator.begin()
+
     # Init plugin manager
     plugin_manager = init_plugin_manager(app_config)
-    settings["plugin_manager"] = plugin_manager
+    configurator.registry.settings["plugin_manager"] = plugin_manager
 
-    configurator = Configurator(settings=settings, autocommit=True)
     # Add beaker session cookie
     tracim_setting_for_beaker_session = sliced_dict(settings, beginning_key_string="session.")
     tracim_setting_for_beaker_session["session.data_dir"] = app_config.SESSION__DATA_DIR
@@ -186,6 +189,10 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     policies.append(
         adapt_auth_policy(TracimBasicAuthAuthenticationPolicy(realm=BASIC_AUTH_WEBUI_REALM))
     )
+
+    if AuthType.SAML in app_config.AUTH_TYPES:
+        policies.append(SAMLSecurityPolicy(app_config, configurator))
+
     # Hack for ldap
     if AuthType.LDAP in app_config.AUTH_TYPES:
         import ldap3
@@ -333,6 +340,8 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     plugin_manager.hook.web_include(configurator=configurator, app_config=app_config)
 
     hapic.add_documentation_view("/api/doc", "Tracim API", "API of Tracim")
+
+    configurator.end()
     return configurator.make_wsgi_app()
 
 

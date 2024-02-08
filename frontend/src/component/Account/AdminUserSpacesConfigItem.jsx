@@ -50,7 +50,7 @@ export const AdminUserSpacesConfigItem = props => {
             currentEmailNotificationType={props.member.emailNotificationType}
             onClickChangeEmailNotificationType={props.onChangeEmailNotificationType}
             flexJustifyContent='flex-start'
-            formName={`notificationType_${props.space.id}`}
+            formName={`admin_notificationType_${props.space.id}`}
             displayLabel={false}
           />
         </td>

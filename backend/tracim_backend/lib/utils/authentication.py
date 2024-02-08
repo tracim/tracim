@@ -1,29 +1,47 @@
 from abc import ABC
 from abc import abstractmethod
 import datetime
+import json
+import logging
+import os
 from pyramid.authentication import BasicAuthAuthenticationPolicy
 from pyramid.authentication import CallbackAuthenticationPolicy
 from pyramid.authentication import SessionAuthenticationHelper
 from pyramid.authentication import SessionAuthenticationPolicy
 from pyramid.authentication import extract_http_basic_credentials
 from pyramid.config import Configurator
+from pyramid.exceptions import Forbidden
+from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPNotFound
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.request import Request
 from pyramid.response import Response
 from pyramid.security import Allowed
-from pyramid.security import Denied
 from pyramid_ldap3 import get_ldap_connector
+import re
+from saml2 import BINDING_HTTP_POST
+from saml2 import BINDING_HTTP_REDIRECT
+from saml2.client import Saml2Client
+from saml2.config import Config as Saml2Config
+from saml2.metadata import create_metadata_string
+from saml2.validate import ResponseLifetimeExceed
+from sqlalchemy.exc import InvalidRequestError
 import time
 import typing
 from zope.interface import implementer
 
 from tracim_backend.config import CFG  # noqa: F401
+from tracim_backend.config import SamLIdPConfig
 from tracim_backend.exceptions import AuthenticationFailed
+from tracim_backend.exceptions import TracimValidationFailed
+from tracim_backend.exceptions import UserAuthenticatedIsNotActive
 from tracim_backend.exceptions import UserDoesNotExist
+from tracim_backend.exceptions import WrongAuthTypeForUser
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models.auth import AuthType
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 
 BASIC_AUTH_WEBUI_REALM = "tracim"
@@ -32,41 +50,171 @@ TRACIM_API_USER_LOGIN_HEADER = "Tracim-Api-Login"
 AUTH_TOKEN_QUERY_PARAMETER = "access_token"
 CLIENT_TOKEN_HEADER = "X-Tracim-ClientToken"
 
+SAML_IDP_DEFAULT_CONFIG = {
+    "default": {
+        "logo_url": "",
+        "displayed_name": "",
+        "attribute_map": {
+            "user_id": "${mail}",
+            "email": "${eduPersonUniqueId}",
+            "username": "${commonName}",
+            "public_name": "${surName} ${givenName}",
+        },
+        "profile_map": {
+            "trusted-users": {"value": "${eduPersonPrimaryAffiliation}", "match": "teacher|member"},
+            "administrators": {"value": "${eduPersonPrimaryAffiliation}", "match": "employee"},
+        },
+    }
+}
+
+
+def format_attribute(pattern: str, attributes: typing.Dict) -> str:
+    # NOTE - M.L - 2023-10-25 - This regex parses the ${xxx} formatted attribute mapping
+    #  it permits to find and replace multiple patterns in a same string
+    #  \$ Matches the '$' character
+    #  {(.*?)} matches this pattern {xxx} and captures and isolate in a group
+    #  anything between the "{}", it matches between zero and unlimited times
+    #  as few times as possible, meaning that if it meets a '}', it will not be matched
+    placeholders = re.findall(r"\${(.*?)}", pattern)
+    formatted_value = pattern
+    for placeholder in placeholders:
+        if placeholder in attributes:
+            formatted_value = formatted_value.replace(
+                f"${{{placeholder}}}", "".join(attributes[placeholder])
+            )
+    return formatted_value
+
 
 class SAMLSecurityPolicy:
     def __init__(self, app_config: CFG, configurator: Configurator) -> None:
         self.app_config = app_config
         self._session_helper = SessionAuthenticationHelper()
         # TODO - SGD - 2023-07-26 - Add views for sso/slo/acs/sls
-        # The routes could also be defined through a controller (see Controller class)
-        # even if it added-value is small.
-        configurator.add_forbidden_view(self._idp_chooser)
+        #  The routes could also be defined through a controller (see Controller class)
+        #  even if it added-value is small.
+
+        # TODO - M.L - 2023-11-03 - Add documentation through swagger
+        #  (currently is in the doc/setting.md file) or upgrade the way swagger generates
+        #  documentation to ease the addition of non conventional routes
+
+        self._load_settings(configurator)
+        _config = configurator.get_settings().get("pyramid_saml")
+        with open(_config.get("saml_path"), "r") as config_file:
+            config_data = json.load(config_file)
+            self.saml_config = Saml2Config()
+            self.saml_config.load(config_data)
+        self._metadata_response = Response(content_type="application/xml")
+        self._metadata_response.text = create_metadata_string(
+            config=self.saml_config, configfile=None
+        ).decode()
+        self.saml_client = Saml2Client(config=self.saml_config)
+
+        for url, data in self.saml_client.config.vorg.items():
+            if data.common_identifier not in app_config.SAML_IDP_LIST:
+                idp_config = config_data["virtual_organization"][url]
+                merged_config = SAML_IDP_DEFAULT_CONFIG["default"].copy()
+                merged_config.update(idp_config)
+                SAML_IDP_DEFAULT_CONFIG[data.common_identifier] = merged_config
+                app_config.SAML_IDP_LIST.append(
+                    SamLIdPConfig(
+                        displayed_name=merged_config.get("displayed_name"),
+                        identifier=data.common_identifier,
+                        logo_url=merged_config.get("logo_url"),
+                    )
+                )
 
         configurator.add_route("acs", "/saml/acs", request_method="POST")
+        configurator.add_route("sso", "/saml/sso", request_method="GET")
+        configurator.add_route("slo_redirect", "/saml/slo/redirect", request_method="GET")
+        configurator.add_route("slo_post", "/saml/slo/post", request_method="POST")
+        configurator.add_route("metadata", "/saml/metadata", request_method="GET")
         configurator.add_view(self._acs, route_name="acs")
+        configurator.add_view(self._sso, route_name="sso")
+        configurator.add_view(self._slo, route_name="slo_redirect")
+        configurator.add_view(self._slo, route_name="slo_post")
+        configurator.add_view(self._metadata, route_name="metadata")
+
+    def _load_settings(self, config: Configurator):
+        """Parse and validate SAML configuration.
+
+        Args:
+            config (pyramid.config.Configurator): The configuration of the
+                existing Pyramid application.
+        """
+
+        if "TRACIM_PYRAMID_SAML_PATH" in os.environ:
+            if "pyramid_saml" not in config.get_settings():
+                config.get_settings().update({"pyramid_saml": {}})
+            config.get_settings().get("pyramid_saml").update(
+                {"saml_path": os.environ.get("TRACIM_PYRAMID_SAML_PATH")}
+            )
+
+        if "pyramid_saml" not in config.get_settings():
+            msg = "Missing 'pyramid_saml' configuration in settings"
+            raise AssertionError(msg)
+        else:
+            settings = config.get_settings().get("pyramid_saml")
+
+        if "saml_path" not in settings:
+            msg = "Missing 'saml_path' in settings"
+            raise AssertionError(msg)
 
     def authenticated_userid(
         self, request: TracimRequest
     ) -> typing.Optional[typing.Union[str, int]]:
-        # FIXME - SGD - 2023-07-26 - Return Tracim user id when SAML data is present in the session.
-        # By matching it with SAML ID attribute (in external_id, see https://github.com/tracim/tracim/issues/6209)
         saml_user_id = request.session.get("saml_user_id")
         if saml_user_id is None:
             return None
+        saml_expiry = request.session.get("saml_expiry")
+        if saml_expiry is None or saml_expiry <= int(time.time()):
+            return None
+
         user_api = UserApi(None, request.dbsession, self.app_config)
         try:
-            user = user_api.get_one_by_login(saml_user_id)
-        except UserDoesNotExist:
-            user = user_api.create_minimal_user(
-                username=saml_user_id, email=f"{saml_user_id}@saml.test", save_now=True
-            )
-        self.remember(request, user.user_id)
-        request.set_user(user)
-        return user.user_id
+            # TODO - BS - 2023-11-10 - Remove this noautoflush when
+            #  UserApi.update moved in SAMLSecurityPolicy._acs
+            #  The saml_authenticate method (through SAMLSecurityPolicy.authenticated_userid)
+            #  is called every times Request.authenticated_userid property is called.
+            #  So, this updated can be (and is) called when original code
+            #  already flushed the session. And result "session already flushed" error. See #6266
+            with request.dbsession.no_autoflush:
+                user = user_api.saml_authenticate(
+                    user=None,
+                    external_id=saml_user_id,
+                    username=request.session.get("saml_username"),
+                    public_name=request.session.get("saml_public_name"),
+                    mail=request.session.get("saml_email"),
+                    profile=request.session.get("saml_user_profile"),
+                )
+
+            self.remember(request, user.user_id)
+            request.set_user(user)
+            return user.user_id
+        except (
+            UserDoesNotExist,
+            WrongAuthTypeForUser,
+            UserAuthenticatedIsNotActive,
+            TracimValidationFailed,
+        ) as e:
+            logging.getLogger().warning(f"An error occurred during saml auth: {e}")
+        except InvalidRequestError as e:
+            # TODO - BS - 2023-11-10 - Remove this except when UserApi.update moved in
+            #  SAMLSecurityPolicy._acs The saml_authenticate method (through
+            #  SAMLSecurityPolicy.authenticated_userid) is called every times
+            #  Request.authenticated_userid property is called. So, this updated can be (and is)
+            #  called when original code already flushed the session. And result "session already
+            #  flushed" error. See #6266
+            logging.getLogger().warning(f"An error occurred during saml auth: {e}")
+        except Exception as e:
+            logging.getLogger().error("An error occurred: ", exc_info=e)
+
+        self.forget(request)
 
     def permits(self, request, context, permission):
-        if request.authenticated_userid is None and not request.path.startswith("/saml"):
-            return Denied("Nobody is allowed")
+        saml_expiry = request.session.get("saml_expiry")
+        if saml_expiry is not None and saml_expiry <= int(time.time()):
+            self.forget(request, context=context)
+            return Forbidden("Session Expired")
         return Allowed("Allowed")
 
     def remember(
@@ -76,29 +224,120 @@ class SAMLSecurityPolicy:
         return []
 
     def forget(self, request: TracimRequest, **kw: typing.Any) -> typing.Iterable[str]:
-        del request.session["saml_user_id"]
+        if "saml_user_id" in request.session:
+            try:
+                del request.session["saml_user_id"]
+                del request.session["saml_username"]
+                del request.session["saml_email"]
+                del request.session["saml_public_name"]
+                del request.session["saml_user_profile"]
+                del request.session["saml_expiry"]
+            except KeyError:
+                pass
         self._session_helper.forget(request, **kw)
         return []
 
-    def _idp_chooser(self, request: TracimRequest) -> Response:
-        # TODO - SGD - 2023-07-26 - This view should render an HTML form
-        # with the list of configured IdPs.
-        # The form should redirect to the chosen IdPs SSO endpoint when submitted.
-        # Maybe some JS will be needed here?
-        return Response(
-            f"""
-          <form action="{self.app_config.WEBSITE__BASE_URL}/saml/acs" method="POST">
-            <input name="saml_user_id" type="hidden" value="saml-user"/>
-            <input name="redirect_url" type="hidden" value="{request.path_url}" />
-            <button>Login</button>
-          </form>"""
+    # NOTE - M.L - 2023-10-25 - ACS (Assertion Consumer Service) is where the response
+    #  sent by the SAML IdP is processed and consumed
+    def _acs(self, request: TracimRequest) -> Response:
+        if "RelayState" not in request.POST or "SAMLResponse" not in request.POST:
+            return HTTPBadRequest()
+        response = request.POST["SAMLResponse"]
+        try:
+            authn_response = self.saml_client.parse_authn_request_response(
+                response,
+                binding=BINDING_HTTP_POST,
+            )
+        except ResponseLifetimeExceed as e:
+            return Response(e.__str__())
+        if authn_response.not_on_or_after <= int(time.time()):
+            return HTTPBadRequest()
+        identity = authn_response.get_identity()
+        if identity is None:
+            return HTTPBadRequest()
+        # NOTE - M.L - 2023-10-25 - RelayState is information conveyed through the auth process,
+        #  this is here to keep info about at which idp the user authenticated
+        idp_name = request.POST.get("RelayState")
+
+        formatted_attributes = {}
+        for key, value in SAML_IDP_DEFAULT_CONFIG[idp_name]["attribute_map"].items():
+            formatted_attributes[key] = format_attribute(value, identity)
+
+        user_id = formatted_attributes["user_id"]
+
+        user_profile = None
+        for key, profile_mapping in SAML_IDP_DEFAULT_CONFIG[idp_name]["profile_map"].items():
+            profile_mapping_value = format_attribute(profile_mapping["value"], identity)
+            profile_mapping_match = profile_mapping["match"]
+            logging.getLogger().debug(
+                f"User profile level test for '{user_id}': "
+                f"test if given value '{profile_mapping_value}' == '{profile_mapping_match}'"
+            )
+            if re.match(profile_mapping_match, profile_mapping_value) is not None:
+                user_profile = Profile.get_profile_from_slug(key)
+                break
+
+        if user_profile is None:
+            logging.getLogger().warning(f"User profile level not found for '{user_id}'")
+            return HTTPFound("/")
+        logging.getLogger().debug(f"User profile level found for '{user_id}': '{user_profile}'")
+
+        if "user_id" not in formatted_attributes:
+            return HTTPBadRequest()
+
+        request.session["saml_user_id"] = user_id
+        if "username" in formatted_attributes:
+            request.session["saml_username"] = formatted_attributes["username"]
+        if "email" in formatted_attributes:
+            request.session["saml_email"] = formatted_attributes["email"]
+        if "public_name" in formatted_attributes:
+            request.session["saml_public_name"] = formatted_attributes["public_name"]
+        request.session["saml_user_profile"] = user_profile
+        request.session["saml_expiry"] = authn_response.not_on_or_after
+        return HTTPFound("/")
+
+    def _sso(self, request: TracimRequest) -> Response:
+        if "target" not in request.params:
+            return HTTPBadRequest("Missing target parameter")
+
+        target = None
+        target_identifier = None
+        for entity_id, data in self.saml_client.config.vorg.items():
+            if request.params["target"] == data.common_identifier:
+                target_identifier = data.common_identifier
+                target = entity_id
+
+        if target is None:
+            return HTTPNotFound("This IdP doesn't exist")
+        # NOTE - M.L - 2023-10-25 - RelayState is information conveyed through the auth process,
+        #  this is here to keep info about at which idp the user authenticated
+        req_id, info = self.saml_client.prepare_for_authenticate(
+            relay_state=target_identifier,
+            entityid=self.saml_config.metadata.metadata[target].entity_descr.entity_id,
         )
 
-    def _acs(self, request: TracimRequest) -> Response:
-        saml_user_id = request.params.get("saml_user_id")
-        if saml_user_id is not None:
-            request.session["saml_user_id"] = saml_user_id
-        return HTTPFound(request.params["redirect_url"])
+        redirect_url = None
+        for key, value in info["headers"]:
+            if key == "Location":
+                redirect_url = value
+        return HTTPFound(redirect_url)
+
+    def _slo(self, request: TracimRequest) -> Response:
+        http_args = request.GET if request.method == "GET" else request.POST
+        saml_request = http_args.get("SAMLRequest", None)
+
+        if not saml_request:
+            return HTTPBadRequest("Missing SAMLRequest parameter")
+
+        result = self.saml_client.parse_logout_request(saml_request, BINDING_HTTP_REDIRECT)
+        if not result:
+            return HTTPBadRequest("Invalid SLO request")
+
+        self.forget(request, from_slo=True)
+        return HTTPFound("/")
+
+    def _metadata(self, request: TracimRequest) -> Response:
+        return self._metadata_response
 
 
 class TracimAuthenticationPolicy(ABC):

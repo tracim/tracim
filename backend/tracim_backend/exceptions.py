@@ -218,6 +218,10 @@ class InsufficientUserProfile(TracimException):
     error_code = ErrorCode.INSUFFICIENT_USER_PROFILE
 
 
+class ReadOnlyFieldException(TracimException):
+    error_code = ErrorCode.CANT_EDIT_READONLY_FIELD
+
+
 class InvalidWorkspaceAccessType(TracimException):
     error_code = ErrorCode.INVALID_WORKSPACE_ACCESS_TYPE
 

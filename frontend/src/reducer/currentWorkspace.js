@@ -9,13 +9,15 @@ import {
   WORKSPACE_READ_STATUS_LIST,
   WORKSPACE_MEMBER,
   UPDATE,
-  USER,
   USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
   FOLDER_READ,
   WORKSPACE_AGENDA_URL,
   WORKSPACE_CONTENT,
   RESTORE,
-  WORKSPACE_LOADED
+  WORKSPACE_LOADED,
+  REMOVE_WORKSPACE_MEMBER,
+  UPDATE_USER,
+  ADD_WORKSPACE_MEMBER
 } from '../action-creator.sync.js'
 import { serializeContentProps } from './workspaceContentList.js'
 import { EMAIL_NOTIFICATION_TYPE } from '../util/helper.js'
@@ -42,15 +44,15 @@ const defaultWorkspace = {
 export const serializeWorkspace = ws => {
   return {
     accessType: ws.access_type,
-    defaultRole: ws.default_user_role,
-    id: ws.workspace_id,
-    slug: ws.slug,
-    label: ws.label,
-    description: ws.description,
     agendaEnabled: ws.agenda_enabled,
+    defaultRole: ws.default_user_role,
+    description: ws.description,
     downloadEnabled: ws.public_download_enabled,
-    uploadEnabled: ws.public_upload_enabled,
-    publicationEnabled: ws.publication_enabled
+    id: ws.workspace_id,
+    label: ws.label,
+    publicationEnabled: ws.publication_enabled,
+    slug: ws.slug,
+    uploadEnabled: ws.public_upload_enabled
   }
 }
 
@@ -101,7 +103,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         memberList: action.workspaceMemberList.map(m => serializeMember(m))
       }
 
-    case `${ADD}/${WORKSPACE_MEMBER}`:
+    case ADD_WORKSPACE_MEMBER:
       if (state.id !== action.workspaceId) return state
       return {
         ...state,
@@ -121,7 +123,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         )
       }
 
-    case `${REMOVE}/${WORKSPACE_MEMBER}`:
+    case REMOVE_WORKSPACE_MEMBER:
       if (state.id !== action.workspaceId) return state
       return {
         ...state,
@@ -222,7 +224,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
     case `${SET}/${WORKSPACE_LOADED}`:
       return { ...state, workspaceLoaded: true }
 
-    case `${UPDATE}/${USER}`:
+    case UPDATE_USER:
       if (!state.memberList.some(member => member.id === action.newUser.user_id)) return state
 
       return {

@@ -191,6 +191,13 @@ function install_font {
     $SUDO fc-cache -f
 }
 
+function generate_dev_cert {
+    log "Generating dev certificate for SAML"
+    pushd backend
+    openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout sp.key -out sp.crt -subj "/C=US/ST=State/L=City/O=Organization/CN=example.com"
+    popd
+}
+
 ############################################
 
 # Check if running as root
@@ -216,3 +223,4 @@ setup_config_file
 create_require_dirs
 setup_db
 translate_email
+generate_dev_cert

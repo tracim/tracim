@@ -1,0 +1,7 @@
+FROM unicon/shibboleth-idp
+
+ADD shibboleth-idp/ /opt/shibboleth-idp/
+
+ENV JETTY_BROWSER_SSL_KEYSTORE_PASSWORD=test
+ENV JETTY_BACKCHANNEL_SSL_KEYSTORE_PASSWORD=test
+ENV JETTY_MAX_HEAP=2048m
