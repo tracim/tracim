@@ -2076,6 +2076,10 @@ class ContentModifyAbstractSchema(marshmallow.Schema):
         required=False,
         description="Content of the object, may be raw text or <b>html</b> for example",
     )
+    content_namespace = StrippedString(
+        required=False,
+        description="Content_namespace of the object, raw text",
+    )
 
 
 class ContentModifySchema(ContentModifyAbstractSchema):

@@ -1751,12 +1751,14 @@ class ContentApi(object):
                 "and a valid filename".format(item.content_id, content_type_slug)
             )
 
+        if new_content_namespace != item.content_namespace :
+            self.set_content_namespace(item.id,new_content_namespace)
+
         if self._user:
             item.owner = self._user
         item.label = new_label
         item.raw_content = new_raw_content
         item.description = new_description
-        item.content_namespace = new_content_namespace
         item.revision_type = ActionDescription.EDITION
         return item
 

@@ -802,10 +802,12 @@ class ContentUpdate(object):
         label: Optional[str] = None,
         raw_content: Optional[str] = None,
         description: Optional[str] = None,
+        content_namespace: Optional[str] = None,
     ) -> None:
         self.label = label
         self.raw_content = raw_content
         self.description = description
+        self.content_namespace = content_namespace
 
 
 class BasePaginatedQuery(object):
