@@ -137,7 +137,7 @@ class ThreadController(Controller):
                 new_label=hapic_data.body.label,
                 new_raw_content=hapic_data.body.raw_content,
                 new_description=hapic_data.body.description,
-                new_content_namespace=hapic_data.body.content_namespace
+                new_content_namespace=hapic_data.body.content_namespace,
             )
             api.save(content)
         return api.get_content_in_context(content)
