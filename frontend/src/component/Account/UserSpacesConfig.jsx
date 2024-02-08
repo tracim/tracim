@@ -26,7 +26,7 @@ import {
 } from 'tracim_frontend_lib'
 import { serializeUserConfig, serializeUserWorkspaceConfig, serializeWorkspaceListProps } from '../../reducer/workspaceList.js'
 import { newFlashMessage } from '../../action-creator.sync.js'
-import { deleteWorkspaceMember, getUserWorkspaceConfigList } from '../../action-creator.async.js'
+import { deleteUserRole, getUserWorkspaceConfigList } from '../../action-creator.async.js'
 import AdminUserSpacesConfig from '../../container/AdminUserSpacesConfig.jsx'
 import UserSpacesConfigLine from './UserSpacesConfigLine.jsx'
 
@@ -182,7 +182,7 @@ export const UserSpacesConfig = (props) => {
 
     setSpaceBeingDeleted(null)
 
-    const fetchResult = await props.dispatch(deleteWorkspaceMember(spaceId, props.userToEditId))
+    const fetchResult = await props.dispatch(deleteUserRole(spaceId, props.userToEditId))
     if (fetchResult.status !== 204) {
       props.dispatch(newFlashMessage(props.t('Error while leaving the space'), 'warning'))
     }

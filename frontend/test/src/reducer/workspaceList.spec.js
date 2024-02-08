@@ -12,13 +12,14 @@ import {
   setUserWorkspaceConfigList,
   UPDATE,
   updateWorkspaceDetail,
-  updateWorkspaceMember,
+  updateUserRole,
   UPDATE_USER_WORKSPACE_CONFIG_LIST,
   addUserWorkspaceConfigList,
   updateUserWorkspaceConfigList,
   WORKSPACE_DETAIL,
   WORKSPACE_LIST,
   USER_ROLE,
+  UPDATE_USER_ROLE,
   USER_WORKSPACE_CONFIG_LIST
 } from '../../../src/action-creator.sync'
 import { ROLE, serialize } from 'tracim_frontend_lib'
@@ -27,7 +28,7 @@ import { serializeSidebarEntryProps } from '../../../src/reducer/currentWorkspac
 import { globalManagerFromApi } from '../../fixture/user/globalManagerFromApi'
 import { globalManagerSetting, globalManagerSettingReader } from '../../fixture/user/globalManagerSetting.js'
 import { globalManagerAsMemberFromApi } from '../../fixture/user/globalManagerAsMember'
-import { globalManagerWorkspaceFromApi } from '../../fixture/workspace/globalManagerWorkspce.js'
+import { globalManagerWorkspaceConfigFromApi } from '../../fixture/workspace/globalManagerWorkspaceConfig.js'
 
 describe('workspaceList reducer', () => {
   describe('actions', () => {
@@ -53,7 +54,7 @@ describe('workspaceList reducer', () => {
     })
 
     describe(`${SET}/${USER_WORKSPACE_CONFIG_LIST}`, () => {
-      const rez = workspaceList(initialState, setUserWorkspaceConfigList([globalManagerWorkspaceFromApi]))
+      const rez = workspaceList(initialState, setUserWorkspaceConfigList([globalManagerWorkspaceConfigFromApi]))
 
       it('should return a workspace list with the new list', () => {
         expect(rez).to.deep.equal([
@@ -62,8 +63,7 @@ describe('workspaceList reducer', () => {
             sidebarEntryList: firstWorkspaceFromApi.sidebar_entries.map(
               sbe => serialize(sbe, serializeSidebarEntryProps)
             ),
-            memberList: [serializeUserConfig(globalManagerAsMemberFromApi)
-            ]
+            memberList: [serializeUserConfig(globalManagerAsMemberFromApi)]
           }
         ])
       })
@@ -185,7 +185,7 @@ describe('workspaceList reducer', () => {
       })
     })
 
-    describe(`${UPDATE}/${USER_ROLE}`, () => {
+    describe(UPDATE_USER_ROLE, () => {
       const rez = workspaceList(
         [
           ...initialState,
@@ -193,7 +193,7 @@ describe('workspaceList reducer', () => {
             ...serializedFirstWorkspaceFromApi
           }
         ],
-        updateWorkspaceMember(globalManagerFromApi, firstWorkspaceFromApi.workspace_id, { user: globalManagerFromApi, email_notification_type: 'none', role: ROLE.contributor })
+        updateUserRole(globalManagerFromApi, firstWorkspaceFromApi.workspace_id, { user: globalManagerFromApi, email_notification_type: 'none', role: ROLE.contributor })
       )
 
       it('should return a workspace list with the member correctly updated in the right workspace', () => {

@@ -4,10 +4,10 @@ import {
   ADD,
   REMOVE,
   WORKSPACE_DETAIL,
-  USER_ROLE_LIST,
+  SET_USER_ROLE_LIST,
   WORKSPACE_READ_STATUS,
   WORKSPACE_READ_STATUS_LIST,
-  USER_ROLE,
+  UPDATE_USER_ROLE,
   UPDATE,
   FOLDER_READ,
   WORKSPACE_AGENDA_URL,
@@ -62,7 +62,7 @@ export const serializeSidebarEntryProps = {
   label: 'label'
 }
 
-export const serializeRole = m => {
+export const serializeUserRole = m => {
   return {
     id: m.user.user_id,
     publicName: m.user.public_name,
@@ -94,10 +94,11 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         sidebarEntryList: action.workspaceDetail.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps))
       }
 
-    case `${SET}/${USER_ROLE_LIST}`:
+    // INFO - FS - 2024-02-08 - USER ROLE is an object made with a user and his role in a workspace
+    case SET_USER_ROLE_LIST:
       return {
         ...state,
-        memberList: action.workspaceMemberList.map(m => serializeRole(m))
+        memberList: action.userRoleList.map(m => serializeUserRole(m))
       }
 
     case ADD_USER_ROLE:
@@ -106,16 +107,16 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         ...state,
         memberList: uniqBy([
           ...state.memberList,
-          serializeRole(action.newMember)
+          serializeUserRole(action.newMember)
         ], 'id')
       }
 
-    case `${UPDATE}/${USER_ROLE}`:
+    case UPDATE_USER_ROLE:
       if (state.id !== action.workspaceId) return state
       return {
         ...state,
         memberList: state.memberList.map(m => m.id === action.member.user.user_id
-          ? { ...m, ...serializeRole(action.member) }
+          ? { ...m, ...serializeUserRole(action.member) }
           : m
         )
       }
@@ -216,7 +217,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
       return {
         ...state,
         memberList: state.memberList.map(member => member.id === action.newUser.user_id
-          ? serializeRole({ ...member, user: action.newUser })
+          ? serializeUserRole({ ...member, user: action.newUser })
           : member
         )
       }

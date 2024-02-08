@@ -30,25 +30,25 @@ export const serializeWorkspaceListProps = {
   members: 'memberList'
 }
 
-export const serializeUserConfig = m => {
+export const serializeUserConfig = userConfig => {
   return {
-    id: m.user.user_id,
-    publicName: m.user.public_name,
-    username: m.user.username,
-    role: m.role,
-    emailNotificationType: m.email_notification_type || EMAIL_NOTIFICATION_TYPE.NONE,
-    hasAvatar: m.user.has_avatar || true,
-    hasCover: m.user.has_cover || false
+    id: userConfig.user.user_id,
+    publicName: userConfig.user.public_name,
+    username: userConfig.user.username,
+    role: userConfig.role,
+    emailNotificationType: userConfig.email_notification_type || EMAIL_NOTIFICATION_TYPE.NONE,
+    hasAvatar: userConfig.user.has_avatar || true,
+    hasCover: userConfig.user.has_cover || false
   }
 }
 
-export const serializeUserWorkspaceConfig = config => {
+export const serializeUserWorkspaceConfig = userWorkspaceConfig => {
   return {
-    ...serialize(config.workspace, serializeWorkspaceListProps),
-    sidebarEntryList: config.workspace.sidebar_entries.map(
+    ...serialize(userWorkspaceConfig.workspace, serializeWorkspaceListProps),
+    sidebarEntryList: userWorkspaceConfig.workspace.sidebar_entries.map(
       sbe => serialize(sbe, serializeSidebarEntryProps)
     ),
-    memberList: [config].map(serializeUserConfig)
+    memberList: [userWorkspaceConfig].map(serializeUserConfig)
   }
 }
 function addWorkspaceSetting (setting, user, workspace, workspaceList) {
@@ -68,7 +68,6 @@ function addWorkspaceSetting (setting, user, workspace, workspaceList) {
 
 export function workspaceList (state = [], action, lang) {
   switch (action.type) {
-    // FIXME - F.S. - 2023-11-27 - change test of `${SET}/${WORKSPACE_LIST}` to test `${SET}/${USER_WORKSPACE_CONFIG_LIST}`
     case `${SET}/${USER_WORKSPACE_CONFIG_LIST}`:
       return action.workspaceList.map(serializeUserWorkspaceConfig)
 

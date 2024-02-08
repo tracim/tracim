@@ -50,9 +50,9 @@ import {
   WORKSPACE_CONTENT_SHARE_FOLDER,
   WORKSPACE_DETAIL,
   WORKSPACE_LIST,
-  USER_ROLE_ADD,
-  USER_ROLE_REMOVE,
-  USER_ROLE_UPDATE,
+  ADD_USER_ROLE,
+  REMOVE_USER_ROLE,
+  UPDATE_USER_ROLE,
   WORKSPACE_PUBLICATION_LIST,
   WORKSPACE_READ_STATUS,
   ACCESSIBLE_WORKSPACE_LIST,
@@ -652,7 +652,7 @@ export const getMyselfWorkspaceReadStatusList = workspaceId => dispatch => {
   })
 }
 
-export const postWorkspaceMember = (workspaceId, newMember) => dispatch => {
+export const postUserRole = (workspaceId, newMember) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/members`,
     param: {
@@ -668,12 +668,12 @@ export const postWorkspaceMember = (workspaceId, newMember) => dispatch => {
         role: newMember.role
       })
     },
-    actionName: USER_ROLE_ADD,
+    actionName: ADD_USER_ROLE,
     dispatch
   })
 }
 
-export const deleteWorkspaceMember = (workspaceId, memberId) => dispatch => {
+export const deleteUserRole = (workspaceId, memberId) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/members/${memberId}`,
     param: {
@@ -681,12 +681,12 @@ export const deleteWorkspaceMember = (workspaceId, memberId) => dispatch => {
       headers: { ...FETCH_CONFIG.headers },
       method: 'DELETE'
     },
-    actionName: USER_ROLE_REMOVE,
+    actionName: REMOVE_USER_ROLE,
     dispatch
   })
 }
 
-export const updateWorkspaceMember = (workspaceId, memberId, newRole) => dispatch => {
+export const updateUserRole = (workspaceId, memberId, newRole) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/members/${memberId}`,
     param: {
@@ -697,7 +697,7 @@ export const updateWorkspaceMember = (workspaceId, memberId, newRole) => dispatc
         role: newRole
       })
     },
-    actionName: USER_ROLE_UPDATE,
+    actionName: UPDATE_USER_ROLE,
     dispatch
   })
 }

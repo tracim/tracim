@@ -20,10 +20,10 @@ import {
 import { serializeUserConfig, serializeUserWorkspaceConfig, serializeWorkspaceListProps } from '../reducer/workspaceList.js'
 import { newFlashMessage } from '../action-creator.sync.js'
 import {
-  deleteWorkspaceMember,
+  deleteUserRole,
   getWorkspaceList,
-  postWorkspaceMember,
-  updateWorkspaceMember,
+  postUserRole,
+  updateUserRole,
   getUserWorkspaceConfigList
 } from '../action-creator.async.js'
 import AdminUserSpacesConfigItem from '../component/Account/AdminUserSpacesConfigItem.jsx'
@@ -181,7 +181,7 @@ export const AdminUserSpacesConfig = (props) => {
     if (!space.id) return
 
     try {
-      const fetchResult = await props.dispatch(deleteWorkspaceMember(space.id, props.userToEditId))
+      const fetchResult = await props.dispatch(deleteUserRole(space.id, props.userToEditId))
       if (fetchResult.status !== 204) {
         props.dispatch(newFlashMessage(props.t('Error while leaving the space'), 'warning'))
       }
@@ -193,7 +193,7 @@ export const AdminUserSpacesConfig = (props) => {
 
   const handleAddToSpace = async (space) => {
     const fetchPutUserSpaceSubscription = await props.dispatch(
-      postWorkspaceMember(space.id, {
+      postUserRole(space.id, {
         id: props.userToEditId,
         email: props.userEmail,
         username: props.userUsername,
@@ -208,7 +208,7 @@ export const AdminUserSpacesConfig = (props) => {
 
   const handleClickChangeRole = async (space, role) => {
     const fetchUpdateSpaceMember = await props.dispatch(
-      updateWorkspaceMember(space.id, props.userToEditId, role.slug)
+      updateUserRole(space.id, props.userToEditId, role.slug)
     )
     if (fetchUpdateSpaceMember.status !== 200) {
       props.dispatch(newFlashMessage(

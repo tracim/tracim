@@ -116,13 +116,8 @@ export const setWorkspaceLoaded = () => ({ type: `${SET}/${WORKSPACE_LOADED}` })
 const ROLE = 'Role'
 export const USER_ROLE = `${USER}/${ROLE}`
 export const USER_ROLE_LIST = `${USER_ROLE}/List`
-export const setWorkspaceMemberList = workspaceMemberList => ({ type: `${SET}/${USER_ROLE_LIST}`, workspaceMemberList })
-// INFO - CH - 2023-11-22 - USER_ROLE_ADD is used by api function postWorkspaceMember()
-// but nothing is bound to it
-export const USER_ROLE_ADD = `${USER_ROLE}/${ADD}`
-// INFO - CH - 2023-11-22 - USER_ROLE_ADD is used by api function deleteWorkspaceMember()
-// but nothing is bound to it
-export const USER_ROLE_REMOVE = `${USER_ROLE}/${REMOVE}`
+export const SET_USER_ROLE_LIST = `${SET}/${USER_ROLE_LIST}`
+export const setUserRoleList = userRoleList => ({ type: SET_USER_ROLE_LIST, userRoleList })
 export const USER_ROLE_UPDATE = `${USER_ROLE}/${UPDATE}`
 export const ADD_USER_ROLE = `${ADD}/${USER_ROLE}`
 export const addWorkspaceMember = (user, workspaceId, member) => ({
@@ -130,8 +125,9 @@ export const addWorkspaceMember = (user, workspaceId, member) => ({
   newMember: { user: user, ...member },
   workspaceId
 })
-export const updateWorkspaceMember = (user, workspaceId, member) => ({
-  type: `${UPDATE}/${USER_ROLE}`,
+export const UPDATE_USER_ROLE = `${UPDATE}/${USER_ROLE}`
+export const updateUserRole = (user, workspaceId, member) => ({
+  type: UPDATE_USER_ROLE,
   member: { user: user, ...member },
   workspaceId
 })

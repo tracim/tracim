@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import currentWorkspace, {
-  serializeRole,
+  serializeUserRole,
   serializeSidebarEntryProps,
   serializeWorkspace
 } from '../../../src/reducer/currentWorkspace.js'
@@ -17,19 +17,19 @@ import {
   setWorkspaceAgendaUrl,
   setWorkspaceContentRead,
   setWorkspaceDetail,
-  setWorkspaceMemberList,
+  setUserRoleList,
   setWorkspaceReadStatusList,
   UPDATE,
   updateUser,
   updateWorkspaceContentList,
   updateWorkspaceDetail,
-  updateWorkspaceMember,
+  updateUserRole,
   addWorkspaceReadStatus,
   WORKSPACE_AGENDA_URL,
   WORKSPACE_CONTENT,
   WORKSPACE_DETAIL,
   USER_ROLE,
-  USER_ROLE_LIST,
+  SET_USER_ROLE_LIST,
   WORKSPACE_READ_STATUS,
   WORKSPACE_READ_STATUS_LIST,
   WORKSPACE_CONTENT_SHARE_FOLDER,
@@ -63,8 +63,8 @@ describe('reducer currentWorkspace.js', () => {
       })
     })
 
-    describe('serializeRole()', () => {
-      const rez = serializeRole(globalManagerAsMemberFromApi)
+    describe('serializeUserRole()', () => {
+      const rez = serializeUserRole(globalManagerAsMemberFromApi)
       it('should return an object (in camelCase)', () => {
         expect(rez).to.deep.equal({
           id: globalManagerAsMemberFromApi.user.user_id,
@@ -117,13 +117,13 @@ describe('reducer currentWorkspace.js', () => {
       })
     })
 
-    describe(`${SET}/${USER_ROLE_LIST}`, () => {
-      const rez = currentWorkspace(initialState, setWorkspaceMemberList([globalManagerAsMemberFromApi]))
+    describe(SET_USER_ROLE_LIST, () => {
+      const rez = currentWorkspace(initialState, setUserRoleList([globalManagerAsMemberFromApi]))
 
       it('should return a workspace object with a proper members list', () => {
         expect(rez).to.deep.equal({
           ...initialState,
-          memberList: [serializeRole(globalManagerAsMemberFromApi)]
+          memberList: [serializeUserRole(globalManagerAsMemberFromApi)]
         })
       })
     })
@@ -151,7 +151,7 @@ describe('reducer currentWorkspace.js', () => {
           ...initialState,
           memberList: [
             randomMember,
-            serializeRole(globalManagerAsMemberFromApi)
+            serializeUserRole(globalManagerAsMemberFromApi)
           ]
         })
       })
@@ -174,7 +174,7 @@ describe('reducer currentWorkspace.js', () => {
       const initialStateWithMember = { ...initialState, memberList: [globalManagerAsMember] }
       const rez = currentWorkspace(
         initialStateWithMember,
-        updateWorkspaceMember(
+        updateUserRole(
           globalManagerFromApi, initialState.id, {
             role: ROLE.contributor.slug, email_notification_type: 'summary'
           }
@@ -449,7 +449,7 @@ describe('reducer currentWorkspace.js', () => {
       const newInitialState = {
         ...initialState,
         memberList: [{
-          ...serializeRole(globalManagerAsMemberFromApi)
+          ...serializeUserRole(globalManagerAsMemberFromApi)
         }]
       }
       const rez = currentWorkspace(newInitialState, updateUser({ ...globalManagerFromApi, username: 'newUsername' }))

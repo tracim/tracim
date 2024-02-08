@@ -1,7 +1,7 @@
 import { globalManagerFromApi } from '../user/globalManagerFromApi.js'
 import { firstWorkspaceFromApi } from './firstWorkspace.js'
 
-export const globalManagerWorkspaceFromApi = {
+export const globalManagerWorkspaceConfigFromApi = {
   email_notification_type: 'summary',
   role: 'workspace-manager',
   user_id: globalManagerFromApi.user_id,
