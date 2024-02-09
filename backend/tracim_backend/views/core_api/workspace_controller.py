@@ -275,7 +275,7 @@ class WorkspaceController(Controller):
         wapi.undelete(request.current_workspace, flush=True)
         return
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS], deprecated=True)
     @check_right(can_see_workspace_information)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_query(WorkspaceMemberFilterQuerySchema())
@@ -284,6 +284,7 @@ class WorkspaceController(Controller):
         self, context, request: TracimRequest, hapic_data=None
     ) -> typing.List[UserConfigWorkspaceInContext]:
         """
+        DEPRECATED. Prefer using GET "/workspaces/{workspace_id}/role" instead
         Returns the list of space members with their role, avatar, etc.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
