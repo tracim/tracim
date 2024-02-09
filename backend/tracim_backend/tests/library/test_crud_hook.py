@@ -70,21 +70,21 @@ class UserRoleInWorkspaceHookImpl:
 
     @hookimpl
     def on_user_config_in_workspace_created(
-        self, config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
     ) -> None:
-        self.mock_hooks("created", config=config, context=context)
+        self.mock_hooks("created", user_workspace_config=user_workspace_config, context=context)
 
     @hookimpl
     def on_user_config_in_workspace_modified(
-        self, config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
     ) -> None:
-        self.mock_hooks("modified", config=config, context=context)
+        self.mock_hooks("modified", user_workspace_config=user_workspace_config, context=context)
 
     @hookimpl
     def on_user_config_in_workspace_deleted(
-        self, config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
     ) -> None:
-        self.mock_hooks("deleted", config=config, context=context)
+        self.mock_hooks("deleted", user_workspace_config=user_workspace_config, context=context)
 
 
 @pytest.mark.usefixtures("base_fixture")

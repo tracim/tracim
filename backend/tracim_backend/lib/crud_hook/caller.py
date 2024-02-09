@@ -33,7 +33,7 @@ class DatabaseCrudHookCaller:
     ) -> None:
         assert session.context, "session must have a context"
         assert session.context.dbsession
-        configs = []
+        user_workspace_configs = []
         for obj in session.new:
             if isinstance(obj, User):
                 self._plugin_manager.hook.on_user_created(user=obj, context=session.context)
@@ -43,9 +43,9 @@ class DatabaseCrudHookCaller:
                 )
             elif isinstance(obj, UserConfigInWorkspace):
                 self._plugin_manager.hook.on_user_config_in_workspace_created(
-                    config=obj, context=session.context
+                    user_workspace_config=obj, context=session.context
                 )
-                configs.append(obj)
+                user_workspace_configs.append(obj)
             elif isinstance(obj, Content):
                 self._plugin_manager.hook.on_content_created(content=obj, context=session.context)
             elif isinstance(obj, WorkspaceSubscription):
@@ -64,9 +64,9 @@ class DatabaseCrudHookCaller:
                 self._plugin_manager.hook.on_user_call_created(
                     user_call=obj, context=session.context
                 )
-        if configs:
+        if user_workspace_configs:
             self._plugin_manager.hook.on_user_config_in_workspaces_created(
-                configs=configs, context=session.context
+                user_workspace_configs=user_workspace_configs, context=session.context
             )
 
         for obj in session.dirty:
@@ -85,7 +85,7 @@ class DatabaseCrudHookCaller:
                 )
             elif isinstance(obj, UserConfigInWorkspace):
                 self._plugin_manager.hook.on_user_config_in_workspace_modified(
-                    config=obj, context=session.context
+                    user_workspace_config=obj, context=session.context
                 )
             elif isinstance(obj, Content):
                 self._plugin_manager.hook.on_content_modified(content=obj, context=session.context)
@@ -117,7 +117,7 @@ class DatabaseCrudHookCaller:
                 )
             elif isinstance(obj, UserConfigInWorkspace):
                 self._plugin_manager.hook.on_user_config_in_workspace_deleted(
-                    config=obj, context=session.context
+                    user_workspace_config=obj, context=session.context
                 )
             elif isinstance(obj, Content):
                 self._plugin_manager.hook.on_content_deleted(content=obj, context=session.context)

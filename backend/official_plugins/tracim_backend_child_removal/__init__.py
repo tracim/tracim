@@ -17,13 +17,13 @@ class ChildRemovalPlugin:
 
     @hookimpl
     def on_user_config_in_workspace_deleted(
-        self, config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
     ) -> None:
         """
         Remove the user from all child spaces
         """
-        user = config.user
-        parent_workspace = config.workspace
+        user = user_workspace_config.user
+        parent_workspace = user_workspace_config.workspace
         user_workspace_config_api = UserWorkspaceConfigApi(
             session=context.dbsession, config=context.app_config, current_user=None
         )

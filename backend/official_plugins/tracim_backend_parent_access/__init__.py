@@ -24,13 +24,13 @@ class ParentAccessPlugin:
 
     @hookimpl
     def on_user_config_in_workspace_created(
-        self, config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
     ) -> None:
         """
         Set user as members of all parent of this workspace with default workspace default_user_role
         """
-        user = config.user
-        current_workspace = config.workspace.parent
+        user = user_workspace_config.user
+        current_workspace = user_workspace_config.workspace.parent
         user_workspace_config_api = UserWorkspaceConfigApi(
             session=context.dbsession, config=context.app_config, current_user=None
         )

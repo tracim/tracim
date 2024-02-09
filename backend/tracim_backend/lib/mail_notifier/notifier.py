@@ -500,7 +500,7 @@ class EmailManager(object):
     def _build_email_body_for_content(
         self,
         mako_template_filepath: str,
-        config: UserConfigInWorkspace,
+        user_workspace_config: UserConfigInWorkspace,
         content_in_context: ContentInContext,
         parent_in_context: typing.Optional[ContentInContext],
         workspace_in_context: WorkspaceInContext,
@@ -527,7 +527,7 @@ class EmailManager(object):
             "Building email content from MAKO template {}".format(mako_template_filepath),
         )
         context = self._build_context_for_content_update(
-            role=config,
+            role=user_workspace_config,
             content_in_context=content_in_context,
             parent_in_context=parent_in_context,
             workspace_in_context=workspace_in_context,

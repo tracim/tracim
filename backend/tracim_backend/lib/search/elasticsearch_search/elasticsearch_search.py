@@ -1168,26 +1168,26 @@ class ESUserIndexer:
     @hookimpl
     def on_user_config_in_workspace_created(
         self,
-        config: UserConfigInWorkspace,
+        user_workspace_config: UserConfigInWorkspace,
         context: TracimContext,
     ) -> None:
-        self.index_user(config.user, context)
+        self.index_user(user_workspace_config.user, context)
 
     @hookimpl
     def on_user_config_in_workspace_modified(
         self,
-        config: UserConfigInWorkspace,
+        user_workspace_config: UserConfigInWorkspace,
         context: TracimContext,
     ) -> None:
-        self.index_user(config.user, context)
+        self.index_user(user_workspace_config.user, context)
 
     @hookimpl
     def on_user_config_in_workspace_deleted(
         self,
-        config: UserConfigInWorkspace,
+        user_workspace_config: UserConfigInWorkspace,
         context: TracimContext,
     ) -> None:
-        self.index_user(config.user, context)
+        self.index_user(user_workspace_config.user, context)
 
     def index_user(self, user: User, context: TracimContext) -> None:
         """Index the given user in the corresponding ES index.
@@ -1248,21 +1248,21 @@ class ESWorkspaceIndexer:
 
     @hookimpl
     def on_user_config_in_workspace_created(
-        self, config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
     ) -> None:
-        self.index_workspace(config.workspace, context)
+        self.index_workspace(user_workspace_config.workspace, context)
 
     @hookimpl
     def on_user_config_in_workspace_modified(
-        self, config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
     ) -> None:
-        self.index_workspace(config.workspace, context)
+        self.index_workspace(user_workspace_config.workspace, context)
 
     @hookimpl
     def on_user_config_in_workspace_deleted(
-        self, config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
     ) -> None:
-        self.index_workspace(config.workspace, context)
+        self.index_workspace(user_workspace_config.workspace, context)
 
     def index_workspace(self, workspace: Workspace, context: TracimContext) -> None:
         """Index the given workpace in the corresponding ES index.

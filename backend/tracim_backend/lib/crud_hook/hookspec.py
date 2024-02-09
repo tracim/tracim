@@ -53,7 +53,7 @@ class DatabaseCrudHookSpec:
     @hookspec
     def on_user_config_in_workspace_created(
         self,
-        config: UserConfigInWorkspace,
+        user_workspace_config: UserConfigInWorkspace,
         context: TracimContext,
     ) -> None:
         ...
@@ -61,7 +61,7 @@ class DatabaseCrudHookSpec:
     @hookspec
     def on_user_config_in_workspaces_created(
         self,
-        configs: typing.List[UserConfigInWorkspace],
+        user_workspace_configs: typing.List[UserConfigInWorkspace],
         context: TracimContext,
     ) -> None:
         ...
@@ -69,7 +69,7 @@ class DatabaseCrudHookSpec:
     @hookspec
     def on_user_config_in_workspace_modified(
         self,
-        config: UserConfigInWorkspace,
+        user_workspace_config: UserConfigInWorkspace,
         context: TracimContext,
     ) -> None:
         ...
@@ -77,7 +77,7 @@ class DatabaseCrudHookSpec:
     @hookspec
     def on_user_config_in_workspace_deleted(
         self,
-        config: UserConfigInWorkspace,
+        user_workspace_config: UserConfigInWorkspace,
         context: TracimContext,
     ) -> None:
         ...

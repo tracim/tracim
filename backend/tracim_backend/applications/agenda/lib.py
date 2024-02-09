@@ -744,20 +744,20 @@ class AgendaHooks:
 
     @hookimpl
     def on_user_config_in_workspace_deleted(
-        self, config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
     ) -> None:
         self.sync_workspace_symlinks(
-            user_workspace_config=config, context=context, role_deletion=True
+            user_workspace_config=user_workspace_config, context=context, role_deletion=True
         )
 
     @hookimpl
     def on_user_config_in_workspace_modified(
-        self, config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
     ) -> None:
-        self.sync_workspace_symlinks(user_workspace_config=config, context=context)
+        self.sync_workspace_symlinks(user_workspace_config=user_workspace_config, context=context)
 
     @hookimpl
     def on_user_config_in_workspace_created(
-        self, config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
     ) -> None:
-        self.sync_workspace_symlinks(user_workspace_config=config, context=context)
+        self.sync_workspace_symlinks(user_workspace_config=user_workspace_config, context=context)

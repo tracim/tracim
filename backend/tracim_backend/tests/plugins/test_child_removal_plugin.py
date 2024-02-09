@@ -15,15 +15,15 @@ from tracim_backend.tests.fixtures import *  # noqa:F401,F403
 class RemoveFromAllSpacesPlugin:
     @hookimpl
     def on_user_config_in_workspace_deleted(
-        self, config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
     ) -> None:
         wapi = WorkspaceApi(context.dbsession, None, context.app_config)
         user_workspace_config_api = UserWorkspaceConfigApi(
             context.dbsession, None, context.app_config
         )
-        for workspace in wapi.get_all_for_user(config.user):
+        for workspace in wapi.get_all_for_user(user_workspace_config.user):
             user_workspace_config_api.delete_one(
-                config.user.user_id, workspace.workspace_id, flush=False
+                user_workspace_config.user.user_id, workspace.workspace_id, flush=False
             )
 
 
