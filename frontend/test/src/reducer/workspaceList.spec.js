@@ -8,7 +8,6 @@ import {
   REMOVE_USER_ROLE,
   removeWorkspace,
   removeUserRole,
-  SET,
   setUserWorkspaceConfigList,
   UPDATE,
   updateWorkspaceDetail,
@@ -20,7 +19,7 @@ import {
   WORKSPACE_LIST,
   USER_ROLE,
   UPDATE_USER_ROLE,
-  USER_WORKSPACE_CONFIG_LIST
+  SET_USER_WORKSPACE_CONFIG_LIST
 } from '../../../src/action-creator.sync'
 import { ROLE, serialize } from 'tracim_frontend_lib'
 import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace'
@@ -53,7 +52,7 @@ describe('workspaceList reducer', () => {
       expect(rez).to.deep.equal(initialState)
     })
 
-    describe(`${SET}/${USER_WORKSPACE_CONFIG_LIST}`, () => {
+    describe(SET_USER_WORKSPACE_CONFIG_LIST, () => {
       const rez = workspaceList(initialState, setUserWorkspaceConfigList([globalManagerWorkspaceConfigFromApi]))
 
       it('should return a workspace list with the new list', () => {

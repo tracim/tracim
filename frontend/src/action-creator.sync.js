@@ -76,8 +76,10 @@ export const unDeleteWorkspaceContentList = (workspaceContentList, workspaceId) 
 export const updateWorkspaceFilter = filterList => ({ type: `${UPDATE}/${WORKSPACE}/Filter`, filterList })
 
 export const USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE = `${USER}/${WORKSPACE}/EmailNotificationType`
+export const UPDATE_USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE = `${UPDATE}/${USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE}`
+
 export const updateUserWorkspaceEmailNotificationType = (userId, workspaceId, emailNotificationType) =>
-  ({ type: `${UPDATE}/${USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE}`, userId, workspaceId, emailNotificationType })
+  ({ type: UPDATE_USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE, userId, workspaceId, emailNotificationType })
 
 export const WORKSPACE_CONTENT_ARCHIVED = `${WORKSPACE_CONTENT}/Archived`
 export const WORKSPACE_CONTENT_DELETED = `${WORKSPACE_CONTENT}/Deleted`
@@ -100,7 +102,8 @@ export const CONFIG = 'Config'
 export const USER_WORKSPACE_CONFIG_LIST = `${USER}/${WORKSPACE}/${CONFIG}/List`
 export const ADD_USER_WORKSPACE_CONFIG_LIST = `${ADD}/${USER_WORKSPACE_CONFIG_LIST}`
 export const UPDATE_USER_WORKSPACE_CONFIG_LIST = `${UPDATE}/${USER_WORKSPACE_CONFIG_LIST}`
-export const setUserWorkspaceConfigList = workspaceList => ({ type: `${SET}/${USER_WORKSPACE_CONFIG_LIST}`, workspaceList })
+export const SET_USER_WORKSPACE_CONFIG_LIST = `${SET}/${USER_WORKSPACE_CONFIG_LIST}`
+export const setUserWorkspaceConfigList = workspaceList => ({ type: SET_USER_WORKSPACE_CONFIG_LIST, workspaceList })
 export const addUserWorkspaceConfigList = (user, setting, workspace) => ({ type: ADD_USER_WORKSPACE_CONFIG_LIST, user, setting, workspace })
 export const updateUserWorkspaceConfigList = (user, setting, workspace) => ({ type: UPDATE_USER_WORKSPACE_CONFIG_LIST, user, setting, workspace })
 export const removeUserWorkspaceConfig = workspace => ({ type: `${REMOVE}/${USER_WORKSPACE_CONFIG_LIST}`, workspace })
@@ -118,7 +121,6 @@ export const USER_ROLE = `${USER}/${ROLE}`
 export const USER_ROLE_LIST = `${USER_ROLE}/List`
 export const SET_USER_ROLE_LIST = `${SET}/${USER_ROLE_LIST}`
 export const setUserRoleList = userRoleList => ({ type: SET_USER_ROLE_LIST, userRoleList })
-export const USER_ROLE_UPDATE = `${USER_ROLE}/${UPDATE}`
 export const ADD_USER_ROLE = `${ADD}/${USER_ROLE}`
 export const addWorkspaceMember = (user, workspaceId, member) => ({
   type: ADD_USER_ROLE,

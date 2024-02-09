@@ -12,9 +12,8 @@ import { workspaceList } from '../../hocMock/redux/workspaceList/workspaceList.j
 import {
   BREADCRUMBS,
   SET,
-  UPDATE,
   USER_AGENDA_URL,
-  USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
+  UPDATE_USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
   ADD,
   FLASH_MESSAGE,
   REMOVE,
@@ -52,7 +51,7 @@ describe('In <Account />', () => {
     switch (type) {
       case UPDATE_USER: updateUserCallBack(); break
       case `${SET}/${USER_AGENDA_URL}`: updateUserAgendaUrlCallBack(); break
-      case `${UPDATE}/${USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE}`: updateUserWorkspaceSubscriptionNotifCallBack(); break
+      case UPDATE_USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE: updateUserWorkspaceSubscriptionNotifCallBack(); break
       case `${SET}/${BREADCRUMBS}`: setBreadcrumbsCallBack(); break
       case `${ADD}/${FLASH_MESSAGE}`:
         if (params.msg.type === 'warning') {

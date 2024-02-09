@@ -1,12 +1,11 @@
 import {
   ADD_USER_WORKSPACE_CONFIG_LIST,
   UPDATE_USER_WORKSPACE_CONFIG_LIST,
-  USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
+  UPDATE_USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
   REMOVE,
-  SET,
   UPDATE,
   WORKSPACE_LIST,
-  USER_WORKSPACE_CONFIG_LIST,
+  SET_USER_WORKSPACE_CONFIG_LIST,
   WORKSPACE_DETAIL
 } from '../action-creator.sync.js'
 import { serialize, sortListByMultipleCriteria, SORT_BY, SORT_ORDER } from 'tracim_frontend_lib'
@@ -68,7 +67,7 @@ function addWorkspaceSetting (setting, user, workspace, workspaceList) {
 
 export function workspaceList (state = [], action, lang) {
   switch (action.type) {
-    case `${SET}/${USER_WORKSPACE_CONFIG_LIST}`:
+    case SET_USER_WORKSPACE_CONFIG_LIST:
       return action.workspaceList.map(serializeUserWorkspaceConfig)
 
     case ADD_USER_WORKSPACE_CONFIG_LIST :
@@ -105,7 +104,7 @@ export function workspaceList (state = [], action, lang) {
       return sortListByMultipleCriteria(spaceList, [SORT_BY.LABEL, SORT_BY.ID], SORT_ORDER.ASCENDING, lang)
     }
 
-    case `${UPDATE}/${USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE}`:
+    case UPDATE_USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE:
       if (!state.some(ws => ws.id === action.workspaceId)) return state
       return state.map(
         ws => ws.id === action.workspaceId
