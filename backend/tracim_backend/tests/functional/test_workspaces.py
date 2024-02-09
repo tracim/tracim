@@ -3105,6 +3105,219 @@ class TestWorkspaceMembersEndpoint(object):
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.usefixtures("default_content_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestWorkspaceRoleEndpoint(object):
+    """
+    Tests for /api/workspaces/{workspace_id}/role endpoint
+    """
+
+    def test_api__get_workspace_role__ok_200__nominal_case(self, web_testapp):
+        """
+        Check obtain user role list with a reachable workspace for user
+        """
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        res = web_testapp.get("/api/workspaces/1/role", status=200).json_body
+        assert len(res) == 1
+        user_role = res[0]
+        assert user_role["role"] == "workspace-manager"
+        assert user_role["user_id"] == 1
+        assert user_role["workspace_id"] == 1
+        assert user_role["user"]["public_name"] == "Global manager"
+        assert user_role["user"]["username"] == "TheAdmin"
+        assert user_role["user"]["user_id"] == 1
+        assert user_role["is_active"] is True
+        assert user_role["user"]["has_avatar"] is True
+
+    def test_api__get_workspace_role__ok_200_show_disabled_users(
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
+        admin_user,
+    ):
+        """
+        Check obtain user role list with also disabled users
+        """
+        uapi = user_api_factory.get()
+        user = uapi.create_user(
+            "test@test.test",
+            profile=Profile.TRUSTED_USER,
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+        )
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test_2", save_now=True)
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=admin_user)
+        uapi.disable(user, do_save=True)
+        user_workspace_config_api.create_one(
+            user,
+            workspace,
+            UserConfigInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        transaction.commit()
+        user_id = user.user_id
+        workspace_id = workspace.workspace_id
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        res = web_testapp.get(
+            "/api/workspaces/{}/role?show_disabled_user=1".format(workspace_id),
+            status=200,
+        ).json_body
+        assert len(res) == 2
+        user_role = res[1]
+        assert user_role["role"] == "reader"
+        assert user_role["user_id"] == user_id
+        assert user_role["workspace_id"] == workspace_id
+        assert user_role["is_active"] is False
+
+    def test_api__get_workspace_role__ok_200_show_only_enabled_users(
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
+        admin_user,
+    ):
+        """
+        Check obtain user role list with only enabled users
+        """
+        uapi = user_api_factory.get()
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=Profile.TRUSTED_USER,
+        )
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test_2", save_now=True)
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=admin_user)
+        uapi.disable(user, do_save=True)
+        user_workspace_config_api.create_one(
+            user,
+            workspace,
+            UserConfigInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        transaction.commit()
+        workspace_id = workspace.workspace_id
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        res = web_testapp.get(
+            "/api/workspaces/{}/role?show_disabled_user=0".format(workspace_id),
+            status=200,
+        ).json_body
+        assert len(res) == 1
+        user_role = res[0]
+        assert user_role["user_id"] == admin_user.user_id
+        assert user_role["workspace_id"] == workspace_id
+        assert user_role["is_active"] is True
+
+    def test_api__get_workspace_role__ok_200__as_admin(
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
+        admin_user,
+    ):
+        """
+        Check obtain user role list of a workspace where admin doesn't
+        have any right
+        """
+
+        uapi = user_api_factory.get()
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=Profile.TRUSTED_USER,
+        )
+        admin2 = uapi.create_user(
+            email="admin2@admin2.admin2", profile=Profile.ADMIN, do_notify=False
+        )
+        workspace_api = workspace_api_factory.get(current_user=admin2)
+        workspace = workspace_api.create_workspace("test_2", save_now=True)
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=admin2)
+        user_workspace_config_api.create_one(
+            user,
+            workspace,
+            UserConfigInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        transaction.commit()
+        user_id = user.user_id
+        workspace_id = workspace.workspace_id
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        res = web_testapp.get("/api/workspaces/{}/role".format(workspace_id), status=200).json_body
+        assert len(res) == 2
+        user_role = res[0]
+        assert user_role["role"] == "reader"
+        assert user_role["user_id"] == user_id
+        assert user_role["workspace_id"] == workspace_id
+        assert user_role["is_active"] is True
+
+    def test_api__get_workspace_role__err_400__unallowed_user(self, web_testapp):
+        """
+        Check obtain user role list with an unreachable workspace for
+        user
+        """
+        web_testapp.authorization = (
+            "Basic",
+            ("lawrence-not-real-email@fsf.local", "foobarbaz"),
+        )
+        res = web_testapp.get("/api/workspaces/3/role", status=400)
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
+        assert "message" in res.json.keys()
+        assert "details" in res.json.keys()
+
+    def test_api__get_workspace_role__err_401__unregistered_user(self, web_testapp):
+        """
+        Check obtain user role list with an unregistered user
+        """
+        web_testapp.authorization = ("Basic", ("john@doe.doe", "lapin"))
+        res = web_testapp.get("/api/workspaces/1/role", status=401)
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert res.json_body["code"] is None
+        assert "message" in res.json.keys()
+        assert "details" in res.json.keys()
+
+    def test_api__get_workspace_role__err_400__workspace_does_not_exist(self, web_testapp):
+        """
+        Check obtain workspace role list with an existing user but
+        an unexisting workspace
+        """
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        res = web_testapp.get("/api/workspaces/5/role", status=400)
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND
+        assert "message" in res.json.keys()
+        assert "details" in res.json.keys()
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
 @pytest.mark.parametrize(
     "config_section",
     [{"name": "functional_test_with_mail_test_sync_default_profile_trusted_users"}],
