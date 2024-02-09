@@ -347,10 +347,12 @@ class WorkspaceController(Controller):
             config=app_config,
         )
 
-        config = user_workspace_config_api.get_one(
+        user_workspace_config = user_workspace_config_api.get_one(
             user_id=hapic_data.path.user_id, workspace_id=hapic_data.path.workspace_id
         )
-        return user_workspace_config_api.get_user_workspace_config_with_context(config)
+        return user_workspace_config_api.get_user_workspace_config_with_context(
+            user_workspace_config
+        )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
     @hapic.handle_exception(UserRoleNotFound, HTTPStatus.BAD_REQUEST)
@@ -479,7 +481,7 @@ class WorkspaceController(Controller):
                 )
             newly_created = True
 
-        config = user_workspace_config_api.create_one(
+        user_workspace_config = user_workspace_config_api.create_one(
             user=user,
             workspace=request.current_workspace,
             role_level=WorkspaceRoles.get_role_from_slug(hapic_data.body.role).level,
@@ -489,7 +491,7 @@ class WorkspaceController(Controller):
             flush=True,
         )
         return user_workspace_config_api.get_user_workspace_config_with_context(
-            config, newly_created=newly_created
+            user_workspace_config, newly_created=newly_created
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_SUBSCRIPTION_ENDPOINTS])

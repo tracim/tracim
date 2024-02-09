@@ -151,7 +151,7 @@ class WorkspaceApi(object):
             session=self._session, current_user=self._user, config=self._config
         )
         with self._session.no_autoflush:
-            config = user_workspace_config_api.create_one(
+            user_workspace_config = user_workspace_config_api.create_one(
                 self._user,
                 workspace,
                 UserConfigInWorkspace.WORKSPACE_MANAGER,
@@ -159,7 +159,7 @@ class WorkspaceApi(object):
                 flush=False,
             )
         self._session.add(workspace)
-        self._session.add(config)
+        self._session.add(user_workspace_config)
         if save_now:
             self._session.flush()
         return workspace

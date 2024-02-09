@@ -153,22 +153,22 @@ class UserWorkspaceConfigApi(object):
                     user.user_id, workspace.workspace_id
                 )
             )
-        setting = UserConfigInWorkspace()
-        setting.user = user
-        setting.workspace = workspace
-        setting.role = role_level
-        setting.email_notification_type = email_notification_type
+        user_workspace_config = UserConfigInWorkspace()
+        user_workspace_config.user = user
+        user_workspace_config.workspace = workspace
+        user_workspace_config.role = role_level
+        user_workspace_config.email_notification_type = email_notification_type
         if flush:
             self._session.flush()
-        return setting
+        return user_workspace_config
 
     def delete_one(self, user_id: int, workspace_id: int, flush=True) -> None:
         if self._is_last_workspace_manager(user_id, workspace_id):
             raise LastWorkspaceManagerRoleCantBeModified(
                 "last workspace manager {} can't remove their own role in workspace".format(user_id)
             )
-        setting = self.get_one(user_id, workspace_id)
-        self._session.delete(setting)
+        user_workspace_config = self.get_one(user_id, workspace_id)
+        self._session.delete(user_workspace_config)
         if flush:
             self._session.flush()
 
