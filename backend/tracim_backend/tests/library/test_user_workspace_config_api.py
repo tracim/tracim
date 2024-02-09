@@ -11,7 +11,7 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.usefixtures("default_content_fixture")
-class TestRoleApi(object):
+class TestUserWorkspaceConfigApi(object):
     def test_unit__get_one__ok__nominal_case(self, admin_user, session, app_config):
         user_workspace_config_api = UserWorkspaceConfigApi(
             current_user=admin_user, session=session, config=app_config

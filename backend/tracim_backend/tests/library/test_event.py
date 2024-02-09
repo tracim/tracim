@@ -339,7 +339,7 @@ class TestEventReceiver:
         workspace_in_context = workspace_api.get_workspace_with_context(my_workspace)
         user_workspace_config_api = user_workspace_config_api_factory.get()
         user_api = user_api_factory.get()
-        config_in_context = user_workspace_config_api.get_user_config_workspace_with_context(role)
+        config_in_context = user_workspace_config_api.get_user_workspace_config_with_context(role)
         fields = {
             Event.AUTHOR_FIELD: UserSchema()
             .dump(user_api.get_user_with_context(event_initiator))
@@ -385,7 +385,7 @@ class TestEventReceiver:
         workspace_in_context = workspace_api.get_workspace_with_context(my_workspace)
         user_workspace_config_api = user_workspace_config_api_factory.get()
         user_api = user_api_factory.get()
-        config_in_context = user_workspace_config_api.get_user_config_workspace_with_context(role)
+        config_in_context = user_workspace_config_api.get_user_workspace_config_with_context(role)
         fields = {
             Event.AUTHOR_FIELD: UserSchema()
             .dump(user_api.get_user_with_context(event_initiator))

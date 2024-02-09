@@ -224,7 +224,7 @@ class UserController(Controller):
             config=app_config,
         )
         return [
-            wapi.get_user_config_workspace_with_context(role)
+            wapi.get_user_workspace_config_with_context(role)
             for role in request.candidate_user.get_active_roles()
         ]
 

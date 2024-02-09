@@ -1174,7 +1174,7 @@ class WorkspaceInContext(object):
         )
 
 
-class UserConfigWorkspaceInContext(object):
+class UserWorkspaceConfigInContext(object):
     """
     Interface to get UserConfigInWorkspace data and related content
 

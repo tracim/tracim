@@ -696,7 +696,10 @@ class AgendaHooks:
                 logger.exception(self, exc)
 
     def sync_workspace_symlinks(
-        self, role: UserConfigInWorkspace, context: TracimContext, role_deletion=False
+        self,
+        user_workspace_config: UserConfigInWorkspace,
+        context: TracimContext,
+        role_deletion=False,
     ):
         app_lib = ApplicationApi(app_list=app_list)
         if app_lib.exist(AGENDA__APP_SLUG):
@@ -704,7 +707,9 @@ class AgendaHooks:
                 current_user=None, session=context.dbsession, config=context.app_config
             )
             agenda_api.sync_workspace_symlinks(
-                role.user, role.workspace, role_deletion=role_deletion
+                user_workspace_config.user,
+                user_workspace_config.workspace,
+                role_deletion=role_deletion,
             )
 
     @hookimpl
@@ -741,16 +746,18 @@ class AgendaHooks:
     def on_user_config_in_workspace_deleted(
         self, config: UserConfigInWorkspace, context: TracimContext
     ) -> None:
-        self.sync_workspace_symlinks(role=config, context=context, role_deletion=True)
+        self.sync_workspace_symlinks(
+            user_workspace_config=config, context=context, role_deletion=True
+        )
 
     @hookimpl
     def on_user_config_in_workspace_modified(
         self, config: UserConfigInWorkspace, context: TracimContext
     ) -> None:
-        self.sync_workspace_symlinks(role=config, context=context)
+        self.sync_workspace_symlinks(user_workspace_config=config, context=context)
 
     @hookimpl
     def on_user_config_in_workspace_created(
         self, config: UserConfigInWorkspace, context: TracimContext
     ) -> None:
-        self.sync_workspace_symlinks(role=config, context=context)
+        self.sync_workspace_symlinks(user_workspace_config=config, context=context)
