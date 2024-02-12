@@ -182,8 +182,27 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
           }
         }
       }
+      let activityList = props.activity.list
+      if (data.event_type.includes(TLM_ET.CONTENT) && data.event_type.includes(TLM_SUB.COMMENT) && data.event_type.includes(TLM_CET.MODIFIED)) {
+        const contentParent = props.activity.list.find(a => a.content.content_id === data.fields.content.parent_id)
+        if (contentParent.content.content_namespace !== data.fields.content.parent_content_namespace) {
+          activityList = props.activity.list.map(activity => {
+            if (activity.content.content_id === contentParent.content.content_id) {
+              return {
+                ...contentParent,
+                content: {
+                  ...contentParent.content,
+                  content_namespace: data.fields.content.parent_content_namespace
+                }
+              }
+            } else {
+              return activity
+            }
+          })
+        }
+      }
       const updatedActivityList = await addMessageToActivityList(
-        activity, props.activity.list, FETCH_CONFIG.apiUrl
+        activity, activityList, FETCH_CONFIG.apiUrl
       )
       if (!isEqual(props.activity.list, updatedActivityList)) {
         props.dispatch(setActivityList(updatedActivityList))
