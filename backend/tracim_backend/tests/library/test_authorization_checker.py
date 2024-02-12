@@ -26,7 +26,7 @@ from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.tests.fixtures import *  # noqa F403,F401
@@ -93,7 +93,7 @@ class TestAuthorizationChecker(object):
         current_user = User(user_id=2, email="toto@toto.toto")
         current_user.profile = Profile.TRUSTED_USER
         current_workspace = Workspace(workspace_id=3, owner=current_user)
-        role = UserConfigInWorkspace(user_id=2, workspace_id=3, role=2)
+        role = UserWorkspaceConfig(user_id=2, workspace_id=3, role=2)
         session.add(current_user)
         session.add(current_workspace)
         session.add(role)
@@ -116,7 +116,7 @@ class TestAuthorizationChecker(object):
         current_user = User(user_id=2, email="toto@toto.toto")
         current_user.profile = Profile.TRUSTED_USER
         current_workspace = Workspace(workspace_id=3, owner=current_user)
-        role = UserConfigInWorkspace(user_id=2, workspace_id=3, role=2)
+        role = UserWorkspaceConfig(user_id=2, workspace_id=3, role=2)
         session.add(current_user)
         session.add(current_workspace)
         session.add(role)
@@ -170,7 +170,7 @@ class TestAuthorizationChecker(object):
         current_user = User(user_id=2, email="toto@toto.toto")
         current_user.profile = Profile.TRUSTED_USER
         candidate_workspace = Workspace(workspace_id=3, owner=current_user)
-        role = UserConfigInWorkspace(user_id=2, workspace_id=3, role=2)
+        role = UserWorkspaceConfig(user_id=2, workspace_id=3, role=2)
         session.add(current_user)
         session.add(candidate_workspace)
         session.add(role)
@@ -193,7 +193,7 @@ class TestAuthorizationChecker(object):
         current_user = User(user_id=2, email="toto@toto.toto")
         current_user.profile = Profile.TRUSTED_USER
         candidate_workspace = Workspace(workspace_id=3, owner=current_user)
-        role = UserConfigInWorkspace(user_id=2, workspace_id=3, role=2)
+        role = UserWorkspaceConfig(user_id=2, workspace_id=3, role=2)
         session.add(current_user)
         session.add(candidate_workspace)
         session.add(role)
@@ -499,7 +499,7 @@ class TestAuthorizationChecker(object):
             available_statuses=[],
             minimal_role_content_creation=WorkspaceRoles.CONTENT_MANAGER,
         )
-        role = UserConfigInWorkspace(
+        role = UserWorkspaceConfig(
             user_id=2, workspace_id=3, role=WorkspaceRoles.CONTENT_MANAGER.level
         )
         session.add(current_user)
@@ -539,7 +539,7 @@ class TestAuthorizationChecker(object):
             available_statuses=[],
             minimal_role_content_creation=WorkspaceRoles.CONTENT_MANAGER,
         )
-        role = UserConfigInWorkspace(
+        role = UserWorkspaceConfig(
             user_id=2, workspace_id=3, role=WorkspaceRoles.CONTENT_MANAGER.level
         )
         session.add(current_user)
@@ -579,9 +579,7 @@ class TestAuthorizationChecker(object):
             available_statuses=[],
             minimal_role_content_creation=WorkspaceRoles.CONTENT_MANAGER,
         )
-        role = UserConfigInWorkspace(
-            user_id=2, workspace_id=3, role=WorkspaceRoles.CONTRIBUTOR.level
-        )
+        role = UserWorkspaceConfig(user_id=2, workspace_id=3, role=WorkspaceRoles.CONTRIBUTOR.level)
         session.add(current_user)
         session.add(current_workspace)
         session.add(role)
@@ -616,9 +614,7 @@ class TestAuthorizationChecker(object):
         current_user = User(user_id=2, email="toto@toto.toto")
         current_user.profile = Profile.TRUSTED_USER
         current_workspace = Workspace(workspace_id=3, owner=current_user)
-        role = UserConfigInWorkspace(
-            user_id=2, workspace_id=3, role=WorkspaceRoles.CONTRIBUTOR.level
-        )
+        role = UserWorkspaceConfig(user_id=2, workspace_id=3, role=WorkspaceRoles.CONTRIBUTOR.level)
         candidate_content_type = TracimContentType(
             slug="test",
             fa_icon="",
@@ -661,10 +657,10 @@ class TestAuthorizationChecker(object):
             candidate_user = User(user_id=2, email="foo@foo.fo")
 
         workspace = Workspace(workspace_id=3, owner=Context.current_user)
-        current_user_role = UserConfigInWorkspace(
+        current_user_role = UserWorkspaceConfig(
             user_id=1, workspace_id=3, role=WorkspaceRoles.CONTRIBUTOR.level
         )
-        candidate_user_role = UserConfigInWorkspace(
+        candidate_user_role = UserWorkspaceConfig(
             user_id=2, workspace_id=3, role=WorkspaceRoles.CONTRIBUTOR.level
         )
         session.add_all(

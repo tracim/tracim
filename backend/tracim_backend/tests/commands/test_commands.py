@@ -17,7 +17,7 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import User
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.reaction import Reaction
 from tracim_backend.models.revision_protection import new_revision
@@ -887,7 +887,7 @@ class TestCommands(object):
         user_workspace_config_api.create_one(
             test_user,
             test_workspace,
-            role_level=UserConfigInWorkspace.CONTENT_MANAGER,
+            role_level=UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         content_api = content_api_factory.get(
@@ -1000,7 +1000,7 @@ class TestCommands(object):
         user_workspace_config_api.create_one(
             test_user,
             admin_workspace,
-            role_level=UserConfigInWorkspace.CONTENT_MANAGER,
+            role_level=UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         session.add(admin_workspace)
@@ -1129,7 +1129,7 @@ class TestCommands(object):
         user_workspace_config_api.create_one(
             test_user,
             admin_workspace,
-            role_level=UserConfigInWorkspace.CONTENT_MANAGER,
+            role_level=UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         session.add(admin_workspace)
@@ -1269,7 +1269,7 @@ class TestCommands(object):
         user_workspace_config_api.create_one(
             test_user,
             test_workspace,
-            role_level=UserConfigInWorkspace.CONTENT_MANAGER,
+            role_level=UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         content_api = content_api_factory.get(

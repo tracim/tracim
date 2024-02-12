@@ -89,7 +89,7 @@ from tracim_backend.models.context_models import AboutUser
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import Content
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.mention import TRANSLATED_GROUP_MENTIONS
 from tracim_backend.models.social import UserFollower
@@ -239,9 +239,9 @@ class UserApi(object):
 
     def get_members_of_workspaces(self, workspace_ids: typing.List[int]) -> typing.List[int]:
         user_ids_in_workspaces_tuples = (
-            self._session.query(UserConfigInWorkspace.user_id)
-            .distinct(UserConfigInWorkspace.user_id)
-            .filter(UserConfigInWorkspace.workspace_id.in_(workspace_ids))
+            self._session.query(UserWorkspaceConfig.user_id)
+            .distinct(UserWorkspaceConfig.user_id)
+            .filter(UserWorkspaceConfig.workspace_id.in_(workspace_ids))
             .all()
         )
         return [item[0] for item in user_ids_in_workspaces_tuples]
@@ -263,8 +263,8 @@ class UserApi(object):
         """
         from sqlalchemy.orm import aliased
 
-        s1 = aliased(UserConfigInWorkspace)
-        s2 = aliased(UserConfigInWorkspace)
+        s1 = aliased(UserWorkspaceConfig)
+        s2 = aliased(UserWorkspaceConfig)
 
         return (
             self._session.query(s2.user_id, User.username, User.display_name, s2.workspace_id)
@@ -498,8 +498,8 @@ need to be in every workspace you include."
         return tuple(reserved_usernames)
 
     def get_user_workspaces_query(self, user_id: int) -> Query:
-        return self._session.query(UserConfigInWorkspace.workspace_id).filter(
-            UserConfigInWorkspace.user_id == user_id
+        return self._session.query(UserWorkspaceConfig.workspace_id).filter(
+            UserWorkspaceConfig.user_id == user_id
         )
 
     def get_user_workspaces(self) -> typing.List[Workspace]:
@@ -508,9 +508,9 @@ need to be in every workspace you include."
     def _get_user_ids_in_same_workspace(self, user_id: int):
         user_workspaces_id_query = self.get_user_workspaces_query(user_id)
         users_in_workspaces = (
-            self._session.query(UserConfigInWorkspace.user_id)
-            .distinct(UserConfigInWorkspace.user_id)
-            .filter(UserConfigInWorkspace.workspace_id.in_(user_workspaces_id_query.subquery()))
+            self._session.query(UserWorkspaceConfig.user_id)
+            .distinct(UserWorkspaceConfig.user_id)
+            .filter(UserWorkspaceConfig.workspace_id.in_(user_workspaces_id_query.subquery()))
             .subquery()
         )
         return users_in_workspaces

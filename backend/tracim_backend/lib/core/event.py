@@ -48,7 +48,7 @@ from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import EmailNotificationType
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.data import WorkspaceSubscription
@@ -331,9 +331,9 @@ class EventApi:
             query = query.filter(Event.created >= created_after)
         if email_notification_type is not None:
             query = (
-                query.filter(UserConfigInWorkspace.workspace_id == Event.workspace_id)
-                .filter(UserConfigInWorkspace.user_id == user_id)
-                .filter(UserConfigInWorkspace.email_notification_type == email_notification_type)
+                query.filter(UserWorkspaceConfig.workspace_id == Event.workspace_id)
+                .filter(UserWorkspaceConfig.user_id == user_id)
+                .filter(UserWorkspaceConfig.email_notification_type == email_notification_type)
             )
 
         return query.all()
@@ -408,10 +408,10 @@ class EventApi:
         query = query.filter(Message.receiver_id == user_id)
         query = query.filter(Message.read == None)  # noqa: E711
         query = query.filter(Event.created >= created_after)
-        query = query.filter(UserConfigInWorkspace.workspace_id == Event.workspace_id)
-        query = query.filter(UserConfigInWorkspace.user_id == user_id)
+        query = query.filter(UserWorkspaceConfig.workspace_id == Event.workspace_id)
+        query = query.filter(UserWorkspaceConfig.user_id == user_id)
         query = query.filter(
-            UserConfigInWorkspace.email_notification_type == EmailNotificationType.SUMMARY
+            UserWorkspaceConfig.email_notification_type == EmailNotificationType.SUMMARY
         )
 
         # INFO - MP - 2023-03-14 - Filtering entity type WORKSPACE_MEMBER.MODIFIED because we want
@@ -729,29 +729,29 @@ class EventBuilder:
             context=context,
         )
 
-    # UserConfigInWorkspace events
+    # UserWorkspaceConfig events
     @hookimpl
     def on_user_config_in_workspace_created(
-        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserWorkspaceConfig, context: TracimContext
     ) -> None:
         self._create_role_event(OperationType.CREATED, user_workspace_config, context)
 
     @hookimpl
     def on_user_config_in_workspace_modified(
-        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserWorkspaceConfig, context: TracimContext
     ) -> None:
         self._create_role_event(OperationType.MODIFIED, user_workspace_config, context)
 
     @hookimpl
     def on_user_config_in_workspace_deleted(
-        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserWorkspaceConfig, context: TracimContext
     ) -> None:
         self._create_role_event(OperationType.DELETED, user_workspace_config, context)
 
     def _create_role_event(
         self,
         operation: OperationType,
-        user_workspace_config: UserConfigInWorkspace,
+        user_workspace_config: UserWorkspaceConfig,
         context: TracimContext,
     ) -> None:
         current_user = context.safe_current_user()
@@ -1262,7 +1262,7 @@ class SyncLiveMessageBuilder(BaseLiveMessageBuilder):
 class MessageHooks:
     @hookimpl
     def on_user_config_in_workspaces_created(
-        self, user_workspace_configs: typing.List[UserConfigInWorkspace], context: TracimContext
+        self, user_workspace_configs: typing.List[UserWorkspaceConfig], context: TracimContext
     ) -> None:
         current_user = context.safe_current_user()
         event_api = EventApi(current_user, context.dbsession, context.app_config)
@@ -1296,7 +1296,7 @@ class MessageHooks:
 
     @hookimpl
     def on_user_config_in_workspace_deleted(
-        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserWorkspaceConfig, context: TracimContext
     ) -> None:
         current_user = context.safe_current_user()
         event_api = EventApi(current_user, context.dbsession, context.app_config)

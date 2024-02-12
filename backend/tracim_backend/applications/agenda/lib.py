@@ -26,7 +26,7 @@ from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import Agenda
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 
 CREATE_CALENDAR_TEMPLATE = """<?xml version="1.0" encoding="UTF-8" ?>
@@ -697,7 +697,7 @@ class AgendaHooks:
 
     def sync_workspace_symlinks(
         self,
-        user_workspace_config: UserConfigInWorkspace,
+        user_workspace_config: UserWorkspaceConfig,
         context: TracimContext,
         role_deletion=False,
     ):
@@ -744,7 +744,7 @@ class AgendaHooks:
 
     @hookimpl
     def on_user_config_in_workspace_deleted(
-        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserWorkspaceConfig, context: TracimContext
     ) -> None:
         self.sync_workspace_symlinks(
             user_workspace_config=user_workspace_config, context=context, role_deletion=True
@@ -752,12 +752,12 @@ class AgendaHooks:
 
     @hookimpl
     def on_user_config_in_workspace_modified(
-        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserWorkspaceConfig, context: TracimContext
     ) -> None:
         self.sync_workspace_symlinks(user_workspace_config=user_workspace_config, context=context)
 
     @hookimpl
     def on_user_config_in_workspace_created(
-        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserWorkspaceConfig, context: TracimContext
     ) -> None:
         self.sync_workspace_symlinks(user_workspace_config=user_workspace_config, context=context)

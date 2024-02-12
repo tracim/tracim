@@ -273,7 +273,7 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
 Index("idx__workspaces__parent_id", Workspace.parent_id)
 
 
-class UserConfigInWorkspace(DeclarativeBase):
+class UserWorkspaceConfig(DeclarativeBase):
     __tablename__ = "user_workspace"
 
     user_id = Column(

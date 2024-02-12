@@ -4,7 +4,7 @@ from tracim_backend.exceptions import UserRoleNotFound
 from tracim_backend.lib.core.plugins import hookimpl
 from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.utils.request import TracimContext
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 
 
 class ChildRemovalPlugin:
@@ -17,7 +17,7 @@ class ChildRemovalPlugin:
 
     @hookimpl
     def on_user_config_in_workspace_deleted(
-        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserWorkspaceConfig, context: TracimContext
     ) -> None:
         """
         Remove the user from all child spaces

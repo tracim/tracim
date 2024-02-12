@@ -10,7 +10,7 @@ from tracim_backend.applications.agenda.models import AgendaResourceType
 from tracim_backend.lib.cleanup.cleanup import CleanupLib
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import EmailNotificationType
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 VALID_CALDAV_BODY_PUT_EVENT = """
@@ -150,7 +150,7 @@ class TestCaldavRadicaleProxyEndpoints(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -310,7 +310,7 @@ class TestCaldavRadicaleProxyEndpoints(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -491,7 +491,7 @@ class TestCaldavRadicaleProxyEndpoints(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -572,7 +572,7 @@ class TestCaldavRadicaleSync(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTRIBUTOR,
+            UserWorkspaceConfig.CONTRIBUTOR,
             email_notification_type=EmailNotificationType.NONE,
         )
         session.flush()
@@ -666,7 +666,7 @@ class TestCaldavRadicaleSync(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTRIBUTOR,
+            UserWorkspaceConfig.CONTRIBUTOR,
             email_notification_type=EmailNotificationType.NONE,
         )
         session.flush()
@@ -765,7 +765,7 @@ class TestCaldavRadicaleSync(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTRIBUTOR,
+            UserWorkspaceConfig.CONTRIBUTOR,
             email_notification_type=EmailNotificationType.NONE,
         )
         session.flush()
@@ -812,7 +812,7 @@ class TestCaldavRadicaleSync(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.SUMMARY,
         )
         transaction.commit()
@@ -851,7 +851,7 @@ class TestCaldavRadicaleSync(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTRIBUTOR,
+            UserWorkspaceConfig.CONTRIBUTOR,
             email_notification_type=EmailNotificationType.NONE,
         )
         session.flush()
@@ -929,7 +929,7 @@ class TestCaldavRadicaleSync(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTRIBUTOR,
+            UserWorkspaceConfig.CONTRIBUTOR,
             email_notification_type=EmailNotificationType.NONE,
         )
         session.flush()
@@ -1007,7 +1007,7 @@ class TestCaldavRadicaleSync(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTRIBUTOR,
+            UserWorkspaceConfig.CONTRIBUTOR,
             email_notification_type=EmailNotificationType.NONE,
         )
         session.flush()
@@ -1086,7 +1086,7 @@ class TestCaldavRadicaleSync(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTRIBUTOR,
+            UserWorkspaceConfig.CONTRIBUTOR,
             email_notification_type=EmailNotificationType.NONE,
         )
         session.flush()
@@ -1240,19 +1240,19 @@ class TestAgendaApi(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTRIBUTOR,
+            UserWorkspaceConfig.CONTRIBUTOR,
             email_notification_type=EmailNotificationType.NONE,
         )
         user_workspace_config_api.create_one(
             user,
             workspace2,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         user_workspace_config_api.create_one(
             user,
             workspace3,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -1304,19 +1304,19 @@ class TestAgendaApi(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTRIBUTOR,
+            UserWorkspaceConfig.CONTRIBUTOR,
             email_notification_type=EmailNotificationType.NONE,
         )
         user_workspace_config_api.create_one(
             user,
             workspace2,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         user_workspace_config_api.create_one(
             user,
             workspace3,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()

@@ -74,7 +74,7 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import RevisionReadStatus
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.favorites import FavoriteContent
@@ -225,7 +225,7 @@ class ContentApi(object):
             # Filter according to user workspaces
             workspace_ids = UserWorkspaceConfigApi(
                 session=self._session, current_user=self._user, config=self._config
-            ).get_user_workspaces_ids(self._user_id, UserConfigInWorkspace.READER)
+            ).get_user_workspaces_ids(self._user_id, UserWorkspaceConfig.READER)
             result = result.filter(
                 or_(
                     Content.workspace_id.in_(workspace_ids),
@@ -274,7 +274,7 @@ class ContentApi(object):
             user = self._session.query(User).get(self._user_id)
             # Filter according to user workspaces
             workspace_ids = [
-                r.workspace_id for r in user.roles if r.role >= UserConfigInWorkspace.READER
+                r.workspace_id for r in user.roles if r.role >= UserWorkspaceConfig.READER
             ]
             result = result.filter(ContentRevisionRO.workspace_id.in_(workspace_ids))
 

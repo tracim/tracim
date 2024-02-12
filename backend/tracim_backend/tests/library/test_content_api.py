@@ -17,7 +17,7 @@ from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import EmailNotificationType
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.tests.fixtures import *  # noqa F403,F401
@@ -1060,7 +1060,7 @@ class TestContentApi(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api2 = ContentApi(current_user=user2, session=session, config=app_config)
@@ -1997,7 +1997,7 @@ class TestContentApi(object):
         user_workspace_config_api_1.create_one(
             user=user_b,
             workspace=workspace1,
-            role_level=UserConfigInWorkspace.READER,
+            role_level=UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
 
@@ -2005,7 +2005,7 @@ class TestContentApi(object):
         user_workspace_config_api_2.create_one(
             user=user_b,
             workspace=workspace2,
-            role_level=UserConfigInWorkspace.READER,
+            role_level=UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
 
@@ -2097,7 +2097,7 @@ class TestContentApi(object):
         user_workspace_config_api.create_one(
             user=user_b,
             workspace=workspace,
-            role_level=UserConfigInWorkspace.READER,
+            role_level=UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         cont_api_a = ContentApi(current_user=user_a, session=session, config=app_config)
@@ -2142,7 +2142,7 @@ class TestContentApi(object):
         user_workspace_config_api.create_one(
             user=user_b,
             workspace=workspace,
-            role_level=UserConfigInWorkspace.READER,
+            role_level=UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         cont_api_a = ContentApi(current_user=user_a, session=session, config=app_config)
@@ -2213,7 +2213,7 @@ class TestContentApi(object):
         user_workspace_config_api_factory.get(current_user=user1).create_one(
             user2,
             workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
             flush=True,
         )
@@ -2293,7 +2293,7 @@ class TestContentApi(object):
         user_workspace_config_api_factory.get(current_user=user1).create_one(
             user2,
             workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
             flush=True,
         )
@@ -2364,7 +2364,7 @@ class TestContentApi(object):
         user_workspace_config_api_factory.get(current_user=user1).create_one(
             user2,
             workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
             flush=True,
         )
@@ -2441,7 +2441,7 @@ class TestContentApi(object):
         user_workspace_config_api_factory.get(current_user=user1).create_one(
             user2,
             workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
             flush=True,
         )
@@ -2517,7 +2517,7 @@ class TestContentApi(object):
         user_workspace_config_api_factory.get(current_user=user1).create_one(
             user2,
             workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.SUMMARY,
             flush=True,
         )
@@ -2598,7 +2598,7 @@ class TestContentApi(object):
         user_workspace_config_api_factory.get(current_user=user1).create_one(
             user2,
             workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.SUMMARY,
             flush=True,
         )
@@ -2671,7 +2671,7 @@ class TestContentApi(object):
         user_workspace_config_api_factory.get(current_user=user1).create_one(
             user2,
             workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.SUMMARY,
             flush=True,
         )
@@ -2743,7 +2743,7 @@ class TestContentApi(object):
         user_workspace_config_api_factory.get(current_user=user1).create_one(
             user2,
             workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.SUMMARY,
             flush=True,
         )
@@ -2816,7 +2816,7 @@ class TestContentApi(object):
         user_workspace_config_api_factory.get(current_user=user1).create_one(
             user2,
             workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
             flush=True,
         )
@@ -2872,7 +2872,7 @@ class TestContentApi(object):
         user_workspace_config_api_factory.get(current_user=user1).create_one(
             user2,
             workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.SUMMARY,
             flush=True,
         )
@@ -2965,7 +2965,7 @@ class TestContentApi(object):
         user_workspace_config_api_factory.get(current_user=user1).create_one(
             user2,
             workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.SUMMARY,
             flush=True,
         )

@@ -4,7 +4,7 @@ import transaction
 from tracim_backend.lib.core.tag import TagLib
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import EmailNotificationType
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
@@ -56,7 +56,7 @@ class TestSimpleSearch(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get(current_user=user)
@@ -129,7 +129,7 @@ class TestSimpleSearch(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get(current_user=user)
@@ -221,7 +221,7 @@ class TestSimpleSearch(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get(current_user=user)
@@ -323,7 +323,7 @@ class TestSimpleSearch(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get(current_user=user)
@@ -430,7 +430,7 @@ class TestSimpleSearch(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get(current_user=user)
@@ -516,7 +516,7 @@ class TestSimpleSearch(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get(current_user=user)
@@ -594,7 +594,7 @@ class TestSimpleSearch(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get(current_user=user)
@@ -638,7 +638,7 @@ class TestSimpleSearch(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get(current_user=user)
@@ -739,7 +739,7 @@ class TestSimpleSearch(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get(current_user=user)

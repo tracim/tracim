@@ -13,7 +13,7 @@ from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.error import ErrorCode
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import EmailNotificationType
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.revision_protection import new_revision
@@ -323,7 +323,7 @@ class TestWorkspaceDiskSpaceEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTRIBUTOR,
+            UserWorkspaceConfig.CONTRIBUTOR,
             email_notification_type=EmailNotificationType.NONE,
         )
         workspace_api = workspace_api_factory.get()
@@ -383,7 +383,7 @@ class TestWorkspaceEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         workspace_api = workspace_api_factory.get()
@@ -983,7 +983,7 @@ class TestWorkspaceEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -1025,7 +1025,7 @@ class TestWorkspaceEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -1065,7 +1065,7 @@ class TestWorkspaceEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -1184,7 +1184,7 @@ class TestWorkspaceEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -1226,7 +1226,7 @@ class TestWorkspaceEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -1267,7 +1267,7 @@ class TestWorkspaceEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -1420,7 +1420,7 @@ class TestWorkspacesEndpoints(object):
         user_workspace_config_api.create_one(
             user,
             space2,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -1602,7 +1602,7 @@ class TestWorkspaceMembersEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -1650,7 +1650,7 @@ class TestWorkspaceMembersEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -1700,7 +1700,7 @@ class TestWorkspaceMembersEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -1804,7 +1804,7 @@ class TestWorkspaceMembersEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -1850,7 +1850,7 @@ class TestWorkspaceMembersEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -2057,7 +2057,7 @@ class TestWorkspaceMembersEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -2323,13 +2323,13 @@ class TestWorkspaceMembersEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         user_workspace_config_api.create_one(
             user2,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -2490,13 +2490,13 @@ class TestWorkspaceMembersEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTRIBUTOR,
+            UserWorkspaceConfig.CONTRIBUTOR,
             email_notification_type=EmailNotificationType.NONE,
         )
         user_workspace_config_api.create_one(
             user2,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -2561,13 +2561,13 @@ class TestWorkspaceMembersEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         user_workspace_config_api.create_one(
             user2,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -2629,13 +2629,13 @@ class TestWorkspaceMembersEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         user_workspace_config_api.create_one(
             user2,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -2706,7 +2706,7 @@ class TestWorkspaceMembersEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -2784,13 +2784,13 @@ class TestWorkspaceMembersEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         user_workspace_config_api.create_one(
             user2,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -2886,7 +2886,7 @@ class TestWorkspaceMembersEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -2943,7 +2943,7 @@ class TestWorkspaceMembersEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -3007,7 +3007,7 @@ class TestWorkspaceMembersEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -3071,13 +3071,13 @@ class TestWorkspaceMembersEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         user_workspace_config_api.create_one(
             user2,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -3157,7 +3157,7 @@ class TestWorkspaceRoleEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -3204,7 +3204,7 @@ class TestWorkspaceRoleEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -3253,7 +3253,7 @@ class TestWorkspaceRoleEndpoint(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -3353,7 +3353,7 @@ class TestUserInvitationWithMailActivatedSyncDefaultProfileTrustedUser(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -3429,7 +3429,7 @@ class TestUserInvitationWithMailActivatedSync(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -3498,7 +3498,7 @@ class TestUserInvitationWithMailActivatedSync(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -3558,7 +3558,7 @@ class TestUserInvitationWithMailActivatedSyncWithNotification(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.INDIVIDUAL,
         )
         transaction.commit()
@@ -5634,7 +5634,7 @@ class TestWorkspaceContentsWithFixture(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTRIBUTOR,
+            UserWorkspaceConfig.CONTRIBUTOR,
             email_notification_type=EmailNotificationType.NONE,
         )
         content_api = content_api_factory.get()
@@ -5693,7 +5693,7 @@ class TestWorkspaceContentsWithFixture(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         content_api = content_api_factory.get()
@@ -5749,7 +5749,7 @@ class TestWorkspaceContentsWithFixture(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         content_api = content_api_factory.get()
@@ -5819,7 +5819,7 @@ class TestWorkspaceContentsWithFixture(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         content_api = content_api_factory.get()
@@ -6088,13 +6088,13 @@ class TestWorkspaceContentsWithFixture(object):
         user_workspace_config_api.create_one(
             user,
             projectA_workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         user_workspace_config_api.create_one(
             user,
             projectB_workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         content_api = content_api_factory.get()
@@ -6479,7 +6479,7 @@ class TestWorkspaceContents(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()

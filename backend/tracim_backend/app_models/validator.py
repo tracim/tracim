@@ -20,7 +20,7 @@ from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import ContentRevisionRO
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.data import WorkspaceSubscriptionState
@@ -114,7 +114,7 @@ user_public_name_validator = Length(
     min=User.MIN_PUBLIC_NAME_LENGTH, max=User.MAX_PUBLIC_NAME_LENGTH
 )
 user_lang_validator = Length(min=User.MIN_LANG_LENGTH, max=User.MAX_LANG_LENGTH)
-user_role_validator = OneOf(UserConfigInWorkspace.get_all_role_slug())
+user_role_validator = OneOf(UserWorkspaceConfig.get_all_role_slug())
 page_token_validator = validate_page_token
 user_config_validator = validate_simple_dict
 tag_length_validator = Length(min=Tag.MIN_TAG_NAME_LENGTH, max=Tag.MAX_TAG_NAME_LENGTH)

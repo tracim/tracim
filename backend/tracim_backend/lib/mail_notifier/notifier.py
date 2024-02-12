@@ -26,7 +26,7 @@ from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import WorkspaceInContext
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 
 
 class EmailNotifier(INotifier):
@@ -466,7 +466,7 @@ class EmailManager(object):
 
     def _build_context_for_content_update(
         self,
-        role: UserConfigInWorkspace,
+        role: UserWorkspaceConfig,
         content_in_context: ContentInContext,
         parent_in_context: typing.Optional[ContentInContext],
         workspace_in_context: WorkspaceInContext,
@@ -500,7 +500,7 @@ class EmailManager(object):
     def _build_email_body_for_content(
         self,
         mako_template_filepath: str,
-        user_workspace_config: UserConfigInWorkspace,
+        user_workspace_config: UserWorkspaceConfig,
         content_in_context: ContentInContext,
         parent_in_context: typing.Optional[ContentInContext],
         workspace_in_context: WorkspaceInContext,

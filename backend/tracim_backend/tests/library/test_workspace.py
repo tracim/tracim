@@ -6,7 +6,7 @@ from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import EmailNotificationType
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
@@ -52,13 +52,13 @@ class TestThread(object):
         role_1 = user_workspace_config_api.create_one(
             user_1,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.INDIVIDUAL,
         )
         role_2 = user_workspace_config_api.create_one(
             user_2,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
 
@@ -85,13 +85,13 @@ class TestThread(object):
         role_1 = user_workspace_config_api.create_one(
             user_1,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.INDIVIDUAL,
         )
         role_2 = user_workspace_config_api.create_one(
             user_2,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.INDIVIDUAL,
         )
 
@@ -124,13 +124,13 @@ class TestThread(object):
         role_1 = user_workspace_config_api.create_one(
             user_1,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.INDIVIDUAL,
         )
         role_2 = user_workspace_config_api.create_one(
             user_2,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.INDIVIDUAL,
         )
 
@@ -166,13 +166,13 @@ class TestThread(object):
         role_1 = user_workspace_config_api.create_one(
             user_1,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.INDIVIDUAL,
         )
         role_2 = user_workspace_config_api.create_one(
             user_2,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.INDIVIDUAL,
         )
 
@@ -203,19 +203,19 @@ class TestThread(object):
         role_1 = user_workspace_config_api.create_one(
             user_1,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.INDIVIDUAL,
         )
         role_2 = user_workspace_config_api.create_one(
             user_2,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.INDIVIDUAL,
         )
         role_3 = user_workspace_config_api.create_one(
             user_3,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.INDIVIDUAL,
         )
 
@@ -246,25 +246,25 @@ class TestThread(object):
         user_workspace_config_api.create_one(
             user=u,
             workspace=w4,
-            role_level=UserConfigInWorkspace.READER,
+            role_level=UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         user_workspace_config_api.create_one(
             user=u,
             workspace=w3,
-            role_level=UserConfigInWorkspace.CONTRIBUTOR,
+            role_level=UserWorkspaceConfig.CONTRIBUTOR,
             email_notification_type=EmailNotificationType.NONE,
         )
         user_workspace_config_api.create_one(
             user=u,
             workspace=w2,
-            role_level=UserConfigInWorkspace.CONTENT_MANAGER,
+            role_level=UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         user_workspace_config_api.create_one(
             user=u,
             workspace=w1,
-            role_level=UserConfigInWorkspace.WORKSPACE_MANAGER,
+            role_level=UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         assert [] == wapi.get_all_manageable()
@@ -274,7 +274,7 @@ class TestThread(object):
         user_workspace_config_api.create_one(
             user=u,
             workspace=w2,
-            role_level=UserConfigInWorkspace.WORKSPACE_MANAGER,
+            role_level=UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         assert [w1, w2] == wapi.get_all_manageable()

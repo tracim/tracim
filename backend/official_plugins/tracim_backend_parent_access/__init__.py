@@ -5,7 +5,7 @@ from tracim_backend.lib.core.plugins import hookimpl
 from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.data import EmailNotificationType
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.tracim_session import TracimSession
 
 
@@ -15,7 +15,7 @@ class ParentAccessPlugin:
     def _is_role_in_session(self, session: TracimSession, user_id: int, workspace_id: int) -> bool:
         for obj in session.new:
             if (
-                isinstance(obj, UserConfigInWorkspace)
+                isinstance(obj, UserWorkspaceConfig)
                 and obj.user.user_id == user_id
                 and obj.workspace.workspace_id == workspace_id
             ):
@@ -24,7 +24,7 @@ class ParentAccessPlugin:
 
     @hookimpl
     def on_user_config_in_workspace_created(
-        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserWorkspaceConfig, context: TracimContext
     ) -> None:
         """
         Set user as members of all parent of this workspace with default workspace default_user_role

@@ -6,7 +6,7 @@ from tracim_backend.lib.core.event import EventApi
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import EmailNotificationType
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import Event
@@ -67,7 +67,7 @@ def create_workspace_and_users(
     role = user_workspace_config_api.create_one(
         same_workspace_user,
         my_workspace,
-        UserConfigInWorkspace.WORKSPACE_MANAGER,
+        UserWorkspaceConfig.WORKSPACE_MANAGER,
         email_notification_type=EmailNotificationType.NONE,
     )
     transaction.commit()
@@ -513,13 +513,13 @@ class TestEventReceiver:
         user_workspace_config_api.create_one(
             workspace_content_manager,
             my_workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         user_workspace_config_api.create_one(
             workspace_manager,
             my_workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         subscription = subscription_lib.submit_subscription(my_workspace)
@@ -593,13 +593,13 @@ class TestEventReceiver:
         user_workspace_config_api.create_one(
             workspace_content_manager,
             my_workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         user_workspace_config_api.create_one(
             workspace_manager,
             my_workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         subscription = subscription_lib.submit_subscription(my_workspace)
@@ -668,7 +668,7 @@ class TestEventApi:
         user_workspace_config_api.create_one(
             other_user,
             my_workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -690,7 +690,7 @@ class TestEventApi:
         user_workspace_config_api.create_one(
             other_user,
             my_workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -742,7 +742,7 @@ class TestEventApi:
         user_workspace_config_api.create_one(
             other_user,
             my_workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -809,7 +809,7 @@ class TestEventApi:
         user_workspace_config_api.create_one(
             other_user,
             my_workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -884,7 +884,7 @@ class TestEventApi:
         user_workspace_config_api.create_one(
             other_user,
             my_workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -966,7 +966,7 @@ class TestEventApi:
         user_workspace_config_api.create_one(
             other_user,
             my_workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()

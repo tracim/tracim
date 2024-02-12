@@ -19,7 +19,7 @@ from tracim_backend.lib.search.elasticsearch_search.es_models import get_es_fiel
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
@@ -283,15 +283,15 @@ class TestElasticSearchUserIndexer:
             (ESUserIndexer.on_content_modified, Content(owner=a_user())),
             (
                 ESUserIndexer.on_user_config_in_workspace_created,
-                UserConfigInWorkspace(user=a_user(), workspace=Workspace()),
+                UserWorkspaceConfig(user=a_user(), workspace=Workspace()),
             ),
             (
                 ESUserIndexer.on_user_config_in_workspace_modified,
-                UserConfigInWorkspace(user=a_user(), workspace=Workspace()),
+                UserWorkspaceConfig(user=a_user(), workspace=Workspace()),
             ),
             (
                 ESUserIndexer.on_user_config_in_workspace_deleted,
-                UserConfigInWorkspace(user=a_user(), workspace=Workspace()),
+                UserWorkspaceConfig(user=a_user(), workspace=Workspace()),
             ),
         ],
     )
@@ -345,15 +345,15 @@ class TestElasticSearchWorkspaceIndexer:
             (ESWorkspaceIndexer.on_workspace_modified, a_workspace()),
             (
                 ESWorkspaceIndexer.on_user_config_in_workspace_created,
-                UserConfigInWorkspace(user=a_user(), workspace=a_workspace()),
+                UserWorkspaceConfig(user=a_user(), workspace=a_workspace()),
             ),
             (
                 ESWorkspaceIndexer.on_user_config_in_workspace_modified,
-                UserConfigInWorkspace(user=a_user(), workspace=a_workspace()),
+                UserWorkspaceConfig(user=a_user(), workspace=a_workspace()),
             ),
             (
                 ESWorkspaceIndexer.on_user_config_in_workspace_deleted,
-                UserConfigInWorkspace(user=a_user(), workspace=a_workspace()),
+                UserWorkspaceConfig(user=a_user(), workspace=a_workspace()),
             ),
         ],
     )

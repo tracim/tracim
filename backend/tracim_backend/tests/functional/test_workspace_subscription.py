@@ -12,7 +12,7 @@ from tracim_backend.error import ErrorCode
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import EmailNotificationType
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.data import WorkspaceSubscriptionState
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
@@ -452,7 +452,7 @@ class TestWorkspaceSubscriptionEndpoint(object):
         user_workspace_config_api.create_one(
             test_user,
             on_request_workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         subscription_lib_factory.get(test_user).submit_subscription(workspace=on_request_workspace)

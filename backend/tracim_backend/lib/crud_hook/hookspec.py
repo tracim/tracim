@@ -5,7 +5,7 @@ from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import User
 from tracim_backend.models.call import UserCall
 from tracim_backend.models.data import Content
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceSubscription
 from tracim_backend.models.reaction import Reaction
@@ -18,7 +18,7 @@ class DatabaseCrudHookSpec:
     - User
     - Content
     - Workspace
-    - UserConfigInWorkspace
+    - UserWorkspaceConfig
     - WorkspaceSubscription
     - Reaction
     - Tag
@@ -53,7 +53,7 @@ class DatabaseCrudHookSpec:
     @hookspec
     def on_user_config_in_workspace_created(
         self,
-        user_workspace_config: UserConfigInWorkspace,
+        user_workspace_config: UserWorkspaceConfig,
         context: TracimContext,
     ) -> None:
         ...
@@ -61,7 +61,7 @@ class DatabaseCrudHookSpec:
     @hookspec
     def on_user_config_in_workspaces_created(
         self,
-        user_workspace_configs: typing.List[UserConfigInWorkspace],
+        user_workspace_configs: typing.List[UserWorkspaceConfig],
         context: TracimContext,
     ) -> None:
         ...
@@ -69,7 +69,7 @@ class DatabaseCrudHookSpec:
     @hookspec
     def on_user_config_in_workspace_modified(
         self,
-        user_workspace_config: UserConfigInWorkspace,
+        user_workspace_config: UserWorkspaceConfig,
         context: TracimContext,
     ) -> None:
         ...
@@ -77,7 +77,7 @@ class DatabaseCrudHookSpec:
     @hookspec
     def on_user_config_in_workspace_deleted(
         self,
-        user_workspace_config: UserConfigInWorkspace,
+        user_workspace_config: UserWorkspaceConfig,
         context: TracimContext,
     ) -> None:
         ...

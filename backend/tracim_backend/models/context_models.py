@@ -35,7 +35,7 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import ContentSortOrder
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.event import EventTypeDatabaseParameters
@@ -1168,21 +1168,21 @@ class WorkspaceInContext(object):
     @property
     def number_of_members(self) -> int:
         return (
-            self.dbsession.query(UserConfigInWorkspace)
-            .filter(UserConfigInWorkspace.workspace_id == self.workspace.workspace_id)
+            self.dbsession.query(UserWorkspaceConfig)
+            .filter(UserWorkspaceConfig.workspace_id == self.workspace.workspace_id)
             .count()
         )
 
 
 class UserWorkspaceConfigInContext(object):
     """
-    Interface to get UserConfigInWorkspace data and related content
+    Interface to get UserWorkspaceConfig data and related content
 
     """
 
     def __init__(
         self,
-        user_role: UserConfigInWorkspace,
+        user_role: UserWorkspaceConfig,
         dbsession: Session,
         config: CFG,
         # Extended params
@@ -1227,7 +1227,7 @@ class UserWorkspaceConfigInContext(object):
     def role_slug(self) -> str:
         """
         simple name of the role of the user.
-        can be anything from UserConfigInWorkspace SLUG, like
+        can be anything from UserWorkspaceConfig SLUG, like
         'not_applicable', 'reader',
         'contributor', 'content-manager', 'workspace-manager'
         :return: user workspace role as slug.

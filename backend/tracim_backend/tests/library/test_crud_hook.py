@@ -7,7 +7,7 @@ from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
@@ -70,19 +70,19 @@ class UserRoleInWorkspaceHookImpl:
 
     @hookimpl
     def on_user_config_in_workspace_created(
-        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserWorkspaceConfig, context: TracimContext
     ) -> None:
         self.mock_hooks("created", user_workspace_config=user_workspace_config, context=context)
 
     @hookimpl
     def on_user_config_in_workspace_modified(
-        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserWorkspaceConfig, context: TracimContext
     ) -> None:
         self.mock_hooks("modified", user_workspace_config=user_workspace_config, context=context)
 
     @hookimpl
     def on_user_config_in_workspace_deleted(
-        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserWorkspaceConfig, context: TracimContext
     ) -> None:
         self.mock_hooks("deleted", user_workspace_config=user_workspace_config, context=context)
 
@@ -135,8 +135,8 @@ class TestDatabaseCrudHookCaller:
         session.add(workspace)
         session.flush()
 
-        user_workspace_config = UserConfigInWorkspace(
-            role=UserConfigInWorkspace.READER, user=owner, workspace=workspace
+        user_workspace_config = UserWorkspaceConfig(
+            role=UserWorkspaceConfig.READER, user=owner, workspace=workspace
         )
         session.add(user_workspace_config)
         session.flush()
@@ -144,7 +144,7 @@ class TestDatabaseCrudHookCaller:
             "created", user_workspace_config=user_workspace_config, context=session.context
         )
 
-        user_workspace_config.role = UserConfigInWorkspace.WORKSPACE_MANAGER
+        user_workspace_config.role = UserWorkspaceConfig.WORKSPACE_MANAGER
         session.add(user_workspace_config)
         session.flush()
         hook.mock_hooks.assert_called_with(

@@ -5,7 +5,7 @@ import transaction
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.core.tag import TagLib
 from tracim_backend.models.data import EmailNotificationType
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 TAG_URLS = (
@@ -354,7 +354,7 @@ class TestTagsEndpoint(object):
         user_workspace_config_api.create_one(
             riyad_user,
             test_workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         folder = content_api.create(
@@ -402,7 +402,7 @@ class TestTagsEndpoint(object):
         user_workspace_config_api.create_one(
             riyad_user,
             test_workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         folder = content_api.create(
@@ -560,7 +560,7 @@ class TestTagsEndpoint(object):
         user_workspace_config_api.create_one(
             riyad_user,
             test_workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         folder = content_api.create(

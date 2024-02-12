@@ -12,7 +12,7 @@ from tracim_backend.lib.cleanup.cleanup import CleanupLib
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import RevisionReadStatus
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.favorites import FavoriteContent
 from tracim_backend.models.revision_protection import new_revision
@@ -212,8 +212,8 @@ class TestCleanupLib(object):
         with pytest.raises(NoResultFound):
             session.query(Workspace).filter(Workspace.workspace_id == workspace_id).one()
         with pytest.raises(NoResultFound):
-            session.query(UserConfigInWorkspace).filter(
-                UserConfigInWorkspace.workspace_id == workspace_id
+            session.query(UserWorkspaceConfig).filter(
+                UserWorkspaceConfig.workspace_id == workspace_id
             ).one()
         with pytest.raises(NoResultFound):
             session.query(UploadPermission).filter(
@@ -316,8 +316,8 @@ class TestCleanupLib(object):
         # INFO - G.M - 2019-12-20 - workspace is not deleted by this method
         session.query(Workspace).filter(Workspace.workspace_id == workspace_id).one()
         with pytest.raises(NoResultFound):
-            session.query(UserConfigInWorkspace).filter(
-                UserConfigInWorkspace.workspace_id == workspace_id
+            session.query(UserWorkspaceConfig).filter(
+                UserWorkspaceConfig.workspace_id == workspace_id
             ).one()
         with pytest.raises(NoResultFound):
             session.query(UploadPermission).filter(

@@ -54,7 +54,7 @@ from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.tag import Tag
 from tracim_backend.models.tag import TagOnContent
@@ -508,7 +508,7 @@ class ESSearchApi(SearchApi):
 
         if not search_parameters.search_string:
             return ContentSearchResponse()
-        filtered_workspace_ids = self._get_user_workspaces_id(min_role=UserConfigInWorkspace.READER)
+        filtered_workspace_ids = self._get_user_workspaces_id(min_role=UserWorkspaceConfig.READER)
         es_search_fields = []
         search_fields = search_parameters.search_fields or DEFAULT_CONTENT_SEARCH_FIELDS
 
@@ -1168,7 +1168,7 @@ class ESUserIndexer:
     @hookimpl
     def on_user_config_in_workspace_created(
         self,
-        user_workspace_config: UserConfigInWorkspace,
+        user_workspace_config: UserWorkspaceConfig,
         context: TracimContext,
     ) -> None:
         self.index_user(user_workspace_config.user, context)
@@ -1176,7 +1176,7 @@ class ESUserIndexer:
     @hookimpl
     def on_user_config_in_workspace_modified(
         self,
-        user_workspace_config: UserConfigInWorkspace,
+        user_workspace_config: UserWorkspaceConfig,
         context: TracimContext,
     ) -> None:
         self.index_user(user_workspace_config.user, context)
@@ -1184,7 +1184,7 @@ class ESUserIndexer:
     @hookimpl
     def on_user_config_in_workspace_deleted(
         self,
-        user_workspace_config: UserConfigInWorkspace,
+        user_workspace_config: UserWorkspaceConfig,
         context: TracimContext,
     ) -> None:
         self.index_user(user_workspace_config.user, context)
@@ -1248,19 +1248,19 @@ class ESWorkspaceIndexer:
 
     @hookimpl
     def on_user_config_in_workspace_created(
-        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserWorkspaceConfig, context: TracimContext
     ) -> None:
         self.index_workspace(user_workspace_config.workspace, context)
 
     @hookimpl
     def on_user_config_in_workspace_modified(
-        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserWorkspaceConfig, context: TracimContext
     ) -> None:
         self.index_workspace(user_workspace_config.workspace, context)
 
     @hookimpl
     def on_user_config_in_workspace_deleted(
-        self, user_workspace_config: UserConfigInWorkspace, context: TracimContext
+        self, user_workspace_config: UserWorkspaceConfig, context: TracimContext
     ) -> None:
         self.index_workspace(user_workspace_config.workspace, context)
 

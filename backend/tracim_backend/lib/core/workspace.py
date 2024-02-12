@@ -21,7 +21,7 @@ from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import WorkspaceInContext
 from tracim_backend.models.data import EmailNotificationType
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.roles import WorkspaceRoles
@@ -82,7 +82,7 @@ class WorkspaceApi(object):
 
         query = self._base_query_without_roles()
         query = query.join(Workspace.roles).filter(
-            UserConfigInWorkspace.user_id == self._user.user_id
+            UserWorkspaceConfig.user_id == self._user.user_id
         )
         return query
 
@@ -154,7 +154,7 @@ class WorkspaceApi(object):
             user_workspace_config = user_workspace_config_api.create_one(
                 self._user,
                 workspace,
-                UserConfigInWorkspace.WORKSPACE_MANAGER,
+                UserWorkspaceConfig.WORKSPACE_MANAGER,
                 email_notification_type=EmailNotificationType.SUMMARY,
                 flush=False,
             )
@@ -294,7 +294,7 @@ class WorkspaceApi(object):
                 session=self._session, current_user=self._user, config=self._config
             )
             workspace_ids = user_workspace_config_api.get_user_workspaces_ids(
-                user_id=self._user.user_id, min_role=UserConfigInWorkspace.READER
+                user_id=self._user.user_id, min_role=UserWorkspaceConfig.READER
             )
             query = query.filter(
                 or_(
@@ -382,7 +382,7 @@ class WorkspaceApi(object):
         if include_with_role:
             workspace_ids.extend(
                 user_workspace_config_api.get_user_workspaces_ids(
-                    user_id=user.user_id, min_role=UserConfigInWorkspace.READER
+                    user_id=user.user_id, min_role=UserWorkspaceConfig.READER
                 )
             )
         if include_owned:
@@ -403,7 +403,7 @@ class WorkspaceApi(object):
         )
         workspace_ids.extend(
             user_workspace_config_api.get_user_workspaces_ids(
-                user_id=user.user_id, min_role=UserConfigInWorkspace.READER
+                user_id=user.user_id, min_role=UserWorkspaceConfig.READER
             )
         )
         query = query.filter(Workspace.workspace_id.in_(workspace_ids))
@@ -423,8 +423,8 @@ class WorkspaceApi(object):
         )
         query = query.filter(
             Workspace.workspace_id.notin_(
-                self._session.query(UserConfigInWorkspace.workspace_id).filter(
-                    UserConfigInWorkspace.user_id == user.user_id
+                self._session.query(UserWorkspaceConfig.workspace_id).filter(
+                    UserWorkspaceConfig.user_id == user.user_id
                 )
             )
         )
@@ -438,7 +438,7 @@ class WorkspaceApi(object):
         elif self._user.profile.id == Profile.TRUSTED_USER.id:
             workspaces = (
                 self._base_query()
-                .filter(UserConfigInWorkspace.role == UserConfigInWorkspace.WORKSPACE_MANAGER)
+                .filter(UserWorkspaceConfig.role == UserWorkspaceConfig.WORKSPACE_MANAGER)
                 .order_by(Workspace.label)
                 .all()
             )
@@ -446,7 +446,7 @@ class WorkspaceApi(object):
 
     def get_notifiable_roles(
         self, workspace: Workspace, force_notify: bool = False
-    ) -> typing.List[UserConfigInWorkspace]:
+    ) -> typing.List[UserWorkspaceConfig]:
         """return workspace roles of given workspace which can be notified. Note that user without
         email are excluded from return as user with no notification parameter (if force_notify is
         False).

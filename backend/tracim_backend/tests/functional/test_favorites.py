@@ -7,7 +7,7 @@ from tracim_backend.error import ErrorCode
 from tracim_backend.exceptions import FavoriteContentNotFound
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.models.data import EmailNotificationType
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
@@ -297,7 +297,7 @@ class TestFavoriteContent(object):
         user_workspace_config_api.create_one(
             riyad_user,
             test_workspace,
-            role_level=UserConfigInWorkspace.CONTENT_MANAGER,
+            role_level=UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         content_api = content_api_factory.get(current_user=riyad_user)  # type: ContentApi
@@ -341,7 +341,7 @@ class TestFavoriteContent(object):
         user_workspace_config_api.create_one(
             riyad_user,
             test_workspace,
-            role_level=UserConfigInWorkspace.CONTENT_MANAGER,
+            role_level=UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         content_api = content_api_factory.get(current_user=riyad_user)  # type: ContentApi

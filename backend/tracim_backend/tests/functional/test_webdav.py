@@ -8,7 +8,7 @@ from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import EmailNotificationType
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
@@ -150,7 +150,7 @@ class TestFunctionalWebdavGet(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -207,13 +207,13 @@ class TestFunctionalWebdavGet(object):
         user_workspace_config_api.create_one(
             user,
             workspace_parent,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -275,19 +275,19 @@ class TestFunctionalWebdavGet(object):
         user_workspace_config_api.create_one(
             user,
             other_workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         user_workspace_config_api.create_one(
             user,
             workspace_children,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -357,25 +357,25 @@ class TestFunctionalWebdavGet(object):
         user_workspace_config_api.create_one(
             user,
             workspace_parent,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         user_workspace_config_api.create_one(
             user,
             workspace_child,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         user_workspace_config_api.create_one(
             user,
             workspace_grandson,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -778,7 +778,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get()
@@ -977,13 +977,13 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         user_workspace_config_api.create_one(
             user,
             workspace2,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get()
@@ -1160,7 +1160,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get()
@@ -1338,13 +1338,13 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         user_workspace_config_api.create_one(
             user,
             workspace2,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get()
@@ -1500,7 +1500,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get()
@@ -1671,13 +1671,13 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         user_workspace_config_api.create_one(
             user,
             workspace2,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get()
@@ -1828,7 +1828,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get()
@@ -1970,13 +1970,13 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         user_workspace_config_api.create_one(
             user,
             workspace2,
-            UserConfigInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get()

@@ -11,7 +11,7 @@ from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import EmailNotificationType
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.tag import Tag
@@ -46,7 +46,7 @@ def workspace_search_fixture(
     user_workspace_config_api.create_one(
         riyad_user,
         bob_and_riyad,
-        role_level=UserConfigInWorkspace.CONTRIBUTOR,
+        role_level=UserWorkspaceConfig.CONTRIBUTOR,
         email_notification_type=EmailNotificationType.NONE,
     )
     private = wapi.create_workspace(label="private", description="private")
@@ -156,7 +156,7 @@ class TestElasticSearch(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get(current_user=user)
@@ -233,7 +233,7 @@ class TestElasticSearch(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get(current_user=user)
@@ -439,7 +439,7 @@ class TestElasticSearch(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get(current_user=user)
@@ -560,7 +560,7 @@ class TestElasticSearch(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get(current_user=user)
@@ -695,7 +695,7 @@ class TestElasticSearch(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get(current_user=user)
@@ -809,7 +809,7 @@ class TestElasticSearch(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get(current_user=user)
@@ -880,7 +880,7 @@ class TestElasticSearch(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get(current_user=user)
@@ -927,7 +927,7 @@ class TestElasticSearch(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get(current_user=user)
@@ -1055,7 +1055,7 @@ class TestElasticSearch(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get(current_user=user)
@@ -1217,7 +1217,7 @@ class TestElasticSearchSearchWithIngest(object):
         user_workspace_config_api.create_one(
             user,
             workspace,
-            UserConfigInWorkspace.WORKSPACE_MANAGER,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         api = content_api_factory.get(current_user=user)
@@ -1266,7 +1266,7 @@ def user_search_fixture(
     user_workspace_config_api.create_one(
         riyad_user,
         bob_and_riyad,
-        role_level=UserConfigInWorkspace.CONTRIBUTOR,
+        role_level=UserWorkspaceConfig.CONTRIBUTOR,
         email_notification_type=EmailNotificationType.NONE,
     )
 

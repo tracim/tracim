@@ -5,7 +5,7 @@ from sqlalchemy.orm.session import UOWTransaction
 from tracim_backend.models.auth import User
 from tracim_backend.models.call import UserCall
 from tracim_backend.models.data import Content
-from tracim_backend.models.data import UserConfigInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceSubscription
 from tracim_backend.models.reaction import Reaction
@@ -41,7 +41,7 @@ class DatabaseCrudHookCaller:
                 self._plugin_manager.hook.on_workspace_created(
                     workspace=obj, context=session.context
                 )
-            elif isinstance(obj, UserConfigInWorkspace):
+            elif isinstance(obj, UserWorkspaceConfig):
                 self._plugin_manager.hook.on_user_config_in_workspace_created(
                     user_workspace_config=obj, context=session.context
                 )
@@ -83,7 +83,7 @@ class DatabaseCrudHookCaller:
                 self._plugin_manager.hook.on_workspace_modified(
                     workspace=obj, context=session.context
                 )
-            elif isinstance(obj, UserConfigInWorkspace):
+            elif isinstance(obj, UserWorkspaceConfig):
                 self._plugin_manager.hook.on_user_config_in_workspace_modified(
                     user_workspace_config=obj, context=session.context
                 )
@@ -115,7 +115,7 @@ class DatabaseCrudHookCaller:
                 self._plugin_manager.hook.on_workspace_deleted(
                     workspace=obj, context=session.context
                 )
-            elif isinstance(obj, UserConfigInWorkspace):
+            elif isinstance(obj, UserWorkspaceConfig):
                 self._plugin_manager.hook.on_user_config_in_workspace_deleted(
                     user_workspace_config=obj, context=session.context
                 )
