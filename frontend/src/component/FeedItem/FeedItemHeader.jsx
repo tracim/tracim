@@ -72,7 +72,7 @@ export class FeedItemHeader extends React.Component {
       props.user.userId,
       (props.workspaceList.find(workspace => workspace.id === props.workspaceId) || {}).memberList || [],
       ROLE_LIST
-    ) >= ROLE.contentManager.id && props.content.contentNamespace === CONTENT_NAMESPACE.PUBLICATION && props.onClickChangeType !== undefined
+    ) >= ROLE.contentManager.id && props.content.contentNamespace === CONTENT_NAMESPACE.PUBLICATION && props.onClickChangeType.toString() !== '() => {}'
 
     return (
       <div className='feedItemHeader'>
@@ -162,13 +162,13 @@ export class FeedItemHeader extends React.Component {
               <IconButton
                 customClass='feedItemHeader__actionMenu__item'
                 disabled={props.content.is_archived || props.content.is_deleted}
-                icon='fa-fw fas fa-fw fa-th'
+                icon='fas fa-fw fa-th'
                 text={props.t('Change into content')}
                 textMobile={props.t('Change into content')}
                 label={props.t('Change into content')}
-                key={`change-type-${contentId}`}
+                key={`content-type-${contentId}`}
                 onClick={props.onClickChangeType}
-                dataCy='popinListItem__change_type'
+                dataCy='popinListItem__content_type'
               />
             )}
 
@@ -217,5 +217,6 @@ FeedItemHeader.defaultProps = {
   lastModifier: {},
   modifiedDate: '',
   onClickEdit: () => {},
-  titleLink: null
+  titleLink: null,
+  onClickChangeType: () => {}
 }

@@ -685,47 +685,31 @@ export function appContentFactory (WrappedComponent) {
 
     appContentChangeType = async (content, setState) => {
       this.checkApiUrl()
-      if (content.content_id === undefined) {
-        const response = await handleFetchResult(
-          await putContentChangeType(this.apiUrl, content.workspaceId, content.id, 'content')
-        )
-        switch (response.status) {
-          case 204:
-            setState({ mode: APP_FEATURE_MODE.VIEW })
-            break
-          default:
-            GLOBAL_dispatchEvent({
-              type: CUSTOM_EVENT.ADD_FLASH_MSG,
-              data: {
-                msg: i18n.t('Error while changing content type'),
-                type: 'warning',
-                delay: undefined
-              }
-            })
-            break
-        }
-        return response
-      } else {
-        const response = await handleFetchResult(
-          await putContentChangeType(this.apiUrl, content.workspace_id, content.content_id, 'content')
-        )
-        switch (response.status) {
-          case 204:
-            setState({ mode: APP_FEATURE_MODE.VIEW })
-            break
-          default:
-            GLOBAL_dispatchEvent({
-              type: CUSTOM_EVENT.ADD_FLASH_MSG,
-              data: {
-                msg: i18n.t('Error while changing content type'),
-                type: 'warning',
-                delay: undefined
-              }
-            })
-            break
-        }
-        return response
+      let contentId = content.id
+      let workspaceId = content.workspaceId
+      if (contentId === undefined) {
+        contentId = content.content_id
+        workspaceId = content.workspace_id
       }
+      const response = await handleFetchResult(
+        await putContentChangeType(this.apiUrl, workspaceId, contentId, 'content')
+      )
+      switch (response.status) {
+        case 204:
+          setState({ mode: APP_FEATURE_MODE.VIEW })
+          break
+        default:
+          GLOBAL_dispatchEvent({
+            type: CUSTOM_EVENT.ADD_FLASH_MSG,
+            data: {
+              msg: i18n.t('Error while changing content type'),
+              type: 'warning',
+              delay: undefined
+            }
+          })
+          break
+      }
+      return response
     }
 
     appContentDelete = async (content, setState, appSlug) => {
