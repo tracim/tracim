@@ -98,7 +98,7 @@ export const putContentArchived = (apiUrl, workspaceId, contentId) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/archived`)
 
 export const putContentChangeType = (apiUrl, workspaceId, contentId, type) =>
-  baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/type`, {
+  baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/threads/${contentId}/namespace`, {
     content_namespace: type
   })
 

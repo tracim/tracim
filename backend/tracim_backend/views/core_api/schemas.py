@@ -53,6 +53,7 @@ from tracim_backend.models.context_models import ContentAndUserPath
 from tracim_backend.models.context_models import ContentCreation
 from tracim_backend.models.context_models import ContentFilter
 from tracim_backend.models.context_models import ContentIdsQuery
+from tracim_backend.models.context_models import ContentNamespaceUpdate
 from tracim_backend.models.context_models import ContentUpdate
 from tracim_backend.models.context_models import FileCreation
 from tracim_backend.models.context_models import FilePath
@@ -2083,6 +2084,9 @@ class ContentModifyAbstractSchema(marshmallow.Schema):
         required=False,
         description="Content of the object, may be raw text or <b>html</b> for example",
     )
+
+
+class ContentModifyNamespaceAbstractSchema(marshmallow.Schema):
     content_namespace = StrippedString(
         required=False,
         description="Content_namespace of the object, raw text",
@@ -2093,6 +2097,12 @@ class ContentModifySchema(ContentModifyAbstractSchema):
     @post_load
     def text_based_content_update(self, data: typing.Dict[str, typing.Any]) -> object:
         return ContentUpdate(**data)
+
+
+class ContentModifyNamespaceSchema(ContentModifyNamespaceAbstractSchema):
+    @post_load
+    def content_namespace_update(self, data: typing.Dict[str, typing.Any]) -> object:
+        return ContentNamespaceUpdate(**data)
 
 
 class FolderContentModifySchema(ContentModifyAbstractSchema):

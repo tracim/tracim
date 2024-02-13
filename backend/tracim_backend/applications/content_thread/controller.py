@@ -17,6 +17,7 @@ from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.utils.authorization import ContentTypeChecker
 from tracim_backend.lib.utils.authorization import check_right
+from tracim_backend.lib.utils.authorization import is_content_manager
 from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
 from tracim_backend.lib.utils.request import TracimRequest
@@ -25,6 +26,7 @@ from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import PaginatedObject
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
+from tracim_backend.views.core_api.schemas import ContentModifyNamespaceSchema
 from tracim_backend.views.core_api.schemas import ContentModifySchema
 from tracim_backend.views.core_api.schemas import ContentRevisionsPageQuerySchema
 from tracim_backend.views.core_api.schemas import ContentSchema
@@ -137,10 +139,36 @@ class ThreadController(Controller):
                 new_label=hapic_data.body.label,
                 new_raw_content=hapic_data.body.raw_content,
                 new_description=hapic_data.body.description,
-                new_content_namespace=hapic_data.body.content_namespace,
             )
             api.save(content)
         return api.get_content_in_context(content)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_THREAD_ENDPOINTS])
+    @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(UserNotMemberOfWorkspace, HTTPStatus.BAD_REQUEST)
+    @check_right(is_content_manager)
+    @check_right(is_thread_content)
+    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.input_body(ContentModifyNamespaceSchema())
+    @hapic.output_body(ContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def update_thread_namespace(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> ContentInContext:
+        """
+        Change namespace of a thread
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        content = api.set_content_namespace(
+            hapic_data.path.content_id, hapic_data.body.content_namespace
+        )
+        return content
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_THREAD_ENDPOINTS])
     @check_right(is_reader)
@@ -226,6 +254,14 @@ class ThreadController(Controller):
             request_method="PUT",
         )
         configurator.add_view(self.update_thread, route_name="update_thread")
+
+        # update thread namespace
+        configurator.add_route(
+            "update_thread_namespace",
+            "/workspaces/{workspace_id}/threads/{content_id}/namespace",
+            request_method="PUT",
+        )
+        configurator.add_view(self.update_thread_namespace, route_name="update_thread_namespace")
 
         # get thread revisions
         configurator.add_route(
