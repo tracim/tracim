@@ -424,7 +424,6 @@
   "Password:": "Mot de passe :",
   "Favorite": "Favori",
   "My favorites": "Mes favoris",
-  "Change into content": "Transformer en contenu",
   "Error while changing content type": "Une erreur est survenue lors de la transformation en contenu",
   "An error has happened while fetching favorites": "Une erreur est survenue pendant la récupération des favoris",
   "An error has happened while removing the favorite": "Une erreur est survenue pendant la suppression du favori",
@@ -623,5 +622,6 @@
   "News title": "Titre de l'actualité",
   "A news with the same title already exists": "Une actualité avec le même titre existe déjà",
   "Labeling the news": "Nommer l'actualité",
-  "Publish without title": "Publier sans titre"
+  "Publish without title": "Publier sans titre",
+  "Turn into Content": "Transformer en contenu"
 }

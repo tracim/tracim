@@ -162,10 +162,10 @@ export class FeedItemHeader extends React.Component {
               <IconButton
                 customClass='feedItemHeader__actionMenu__item'
                 disabled={props.content.is_archived || props.content.is_deleted}
-                icon='fas fa-fw fa-th'
-                text={props.t('Change into content')}
-                textMobile={props.t('Change into content')}
-                label={props.t('Change into content')}
+                icon='far fa-comments'
+                text={props.t('Turn into Content')}
+                textMobile={props.t('Turn into Content')}
+                label={props.t('Turn into Content')}
                 key={`content-type-${contentId}`}
                 onClick={props.onClickChangeType}
                 dataCy='popinListItem__content_type'

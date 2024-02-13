@@ -666,8 +666,8 @@ export class Publications extends React.Component {
         {state.showChangeTypeContentPopup && (
           <ConfirmPopup
             customColor={props.customColor}
-            confirmLabel={props.t('Change into content')}
-            confirmIcon='fas fa-fw fa-th'
+            confirmLabel={props.t('Turn into Content')}
+            confirmIcon='far fa-comments'
             onConfirm={this.handleClickValidateChangeType}
             onCancel={this.handleToggleContentChangeTypePopup}
           />

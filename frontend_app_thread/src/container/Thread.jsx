@@ -387,8 +387,8 @@ export class Thread extends React.Component {
               showAction: true,
               dataCy: 'popinListItem__copyLink'
             }, {
-              icon: 'fas fa-fw fa-th',
-              label: props.t('Change into content'),
+              icon: 'far fa-comments',
+              label: props.t('Turn into Content'),
               onClick: this.handleToggleContentChangeTypePopup,
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
               disabled: state.content.is_archived || state.content.is_deleted,
@@ -436,8 +436,8 @@ export class Thread extends React.Component {
         {state.showChangeTypeContentPopup && (
           <ConfirmPopup
             customColor={props.customColor}
-            confirmLabel={props.t('Change into content')}
-            confirmIcon='fas fa-fw fa-th'
+            confirmLabel={props.t('Turn into Content')}
+            confirmIcon='far fa-comments'
             onConfirm={this.handleClickValidateChangeType}
             onCancel={this.handleToggleContentChangeTypePopup}
           />

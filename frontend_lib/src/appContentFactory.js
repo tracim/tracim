@@ -694,9 +694,27 @@ export function appContentFactory (WrappedComponent) {
       const response = await handleFetchResult(
         await putContentChangeType(this.apiUrl, workspaceId, contentId, 'content')
       )
-      switch (response.status) {
+      const status = response.status ? response.status : response.apiResponse.status
+      switch (status) {
         case 204:
           setState({ mode: APP_FEATURE_MODE.VIEW })
+          break
+        case 400:
+          switch (response.body.code) {
+            case 3002:
+              sendGlobalFlashMessage(i18n.t('A content with the same name already exists'))
+              break
+            default:
+              GLOBAL_dispatchEvent({
+                type: CUSTOM_EVENT.ADD_FLASH_MSG,
+                data: {
+                  msg: i18n.t('Error while changing content type'),
+                  type: 'warning',
+                  delay: undefined
+                }
+              })
+              break
+          }
           break
         default:
           GLOBAL_dispatchEvent({
