@@ -2402,8 +2402,13 @@ class ContentApi(object):
         if (
             content.content_namespace != ContentNamespaces.PUBLICATION
             or content_namespace != ContentNamespaces.CONTENT
+        ) and (
+            content.content_namespace != ContentNamespaces.CONTENT
+            or content_namespace != ContentNamespaces.PUBLICATION
         ):
-            return 0
+            raise ContentNamespaceDoNotMatch(
+                "the content namespace wanted and the namespace of the content aren't allowed"
+            )
 
         with new_revision(session=self._session, tm=transaction.manager, content=content):
             self.move(

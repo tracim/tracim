@@ -8,6 +8,7 @@ import transaction
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
+from tracim_backend.exceptions import ContentNamespaceDoNotMatch
 from tracim_backend.exceptions import ContentStatusException
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import InvalidMention
@@ -146,6 +147,7 @@ class ThreadController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_THREAD_ENDPOINTS])
     @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UserNotMemberOfWorkspace, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ContentNamespaceDoNotMatch, HTTPStatus.BAD_REQUEST)
     @check_right(is_content_manager)
     @check_right(is_thread_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
