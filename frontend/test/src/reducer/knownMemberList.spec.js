@@ -1,9 +1,9 @@
 import { expect } from 'chai'
 import knownMemberReducer from '../../../src/reducer/knownMemberList.js'
 import {
-  addWorkspaceMember, removeWorkspaceMember,
-  // ADD_WORKSPACE_MEMBER,
-  // REMOVE_WORKSPACE_MEMBER,
+  addWorkspaceMember, removeUserRole,
+  // ADD_USER_ROLE,
+  // REMOVE_USER_ROLE,
   // SET_KNOWN_MEMBER_LIST,
   setKnownMemberList
   // UPDATE_USER
@@ -30,7 +30,7 @@ describe('reducer knownMemberList.js', () => {
 
   // INFO - CH - 2023-11-23 - Skipping tests bellow until refactor for member and workspace setting
   // naming is done
-  it.skip('should handle ADD_WORKSPACE_MEMBER action', () => {
+  it.skip('should handle ADD_USER_ROLE action', () => {
     const fakeAction = addWorkspaceMember(
       globalManagerAsDigestSchemaFromApi, 1, globalManagerWorkspaceSettingFromApi
     )
@@ -46,8 +46,8 @@ describe('reducer knownMemberList.js', () => {
     }])
   })
 
-  it.skip('should handle REMOVE_WORKSPACE_MEMBER action', () => {
-    const fakeAction = removeWorkspaceMember(1, 1)
+  it.skip('should handle REMOVE_USER_ROLE action', () => {
+    const fakeAction = removeUserRole(1, 1)
     expect(knownMemberReducer([globalManagerAsDigestSchemaFromApi], fakeAction)).to.deep.equal([])
   })
 

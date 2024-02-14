@@ -15,14 +15,14 @@ import { mockGetWorkspaceDetail200 } from '../../apiMock.js'
 import { Dashboard as DashboardWithoutHOC } from '../../../src/container/Dashboard.jsx'
 import { FETCH_CONFIG } from '../../../src/util/helper.js'
 import {
-  ADD, REMOVE, SET, UPDATE, WORKSPACE_CONTENT, WORKSPACE_DETAIL, WORKSPACE_MEMBER, WORKSPACE_READ_STATUS
+  ADD, REMOVE, SET, UPDATE, WORKSPACE_CONTENT, WORKSPACE_DETAIL, USER_ROLE, WORKSPACE_READ_STATUS
 } from '../../../src/action-creator.sync.js'
 
 describe('<Dashboard />', () => {
   const setWorkspaceDetailSpy = sinon.spy()
   const addWorkspaceMemberSpy = sinon.spy()
   const updateWorkspaceMemberSpy = sinon.spy()
-  const removeWorkspaceMemberSpy = sinon.spy()
+  const removeUserRoleSpy = sinon.spy()
   const addWorkspaceContentListSpy = sinon.spy()
   const removeWorkspaceReadStatusSpy = sinon.spy()
   const updateWorkspaceContentListSpy = sinon.spy()
@@ -33,9 +33,9 @@ describe('<Dashboard />', () => {
     const { type } = params
     switch (type) {
       case `${SET}/${WORKSPACE_DETAIL}`: setWorkspaceDetailSpy(); break
-      case `${ADD}/${WORKSPACE_MEMBER}`: addWorkspaceMemberSpy(); break
-      case `${UPDATE}/${WORKSPACE_MEMBER}`: updateWorkspaceMemberSpy(); break
-      case `${REMOVE}/${WORKSPACE_MEMBER}`: removeWorkspaceMemberSpy(); break
+      case `${ADD}/${USER_ROLE}`: addWorkspaceMemberSpy(); break
+      case `${UPDATE}/${USER_ROLE}`: updateWorkspaceMemberSpy(); break
+      case `${REMOVE}/${USER_ROLE}`: removeUserRoleSpy(); break
       case `${ADD}/${WORKSPACE_CONTENT}`: addWorkspaceContentListSpy(); break
       case `${REMOVE}/${WORKSPACE_READ_STATUS}`: removeWorkspaceReadStatusSpy(); break
       case `${UPDATE}/${WORKSPACE_CONTENT}`: updateWorkspaceContentListSpy(); break

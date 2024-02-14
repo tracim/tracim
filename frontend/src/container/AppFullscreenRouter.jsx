@@ -88,8 +88,8 @@ export class AppFullscreenRouter extends React.Component {
                   workspaceId: workspaceId,
                   forceShowSidebar: false
                 }
-                const workspaceMemberList = (props.workspaceList.find(ws => ws.id === workspaceId) || { memberList: [] }).memberList
-                const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, workspaceMemberList, ROLE_LIST)
+                const userRoleList = (props.workspaceList.find(ws => ws.id === workspaceId) || { memberList: [] }).memberList
+                const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, userRoleList, ROLE_LIST)
 
                 props.renderAppFullscreen({ slug: 'agenda', hexcolor: '#7d4e24', appConfig: agendaConfig }, props.user, userRoleIdInWorkspace, {})
                 return null
@@ -104,8 +104,8 @@ export class AppFullscreenRouter extends React.Component {
                   workspaceId: workspaceId,
                   forceShowSidebar: false
                 }
-                const workspaceMemberList = (props.workspaceList.find(ws => ws.id === workspaceId) || { memberList: [] }).memberList
-                const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, workspaceMemberList, ROLE_LIST)
+                const userRoleList = (props.workspaceList.find(ws => ws.id === workspaceId) || { memberList: [] }).memberList
+                const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, userRoleList, ROLE_LIST)
 
                 props.renderAppFullscreen({ slug: 'gallery', hexcolor: '#7d4e24', appConfig: galleryConfig }, props.user, userRoleIdInWorkspace, {})
                 return null
@@ -120,8 +120,8 @@ export class AppFullscreenRouter extends React.Component {
                   workspace_id: workspaceId,
                   content_id: match.params.idcts
                 }
-                const workspaceMemberList = (props.workspaceList.find(ws => ws.id === workspaceId) || { memberList: [] }).memberList
-                const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, workspaceMemberList, ROLE_LIST)
+                const userRoleList = (props.workspaceList.find(ws => ws.id === workspaceId) || { memberList: [] }).memberList
+                const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, userRoleList, ROLE_LIST)
 
                 props.renderAppFullscreen({ slug: 'collaborative_document_edition', hexcolor: '#7d4e24' }, props.user, userRoleIdInWorkspace, content)
                 return null

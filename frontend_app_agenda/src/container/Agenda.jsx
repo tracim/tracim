@@ -5,7 +5,7 @@ import {
   addAllResourceI18n,
   handleFetchResult,
   getWorkspaceDetail,
-  getSpaceMemberList,
+  getSpaceUserRoleList,
   sendGlobalFlashMessage,
   PageContent,
   PageTitle,
@@ -205,8 +205,8 @@ export class Agenda extends React.Component {
       agendaList
         .filter(a => a.agenda_type === 'workspace')
         .map(async a => {
-          const fetchWorkspaceMemberList = await handleFetchResult(await getSpaceMemberList(state.config.apiUrl, a.workspace_id))
-          return fetchWorkspaceMemberList
+          const fetchWorkspaceUserRoleList = await handleFetchResult(await getSpaceUserRoleList(state.config.apiUrl, a.workspace_id))
+          return fetchWorkspaceUserRoleList
         })
     )
 

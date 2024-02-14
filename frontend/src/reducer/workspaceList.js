@@ -1,15 +1,16 @@
 import {
-  ADD_ROLE_WORKSPACE_LIST,
-  UPDATE_ROLE_WORKSPACE_LIST,
+  ADD_USER_WORKSPACE_CONFIG_LIST,
+  UPDATE_USER_WORKSPACE_CONFIG_LIST,
+  UPDATE_USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
   REMOVE,
-  SET,
   UPDATE,
   WORKSPACE_LIST,
-  ROLE_WORKSPACE_LIST,
+  SET_USER_WORKSPACE_CONFIG_LIST,
   WORKSPACE_DETAIL
 } from '../action-creator.sync.js'
 import { serialize, sortListByMultipleCriteria, SORT_BY, SORT_ORDER } from 'tracim_frontend_lib'
-import { serializeMember, serializeSidebarEntryProps } from './currentWorkspace.js'
+import { serializeSidebarEntryProps, serializeWorkspace } from './currentWorkspace.js'
+import { EMAIL_NOTIFICATION_TYPE } from '../util/helper.js'
 
 export const serializeWorkspaceListProps = {
   access_type: 'accessType',
@@ -28,24 +29,25 @@ export const serializeWorkspaceListProps = {
   members: 'memberList'
 }
 
-export const serializeWorkspace = workspace => {
+export const serializeUserConfig = userConfig => {
   return {
-    ...serialize(workspace, serializeWorkspaceListProps),
-    sidebarEntryList: workspace.sidebar_entries.map(
-      sbe => serialize(sbe, serializeSidebarEntryProps)
-    )
+    id: userConfig.user.user_id,
+    publicName: userConfig.user.public_name,
+    username: userConfig.user.username,
+    role: userConfig.role,
+    emailNotificationType: userConfig.email_notification_type || EMAIL_NOTIFICATION_TYPE.NONE,
+    hasAvatar: userConfig.user.has_avatar || true,
+    hasCover: userConfig.user.has_cover || false
   }
 }
 
-export const serializeRole = role => {
-  // TODO - CH - 2023-11-02 - This function should use serializeWorkspace
-  // and be renamed according to this issue: https://github.com/tracim/tracim/issues/6252
+export const serializeUserWorkspaceConfig = userWorkspaceConfig => {
   return {
-    ...serialize(role.workspace, serializeWorkspaceListProps),
-    sidebarEntryList: role.workspace.sidebar_entries.map(
+    ...serialize(userWorkspaceConfig.workspace, serializeWorkspaceListProps),
+    sidebarEntryList: userWorkspaceConfig.workspace.sidebar_entries.map(
       sbe => serialize(sbe, serializeSidebarEntryProps)
     ),
-    memberList: [role].map(serializeMember)
+    memberList: [userWorkspaceConfig].map(serializeUserConfig)
   }
 }
 function addWorkspaceSetting (setting, user, workspace, workspaceList) {
@@ -58,20 +60,17 @@ function addWorkspaceSetting (setting, user, workspace, workspaceList) {
   }
   const spaceList = [
     ...workspaceList,
-    serializeRole(settings)
+    serializeUserWorkspaceConfig(settings)
   ]
   return spaceList
 }
 
 export function workspaceList (state = [], action, lang) {
   switch (action.type) {
-    case `${SET}/${ROLE_WORKSPACE_LIST}`:
-      return action.workspaceList.map(serializeRole)
+    case SET_USER_WORKSPACE_CONFIG_LIST:
+      return action.workspaceList.map(serializeUserWorkspaceConfig)
 
-    case `${SET}/${WORKSPACE_LIST}`:
-      return action.workspaceList.map(serializeWorkspace)
-
-    case ADD_ROLE_WORKSPACE_LIST :
+    case ADD_USER_WORKSPACE_CONFIG_LIST :
       return sortListByMultipleCriteria(
         addWorkspaceSetting(action.setting, action.user, action.workspace, state),
         [SORT_BY.LABEL, SORT_BY.ID],
@@ -79,7 +78,7 @@ export function workspaceList (state = [], action, lang) {
         lang
       )
 
-    case UPDATE_ROLE_WORKSPACE_LIST :
+    case UPDATE_USER_WORKSPACE_CONFIG_LIST :
       return sortListByMultipleCriteria(
         addWorkspaceSetting(
           action.setting,
@@ -104,6 +103,14 @@ export function workspaceList (state = [], action, lang) {
       )
       return sortListByMultipleCriteria(spaceList, [SORT_BY.LABEL, SORT_BY.ID], SORT_ORDER.ASCENDING, lang)
     }
+
+    case UPDATE_USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE:
+      if (!state.some(ws => ws.id === action.workspaceId)) return state
+      return state.map(
+        ws => ws.id === action.workspaceId
+          ? { ...ws, memberList: [{ ...ws.memberList[0], emailNotificationType: action.emailNotificationType }] }
+          : ws
+      )
 
     default:
       return state

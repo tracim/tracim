@@ -150,10 +150,10 @@ export const getReservedUsernames = async (apiUrl) =>
 export const getWorkspaceDetail = (apiUrl, workspaceId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}`)
 
-export const getSpaceMemberList = (apiUrl, spaceId, showDisabledUser = false) =>
+export const getSpaceUserRoleList = (apiUrl, spaceId, showDisabledUser = false) =>
   baseFetch(
     'GET',
-    `${apiUrl}/workspaces/${spaceId}/members${showDisabledUser ? '?show_disabled_user=1' : ''}`
+    `${apiUrl}/workspaces/${spaceId}/role${showDisabledUser ? '?show_disabled_user=1' : ''}`
   )
 
 export const getSpaceMemberFromId = (apiUrl, spaceId, userId) =>

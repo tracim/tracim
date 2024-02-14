@@ -13,7 +13,7 @@ from tracim_backend.exceptions import UserNotAllowedToCreateMoreWorkspace
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.exceptions import WorkspacePublicDownloadDisabledException
 from tracim_backend.exceptions import WorkspacePublicUploadDisabledException
-from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.utils import current_date_for_filename
 from tracim_backend.models.auth import AuthType
@@ -21,7 +21,7 @@ from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import WorkspaceInContext
 from tracim_backend.models.data import EmailNotificationType
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.roles import WorkspaceRoles
@@ -82,7 +82,7 @@ class WorkspaceApi(object):
 
         query = self._base_query_without_roles()
         query = query.join(Workspace.roles).filter(
-            UserRoleInWorkspace.user_id == self._user.user_id
+            UserWorkspaceConfig.user_id == self._user.user_id
         )
         return query
 
@@ -147,17 +147,19 @@ class WorkspaceApi(object):
         workspace.publication_enabled = publication_enabled
         # By default, we force the current user to be the workspace manager
         # And to receive email notifications
-        role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
+        user_workspace_config_api = UserWorkspaceConfigApi(
+            session=self._session, current_user=self._user, config=self._config
+        )
         with self._session.no_autoflush:
-            role = role_api.create_one(
+            user_workspace_config = user_workspace_config_api.create_one(
                 self._user,
                 workspace,
-                UserRoleInWorkspace.WORKSPACE_MANAGER,
+                UserWorkspaceConfig.WORKSPACE_MANAGER,
                 email_notification_type=EmailNotificationType.SUMMARY,
                 flush=False,
             )
         self._session.add(workspace)
-        self._session.add(role)
+        self._session.add(user_workspace_config)
         if save_now:
             self._session.flush()
         return workspace
@@ -246,12 +248,12 @@ class WorkspaceApi(object):
             raise WorkspaceNotFound(
                 "workspace {} does not exist or not visible for user".format(workspace_id)
             ) from exc
-        role_api = RoleApi(
+        user_workspace_config_api = UserWorkspaceConfigApi(
             current_user=self._user,
             session=self._session,
             config=self._config,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             self._user,
             workspace,
             workspace.default_user_role.level,
@@ -288,9 +290,11 @@ class WorkspaceApi(object):
         if parent:
             query = query.filter(Workspace.parent_id == parent.workspace_id)
         else:
-            role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
-            workspace_ids = role_api.get_user_workspaces_ids(
-                user_id=self._user.user_id, min_role=UserRoleInWorkspace.READER
+            user_workspace_config_api = UserWorkspaceConfigApi(
+                session=self._session, current_user=self._user, config=self._config
+            )
+            workspace_ids = user_workspace_config_api.get_user_workspaces_ids(
+                user_id=self._user.user_id, min_role=UserWorkspaceConfig.READER
             )
             query = query.filter(
                 or_(
@@ -372,11 +376,13 @@ class WorkspaceApi(object):
         """
         query = self._base_query()
         workspace_ids = []
-        role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
+        user_workspace_config_api = UserWorkspaceConfigApi(
+            session=self._session, current_user=self._user, config=self._config
+        )
         if include_with_role:
             workspace_ids.extend(
-                role_api.get_user_workspaces_ids(
-                    user_id=user.user_id, min_role=UserRoleInWorkspace.READER
+                user_workspace_config_api.get_user_workspaces_ids(
+                    user_id=user.user_id, min_role=UserWorkspaceConfig.READER
                 )
             )
         if include_owned:
@@ -392,10 +398,12 @@ class WorkspaceApi(object):
         """Get all user workspaces where the users is not member of the parent and parent exists"""
         query = self._base_query()
         workspace_ids = []
-        role_api = RoleApi(session=self._session, current_user=self._user, config=self._config)
+        user_workspace_config_api = UserWorkspaceConfigApi(
+            session=self._session, current_user=self._user, config=self._config
+        )
         workspace_ids.extend(
-            role_api.get_user_workspaces_ids(
-                user_id=user.user_id, min_role=UserRoleInWorkspace.READER
+            user_workspace_config_api.get_user_workspaces_ids(
+                user_id=user.user_id, min_role=UserWorkspaceConfig.READER
             )
         )
         query = query.filter(Workspace.workspace_id.in_(workspace_ids))
@@ -415,8 +423,8 @@ class WorkspaceApi(object):
         )
         query = query.filter(
             Workspace.workspace_id.notin_(
-                self._session.query(UserRoleInWorkspace.workspace_id).filter(
-                    UserRoleInWorkspace.user_id == user.user_id
+                self._session.query(UserWorkspaceConfig.workspace_id).filter(
+                    UserWorkspaceConfig.user_id == user.user_id
                 )
             )
         )
@@ -430,7 +438,7 @@ class WorkspaceApi(object):
         elif self._user.profile.id == Profile.TRUSTED_USER.id:
             workspaces = (
                 self._base_query()
-                .filter(UserRoleInWorkspace.role == UserRoleInWorkspace.WORKSPACE_MANAGER)
+                .filter(UserWorkspaceConfig.role == UserWorkspaceConfig.WORKSPACE_MANAGER)
                 .order_by(Workspace.label)
                 .all()
             )
@@ -438,7 +446,7 @@ class WorkspaceApi(object):
 
     def get_notifiable_roles(
         self, workspace: Workspace, force_notify: bool = False
-    ) -> typing.List[UserRoleInWorkspace]:
+    ) -> typing.List[UserWorkspaceConfig]:
         """return workspace roles of given workspace which can be notified. Note that user without
         email are excluded from return as user with no notification parameter (if force_notify is
         False).

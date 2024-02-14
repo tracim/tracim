@@ -8,7 +8,7 @@ from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.translate.services.systran import FILE_TRANSLATION_ENDPOINT
 from tracim_backend.models.data import EmailNotificationType
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
@@ -703,7 +703,7 @@ class TestEditComment(object):
         content_type_list,
         session,
         riyad_user,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ):
         """
         Edit other user comment content as workspace manager
@@ -746,7 +746,7 @@ class TestEditComment(object):
         content_type_list,
         session,
         riyad_user,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ):
         """
         Edit own comment content where user is not members of the workspace
@@ -786,21 +786,21 @@ class TestEditComment(object):
         content_type_list,
         session,
         riyad_user,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ):
         """
         Edit user comment content where user is only simple reader
         """
         workspace_api = workspace_api_factory.get()
-        role_api = role_api_factory.get()
+        user_workspace_config_api = user_workspace_config_api_factory.get()
         content_api = content_api_factory.get(current_user=riyad_user)
         workspace, test_html_document, comment = create_doc_and_comment(
             workspace_api, content_api, content_api
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             riyad_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()

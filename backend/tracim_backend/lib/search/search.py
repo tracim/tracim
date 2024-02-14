@@ -6,7 +6,7 @@ import typing
 
 from tracim_backend.config import CFG
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
@@ -107,8 +107,10 @@ class SearchApi(ABC):
         Get user workspace list or None if no user set
         """
         if self._user:
-            role_api = RoleApi(config=self._config, session=self._session, current_user=self._user)
-            return role_api.get_user_workspaces_ids(self._user.user_id, min_role)
+            user_workspace_config_api = UserWorkspaceConfigApi(
+                config=self._config, session=self._session, current_user=self._user
+            )
+            return user_workspace_config_api.get_user_workspaces_ids(self._user.user_id, min_role)
         return None
 
     def offset_from_pagination(self, size: int, page_nb: int) -> int:

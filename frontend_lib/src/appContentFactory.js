@@ -51,7 +51,7 @@ import {
   getFavoriteContentList,
   getFileChildContent,
   getMyselfKnownContents,
-  getSpaceMemberList,
+  getSpaceUserRoleList,
   getTemplateList,
   getToDoList,
   postContentToFavoriteList,
@@ -1024,7 +1024,7 @@ export function appContentFactory (WrappedComponent) {
       } else {
         autoCompleteItemList = getMatchingGroupMentionList(keyword)
         const fetchSpaceMemberList = await handleFetchResult(
-          await getSpaceMemberList(this.apiUrl, workspaceId)
+          await getSpaceUserRoleList(this.apiUrl, workspaceId)
         )
 
         const includesKeyword = stringIncludes(keyword)

@@ -12,7 +12,7 @@ from webtest import TestResponse
 from tracim_backend.error import ErrorCode
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import EmailNotificationType
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
@@ -29,7 +29,7 @@ class TestAccountEndpoint(object):
         workspace_api_factory,
         user_api_factory,
         content_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         session,
         web_testapp,
@@ -77,7 +77,7 @@ class TestAccountKnownMembersEndpoint(object):
         workspace_api_factory,
         user_api_factory,
         content_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         session,
         web_testapp,
@@ -134,7 +134,7 @@ class TestAccountKnownMembersEndpoint(object):
         workspace_api_factory,
         user_api_factory,
         content_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         session,
         web_testapp,
@@ -188,7 +188,7 @@ class TestAccountKnownMembersEndpoint(object):
         workspace_api_factory,
         user_api_factory,
         content_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         session,
         web_testapp,
@@ -238,7 +238,7 @@ class TestAccountKnownMembersEndpoint(object):
         workspace_api_factory,
         user_api_factory,
         content_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         session,
         web_testapp,
@@ -280,17 +280,17 @@ class TestAccountKnownMembersEndpoint(object):
         uapi.save(test_user2)
         uapi.save(test_user3)
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             test_user,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             test_user2,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -334,7 +334,7 @@ class TestSetEmailEndpoint(object):
         workspace_api_factory,
         user_api_factory,
         content_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         session,
         web_testapp,
@@ -382,7 +382,7 @@ class TestSetEmailEndpoint(object):
         workspace_api_factory,
         user_api_factory,
         content_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         session,
         web_testapp,
@@ -433,7 +433,7 @@ class TestSetEmailEndpoint(object):
         workspace_api_factory,
         user_api_factory,
         content_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         session,
         web_testapp,

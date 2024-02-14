@@ -23,7 +23,7 @@ import {
   appContentFactory,
   deleteWorkspace,
   getMyselfKnownMember,
-  getSpaceMemberList,
+  getSpaceUserRoleList,
   getWorkspaceDetail,
   handleFetchResult,
   removeAtInUsername,
@@ -43,7 +43,7 @@ import {
   putUploadEnabled,
   putMemberRole,
   deleteMember,
-  postWorkspaceMember,
+  postUserRole,
   getAppList,
   putPublicationEnabled
 } from '../action.async.js'
@@ -268,7 +268,7 @@ export class WorkspaceAdvanced extends React.Component {
     const { props, state } = this
 
     const fetchWorkspaceDetail = handleFetchResult(await getWorkspaceDetail(state.config.apiUrl, state.content.workspace_id))
-    const fetchWorkspaceMember = handleFetchResult(await getSpaceMemberList(state.config.apiUrl, state.content.workspace_id, false))
+    const fetchWorkspaceMember = handleFetchResult(await getSpaceUserRoleList(state.config.apiUrl, state.content.workspace_id, false))
     const fetchAppList = handleFetchResult(await getAppList(state.config.apiUrl))
 
     const [resDetail, resMember, resAppList] = await Promise.all([fetchWorkspaceDetail, fetchWorkspaceMember, fetchAppList])
@@ -583,7 +583,7 @@ export class WorkspaceAdvanced extends React.Component {
       this.setState({ newMember: { ...state.newMember, id: newMemberInKnownMemberList.user_id } })
     }
 
-    const fetchWorkspaceNewMember = await handleFetchResult(await postWorkspaceMember(state.config.apiUrl, state.content.workspace_id, {
+    const fetchWorkspaceNewMember = await handleFetchResult(await postUserRole(state.config.apiUrl, state.content.workspace_id, {
       id: state.newMember.id || newMemberInKnownMemberList ? newMemberInKnownMemberList.user_id : null,
       email: state.newMember.isEmail ? state.newMember.personalData.trim() : '',
       username: state.newMember.isEmail ? '' : state.newMember.personalData,

@@ -38,7 +38,7 @@ from tracim_backend.models.mixins import TrashableMixin
 from tracim_backend.models.types import TracimUploadedFileField
 
 if TYPE_CHECKING:
-    from tracim_backend.models.data import UserRoleInWorkspace
+    from tracim_backend.models.data import UserWorkspaceConfig
     from tracim_backend.models.data import Workspace
 __all__ = ["User"]
 
@@ -275,9 +275,9 @@ class User(TrashableMixin, DeclarativeBase):
             if role.workspace == workspace:
                 return role.role
 
-        return UserRoleInWorkspace.NOT_APPLICABLE
+        return UserWorkspaceConfig.NOT_APPLICABLE
 
-    def get_active_roles(self) -> typing.List["UserRoleInWorkspace"]:
+    def get_active_roles(self) -> typing.List["UserWorkspaceConfig"]:
         """
         :return: list of roles of the user for all not-deleted workspaces
         """
