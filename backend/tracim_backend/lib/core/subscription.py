@@ -7,7 +7,7 @@ from typing import Optional
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import InvalidWorkspaceAccessType
 from tracim_backend.exceptions import SubcriptionDoesNotExist
-from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import Workspace
@@ -29,7 +29,7 @@ class SubscriptionLib(object):
         self._session = session
         self._user = current_user
         self._config = config
-        self._role_lib = RoleApi(
+        self.user_workspace_config_lib = UserWorkspaceConfigApi(
             session=self._session, config=self._config, current_user=self._user
         )
 
@@ -90,14 +90,14 @@ class SubscriptionLib(object):
         subscription.state = WorkspaceSubscriptionState.ACCEPTED
         subscription.evaluator = self._user
         subscription.evaluation_date = datetime.utcnow()
-        role = self._role_lib.create_one(
+        user_workspace_config = self.user_workspace_config_lib.create_one(
             user=subscription.author,
             workspace=subscription.workspace,
             role_level=user_role.level,
             email_notification_type=EmailNotificationType.SUMMARY,
         )
         self._session.add(subscription)
-        self._session.add(role)
+        self._session.add(user_workspace_config)
         self._session.flush()
         return subscription
 

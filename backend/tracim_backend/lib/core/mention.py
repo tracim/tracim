@@ -13,7 +13,7 @@ from tracim_backend.lib.core.event import BaseLiveMessageBuilder
 from tracim_backend.lib.core.event import EventApi
 from tracim_backend.lib.core.plugins import hookimpl
 from tracim_backend.lib.core.user import UserApi
-from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimContext
@@ -222,9 +222,11 @@ class MentionBuilder:
         if mention["type"] == MentionType.USER:
             return [int(recipient)]
         elif mention["type"] == MentionType.ROLE:
-            role_api = RoleApi(session=session, config=config, current_user=None)
+            user_workspace_config_api = UserWorkspaceConfigApi(
+                session=session, config=config, current_user=None
+            )
             min_level = WorkspaceRoles.get_role_from_level(int(recipient))
-            return role_api.get_workspace_member_ids(event.workspace_id, min_level)
+            return user_workspace_config_api.get_workspace_member_ids(event.workspace_id, min_level)
 
     @classmethod
     def _create_mention_events(
@@ -233,8 +235,10 @@ class MentionBuilder:
         content: Content,
         context: TracimContext,
     ) -> None:
-        role_api = RoleApi(session=context.dbsession, config=context.app_config, current_user=None)
-        space_members_ids = role_api.get_workspace_member_ids(content.workspace_id)
+        user_workspace_config_api = UserWorkspaceConfigApi(
+            session=context.dbsession, config=context.app_config, current_user=None
+        )
+        space_members_ids = user_workspace_config_api.get_workspace_member_ids(content.workspace_id)
 
         for mention in mentions:
             if mention.type == MentionType.ROLE:

@@ -29,7 +29,7 @@ from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.subscription import SubscriptionLib
 from tracim_backend.lib.core.user import UserApi
-from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import can_create_content
 from tracim_backend.lib.utils.authorization import can_delete_workspace
@@ -52,7 +52,7 @@ from tracim_backend.models.auth import UserCreationType
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import ListItemsObject
 from tracim_backend.models.context_models import PaginatedObject
-from tracim_backend.models.context_models import UserRoleWorkspaceInContext
+from tracim_backend.models.context_models import UserWorkspaceConfigInContext
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import EmailNotificationType
@@ -74,6 +74,8 @@ from tracim_backend.views.core_api.schemas import RoleUpdateSchema
 from tracim_backend.views.core_api.schemas import SetContentIsTemplateSchema
 from tracim_backend.views.core_api.schemas import TemplateQuerySchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
+from tracim_backend.views.core_api.schemas import UserWorkspaceConfigSchema
+from tracim_backend.views.core_api.schemas import UserWorkspaceRoleSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndUserIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceCreationSchema
@@ -83,7 +85,6 @@ from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberCreationSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberFilterQuerySchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberInviteSchema
-from tracim_backend.views.core_api.schemas import WorkspaceMemberSchema
 from tracim_backend.views.core_api.schemas import WorkspaceModifySchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSubscriptionSchema
@@ -274,49 +275,84 @@ class WorkspaceController(Controller):
         wapi.undelete(request.current_workspace, flush=True)
         return
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS], deprecated=True)
     @check_right(can_see_workspace_information)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_query(WorkspaceMemberFilterQuerySchema())
-    @hapic.output_body(WorkspaceMemberSchema(many=True))
+    @hapic.output_body(UserWorkspaceConfigSchema(many=True))
     def workspaces_members(
         self, context, request: TracimRequest, hapic_data=None
-    ) -> typing.List[UserRoleWorkspaceInContext]:
+    ) -> typing.List[UserWorkspaceConfigInContext]:
         """
+        DEPRECATED. Prefer using GET "/workspaces/{workspace_id}/role" instead
         Returns the list of space members with their role, avatar, etc.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        role_api = RoleApi(
+        user_workspace_config_api = UserWorkspaceConfigApi(
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
             show_disabled_user=hapic_data.query.show_disabled_user,
         )
 
-        roles = role_api.get_all_for_workspace(workspace=request.current_workspace)
-        return [role_api.get_user_role_workspace_with_context(user_role) for user_role in roles]
+        configs = user_workspace_config_api.get_all_for_workspace(
+            workspace=request.current_workspace
+        )
+        return [
+            user_workspace_config_api.get_user_workspace_config_with_context(user_config)
+            for user_config in configs
+        ]
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
+    @check_right(can_see_workspace_information)
+    @hapic.input_path(WorkspaceIdPathSchema())
+    @hapic.input_query(WorkspaceMemberFilterQuerySchema())
+    @hapic.output_body(UserWorkspaceRoleSchema(many=True))
+    def workspaces_role(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> typing.List[UserWorkspaceConfigInContext]:
+        """
+        Returns the list of space user with their role, avatar, etc.
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        user_workspace_config_api = UserWorkspaceConfigApi(
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+            show_disabled_user=hapic_data.query.show_disabled_user,
+        )
+
+        configs = user_workspace_config_api.get_all_for_workspace(
+            workspace=request.current_workspace
+        )
+        return [
+            user_workspace_config_api.get_user_workspace_config_with_context(user_config)
+            for user_config in configs
+        ]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
     @check_right(can_see_workspace_information)
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
-    @hapic.output_body(WorkspaceMemberSchema())
+    @hapic.output_body(UserWorkspaceConfigSchema())
     def workspaces_member_role(
         self, context, request: TracimRequest, hapic_data=None
-    ) -> UserRoleWorkspaceInContext:
+    ) -> UserWorkspaceConfigInContext:
         """
         Returns given space member with its role, avatar, etc.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        role_api = RoleApi(
+        user_workspace_config_api = UserWorkspaceConfigApi(
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
         )
 
-        role = role_api.get_one(
+        user_workspace_config = user_workspace_config_api.get_one(
             user_id=hapic_data.path.user_id, workspace_id=hapic_data.path.workspace_id
         )
-        return role_api.get_user_role_workspace_with_context(role)
+        return user_workspace_config_api.get_user_workspace_config_with_context(
+            user_workspace_config
+        )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
     @hapic.handle_exception(UserRoleNotFound, HTTPStatus.BAD_REQUEST)
@@ -324,26 +360,26 @@ class WorkspaceController(Controller):
     @hapic.handle_exception(LastWorkspaceManagerRoleCantBeModified, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
     @hapic.input_body(RoleUpdateSchema())
-    @hapic.output_body(WorkspaceMemberSchema())
+    @hapic.output_body(UserWorkspaceConfigSchema())
     def update_workspaces_members_role(
         self, context, request: TracimRequest, hapic_data=None
-    ) -> UserRoleWorkspaceInContext:
+    ) -> UserWorkspaceConfigInContext:
         """
         Update role of the given space member.
         This feature is for workspace managers, trusted users and administrators.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        role_api = RoleApi(
+        user_workspace_config_api = UserWorkspaceConfigApi(
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
         )
 
-        role = role_api.get_one(
+        role = user_workspace_config_api.get_one(
             user_id=hapic_data.path.user_id, workspace_id=hapic_data.path.workspace_id
         )
-        role = role_api.update_role(role, role_level=hapic_data.body.role.level)
-        return role_api.get_user_role_workspace_with_context(role)
+        role = user_workspace_config_api.update_role(role, role_level=hapic_data.body.role.level)
+        return user_workspace_config_api.get_user_workspace_config_with_context(role)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
     @check_right(can_leave_workspace)
@@ -360,12 +396,12 @@ class WorkspaceController(Controller):
         """
 
         app_config = request.registry.settings["CFG"]  # type: CFG
-        role_api = RoleApi(
+        user_workspace_config_api = UserWorkspaceConfigApi(
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
         )
-        role_api.delete_one(
+        user_workspace_config_api.delete_one(
             user_id=hapic_data.path.user_id, workspace_id=hapic_data.path.workspace_id
         )
         return
@@ -381,14 +417,14 @@ class WorkspaceController(Controller):
     @hapic.output_body(WorkspaceMemberCreationSchema())
     def create_workspaces_members_role(
         self, context, request: TracimRequest, hapic_data=None
-    ) -> UserRoleWorkspaceInContext:
+    ) -> UserWorkspaceConfigInContext:
         """
         Add a member to this workspace.
         This feature is for workspace managers and administrators.
         """
         newly_created = False
         app_config = request.registry.settings["CFG"]  # type: CFG
-        role_api = RoleApi(
+        user_workspace_config_api = UserWorkspaceConfigApi(
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
@@ -445,7 +481,7 @@ class WorkspaceController(Controller):
                 )
             newly_created = True
 
-        role = role_api.create_one(
+        user_workspace_config = user_workspace_config_api.create_one(
             user=user,
             workspace=request.current_workspace,
             role_level=WorkspaceRoles.get_role_from_slug(hapic_data.body.role).level,
@@ -454,7 +490,9 @@ class WorkspaceController(Controller):
             ),
             flush=True,
         )
-        return role_api.get_user_role_workspace_with_context(role, newly_created=newly_created)
+        return user_workspace_config_api.get_user_workspace_config_with_context(
+            user_workspace_config, newly_created=newly_created
+        )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_SUBSCRIPTION_ENDPOINTS])
     @check_right(can_modify_workspace)
@@ -933,6 +971,13 @@ class WorkspaceController(Controller):
             request_method="GET",
         )
         configurator.add_view(self.workspaces_members, route_name="workspace_members")
+        # Workspace Roles
+        configurator.add_route(
+            "workspaces_role",
+            "/workspaces/{workspace_id}/role",
+            request_method="GET",
+        )
+        configurator.add_view(self.workspaces_role, route_name="workspaces_role")
         # Workspace Members (Role) Individual
         configurator.add_route(
             "workspace_member_role",

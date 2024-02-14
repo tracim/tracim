@@ -50,7 +50,7 @@ from tracim_backend.lib.core.user import DEFAULT_COVER_SIZE
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.user_custom_properties import UserCustomPropertiesApi
 from tracim_backend.lib.core.userconfig import UserConfigApi
-from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import has_personal_access
@@ -110,10 +110,10 @@ from tracim_backend.views.core_api.schemas import UserPicturePathSchema
 from tracim_backend.views.core_api.schemas import UserPreviewPicturePathSchema
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceAndContentIdPathSchema
+from tracim_backend.views.core_api.schemas import UserWorkspaceConfigSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceFilterQuerySchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdSchema
-from tracim_backend.views.core_api.schemas import WorkspaceMemberSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSubscriptionSchema
 from tracim_backend.views.core_api.schemas import WorkspaceWithUserMemberSchema
@@ -212,19 +212,19 @@ class UserController(Controller):
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(UserWorkspaceFilterQuerySchema())
-    @hapic.output_body(WorkspaceMemberSchema(many=True))
+    @hapic.output_body(UserWorkspaceConfigSchema(many=True))
     def user_role_workspace(self, context, request: TracimRequest, hapic_data=None):
         """
         Get list of all roles of the given user
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        wapi = RoleApi(
+        wapi = UserWorkspaceConfigApi(
             current_user=request.candidate_user,  # User
             session=request.dbsession,
             config=app_config,
         )
         return [
-            wapi.get_user_role_workspace_with_context(role)
+            wapi.get_user_workspace_config_with_context(role)
             for role in request.candidate_user.get_active_roles()
         ]
 
@@ -744,13 +744,13 @@ class UserController(Controller):
         app_config = request.registry.settings["CFG"]  # type: CFG
         user_id = request.candidate_user.user_id
         space_id = hapic_data.path.workspace_id
-        role_api = RoleApi(
+        user_workspace_config_api = UserWorkspaceConfigApi(
             current_user=request.candidate_user,  # User
             session=request.dbsession,
             config=app_config,
         )
-        role_in_space = role_api.get_one(user_id=user_id, workspace_id=space_id)
-        role_api.update_role(
+        role_in_space = user_workspace_config_api.get_one(user_id=user_id, workspace_id=space_id)
+        user_workspace_config_api.update_role(
             role=role_in_space,
             email_notification_type_value=hapic_data.body["email_notification_type"],
             save_now=True,

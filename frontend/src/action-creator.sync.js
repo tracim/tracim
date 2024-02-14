@@ -76,8 +76,10 @@ export const unDeleteWorkspaceContentList = (workspaceContentList, workspaceId) 
 export const updateWorkspaceFilter = filterList => ({ type: `${UPDATE}/${WORKSPACE}/Filter`, filterList })
 
 export const USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE = `${USER}/${WORKSPACE}/EmailNotificationType`
+export const UPDATE_USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE = `${UPDATE}/${USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE}`
+
 export const updateUserWorkspaceEmailNotificationType = (userId, workspaceId, emailNotificationType) =>
-  ({ type: `${UPDATE}/${USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE}`, userId, workspaceId, emailNotificationType })
+  ({ type: UPDATE_USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE, userId, workspaceId, emailNotificationType })
 
 export const WORKSPACE_CONTENT_ARCHIVED = `${WORKSPACE_CONTENT}/Archived`
 export const WORKSPACE_CONTENT_DELETED = `${WORKSPACE_CONTENT}/Deleted`
@@ -92,23 +94,19 @@ export const WORKSPACE_CONTENT_MOVE = `${MOVE}/${WORKSPACE_CONTENT}`
 export const moveWorkspaceContent = (source, destination) => ({ type: `${MOVE}/${WORKSPACE_CONTENT}`, source, destination })
 
 export const WORKSPACE_LIST = `${WORKSPACE}/List`
-export const setWorkspaceList = workspaceList => ({ type: `${SET}/${WORKSPACE_LIST}`, workspaceList })
 export const removeWorkspace = workspace => ({ type: `${REMOVE}/${WORKSPACE_LIST}`, workspace })
 
 export const USER_WORKSPACE_LIST = `${USER}/${WORKSPACE_LIST}`
 
-const ROLE = 'Role'
-// TODO - CH - 2023-11-02 - The const bellow should be rename
-// See: https://github.com/tracim/tracim/issues/6252
-export const ROLE_WORKSPACE_LIST = `${ROLE}/${WORKSPACE}/List`
-export const ADD_ROLE_WORKSPACE_LIST = `${ADD}/${ROLE_WORKSPACE_LIST}`
-export const UPDATE_ROLE_WORKSPACE_LIST = `${UPDATE}/${ROLE_WORKSPACE_LIST}`
-export const setRoleWorkspaceList = workspaceList => ({ type: `${SET}/${ROLE_WORKSPACE_LIST}`, workspaceList })
-export const addRoleWorkspaceList = (user, setting, workspace) => ({ type: ADD_ROLE_WORKSPACE_LIST, user, setting, workspace })
-export const updateRoleWorkspaceList = (user, setting, workspace) => ({ type: UPDATE_ROLE_WORKSPACE_LIST, user, setting, workspace })
-export const removeRoleWorkspace = workspace => ({ type: `${REMOVE}/${ROLE_WORKSPACE_LIST}`, workspace })
-
-export const USER_ROLE_WORKSPACE_LIST = `${USER}/${ROLE_WORKSPACE_LIST}`
+export const CONFIG = 'Config'
+export const USER_WORKSPACE_CONFIG_LIST = `${USER}/${WORKSPACE}/${CONFIG}/List`
+export const ADD_USER_WORKSPACE_CONFIG_LIST = `${ADD}/${USER_WORKSPACE_CONFIG_LIST}`
+export const UPDATE_USER_WORKSPACE_CONFIG_LIST = `${UPDATE}/${USER_WORKSPACE_CONFIG_LIST}`
+export const SET_USER_WORKSPACE_CONFIG_LIST = `${SET}/${USER_WORKSPACE_CONFIG_LIST}`
+export const setUserWorkspaceConfigList = workspaceList => ({ type: SET_USER_WORKSPACE_CONFIG_LIST, workspaceList })
+export const addUserWorkspaceConfigList = (user, setting, workspace) => ({ type: ADD_USER_WORKSPACE_CONFIG_LIST, user, setting, workspace })
+export const updateUserWorkspaceConfigList = (user, setting, workspace) => ({ type: UPDATE_USER_WORKSPACE_CONFIG_LIST, user, setting, workspace })
+export const removeUserWorkspaceConfig = workspace => ({ type: `${REMOVE}/${USER_WORKSPACE_CONFIG_LIST}`, workspace })
 
 // workspace related const below is for currentWorkspace
 export const WORKSPACE_DETAIL = `${WORKSPACE}/Detail`
@@ -118,35 +116,31 @@ export const updateWorkspaceDetail = workspaceDetail => ({ type: `${UPDATE}/${WO
 export const WORKSPACE_LOADED = `${WORKSPACE}/Loaded`
 export const setWorkspaceLoaded = () => ({ type: `${SET}/${WORKSPACE_LOADED}` })
 
-const MEMBER = 'Member'
-export const WORKSPACE_MEMBER = `${WORKSPACE}/${MEMBER}`
-export const WORKSPACE_MEMBER_LIST = `${WORKSPACE_MEMBER}/List`
-export const setWorkspaceMemberList = workspaceMemberList => ({ type: `${SET}/${WORKSPACE_MEMBER_LIST}`, workspaceMemberList })
-// INFO - CH - 2023-11-22 - WORKSPACE_MEMBER_ADD is used by api function postWorkspaceMember()
-// but nothing is bound to it
-export const WORKSPACE_MEMBER_ADD = `${WORKSPACE_MEMBER}/${ADD}`
-// INFO - CH - 2023-11-22 - WORKSPACE_MEMBER_ADD is used by api function deleteWorkspaceMember()
-// but nothing is bound to it
-export const WORKSPACE_MEMBER_REMOVE = `${WORKSPACE_MEMBER}/${REMOVE}`
-export const WORKSPACE_MEMBER_UPDATE = `${WORKSPACE_MEMBER}/${UPDATE}`
-export const ADD_WORKSPACE_MEMBER = `${ADD}/${WORKSPACE_MEMBER}`
+const ROLE = 'Role'
+export const USER_ROLE = `${USER}/${ROLE}`
+export const USER_ROLE_LIST = `${USER_ROLE}/List`
+export const SET_USER_ROLE_LIST = `${SET}/${USER_ROLE_LIST}`
+export const setUserRoleList = userRoleList => ({ type: SET_USER_ROLE_LIST, userRoleList })
+export const ADD_USER_ROLE = `${ADD}/${USER_ROLE}`
 export const addWorkspaceMember = (user, workspaceId, member) => ({
-  type: ADD_WORKSPACE_MEMBER,
+  type: ADD_USER_ROLE,
   newMember: { user: user, ...member },
   workspaceId
 })
-export const updateWorkspaceMember = (user, workspaceId, member) => ({
-  type: `${UPDATE}/${WORKSPACE_MEMBER}`,
+export const UPDATE_USER_ROLE = `${UPDATE}/${USER_ROLE}`
+export const updateUserRole = (user, workspaceId, member) => ({
+  type: UPDATE_USER_ROLE,
   member: { user: user, ...member },
   workspaceId
 })
-export const REMOVE_WORKSPACE_MEMBER = `${REMOVE}/${WORKSPACE_MEMBER}`
-export const removeWorkspaceMember = (memberId, workspaceId) => ({
-  type: REMOVE_WORKSPACE_MEMBER,
-  memberId,
+export const REMOVE_USER_ROLE = `${REMOVE}/${USER_ROLE}`
+export const removeUserRole = (userId, workspaceId) => ({
+  type: REMOVE_USER_ROLE,
+  userId,
   workspaceId
 })
 
+const MEMBER = 'Member'
 export const KNOWN_MEMBER = `Known${MEMBER}`
 export const SET_KNOWN_MEMBER_LIST = `${SET}/${KNOWN_MEMBER}/${LIST}`
 export const setKnownMemberList = knownMemberList => ({ type: SET_KNOWN_MEMBER_LIST, knownMemberList })
@@ -177,7 +171,6 @@ export const CONTENT_TYPE = 'ContentType'
 export const CONTENT_TYPE_LIST = `${CONTENT_TYPE}/List`
 export const setContentTypeList = contentTypeList => ({ type: `${SET}/${CONTENT_TYPE_LIST}`, contentTypeList })
 
-export const CONFIG = 'Config'
 export const setConfig = config => ({ type: `${SET}/${CONFIG}`, config })
 
 export const CUSTOM_PROPERTIES = 'CustomProperties'

@@ -12,14 +12,14 @@ from tracim_backend.error import ErrorCode
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import EmailNotificationType
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.data import WorkspaceSubscriptionState
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.tests.utils import EventHelper
-from tracim_backend.tests.utils import RoleApiFactory
 from tracim_backend.tests.utils import SubscriptionLibFactory
 from tracim_backend.tests.utils import UserApiFactory
+from tracim_backend.tests.utils import UserWorkspaceConfigApiFactory
 from tracim_backend.tests.utils import WorkspaceApiFactory
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 
@@ -429,7 +429,7 @@ class TestWorkspaceSubscriptionEndpoint(object):
         workspace_api_factory: WorkspaceApiFactory,
         web_testapp: TestApp,
         subscription_lib_factory: SubscriptionLibFactory,
-        role_api_factory: RoleApiFactory,
+        user_workspace_config_api_factory: UserWorkspaceConfigApiFactory,
         admin_user: User,
     ):
         on_request_workspace = workspace_api_factory.get().create_workspace(
@@ -448,11 +448,11 @@ class TestWorkspaceSubscriptionEndpoint(object):
             do_save=True,
             do_notify=False,
         )
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             test_user,
             on_request_workspace,
-            UserRoleInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         subscription_lib_factory.get(test_user).submit_subscription(workspace=on_request_workspace)
