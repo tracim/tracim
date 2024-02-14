@@ -1694,7 +1694,6 @@ class ContentApi(object):
         new_label: typing.Optional[str] = None,
         new_raw_content: typing.Optional[str] = None,
         new_description: typing.Optional[str] = None,
-        new_content_namespace: typing.Optional[str] = None,
         force_update=False,
     ) -> Content:
         """
@@ -1717,14 +1716,11 @@ class ContentApi(object):
             new_raw_content = item.raw_content
         if new_description is None:
             new_description = item.description
-        if new_content_namespace is None:
-            new_content_namespace = item.content_namespace
         if not force_update:
             if (
                 item.label == new_label
                 and item.raw_content == new_raw_content
                 and item.description == new_description
-                and item.content_namespace == new_content_namespace
             ):
                 # TODO - G.M - 20-03-2018 - Fix internatization for webdav access.
                 # Internatization disabled in libcontent for now.
@@ -1750,9 +1746,6 @@ class ContentApi(object):
                 "content {} of type {} should always have a label "
                 "and a valid filename".format(item.content_id, content_type_slug)
             )
-
-        if new_content_namespace != item.content_namespace:
-            self.set_content_namespace(item.id, new_content_namespace)
 
         if self._user:
             item.owner = self._user
