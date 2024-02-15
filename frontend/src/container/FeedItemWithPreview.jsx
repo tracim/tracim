@@ -327,7 +327,7 @@ export class FeedItemWithPreview extends React.Component {
           onClickEdit={props.onClickEdit}
           workspaceId={props.workspaceId}
           titleLink={props.titleLink}
-          onClickChangeType={props.onClickChangeType}
+          onClickChangeContentType={props.onClickChangeContentType}
         />
         {props.contentAvailable && !isContentDeleted && (
           <>
@@ -475,7 +475,7 @@ FeedItemWithPreview.propTypes = {
   lastModifier: PropTypes.object,
   modifiedDate: PropTypes.string,
   onEventClicked: PropTypes.func,
-  onClickChangeType: PropTypes.func,
+  onClickChangeContentType: PropTypes.func,
   onClickEdit: PropTypes.func,
   reactionList: PropTypes.array,
   showCommentList: PropTypes.bool,
@@ -496,7 +496,7 @@ FeedItemWithPreview.defaultProps = {
   lastModificationType: '',
   lastModifier: {},
   modifiedDate: '',
-  onClickChangeType: () => {},
+  onClickChangeContentType: () => {},
   onClickEdit: () => { },
   reactionList: [],
   showCommentList: false,

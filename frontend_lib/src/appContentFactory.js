@@ -66,7 +66,7 @@ import {
   putEditContent,
   putEditStatus,
   putToDo,
-  putContentChangeType
+  putChangeContentNamespace
 } from './action.async.js'
 
 import {
@@ -685,6 +685,7 @@ export function appContentFactory (WrappedComponent) {
 
     appContentChangeType = async (content, setState) => {
       this.checkApiUrl()
+      // INFO - FS - 2024-02-15 - Depending on if the content comes from Publication or Thread the variable name are different
       let contentId = content.id
       let workspaceId = content.workspaceId
       if (contentId === undefined) {
@@ -692,9 +693,9 @@ export function appContentFactory (WrappedComponent) {
         workspaceId = content.workspace_id
       }
       const response = await handleFetchResult(
-        await putContentChangeType(this.apiUrl, workspaceId, contentId, 'content')
+        await putChangeContentNamespace(this.apiUrl, workspaceId, contentId, 'content')
       )
-      const status = response.status ? response.status : response.apiResponse.status
+      const status = response.ok ? response.status : response.apiResponse.status
       switch (status) {
         case 204:
           setState({ mode: APP_FEATURE_MODE.VIEW })

@@ -68,11 +68,13 @@ export class FeedItemHeader extends React.Component {
       props.content.currentRevisionType &&
       props.lastModifier
     )
-    const shouldShowChangeTypeButton = findUserRoleIdInWorkspace(
+    const userRoleInWorkspace = findUserRoleIdInWorkspace(
       props.user.userId,
       (props.workspaceList.find(workspace => workspace.id === props.workspaceId) || {}).memberList || [],
       ROLE_LIST
-    ) >= ROLE.contentManager.id && props.content.contentNamespace === CONTENT_NAMESPACE.PUBLICATION && props.onClickChangeType.toString() !== '() => {}'
+    )
+    const shouldShowChangeContentTypeButton = userRoleInWorkspace >= ROLE.contentManager.id &&
+      props.content.contentNamespace === CONTENT_NAMESPACE.PUBLICATION
 
     return (
       <div className='feedItemHeader'>
@@ -153,12 +155,13 @@ export class FeedItemHeader extends React.Component {
               title={props.t('Open as content')}
               to={PAGE.WORKSPACE.CONTENT(props.workspaceId, props.content.type, contentId)}
               key={`open-${contentId}`}
+              dataCy='popinListItem__open_as_content'
             >
               <i className={`fa-fw ${props.contentType.faIcon}`} />
               {props.t('Open as content')}
             </Link>
 
-            {shouldShowChangeTypeButton && (
+            {shouldShowChangeContentTypeButton && (
               <IconButton
                 customClass='feedItemHeader__actionMenu__item'
                 disabled={props.content.is_archived || props.content.is_deleted}
@@ -167,7 +170,7 @@ export class FeedItemHeader extends React.Component {
                 textMobile={props.t('Turn into Content')}
                 label={props.t('Turn into Content')}
                 key={`content-type-${contentId}`}
-                onClick={props.onClickChangeType}
+                onClick={props.onClickChangeContentType}
                 dataCy='popinListItem__content_type'
               />
             )}
@@ -199,7 +202,7 @@ FeedItemHeader.propTypes = {
   onEventClicked: PropTypes.func,
   onClickEdit: PropTypes.func,
   titleLink: PropTypes.string,
-  onClickChangeType: PropTypes.func
+  onClickChangeContentType: PropTypes.func
 }
 
 FeedItemHeader.defaultProps = {
@@ -218,5 +221,5 @@ FeedItemHeader.defaultProps = {
   modifiedDate: '',
   onClickEdit: () => {},
   titleLink: null,
-  onClickChangeType: () => {}
+  onClickChangeContentType: () => {}
 }

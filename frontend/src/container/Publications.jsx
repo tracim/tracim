@@ -109,7 +109,7 @@ export class Publications extends React.Component {
       publicationAsFileList: [],
       showEditPopup: false,
       contentToChange: null,
-      showChangeTypeContentPopup: false,
+      showChangeContentTypePopup: false,
       showReorderButton: false
     }
   }
@@ -232,18 +232,18 @@ export class Publications extends React.Component {
     props.dispatch(setCommentListToPublication(parentPublication.id, newTimeline))
   }
 
-  handleToggleContentChangeTypePopup = (e, content) => {
+  handleToggleChangeContentTypePopup = (e, content) => {
     this.setState(prev => ({
-      showChangeTypeContentPopup: !prev.showChangeTypeContentPopup,
-      contentToChange: prev.showChangeTypeContentPopup ? null : content
+      showChangeContentTypePopup: !prev.showChangeContentTypePopup,
+      contentToChange: prev.showChangeContentTypePopup ? null : content
     }))
   }
 
-  handleClickValidateChangeType = async () => {
+  handleClickValidateChangeContentType = async () => {
     const { props, state } = this
     props.appContentChangeType(state.contentToChange, this.setState.bind(this))
     this.setState({
-      showChangeTypeContentPopup: false,
+      showChangeContentTypePopup: false,
       contentToChange: null
     })
   }
@@ -616,7 +616,7 @@ export class Publications extends React.Component {
             showCommentList
             workspaceId={Number(publication.workspaceId)}
             user={props.user}
-            onClickChangeType={(e) => this.handleToggleContentChangeTypePopup(e, publication)}
+            onClickChangeContentType={(e) => this.handleToggleChangeContentTypePopup(e, publication)}
             {...this.getPreviewLinkParameters(publication)}
           />
         )}
@@ -663,13 +663,13 @@ export class Publications extends React.Component {
             allowEmptyTitle
           />
         )}
-        {state.showChangeTypeContentPopup && (
+        {state.showChangeContentTypePopup && (
           <ConfirmPopup
             customColor={props.customColor}
             confirmLabel={props.t('Turn into Content')}
             confirmIcon='far fa-comments'
-            onConfirm={this.handleClickValidateChangeType}
-            onCancel={this.handleToggleContentChangeTypePopup}
+            onConfirm={this.handleClickValidateChangeContentType}
+            onCancel={this.handleToggleChangeContentTypePopup}
           />
         )}
       </ScrollToBottomWrapper>
