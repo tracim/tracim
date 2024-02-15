@@ -2392,15 +2392,17 @@ class ContentApi(object):
             Content: The modified content.
         """
         content = self.get_one(content_id=content_id)
-        if (
-            content.content_namespace != ContentNamespaces.PUBLICATION
-            or content_namespace != ContentNamespaces.CONTENT
-        ) and (
-            content.content_namespace != ContentNamespaces.CONTENT
-            or content_namespace != ContentNamespaces.PUBLICATION
-        ):
+        is_publication_to_content = (
+            content.content_namespace == ContentNamespaces.PUBLICATION
+            and content_namespace == ContentNamespaces.CONTENT
+        )
+        is_content_to_publication = (
+            content.content_namespace == ContentNamespaces.CONTENT
+            and content_namespace == ContentNamespaces.PUBLICATION
+        )
+        if not any([is_publication_to_content, is_content_to_publication]):
             raise ContentNamespaceDoNotMatch(
-                "the content namespace wanted and the namespace of the content aren't allowed"
+                "Namespace transision not allowed (allowed are PUBLICATION → CONTENT and CONTENT → PUBLICATION)"
             )
 
         with new_revision(session=self._session, tm=transaction.manager, content=content):

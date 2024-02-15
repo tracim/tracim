@@ -821,7 +821,7 @@ class ContentNamespaceUpdate(object):
 
     def __init__(
         self,
-        content_namespace: Optional[str] = None,
+        content_namespace: str,
     ) -> None:
         self.content_namespace = content_namespace
 

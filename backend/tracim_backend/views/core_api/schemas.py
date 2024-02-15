@@ -2099,7 +2099,7 @@ class ContentModifyAbstractSchema(marshmallow.Schema):
 
 class ContentModifyNamespaceAbstractSchema(marshmallow.Schema):
     content_namespace = StrippedString(
-        required=False,
+        required=True,
         description="Content_namespace of the object, raw text",
     )
 
