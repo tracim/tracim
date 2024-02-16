@@ -328,6 +328,7 @@ export class FeedItemWithPreview extends React.Component {
           workspaceId={props.workspaceId}
           titleLink={props.titleLink}
           onClickChangeContentType={props.onClickChangeContentType}
+          showButtonChangeContentType={props.showButtonChangeContentType}
         />
         {props.contentAvailable && !isContentDeleted && (
           <>
@@ -482,7 +483,8 @@ FeedItemWithPreview.propTypes = {
   titleLink: PropTypes.string,
   previewLink: PropTypes.string,
   previewLinkType: PropTypes.oneOf(Object.values(LINK_TYPE)),
-  showParticipateButton: PropTypes.bool
+  showParticipateButton: PropTypes.bool,
+  showButtonChangeContentType: PropTypes.bool
 }
 
 FeedItemWithPreview.defaultProps = {
@@ -503,5 +505,6 @@ FeedItemWithPreview.defaultProps = {
   previewLinkType: LINK_TYPE.OPEN_IN_APP,
   titleLink: null,
   previewLink: null,
-  showParticipateButton: false
+  showParticipateButton: false,
+  showButtonChangeContentType: false
 }

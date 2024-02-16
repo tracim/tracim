@@ -617,6 +617,7 @@ export class Publications extends React.Component {
             workspaceId={Number(publication.workspaceId)}
             user={props.user}
             onClickChangeContentType={(e) => this.handleToggleChangeContentTypePopup(e, publication)}
+            showButtonChangeContentType
             {...this.getPreviewLinkParameters(publication)}
           />
         )}

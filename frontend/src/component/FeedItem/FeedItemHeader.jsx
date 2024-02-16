@@ -74,7 +74,7 @@ export class FeedItemHeader extends React.Component {
       ROLE_LIST
     )
     const shouldShowChangeContentTypeButton = userRoleInWorkspace >= ROLE.contentManager.id &&
-      props.content.contentNamespace === CONTENT_NAMESPACE.PUBLICATION
+      props.content.contentNamespace === CONTENT_NAMESPACE.PUBLICATION && props.showButtonChangeContentType
 
     return (
       <div className='feedItemHeader'>
@@ -202,7 +202,8 @@ FeedItemHeader.propTypes = {
   onEventClicked: PropTypes.func,
   onClickEdit: PropTypes.func,
   titleLink: PropTypes.string,
-  onClickChangeContentType: PropTypes.func
+  onClickChangeContentType: PropTypes.func,
+  showButtonChangeContentType: PropTypes.bool
 }
 
 FeedItemHeader.defaultProps = {
@@ -221,5 +222,6 @@ FeedItemHeader.defaultProps = {
   modifiedDate: '',
   onClickEdit: () => {},
   titleLink: null,
-  onClickChangeContentType: () => {}
+  onClickChangeContentType: () => {},
+  showButtonChangeContentType: false
 }
