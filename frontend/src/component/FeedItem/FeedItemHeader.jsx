@@ -134,8 +134,8 @@ export class FeedItemHeader extends React.Component {
               customClass='feedItemHeader__actionMenu__item'
               icon='fas fa-link'
               onClick={props.onClickCopyLink}
-              text={props.t('Copy content link')}
-              textMobile={props.t('Copy content link')}
+              text={props.content.contentNamespace === CONTENT_NAMESPACE.PUBLICATION ? props.t('Copy news link') : props.t('Copy content link')}
+              textMobile={props.content.contentNamespace === CONTENT_NAMESPACE.PUBLICATION ? props.t('Copy news link') : props.t('Copy content link')}
               key={`link-${contentId}`}
             />
 
@@ -166,9 +166,9 @@ export class FeedItemHeader extends React.Component {
                 customClass='feedItemHeader__actionMenu__item'
                 disabled={props.content.is_archived || props.content.is_deleted}
                 icon='far fa-comments'
-                text={props.t('Turn into Content')}
-                textMobile={props.t('Turn into Content')}
-                label={props.t('Turn into Content')}
+                text={props.t('Turn into content')}
+                textMobile={props.t('Turn into content')}
+                label={props.t('Turn into content')}
                 key={`content-type-${contentId}`}
                 onClick={props.onClickChangeContentType}
                 dataCy='popinListItem__content_type'

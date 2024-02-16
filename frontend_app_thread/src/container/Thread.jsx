@@ -382,13 +382,13 @@ export class Thread extends React.Component {
           actionList={isPublication ? [
             {
               icon: 'fas fa-link',
-              label: props.t('Copy content link'),
+              label: props.t('Copy news link'),
               onClick: this.handleClickCopyLink,
               showAction: true,
               dataCy: 'popinListItem__copyLink'
             }, {
               icon: 'far fa-comments',
-              label: props.t('Turn into Content'),
+              label: props.t('Turn into content'),
               onClick: this.handleToggleContentChangeTypePopup,
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
               disabled: state.content.is_archived || state.content.is_deleted,
@@ -436,7 +436,7 @@ export class Thread extends React.Component {
         {state.showChangeTypeContentPopup && (
           <ConfirmPopup
             customColor={props.customColor}
-            confirmLabel={props.t('Turn into Content')}
+            confirmLabel={props.t('Turn into content')}
             confirmIcon='far fa-comments'
             onConfirm={this.handleClickValidateChangeType}
             onCancel={this.handleToggleContentChangeTypePopup}
