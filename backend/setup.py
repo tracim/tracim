@@ -55,6 +55,8 @@ requires = [
     "pyramid_ldap3",
     # frontend file serve
     "pyramid_mako",
+    # SAML
+    "pysaml2>=7.3.1",
     # i18n
     "Babel",
     "requests",

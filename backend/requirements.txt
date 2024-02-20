@@ -45,6 +45,7 @@ certifi==2021.5.30
 cffi==1.15.0
     # via
     #   cairocffi
+    #   cryptography
     #   weasyprint
 chardet==4.0.0
     # via requests
@@ -60,6 +61,10 @@ colorlog==5.0.1
     # via tracim-backend (setup.py)
 colour==0.1.5
     # via tracim-backend (setup.py)
+cryptography==42.0.3
+    # via
+    #   pyopenssl
+    #   pysaml2
 cssselect2==0.6.0
     # via
     #   cairosvg
@@ -67,6 +72,7 @@ cssselect2==0.6.0
 defusedxml==0.7.1
     # via
     #   cairosvg
+    #   pysaml2
     #   radicale
     #   wsgidav
 elasticsearch==7.13.1
@@ -75,6 +81,8 @@ elasticsearch==7.13.1
     #   tracim-backend (setup.py)
 elasticsearch-dsl==7.3.0
     # via tracim-backend (setup.py)
+elementpath==4.3.0
+    # via xmlschema
 email-reply-parser==0.5.12
     # via tracim-backend (setup.py)
 filedepot==0.8.0
@@ -173,6 +181,8 @@ pyjwt==2.4.0
     # via
     #   gripcontrol
     #   pubcontrol
+pyopenssl==24.0.0
+    # via pysaml2
 pypandoc==1.8.1
     # via tracim-backend (setup.py)
 pyparsing==2.4.7
@@ -206,10 +216,13 @@ pyramid-tm==2.4
     # via tracim-backend (setup.py)
 pyrsistent==0.18.0
     # via jsonschema
+pysaml2==7.3.1
+    # via tracim-backend (setup.py)
 python-dateutil==2.8.1
     # via
     #   alembic
     #   elasticsearch-dsl
+    #   pysaml2
     #   radicale
     #   sqlakeyset
     #   tracim-backend (setup.py)
@@ -221,7 +234,9 @@ python-magic==0.4.24
 python-slugify==5.0.2
     # via tracim-backend (setup.py)
 pytz==2021.1
-    # via babel
+    # via
+    #   babel
+    #   pysaml2
 pyyaml==5.4.1
     # via
     #   cliff
@@ -242,6 +257,7 @@ requests==2.25.1
     # via
     #   caldav
     #   pubcontrol
+    #   pysaml2
     #   tracim-backend (setup.py)
     #   webpreview
 rq==1.9.0
@@ -316,6 +332,8 @@ webpreview @ git+https://github.com/algoo/webpreview@v1.6.0+algoo
     # via tracim-backend (setup.py)
 wsgidav==2.4.1
     # via tracim-backend (setup.py)
+xmlschema==3.0.2
+    # via pysaml2
 zipp==3.4.1
     # via importlib-metadata
 zope-deprecation==4.4.0
@@ -327,7 +345,6 @@ zope-interface==5.4.0
     #   zope-sqlalchemy
 zope-sqlalchemy==1.6
     # via tracim-backend (setup.py)
-pysaml2==7.3.1
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
