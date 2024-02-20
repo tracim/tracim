@@ -16,6 +16,8 @@ apispec-marshmallow-advanced==0.4
     # via
     #   hapic
     #   tracim-backend (setup.py)
+async-timeout==4.0.3
+    # via redis
 attrs==21.4.0
     # via
     #   cmd2
@@ -232,7 +234,7 @@ pyzmq==22.1.0
     # via tracim-backend (setup.py)
 radicale==3.1.0
     # via tracim-backend (setup.py)
-redis==3.5.3
+redis==4.6.0
     # via
     #   rq
     #   tracim-backend (setup.py)
@@ -244,7 +246,7 @@ requests==2.25.1
     #   pubcontrol
     #   tracim-backend (setup.py)
     #   webpreview
-rq==1.9.0
+rq==1.15.1
     # via tracim-backend (setup.py)
 six==1.16.0
     # via
