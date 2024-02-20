@@ -57,6 +57,7 @@ requires = [
     "pyramid_mako",
     # SAML
     "pysaml2>=7.3.1",
+    "elementpath==4.1.5",  # to enforce support for python 3.7 (limited to 4.1.5)
     # i18n
     "Babel",
     "requests",
