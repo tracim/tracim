@@ -564,7 +564,8 @@ need to be in every workspace you include."
                 raise WrongAuthTypeForUser(
                     'User "{}" auth_type is {} and cannot authenticate with {}'.format(
                         login, user.auth_type.value, auth_type.value
-                    ))
+                    )
+                )
             raise WrongLDAPCredentials("LDAP credentials are not correct")
         ldap_data = data[1]
 
