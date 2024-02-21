@@ -560,6 +560,11 @@ need to be in every workspace you include."
         # INFO - G.M - 2018-11-22 - LDAP Auth
         data = ldap_connector.authenticate(login, password)
         if not data:
+            if user.auth_type == AuthType.UNKNOWN:
+                raise WrongAuthTypeForUser(
+                    'User "{}" auth_type is {} and cannot authenticate with {}'.format(
+                        login, user.auth_type.value, auth_type.value
+                    ))
             raise WrongLDAPCredentials("LDAP credentials are not correct")
         ldap_data = data[1]
 
