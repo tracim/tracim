@@ -1,6 +1,7 @@
 import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
+import * as Cookies from 'js-cookie'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import { isMobile } from 'react-device-detect'
@@ -17,6 +18,7 @@ import {
 import {
   ADVANCED_SEARCH_TYPE,
   ALL_CONTENT_TYPES,
+  COOKIE_FRONTEND,
   NO_ACTIVE_SPACE_ID,
   SEARCH_TYPE,
   TRACIM_APP_VERSION,
@@ -35,16 +37,38 @@ import CustomToolboxContainer from '../component/CustomToolboxContainer.jsx'
 const qs = require('query-string')
 export const LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE = 'lockToggleSidebarWhenOpenedOnMobile'
 
+export const SIDEBAR_STATE_COOKIE_KEY = {
+  FOLDED_SPACE_LIST: 'foldedSpaceList',
+  SHOW_SPACE_LIST: 'showSpaceList',
+  SHOW_USER_ITEMS: 'showUserItems'
+}
+export const getSidebarStateCookie = () => JSON.parse(Cookies.get(COOKIE_FRONTEND.SIDEBAR_STATE) || '{}')
+export const setSidebarStateCookie = (key, newValue) => {
+  if (Object.values(SIDEBAR_STATE_COOKIE_KEY).includes(key) === false) {
+    console.error('setSidebarStateCookie called with unknown key parameter')
+    return
+  }
+  const sidebarStateCookie = getSidebarStateCookie()
+  const newSidebarStateCookie = {
+    ...sidebarStateCookie,
+    [key]: newValue
+  }
+  Cookies.set(COOKIE_FRONTEND.SIDEBAR_STATE, JSON.stringify(newSidebarStateCookie), { expires: 180 })
+}
+
 export class Sidebar extends React.Component {
   constructor (props) {
     super(props)
     this.frameRef = React.createRef()
+
+    const sidebarStateCookie = getSidebarStateCookie()
+
     this.state = {
       activeSpaceId: NO_ACTIVE_SPACE_ID,
-      foldedSpaceList: [],
+      foldedSpaceList: sidebarStateCookie?.[SIDEBAR_STATE_COOKIE_KEY.FOLDED_SPACE_LIST] ?? [],
       isSidebarClosed: isMobile,
-      showSpaceList: true,
-      showUserItems: false
+      showSpaceList: sidebarStateCookie?.[SIDEBAR_STATE_COOKIE_KEY.SHOW_SPACE_LIST] ?? true,
+      showUserItems: sidebarStateCookie?.[SIDEBAR_STATE_COOKIE_KEY.SHOW_USER_ITEMS] ?? false
     }
 
     props.registerCustomEventHandlerList([
@@ -77,12 +101,18 @@ export class Sidebar extends React.Component {
     props.history.push(PAGE.SEARCH_RESULT + '?' + qs.stringify(newUrlSearchObject, { encode: true }))
   }
 
-  handleToggleFoldChildren = (id) => {
-    const { state } = this
-    if (state.foldedSpaceList.find(spaceId => spaceId === id)) {
-      const newFoldedSpaceList = state.foldedSpaceList.filter(spaceId => spaceId !== id)
-      this.setState({ foldedSpaceList: newFoldedSpaceList })
-    } else this.setState(prev => ({ foldedSpaceList: [...prev.foldedSpaceList, id] }))
+  handleToggleFoldSpaceChildren = (spaceId) => {
+    this.setState(prevState => {
+      const isSpaceFolded = !!prevState.foldedSpaceList.find(sId => sId === spaceId)
+
+      const newFoldedSpaceList = isSpaceFolded
+        ? prevState.foldedSpaceList.filter(sId => sId !== spaceId)
+        : [...prevState.foldedSpaceList, spaceId]
+
+      setSidebarStateCookie(SIDEBAR_STATE_COOKIE_KEY.FOLDED_SPACE_LIST, newFoldedSpaceList)
+
+      return { foldedSpaceList: newFoldedSpaceList }
+    })
   }
 
   componentDidMount () {
@@ -150,13 +180,25 @@ export class Sidebar extends React.Component {
 
   handleOpenSidebar = () => this.setState({ isSidebarClosed: false })
 
-  handleClickOpenSpaceList = () => this.setState({ showSpaceList: true })
+  handleClickOpenSpaceList = () => {
+    setSidebarStateCookie(SIDEBAR_STATE_COOKIE_KEY.SHOW_SPACE_LIST, true)
+    this.setState({ showSpaceList: true })
+  }
 
-  handleClickOpenUserItems = () => this.setState({ showUserItems: true })
+  handleClickOpenUserItems = () => {
+    setSidebarStateCookie(SIDEBAR_STATE_COOKIE_KEY.SHOW_USER_ITEMS, true)
+    this.setState({ showUserItems: true })
+  }
 
-  handleClickToggleSpaceList = () => this.setState(previousState => ({ showSpaceList: !previousState.showSpaceList }))
+  handleClickToggleSpaceList = () => this.setState(previousState => {
+    setSidebarStateCookie(SIDEBAR_STATE_COOKIE_KEY.SHOW_SPACE_LIST, !previousState.showSpaceList)
+    return { showSpaceList: !previousState.showSpaceList }
+  })
 
-  handleClickToggleUserItems = () => this.setState(previousState => ({ showUserItems: !previousState.showUserItems }))
+  handleClickToggleUserItems = () => this.setState(previousState => {
+    setSidebarStateCookie(SIDEBAR_STATE_COOKIE_KEY.SHOW_USER_ITEMS, !previousState.showUserItems)
+    return { showUserItems: !previousState.showUserItems }
+  })
 
   handleClickLogout = () => {
     this.props.dispatch(logoutUser(this.props.history))
@@ -256,7 +298,7 @@ export class Sidebar extends React.Component {
           onClickNewSpace={this.handleClickNewSpace}
           onClickOpenSpaceList={this.handleClickOpenSpaceList}
           onClickToggleSpaceList={this.handleClickToggleSpaceList}
-          onToggleFoldChildren={this.handleToggleFoldChildren}
+          onToggleFoldChildren={this.handleToggleFoldSpaceChildren}
           showSpaceList={state.showSpaceList}
           spaceList={props.workspaceList}
           isSpaceListLoaded={props.isSpaceListLoaded}

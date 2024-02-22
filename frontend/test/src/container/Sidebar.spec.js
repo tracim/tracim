@@ -1,11 +1,17 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import { Sidebar as SidebarWithoutHOC } from '../../../src/container/Sidebar.jsx'
+import {
+  Sidebar as SidebarWithoutHOC,
+  SIDEBAR_STATE_COOKIE_KEY,
+  getSidebarStateCookie,
+  setSidebarStateCookie
+} from '../../../src/container/Sidebar.jsx'
 import sinon from 'sinon'
 import { user } from '../../hocMock/redux/user/user'
 import { workspaceList } from '../../hocMock/redux/workspaceList/workspaceList'
 import { withRouterMock } from '../../hocMock/withRouter'
+import { COOKIE_FRONTEND } from '../../../src/util/helper'
 
 describe('<Sidebar />', () => {
   const dispatchCallBack = sinon.stub()
@@ -55,6 +61,39 @@ describe('<Sidebar />', () => {
       wrapper.setState({ isSidebarClosed: true })
       expect(wrapper.find('.sidebar.sidebarClose').length).to.equal(1)
       wrapper.setState({ isSidebarClosed: false })
+    })
+  })
+
+  describe('function setSidebarStateCookie', () => {
+    it('should create a cookie for sidebar state with proper values', () => {
+      setSidebarStateCookie(SIDEBAR_STATE_COOKIE_KEY.FOLDED_SPACE_LIST, [1, 2, 3])
+      const cookie = global.document.cookie
+      // INFO - CH - 20240222 - cookie // sidebarState={%22foldedSpaceList%22:[1%2C2%2C3]}
+      expect(cookie).to.not.equal('')
+      const sidebarStateCookie = cookie.split(';').filter(c => c.includes(COOKIE_FRONTEND.SIDEBAR_STATE))
+      expect(sidebarStateCookie).to.not.equal([])
+      const sidebarStateCookieValue = sidebarStateCookie[0]?.split('=')[1]
+      expect(
+        JSON.stringify(JSON.parse(decodeURIComponent(sidebarStateCookieValue)))
+      ).to.equal(
+        JSON.stringify(JSON.parse('{ "foldedSpaceList" : [1, 2, 3] }'))
+      )
+    })
+  })
+
+  describe('function getSidebarStateCookie', () => {
+    it('should get the sidebar state cookie', () => {
+      setSidebarStateCookie(SIDEBAR_STATE_COOKIE_KEY.FOLDED_SPACE_LIST, [1, 2, 3])
+      setSidebarStateCookie(SIDEBAR_STATE_COOKIE_KEY.SHOW_SPACE_LIST, true)
+      setSidebarStateCookie(SIDEBAR_STATE_COOKIE_KEY.SHOW_USER_ITEMS, false)
+
+      const sidebarStateCookie = getSidebarStateCookie()
+
+      expect(
+        JSON.stringify(sidebarStateCookie)
+      ).to.equal(
+        JSON.stringify(JSON.parse('{ "foldedSpaceList": [1, 2, 3], "showSpaceList": true, "showUserItems": false }'))
+      )
     })
   })
 })

@@ -157,7 +157,8 @@ export const COOKIE_FRONTEND = {
   LAST_CONNECTION: 'lastConnection',
   DEFAULT_LANGUAGE: 'defaultLanguage',
   DEFAULT_EXPIRE_TIME: 180,
-  SHOW_USERNAME_POPUP: 'showUsernamePopup'
+  SHOW_USERNAME_POPUP: 'showUsernamePopup',
+  SIDEBAR_STATE: 'sidebarState'
 }
 
 export const getUserProfile = slug => PROFILE_LIST.find(p => slug === p.slug) || {}
