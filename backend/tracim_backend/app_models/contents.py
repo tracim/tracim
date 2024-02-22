@@ -167,6 +167,8 @@ class ContentTypeSlug(str, Enum):
     KANBAN = "kanban"
     THREAD = "thread"
     TODO = "todo"
+    LOGBOOK = "logbook"
+    LOGBOOK_ENTRY = "logbook-entry"
     ANY = "any"
 
 
@@ -210,6 +212,14 @@ class ContentTypeList(object):
     @property
     def Todo(self) -> TracimContentType:
         return self.get_one_by_slug(ContentTypeSlug.TODO.value)
+
+    @property
+    def Logbook(self) -> TracimContentType:
+        return self.get_one_by_slug(ContentTypeSlug.LOGBOOK.value)
+
+    @property
+    def LogbookEntry(self) -> TracimContentType:
+        return self.get_one_by_slug(ContentTypeSlug.LOGBOOK_ENTRY.value)
 
     def __init__(self, app_list: typing.List["TracimApplication"]):
         self.app_list = app_list
