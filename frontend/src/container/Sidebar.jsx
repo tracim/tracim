@@ -17,7 +17,6 @@ import {
 import {
   ADVANCED_SEARCH_TYPE,
   ALL_CONTENT_TYPES,
-  COOKIE_FRONTEND,
   NO_ACTIVE_SPACE_ID,
   SEARCH_TYPE,
   TRACIM_APP_VERSION,
@@ -43,7 +42,7 @@ export const SIDEBAR_STATE_LOCAL_STORAGE_KEY = {
 }
 export const buildSidebarStateLocalStorageKey = userId => `sidebarState/${userId}`
 export const getSidebarStateLocalStorage = userId => JSON.parse(
-  localStorage.getItem(buildSidebarStateLocalStorageKey(userId))
+  window.localStorage.getItem(buildSidebarStateLocalStorageKey(userId))
 )
 export const setSidebarStateLocalStorage = (key, newValue, userId) => {
   if (Object.values(SIDEBAR_STATE_LOCAL_STORAGE_KEY).includes(key) === false) {
@@ -56,7 +55,7 @@ export const setSidebarStateLocalStorage = (key, newValue, userId) => {
     [key]: newValue
   }
   const localStorageKey = buildSidebarStateLocalStorageKey(userId)
-  localStorage.setItem(localStorageKey, JSON.stringify(newSidebarStateLocalStorage))
+  window.localStorage.setItem(localStorageKey, JSON.stringify(newSidebarStateLocalStorage))
 }
 
 export class Sidebar extends React.Component {

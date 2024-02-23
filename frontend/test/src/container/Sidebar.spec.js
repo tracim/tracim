@@ -77,7 +77,7 @@ describe('<Sidebar />', () => {
       const userId = 1
       setSidebarStateLocalStorage(SIDEBAR_STATE_LOCAL_STORAGE_KEY.FOLDED_SPACE_LIST, [1, 2, 3], userId)
       const localStorageKey = buildSidebarStateLocalStorageKey(userId)
-      const localStorageValue = JSON.parse(localStorage.getItem(localStorageKey))
+      const localStorageValue = JSON.parse(window.localStorage.getItem(localStorageKey))
       expect(localStorageValue).to.not.equal(null)
       expect(SIDEBAR_STATE_LOCAL_STORAGE_KEY.FOLDED_SPACE_LIST in localStorageValue).to.equal(true)
       expect(localStorageValue[SIDEBAR_STATE_LOCAL_STORAGE_KEY.FOLDED_SPACE_LIST]).to.have.ordered.members([1, 2, 3])
