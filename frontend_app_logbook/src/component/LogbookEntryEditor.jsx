@@ -1,15 +1,26 @@
-import React, { useState } from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import { translate } from 'react-i18next'
-import {
-  IconButton,
-  TextInput,
-  TinyEditor
-} from 'tracim_frontend_lib'
+import {translate} from 'react-i18next'
+import {DateInput, IconButton, TextInput, TinyEditor} from 'tracim_frontend_lib'
 
 function LogbookEntryEditor (props) {
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('This is a description')
+  const { entry } = props
+
+  const [title, setTitle] = useState(entry.title || '')
+  const [description, setDescription] = useState(entry.description || 'This is a description')
+  const [bgColor, setBgColor] = useState(entry.bgColor || props.customColor)
+  const [deadline, setDeadline] = useState(entry.deadline || getCurrentDateTime())
+  const [freeInput, setFreeInput] = useState(entry.freeInput || '')
+
+  function getCurrentDateTime() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = `${(now.getMonth() + 1)}`.padStart(2, '0');
+    const day = `${now.getDate()}`.padStart(2, '0');
+    const hours = `${now.getHours()}`.padStart(2, '0');
+    const minutes = `${now.getMinutes()}`.padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
 
   function handleValidate (e) {
     e.preventDefault()
@@ -17,8 +28,12 @@ function LogbookEntryEditor (props) {
     const descriptionText = description.target ? description.target.value : description
 
     props.onValidate({
+      ...entry,
       title,
-      description: descriptionText
+      description: descriptionText,
+      bgColor,
+      deadline,
+      freeInput
     })
   }
 
@@ -53,40 +68,70 @@ function LogbookEntryEditor (props) {
             placeholder={props.t('Description of the entry')}
           />
         </div>
+
+        <div className='logbook__LogbookPopup__bgColor'>
+          <label htmlFor='logbook__LogbookPopup__bgColor'>{props.t('Color:')}</label>
+          <input
+            id='logbook__LogbookPopup__bgColor'
+            type='color'
+            value={bgColor}
+            onChange={(e) => setBgColor(e.target.value)}
+          />
+        </div>
+
+        <div className='logbook__LogbookPopup__deadline'>
+          <label htmlFor='logbook__LogbookPopup__deadline'>{props.t('Deadline:')}</label>
+          <DateInput
+            id='logbook__LogbookPopup__deadline'
+            onChange={(e) => setDeadline(e.target.value)}
+            onValidate={handleValidate}
+            value={deadline}
+            type='datetime-local'
+          />
+        </div>
+
+        <div className='logbook__LogbookPopup__freeInput'>
+          <label htmlFor='logbook__LogbookPopup__freeInput'>{props.t('Value:')}</label>
+          <TextInput
+            id='logbook__LogbookPopup__freeInput'
+            onChange={(e) => setFreeInput(e.target.value)}
+            onValidate={handleValidate}
+            value={freeInput}
+          />
+        </div>
       </div>
       <div className='logbook__LogbookPopup__form_buttons'>
         <IconButton
           color={props.customColor}
+          dataCy='confirm_popup__button_cancel'
+          icon='fas fa-times'
+          onClick={props.onCancel}
+          text={props.t('Cancel')}
+        />
+
+        <IconButton
+          color={props.customColor}
           dataCy='confirm_popup__button_confirm'
-          icon='fa-fw fas fa-quote-left'
+          icon='fas fa-check'
           intent='primary'
           mode='light'
           onClick={handleValidate}
-          text={props.t('Create entry')}
+          text={props.t('Validate')}
         />
       </div>
     </form>
   )
 }
-
-//         <IconButton
-//           color={props.customColor}
-//           dataCy='confirm_popup__button_cancel'
-//           icon='fas fa-times'
-//           onClick={props.onCancel}
-//           text={props.t('Cancel')}
-//         />
-
 export default translate()(LogbookEntryEditor)
 
 LogbookEntryEditor.propTypes = {
   apiUrl: PropTypes.string.isRequired,
+  entry: PropTypes.object.isRequired,
   onValidate: PropTypes.func.isRequired,
-  // onCancel: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
   // End of required props /////////////////////////////////////////////////////////////////////////
   codeLanguageList: PropTypes.array,
   customColor: PropTypes.string,
-  focusOnDescription: PropTypes.bool,
   language: PropTypes.string,
   memberList: PropTypes.array
 }
@@ -94,6 +139,5 @@ LogbookEntryEditor.propTypes = {
 LogbookEntryEditor.defaultProps = {
   codeLanguageList: [],
   customColor: '',
-  focusOnDescription: false,
   language: 'en'
 }

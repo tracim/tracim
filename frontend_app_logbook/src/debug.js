@@ -15,7 +15,7 @@ export const debug = {
   },
   content: {
     ...defaultDebug.content,
-    content_id: 7,
+    content_id: 25,
     content_type: 'logbook',
     workspace_id: 1
   },

@@ -16,7 +16,7 @@ export class DateInput extends React.Component {
     return (
       <input
         autoFocus={props.autoFocus}
-        type='date'
+        type={props.type}
         className='dateInput form-control'
         onChange={props.onChange}
         disabled={props.disabled}
@@ -36,7 +36,8 @@ DateInput.propTypes = {
   disabled: PropTypes.bool,
   placeholder: PropTypes.string,
   customClass: PropTypes.string,
-  icon: PropTypes.string
+  icon: PropTypes.string,
+  type: PropTypes.string
 }
 
 DateInput.defaultProps = {
@@ -45,7 +46,8 @@ DateInput.defaultProps = {
   disabled: false,
   placeholder: undefined,
   customClass: '',
-  icon: undefined
+  icon: undefined,
+  type: 'date'
 }
 
 export default DateInput

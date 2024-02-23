@@ -71,13 +71,11 @@ is_file_content = ContentTypeChecker([
     ContentTypeSlug.FILE.value,
     ContentTypeSlug.KANBAN.value,
     ContentTypeSlug.LOGBOOK.value,
-    ContentTypeSlug.LOGBOOK_ENTRY.value,
 ])
 can_create_file = OrAuthorizationChecker(
     ContentTypeCreationChecker(content_type_list, ContentTypeSlug.FILE.value),
     ContentTypeCreationChecker(content_type_list, ContentTypeSlug.KANBAN.value),
     ContentTypeCreationChecker(content_type_list, ContentTypeSlug.LOGBOOK.value),
-    ContentTypeCreationChecker(content_type_list, ContentTypeSlug.LOGBOOK_ENTRY.value),
 )
 
 

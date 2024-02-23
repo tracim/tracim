@@ -1,24 +1,25 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import classnames from 'classnames'
+import { v4 as uuidv4 } from 'uuid'
 
 import {
   APP_FEATURE_MODE,
   IconButton,
   handleFetchResult,
-  // CardPopup,
+  putRawFileContent,
+  getRawFileContent,
+  CardPopup,
   Loading,
   PromptMessage,
   RefreshWarningMessage,
-  postNewEmptyContent,
-  putEditContent,
-  getLogbookChildEntries,
-  getFileContent,
-  Icon
+  sendGlobalFlashMessage
 } from 'tracim_frontend_lib'
 
-import LogbookEntryEditor from "./LogbookEntryEditor.jsx";
+import { LOGBOOK_MIME_TYPE, LOGBOOK_FILE_EXTENSION } from '../helper.js'
+import LogbookEntry from './LogbookEntry.jsx'
+import LogbookEntryEditor from './LogbookEntryEditor.jsx'
 
 export const LOGBOOK_STATE = {
   INIT: 'init',
@@ -28,42 +29,19 @@ export const LOGBOOK_STATE = {
   ERROR: 'error'
 }
 
-const LogbookEntry = (props) => {
-  const [entry, setEntry] = useState(props.entry)
+const addEntryToLogbook = (logbook, newEntry) => {
+  newEntry.id = uuidv4()
+  logbook.entries.push(newEntry);
+  return logbook;
+}
 
-  useEffect(() => {
-    const effect = async () => {
-      const fetchFileContent = await handleFetchResult(
-        await getFileContent(
-          props.config.apiUrl,
-          props.entry.workspace_id,
-          props.entry.content_id
-        )
-      )
+const replaceEntryInLogbook = (logbook, idToReplace, newEntry) => {
+  logbook.entries = logbook.entries.map(entry => entry.id === idToReplace ? newEntry : entry);
+  return logbook;
+}
 
-      if (!fetchFileContent.apiResponse.ok) return
-      setEntry(fetchFileContent.body)
-    }
-    effect()
-  }, [props.entry])
-
-  // TODO add title to icon
-  return (
-    <div className='logbook__wrapper__timeline__entries__entry'>
-      <div className='logbook__wrapper__timeline__entries__entry__dot' />
-      <div className='logbook__wrapper__timeline__entries__entry__arrow' />
-      <div className='logbook__wrapper__timeline__entries__entry__data'>
-        <h4>{entry.label}</h4>
-        <span className='logbook__wrapper__timeline__entries__entry__data__date'>
-          <Icon
-            icon='fas fa-clock'
-          />
-          {entry.created}
-        </span>
-        <p>{entry.raw_content}</p>
-      </div>
-    </div>
-  )
+const removeEntryFromLogbook = (logbook, entryToRemove) => {
+  return logbook.entries.filter(entry => entry.id !== entryToRemove.id)
 }
 
 export class Logbook extends React.Component {
@@ -74,9 +52,10 @@ export class Logbook extends React.Component {
 
     this.state = {
       logbook: { entries: [] },
-      logbookInitiallyLoaded: false,
-      logbookState: justCreated ? LOGBOOK_STATE.LOADED : LOGBOOK_STATE.INIT
-     // logbookAddEntry: false
+      logbookState: justCreated ? LOGBOOK_STATE.LOADED : LOGBOOK_STATE.INIT,
+      entryToEdit: {},
+      saveRequired: false,
+      showEditPopIn: false,
     }
   }
 
@@ -89,18 +68,24 @@ export class Logbook extends React.Component {
       this.setState({
         logbookState: LOGBOOK_STATE.LOADED,
         logbookInitiallyLoaded: true,
+        saveRequired: true,
         logbook: newLogbook
       })
     }
   }
 
   async componentDidUpdate (prevProps) {
-    const { props } = this
+    const { state, props } = this
     if (
       (props.content.current_revision_id !== prevProps.content.current_revision_id) ||
       (props.isNewContentRevision && prevProps.isNewContentRevision !== props.isNewContentRevision)
     ) {
       this.loadLogbookContent()
+    }
+
+    if (state.saveRequired) {
+      this.save(state.logbook)
+      this.setState({ saveRequired: false })
     }
   }
 
@@ -108,75 +93,98 @@ export class Logbook extends React.Component {
     this.setState({ logbookState: LOGBOOK_STATE.LOADING })
     const { props } = this
 
-    const fetchFileChildContent = await handleFetchResult(
-      await getLogbookChildEntries(
+    const fetchRawFileContent = await handleFetchResult(
+      await getRawFileContent(
         props.config.apiUrl,
         props.content.workspace_id,
-        props.content.content_id
-      )
+        props.content.content_id,
+        props.content.current_revision_id,
+        props.content.label + LOGBOOK_FILE_EXTENSION
+      ),
+      true
     )
 
-    if (fetchFileChildContent.apiResponse.ok) {
+    if (fetchRawFileContent.apiResponse.ok && fetchRawFileContent.body.entries) {
       this.setState({
         logbookState: LOGBOOK_STATE.LOADED,
         logbookInitiallyLoaded: true,
-        logbook: { entries: fetchFileChildContent.body.items.sort((a, b) => new Date(b.created) - new Date(a.created)) }
+        logbook: fetchRawFileContent.body
       })
     } else {
       this.setState({ logbookState: LOGBOOK_STATE.ERROR })
     }
   }
 
-  // handleShowPopIn () {
-  //  this.setState({ logbookAddEntry: true })
-  // }
+  handleShowPopIn = (entry) => {
+    this.setState({
+      entryToEdit: entry,
+      showEditPopIn: true
+    })
+  }
 
-  // handleHidePopIn () {
-  //  this.setState({ logbookAddEntry: false })
-  // }
+  handleHidePopIn = () => {
+    this.setState({
+      entryToEdit: {},
+      showEditPopIn: false
+    })
+  }
 
-  async handleNewEntry (entry) {
+  handleAddOrEditEntry = (entry) => {
+    this.setState(prevState => {
+      const newLogbook = entry.id
+        ? replaceEntryInLogbook(prevState.logbook, entry)
+        : addEntryToLogbook(prevState.logbook, entry)
+      return {
+        showEditPopIn: false,
+        logbookState: LOGBOOK_STATE.SAVING,
+        saveRequired: true,
+        logbook: newLogbook
+      }
+    })
+  }
+
+  handleRemoveEntry = (entry) => {
+    this.setState(prevState => {
+      const newLogbook = removeEntryFromLogbook(prevState.logbook, entry)
+      return {
+        logbookState: LOGBOOK_STATE.SAVING,
+        saveRequired: true,
+        logbook: newLogbook
+      }
+    })
+  }
+
+  async save (newLogbook) {
     const { props } = this
-
-    this.handleHidePopIn()
-    const newEmptyContent = await handleFetchResult(
-      await postNewEmptyContent(
+    const fetchResultSaveLogbook = await handleFetchResult(
+      await putRawFileContent(
         props.config.apiUrl,
         props.content.workspace_id,
         props.content.content_id,
-        'logbook-entry',
-        entry.title
-      )
-    )
-    if (!newEmptyContent.apiResponse.ok) {
-      this.setState({ logbookState: LOGBOOK_STATE.ERROR })
-      return
-    }
-
-    const newEntry = newEmptyContent.body
-    const updatedContent = await handleFetchResult(
-      await putEditContent(
-        props.config.apiUrl,
-        props.content.workspace_id,
-        newEntry.content_id,
-        'file',
-        entry.title,
-        entry.description
+        props.content.label + LOGBOOK_FILE_EXTENSION,
+        JSON.stringify(newLogbook),
+        LOGBOOK_MIME_TYPE
       )
     )
 
-    if (!updatedContent.apiResponse.ok) {
-      this.setState({ logbookState: LOGBOOK_STATE.ERROR })
-      return
+    if (!fetchResultSaveLogbook.ok) {
+      switch (fetchResultSaveLogbook.body.code) {
+        case 2044:
+          sendGlobalFlashMessage(props.t('You must change the status or restore this logbook logbook before any change'))
+          break
+        default:
+          sendGlobalFlashMessage(props.t('Error while saving the new version'))
+          break
+      }
     }
-
-    console.log(updatedContent)
-    this.loadLogbookContent()
   }
 
   render () {
     const { props, state } = this
     const changesAllowed = !props.readOnly && state.logbookState === LOGBOOK_STATE.LOADED
+    const sorted = state.logbook.entries.sort((a, b) => new Date(b.deadline) - new Date(a.deadline))
+
+    console.log(sorted)
 
     return (
       <div className={classnames('logbook__contentpage__wrapper', { fullscreen: props.fullscreen })}>
@@ -220,61 +228,69 @@ export class Logbook extends React.Component {
         </div>
         {state.logbookState === LOGBOOK_STATE.INIT && <Loading />}
         {state.logbookState === LOGBOOK_STATE.ERROR && <span> {props.t('Error while loading the logbook.')} </span>}
-        <div className={"logbook__wrapper"}>
-          {changesAllowed && (
-            <LogbookEntryEditor
-              apiUrl={props.config.apiUrl}
-              onValidate={(entry) => this.handleNewEntry(entry)}
-              // onCancel={() => this.handleHidePopIn()}
-              // End of required props ///////////////////////////////////////
-              codeLanguageList={props.config.system.config.ui__notes__code_sample_languages}
-              customColor={props.config.hexcolor}
-              language={props.language}
-            />
-          )}
+        <>
           <div
-            className={classnames('logbook__wrapper__timeline', {
+            className={classnames('logbook__contentpage__wrapper__logbook', 'logbook__wrapper', {
               hidden: state.logbookState === LOGBOOK_STATE.INIT
             })}
           >
-            {state.logbook.entries.length >= 1
-              ? (
-                <>
-                  <div className='logbook__wrapper__timeline__bar' />
-                  <div className='logbook__wrapper__timeline__entries'>
-                    {state.logbook.entries.map((entry, i) =>
-                      <LogbookEntry key={i} entry={entry} config={props.config} />
-                    )}
-                  </div>
-                </>
-              )
-              : (<h2>{props.t('No entry yet')}</h2>)}
+            {changesAllowed && (
+                <IconButton
+                  customClass={'logbook__new_button'}
+                  text={props.t('Create a new entry')}
+                  textMobile={props.t('Create a new entry')}
+                  icon='fas fa-plus'
+                  onClick={() => this.handleShowPopIn({})}
+                />
+            )}
+            <div className='logbook__timeline'>
+              {state.logbook.entries.length >= 1
+                ? (
+                  <>
+                    <div className='logbook__timeline__bar' />
+                    <div className='logbook__timeline__entries'>
+                      {state.logbook.entries.toSorted((a, b) => new Date(b.deadline) - new Date(a.deadline)).map((entry, id) =>
+                        <LogbookEntry
+                          customColor={props.config.hexcolor}
+                          readOnly={!changesAllowed}
+                          hideButtonsWhenReadOnly={props.readOnly}
+                          entry={entry}
+                          onEditEntry={this.handleShowPopIn}
+                          onRemoveEntry={this.handleRemoveEntry}
+                          key={id}
+                        />
+                      )}
+                    </div>
+                  </>
+                )
+                : (<h2>{props.t('No entry yet')}</h2>)}
+            </div>
           </div>
-        </div>
+          {state.showEditPopIn && (
+            <CardPopup
+              customClass={classnames('logbook__LogbookPopup', { hidden: state.logbookState !== LOGBOOK_STATE.LOADED })}
+              customColor={props.config.hexcolor}
+              faIcon='far fa-id-card'
+              label={state.entryToEdit.id ? props.t('Editing Entry') : props.t('New Entry')}
+              onClose={this.handleHidePopIn}
+            >
+              <LogbookEntryEditor
+                apiUrl={props.config.apiUrl}
+                entry={state.entryToEdit}
+                onValidate={this.handleAddOrEditEntry}
+                onCancel={this.handleHidePopIn}
+                // End of required props ///////////////////////////////////////
+                codeLanguageList={props.config.system.config.ui__notes__code_sample_languages}
+                customColor={props.config.hexcolor}
+                language={props.language}
+              />
+            </CardPopup>
+          )}
+        </>
       </div>
     )
   }
 }
-
-//           {state.logbookAddEntry && changesAllowed && (
-//             <CardPopup
-//               customClass={classnames('logbook__LogbookPopup', { hidden: state.logbookState !== LOGBOOK_STATE.LOADED })}
-//               customColor={props.config.hexcolor}
-//               faIcon='far fa-id-card'
-//               label={props.t('New entry')}
-//               onClose={() => this.handleHidePopIn()}
-//             >
-//               <LogbookEntryEditor
-//                 apiUrl={props.config.apiUrl}
-//                 onValidate={(entry) => this.handleNewEntry(entry)}
-//                 onCancel={() => this.handleHidePopIn()}
-//                 // End of required props ///////////////////////////////////////
-//                 codeLanguageList={props.config.system.config.ui__notes__code_sample_languages}
-//                 customColor={props.config.hexcolor}
-//                 language={props.language}
-//               />
-//             </CardPopup>
-//           )}
 
 Logbook.propTypes = {
   config: PropTypes.object.isRequired,

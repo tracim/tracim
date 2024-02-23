@@ -320,7 +320,6 @@ class CFG(object):
         # see issue https://github.com/tracim/tracim/issues/2326
         default_app_order = (
             "contents/logbook",
-            "contents/logbook-entry",
             "contents/thread",
             "contents/file",
             "contents/html-document",
