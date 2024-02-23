@@ -1,0 +1,178 @@
+import React from 'react'
+import i18n from '../i18n.js'
+import { translate } from 'react-i18next'
+import {
+  CONTENT_TYPE,
+  CUSTOM_EVENT,
+  addAllResourceI18n,
+  CardPopupCreateContent,
+  handleFetchResult,
+  buildHeadTitle,
+  appContentFactory,
+  TracimComponent,
+  postRawFileContent
+} from 'tracim_frontend_lib'
+
+import { LOGBOOK_MIME_TYPE, LOGBOOK_FILE_EXTENSION } from '../helper.js'
+import { debug } from '../debug.js'
+
+const defaultLogbookBoard = {
+  columns: []
+}
+
+export class PopupCreateLogbook extends React.Component {
+  constructor (props) {
+    super(props)
+
+    const param = props.data || debug
+    props.setApiUrl(param.config.apiUrl)
+
+    this.state = {
+      appName: 'logbook', // must remain 'logbook' because it is the name of the react built app (which contains Logbook and PopupCreateLogbook)
+      config: param.config,
+      templateId: null,
+      loggedUser: param.loggedUser,
+      workspaceId: param.workspaceId,
+      folderId: param.folderId,
+      newContentName: '',
+      templateList: []
+    }
+
+    // i18n has been init, add resources from frontend
+    addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
+    i18n.changeLanguage(this.state.loggedUser.lang)
+
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
+  }
+
+  componentDidMount () {
+    this.setHeadTitle()
+    this.props.getTemplateList(this.setState.bind(this), CONTENT_TYPE.LOGBOOK)
+  }
+
+  handleAllAppChangeLanguage = data => {
+    console.log('%c<PopupCreateLogbook> Custom event', 'color: #28a745', CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, data)
+
+    this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
+    this.setHeadTitle()
+  }
+
+  setHeadTitle = () => {
+    const { state, props } = this
+
+    if (state.config && state.config.workspace) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.SET_HEAD_TITLE,
+        data: { title: buildHeadTitle([props.t('New Logbook board'), state.config.workspace.label]) }
+      })
+    }
+  }
+
+  handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
+
+  handleChangeTemplate = (template, { action }) => {
+    // NOTE - MP - 2022-06-07 - Clear is an action type of react-select
+    // see https://react-select.com/props#prop-types
+    if (action !== 'clear') {
+      if (template.content_id !== -1) {
+        this.setState({ templateId: template.content_id })
+        this.setState({ newContentName: `${template.label} ${this.state.newContentName}` })
+      }
+    } else {
+      this.setState({ templateId: null })
+    }
+  }
+
+  handleClose = () => GLOBAL_dispatchEvent({
+    type: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT,
+    data: {
+      name: this.state.appName
+    }
+  })
+
+  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
+    type: CUSTOM_EVENT.ADD_FLASH_MSG,
+    data: {
+      msg: msg,
+      type: 'warning',
+      delay: undefined
+    }
+  })
+
+  handleValidate = async () => {
+    const { props, state } = this
+
+    const fetchSaveLogbookDoc = postRawFileContent(
+      state.config.apiUrl,
+      state.workspaceId,
+      state.newContentName + LOGBOOK_FILE_EXTENSION,
+      JSON.stringify(defaultLogbookBoard),
+      LOGBOOK_MIME_TYPE,
+      state.folderId,
+      state.templateId,
+      state.config.slug
+    )
+
+    const resSave = await handleFetchResult(await fetchSaveLogbookDoc)
+
+    switch (resSave.apiResponse.status) {
+      case 200:
+        this.handleClose()
+
+        GLOBAL_dispatchEvent({
+          type: CUSTOM_EVENT.OPEN_CONTENT_URL,
+          data: {
+            workspaceId: resSave.body.workspace_id,
+            contentType: state.appName,
+            contentId: resSave.body.content_id
+          }
+        })
+        break
+      case 400:
+        switch (resSave.body.code) {
+          case 3002:
+            this.sendGlobalFlashMessage(props.t('A content with the same name already exists'))
+            break
+          case 6002:
+            this.sendGlobalFlashMessage(props.t('The file is larger than the maximum file size allowed'))
+            break
+          case 6003:
+            this.sendGlobalFlashMessage(props.t('Error, the space exceed its maximum size'))
+            break
+          case 6004:
+            this.sendGlobalFlashMessage(props.t('You have reached your storage limit, you cannot add new files'))
+            break
+          default:
+            this.sendGlobalFlashMessage(props.t('Error while creating logbook'))
+            break
+        }
+        break
+      default:
+        this.sendGlobalFlashMessage(props.t('Error while creating logbook'))
+        break
+    }
+  }
+
+  render () {
+    return (
+      <CardPopupCreateContent
+        btnValidateLabel={this.props.t('Validate and create')}
+        contentName={this.state.newContentName}
+        customColor={this.state.config.hexcolor}
+        displayTemplateList
+        faIcon={this.state.config.faIcon}
+        inputPlaceholder={this.props.t("Board's name")}
+        label={this.props.t('New Logbook board')}
+        onChangeContentName={this.handleChangeNewContentName}
+        onChangeTemplate={this.handleChangeTemplate}
+        onClose={this.handleClose}
+        onValidate={this.handleValidate}
+        templateList={this.state.templateList}
+      />
+    )
+  }
+}
+
+export default translate()(appContentFactory(TracimComponent(PopupCreateLogbook)))

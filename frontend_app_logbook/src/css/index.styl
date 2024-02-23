@@ -1,0 +1,301 @@
+@import '~tracim_frontend_lib/src/css/Variable.styl'
+
+cardWidth = 280px
+
+.logbook
+  &__timeline
+    height: 100%;
+    padding: standardSpacing;
+    display: flex;
+    flex-direction: row;
+    &__bar
+      background-color: lightGrey1;
+      width: 10px;
+      height: 100%;
+    &__entries
+      padding-left: standardSpacing;
+      width: 99%;
+      max-width 700px
+      margin-left standardSpacing
+      &__entry
+        background-color: lightGrey2;
+        border-radius: standardBorderRadius;
+        display: flex;
+        flex-direction: row;
+        margin-bottom standardSpacing
+        &__dot
+          border-radius: 100%;
+          margin-top: standardSpacing;
+          margin-left: -33px;
+          width: 16px;
+          height: 16px;
+          border: solid 3px lightGrey1;
+          background-color: lightGrey2;
+          z-index: 400;
+        &__arrow
+          width: 0.5rem;
+          height: 0.5rem;
+          margin-top: standardSpacing;
+          margin-left: standardSpacing;
+          border-top: 0.5rem solid transparent;
+          border-right: 0.5rem solid lightGrey2;
+          border-bottom: 0.5rem solid transparent;
+        &__data
+          width: 100%;
+          padding: standardSpacing;
+          display: flex;
+          flex-direction: column;
+          &__date
+            margin-bottom: standardSpacing;
+
+
+
+.logbook
+  &__contentpage
+    &__content
+      &__left
+        background-color offWhite
+        display flex
+        flex-direction column
+    &__wrapper
+      display flex
+      flex-direction column
+      // INFO - GB - 2021-12-20 - 28px is the wsContentGeneric__content__left__top height
+      height "calc(100% - %s)" % (headerHeight + 28px)
+      &.fullscreen
+        position fixed
+        width "calc(100% - %s)" % closedSidebarWidth
+        height 100%
+        // INFO - GB - 2022-08-09 - .logbook.fullscreen has z-index 2 to be above TinyMCE (.tox .tox-editor-header)
+        // In case advanced edition is enabled at the moment the user goes into fullscreen mode.
+        z-index 2
+        background offWhite
+
+      &__options
+        display flex
+        justify-content flex-end
+        & button
+          margin-inline-end standardSpacing
+
+      &__board
+        flex 1
+        overflow-x auto
+        overflow-y hidden
+
+        &.hidden
+          display none
+
+        &__column
+          display flex
+          flex-direction row
+          border-bottom 3px solid
+          padding-bottom standardSpacing
+          margin-bottom standardSpacing
+          align-items baseline
+          justify-content space-evenly
+          text-align start
+          &__title
+            width 180px
+            text-overflow ellipsis
+            overflow hidden
+            white-space nowrap
+            flex 1
+            unicode-bidi plaintext
+            & > strong
+              font-size titleFontSize
+              flex 1
+              cursor pointer
+              overflow hidden
+              text-overflow ellipsis
+            &__actions.dropdownMenuButton
+              color fontColor
+              padding 0
+              &::after
+                display none
+          & button:hover
+            background-color lightGrey1
+          &.buttonHidden
+            .dropdown, .logbook_addCard
+              display none
+          &.readOnly
+            strong
+              cursor auto
+
+        & .react-kanban-board
+          direction ltr
+          height 100%
+          overflow-x visible
+          padding standardSpacing
+          & > div
+            height 100%
+
+      &__toolbar
+        position absolute
+        top standardSpacing
+        z-index 1
+        & .iconbutton
+          background-color offWhite
+          &:hover
+            background-color lightGrey2
+        &:empty
+          display none
+
+      & .react-kanban-column-header
+        display flex
+        flex-direction row
+        > :first-child
+          flex 1
+        > :last-child
+          display inline-block
+          border-radius standardBorderRadius
+          cursor default
+
+      & .react-kanban-column
+        padding standardSpacing
+        background-color lightGrey2
+        border-radius standardBorderRadius
+        margin 0 textSpacing
+        min-width 315px
+        text-align center
+        & > :last-child
+          overflow hidden
+          // INFO - GB - 2021-12-20 - The css rule below is !important because it overrides the library style
+          height calc(100% - 43px) !important
+          &:hover
+            overflow-y auto
+  &__LogbookPopup
+    max-height 80%
+    &.hidden
+      display none
+    &__bgColor, &__deadline
+      display flex
+      flex-direction column
+      &__inline
+        flex-direction row
+
+    & .cardPopup__container
+      width 80%
+      display flex
+      flex-direction column
+      overflow auto
+
+    & [type=checkbox]
+      margin textSpacing
+
+    & [type=text], textarea
+      width 100%
+
+    & [type=color]
+      margin-bottom textSpacing
+
+    & label
+      white-space pre
+      font-weight bold
+
+    & input
+      vertical-align middle
+
+    &__description, &__deadline, &__title, &__freeInput
+      margin-bottom standardSpacing
+
+    &__description
+      > div
+        height 200px
+
+    &__form
+      overflow-y auto
+      width 100%
+      height 100%
+      &__fields
+          width calc(100% - 2px) // NOTE - RJ - 19-01-2022 - TinyMCE borders make the form overflow if we don't remove these 2px here
+        label
+          padding-inline-end textSpacing
+
+        & .form-control
+          color unset
+          font-size standardFontSize
+          padding-inline-start textSpacing
+          border none
+
+      &_buttons
+        margin-bottom 0
+        padding-bottom 0
+        text-align end
+        button:last-child, input:last-child
+          margin-inline-start standardSpacing
+
+    &__confirm
+      display flex
+      width 100%
+      justify-content flex-end
+      & > .iconbutton
+        margin-inline-start standardSpacing
+
+  &__columnAdder
+    border 1px lightGrey1 dashed
+    min-width cardWidth
+    max-height 70px
+    margin 0 textSpacing
+    text-align-last center
+    display flex
+    border-radius standardBorderRadius
+    flex-direction column
+    cursor pointer
+    &.disabled
+      cursor not-allowed
+      opacity 0.5
+
+    &:hover
+      background-color lightGrey2
+    & > *
+      margin auto
+
+[dir=ltr] .logbook
+  &__contentpage
+    &__wrapper
+      &.fullscreen
+        left closedSidebarWidth
+      &__toolbar
+        right standardSpacing
+
+[dir=rtl] .logbook
+  &__contentpage
+    &__wrapper
+      &.fullscreen
+        right closedSidebarWidth
+      &__toolbar
+        left standardSpacing
+
+@media (min-width: max-xs) and (max-width: max-lg)
+  .logbook
+    &__contentpage
+      display block
+      &__content__left
+        min-height 250px
+      &__wrapper
+        width 100%
+        .commentArea
+          &__simpletext
+            display inline-flex
+            width 60%
+          &__submit
+            display inline-flex
+            margin standardSpacing 0
+
+@media (max-width: max-xs)
+  body:not(.tox-fullscreen) .logbook__LogbookPopup
+    transform translate(-50%, 0%) !important
+
+  .logbook__LogbookPopup
+    position absolute
+    top 10%
+    max-height "calc(100% - %s)" % listIconWidth
+
+    & .cardPopup__container
+      min-width 100%
+      max-height 100%
+      overflow auto
+      & .cardPopup__body
+        height 100%
+        & .logbook__LogbookPopup__form
+          height "calc(100% - %s)" % standardSpacing
