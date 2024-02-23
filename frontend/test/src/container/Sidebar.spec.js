@@ -3,15 +3,15 @@ import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import {
   Sidebar as SidebarWithoutHOC,
-  SIDEBAR_STATE_COOKIE_KEY,
-  getSidebarStateCookie,
-  setSidebarStateCookie
+  SIDEBAR_STATE_LOCAL_STORAGE_KEY,
+  getSidebarStateLocalStorage,
+  setSidebarStateLocalStorage,
+  buildSidebarStateLocalStorageKey
 } from '../../../src/container/Sidebar.jsx'
 import sinon from 'sinon'
-import { user } from '../../hocMock/redux/user/user'
-import { workspaceList } from '../../hocMock/redux/workspaceList/workspaceList'
-import { withRouterMock } from '../../hocMock/withRouter'
-import { COOKIE_FRONTEND } from '../../../src/util/helper'
+import { user } from '../../hocMock/redux/user/user.js'
+import { workspaceList } from '../../hocMock/redux/workspaceList/workspaceList.js'
+import { withRouterMock } from '../../hocMock/withRouter.js'
 
 describe('<Sidebar />', () => {
   const dispatchCallBack = sinon.stub()
@@ -64,36 +64,41 @@ describe('<Sidebar />', () => {
     })
   })
 
-  describe('function setSidebarStateCookie', () => {
-    it('should create a cookie for sidebar state with proper values', () => {
-      setSidebarStateCookie(SIDEBAR_STATE_COOKIE_KEY.FOLDED_SPACE_LIST, [1, 2, 3])
-      const cookie = global.document.cookie
-      // INFO - CH - 20240222 - cookie // sidebarState={%22foldedSpaceList%22:[1%2C2%2C3]}
-      expect(cookie).to.not.equal('')
-      const sidebarStateCookie = cookie.split(';').filter(c => c.includes(COOKIE_FRONTEND.SIDEBAR_STATE))
-      expect(sidebarStateCookie).to.not.equal([])
-      const sidebarStateCookieValue = sidebarStateCookie[0]?.split('=')[1]
-      expect(
-        JSON.stringify(JSON.parse(decodeURIComponent(sidebarStateCookieValue)))
-      ).to.equal(
-        JSON.stringify(JSON.parse('{ "foldedSpaceList" : [1, 2, 3] }'))
-      )
+  describe('function buildSidebarStateLocalStorageKey', () => {
+    it('should build the key by concatenating sidebarState and the userId in paramter', () => {
+      const userId = 1
+      const localStorageKey = buildSidebarStateLocalStorageKey(userId)
+      expect(localStorageKey).to.equal('sidebarState/1')
     })
   })
 
-  describe('function getSidebarStateCookie', () => {
-    it('should get the sidebar state cookie', () => {
-      setSidebarStateCookie(SIDEBAR_STATE_COOKIE_KEY.FOLDED_SPACE_LIST, [1, 2, 3])
-      setSidebarStateCookie(SIDEBAR_STATE_COOKIE_KEY.SHOW_SPACE_LIST, true)
-      setSidebarStateCookie(SIDEBAR_STATE_COOKIE_KEY.SHOW_USER_ITEMS, false)
+  describe('function setSidebarStateLocalStorage', () => {
+    it('should create a local storage entry for sidebar state with proper values', () => {
+      const userId = 1
+      setSidebarStateLocalStorage(SIDEBAR_STATE_LOCAL_STORAGE_KEY.FOLDED_SPACE_LIST, [1, 2, 3], userId)
+      const localStorageKey = buildSidebarStateLocalStorageKey(userId)
+      const localStorageValue = JSON.parse(localStorage.getItem(localStorageKey))
+      expect(localStorageValue).to.not.equal(null)
+      expect(SIDEBAR_STATE_LOCAL_STORAGE_KEY.FOLDED_SPACE_LIST in localStorageValue).to.equal(true)
+      expect(localStorageValue[SIDEBAR_STATE_LOCAL_STORAGE_KEY.FOLDED_SPACE_LIST]).to.have.ordered.members([1, 2, 3])
+    })
+  })
 
-      const sidebarStateCookie = getSidebarStateCookie()
+  describe('function getSidebarStateLocalStorage', () => {
+    it('should get the sidebar state from localStorage', () => {
+      setSidebarStateLocalStorage(SIDEBAR_STATE_LOCAL_STORAGE_KEY.FOLDED_SPACE_LIST, [1, 2, 3])
+      setSidebarStateLocalStorage(SIDEBAR_STATE_LOCAL_STORAGE_KEY.SHOW_SPACE_LIST, true)
+      setSidebarStateLocalStorage(SIDEBAR_STATE_LOCAL_STORAGE_KEY.SHOW_USER_ITEMS, false)
 
-      expect(
-        JSON.stringify(sidebarStateCookie)
-      ).to.equal(
-        JSON.stringify(JSON.parse('{ "foldedSpaceList": [1, 2, 3], "showSpaceList": true, "showUserItems": false }'))
-      )
+      const sidebarState = getSidebarStateLocalStorage()
+
+      expect(SIDEBAR_STATE_LOCAL_STORAGE_KEY.FOLDED_SPACE_LIST in sidebarState).to.equal(true)
+      expect(SIDEBAR_STATE_LOCAL_STORAGE_KEY.SHOW_SPACE_LIST in sidebarState).to.equal(true)
+      expect(SIDEBAR_STATE_LOCAL_STORAGE_KEY.SHOW_USER_ITEMS in sidebarState).to.equal(true)
+
+      expect(sidebarState[SIDEBAR_STATE_LOCAL_STORAGE_KEY.FOLDED_SPACE_LIST]).to.have.ordered.members([1, 2, 3])
+      expect(sidebarState[SIDEBAR_STATE_LOCAL_STORAGE_KEY.SHOW_SPACE_LIST]).to.equal(true)
+      expect(sidebarState[SIDEBAR_STATE_LOCAL_STORAGE_KEY.SHOW_USER_ITEMS]).to.equal(false)
     })
   })
 })
