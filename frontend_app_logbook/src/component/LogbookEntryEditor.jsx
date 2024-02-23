@@ -57,31 +57,32 @@ function LogbookEntryEditor (props) {
       <div className='logbook__LogbookPopup__form_buttons'>
         <IconButton
           color={props.customColor}
-          dataCy='confirm_popup__button_cancel'
-          icon='fas fa-times'
-          onClick={props.onCancel}
-          text={props.t('Cancel')}
-        />
-
-        <IconButton
-          color={props.customColor}
           dataCy='confirm_popup__button_confirm'
-          icon='fas fa-check'
+          icon='fa-fw fas fa-quote-left'
           intent='primary'
           mode='light'
           onClick={handleValidate}
-          text={props.t('Validate')}
+          text={props.t('Create entry')}
         />
       </div>
     </form>
   )
 }
+
+//         <IconButton
+//           color={props.customColor}
+//           dataCy='confirm_popup__button_cancel'
+//           icon='fas fa-times'
+//           onClick={props.onCancel}
+//           text={props.t('Cancel')}
+//         />
+
 export default translate()(LogbookEntryEditor)
 
 LogbookEntryEditor.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   onValidate: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired,
+  // onCancel: PropTypes.func.isRequired,
   // End of required props /////////////////////////////////////////////////////////////////////////
   codeLanguageList: PropTypes.array,
   customColor: PropTypes.string,

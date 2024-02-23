@@ -17,7 +17,7 @@ import { LOGBOOK_MIME_TYPE, LOGBOOK_FILE_EXTENSION } from '../helper.js'
 import { debug } from '../debug.js'
 
 const defaultLogbookBoard = {
-  columns: []
+  entries: []
 }
 
 export class PopupCreateLogbook extends React.Component {
@@ -163,8 +163,8 @@ export class PopupCreateLogbook extends React.Component {
         customColor={this.state.config.hexcolor}
         displayTemplateList
         faIcon={this.state.config.faIcon}
-        inputPlaceholder={this.props.t("Board's name")}
-        label={this.props.t('New Logbook board')}
+        inputPlaceholder={this.props.t("Logbook's name")}
+        label={this.props.t('New Logbook')}
         onChangeContentName={this.handleChangeNewContentName}
         onChangeTemplate={this.handleChangeTemplate}
         onClose={this.handleClose}
