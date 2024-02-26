@@ -23,7 +23,6 @@
   "Board's name": "Board's name",
   "This content is deleted": "This content is deleted",
   "Restore": "Restore",
-  "Value:": "Value:",
   "Last version": "Last version",
   "The content has been modified by {{author}}": "The content has been modified by {{author}}",
   "Add new column": "Add new column",
@@ -45,5 +44,6 @@
   "Tasks": "Tasks",
   "The link has been copied to clipboard": "Link copied to clipboard",
   "Copy content link": "Copy content link",
-  "Description of the card": "Description of the card"
+  "Description of the card": "Description of the card",
+  "Open field:": "Open field:"
 }

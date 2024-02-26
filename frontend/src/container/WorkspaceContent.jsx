@@ -167,8 +167,8 @@ export class WorkspaceContent extends React.Component {
     this.setDisplayedContentList()
   }
 
-  // Côme - 2018/11/26 - refactor idea: do not rebuild folder_open when on direct link of an app (without folder_open)
-  // and add process that always keep url and folders open sync
+  // CH - 2018-11-26 - refactor idea: do not rebuild folder_open when on direct link of an app
+  // (without folder_open) and add process that always keep url and folders open sync
   async componentDidUpdate (prevProps, prevState) {
     const { props, state } = this
 
