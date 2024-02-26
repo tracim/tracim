@@ -6,7 +6,6 @@ import { TracimComponent } from '../../tracimComponent.js'
 import { appContentFactory } from '../../appContentFactory.js'
 import { CUSTOM_EVENT } from '../../customEvent.js'
 import { CONTENT_TYPE } from '../../helper.js'
-import { DEFAULT_ROLE_LIST } from '../../mentionOrLink.js'
 import CardPopup from '../CardPopup/CardPopup.jsx'
 import CommentArea from './CommentArea.jsx'
 
@@ -57,10 +56,10 @@ export class EditCommentPopup extends React.Component {
           isDisplayedAdvancedEditionButton={false}
           isDisplayedCancelButton
           isDisplayedUploadFileButton={false}
+          language={props.user.lang}
+          memberList={props.memberList}
           newComment={state.newComment}
           onClickWithstand={props.onClickClose}
-          roleList={DEFAULT_ROLE_LIST}
-          memberList={props.memberList}
           submitLabel={props.t('Send')}
           withstandLabel={props.t('Cancel')}
         />
@@ -78,9 +77,9 @@ EditCommentPopup.propTypes = {
   codeLanguageList: PropTypes.array,
   commentId: PropTypes.number,
   customColor: PropTypes.string,
-  loggedUserLanguage: PropTypes.string,
   memberList: PropTypes.array,
   parentId: PropTypes.number,
+  user: PropTypes.object,
   // NOTE - MP - 2023-01-06 - There is no workspaceId in string
   workspaceId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 }
@@ -89,8 +88,8 @@ EditCommentPopup.defaultProps = {
   codeLanguageList: [],
   commentId: 0,
   customColor: undefined,
-  loggedUserLanguage: 'en',
   memberList: [],
   parentId: 0,
+  user: undefined,
   workspaceId: undefined
 }

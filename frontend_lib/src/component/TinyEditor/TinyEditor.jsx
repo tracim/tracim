@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useRef } from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import i18n from '../../i18n.js'
@@ -14,6 +14,9 @@ import {
 import {
   CUSTOM_EVENT
 } from '../../customEvent.js'
+import {
+  DEFAULT_ROLE_LIST
+} from '../../mentionOrLink.js'
 
 // require('./TinyEditor.styl') // see https://github.com/tracim/tracim/issues/1156
 
@@ -24,7 +27,10 @@ const advancedToolBar = [
   'code codesample | insert | removeformat | customFullscreen help'
 ].join('')
 
-const simpleToolBar = 'bold italic underline | bullist numlist'
+const simpleToolBar = [
+  'bold italic underline | bullist numlist | link customInsertImage emoticons | ',
+  'customFullscreen help'
+].join('')
 
 const handleFileSelected = (e, editorRef) => {
   const files = Array.from(e.target.files)
@@ -57,38 +63,53 @@ const base64EncodeAndTinyMceInsert = (editorRef, files) => {
   }
 }
 
+/**
+ * Translate Tracim language code to TinyMCE language code
+ * In some cases, Tracim and TinyMCE use different language codes
+ * In these cases, we need to translate the language code
+ * @param {String} lang
+ * @returns {String} TinyMCE language code
+ */
+const getTinyMceLang = (lang) => {
+  switch (lang) {
+    case 'fr':
+      return 'fr_FR'
+    case 'pt':
+      return 'pt_PT'
+    default:
+      return lang
+  }
+}
+
 export const TinyEditor = props => {
+  const defaultRoleList = DEFAULT_ROLE_LIST.map(role => ({
+    type: 'cardmenuitem',
+    direction: 'horizontal',
+    value: `@${props.t(role.slug)} `,
+    label: `@${props.t(role.slug)}`,
+    items: [
+      {
+        type: 'cardtext',
+        text: props.t(role.description),
+        name: 'roleDescription',
+        classes: ['tinymce-role-description']
+      },
+      {
+        type: 'cardtext',
+        text: `@${props.t(role.slug)}`,
+        name: 'roleName',
+        classes: ['tinymce-role-name']
+      }
+    ]
+  }))
+
   const editorRef = useRef(null)
   const inputRef = useRef(null)
-
-  let defaultRoleList = []
 
   const toolbar = props.isAdvancedEdition ? advancedToolBar : simpleToolBar
   // NOTE - MP - 2023-01-10 - Changing the key allow reloading the Editor component this allows us
   // to change the toolbar
   const editorKey = props.isAdvancedEdition ? 'advanced_key' : 'simple_key'
-
-  useEffect(() => {
-    defaultRoleList = props.roleList.map(role => ({
-      type: 'cardmenuitem',
-      direction: 'horizontal',
-      value: `@${role.slug} `,
-      label: `@${role.slug}`,
-      items: [
-        {
-          type: 'cardtext',
-          text: role.description,
-          name: 'roleDescription'
-        },
-        {
-          type: 'cardtext',
-          text: `@${role.slug}`,
-          name: 'roleName',
-          classes: ['tinymce-username']
-        }
-      ]
-    }))
-  }, [props.isAdvancedEdition, props.roleList])
 
   return (
     <>
@@ -101,27 +122,29 @@ export const TinyEditor = props => {
       />
       <Editor
         key={editorKey}
+        tinymceScriptSrc='/assets/tinymce-5.10.3/js/tinymce/tinymce.min.js'
+        disabled={props.isDisabled}
         onInit={(evt, editor) => {
           editorRef.current = editor
         }}
         init={{
           selector: 'textarea',
+          language: getTinyMceLang(props.language),
           height: props.height,
           max_height: props.maxHeight,
           min_height: props.minHeight,
           width: '100%',
           placeholder: props.placeholder,
           menubar: false,
-          statusbar: true,
+          resize: false,
+          statusbar: props.isStatusBarEnabled,
           toolbar: toolbar,
+          default_link_target: '_blank',
           plugins: [
-            // /////////////////////////////////////////////
-            // TinyMCE recommends to use custom plugins in "external plugins" section
-            // 'autocompletion',
-            // /////////////////////////////////////////////
             'advlist autolink lists link image charmap print preview anchor',
             'searchreplace visualblocks code codesample fullscreen emoticons',
-            'insertdatetime media table paste code help wordcount'
+            'insertdatetime media table paste code help wordcount',
+            props.isAutoResizeEnabled ? 'autoresize' : ''
           ],
           contextmenu: 'selectall copy paste link customInsertImage table',
           codesample_global_prismjs: true,
@@ -219,139 +242,134 @@ export const TinyEditor = props => {
             // /////////////////////////////////////////////
             // Handle mentions
             const maxFetchResults = 15
-            editor.ui.registry.addAutocompleter('mentions', {
-              ch: '@',
-              columns: 1,
-              highlightOn: ['roleName', 'publicName', 'username'],
-              minChars: 0,
-              maxResults: maxFetchResults,
-              fetch: async function (pattern) {
-                const insensitivePattern = pattern.toLowerCase()
-                const matchedMemberList = props.userList.filter((user) => {
-                  if (!user.username) {
-                    return false
-                  }
-                  const insensitiveUsername = user.username.toLowerCase()
-                  const insensitivePublicName = user.publicName.toLowerCase()
-                  const isUsername = insensitiveUsername.indexOf(insensitivePattern) !== -1
-                  const isPublicName = insensitivePublicName.indexOf(insensitivePattern) !== -1
-                  return isUsername || isPublicName
-                })
-                const matchedRoleList = defaultRoleList.filter((role) => {
-                  const insensitiveRoleLabel = role.label.toLowerCase()
-                  const isRole = insensitiveRoleLabel.indexOf(insensitivePattern) !== -1
-                  return isRole
-                })
-                const userResultList = matchedMemberList.map((user) => ({
-                  type: 'cardmenuitem',
-                  value: `@${user.username} `,
-                  label: `@${user.username}`,
-                  direction: 'horizontal',
-                  items: [
-                    {
-                      type: 'cardimage',
-                      src: `${getAvatarBaseUrl(props.apiUrl, user.id)}/raw/avatar`,
-                      alt: user.publicName,
-                      name: 'avatar',
-                      classes: ['tinymce-avatar']
-                    },
-                    {
-                      type: 'cardcontainer',
-                      direction: 'horizontal',
-                      align: 'left',
-                      valign: 'middle',
-                      items: [
-                        {
-                          type: 'cardtext',
-                          text: ` ${user.publicName}`,
-                          name: 'publicName'
-                        },
-                        {
-                          type: 'cardtext',
-                          text: `@${user.username}`,
-                          name: 'username',
-                          classes: ['tinymce-username']
-                        }
-                      ]
+            if (props.isMentionEnabled) {
+              editor.ui.registry.addAutocompleter('mentions', {
+                ch: '@',
+                columns: 1,
+                highlightOn: ['roleName', 'publicName', 'username'],
+                minChars: 0,
+                maxResults: maxFetchResults,
+                fetch: async function (pattern) {
+                  const insensitivePattern = pattern.toLowerCase()
+                  const matchedMemberList = props.userList.filter((user) => {
+                    if (!user.username) {
+                      return false
                     }
-                  ]
-                }))
+                    const insensitiveUsername = user.username.toLowerCase()
+                    const insensitivePublicName = user.publicName.toLowerCase()
+                    const isUsername = insensitiveUsername.indexOf(insensitivePattern) !== -1
+                    const isPublicName = insensitivePublicName.indexOf(insensitivePattern) !== -1
+                    return isUsername || isPublicName
+                  })
+                  const matchedRoleList = defaultRoleList.filter((role) => {
+                    const insensitiveRoleLabel = role.label.toLowerCase()
+                    const isRole = insensitiveRoleLabel.indexOf(insensitivePattern) !== -1
+                    return isRole
+                  })
+                  const userResultList = matchedMemberList.map((user) => ({
+                    type: 'cardmenuitem',
+                    value: `@${user.username} `,
+                    label: `@${user.username}`,
+                    items: [
+                      {
+                        type: 'cardcontainer',
+                        align: 'left',
+                        direction: 'horizontal',
+                        valign: 'middle',
+                        items: [
+                          {
+                            type: 'cardimage',
+                            src: `${getAvatarBaseUrl(props.apiUrl, user.id)}/preview/jpg/25x25/avatar`,
+                            alt: '',
+                            name: 'avatar',
+                            classes: ['tinymce-avatar']
+                          },
+                          {
+                            type: 'cardtext',
+                            text: user.publicName,
+                            name: 'publicName',
+                            classes: ['tinymce-public-name']
+                          },
+                          {
+                            type: 'cardtext',
+                            text: `@${user.username}`,
+                            name: 'username',
+                            classes: ['tinymce-username']
+                          }
+                        ]
+                      }
+                    ]
+                  }))
 
-                return matchedRoleList.concat(userResultList)
-              },
-              onAction: onAction
-            })
+                  return matchedRoleList.concat(userResultList)
+                },
+                onAction: onAction
+              })
+            }
             // /////////////////////////////////////////////
             // Handle content link
-            editor.ui.registry.addAutocompleter('content', {
-              ch: '#',
-              columns: 1,
-              highlightOn: ['content_label', 'content_id'],
-              minChars: 1,
-              maxResults: maxFetchResults,
-              fetch: async function (pattern) {
-                try {
-                  const contentList = await handleFetchResult(
-                    await getMyselfKnownContents(props.apiUrl, pattern, maxFetchResults)
-                  )
-                  const insensitivePattern = pattern.toLowerCase()
-                  const matchedContentList = contentList.body.filter((content) => {
-                    const insensitiveContentLabel = content.label.toLowerCase()
-                    const contentId = content.content_id
-                    const isLabel = insensitiveContentLabel.indexOf(insensitivePattern) !== -1
-                    const isId = contentId.toString().indexOf(insensitivePattern) !== -1
-                    return isLabel || isId
-                  })
+            if (props.isContentLinkEnabled) {
+              editor.ui.registry.addAutocompleter('content', {
+                ch: '#',
+                columns: 1,
+                highlightOn: ['content_label', 'content_id'],
+                minChars: 0,
+                maxResults: maxFetchResults,
+                fetch: async function (pattern) {
+                  try {
+                    const contentList = await handleFetchResult(
+                      await getMyselfKnownContents(props.apiUrl, pattern, maxFetchResults)
+                    )
+                    const insensitivePattern = pattern.toLowerCase()
+                    const matchedContentList = contentList.body.filter((content) => {
+                      const insensitiveContentLabel = content.label.toLowerCase()
+                      const contentId = content.content_id
+                      const isLabel = insensitiveContentLabel.indexOf(insensitivePattern) !== -1
+                      const isId = contentId.toString().indexOf(insensitivePattern) !== -1
+                      return isLabel || isId
+                    })
 
-                  const resultList = matchedContentList.map((content) => {
-                    return {
-                      type: 'cardmenuitem',
-                      value: `#${content.content_id} `,
-                      label: content.label,
-                      items: [
-                        {
-                          type: 'cardcontainer',
-                          direction: 'vertical',
-                          items: [
-                            {
-                              type: 'cardcontainer',
-                              direction: 'horizontal',
-                              items: [
-                                {
-                                  type: 'cardtext',
-                                  text: content.label,
-                                  name: 'content_label'
-                                }
-                              ]
-                            },
-                            {
-                              type: 'cardcontainer',
-                              direction: 'horizontal',
-                              items: [
-                                {
-                                  type: 'cardtext',
-                                  text: `#${content.content_id.toString()}`,
-                                  name: 'content_id',
-                                  classes: ['tinymce-username']
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  })
+                    const resultList = matchedContentList.map((content) => {
+                      return {
+                        type: 'cardmenuitem',
+                        value: `#${content.content_id} `,
+                        label: content.label,
+                        items: [
+                          {
+                            type: 'cardcontainer',
+                            align: 'left',
+                            direction: 'vertical',
+                            valign: 'middle',
+                            items: [
+                              {
+                                type: 'cardtext',
+                                text: content.label,
+                                name: 'content_label',
+                                classes: ['tinymce-content-label']
+                              },
+                              {
+                                type: 'cardtext',
+                                text: `#${content.content_id.toString()}`,
+                                name: 'content_id',
+                                classes: ['tinymce-content-id']
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    })
 
-                  return resultList
-                } catch (e) {
-                  console.error(
-                    'Error in TinyEditor.jsx, couldn\'t fetch content list properly:\n', e
-                  )
-                  return []
-                }
-              },
-              onAction: onAction
-            })
+                    return resultList
+                  } catch (e) {
+                    console.error(
+                      'Error in TinyEditor.jsx, couldn\'t fetch content list properly:\n', e
+                    )
+                    return []
+                  }
+                },
+                onAction: onAction
+              })
+            }
             // /////////////////////////////////////////////
             // Handle tab to select autocomplete
             editor.on('keydown', function (e) {
@@ -366,6 +384,7 @@ export const TinyEditor = props => {
             // /////////////////////////////////////////////
             // Handle shortcuts
             editor.addShortcut('ctrl+13', 'Send comment', () => {
+              if (editor.getContent() === '') return
               props.onCtrlEnterEvent(editor.getContent(), false)
               document.activeElement.blur()
             })
@@ -390,10 +409,15 @@ TinyEditor.propTypes = {
   onCtrlEnterEvent: PropTypes.func,
   height: PropTypes.any,
   isAdvancedEdition: PropTypes.bool,
+  isAutoResizeEnabled: PropTypes.bool,
+  isContentLinkEnabled: PropTypes.bool,
+  isDisabled: PropTypes.bool,
+  isMentionEnabled: PropTypes.bool,
+  isStatusBarEnabled: PropTypes.bool,
+  language: PropTypes.string,
   maxHeight: PropTypes.number,
   minHeight: PropTypes.number,
   placeholder: PropTypes.string,
-  roleList: PropTypes.array,
   userList: PropTypes.array
 }
 
@@ -403,9 +427,14 @@ TinyEditor.defaultProps = {
   onCtrlEnterEvent: () => { },
   height: undefined,
   isAdvancedEdition: false,
+  isAutoResizeEnabled: true,
+  isContentLinkEnabled: true,
+  isDisabled: false,
+  isMentionEnabled: true,
+  isStatusBarEnabled: false,
+  language: 'en',
   maxHeight: undefined,
   minHeight: 100,
   placeholder: '',
-  roleList: [],
   userList: []
 }

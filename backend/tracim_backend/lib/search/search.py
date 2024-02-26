@@ -1,13 +1,12 @@
 from abc import ABC
 from abc import abstractmethod
-import typing
-
 import pluggy
 from sqlalchemy.orm import Session
+import typing
 
 from tracim_backend.config import CFG
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
@@ -15,7 +14,9 @@ from tracim_backend.models.data import Content
 
 class IndexedContentsResults(object):
     def __init__(
-        self, content_ids_to_index: typing.List[int], errored_indexed_content_ids: typing.List[int]
+        self,
+        content_ids_to_index: typing.List[int],
+        errored_indexed_content_ids: typing.List[int],
     ) -> None:
         self.content_ids_to_index = content_ids_to_index
         self.errored_indexed_contents_ids = errored_indexed_content_ids
@@ -106,8 +107,10 @@ class SearchApi(ABC):
         Get user workspace list or None if no user set
         """
         if self._user:
-            rapi = RoleApi(config=self._config, session=self._session, current_user=self._user)
-            return rapi.get_user_workspaces_ids(self._user.user_id, min_role)
+            user_workspace_config_api = UserWorkspaceConfigApi(
+                config=self._config, session=self._session, current_user=self._user
+            )
+            return user_workspace_config_api.get_user_workspaces_ids(self._user.user_id, min_role)
         return None
 
     def offset_from_pagination(self, size: int, page_nb: int) -> int:

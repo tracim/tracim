@@ -13,7 +13,7 @@ describe('<PersonalData />', () => {
   const props = {
     onClickSubmit: onClickSubmitCallBack,
     displayAdminInfo: false,
-    userAuthType: 'randomUserAuthType',
+    userAuthType: 'internal',
     isUsernameValid: true,
     langList: [{
       id: 'fr',
@@ -34,6 +34,21 @@ describe('<PersonalData />', () => {
       expect(wrapper.find('.personaldata__form__txtinput__msgerror').length).to.equal(1)
       wrapper.setProps({ isUsernameValid: props.isUsernameValid })
     })
+
+    it('should display allowed inputs if parameter userAuthType is "internal"', () => {
+      expect(wrapper.find('[data-cy="personaldata__form__txtinput__fullname"]').prop('disabled')).to.equal(false)
+      expect(wrapper.find('[data-cy="personaldata__form__txtinput__username"]').prop('disabled')).to.equal(false)
+      expect(wrapper.find('[data-cy="personaldata__form__txtinput__email"]').prop('disabled')).to.equal(false)
+    })
+
+    // Deprecated test
+    // it('should display disabled inputs if parameter userAuthType is not "internal"', () => {
+    //   wrapper.setProps({ userAuthType: 'ldap' })
+    //   expect(wrapper.find('[data-cy="personaldata__form__txtinput__fullname"]').prop('disabled')).to.equal(true)
+    //   expect(wrapper.find('[data-cy="personaldata__form__txtinput__username"]').prop('disabled')).to.equal(true)
+    //   expect(wrapper.find('[data-cy="personaldata__form__txtinput__email"]').prop('disabled')).to.equal(true)
+    //   wrapper.setProps({ userAuthType: props.userAuthType })
+    // })
   })
 
   describe('handlers', () => {

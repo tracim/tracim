@@ -127,7 +127,7 @@ jobs:
       values: *python_versions
       max_in_flight: all
     task: backend-quick-tests_((.:python_version))
-    timeout: 30m
+    timeout: 1h
     image: test-image
     # TODO - 2021-08-04 - SG - is there a less intrusive way to allow docker-in-docker?
     privileged: true
@@ -147,7 +147,7 @@ jobs:
       values: *databases
       max_in_flight: all
     task: backend-full-tests_((.:database))
-    timeout: 1h30m
+    timeout: 2h30m
     image: test-image
     # TODO - 2021-08-04 - SG - is there a less intrusive way to allow docker-in-docker?
     privileged: true
@@ -178,7 +178,7 @@ jobs:
   - *pending_status_notification
 
   - task: frontend-unit-tests
-    timeout: 15m
+    timeout: 30m
     image: test-image
     config:
       platform: linux

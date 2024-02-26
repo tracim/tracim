@@ -4,32 +4,29 @@ import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import {
-  getSpaceMemberList,
-  handleFetchResult,
   PAGE,
   PROFILE,
+  ROLE_LIST,
   ROLE,
-  serialize,
-  ConfirmPopup,
-  IconButton,
-  Loading,
   SORT_BY,
   SORT_ORDER,
-  sortListBy,
-  sortListByMultipleCriteria,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  ConfirmPopup,
+  EmptyListMessage,
+  FilterBar,
+  IconButton,
+  Loading,
   TitleListHeader,
   TracimComponent,
-  TLM_ENTITY_TYPE as TLM_ET,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  FilterBar,
-  ROLE_LIST,
-  stringIncludes
+  sortListBy,
+  sortListByMultipleCriteria,
+  stringIncludes,
+  serialize
 } from 'tracim_frontend_lib'
-import { serializeWorkspaceListProps } from '../../reducer/workspaceList.js'
-import { serializeMember } from '../../reducer/currentWorkspace.js'
-import { FETCH_CONFIG } from '../../util/helper.js'
+import { serializeUserConfig, serializeUserWorkspaceConfig, serializeWorkspaceListProps } from '../../reducer/workspaceList.js'
 import { newFlashMessage } from '../../action-creator.sync.js'
-import { deleteWorkspaceMember, getUserWorkspaceList } from '../../action-creator.async.js'
+import { deleteUserRole, getUserWorkspaceConfigList } from '../../action-creator.async.js'
 import AdminUserSpacesConfig from '../../container/AdminUserSpacesConfig.jsx'
 import UserSpacesConfigLine from './UserSpacesConfigLine.jsx'
 
@@ -41,14 +38,6 @@ export const onlyManager = (userToEditId, member, memberList) => {
   }
 
   return !memberList.some(m => m.user_id !== userToEditId && m.role === manager)
-}
-
-export const fillMemberList = async (space) => {
-  const fetchMemberList = await handleFetchResult(await getSpaceMemberList(FETCH_CONFIG.apiUrl, space.id))
-  return {
-    ...space,
-    memberList: fetchMemberList.body.map(member => serializeMember(member)) || []
-  }
 }
 
 export const UserSpacesConfig = (props) => {
@@ -66,11 +55,14 @@ export const UserSpacesConfig = (props) => {
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: handleMemberModified },
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: handleMemberDeleted }
     ])
-  }, [spaceList])
+    getSpaceList()
+  }, [])
 
   useEffect(() => {
     const filteredListWithMember = []
-
+    if (spaceList === undefined) {
+      return
+    }
     spaceList.forEach(space => {
       const member = space.memberList.find(u => u.id === props.userToEditId)
       if (space.memberList.length > 0 && member) {
@@ -87,12 +79,14 @@ export const UserSpacesConfig = (props) => {
 
     const filteredSpaceList = filterSpaceList(sortedList)
 
-    const entrieList = filteredSpaceList.map(space => {
+    const entryList = filteredSpaceList.map(space => {
       return (
         <UserSpacesConfigLine
           space={space}
           key={space.id}
-          onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
+          onChangeEmailNotificationType={
+            emailNotificationType => props.onChangeEmailNotificationType(space.id, emailNotificationType)
+          }
           onLeaveSpace={handleLeaveSpace}
           admin={props.admin}
           system={props.system}
@@ -100,7 +94,7 @@ export const UserSpacesConfig = (props) => {
         />
       )
     })
-    setEntries(entrieList)
+    setEntries(entryList)
   }, [spaceList, sortOrder, selectedSortCriterion, userFilter])
 
   const filterSpaceList = (list) => {
@@ -121,85 +115,65 @@ export const UserSpacesConfig = (props) => {
     })
   }
 
-  useEffect(() => {
-    if (props.userToEditId === props.user.userId && props.workspaceList) {
-      setSpaceList(props.workspaceList)
-      setIsLoading(false)
-    } else getSpaceList()
-  }, [props.userToEditId])
-
   const handleMemberModified = (data) => {
-    setSpaceList(spaceList.map(space => {
-      if (space.id === data.fields.workspace.workspace_id) {
-        return {
+    if (data.fields.user.user_id === props.userToEditId) {
+      setSpaceList(s => s.map(space => space.id === data.fields.workspace.workspace_id
+        ? {
           ...space,
-          memberList: space.memberList.map(member => {
-            if (member.id === data.fields.user.user_id) {
-              return { ...member, ...serializeMember({ user: data.fields.user, ...data.fields.member }) }
-            } else {
-              return member
+          memberList: space.memberList.map(member => member.id === data.fields.user.user_id
+            ? { ...member, ...serializeUserConfig({ user: data.fields.user, ...data.fields.member }) }
+            : member
+          )
+        }
+        : space
+      ))
+    }
+  }
+
+  const handleMemberDeleted = (data) => {
+    if (data.fields.user.user_id === props.userToEditId) {
+      setSpaceList(s => s.filter(space => space.id !== data.fields.workspace.workspace_id))
+    }
+  }
+
+  const handleMemberCreated = (data) => {
+    if (data.fields.user.user_id === props.userToEditId && !spaceList.find(space => space.id === data.fields.workspace.workspace_id)) {
+      setSpaceList(s => {
+        if (!s.find(space => space.id === data.fields.workspace.workspace_id)) {
+          const newMemberSpaceList = [
+            ...s,
+            {
+              ...serialize(data.fields.workspace, serializeWorkspaceListProps),
+              memberList: [
+                serializeUserConfig({ user: data.fields.user, ...data.fields.member })
+              ]
             }
-          })
-        }
-      } else {
-        return space
-      }
-    }))
-  }
-
-  const handleMemberDeleted = async (data) => {
-    setSpaceList(spaceList.map(space => {
-      if (space.id === data.fields.workspace.workspace_id) {
-        return {
-          ...space,
-          memberList: space.memberList.filter(member => member.id !== data.fields.user.user_id)
-        }
-      } else {
-        return space
-      }
-    }))
-  }
-
-  const handleMemberCreated = async (data) => {
-    const spaceIndex = spaceList.findIndex(space => space.id === data.fields.workspace.workspace_id)
-
-    if (spaceIndex) {
-      setSpaceList(spaceList.map(space => {
-        if (space.id === data.fields.workspace.workspace_id) {
-          return {
-            ...space,
-            memberList: [...space.memberList, serializeMember({ user: data.fields.user, ...data.fields.member })]
-          }
+          ]
+          return sortListByMultipleCriteria(newMemberSpaceList, [SORT_BY.LABEL, SORT_BY.ID])
         } else {
-          return space
+          return s
         }
-      }))
-    } else {
-      const space = await fillMemberList(data.fields.workspace)
-      setSpaceList(sortListByMultipleCriteria([...spaceList, space], [SORT_BY.LABEL, SORT_BY.ID]))
+      })
     }
   }
 
   const getSpaceList = async () => {
-    const fetchGetUserWorkspaceList = await props.dispatch(getUserWorkspaceList(props.userToEditId, false))
+    const fetchGetUserWorkspaceList = await props.dispatch(
+      getUserWorkspaceConfigList(props.userToEditId, false)
+    )
 
     switch (fetchGetUserWorkspaceList.status) {
       case 200: {
-        const userSpaceList = fetchGetUserWorkspaceList.json.map(space => serialize(space, serializeWorkspaceListProps))
-        getUserSpaceListMemberList(userSpaceList)
+        const userSpaceList = fetchGetUserWorkspaceList.json.map(
+          config => serializeUserWorkspaceConfig(config)
+        )
+        setSpaceList(userSpaceList)
         break
       }
       default: props.dispatch(newFlashMessage(props.t('Error while loading user')))
     }
-  }
 
-  const getUserSpaceListMemberList = async (fetchedSpaceList) => {
-    Promise.all(fetchedSpaceList.map(userSpace => {
-      return props.workspaceList.find(space => space.id === userSpace.id && space.memberList.length > 0) || fillMemberList(userSpace)
-    })).then((spaceListResult) => {
-      setSpaceList(sortListByMultipleCriteria(spaceListResult, [SORT_BY.LABEL, SORT_BY.ID]))
-      setIsLoading(false)
-    })
+    setIsLoading(false)
   }
 
   const handleConfirmDeleteSpace = async () => {
@@ -208,7 +182,7 @@ export const UserSpacesConfig = (props) => {
 
     setSpaceBeingDeleted(null)
 
-    const fetchResult = await props.dispatch(deleteWorkspaceMember(spaceId, props.userToEditId))
+    const fetchResult = await props.dispatch(deleteUserRole(spaceId, props.userToEditId))
     if (fetchResult.status !== 204) {
       props.dispatch(newFlashMessage(props.t('Error while leaving the space'), 'warning'))
     }
@@ -251,7 +225,7 @@ export const UserSpacesConfig = (props) => {
               userEmail={props.userEmail}
               userPublicName={props.userPublicName}
               userUsername={props.userUsername}
-              onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
+              onChangeEmailNotificationType={props.onChangeEmailNotificationType}
               onClose={(() => props.history.push(PAGE.ADMIN.USER_EDIT(props.userToEditId), 'spacesConfig'))}
             />
           )}
@@ -315,11 +289,17 @@ export const UserSpacesConfig = (props) => {
                 ))}
               </div>
             ) : (
-              userFilter !== ''
-                ? props.t('There are no spaces that matches your filter')
-                : props.admin
-                  ? props.t('This user is not a member of any space yet')
-                  : props.t('You are not a member of any space yet')
+              <EmptyListMessage>
+                {
+                  userFilter !== '' ? (
+                    props.t('There are no spaces that matches your filter')
+                  ) : props.admin ? (
+                    props.t('This user is not a member of any space yet')
+                  ) : (
+                    props.t('You are not a member of any space yet')
+                  )
+                }
+              </EmptyListMessage>
             )
           )}
         </div>
@@ -332,10 +312,10 @@ export default connect(mapStateToProps)(withRouter(translate()(TracimComponent(U
 
 UserSpacesConfig.propTypes = {
   userToEditId: PropTypes.number.isRequired,
-  onChangeSubscriptionNotif: PropTypes.func,
+  onChangeEmailNotificationType: PropTypes.func,
   admin: PropTypes.bool.isRequired
 }
 
 UserSpacesConfig.defaultProps = {
-  onChangeSubscriptionNotif: () => { }
+  onChangeEmailNotificationType: () => { }
 }

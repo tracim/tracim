@@ -1,10 +1,9 @@
 import argparse
 import json
-
 from pyramid.scripting import AppEnvironment
 
 from tracim_backend.command import AppContextCommand
-from tracim_backend.config import CFG
+from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.config import ConfigParam
 from tracim_backend.lib.core.live_messages import LiveMessagesLib
 from tracim_backend.lib.core.user_custom_properties import UserCustomPropertiesApi
@@ -173,7 +172,11 @@ class LiveMessageTesterCommand(AppContextCommand):
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super().get_parser(prog_name)
         parser.add_argument(
-            "-u", "--user_id", help="id of the user to test", dest="user_id", required=True,
+            "-u",
+            "--user_id",
+            help="id of the user to test",
+            dest="user_id",
+            required=True,
         )
         return parser
 
@@ -195,7 +198,7 @@ class LiveMessageTesterCommand(AppContextCommand):
 
 
 class SMTPMailCheckerCommand(AppContextCommand):
-    """ Check SMTP configuration by sending test email to given email address"""
+    """Check SMTP configuration by sending test email to given email address"""
 
     def get_description(self) -> str:
         return "check tracim smtp configuration by sending test email"
@@ -249,7 +252,7 @@ class SMTPMailCheckerCommand(AppContextCommand):
         )
         sender.send_mail(msg)
         sender.disconnect()
-        print("Email sended")
+        print("Email sent")
 
 
 class ExtractCustomPropertiesTranslationsCommand(AppContextCommand):
@@ -284,10 +287,16 @@ class CustomPropertiesCheckerCommand(AppContextCommand):
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super().get_parser(prog_name)
         parser.add_argument(
-            "-s", "--json-schema", help="path of the json schema", dest="json_schema",
+            "-s",
+            "--json-schema",
+            help="path of the json schema",
+            dest="json_schema",
         )
         parser.add_argument(
-            "-u", "--ui-schema", help="path of the ui schema", dest="ui_schema",
+            "-u",
+            "--ui-schema",
+            help="path of the ui schema",
+            dest="ui_schema",
         )
         return parser
 

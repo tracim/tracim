@@ -6,7 +6,6 @@
   "Description": "Description",
   "Error while rejecting user": "Erreur lors du rejet d'un utilisateur",
   "Error while saving new default role": "Erreur lors de la sauvegarde d'un nouveau rôle par défaut",
-  "Error while saving the new version": "Erreur lors de la sauvegarde de la nouvelle version",
   "Add a member": "Ajouter un membre",
   "Error while loading members list": "Erreur lors du chargement de la liste des membres",
   "Save successful": "Sauvegarde réussie",
@@ -20,7 +19,6 @@
   "Error while loading space details": "Erreur lors du chargement des détails de l'espace",
   "Error while saving new space label": "Erreur lors de la sauvegarde du titre de l'espace",
   "Error while adding the member to the space": "Erreur lors de l'ajout du membre à l'espace",
-  "Space's description": "Description de l'espace",
   "Delete space": "Supprimer l'espace",
   "Delete": "Supprimer",
   "Unknown user": "Utilisateur inconnu",
@@ -60,5 +58,8 @@
   "You cannot change this member role because there are no other space managers.": "Vous ne pouvez pas modifier ce rôle de membre car il n'y a pas d'autres responsables.",
   "Use this link to integrate this agenda to your": "Utiliser ce lien pour intégrer l'agenda à votre",
   "CalDAV compatible software": "logiciel compatible CalDAV",
-  "Filter users": "Filtrer les utilisateurs"
+  "Filter users": "Filtrer les utilisateurs",
+  "Description of the space": "Description de l'espace",
+  "This space doesn't have a description yet.": "Cet espace n'a pas encore de description.",
+  "Edit": "Modifier"
 }

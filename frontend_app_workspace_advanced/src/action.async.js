@@ -52,7 +52,7 @@ export const putSubscriptionReject = (apiUrl, spaceId, userId) =>
 export const deleteMember = (apiUrl, workspaceId, memberId) =>
   baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/members/${memberId}`)
 
-export const postWorkspaceMember = (apiUrl, workspaceId, newMember) =>
+export const postUserRole = (apiUrl, workspaceId, newMember) =>
   baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/members`, {
     user_id: newMember.id || null,
     user_email: newMember.email || null,

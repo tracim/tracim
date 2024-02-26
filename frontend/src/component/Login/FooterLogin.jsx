@@ -5,7 +5,7 @@ require('./FooterLogin.styl')
 export const FooterLogin = () =>
   <footer className='loginpage__main__footer'>
     <div className='loginpage__main__footer__text'>
-      copyright © 2013 - 2022&nbsp;-&nbsp;
+      copyright © 2013 - 2024&nbsp;-&nbsp;
       <a
         className='loginpage__main__footer__text__link'
         href='http://www.tracim.fr/'

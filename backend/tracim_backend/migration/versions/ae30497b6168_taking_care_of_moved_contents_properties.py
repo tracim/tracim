@@ -11,9 +11,8 @@ Revises: 78a01733957f
 Create Date: 2021-03-16 15:59:36.034739
 
 """
-import json
-
 from alembic import op
+import json
 import sqlalchemy as sa
 from sqlalchemy import Column
 from sqlalchemy import Integer

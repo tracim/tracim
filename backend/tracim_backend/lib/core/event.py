@@ -1,6 +1,18 @@
 import abc
 import contextlib
 from datetime import datetime
+from sqlakeyset import Page
+from sqlakeyset import get_page
+from sqlalchemy import and_
+from sqlalchemy import event as sqlalchemy_event
+from sqlalchemy import func
+from sqlalchemy import inspect
+from sqlalchemy import not_
+from sqlalchemy import null
+from sqlalchemy import or_
+from sqlalchemy.orm import Query
+from sqlalchemy.orm import Session
+from sqlalchemy.orm.exc import NoResultFound
 import typing
 from typing import Any
 from typing import Callable
@@ -12,24 +24,7 @@ from typing import Optional
 from typing import Set
 from typing import Union
 
-from sqlakeyset import Page
-from sqlakeyset import get_page
-from sqlalchemy import and_
-from sqlalchemy import event as sqlalchemy_event
-from sqlalchemy import inspect
-from sqlalchemy import not_
-from sqlalchemy import null
-from sqlalchemy import or_
-from sqlalchemy.orm import Query
-from sqlalchemy.orm import Session
-from sqlalchemy.orm.exc import NoResultFound
-
-from tracim_backend.app_models.contents import COMMENT_TYPE
-from tracim_backend.app_models.contents import FILE_TYPE
-from tracim_backend.app_models.contents import FOLDER_TYPE
-from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
-from tracim_backend.app_models.contents import THREAD_TYPE
-from tracim_backend.app_models.contents import TODO_TYPE
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import MessageDoesNotExist
 from tracim_backend.exceptions import UserDoesNotExist
@@ -37,7 +32,7 @@ from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.live_messages import LiveMessagesLib
 from tracim_backend.lib.core.plugins import hookimpl
 from tracim_backend.lib.core.user import UserApi
-from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.rq import RqQueueName
 from tracim_backend.lib.rq import get_redis_connection
@@ -52,7 +47,8 @@ from tracim_backend.models.call import UserCall
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import EmailNotificationType
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.data import WorkspaceSubscription
@@ -92,12 +88,12 @@ class EventApi:
     workspace_schema = WorkspaceSchema()
     workspace_without_description_schema = WorkspaceWithoutDescriptionSchema()
     content_schemas = {
-        COMMENT_TYPE: MessageCommentSchema(),
-        HTML_DOCUMENTS_TYPE: MessageContentSchema(),
-        FILE_TYPE: FileContentSchema(),
-        FOLDER_TYPE: MessageContentSchema(),
-        THREAD_TYPE: MessageContentSchema(),
-        TODO_TYPE: ToDoSchema(),
+        ContentTypeSlug.COMMENT.value: MessageCommentSchema(),
+        ContentTypeSlug.HTML_DOCUMENTS.value: MessageContentSchema(),
+        ContentTypeSlug.FILE.value: FileContentSchema(),
+        ContentTypeSlug.FOLDER.value: MessageContentSchema(),
+        ContentTypeSlug.THREAD.value: MessageContentSchema(),
+        ContentTypeSlug.TODO.value: ToDoSchema(),
     }
     reaction_schema = ReactionSchema()
     tag_schema = TagSchema()
@@ -112,7 +108,10 @@ class EventApi:
         self._config = config
 
     def _filter_event_types(
-        self, query: Query, event_types: Optional[List[EventTypeDatabaseParameters]], exclude: bool
+        self,
+        query: Query,
+        event_types: Optional[List[EventTypeDatabaseParameters]],
+        exclude: bool,
     ) -> Query:
         if event_types:
             event_type_filters = []
@@ -196,7 +195,10 @@ class EventApi:
             )
         elif parent_ids and content_ids:
             query = query.filter(
-                or_(Event.content_id.in_(content_ids), Event.parent_id.in_(parent_ids),)
+                or_(
+                    Event.content_id.in_(content_ids),
+                    Event.parent_id.in_(parent_ids),
+                )
             )
         elif content_ids:
             query = query.filter(Event.content_id.in_(content_ids))
@@ -229,7 +231,10 @@ class EventApi:
                 # PostgreSQL. See https://github.com/sqlalchemy/sqlalchemy/issues/5575
 
                 query = query.filter(
-                    or_(Event.author_id != author_id, Event.author_id == None)
+                    or_(
+                        Event.author_id != author_id,
+                        Event.author_id == None,  # noqa: E711
+                    )  # noqa: E712
                 )  # noqa: E711
 
         if after_event_id:
@@ -307,8 +312,30 @@ class EventApi:
         self._session.flush()
         return unread_messages
 
-    def get_messages_for_user(self, user_id: int, after_event_id: int = 0) -> List[Message]:
-        query = self._base_query(user_id=user_id, after_event_id=after_event_id,)
+    def get_messages_for_user(
+        self,
+        user_id: int,
+        after_event_id: int = 0,
+        created_after: Optional[datetime] = None,
+        event_type: Optional[EventTypeDatabaseParameters] = None,
+        read_status: ReadStatus = ReadStatus.ALL,
+        email_notification_type: Optional[EmailNotificationType] = None,
+    ) -> List[Message]:
+        query = self._base_query(
+            user_id=user_id,
+            after_event_id=after_event_id,
+            include_event_types=[event_type] if event_type is not None else None,
+            read_status=read_status,
+        )
+        if created_after:
+            query = query.filter(Event.created >= created_after)
+        if email_notification_type is not None:
+            query = (
+                query.filter(UserWorkspaceConfig.workspace_id == Event.workspace_id)
+                .filter(UserWorkspaceConfig.user_id == user_id)
+                .filter(UserWorkspaceConfig.email_notification_type == email_notification_type)
+            )
+
         return query.all()
 
     def get_mentions_for_content(self, content_id: int, after_event_id: int = 0) -> List[Message]:
@@ -366,6 +393,38 @@ class EventApi:
             related_to_content_ids=related_to_content_ids,
         ).count()
 
+    def get_unread_messages_summary(
+        self,
+        user_id: int,
+        created_after: datetime,
+    ) -> List[typing.Tuple[int, str]]:
+        query = (
+            self._session.query(
+                func.count(Message.event_id), Workspace.workspace_id, Workspace.label
+            )
+            .join(Event)
+            .join(Workspace, Event.workspace_id == Workspace.workspace_id)
+        )
+        query = query.filter(Message.receiver_id == user_id)
+        query = query.filter(Message.read == None)  # noqa: E711
+        query = query.filter(Event.created >= created_after)
+        query = query.filter(UserWorkspaceConfig.workspace_id == Event.workspace_id)
+        query = query.filter(UserWorkspaceConfig.user_id == user_id)
+        query = query.filter(
+            UserWorkspaceConfig.email_notification_type == EmailNotificationType.SUMMARY
+        )
+
+        # INFO - MP - 2023-03-14 - Filtering entity type WORKSPACE_MEMBER.MODIFIED because we want
+        # to display an equivalent result as the notification wall.
+        query = query.filter(
+            or_(
+                Event.entity_type != EntityType.WORKSPACE_MEMBER,
+                Event.operation != OperationType.MODIFIED,
+            )
+        )  # noqa: E711
+        query = query.group_by(Workspace.workspace_id)
+        return query.all()
+
     def create_event(
         self,
         entity_type: EntityType,
@@ -406,7 +465,10 @@ class EventApi:
         return event
 
     def create_messages_history_for_user(
-        self, user_id: int, workspace_ids: List[int], max_messages_count: int = -1,
+        self,
+        user_id: int,
+        workspace_ids: List[int],
+        max_messages_count: int = -1,
     ) -> List[Message]:
         """
         Generate up to max_messages_count missing messages to ensure the last max_messages_count event
@@ -416,6 +478,7 @@ class EventApi:
             return []
 
         session = self._session
+
         already_known_event_ids_query = session.query(Message.event_id).filter(
             Message.receiver_id == user_id
         )
@@ -427,10 +490,6 @@ class EventApi:
                 Event.event_id.desc()
             ).limit(max_messages_count)
 
-        # INFO - G.M - 2020-11-20 - Process result of workspace_event_ids_query instead of using subquery as
-        # mysql/mariadb doesn't support limit operator in subquery
-        workspace_event_ids = [event_id for event_id, in workspace_event_ids_query.all()]
-
         # INFO - S.G - 2021-05-12 - Do not create messages for pending events
         # as messages for those will be handled by EventPublisher.
         # This avoids to create twice the same Message() which causes an integrity error.
@@ -439,32 +498,35 @@ class EventApi:
         ]
         event_query = (
             session.query(Event)
-            .filter(Event.event_id.in_(workspace_event_ids))
+            .filter(Event.event_id.in_(workspace_event_ids_query.subquery()))
             .filter(Event.event_id.notin_(already_known_event_ids_query.subquery()))
             .filter(Event.event_id.notin_(pending_event_ids))
         )
         messages = []
-        for event in event_query:
-            try:
-                receiver_ids = BaseLiveMessageBuilder.get_receiver_ids(event, session, self._config)
-            except Exception as exc:
-                # NOTE - 2021-02-03 - S.G.
-                # Safeguard easy mistakes due to changing JSON structure of fields
-                msg = (
-                    "Event {} is malformed " "ignoring it during historic messages creation"
-                ).format(event.event_id, exc)
-                logger.warning(self, msg, exc_info=True)
-                receiver_ids = []
-            if user_id in receiver_ids:
-                messages.append(
-                    Message(
-                        receiver_id=user_id,
-                        event=event,
-                        event_id=event.event_id,
-                        sent=None,
-                        read=datetime.utcnow(),
+        with session.cache():
+            for event in event_query:
+                try:
+                    receiver_ids = BaseLiveMessageBuilder.get_receiver_ids(
+                        event, session, self._config
                     )
-                )
+                except Exception as exc:
+                    # NOTE - 2021-02-03 - S.G.
+                    # Safeguard easy mistakes due to changing JSON structure of fields
+                    msg = (  # noqa: F523
+                        "Event {} is malformed " "ignoring it during historic messages creation"
+                    ).format(event.event_id, exc)
+                    logger.warning(self, msg, exc_info=True)
+                    receiver_ids = []
+                if user_id in receiver_ids:
+                    messages.append(
+                        Message(
+                            receiver_id=user_id,
+                            event=event,
+                            event_id=event.event_id,
+                            sent=None,
+                            read=datetime.utcnow(),
+                        )
+                    )
         session.add_all(messages)
         return messages
 
@@ -597,7 +659,10 @@ class EventBuilder:
     ) -> None:
         current_user = context.safe_current_user()
         api = WorkspaceApi(
-            current_user=current_user, session=context.dbsession, config=self._config
+            current_user=current_user,
+            session=context.dbsession,
+            config=self._config,
+            show_deleted=True,
         )
         workspace_in_context = api.get_workspace_with_context(workspace)
         fields = {Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data}
@@ -664,27 +729,30 @@ class EventBuilder:
             context=context,
         )
 
-    # UserRoleInWorkspace events
+    # UserWorkspaceConfig events
     @hookimpl
-    def on_user_role_in_workspace_created(
-        self, role: UserRoleInWorkspace, context: TracimContext
+    def on_user_config_in_workspace_created(
+        self, user_workspace_config: UserWorkspaceConfig, context: TracimContext
     ) -> None:
-        self._create_role_event(OperationType.CREATED, role, context)
+        self._create_role_event(OperationType.CREATED, user_workspace_config, context)
 
     @hookimpl
-    def on_user_role_in_workspace_modified(
-        self, role: UserRoleInWorkspace, context: TracimContext
+    def on_user_config_in_workspace_modified(
+        self, user_workspace_config: UserWorkspaceConfig, context: TracimContext
     ) -> None:
-        self._create_role_event(OperationType.MODIFIED, role, context)
+        self._create_role_event(OperationType.MODIFIED, user_workspace_config, context)
 
     @hookimpl
-    def on_user_role_in_workspace_deleted(
-        self, role: UserRoleInWorkspace, context: TracimContext
+    def on_user_config_in_workspace_deleted(
+        self, user_workspace_config: UserWorkspaceConfig, context: TracimContext
     ) -> None:
-        self._create_role_event(OperationType.DELETED, role, context)
+        self._create_role_event(OperationType.DELETED, user_workspace_config, context)
 
     def _create_role_event(
-        self, operation: OperationType, role: UserRoleInWorkspace, context: TracimContext
+        self,
+        operation: OperationType,
+        user_workspace_config: UserWorkspaceConfig,
+        context: TracimContext,
     ) -> None:
         current_user = context.safe_current_user()
         workspace_api = WorkspaceApi(
@@ -697,27 +765,29 @@ class EventBuilder:
             current_user=None,
         )
         workspace_in_context = workspace_api.get_workspace_with_context(
-            workspace_api.get_one(role.workspace_id)
+            workspace_api.get_one(user_workspace_config.workspace_id)
         )
         user_api = UserApi(current_user, context.dbsession, self._config, show_deleted=True)
-        role_api = RoleApi(
+        user_workspace_config_api = UserWorkspaceConfigApi(
             current_user=current_user, session=context.dbsession, config=self._config
         )
         try:
             user_field = EventApi.user_schema.dump(
-                user_api.get_user_with_context(user_api.get_one(role.user_id))
+                user_api.get_user_with_context(user_api.get_one(user_workspace_config.user_id))
             ).data
         except UserDoesNotExist:
             # It is possible to have an already deleted user when deleting his roles.
             user_field = None
 
-        role_in_context = role_api.get_user_role_workspace_with_context(role)
+        config_in_context = user_workspace_config_api.get_user_workspace_config_with_context(
+            user_workspace_config
+        )
         fields = {
             Event.USER_FIELD: user_field,
             Event.WORKSPACE_FIELD: EventApi.workspace_without_description_schema.dump(
                 workspace_in_context
             ).data,
-            Event.MEMBER_FIELD: EventApi.workspace_user_role_schema.dump(role_in_context).data,
+            Event.MEMBER_FIELD: EventApi.workspace_user_role_schema.dump(config_in_context).data,
         }
         event_api = EventApi(current_user, context.dbsession, self._config)
         event_api.create_event(
@@ -794,11 +864,16 @@ class EventBuilder:
         self._create_user_call_event(OperationType.DELETED, user_call, context)
 
     def _create_subscription_event(
-        self, operation: OperationType, subscription: WorkspaceSubscription, context: TracimContext
+        self,
+        operation: OperationType,
+        subscription: WorkspaceSubscription,
+        context: TracimContext,
     ) -> None:
         current_user = context.safe_current_user()
         workspace_api = WorkspaceApi(
-            session=context.dbsession, config=self._config, current_user=None,
+            session=context.dbsession,
+            config=self._config,
+            current_user=None,
         )
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(subscription.workspace_id)
@@ -827,7 +902,9 @@ class EventBuilder:
     ) -> None:
         current_user = context.safe_current_user()
         workspace_api = WorkspaceApi(
-            session=context.dbsession, config=self._config, current_user=None,
+            session=context.dbsession,
+            config=self._config,
+            current_user=None,
         )
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(reaction.content.workspace_id)
@@ -859,7 +936,9 @@ class EventBuilder:
         """Create an event for a tag operation (create/update/delete)."""
         current_user = context.safe_current_user()
         workspace_api = WorkspaceApi(
-            session=context.dbsession, config=self._config, current_user=None,
+            session=context.dbsession,
+            config=self._config,
+            current_user=None,
         )
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(tag.workspace_id)
@@ -879,12 +958,17 @@ class EventBuilder:
         )
 
     def _create_content_tag_event(
-        self, operation: OperationType, content_tag: TagOnContent, context: TracimContext
+        self,
+        operation: OperationType,
+        content_tag: TagOnContent,
+        context: TracimContext,
     ) -> None:
         """Create an event for a tag operation on a content (add/remove)."""
         current_user = context.safe_current_user()
         workspace_api = WorkspaceApi(
-            session=context.dbsession, config=self._config, current_user=None,
+            session=context.dbsession,
+            config=self._config,
+            current_user=None,
         )
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(content_tag.content.workspace_id)
@@ -948,14 +1032,17 @@ def get_event_user_id(session: TracimSession, event: Event) -> typing.Optional[i
     # INFO - G.M - 2022-01-10 - user is None case
     if not event.fields.get(Event.USER_FIELD):
         return None
+    user_id = event.user["user_id"]
     try:
-        # TODO - MP - 2022-11-29 - Should use line 934, keep testing like this and remove 935 before
-        # merge (comment start line 933)
-        # return int(event.user["user_id"])
-        return session.query(User.user_id).filter(User.user_id == event.user["user_id"]).scalar()
-    except (AttributeError, NoResultFound):
+        # NOTE - SGD - 2023-03-28 - Validate that the user is still existing
+        user_id = session.use_cache(
+            f"get_event_user_id({user_id})",
+            lambda: session.query(User.user_id).filter(User.user_id == event.user["user_id"]).all(),
+        )[0][0]
+    except IndexError:
         # no user in event or user does not exist anymore
-        return None
+        user_id = None
+    return user_id
 
 
 def _get_user_event_receiver_ids(event: Event, session: TracimSession, config: CFG) -> Set[int]:
@@ -984,8 +1071,10 @@ def _get_members_and_administrators_ids(
     """
     user_api = UserApi(current_user=None, session=session, config=config)
     administrators = user_api.get_user_ids_from_profile(Profile.ADMIN)
-    role_api = RoleApi(current_user=None, session=session, config=config)
-    workspace_members = role_api.get_workspace_member_ids(event.workspace_id)
+    user_workspace_config_api = UserWorkspaceConfigApi(
+        current_user=None, session=session, config=config
+    )
+    workspace_members = user_workspace_config_api.get_workspace_member_ids(event.workspace_id)
     receiver_ids = set(administrators + workspace_members)
     event_user_id = get_event_user_id(session, event)
     if event_user_id:
@@ -1006,7 +1095,7 @@ def _get_workspace_event_receiver_ids(
         access_type = WorkspaceAccessType.CONFIDENTIAL
     if access_type in Workspace.ACCESSIBLE_TYPES:
         user_api = UserApi(current_user=None, session=session, config=config)
-        receiver_ids = set(user.user_id for user in user_api.get_all())
+        receiver_ids = set(user_api.get_all_user_ids())
     else:
         receiver_ids = _get_members_and_administrators_ids(event, session, config)
     return receiver_ids
@@ -1024,8 +1113,10 @@ def _get_workspace_subscription_event_receiver_ids(
     user_api = UserApi(current_user=None, session=session, config=config)
     administrators = user_api.get_user_ids_from_profile(Profile.ADMIN)
     author = event.subscription["author"]["user_id"]
-    role_api = RoleApi(current_user=None, session=session, config=config)
-    workspace_managers = role_api.get_workspace_member_ids(
+    user_workspace_config_api = UserWorkspaceConfigApi(
+        current_user=None, session=session, config=config
+    )
+    workspace_managers = user_workspace_config_api.get_workspace_member_ids(
         event.workspace_id, min_role=WorkspaceRoles.WORKSPACE_MANAGER
     )
     return set(administrators + workspace_managers + [author])
@@ -1043,15 +1134,16 @@ def _get_content_event_receiver_ids(event: Event, session: TracimSession, config
     Returns:
         Set[int]: List of user id that will receive the event
     """
-    role_api = RoleApi(current_user=None, session=session, config=config)
-    workspace_members = role_api.get_workspace_member_ids(event.workspace_id)
+    user_workspace_config_api = UserWorkspaceConfigApi(
+        current_user=None, session=session, config=config
+    )
+    workspace_members = user_workspace_config_api.get_workspace_member_ids(event.workspace_id)
     return set(workspace_members)
 
 
 def _get_user_call_event_receiver_ids(
     event: Event, session: TracimSession, config: CFG
 ) -> Set[int]:
-
     return {event.user_call["caller"]["user_id"], event.user_call["callee"]["user_id"]}
 
 
@@ -1059,7 +1151,7 @@ GetReceiverIdsCallable = Callable[[Event, TracimSession, CFG], Iterable[int]]
 
 
 class BaseLiveMessageBuilder(abc.ABC):
-    """"Base class for message building with most implementation."""
+    """ "Base class for message building with most implementation."""
 
     _event_schema = EventSchema()
 
@@ -1106,7 +1198,11 @@ class BaseLiveMessageBuilder(abc.ABC):
     def _publish_messages_for_event(self, event_id: int) -> None:
         with self.context() as context:
             session = context.dbsession
-            event = session.query(Event).filter(Event.event_id == event_id).one()
+            try:
+                event = session.query(Event).filter(Event.event_id == event_id).one()
+            except NoResultFound:
+                logger.debug(self, f"Event {event_id} not found. Skipping.")
+                return
             receiver_ids = self.get_receiver_ids(event, session, self._config)
             logger.debug(self, f"Sending eventid: {event_id} to users: {receiver_ids}")
             messages = [
@@ -1125,7 +1221,7 @@ class BaseLiveMessageBuilder(abc.ABC):
 
 
 class AsyncLiveMessageBuilder(BaseLiveMessageBuilder):
-    """"Live message building + sending executed in a RQ job."""
+    """ "Live message building + sending executed in a RQ job."""
 
     def __init__(self, context: TracimContext) -> None:
         super().__init__(context.app_config)
@@ -1148,7 +1244,7 @@ class AsyncLiveMessageBuilder(BaseLiveMessageBuilder):
 
 
 class SyncLiveMessageBuilder(BaseLiveMessageBuilder):
-    """"Live message building + sending executed in tracim web application."""
+    """ "Live message building + sending executed in tracim web application."""
 
     def __init__(self, context: TracimContext) -> None:
         super().__init__(context.app_config)
@@ -1164,22 +1260,19 @@ class SyncLiveMessageBuilder(BaseLiveMessageBuilder):
 
 
 class MessageHooks:
-    def _create_workspace_historic_messages_for_current_user(
-        self, role: UserRoleInWorkspace, context: TracimContext
-    ):
+    @hookimpl
+    def on_user_config_in_workspaces_created(
+        self, user_workspace_configs: typing.List[UserWorkspaceConfig], context: TracimContext
+    ) -> None:
         current_user = context.safe_current_user()
         event_api = EventApi(current_user, context.dbsession, context.app_config)
+        user_id = user_workspace_configs[0].user_id
         event_api.create_messages_history_for_user(
-            user_id=role.user_id,
-            workspace_ids=[role.workspace_id],
-            max_messages_count=context.app_config.WORKSPACE__JOIN__MAX_MESSAGES_HISTORY_COUNT,
+            user_id=user_id,
+            workspace_ids=[config.workspace_id for config in user_workspace_configs],
+            max_messages_count=len(user_workspace_configs)
+            * context.app_config.WORKSPACE__JOIN__MAX_MESSAGES_HISTORY_COUNT,
         )
-
-    @hookimpl
-    def on_user_role_in_workspace_created(
-        self, role: UserRoleInWorkspace, context: TracimContext
-    ) -> None:
-        self._create_workspace_historic_messages_for_current_user(role, context)
 
     @hookimpl
     def on_workspace_deleted(self, workspace: Workspace, context: TracimContext) -> None:
@@ -1202,11 +1295,11 @@ class MessageHooks:
                 )
 
     @hookimpl
-    def on_user_role_in_workspace_deleted(
-        self, role: UserRoleInWorkspace, context: TracimContext
+    def on_user_config_in_workspace_deleted(
+        self, user_workspace_config: UserWorkspaceConfig, context: TracimContext
     ) -> None:
         current_user = context.safe_current_user()
         event_api = EventApi(current_user, context.dbsession, context.app_config)
         event_api.delete_message_for_user_in_workspace(
-            user_id=role.user_id, workspace_id=role.workspace_id
+            user_id=user_workspace_config.user_id, workspace_id=user_workspace_config.workspace_id
         )

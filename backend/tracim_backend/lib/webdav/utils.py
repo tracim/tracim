@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-import tempfile
-
 from sqlalchemy.orm import Session
+import tempfile
 import transaction
 from wsgidav import util
-from wsgidav.dav_error import HTTP_FORBIDDEN
 from wsgidav.dav_error import DAVError
+from wsgidav.dav_error import HTTP_FORBIDDEN
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import TracimException
@@ -138,7 +137,10 @@ class FakeFileStream(object):
                     do_save=False,
                 )
                 self._api.update_file_data(
-                    file, self._file_name, util.guessMimeType(self._file_name), self.temp_file
+                    file,
+                    self._file_name,
+                    util.guessMimeType(self._file_name),
+                    self.temp_file,
                 )
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN) from exc

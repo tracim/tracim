@@ -1,6 +1,5 @@
-from http import HTTPStatus
-
 from beaker.cache import cache_region
+from http import HTTPStatus
 from pyramid.config import Configurator
 
 from tracim_backend.exceptions import UnavailableURLPreview
@@ -39,6 +38,8 @@ class URLPreviewController(Controller):
 
     def bind(self, configurator: Configurator) -> None:
         configurator.add_route(
-            "url_preview", "/url-preview", request_method="GET",  # noqa: W605
+            "url_preview",
+            "/url-preview",
+            request_method="GET",  # noqa: W605
         )
         configurator.add_view(self.url_preview, route_name="url_preview")

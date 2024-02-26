@@ -2,6 +2,7 @@
 
 module.exports = {
   require: [
+    'mock-local-storage',
     'core-js/stable',
     'regenerator-runtime/runtime',
     '@babel/register',

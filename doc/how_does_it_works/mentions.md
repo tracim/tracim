@@ -9,11 +9,11 @@ To be detected by the backend, a mention must be under the following:
 ```
 
 `DATA` can be decomposed either into `roleid="X"` or `userid="Y"` depending if the mention is a role
-mention or a user mention.
+mention or a user mention. X and Y are the ID of the role or user respectively.
 
 ### Examples
 
-Mentionning everyone in a space:
+Mentioning everyone in a space:
 
 ```html
 <html-mention roleid="0"></html-mention>

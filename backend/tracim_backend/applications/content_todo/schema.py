@@ -1,7 +1,6 @@
-import typing
-
 import marshmallow
 from marshmallow import post_load
+import typing
 
 from tracim_backend.app_models.validator import strictly_positive_int_validator
 from tracim_backend.applications.content_todo.models_in_context import TodoPath
@@ -10,7 +9,10 @@ from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchem
 
 
 class TodoIdSchema(marshmallow.Schema):
-    todo_id = marshmallow.fields.Integer(example=42, description="Id of the todo",)
+    todo_id = marshmallow.fields.Integer(
+        example=42,
+        description="Id of the todo",
+    )
 
 
 class SetTodoSchema(marshmallow.Schema):

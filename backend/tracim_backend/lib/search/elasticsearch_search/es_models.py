@@ -1,5 +1,3 @@
-import typing
-
 # from elasticsearch_dsl import Float
 from elasticsearch_dsl import Boolean
 from elasticsearch_dsl import Date
@@ -11,6 +9,7 @@ from elasticsearch_dsl import Keyword
 from elasticsearch_dsl import Nested
 from elasticsearch_dsl import Object
 from elasticsearch_dsl import Text
+import typing
 
 from tracim_backend.config import CFG
 from tracim_backend.lib.search.elasticsearch_search.default_analyzers import edge_ngram_folding
@@ -49,7 +48,8 @@ UTF8_MAX_KEYWORD_SIZE = 8191
 class SimpleKeyword(Keyword):
     def __init__(self, **kwargs: dict) -> None:
         super().__init__(
-            ignore_above=UTF8_MAX_KEYWORD_SIZE, **kwargs,
+            ignore_above=UTF8_MAX_KEYWORD_SIZE,
+            **kwargs,
         )
 
 

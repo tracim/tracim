@@ -1,9 +1,8 @@
-import typing
-
 from hapic import MarshmallowProcessor
 from hapic.exception import OutputValidationException
 from hapic.exception import ValidationException
 from hapic.processor.main import ProcessValidationError
+import typing
 
 
 class TracimProcessor(MarshmallowProcessor):

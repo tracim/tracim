@@ -14,7 +14,6 @@ import {
   COLORS,
   CONTENT_TYPE,
   CUSTOM_EVENT,
-  DEFAULT_ROLE_LIST,
   PAGE,
   ROLE_LIST,
   ROLE,
@@ -122,8 +121,7 @@ export class FeedItemWithPreview extends React.Component {
     }
     await props.appContentSaveNewCommentText(
       content,
-      comment,
-      props.content.type
+      comment
     )
     await props.appContentSaveNewCommentFileList(
       this.setState.bind(this),
@@ -266,18 +264,28 @@ export class FeedItemWithPreview extends React.Component {
     }
 
     const shouldShowComment = props.content.type === CONTENT_TYPE.THREAD
-    const commentToShow = (
-      shouldShowComment
-        ? this.getFirstComment()
-        : null
-    )
+    const commentToShow = shouldShowComment ? this.getFirstComment() : null
+
     if (shouldShowComment && props.inRecentActivities) {
       props.content.firstComment = commentToShow
     }
 
     const commentList = this.getTimelineData()
 
-    const spaceMemberList = (props.workspaceList.find(workspace => workspace.id === props.content.workspaceId) || { memberList: [] }).memberList
+    // HACK - M.L. - 2032-11-23 - mapping id to userId since both are used later in the code
+    //  this needs to be changed someday
+    //  it should be done in https://github.com/tracim/tracim/issues/6252
+    const spaceMemberList = props.knownMemberList
+      .filter(km => km.spaceList.includes(props.content.workspaceId))
+      .map(km => ({
+        ...km,
+        id: km.userId,
+        role: props.workspaceList
+          // HACK - CH - 2023-11-24 - This will change in the refactor required by
+          // https://github.com/tracim/tracim/issues/6252
+          .find(w => w.id === props.content.workspaceId)?.memberList
+          .find(m => m.id === props.user.userId)?.role
+      }))
 
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(
       props.user.userId,
@@ -412,17 +420,16 @@ export class FeedItemWithPreview extends React.Component {
                 translationTargetLanguageList={props.system.config.translation_service__target_languages}
                 workspaceId={props.workspaceId}
                 // End of required props ///////////////////////////////////////
-                codeLanguageList={props.system.config.code_languages}
+                codeLanguageList={props.system.config.ui__notes__code_sample_languages}
                 customClass='feedItem__timeline'
                 customColor={contentType.hexcolor}
                 id={props.content.id}
                 invalidMentionList={state.invalidMentionList}
-                memberList={props.memberList}
+                memberList={spaceMemberList}
                 onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
                 onClickDeleteComment={this.handleClickDeleteComment}
                 onClickEditComment={this.handleClickEditComment}
                 onClickOpenFileComment={this.handleClickOpenFileComment}
-                roleList={DEFAULT_ROLE_LIST}
                 shouldScrollToBottom={false}
                 showParticipateButton={props.showParticipateButton}
               />
@@ -439,8 +446,9 @@ const mapStateToProps = ({
   system,
   user,
   currentWorkspace,
-  workspaceList
-}) => ({ appList, system, user, currentWorkspace, workspaceList })
+  workspaceList,
+  knownMemberList
+}) => ({ appList, system, user, currentWorkspace, workspaceList, knownMemberList })
 const FeedItemWithPreviewWithoutRef = translate()(appContentFactory(withRouter(TracimComponent(connect(mapStateToProps)(FeedItemWithPreview)))))
 const FeedItemWithPreviewWithRef = React.forwardRef((props, ref) => {
   return <FeedItemWithPreviewWithoutRef innerRef={ref} {...props} />
@@ -464,7 +472,6 @@ FeedItemWithPreview.propTypes = {
   lastModificationSubEntityType: PropTypes.string,
   lastModificationType: PropTypes.string,
   lastModifier: PropTypes.object,
-  memberList: PropTypes.array,
   modifiedDate: PropTypes.string,
   onEventClicked: PropTypes.func,
   onClickEdit: PropTypes.func,
@@ -486,7 +493,6 @@ FeedItemWithPreview.defaultProps = {
   lastModificationSubEntityType: '',
   lastModificationType: '',
   lastModifier: {},
-  memberList: [],
   modifiedDate: '',
   onClickEdit: () => { },
   reactionList: [],

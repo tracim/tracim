@@ -1,0 +1,28 @@
+@import '~tracim_frontend_lib/src/css/Variable.styl'
+
+.classicLoginAuthForm
+  width 100%
+  margin-block-start 15%
+  display flex
+  flex-direction column
+  &__forgot_password
+    cursor pointer
+    font-size metadataFontSize
+  &__btnsubmit
+    margin-inline-start auto
+  &__btnback
+    margin-top standardSpacing
+    margin-inline-start auto
+  &__buttonList
+    display flex
+    flex-direction row
+  &__header
+    display flex
+    &__title
+      margin-inline-end auto
+    &__createButton
+      margin auto 0
+
+@media (max-width: max-md)
+  .classicLoginAuthForm
+    margin-block-start standardSpacing

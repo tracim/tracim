@@ -3,7 +3,8 @@ import transaction
 
 from tracim_backend.lib.core.tag import TagLib
 from tracim_backend.models.auth import Profile
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import EmailNotificationType
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
@@ -30,7 +31,7 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__by_label(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         web_testapp,
         content_api_factory,
@@ -39,7 +40,6 @@ class TestSimpleSearch(object):
         nb_content_result,
         first_search_result_content_name,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.TRUSTED_USER
@@ -52,8 +52,13 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            user,
+            workspace,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get(current_user=user)
         api.create(
             content_type_slug="html-document",
@@ -68,7 +73,10 @@ class TestSimpleSearch(object):
             do_save=True,
         )
         api.create(
-            content_type_slug="html-document", workspace=workspace, label="test", do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="test",
+            do_save=True,
         )
         transaction.commit()
 
@@ -96,7 +104,7 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__by_filename(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         content_api_factory,
         web_testapp,
@@ -105,7 +113,6 @@ class TestSimpleSearch(object):
         nb_content_result,
         first_search_result_content_name,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.TRUSTED_USER
@@ -118,8 +125,13 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            user,
+            workspace,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get(current_user=user)
         api.create(
             content_type_slug="html-document",
@@ -128,10 +140,16 @@ class TestSimpleSearch(object):
             do_save=True,
         )
         api.create(
-            content_type_slug="html-document", workspace=workspace, label="report", do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="report",
+            do_save=True,
         )
         api.create(
-            content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
+            content_type_slug="thread",
+            workspace=workspace,
+            label="discussion",
+            do_save=True,
         )
         transaction.commit()
 
@@ -176,7 +194,7 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__by_content(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         content_api_factory,
         web_testapp,
@@ -187,7 +205,6 @@ class TestSimpleSearch(object):
         nb_content_result,
         first_search_result_content_name,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.TRUSTED_USER
@@ -200,8 +217,13 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            user,
+            workspace,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get(current_user=user)
         content = api.create(
             content_type_slug="html-document",
@@ -211,14 +233,22 @@ class TestSimpleSearch(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=content):
             api.update_content(
-                content, new_label=created_content_name, new_raw_content=created_content_body
+                content,
+                new_label=created_content_name,
+                new_raw_content=created_content_body,
             )
             api.save(content)
         api.create(
-            content_type_slug="html-document", workspace=workspace, label="report", do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="report",
+            do_save=True,
         )
         api.create(
-            content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
+            content_type_slug="thread",
+            workspace=workspace,
+            label="discussion",
+            do_save=True,
         )
         transaction.commit()
 
@@ -266,7 +296,7 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__by_comment_content(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         content_api_factory,
         web_testapp,
@@ -277,7 +307,6 @@ class TestSimpleSearch(object):
         first_created_comment_content,
         second_created_comment_content,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.TRUSTED_USER
@@ -290,8 +319,13 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            user,
+            workspace,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get(current_user=user)
         content = api.create(
             content_type_slug="html-document",
@@ -300,7 +334,10 @@ class TestSimpleSearch(object):
             do_save=True,
         )
         api.create_comment(
-            workspace=workspace, parent=content, content=first_created_comment_content, do_save=True
+            workspace=workspace,
+            parent=content,
+            content=first_created_comment_content,
+            do_save=True,
         )
         api.create_comment(
             workspace=workspace,
@@ -309,10 +346,16 @@ class TestSimpleSearch(object):
             do_save=True,
         )
         api.create(
-            content_type_slug="html-document", workspace=workspace, label="report", do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="report",
+            do_save=True,
         )
         api.create(
-            content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
+            content_type_slug="thread",
+            workspace=workspace,
+            label="discussion",
+            do_save=True,
         )
         transaction.commit()
 
@@ -360,7 +403,7 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__by_todo_content(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         content_api_factory,
         web_testapp,
@@ -371,7 +414,6 @@ class TestSimpleSearch(object):
         first_created_todo_content,
         second_created_todo_content,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.TRUSTED_USER
@@ -384,8 +426,13 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            user,
+            workspace,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get(current_user=user)
         content = api.create(
             content_type_slug="html-document",
@@ -394,16 +441,26 @@ class TestSimpleSearch(object):
             do_save=True,
         )
         api.create_todo(
-            parent=content, assignee=user, raw_content=first_created_todo_content,
+            parent=content,
+            assignee=user,
+            raw_content=first_created_todo_content,
         )
         api.create_todo(
-            parent=content, assignee=user, raw_content=second_created_todo_content,
+            parent=content,
+            assignee=user,
+            raw_content=second_created_todo_content,
         )
         api.create(
-            content_type_slug="html-document", workspace=workspace, label="report", do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="report",
+            do_save=True,
         )
         api.create(
-            content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
+            content_type_slug="thread",
+            workspace=workspace,
+            label="discussion",
+            do_save=True,
         )
         transaction.commit()
 
@@ -433,7 +490,7 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__avoid_duplicate_content(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         content_api_factory,
         created_content_name,
@@ -455,8 +512,13 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            user,
+            workspace,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get(current_user=user)
         content = api.create(
             content_type_slug="html-document",
@@ -465,7 +527,10 @@ class TestSimpleSearch(object):
             do_save=True,
         )
         api.create_comment(
-            workspace=workspace, parent=content, content=first_created_comment_content, do_save=True
+            workspace=workspace,
+            parent=content,
+            content=first_created_comment_content,
+            do_save=True,
         )
         api.create_comment(
             workspace=workspace,
@@ -474,10 +539,16 @@ class TestSimpleSearch(object):
             do_save=True,
         )
         api.create(
-            content_type_slug="html-document", workspace=workspace, label="report", do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="report",
+            do_save=True,
         )
         api.create(
-            content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
+            content_type_slug="thread",
+            workspace=workspace,
+            label="discussion",
+            do_save=True,
         )
         transaction.commit()
 
@@ -502,12 +573,11 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__no_search_string(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         content_api_factory,
         web_testapp,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.TRUSTED_USER
@@ -520,11 +590,19 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            user,
+            workspace,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get(current_user=user)
         api.create(
-            content_type_slug="html-document", workspace=workspace, label="test", do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="test",
+            do_save=True,
         )
         transaction.commit()
 
@@ -539,12 +617,11 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__filter_by_content_type(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_api_factory,
         workspace_api_factory,
         web_testapp,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.TRUSTED_USER
@@ -557,8 +634,13 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            user,
+            workspace,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get(current_user=user)
         api.create(
             content_type_slug="html-document",
@@ -607,7 +689,10 @@ class TestSimpleSearch(object):
         assert search_result["contents"][0]["label"] == "stringtosearch doc 2"
         assert search_result["contents"][1]["label"] == "stringtosearch doc"
 
-        params = {"search_string": "stringtosearch", "content_types": "html-document,thread"}
+        params = {
+            "search_string": "stringtosearch",
+            "content_types": "html-document,thread",
+        }
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
         res = web_testapp.get("/api/search/content".format(), status=200, params=params)
         search_result = res.json_body
@@ -632,13 +717,12 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__filter_by_deleted_archived_active(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         content_api_factory,
         session,
         web_testapp,
     ) -> None:
-
         uapi = user_api_factory.get()
 
         profile = Profile.TRUSTED_USER
@@ -651,8 +735,13 @@ class TestSimpleSearch(object):
         )
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            user,
+            workspace,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get(current_user=user)
         api.create(
             content_type_slug="html-document",
@@ -763,7 +852,7 @@ class TestSimpleSearch(object):
     def test_api___simple_search_ok__by_tags(
         self,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
         content_api_factory,
         web_testapp,
@@ -776,16 +865,25 @@ class TestSimpleSearch(object):
         workspace = workspace_api.create_workspace("test", save_now=True)
         content_api = content_api_factory.get()
         content_api.create(
-            content_type_slug="html-document", workspace=workspace, label="Foo", do_save=True,
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="Foo",
+            do_save=True,
         )
         bar = content_api.create(
-            content_type_slug="html-document", workspace=workspace, label="Bar", do_save=True
+            content_type_slug="html-document",
+            workspace=workspace,
+            label="Bar",
+            do_save=True,
         )
         tag_lib = TagLib(session)
         tag_lib.add_tag_to_content(user=admin_user, content=bar, tag_name="World")
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"search_string": search_string}
         res = web_testapp.get("/api/search/content".format(), status=200, params=params)
         search_result = res.json_body

@@ -65,14 +65,13 @@ import {
   setupCommonRequestHeaders,
   splitFilenameExtension,
   stringIncludes,
-  tinymceRemove,
   updateTLMUser
 } from './helper.js'
 
 import {
   SORT_BY,
   SORT_ORDER,
-  putFoldersAtListBeginning,
+  sortWithFoldersAtListBeginning,
   sortListBy,
   sortListByMultipleCriteria,
   sortTimelineByDate
@@ -80,14 +79,12 @@ import {
 
 import {
   DEFAULT_ROLE_LIST,
-  GROUP_MENTION_TRANSLATION_LIST,
+  MENTION_CONSTANT,
   addClassToMentionsOfUser,
   getInvalidMentionList,
-  handleLinksBeforeSave,
-  handleMentionsBeforeSave,
   replaceHTMLElementWithMention,
-  searchContentAndPlaceBalise,
-  searchMentionAndPlaceBalise
+  searchContentAndReplaceWithTag,
+  searchMentionAndReplaceWithTag
 } from './mentionOrLink.js'
 
 import { TracimComponent } from './tracimComponent.js'
@@ -140,11 +137,9 @@ import TinyEditor from './component/TinyEditor/TinyEditor.jsx'
 
 import ScrollToBottomWrapper from './component/ScrollToBottomWrapper/ScrollToBottomWrapper.jsx'
 
-import TextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
 import BtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
 import Checkbox from './component/Input/Checkbox.jsx'
 import SingleChoiceList from './component/Input/SingleChoiceList/SingleChoiceList.jsx'
-import AutoComplete from './component/Input/AutoComplete/AutoComplete.jsx'
 
 import PageWrapper from './component/Layout/PageWrapper.jsx'
 import PageTitle from './component/Layout/PageTitle.jsx'
@@ -206,14 +201,6 @@ import ToDoItem from './component/ToDo/ToDoItem.jsx'
 import ContentType from './component/ContentType/ContentType.jsx'
 
 import {
-  tinymceAutoCompleteHandleInput,
-  tinymceAutoCompleteHandleKeyDown,
-  tinymceAutoCompleteHandleKeyUp,
-  tinymceAutoCompleteHandleClickItem,
-  tinymceAutoCompleteHandleSelectionChange
-} from './tinymceAutoCompleteHelper.js'
-
-import {
   baseFetch,
   deleteToDo,
   deleteWorkspace,
@@ -236,7 +223,7 @@ import {
   getReservedUsernames,
   getSpaceContent,
   getSpaceMemberFromId,
-  getSpaceMemberList,
+  getSpaceUserRoleList,
   getToDo,
   getToDoListForUser,
   getUsernameAvailability,
@@ -332,11 +319,11 @@ export {
   DEFAULT_ROLE_LIST,
   FETCH_CONFIG,
   FILE_PREVIEW_STATE,
-  GROUP_MENTION_TRANSLATION_LIST,
   IMG_LOAD_STATE,
   LIVE_MESSAGE_ERROR_CODE,
   LIVE_MESSAGE_STATUS,
   MAXIMUM_CHARACTERS_USERNAME,
+  MENTION_CONSTANT,
   MINIMUM_CHARACTERS_USERNAME,
   NUMBER_RESULTS_BY_PAGE,
   PAGE,
@@ -360,7 +347,6 @@ export {
   AddFileToUploadButton,
   AgendaInfo,
   ArchiveDeleteContent,
-  AutoComplete,
   Avatar,
   Badge,
   Breadcrumbs,
@@ -412,7 +398,6 @@ export {
   ShareDownload,
   ShareLink,
   SingleChoiceList,
-  TextAreaApp,
   TextInput,
   TimedEvent,
   Timeline,
@@ -473,7 +458,7 @@ export {
   getRevisionTypeLabel,
   getSpaceContent,
   getSpaceMemberFromId,
-  getSpaceMemberList,
+  getSpaceUserRoleList,
   getToDo,
   getToDoListForUser,
   getUsernameAvailability,
@@ -481,8 +466,6 @@ export {
   getWorkspaceDetail,
   handleClickCopyLink,
   handleFetchResult,
-  handleLinksBeforeSave,
-  handleMentionsBeforeSave,
   hasSpaces,
   htmlToText,
   isFileUploadInErrorState,
@@ -501,7 +484,6 @@ export {
   putEditStatus,
   putFileDescription,
   putFileIsDeleted,
-  putFoldersAtListBeginning,
   putMyselfFileRead,
   putRawFileContent,
   putToDo,
@@ -511,22 +493,17 @@ export {
   replaceHTMLElementWithMention,
   revisionTypeList,
   scrollIntoViewIfNeeded,
-  searchContentAndPlaceBalise,
-  searchMentionAndPlaceBalise,
+  searchContentAndReplaceWithTag,
+  searchMentionAndReplaceWithTag,
   sendGlobalFlashMessage,
   serialize,
   setupCommonRequestHeaders,
   sortListBy,
   sortListByMultipleCriteria,
   sortTimelineByDate,
+  sortWithFoldersAtListBeginning,
   splitFilenameExtension,
   stringIncludes,
-  tinymceAutoCompleteHandleClickItem,
-  tinymceAutoCompleteHandleInput,
-  tinymceAutoCompleteHandleKeyDown,
-  tinymceAutoCompleteHandleKeyUp,
-  tinymceAutoCompleteHandleSelectionChange,
-  tinymceRemove,
   updateTLMUser,
   uploadFile
 }

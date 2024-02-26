@@ -12,10 +12,12 @@ Make sure you have:
   - can be used with docker image
 - the `kes` binary available ([Installation instructions](https://github.com/minio/kes/#install))
   - Example for amd64:
-```
+
+```bash
 wget https://github.com/minio/kes/releases/latest/download/kes-linux-amd64
 chmod +x kes-linux-amd64
 ```
+
 - `openssl` utilities to generate the needed key (`openssl` package in Debian >= 1.1.1).
 
 This guide uses a docker compose and some configuration available in [tools_docker/minio-encryption](../../tools_docker/minio-encryption).
@@ -34,51 +36,51 @@ You should properly backup the `kes-config/keys` directory as it will contain th
 
 ## Instructions
 
-**All the commands should be executed from the `tools_docker/minio-encryption` directory.**
+__All the commands should be executed from the `tools_docker/minio-encryption` directory.__
 
 Choose an access and secret key for authenticating Tracim with min.io then write them in a `.env` file next to the `docker-compose.yml` file:
 
-```
+```ini
 MINIO_ACCESS_KEY=<minio_access_key>
 MINIO_SECRET_KEY=<minio_secret_key>
 ```
 
 Generate a TLS key/certificate as the min.io connection to `kes` must be TLS based:
 
-```
+```bash
 openssl ecparam -genkey -name prime256v1 | openssl ec -out kes-config/kes.key
 ```
 
 Create a self-signed certificate:
 
-```
+```bash
 openssl req -new -x509 -days 30 -key kes-config/kes.key -out kes-config/kes.cert -subj "/C=/ST=/L=/O=/CN=kes" -addext "subjectAltName = DNS:kes"
 cp kes-config/kes.cert minio-config/certs/CAs/
 ```
 
 Create an identity key/certificate for authenticating min.io with kes:
 
-```
+```bash
 cd minio-config
 kes-linux-amd64 tool identity new minio
 ```
 
 Display the generated identity:
 
-```
+```bash
 kes-linux-amd64 tool identity of public.cert
 cd -
 ```
 
 And add it to the `.env` file:
 
-```
+```ini
 MINIO_IDENTITY=<minio_identity_as_displayed>
 ```
 
 Your `.env` file should now have 3 lines:
 
-```
+```ini
 MINIO_ACCESS_KEY=<minio_access_key>
 MINIO_SECRET_KEY=<minio_secret_key>
 MINIO_IDENTITY=<minio_identity_as_displayed>
@@ -86,53 +88,53 @@ MINIO_IDENTITY=<minio_identity_as_displayed>
 
 Now start the docker-compose file:
 
-```
+```bash
 docker-compose up -d
 ```
 
 Configure the `mc` client to access the minio instance:
 
-```
+```bash
 mc alias set myminio http://localhost:9000 <minio_access_key> <minio_secret_key>
 ```
 
 - If you use `mc` with docker:
 
-```
+```bash
 docker run -d --entrypoint=/bin/sh minio/mc
 docker exec -it <container_id> /bin/bash
 ```
 
 - You can now execute all necessary `mc` command.
 
-```
+```bash
 mc alias set myminio http://<ip_address_minio_server>:9000 <minio_access_key> <minio_secret_key>
 ```
 
 Create the encryption master key:
 
-```
+```bash
 mc admin kms key create myminio minio
 ```
 
 And enable encryption for the `tracim` bucket:
 
-```
+```bash
 mc encrypt set sse-s3 myminio/tracim/
 ```
 
-**You are done!**
+__You are done!__
 
 ### Tips
 
 - Check list of all alias
 
-```
+```bash
 mc alias list
 ```
 
 - Check if sse-s3 is enabled on selected bucket
 
-```
+```bash
 mc encrypt info myminio/<bucket-name>
 ```

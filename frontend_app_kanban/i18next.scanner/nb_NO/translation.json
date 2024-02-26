@@ -14,7 +14,6 @@
   "Timeline": "Tidslinje",
   "Tags": "Etiketter",
   "Restore": "Gjenopprett",
-  "Description": "Beskrivelse",
   "Are you sure?": "Er du sikker?",
   "Add new column": "Legg til ny kolonne",
   "Edit Column": "Rediger kolonne",
@@ -30,7 +29,6 @@
   "A content with the same name already exists": "Innhold med samme navn finnes allerede",
   "This content is deleted": "Dette innholdet er slettet",
   "The content has been modified by {{author}}": "Innholdet har blitt endret av {{author}}",
-  "Value:": "Verdi:",
   "The link has been copied to clipboard": "Lenke kopiert til utklippstavle",
   "Copy content link": "Kopier innholdslenke",
   "Create a Kanban board": "Opprett en kanban-tavle",
@@ -46,7 +44,6 @@
   "The file is larger than the maximum file size allowed": "Filen er større enn det som er tillatt",
   "Error, the space exceed its maximum size": "Rommet er nå større enn det som tillates",
   "Title:": "Navn:",
-  "Every members of the space": "",
-  "All": "",
-  "all": ""
+  "Description of the card": "",
+  "Open field:": ""
 }

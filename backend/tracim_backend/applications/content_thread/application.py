@@ -1,7 +1,7 @@
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
 
-from tracim_backend.app_models.contents import THREAD_TYPE
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.config import CFG
 from tracim_backend.lib.core.mention import DescriptionMentionParser
@@ -14,7 +14,7 @@ from tracim_backend.models.roles import WorkspaceRoles
 class ContentThreadApp(TracimApplication):
     def load_content_types(self) -> None:
         content_type = TracimContentType(
-            slug=THREAD_TYPE,
+            slug=ContentTypeSlug.THREAD.value,
             fa_icon=self.fa_icon,
             label="Thread",
             creation_label="Start a topic",
@@ -24,7 +24,9 @@ class ContentThreadApp(TracimApplication):
             app=self,
         )
         self.content_types.append(content_type)
-        MentionBuilder.register_content_type_parser(THREAD_TYPE, DescriptionMentionParser())
+        MentionBuilder.register_content_type_parser(
+            ContentTypeSlug.THREAD.value, DescriptionMentionParser()
+        )
 
     def load_config(self, app_config: CFG) -> None:
         pass
@@ -48,7 +50,7 @@ class ContentThreadApp(TracimApplication):
 def create_app() -> TracimApplication:
     return ContentThreadApp(
         label="Threads",
-        slug="contents/{}".format(THREAD_TYPE),
+        slug="contents/{}".format(ContentTypeSlug.THREAD.value),
         fa_icon="far fa-comments",
         config={},
         main_route="",

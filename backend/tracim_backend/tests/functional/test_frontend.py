@@ -40,7 +40,9 @@ class TestContentSecurityPolicy:
         assert res.headers.get("Report-To") == "https://some.uri"
 
     @pytest.mark.parametrize(
-        "config_section", [{"name": "functional_test_csp_additional_directives"}], indirect=True
+        "config_section",
+        [{"name": "functional_test_csp_additional_directives"}],
+        indirect=True,
     )
     def test_api__csp_header__ok_200__additional_directives(self, web_testapp):
         res = web_testapp.get("/", status=200)

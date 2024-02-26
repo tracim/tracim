@@ -33,7 +33,7 @@ describe('A comment', () => {
 
   it(`should redirect to author's profile when click in they public name`, function () {
     cy.get(contentHtmlDocGetter).click()
-    cy.get('.editionmode__button__cancel').click()
+    cy.get('.html-document__editionmode__cancel').click()
     cy.get('.timeline__comment__body__content__header__meta__author').click()
     cy.get('.profile__mainBar__info__user').should('be.visible')
   })

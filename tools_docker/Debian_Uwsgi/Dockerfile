@@ -50,6 +50,7 @@ RUN apt-get install -qy $(cat "${PACKAGE_DIR}/build_backend_packages.list") \
     -r requirements-storage-s3.txt \
     -r requirements-full-preview-generator.txt \
     -e "."
+RUN cp -r /tracim/frontend/dist/assets/font/Nunito/ /usr/share/fonts/nunito
 
 
 ###
@@ -105,6 +106,8 @@ RUN printf "Package: condure\nPin: version *\nPin-Priority: -1" > /etc/apt/prefe
 COPY --from=build_backend /tracim /tracim
 # backend dependencies installed through pip
 COPY --from=build_backend /usr/local /usr/local
+# backend font to generate avatars
+COPY --from=build_backend /usr/share/fonts/nunito /usr/share/fonts/nunito
 # Tracim code: frontend
 COPY --from=build_frontend /tracim/frontend/dist /tracim/frontend/dist
 # backend translation

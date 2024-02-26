@@ -3,36 +3,39 @@ import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import { withRouter } from 'react-router-dom'
 import {
-  TracimComponent,
-  TLM_ENTITY_TYPE as TLM_ET,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  PageWrapper,
-  PageContent,
-  IconButton,
   BREADCRUMBS_TYPE,
   COLORS,
   CUSTOM_EVENT,
+  PAGE,
+  PROFILE,
   ROLE,
   ROLE_LIST,
-  PROFILE,
-  buildHeadTitle,
-  PAGE,
-  removeAtInUsername,
   SPACE_TYPE,
-  addExternalLinksIcons
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  getMyselfKnownMember,
+  handleFetchResult,
+  IconButton,
+  Loading,
+  PageContent,
+  PageWrapper,
+  TracimComponent,
+  buildHeadTitle,
+  removeAtInUsername,
+  addExternalLinksIcons,
+  getSpaceUserRoleList
 } from 'tracim_frontend_lib'
 import {
-  getMyselfKnownMember,
   getSubscriptions,
-  postWorkspaceMember,
-  deleteWorkspaceMember,
-  putMyselfWorkspaceDoNotify
+  postUserRole,
+  deleteUserRole,
+  putMyselfWorkspaceEmailNotificationType
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
-  updateUserWorkspaceSubscriptionNotif,
   setBreadcrumbs,
-  setHeadTitle
+  setHeadTitle,
+  setUserRoleList
 } from '../action-creator.sync.js'
 import appFactory from '../util/appFactory.js'
 import {
@@ -97,6 +100,27 @@ export class Dashboard extends React.Component {
     this.setHeadTitle()
     this.loadNewRequestNumber()
     this.buildBreadcrumbs()
+    if (this.currentWorkspace !== undefined && this.currentWorkspace.memberList === undefined) {
+      this.updateWorkspaceList()
+    }
+  }
+
+  async updateWorkspaceList () {
+    const { props } = this
+
+    const requestUserRoleList = await getSpaceUserRoleList(FETCH_CONFIG.apiUrl, props.currentWorkspace.id)
+
+    const responseUserRoleList = await handleFetchResult(requestUserRoleList)
+
+    if (responseUserRoleList.apiResponse.status === 200) {
+      props.dispatch(setUserRoleList(responseUserRoleList.body))
+    } else {
+      switch (responseUserRoleList.apiResponse.status) {
+        case 200: break
+        case 400: break
+        default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('member list')}`, 'warning')); break
+      }
+    }
   }
 
   async componentDidUpdate (prevProps) {
@@ -109,6 +133,9 @@ export class Dashboard extends React.Component {
 
     if (prevProps.currentWorkspace.defaultRole !== '' && props.currentWorkspace.defaultRole === '') {
       this.setState(prev => ({ newMember: { ...prev.newMember, role: props.currentWorkspace.defaultRole } }))
+    }
+    if (props.currentWorkspace !== undefined && props.currentWorkspace.memberList === undefined) {
+      this.updateWorkspaceList()
     }
 
     if (!prevProps.match || !props.match || prevProps.currentWorkspace.id === props.currentWorkspace.id) return
@@ -138,8 +165,11 @@ export class Dashboard extends React.Component {
 
   loadNewRequestNumber = async () => {
     const { props } = this
+    const spaceMemberList = (props.workspaceList.find(workspace => workspace.id === props.currentWorkspace.id) || {}).memberList || []
+    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(
+      props.user.userId, spaceMemberList, ROLE_LIST
+    )
 
-    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
     if (userRoleIdInWorkspace < ROLE.workspaceManager.id) return
 
     const fetchGetWorkspaceSubscriptions = await props.dispatch(getSubscriptions(props.currentWorkspace.id))
@@ -197,16 +227,27 @@ export class Dashboard extends React.Component {
 
   handleClickCloseAddMemberBtn = () => this.setState({ displayNewMemberForm: false })
 
-  handleToggleNotifBtn = () => this.setState(prevState => ({ displayNotifBtn: !prevState.displayNotifBtn }))
-
   handleToggleWebdavBtn = () => this.setState(prevState => ({ displayWebdavBtn: !prevState.displayWebdavBtn }))
 
   handleSearchUser = async personalDataToSearch => {
     const { props } = this
-    const fetchUserKnownMemberList = await props.dispatch(getMyselfKnownMember(personalDataToSearch, props.currentWorkspace.id))
-    switch (fetchUserKnownMemberList.status) {
-      case 200: this.setState({ searchedKnownMemberList: fetchUserKnownMemberList.json }); break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('known members list')}`, 'warning')); break
+    // INFO - CH - 2023-11-23 - getMyselfKnownMember is an async function from frontend_lib. It doesn't return
+    // the same objects as async function in frontend/. This explains the handleFetchResult, the .apiResponse
+    // and the .body
+    const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(
+      FETCH_CONFIG.apiUrl,
+      personalDataToSearch,
+      null,
+      props.currentWorkspace.id
+    ))
+    switch (fetchUserKnownMemberList.apiResponse.status) {
+      case 200: this.setState({ searchedKnownMemberList: fetchUserKnownMemberList.body }); break
+      default:
+        props.dispatch(newFlashMessage(
+          `${props.t('An error has happened while getting')} ${props.t('known members list')}`,
+          'warning'
+        ))
+        break
     }
   }
 
@@ -274,7 +315,7 @@ export class Dashboard extends React.Component {
       this.setState({ newMember: { ...state.newMember, id: newMemberInKnownMemberList.user_id } })
     }
 
-    const fetchWorkspaceNewMember = await props.dispatch(postWorkspaceMember(props.currentWorkspace.id, {
+    const fetchWorkspaceNewMember = await props.dispatch(postUserRole(props.currentWorkspace.id, {
       id: state.newMember.id || newMemberInKnownMemberList ? newMemberInKnownMemberList.user_id : null,
       email: state.newMember.isEmail ? state.newMember.personalData.trim() : '',
       username: state.newMember.isEmail ? '' : state.newMember.personalData,
@@ -333,7 +374,7 @@ export class Dashboard extends React.Component {
 
     this.setState({ isMemberListLoading: true })
 
-    const fetchWorkspaceRemoveMember = await props.dispatch(deleteWorkspaceMember(props.currentWorkspace.id, memberId))
+    const fetchWorkspaceRemoveMember = await props.dispatch(deleteUserRole(props.currentWorkspace.id, memberId))
     switch (fetchWorkspaceRemoveMember.status) {
       case 204:
         props.dispatch(newFlashMessage(props.t('Member removed'), 'info'))
@@ -356,28 +397,38 @@ export class Dashboard extends React.Component {
     this.setState({ advancedDashboardOpenedId: props.currentWorkspace.id })
   }
 
-  handleClickAddNotification = async () => {
+  handleClickChangeEmailNotificationType = async (emailNotificationType) => {
     const { props } = this
-    const fetchWorkspaceUserAddNotification = await props.dispatch(putMyselfWorkspaceDoNotify(props.currentWorkspace.id, true))
-    switch (fetchWorkspaceUserAddNotification.status) {
-      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.userId, props.currentWorkspace.id, true)); break
-      default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
-    }
-  }
 
-  handleClickRemoveNotification = async () => {
-    const { props } = this
-    const fetchWorkspaceUserAddNotification = await props.dispatch(putMyselfWorkspaceDoNotify(props.currentWorkspace.id, false))
-    switch (fetchWorkspaceUserAddNotification.status) {
-      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.userId, props.currentWorkspace.id, false)); break
-      default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
+    let fetchChangeEmailNotificationType
+    try {
+      fetchChangeEmailNotificationType = await props.dispatch(putMyselfWorkspaceEmailNotificationType(
+        props.currentWorkspace.id, emailNotificationType
+      ))
+    } catch (e) {
+      props.dispatch(newFlashMessage(props.t('Error while changing email subscription'), 'warning'))
+      console.error(
+        'Error while changing email subscription. handleClickChangeEmailNotificationType.',
+        fetchChangeEmailNotificationType
+      )
     }
   }
 
   render () {
     const { props, state } = this
 
-    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
+    if (props.currentWorkspace.memberList === undefined) {
+      return (
+        <Loading
+          height={100}
+          width={100}
+        />
+      )
+    }
+
+    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(
+      props.user.userId, props.currentWorkspace.memberList, ROLE_LIST
+    )
 
     // INFO - GB - 2019-08-29 - these filters are made temporarily by the frontend, but may change to have all the intelligence in the backend
     // https://github.com/tracim/tracim/issues/2326
@@ -473,22 +524,22 @@ export class Dashboard extends React.Component {
                       )
                     )}
                   </div>
-                  {props.currentWorkspace && props.currentWorkspace.id && <WorkspaceRecentActivities workspaceId={props.currentWorkspace.id} />}
+                  {props.currentWorkspace && props.currentWorkspace.id && (
+                    <WorkspaceRecentActivities workspaceId={props.currentWorkspace.id} />
+                  )}
                 </div>
 
                 <div className='dashboard__workspace__rightMenu'>
                   <UserStatus
                     user={props.user}
-                    currentWorkspace={props.currentWorkspace}
+                    currentWorkspace={props.workspaceList.find(workspace => workspace.id === props.currentWorkspace.id)}
                     displayNotifBtn={props.system.config.email_notification_activated}
                     displaySubscriptionRequestsInformation={
                       userRoleIdInWorkspace >= ROLE.workspaceManager.id &&
                       props.currentWorkspace.accessType === SPACE_TYPE.onRequest.slug
                     }
                     newSubscriptionRequestsNumber={state.newSubscriptionRequestsNumber}
-                    onClickToggleNotifBtn={this.handleToggleNotifBtn}
-                    onClickAddNotify={this.handleClickAddNotification}
-                    onClickRemoveNotify={this.handleClickRemoveNotification}
+                    onClickChangeEmailNotificationType={this.handleClickChangeEmailNotificationType}
                     t={props.t}
                   />
 
@@ -558,7 +609,7 @@ export class Dashboard extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, contentType, appList, currentWorkspace, system }) => ({
-  breadcrumbs, user, contentType, appList, currentWorkspace, system
+const mapStateToProps = ({ breadcrumbs, user, knownMemberList, contentType, appList, currentWorkspace, system }) => ({
+  breadcrumbs, user, knownMemberList, contentType, appList, currentWorkspace, system
 })
 export default connect(mapStateToProps)(withRouter(appFactory(translate()(TracimComponent(Dashboard)))))

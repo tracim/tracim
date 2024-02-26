@@ -44,7 +44,11 @@ class TestApplicationApi(object):
         app_config.APPS_COLORS["primary"] = "#fff"
 
         thread = DummyApp(
-            label="Threads", slug="contents/thread", fa_icon="comments-o", config={}, main_route="",
+            label="Threads",
+            slug="contents/thread",
+            fa_icon="comments-o",
+            config={},
+            main_route="",
         )
         content_type = TracimContentType(
             slug="thread",
@@ -103,7 +107,11 @@ class TestApplicationApi(object):
         app_config.APPS_COLORS["primary"] = "#fff"
 
         folder = DummyApp(
-            label="Folder", slug="contents/folder", fa_icon="folder-o", config={}, main_route=""
+            label="Folder",
+            slug="contents/folder",
+            fa_icon="folder-o",
+            config={},
+            main_route="",
         )
         content_type = TracimContentType(
             slug="folder",
@@ -179,7 +187,9 @@ class TestApplicationApi(object):
         assert default_workspace_menu_entry[1].label == publication_menu_entry.label
         assert default_workspace_menu_entry[2].label == all_content_menu_entry.label
 
-    def test_get_default_workspace_menu_entry__ok__publication_disabled_workspace_case(self):
+    def test_get_default_workspace_menu_entry__ok__publication_disabled_workspace_case(
+        self,
+    ):
         app_config = Mock()
         app_config.APPS_COLORS = {}
         app_config.APPS_COLORS["primary"] = "#fff"

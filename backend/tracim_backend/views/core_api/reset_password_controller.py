@@ -1,9 +1,8 @@
 # coding=utf-8
 from http import HTTPStatus
-
 from pyramid.config import Configurator
 
-from tracim_backend.config import CFG
+from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import ExpiredResetPasswordToken
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import InvalidResetPasswordToken
@@ -11,8 +10,10 @@ from tracim_backend.exceptions import MissingEmailCantResetPassword
 from tracim_backend.exceptions import NotificationDisabledCantResetPassword
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import UserAuthTypeDisabled
+from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.views.controllers import Controller
@@ -30,12 +31,6 @@ SWAGGER_TAG__AUTHENTICATION_RESET_PASSWORD_ENDPOINTS = generate_documentation_sw
 
 class ResetPasswordController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__AUTHENTICATION_RESET_PASSWORD_ENDPOINTS])
-    @hapic.handle_exception(MissingEmailCantResetPassword, http_code=HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(NotificationDisabledCantResetPassword, http_code=HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(
-        ExternalAuthUserPasswordModificationDisallowed, http_code=HTTPStatus.BAD_REQUEST
-    )
-    @hapic.handle_exception(UserAuthTypeDisabled, http_code=HTTPStatus.BAD_REQUEST)
     @hapic.input_body(ResetPasswordRequestSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def reset_password_request(self, context, request: TracimRequest, hapic_data=None):
@@ -44,12 +39,23 @@ class ResetPasswordController(Controller):
         with a token to be used for password reset operation.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        uapi = UserApi(None, session=request.dbsession, config=app_config)
-        if hapic_data.body.username:
-            user = uapi.get_one_by_username(username=hapic_data.body.username)
-        else:
-            user = uapi.get_one_by_email(email=hapic_data.body.email)
-        uapi.reset_password_notification(user, do_save=True)
+        uapi = UserApi(None, session=request.dbsession, config=app_config, show_deactivated=False)
+        try:
+            if hapic_data.body.username:
+                user = uapi.get_one_by_username(username=hapic_data.body.username)
+            else:
+                user = uapi.get_one_by_email(email=hapic_data.body.email)
+            uapi.reset_password_notification(user, do_save=True)
+        except (
+            ExternalAuthUserPasswordModificationDisallowed,
+            MissingEmailCantResetPassword,
+            NotificationDisabledCantResetPassword,
+            UserAuthTypeDisabled,
+            UserDoesNotExist,
+        ) as exc:
+            # INFO - MP - 2023-04-21 - We do not want to give information about user existence to
+            # external user, so we just return a 200 even if there is any error.
+            logger.error(self, exc)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__AUTHENTICATION_RESET_PASSWORD_ENDPOINTS])
     @hapic.handle_exception(ExpiredResetPasswordToken, http_code=HTTPStatus.BAD_REQUEST)
@@ -101,18 +107,24 @@ class ResetPasswordController(Controller):
     def bind(self, configurator: Configurator):
         # reset password request
         configurator.add_route(
-            "reset_password_request", "/auth/password/reset/request", request_method="POST"
+            "reset_password_request",
+            "/auth/password/reset/request",
+            request_method="POST",
         )
         configurator.add_view(self.reset_password_request, route_name="reset_password_request")
         # check reset password token
         configurator.add_route(
-            "reset_password_check_token", "/auth/password/reset/token/check", request_method="POST"
+            "reset_password_check_token",
+            "/auth/password/reset/token/check",
+            request_method="POST",
         )
         configurator.add_view(
             self.reset_password_check_token, route_name="reset_password_check_token"
         )
         # reset password, set password
         configurator.add_route(
-            "reset_password_modify", "/auth/password/reset/modify", request_method="POST"
+            "reset_password_modify",
+            "/auth/password/reset/modify",
+            request_method="POST",
         )
         configurator.add_view(self.reset_password_modify, route_name="reset_password_modify")

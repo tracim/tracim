@@ -8,7 +8,6 @@ import {
   BREADCRUMBS_TYPE,
   CONTENT_TYPE,
   CUSTOM_EVENT,
-  DEFAULT_ROLE_LIST,
   FAVORITE_STATE,
   LOCAL_STORAGE_FIELD,
   PAGE,
@@ -45,11 +44,10 @@ import {
   putUserConfiguration,
   removeLocalStorageItem,
   replaceHTMLElementWithMention,
-  searchContentAndPlaceBalise,
-  searchMentionAndPlaceBalise,
+  searchContentAndReplaceWithTag,
+  searchMentionAndReplaceWithTag,
   sendGlobalFlashMessage,
-  sortListByMultipleCriteria,
-  tinymceAutoCompleteHandleClickItem
+  sortListByMultipleCriteria
 } from 'tracim_frontend_lib'
 import {
   getHtmlDocContent,
@@ -420,7 +418,7 @@ export class HtmlDocument extends React.Component {
   }
 
   handleClickNewVersion = () => {
-    const { props, state } = this
+    const { state } = this
     const previouslyUnsavedRawContent = getLocalStorageItem(
       state.appName,
       state.content.content_id,
@@ -429,11 +427,6 @@ export class HtmlDocument extends React.Component {
     )
 
     const rawContent = replaceHTMLElementWithMention(
-      [{
-        id: 0,
-        label: props.t('All'),
-        slug: props.t('all')
-      }],
       state.config.workspace.memberList,
       previouslyUnsavedRawContent || state.content.raw_content
     )
@@ -471,12 +464,11 @@ export class HtmlDocument extends React.Component {
   handleClickSaveDocument = async () => {
     const { state } = this
     const content = tinymce.activeEditor.getContent()
-    const parsedContentCommentObject = await searchContentAndPlaceBalise(
+    const parsedContentCommentObject = await searchContentAndReplaceWithTag(
       state.config.apiUrl,
       content
     )
-    const parsedMentionCommentObject = searchMentionAndPlaceBalise(
-      DEFAULT_ROLE_LIST,
+    const parsedMentionCommentObject = searchMentionAndReplaceWithTag(
       state.config.workspace.memberList,
       parsedContentCommentObject.html
     )
@@ -498,7 +490,13 @@ export class HtmlDocument extends React.Component {
     const { state, props } = this
 
     const fetchResultSaveHtmlDoc = await handleFetchResult(
-      await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, textToSend)
+      await putHtmlDocContent(
+        state.config.apiUrl,
+        state.content.workspace_id,
+        state.content.content_id,
+        state.content.label,
+        textToSend
+      )
     )
 
     switch (fetchResultSaveHtmlDoc.apiResponse.status) {
@@ -556,8 +554,7 @@ export class HtmlDocument extends React.Component {
     const { props, state } = this
     await props.appContentSaveNewCommentText(
       state.content,
-      comment,
-      state.config.slug
+      comment
     )
     await props.appContentSaveNewCommentFileList(
       this.setState.bind(this),
@@ -728,7 +725,7 @@ export class HtmlDocument extends React.Component {
   handleClickNotifyAll = async () => {
     const { state, props } = this
 
-    props.appContentNotifyAll(state.content, state.config.slug)
+    props.appContentNotifyAll(state.content)
     this.handleCloseNotifyAllMessage()
   }
 
@@ -838,10 +835,14 @@ export class HtmlDocument extends React.Component {
             // End of required props ///////////////////////////////////////////
             availableStatusList={state.config.availableStatuses}
             canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
-            codeLanguageList={state.config.system.config.code_languages}
+            codeLanguageList={state.config.system.config.ui__notes__code_sample_languages}
             customClass={`${state.config.slug}__contentpage__timeline`}
             customColor={state.config.hexcolor}
-            disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
+            disableComment={
+              state.mode === APP_FEATURE_MODE.REVISION ||
+              state.mode === APP_FEATURE_MODE.EDIT ||
+              !state.content.is_editable
+            }
             invalidMentionList={state.invalidMentionList}
             isFileCommentLoading={state.isFileCommentLoading}
             isLastTimelineItemCurrentToken={props.isLastTimelineItemCurrentToken}
@@ -853,7 +854,6 @@ export class HtmlDocument extends React.Component {
             onClickOpenFileComment={this.handleClickOpenFileComment}
             onClickRevisionBtn={this.handleClickShowRevision}
             onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
-            roleList={DEFAULT_ROLE_LIST}
             shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
           />
         </PopinFixedRightPartContent>
@@ -1045,7 +1045,6 @@ export class HtmlDocument extends React.Component {
             onClickShowDraft={this.handleClickNewVersion}
             key='html-document'
             isRefreshNeeded={state.showRefreshWarning}
-            onClickAutoCompleteItem={(mention) => tinymceAutoCompleteHandleClickItem(mention, this.setState.bind(this))}
             displayNotifyAllMessage={this.shouldDisplayNotifyAllMessage()}
             onClickCloseNotifyAllMessage={this.handleCloseNotifyAllMessage}
             onClickNotifyAll={this.handleClickNotifyAll}
@@ -1055,6 +1054,7 @@ export class HtmlDocument extends React.Component {
             onClickRefresh={this.handleClickRefresh}
             onClickLastVersion={this.handleClickLastVersion}
             workspaceId={state.content.workspace_id}
+            codeLanguageList={state.config.system.config.ui__notes__code_sample_languages}
           />
 
           <PopinFixedRightPart

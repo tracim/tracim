@@ -14,7 +14,10 @@ class TestCollaborativeDocumentEdition(object):
     def test_api__collaborative_document_edition_templates__ok_200__nominal_case(
         self, admin_user, session, app_config, web_testapp
     ):
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         url = "/api/collaborative-document-edition/templates"
         res = web_testapp.get(url, status=200)
         content = res.json_body
@@ -39,7 +42,10 @@ class TestCollaborativeDocumentEdition(object):
         """
         Ask for edition token
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         url = "/api/collaborative-document-edition/token"
         res = web_testapp.get(url, status=200)
         content = res.json_body
@@ -77,13 +83,16 @@ class TestCollaborativeDocumentEdition(object):
         )
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         url = "/api/collaborative-document-edition/workspaces/{}/files".format(
             data_workspace.workspace_id
         )
-        template_filename = collaborative_document_edition_api.get_file_template_list().file_templates[
-            0
-        ]
+        template_filename = (
+            collaborative_document_edition_api.get_file_template_list().file_templates[0]
+        )
         res = web_testapp.post_json(
             url,
             params={
@@ -108,7 +117,8 @@ class TestCollaborativeDocumentEdition(object):
             status=200,
         )
         with open(
-            collaborative_document_edition_api._get_file_template_path(template_filename), "rb"
+            collaborative_document_edition_api._get_file_template_path(template_filename),
+            "rb",
         ) as file:
             assert res.body == file.read()
 
@@ -137,7 +147,10 @@ class TestCollaborativeDocumentEdition(object):
             workspace=data_workspace,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         url = "/api/collaborative-document-edition/workspaces/{}/files".format(
             data_workspace.workspace_id
         )

@@ -4,10 +4,9 @@ Tests for /api/users config related subpath endpoints.
 """
 
 import json
-import typing
-
 import pytest
 import transaction
+import typing
 from webtest import TestApp
 
 from tracim_backend.error import ErrorCode
@@ -96,10 +95,19 @@ class TestUserConfigEndpoint(object):
 
     @pytest.mark.parametrize(
         "user_config",
-        [{"@": "coucou"}, {"": "coucou"}, {"param1": {"a": "b"}}, {"param2": ["b"]}, ["super"]],
+        [
+            {"@": "coucou"},
+            {"": "coucou"},
+            {"param1": {"a": "b"}},
+            {"param2": ["b"]},
+            ["super"],
+        ],
     )
     def test__put_user_config_endpoint__error__400__invalid_format(
-        self, user_api_factory: UserApiFactory, web_testapp: TestApp, user_config: typing.Dict
+        self,
+        user_api_factory: UserApiFactory,
+        web_testapp: TestApp,
+        user_config: typing.Dict,
     ):
         uapi = user_api_factory.get()
         profile = Profile.USER

@@ -38,7 +38,7 @@ import {
   putMyselfEmail,
   putUserUsername,
   putMyselfPassword,
-  putMyselfWorkspaceDoNotify,
+  putMyselfWorkspaceEmailNotificationType,
   getLoggedUserCalendar,
   putUserLang
 } from '../action-creator.async.js'
@@ -251,12 +251,20 @@ export class Account extends React.Component {
 
   handleChangeUsername = debounce(this.changeUsername, CHECK_USERNAME_DEBOUNCE_WAIT)
 
-  handleChangeSubscriptionNotif = async (workspaceId, doNotify) => {
+  handleChangeEmailNotificationType = async (workspaceId, emailNotificationType) => {
     const { props } = this
 
-    const fetchPutUserWorkspaceDoNotify = await props.dispatch(putMyselfWorkspaceDoNotify(workspaceId, doNotify))
-    if (fetchPutUserWorkspaceDoNotify.status !== 204) {
-      props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
+    let fetchChangeEmailNotificationType
+    try {
+      fetchChangeEmailNotificationType = await props.dispatch(putMyselfWorkspaceEmailNotificationType(
+        workspaceId, emailNotificationType
+      ))
+    } catch (e) {
+      props.dispatch(newFlashMessage(props.t('Error while changing email subscription'), 'warning'))
+      console.error(
+        'Error while changing email subscription. handleChangeEmailNotificationType.',
+        fetchChangeEmailNotificationType
+      )
     }
   }
 
@@ -326,7 +334,7 @@ export class Account extends React.Component {
                         return (
                           <UserSpacesConfig
                             userToEditId={props.user.userId}
-                            onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
+                            onChangeEmailNotificationType={this.handleChangeEmailNotificationType}
                             admin={false}
                           />
                         )

@@ -152,7 +152,11 @@ class CaldavChecker(AuthorizationChecker):
             return self.checker.check(tracim_context)
         except NotAuthenticated as exc:
             raise CaldavNotAuthenticated() from exc
-        except (UserGivenIsNotTheSameAsAuthenticated, UserDoesNotExist, WorkspaceNotFound) as exc:
+        except (
+            UserGivenIsNotTheSameAsAuthenticated,
+            UserDoesNotExist,
+            WorkspaceNotFound,
+        ) as exc:
             raise CaldavNotAuthorized() from exc
 
 

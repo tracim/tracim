@@ -1,10 +1,19 @@
 # Tracim configuration parameters which can be given as an environment variable
 
-This list is generated using
-```
+This list is generated using:
+
+```bash
 tracimcli dev parameters list --template "| {env_var_name: <74}| {config_file_name: <63}| {config_name: <67}|"
 ```
-Note that you need to activate all applications (`app.enabled` setting) for this list to be complete.
+⚠️ These are only Tracim environment variables. You can find more environment variables for docker start on the [tracim/tools_docker/README.md](https://github.com/tracim/tracim/blob/master/tools_docker/README.md) page ⚠️
+
+⚠️ The generated list is based on your `development.ini` file. ⚠️
+
+To update the list below you will need to:
+
+- Activate all applications (`app.enabled` setting)
+- Set `collaborative_document_edition.software` to `collabora`
+- Give a value to `collaborative_document_edition.collabora.base_url`
 
 | Environment variable name                                                 | Configuration file name                                        | Displayed configuration name                                       |
 |---------------------------------------------------------------------------|----------------------------------------------------------------|--------------------------------------------------------------------|
@@ -13,6 +22,9 @@ Note that you need to activate all applications (`app.enabled` setting) for this
 | TRACIM_DEFAULT_LANG                                                       | default_lang                                                   | DEFAULT_LANG                                                       |
 | TRACIM_PREVIEW_CACHE_DIR                                                  | preview_cache_dir                                              | PREVIEW_CACHE_DIR                                                  |
 | TRACIM_AUTH_TYPES                                                         | auth_types                                                     | AUTH_TYPES                                                         |
+| TRACIM_USER__PROFILE__READ_ONLY_FIELDS_SAML                               | user.profile.read_only_fields.saml                             | USER__PROFILE__READ_ONLY_FIELDS__SAML                              |
+| TRACIM_USER__PROFILE__READ_ONLY_FIELDS_LDAP                               | user.profile.read_only_fields.ldap                             | USER__PROFILE__READ_ONLY_FIELDS__LDAP                              |
+| TRACIM_USER__PROFILE__READ_ONLY_FIELDS_INTERNAL                           | user.profile.read_only_fields.internal                         | USER__PROFILE__READ_ONLY_FIELDS__INTERNAL                          |
 | TRACIM_REMOTE_USER_HEADER                                                 | remote_user_header                                             | REMOTE_USER_HEADER                                                 |
 | TRACIM_API__KEY                                                           | api.key                                                        | API__KEY                                                           |
 | TRACIM_SESSION__TYPE                                                      | session.type                                                   | SESSION__TYPE                                                      |
@@ -82,9 +94,11 @@ Note that you need to activate all applications (`app.enabled` setting) for this
 | TRACIM_JOBS__ASYNC__REDIS__PORT                                           | jobs.async.redis.port                                          | JOBS__ASYNC__REDIS__PORT                                           |
 | TRACIM_JOBS__ASYNC__REDIS__DB                                             | jobs.async.redis.db                                            | JOBS__ASYNC__REDIS__DB                                             |
 | TRACIM_LIVE_MESSAGES__CONTROL_ZMQ_URI                                     | live_messages.control_zmq_uri                                  | LIVE_MESSAGES__CONTROL_ZMQ_URI                                     |
+| TRACIM_LIVE_MESSAGES__PUSH_ZMQ_URI                                        | live_messages.push_zmq_uri                                     | LIVE_MESSAGES__PUSH_ZMQ_URI                                        |
+| TRACIM_LIVE_MESSAGES__PUB_ZMQ_URI                                         | live_messages.pub_zmq_uri                                      | LIVE_MESSAGES__PUB_ZMQ_URI                                         |
 | TRACIM_LIVE_MESSAGES__STATS_ZMQ_URI                                       | live_messages.stats_zmq_uri                                    | LIVE_MESSAGES__STATS_ZMQ_URI                                       |
 | TRACIM_LIVE_MESSAGES__BLOCKING_PUBLISH                                    | live_messages.blocking_publish                                 | LIVE_MESSAGES__BLOCKING_PUBLISH                                    |
-| TRACIM_EMAIL__NOTIFICATION__ENABLED_ON_INVITATION                         | email.notification.enabled_on_invitation                       | EMAIL__NOTIFICATION__ENABLED_ON_INVITATION                         |
+| TRACIM_EMAIL__NOTIFICATION__TYPE_ON_INVITATION                            | email.notification.type_on_invitation                          | EMAIL__NOTIFICATION__TYPE_ON_INVITATION                            |
 | TRACIM_EMAIL__NOTIFICATION__FROM__EMAIL                                   | email.notification.from.email                                  | EMAIL__NOTIFICATION__FROM__EMAIL                                   |
 | TRACIM_EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL                           | email.notification.from.default_label                          | EMAIL__NOTIFICATION__FROM__DEFAULT_LABEL                           |
 | TRACIM_EMAIL__NOTIFICATION__REPLY_TO__EMAIL                               | email.notification.reply_to.email                              | EMAIL__NOTIFICATION__REPLY_TO__EMAIL                               |
@@ -95,6 +109,7 @@ Note that you need to activate all applications (`app.enabled` setting) for this
 | TRACIM_EMAIL__NOTIFICATION__CREATED_ACCOUNT__SUBJECT                      | email.notification.created_account.subject                     | EMAIL__NOTIFICATION__CREATED_ACCOUNT__SUBJECT                      |
 | TRACIM_EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__TEMPLATE__HTML        | email.notification.reset_password_request.template.html        | EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__TEMPLATE__HTML        |
 | TRACIM_EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__SUBJECT               | email.notification.reset_password_request.subject              | EMAIL__NOTIFICATION__RESET_PASSWORD_REQUEST__SUBJECT               |
+| TRACIM_EMAIL__NOTIFICATION__SUMMARY__TEMPLATE__HTML                       | email.notification.summary.template.html                       | EMAIL__NOTIFICATION__SUMMARY__TEMPLATE__HTML                       |
 | TRACIM_EMAIL__NOTIFICATION__ACTIVATED                                     | email.notification.activated                                   | EMAIL__NOTIFICATION__ACTIVATED                                     |
 | TRACIM_EMAIL__NOTIFICATION__SMTP__SERVER                                  | email.notification.smtp.server                                 | EMAIL__NOTIFICATION__SMTP__SERVER                                  |
 | TRACIM_EMAIL__NOTIFICATION__SMTP__PORT                                    | email.notification.smtp.port                                   | EMAIL__NOTIFICATION__SMTP__PORT                                    |
@@ -125,7 +140,8 @@ Note that you need to activate all applications (`app.enabled` setting) for this
 | TRACIM_LDAP_BIND_ANONYMOUS                                                | ldap_bind_anonymous                                            | LDAP_BIND_ANONYMOUS                                                |
 | TRACIM_LDAP_TLS                                                           | ldap_tls                                                       | LDAP_TLS                                                           |
 | TRACIM_LDAP_USER_BASE_DN                                                  | ldap_user_base_dn                                              | LDAP_USER_BASE_DN                                                  |
-| TRACIM_LDAP_LOGIN_ATTRIBUTE                                               | ldap_login_attribute                                           | LDAP_LOGIN_ATTRIBUTE                                               |
+| TRACIM_LDAP_MAIL_ATTRIBUTE                                                | ldap_mail_attribute                                            | LDAP_MAIL_ATTRIBUTE                                                |
+| TRACIM_LDAP_USERNAME_ATTRIBUTE                                            | ldap_username_attribute                                        | LDAP_USERNAME_ATTRIBUTE                                            |
 | TRACIM_LDAP_NAME_ATTRIBUTE                                                | ldap_name_attribute                                            | LDAP_NAME_ATTRIBUTE                                                |
 | TRACIM_WEBDAV__UI__ENABLED                                                | webdav.ui.enabled                                              | WEBDAV__UI__ENABLED                                                |
 | TRACIM_WEBDAV__BASE_URL                                                   | webdav.base_url                                                | WEBDAV__BASE_URL                                                   |

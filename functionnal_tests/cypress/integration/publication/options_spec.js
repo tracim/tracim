@@ -1,4 +1,5 @@
 import { PAGES } from '../../support/urls_commands'
+import { SELECTORS } from '../../support/generic_selector_commands.js'
 
 const publishButton = '.commentArea__submit__btn'
 const sendButton = '[data-cy=commentArea__comment__send]'
@@ -17,6 +18,9 @@ describe('Publications page', () => {
       })
       cy.inputInTinyMCE(text)
       cy.contains(publishButton, 'Publish').click()
+      cy.getTag({ selectorName: SELECTORS.CARD_POPUP_BODY })
+          .get('[data-cy=popup__createcontent__form__button]')
+          .click()
     })
   })
 
@@ -63,6 +67,9 @@ describe('Publications page', () => {
     it('should be able to open as a content', () => {
       cy.get('.feedItemHeader__actionMenu__item[title="Open as content"]').click()
       cy.url().should('include', '/contents')
+      // INFO - CH - 2023-10-25 - adding wait() here because without it, the test randomly fails because of an error related
+      // to tinymce. It is possible that redirection in the test followed by the redirection of the afterEach is the reason
+      cy.wait(1000)
     })
   })
 })

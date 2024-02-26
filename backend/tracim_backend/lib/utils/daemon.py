@@ -1,5 +1,4 @@
 import os
-
 from pyramid.paster import get_appsettings
 from pyramid.paster import setup_logging
 

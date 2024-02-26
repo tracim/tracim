@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-01-16 16:50+0100\n"
+"POT-Creation-Date: 2023-04-24 16:25+0200\n"
 "PO-Revision-Date: 2022-08-31 08:22+0000\n"
 "Last-Translator: gbonaspetti <gbonaspetti@hotmail.com>\n"
 "Language: nl\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.9.1\n"
 
-#: tracim_backend/config.py:768
+#: tracim_backend/config.py:764
 msgid ""
 "[{website_title}] [{workspace_label}] {content_label} "
 "({content_status_label})"
@@ -23,11 +23,11 @@ msgstr ""
 "[{website_title}] [{workspace_label}] {content_label} "
 "({content_status_label})"
 
-#: tracim_backend/config.py:777
+#: tracim_backend/config.py:773
 msgid "[{website_title}] Someone created an account for you"
 msgstr "[{website_title}] Iemand heeft een account voor je aangemaakt"
 
-#: tracim_backend/config.py:787
+#: tracim_backend/config.py:783
 msgid "[{website_title}] A password reset has been requested"
 msgstr "[{website_title}] Wachtwoord herstel aangevraagd"
 
@@ -97,6 +97,10 @@ msgstr "Bericht van {username}: {message}"
 msgid "Uploaded by {username}."
 msgstr "Ge-upload door {username}."
 
+#: tracim_backend/command/periodic.py:59
+msgid "[{website_title}] Your daily summary"
+msgstr ""
+
 #: tracim_backend/lib/core/content.py:753
 msgid "Space {workspace_name}"
 msgstr ""
@@ -123,37 +127,37 @@ msgstr "Nieuwe Map"
 msgid "New folder {0}"
 msgstr "Nieuwe map {0}"
 
-#: tracim_backend/lib/core/workspace.py:497
+#: tracim_backend/lib/core/mention.py:144 tracim_backend/models/mention.py:5
+msgid "all"
+msgstr "alles"
+
+#: tracim_backend/lib/core/workspace.py:495
 msgid "Space"
 msgstr "Omgeving"
 
-#: tracim_backend/lib/core/workspace.py:500
+#: tracim_backend/lib/core/workspace.py:498
 msgid "Space {}"
 msgstr "Omgeving {}"
 
-#: tracim_backend/lib/mail_notifier/notifier.py:281
+#: tracim_backend/lib/mail_notifier/notifier.py:283
 msgid "{username} & all members of {workspace}"
 msgstr "{username} & alle leden van {workspace}"
 
-#: tracim_backend/models/mention.py:5
-msgid "all"
-msgstr ""
-
 #: tracim_backend/models/mention.py:6
 msgid "reader"
-msgstr ""
+msgstr "lezer"
 
 #: tracim_backend/models/mention.py:7
 msgid "contributor"
-msgstr ""
+msgstr "bijdrager"
 
 #: tracim_backend/models/mention.py:8
 msgid "content-manager"
-msgstr ""
+msgstr "inhoudsbeheerder"
 
 #: tracim_backend/models/mention.py:9
 msgid "space-manager"
-msgstr ""
+msgstr "ruimtebeheerder"
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:31
 msgid ""
@@ -186,6 +190,7 @@ msgid "<a href=\"{call_to_action_url}\">view it on tracim</a>"
 msgstr "<a href=\"{call_to_action_url}\">toon het online</a>"
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:65
+#: tracim_backend/templates/mail/summary_body_html.mak:47
 msgid "You're receiving this email because of your account on {website_title}."
 msgstr "Je ontvangt deze email omdat je een account hebt op {website_title}."
 
@@ -202,6 +207,7 @@ msgstr ""
 #: tracim_backend/templates/mail/reset_password_body_html.mak:4
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:4
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:5
+#: tracim_backend/templates/mail/summary_body_html.mak:4
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:4
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:5
 msgid "Hello {username},"
@@ -254,6 +260,7 @@ msgstr "Veel plezier :)"
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:17
 #: tracim_backend/templates/mail/reset_password_body_html.mak:21
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:17
+#: tracim_backend/templates/mail/summary_body_html.mak:44
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:17
 msgid "Suricat', your digital assistant"
 msgstr "Suricat', jouw digitale assistent"
@@ -262,6 +269,7 @@ msgstr "Suricat', jouw digitale assistent"
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:21
 #: tracim_backend/templates/mail/reset_password_body_html.mak:25
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:21
+#: tracim_backend/templates/mail/summary_body_html.mak:56
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:21
 msgid "Suricat', the bot"
 msgstr "Suricat', de robot"
@@ -271,6 +279,7 @@ msgstr "Suricat', de robot"
 #: tracim_backend/templates/mail/reset_password_body_html.mak:28
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:24
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:32
+#: tracim_backend/templates/mail/summary_body_html.mak:59
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:24
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:26
 msgid "powered by tracim software"
@@ -383,6 +392,32 @@ msgstr "Bedankt"
 msgid "{username} (through tracim)"
 msgstr "{username} (door Tracim)"
 
+#: tracim_backend/templates/mail/summary_body_html.mak:7
+msgid "Here is the list of your unread mentions in the last 24h:"
+msgstr ""
+
+#: tracim_backend/templates/mail/summary_body_html.mak:24
+msgid "{author} mentioned you in"
+msgstr ""
+
+#: tracim_backend/templates/mail/summary_body_html.mak:32
+msgid "Here is the summary of your unread notifications in the last 24h:"
+msgstr ""
+
+#: tracim_backend/templates/mail/summary_body_html.mak:36
+msgid "{event_count} activity in the space"
+msgstr ""
+
+#: tracim_backend/templates/mail/summary_body_html.mak:48
+msgid ""
+"You can change this setting by going to the \"My Spaces\" menu through "
+"this link:"
+msgstr ""
+
+#: tracim_backend/templates/mail/summary_body_html.mak:52
+msgid "This email is automatically created, please do not reply."
+msgstr ""
+
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:5
 msgid ""
 "You have invited {nb_receivers} people to upload files in this space <a "
@@ -414,3 +449,24 @@ msgid ""
 msgstr ""
 "Deze upload is beveiligd met een wachtwoord. Neem contact op met (<a "
 "href=\"mailto:{emitter_email}\">{username}</a>) voor toegang."
+
+#~ msgid "Administrator (through {website_title})"
+#~ msgstr ""
+
+#~ msgid "{event_count} events in the space"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "You can change this setting by "
+#~ "going to the \"My Spaces\" menu "
+#~ "through this <a "
+#~ "href=\"https://algoo.tracim.fr/ui/account\">link</a>"
+#~ msgstr ""
+
+# | msgid "You're receiving this email because of your account on
+# | {website_title}."
+#~ msgid ""
+#~ "You are receiving this email because "
+#~ "you have at least one space set"
+#~ " with the daily email."
+#~ msgstr "Je ontvangt deze email omdat je een account hebt op {website_title}."

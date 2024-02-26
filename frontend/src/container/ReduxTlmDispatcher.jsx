@@ -16,16 +16,17 @@ import {
   newFlashMessage,
   addNotification,
   addWorkspaceContentList,
-  addWorkspaceList,
+  addUserWorkspaceConfigList,
+  updateUserWorkspaceConfigList,
   addWorkspaceMember,
   deleteWorkspaceContentList,
-  removeWorkspaceMember,
+  removeUserRole,
   removeWorkspaceReadStatus,
   unDeleteWorkspaceContentList,
   updateUser,
   updateWorkspaceContentList,
   updateWorkspaceDetail,
-  updateWorkspaceMember,
+  updateUserRole,
   removeWorkspace,
   addWorkspaceReadStatus,
   removeAccessibleWorkspace,
@@ -33,9 +34,10 @@ import {
   updateAccessibleWorkspace,
   addWorkspaceSubscription,
   removeWorkspaceSubscription,
-  updateWorkspaceSubscription
+  updateWorkspaceSubscription,
+  setKnownMemberList
 } from '../action-creator.sync.js'
-import { getUser } from '../action-creator.async.js'
+import { getUser, getMyselfAllKnownMember } from '../action-creator.async.js'
 import { FETCH_CONFIG } from '../util/helper.js'
 import { cloneDeep } from 'lodash'
 
@@ -81,6 +83,7 @@ export class ReduxTlmDispatcher extends React.Component {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentCreated },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FOLDER, handler: this.handleContentCreated },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.KANBAN, handler: this.handleContentCreated },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.TODO, handler: this.handleToDo },
 
       // Content modified
@@ -88,6 +91,7 @@ export class ReduxTlmDispatcher extends React.Component {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FOLDER, handler: this.handleContentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.KANBAN, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.TODO, handler: this.handleToDo },
 
       // Content deleted
@@ -95,6 +99,7 @@ export class ReduxTlmDispatcher extends React.Component {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FOLDER, handler: this.handleContentDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.KANBAN, handler: this.handleContentDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.TODO, handler: this.handleToDo },
 
       // Content restored
@@ -102,6 +107,7 @@ export class ReduxTlmDispatcher extends React.Component {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentUnDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentUnDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FOLDER, handler: this.handleContentUnDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.KANBAN, handler: this.handleContentUnDeleted },
 
       // User call
       { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserCallNotification }
@@ -161,35 +167,36 @@ export class ReduxTlmDispatcher extends React.Component {
     this.handleNotification(data)
   }
 
-  handleMemberCreated = data => {
+  handleMemberCreated = async data => {
     const { props } = this
-    if (props.user.userId === data.fields.user.user_id || props.workspaceList.find(space => space.id === data.fields.workspace.workspace_id)) {
-      // NOTE - RJ & MP - 2022-02-18
-      // When receiving a member created TLM, it is possible that we haven't added the workspace itself yet
-      // In this case, addWorkspaceMember does nothing.
-      // We actually noticed that the member created TLM arrives before the workspace created TLM.
-      // Let's add the workpace first to avoid this.
-      // See https://github.com/tracim/tracim/issues/5451
-      props.dispatch(addWorkspaceList([data.fields.workspace]))
 
-      props.dispatch(addWorkspaceMember(data.fields.user, data.fields.workspace.workspace_id, data.fields.member))
-      if (props.user.userId === data.fields.user.user_id) {
-        props.dispatch(removeAccessibleWorkspace(data.fields.workspace))
+    if (props.user.userId === data.fields.user.user_id) {
+      props.dispatch(addUserWorkspaceConfigList(data.fields.user, data.fields.member, data.fields.workspace))
+      props.dispatch(removeAccessibleWorkspace(data.fields.workspace))
+      // FIXME - FS - 2023-11-28 - https://github.com/tracim/tracim/issues/6292
+      // use KnownMember to only get the member of the new space joined
+      const fetchGetKnownMemberList = await props.dispatch(getMyselfAllKnownMember())
+      if (fetchGetKnownMemberList.status === 200) {
+        props.dispatch(setKnownMemberList(fetchGetKnownMemberList.json))
       }
-      this.handleNotification(data)
-    }
+    } else if (!props.workspaceList.some(space => space.id === data.fields.workspace.workspace_id)) return
+
+    props.dispatch(addWorkspaceMember(data.fields.user, data.fields.workspace.workspace_id, data.fields.member))
+    this.handleNotification(data)
   }
 
   handleMemberModified = data => {
     const { props } = this
-    props.dispatch(addWorkspaceList([data.fields.workspace]))
-    props.dispatch(updateWorkspaceMember(data.fields.user, data.fields.workspace.workspace_id, data.fields.member))
+    if (props.user.userId === data.fields.user.user_id) {
+      props.dispatch(updateUserWorkspaceConfigList(data.fields.user, data.fields.member, data.fields.workspace))
+    }
+    props.dispatch(updateUserRole(data.fields.user, data.fields.workspace.workspace_id, data.fields.member))
     this.handleNotification(data)
   }
 
   handleMemberDeleted = data => {
     const { props } = this
-    props.dispatch(removeWorkspaceMember(data.fields.user.user_id, data.fields.workspace.workspace_id))
+    props.dispatch(removeUserRole(data.fields.user.user_id, data.fields.workspace.workspace_id))
     if (props.user.userId === data.fields.user.user_id) {
       props.dispatch(removeWorkspace(data.fields.workspace))
       if (ACCESSIBLE_SPACE_TYPE_LIST.some(s => s.slug === data.fields.workspace.access_type)) {

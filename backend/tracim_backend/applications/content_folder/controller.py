@@ -1,13 +1,11 @@
 # coding=utf-8
 from http import HTTPStatus
-import typing
-
 from pyramid.config import Configurator
 import transaction
+import typing
 
-from tracim_backend.app_models.contents import FOLDER_TYPE
-from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.config import CFG
+from tracim_backend.app_models.contents import ContentTypeSlug
+from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.extensions import hapic
@@ -34,7 +32,7 @@ SWAGGER_TAG__CONTENT_FOLDER_SECTION = "Folders"
 SWAGGER_TAG__CONTENT_FOLDER_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__CONTENT_ENDPOINTS, SWAGGER_TAG__CONTENT_FOLDER_SECTION
 )
-is_folder_content = ContentTypeChecker([FOLDER_TYPE])
+is_folder_content = ContentTypeChecker([ContentTypeSlug.FOLDER.value])
 
 
 class FolderController(Controller):
@@ -55,7 +53,7 @@ class FolderController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         return api.get_content_in_context(content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FOLDER_ENDPOINTS])
@@ -78,7 +76,7 @@ class FolderController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.update_container_content(
                 item=content,
@@ -108,7 +106,7 @@ class FolderController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         revisions = content.get_revisions()
         return [api.get_revision_in_context(revision, number) for revision, number in revisions]
 
@@ -130,7 +128,7 @@ class FolderController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.set_status(content, hapic_data.body.status)
             api.save(content)
@@ -139,13 +137,17 @@ class FolderController(Controller):
     def bind(self, configurator: Configurator) -> None:
         # Get folder
         configurator.add_route(
-            "folder", "/workspaces/{workspace_id}/folders/{content_id}", request_method="GET"
+            "folder",
+            "/workspaces/{workspace_id}/folders/{content_id}",
+            request_method="GET",
         )
         configurator.add_view(self.get_folder, route_name="folder")
 
         # update folder
         configurator.add_route(
-            "update_folder", "/workspaces/{workspace_id}/folders/{content_id}", request_method="PUT"
+            "update_folder",
+            "/workspaces/{workspace_id}/folders/{content_id}",
+            request_method="PUT",
         )
         configurator.add_view(self.update_folder, route_name="update_folder")
 

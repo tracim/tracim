@@ -11,14 +11,15 @@ from webtest import TestApp
 from tracim_backend.error import ErrorCode
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import EmailNotificationType
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.data import WorkspaceSubscriptionState
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.tests.utils import EventHelper
-from tracim_backend.tests.utils import RoleApiFactory
 from tracim_backend.tests.utils import SubscriptionLibFactory
 from tracim_backend.tests.utils import UserApiFactory
+from tracim_backend.tests.utils import UserWorkspaceConfigApiFactory
 from tracim_backend.tests.utils import WorkspaceApiFactory
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 
@@ -71,7 +72,8 @@ class TestUserSubscriptionEndpoint(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         res = web_testapp.get(
-            "/api/users/{}/workspace_subscriptions".format(test_user.user_id), status=200
+            "/api/users/{}/workspace_subscriptions".format(test_user.user_id),
+            status=200,
         )
         assert len(res.json_body) == 2
         first_subscription = res.json_body[0]
@@ -92,9 +94,13 @@ class TestUserSubscriptionEndpoint(object):
         assert second_subscription["evaluation_date"]
         assert second_subscription["evaluator"]["user_id"] == admin_user.user_id
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res2 = web_testapp.get(
-            "/api/users/{}/workspace_subscriptions".format(test_user.user_id), status=200
+            "/api/users/{}/workspace_subscriptions".format(test_user.user_id),
+            status=200,
         )
         assert res.json_body == res2.json_body
 
@@ -142,13 +148,17 @@ class TestUserSubscriptionEndpoint(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         res = web_testapp.get(
-            "/api/users/{}/workspace_subscriptions".format(test_user.user_id), status=200
+            "/api/users/{}/workspace_subscriptions".format(test_user.user_id),
+            status=200,
         )
         last_event = event_helper.last_event
         assert last_event.event_type == "workspace_subscription.created"
         author = web_testapp.get("/api/users/{}".format(test_user.user_id), status=200).json_body
         assert last_event.author == UserDigestSchema().dump(author).data
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(on_request_workspace.workspace_id), status=200
         ).json_body
@@ -243,7 +253,8 @@ class TestUserSubscriptionEndpoint(object):
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
 
         res = web_testapp.get(
-            "/api/users/{}/workspace_subscriptions".format(test_user.user_id), status=200
+            "/api/users/{}/workspace_subscriptions".format(test_user.user_id),
+            status=200,
         )
         assert len(res.json_body) == 1
         subscription = res.json_body[0]
@@ -273,7 +284,10 @@ class TestUserSubscriptionEndpoint(object):
         assert last_event.event_type == "workspace_subscription.modified"
         author = web_testapp.get("/api/users/{}".format(test_user.user_id), status=200).json_body
         assert last_event.author == UserDigestSchema().dump(author).data
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(on_request_workspace.workspace_id), status=200
         ).json_body
@@ -285,7 +299,8 @@ class TestUserSubscriptionEndpoint(object):
 
         # after resubscribe
         res = web_testapp.get(
-            "/api/users/{}/workspace_subscriptions".format(test_user.user_id), status=200
+            "/api/users/{}/workspace_subscriptions".format(test_user.user_id),
+            status=200,
         )
         assert len(res.json_body) == 1
         subscription = res.json_body[0]
@@ -300,7 +315,10 @@ class TestUserSubscriptionEndpoint(object):
         assert last_event.event_type == "workspace_subscription.modified"
         author = web_testapp.get("/api/users/{}".format(test_user.user_id), status=200).json_body
         assert last_event.author == UserDigestSchema().dump(author).data
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(on_request_workspace.workspace_id), status=200
         ).json_body
@@ -344,9 +362,13 @@ class TestWorkspaceSubscriptionEndpoint(object):
         )
         subscription_lib_factory.get(test_user).submit_subscription(workspace=on_request_workspace)
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
-            "/api/workspaces/{}/subscriptions".format(on_request_workspace.workspace_id), status=200
+            "/api/workspaces/{}/subscriptions".format(on_request_workspace.workspace_id),
+            status=200,
         )
         assert len(res.json_body) == 1
         first_subscription = res.json_body[0]
@@ -384,7 +406,10 @@ class TestWorkspaceSubscriptionEndpoint(object):
         subscription_lib_factory.get(test_user).submit_subscription(workspace=on_request_workspace)
         transaction.commit()
         params = {"role": "contributor"}
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put_json(
             "/api/workspaces/{}/subscriptions/{}/accept".format(
                 on_request_workspace.workspace_id, test_user.user_id
@@ -394,7 +419,8 @@ class TestWorkspaceSubscriptionEndpoint(object):
         )
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         web_testapp.get(
-            "/api/workspaces/{}".format(on_request_workspace.workspace_id), status=200,
+            "/api/workspaces/{}".format(on_request_workspace.workspace_id),
+            status=200,
         )
 
     def test__accept_workspace_subscription__err__400__already_in(
@@ -403,7 +429,7 @@ class TestWorkspaceSubscriptionEndpoint(object):
         workspace_api_factory: WorkspaceApiFactory,
         web_testapp: TestApp,
         subscription_lib_factory: SubscriptionLibFactory,
-        role_api_factory: RoleApiFactory,
+        user_workspace_config_api_factory: UserWorkspaceConfigApiFactory,
         admin_user: User,
     ):
         on_request_workspace = workspace_api_factory.get().create_workspace(
@@ -422,12 +448,20 @@ class TestWorkspaceSubscriptionEndpoint(object):
             do_save=True,
             do_notify=False,
         )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, on_request_workspace, UserRoleInWorkspace.READER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            on_request_workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         subscription_lib_factory.get(test_user).submit_subscription(workspace=on_request_workspace)
         transaction.commit()
         params = {"role": "contributor"}
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.put_json(
             "/api/workspaces/{}/subscriptions/{}/accept".format(
                 on_request_workspace.workspace_id, test_user.user_id
@@ -463,7 +497,10 @@ class TestWorkspaceSubscriptionEndpoint(object):
         )
         subscription_lib_factory.get(test_user).submit_subscription(workspace=on_request_workspace)
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put_json(
             "/api/workspaces/{}/subscriptions/{}/reject".format(
                 on_request_workspace.workspace_id, test_user.user_id
@@ -472,6 +509,7 @@ class TestWorkspaceSubscriptionEndpoint(object):
         )
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         res = web_testapp.get(
-            "/api/workspaces/{}".format(on_request_workspace.workspace_id), status=400,
+            "/api/workspaces/{}".format(on_request_workspace.workspace_id),
+            status=400,
         )
         assert res.json_body["code"] == ErrorCode.WORKSPACE_NOT_FOUND

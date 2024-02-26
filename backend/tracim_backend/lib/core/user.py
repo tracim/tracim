@@ -1,27 +1,29 @@
 # -*- coding: utf-8 -*-
 import datetime
+from depot.io.utils import FileIntent
+from hapic.data import HapicFile
 import hashlib
 import io
+from marshmallow import ValidationError
 import os
+from pyramid_ldap3 import Connector
 import re
 from smtplib import SMTPException
 from smtplib import SMTPRecipientsRefused
-import typing as typing
-
-from depot.io.utils import FileIntent
-from hapic.data import HapicFile
-from marshmallow import ValidationError
-from pyramid_ldap3 import Connector
 from sqlakeyset import Page
 from sqlakeyset import get_page
 import sqlalchemy
 from sqlalchemy import and_
 from sqlalchemy import func
+from sqlalchemy import not_
 from sqlalchemy import or_
 from sqlalchemy.orm import Query
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.expression import cast
 import transaction
+import typing as typing
+from typing import List
+from typing import Tuple
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.email_validators import TracimEmailValidator
@@ -45,11 +47,11 @@ from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisall
 from tracim_backend.exceptions import InvalidUsernameFormat
 from tracim_backend.exceptions import MissingEmailCantResetPassword
 from tracim_backend.exceptions import MissingLDAPConnector
+from tracim_backend.exceptions import NoUserSetted
 from tracim_backend.exceptions import NotFound
 from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation
 from tracim_backend.exceptions import NotificationDisabledCantResetPassword
 from tracim_backend.exceptions import NotificationSendingFailed
-from tracim_backend.exceptions import NoUserSetted
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import RemoteUserAuthDisabled
 from tracim_backend.exceptions import ReservedUsernameError
@@ -57,9 +59,9 @@ from tracim_backend.exceptions import TooManyOnlineUsersError
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UnknownAuthType
+from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.exceptions import UserAuthenticatedIsDeleted
 from tracim_backend.exceptions import UserAuthenticatedIsNotActive
-from tracim_backend.exceptions import UserAuthTypeDisabled
 from tracim_backend.exceptions import UserCantChangeIsOwnProfile
 from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
@@ -87,7 +89,7 @@ from tracim_backend.models.context_models import AboutUser
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import Content
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.mention import TRANSLATED_GROUP_MENTIONS
 from tracim_backend.models.social import UserFollower
@@ -102,6 +104,7 @@ COVER_RATIO = ImageRatio(35, 4)
 DEFAULT_AVATAR_SIZE = ImageSize(100, 100)
 DEFAULT_COVER_SIZE = ImageSize(1300, 150)
 SVG_MIMETYPE = "image/svg+xml"
+USERNAME_ALLOWED_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_."
 
 
 class UserApi(object):
@@ -122,9 +125,9 @@ class UserApi(object):
 
     def _apply_base_filters(self, query):
         if not self._show_deleted:
-            query = query.filter(User.is_deleted == False)  # noqa: E711
+            query = query.filter(User.is_deleted == False)  # noqa: E712
         if not self._show_deactivated:
-            query = query.filter(User.is_active == True)  # noqa: E711
+            query = query.filter(User.is_active == True)  # noqa: E712
         return query
 
     def base_query(self):
@@ -146,6 +149,16 @@ class UserApi(object):
             user = self.base_query().filter(User.user_id == user_id).one()
         except NoResultFound as exc:
             raise UserDoesNotExist('User "{}" not found in database'.format(user_id)) from exc
+        return user
+
+    def get_one_by_external_id(self, external_id: str) -> User:
+        """Return the user identified by the given external_id."""
+        try:
+            user = self.base_query().filter(User.external_id == external_id).one()
+        except NoResultFound as exc:
+            raise UserDoesNotExist(
+                'User for external_id "{}" not found in database'.format(external_id)
+            ) from exc
         return user
 
     def get_one_by_login(self, login: str) -> User:
@@ -171,7 +184,7 @@ class UserApi(object):
         :return: one user
         """
         if not email:
-            raise UserDoesNotExist("User not found : no email provided")
+            raise UserDoesNotExist("User not found: no email provided")
         try:
             user = self.base_query().filter(User.email == email.lower()).one()
         except NoResultFound as exc:
@@ -207,22 +220,108 @@ class UserApi(object):
     def get_all(self) -> typing.List[User]:
         return self._get_all_query().all()
 
+    def get_all_user_ids(self) -> typing.List[int]:
+        """When only needing user ids, this is much faster than get_all()."""
+        return self._session.use_cache(
+            "UserApi.get_all_user_ids()",
+            lambda: [r[0] for r in self._session.query(User.user_id).all()],
+        )
+
     def get_user_ids_from_profile(self, profile: Profile) -> typing.Iterable[int]:
-        query = self._apply_base_filters(self._session.query(User.user_id))
-        return [res[0] for res in query.filter(User.profile == profile)]
+        ids = self._session.use_cache(
+            f"UserApi.get_user_ids_from_profile({profile})",
+            lambda: [
+                r[0]
+                for r in self._session.query(User.user_id).filter(User.profile == profile).all()
+            ],
+        )
+        return ids
 
     def get_members_of_workspaces(self, workspace_ids: typing.List[int]) -> typing.List[int]:
         user_ids_in_workspaces_tuples = (
-            self._session.query(UserRoleInWorkspace.user_id)
-            .distinct(UserRoleInWorkspace.user_id)
-            .filter(UserRoleInWorkspace.workspace_id.in_(workspace_ids))
+            self._session.query(UserWorkspaceConfig.user_id)
+            .distinct(UserWorkspaceConfig.user_id)
+            .filter(UserWorkspaceConfig.workspace_id.in_(workspace_ids))
             .all()
         )
         return [item[0] for item in user_ids_in_workspaces_tuples]
 
+    def get_users_in_common_with_user_workspace(
+        self, user_id: int
+    ) -> List[Tuple[int, str, str, int]]:
+        """
+        Returns a list of found user data in common with the provided user as a tuple
+        :param user_id: id of the user to get data from
+        :return: List of found user data in common with the provided user as a tuple
+            of the following format
+            (
+                0 -> user_id
+                1 -> username
+                2 -> display_name
+                3 -> workspace_id
+            )
+        """
+        from sqlalchemy.orm import aliased
+
+        s1 = aliased(UserWorkspaceConfig)
+        s2 = aliased(UserWorkspaceConfig)
+
+        return (
+            self._session.query(s2.user_id, User.username, User.display_name, s2.workspace_id)
+            .join(s1, and_(s1.workspace_id == s2.workspace_id, s1.user_id == user_id))
+            .join(User, User.user_id == s2.user_id)
+            .join(
+                Workspace,
+                and_(Workspace.workspace_id == s1.workspace_id, not_(Workspace.is_deleted)),
+            )
+            .order_by(s2.user_id)
+            .all()
+        )
+
+    def get_all_known_users_of_user(self, user_id: int) -> typing.List[User]:
+        """
+        Return list of known users of the provided users.
+        This list includes all users that share a same workspace with the user.
+        It also adds a list of shared workspaces per user to the user model.
+        :param user_id: user_id to get know_users of
+        :return: List of found users, with a list of shared workspaces per user
+        """
+
+        user_workspace_settings = self.get_users_in_common_with_user_workspace(user_id)
+
+        if user_workspace_settings is None:
+            return []
+
+        # INFO- M.L. - 2023-11-23 - This loop relies on the above query
+        #  that returns an ordered list of users and their associated workspaces
+        #  with one entry per user/workspace relationship.
+        users = []
+        prev_user_id = None
+        # Initialises index to -1 to prevent initialisation snippet before the loop
+        current_index = -1
+        for user_workspace_setting in user_workspace_settings:
+            # Since the list is ordered, when the previous user_id is different
+            #  from the current one, initialise a new entry containing minimum user_info
+            #  and add the workspace of the current relationship into the list of the
+            #  user's workspaces
+            if prev_user_id is not user_workspace_setting[0]:
+                current_index += 1
+                user = User()
+                user.user_id = user_workspace_setting[0]
+                user.username = user_workspace_setting[1]
+                user.display_name = user_workspace_setting[2]
+                user.workspace_ids = [user_workspace_setting[3]]
+                users.append(user)
+                prev_user_id = user.user_id
+                continue
+            # If the user_id is the same as the precedent one, add the workspace
+            #  to the list of the user's workspaces
+            users[current_index].workspace_ids.append(user_workspace_setting[3])
+        return users
+
     def get_known_users(
         self,
-        acp: str,
+        acp: str = "",
         exclude_user_ids: typing.List[int] = None,
         exclude_workspace_ids: typing.List[int] = None,
         include_workspace_ids: typing.List[int] = None,
@@ -231,16 +330,22 @@ class UserApi(object):
     ) -> typing.List[User]:
         """
         Return list of known users by current UserApi user.
+        If no parameter is provided, return a list of all known users
         :param acp: autocomplete filter by name/email
         :param exclude_user_ids: user id to exclude from result
         :param exclude_workspace_ids: workspace user to exclude from result
         :param include_workspace_ids: only include users from these workspaces
-        :limit: maximum number of users to return. This value will be capped to
+        :param limit: maximum number of users to return. This value will be capped to
                 KNOWN_MEMBERS_ITEMS_LIMIT if requesting users from workspaces that
                 the requester is not part of.
-        :filter_results: If true, do filter result according to user workspace if user is provided
+        :param filter_results: If true, do filter result according to user workspace if user is provided
         :return: List of found users
         """
+
+        # INFO- M.L. - 2023-11-23 - If no crucial parameter is provided,
+        #  return the result of get_all_known_users_of_user
+        if len(acp) <= 0 and not exclude_workspace_ids and not include_workspace_ids:
+            return self.get_all_known_users_of_user(self._user.user_id)
 
         nb_elems = KNOWN_MEMBERS_ITEMS_LIMIT
 
@@ -354,7 +459,9 @@ need to be in every workspace you include."
             limit = KNOWN_CONTENT_ITEMS_DEFAULT_LIMIT
 
         content_api = ContentApi(
-            session=self._session, current_user=self._user, config=self._config,
+            session=self._session,
+            current_user=self._user,
+            config=self._config,
         )
 
         query = content_api.get_base_query(workspaces=self.get_user_workspaces())
@@ -376,15 +483,23 @@ need to be in every workspace you include."
         return [content_api.get_content_in_context(content) for content in contents]
 
     def get_reserved_usernames(self) -> typing.Tuple[str, ...]:
-        reserved_usernames = ["all", "reader", "contributor", "content-manager", "space-manager"]
+        reserved_usernames = [
+            "all",
+            "reader",
+            "contributor",
+            "content-manager",
+            "space-manager",
+        ]
         for key in TRANSLATED_GROUP_MENTIONS.keys():
-            for lang in self._config.TRANSLATIONS["GLOBAL"].keys():
-                reserved_usernames += [self._config.TRANSLATIONS["GLOBAL"][lang][key]]
+            translation_lang_dict = self._config.TRANSLATIONS["GLOBAL"]
+            for lang in translation_lang_dict.keys():
+                if key in translation_lang_dict[lang]:
+                    reserved_usernames += [translation_lang_dict[lang][key]]
         return tuple(reserved_usernames)
 
     def get_user_workspaces_query(self, user_id: int) -> Query:
-        return self._session.query(UserRoleInWorkspace.workspace_id).filter(
-            UserRoleInWorkspace.user_id == user_id
+        return self._session.query(UserWorkspaceConfig.workspace_id).filter(
+            UserWorkspaceConfig.user_id == user_id
         )
 
     def get_user_workspaces(self) -> typing.List[Workspace]:
@@ -393,9 +508,9 @@ need to be in every workspace you include."
     def _get_user_ids_in_same_workspace(self, user_id: int):
         user_workspaces_id_query = self.get_user_workspaces_query(user_id)
         users_in_workspaces = (
-            self._session.query(UserRoleInWorkspace.user_id)
-            .distinct(UserRoleInWorkspace.user_id)
-            .filter(UserRoleInWorkspace.workspace_id.in_(user_workspaces_id_query.subquery()))
+            self._session.query(UserWorkspaceConfig.user_id)
+            .distinct(UserWorkspaceConfig.user_id)
+            .filter(UserWorkspaceConfig.workspace_id.in_(user_workspaces_id_query.subquery()))
             .subquery()
         )
         return users_in_workspaces
@@ -416,7 +531,11 @@ need to be in every workspace you include."
             return False
 
     def _ldap_authenticate(
-        self, user: typing.Optional[User], login: str, password: str, ldap_connector: "Connector"
+        self,
+        user: typing.Optional[User],
+        login: str,
+        password: str,
+        ldap_connector: "Connector",
     ) -> User:
         """
         Authenticate with ldap, return authenticated user or raise Exception
@@ -425,13 +544,12 @@ need to be in every workspace you include."
         :param user: user to check,, can be none if user not found, will try
          to create new user if none but ldap auth succeed
         :param login: login of the user
-        :param password: cleartext password of the user
+        :param password: plaintext password of the user
         :param ldap_connector: ldap connector, enable ldap auth if provided
         """
         auth_type = AuthType.LDAP
 
-        # INFO - G.M - 2018-11-22 - Do no_t authenticate user with auth_type
-        # different from LDAP
+        # INFO - G.M - 2018-11-22 - Do not authenticate user with auth_type different from LDAP
         if user and user.auth_type not in [auth_type, AuthType.UNKNOWN]:
             raise WrongAuthTypeForUser(
                 'User "{}" auth_type is {} not {}'.format(
@@ -463,15 +581,18 @@ need to be in every workspace you include."
             #             )
             #         )
             name = None
-            if self._config.LDAP_NAME_ATTRIBUTE:
+            mail = None
+            username = None
+            if self._config.LDAP_NAME_ATTRIBUTE and self._config.LDAP_NAME_ATTRIBUTE in ldap_data:
                 name = ldap_data[self._config.LDAP_NAME_ATTRIBUTE][0]
+            if self._config.LDAP_MAIL_ATTRIBUTE:
+                mail = ldap_data[self._config.LDAP_MAIL_ATTRIBUTE][0]
+            if self._config.LDAP_USERNAME_ATTRIBUTE:
+                username = ldap_data[self._config.LDAP_USERNAME_ATTRIBUTE][0]
             # INFO - G.M - 2018-11-08 - Create new user from ldap credentials
-            use_email = False
-            if "@" in login:
-                use_email = True
             user = self.create_user(
-                email=login if use_email else None,
-                username=login if not use_email else None,
+                email=mail,
+                username=username,
                 name=name,
                 profile=profile,
                 auth_type=AuthType.LDAP,
@@ -501,7 +622,7 @@ need to be in every workspace you include."
         WrongUserPassword or UserAuthenticatedIsNotActive
         :param user: user to check, can be none if user not found, will raise
         UserDoesNotExist exception if none
-        :param password: cleartext password of the user
+        :param password: plaintext password of the user
         :param ldap_connector: ldap connector, enable ldap auth if provided
         """
         auth_type = AuthType.INTERNAL
@@ -617,17 +738,24 @@ need to be in every workspace you include."
         ) as exc:
             raise AuthenticationFailed('User "{}" authentication failed'.format(login)) from exc
 
-    def authenticate(self, password: str, login: str, ldap_connector: "Connector" = None) -> User:
+    def authenticate(
+        self,
+        password: str,
+        login: str,
+        ldap_connector: "Connector" = None,
+    ) -> User:
         """
         Authenticate user with email/username and password, raise AuthenticationFailed
         if incorrect. try all auth available in order and raise issue of
         last auth if all auth failed.
         :param login: login or username of the user
-        :param password: cleartext password of the user
+        :param password: plaintext password of the user
         :param ldap_connector: ldap connector, enable ldap auth if provided
         :return: User who was authenticated.
         """
         for auth_type in self._config.AUTH_TYPES:
+            if auth_type == AuthType.SAML:
+                continue
             try:
                 return self._authenticate(
                     login=login,
@@ -642,6 +770,77 @@ need to be in every workspace you include."
 
         raise AuthenticationFailed("Auth mechanism for this user is not activated")
 
+    def saml_authenticate(
+        self,
+        user: typing.Optional[User],
+        external_id: str,
+        username: str,
+        public_name: str,
+        mail: str,
+        profile: Profile = Profile.USER,
+    ) -> User:
+        """
+        Authenticate with ldap, return authenticated user or raise Exception
+        like WrongAuthTypeForUser, WrongLDAPCredentials, UserDoesNotExist
+        or UserAuthenticatedIsNotActive
+        :param user to check, can be none if user not found, will try
+         to create new user if none but ldap auth succeed
+        :param external_id
+        :param username of the user
+        :param public_name extracted from saml attributes
+        :param mail extracted from saml attributes
+        :param profile: user Profile extracted from saml attributes
+        """
+        auth_type = AuthType.SAML
+
+        if not user:
+            # NOTE - M.L. - 23-11-10 - Processing the username
+            #  to make sure it fits username restrictions
+            if username is not None:
+                username = "".join(
+                    char if char in USERNAME_ALLOWED_CHARACTERS else "_" for char in username
+                )
+                username = username[: User.MAX_USERNAME_LENGTH].ljust(User.MIN_USERNAME_LENGTH, "_")
+            try:
+                user = self.get_one_by_external_id(external_id)
+                # TODO - BS - 2023-11-10 - Update must be moved in SAMLSecurityPolicy._acs
+                #  The saml_authenticate method (through SAMLSecurityPolicy.authenticated_userid)
+                #  is called every times Request.authenticated_userid property is called.
+                #  So, this updated can be (and is) called when original code already flushed
+                #  the session. And result "session already flushed" error. See #6266
+
+                user = self.update(
+                    user=user, email=mail, username=username, name=public_name, do_save=True
+                )
+            except UserDoesNotExist:
+                _ = self.create_user(
+                    external_id=external_id,
+                    email=mail,
+                    username=username,
+                    name=public_name,
+                    auth_type=AuthType.SAML,
+                    do_save=True,
+                    do_notify=False,
+                    profile=profile,
+                )
+                user = self.get_one_by_external_id(external_id)
+        if user and user.auth_type not in [auth_type, AuthType.UNKNOWN]:
+            raise WrongAuthTypeForUser(
+                'User with external_id "{}" auth_type is {} not {}'.format(
+                    external_id, user.auth_type.value, auth_type.value
+                )
+            )
+
+        if user.is_deleted:
+            raise UserDoesNotExist("This user has been deleted")
+
+        if not user.is_active:
+            raise UserAuthenticatedIsNotActive("This user is not activated")
+
+        if user.auth_type == AuthType.UNKNOWN:
+            user.auth_type = auth_type
+        return user
+
     def _authenticate(
         self,
         password: str,
@@ -653,7 +852,7 @@ need to be in every workspace you include."
         Authenticate user with email/username and password, raise AuthenticationFailed
         if incorrect. check only one auth
         :param login: login of the user
-        :param password: cleartext password of the user
+        :param password: plaintext password of the user
         :param ldap_connector: ldap connector, enable ldap auth if provided
         :param auth_type: auth type to test.
         :return: User who was authenticated.
@@ -696,7 +895,7 @@ need to be in every workspace you include."
         Set User password if logged-in user password is correct
         and both new_password are the same.
         :param user: User who need password changed
-        :param loggedin_user_password: cleartext password of logged user (not
+        :param loggedin_user_password: plaintext password of logged user (not
         same as user)
         :param new_password: new password for user
         :param new_password2: should be same as new_password
@@ -727,7 +926,7 @@ need to be in every workspace you include."
         """
         Set email address of user if loggedin user password is correct
         :param user: User who need email changed
-        :param loggedin_user_password: cleartext password of logged user (not
+        :param loggedin_user_password: plaintext password of logged user (not
         same as user)
         :param email:
         :param do_save:
@@ -746,12 +945,16 @@ need to be in every workspace you include."
         return user
 
     def set_username(
-        self, user: User, loggedin_user_password: str, username: str, do_save: bool = True
+        self,
+        user: User,
+        loggedin_user_password: str,
+        username: str,
+        do_save: bool = True,
     ) -> User:
         """
         Set username of user if loggedin user password is correct
         :param user: User who need email changed
-        :param loggedin_user_password: cleartext password of logged user (not
+        :param loggedin_user_password: plaintext password of logged user (not
         same as user)
         :param username: new username
         :param do_save: if True, flush database session
@@ -847,7 +1050,7 @@ need to be in every workspace you include."
         if len(username) < User.MIN_USERNAME_LENGTH or len(username) > User.MAX_USERNAME_LENGTH:
             return False
         for char in username:
-            if char not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_":
+            if char not in USERNAME_ALLOWED_CHARACTERS:
                 return False
         return True
 
@@ -864,6 +1067,7 @@ need to be in every workspace you include."
         allowed_space: typing.Optional[int] = None,
         username: str = None,
         do_save=True,
+        external_id: typing.Optional[str] = None,
     ) -> User:
         """Update given user instance with given parameters"""
         validator = TracimValidator()
@@ -920,6 +1124,9 @@ need to be in every workspace you include."
         if timezone is not None:
             user.timezone = timezone
 
+        if external_id is not None:
+            user.external_id = external_id
+
         if lang is not None:
             user.lang = lang
 
@@ -939,7 +1146,10 @@ need to be in every workspace you include."
         return user
 
     def _check_password_modification_allowed(self, user: User) -> bool:
-        if user.auth_type and user.auth_type not in [AuthType.INTERNAL, AuthType.UNKNOWN]:
+        if user.auth_type and user.auth_type not in [
+            AuthType.INTERNAL,
+            AuthType.UNKNOWN,
+        ]:
             raise ExternalAuthUserPasswordModificationDisallowed(
                 "user {} is link to external auth {},"
                 "password modification disallowed".format(user.login, user.auth_type)
@@ -947,7 +1157,11 @@ need to be in every workspace you include."
         return True
 
     def _check_email_modification_allowed(self, user: User) -> bool:
-        if user.auth_type and user.auth_type not in [AuthType.INTERNAL, AuthType.UNKNOWN]:
+        if user.auth_type and user.auth_type not in [
+            AuthType.INTERNAL,
+            AuthType.UNKNOWN,
+            AuthType.SAML,
+        ]:
             raise ExternalAuthUserEmailModificationDisallowed(
                 "user {} is link to external auth {},"
                 "email modification disallowed".format(user.login, user.auth_type)
@@ -960,6 +1174,7 @@ need to be in every workspace you include."
         username: typing.Optional[str] = None,
         password: typing.Optional[str] = None,
         name: typing.Optional[str] = None,
+        external_id: typing.Optional[str] = None,
         timezone: str = "",
         lang: typing.Optional[str] = None,
         auth_type: AuthType = AuthType.UNKNOWN,
@@ -972,15 +1187,18 @@ need to be in every workspace you include."
     ) -> User:
         if do_notify and not self._config.EMAIL__NOTIFICATION__ACTIVATED:
             raise NotificationDisabledCantCreateUserWithInvitation(
-                "Can't create user with invitation mail because " "notification are disabled."
+                "Can't create user with invitation mail because notification are disabled."
             )
         new_user = self.create_minimal_user(email, username, profile, save_now=False)
+        if external_id is None:
+            external_id = new_user.user_id
         if allowed_space is None:
             allowed_space = self._config.LIMITATION__USER_DEFAULT_ALLOWED_SPACE
         self.update(
             user=new_user,
             name=name,
             username=username,
+            external_id=external_id,
             email=email,
             auth_type=auth_type,
             password=password,
@@ -1106,7 +1324,8 @@ need to be in every workspace you include."
         self._check_user_auth_validity(user)
         self._check_password_modification_allowed(user)
         return user.validate_reset_password_token(
-            token=token, validity_seconds=self._config.USER__RESET_PASSWORD__TOKEN_LIFETIME
+            token=token,
+            validity_seconds=self._config.USER__RESET_PASSWORD__TOKEN_LIFETIME,
         )
 
     def enable(self, user: User, do_save=False):
@@ -1193,7 +1412,10 @@ need to be in every workspace you include."
         if (
             self._session.query(UserFollower)
             .filter(
-                and_(UserFollower.leader_id == leader_id, UserFollower.follower_id == follower_id)
+                and_(
+                    UserFollower.leader_id == leader_id,
+                    UserFollower.follower_id == follower_id,
+                )
             )
             .count()
         ):
@@ -1215,7 +1437,8 @@ need to be in every workspace you include."
                 self._session.query(UserFollower)
                 .filter(
                     and_(
-                        UserFollower.leader_id == leader_id, UserFollower.follower_id == follower_id
+                        UserFollower.leader_id == leader_id,
+                        UserFollower.follower_id == follower_id,
                     )
                 )
                 .one()
@@ -1288,7 +1511,11 @@ need to be in every workspace you include."
         )
 
     def get_avatar(
-        self, user_id: int, filename: str, default_filename: str, force_download: bool = False,
+        self,
+        user_id: int,
+        filename: str,
+        default_filename: str,
+        force_download: bool = False,
     ) -> HapicFile:
         user = self.get_one(user_id)
         if not user.avatar:
@@ -1359,7 +1586,11 @@ need to be in every workspace you include."
             self._session.flush()
 
     def get_cover(
-        self, user_id: int, filename: str, default_filename: str, force_download: bool = False,
+        self,
+        user_id: int,
+        filename: str,
+        default_filename: str,
+        force_download: bool = False,
     ) -> HapicFile:
         user = self.get_one(user_id)
         if not user.cover:
@@ -1396,7 +1627,11 @@ need to be in every workspace you include."
         )
 
     def set_cover(
-        self, user_id: int, new_filename: str, new_mimetype: str, new_content: typing.BinaryIO
+        self,
+        user_id: int,
+        new_filename: str,
+        new_mimetype: str,
+        new_content: typing.BinaryIO,
     ) -> None:
         user = self.get_one(user_id)
         (user.cover, user.cropped_cover) = self._crop_and_prepare_depot_storage(

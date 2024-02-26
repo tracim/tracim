@@ -1,6 +1,5 @@
 from fractions import Fraction
 import typing
-
 from wand.image import Image
 
 
@@ -59,7 +58,10 @@ class ImageSize(ImageRatio):
 
 
 def crop_image(
-    source_file: typing.BinaryIO, destination_file: typing.BinaryIO, ratio: ImageRatio, format="png"
+    source_file: typing.BinaryIO,
+    destination_file: typing.BinaryIO,
+    ratio: ImageRatio,
+    format="png",
 ) -> None:
     """
     Crop Image according to ratio.

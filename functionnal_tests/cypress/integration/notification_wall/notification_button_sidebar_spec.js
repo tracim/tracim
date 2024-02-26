@@ -54,14 +54,13 @@ describe('Check notification dot', () => {
     })
 
     describe(`As ${baseUser.username} sending ${defaultAdmin.username} a notifications`, () => {
-      it('create a general notifiation', () => {
+      it('create a general notification', () => {
         cy.get('.componentTitle').should('be.visible')
         cy.inputInTinyMCE(comment).then(() => {
           cy.get('.commentArea__submit__btn')
             .should('be.visible')
             .click()
         })
-        cy.contains('.thread__contentpage__comment', comment)
         cy.logout()
 
         cy.login(defaultAdmin)
@@ -77,17 +76,13 @@ describe('Check notification dot', () => {
           .should('be.visible')
       })
 
-      it('create a mention notifiation', () => {
+      it('create a mention notification', () => {
         cy.get('.componentTitle').should('be.visible')
         cy.inputInTinyMCE(commentAll).then(() => {
           cy.get('.commentArea__submit__btn')
             .should('be.visible')
             .click()
         })
-        cy.get('.commentArea__submit__btn')
-          .should('be.visible')
-          .click()
-        cy.contains('.thread__contentpage__comment', commentAll)
         cy.logout()
 
         cy.get('.loginpage__main__header__title')

@@ -27,7 +27,6 @@ if (!global.window && !global.document) {
     getItem: () => {}
   }
   global.GLOBAL_primaryColor = '#aaaaaa'
-  global.wysiwyg = () => {}
   global.GLOBAL_dispatchEvent = () => {}
   const nodeCrypto = require('crypto')
   global.crypto = {

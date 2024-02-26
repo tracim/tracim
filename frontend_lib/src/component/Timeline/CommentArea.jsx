@@ -4,8 +4,8 @@ import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 
 import {
-  searchContentAndPlaceBalise,
-  searchMentionAndPlaceBalise
+  searchContentAndReplaceWithTag,
+  searchMentionAndReplaceWithTag
 } from '../../mentionOrLink.js'
 import {
   LOCAL_STORAGE_FIELD,
@@ -28,7 +28,7 @@ export const CommentArea = props => {
   const [textToSend, setTextToSend] = useState('')
 
   useEffect(() => {
-    if (props.newComment) {
+    if (props.newComment !== undefined && props.newComment !== '') {
       setContent(props.newComment)
     } else {
       const savedComment = getLocalStorageItem(
@@ -45,7 +45,14 @@ export const CommentArea = props => {
   }, [props.contentType, props.contentId, props.workspaceId])
 
   useEffect(() => {
-    if (content) {
+    if (content === undefined || content === '') {
+      removeLocalStorageItem(
+        props.contentType,
+        props.contentId,
+        props.workspaceId,
+        LOCAL_STORAGE_FIELD.COMMENT
+      )
+    } else {
       setLocalStorageItem(
         props.contentType,
         props.contentId,
@@ -53,15 +60,13 @@ export const CommentArea = props => {
         LOCAL_STORAGE_FIELD.COMMENT,
         content
       )
-    } else {
-      removeLocalStorageItem(
-        props.contentType,
-        props.contentId,
-        props.workspaceId,
-        LOCAL_STORAGE_FIELD.COMMENT
-      )
     }
   }, [content])
+
+  const resetComment = () => {
+    setContent('')
+    setFileListToUpload([])
+  }
 
   /**
    * Send the comment to the backend
@@ -72,8 +77,7 @@ export const CommentArea = props => {
     let commentToSend = comment
 
     if (!force) {
-      const parsedMentionCommentObject = searchMentionAndPlaceBalise(
-        props.roleList,
+      const parsedMentionCommentObject = searchMentionAndReplaceWithTag(
         props.memberList,
         commentToSend
       )
@@ -85,7 +89,7 @@ export const CommentArea = props => {
       }
     }
 
-    const parsedContentCommentObject = await searchContentAndPlaceBalise(
+    const parsedContentCommentObject = await searchContentAndReplaceWithTag(
       props.apiUrl,
       commentToSend
     )
@@ -94,13 +98,13 @@ export const CommentArea = props => {
     // In case of an error it's preferable to hide the popup
     setInvalidMentionList([])
 
-    const submitSuccessfull = await props.onClickSubmit(
+    const submitSuccessful = await props.onClickSubmit(
       parsedContentCommentObject.html,
-      fileListToUpload
+      fileListToUpload,
+      resetComment
     )
-    if (submitSuccessfull) {
-      setContent('')
-      setFileListToUpload([])
+    if (submitSuccessful) {
+      resetComment()
     }
   }
 
@@ -143,10 +147,11 @@ export const CommentArea = props => {
               </div>
             </>
           }
-          confirmLabel={props.t('Edit')}
-          confirmIcon='fas fa-edit'
-          cancelLabel={props.t('Validate anyway')}
           cancelIcon='fas fa-fw fa-check'
+          cancelLabel={props.t('Validate anyway')}
+          confirmIcon='fas fa-edit'
+          confirmLabel={props.t('Edit')}
+          customColor={props.customColor}
         />
       )}
       <TinyEditor
@@ -158,10 +163,11 @@ export const CommentArea = props => {
         onCtrlEnterEvent={sendComment}
         height={100}
         isAdvancedEdition={isAdvancedEdition}
+        isDisabled={props.disableComment}
+        language={props.language}
         maxHeight={300}
         minHeight={100}
         placeholder={props.placeholder}
-        roleList={props.roleList}
         userList={props.memberList}
       />
       <div
@@ -258,6 +264,7 @@ CommentArea.propTypes = {
   contentType: PropTypes.string.isRequired,
   onClickSubmit: PropTypes.func.isRequired,
   workspaceId: PropTypes.number.isRequired,
+  // End of required props /////////////////////////////////////////////////////
   codeLanguageList: PropTypes.array,
   customClass: PropTypes.string,
   customColor: PropTypes.string,
@@ -269,12 +276,12 @@ CommentArea.propTypes = {
   isDisplayedSendButton: PropTypes.bool,
   isDisplayedUploadFileButton: PropTypes.bool,
   isFileCommentLoading: PropTypes.bool,
+  language: PropTypes.string,
   memberList: PropTypes.array,
   multipleFiles: PropTypes.bool,
   newComment: PropTypes.string,
   onClickWithstand: PropTypes.func,
   placeholder: PropTypes.string,
-  roleList: PropTypes.array,
   submitIcon: PropTypes.string,
   submitLabel: PropTypes.string,
   withstandLabel: PropTypes.string
@@ -292,12 +299,12 @@ CommentArea.defaultProps = {
   isDisplayedSendButton: true,
   isDisplayedUploadFileButton: true,
   isFileCommentLoading: false,
+  language: 'en',
   memberList: [],
   multipleFiles: true,
   newComment: undefined,
   onClickWithstand: () => { },
   placeholder: 'Write a comment...',
-  roleList: [],
   submitIcon: 'far fa-paper-plane',
   submitLabel: 'Submit',
   withstandLabel: 'Withstand'

@@ -1,10 +1,10 @@
 # coding=utf-8
 from http import HTTPStatus
-import typing
-
 from pyramid.config import Configurator
 import transaction
+import typing
 
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.applications.content_todo.schema import SetTodoSchema
 from tracim_backend.applications.content_todo.schema import TodoPathSchema
@@ -56,11 +56,14 @@ class TodoController(Controller):
         app_config = request.registry.settings["CFG"]
 
         content_api = ContentApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
 
         todos = content_api.get_all_query(
-            content_type_slug=content_type_list.Todo.slug, assignee_id=hapic_data.path["user_id"]
+            content_type_slug=content_type_list.Todo.slug,
+            assignee_id=hapic_data.path["user_id"],
         )
 
         todos_in_context = []
@@ -85,11 +88,14 @@ class TodoController(Controller):
         app_config = request.registry.settings["CFG"]
 
         content_api = ContentApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
 
         todos = content_api.get_all(
-            parent_ids=[hapic_data.path.content_id], content_type=content_type_list.Todo.slug
+            parent_ids=[hapic_data.path.content_id],
+            content_type=content_type_list.Todo.slug,
         )
 
         todos_in_context = []
@@ -111,7 +117,9 @@ class TodoController(Controller):
         app_config = request.registry.settings["CFG"]
 
         content_api = ContentApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
 
         todo = content_api.get_one(
@@ -134,17 +142,21 @@ class TodoController(Controller):
         app_config = request.registry.settings["CFG"]
 
         content_api = ContentApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
         user_api = UserApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
 
         parent = None  # type: typing.Optional['Content']
         try:
             parent = content_api.get_one(
                 content_id=request.current_content.content_id,
-                content_type=content_type_list.Any_SLUG,
+                content_type=ContentTypeSlug.ANY.value,
             )
         except ContentNotFound as exc:
             raise ParentNotFound(
@@ -163,7 +175,9 @@ class TodoController(Controller):
                 ) from exc
 
         todo = content_api.create_todo(
-            parent=parent, raw_content=hapic_data.body["raw_content"], assignee=assignee,
+            parent=parent,
+            raw_content=hapic_data.body["raw_content"],
+            assignee=assignee,
         )
 
         todo_in_context = content_api.get_content_in_context(todo)
@@ -183,7 +197,9 @@ class TodoController(Controller):
         app_config = request.registry.settings["CFG"]
 
         content_api = ContentApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
 
         todo_content = content_api.get_one(
@@ -206,12 +222,15 @@ class TodoController(Controller):
         app_config = request.registry.settings["CFG"]
 
         content_api = ContentApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
 
         try:
             todo_content = content_api.get_one(
-                content_id=hapic_data.path.todo_id, content_type=content_type_list.Todo.slug
+                content_id=hapic_data.path.todo_id,
+                content_type=content_type_list.Todo.slug,
             )
         except ContentNotFound as exc:
             raise TodoNotFound(
@@ -224,13 +243,17 @@ class TodoController(Controller):
     def bind(self, configurator: Configurator):
         # Get every todo of a user
         configurator.add_route(
-            "user_todos", "/users/{user_id}/todos", request_method="GET",
+            "user_todos",
+            "/users/{user_id}/todos",
+            request_method="GET",
         )
         configurator.add_view(self.get_user_todos, route_name="user_todos")
 
         # Get every todo of a content
         configurator.add_route(
-            "todos", "/workspaces/{workspace_id}/contents/{content_id}/todos", request_method="GET",
+            "todos",
+            "/workspaces/{workspace_id}/contents/{content_id}/todos",
+            request_method="GET",
         )
         configurator.add_view(self.get_todos, route_name="todos")
 

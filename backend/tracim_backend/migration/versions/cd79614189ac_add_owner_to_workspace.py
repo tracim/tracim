@@ -5,9 +5,6 @@ Revises: 32e629b17e2e
 Create Date: 2019-07-10 11:04:00.497200
 
 """
-# revision identifiers, used by Alembic.
-import typing
-
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy import Column
@@ -17,6 +14,7 @@ from sqlalchemy import MetaData
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import relationship
+import typing  # revision identifiers, used by Alembic.
 
 NAMING_CONVENTION = {
     "ix": "ix_%(column_0_label)s",
@@ -35,7 +33,7 @@ down_revision = "7bd8ec4c7236"
 
 
 class TemporaryRoles(DeclarativeBase):
-    """ temporary sqlalchemy object to help migration"""
+    """temporary sqlalchemy object to help migration"""
 
     __tablename__ = "user_workspace"
 
@@ -52,7 +50,7 @@ class TemporaryRoles(DeclarativeBase):
 
 
 class TemporaryUserGroup(DeclarativeBase):
-    """ temporary sqlalchemy object to help migration"""
+    """temporary sqlalchemy object to help migration"""
 
     __tablename__ = "user_group"
 
@@ -61,7 +59,7 @@ class TemporaryUserGroup(DeclarativeBase):
 
 
 class TemporaryWorkspaces(DeclarativeBase):
-    """ temporary sqlalchemy object to help migration"""
+    """temporary sqlalchemy object to help migration"""
 
     __tablename__ = "workspaces"
 

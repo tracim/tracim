@@ -10,7 +10,7 @@
     padding 0 standardSpacing
   &__searchBar:focus-within
     border 1px solid lightBlue
-  &__searchBar .textinput__box:focus-within
+  &__searchBar .textInputComponent:focus-within
     border 0
 
   &__description
@@ -31,9 +31,12 @@
         white-space nowrap
         overflow hidden
         text-overflow ellipsis
-        cursor pointer
         &:not(:hover)
           color inherit
+        &__link
+          color inherit
+          margin -20px auto
+          padding 20px
       &__td-description
         max-width 0
         white-space nowrap
@@ -66,7 +69,7 @@
     padding 0 standardSpacing
   &__searchBar:focus-within
     border 1px solid lightBlue
-  &__searchBar .textinput__box:focus-within
+  &__searchBar .textInputComponent:focus-within
     border 0
 
   &__description

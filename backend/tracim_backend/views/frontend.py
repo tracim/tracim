@@ -1,18 +1,17 @@
 import glob
 import os
 import pathlib
-import typing
-
 from pyramid.config import Configurator
 from pyramid.renderers import render_to_response
 from pyramid.response import Response
+import typing
 
-from tracim_backend.config import CFG
+from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.request import TracimRequest
-from tracim_backend.lib.utils.utils import FRONTEND_UI_SUBPATH
 from tracim_backend.lib.utils.utils import ExtendedColor
+from tracim_backend.lib.utils.utils import FRONTEND_UI_SUBPATH
 from tracim_backend.views.controllers import Controller
 
 INDEX_PAGE_NAME = "index.mak"
@@ -23,7 +22,10 @@ BASE_CSP_DIRECTIVES = (
     # NOTE S.G - 2020-12-14 - unsafe-eval is needed for
     # custom forms app and user profile page
     # (react-jsonschema-form/ajv dependency)
-    ("script-src", "'unsafe-eval' 'nonce-{nonce}'"),
+    (
+        "script-src",
+        "'unsafe-eval' 'nonce-{nonce}' {base_url}/assets/tinymce-5.10.3/js/",
+    ),
     # NOTE S.G. - 2020-12-14 - unsafe-inline is needed for tinyMce
     ("style-src", "'unsafe-inline' 'self'"),
     ("connect-src", "'self'"),
@@ -110,7 +112,7 @@ class FrontendController(Controller):
 
             csp = "; ".join("{} {}".format(key, value) for key, value in csp_directives.items())
             csp = "{}; {}".format(app_config.CONTENT_SECURITY_POLICY__ADDITIONAL_DIRECTIVES, csp)
-            csp_header_value = csp.format(nonce=csp_nonce)
+            csp_header_value = csp.format(nonce=csp_nonce, base_url=app_config.WEBSITE__BASE_URL)
             if app_config.CONTENT_SECURITY_POLICY__REPORT_URI:
                 csp_headers.append(("Report-To", app_config.CONTENT_SECURITY_POLICY__REPORT_URI))
                 csp_header_value = "{}; report-uri {}".format(
@@ -147,7 +149,9 @@ class FrontendController(Controller):
         configurator.add_route("root", "/", request_method="GET")
         configurator.add_view(self.index, route_name="root")
         configurator.add_route(
-            "ui", "/{}{{ui_subpath:.*}}".format(FRONTEND_UI_SUBPATH), request_method="GET"
+            "ui",
+            "/{}{{ui_subpath:.*}}".format(FRONTEND_UI_SUBPATH),
+            request_method="GET",
         )
         configurator.add_view(self.ui, route_name="ui")
         configurator.add_route("index", INDEX_PAGE_NAME, request_method="GET")

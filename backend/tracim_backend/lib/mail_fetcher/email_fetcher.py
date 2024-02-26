@@ -4,16 +4,15 @@ from email.header import decode_header
 from email.header import make_header
 from email.message import Message
 from email.utils import parseaddr
-import socket
-import ssl
-import time
-import typing
-
 from email_reply_parser import EmailReplyParser
 import filelock
 import imapclient
 import markdown
 import requests
+import socket
+import ssl
+import time
+import typing
 
 from tracim_backend.exceptions import AutoReplyEmailNotAllowed
 from tracim_backend.exceptions import BadStatusCode
@@ -21,8 +20,8 @@ from tracim_backend.exceptions import EmptyEmailBody
 from tracim_backend.exceptions import NoKeyFound
 from tracim_backend.exceptions import UnsupportedRequestMethod
 from tracim_backend.lib.mail_fetcher.email_processing.parser import ParsedHTMLMail
-from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
-from tracim_backend.lib.utils.authentification import TRACIM_API_USER_LOGIN_HEADER
+from tracim_backend.lib.utils.authentication import TRACIM_API_KEY_HEADER
+from tracim_backend.lib.utils.authentication import TRACIM_API_USER_LOGIN_HEADER
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.sanitizer import HtmlSanitizer  # nopep8
 
@@ -120,7 +119,6 @@ class DecodedMail(object):
         return part
 
     def get_key(self) -> typing.Optional[str]:
-
         """
         key is the string contain in some mail header we need to retrieve.
         First try checking special header, them check 'to' header
@@ -148,7 +146,7 @@ class DecodedMail(object):
     def find_key_from_mail_address(
         cls, mail_address: str, pattern: str, marker_str: str
     ) -> typing.Optional[str]:
-        """ Parse mail_adress-like string
+        """Parse mail_adress-like string
         to retrieve key.
         :param mail_address: mail_adress like user+key@something / key@something
         :param pattern: pattern like user+{marker_str}@something
@@ -166,10 +164,12 @@ class DecodedMail(object):
                 if key.isalnum():
                     return key
                 logger.warning(
-                    cls, "key found {} is not alphanumeric, cannot retrieve value".format(key)
+                    cls,
+                    "key found {} is not alphanumeric, cannot retrieve value".format(key),
                 )
             logger.warning(
-                cls, "pattern {} does not match email address {} ".format(pattern, mail_address)
+                cls,
+                "pattern {} does not match email address {} ".format(pattern, mail_address),
             )
         return None
 
@@ -293,7 +293,10 @@ class MailFetcher(object):
             sleep_after_connection = True
             try:
                 imapc = imapclient.IMAPClient(
-                    self.host, self.port, ssl=self.use_ssl, timeout=MAIL_FETCHER_CONNECTION_TIMEOUT
+                    self.host,
+                    self.port,
+                    ssl=self.use_ssl,
+                    timeout=MAIL_FETCHER_CONNECTION_TIMEOUT,
                 )
                 imapc.login(self.user, self.password)
 
@@ -500,7 +503,10 @@ class MailFetcher(object):
                 logger.exception(self, log)
 
     def _get_auth_headers(self, user_email) -> dict:
-        return {TRACIM_API_KEY_HEADER: self.api_key, TRACIM_API_USER_LOGIN_HEADER: user_email}
+        return {
+            TRACIM_API_KEY_HEADER: self.api_key,
+            TRACIM_API_USER_LOGIN_HEADER: user_email,
+        }
 
     def _get_content_info(self, content_id, user_email):
         endpoint = "{api_base_url}contents/{content_id}".format(

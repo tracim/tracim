@@ -64,7 +64,7 @@
     "eslint": "^6.8.0",
     "eventsourcemock": "^2.0.0",
     "file-loader": "^6.0.0",
-    "i18next-scanner": "^2.10.2",
+    "i18next-scanner": "4.4.0",
     "ignore-styles": "^5.0.1",
     "isomorphic-fetch": "^2.2.1",
     "jsdom": "^15.1.1",
@@ -102,7 +102,6 @@
       "XMLHttpRequest",
       "Image",
       "FileReader",
-      "wysiwyg",
       "File",
       "ResizeObserver"
     ],

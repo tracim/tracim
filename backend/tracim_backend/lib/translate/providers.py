@@ -1,9 +1,8 @@
 from enum import Enum
-from io import BytesIO
-import typing
-
 from hapic.data import HapicFile
+from io import BytesIO
 from sqlalchemy.orm import Session
+import typing
 
 from tracim_backend.exceptions import TracimException
 from tracim_backend.lib.translate.services.systran import SystranTranslationService
@@ -41,7 +40,6 @@ class TranslationLib:
         self._config = config
 
     def get_translation_service(self) -> TranslationService:
-
         if self._config.TRANSLATION_SERVICE__PROVIDER == TranslationProvider.SYSTRAN:
             return SystranTranslationService(
                 api_url=self._config.TRANSLATION_SERVICE__SYSTRAN__API_URL,

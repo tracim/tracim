@@ -5,10 +5,6 @@ import classnames from 'classnames'
 import { DEFAULT_ROLE_LIST } from 'tracim_frontend_lib'
 import { store } from '../../store.js'
 
-import {
-  getUser
-} from '../../action-creator.async.js'
-
 const MentionWrapped = props => {
   return (
     <Provider store={store}>
@@ -20,7 +16,7 @@ const MentionWrapped = props => {
 const calculateUserMention = (props) => {
   const mention = {
     isToMe: false, // true: mention to me, false: mention to someone else
-    text: undefined // Text to display in the mention
+    text: 'UndefinedUser' // Text to display in the mention
   }
   const userId = Number(props.userid) // User id of the mention
 
@@ -31,15 +27,22 @@ const calculateUserMention = (props) => {
     return mention
   }
 
+  let user
+  user = props.knownMemberList.find(km => km.userId === userId)
+  if (user) {
+    mention.text = user.username
+    return mention
+  }
+
   // Fetch from current space
-  const user = props.currentWorkspace.memberList.find(m => m.id === userId)
+  user = props.currentWorkspace.memberList.find(m => m.id === userId)
   if (user) {
     mention.text = user.username
     return mention
   }
 
   // Fetch from other spaces
-  for (const space in props.workspaceList) {
+  for (const space of props.workspaceList) {
     const user = space.memberList.find(m => m.id === userId)
     if (user) {
       mention.text = user.username
@@ -47,18 +50,20 @@ const calculateUserMention = (props) => {
     }
   }
 
+  // DEPRECATED - CH - 2023-11-21 - I don't think this is doing anything since when the async function executes
+  // its callback, the parent function has already returned
   // Fetch from API (can't use async since it's used to render)
-  props.dispatch(getUser(userId)).then(
-    (response) => {
-      if (response.status === 200) {
-        const user = response.json
-        mention.text = user.username
-      }
-    },
-    (error) => {
-      console.error('Error in Mention.jsx, fetching from API went wrong: ', error.message)
-    }
-  )
+  // props.dispatch(getUser(userId)).then(
+  //   (response) => {
+  //     if (response.status === 200) {
+  //       const user = response.json
+  //       mention.text = user.username
+  //     }
+  //   },
+  //   (error) => {
+  //     console.error('Error in Mention.jsx, fetching from API went wrong: ', error.message)
+  //   }
+  // )
   return mention
 }
 
@@ -72,7 +77,7 @@ const calculateRoleMention = (props) => {
   const role = DEFAULT_ROLE_LIST.find(r => Number(r.id) === roleId)
 
   if (role) {
-    mention.text = role.slug
+    mention.text = props.t(role.slug)
   }
 
   // NOTE - MP - 2023-01-11 - So far we don't support other roles than `all`
@@ -121,9 +126,9 @@ export const Mention = props => {
 }
 
 const mapStateToProps = (
-  { currentWorkspace, system, user, workspaceList }
+  { currentWorkspace, system, user, workspaceList, knownMemberList }
 ) => (
-  { currentWorkspace, system, user, workspaceList }
+  { currentWorkspace, system, user, workspaceList, knownMemberList }
 )
 const ConnectedMention = translate()(connect(mapStateToProps)(Mention))
 

@@ -64,7 +64,7 @@ describe.skip('Scroll to active content when refreshing the page', () => {
           .type(userWithoutUsername.password)
 
         cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
-          .find('.loginpage__main__form__btnsubmit')
+          .find('.classicLoginAuthForm__btnsubmit')
           .click()
       })
 
@@ -127,7 +127,7 @@ describe.skip('Scroll to active content when refreshing the page', () => {
             .type(userWithoutUsername.password)
 
           cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
-            .find('.loginpage__main__form__btnsubmit')
+            .find('.classicLoginAuthForm__btnsubmit')
             .click()
 
           cy.get(usernamePopup).should('not.be.visible')
@@ -146,7 +146,7 @@ describe.skip('Scroll to active content when refreshing the page', () => {
           .type(userWithUsernamePassword)
 
         cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
-          .find('.loginpage__main__form__btnsubmit')
+          .find('.classicLoginAuthForm__btnsubmit')
           .click()
       })
       it('should not open the set username popup', function () {

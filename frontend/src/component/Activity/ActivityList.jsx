@@ -2,20 +2,23 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import {
-  CONTENT_NAMESPACE,
   BREADCRUMBS_TYPE,
+  CONTENT_NAMESPACE,
   CONTENT_TYPE,
-  IconButton,
   PAGE,
-  serialize,
-  SUBSCRIPTION_TYPE,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_ENTITY_TYPE as TLM_ET
+  TLM_ENTITY_TYPE as TLM_ET,
+  EmptyListMessage,
+  IconButton,
+  Loading,
+  serialize
 } from 'tracim_frontend_lib'
 import { serializeContentProps } from '../../reducer/workspaceContentList.js'
 import FeedItemWithPreview from '../../container/FeedItemWithPreview.jsx'
 import ContentWithoutPreviewActivity from './ContentWithoutPreviewActivity.jsx'
 import MemberActivity from './MemberActivity.jsx'
+import {
+  activityDisplayFilter
+} from '../../util/activity.js'
 
 require('./ActivityList.styl')
 
@@ -72,9 +75,6 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
   [TLM_ET.SHAREDSPACE_SUBSCRIPTION, (activity) => <MemberActivity activity={activity} key={activity.id} />],
   [TLM_ET.SHAREDSPACE, (activity) => <MemberActivity activity={activity} key={activity.id} />]
 ])
-const DISPLAYED_SUBSCRIPTION_STATE_LIST = [SUBSCRIPTION_TYPE.rejected.slug]
-const DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST = [TLM_CET.CREATED, TLM_CET.MODIFIED]
-
 const ActivityList = (props) => {
   const buildActivityBreadcrumbsList = (activity) => {
     const workspace = activity.newestMessage.fields.workspace
@@ -118,45 +118,13 @@ const ActivityList = (props) => {
     return <div className='activityList__item' data-cy='activityList__item' key={activity.id}>{component}</div>
   }
 
-  // FIXME - MB - 2021-05-26 - this code is duplicated for activityDisplayFilter, in withActivity
-  // See this ticket https://github.com/tracim/tracim/issues/4677
-
-  const isSubscriptionRequestOrRejection = (activity) => {
-    return (activity.entityType === TLM_ET.SHAREDSPACE_SUBSCRIPTION &&
-      DISPLAYED_SUBSCRIPTION_STATE_LIST.includes(activity.newestMessage.fields.subscription.state))
-  }
-
-  const isMemberCreatedOrModified = (activity) => {
-    const coreEventType = activity.newestMessage.event_type.split('.')[1]
-    return (activity.entityType === TLM_ET.SHAREDSPACE_MEMBER &&
-      DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST.includes(coreEventType))
-  }
-
-  const isNotPublicationOrInWorkspaceWithActivatedPublications = (activity) => {
-    if (activity.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION ||
-      !activity.newestMessage.fields.workspace) return true
-    const activityWorkspace = props.workspaceList.find(ws => ws.id === activity.newestMessage.fields.workspace.workspace_id)
-    if (!activityWorkspace) return true
-    return activityWorkspace.publicationEnabled
-  }
-
-  const isLoggedUserMember = (activity) => props.workspaceList.find(space => space.id === activity.newestMessage.fields.workspace.workspace_id)
-
-  const isActivityAnAttachedFileOnPublication = (activity) => activity.content
-    ? activity.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION && activity.content.content_type === CONTENT_TYPE.FILE
-    : false
-
-  const activityDisplayFilter = (activity) => {
-    return ENTITY_TYPE_COMPONENT_CONSTRUCTOR.has(activity.entityType) && !isActivityAnAttachedFileOnPublication(activity) &&
-      (
-        (activity.entityType === TLM_ET.CONTENT && isNotPublicationOrInWorkspaceWithActivatedPublications(activity)) ||
-        (isSubscriptionRequestOrRejection(activity) && isLoggedUserMember(activity)) ||
-        (isMemberCreatedOrModified(activity) && isLoggedUserMember(activity)) ||
-        (activity.entityType === TLM_ET.SHAREDSPACE && activity.newestMessage.fields.author.user_id !== props.userId)
-      )
-  }
-
-  const activityList = props.activity.list.filter(activityDisplayFilter).map(renderActivityComponent)
+  const activityList = props.activity.list.filter(
+    (activity) => activityDisplayFilter(
+      activity,
+      props.workspaceList,
+      props.userId
+    )
+  ).map(renderActivityComponent)
 
   return (
     <div className='activityList'>
@@ -175,7 +143,17 @@ const ActivityList = (props) => {
           ? activityList
           : (
             <div className='activityList__placeholder'>
-              {props.activity.hasNextPage ? props.t('Loading recent activities…') : props.t('No activity')}
+              {props.activity.hasNextPage ? (
+                <Loading
+                  height={100}
+                  text={props.t('Loading recent activities…')}
+                  width={100}
+                />
+              ) : (
+                <EmptyListMessage>
+                  {props.t('No activity')}
+                </EmptyListMessage>
+              )}
             </div>
           )
         )}

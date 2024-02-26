@@ -23,8 +23,6 @@
   "Board's name": "Nom du tableau",
   "This content is deleted": "Ce contenu est supprimé",
   "Restore": "Restaurer",
-  "Description": "Description",
-  "Value:": "Valeur :",
   "Last version": "Dernière version",
   "The content has been modified by {{author}}": "Le contenu a été modifié par {{author}}",
   "Add new column": "Ajouter une nouvelle colonne",
@@ -46,7 +44,6 @@
   "Tasks": "Tâches",
   "The link has been copied to clipboard": "Lien copié dans le presse-papiers",
   "Copy content link": "Copier le lien du contenu",
-  "Every members of the space": "",
-  "All": "",
-  "all": ""
+  "Description of the card": "Description de la carte",
+  "Open field:": "Champ libre :"
 }

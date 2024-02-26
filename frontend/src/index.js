@@ -15,7 +15,6 @@ import { history } from './util/helper.js'
 require('./css/index.styl')
 
 require('./util/appInterface.js')
-require('./util/tinymceInit.js')
 
 ReactDOM.render(
   <Provider store={store}>

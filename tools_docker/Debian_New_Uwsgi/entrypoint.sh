@@ -77,9 +77,20 @@ fi
 printenv |grep TRACIM > /var/tracim/data/tracim_env_variables || true
 # Add variable for using xvfb with uwsgi
 echo "DISPLAY=:99.0" >> /var/tracim/data/tracim_env_variables
+
+# FIXME - MP - 2023-03-22 - Create a file with every TRACIM environment variables
+# The difference with the `printenv` above is that it escapes the values
+# This creates two files: `tracim_env_variables` and `tracim_env_variables_cron` which should be
+# merged in one. See https://github.com/tracim/tracim/issues/6106#issuecomment-1479730122
+declare -x | grep TRACIM | cut -c12- > /var/tracim/data/tracim_env_variables_cron || true
+
 log "Ensuring www-data is the owner of /var/tracim files"
 find /var/tracim/ \( ! -user www-data -o ! -group www-data \) -exec chown www-data:www-data {} \;
 loggood "Ensuring www-data is the owner of /var/tracim files: success"
+
+log "[HACK - MP - 06-03-2023] Storing HEAD information in a file while finding a fix. See https://github.com/gitpython-developers/GitPython/issues/1016"
+cd /tracim && git rev-parse HEAD > revision.txt
+cd /
 
 log "Checking database"
 case "$DATABASE_TYPE" in
@@ -187,6 +198,8 @@ log "Restarting Apache2 service..."
 service apache2 restart
 loggood "Apache2 restarted"
 
+service cron start
+
 log "Run supervisord"
 supervisord -c "$docker_script_dir/supervisord_tracim.conf"
 # Activate daemon for reply by email
@@ -194,6 +207,25 @@ if [ "$REPLY_BY_EMAIL" = "1" ];then
     log "Starting mail fetcher"
     supervisorctl start tracim_mail_fetcher
 fi
+
+## Check running services
+REDIS_SERVICE_RUNNING=$(ps -ef | grep -v grep|grep "redis-server" | wc -l)
+if [ $REDIS_SERVICE_RUNNING = 0 ]; then
+    logerror "Redis service must be running."
+    exit 1
+fi
+PUSHPIN_SERVICE_RUNNING=$(ps -ef | grep -v grep|grep "pushpin" | wc -l)
+if [ $PUSHPIN_SERVICE_RUNNING = 0 ]; then
+    logerror "Pushpin service must be running."
+    exit 1
+fi
+ZURL_SERVICE_RUNNING=$(ps -ef | grep -v grep|grep "zurl" | wc -l)
+if [ $ZURL_SERVICE_RUNNING = 0 ]; then
+    logerror "Zurl service must be running."
+    exit 1
+fi
+
+
 # Start tracim
 log "start uwsgi"
 set +e

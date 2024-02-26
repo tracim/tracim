@@ -8,7 +8,6 @@ import {
   buildContentPathBreadcrumbs,
   CONTENT_NAMESPACE,
   CONTENT_TYPE,
-  DEFAULT_ROLE_LIST,
   handleClickCopyLink,
   handleFetchResult,
   PAGE,
@@ -113,9 +112,7 @@ export class Thread extends React.Component {
   handleAllAppChangeLanguage = data => {
     const { props } = this
     console.log('%c<Thread> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
-    props.appContentCustomEventHandlerAllAppChangeLanguage(
-      data, this.setState.bind(this), i18n, this.state.timelineWysiwyg, this.handleChangeNewComment
-    )
+    props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n)
   }
 
   // TLM Handlers
@@ -250,8 +247,7 @@ export class Thread extends React.Component {
     const { props, state } = this
     await props.appContentSaveNewCommentText(
       state.content,
-      comment,
-      state.config.slug
+      comment
     )
     await props.appContentSaveNewCommentFileList(
       this.setState.bind(this),
@@ -440,7 +436,7 @@ export class Thread extends React.Component {
                 allowClickOnRevision={false}
                 availableStatusList={state.config.availableStatuses}
                 canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
-                codeLanguageList={state.config.system.config.code_languages}
+                codeLanguageList={state.config.system.config.ui__notes__code_sample_languages}
                 customClass={`${state.config.slug}__contentpage`}
                 customColor={color}
                 deprecatedStatus={state.config.availableStatuses[3]}
@@ -461,7 +457,6 @@ export class Thread extends React.Component {
                 onClickRestoreDeleted={this.handleClickRestoreDelete}
                 onClickRevisionBtn={() => { }}
                 onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
-                roleList={DEFAULT_ROLE_LIST}
                 shouldScrollToBottom
               />
             ) : null}

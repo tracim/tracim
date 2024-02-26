@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import currentWorkspace, {
-  serializeMember,
+  serializeUserRole,
   serializeSidebarEntryProps,
   serializeWorkspace
 } from '../../../src/reducer/currentWorkspace.js'
@@ -11,31 +11,30 @@ import {
   deleteWorkspaceContentList,
   FOLDER_READ,
   REMOVE,
-  removeWorkspaceMember,
+  removeUserRole,
   removeWorkspaceReadStatus,
   SET,
   setWorkspaceAgendaUrl,
   setWorkspaceContentRead,
   setWorkspaceDetail,
-  setWorkspaceMemberList,
+  setUserRoleList,
   setWorkspaceReadStatusList,
   UPDATE,
   updateUser,
-  updateUserWorkspaceSubscriptionNotif,
   updateWorkspaceContentList,
   updateWorkspaceDetail,
-  updateWorkspaceMember,
+  updateUserRole,
   addWorkspaceReadStatus,
-  USER,
-  USER_WORKSPACE_DO_NOTIFY,
   WORKSPACE_AGENDA_URL,
   WORKSPACE_CONTENT,
   WORKSPACE_DETAIL,
-  WORKSPACE_MEMBER,
-  WORKSPACE_MEMBER_LIST,
+  USER_ROLE,
+  SET_USER_ROLE_LIST,
   WORKSPACE_READ_STATUS,
   WORKSPACE_READ_STATUS_LIST,
-  WORKSPACE_CONTENT_SHARE_FOLDER
+  WORKSPACE_CONTENT_SHARE_FOLDER,
+  REMOVE_USER_ROLE,
+  UPDATE_USER
 } from '../../../src/action-creator.sync.js'
 import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
 import { globalManagerAsMember, globalManagerAsMemberFromApi } from '../../fixture/user/globalManagerAsMember.js'
@@ -51,27 +50,26 @@ describe('reducer currentWorkspace.js', () => {
       it('should return an object (in camelCase)', () => {
         expect(rez).to.deep.equal({
           accessType: firstWorkspaceFromApi.access_type,
-          defaultRole: firstWorkspaceFromApi.default_user_role,
-          id: firstWorkspaceFromApi.workspace_id,
-          slug: firstWorkspaceFromApi.slug,
-          label: firstWorkspaceFromApi.label,
-          description: firstWorkspaceFromApi.description,
           agendaEnabled: firstWorkspaceFromApi.agenda_enabled,
+          defaultRole: firstWorkspaceFromApi.default_user_role,
+          description: firstWorkspaceFromApi.description,
           downloadEnabled: firstWorkspaceFromApi.public_download_enabled,
-          uploadEnabled: firstWorkspaceFromApi.public_upload_enabled,
-          publicationEnabled: firstWorkspaceFromApi.publication_enabled
+          id: firstWorkspaceFromApi.workspace_id,
+          label: firstWorkspaceFromApi.label,
+          publicationEnabled: firstWorkspaceFromApi.publication_enabled,
+          slug: firstWorkspaceFromApi.slug,
+          uploadEnabled: firstWorkspaceFromApi.public_upload_enabled
         })
       })
     })
 
-    describe('serializeMember()', () => {
-      const rez = serializeMember(globalManagerAsMemberFromApi)
+    describe('serializeUserRole()', () => {
+      const rez = serializeUserRole(globalManagerAsMemberFromApi)
       it('should return an object (in camelCase)', () => {
         expect(rez).to.deep.equal({
           id: globalManagerAsMemberFromApi.user.user_id,
           publicName: globalManagerAsMemberFromApi.user.public_name,
           role: globalManagerAsMemberFromApi.role,
-          doNotify: globalManagerAsMemberFromApi.do_notify,
           username: globalManagerAsMemberFromApi.user.username,
           hasAvatar: true,
           hasCover: false
@@ -81,7 +79,7 @@ describe('reducer currentWorkspace.js', () => {
   })
 
   describe('actions', () => {
-    const initialState = { id: 42, dummyProperty: 'nothing' }
+    const initialState = { id: 42, dummyProperty: 'nothing', memberList: [{ id: 1 }] }
 
     it('should return the initial state when no action given', () => {
       const rez = currentWorkspace(initialState, { type: 'nothing that will match', action: {} })
@@ -119,23 +117,23 @@ describe('reducer currentWorkspace.js', () => {
       })
     })
 
-    describe(`${SET}/${WORKSPACE_MEMBER_LIST}`, () => {
-      const rez = currentWorkspace(initialState, setWorkspaceMemberList([globalManagerAsMemberFromApi]))
+    describe(SET_USER_ROLE_LIST, () => {
+      const rez = currentWorkspace(initialState, setUserRoleList([globalManagerAsMemberFromApi]))
 
       it('should return a workspace object with a proper members list', () => {
         expect(rez).to.deep.equal({
           ...initialState,
-          memberList: [serializeMember(globalManagerAsMemberFromApi)]
+          memberList: [serializeUserRole(globalManagerAsMemberFromApi)]
         })
       })
     })
 
-    describe(`${ADD}/${WORKSPACE_MEMBER}`, () => {
+    describe(`${ADD}/${USER_ROLE}`, () => {
       const randomMember = {
         id: 15,
         publicName: 'random user',
         role: ROLE.reader.slug,
-        doNotify: true,
+        emailNotificationType: 'summary',
         username: 'random'
       }
       const initialStateWithMember = { ...initialState, memberList: [randomMember] }
@@ -145,7 +143,7 @@ describe('reducer currentWorkspace.js', () => {
           addWorkspaceMember(
             globalManagerFromApi,
             initialState.id,
-            { role: ROLE.workspaceManager.slug, do_notify: true }
+            { role: ROLE.workspaceManager.slug, email_notification_type: 'summary' }
           )
         )
 
@@ -153,7 +151,7 @@ describe('reducer currentWorkspace.js', () => {
           ...initialState,
           memberList: [
             randomMember,
-            serializeMember(globalManagerAsMemberFromApi)
+            serializeUserRole(globalManagerAsMemberFromApi)
           ]
         })
       })
@@ -172,11 +170,15 @@ describe('reducer currentWorkspace.js', () => {
       })
     })
 
-    describe(`${UPDATE}/${WORKSPACE_MEMBER}`, () => {
+    describe(`${UPDATE}/${USER_ROLE}`, () => {
       const initialStateWithMember = { ...initialState, memberList: [globalManagerAsMember] }
       const rez = currentWorkspace(
         initialStateWithMember,
-        updateWorkspaceMember(globalManagerFromApi, initialState.id, { role: ROLE.contributor.slug, do_notify: true })
+        updateUserRole(
+          globalManagerFromApi, initialState.id, {
+            role: ROLE.contributor.slug, email_notification_type: 'summary'
+          }
+        )
       )
       it('should return a workspace object with the member global manager as contributor', () => {
         expect(rez).to.deep.equal({
@@ -189,33 +191,16 @@ describe('reducer currentWorkspace.js', () => {
       })
     })
 
-    describe(`${REMOVE}/${WORKSPACE_MEMBER}`, () => {
+    describe(REMOVE_USER_ROLE, () => {
       const initialStateWithMember = { ...initialState, memberList: [globalManagerAsMember] }
       const rez = currentWorkspace(
         initialStateWithMember,
-        removeWorkspaceMember(globalManagerAsMember.id, initialState.id)
+        removeUserRole(globalManagerAsMember.id, initialState.id)
       )
       it('should return a workspace object with an empty member list', () => {
         expect(rez).to.deep.equal({
           ...initialStateWithMember,
           memberList: []
-        })
-      })
-    })
-
-    describe(`${UPDATE}/${USER_WORKSPACE_DO_NOTIFY}`, () => {
-      const initialStateWithMember = { ...initialState, memberList: [{ ...globalManagerAsMember, doNotify: true }] }
-      const rez = currentWorkspace(
-        initialStateWithMember,
-        updateUserWorkspaceSubscriptionNotif(globalManagerAsMember.id, initialState.id, false)
-      )
-      it('should return a workspace object with the member as notification disabled', () => {
-        expect(rez).to.deep.equal({
-          ...initialStateWithMember,
-          memberList: [{
-            ...globalManagerAsMember,
-            doNotify: false
-          }]
         })
       })
     })
@@ -460,12 +445,11 @@ describe('reducer currentWorkspace.js', () => {
       })
     })
 
-    describe(`${UPDATE}/${USER}`, () => {
+    describe(UPDATE_USER, () => {
       const newInitialState = {
         ...initialState,
         memberList: [{
-          ...serializeMember(globalManagerAsMemberFromApi),
-          doNotify: false
+          ...serializeUserRole(globalManagerAsMemberFromApi)
         }]
       }
       const rez = currentWorkspace(newInitialState, updateUser({ ...globalManagerFromApi, username: 'newUsername' }))
@@ -474,7 +458,6 @@ describe('reducer currentWorkspace.js', () => {
           ...newInitialState,
           memberList: [{
             ...globalManagerAsMember,
-            doNotify: false,
             username: 'newUsername'
           }]
         })

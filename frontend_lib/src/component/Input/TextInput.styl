@@ -1,6 +1,6 @@
 @import '../../css/Variable.styl'
 
-.textinput__box
+.textInputComponent
   position relative
   display flex
   border-radius standardBorderRadius
@@ -8,21 +8,19 @@
   background-color offWhite
   &:focus-within
     border 1px solid lightBlue
-
-.textinput__icon
-  color grey
-  margin-top auto
-  margin-bottom auto
-  top 0
-  bottom 0
-  right standardSpacing
-  height 1em
-
-.textinput__text
-  border none
-  flex 1
-  font-size standardFontSize
-  &:focus
-    box-shadow 0 0 0 0
-    border 0 none
-    outline 0
+  &__icon
+    color grey
+    margin-top auto
+    margin-bottom auto
+    top 0
+    bottom 0
+    right standardSpacing
+    height 1em
+  &__text
+    border none
+    flex 1
+    font-size standardFontSize
+    &:focus
+      box-shadow 0 0 0 0
+      border 0 none
+      outline 0

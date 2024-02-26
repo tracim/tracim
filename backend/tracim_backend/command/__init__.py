@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 import argparse
 from argparse import Namespace
-import logging
-import sys
-from typing import Any
-from typing import List
-
 from cliff.app import App
 from cliff.command import Command
 from cliff.commandmanager import CommandManager
+import logging
 from pyramid.paster import bootstrap
 from pyramid.paster import setup_logging
+import sys
 import transaction
+from typing import Any
+from typing import List
 
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import DEFAULT_TRACIM_CONFIG_FILE
@@ -81,7 +80,6 @@ class AppContextCommand(Command):
 
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super(AppContextCommand, self).get_parser(prog_name)
-
         parser.add_argument(
             "-c",
             "--config",

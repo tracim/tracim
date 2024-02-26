@@ -32,7 +32,8 @@ You need to use your username/password like in standard basic auth. See [rfc7616
 As a resume, the standard is to base64-encode username and password in `Authorization` header.
 
 #### With httpie
-```
+
+```bash
 $ http -a admin@admin.admin:admin@admin.admin GET http://127.0.0.1:6543/api/auth/whoami
 HTTP/1.1 200 OK
 Content-Length: 276
@@ -57,7 +58,8 @@ Set-Cookie:  session_key=22fd293b6d850faabc8e3f167bcfc804d8713deed03bc15e5029434
 ```
 
 #### With CURL
-```
+
+```bash
 $ curl -i -u admin@admin.admin:admin@admin.admin http://127.0.0.1:6543/api/auth/whoami
 HTTP/1.1 200 OK
 Date: Mon, 22 Aug 2022 09:16:23 GMT
@@ -81,13 +83,14 @@ Transfer-Encoding: chunked
     "user_id": 1
 }
 ```
+
 ### Api-Key
 
 You need to set 2 custom headers: `Tracim-Api-Key` with a correct API key and `Tracim-Api-Login` with a valid user login.
 
 The Api-Key will make the authentication/authorization while the Login will allow to exec a command "as a sudoer".
 
-```
+```bash
 $ http GET http://127.0.0.1:6543/api/auth/whoami Tracim-Api-Key:changethisnow! Tracim-Api-Login:admin@admin.admin
 HTTP/1.1 200 OK
 Content-Length: 276
@@ -115,7 +118,7 @@ Set-Cookie:  session_key=50307c9007fff16791f660eed14d47a33cf11eef365b3e0403ce42f
 
 You need to send a json with `email` and `password` fields:
 
-```  
+```  bash
 $ http POST http://127.0.0.1:6543/api/auth/login email=admin@admin.admin password=admin@admin.admin
 HTTP/1.1 200 OK
 Content-Length: 276
@@ -141,7 +144,7 @@ Set-Cookie:  session_key=92504e7310aa6433b523405591a9785e056927dab15e49f7c3204ae
 
 Then you need to send cookie using `Cookie` header like any browser do in order to have a temporary access.
 
-```
+```bash
 $ http GET http://127.0.0.1:6543/api/auth/whoami Cookie:" session_key=92504e7310aa6433b523405591a9785e056927dab15e49f7c3204aed88ccc35a70761638"
 HTTP/1.1 200 OK
 Content-Length: 276
@@ -169,7 +172,7 @@ Set-Cookie:  session_key=978301c4058de0646a4c6acf55a2b28b102b297f590edf75ffec429
 
 The Tracim API returns explicit errors when fields are incorrectly filled:
 
-```
+```bash
 $ http POST  http://127.0.0.1:6543/api/auth/login
 HTTP/1.1 400 Bad Request
 Content-Length: 169

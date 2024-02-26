@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-
 from depot.fields.upload import UploadedFile
 from freezegun import freeze_time
 import pytest
@@ -182,7 +181,6 @@ class TestContent(object):
     def test_unit__delete_revision__ok__with_unsafe_context(
         self, admin_user, session, content_type_list
     ):
-
         with unprotected_content_revision(session) as unsafe_session:
             workspace = Workspace(label="TEST_WORKSPACE_1", owner=admin_user)
             unsafe_session.add(workspace)
@@ -209,7 +207,7 @@ class TestContent(object):
     def test_unit__content_depot_file__ok__nominal_case(
         self, admin_user, session, content_type_list
     ):
-        """ Depot file access thought content property methods. """
+        """Depot file access thought content property methods."""
         workspace = Workspace(label="TEST_WORKSPACE_1", owner=admin_user)
         session.add(workspace)
         session.flush()

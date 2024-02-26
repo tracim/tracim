@@ -1,6 +1,5 @@
-from io import BytesIO
-
 from PIL import Image
+from io import BytesIO
 import pytest
 
 from tracim_backend.lib.utils.image_process import ImageRatio

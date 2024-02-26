@@ -7,9 +7,9 @@ This folder is the frontend part of Tracim.
 
 ### Production
 
-Its installation and building are respectively handled by [install_frontend_dependencies.sh](../../install_frontend_dependencies.sh) and [build_full_frontend.sh](../../build_full_frontend.sh).
+Its installation and building are respectively handled by [install_frontend_dependencies.sh](../install_frontend_dependencies.sh) and [build_full_frontend.sh](../build_full_frontend.sh).
 
-See [README.md](../../README.md) at the root of the repository.
+See [README.md](../README.md) at the root of the repository.
 
 
 ### Development
@@ -31,8 +31,8 @@ It uses a proxy for the api and pushpin so that there is nothing more to configu
 ## Linting and translation
 Before pushing changes to this folder, you must:
 
-see [frontend/doc/before_push.md](../frontend/doc/before_push.md)
+see [doc/frontend/before_push.md](../doc/frontend/before_push.md)
 
 ## Other available yarn scripts
 
-see [frontend/doc/yarn_scripts.md](../frontend/doc/yarn_scripts.md)
+see [doc/frontend/yarn_scripts.md](../doc/frontend/yarn_scripts.md)

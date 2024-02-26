@@ -1,6 +1,5 @@
-import typing
-
 import pytest
+import typing
 
 from tracim_backend import CFG
 from tracim_backend.applications.collaborative_document_edition.lib import (
@@ -37,7 +36,9 @@ class CollaborativeDocumentEditionLibForTest(CollaborativeDocumentEditionLib):
     ):
         super().__init__(config=config, current_user=current_user, session=session)
 
-    def _get_supported_file_types(self) -> typing.List[CollaborativeDocumentEditionFileType]:
+    def _get_supported_file_types(
+        self,
+    ) -> typing.List[CollaborativeDocumentEditionFileType]:
         return [foo_file_type, bar_file_type]
 
 

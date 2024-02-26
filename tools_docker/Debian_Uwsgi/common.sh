@@ -56,6 +56,7 @@ if [ ! -f /etc/tracim/development.ini ]; then
     sed -i "s|^; email.notification.upload_permission_to_emitter.template.html = .*|email.notification.upload_permission_to_emitter.template.html = %(email.template_dir)s/upload_permission_to_emitter_body_html.mak|g" /etc/tracim/development.ini
     sed -i "s|^; email.notification.upload_permission_to_receiver.template.html = .*|email.notification.upload_permission_to_receiver.template.html = %(email.template_dir)s/upload_permission_to_receiver_body_html.mak|g" /etc/tracim/development.ini
     sed -i "s|^; email.notification.new_upload_event.template.html = .*|email.notification.new_upload_event.template.html = %(email.template_dir)s/new_upload_event_body_html.mak|g" /etc/tracim/development.ini
+    sed -i "s|^; email.notification.summary.template.html = .*|email.notification.summary.template.html = %(email.template_dir)s/summary_body_html.mak|g" /etc/tracim/development.ini
     sed -i "s|^; email.template_dir =.*|email.template_dir = /tracim/backend/tracim_backend/templates/mail|g" /etc/tracim/development.ini
     sed -i "s|^; email.reply.lockfile_path = .*|email.reply.lockfile_path = /var/tracim/data/email_fetcher.lock|g" /etc/tracim/development.ini
     sed -i "s|^; webdav.base_url = .*|webdav.base_url = http://${tracim_web_internal_listen}|g" /etc/tracim/development.ini
@@ -109,6 +110,21 @@ fi
 # Create pushpin route file
 echo "* ${tracim_web_internal_listen}" > /etc/pushpin/routes
 
+# Create summary mails cron job
+if [ ! -f /etc/tracim/cron_task_tracim_send_summary_mails ]; then
+    cp /tracim/tools_docker/Debian_Uwsgi/cron_task_tracim_send_summary_mails /etc/tracim/cron_task_tracim_send_summary_mails
+fi
+if [ ! -L /etc/cron.d/cron_task_tracim_send_summary_mails ]; then
+    ln -s /etc/tracim/cron_task_tracim_send_summary_mails /etc/cron.d/cron_task_tracim_send_summary_mails
+fi
+# Create script run by the cronjob
+if [ ! -f /etc/tracim/send_summary_mails.sh ]; then
+    cp /tracim/tools_docker/Debian_Uwsgi/send_summary_mails.sh.sample /etc/tracim/send_summary_mails.sh
+    chmod 755 /etc/tracim/send_summary_mails.sh
+    sed -i "s|<PATH TO tracimcli>|/usr/local/bin/tracimcli|g" /etc/tracim/send_summary_mails.sh
+    sed -i "s|<PATH TO development.ini>|/etc/tracim/development.ini|g" /etc/tracim/send_summary_mails.sh
+fi
+
 # Create and link branding directory if it does not exist
 if [ ! -d /etc/tracim/branding ]; then
     cp -r /tracim/frontend/dist/assets/branding.sample /etc/tracim/branding
@@ -150,6 +166,7 @@ if [ ! -d /var/tracim/logs ]; then
     touch /var/tracim/logs/pushpin/pushpin-handler.log
     touch /var/tracim/logs/pushpin/pushpin-proxy.log
     touch /var/tracim/logs/zurl.log
+    touch /var/tracim/logs/cron_task_tracim_send_summary_mails.log
     chown www-data:www-data -R /var/tracim/logs
     chmod 775 -R /var/tracim/logs
 fi
@@ -195,6 +212,7 @@ create_log_symlink /var/tracim/logs/pushpin/mongrel2_7999.log /var/log/mongrel2_
 create_log_symlink /var/tracim/logs/pushpin/pushpin-handler.log /var/log/pushpin-handler.log
 create_log_symlink /var/tracim/logs/pushpin/pushpin-proxy.log /var/log/pushpin-proxy.log
 create_log_symlink /var/tracim/logs/zurl.log /var/log/zurl.log
+create_log_symlink /var/tracim/logs/cron_task_tracim_send_summary_mails.log /var/log/cron_task_tracim_send_summary_mails.log
 
 # Modify default log path for Pushpin, Redis, Zurl (since Tracim 3.0.0)
 sed -i "s|^logdir=.*|logdir=/var/tracim/logs/pushpin/|g" /etc/pushpin/pushpin.conf

@@ -5,7 +5,6 @@ import classnames from 'classnames'
 import {
   APP_FEATURE_MODE,
   CONTENT_TYPE,
-  DEFAULT_ROLE_LIST,
   LOCAL_STORAGE_FIELD,
   TRANSLATION_STATE,
   ConfirmPopup,
@@ -150,6 +149,7 @@ export const HtmlDocument = props => {
             confirmIcon='fas fa-fw fa-edit'
             cancelLabel={props.t('Validate anyway')}
             cancelIcon='fas fa-fw fa-check'
+            customColor={props.customColor}
           />
         )}
 
@@ -158,24 +158,27 @@ export const HtmlDocument = props => {
             <>
               <TinyEditor
                 apiUrl={props.apiUrl}
-                codeLanguageList={[]}
+                setContent={updateTextToEdit}
+                // End of required props ///////////////////////////////////////////////
+                codeLanguageList={props.codeLanguageList}
                 content={textToEdit}
-                onCtrlEnterEvent={props.onClickValidateBtn}
                 height='100%'
                 isAdvancedEdition
-                roleList={DEFAULT_ROLE_LIST}
-                setContent={updateTextToEdit}
+                isAutoResizeEnabled={false}
+                isStatusBarEnabled
+                language={props.lang}
+                onCtrlEnterEvent={props.onClickValidateBtn}
                 spaceId={props.workspaceId}
                 userList={props.memberList}
               />
 
-              <div className={`${props.customClass}__button editionmode__button`}>
+              <div className={`${props.customClass}__editionmode__button`}>
                 <IconButton
                   color={props.customColor}
-                  customClass={`${props.customClass}__cancel editionmode__button__cancel`}
+                  customClass={`${props.customClass}__editionmode__cancel`}
                   icon='fas fa-times'
                   intent='secondary'
-                  key='TextAreaApp__cancel'
+                  key='TinyEditor__cancel'
                   onClick={props.onClickCloseEditMode}
                   tabIndex='1'
                   text={props.t('Cancel')}
@@ -183,12 +186,12 @@ export const HtmlDocument = props => {
 
                 <IconButton
                   color={props.customColor}
-                  customClass={`${props.customClass}__submit editionmode__button__submit`}
+                  customClass={`${props.customClass}__editionmode__submit`}
                   dataCy='editionmode__button__submit'
                   disabled={props.disableValidateBtn(textToEdit)}
                   icon='fas fa-check'
                   intent='primary'
-                  key='TextAreaApp__validate'
+                  key='TinyEditor__validate'
                   mode='light'
                   onClick={() => props.onClickValidateBtn(textToEdit)}
                   text={props.t('Validate')}
@@ -207,8 +210,10 @@ export default translate()(HtmlDocument)
 HtmlDocument.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   workspaceId: PropTypes.number.isRequired,
+  codeLanguageList: PropTypes.array,
   contentId: PropTypes.number,
   contentType: PropTypes.string,
+  customClass: PropTypes.string,
   customColor: PropTypes.string,
   disableValidateBtn: PropTypes.func,
   displayNotifyAllMessage: PropTypes.bool,
@@ -241,8 +246,10 @@ HtmlDocument.propTypes = {
 }
 
 HtmlDocument.defaultProps = {
+  codeLanguageList: [],
   contentId: 0,
   contentType: CONTENT_TYPE.HTML_DOCUMENT,
+  customClass: 'html-document',
   customColor: '#252525',
   deprecatedStatus: {
     faIcon: ''

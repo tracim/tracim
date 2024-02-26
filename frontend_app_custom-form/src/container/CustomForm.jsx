@@ -3,7 +3,6 @@ import CustomFormComponent from '../component/CustomFormComponent.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
-  DEFAULT_ROLE_LIST,
   buildContentPathBreadcrumbs,
   handleFetchResult,
   PopinFixed,
@@ -145,18 +144,18 @@ class CustomForm extends React.Component {
       await this.loadContent()
       buildContentPathBreadcrumbs(state.config.apiUrl, state.content, props)
       // tinymce.remove('#wysiwygNewVersion')
-      wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
+      // wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
     }
 
     if (state.mode === MODE.EDIT && prevState.mode !== MODE.EDIT) {
       // tinymce.remove('#wysiwygNewVersion')
-      wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
+      // wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
     }
   }
 
   componentWillUnmount () {
     console.log('%c<CustomForm> will Unmount', `color: ${this.state.config.hexcolor}`)
-    tinymce.remove('#wysiwygTimelineComment')
+    // tinymce.remove('#wysiwygTimelineComment')
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
@@ -630,7 +629,6 @@ class CustomForm extends React.Component {
               onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
               onClickWysiwygBtn={this.handleToggleWysiwyg}
               onClickRevisionBtn={this.handleClickShowRevision}
-              roleList={DEFAULT_ROLE_LIST}
               shouldScrollToBottom={mode !== MODE.REVISION}
             />
           ) : null}

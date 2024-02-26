@@ -1,6 +1,5 @@
-import time
-
 import pytest
+import time
 
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.rq import RqQueueName
@@ -19,7 +18,6 @@ def get_public_name(user_id: int) -> str:
 @pytest.mark.timeout(45)
 @pytest.mark.usefixtures("base_fixture")
 class TestRQDatabaseWorker(object):
-
     JOB_EXECUTION_TIMEOUT = 30
 
     def test_unit__submit_job__OK_nominal_case(

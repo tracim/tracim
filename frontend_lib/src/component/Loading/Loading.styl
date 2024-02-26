@@ -1,4 +1,27 @@
-.loading
-    display flex
-    align-items center
-    flex-direction column
+@import '../../css/Variable.styl'
+
+.loader
+  display flex
+  align-items center
+  flex-direction column
+  height 100vh
+  &__spinner
+    animation rotation 1s linear infinite
+    border 5px solid offBlack
+    border-bottom-color transparent
+    border-radius 50%
+    box-sizing border-box
+    display inline-block
+    margin-top auto
+  &__text
+    margin-bottom auto
+    margin-top standardSpacing
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

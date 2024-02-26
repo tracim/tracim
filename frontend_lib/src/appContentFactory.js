@@ -13,7 +13,6 @@ import {
   CONTENT_TYPE,
   permissiveNumberEqual,
   getOrCreateSessionClientToken,
-  tinymceRemove,
   addRevisionFromTLM,
   stringIncludes
 } from './helper.js'
@@ -52,7 +51,7 @@ import {
   getFavoriteContentList,
   getFileChildContent,
   getMyselfKnownContents,
-  getSpaceMemberList,
+  getSpaceUserRoleList,
   getTemplateList,
   getToDoList,
   postContentToFavoriteList,
@@ -354,21 +353,16 @@ export function appContentFactory (WrappedComponent) {
 
     // INFO - CH - 2019-01-08 - event called by OpenContentApp in case of opening another app feature
     appContentCustomEventHandlerHideApp = setState => {
-      tinymceRemove('#wysiwygTimelineComment')
       setState({
-        isVisible: false,
-        timelineWysiwyg: false
+        isVisible: false
       })
     }
 
     // CH - 2019-31-12 - This event is used to send a new content_id that will trigger data reload through componentDidUpdate
     appContentCustomEventHandlerReloadContent = (newContent, setState, appSlug) => {
-      tinymceRemove('#wysiwygTimelineComment')
-
       setState(prev => ({
         content: { ...prev.content, ...newContent },
         isVisible: true,
-        timelineWysiwyg: false,
         newComment: prev.content.content_id === newContent.content_id
           ? prev.newComment
           : getLocalStorageItem(
@@ -386,13 +380,7 @@ export function appContentFactory (WrappedComponent) {
       loadTimeline()
     }
 
-    // INFO - 2019-01-09 - if param isTimelineWysiwyg is false, param changeNewCommentHandler isn't required
-    appContentCustomEventHandlerAllAppChangeLanguage = (newLang, setState, i18n, isTimelineWysiwyg, changeNewCommentHandler = null) => {
-      if (isTimelineWysiwyg) {
-        tinymceRemove('#wysiwygTimelineComment')
-        globalThis.wysiwyg('#wysiwygTimelineComment', newLang, changeNewCommentHandler)
-      }
-
+    appContentCustomEventHandlerAllAppChangeLanguage = (newLang, setState, i18n) => {
       setState(prev => ({
         loggedUser: {
           ...prev.loggedUser,
@@ -563,8 +551,12 @@ export function appContentFactory (WrappedComponent) {
       )
     }
 
-    appContentSaveNewCommentText = async (content, newComment, appSlug) => {
+    appContentSaveNewCommentText = async (content, newComment) => {
       this.checkApiUrl()
+
+      if (newComment === '') {
+        return { apiResponse: { status: 400 }, body: { code: 2003 } }
+      }
 
       const contentToSend = Autolinker.link(newComment, { stripPrefix: false })
 
@@ -762,11 +754,11 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
-    appContentNotifyAll = (content, setState, appSlug) => {
+    appContentNotifyAll = (content) => {
       const comment = i18n.t('Please notice that I did an important update on this content.')
       const commentWithMention = `<html-mention roleid="0"></html-mention> ${comment}`
 
-      this.appContentSaveNewCommentText(content, commentWithMention, appSlug)
+      this.appContentSaveNewCommentText(content, commentWithMention)
     }
 
     buildTimelineItemComment = (content, loggedUser, initialCommentTranslationState) => ({
@@ -984,7 +976,7 @@ export function appContentFactory (WrappedComponent) {
       } else {
         autoCompleteItemList = getMatchingGroupMentionList(keyword)
         const fetchSpaceMemberList = await handleFetchResult(
-          await getSpaceMemberList(this.apiUrl, workspaceId)
+          await getSpaceUserRoleList(this.apiUrl, workspaceId)
         )
 
         const includesKeyword = stringIncludes(keyword)

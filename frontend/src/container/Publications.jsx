@@ -8,7 +8,6 @@ import {
   CONTENT_NAMESPACE,
   CONTENT_TYPE,
   CUSTOM_EVENT,
-  DEFAULT_ROLE_LIST,
   NUMBER_RESULTS_BY_PAGE,
   PAGE,
   ROLE_LIST,
@@ -19,6 +18,7 @@ import {
   TLM_SUB_TYPE as TLM_ST,
   TRANSLATION_STATE,
   CommentArea,
+  CardPopupCreateContent,
   EditCommentPopup,
   EmptyListMessage,
   IconButton,
@@ -101,6 +101,11 @@ export class Publications extends React.Component {
       newCurrentPublication: !!this.props.match.params.idcts,
       isLastItemAddedFromCurrentToken: false,
       invalidMentionList: [],
+      showPublicationTitlePopup: false,
+      publication: '',
+      newPublicationTitle: '',
+      commentReset: () => {},
+      publicationAsFileList: [],
       showEditPopup: false,
       showReorderButton: false
     }
@@ -181,6 +186,37 @@ export class Publications extends React.Component {
         props.dispatch(newFlashMessage(props.t('Unknown content')))
         break
     }
+  }
+
+  handleChangeNewPublicationTitle = e => {
+    this.setState({ newPublicationTitle: e.target.value })
+  }
+
+  handleTogglePublicationTitlePopup = (publication, publicationAsFileList, commentReset = undefined) => {
+    const { state } = this
+
+    const fakeEvent = { target: { value: '' } }
+    this.handleChangeNewPublicationTitle(fakeEvent)
+    this.setState(prev => ({
+      showPublicationTitlePopup: !prev.showPublicationTitlePopup,
+      publication: publication,
+      publicationAsFileList: publicationAsFileList,
+      commentReset: commentReset || state.commentReset
+    }))
+    // INFO - M.L - 2024-01-02 - Returning false so the reset mechanism of the CommentArea is not triggered early
+    return false
+  }
+
+  handleClickValidatePublicationTitle = async () => {
+    const { state } = this
+    this.handleSaveThreadPublication(state.publication, state.publicationAsFileList)
+    state.commentReset()
+    this.setState({
+      showPublicationTitlePopup: false,
+      publication: '',
+      publicationAsFileList: [],
+      commentReset: () => {}
+    })
   }
 
   handleContentCommentDeleted = (data) => {
@@ -399,12 +435,28 @@ export class Publications extends React.Component {
   }
 
   handleSaveThreadPublication = async (publication, publicationAsFileList) => {
-    const { props } = this
+    const { props, state } = this
 
     const spaceId = props.currentWorkspace.id
-    const publicationName = this.buildPublicationName(props.user.publicName, props.user.lang)
+    let title = `${state.newPublicationTitle} - ${this.buildPublicationName(props.user.publicName, props.user.lang)}`
+    if (state.newPublicationTitle === '') {
+      title = this.buildPublicationName(props.user.publicName, props.user.lang)
+    }
+    const fetchPostPublication = await props.dispatch(postThreadPublication(spaceId, title))
 
-    const fetchPostPublication = await props.dispatch(postThreadPublication(spaceId, publicationName))
+    switch (fetchPostPublication.status) {
+      case 200:
+        break
+      case 400:
+        switch (fetchPostPublication.json.code) {
+          case 3002:
+            props.dispatch(newFlashMessage(`${props.t('A news with the same title already exists')}`, 'warning'))
+            break
+        }
+        break
+      default:
+        props.dispatch(newFlashMessage(`${props.t('Error while saving new news')}`, 'warning'))
+    }
 
     if (fetchPostPublication.status !== 200) {
       props.dispatch(newFlashMessage(`${props.t('Error while saving new news')}`, 'warning'))
@@ -413,8 +465,7 @@ export class Publications extends React.Component {
 
     await props.appContentSaveNewCommentText(
       fetchPostPublication.json,
-      publication,
-      ''
+      publication
     )
     await props.appContentSaveNewCommentFileList(
       this.setState.bind(this),
@@ -456,7 +507,20 @@ export class Publications extends React.Component {
 
   render () {
     const { props, state } = this
-    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
+
+    if (props.currentWorkspace.memberList === undefined) {
+      return (
+        <Loading
+          height={100}
+          width={100}
+        />
+      )
+    }
+
+    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(
+      props.user.userId, props.currentWorkspace.memberList, ROLE_LIST
+    )
+
     const currentPublicationId = Number(props.match.params.idcts || 0)
     const isPublicationListEmpty = props.publicationPage.list.length === 0
 
@@ -477,18 +541,18 @@ export class Publications extends React.Component {
               apiUrl={FETCH_CONFIG.apiUrl}
               contentId={newPublicationId}
               contentType={CONTENT_TYPE.THREAD}
-              onClickSubmit={this.handleSaveThreadPublication}
+              onClickSubmit={this.handleTogglePublicationTitlePopup}
               workspaceId={parseInt(props.match.params.idws)}
               // End of required props /////////////////////////////////////////
-              codeLanguageList={props.system.config.code_languages}
-              customColor={COLORS.PUBLICATION}
+              codeLanguageList={props.system.config.ui__notes__code_sample_languages}
               customClass='publishArea'
+              customColor={COLORS.PUBLICATION}
               icon='fa-fw far fa-paper-plane'
               invalidMentionList={state.invalidMentionList}
+              language={props.user.lang}
               memberList={props.currentWorkspace.memberList}
               multipleFiles
-              placeHolder={props.t('Share a news...')}
-              roleList={DEFAULT_ROLE_LIST}
+              placeholder={props.t('Share a news...')}
               submitLabel={props.t('Publish')}
             />
           </div>
@@ -535,19 +599,14 @@ export class Publications extends React.Component {
         {!state.loading && state.showEditPopup && (
           <EditCommentPopup
             apiUrl={FETCH_CONFIG.apiUrl}
-            codeLanguageList={props.system.config.code_languages}
+            codeLanguageList={props.system.config.ui__notes__code_sample_languages}
             comment={replaceHTMLElementWithMention(
-              [{
-                id: 0,
-                label: props.t('All'),
-                slug: props.t('all')
-              }],
               props.currentWorkspace.memberList,
               state.commentToEdit.raw_content
             )}
             commentId={state.commentToEdit.content_id}
             customColor={COLORS.PUBLICATION}
-            loggedUserLanguage={props.user.lang}
+            user={props.user}
             memberList={props.currentWorkspace.memberList}
             onClickClose={() => this.setState({ showEditPopup: false })}
             onClickValidate={this.handleClickValidateEdit}
@@ -563,6 +622,20 @@ export class Publications extends React.Component {
             dataCy='showMorePublicationItemsBtn'
             customClass='publications__showMoreButton'
             onClick={() => this.getPublicationPage(props.publicationPage.nextPageToken)}
+          />
+        )}
+        {state.showPublicationTitlePopup && (
+          <CardPopupCreateContent
+            onClose={this.handleTogglePublicationTitlePopup}
+            onValidate={this.handleClickValidatePublicationTitle}
+            label={props.t('Labeling the news')}
+            customColor={COLORS.PUBLICATION}
+            faIcon='fas fa-fw fa-stream'
+            contentName={state.newPublicationTitle !== undefined ? state.newPublicationTitle : ''}
+            onChangeContentName={this.handleChangeNewPublicationTitle}
+            btnValidateLabel={state.newPublicationTitle ? props.t('Publish') : props.t('Publish without title')}
+            inputPlaceholder={props.t('News title')}
+            allowEmptyTitle
           />
         )}
       </ScrollToBottomWrapper>

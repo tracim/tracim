@@ -310,7 +310,7 @@ describe('<AdminWorkspaceUser />', () => {
       props.data.config.type = 'workspace'
 
       const member = {
-        do_notify: true,
+        email_notification_type: 'summary',
         is_active: true,
         role: 'contributor'
       }

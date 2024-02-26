@@ -1,14 +1,12 @@
 # coding=utf-8
+from hapic.data import HapicFile
 from http import HTTPStatus
 from io import BytesIO
-
-from hapic.data import HapicFile
 from pyramid.config import Configurator
 import transaction
 
-from tracim_backend.app_models.contents import THREAD_TYPE
-from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.config import CFG
+from tracim_backend.app_models.contents import ContentTypeSlug
+from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentStatusException
 from tracim_backend.exceptions import EmptyLabelNotAllowed
@@ -42,7 +40,7 @@ SWAGGER_TAG__CONTENT_THREAD_SECTION = "Threads"
 SWAGGER_TAG__CONTENT_THREAD_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__CONTENT_ENDPOINTS, SWAGGER_TAG__CONTENT_THREAD_SECTION
 )
-is_thread_content = ContentTypeChecker([THREAD_TYPE])
+is_thread_content = ContentTypeChecker([ContentTypeSlug.THREAD.value])
 CONTENT_TYPE_TEXT_HTML = "text/html"
 
 
@@ -64,7 +62,7 @@ class ThreadController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         return api.get_content_in_context(content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_THREAD_ENDPOINTS])
@@ -76,10 +74,10 @@ class ThreadController(Controller):
     @hapic.output_file([])
     def get_thread_preview(self, context, request: TracimRequest, hapic_data=None) -> HapicFile:
         """
-           Download preview of html document
-           Good pratice for filename is filename is `{label}{file_extension}` or `{filename}`.
-           Default filename value is 'raw' (without file extension) or nothing.
-           """
+        Download preview of html document
+        Good pratice for filename is filename is `{label}{file_extension}` or `{filename}`.
+        Default filename value is 'raw' (without file extension) or nothing.
+        """
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
@@ -88,7 +86,7 @@ class ThreadController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         first_comment = content.get_first_comment()
         if not first_comment:
             raise UnavailablePreview(
@@ -132,7 +130,7 @@ class ThreadController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.update_content(
                 item=content,
@@ -163,7 +161,7 @@ class ThreadController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         revisions_page = content.get_revisions(
             page_token=hapic_data.query["page_token"],
             count=hapic_data.query["count"],
@@ -193,7 +191,7 @@ class ThreadController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         if content.status == request.json_body.get("status"):
             raise ContentStatusException(
                 "Content id {} already have status {}".format(content.content_id, content.status)
@@ -206,7 +204,9 @@ class ThreadController(Controller):
     def bind(self, configurator: Configurator) -> None:
         # Get thread
         configurator.add_route(
-            "thread", "/workspaces/{workspace_id}/threads/{content_id}", request_method="GET"
+            "thread",
+            "/workspaces/{workspace_id}/threads/{content_id}",
+            request_method="GET",
         )
         configurator.add_view(self.get_thread, route_name="thread")
 
@@ -220,7 +220,9 @@ class ThreadController(Controller):
 
         # update thread
         configurator.add_route(
-            "update_thread", "/workspaces/{workspace_id}/threads/{content_id}", request_method="PUT"
+            "update_thread",
+            "/workspaces/{workspace_id}/threads/{content_id}",
+            request_method="PUT",
         )
         configurator.add_view(self.update_thread, route_name="update_thread")
 

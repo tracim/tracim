@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 4.1.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-01-16 16:50+0100\n"
-"PO-Revision-Date: 2022-06-25 11:18+0000\n"
-"Last-Translator: Yassine Mouhli <ymouhli@asf.be>\n"
+"POT-Creation-Date: 2023-04-24 16:25+0200\n"
+"PO-Revision-Date: 2023-03-13 19:38+0000\n"
+"Last-Translator: gbonaspetti <gbonaspetti@hotmail.com>\n"
 "Language: ar\n"
 "Language-Team: Arabic "
 "<https://hosted.weblate.org/projects/tracim/backend/ar/>\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.9.1\n"
 
-#: tracim_backend/config.py:768
+#: tracim_backend/config.py:764
 msgid ""
 "[{website_title}] [{workspace_label}] {content_label} "
 "({content_status_label})"
@@ -29,11 +29,11 @@ msgstr ""
 "[{website_title}] [{workspace_label}] {content_label} "
 "({content_status_label})"
 
-#: tracim_backend/config.py:777
+#: tracim_backend/config.py:773
 msgid "[{website_title}] Someone created an account for you"
 msgstr "[{website_title}] أحدهم أنشأ لك حسابا"
 
-#: tracim_backend/config.py:787
+#: tracim_backend/config.py:783
 msgid "[{website_title}] A password reset has been requested"
 msgstr "[{website_title}] لقد تم طلب تغيير كلمة المرور"
 
@@ -148,6 +148,10 @@ msgstr "رسالة من {username}: {message}"
 msgid "Uploaded by {username}."
 msgstr "تم التحميل بواسطة {username}."
 
+#: tracim_backend/command/periodic.py:59
+msgid "[{website_title}] Your daily summary"
+msgstr ""
+
 #: tracim_backend/lib/core/content.py:753
 msgid "Space {workspace_name}"
 msgstr "فضاء {اسم_الفضاء}"
@@ -172,21 +176,22 @@ msgstr "مجلد جديد"
 msgid "New folder {0}"
 msgstr "مجلّد جديد {0}"
 
-#: tracim_backend/lib/core/workspace.py:497
+#: tracim_backend/lib/core/mention.py:144 tracim_backend/models/mention.py:5
+#, fuzzy
+msgid "all"
+msgstr "الكل"
+
+#: tracim_backend/lib/core/workspace.py:495
 msgid "Space"
 msgstr "فضاء"
 
-#: tracim_backend/lib/core/workspace.py:500
+#: tracim_backend/lib/core/workspace.py:498
 msgid "Space {}"
 msgstr "فضاء {}"
 
-#: tracim_backend/lib/mail_notifier/notifier.py:281
+#: tracim_backend/lib/mail_notifier/notifier.py:283
 msgid "{username} & all members of {workspace}"
 msgstr "{username} و كل أعضاء {workspace}"
-
-#: tracim_backend/models/mention.py:5
-msgid "all"
-msgstr ""
 
 #: tracim_backend/models/mention.py:6
 msgid "reader"
@@ -235,6 +240,7 @@ msgid "<a href=\"{call_to_action_url}\">view it on tracim</a>"
 msgstr "<a href=\"{call_to_action_url}\"> اطّلع عليه في Tracim</a>"
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:65
+#: tracim_backend/templates/mail/summary_body_html.mak:47
 msgid "You're receiving this email because of your account on {website_title}."
 msgstr "يصلك هذا البريد الإلكتروني نظرا لإمتلاكك حسابا في {website_title}."
 
@@ -251,6 +257,7 @@ msgstr ""
 #: tracim_backend/templates/mail/reset_password_body_html.mak:4
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:4
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:5
+#: tracim_backend/templates/mail/summary_body_html.mak:4
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:4
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:5
 msgid "Hello {username},"
@@ -303,6 +310,7 @@ msgstr "يوما طيبا :)"
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:17
 #: tracim_backend/templates/mail/reset_password_body_html.mak:21
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:17
+#: tracim_backend/templates/mail/summary_body_html.mak:44
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:17
 msgid "Suricat', your digital assistant"
 msgstr "سوريكات، مساعدك الرقمي"
@@ -311,6 +319,7 @@ msgstr "سوريكات، مساعدك الرقمي"
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:21
 #: tracim_backend/templates/mail/reset_password_body_html.mak:25
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:21
+#: tracim_backend/templates/mail/summary_body_html.mak:56
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:21
 msgid "Suricat', the bot"
 msgstr "سوريكات، البوت"
@@ -320,6 +329,7 @@ msgstr "سوريكات، البوت"
 #: tracim_backend/templates/mail/reset_password_body_html.mak:28
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:24
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:32
+#: tracim_backend/templates/mail/summary_body_html.mak:59
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:24
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:26
 msgid "powered by tracim software"
@@ -432,6 +442,32 @@ msgstr "شكرا جزيلا"
 msgid "{username} (through tracim)"
 msgstr "{username} (عبر Tracim)"
 
+#: tracim_backend/templates/mail/summary_body_html.mak:7
+msgid "Here is the list of your unread mentions in the last 24h:"
+msgstr ""
+
+#: tracim_backend/templates/mail/summary_body_html.mak:24
+msgid "{author} mentioned you in"
+msgstr ""
+
+#: tracim_backend/templates/mail/summary_body_html.mak:32
+msgid "Here is the summary of your unread notifications in the last 24h:"
+msgstr ""
+
+#: tracim_backend/templates/mail/summary_body_html.mak:36
+msgid "{event_count} activity in the space"
+msgstr ""
+
+#: tracim_backend/templates/mail/summary_body_html.mak:48
+msgid ""
+"You can change this setting by going to the \"My Spaces\" menu through "
+"this link:"
+msgstr ""
+
+#: tracim_backend/templates/mail/summary_body_html.mak:52
+msgid "This email is automatically created, please do not reply."
+msgstr ""
+
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:5
 #, fuzzy
 msgid ""
@@ -480,3 +516,24 @@ msgid ""
 msgstr ""
 "هذا التحميل محمي بكلمة مرور، اتصل بي من فضلك على (<a "
 "href=\"mailto:{emitter_email}\">{username}</a>) للحصول على كلمة المرور."
+
+#~ msgid "Administrator (through {website_title})"
+#~ msgstr ""
+
+#~ msgid "{event_count} events in the space"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "You can change this setting by "
+#~ "going to the \"My Spaces\" menu "
+#~ "through this <a "
+#~ "href=\"https://algoo.tracim.fr/ui/account\">link</a>"
+#~ msgstr ""
+
+# | msgid "You're receiving this email because of your account on
+# | {website_title}."
+#~ msgid ""
+#~ "You are receiving this email because "
+#~ "you have at least one space set"
+#~ " with the daily email."
+#~ msgstr "يصلك هذا البريد الإلكتروني نظرا لإمتلاكك حسابا في {website_title}."

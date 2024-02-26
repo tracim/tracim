@@ -7,7 +7,6 @@ import {
   BREADCRUMBS_TYPE,
   CONTENT_TYPE,
   CUSTOM_EVENT,
-  DEFAULT_ROLE_LIST,
   FAVORITE_STATE,
   PAGE,
   ROLE_LIST,
@@ -128,9 +127,7 @@ export class Kanban extends React.Component {
   handleAllAppChangeLanguage = data => {
     const { props } = this
     console.log('%c<Kanban> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
-    props.appContentCustomEventHandlerAllAppChangeLanguage(
-      data, this.setState.bind(this), i18n, this.state.timelineWysiwyg, this.handleChangeNewComment
-    )
+    props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n)
   }
 
   handleChangeMarkedTemplate = (isTemplate) => {
@@ -288,7 +285,7 @@ export class Kanban extends React.Component {
             // End of required props ///////////////////////////////////////////
             availableStatusList={state.config.availableStatuses}
             canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
-            codeLanguageList={state.config.system.config.code_languages}
+            codeLanguageList={state.config.system.config.ui__notes__code_sample_languages}
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}
             disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
@@ -303,7 +300,6 @@ export class Kanban extends React.Component {
             onClickOpenFileComment={this.handleClickOpenFileComment}
             onClickRevisionBtn={this.handleClickShowRevision}
             onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
-            roleList={DEFAULT_ROLE_LIST}
             shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
           />
         </PopinFixedRightPartContent>
@@ -499,8 +495,7 @@ export class Kanban extends React.Component {
     const { props, state } = this
     await props.appContentSaveNewCommentText(
       state.content,
-      comment,
-      state.config.slug
+      comment
     )
     await props.appContentSaveNewCommentFileList(
       this.setState.bind(this),
@@ -681,10 +676,12 @@ export class Kanban extends React.Component {
           <KanbanComponent
             config={state.config}
             content={state.content}
+            // End of required props ///////////////////////////////////////////
             editionAuthor={state.editionAuthor}
             fullscreen={state.fullscreen}
             isNewContentRevision={!!state.currentContentRevisionId}
             isRefreshNeeded={state.showRefreshWarning}
+            language={state.loggedUser.lang}
             mode={state.mode}
             onClickFullscreen={this.handleClickFullscreen}
             onClickLastVersion={this.handleClickLastVersion}

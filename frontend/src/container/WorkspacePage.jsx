@@ -12,11 +12,11 @@ import {
   setWorkspaceAgendaUrl,
   setWorkspaceDetail,
   setWorkspaceLoaded,
-  setWorkspaceMemberList
+  setUserRoleList
 } from '../action-creator.sync.js'
 import { FETCH_CONFIG } from '../util/helper.js'
 import {
-  getSpaceMemberList,
+  getSpaceUserRoleList,
   handleFetchResult,
   PAGE,
   Loading
@@ -31,23 +31,23 @@ class WorkspacePage extends React.Component {
   async updateCurrentWorkspace () {
     const { props } = this
 
-    const requestMemberList = handleFetchResult(await getSpaceMemberList(FETCH_CONFIG.apiUrl, props.workspaceId))
+    const requestUserRoleList = handleFetchResult(await getSpaceUserRoleList(FETCH_CONFIG.apiUrl, props.workspaceId))
     const requestWorkspaceDetail = props.dispatch(getWorkspaceDetail(props.workspaceId))
 
-    const [responseMemberList, responseWorkspaceDetail] = await Promise.all([
-      requestMemberList, requestWorkspaceDetail
+    const [responseUserRoleList, responseWorkspaceDetail] = await Promise.all([
+      requestUserRoleList, requestWorkspaceDetail
     ])
 
-    if (responseMemberList.apiResponse.status === 200 && responseWorkspaceDetail.status === 200) {
-      props.dispatch(setWorkspaceMemberList(responseMemberList.body))
+    if (responseUserRoleList.apiResponse.status === 200 && responseWorkspaceDetail.status === 200) {
       props.dispatch(setWorkspaceDetail(responseWorkspaceDetail.json))
+      props.dispatch(setUserRoleList(responseUserRoleList.body))
       props.dispatch(setWorkspaceLoaded())
 
       if (props.appList.some(a => a.slug === 'agenda') && responseWorkspaceDetail.json.agenda_enabled) {
         this.loadCalendarDetail()
       }
     } else {
-      switch (responseMemberList.apiResponse.status) {
+      switch (responseUserRoleList.apiResponse.status) {
         case 200: break
         case 400: break
         default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('member list')}`, 'warning')); break

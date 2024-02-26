@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import argparse
-
 import plaster
 from pyramid.scripting import AppEnvironment
 
@@ -53,7 +52,10 @@ class CaldavSyncCommand(AppContextCommand):
         self._app_config = app_context["registry"].settings["CFG"]
         self._user_api = UserApi(current_user=None, session=self._session, config=self._app_config)
         self._workspace_api = WorkspaceApi(
-            current_user=None, force_role=True, session=self._session, config=self._app_config
+            current_user=None,
+            force_role=True,
+            session=self._session,
+            config=self._app_config,
         )
         self._agenda_api = AgendaApi(
             current_user=None, session=self._session, config=self._app_config
@@ -83,7 +85,7 @@ class CaldavSyncCommand(AppContextCommand):
         nb_verified_user_agenda = len(users) - nb_error_agenda_access
         print("{}/{} users agenda verified".format(nb_verified_user_agenda, nb_user_agendas))
 
-        # # INFO - G.M - 2019-03-13 - check workspaces agendas
+        # INFO - G.M - 2019-03-13 - check workspaces agendas
         workspaces = self._workspace_api.get_all()
         nb_error_agenda_access = 0
         nb_workspaces = 0

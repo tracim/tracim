@@ -13,7 +13,9 @@ from tracim_backend.lib.utils.logger import logger
 
 
 def send_email_through(
-    config: CFG, sendmail_callable: typing.Callable[[MIMEMultipart], None], message: MIMEMultipart
+    config: CFG,
+    sendmail_callable: typing.Callable[[MIMEMultipart], None],
+    message: MIMEMultipart,
 ) -> None:
     """
     Send mail encapsulation to send it in async or sync mode.
@@ -80,7 +82,8 @@ class EmailSender(object):
 
                     log = "SMTP Start TLS return code: {} with message: {}"
                     logger.debug(
-                        self, log.format(starttls_result[0], starttls_result[1].decode("utf-8"))
+                        self,
+                        log.format(starttls_result[0], starttls_result[1].decode("utf-8")),
                     )
                 except smtplib.SMTPResponseException as exc:
                     log = "SMTP start TLS return error code: {} with message: {}"
@@ -106,7 +109,8 @@ class EmailSender(object):
                     log = "SMTP auth return error code: {} with message: {}"
                     logger.error(self, log.format(exc.smtp_code, exc.smtp_error.decode("utf-8")))
                     logger.error(
-                        self, "check your auth params combinaison " "(login/password) for SMTP"
+                        self,
+                        "check your auth params combinaison " "(login/password) for SMTP",
                     )
                 except smtplib.SMTPResponseException as exc:
                     log = "SMTP login return error code: {} with message: {}"
