@@ -22,7 +22,11 @@ const LogbookEntry = (props) => {
         <div className='logbook__timeline__entries__entry__data__header'>
           <div className='logbook__timeline__entries__entry__data__header__top'>
             <h4 className='logbook__timeline__entries__entry__data__header__top__title'>{props.entry.title}</h4>
-            <span className='logbook__timeline__entries__entry__data__header__top__value'>{props.entry.freeInput}</span>
+            {props.entry.freeInput && (
+              <span className='logbook__timeline__entries__entry__data__header__top__freeInput'>
+                {props.entry.freeInput}
+              </span>
+            )}
           </div>
           <span className='logbook__timeline__entries__entry__data__header__date'>
             <Icon
