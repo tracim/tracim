@@ -50,7 +50,7 @@ describe('Publications page', () => {
     })
 
     it('should be able to copy content link', () => {
-      cy.get('.feedItemHeader__actionMenu__item[title="Copy content link"]').click()
+      cy.get('.feedItemHeader__actionMenu__item[data-cy="popinListItem__copy_content_link"]').click()
       cy.get('.flashmessage__container .bg-info').should('be.visible')
     })
 

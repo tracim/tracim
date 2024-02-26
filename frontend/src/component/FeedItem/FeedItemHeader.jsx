@@ -137,6 +137,7 @@ export class FeedItemHeader extends React.Component {
               text={props.content.contentNamespace === CONTENT_NAMESPACE.PUBLICATION ? props.t('Copy news link') : props.t('Copy content link')}
               textMobile={props.content.contentNamespace === CONTENT_NAMESPACE.PUBLICATION ? props.t('Copy news link') : props.t('Copy content link')}
               key={`link-${contentId}`}
+              dataCy='popinListItem__copy_content_link'
             />
 
             {props.allowEdition && (
