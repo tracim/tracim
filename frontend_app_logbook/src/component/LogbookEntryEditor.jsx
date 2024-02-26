@@ -13,7 +13,7 @@ function LogbookEntryEditor (props) {
 
   const [title, setTitle] = useState(entry.title || '')
   const [description, setDescription] = useState(entry.description || 'This is a description')
-  const [bgColor, setBgColor] = useState(entry.bgColor || props.customColor)
+  const [bgColor, setBgColor] = useState(entry.bgColor || '#e8e8e8')
   const [deadline, setDeadline] = useState(entry.deadline || getCurrentDateTime())
   const [freeInput, setFreeInput] = useState(entry.freeInput || '')
 

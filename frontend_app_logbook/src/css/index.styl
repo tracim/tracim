@@ -28,8 +28,8 @@ cardWidth = 280px
       width 99%
       max-width 700px
       margin-inline-start standardSpacing
+      z-index 10
       &__entry
-        background-color lightGrey2
         border-radius standardBorderRadius
         display flex
         flex-direction row
@@ -49,8 +49,8 @@ cardWidth = 280px
           margin-top standardSpacing
           margin-inline-start standardSpacing
           border-top 0.5rem solid transparent
-          border-right 0.5rem solid lightGrey2
           border-bottom 0.5rem solid transparent
+          z-index -1
         &__data
           width 100%
           padding standardSpacing
@@ -58,11 +58,27 @@ cardWidth = 280px
           flex-direction column
           &__header
             margin-bottom standardSpacing
-            display flex
-            flex-direction row
-            justify-content space-between
-          &__date
-            margin-bottom standardSpacing
+            &__top
+              display flex
+              flex-direction row
+              justify-content space-between
+              &__title
+                margin-bottom 0
+              &__value
+                line-height 1
+                text-align center
+                white-space nowrap
+                border-radius standardBorderRadius
+                padding 5px
+                background-color sidebarActivitiesItem
+                color offWhite
+                height fit-content
+            &__date
+              margin-bottom standardSpacing
+              font-size metadataFontSize
+              color darkGrey
+              &__icon
+                margin-inline-end 4px
           &__edit
             display flex
             flex-direction row

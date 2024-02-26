@@ -256,6 +256,7 @@ export class Logbook extends React.Component {
                           onEditEntry={this.handleShowPopIn}
                           onRemoveEntry={this.handleRemoveEntry}
                           key={id}
+                          language={props.language}
                         />
                       )}
                     </div>
