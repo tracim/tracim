@@ -693,7 +693,10 @@ class WorkspaceController(Controller):
         )
         content_type = content_type_list.get_one_by_slug(content.type).slug
 
-        if content_type == ContentTypeSlug.KANBAN.value:
+        if (
+            content_type == ContentTypeSlug.KANBAN.value
+            or content_type == ContentTypeSlug.LOGBOOK.value
+        ):
             content_type = ContentTypeSlug.FILE.value
 
         # TODO - G.M - 2018-08-03 - Jsonify redirect response ?
