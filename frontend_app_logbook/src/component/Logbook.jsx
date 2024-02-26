@@ -156,6 +156,7 @@ export class Logbook extends React.Component {
 
   async save (newLogbook) {
     const { props } = this
+    newLogbook.entries.toSorted((a, b) => new Date(b.deadline) - new Date(a.deadline))
     const fetchResultSaveLogbook = await handleFetchResult(
       await putRawFileContent(
         props.config.apiUrl,
@@ -182,9 +183,6 @@ export class Logbook extends React.Component {
   render () {
     const { props, state } = this
     const changesAllowed = !props.readOnly && state.logbookState === LOGBOOK_STATE.LOADED
-    const sorted = state.logbook.entries.sort((a, b) => new Date(b.deadline) - new Date(a.deadline))
-
-    console.log(sorted)
 
     return (
       <div className={classnames('logbook__contentpage__wrapper', { fullscreen: props.fullscreen })}>
