@@ -242,6 +242,7 @@ export class Logbook extends React.Component {
                   icon='fas fa-plus'
                   onClick={() => this.handleShowPopIn({})}
                 />
+                icon='fas fa-plus'
             )}
             <div className='logbook__timeline'>
               {state.logbook.entries.length >= 1

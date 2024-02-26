@@ -38,7 +38,6 @@ export default translate()(LogbookEntry)
 LogbookEntry.propTypes = {
   entry: PropTypes.object.isRequired,
   onEditEntry: PropTypes.func.isRequired,
-  onEditEntryContent: PropTypes.func.isRequired,
   onRemoveEntry: PropTypes.func.isRequired,
   customColor: PropTypes.string,
   readOnly: PropTypes.bool
