@@ -2,7 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import {
-  Icon
+  Icon,
+  IconButton
 } from 'tracim_frontend_lib'
 
 const LogbookEntry = (props) => {
@@ -30,7 +31,17 @@ const LogbookEntry = (props) => {
           className='logbook__timeline__entries__entry__data__description'
           dangerouslySetInnerHTML={{ __html: props.entry.description }}
         />
-
+        {!props.readOnly && (
+          <div className='logbook__timeline__entries__entry__data__edit'>
+            <IconButton
+              customClass='logbook__timeline__entries__entry__data__header__edit__button'
+              text={props.t('Edit entry')}
+              textMobile={props.t('Edit entry')}
+              icon='fa-fw fas fa-pencil-alt'
+              onClick={() => props.onEditEntry(props.entry)}
+            />
+          </div>
+        )}
       </div>
     </div>
   )

@@ -35,8 +35,8 @@ const addEntryToLogbook = (logbook, newEntry) => {
   return logbook
 }
 
-const replaceEntryInLogbook = (logbook, idToReplace, newEntry) => {
-  logbook.entries = logbook.entries.map(entry => entry.id === idToReplace ? newEntry : entry)
+const replaceEntryInLogbook = (logbook, newEntry) => {
+  logbook.entries = logbook.entries.map(entry => entry.id === newEntry.id ? newEntry : entry)
   return logbook
 }
 
