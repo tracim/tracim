@@ -1,7 +1,12 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
-import {translate} from 'react-i18next'
-import {DateInput, IconButton, TextInput, TinyEditor} from 'tracim_frontend_lib'
+import { translate } from 'react-i18next'
+import {
+  DateInput,
+  IconButton,
+  TextInput,
+  TinyEditor
+} from 'tracim_frontend_lib'
 
 function LogbookEntryEditor (props) {
   const { entry } = props
@@ -12,14 +17,14 @@ function LogbookEntryEditor (props) {
   const [deadline, setDeadline] = useState(entry.deadline || getCurrentDateTime())
   const [freeInput, setFreeInput] = useState(entry.freeInput || '')
 
-  function getCurrentDateTime() {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = `${(now.getMonth() + 1)}`.padStart(2, '0');
-    const day = `${now.getDate()}`.padStart(2, '0');
-    const hours = `${now.getHours()}`.padStart(2, '0');
-    const minutes = `${now.getMinutes()}`.padStart(2, '0');
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  function getCurrentDateTime () {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = `${(now.getMonth() + 1)}`.padStart(2, '0')
+    const day = `${now.getDate()}`.padStart(2, '0')
+    const hours = `${now.getHours()}`.padStart(2, '0')
+    const minutes = `${now.getMinutes()}`.padStart(2, '0')
+    return `${year}-${month}-${day}T${hours}:${minutes}`
   }
 
   function handleValidate (e) {

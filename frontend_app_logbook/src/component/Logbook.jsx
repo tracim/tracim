@@ -31,13 +31,13 @@ export const LOGBOOK_STATE = {
 
 const addEntryToLogbook = (logbook, newEntry) => {
   newEntry.id = uuidv4()
-  logbook.entries.push(newEntry);
-  return logbook;
+  logbook.entries.push(newEntry)
+  return logbook
 }
 
 const replaceEntryInLogbook = (logbook, idToReplace, newEntry) => {
-  logbook.entries = logbook.entries.map(entry => entry.id === idToReplace ? newEntry : entry);
-  return logbook;
+  logbook.entries = logbook.entries.map(entry => entry.id === idToReplace ? newEntry : entry)
+  return logbook
 }
 
 const removeEntryFromLogbook = (logbook, entryToRemove) => {
@@ -55,7 +55,7 @@ export class Logbook extends React.Component {
       logbookState: justCreated ? LOGBOOK_STATE.LOADED : LOGBOOK_STATE.INIT,
       entryToEdit: {},
       saveRequired: false,
-      showEditPopIn: false,
+      showEditPopIn: false
     }
   }
 
@@ -235,14 +235,13 @@ export class Logbook extends React.Component {
             })}
           >
             {changesAllowed && (
-                <IconButton
-                  customClass={'logbook__new_button'}
-                  text={props.t('Create a new entry')}
-                  textMobile={props.t('Create a new entry')}
-                  icon='fas fa-plus'
-                  onClick={() => this.handleShowPopIn({})}
-                />
+              <IconButton
+                customClass='logbook__new_button'
+                text={props.t('Create a new entry')}
+                textMobile={props.t('Create a new entry')}
                 icon='fas fa-plus'
+                onClick={() => this.handleShowPopIn({})}
+              />
             )}
             <div className='logbook__timeline'>
               {state.logbook.entries.length >= 1
