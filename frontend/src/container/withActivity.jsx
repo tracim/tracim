@@ -182,8 +182,30 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
           }
         }
       }
+      // INFO - FS - 2024-02-15 - This TLM handler is used to fix a special case witch happened when turning a publication into a content,
+      // the content and it's comment will send a TLM each, and sometime the TLM of comment overrides the modification of the content
+      // This code fix the bug by applying the update of the comment to the content if it's not already done
+      let activityList = props.activity.list
+      if (data.event_type.includes(TLM_ET.CONTENT) && data.event_type.includes(TLM_SUB.COMMENT) && data.event_type.includes(TLM_CET.MODIFIED)) {
+        const contentParent = props.activity.list.find(a => a.content.content_id === data.fields.content.parent_id)
+        if (contentParent.content.content_namespace !== data.fields.content.parent_content_namespace) {
+          activityList = props.activity.list.map(activity => {
+            if (activity.content.content_id === contentParent.content.content_id) {
+              return {
+                ...contentParent,
+                content: {
+                  ...contentParent.content,
+                  content_namespace: data.fields.content.parent_content_namespace
+                }
+              }
+            } else {
+              return activity
+            }
+          })
+        }
+      }
       const updatedActivityList = await addMessageToActivityList(
-        activity, props.activity.list, FETCH_CONFIG.apiUrl
+        activity, activityList, FETCH_CONFIG.apiUrl
       )
       if (!isEqual(props.activity.list, updatedActivityList)) {
         props.dispatch(setActivityList(updatedActivityList))

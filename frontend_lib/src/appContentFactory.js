@@ -65,7 +65,8 @@ import {
   putContentTemplate,
   putEditContent,
   putEditStatus,
-  putToDo
+  putToDo,
+  putChangeContentNamespace
 } from './action.async.js'
 
 import {
@@ -682,6 +683,54 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
+    appContentChangeType = async (content, setState) => {
+      this.checkApiUrl()
+      // INFO - FS - 2024-02-15 - Depending on if the content comes from Publication or Thread the variable name are different
+      let contentId = content.id
+      let workspaceId = content.workspaceId
+      if (contentId === undefined) {
+        contentId = content.content_id
+        workspaceId = content.workspace_id
+      }
+      const response = await handleFetchResult(
+        await putChangeContentNamespace(this.apiUrl, workspaceId, contentId, 'content')
+      )
+      const status = response.ok ? response.status : response.apiResponse.status
+      switch (status) {
+        case 204:
+          setState({ mode: APP_FEATURE_MODE.VIEW })
+          break
+        case 400:
+          switch (response.body.code) {
+            case 3002:
+              sendGlobalFlashMessage(i18n.t('A content with the same name already exists'))
+              break
+            default:
+              GLOBAL_dispatchEvent({
+                type: CUSTOM_EVENT.ADD_FLASH_MSG,
+                data: {
+                  msg: i18n.t('Error while changing content type'),
+                  type: 'warning',
+                  delay: undefined
+                }
+              })
+              break
+          }
+          break
+        default:
+          GLOBAL_dispatchEvent({
+            type: CUSTOM_EVENT.ADD_FLASH_MSG,
+            data: {
+              msg: i18n.t('Error while changing content type'),
+              type: 'warning',
+              delay: undefined
+            }
+          })
+          break
+      }
+      return response
+    }
+
     appContentDelete = async (content, setState, appSlug) => {
       this.checkApiUrl()
 
@@ -1110,6 +1159,7 @@ export function appContentFactory (WrappedComponent) {
           appContentCustomEventHandlerAllAppChangeLanguage={this.appContentCustomEventHandlerAllAppChangeLanguage}
           appContentChangeTitle={this.appContentChangeTitle}
           appContentChangeComment={this.appContentChangeComment}
+          appContentChangeType={this.appContentChangeType}
           appContentDeleteComment={this.appContentDeleteComment}
           appContentDeleteToDo={this.appContentDeleteToDo}
           appContentEditComment={this.appContentEditComment}

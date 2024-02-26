@@ -327,6 +327,8 @@ export class FeedItemWithPreview extends React.Component {
           onClickEdit={props.onClickEdit}
           workspaceId={props.workspaceId}
           titleLink={props.titleLink}
+          onClickChangeContentType={props.onClickChangeContentType}
+          showButtonChangeContentType={props.showButtonChangeContentType}
         />
         {props.contentAvailable && !isContentDeleted && (
           <>
@@ -474,13 +476,15 @@ FeedItemWithPreview.propTypes = {
   lastModifier: PropTypes.object,
   modifiedDate: PropTypes.string,
   onEventClicked: PropTypes.func,
+  onClickChangeContentType: PropTypes.func,
   onClickEdit: PropTypes.func,
   reactionList: PropTypes.array,
   showCommentList: PropTypes.bool,
   titleLink: PropTypes.string,
   previewLink: PropTypes.string,
   previewLinkType: PropTypes.oneOf(Object.values(LINK_TYPE)),
-  showParticipateButton: PropTypes.bool
+  showParticipateButton: PropTypes.bool,
+  showButtonChangeContentType: PropTypes.bool
 }
 
 FeedItemWithPreview.defaultProps = {
@@ -494,11 +498,13 @@ FeedItemWithPreview.defaultProps = {
   lastModificationType: '',
   lastModifier: {},
   modifiedDate: '',
+  onClickChangeContentType: () => {},
   onClickEdit: () => { },
   reactionList: [],
   showCommentList: false,
   previewLinkType: LINK_TYPE.OPEN_IN_APP,
   titleLink: null,
   previewLink: null,
-  showParticipateButton: false
+  showParticipateButton: false,
+  showButtonChangeContentType: false
 }

@@ -12,5 +12,7 @@
   "Delete": "Slett",
   "The content has been modified by {{author}}": "Innholdet har blitt endret av {{author}}",
   "The link has been copied to clipboard": "Lenke kopiert til utklippstavle",
-  "Copy content link": "Kopier innholdslenke"
+  "Copy content link": "Kopier innholdslenke",
+  "Copy news link": "Kopier innholdslenke",
+  "Turn into content": ""
 }

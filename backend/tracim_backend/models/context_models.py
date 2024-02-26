@@ -814,6 +814,18 @@ class ContentUpdate(object):
         self.description = description
 
 
+class ContentNamespaceUpdate(object):
+    """
+    Content namespace update model
+    """
+
+    def __init__(
+        self,
+        content_namespace: str,
+    ) -> None:
+        self.content_namespace = content_namespace
+
+
 class BasePaginatedQuery(object):
     """
     Base of paginated query

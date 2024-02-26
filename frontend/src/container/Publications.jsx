@@ -19,6 +19,7 @@ import {
   TRANSLATION_STATE,
   CommentArea,
   CardPopupCreateContent,
+  ConfirmPopup,
   EditCommentPopup,
   EmptyListMessage,
   IconButton,
@@ -107,6 +108,8 @@ export class Publications extends React.Component {
       commentReset: () => {},
       publicationAsFileList: [],
       showEditPopup: false,
+      contentToChange: null,
+      showChangeContentTypePopup: false,
       showReorderButton: false
     }
   }
@@ -229,6 +232,22 @@ export class Publications extends React.Component {
     props.dispatch(setCommentListToPublication(parentPublication.id, newTimeline))
   }
 
+  handleToggleChangeContentTypePopup = (e, content) => {
+    this.setState(prev => ({
+      showChangeContentTypePopup: !prev.showChangeContentTypePopup,
+      contentToChange: prev.showChangeContentTypePopup ? null : content
+    }))
+  }
+
+  handleClickValidateChangeContentType = async () => {
+    const { props, state } = this
+    props.appContentChangeType(state.contentToChange, this.setState.bind(this))
+    this.setState({
+      showChangeContentTypePopup: false,
+      contentToChange: null
+    })
+  }
+
   handleContentCreatedOrRestored = (data) => {
     const { props } = this
 
@@ -309,7 +328,12 @@ export class Publications extends React.Component {
 
   handleContentModified = (data) => {
     const { props } = this
-    if (data.fields.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION) return
+    if (data.fields.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION) {
+      if (props.publicationPage.list.find((content) => content.id === data.fields.content.content_id) !== undefined) {
+        props.dispatch(removePublication(data.fields.content.content_id))
+      }
+      return
+    }
 
     props.dispatch(updatePublication(data.fields.content))
 
@@ -592,6 +616,8 @@ export class Publications extends React.Component {
             showCommentList
             workspaceId={Number(publication.workspaceId)}
             user={props.user}
+            onClickChangeContentType={(e) => this.handleToggleChangeContentTypePopup(e, publication)}
+            showButtonChangeContentType
             {...this.getPreviewLinkParameters(publication)}
           />
         )}
@@ -636,6 +662,15 @@ export class Publications extends React.Component {
             btnValidateLabel={state.newPublicationTitle ? props.t('Publish') : props.t('Publish without title')}
             inputPlaceholder={props.t('News title')}
             allowEmptyTitle
+          />
+        )}
+        {state.showChangeContentTypePopup && (
+          <ConfirmPopup
+            customColor={props.customColor}
+            confirmLabel={props.t('Turn into content')}
+            confirmIcon='far fa-comments'
+            onConfirm={this.handleClickValidateChangeContentType}
+            onCancel={this.handleToggleChangeContentTypePopup}
           />
         )}
       </ScrollToBottomWrapper>
