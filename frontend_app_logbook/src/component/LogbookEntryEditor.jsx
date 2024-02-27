@@ -96,7 +96,7 @@ function LogbookEntryEditor (props) {
         </div>
 
         <div className='logbook__LogbookPopup__freeInput'>
-          <label htmlFor='logbook__LogbookPopup__freeInput'>{props.t('Value:')}</label>
+          <label htmlFor='logbook__LogbookPopup__freeInput'>{props.t('Open field:')}</label>
           <TextInput
             id='logbook__LogbookPopup__freeInput'
             onChange={(e) => setFreeInput(e.target.value)}
