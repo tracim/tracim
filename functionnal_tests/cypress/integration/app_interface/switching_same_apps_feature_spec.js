@@ -88,8 +88,9 @@ describe('Hot switching between the same app', () => {
           .click('left')
 
         // NOTE - M.L. - 2024-2-27 - This is to wait for the notification wall animation, so that it really clicks on
-        //  the desired notification (same applies for below)
-        cy.wait(200)
+        //  the desired notification (same applies for below) the wait value is chosen based on the transition delay
+        //  as in frontend/src/css/NotificationWall.styl line 10
+        cy.wait(500)
         cy.get(`.notification__list__item.isMention .contentTitle__highlight[title="${aThirdFileTitle}"]`)
           .click('left')
 
@@ -108,7 +109,7 @@ describe('Hot switching between the same app', () => {
         cy.get('.sidebar__notification__item')
           .click('left')
 
-        cy.wait(200)
+        cy.wait(500)
         cy.get(`.notification__list__item.isMention .contentTitle__highlight[title="${aThirdHtmlDocTitle}"]`)
           .click('left')
 
@@ -130,7 +131,7 @@ describe('Hot switching between the same app', () => {
         cy.get('.sidebar__notification__item')
           .click('left')
 
-        cy.wait(200)
+        cy.wait(500)
         cy.get(`.notification__list__item.isMention .contentTitle__highlight[title="${aThirdThreadTitle}"]`)
           .click('left')
 
@@ -152,7 +153,7 @@ describe('Hot switching between the same app', () => {
         cy.get('.sidebar__notification__item')
           .click('left')
 
-        cy.wait(200)
+        cy.wait(500)
         cy.get(`.notification__list__item.isMention .contentTitle__highlight[title="${aThirdKanbanTitle}"]`)
           .click('left')
 
