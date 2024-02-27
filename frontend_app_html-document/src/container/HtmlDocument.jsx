@@ -725,7 +725,7 @@ export class HtmlDocument extends React.Component {
     this.setState(prev => ({ showPermanentlyDeletePopup: !prev.showPermanentlyDeletePopup }))
   }
 
-  handleValidatePermanentlyDeleteButton = () => {
+  handleClickValidatePermanentlyDeleteButton = () => {
     const { state } = this
     this.props.appContentDeletePermanently(state.content.workspace_id, state.content.content_id, this.handleClickBtnCloseApp)
     this.handleClickPermanentlyDeleteButton()
@@ -972,20 +972,12 @@ export class HtmlDocument extends React.Component {
               dataCy: 'popinListItem__delete'
             },
             {
-              icon: '',
-              label: '',
-              onClick: () => {},
-              showAction: state.loggedUser.profile === PROFILE.administrator.slug,
-              disabled: false,
-              separatorLine: true,
-              dataCy: 'popinListItem__separatorLine'
-            },
-            {
               icon: 'far fa-trash-alt iconbutton__icon',
               label: props.t('Permanently delete'),
               onClick: this.handleClickPermanentlyDeleteButton,
               showAction: state.loggedUser.profile === PROFILE.administrator.slug,
               disabled: false,
+              separatorLine: true,
               dataCy: 'popinListItem__permanentlyDelete'
             }
           ]}
@@ -1098,8 +1090,9 @@ export class HtmlDocument extends React.Component {
             customColor={props.customColor}
             confirmLabel={props.t('Permanently delete')}
             confirmIcon='far fa-trash-alt iconbutton__icon'
-            onConfirm={this.handleValidatePermanentlyDeleteButton}
+            onConfirm={this.handleClickValidatePermanentlyDeleteButton}
             onCancel={this.handleClickPermanentlyDeleteButton}
+            msg={props.t('This content will be deleted permanently and won\'t be restorable')}
           />
         )}
       </PopinFixed>

@@ -937,8 +937,7 @@ class WorkspaceController(Controller):
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def delete_content_permanently(self, context, request: TracimRequest, hapic_data=None):
         """
-        Delete a content. This route is for trusted users and administrators.
-        Note : a trusted user can only delete spaces on which he/she is space manager
+        Delete a content permanently. This route is for administrators.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         session = request.dbsession
