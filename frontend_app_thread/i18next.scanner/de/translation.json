@@ -12,5 +12,7 @@
   "The content has been modified by {{author}}": "Der Inhalt wurde geändert von {{author}}",
   "Delete": "Löschen",
   "The link has been copied to clipboard": "Link in die Zwischenablage kopiert",
-  "Copy content link": "Link zum Inhalt kopieren"
+  "Copy content link": "Link zum Inhalt kopieren",
+  "Copy news link": "Link zum Inhalt kopieren",
+  "Turn into content": ""
 }

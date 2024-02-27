@@ -97,6 +97,11 @@ export const putContentTemplate = (apiUrl, workspaceId, contentId, isTemplate) =
 export const putContentArchived = (apiUrl, workspaceId, contentId) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/archived`)
 
+export const putChangeContentNamespace = (apiUrl, workspaceId, contentId, type) =>
+  baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/threads/${contentId}/namespace`, {
+    content_namespace: type
+  })
+
 export const putContentDeleted = (apiUrl, workspaceId, contentId) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/trashed`)
 

@@ -2378,3 +2378,45 @@ class ContentApi(object):
         self.save(item, ActionDescription.CREATION, do_notify=do_notify)
 
         return item
+
+    def set_content_namespace(
+        self, content_id: int, content_namespace: ContentNamespaces
+    ) -> Content:
+        """Change the content namespace of a content
+
+        Args:
+            content_id: Id of the content
+            content_namespace: content_namespace wanted for the content
+
+        Returns:
+            Content: The modified content.
+        """
+        content = self.get_one(content_id=content_id)
+        is_publication_to_content = (
+            content.content_namespace == ContentNamespaces.PUBLICATION
+            and content_namespace == ContentNamespaces.CONTENT
+        )
+        is_content_to_publication = (
+            content.content_namespace == ContentNamespaces.CONTENT
+            and content_namespace == ContentNamespaces.PUBLICATION
+        )
+        if not any([is_publication_to_content, is_content_to_publication]):
+            raise ContentNamespaceDoNotMatch(
+                "Namespace transision not allowed (allowed are PUBLICATION → CONTENT and CONTENT → PUBLICATION)"
+            )
+
+        with new_revision(session=self._session, tm=transaction.manager, content=content):
+            self.move(
+                content,
+                new_parent=None,
+                new_workspace=content.workspace,
+                new_content_namespace=content_namespace,
+                must_stay_in_same_workspace=False,
+            )
+            self.save(content)
+
+        self._move_children_content_to_new_workspace(
+            item=content, new_workspace=content.workspace, new_content_namespace=content_namespace
+        )
+
+        return content

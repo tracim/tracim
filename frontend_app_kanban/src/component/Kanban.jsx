@@ -397,6 +397,7 @@ export class Kanban extends React.Component {
                 customColor={props.config.hexcolor}
                 focusOnDescription={state.editedCardInfos.focusOnDescription}
                 language={props.language}
+                memberList={props.config.workspace.memberList}
               />
             </CardPopup>
           )}
