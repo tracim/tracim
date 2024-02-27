@@ -1,8 +1,6 @@
 from http import HTTPStatus
 from pyramid.config import Configurator
 from pyramid.httpexceptions import HTTPFound
-from sqlalchemy.engine import Engine
-from sqlalchemy.event import listen
 import transaction
 import typing
 
