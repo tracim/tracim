@@ -35,5 +35,7 @@
   "The link has been copied to clipboard": "Lien copié dans le presse-papiers",
   "Copy content link": "Copier le lien du contenu",
   "Cancel": "Annuler",
-  "Validate": "Valider"
+  "Validate": "Valider",
+  "Permanently delete": "Supprimer définitivement",
+  "This content will be deleted permanently and won't be restorable": "Ce contenu sera supprimé définitivement et ne pourra pas être restauré"
 }

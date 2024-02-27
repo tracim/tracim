@@ -45,5 +45,7 @@
   "The link has been copied to clipboard": "Lien copié dans le presse-papiers",
   "Copy content link": "Copier le lien du contenu",
   "Description of the card": "Description de la carte",
-  "Open field:": "Champ libre :"
+  "Open field:": "Champ libre :",
+  "Permanently delete": "Supprimer définitivement",
+  "This content will be deleted permanently and won't be restorable": "Ce contenu sera supprimé définitivement et ne pourra pas être restauré"
 }

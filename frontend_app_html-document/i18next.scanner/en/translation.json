@@ -35,5 +35,7 @@
   "The link has been copied to clipboard": "Link copied to clipboard",
   "Copy content link": "Copy content link",
   "Cancel": "Cancel",
-  "Validate": "Validate"
+  "Validate": "Validate",
+  "Permanently delete": "Permanently delete",
+  "This content will be deleted permanently and won't be restorable": "This content will be deleted permanently and won't be restorable"
 }

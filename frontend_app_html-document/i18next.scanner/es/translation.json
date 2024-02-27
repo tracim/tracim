@@ -35,5 +35,7 @@
   "The link has been copied to clipboard": "Enlace copiado en el portapapeles",
   "Copy content link": "Copiar enlace al contenido",
   "Cancel": "Cancelar",
-  "Validate": "Validar"
+  "Validate": "Validar",
+  "Permanently delete": "",
+  "This content will be deleted permanently and won't be restorable": ""
 }

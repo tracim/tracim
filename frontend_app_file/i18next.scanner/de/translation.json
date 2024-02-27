@@ -64,5 +64,7 @@
   "Delete": "Löschen",
   "Tasks": "",
   "The link has been copied to clipboard": "Der Link wurde in die Clipboard kopiert",
-  "Copy content link": "Link zum Inhalt kopieren"
+  "Copy content link": "Link zum Inhalt kopieren",
+  "Permanently delete": "",
+  "This content will be deleted permanently and won't be restorable": ""
 }
