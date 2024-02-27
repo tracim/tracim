@@ -261,7 +261,7 @@ export const NotificationWall = props => {
     // autoFocus props cannot work
     if (props.isNotificationWallOpen === true) {
       const inputTextHtml = document.querySelector(
-        '.notification__filterInput [data-cy=textInputComponent__text]'
+        '.notification__filterInput .textInputComponent__text'
       )
       if (inputTextHtml !== null) inputTextHtml.focus()
     }
