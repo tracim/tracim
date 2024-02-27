@@ -23,6 +23,7 @@ export class DateInput extends React.Component {
         placeholder={props.placeholder}
         onKeyPress={this.handleValidateIfEnterKey}
         value={props.value}
+        step={props.step}
       />
     )
   }
@@ -37,7 +38,8 @@ DateInput.propTypes = {
   placeholder: PropTypes.string,
   customClass: PropTypes.string,
   icon: PropTypes.string,
-  type: PropTypes.string
+  type: PropTypes.string,
+  step: PropTypes.number
 }
 
 DateInput.defaultProps = {
@@ -47,7 +49,8 @@ DateInput.defaultProps = {
   placeholder: undefined,
   customClass: '',
   icon: undefined,
-  type: 'date'
+  type: 'date',
+  step: undefined
 }
 
 export default DateInput

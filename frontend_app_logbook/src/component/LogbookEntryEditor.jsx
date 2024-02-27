@@ -92,6 +92,7 @@ function LogbookEntryEditor (props) {
             onValidate={handleValidate}
             value={deadline}
             type='datetime-local'
+            step={1}
           />
         </div>
 
