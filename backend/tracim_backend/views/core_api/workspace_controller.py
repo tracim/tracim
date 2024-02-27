@@ -8,8 +8,6 @@ import typing
 
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.command.cleanup import disable_sqlite_foreign_keys
-from tracim_backend.command.cleanup import enable_sqlite_foreign_keys
 from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import ConflictingMoveInChild
 from tracim_backend.exceptions import ConflictingMoveInItself
