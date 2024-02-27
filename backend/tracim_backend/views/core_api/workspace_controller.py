@@ -37,7 +37,6 @@ from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import can_create_content
-from tracim_backend.lib.utils.authorization import can_delete_content_permanently
 from tracim_backend.lib.utils.authorization import can_delete_workspace
 from tracim_backend.lib.utils.authorization import can_leave_workspace
 from tracim_backend.lib.utils.authorization import can_modify_workspace
@@ -933,7 +932,7 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_TRASH_AND_RESTORE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
-    @check_right(can_delete_content_permanently)
+    @check_right(is_administrator)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def delete_content_permanently(self, context, request: TracimRequest, hapic_data=None):
@@ -951,25 +950,24 @@ class WorkspaceController(Controller):
 
         content = api.get_one(path_data.content_id, content_type=ContentTypeSlug.ANY.value)
 
-        if is_administrator or content.is_deleted:
-            if session.bind.dialect.name == "sqlite":
-                listen(Engine, "connect", enable_sqlite_foreign_keys)
+        if session.bind.dialect.name == "sqlite":
+            listen(Engine, "connect", enable_sqlite_foreign_keys)
 
-            cleanup_lib = CleanupLib(session, app_config)
+        cleanup_lib = CleanupLib(session, app_config)
 
-            cleanup_lib.soft_delete_content(content)
+        cleanup_lib.soft_delete_content(content)
+        session.flush()
+        session.expire_all()
+
+        with unprotected_content_revision(session) as session:
+            cleanup_lib_unprotected = CleanupLib(session, app_config)
+            cleanup_lib_unprotected.delete_content(content)
             session.flush()
-            session.expire_all()
 
-            with unprotected_content_revision(session) as session:
-                cleanup_lib_unprotected = CleanupLib(session, app_config)
-                cleanup_lib_unprotected.delete_content(content)
-                session.flush()
+        if session.bind.dialect.name == "sqlite":
+            listen(Engine, "connect", disable_sqlite_foreign_keys)
 
-            if session.bind.dialect.name == "sqlite":
-                listen(Engine, "connect", disable_sqlite_foreign_keys)
-
-            return
+        return
 
     def bind(self, configurator: Configurator) -> None:
         """

@@ -35,6 +35,7 @@ import {
   buildHeadTitle,
   ROLE,
   ROLE_LIST,
+  PROFILE,
   APP_FEATURE_MODE,
   computeProgressionPercentage,
   FILE_PREVIEW_STATE,
@@ -1229,7 +1230,7 @@ export class File extends React.Component {
               icon: '',
               label: '',
               onClick: () => {},
-              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              showAction: state.loggedUser.profile === PROFILE.administrator.slug,
               disabled: false,
               separatorLine: true,
               dataCy: 'popinListItem__separatorLine'
@@ -1238,7 +1239,7 @@ export class File extends React.Component {
               icon: 'far fa-trash-alt iconbutton__icon',
               label: props.t('Permanently delete'),
               onClick: this.handleClickPermanentlyDeleteButton,
-              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              showAction: state.loggedUser.profile === PROFILE.administrator.slug,
               disabled: false,
               dataCy: 'popinListItem__permanentlyDelete'
             }

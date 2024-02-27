@@ -12,6 +12,7 @@ import {
   PAGE,
   ROLE_LIST,
   ROLE,
+  PROFILE,
   SORT_BY,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -650,7 +651,7 @@ export class Kanban extends React.Component {
               icon: '',
               label: '',
               onClick: () => {},
-              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              showAction: state.loggedUser.profile === PROFILE.administrator.slug,
               disabled: false,
               separatorLine: true,
               dataCy: 'popinListItem__separatorLine'
@@ -659,7 +660,7 @@ export class Kanban extends React.Component {
               icon: 'far fa-trash-alt iconbutton__icon',
               label: props.t('Permanently delete'),
               onClick: this.handleClickPermanentlyDeleteButton,
-              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              showAction: state.loggedUser.profile === PROFILE.administrator.slug,
               disabled: false,
               dataCy: 'popinListItem__permanentlyDelete'
             }

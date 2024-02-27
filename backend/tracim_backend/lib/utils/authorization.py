@@ -479,9 +479,6 @@ can_move_content = AndAuthorizationChecker(
     CandidateWorkspaceRoleChecker(WorkspaceRoles.CONTENT_MANAGER.level),
 )
 can_create_content = ContentTypeCreationChecker(content_type_list)
-can_delete_content_permanently = OrAuthorizationChecker(
-    is_administrator, AndAuthorizationChecker(is_workspace_manager, is_trusted_user)
-)
 # comments
 is_comment_owner = CommentOwnerChecker()
 can_edit_comment = OrAuthorizationChecker(

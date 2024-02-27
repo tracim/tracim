@@ -8,7 +8,6 @@ import {
   buildContentPathBreadcrumbs,
   CONTENT_NAMESPACE,
   CONTENT_TYPE,
-  ConfirmPopup,
   handleClickCopyLink,
   handleFetchResult,
   PAGE,
@@ -28,6 +27,7 @@ import {
   sendGlobalFlashMessage,
   FAVORITE_STATE,
   ROLE,
+  PROFILE,
   COLORS,
   SelectStatus
 } from 'tracim_frontend_lib'
@@ -120,6 +120,8 @@ export class Thread extends React.Component {
   }
 
   handleClickPermanentlyDeleteButton = () => {
+    const { state } = this
+    console.log(state.loggedUser)
     this.setState(prev => ({ showPermanentlyDeletePopup: !prev.showPermanentlyDeletePopup }))
   }
 
@@ -412,6 +414,23 @@ export class Thread extends React.Component {
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
               disabled: state.content.is_archived || state.content.is_deleted,
               dataCy: 'popinListItem__delete'
+            },
+            {
+              icon: '',
+              label: '',
+              onClick: () => {},
+              showAction: state.loggedUser.profile === PROFILE.administrator.slug,
+              disabled: false,
+              separatorLine: true,
+              dataCy: 'popinListItem__separatorLine'
+            },
+            {
+              icon: 'far fa-trash-alt iconbutton__icon',
+              label: props.t('Permanently delete'),
+              onClick: this.handleClickPermanentlyDeleteButton,
+              showAction: state.loggedUser.profile === PROFILE.administrator.slug,
+              disabled: false,
+              dataCy: 'popinListItem__permanentlyDelete'
             }
           ] : [
             {
@@ -432,7 +451,7 @@ export class Thread extends React.Component {
               icon: '',
               label: '',
               onClick: () => {},
-              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              showAction: state.loggedUser.profile === PROFILE.administrator.slug,
               disabled: false,
               separatorLine: true,
               dataCy: 'popinListItem__separatorLine'
@@ -441,7 +460,7 @@ export class Thread extends React.Component {
               icon: 'far fa-trash-alt iconbutton__icon',
               label: props.t('Permanently delete'),
               onClick: this.handleClickPermanentlyDeleteButton,
-              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              showAction: state.loggedUser.profile === PROFILE.administrator.slug,
               disabled: false,
               dataCy: 'popinListItem__permanentlyDelete'
             }
