@@ -12,5 +12,7 @@
   "Delete": "حذف",
   "The content has been modified by {{author}}": "تم تعديل المحتوى بواسطة {{author}}",
   "The link has been copied to clipboard": "تم نسخ الرابط إلى الحافظة",
-  "Copy content link": "نسخ رابط المحتوى"
+  "Copy content link": "نسخ رابط المحتوى",
+  "Copy news link": "نسخ رابط المحتوى",
+  "Turn into content": ""
 }

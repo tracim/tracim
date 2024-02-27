@@ -560,7 +560,10 @@ need to be in every workspace you include."
         # INFO - G.M - 2018-11-22 - LDAP Auth
         data = ldap_connector.authenticate(login, password)
         if not data:
-            if user.auth_type == AuthType.UNKNOWN:
+            if user and user.auth_type == AuthType.UNKNOWN:
+                # INFO - M.L - 2024-02-22 - In the event the user is of "UNKNOWN" auth type,
+                #  we can't be sure if the user is not allowed to authenticate with the other
+                #  auth types. This permits to try to authenticate with the other auth types.
                 raise WrongAuthTypeForUser(
                     'User "{}" auth_type is {} and cannot authenticate with {}'.format(
                         login, user.auth_type.value, auth_type.value
