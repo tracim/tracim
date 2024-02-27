@@ -17,20 +17,23 @@ cardWidth = 280px
     height 100%
     display flex
     flex-direction row
-    flex-wrap wrap
-    align-items stretch
     margin-top standardSpacing
-    padding-left 10px
-    overflow-y auto
+    position relative
     &__bar
       background-color lightGrey1
-      width 10px
-    &__entries
-      padding-inline-start standardSpacing
-      width 99%
-      max-width 700px
+      width standardSpacing
+      height 100%
       margin-inline-start standardSpacing
-      z-index 10
+      position absolute
+    &__entries
+      $multiple = 4
+      padding-inline-start '%s' % (4 * standardSpacing)
+      width 100%
+      max-width 700px
+      height 100%
+      overflow-y auto
+      padding-inline-end standardSpacing
+      position absolute
       &__entry
         border-radius standardBorderRadius
         display flex
@@ -52,7 +55,6 @@ cardWidth = 280px
           margin-inline-start standardSpacing
           border-top 0.5rem solid transparent
           border-bottom 0.5rem solid transparent
-          z-index -1
         &__data
           width 100%
           padding standardSpacing
