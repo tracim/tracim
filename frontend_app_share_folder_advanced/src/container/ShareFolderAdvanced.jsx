@@ -253,7 +253,7 @@ export class ShareFolderAdvanced extends React.Component {
           customClass='folderAdvanced'
           customColor={state.config.hexcolor}
           faIcon={state.config.faIcon}
-          componentTitle={<div>{props.t('Received files')}</div>}
+          componentTitle={<span className='componentTitle'>{props.t('Received files')}</span>}
           userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           showChangeTitleButton={false}
@@ -280,7 +280,7 @@ export class ShareFolderAdvanced extends React.Component {
                 uploadPassword={state.uploadPassword}
                 onChangeUploadPassword={this.handleChangePassword}
                 onKeyDownEnter={this.handleKeyDownEnter}
-                emailNotifActivated={state.config.system.config.email_notification_activated}
+                isEmailNotifActivated={state.config.system.config.email_notification_activated}
               />
             )
           )}

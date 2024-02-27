@@ -2,7 +2,7 @@ import pytest
 from rq import SimpleWorker
 import transaction
 
-from tracim_backend.applications.share.lib import ShareLib
+from tracim_backend.applications.share.lib import ShareLib  # noqa: F401
 from tracim_backend.applications.share.models import ContentShareType
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.rq import RqQueueName
@@ -17,7 +17,12 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestPrivateShareEndpoints(object):
     def test_api__get_shares__ok_200__no_result(
-        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        session,
+        web_testapp,
+        content_type_list,
     ) -> None:
         """
         Get one file of a content
@@ -35,11 +40,17 @@ class TestPrivateShareEndpoints(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.save(test_file)
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/workspaces/{}/contents/{}/shares".format(
                 workspace.workspace_id, test_file.content_id
@@ -71,13 +82,19 @@ class TestPrivateShareEndpoints(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(test_file, emails=["test@test.test", "test2@test2.test2"])
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/workspaces/{}/contents/{}/shares".format(
                 workspace.workspace_id, test_file.content_id
@@ -127,13 +144,19 @@ class TestPrivateShareEndpoints(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(test_file, emails=["test@test.test", "test2@test2.test2"])
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/workspaces/{}/contents/{}/shares".format(
                 workspace.workspace_id, test_file.content_id
@@ -184,13 +207,19 @@ class TestPrivateShareEndpoints(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(test_file, emails=["test@test.test", "test2@test2.test2"])
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/workspaces/{}/contents/{}/shares".format(
                 workspace.workspace_id, test_file.content_id
@@ -221,13 +250,19 @@ class TestPrivateShareEndpoints(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/workspaces/{}/contents/{}/shares".format(
                 workspace.workspace_id, test_file.content_id
@@ -236,7 +271,10 @@ class TestPrivateShareEndpoints(object):
         )
         content = res.json_body
         assert len(content) == 1
-        params = {"emails": ["test <test@test.test>", "test2@test2.test2"], "password": "123456"}
+        params = {
+            "emails": ["test <test@test.test>", "test2@test2.test2"],
+            "password": "123456",
+        }
         res = web_testapp.post_json(
             "/api/workspaces/{}/contents/{}/shares".format(
                 workspace.workspace_id, test_file.content_id
@@ -296,13 +334,19 @@ class TestPrivateShareEndpoints(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"emails": [], "password": "123456"}
         res = web_testapp.post_json(
             "/api/workspaces/{}/contents/{}/shares".format(
@@ -337,8 +381,14 @@ class TestPrivateShareEndpoints(object):
         share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"emails": ["test@test.test", "test2@test2.test2"], "password": "123456"}
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        params = {
+            "emails": ["test@test.test", "test2@test2.test2"],
+            "password": "123456",
+        }
         res = web_testapp.post_json(
             "/api/workspaces/{}/contents/{}/shares".format(
                 workspace.workspace_id, test_file.content_id
@@ -372,14 +422,23 @@ class TestPrivateShareEndpoints(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"emails": ["test@test.test", "test2@test2.test2"], "password": "123456"}
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        params = {
+            "emails": ["test@test.test", "test2@test2.test2"],
+            "password": "123456",
+        }
         res = web_testapp.post_json(
             "/api/workspaces/{}/contents/{}/shares".format(
                 workspace.workspace_id, test_file.content_id
@@ -411,13 +470,19 @@ class TestPrivateShareEndpoints(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(test_file, emails=["thissharewill@notbe.presentinresponse"])
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/workspaces/{}/contents/{}/shares".format(
                 workspace.workspace_id, test_file.content_id
@@ -464,7 +529,8 @@ class TestPrivateShareEndpoints(object):
         )
         assert res.json_body["code"] == ErrorCode.CONTENT_SHARE_NOT_FOUND
         res = web_testapp.get(
-            "/api/public/guest-download/{share_token}".format(share_token=share_token), status=400,
+            "/api/public/guest-download/{share_token}".format(share_token=share_token),
+            status=400,
         )
         assert res.json_body["code"] == ErrorCode.CONTENT_SHARE_NOT_FOUND
 
@@ -492,7 +558,10 @@ class TestPrivateShareEndpoints(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
@@ -501,7 +570,10 @@ class TestPrivateShareEndpoints(object):
         )
         share_id = shares[0].share_id
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.delete(
             "/api/workspaces/{}/contents/{}/shares/{}".format(
                 workspace.workspace_id, test_file.content_id, share_id
@@ -532,11 +604,17 @@ class TestPrivateShareEndpoints(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.save(test_file)
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.delete(
             "/api/workspaces/{}/contents/{}/shares/{}".format(
                 workspace.workspace_id, test_file.content_id, 1
@@ -549,7 +627,9 @@ class TestPrivateShareEndpoints(object):
 @pytest.mark.usefixtures("base_fixture")
 class TestPrivateShareEndpointsWithNotification(object):
     @pytest.mark.parametrize(
-        "config_section", [{"name": "functional_test_with_mail_test_sync"}], indirect=True
+        "config_section",
+        [{"name": "functional_test_with_mail_test_sync"}],
+        indirect=True,
     )
     def test_api__add_share__ok_200__with_email_notification(
         self,
@@ -574,7 +654,10 @@ class TestPrivateShareEndpointsWithNotification(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
@@ -584,7 +667,11 @@ class TestPrivateShareEndpointsWithNotification(object):
         transaction.commit()
         response = mailhog.get_mailhog_mails()
         assert len(response) == 3
-        valid_dests = ["Global manager <admin@admin.admin>", "test@test.test", "test2@test2.test2"]
+        valid_dests = [
+            "Global manager <admin@admin.admin>",
+            "test@test.test",
+            "test2@test2.test2",
+        ]
         for email in response:
             assert (
                 email["Content"]["Headers"]["From"][0]
@@ -597,7 +684,9 @@ class TestPrivateShareEndpointsWithNotification(object):
         assert valid_dests == []
 
     @pytest.mark.parametrize(
-        "config_section", [{"name": "functional_test_with_mail_test_async"}], indirect=True
+        "config_section",
+        [{"name": "functional_test_with_mail_test_async"}],
+        indirect=True,
     )
     def test_api__add_share__ok_200__with_email_notification_async(
         self,
@@ -623,7 +712,10 @@ class TestPrivateShareEndpointsWithNotification(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
@@ -641,7 +733,11 @@ class TestPrivateShareEndpointsWithNotification(object):
 
         response = mailhog.get_mailhog_mails()
         assert len(response) == 3
-        valid_dests = ["Global manager <admin@admin.admin>", "test@test.test", "test2@test2.test2"]
+        valid_dests = [
+            "Global manager <admin@admin.admin>",
+            "test@test.test",
+            "test2@test2.test2",
+        ]
         for email in response:
             assert (
                 email["Content"]["Headers"]["From"][0]
@@ -654,7 +750,9 @@ class TestPrivateShareEndpointsWithNotification(object):
         assert valid_dests == []
 
     @pytest.mark.parametrize(
-        "config_section", [{"name": "functional_test_with_mail_test_sync"}], indirect=True
+        "config_section",
+        [{"name": "functional_test_with_mail_test_sync"}],
+        indirect=True,
     )
     def test_api__add_share__ok_200__with_email_notification_and_password(
         self,
@@ -679,7 +777,10 @@ class TestPrivateShareEndpointsWithNotification(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
@@ -709,7 +810,9 @@ class TestPrivateShareEndpointsWithNotification(object):
         assert valid_dests == []
 
     @pytest.mark.parametrize(
-        "config_section", [{"name": "functional_test_with_mail_test_sync"}], indirect=True
+        "config_section",
+        [{"name": "functional_test_with_mail_test_sync"}],
+        indirect=True,
     )
     def test_api__add_share__ok_200__with_email_notification_and_emitter_without_email(
         self,
@@ -734,7 +837,10 @@ class TestPrivateShareEndpointsWithNotification(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
@@ -789,7 +895,10 @@ class TestGuestDownloadShareEndpoints(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
@@ -841,7 +950,10 @@ class TestGuestDownloadShareEndpoints(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
@@ -931,7 +1043,10 @@ class TestGuestDownloadShareEndpoints(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
@@ -984,7 +1099,10 @@ class TestGuestDownloadShareEndpoints(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
@@ -1082,12 +1200,17 @@ class TestGuestDownloadShareEndpoints(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(
-            test_file, emails=["thissharewill@notbe.presentinresponse"], password="123456"
+            test_file,
+            emails=["thissharewill@notbe.presentinresponse"],
+            password="123456",
         )
         content_shares = share_api.get_content_shares(test_file)
         assert len(content_shares) == 1
@@ -1128,12 +1251,17 @@ class TestGuestDownloadShareEndpoints(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(
-            test_file, emails=["thissharewill@notbe.presentinresponse"], password="123456"
+            test_file,
+            emails=["thissharewill@notbe.presentinresponse"],
+            password="123456",
         )
         content_shares = share_api.get_content_shares(test_file)
         assert len(content_shares) == 1
@@ -1174,12 +1302,17 @@ class TestGuestDownloadShareEndpoints(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(
-            test_file, emails=["thissharewill@notbe.presentinresponse"], password="123456"
+            test_file,
+            emails=["thissharewill@notbe.presentinresponse"],
+            password="123456",
         )
         content_shares = share_api.get_content_shares(test_file)
         assert len(content_shares) == 1
@@ -1215,7 +1348,10 @@ class TestGuestDownloadShareEndpoints(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
@@ -1255,7 +1391,10 @@ class TestGuestDownloadShareEndpoints(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
@@ -1310,7 +1449,10 @@ class TestGuestDownloadShareEndpoints(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.delete(test_file)
@@ -1351,7 +1493,10 @@ class TestGuestDownloadShareEndpoints(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.archive(test_file)
@@ -1427,12 +1572,17 @@ class TestGuestDownloadShareEndpoints(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(
-            test_file, emails=["thissharewill@notbe.presentinresponse"], password="123456"
+            test_file,
+            emails=["thissharewill@notbe.presentinresponse"],
+            password="123456",
         )
         content_shares = share_api.get_content_shares(test_file)
         assert len(content_shares) == 1
@@ -1468,12 +1618,17 @@ class TestGuestDownloadShareEndpoints(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(
-            test_file, emails=["thissharewill@notbe.presentinresponse"], password="123456"
+            test_file,
+            emails=["thissharewill@notbe.presentinresponse"],
+            password="123456",
         )
         content_shares = share_api.get_content_shares(test_file)
         assert len(content_shares) == 1
@@ -1508,12 +1663,17 @@ class TestGuestDownloadShareEndpoints(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=test_file):
             content_api.update_file_data(
-                test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                test_file,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.save(test_file)
         share_api = share_lib_factory.get()  # type: ShareLib
         share_api.share_content(
-            test_file, emails=["thissharewill@notbe.presentinresponse"], password="123456"
+            test_file,
+            emails=["thissharewill@notbe.presentinresponse"],
+            password="123456",
         )
         content_shares = share_api.get_content_shares(test_file)
         assert len(content_shares) == 1

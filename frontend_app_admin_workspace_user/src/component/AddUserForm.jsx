@@ -1,11 +1,11 @@
 import React from 'react'
 import { translate } from 'react-i18next'
-import { Popover, PopoverBody } from 'reactstrap'
 import {
   CUSTOM_EVENT,
   IconButton,
   PROFILE_LIST,
-  ALLOWED_CHARACTERS_USERNAME
+  ALLOWED_CHARACTERS_USERNAME,
+  Popover
 } from 'tracim_frontend_lib'
 
 export class AddUserForm extends React.Component {
@@ -17,15 +17,8 @@ export class AddUserForm extends React.Component {
       newUserUsername: '',
       newUserEmail: '',
       newUserPassword: '',
-      newUserType: '',
-      popoverEmailInfoOpen: false
+      newUserType: ''
     }
-  }
-
-  handleTogglePopoverEmailInfo = () => {
-    this.setState(prevState => ({
-      popoverEmailInfoOpen: !prevState.popoverEmailInfoOpen
-    }))
   }
 
   handleChangeNewUserName = e => this.setState({ newUserName: e.target.value })
@@ -35,7 +28,10 @@ export class AddUserForm extends React.Component {
     this.props.onChangeUsername(e.target.value)
   }
 
-  handleChangeNewUserEmail = e => this.setState({ newUserEmail: e.target.value })
+  handleChangeNewUserEmail = e => {
+    const email = e.target.value.trim()
+    this.setState({ newUserEmail: email })
+  }
 
   handleChangeNewUserPassword = e => this.setState({ newUserPassword: e.target.value })
 
@@ -43,8 +39,9 @@ export class AddUserForm extends React.Component {
 
   handleClickAddUser = () => {
     const { props, state } = this
+    const email = state.newUserEmail.trim()
 
-    if (state.newUserName === '' || (state.newUserUsername === '' && state.newUserEmail === '') || state.newUserType === '') {
+    if (state.newUserName === '' || (state.newUserUsername === '' && email === '') || state.newUserType === '') {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
@@ -59,7 +56,7 @@ export class AddUserForm extends React.Component {
     props.onClickAddUser(
       state.newUserName,
       state.newUserUsername,
-      state.newUserEmail,
+      email,
       state.newUserType,
       state.newUserPassword
     )
@@ -67,9 +64,9 @@ export class AddUserForm extends React.Component {
 
   isValidateButtonDisabled = () => {
     const { props, state } = this
-    if (props.emailNotifActivated && state.newUserEmail === '' && state.newUserPassword === '') return true
+    if (props.isEmailNotifActivated && state.newUserEmail === '' && state.newUserPassword === '') return true
     if (state.newUserName === '' || state.newUserType === '') return true
-    if (!props.emailNotifActivated && state.newUserPassword === '') return true
+    if (!props.isEmailNotifActivated && state.newUserPassword === '') return true
     if (props.isEmailRequired && state.newUserEmail === '') return true
     else return ((state.newUserUsername === '' && state.newUserEmail === '') || !props.isUsernameValid)
   }
@@ -86,7 +83,7 @@ export class AddUserForm extends React.Component {
 
           <input
             type='text'
-            className='userData__input form-control primaryColorBorderLighten'
+            className='userData__input form-control'
             id='adduser_name'
             placeholder={props.t('Full name')}
             value={state.newUserName}
@@ -101,7 +98,7 @@ export class AddUserForm extends React.Component {
           <div>
             <input
               type='text'
-              className='userData__input userData__input__username form-control primaryColorBorderLighten'
+              className='userData__input userData__input__username form-control'
               id='adduser_username'
               placeholder={props.t('Username')}
               value={state.newUserUsername}
@@ -126,7 +123,7 @@ export class AddUserForm extends React.Component {
               {props.t('Email')}
             </label>
 
-            {!props.emailNotifActivated && (
+            {!props.isEmailNotifActivated && (
               <>
                 <button
                   type='button'
@@ -137,24 +134,16 @@ export class AddUserForm extends React.Component {
                 </button>
 
                 <Popover
-                  placement='bottom'
-                  isOpen={state.popoverEmailInfoOpen}
-                  target='popoverEmailInfo'
-                  // INFO - GB - 20200507 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
-                  toggle={this.handleTogglePopoverEmailInfo} // eslint-disable-line react/jsx-handler-names
-                  trigger='hover'
-                >
-                  <PopoverBody>
-                    {props.t('Linking an email address is required for the user to be able to reset the password.')}
-                  </PopoverBody>
-                </Popover>
+                  targetId='popoverEmailInfo'
+                  popoverBody={props.t('Linking an email address is required for the user to be able to reset the password.')}
+                />
               </>
             )}
           </div>
 
           <input
-            type='text'
-            className='userData__input form-control primaryColorBorderLighten'
+            type='email'
+            className='userData__input form-control'
             id='adduser_email'
             placeholder={props.t('Email')}
             value={state.newUserEmail}
@@ -169,7 +158,7 @@ export class AddUserForm extends React.Component {
 
             <input
               type='text'
-              className='userData__input form-control primaryColorBorderLighten'
+              className='userData__input form-control'
               id='adduser_password'
               placeholder={props.t('Password')}
               value={state.newUserPassword}
@@ -178,7 +167,7 @@ export class AddUserForm extends React.Component {
             />
           </div>
 
-          {(props.emailNotifActivated && state.newUserEmail === '') && (
+          {(props.isEmailNotifActivated && state.newUserEmail === '') && (
             <div className='userData__info'>
               <i className='fas fa-exclamation-triangle userData__info__icon' />
               {props.t('If you do not link an email to this new user, please notify manually the username and password.')}

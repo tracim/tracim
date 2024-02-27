@@ -4,29 +4,48 @@ from email.utils import formataddr
 from email.utils import formatdate
 from email.utils import make_msgid
 from email.utils import parseaddr
+import enum
+import html2text
 import typing
 
-import html2text
-
 from tracim_backend.lib.utils.sanitizer import HtmlSanitizer
+
+
+class SmtpEncryption(str, enum.Enum):
+    DEFAULT = "default"  # use starttls, fallback to unencrypted
+    UNSECURE = "unsecure"  # unencrypted
+    SMTPS = "smtps"  # use direct encryption
+
+    @classmethod
+    def get_all_values(cls) -> typing.List[str]:
+        return [cm.value for cm in SmtpEncryption]
 
 
 class SmtpConfiguration(object):
     """Container class for SMTP configuration used in Tracim."""
 
-    def __init__(self, server: str, port: int, login: str, password: str, use_implicit_ssl: bool):
+    def __init__(
+        self,
+        server: str,
+        port: int,
+        login: str,
+        password: str,
+        encryption: SmtpEncryption,
+        authentication: bool,
+    ):
         self.server = server
         self.port = port
         self.login = login
         self.password = password
-        self.use_implicit_ssl = use_implicit_ssl
+        self.encryption = encryption
+        self.authentication = authentication
 
 
 class EST(object):
     """
     EST = Email Subject Tags - this is a convenient class - no business logic
     here
-    This class is intended to agregate all dynamic content that may be included
+    This class is intended to aggregate all dynamic content that may be included
     in email subjects
     """
 
@@ -37,7 +56,12 @@ class EST(object):
 
     @classmethod
     def all(cls):
-        return [cls.CONTENT_LABEL, cls.CONTENT_STATUS_LABEL, cls.WEBSITE_TITLE, cls.WORKSPACE_LABEL]
+        return [
+            cls.CONTENT_LABEL,
+            cls.CONTENT_STATUS_LABEL,
+            cls.WEBSITE_TITLE,
+            cls.WORKSPACE_LABEL,
+        ]
 
 
 class EmailAddress(object):

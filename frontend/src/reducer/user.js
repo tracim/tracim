@@ -1,17 +1,19 @@
 import {
   SET,
-  UPDATE,
-  USER,
   USER_CONFIGURATION,
   USER_CONNECTED,
   USER_DISCONNECTED,
   USER_LANG,
   USER_AGENDA_URL,
   USER_PROFILE_AVATAR_NAME,
-  USER_PROFILE_COVER_NAME
+  USER_PROFILE_COVER_NAME,
+  UPDATE_USER
 } from '../action-creator.sync.js'
-import { getBrowserLang } from '../util/helper.js'
-import { PROFILE, serialize } from 'tracim_frontend_lib'
+import {
+  getBrowserLang,
+  PROFILE,
+  serialize
+} from 'tracim_frontend_lib'
 
 export const serializeUserProps = {
   config: 'config',
@@ -74,7 +76,7 @@ export default function user (state = defaultUser, action) {
     case `${SET}/${USER_LANG}`:
       return { ...state, lang: action.lang }
 
-    case `${UPDATE}/${USER}`:
+    case UPDATE_USER:
       if (action.newUser.user_id !== state.userId) return state
       return {
         ...state,
@@ -97,4 +99,15 @@ export default function user (state = defaultUser, action) {
     default:
       return state
   }
+}
+
+// INFO - CH - 2023-11-08 - Attributes bellow are possibly read only depending on auth type
+// Whether they are read only will be set by reducer system.config.user__read_only_fields[auth_type]
+// which value comes from backend (/api/system/config)
+// This object must stay synced with backend/tracim_backend/config.py class UserReadOnlyFields
+export const UserReadOnlyFields = {
+  PUBLIC_NAME: 'publicName',
+  USERNAME: 'username',
+  EMAIL: 'email',
+  PASSWORD: 'password'
 }

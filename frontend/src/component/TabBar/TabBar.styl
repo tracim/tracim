@@ -1,12 +1,16 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
+@import '~tracim_frontend_lib/src/css/Variable.styl'
 
-tabWidth = 160 //160px
+tabWidth = 170 // 170px
 
 .tabBar
   display flex
   background-color offWhite
+  &__tabs
+    display flex
+    flex-basis content
   & .pageTitleGeneric
     flex 1
+    min-width 0
     &__title__label
       font-weight bold
   // INFO - GB - 2020-12-09 - The style below means that for 4 items the label "Home"
@@ -19,12 +23,10 @@ tabWidth = 160 //160px
           display none
 
 .tab
-  border-bottom borderStyle
   width (tabWidth)px
   display flex
   align-items center
   justify-content center
-  border-left borderStyle
   padding 5px standardSpacing
   color fontColor
   &__active
@@ -32,16 +34,16 @@ tabWidth = 160 //160px
     border-top-width 5px
     border-top-style solid
     border-bottom 1px solid transparent
-    background-color veryLightGrey
+    background-color lightGrey2
   .fas, .far
-    margin-right textSpacing
+    margin-inline-end textSpacing
   // INFO - GB - 2020-11-20 - The style below should be specific to tachometer-alt icon.
   // See https://github.com/tracim/tracim/issues/3863
   .fa-tachometer-alt
     margin-bottom 1px
   &:hover
     color fontColor
-    background-color veryLightGrey
+    background-color lightGrey2
 
 @media (max-width: max-md)
   tabWidth = 50
@@ -54,8 +56,6 @@ tabWidth = 160 //160px
   .tabBar
     .breadcrumbs
       display none
-    .pageTitleGeneric
-      width "calc(100% - %s)" % (3*tabWidth)px
 
 @media (max-width: max-xs)
   .tabBar

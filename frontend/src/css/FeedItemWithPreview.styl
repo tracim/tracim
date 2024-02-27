@@ -1,12 +1,11 @@
-backgroundColor = grey-hover
+backgroundColor = lightGrey1
 feedWidth = 800px
 smallScreenFeedWidth = 400px
 
 .feedItem
   background-color backgroundColor
-  border borderStyle
-  padding standardSpacing
   margin-bottom standardSpacing
+  padding standardSpacing
   border-radius standardBorderRadius
   margin-inline-end auto
   margin-inline-start auto
@@ -20,15 +19,15 @@ smallScreenFeedWidth = 400px
   & .timeline
     width 100%
     height unset
+  & .timeline__texteditor
+    margin standardSpacing 0 0
   &__timeline
-    &__texteditor.timeline__texteditor
-      margin standardSpacing 0 0
     &__messagelist
       padding 0
   &__publication
     &__messagelist__item
       margin-bottom 0
-    &.comment
+    &.timeline__comment
       border 0
       &.sent, &.received
         margin 0

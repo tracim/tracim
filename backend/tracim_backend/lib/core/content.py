@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
 from contextlib import contextmanager
 import datetime
-import os
-import typing
-
+from datetime import timezone
 from depot.io.utils import FileIntent
 from hapic.data import HapicFile
+from importlib_metadata import metadata
+import os
 from preview_generator.exception import UnsupportedMimeType
 from preview_generator.manager import PreviewManager
 from sqlakeyset import Page
 from sqlakeyset import get_page
-from sqlalchemy import desc
+from sqlalchemy import Integer
+from sqlalchemy import bindparam
 from sqlalchemy import func
 from sqlalchemy import or_
+from sqlalchemy import text
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm.attributes import QueryableAttribute
@@ -20,8 +22,9 @@ from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.elements import and_
 import transaction
+import typing
 
-from tracim_backend.app_models.contents import FOLDER_TYPE
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
@@ -32,6 +35,7 @@ from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentInNotEditableState
 from tracim_backend.exceptions import ContentNamespaceDoNotMatch
 from tracim_backend.exceptions import ContentNotFound
+from tracim_backend.exceptions import ContentRevisionNotFound
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import EmptyCommentContentNotAllowed
 from tracim_backend.exceptions import EmptyLabelNotAllowed
@@ -46,14 +50,18 @@ from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.core.notifications import NotifierFactory
 from tracim_backend.lib.core.storage import StorageLib
-from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.tag import TagLib
+from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.lib.rich_text_preview.html_preview import RichTextPreviewLib
 from tracim_backend.lib.utils.app import TracimContentType
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.sanitizer import HtmlSanitizer
 from tracim_backend.lib.utils.sanitizer import HtmlSanitizerConfig
 from tracim_backend.lib.utils.translation import Translator
+from tracim_backend.lib.utils.translation import translator_marker as _
 from tracim_backend.lib.utils.utils import current_date_for_filename
+from tracim_backend.lib.utils.utils import date_as_lang
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import AuthoredContentRevisionsInfos
 from tracim_backend.models.context_models import ContentInContext
@@ -66,11 +74,15 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import RevisionReadStatus
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.event import OperationType
 from tracim_backend.models.favorites import FavoriteContent
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.tracim_session import TracimSession
+
+if typing.TYPE_CHECKING:
+    from tracim_backend.lib.utils.request import TracimContext
 
 __author__ = "damien"
 
@@ -88,7 +100,6 @@ class AddCopyRevisionsResult(object):
 
 
 class ContentApi(object):
-
     # DISPLAYABLE_CONTENTS = (
     #     content_type_list.Folder.slug,
     #     content_type_list.File.slug,
@@ -134,7 +145,10 @@ class ContentApi(object):
 
     @contextmanager
     def show(
-        self, show_archived: bool = False, show_deleted: bool = False, show_temporary: bool = False
+        self,
+        show_archived: bool = False,
+        show_deleted: bool = False,
+        show_temporary: bool = False,
     ) -> typing.Generator["ContentApi", None, None]:
         """
         Use this method as context manager to update show_archived,
@@ -171,7 +185,11 @@ class ContentApi(object):
         """
         # TODO - G.M - 2018-06-173 - create revision in context object
         return RevisionInContext(
-            revision, self._session, self._config, self._user, version_number=version_number
+            revision,
+            self._session,
+            self._config,
+            self._user,
+            version_number=version_number,
         )
 
     def get_canonical_query(self) -> Query:
@@ -181,7 +199,10 @@ class ContentApi(object):
         """
         return (
             self._session.query(Content)
-            .join(ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id)
+            .join(
+                ContentRevisionRO,
+                Content.cached_revision_id == ContentRevisionRO.revision_id,
+            )
             .options(contains_eager(Content.current_revision))
         )
 
@@ -202,15 +223,16 @@ class ContentApi(object):
         # with user workspaces privileges
         if self._user and not self._disable_user_workspaces_filter:
             # Filter according to user workspaces
-            workspace_ids = RoleApi(
+            workspace_ids = UserWorkspaceConfigApi(
                 session=self._session, current_user=self._user, config=self._config
-            ).get_user_workspaces_ids(self._user_id, UserRoleInWorkspace.READER)
+            ).get_user_workspaces_ids(self._user_id, UserWorkspaceConfig.READER)
             result = result.filter(
                 or_(
                     Content.workspace_id.in_(workspace_ids),
                     # And allow access to non workspace document when he is owner
                     and_(
-                        Content.workspace_id == None, Content.owner_id == self._user_id
+                        Content.workspace_id == None,  # noqa: E711
+                        Content.owner_id == self._user_id,  # noqa: E711
                     ),  # noqa: E711
                 )
             )
@@ -222,16 +244,16 @@ class ContentApi(object):
 
         if not self._show_active:
             result = result.filter(
-                or_(Content.is_deleted == True, Content.is_archived == True)
+                or_(Content.is_deleted == True, Content.is_archived == True)  # noqa: E712
             )  # noqa: E711
         if not self._show_deleted:
-            result = result.filter(Content.is_deleted == False)  # noqa: E711
+            result = result.filter(Content.is_deleted == False)  # noqa: E712
 
         if not self._show_archived:
-            result = result.filter(Content.is_archived == False)  # noqa: E711
+            result = result.filter(Content.is_archived == False)  # noqa: E712
 
         if not self._show_temporary:
-            result = result.filter(Content.is_temporary == False)  # noqa: E711
+            result = result.filter(Content.is_temporary == False)  # noqa: E712
 
         if self.namespaces_filter:
             result = result.filter(Content.content_namespace.in_(self.namespaces_filter))
@@ -252,7 +274,7 @@ class ContentApi(object):
             user = self._session.query(User).get(self._user_id)
             # Filter according to user workspaces
             workspace_ids = [
-                r.workspace_id for r in user.roles if r.role >= UserRoleInWorkspace.READER
+                r.workspace_id for r in user.roles if r.role >= UserWorkspaceConfig.READER
             ]
             result = result.filter(ContentRevisionRO.workspace_id.in_(workspace_ids))
 
@@ -262,13 +284,13 @@ class ContentApi(object):
         result = self.__revisions_real_base_query(workspace)
 
         if not self._show_deleted:
-            result = result.filter(ContentRevisionRO.is_deleted == False)  # noqa: E711
+            result = result.filter(ContentRevisionRO.is_deleted == False)  # noqa: E712
 
         if not self._show_archived:
-            result = result.filter(ContentRevisionRO.is_archived == False)  # noqa: E711
+            result = result.filter(ContentRevisionRO.is_archived == False)  # noqa: E712
 
         if not self._show_temporary:
-            result = result.filter(Content.is_temporary == False)  # noqa: E711
+            result = result.filter(Content.is_temporary == False)  # noqa: E712
 
         return result
 
@@ -381,6 +403,7 @@ class ContentApi(object):
         self,
         content_type_slug: str,
         workspace: Workspace,
+        template_id: int = None,
         parent: Content = None,
         label: str = "",
         filename: str = "",
@@ -390,7 +413,7 @@ class ContentApi(object):
         content_namespace: ContentNamespaces = ContentNamespaces.CONTENT,
     ) -> Content:
         # TODO - G.M - 2018-07-16 - raise Exception instead of assert
-        assert content_type_slug != content_type_list.Any_SLUG
+        assert content_type_slug != ContentTypeSlug.ANY.value
         assert not (label and filename)
         assert content_namespace
 
@@ -402,7 +425,7 @@ class ContentApi(object):
                 "parent namespace and content namespace should be the same."
             )
 
-        if content_type_slug == FOLDER_TYPE and not label:
+        if content_type_slug == ContentTypeSlug.FOLDER.value and not label:
             label = self.generate_folder_label(workspace, parent)
 
         if content_namespace == ContentNamespaces.PUBLICATION:
@@ -417,6 +440,19 @@ class ContentApi(object):
 
         self._check_valid_content_type_in_dir(content_type, parent, workspace)
         content = Content()
+
+        # NOTE - MP - 2022-07-04 - We should copy the template, not try to create a copy
+        if template_id:
+            template = self.get_one(template_id)
+            content = self.copy_from_template(
+                new_content=content,
+                source_content=template,
+                new_parent=parent,
+                new_content_namespace=content_namespace,
+            )
+        else:
+            content.revision_type = ActionDescription.CREATION
+
         if label:
             file_extension = ""
             if content_type.file_extension:
@@ -444,18 +480,53 @@ class ContentApi(object):
                 )
         if self._user:
             content.owner = self._user
-        content.parent = parent
 
+        content.parent = parent
         content.workspace = workspace
         content.type = content_type.slug
         content.is_temporary = is_temporary
-        content.revision_type = ActionDescription.CREATION
         content.content_namespace = content_namespace
 
         if do_save:
             self._session.add(content)
-            self.save(content, ActionDescription.CREATION, do_notify=do_notify)
+            self.save(content, content.revision_type, do_notify=do_notify)
+
         return content
+
+    def copy_tags(
+        self,
+        destination: Content,
+        source_content_id: int,
+    ) -> None:
+        """Create extra data for templates: tags"""
+        tag_lib = TagLib(self._session)
+        tags_values = tag_lib.get_all(content_id=source_content_id)
+
+        for tag in tags_values:
+            tag_lib.add_tag_to_content(user=self._user, content=destination, tag_name=tag.tag_name)
+
+    def copy_todos(self, new_parent: Content, template_id: int) -> None:
+        """Create extra data for templates: todos"""
+        try:
+            todos = self.get_all_query(
+                parent_ids=[template_id],
+                content_type_slug=ContentTypeSlug.TODO.value,
+            ).all()
+
+            for todo in todos:
+                self.create(
+                    content_type_slug=ContentTypeSlug.TODO.value,
+                    workspace=new_parent.workspace,
+                    template_id=todo.content_id,
+                    parent=new_parent,
+                    content_namespace=new_parent.content_namespace,
+                    do_save=False,
+                    do_notify=False,
+                )
+
+        except ContentTypeNotExist:
+            # INFO - MP - 2022-07-08 - We can have an error if the todo application isn't activated
+            pass
 
     def create_comment(
         self,
@@ -466,7 +537,7 @@ class ContentApi(object):
         do_notify=True,
     ) -> Content:
         # TODO: check parent allowed_type and workspace allowed_ type
-        assert parent and parent.type != FOLDER_TYPE
+        assert parent and parent.type != ContentTypeSlug.FOLDER.value
         if not self.is_editable(parent):
             raise ContentInNotEditableState(
                 "Can't create comment on content, you need to change its"
@@ -476,6 +547,7 @@ class ContentApi(object):
         config = HtmlSanitizerConfig(tag_blacklist=["script"], tag_whitelist=list())
         sanitizer = HtmlSanitizer(html_body=content, config=config)
         content = sanitizer.sanitize_html()
+
         if (not content) or sanitizer.html_is_empty():
             raise EmptyCommentContentNotAllowed()
 
@@ -488,6 +560,7 @@ class ContentApi(object):
             do_save=False,
             label="",
         )
+
         item.raw_content = content
         item.revision_type = ActionDescription.COMMENT
         if do_save:
@@ -495,7 +568,11 @@ class ContentApi(object):
         return item
 
     def get_one_from_revision(
-        self, content_id: int, content_type: str, workspace: Workspace = None, revision_id=None
+        self,
+        content_id: int,
+        content_type: str,
+        workspace: Workspace = None,
+        revision_id=None,
     ) -> Content:
         """
         This method is a hack to convert a node revision item into a node
@@ -523,12 +600,11 @@ class ContentApi(object):
     def get_one(
         self,
         content_id: int,
-        content_type: str = content_type_list.Any_SLUG,
+        content_type: str = ContentTypeSlug.ANY.value,
         workspace: Workspace = None,
         parent: Content = None,
         ignore_content_state_filter: bool = False,
     ) -> typing.Optional[Content]:
-
         if not content_id:
             return None
 
@@ -541,7 +617,7 @@ class ContentApi(object):
 
         base_request = base_request.filter(Content.content_id == content_id)
 
-        if content_type != content_type_list.Any_SLUG:
+        if content_type != ContentTypeSlug.ANY.value:
             base_request = base_request.filter(Content.type == content_type)
 
         if parent:
@@ -570,11 +646,16 @@ class ContentApi(object):
         """
         assert revision_id is not None  # DYN_REMOVE
 
-        revision = (
-            self._session.query(ContentRevisionRO)
-            .filter(ContentRevisionRO.revision_id == revision_id)
-            .one()
-        )
+        try:
+            revision = (
+                self._session.query(ContentRevisionRO)
+                .filter(ContentRevisionRO.revision_id == revision_id)
+                .one()
+            )
+        except NoResultFound as exc:
+            raise ContentRevisionNotFound(
+                'Content revision "{}" not found'.format(revision_id)
+            ) from exc
         if content and revision.content_id != content.content_id:
             raise RevisionDoesNotMatchThisContent(
                 "revision {revision_id} is not a revision of content {content_id}".format(
@@ -628,8 +709,14 @@ class ContentApi(object):
                         Content.label == file_name,
                         Content.file_extension == file_extension,
                     ),
-                    and_(Content.type == content_type_list.Thread.slug, Content.label == file_name),
-                    and_(Content.type == content_type_list.Page.slug, Content.label == file_name),
+                    and_(
+                        Content.type == content_type_list.Thread.slug,
+                        Content.label == file_name,
+                    ),
+                    and_(
+                        Content.type == content_type_list.Page.slug,
+                        Content.label == file_name,
+                    ),
                     and_(
                         Content.type == content_type_list.Folder.slug,
                         Content.label == content_label,
@@ -642,7 +729,10 @@ class ContentApi(object):
             ) from exc
 
     def get_one_by_filename(
-        self, filename: str, workspace: Workspace, parent: typing.Optional[Content] = None,
+        self,
+        filename: str,
+        workspace: Workspace,
+        parent: typing.Optional[Content] = None,
     ):
         query = self._base_query([workspace] if workspace else None)
         query = query.filter((Content.label + Content.file_extension) == filename)
@@ -680,6 +770,75 @@ class ContentApi(object):
             force_download=force_download,
         )
 
+    def get_full_pdf_preview_from_html_raw_content(
+        self,
+        revision: ContentRevisionRO,
+        filename: str,
+        default_filename: str,
+        additional_metadata: typing.Optional[typing.Dict[str, typing.Any]] = None,
+        force_download: bool = None,
+    ):
+        if not additional_metadata:
+            additional_metadata = {}
+        content = revision.node
+        revision_in_context = self.get_revision_in_context(revision)
+        space_name = _("Space {workspace_name}").format(workspace_name=content.workspace.label)
+        tag_lib = TagLib(session=self._session)
+        tags_objs = tag_lib.get_all(
+            workspace_id=content.workspace_id, content_id=content.content_id
+        )
+        keywords = ",".join([tag_obj.tag_name for tag_obj in tags_objs])
+        generator = "Tracim {}".format(metadata("tracim_backend")["Version"])
+        current_date = date_as_lang(
+            datetime.datetime.now(),
+            locale=self._user.lang,
+            default_locale=self._config.DEFAULT_LANG,
+        )
+
+        revision_txt = _("version {} (revision {}) on {}").format(
+            revision_in_context.version_number,
+            revision_in_context.revision_id,
+            date_as_lang(
+                revision_in_context.created,
+                locale=self._user.lang,
+                default_locale=self._config.DEFAULT_LANG,
+            ),
+        )
+        content_url = "{}/ui/workspaces/{}/contents/html-document/{}".format(
+            self._config.WEBSITE__BASE_URL, content.workspace_id, content.content_id
+        )
+        preview_metadata = {
+            "title": content.label,
+            "subtitle": space_name,
+            "author": content.owner.public_name,
+            "keywords": keywords,
+            "description": content.description,
+            "generator": generator,
+            "created": content.created.astimezone(timezone.utc).isoformat(),
+            "updated": content.updated.astimezone(timezone.utc).isoformat(),
+            "date": date_as_lang(
+                content.updated,
+                locale=self._user.lang,
+                default_locale=self._config.DEFAULT_LANG,
+            ),
+            "content_url": content_url,
+            "revision_txt": revision_txt,
+            "footer_text": _("Generated by Tracim, on {}".format(current_date)),
+            "toctitle": _("Summary"),
+            "website_url": self._config.WEBSITE__BASE_URL,
+            "logo_url": self._config.WEBSITE__BASE_URL + "/assets/branding/images/tracim-logo.png",
+        }
+        preview_metadata.update(additional_metadata)
+
+        return RichTextPreviewLib(self._config).get_full_pdf_preview(
+            content=revision.raw_content,
+            default_filename=default_filename,
+            filename=filename,
+            force_download=force_download,
+            last_modified=revision.updated,
+            metadata=preview_metadata,
+        )
+
     def get_full_pdf_preview(
         self,
         revision: ContentRevisionRO,
@@ -700,7 +859,8 @@ class ContentApi(object):
         Get jpg preview allowed dimensions and strict bool param.
         """
         return PreviewAllowedDim(
-            self._config.PREVIEW__JPG__RESTRICTED_DIMS, self._config.PREVIEW__JPG__ALLOWED_DIMS
+            self._config.PREVIEW__JPG__RESTRICTED_DIMS,
+            self._config.PREVIEW__JPG__ALLOWED_DIMS,
         )
 
     def get_jpeg_preview(
@@ -754,7 +914,7 @@ class ContentApi(object):
     def get_all_query(
         self,
         parent_ids: typing.Optional[typing.List[int]] = None,
-        content_type_slug: str = content_type_list.Any_SLUG,
+        content_type_slug: str = ContentTypeSlug.ANY.value,
         workspaces: typing.Optional[typing.List[Workspace]] = None,
         label: typing.Optional[str] = None,
         order_by_properties: typing.Optional[
@@ -762,6 +922,7 @@ class ContentApi(object):
         ] = None,
         complete_path_to_id: typing.Optional[int] = None,
         user: typing.Optional[User] = None,
+        assignee_id: typing.Optional[int] = None,
     ) -> Query:
         """
         Extended filter for better "get all data" query
@@ -773,6 +934,8 @@ class ContentApi(object):
         :param order_by_properties: filter by properties can be both string of
         attribute or attribute of Model object from sqlalchemy(preferred way,
         QueryableAttribute object)
+        :param user: user owner of the contents
+        :param assignee_id: assignee of the contents
         :return: Query object
         """
         order_by_properties = order_by_properties or []  # FDV
@@ -785,7 +948,9 @@ class ContentApi(object):
         #  of content, workspace root included
         if complete_path_to_id:
             content = self.get_one(
-                complete_path_to_id, content_type_list.Any_SLUG, ignore_content_state_filter=True
+                complete_path_to_id,
+                ContentTypeSlug.ANY.value,
+                ignore_content_state_filter=True,
             )
             if content.parent_id:
                 content = content.parent
@@ -797,7 +962,7 @@ class ContentApi(object):
             # parent_ids list when complete_path_to_id is set
             parent_ids.append(0)
 
-        if content_type_slug != content_type_list.Any_SLUG:
+        if content_type_slug != ContentTypeSlug.ANY.value:
             # INFO - G.M - 2018-07-05 - convert with
             #  content type object to support legacy slug
             content_type_object = content_type_list.get_one_by_slug(content_type_slug)
@@ -822,7 +987,8 @@ class ContentApi(object):
             if allow_root:
                 query = query.filter(
                     or_(
-                        Content.parent_id.in_(allowed_parent_ids), Content.parent_id == None
+                        Content.parent_id.in_(allowed_parent_ids),
+                        Content.parent_id == None,  # noqa: E712,E711
                     )  # noqa: E711
                 )
             else:
@@ -838,6 +1004,9 @@ class ContentApi(object):
             )
             query = query.filter(or_(Content.owner == user, user.user_id == author_id_query))
 
+        if assignee_id:
+            query = query.filter(Content.assignee_id == assignee_id)
+
         for _property in order_by_properties:
             query = query.order_by(_property)
 
@@ -846,7 +1015,7 @@ class ContentApi(object):
     def get_all(
         self,
         parent_ids: typing.Optional[typing.List[int]] = None,
-        content_type: str = content_type_list.Any_SLUG,
+        content_type: str = ContentTypeSlug.ANY.value,
         workspaces: typing.Optional[typing.List[Workspace]] = None,
         label: typing.Optional[str] = None,
         order_by_properties: typing.Optional[
@@ -872,98 +1041,132 @@ class ContentApi(object):
         :return: Paged list of contents
         """
         query = self.get_all_query(
-            parent_ids, content_type, workspaces, label, order_by_properties, complete_path_to_id
+            parent_ids,
+            content_type,
+            workspaces,
+            label,
+            order_by_properties,
+            complete_path_to_id,
         )
         if count:
             return get_page(query, per_page=count, page=page_token or False)
         return Page(query.all())
 
-    def get_last_active(
+    def _text_filter_generator(
         self,
+        filters: typing.List[str],
+        prefix: str = "where ",
+        separator: str = " and ",
+    ):
+        if not filters:
+            return ""
+        text = prefix
+        text = prefix + separator.join(filters)
+        return text
+
+    def get_read_status(
+        self,
+        user: User,
         workspace: typing.Optional[Workspace] = None,
-        limit: typing.Optional[int] = None,
-        before_content: typing.Optional[Content] = None,
         content_ids: typing.Optional[typing.List[int]] = None,
-    ) -> typing.List[Content]:
+    ) -> typing.List[typing.Dict[str, typing.Any]]:
         """
-        get contents list sorted by last update
-        (last modification of content itself or one of this comment)
-        :param workspace: Workspace to check
-        :param limit: maximum number of elements to return
-        :param before_content: last_active content are only those updated
-         before this content given.
-        :param content_ids: restrict selection to some content ids and
-        related Comments
-        :return: list of content
+        Return read status for a user of a content
+        :param user: user concerned by these read status
+        :param workspace: workspace to check for read status
+        :param content_ids: list of content to check for read status
+        :return: list of read status
+
+        :warning: This method does not use standard security filter, so be careful with
+        access right.
+
+        Result is dependant of show_deleted, show_archived and show_active filters
         """
 
-        resultset = (
-            self.get_all_query(workspaces=[workspace] if workspace else None)
-            .outerjoin(
-                RevisionReadStatus,
-                and_(
-                    RevisionReadStatus.revision_id == Content.cached_revision_id,
-                    RevisionReadStatus.user_id == self._user_id,
+        optional_begin_filters = []
+        optional_end_filters = []
+        if content_ids:
+            optional_end_filters.append("root_id in :content_ids")
+
+        if workspace:
+            optional_begin_filters.append("cr.workspace_id = :workspace_id")
+
+        # NOTE - G.M - 2022-06-21: Theses SQL boolean filters use a syntax especially chosen
+        # to be compatible with both postgresql and sqlite, using some other similar syntax
+        # may failed in one or the other database software.
+        if not self._show_deleted:
+            optional_begin_filters.append("not cr.is_deleted")
+        if not self._show_archived:
+            optional_begin_filters.append("not cr.is_archived")
+        if not self._show_active:
+            optional_begin_filters.append("(cr.is_archived or cr.is_deleted)")
+
+        statement = text(
+            """
+            with recursive content_read_status as (
+                select c.id                                                      as content_id,
+                       cr.parent_id                                              as parent_id,
+                       rrs.view_datetime                                         as view_datetime,
+                       case when rrs.view_datetime is not NULL then 1 else 0 END as read
+                from content c
+                         join content_revisions cr on c.cached_revision_id = cr.revision_id
+                         left outer join revision_read_status rrs on cr.revision_id = rrs.revision_id and rrs.user_id = :user_id
+                {optional_begin_filter}
+            ), temp_read_status as
+            (
+              select
+                  crs.content_id,
+                  crs.view_datetime,
+                  crs.read,
+                  crs.content_id as root_id
+              from content_read_status crs
+              union all
+              select crs.content_id,
+                     crs.view_datetime,
+                     crs.read,
+                     trs.root_id as root_id
+              from content_read_status crs
+                inner join temp_read_status trs
+                  on crs.parent_id = trs.content_id
+            )
+            select
+                   trs.root_id as root_id,
+                   max(trs.view_datetime) as last_view_datetime,
+                   min(trs.read) as read
+            from temp_read_status trs
+            group by root_id
+            {optional_end_filter}
+            ;
+        """.format(
+                optional_begin_filter=self._text_filter_generator(optional_begin_filters),
+                optional_end_filter=self._text_filter_generator(
+                    prefix="having ", filters=optional_end_filters
                 ),
             )
-            .options(
-                contains_eager(Content.current_revision).contains_eager(
-                    ContentRevisionRO.revision_read_statuses
-                )
-            )
         )
-
         if content_ids:
-            resultset = resultset.filter(
-                or_(
-                    Content.content_id.in_(content_ids),
-                    and_(
-                        Content.parent_id.in_(content_ids),
-                        Content.type == content_type_list.Comment.slug,
-                    ),
-                )
+            statement = statement.bindparams(
+                bindparam("content_ids", expanding=True, type_=Integer())
             )
 
-        resultset = resultset.order_by(
-            desc(ContentRevisionRO.updated),
-            desc(ContentRevisionRO.revision_id),
-            desc(ContentRevisionRO.content_id),
-        )
-
-        active_contents = []
-        too_recent_content = []
-        before_content_find = False
-        for content in resultset:
-            related_active_content = None
-            if content_type_list.Comment.slug == content.type:
-                related_active_content = content.parent
-            else:
-                related_active_content = content
-
-            # INFO - G.M - 2018-08-10 - re-apply general filters here to avoid
-            # issue with comments
-            if not self._show_deleted and related_active_content.is_deleted:
-                continue
-            if not self._show_archived and related_active_content.is_archived:
-                continue
-
-            if (
-                related_active_content not in active_contents
-                and related_active_content not in too_recent_content
-            ):
-
-                if not before_content or before_content_find:
-                    active_contents.append(related_active_content)
-                else:
-                    too_recent_content.append(related_active_content)
-
-                if before_content and related_active_content == before_content:
-                    before_content_find = True
-
-            if limit and len(active_contents) >= limit:
-                break
-
-        return active_contents
+        tuples_result = self._session.execute(
+            statement,
+            {
+                "user_id": user.user_id,
+                "workspace_id": workspace.workspace_id if workspace else None,
+                "content_ids": content_ids or [],
+            },
+        ).fetchall()
+        result = []
+        for tuple in tuples_result:
+            result.append(
+                {
+                    "content_id": tuple[0],
+                    "last_view_datetime": tuple[1],
+                    "read_by_user": tuple[2],
+                }
+            )
+        return result
 
     def _set_allowed_content(self, content: Content, allowed_content_dict: dict) -> Content:
         """
@@ -977,9 +1180,13 @@ class ContentApi(object):
             )
         :return: content
         """
-        properties = content.properties.copy()
-        if set(properties["allowed_content"]) == set(allowed_content_dict):
+
+        if set(content.all_properties["allowed_content"]) == set(allowed_content_dict):
             raise SameValueError("Content allowed content did not change")
+        if content.properties:
+            properties = content.properties.copy()
+        else:
+            properties = {}
         properties["allowed_content"] = allowed_content_dict
         content.properties = properties
         return content
@@ -1003,17 +1210,6 @@ class ContentApi(object):
 
         return self._set_allowed_content(content, allowed_content_dict)
 
-    def restore_content_default_allowed_content(self, content: Content) -> None:
-        """
-        Return to default allowed_content_types
-        :param content: the given content instance
-        :return: nothing
-        """
-        if content._properties and "allowed_content" in content._properties:
-            properties = content.properties.copy()
-            del properties["allowed_content"]
-            content.properties = properties
-
     def set_status(self, content: Content, new_status: str):
         if new_status in content_status_list.get_all_slugs_values():
             if self._user:
@@ -1034,7 +1230,11 @@ class ContentApi(object):
         if new_content_namespace == ContentNamespaces.PUBLICATION:
             (new_workspace or item.workspace).check_for_publication()
         self._move_current(
-            item, new_parent, must_stay_in_same_workspace, new_workspace, new_content_namespace
+            item,
+            new_parent,
+            must_stay_in_same_workspace,
+            new_workspace,
+            new_content_namespace,
         )
         self.save(item)
         self._move_children_content_to_new_workspace(item, new_workspace, new_content_namespace)
@@ -1131,20 +1331,23 @@ class ContentApi(object):
     ) -> None:
         if parent:
             assert workspace == parent.workspace
-            if parent.properties and "allowed_content" in parent.properties:
+            properties = parent.all_properties
+            if properties and "allowed_content" in properties:
                 if content_type not in self._get_allowed_content_type(
-                    parent.properties["allowed_content"]
+                    properties["allowed_content"]
                 ):
                     raise UnallowedSubContent(
                         " SubContent of type {subcontent_type}  not allowed in content {content_id}".format(
-                            subcontent_type=content_type.slug, content_id=parent.content_id
+                            subcontent_type=content_type.slug,
+                            content_id=parent.content_id,
                         )
                     )
         if workspace:
             if content_type not in workspace.get_allowed_content_types():
                 raise UnallowedSubContent(
                     " SubContent of type {subcontent_type}  not allowed in workspace {content_id}".format(
-                        subcontent_type=content_type.slug, content_id=workspace.workspace_id
+                        subcontent_type=content_type.slug,
+                        content_id=workspace.workspace_id,
                     )
                 )
 
@@ -1158,6 +1361,7 @@ class ContentApi(object):
     def copy(
         self,
         item: Content,
+        context: "TracimContext",
         new_parent: Content = None,
         new_label: str = None,
         new_workspace: Workspace = None,
@@ -1248,26 +1452,52 @@ class ContentApi(object):
                 "content {} of type {} should always have a label "
                 "and a valid filename".format(item.content_id, content_type_slug)
             )
-
-        copy_result = self._copy(item, content_namespace, parent)
-        copy_result = self._add_copy_revisions(
-            original_content=item,
-            new_content=copy_result.new_content,
-            original_content_children=copy_result.original_children_dict,
-            new_content_children=copy_result.new_children_dict,
-            new_parent=parent,
-            new_label=label,
-            new_workspace=workspace,
-            new_file_extension=file_extension,
-            new_content_namespace=content_namespace,
-            do_save=do_save,
-            do_notify=do_notify,
-        )
+        new_content = Content()
+        with context.batched_events(
+            operation_type=OperationType.COPIED,
+            obj=new_content,
+        ):
+            copy_result = self._copy(item, new_content, content_namespace, parent)
+            copy_result = self._add_copy_revisions(
+                original_content=item,
+                new_content=copy_result.new_content,
+                original_content_children=copy_result.original_children_dict,
+                new_content_children=copy_result.new_children_dict,
+                new_parent=parent,
+                new_label=label,
+                new_workspace=workspace,
+                new_file_extension=file_extension,
+                new_content_namespace=content_namespace,
+                do_save=do_save,
+                do_notify=do_notify,
+            )
         return copy_result.new_content
+
+    def copy_from_template(
+        self,
+        new_content: Content,
+        source_content: Content,
+        new_parent: Content,
+        new_content_namespace: ContentNamespaces = None,
+    ) -> Content:
+        cpy_rev = ContentRevisionRO.copy(
+            revision=source_content.last_revision,
+            parent=new_parent,
+            new_content_namespace=new_content_namespace,
+            copy_as_template=True,
+        )
+        cpy_rev.properties = {}
+        cpy_rev.node = new_content
+
+        new_content.current_revision = cpy_rev
+        self._flag_revision_as_copy(new_content, source_content)
+
+        return new_content
 
     def _copy(
         self,
         content: Content,
+        new_content: Content,
         new_content_namespace: ContentNamespaces = None,
         new_parent: Content = None,
     ) -> AddCopyRevisionsResult:
@@ -1279,7 +1509,6 @@ class ContentApi(object):
         :return: new content created based on original root content,
         dict of new children content and original children content with original content id as key.
         """
-        new_content = Content()
         # INFO - G.M - 2019-04-30 - we store all children content created and old content id of them
         # to be able to retrieve them for applying new revisions on them easily. key of dict is
         # original content_id.
@@ -1289,7 +1518,6 @@ class ContentApi(object):
         original_content_children = {}  # type: typing.Dict[int,Content]
 
         for rev, is_current_rev in content.get_tree_revisions_advanced():
-
             if rev.content_id == content.content_id:
                 related_content = new_content  # type: Content
                 related_parent = new_parent
@@ -1310,11 +1538,26 @@ class ContentApi(object):
             related_content.current_revision = cpy_rev
             self._session.add(related_content)
             self._session.flush()
+
         return AddCopyRevisionsResult(
             new_content=new_content,
             new_children_dict=new_content_children,
             original_children_dict=original_content_children,
         )
+
+    def _flag_revision_as_copy(
+        self,
+        content: ContentRevisionRO,
+        original_content: Content,
+    ):
+        properties = content.properties.copy()
+        properties["origin"] = {
+            "content": original_content.id,
+            "revision": original_content.last_revision.revision_id,
+        }
+        content.revision_type = ActionDescription.COPY
+        content.properties = properties
+        return content
 
     def _add_copy_revisions(
         self,
@@ -1353,13 +1596,7 @@ class ContentApi(object):
                 force_create_new_revision=True,
             ) as rev:
                 rev.workspace = new_workspace
-                rev.revision_type = ActionDescription.COPY
-                properties = rev.properties.copy()
-                properties["origin"] = {
-                    "content": original_child.id,
-                    "revision": original_child.last_revision.revision_id,
-                }
-                rev.properties = properties
+                self._flag_revision_as_copy(content=rev, original_content=original_child)
             self.save(new_child, ActionDescription.COPY, do_notify=False)
         with new_revision(
             session=self._session,
@@ -1374,13 +1611,7 @@ class ContentApi(object):
             rev.label = new_label
             rev.file_extension = new_file_extension
             rev.content_namespace = new_content_namespace
-            rev.revision_type = ActionDescription.COPY
-            properties = rev.properties.copy()
-            properties["origin"] = {
-                "content": original_content.id,
-                "revision": original_content.last_revision.revision_id,
-            }
-            rev.properties = properties
+            self._flag_revision_as_copy(content=rev, original_content=original_content)
         if do_save:
             self.save(new_content, ActionDescription.COPY, do_notify=do_notify)
         return AddCopyRevisionsResult(
@@ -1390,7 +1621,10 @@ class ContentApi(object):
         )
 
     def _move_children_content_to_new_workspace(
-        self, item: Content, new_workspace: Workspace, new_content_namespace: ContentNamespaces
+        self,
+        item: Content,
+        new_workspace: Workspace,
+        new_content_namespace: ContentNamespaces,
     ) -> None:
         """
         Change workspace_id of all children of content according to new_workspace
@@ -1421,7 +1655,7 @@ class ContentApi(object):
     def update_container_content(
         self,
         item: Content,
-        allowed_content_type_slug_list: typing.List[str],
+        allowed_content_type_slug_list: typing.Optional[typing.List[str]],
         new_label: str,
         new_description: typing.Optional[str] = None,
         new_raw_content: typing.Optional[str] = None,
@@ -1437,11 +1671,13 @@ class ContentApi(object):
          of content.
         :return:
         """
-        try:
-            item = self.set_allowed_content(item, allowed_content_type_slug_list)
-            content_has_changed = True
-        except SameValueError:
-            content_has_changed = False
+        content_has_changed = False
+        if allowed_content_type_slug_list is not None:
+            try:
+                item = self.set_allowed_content(item, allowed_content_type_slug_list)
+                content_has_changed = True
+            except SameValueError:
+                pass
         item = self.update_content(
             item,
             new_label,
@@ -1488,13 +1724,16 @@ class ContentApi(object):
             ):
                 # TODO - G.M - 20-03-2018 - Fix internatization for webdav access.
                 # Internatization disabled in libcontent for now.
-                raise SameValueError("The content did not changed")
+                raise SameValueError("The content did not change")
 
         filename = self._prepare_filename(new_label, item.file_extension)
         content_type_slug = item.type
         if filename:
             self._is_filename_available_or_raise(
-                filename, item.workspace, item.parent, exclude_content_id=item.content_id
+                filename,
+                item.workspace,
+                item.parent,
+                exclude_content_id=item.content_id,
             )
         elif self._allow_empty_label(content_type_slug):
             # INFO - G.M - 2019-04-29 - special content like "Comment"
@@ -1531,13 +1770,16 @@ class ContentApi(object):
         # using read can be used everytime.
         # if new_mimetype == item.file_mimetype and \
         #         new_content == item.depot_file.file.read():
-        #     raise SameValueError('The content did not changed')
+        #     raise SameValueError('The content did not change')
         if self._user:
             item.owner = self._user
         content_type_slug = item.type
         if new_filename:
             self._is_filename_available_or_raise(
-                new_filename, item.workspace, item.parent, exclude_content_id=item.content_id
+                new_filename,
+                item.workspace,
+                item.parent,
+                exclude_content_id=item.content_id,
             )
         elif self._allow_empty_label(content_type_slug):
             # INFO - G.M - 2019-04-29 - special content like "Comment"
@@ -1573,14 +1815,16 @@ class ContentApi(object):
             )
 
     def check_workspace_size_limitation(self, content_length: int, workspace: Workspace) -> None:
-        workspace_size = workspace.get_size()
         # INFO - G.M - 2019-08-23 - 0 mean no size limit
         if self._config.LIMITATION__WORKSPACE_SIZE == 0:
             return
-        elif workspace_size > self._config.LIMITATION__WORKSPACE_SIZE:
+        workspace_size = workspace.get_size()
+        if workspace_size > self._config.LIMITATION__WORKSPACE_SIZE:
             raise FileSizeOverWorkspaceEmptySpace(
                 'File cannot be added (size "{}") because workspace is full: "{}/{}"'.format(
-                    content_length, workspace_size, self._config.LIMITATION__WORKSPACE_SIZE
+                    content_length,
+                    workspace_size,
+                    self._config.LIMITATION__WORKSPACE_SIZE,
                 )
             )
 
@@ -1598,6 +1842,34 @@ class ContentApi(object):
                 )
             )
 
+    def set_template(self, content: Content, is_template: bool) -> Content:
+        if not self.is_editable(content):
+            raise ContentInNotEditableState(
+                "Can't mark not editable file, you need to change his status or state (deleted/archived) before any change."
+            )
+        content.is_template = is_template
+        if is_template:
+            content.revision_type = ActionDescription.MARK_AS_TEMPLATE
+        else:
+            content.revision_type = ActionDescription.UNMARK_AS_TEMPLATE
+        return content
+
+    def get_templates(self, user: User, template_type: str) -> typing.List[Content]:
+        space_api = WorkspaceApi(current_user=None, session=self._session, config=self._config)
+        space_list = space_api.get_all_for_user(user)
+        if not space_list:
+            return []
+        content_list = (
+            self._base_query(space_list)
+            .filter(
+                Content.is_template.is_(True),
+                Content.type == template_type,
+            )
+            .all()
+        )
+
+        return content_list
+
     def archive(self, content: Content):
         if self._user:
             content.owner = self._user
@@ -1612,7 +1884,10 @@ class ContentApi(object):
         # INFO - G.M - 2019-04-29 - filename already exist here, for special type
         # comment too, so we can allow check filename for all content
         self._is_filename_available_or_raise(
-            filename, content.workspace, content.parent, exclude_content_id=content.content_id
+            filename,
+            content.workspace,
+            content.parent,
+            exclude_content_id=content.content_id,
         )
         content.label = label
         content.revision_type = ActionDescription.ARCHIVING
@@ -1637,7 +1912,10 @@ class ContentApi(object):
         # INFO - G.M - 2019-04-29 - filename already exist here, for special type
         # comment too, so we can allow check filename for all content
         self._is_filename_available_or_raise(
-            filename, content.workspace, content.parent, exclude_content_id=content.content_id
+            filename,
+            content.workspace,
+            content.parent,
+            exclude_content_id=content.content_id,
         )
         content.label = label
         content.revision_type = ActionDescription.DELETION
@@ -1657,7 +1935,9 @@ class ContentApi(object):
             return None
         except CannotGetDepotFileDepotCorrupted:
             logger.warning(
-                self, "Unable to get revision filepath, depot is corrupted", exc_info=True
+                self,
+                "Unable to get revision filepath, depot is corrupted",
+                exc_info=True,
             )
             return None
         except Exception:
@@ -1674,7 +1954,9 @@ class ContentApi(object):
             return False
         except CannotGetDepotFileDepotCorrupted:
             logger.warning(
-                self, "Unable to get revision filepath, depot is corrupted", exc_info=True
+                self,
+                "Unable to get revision filepath, depot is corrupted",
+                exc_info=True,
             )
             return False
         except Exception:
@@ -1690,7 +1972,9 @@ class ContentApi(object):
             return False
         except CannotGetDepotFileDepotCorrupted:
             logger.warning(
-                self, "Unable to get revision filepath, depot is corrupted", exc_info=True
+                self,
+                "Unable to get revision filepath, depot is corrupted",
+                exc_info=True,
             )
             return False
         except Exception:
@@ -1785,7 +2069,6 @@ class ContentApi(object):
 
         if do_flush:
             self.flush()
-
         return content
 
     def mark_unread(self, content: Content, do_flush=True) -> Content:
@@ -1815,12 +2098,21 @@ class ContentApi(object):
     def flush(self):
         self._session.flush()
 
-    def save(self, content: Content, action_description: str = None, do_flush=True, do_notify=True):
+    def save(
+        self,
+        content: Content,
+        action_description: str = None,
+        do_flush=True,
+        do_notify=True,
+    ):
         """
         Save an object, flush the session and set the revision_type property
-        :param content:
-        :param action_description:
-        :return:
+
+        Args:
+            content (Content): Content to save
+            action_description (str, optional): Action done on the content. Defaults to None.
+            do_flush (bool, optional): Should it flush. Defaults to True.
+            do_notify (bool, optional): Should it notify users. Defaults to True.
         """
         assert (
             action_description is None or action_description in ActionDescription.allowed_values()
@@ -1858,12 +2150,12 @@ class ContentApi(object):
         if do_notify:
             self.do_notify(content)
 
-    def do_notify(self, content: Content):
+    def do_notify(self, content: Content) -> None:
         """
-        Allow to force notification for a given content. By default, it is
-        called during the .save() operation
-        :param content:
-        :return:
+        Create a notification -mail- and notify the current user
+
+        Args:
+            content (Content): Content that the notification will be about
         """
         NotifierFactory.create(
             config=self._config, current_user=self._user, session=self._session
@@ -1911,10 +2203,10 @@ class ContentApi(object):
         return _("New folder {0}").format(query.count() + 1)
 
     def _allow_empty_label(self, content_type_slug: str) -> bool:
-        if (
-            content_type_list.get_one_by_slug(content_type_slug).slug
-            == content_type_list.Comment.slug
-        ):
+        if content_type_list.get_one_by_slug(content_type_slug).slug in [
+            ContentTypeSlug.COMMENT.value,
+            ContentTypeSlug.TODO.value,
+        ]:
             return True
         return False
 
@@ -1958,7 +2250,8 @@ class ContentApi(object):
         )
         favorite_content_ids = [elem[0] for elem in favorite_content_ids_tuple]
         paged_favorites = self._get_user_favorite_contents(
-            user_id=user_id, order_by_properties=[FavoriteContent.created],
+            user_id=user_id,
+            order_by_properties=[FavoriteContent.created],
         )
         favorites = []
         for favorite in paged_favorites:
@@ -1972,7 +2265,7 @@ class ContentApi(object):
         query = (
             self.get_all_query(
                 parent_ids=None,
-                content_type_slug=content_type_list.Any_SLUG,
+                content_type_slug=ContentTypeSlug.ANY.value,
                 workspaces=None,
                 label=None,
             )
@@ -2018,7 +2311,8 @@ class ContentApi(object):
             return (
                 self._session.query(FavoriteContent)
                 .filter(
-                    FavoriteContent.user_id == user_id, FavoriteContent.content_id == content_id
+                    FavoriteContent.user_id == user_id,
+                    FavoriteContent.content_id == content_id,
                 )
                 .one()
             )
@@ -2050,7 +2344,79 @@ class ContentApi(object):
 
     def remove_favorite(self, content_id: int, do_save: bool = True) -> None:
         self._session.query(FavoriteContent).filter(
-            FavoriteContent.user_id == self._user.user_id, FavoriteContent.content_id == content_id,
+            FavoriteContent.user_id == self._user.user_id,
+            FavoriteContent.content_id == content_id,
         ).delete()
         if do_save:
             self._session.flush()
+
+    def create_todo(
+        self, parent: Content, assignee: User, raw_content: str, do_notify: bool = True
+    ) -> Content:
+        """Create a todo in the database.
+
+        Args:
+            parent (Content): Parent content of the Todo. By our definition, a Todo can only exist \
+                if it got a parent.
+            assignee (User): User assigned to the Todo. Can be `None` if the Todo has no assignee.
+            raw_content (str): Text of the Todo.
+            do_notify (bool, optional): Notify everyone. Defaults to False.
+
+        Returns:
+            Content: The created Todo.
+        """
+        item = self.create(
+            content_namespace=parent.content_namespace,
+            content_type_slug=content_type_list.Todo.slug,
+            workspace=parent.workspace,
+            parent=parent,
+        )
+        item.raw_content = raw_content
+        if assignee:
+            item.assignee = assignee
+        self._session.add(item)
+        self.save(item, ActionDescription.CREATION, do_notify=do_notify)
+
+        return item
+
+    def set_content_namespace(
+        self, content_id: int, content_namespace: ContentNamespaces
+    ) -> Content:
+        """Change the content namespace of a content
+
+        Args:
+            content_id: Id of the content
+            content_namespace: content_namespace wanted for the content
+
+        Returns:
+            Content: The modified content.
+        """
+        content = self.get_one(content_id=content_id)
+        is_publication_to_content = (
+            content.content_namespace == ContentNamespaces.PUBLICATION
+            and content_namespace == ContentNamespaces.CONTENT
+        )
+        is_content_to_publication = (
+            content.content_namespace == ContentNamespaces.CONTENT
+            and content_namespace == ContentNamespaces.PUBLICATION
+        )
+        if not any([is_publication_to_content, is_content_to_publication]):
+            raise ContentNamespaceDoNotMatch(
+                "Namespace transision not allowed (allowed are PUBLICATION → CONTENT and CONTENT → PUBLICATION)"
+            )
+
+        with new_revision(session=self._session, tm=transaction.manager, content=content):
+            self.move(
+                content,
+                new_parent=None,
+                new_workspace=content.workspace,
+                new_content_namespace=content_namespace,
+                must_stay_in_same_workspace=False,
+            )
+            self.save(content)
+
+        self._move_children_content_to_new_workspace(
+            item=content, new_workspace=content.workspace, new_content_namespace=content_namespace
+        )
+
+        return content

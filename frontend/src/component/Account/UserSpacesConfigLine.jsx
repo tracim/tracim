@@ -1,23 +1,22 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import {
-  BtnSwitch,
   IconButton,
   ROLE_LIST
 } from 'tracim_frontend_lib'
+import EmailNotificationTypeButton from '../EmailNotificationTypeButton.jsx'
 
 require('./UserSpacesConfigLine.styl')
 
 class UserSpacesConfigLine extends React.Component {
   render () {
     const { props } = this
-    const { space, member } = props
-    const memberRole = ROLE_LIST.find(r => r.slug === member.role)
+    const memberRole = ROLE_LIST.find(r => r.slug === props.space.member.role)
     return (
       <tr>
         <td>
           <div className='spaceconfig__table__spacename'>
-            {space.label}
+            {props.space.label}
           </div>
         </td>
         <td>
@@ -32,9 +31,12 @@ class UserSpacesConfigLine extends React.Component {
         </td>
         {(props.system.config.email_notification_activated &&
           <td>
-            <BtnSwitch
-              checked={member.do_notify}
-              onChange={() => props.onChangeSubscriptionNotif(space.workspace_id, !member.do_notify)}
+            <EmailNotificationTypeButton
+              currentEmailNotificationType={props.space.member.emailNotificationType}
+              displayLabel={false}
+              flexJustifyRadio='flex-start'
+              formName={`notificationType_${props.space.id}`}
+              onClickChangeEmailNotificationType={props.onChangeEmailNotificationType}
             />
           </td>
         )}
@@ -44,7 +46,7 @@ class UserSpacesConfigLine extends React.Component {
             mode='dark'
             intent='secondary'
             disabled={props.onlyManager}
-            onClick={(() => props.onLeaveSpace(space.workspace_id))}
+            onClick={(() => props.onLeaveSpace(props.space.id))}
             icon='fas fa-sign-out-alt'
             text={props.admin ? props.t('Remove from space') : props.t('Leave space')}
             title={

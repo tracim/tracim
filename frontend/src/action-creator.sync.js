@@ -9,6 +9,8 @@ export const APPEND = 'Append'
 export const RESET = 'Reset'
 export const MOVE = 'Move'
 
+export const LIST = 'LIST'
+
 export const TIMEZONE = 'Timezone'
 export const setTimezone = timezone => ({ type: `${SET}/${TIMEZONE}`, timezone })
 
@@ -41,7 +43,8 @@ export const setUserLang = lang => ({ type: `${SET}/${USER}/Lang`, lang })
 export const USER_KNOWN_MEMBER = `${USER}/KnownMember`
 export const USER_KNOWN_MEMBER_LIST = `${USER_KNOWN_MEMBER}/List`
 
-export const updateUser = newUser => ({ type: `${UPDATE}/${USER}`, newUser })
+export const UPDATE_USER = `${UPDATE}/${USER}`
+export const updateUser = newUser => ({ type: UPDATE_USER, newUser })
 export const USER_PUBLIC_NAME = `${USER}/PublicName`
 export const USER_USERNAME = `${USER}/Username`
 export const USER_EMAIL = `${USER}/Email`
@@ -72,9 +75,11 @@ export const unDeleteWorkspaceContentList = (workspaceContentList, workspaceId) 
 
 export const updateWorkspaceFilter = filterList => ({ type: `${UPDATE}/${WORKSPACE}/Filter`, filterList })
 
-export const USER_WORKSPACE_DO_NOTIFY = `${USER}/${WORKSPACE}/SubscriptionNotif`
-export const updateUserWorkspaceSubscriptionNotif = (userId, workspaceId, doNotify) =>
-  ({ type: `${UPDATE}/${USER_WORKSPACE_DO_NOTIFY}`, userId, workspaceId, doNotify })
+export const USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE = `${USER}/${WORKSPACE}/EmailNotificationType`
+export const UPDATE_USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE = `${UPDATE}/${USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE}`
+
+export const updateUserWorkspaceEmailNotificationType = (userId, workspaceId, emailNotificationType) =>
+  ({ type: UPDATE_USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE, userId, workspaceId, emailNotificationType })
 
 export const WORKSPACE_CONTENT_ARCHIVED = `${WORKSPACE_CONTENT}/Archived`
 export const WORKSPACE_CONTENT_DELETED = `${WORKSPACE_CONTENT}/Deleted`
@@ -89,14 +94,19 @@ export const WORKSPACE_CONTENT_MOVE = `${MOVE}/${WORKSPACE_CONTENT}`
 export const moveWorkspaceContent = (source, destination) => ({ type: `${MOVE}/${WORKSPACE_CONTENT}`, source, destination })
 
 export const WORKSPACE_LIST = `${WORKSPACE}/List`
-export const setWorkspaceList = workspaceList => ({ type: `${SET}/${WORKSPACE_LIST}`, workspaceList })
-export const addWorkspaceList = workspaceList => ({ type: `${ADD}/${WORKSPACE_LIST}`, workspaceList })
 export const removeWorkspace = workspace => ({ type: `${REMOVE}/${WORKSPACE_LIST}`, workspace })
 
 export const USER_WORKSPACE_LIST = `${USER}/${WORKSPACE_LIST}`
 
-export const WORKSPACE_LIST_MEMBER = `${WORKSPACE_LIST}/Member/List`
-export const setWorkspaceListMemberList = workspaceListMemberList => ({ type: `${SET}/${WORKSPACE_LIST_MEMBER}`, workspaceListMemberList })
+export const CONFIG = 'Config'
+export const USER_WORKSPACE_CONFIG_LIST = `${USER}/${WORKSPACE}/${CONFIG}/List`
+export const ADD_USER_WORKSPACE_CONFIG_LIST = `${ADD}/${USER_WORKSPACE_CONFIG_LIST}`
+export const UPDATE_USER_WORKSPACE_CONFIG_LIST = `${UPDATE}/${USER_WORKSPACE_CONFIG_LIST}`
+export const SET_USER_WORKSPACE_CONFIG_LIST = `${SET}/${USER_WORKSPACE_CONFIG_LIST}`
+export const setUserWorkspaceConfigList = workspaceList => ({ type: SET_USER_WORKSPACE_CONFIG_LIST, workspaceList })
+export const addUserWorkspaceConfigList = (user, setting, workspace) => ({ type: ADD_USER_WORKSPACE_CONFIG_LIST, user, setting, workspace })
+export const updateUserWorkspaceConfigList = (user, setting, workspace) => ({ type: UPDATE_USER_WORKSPACE_CONFIG_LIST, user, setting, workspace })
+export const removeUserWorkspaceConfig = workspace => ({ type: `${REMOVE}/${USER_WORKSPACE_CONFIG_LIST}`, workspace })
 
 // workspace related const below is for currentWorkspace
 export const WORKSPACE_DETAIL = `${WORKSPACE}/Detail`
@@ -106,23 +116,34 @@ export const updateWorkspaceDetail = workspaceDetail => ({ type: `${UPDATE}/${WO
 export const WORKSPACE_LOADED = `${WORKSPACE}/Loaded`
 export const setWorkspaceLoaded = () => ({ type: `${SET}/${WORKSPACE_LOADED}` })
 
-export const WORKSPACE_MEMBER = `${WORKSPACE}/Member`
-export const WORKSPACE_MEMBER_LIST = `${WORKSPACE_MEMBER}/List`
-export const setWorkspaceMemberList = workspaceMemberList => ({ type: `${SET}/${WORKSPACE_MEMBER_LIST}`, workspaceMemberList })
-export const WORKSPACE_MEMBER_ADD = `${WORKSPACE_MEMBER}/${ADD}`
-export const WORKSPACE_MEMBER_REMOVE = `${WORKSPACE_MEMBER}/${REMOVE}`
-export const WORKSPACE_MEMBER_UPDATE = `${WORKSPACE_MEMBER}/${UPDATE}`
+const ROLE = 'Role'
+export const USER_ROLE = `${USER}/${ROLE}`
+export const USER_ROLE_LIST = `${USER_ROLE}/List`
+export const SET_USER_ROLE_LIST = `${SET}/${USER_ROLE_LIST}`
+export const setUserRoleList = userRoleList => ({ type: SET_USER_ROLE_LIST, userRoleList })
+export const ADD_USER_ROLE = `${ADD}/${USER_ROLE}`
 export const addWorkspaceMember = (user, workspaceId, member) => ({
-  type: `${ADD}/${WORKSPACE_MEMBER}`,
+  type: ADD_USER_ROLE,
   newMember: { user: user, ...member },
   workspaceId
 })
-export const updateWorkspaceMember = (user, workspaceId, member) => ({
-  type: `${UPDATE}/${WORKSPACE_MEMBER}`,
+export const UPDATE_USER_ROLE = `${UPDATE}/${USER_ROLE}`
+export const updateUserRole = (user, workspaceId, member) => ({
+  type: UPDATE_USER_ROLE,
   member: { user: user, ...member },
   workspaceId
 })
-export const removeWorkspaceMember = (memberId, workspaceId) => ({ type: `${REMOVE}/${WORKSPACE_MEMBER}`, memberId, workspaceId })
+export const REMOVE_USER_ROLE = `${REMOVE}/${USER_ROLE}`
+export const removeUserRole = (userId, workspaceId) => ({
+  type: REMOVE_USER_ROLE,
+  userId,
+  workspaceId
+})
+
+const MEMBER = 'Member'
+export const KNOWN_MEMBER = `Known${MEMBER}`
+export const SET_KNOWN_MEMBER_LIST = `${SET}/${KNOWN_MEMBER}/${LIST}`
+export const setKnownMemberList = knownMemberList => ({ type: SET_KNOWN_MEMBER_LIST, knownMemberList })
 
 export const WORKSPACE_READ_STATUS = `${WORKSPACE}/ReadStatus`
 export const WORKSPACE_READ_STATUS_LIST = `${WORKSPACE_READ_STATUS}/List`
@@ -150,7 +171,6 @@ export const CONTENT_TYPE = 'ContentType'
 export const CONTENT_TYPE_LIST = `${CONTENT_TYPE}/List`
 export const setContentTypeList = contentTypeList => ({ type: `${SET}/${CONTENT_TYPE_LIST}`, contentTypeList })
 
-export const CONFIG = 'Config'
 export const setConfig = config => ({ type: `${SET}/${CONFIG}`, config })
 
 export const CUSTOM_PROPERTIES = 'CustomProperties'
@@ -197,18 +217,33 @@ export const APPLIED_FILTER = (searchType) => `AppliedFilter_${searchType}`
 export const setAppliedFilter = (key, value, searchType) => ({ type: `${SET}/${APPLIED_FILTER(searchType)}`, key, value })
 export const resetAppliedFilter = (searchType) => ({ type: `${RESET}/${APPLIED_FILTER(searchType)}` })
 
-export const NEXT_PAGE = 'NextPage'
-export const NOTIFICATION_LIST = 'NotificationList'
 export const NOTIFICATION = 'Notification'
+export const NEXT_PAGE = 'NextPage'
+export const NOTIFICATION_LIST = `${NOTIFICATION}/List`
+export const EVERY_NOTIFICATION = `Every${NOTIFICATION}`
 export const UNREAD_MENTION_COUNT = 'UnreadMentionCount'
-export const UNREAD_NOTIFICATION_COUNT = 'UnreadNotificationCount'
-export const setNotificationList = notificationList => ({ type: `${SET}/${NOTIFICATION_LIST}`, notificationList })
-export const appendNotificationList = notificationList => ({ type: `${APPEND}/${NOTIFICATION_LIST}`, notificationList })
-export const addNotification = notification => ({ type: `${ADD}/${NOTIFICATION}`, notification })
+export const UNREAD_NOTIFICATION_COUNT = `Unread${NOTIFICATION}Count`
+export const appendNotificationList = (userId, notificationList, spaceList) => ({
+  type: `${APPEND}/${NOTIFICATION_LIST}`,
+  userId,
+  notificationList,
+  spaceList
+})
+export const addNotification = (notification, spaceList) => ({
+  type: `${ADD}/${NOTIFICATION}`,
+  notification,
+  spaceList
+})
 export const updateNotification = (notificationId, notificationList) => ({ type: `${UPDATE}/${NOTIFICATION}`, notificationId, notificationList })
-export const readNotification = notificationId => ({ type: `${READ}/${NOTIFICATION}`, notificationId })
-export const readNotificationList = () => ({ type: `${READ}/${NOTIFICATION_LIST}` })
-export const readContentNotification = contentId => ({ type: `${READ}/${CONTENT}/${NOTIFICATION}`, contentId })
+export const readNotificationList = notificationIdList => ({
+  type: `${READ}/${NOTIFICATION_LIST}`,
+  notificationIdList
+})
+export const readEveryNotification = () => ({ type: `${READ}/${EVERY_NOTIFICATION}` })
+export const readContentNotification = contentId => ({
+  type: `${READ}/${CONTENT}/${NOTIFICATION}`,
+  contentId
+})
 export const setNextPage = (hasNextPage, nextPageToken) => ({ type: `${SET}/${NEXT_PAGE}`, hasNextPage, nextPageToken })
 export const setUnreadMentionCount = (count) => ({ type: `${SET}/${UNREAD_MENTION_COUNT}`, count })
 export const setUnreadNotificationCount = (count) => ({ type: `${SET}/${UNREAD_NOTIFICATION_COUNT}`, count })
@@ -227,7 +262,6 @@ export const removeWorkspaceSubscription = subscription => ({ type: `${REMOVE}/$
 export const updateWorkspaceSubscription = subscription => ({ type: `${UPDATE}/${WORKSPACE_SUBSCRIPTION}`, subscription })
 
 export const WORKSPACE_ACTIVITY = `${WORKSPACE}/Activity`
-export const LIST = 'LIST'
 export const EVENT_LIST = 'EVENT_LIST'
 export const setWorkspaceActivityList = activityList => ({ type: `${SET}/${WORKSPACE_ACTIVITY}/${LIST}`, activityList })
 export const setWorkspaceActivityNextPage = (hasNextPage, nextPageToken) => ({

@@ -15,6 +15,7 @@ export const ContentTypeBtn = props =>
     onClick={props.onClickBtn}
     intent='secondary'
     mode='dark'
+    dataCy={props.dataCy}
   />
 export default Radium(ContentTypeBtn)
 
@@ -25,9 +26,11 @@ ContentTypeBtn.propTypes = {
   creationLabel: PropTypes.string.isRequired,
   customClass: PropTypes.string,
   onClickBtn: PropTypes.func,
-  appSlug: PropTypes.string
+  appSlug: PropTypes.string,
+  dataCy: PropTypes.string
 }
 
 ContentTypeBtn.defaultProps = {
-  customClass: ''
+  customClass: '',
+  dataCy: ''
 }

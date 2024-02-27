@@ -3,18 +3,17 @@ import { expect } from 'chai'
 import { shallow, mount } from 'enzyme'
 import { HtmlDocument } from '../../src/component/HtmlDocument.jsx'
 import {
-  TextAreaApp,
-  PromptMessage,
   APP_FEATURE_MODE,
-  TRANSLATION_STATE
+  TRANSLATION_STATE,
+  PromptMessage,
+  TinyEditor
 } from 'tracim_frontend_lib'
 
 const props = {
   apiUrl: 'http://localhost/api',
   mode: APP_FEATURE_MODE.VIEW,
   customColor: '#654321',
-  wysiwygNewVersion: 'wysiwygNewVersionTest',
-  disableValidateBtn: false,
+  disableValidateBtn: () => false,
   version: '42',
   lastVersion: 1337,
   text: "Hi, I'm a Html Document.",
@@ -30,22 +29,23 @@ const props = {
     globalStatus: 'closed'
   },
   isDraftAvailable: false,
-  onClickValidateBtn: () => {},
-  onChangeText: () => {},
-  onClickCloseEditMode: () => {},
-  onClickRestoreArchived: () => {},
-  onClickRestoreDeleted: () => {},
-  onClickShowDraft: () => {},
-  onClickNotifyAll: () => {},
-  onClickCloseNotifyAllMessage: () => {},
-  onClickToggleTranslation: () => {},
+  onClickValidateBtn: () => { },
+  onChangeText: () => { },
+  onClickCloseEditMode: () => { },
+  onClickRestoreArchived: () => { },
+  onClickRestoreDeleted: () => { },
+  onClickShowDraft: () => { },
+  onClickNotifyAll: () => { },
+  onClickCloseNotifyAllMessage: () => { },
+  onClickToggleTranslation: () => { },
   translationState: TRANSLATION_STATE.DISABLED,
   t: (s, opts) => {
     for (const p in opts) {
       s = s.replace('{{' + p + '}}', opts[p])
     }
     return s
-  }
+  },
+  workspaceId: 1
 }
 
 describe('<HtmlDocument />', () => {
@@ -147,7 +147,7 @@ describe('in EDIT mode', () => {
     />
   )
 
-  it('should contain a <TextAreaApp /> component', () =>
-    expect(wrapper.find('.html-document__contentpage__textnote')).to.have.descendants(TextAreaApp)
+  it('should contain a <TinyEditor /> component', () =>
+    expect(wrapper.find('.html-document__contentpage__textnote')).to.have.descendants(TinyEditor)
   )
 })

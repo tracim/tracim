@@ -1,11 +1,13 @@
 import i18n from 'i18next'
 import { reactI18nextModule } from 'react-i18next'
+import { getBrowserLang } from 'tracim_frontend_lib'
 
 i18n
   .use(reactI18nextModule)
   .init({
-    fallbackLng: 'en',
+    fallbackLng: getBrowserLang(),
     // have a common namespace used around the full app
+    returnEmptyString: false,
     ns: ['translation'], // namespace
     defaultNS: 'translation',
     nsSeparator: false,

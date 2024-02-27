@@ -51,8 +51,6 @@ export function create_htmldocument (cy) {
   cy.get('.html-document.visible').should('be.visible')
   cy.get('.html-document.visible .html-document__contentpage__messagelist__version.revision').should('be.visible')
   cy.get('.html-document.visible .wsContentGeneric__header__title').contains(titre1)
-  //        cy.get('iframe#wysiwygNewVersion_ifr').should('be.visible')
-  //        const $tinymce = Cypress.$.event(document)
   cy.wait(2000)
   cy.get('.html-document.visible .wsContentGeneric__header__close.html-document__header__close').should('be.visible')
   cy.get('.html-document.visible .wsContentGeneric__header__close.html-document__header__close').click()

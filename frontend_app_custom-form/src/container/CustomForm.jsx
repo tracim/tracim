@@ -14,21 +14,16 @@ import {
   ArchiveDeleteContent,
   SelectStatus,
   displayDistanceDate,
-  convertBackslashNToBr,
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
-  setLocalStorageItem,
   removeLocalStorageItem,
   BREADCRUMBS_TYPE,
   appFeatureCustomEventHandlerShowApp,
-  getContentComment,
-  sendGlobalFlashMessage,
-  PAGE
+  sendGlobalFlashMessage
 } from 'tracim_frontend_lib'
 import {
   MODE,
-  debug,
-  initWysiwyg
+  debug
 } from '../helper.js'
 import {
   getCustomFormContent,
@@ -65,7 +60,6 @@ class CustomForm extends React.Component {
       ],
       rawContentBeforeEdit: '',
       timeline: props.data ? [] : [], // debug.timeline,
-      newComment: '',
       timelineWysiwyg: false,
       mode: MODE.VIEW,
       key: props.data ? props.data.content ? props.data.content.content_id : undefined : undefined,
@@ -121,8 +115,6 @@ class CustomForm extends React.Component {
       case 'allApp_changeLang':
         console.log('%c<CustomForm> Custom event', 'color: #28a745', type, data)
 
-        initWysiwyg(state, state.loggedUser.lang, this.handleChangeNewComment, this.handleChangeText)
-
         this.setState(prev => ({
           loggedUser: {
             ...prev.loggedUser,
@@ -142,7 +134,7 @@ class CustomForm extends React.Component {
   }
 
   async componentDidUpdate (prevProps, prevState) {
-    const { state } = this
+    const { props, state } = this
 
     // console.log('%c<CustomForm> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
@@ -152,26 +144,18 @@ class CustomForm extends React.Component {
       await this.loadContent()
       buildContentPathBreadcrumbs(state.config.apiUrl, state.content, props)
       // tinymce.remove('#wysiwygNewVersion')
-      wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
+      // wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
     }
 
     if (state.mode === MODE.EDIT && prevState.mode !== MODE.EDIT) {
       // tinymce.remove('#wysiwygNewVersion')
-      wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
-    }
-
-    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
-    else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymce.remove('#wysiwygTimelineComment')
-
-    // INFO - CH - 2019-05-06 - bellow is to properly init wysiwyg editor when reopening the same content
-    if (!prevState.isVisible && state.isVisible) {
-      initWysiwyg(state, state.loggedUser.lang, this.handleChangeNewComment, this.handleChangeText)
+      // wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
     }
   }
 
   componentWillUnmount () {
     console.log('%c<CustomForm> will Unmount', `color: ${this.state.config.hexcolor}`)
-    tinymce.remove('#wysiwygTimelineComment')
+    // tinymce.remove('#wysiwygTimelineComment')
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
@@ -195,20 +179,12 @@ class CustomForm extends React.Component {
     const { loggedUser, content, config, appName } = this.state
 
     const fetchResultCustomForm = getCustomFormContent(config.apiUrl, content.workspace_id, content.content_id)
-    const fetchResultComment = getContentComment(config.apiUrl, content.workspace_id, content.content_id)
     const fetchResultRevision = getCustomFormRevision(config.apiUrl, content.workspace_id, content.content_id)
 
-    const [resCustomForm, resComment, resRevision] = await Promise.all([
+    const [resCustomForm, resRevision] = await Promise.all([
       handleFetchResult(await fetchResultCustomForm),
-      handleFetchResult(await fetchResultComment),
       handleFetchResult(await fetchResultRevision)
     ])
-
-    const resCommentWithProperDate = resComment.body.map(c => ({
-      ...c,
-      created_raw: c.created,
-      created: displayDistanceDate(c.created, loggedUser.lang)
-    }))
 
     const revisionWithComment = resRevision.body
       .map((r, i) => ({
@@ -227,8 +203,6 @@ class CustomForm extends React.Component {
           loggedUser: this.state.config.loggedUser
         }))
       ], [])
-
-    const localStorageComment = getLocalStorageItem(appName, resCustomForm.body, LOCAL_STORAGE_FIELD.COMMENT)
 
     // first time editing the doc, open in edit mode, unless it has been created with webdav or db imported from tracim v1
     // see https://github.com/tracim/tracim/issues/1206
@@ -264,7 +238,6 @@ class CustomForm extends React.Component {
       },
       schema: rawContent.schema,
       uiSchema: rawContent.uischema,
-      newComment: localStorageComment || '',
       rawContentBeforeEdit: rawContent.formData,
       timeline: revisionWithComment,
       hexcolor: rawContent.hexcolor,
@@ -380,21 +353,16 @@ class CustomForm extends React.Component {
     // setLocalStorageItem(this.state.appName, this.state.content, LOCAL_STORAGE_FIELD.RAW_CONTENT, e.formData)
   }
 
-  handleChangeNewComment = e => {
-    const newComment = e.target.value
-    this.setState({ newComment })
-
-    setLocalStorageItem(this.state.appName, this.state.content.content_id, this.state.content.workspace_id, LOCAL_STORAGE_FIELD.COMMENT, newComment)
-  }
+  convertBackslashNToBr = msg => msg.replace(/\n/g, '<br />')
 
   handleClickValidateNewCommentBtn = async (comment) => {
     const { props, state } = this
 
-    // @FIXME - Côme - 2018/10/31 - line bellow is a hack to force send html to api
+    // @FIXME - Côme - 2018/10/31 - line below is a hack to force send html to api
     // see https://github.com/tracim/tracim/issues/1101
     const newCommentForApi = state.timelineWysiwyg
       ? comment
-      : `<p>${convertBackslashNToBr(comment)}</p>`
+      : `<p>${this.convertBackslashNToBr(comment)}</p>`
 
     const fetchResultSaveNewComment = await handleFetchResult(await postCustomFormNewComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newCommentForApi))
     switch (fetchResultSaveNewComment.apiResponse.status) {
@@ -545,7 +513,6 @@ class CustomForm extends React.Component {
       workspaceId: content.workspace_id
     }
     if (!isVisible) return null
-    // console.log('COMPARE0', rawContentBeforeEdit, content.raw_content, rawContentBeforeEdit === content.raw_content)
     return (
       <PopinFixed
         customClass={`${config.slug}`}
@@ -556,7 +523,7 @@ class CustomForm extends React.Component {
           customColor={this.state.hexcolor}
           faIcon={this.state.faIcon}
           rawTitle={content.label}
-          componentTitle={<div>{content.label}</div>}
+          componentTitle={<span className='componentTitle'>{content.label}</span>}
           userRoleIdInWorkspace={loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
@@ -643,12 +610,16 @@ class CustomForm extends React.Component {
             />
           )}
 
-          {state.config.apiUrl ? (
+          {this.state.config.apiUrl ? (
             <Timeline
+              apiUrl={this.state.config.apiUrl}
+              contentId={this.state.content.content_id}
+              contentType={this.state.content.content_type}
+              workspaceId={this.state.content.workspace_id}
+              onClickSubmit={() => {}}
               customClass={`${config.slug}__contentpage`}
               customColor={this.state.hexcolor}
               loggedUser={loggedUser}
-              apiUrl={state.config.apiUrl}
               timelineData={timeline}
               showHeader
               newComment={newComment}

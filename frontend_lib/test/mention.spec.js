@@ -1,151 +1,144 @@
 import { expect } from 'chai'
 import {
-  wrapMentionsInSpanTags,
+  MENTION_ID_PREFIX,
+  MENTION_ME_CLASS,
   addClassToMentionsOfUser,
   getInvalidMentionList,
-  removeMentionMeClass,
-  handleMentionsBeforeSave,
-  MENTION_ID_PREFIX,
-  MENTION_ME_CLASS
+  searchMentionAndReplaceWithTag,
+  searchMention
 } from '../src/mentionOrLink.js'
 
 const invalidMentionsList = ['@invalid_mention', '@not_a_member']
 
 describe('mentions on mentionOrLink.js', () => {
-  describe('function wrapMentionsInSpanTags', () => {
-    const parser = new global.DOMParser()
-
-    function getWrappedDocument (html) {
-      const doc = parser.parseFromString(html, 'text/html')
-      return wrapMentionsInSpanTags(doc.body, doc, invalidMentionsList)
-    }
-
-    describe('with a source without any mention', () => {
-      const textWithoutMention = 'This is a text without any mention'
-      const docBody = getWrappedDocument(textWithoutMention)
-      it('should not modify the source', () => expect(textWithoutMention).to.equal(docBody.innerHTML))
-    })
-
-    describe('with only one mention in the source', () => {
-      describe('with source as simple text', () => {
-        describe('with the mention at the middle of a sentence', () => {
-          const docBody = getWrappedDocument('This is a text with a mention @admin that should be wrapped')
-          const addedSpanList = docBody.getElementsByTagName('span')
-          const addedSpanListId = addedSpanList[0].id
-
-          it('should only have one span tag', () => expect(addedSpanList).to.have.lengthOf(1))
-          it('should contain the username in the span tag', () => expect(addedSpanList[0].textContent).to.equal('@admin'))
-          it(`should have the span id starting with "${MENTION_ID_PREFIX}"`, () => expect(addedSpanListId.startsWith(MENTION_ID_PREFIX)).to.equal(true))
-          it('should have the span id with a non-empty uuid', () => expect(
-            addedSpanListId.substring(addedSpanListId.lastIndexOf('-') + 1)).to.not.equal('')
-          )
-        })
-
-        describe('with the mention at the beginning of a sentence', () => {
-          const docBody = getWrappedDocument('@admin')
-          const addedSpanList = docBody.getElementsByTagName('span')
-          const addedSpanListId = addedSpanList[0].id
-
-          it('should only have one span tag', () => expect(addedSpanList).to.have.lengthOf(1))
-          it('should contain the username in the span tag', () => expect(addedSpanList[0].textContent).to.equal('@admin'))
-          it(`should have the span id starting with "${MENTION_ID_PREFIX}"`, () => expect(addedSpanListId.startsWith(MENTION_ID_PREFIX)).to.equal(true))
-          it('should have the span id with a non-empty uuid', () => expect(
-            addedSpanListId.substring(addedSpanListId.lastIndexOf('-') + 1)).to.not.equal('')
-          )
-        })
-      })
-
-      describe('with source as HTML text', () => {
-        describe('with the mention at the middle of a sentence', () => {
-          const docBody = getWrappedDocument('<div class="someClass">"This is a text with <p>a mention @admin that</p> should be wrapped"</div>')
-          const addedSpanList = docBody.getElementsByTagName('span')
-          const addedSpanListId = addedSpanList[0].id
-
-          it('should only have one span tag', () => expect(addedSpanList).to.have.lengthOf(1))
-          it('should contain the username in the span tag', () => expect(addedSpanList[0].textContent).to.equal('@admin'))
-          it(`should have the span id starting with "${MENTION_ID_PREFIX}"`, () => expect(addedSpanListId.startsWith(MENTION_ID_PREFIX)).to.equal(true))
-          it('should have the span id with a non-empty uuid', () => expect(
-            addedSpanListId.substring(addedSpanListId.lastIndexOf('-') + 1)).to.not.equal('')
-          )
-        })
-
-        describe('with the mention at the beginning of a sentence', () => {
-          const docBody = getWrappedDocument('<div class="someClass">@admin is a <p>mention</p> that should be wrapped"</div>')
-          const addedSpanList = docBody.getElementsByTagName('span')
-          const addedSpanListId = addedSpanList[0].id
-
-          it('should only have one span tag', () => expect(addedSpanList).to.have.lengthOf(1))
-          it('should contain the username in the span tag', () => expect(addedSpanList[0].textContent).to.equal('@admin'))
-          it(`should have the span id starting with "${MENTION_ID_PREFIX}"`, () => expect(addedSpanListId.startsWith(MENTION_ID_PREFIX)).to.equal(true))
-          it('should have the span id with a non-empty uuid', () => expect(
-            addedSpanListId.substring(addedSpanListId.lastIndexOf('-') + 1)).to.not.equal('')
-          )
+  describe('regex mention', () => {
+    const possibleTests = [
+      {
+        content: '<p>Hello @foo</p>',
+        expected: [' @foo'],
+        description: 'Single mention'
+      },
+      {
+        content: '<p>Hello @foo and @bar</p>',
+        expected: [' @foo', ' @bar'],
+        description: 'Multiple mentions'
+      },
+      {
+        content: '<p>Hello @foo, how are you?</p>',
+        expected: [' @foo'],
+        description: 'Single mention with text before and after'
+      },
+      {
+        content: '<p>Hello @foo_bar, how are you?</p>',
+        expected: [' @foo_bar'],
+        description: 'Single mention with underscores'
+      },
+      {
+        content: '<p>Hello @1foobar, how are you?</p>',
+        expected: [' @1foobar'],
+        description: 'Single mention with numbers'
+      },
+      {
+        content: '<p>Hello @FOOBAR, how are you?</p>',
+        expected: [' @FOOBAR'],
+        description: 'Single mention with uppercase letters'
+      },
+      {
+        content: '<p>Hello@foo, how are you?</p>',
+        expected: [],
+        description: 'Mention without leading whitespace'
+      },
+      {
+        content: '<p>Hello @foo!</p>',
+        expected: [' @foo'],
+        description: 'Mention followed by punctuation'
+      },
+      {
+        content: '<p>Hello,@foo</p>',
+        expected: [',@foo'],
+        description: 'Mention with punctuation before'
+      },
+      {
+        content: '<p>Hello @foo_bar-baz, how are you?</p>',
+        expected: [' @foo_bar-baz'],
+        description: 'Single mention with underscores and hyphens'
+      },
+      {
+        content: '<p>Hello @foo_bar baz, how are you?</p>',
+        expected: [' @foo_bar'],
+        description: 'Single mention with underscore before whitespace'
+      }
+    ]
+    possibleTests.forEach(test => {
+      const { content, expected, description } = test
+      const result = searchMention(content)
+      const expectedResult = `have ${expected.length} results`
+      describe(`For: ${description}`, () => {
+        it(`should ${expectedResult}`, () => {
+          expect(result).to.deep.equal(expected)
         })
       })
     })
+  })
 
-    describe('with 3 mentions in the source', () => {
-      describe('with source as simple text', () => {
-        const docBody = getWrappedDocument('This is a text @user1 with 3 mention @admin that should be @user2 wrapped')
-        const addedSpanList = docBody.getElementsByTagName('span')
-
-        it('should have 3 span tags', () => expect(addedSpanList).to.have.lengthOf(3))
-        it('should contain the username in each span tag', () => {
-          expect(addedSpanList[0].textContent).to.equal('@user1')
-          expect(addedSpanList[1].textContent).to.equal('@admin')
-          expect(addedSpanList[2].textContent).to.equal('@user2')
-        })
-        it(`should have each span id starting with "${MENTION_ID_PREFIX}"`, () => {
-          expect(addedSpanList[0].id.startsWith(MENTION_ID_PREFIX)).to.equal(true)
-          expect(addedSpanList[1].id.startsWith(MENTION_ID_PREFIX)).to.equal(true)
-          expect(addedSpanList[2].id.startsWith(MENTION_ID_PREFIX)).to.equal(true)
+  describe('function searchMentionAndReplaceWithTag', () => {
+    const userList = [
+      {
+        username: 'foo',
+        id: 1
+      },
+      {
+        username: 'bar',
+        id: 2
+      }
+    ]
+    const possibleTests = [
+      {
+        content: '<p>Hello @foo</p>',
+        expected: {
+          html: '<p>Hello <html-mention userid="1"></html-mention></p>',
+          invalidMentionList: []
+        },
+        description: 'Single mention'
+      },
+      {
+        content: '<p>Hello @foo and @bar</p>',
+        expected: {
+          html: '<p>Hello <html-mention userid="1"></html-mention> and <html-mention userid="2"></html-mention></p>',
+          invalidMentionList: []
+        },
+        description: 'Multiple mentions'
+      },
+      {
+        content: '<p>Hello @all!</p>',
+        expected: {
+          html: '<p>Hello <html-mention roleid="0"></html-mention>!</p>',
+          invalidMentionList: []
+        },
+        description: 'Mention of a role'
+      },
+      {
+        content: '<p>Hello @all and @foo</p>',
+        expected: {
+          html: '<p>Hello <html-mention roleid="0"></html-mention> and <html-mention userid="1"></html-mention></p>',
+          invalidMentionList: []
+        },
+        description: 'Mention of a role and a user'
+      }
+    ]
+    possibleTests.forEach(test => {
+      const { content, expected, description } = test
+      const result = searchMentionAndReplaceWithTag(userList, content)
+      const expectedResult = `have ${expected}`
+      describe(`For: ${description}`, () => {
+        it(`should ${expectedResult}`, () => {
+          expect(result).to.deep.equal(expected)
         })
       })
-
-      describe('with source as HTML text', () => {
-        const docBody = getWrappedDocument('<div class="someClass">"This is @user1 a text with <p>a mention @admin that</p> should be @user2 wrapped"</div>')
-        const addedSpanList = docBody.getElementsByTagName('span')
-
-        it('should only have 3 span tags', () => expect(addedSpanList).to.have.lengthOf(3))
-        it('should contain the username in the span tag', () => {
-          expect(addedSpanList[0].textContent).to.equal('@user1')
-          expect(addedSpanList[1].textContent).to.equal('@admin')
-          expect(addedSpanList[2].textContent).to.equal('@user2')
-        })
-        it(`should have each span id starting with "${MENTION_ID_PREFIX}"`, () => {
-          expect(addedSpanList[0].id.startsWith(MENTION_ID_PREFIX)).to.equal(true)
-          expect(addedSpanList[1].id.startsWith(MENTION_ID_PREFIX)).to.equal(true)
-          expect(addedSpanList[2].id.startsWith(MENTION_ID_PREFIX)).to.equal(true)
-        })
-      })
-    })
-
-    describe('with an @ in the source but without a space before', () => {
-      const docBody = getWrappedDocument('This is a text with a mention@admin that should NOT be wrapped')
-      const addedSpanList = docBody.getElementsByTagName('span')
-
-      it('should not have any span tag', () => {
-        expect(addedSpanList).to.have.lengthOf(0)
-      })
-    })
-
-    it('should handle a document containing only a mention correctly', () => {
-      expect(getWrappedDocument('@mention').querySelector('span')).to.be.an.instanceof(Element)
-    })
-
-    it('should not add text between mentions', () => {
-      expect(getWrappedDocument('@mention').textContent).to.equal('@mention')
-      expect(getWrappedDocument('@all @all @bob @claudine').textContent).to.equal('@all @all @bob @claudine')
-    })
-
-    it('should not wrap invalid mentions', () => {
-      const docBody = getWrappedDocument('This is a text with a @invalid_mention that should NOT be wrapped, neither @not_a_member')
-      expect(docBody.getElementsByTagName('span')).to.have.lengthOf(0)
     })
   })
 
   describe('the addClassToMentionsOfUser() and removeClassFromMentionsOfUser() functions', () => {
-    const parser = new globalThis.DOMParser()
     const mentionForFoo = `<span id="${MENTION_ID_PREFIX}foobar">@foo</span>`
     const mentionForAll = `<span id="${MENTION_ID_PREFIX}foobar">@all</span>`
     const htmlCommentWithoutMention = '<p>Hello <strong>world.</strong></p> <p><span style="background-color: #ffff00;">Yop</span></p> <ul> <li>Plop</li> </ul>'
@@ -211,31 +204,6 @@ describe('mentions on mentionOrLink.js', () => {
             expect(modifiedContent).to.equal(expectedContent)
           })
         })
-      })
-    })
-    describe('removeClassFromMentionsOfUser()', () => {
-      testCases.forEach(testCase => {
-        const { content, expectedContent, username, description } = testCase
-        const expectedRemoveResult = content === expectedContent ? 'not change class' : 'remove class'
-        const document = parser.parseFromString(expectedContent, 'text/html')
-        removeMentionMeClass(document, username)
-        describe(`for a ${description}`, () => {
-          it(`should ${expectedRemoveResult}`, () => {
-            expect(document.body.innerHTML).to.equal(content)
-          })
-        })
-      })
-    })
-  })
-
-  describe('the handleMentionsBeforeSave() function', () => {
-    describe('if the source is null', () => {
-      it('should throw an error exception', () => {
-        try {
-          handleMentionsBeforeSave(null)
-        } catch (e) {
-          expect(e).to.be.a(Error)
-        }
       })
     })
   })

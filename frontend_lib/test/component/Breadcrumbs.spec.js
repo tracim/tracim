@@ -33,18 +33,10 @@ describe('<Breadcrumbs />', () => {
   const wrapper = mount(<BreadcrumbsWithHOC {...props} />, { wrappingComponent: RouterMock })
 
   describe('The first level', () => {
-    it('should display "First level"', () => expect(wrapper.find('.breadcrumbs__item').at(1)).to.have.text().to.be.equal('First level'))
-    it('should NOT have the class primaryColorFontDarkenHover and primaryColorFont', () => {
-      expect(wrapper.find('.breadcrumbs__item').at(1)).to.have.attr('class').to.not.contains('primaryColorFontDarkenHover')
-      expect(wrapper.find('.breadcrumbs__item').at(1)).to.have.attr('class').to.not.contains('primaryColorFont')
-    })
+    it('should display "First level"', () => expect(wrapper.find('.breadcrumbs__item').at(1)).to.have.text().to.contains('First level'))
   })
 
   describe('The second level', () => {
     it('should display "Second level"', () => expect(wrapper.find('.breadcrumbs__item').at(2)).to.have.text().to.be.equal('Second level'))
-    it('should have the class primaryColorFontDarkenHover and primaryColorFont', () => {
-      expect(wrapper.find('.breadcrumbs__item').at(2)).to.have.attr('class').to.contains('primaryColorFontDarkenHover')
-      expect(wrapper.find('.breadcrumbs__item').at(2)).to.have.attr('class').to.contains('primaryColorFont')
-    })
   })
 })

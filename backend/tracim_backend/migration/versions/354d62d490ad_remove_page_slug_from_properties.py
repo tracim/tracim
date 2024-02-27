@@ -5,9 +5,8 @@ Revises: 182b9f7aa837
 Create Date: 2019-01-22 15:27:12.462798
 
 """
-import json
-
 from alembic import op
+import json
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import MetaData
@@ -38,7 +37,7 @@ DeclarativeBase = declarative_base(metadata=metadata)
 
 
 class TemporaryContentRevision(DeclarativeBase):
-    """ temporary sqlalchemy object to help migration"""
+    """temporary sqlalchemy object to help migration"""
 
     __tablename__ = "content_revisions"
 
@@ -75,7 +74,7 @@ def upgrade():
 
 
 def downgrade():
-    """ Downgrade is not able to retrieve content with old slug and content
+    """Downgrade is not able to retrieve content with old slug and content
     with new as both are valid before this. Stay with NEW_SLUG is better, so
     don't do anything
     """

@@ -1,35 +1,37 @@
 import React from 'react'
 import i18n from './i18n.js'
 import Autolinker from 'autolinker'
+import { uniqBy } from 'lodash'
 
 import {
   handleFetchResult,
   APP_FEATURE_MODE,
   NUMBER_RESULTS_BY_PAGE,
-  convertBackslashNToBr,
   displayDistanceDate,
-  sortTimelineByDate,
   sendGlobalFlashMessage,
   TIMELINE_TYPE,
   CONTENT_TYPE,
   permissiveNumberEqual,
   getOrCreateSessionClientToken,
-  addRevisionFromTLM
+  addRevisionFromTLM,
+  stringIncludes
 } from './helper.js'
+
+import {
+  SORT_BY,
+  sortListByMultipleCriteria,
+  sortTimelineByDate
+} from './sortListHelper.js'
 
 import {
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
-  setLocalStorageItem,
-  removeLocalStorageItem
+  setLocalStorageItem
 } from './localStorage.js'
 
 import {
   addClassToMentionsOfUser,
-  handleMentionsBeforeSave,
-  getInvalidMentionList,
-  getMatchingGroupMentionList,
-  handleLinksBeforeSave
+  getMatchingGroupMentionList
 } from './mentionOrLink.js'
 
 import {
@@ -40,22 +42,31 @@ import {
 
 import {
   deleteComment,
-  putEditContent,
-  putComment,
+  deleteToDo,
+  deleteContentFromFavoriteList,
+  getComment,
+  getCommentTranslated,
+  getContent,
+  getContentComment,
+  getFavoriteContentList,
+  getFileChildContent,
+  getMyselfKnownContents,
+  getSpaceUserRoleList,
+  getTemplateList,
+  getToDoList,
+  postContentToFavoriteList,
   postNewComment,
-  putEditStatus,
+  postToDo,
+  putComment,
   putContentArchived,
   putContentDeleted,
   putContentRestoreArchive,
   putContentRestoreDelete,
-  getMyselfKnownContents,
-  getMyselfKnownMember,
-  getCommentTranslated,
-  postContentToFavoriteList,
-  getFavoriteContentList,
-  deleteContentFromFavoriteList,
-  getContentComment,
-  getFileChildContent
+  putContentTemplate,
+  putEditContent,
+  putEditStatus,
+  putToDo,
+  putChangeContentNamespace
 } from './action.async.js'
 
 import {
@@ -106,11 +117,12 @@ export function appContentFactory (WrappedComponent) {
 
       props.registerLiveMessageHandlerList([
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, handler: this.handleContentModified },
-        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleChildContentCreated },
+        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleCommentCreated },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.COMMENT, handler: this.handleChildContentDeleted },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentModified },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentCreated },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentDeleted },
+        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentModified },
         { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
       ])
 
@@ -124,16 +136,103 @@ export function appContentFactory (WrappedComponent) {
 
     checkApiUrl = () => {
       if (!this.apiUrl) {
-        console.error("Warning from appContentFactory. apiUrl hasn't been set. You must call props.setApiUrl in your component's constructor.")
+        console.error('Error from appContentFactory. `apiUrl` hasn\'t been set. You must call `props.setApiUrl` in your component\'s constructor.')
       }
     }
 
     setApiUrl = url => { this.apiUrl = url }
 
+    getContent = async (contentId) => {
+      const fetchGetContent = await handleFetchResult(await getContent(this.apiUrl, contentId))
+
+      switch (fetchGetContent.apiResponse.status) {
+        case 200: return fetchGetContent.body
+        default:
+          sendGlobalFlashMessage(i18n.t('Unknown content'))
+          return {}
+      }
+    }
+
+    getTemplateList = async (setState, templateType) => {
+      const result = await getTemplateList(this.apiUrl, templateType)
+      const fetchGetTemplates = await handleFetchResult(result)
+      const templateList = []
+
+      switch (fetchGetTemplates.apiResponse.status) {
+        case 200:
+          fetchGetTemplates.body.forEach(template => {
+            templateList.push({
+              ...template,
+              value: template.content_id
+            })
+          })
+          setState({ templateList: templateList })
+          break
+        default:
+          sendGlobalFlashMessage(i18n.t('Something went wrong'))
+          setState({ templateList: templateList })
+          break
+      }
+    }
+
+    /**
+     * Get a complete comment
+     * This function exists also in withActivity.jsx
+     * @async
+     * @param {int} spaceId
+     * @param {int} contentId
+     * @param {int} commentId
+     * @returns {Promise<JSON>}
+     */
+    getComment = async (spaceId, contentId, commentId) => {
+      const fetchGetComment = await handleFetchResult(await getComment(this.apiUrl, spaceId, contentId, commentId))
+
+      switch (fetchGetComment.apiResponse.status) {
+        case 200: return fetchGetComment.body
+        default:
+          sendGlobalFlashMessage(i18n.t('Unknown comment'))
+          return {}
+      }
+    }
+
+    getToDoList = async (setState, workspaceId, contentId) => {
+      const fetchGetToDo = await handleFetchResult(await getToDoList(this.apiUrl, workspaceId, contentId))
+
+      switch (fetchGetToDo.apiResponse.status) {
+        case 200:
+          setState({
+            toDoList: sortListByMultipleCriteria(
+              uniqBy(fetchGetToDo.body, 'content_id'),
+              [SORT_BY.STATUS, SORT_BY.CREATION_DATE, SORT_BY.ID]
+            )
+          })
+          break
+        default:
+          sendGlobalFlashMessage(i18n.t('Something went wrong'))
+          break
+      }
+    }
+
+    handleCommentCreated = async (tlm) => {
+      const { state } = this
+      if (!state.content || !permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+      const comment = await this.getComment(tlm.fields.workspace.workspace_id, tlm.fields.content.parent_id, tlm.fields.content.content_id)
+      this.handleChildContentCreated({
+        ...tlm,
+        fields: {
+          ...tlm.fields,
+          content: {
+            ...tlm.fields.content,
+            ...comment
+          }
+        }
+      })
+    }
+
     handleChildContentCreated = (tlm) => {
       const { state } = this
       // Not a child of our content
-      if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+      if (!state.content || !permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
 
       const isFromCurrentToken = tlm.fields.client_token === this.sessionClientToken
       this.addChildContentToTimeline(
@@ -146,7 +245,7 @@ export function appContentFactory (WrappedComponent) {
 
     handleChildContentDeleted = (tlm) => {
       const { state } = this
-      if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+      if (!state.content || !permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
       this.setState(prevState => {
         const wholeTimeline = prevState.wholeTimeline.filter(timelineItem => timelineItem.content_id !== tlm.fields.content.content_id)
         const timeline = this.getTimeline(wholeTimeline, prevState.timeline.length - 1)
@@ -154,12 +253,37 @@ export function appContentFactory (WrappedComponent) {
       })
     }
 
-    handleContentCommentModified = (tlm) => {
+    handleChildContentModified = (tlm) => {
+      const { state, props } = this
+
+      if (
+        props.data === undefined ||
+        tlm.fields.content.workspace_id !== props.data.content.workspace_id ||
+        tlm.fields.content.parent_id !== props.data.content.content_id
+      ) return
+
+      const wholeTimeline = [...state.wholeTimeline]
+      const index = wholeTimeline.findIndex(element => element.content_id === tlm.fields.content.content_id)
+      if (index < 0) return
+
+      wholeTimeline[index] = this.buildTimelineItemCommentAsFile(tlm.fields.content, state.loggedUser)
+      const timeline = this.getTimeline(wholeTimeline, state.timeline.length)
+
+      this.setState({
+        wholeTimeline,
+        timeline
+      })
+    }
+
+    handleContentCommentModified = async (tlm) => {
       const { state } = this
-      if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+      if (!state.content || !permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+
+      const comment = await this.getComment(tlm.fields.workspace.workspace_id, tlm.fields.content.parent_id, tlm.fields.content.content_id)
+
       this.setState(prevState => {
         const wholeTimeline = this.updateCommentOnTimeline(
-          tlm.fields.content,
+          { ...tlm.fields.content, ...comment },
           prevState.wholeTimeline,
           prevState.loggedUser.username
         )
@@ -180,15 +304,23 @@ export function appContentFactory (WrappedComponent) {
       })
     }
 
-    handleContentModified = (tlm) => {
+    handleContentModified = async (tlm) => {
       const { state } = this
       // Not our content
       if (!state.content || !permissiveNumberEqual(tlm.fields.content.content_id, state.content.content_id)) return
 
+      const content = await this.getContent(tlm.fields.content.content_id)
+
       this.setState(prevState => {
         const isFromCurrentToken = tlm.fields.client_token === this.sessionClientToken
         const wholeTimeline = addRevisionFromTLM(
-          tlm.fields,
+          {
+            ...tlm.fields,
+            content: {
+              ...tlm.fields.content,
+              ...content
+            }
+          },
           prevState.wholeTimeline,
           prevState.loggedUser.lang,
           isFromCurrentToken
@@ -222,26 +354,22 @@ export function appContentFactory (WrappedComponent) {
 
     // INFO - CH - 2019-01-08 - event called by OpenContentApp in case of opening another app feature
     appContentCustomEventHandlerHideApp = setState => {
-      globalThis.tinymce.remove('#wysiwygTimelineComment')
       setState({
-        isVisible: false,
-        timelineWysiwyg: false
+        isVisible: false
       })
     }
 
     // CH - 2019-31-12 - This event is used to send a new content_id that will trigger data reload through componentDidUpdate
     appContentCustomEventHandlerReloadContent = (newContent, setState, appSlug) => {
-      globalThis.tinymce.remove('#wysiwygTimelineComment')
-
       setState(prev => ({
         content: { ...prev.content, ...newContent },
         isVisible: true,
-        timelineWysiwyg: false,
         newComment: prev.content.content_id === newContent.content_id
           ? prev.newComment
           : getLocalStorageItem(
             appSlug,
-            newContent,
+            newContent.content_id,
+            newContent.workspace_id,
             LOCAL_STORAGE_FIELD.COMMENT
           ) || ''
       }))
@@ -253,13 +381,7 @@ export function appContentFactory (WrappedComponent) {
       loadTimeline()
     }
 
-    // INFO - 2019-01-09 - if param isTimelineWysiwyg is false, param changeNewCommentHandler isn't required
-    appContentCustomEventHandlerAllAppChangeLanguage = (newLang, setState, i18n, isTimelineWysiwyg, changeNewCommentHandler = null) => {
-      if (isTimelineWysiwyg) {
-        globalThis.tinymce.remove('#wysiwygTimelineComment')
-        globalThis.wysiwyg('#wysiwygTimelineComment', newLang, changeNewCommentHandler)
-      }
-
+    appContentCustomEventHandlerAllAppChangeLanguage = (newLang, setState, i18n) => {
       setState(prev => ({
         loggedUser: {
           ...prev.loggedUser,
@@ -294,6 +416,31 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
+    appContentMarkAsTemplate = async (setState, content, isTemplate = false) => {
+      setState({ disableChangeIsTemplate: true })
+      this.checkApiUrl()
+
+      if (!content) {
+        return {}
+      }
+
+      const response = await handleFetchResult(
+        await putContentTemplate(this.apiUrl, content.workspace_id, content.content_id, isTemplate)
+      )
+
+      switch (response.status) {
+        case 204:
+          setState({ isTemplate: isTemplate })
+          break
+        default:
+          sendGlobalFlashMessage('Error while marking this as a template')
+          break
+      }
+
+      setState({ disableChangeIsTemplate: false })
+      return response
+    }
+
     appContentDeleteComment = async (workspaceId, contentId, commentId, contentType = CONTENT_TYPE.COMMENT) => {
       this.checkApiUrl()
       let response
@@ -311,29 +458,60 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
-    appContentEditComment = async (workspaceId, contentId, commentId, loggedUsername) => {
+    appContentSaveNewToDo = async (workspaceId, contentId, assignedUserId, toDo, setState) => {
       this.checkApiUrl()
-      const newCommentForApi = tinymce.get('wysiwygTimelineCommentEdit').getContent()
-      let knownMentions = await this.searchForMentionOrLinkInQuery('', workspaceId)
-      knownMentions = knownMentions.map(member => `@${member.username}`)
-      const invalidMentionList = getInvalidMentionList(newCommentForApi, knownMentions)
+      const response = await handleFetchResult(await postToDo(this.apiUrl, workspaceId, contentId, assignedUserId, toDo))
+      if (response.apiResponse.status !== 200) sendGlobalFlashMessage(i18n.t('Error while saving new to do'))
+      return response
+    }
 
-      let newCommentForApiWithMention
-      try {
-        newCommentForApiWithMention = handleMentionsBeforeSave(newCommentForApi, loggedUsername, invalidMentionList)
-      } catch (e) {
-        return Promise.reject(e)
+    appContentDeleteToDo = async (workspaceId, contentId, toDoId, setState, previousLockedToDoList) => {
+      this.checkApiUrl()
+      setState({ lockedToDoList: [...previousLockedToDoList, toDoId] })
+
+      const response = await handleFetchResult(await deleteToDo(this.apiUrl, workspaceId, contentId, toDoId))
+
+      switch (response.status) {
+        case 204: break
+        case 403:
+          setState({ lockedToDoList: [...previousLockedToDoList] })
+          sendGlobalFlashMessage(i18n.t('You are not allowed to delete this to do'))
+          break
+        default:
+          setState({ lockedToDoList: [...previousLockedToDoList] })
+          sendGlobalFlashMessage(i18n.t('Error while deleting to do'))
+          break
       }
 
-      let newCommentForApiWithMentionAndLink
-      try {
-        newCommentForApiWithMentionAndLink = await handleLinksBeforeSave(newCommentForApiWithMention, this.apiUrl)
-      } catch (e) {
-        return Promise.reject(e)
+      return response
+    }
+
+    appContentChangeStatusToDo = async (workspaceId, contentId, toDoId, status, setState, previousLockedToDoList) => {
+      this.checkApiUrl()
+      setState({ lockedToDoList: [...previousLockedToDoList, toDoId] })
+
+      const response = await handleFetchResult(await putToDo(this.apiUrl, workspaceId, contentId, toDoId, status))
+
+      switch (response.status) {
+        case 204: break
+        case 403:
+          setState({ lockedToDoList: [...previousLockedToDoList] })
+          sendGlobalFlashMessage(i18n.t('You are not allowed to change the status of this to do'))
+          break
+        default:
+          setState({ lockedToDoList: [...previousLockedToDoList] })
+          sendGlobalFlashMessage(i18n.t('Error while saving new to do'))
+          break
       }
+
+      return response
+    }
+
+    appContentEditComment = async (workspaceId, contentId, commentId, newComment) => {
+      this.checkApiUrl()
 
       const response = await handleFetchResult(
-        await putComment(this.apiUrl, workspaceId, contentId, commentId, newCommentForApiWithMentionAndLink)
+        await putComment(this.apiUrl, workspaceId, contentId, commentId, newComment)
       )
 
       switch (response.apiResponse.status) {
@@ -374,50 +552,28 @@ export function appContentFactory (WrappedComponent) {
       )
     }
 
-    saveCommentAsText = async (content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername, id) => {
-      // @FIXME - Côme - 2018/10/31 - line below is a hack to force send html to api
-      // see https://github.com/tracim/tracim/issues/1101
-      const newCommentForApi = isCommentWysiwyg
-        ? tinymce.get(`wysiwygTimelineComment${id}`).getContent()
-        : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`, { stripPrefix: false })
-      let knownMentions = await this.searchForMentionOrLinkInQuery('', content.workspace_id)
-      knownMentions = knownMentions.map(member => `@${member.username}`)
-      const invalidMentionList = getInvalidMentionList(newCommentForApi, knownMentions)
+    appContentSaveNewCommentText = async (content, newComment) => {
+      this.checkApiUrl()
 
-      let newCommentForApiWithMention
-      try {
-        newCommentForApiWithMention = handleMentionsBeforeSave(newCommentForApi, loggedUsername, invalidMentionList)
-      } catch (e) {
-        return Promise.reject(e)
+      if (newComment === '') {
+        return { apiResponse: { status: 400 }, body: { code: 2003 } }
       }
 
-      let newCommentForApiWithMentionAndLink
-      try {
-        newCommentForApiWithMentionAndLink = await handleLinksBeforeSave(newCommentForApiWithMention, this.apiUrl)
-      } catch (e) {
-        return Promise.reject(e)
-      }
+      const contentToSend = Autolinker.link(newComment, { stripPrefix: false })
 
       const response = await handleFetchResult(
         await postNewComment(
           this.apiUrl,
           content.workspace_id,
           content.content_id,
-          newCommentForApiWithMentionAndLink,
+          contentToSend,
           content.content_namespace
         )
       )
 
       switch (response.apiResponse.status) {
         case 200:
-          setState({ newComment: '', showInvalidMentionPopupInComment: false })
-          if (isCommentWysiwyg) tinymce.get(`wysiwygTimelineComment${id}`).setContent('')
-
-          removeLocalStorageItem(
-            appSlug,
-            content,
-            LOCAL_STORAGE_FIELD.COMMENT
-          )
+          // Nothing to do
           break
         case 400:
           switch (response.body.code) {
@@ -441,7 +597,9 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
-    saveCommentAsFile = async (content, newCommentAsFile) => {
+    appContentSaveNewCommentFile = async (content, file) => {
+      this.checkApiUrl()
+
       const errorMessageList = [
         { status: 400, code: 3002, message: i18n.t('A content with the same name already exists') },
         { status: 400, code: 6002, message: i18n.t('The file is larger than the maximum file size allowed') },
@@ -450,7 +608,7 @@ export function appContentFactory (WrappedComponent) {
       ]
       const parentNamespace = content.contentNamespace ? content.contentNamespace : content.content_namespace
       return uploadFile(
-        newCommentAsFile,
+        file,
         `${this.apiUrl}/workspaces/${content.workspace_id}/files`,
         {
           additionalFormData: {
@@ -458,31 +616,28 @@ export function appContentFactory (WrappedComponent) {
             content_namespace: parentNamespace
           },
           httpMethod: 'POST',
-          progressEventHandler: () => {},
+          progressEventHandler: () => { },
           errorMessageList: errorMessageList,
           defaultErrorMessage: i18n.t('Error while uploading file')
         }
       )
     }
 
-    appContentSaveNewComment = async (
-      content, isCommentWysiwyg, newComment, newCommentAsFileList, setState, appSlug, loggedUsername, id = ''
-    ) => {
+    appContentSaveNewCommentFileList = async (setState, content, fileList) => {
       this.checkApiUrl()
 
-      if (newComment) {
-        await this.saveCommentAsText(content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername, id)
-      }
+      setState({ isFileCommentLoading: true })
+      const responseList = await Promise.all(
+        fileList.map(file => this.appContentSaveNewCommentFile(content, file))
+      )
 
-      if (newCommentAsFileList && newCommentAsFileList.length > 0) {
-        const responseList = await Promise.all(
-          newCommentAsFileList.map(newCommentAsFile => this.saveCommentAsFile(content, newCommentAsFile))
-        )
-        const uploadFailedList = responseList.filter(oneUpload => isFileUploadInErrorState(oneUpload))
-        uploadFailedList.forEach(fileInError => sendGlobalFlashMessage(fileInError.errorMessage))
+      // TODO - MP - 2023-01-11 - Send ONE global flash message for every files in error instead of
+      // one message per file
+      // [#6090}(https://github.com/tracim/tracim/issues/6090)
+      const uploadFailedList = responseList.filter(upload => isFileUploadInErrorState(upload))
+      uploadFailedList.forEach(fileInError => sendGlobalFlashMessage(fileInError.errorMessage))
 
-        setState({ newCommentAsFileList: uploadFailedList })
-      }
+      setState({ fileList: uploadFailedList, isFileCommentLoading: false })
     }
 
     appContentChangeStatus = async (content, newStatus, appSlug) => {
@@ -525,6 +680,54 @@ export function appContentFactory (WrappedComponent) {
           break
       }
 
+      return response
+    }
+
+    appContentChangeType = async (content, setState) => {
+      this.checkApiUrl()
+      // INFO - FS - 2024-02-15 - Depending on if the content comes from Publication or Thread the variable name are different
+      let contentId = content.id
+      let workspaceId = content.workspaceId
+      if (contentId === undefined) {
+        contentId = content.content_id
+        workspaceId = content.workspace_id
+      }
+      const response = await handleFetchResult(
+        await putChangeContentNamespace(this.apiUrl, workspaceId, contentId, 'content')
+      )
+      const status = response.ok ? response.status : response.apiResponse.status
+      switch (status) {
+        case 204:
+          setState({ mode: APP_FEATURE_MODE.VIEW })
+          break
+        case 400:
+          switch (response.body.code) {
+            case 3002:
+              sendGlobalFlashMessage(i18n.t('A content with the same name already exists'))
+              break
+            default:
+              GLOBAL_dispatchEvent({
+                type: CUSTOM_EVENT.ADD_FLASH_MSG,
+                data: {
+                  msg: i18n.t('Error while changing content type'),
+                  type: 'warning',
+                  delay: undefined
+                }
+              })
+              break
+          }
+          break
+        default:
+          GLOBAL_dispatchEvent({
+            type: CUSTOM_EVENT.ADD_FLASH_MSG,
+            data: {
+              msg: i18n.t('Error while changing content type'),
+              type: 'warning',
+              delay: undefined
+            }
+          })
+          break
+      }
       return response
     }
 
@@ -600,10 +803,11 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
-    appContentNotifyAll = (content, setState, appSlug) => {
-      const notifyAllComment = i18n.t('@all Please notice that I did an important update on this content.')
+    appContentNotifyAll = (content) => {
+      const comment = i18n.t('Please notice that I did an important update on this content.')
+      const commentWithMention = `<html-mention roleid="0"></html-mention> ${comment}`
 
-      this.appContentSaveNewComment(content, false, notifyAllComment, setState, appSlug)
+      this.appContentSaveNewCommentText(content, commentWithMention)
     }
 
     buildTimelineItemComment = (content, loggedUser, initialCommentTranslationState) => ({
@@ -770,9 +974,9 @@ export function appContentFactory (WrappedComponent) {
       const { state } = this
       return (
         state.wholeTimeline.length > state.timeline.length ||
-          state.hasMoreComments ||
-          state.hasMoreFiles ||
-          state.hasMoreRevisions
+        state.hasMoreComments ||
+        state.hasMoreFiles ||
+        state.hasMoreRevisions
       )
     }
 
@@ -820,10 +1024,19 @@ export function appContentFactory (WrappedComponent) {
         }
       } else {
         autoCompleteItemList = getMatchingGroupMentionList(keyword)
-        const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(this.apiUrl, keyword, workspaceId, null, NUMBER_RESULTS_BY_PAGE))
+        const fetchSpaceMemberList = await handleFetchResult(
+          await getSpaceUserRoleList(this.apiUrl, workspaceId)
+        )
 
-        switch (fetchUserKnownMemberList.apiResponse.status) {
-          case 200: return [...autoCompleteItemList, ...fetchUserKnownMemberList.body.filter(m => m.username).map(m => ({ mention: m.username, detail: m.public_name, ...m }))]
+        const includesKeyword = stringIncludes(keyword)
+
+        switch (fetchSpaceMemberList.apiResponse.status) {
+          case 200: return [
+            ...autoCompleteItemList,
+            ...fetchSpaceMemberList.body
+              .filter(m => includesKeyword(m.user.username) || includesKeyword(m.user.public_name))
+              .map(m => ({ mention: m.user.username, detail: m.user.public_name, ...m.user }))
+          ]
           default: sendGlobalFlashMessage(i18n.t('An error has happened while getting the known members list')); break
         }
       }
@@ -860,7 +1073,7 @@ export function appContentFactory (WrappedComponent) {
       }
 
       const newTimeline = timeline.map(timelineItem => timelineItem.content_id === comment.content_id
-        ? { ...timelineItem, raw_content: addClassToMentionsOfUser(comment.raw_content, loggedUserUsername) }
+        ? { ...timelineItem, ...comment, raw_content: addClassToMentionsOfUser(comment.raw_content, loggedUserUsername) }
         : timelineItem
       )
       return newTimeline
@@ -937,6 +1150,8 @@ export function appContentFactory (WrappedComponent) {
         <WrappedComponent
           {...this.props}
           setApiUrl={this.setApiUrl}
+          addContentToFavoriteList={this.addContentToFavoriteList}
+          appContentChangeStatusToDo={this.appContentChangeStatusToDo}
           appContentCustomEventHandlerShowApp={this.appContentCustomEventHandlerShowApp}
           appContentCustomEventHandlerHideApp={this.appContentCustomEventHandlerHideApp}
           appContentCustomEventHandlerReloadAppFeatureData={this.appContentCustomEventHandlerReloadAppFeatureData}
@@ -944,21 +1159,27 @@ export function appContentFactory (WrappedComponent) {
           appContentCustomEventHandlerAllAppChangeLanguage={this.appContentCustomEventHandlerAllAppChangeLanguage}
           appContentChangeTitle={this.appContentChangeTitle}
           appContentChangeComment={this.appContentChangeComment}
+          appContentChangeType={this.appContentChangeType}
           appContentDeleteComment={this.appContentDeleteComment}
+          appContentDeleteToDo={this.appContentDeleteToDo}
           appContentEditComment={this.appContentEditComment}
-          appContentSaveNewComment={this.appContentSaveNewComment}
+          appContentMarkAsTemplate={this.appContentMarkAsTemplate}
+          appContentSaveNewCommentText={this.appContentSaveNewCommentText}
+          appContentSaveNewCommentFileList={this.appContentSaveNewCommentFileList}
           appContentChangeStatus={this.appContentChangeStatus}
           appContentArchive={this.appContentArchive}
           appContentDelete={this.appContentDelete}
           appContentNotifyAll={this.appContentNotifyAll}
           appContentRestoreArchive={this.appContentRestoreArchive}
           appContentRestoreDelete={this.appContentRestoreDelete}
+          appContentSaveNewToDo={this.appContentSaveNewToDo}
           buildTimelineFromCommentAndRevision={this.buildTimelineFromCommentAndRevision}
-          searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
+          getTemplateList={this.getTemplateList}
+          getToDoList={this.getToDoList}
           handleTranslateComment={this.onHandleTranslateComment}
           handleRestoreComment={this.onHandleRestoreComment}
           isContentInFavoriteList={this.isContentInFavoriteList}
-          addContentToFavoriteList={this.addContentToFavoriteList}
+          searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
           removeContentFromFavoriteList={this.removeContentFromFavoriteList}
           loadFavoriteContentList={this.loadFavoriteContentList}
           buildChildContentTimelineItem={this.buildChildContentTimelineItem}

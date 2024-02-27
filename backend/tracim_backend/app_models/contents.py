@@ -75,7 +75,6 @@ closed_deprecated_status = ContentStatus(
 
 
 class ContentStatusList(object):
-
     OPEN = open_status
 
     def __init__(self, extend_content_status: typing.List[ContentStatus]):
@@ -89,11 +88,11 @@ class ContentStatusList(object):
         raise ContentStatusNotExist()
 
     def get_all_slugs_values(self) -> typing.List[str]:
-        """ Get all slugs"""
+        """Get all slugs"""
         return [item.slug for item in self._content_status]
 
     def get_all(self) -> typing.List[ContentStatus]:
-        """ Get all status"""
+        """Get all status"""
         return [item for item in self._content_status]
 
     def get_default_status(self) -> ContentStatus:
@@ -103,8 +102,10 @@ class ContentStatusList(object):
 content_status_list = ContentStatusList(
     [closed_validated_status, closed_unvalidated_status, closed_deprecated_status]
 )
+
 ####
 # ContentType
+####
 
 
 class ContentTypeInContext(object):
@@ -158,18 +159,20 @@ class ContentTypeInContext(object):
         return self.content_type.file_extension
 
 
-THREAD_TYPE = "thread"
-FILE_TYPE = "file"
-MARKDOWNPLUSPAGE_TYPE = "markdownpage"
-HTML_DOCUMENTS_TYPE = "html-document"
-FOLDER_TYPE = "folder"
-COMMENT_TYPE = "comment"
-KANBAN_TYPE = "kanban"
+class ContentTypeSlug(str, Enum):
+    COMMENT = "comment"
+    FILE = "file"
+    FOLDER = "folder"
+    HTML_DOCUMENTS = "html-document"
+    KANBAN = "kanban"
+    THREAD = "thread"
+    TODO = "todo"
+    ANY = "any"
 
 
 # TODO - G.M - 31-05-2018 - Set Better Comment params
 comment_type = TracimContentType(
-    slug=COMMENT_TYPE,
+    slug=ContentTypeSlug.COMMENT.value,
     fa_icon="",
     label="Comment",
     creation_label="Comment",
@@ -182,29 +185,36 @@ class ContentTypeList(object):
     ContentType List
     """
 
-    Any_SLUG = "any"
     Comment = comment_type
 
     @property
     def Folder(self) -> TracimContentType:
-        return self.get_one_by_slug(FOLDER_TYPE)
+        return self.get_one_by_slug(ContentTypeSlug.FOLDER.value)
+
+    @property
+    def Kanban(self) -> TracimContentType:
+        return self.get_one_by_slug(ContentTypeSlug.KANBAN.value)
 
     @property
     def File(self) -> TracimContentType:
-        return self.get_one_by_slug(FILE_TYPE)
+        return self.get_one_by_slug(ContentTypeSlug.FILE.value)
 
     @property
     def Page(self) -> TracimContentType:
-        return self.get_one_by_slug(HTML_DOCUMENTS_TYPE)
+        return self.get_one_by_slug(ContentTypeSlug.HTML_DOCUMENTS.value)
 
     @property
     def Thread(self) -> TracimContentType:
-        return self.get_one_by_slug(THREAD_TYPE)
+        return self.get_one_by_slug(ContentTypeSlug.THREAD.value)
+
+    @property
+    def Todo(self) -> TracimContentType:
+        return self.get_one_by_slug(ContentTypeSlug.TODO.value)
 
     def __init__(self, app_list: typing.List["TracimApplication"]):
         self.app_list = app_list
         self._special_contents_types = [self.Comment]
-        self._extra_slugs = [self.Any_SLUG]
+        self._extra_slugs = [ContentTypeSlug.ANY.value]
 
     @property
     def _content_types(self) -> List[TracimContentType]:
@@ -256,7 +266,7 @@ class ContentTypeList(object):
         """
         Return all allowed types slug : content_type slug + all alias, any
         and special content_type like comment. Do not return event.
-        Usefull allowed value to perform query to database.
+        Useful allowed value to perform query to database.
         """
         allowed_types_slug = []
         content_types = self._content_types

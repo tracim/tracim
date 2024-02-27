@@ -2970,8 +2970,12 @@ function fullVcalendarToData(inputEvent)
 
 			vCalendar.tplM['contentline_NOTE'][0]=vCalendar.tplC['contentline_NOTE'];
 			vCalendar.tplM['contentline_NOTE'][0]=vCalendar.tplM['contentline_NOTE'][0].replace(/##:::##group_wd##:::##/g, parsed[1]);
-			vCalendar.tplM['contentline_NOTE'][0]=vCalendar.tplM['contentline_NOTE'][0].replace(/##:::##params_wsc##:::##/g, parsed[3]);
 
+			// 	INFO - MB - 2022-02-25 - Disable Description params - some advanced edition might be lost, but they are not editable from caldav anyway.
+			//  See this issue : https://github.com/tracim/tracim/issues/5465
+
+			// vCalendar.tplM['contentline_NOTE'][0]=vCalendar.tplM['contentline_NOTE'][0].replace(/##:::##params_wsc##:::##/g, parsed[3]);
+			vCalendar.tplM['contentline_NOTE'][0]=vCalendar.tplM['contentline_NOTE'][0].replace(/##:::##params_wsc##:::##/g, "");
 			vevent=vevent.replace(vcalendar_element[0], '\r\n');
 
 			if(parsed[1]!='')

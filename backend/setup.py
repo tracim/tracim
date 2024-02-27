@@ -1,15 +1,13 @@
-import sys
-
 from setuptools import find_packages
 from setuptools import setup
+import sys
 
 requires = [
     # pyramid
     "plaster_pastedeploy",
-    "pyramid <2.0",
+    "pyramid>=2.0.0",
     "pyramid_debugtoolbar",
-    "pyramid_retry<2.0",
-    "waitress",
+    "waitress>=2.1.1",
     # Database
     "pyramid_tm",
     "SQLAlchemy<1.4.0",
@@ -22,7 +20,8 @@ requires = [
     # INFO - G.M - 2019-03-21 - this is needed as there is a requirement issue
     # in hapic, apispec-marshmallow-advanced==0.3
     # and hapic==0.73 aren't compatible
-    "apispec-marshmallow-advanced>=0.4" "apispec==2.0.2",
+    "apispec-marshmallow-advanced>=0.4",
+    "apispec==2.0.2",
     "marshmallow <3.0.0a1,>=2.21.0",
     # CLI
     "cliff",
@@ -33,13 +32,13 @@ requires = [
     "filedepot>=0.8.0",
     "babel",
     "python-slugify",
-    "preview-generator>=0.28",
+    "preview-generator>=0.29",
     "colour",
     "python-dateutil",
     "gitpython",
     # mail-notifier
     "mako",
-    "lxml",
+    "lxml>=4.8.0",
     "redis>=3.5.3",
     "rq>=1.9.0",
     "html2text",
@@ -49,8 +48,6 @@ requires = [
     "filelock",
     "imapclient",
     "beautifulsoup4",
-    # auth
-    "pyramid_multiauth",
     # beaker 1.11 is broken: fix does exist but no new release since:
     # https://github.com/bbangert/beaker/commit/889d3055a4ca31b55a0b0681b00f2973b3250d88
     "beaker<1.11.0",
@@ -58,11 +55,14 @@ requires = [
     "pyramid_ldap3",
     # frontend file serve
     "pyramid_mako",
+    # SAML
+    "pysaml2>=7.3.1",
+    "elementpath==4.1.5",  # to enforce support for python 3.7 (limited to 4.1.5)
     # i18n
     "Babel",
     "requests",
     # caldav support
-    "radicale<3.0.0",
+    "radicale>=3.0.6",
     "caldav",
     # search support
     "elasticsearch",
@@ -78,9 +78,13 @@ requires = [
     "tnetstring3",
     "pyzmq",
     "jsonschema",
-    "webpreview",
+    # INFO - G.M - 2022-02-28 - Use algoo fork of webpreview for now:
+    "webpreview @ git+https://github.com/algoo/webpreview@v1.6.0+algoo",
     # importlib
-    "importlib_metadata",
+    "importlib_metadata==4.6.0",
+    # note pdf preview
+    "pypandoc",
+    "weasyprint<53",
 ]
 
 tests_require = [
@@ -99,17 +103,7 @@ tests_require = [
     "sseclient-py",
 ]
 
-devtools_require = [
-    "flake8",
-    "isort",
-    "mypy",
-    "pre-commit",
-]
-
-
-# add black for python 3.6+
-if sys.version_info.major == 3 and sys.version_info.minor >= 6:
-    devtools_require.append("black==19.10b0")
+devtools_require = ["flake8", "isort", "mypy", "pre-commit", "black==19.10b0"]
 
 mysql_require = ["PyMySQL[rsa]"]
 
@@ -144,8 +138,14 @@ setup(
         ],
         "console_scripts": ["tracimcli = tracim_backend.command:main"],
         "tracimcli": [
+            # content
+            "content_delete = tracim_backend.command.cleanup:DeleteContentCommand",
+            "content_show = tracim_backend.command.content:ShowContentTreeCommand",
+            # revision
+            "revision_delete = tracim_backend.command.cleanup:DeleteContentRevisionCommand",
             # workspace
             "space_move = tracim_backend.command.space:MoveSpaceCommand",
+            "space_delete = tracim_backend.command.cleanup:DeleteSpaceCommand",
             # user
             "user_create = tracim_backend.command.user:CreateUserCommand",
             "user_update = tracim_backend.command.user:UpdateUserCommand",
@@ -157,6 +157,8 @@ setup(
             "db update-naming-conventions = tracim_backend.command.database:UpdateNamingConventionsV1ToV2Command",
             "db migrate-mysql-charset = tracim_backend.command.database:MigrateMysqlCharsetCommand",
             "db migrate-storage = tracim_backend.command.database:MigrateStorageCommand",
+            # periodically
+            "periodic send-summary-mails = tracim_backend.command.periodic:SendMailSummariesCommand",
             # search
             "search index-create = tracim_backend.command.search:SearchIndexInitCommand",
             "search index-populate = tracim_backend.command.search:SearchIndexIndexCommand",
@@ -171,10 +173,15 @@ setup(
             "dev parameters list = tracim_backend.command.devtools:ParametersListCommand",
             "dev parameters value = tracim_backend.command.devtools:ParametersValueCommand",
             "dev test live-messages = tracim_backend.command.devtools:LiveMessageTesterCommand",
+            "dev test smtp = tracim_backend.command.devtools:SMTPMailCheckerCommand",
             "dev custom-properties extract-translation-source = tracim_backend.command.devtools:ExtractCustomPropertiesTranslationsCommand",
+            "dev custom-properties checker = tracim_backend.command.devtools:CustomPropertiesCheckerCommand",
         ],
     },
     message_extractors={
-        "tracim_backend": [("**.py", "python", None), ("templates/**.mak", "mako", None)]
+        "tracim_backend": [
+            ("**.py", "python", None),
+            ("templates/**.mak", "mako", None),
+        ]
     },
 )

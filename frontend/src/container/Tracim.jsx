@@ -1,9 +1,12 @@
 import React from 'react'
+import i18next from 'i18next'
+import classnames from 'classnames'
 import { connect } from 'react-redux'
 import { translate, Trans } from 'react-i18next'
 import * as Cookies from 'js-cookie'
 import i18n from '../util/i18n.js'
 import { isEqual } from 'lodash'
+import { isMobile } from 'react-device-detect'
 import {
   Route, withRouter, Redirect
 } from 'react-router-dom'
@@ -22,23 +25,24 @@ import WorkspaceContent from './WorkspaceContent.jsx'
 import OpenWorkspaceAdvanced from '../component/Workspace/OpenWorkspaceAdvanced.jsx'
 import Home from './Home.jsx'
 import WIPcomponent from './WIPcomponent.jsx'
+import CardPopupUsername from './CardPopupUsername'
 import {
   CUSTOM_EVENT,
+  LIVE_MESSAGE_ERROR_CODE,
+  LIVE_MESSAGE_STATUS,
+  PAGE,
   PROFILE,
-  NUMBER_RESULTS_BY_PAGE,
-  formatAbsoluteDate,
-  serialize,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  USER_CALL_STATE,
   CardPopup,
   IconButton,
+  LiveMessageManager,
+  Loading,
   TracimComponent,
   buildHeadTitle,
-  LiveMessageManager,
-  LIVE_MESSAGE_STATUS,
-  LIVE_MESSAGE_ERROR_CODE,
-  PAGE,
-  USER_CALL_STATE,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_ENTITY_TYPE as TLM_ET
+  formatAbsoluteDate,
+  serialize
 } from 'tracim_frontend_lib'
 import {
   COOKIE_FRONTEND,
@@ -46,6 +50,7 @@ import {
   SEARCH_TYPE,
   WELCOME_ELEMENT_ID,
   getUserProfile,
+  initializeCustomElements,
   toggleFavicon,
   unLoggedAllowedPageList
 } from '../util/helper.js'
@@ -54,9 +59,7 @@ import {
   getAppList,
   getConfig,
   getContentTypeList,
-  getWorkspaceMemberList,
-  getMyselfWorkspaceList,
-  getNotificationList,
+  getMyselfWorkspaceConfigList,
   getUserConfiguration,
   getUserIsConnected,
   putUserLang,
@@ -64,7 +67,8 @@ import {
   getAccessibleWorkspaces,
   putSetIncomingUserCallState,
   putSetOutgoingUserCallState,
-  postCreateUserCall
+  postCreateUserCall,
+  getMyselfAllKnownMember
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -72,19 +76,18 @@ import {
   setConfig,
   setAppList,
   setContentTypeList,
-  setNextPage,
-  setNotificationList,
   setUserConfiguration,
   setUserConnected,
-  setWorkspaceList,
+  setUserWorkspaceConfigList,
   setBreadcrumbs,
   appendBreadcrumbs,
-  setWorkspaceListMemberList,
   setUnreadMentionCount,
   setUnreadNotificationCount,
   setHeadTitle,
-  setAccessibleWorkspaceList
+  setAccessibleWorkspaceList,
+  setKnownMemberList
 } from '../action-creator.sync.js'
+import HTMLMention from '../component/Mention/HTMLMention.js'
 import NotificationWall from './NotificationWall.jsx'
 import AdvancedSearch from './AdvancedSearch.jsx'
 import SimpleSearch from './SimpleSearch.jsx'
@@ -99,6 +102,7 @@ import Publications from './Publications.jsx'
 import Favorites from './Favorites.jsx'
 import ContentRedirection from './ContentRedirection.jsx'
 import WorkspacePage from './WorkspacePage.jsx'
+import ToDo from './ToDo.jsx'
 
 const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
 const UNANSWERED_CALL_TIMEOUT = 120000 // 2 minutes
@@ -115,6 +119,8 @@ export class Tracim extends React.Component {
       userCall: undefined,
       unansweredCallTimeoutId: -1
     }
+
+    initializeCustomElements('html-mention', HTMLMention)
 
     this.audioCall = new Audio('/assets/branding/incoming-call.ogg')
     this.liveMessageManager = new LiveMessageManager()
@@ -145,31 +151,41 @@ export class Tracim extends React.Component {
     ])
   }
 
-  handleUserCallCreated = (tlm) => {
+  handleUserCallCreated = async (tlm) => {
     const { props } = this
     const bell = '🔔'
     const isMainTab = this.liveMessageManager.eventSource !== null
-    const notificationOptions = { tag: 'call', renotify: true, requireInteraction: true }
 
     if (tlm.fields.user_call.callee.user_id === props.user.userId) {
-      const notification = new Notification(tlm.fields.user_call.caller.public_name + props.t(' is calling you on Tracim'), notificationOptions)
+      if (window.Notification) {
+        const notificationString = tlm.fields.user_call.caller.public_name + props.t(' is calling you on Tracim')
+        const notificationOptions = { tag: 'call', renotify: true, requireInteraction: true }
+
+        try {
+          if (Notification.permission === 'granted') {
+            new Notification(notificationString, notificationOptions) // eslint-disable-line no-new
+          } else if (Notification.permission !== 'denied') {
+            const permission = await Notification.requestPermission()
+            if (permission === 'granted') {
+              new Notification(notificationString, notificationOptions) // eslint-disable-line no-new
+            }
+          }
+        } catch (e) {
+          console.error('Could not show notification', e)
+        }
+      }
+
       this.setState({ userCall: tlm.fields.user_call })
       this.handleSetHeadTitle({ title: props.system.headTitle }, bell)
+
       if (!isMainTab) return
+
       this.audioCall.addEventListener('ended', function () {
         this.currentTime = 0
         this.play()
       }, false)
+      if (isMobile) return
       this.audioCall.play()
-      if (Notification.permission === 'granted') {
-        return notification
-      } else if (Notification.permission !== 'denied') {
-        Notification.requestPermission().then(function (permission) {
-          if (permission === 'granted') {
-            return notification
-          }
-        })
-      }
     }
     if (tlm.fields.user_call.caller.user_id === props.user.userId) {
       this.setState({ userCall: tlm.fields.user_call })
@@ -187,13 +203,6 @@ export class Tracim extends React.Component {
     props.dispatch(putSetIncomingUserCallState(props.user.userId, state.userCall.call_id, USER_CALL_STATE.ACCEPTED))
     this.handleSetHeadTitle({ title: props.system.headTitle })
     this.audioCall.pause()
-  }
-
-  handleClickOpenCallWindowCaller = () => {
-    const { state } = this
-    const isMainTab = this.liveMessageManager.eventSource !== null
-    if (!isMainTab) return
-    window.open(state.userCall.url)
   }
 
   handleClickRejectCall = () => {
@@ -220,7 +229,6 @@ export class Tracim extends React.Component {
         this.handleSetHeadTitle({ title: props.system.headTitle })
         this.audioCall.pause()
         if (!isMainTab) return
-        window.open(tlm.fields.user_call.url)
       }
       if (tlm.fields.user_call.state === (USER_CALL_STATE.CANCELLED)) {
         this.audioCall.pause()
@@ -277,6 +285,10 @@ export class Tracim extends React.Component {
   handleClickLogout = async () => {
     await this.props.dispatch(logoutUser(this.props.history))
     this.setState({ tooManyUsers: false })
+
+    if (window.ReactNativeWebView) {
+      window.ReactNativeWebView.postMessage('logout')
+    }
   }
 
   handleRedirect = data => {
@@ -330,7 +342,7 @@ export class Tracim extends React.Component {
   }
 
   handleRefreshWorkspaceListThenRedirect = async data => { // Côme - 2018/09/28 - @fixme this is a hack to force the redirection AFTER the workspaceList is loaded
-    await this.loadWorkspaceLists()
+    await this.loadWorkspaceList()
     this.props.history.push(data.url)
   }
 
@@ -370,9 +382,9 @@ export class Tracim extends React.Component {
         i18n.changeLanguage(fetchUser.lang)
 
         this.loadAppConfig()
-        this.loadWorkspaceLists()
+        this.loadWorkspaceList()
+        this.loadKnownMemberList()
         this.loadNotificationNotRead(fetchUser.user_id)
-        this.loadNotificationList(fetchUser.user_id)
         this.loadUserConfiguration(fetchUser.user_id)
 
         this.liveMessageManager.openLiveMessageConnection(fetchUser.user_id, FETCH_CONFIG.apiUrl)
@@ -433,20 +445,16 @@ export class Tracim extends React.Component {
     }
   }
 
-  loadWorkspaceLists = async () => {
+  loadWorkspaceList = async () => {
     const { props } = this
-
-    const showOwnedWorkspace = false
-
-    const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList(showOwnedWorkspace))
+    const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceConfigList())
 
     if (fetchGetWorkspaceList.status !== 200) return false
+    props.dispatch(setUserWorkspaceConfigList(fetchGetWorkspaceList.json))
 
-    props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
-    this.loadWorkspaceListMemberList(fetchGetWorkspaceList.json)
-    this.setState({ workspaceListLoaded: true })
-
-    const fetchAccessibleWorkspaceList = await props.dispatch(getAccessibleWorkspaces(props.user.userId))
+    const fetchAccessibleWorkspaceList = await props.dispatch(
+      getAccessibleWorkspaces(props.user.userId)
+    )
 
     if (fetchAccessibleWorkspaceList.status !== 200) return false
 
@@ -455,22 +463,19 @@ export class Tracim extends React.Component {
     return true
   }
 
-  loadWorkspaceListMemberList = async workspaceList => {
+  loadKnownMemberList = async () => {
     const { props } = this
+    try {
+      const fetchGetKnownMemberList = await props.dispatch(getMyselfAllKnownMember())
 
-    const fetchWorkspaceListMemberList = await Promise.all(
-      workspaceList.map(async ws => ({
-        workspaceId: ws.workspace_id,
-        fetchMemberList: await props.dispatch(getWorkspaceMemberList(ws.workspace_id))
-      }))
-    )
+      if (fetchGetKnownMemberList.status !== 200) return false
 
-    const workspaceListMemberList = fetchWorkspaceListMemberList.map(memberList => ({
-      workspaceId: memberList.workspaceId,
-      memberList: memberList.fetchMemberList.status === 200 ? memberList.fetchMemberList.json : []
-    }))
-
-    props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
+      props.dispatch(setKnownMemberList(fetchGetKnownMemberList.json))
+    } catch (e) {
+      console.error('Error in loadKnownMemberList', e)
+      return false
+    }
+    return true
   }
 
   loadNotificationNotRead = async (userId) => {
@@ -488,27 +493,6 @@ export class Tracim extends React.Component {
     switch (fetchUnreadMessageCount.status) {
       case 200: props.dispatch(setUnreadNotificationCount(fetchUnreadMessageCount.json.unread_messages_count)); break
       default: props.dispatch(newFlashMessage(props.t('Error loading unread mention number')))
-    }
-  }
-
-  loadNotificationList = async (userId) => {
-    const { props } = this
-
-    const fetchGetNotificationWall = await props.dispatch(getNotificationList(
-      userId,
-      {
-        excludeAuthorId: userId,
-        notificationsPerPage: NUMBER_RESULTS_BY_PAGE
-      }
-    ))
-    switch (fetchGetNotificationWall.status) {
-      case 200:
-        props.dispatch(setNotificationList(fetchGetNotificationWall.json.items))
-        props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
-        break
-      default:
-        props.dispatch(newFlashMessage(props.t('Error while loading the notification list'), 'warning'))
-        break
     }
   }
 
@@ -554,7 +538,7 @@ export class Tracim extends React.Component {
   // INFO - MP - 2021-11-10 - Helper function
   // Return the current time HH:mm
   getHoursAndMinutes = () => {
-    return formatAbsoluteDate(new Date(), this.props.user.lang, { hour: '2-digit', minute: '2-digit' })
+    return formatAbsoluteDate(new Date(), this.props.user.lang, 'p')
   }
 
   render () {
@@ -573,25 +557,31 @@ export class Tracim extends React.Component {
       )
     }
 
+    // INFO - MP - 2023-03-31 - Displaying a loader here make the loading page flicker
     if (props.user.logged === null) return null // @TODO show loader
 
     if (!props.location.pathname.includes('/ui')) return <Redirect to={PAGE.HOME} />
 
     if (
       !unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url)) && (
-        !props.system.workspaceListLoaded ||
         !props.system.appListLoaded ||
         !props.system.contentTypeListLoaded
       )
-    ) return null // @TODO Côme - 2018/08/22 - should show loader here
+    ) {
+      return (
+        <div className='tracim fullWidthFullHeight' dir={i18next.dir()}>
+          <Loading
+            height={48}
+            width={48}
+          />
+        </div>
+      )
+    }
 
     return (
-      <div className='tracim fullWidthFullHeight'>
-        <Header
-          onClickNotification={this.handleClickNotificationButton}
-          unreadNotificationCount={props.notificationPage.unreadNotificationCount}
-          unreadMentionCount={props.notificationPage.unreadMentionCount}
-        />
+      <div className='tracim fullWidthFullHeight' dir={i18next.dir()}>
+        <Header />
+
         {state.displayConnectionError && (
           <FlashMessage
             className='connection_error'
@@ -633,14 +623,19 @@ export class Tracim extends React.Component {
                   icon='far fa-clock'
                 />
 
-                <IconButton
-                  intent='primary'
-                  mode='light'
-                  onClick={this.handleClickOpenCallWindowCallee}
-                  text={props.t('Open call')}
-                  icon='fas fa-phone'
-                  color={GLOBAL_primaryColor} // eslint-disable-line camelcase
-                />
+                <a href={state.userCall.url} target='_blank' rel='noopener noreferrer'>
+                  {/* FIXME - MB - 2022-01-05 - a LinkButton should be created with the same style that IconButton
+                  see https://github.com/tracim/tracim/issues/5242 */}
+                  <IconButton
+                    intent='primary'
+                    mode='light'
+                    onClick={this.handleClickOpenCallWindowCallee}
+                    text={props.t('Open call')}
+                    icon='fas fa-phone'
+                    color={GLOBAL_primaryColor} // eslint-disable-line camelcase
+                    customClass='openCallButton'
+                  />
+                </a>
               </div>
             </div>
           </CardPopup>
@@ -666,15 +661,18 @@ export class Tracim extends React.Component {
                   text={props.t('Cancel the call')}
                   icon='fas fa-phone-slash'
                 />
-
-                <IconButton
-                  intent='primary'
-                  mode='light'
-                  onClick={this.handleClickOpenCallWindowCaller}
-                  text={props.t('Open call')}
-                  icon='fas fa-phone'
-                  color={GLOBAL_primaryColor} // eslint-disable-line camelcase
-                />
+                <a href={state.userCall.url} target='_blank' rel='noopener noreferrer'>
+                  {/* FIXME - MB - 2022-01-05 - a LinkButton should be created with the same style that IconButton
+                  see https://github.com/tracim/tracim/issues/5242 */}
+                  <IconButton
+                    intent='primary'
+                    mode='light'
+                    text={props.t('Open call')}
+                    icon='fas fa-phone'
+                    color={GLOBAL_primaryColor} // eslint-disable-line camelcase
+                    customClass='openCallButton'
+                  />
+                </a>
               </div>
             </div>
           </CardPopup>
@@ -739,10 +737,26 @@ export class Tracim extends React.Component {
           />
         )}
 
+        {((!props.user.username && props.user.logged && Cookies.get(COOKIE_FRONTEND.SHOW_USERNAME_POPUP) === 'true' && props.user.config.display_username_popup !== 'false') &&
+          <CardPopupUsername />
+        )}
+
         <ReduxTlmDispatcher />
 
-        <div className='sidebarpagecontainer'>
-          <Route render={() => <Sidebar />} />
+        {/* INFO - CH - 2023-11-07 - notLoggedIn based on user.logged is used to reduce height because
+        when not logged in, we display a 60px header. See Header.jsx */}
+        <div className={classnames('sidebarpagecontainer', { notLoggedIn: props.user.logged === false })}>
+          <Route
+            render={() => (
+              <Sidebar
+                isNotificationWallOpen={state.isNotificationWallOpen}
+                onClickNotification={this.handleClickNotificationButton}
+                unreadMentionCount={props.notificationPage.unreadMentionCount}
+                unreadNotificationCount={props.notificationPage.unreadNotificationCount}
+                isSpaceListLoaded={props.system.workspaceListLoaded}
+              />
+            )}
+          />
 
           <Route
             render={() => (
@@ -779,6 +793,15 @@ export class Tracim extends React.Component {
             render={() => (
               <div className='tracim__content fullWidthFullHeight'>
                 <Favorites />
+              </div>
+            )}
+          />
+
+          <Route
+            path={PAGE.TODO}
+            render={() => (
+              <div className='tracim__content fullWidthFullHeight'>
+                <ToDo />
               </div>
             )}
           />

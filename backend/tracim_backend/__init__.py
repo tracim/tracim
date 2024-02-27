@@ -1,20 +1,18 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
 from copy import deepcopy
-from http import HTTPStatus
-import sys
-import warnings
-
 from hapic.ext.pyramid import PyramidContext
-from preview_generator.preview.builder.office__libreoffice import LO_MIMETYPES
+from http import HTTPStatus
 from pyramid.config import Configurator
+from pyramid.events import NewResponse
 from pyramid.request import Request
 from pyramid.router import Router
 import pyramid_beaker
-from pyramid_multiauth import MultiAuthenticationPolicy
 from sqlalchemy.exc import OperationalError
+import sys
 from transaction._transaction import Status as TransactionStatus
 from transaction.interfaces import NoTransaction
+import warnings
 
 from tracim_backend.applications.agenda.app_factory import CaldavAppFactory
 from tracim_backend.config import CFG
@@ -41,17 +39,21 @@ from tracim_backend.extensions import app_list
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.plugins import init_plugin_manager
-from tracim_backend.lib.utils.authentification import BASIC_AUTH_WEBUI_REALM
-from tracim_backend.lib.utils.authentification import TRACIM_API_KEY_HEADER
-from tracim_backend.lib.utils.authentification import TRACIM_API_USER_LOGIN_HEADER
-from tracim_backend.lib.utils.authentification import ApiTokenAuthentificationPolicy
-from tracim_backend.lib.utils.authentification import CookieSessionAuthentificationPolicy
-from tracim_backend.lib.utils.authentification import QueryTokenAuthentificationPolicy
-from tracim_backend.lib.utils.authentification import RemoteAuthentificationPolicy
-from tracim_backend.lib.utils.authentification import TracimBasicAuthAuthenticationPolicy
-from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
+from tracim_backend.lib.utils.authentication import ApiTokenAuthenticationPolicy
+from tracim_backend.lib.utils.authentication import BASIC_AUTH_WEBUI_REALM
+from tracim_backend.lib.utils.authentication import CookieSessionAuthenticationPolicy
+from tracim_backend.lib.utils.authentication import QueryTokenAuthenticationPolicy
+from tracim_backend.lib.utils.authentication import RemoteAuthenticationPolicy
+from tracim_backend.lib.utils.authentication import SAMLSecurityPolicy
+from tracim_backend.lib.utils.authentication import TRACIM_API_KEY_HEADER
+from tracim_backend.lib.utils.authentication import TRACIM_API_USER_LOGIN_HEADER
+from tracim_backend.lib.utils.authentication import TracimBasicAuthAuthenticationPolicy
 from tracim_backend.lib.utils.authorization import AcceptAllAuthorizationPolicy
+from tracim_backend.lib.utils.authorization import MultiSecurityPolicy
+from tracim_backend.lib.utils.authorization import SecurityPolicyAdaptor
+from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim_backend.lib.utils.cors import add_cors_support
+from tracim_backend.lib.utils.http_cache import default_to_cache_control_no_store
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import sliced_dict
@@ -78,41 +80,6 @@ from tracim_backend.views.frontend import FrontendController
 # useful to avoid apispec error
 if not sys.warnoptions:
     warnings.simplefilter("ignore")
-
-
-# HACK - G.M - 2021-06-14 - disable spreadsheet support for preview by overriding
-# Preview generator Libreoffice mimetype list.
-spreadsheet_mimetypes = (
-    # Excel file mimetypes:
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",  # .xslx
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.template",  # .xlst
-    "application/vnd.ms-excel.sheet.binary.macroEnabled.12",  # .xlsb
-    "application/vnd.ms-excel.sheet.macroEnabled.12",  # .xlsm
-    "application/vnd.ms-excel.template.macroEnabled.12",  # .xltm
-    "application/wps-office.xls",  # .xls
-    "application/wps-office.xlsx",  # .xlsx
-    # Openoffice calc mimetypes:
-    "application/vnd.oasis.opendocument.spreadsheet",  # .ods
-    "application/vnd.oasis.opendocument.spreadsheet-template",  # .ots
-    "application/vnd.oasis.opendocument.spreadsheet-flat-xml",  # .fods
-    # Staroffice
-    "application/vnd.sun.xml.calc",
-    "application/vnd.sun.xml.calc.template",
-    "application/vnd.stardivision.calc",
-    "application/x-starcalc",
-    # Apple numbers
-    "application/x-iwork-numbers-sffnumbers",
-    "application/vnd.apple.numbers",
-    # others:
-    "application/x-gnumeric",
-    "text/spreadsheet",
-    "application/vnd.lotus-1-2-3",
-)
-for mimetype in spreadsheet_mimetypes:
-    try:
-        LO_MIMETYPES.pop(mimetype)
-    except KeyError:
-        pass
 
 
 class TracimPyramidContext(PyramidContext):
@@ -157,8 +124,7 @@ class TracimPyramidContext(PyramidContext):
 
 
 def web(global_config: OrderedDict, **local_settings) -> Router:
-    """ This function returns a Pyramid WSGI application.
-    """
+    """This function returns a Pyramid WSGI application."""
     settings = deepcopy(global_config)
     settings.update(local_settings)
     # set CFG object
@@ -166,11 +132,13 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     app_config.configure_filedepot()
     settings["CFG"] = app_config
 
+    configurator = Configurator(settings=settings, autocommit=True)
+    configurator.begin()
+
     # Init plugin manager
     plugin_manager = init_plugin_manager(app_config)
-    settings["plugin_manager"] = plugin_manager
+    configurator.registry.settings["plugin_manager"] = plugin_manager
 
-    configurator = Configurator(settings=settings, autocommit=True)
     # Add beaker session cookie
     tracim_setting_for_beaker_session = sliced_dict(settings, beginning_key_string="session.")
     tracim_setting_for_beaker_session["session.data_dir"] = app_config.SESSION__DATA_DIR
@@ -192,23 +160,39 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     }
     pyramid_beaker.set_cache_regions_from_settings(cached_region_settings)
 
-    # Add AuthPolicy
-    configurator.include("pyramid_multiauth")
+    def adapt_auth_policy(authentication_policy) -> SecurityPolicyAdaptor:
+        """Adapter function for old-style authentication policies."""
+
+        # NOTE - SGD - 2023-07-26 - Authorization in Tracim is custom-made (see `AuthorizationChecker`)
+        # So use an AcceptAllAuthorizationPolicy() in Pyramid.
+        authorization_policy = AcceptAllAuthorizationPolicy()
+        return SecurityPolicyAdaptor(authentication_policy, authorization_policy)
+
     policies = []
     if app_config.REMOTE_USER_HEADER:
         policies.append(
-            RemoteAuthentificationPolicy(remote_user_login_header=app_config.REMOTE_USER_HEADER)
-        )
-    policies.append(CookieSessionAuthentificationPolicy())
-    policies.append(QueryTokenAuthentificationPolicy())
-    if app_config.API__KEY:
-        policies.append(
-            ApiTokenAuthentificationPolicy(
-                api_key_header=TRACIM_API_KEY_HEADER,
-                api_user_login_header=TRACIM_API_USER_LOGIN_HEADER,
+            adapt_auth_policy(
+                RemoteAuthenticationPolicy(remote_user_login_header=app_config.REMOTE_USER_HEADER)
             )
         )
-    policies.append(TracimBasicAuthAuthenticationPolicy(realm=BASIC_AUTH_WEBUI_REALM))
+    policies.append(adapt_auth_policy(CookieSessionAuthenticationPolicy()))
+    policies.append(adapt_auth_policy(QueryTokenAuthenticationPolicy()))
+    if app_config.API__KEY:
+        policies.append(
+            adapt_auth_policy(
+                ApiTokenAuthenticationPolicy(
+                    api_key_header=TRACIM_API_KEY_HEADER,
+                    api_user_login_header=TRACIM_API_USER_LOGIN_HEADER,
+                )
+            )
+        )
+    policies.append(
+        adapt_auth_policy(TracimBasicAuthAuthenticationPolicy(realm=BASIC_AUTH_WEBUI_REALM))
+    )
+
+    if AuthType.SAML in app_config.AUTH_TYPES:
+        policies.append(SAMLSecurityPolicy(app_config, configurator))
+
     # Hack for ldap
     if AuthType.LDAP in app_config.AUTH_TYPES:
         import ldap3
@@ -216,8 +200,8 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
         configurator.include("pyramid_ldap3")
         configurator.ldap_setup(
             app_config.LDAP_URL,
-            bind=app_config.LDAP_BIND_DN,
-            passwd=app_config.LDAP_BIND_PASS,
+            bind=app_config.LDAP_BIND_DN if not app_config.LDAP_BIND_ANONYMOUS else "",
+            passwd=app_config.LDAP_BIND_PASS if not app_config.LDAP_BIND_ANONYMOUS else "",
             use_tls=app_config.LDAP_TLS,
             use_pool=app_config.LDAP_USE_POOL,
             pool_size=app_config.LDAP_POOL_SIZE,
@@ -234,12 +218,13 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     configurator.include(add_cors_support)
     # make sure to add this before other routes to intercept OPTIONS
     configurator.add_cors_preflight_handler()
-    # Default authorization : Accept anything.
-    configurator.set_authorization_policy(AcceptAllAuthorizationPolicy())
-    authn_policy = MultiAuthenticationPolicy(policies)
-    configurator.set_authentication_policy(authn_policy)
+    # Ensure a "Cache-Control: no-store" is setup by default on all responses
+    # Avoid a bug with Firefox: https://github.com/tracim/tracim/issues/5334
+    configurator.add_subscriber(default_to_cache_control_no_store, NewResponse)
+
+    configurator.set_security_policy(MultiSecurityPolicy(policies))
     # INFO - GM - 11-04-2018 - set default perm
-    # setting default perm is needed to force authentification
+    # setting default perm is needed to force authentication
     # mechanism in all views.
     configurator.set_default_permission(TRACIM_DEFAULT_PERM)
     # Override default request
@@ -249,7 +234,9 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     init_models(configurator, app_config)
     # set Hapic
     context = TracimPyramidContext(
-        configurator=configurator, default_error_builder=ErrorSchema(), debug=app_config.DEBUG
+        configurator=configurator,
+        default_error_builder=ErrorSchema(),
+        debug=app_config.DEBUG,
     )
     # HACK - G.M - 2021-07-01 - Force reset of context if already set.
     # This case happened in some test now for unclear reasons.
@@ -322,10 +309,14 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     app_lib = ApplicationApi(app_list=app_list)
     for app in app_lib.get_all():
         app.load_controllers(
-            app_config=app_config, configurator=configurator, route_prefix=BASE_API, context=context
+            app_config=app_config,
+            configurator=configurator,
+            route_prefix=BASE_API,
+            context=context,
         )
+        app.register_tracim_plugin(plugin_manager)
 
-    configurator.scan("tracim_backend.lib.utils.authentification")
+    configurator.scan("tracim_backend.lib.utils.authentication")
 
     # TODO - G.M - 2019-05-17 - check if possible to avoid this import here,
     # import is here because import SearchController without adding it to
@@ -349,6 +340,8 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     plugin_manager.hook.web_include(configurator=configurator, app_config=app_config)
 
     hapic.add_documentation_view("/api/doc", "Tracim API", "API of Tracim")
+
+    configurator.end()
     return configurator.make_wsgi_app()
 
 

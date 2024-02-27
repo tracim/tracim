@@ -1,6 +1,15 @@
 @import "../../css/Variable.styl"
 
+.slowblink
+  animation blink-animation 2.5s steps(100, start) 2
+@keyframes blink-animation
+  to
+    opacity 0
+
 .pageWrapperGeneric
+  display flex
+  flex-direction column
+  height 100%
   &__header
     display flex
   &__content
@@ -8,11 +17,10 @@
 
 .pageTitleGeneric
   position relative
-  padding-left pageSpacing
-  padding-right pageSpacing
+  padding-inline-start pageSpacing
+  padding-inline-end pageSpacing
   width 100%
   background-color offWhite
-  border-bottom borderStyle
   min-height headerHeight
   display flex
   flex-direction column
@@ -22,24 +30,36 @@
     align-items center
     font-size titleFontSize
     &__icon > i
-      margin-right standardSpacing
+      margin-inline-end standardSpacing
     &__label
       overflow hidden
       text-overflow ellipsis
       white-space nowrap
+    &__emailwarning
+      font-size standardFontSize
+      margin-inline-start standardSpacing
+  &__specificBtn
+    margin-inline-start standardSpacing
+    &:empty
+      display none
   &__subtitle
     margin-top 15px
 
 .pageContentGeneric
+  display flex
+  flex-direction column
+  height 100%
   padding pageSpacing
   width 100%
-  height 100%
 
 @media (min-width: min-md) and (max-width: max-md)
   .pageWrapperGeneric
     display block
     &__header
-      margin 95px 0 5px 30px
+      margin-top 95px
+      margin-inline-end 0
+      margin-bottom textSpacing
+      margin-inline-start pageSpacing
     &__content
       margin 0
 
@@ -50,18 +70,17 @@
       margin 95px 0 35px 0
       &__title
         display inline-block
-        margin-left 0
+        margin-inline-start 0
     &__content
       margin 0
 
 @media (max-width: max-xs)
   .pageWrapperGeneric
     display block
-    &__header
-      display block
-      margin-top 60px
     &__content
       margin 0
+  .pageContentGeneric
+    padding standardSpacing
 
 #appFullscreenContainer > div[data-radium="true"] > .pageWrapperGeneric
   width auto

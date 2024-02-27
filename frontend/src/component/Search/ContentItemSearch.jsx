@@ -2,7 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
-import { AVATAR_SIZE, FilenameWithExtension, Avatar } from 'tracim_frontend_lib'
+import { AVATAR_SIZE, FilenameWithBadges, Avatar } from 'tracim_frontend_lib'
 import { FETCH_CONFIG } from '../../util/helper.js'
 
 require('./ContentItemSearch.styl')
@@ -24,20 +24,20 @@ export const ContentItemSearch = props => {
         <i className={`fa-fw ${props.faIcon}`} />
       </div>
 
-      <FilenameWithExtension file={props} customClass='content__name searchResultPage' />
+      <FilenameWithBadges file={props} customClass='content__name searchResultPage' />
 
       <div className='content__path' title={props.path}>
         {props.path}
       </div>
 
-      <div className='content__lastModification' title={props.lastModificationFormated}>
+      <div className='content__search__lastModification' title={props.lastModificationFormated}>
         <Avatar
           size={AVATAR_SIZE.SMALL}
           user={props.lastModificationAuthor}
           apiUrl={FETCH_CONFIG.apiUrl}
           style={{
             display: 'inline-block',
-            marginRight: '10px'
+            marginInlineEnd: '10px'
           }}
         />
         {props.lastModificationTime}

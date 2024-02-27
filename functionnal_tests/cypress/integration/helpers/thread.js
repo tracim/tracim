@@ -1,6 +1,6 @@
 import { assertPopupCreateContent } from './index.js'
 
-// INFO - CH - 2019-05-15 - The function bellow assumes you already is on a workspace's content list page
+// INFO - CH - 2019-05-15 - The function below assumes you already is on a workspace's content list page
 // it is better to use commands from support/db_commands.js (write it if not exists)
 export const create_thread = (cy, threadTitle = 'Thread 1') => {
   cy.get('[data-cy=dropdownCreateBtn]').should('be.visible').click()
@@ -21,6 +21,6 @@ export const create_thread = (cy, threadTitle = 'Thread 1') => {
   cy.get('[data-cy="popinFixed"].thread')
     .should('be.visible')
 
-  cy.get(`.workspace__content__fileandfolder > .content[title="${threadTitle}"]`)
+  cy.get(`.workspace__content__file_and_folder > .content[title="${threadTitle}"]`)
     .should('be.visible')
 }

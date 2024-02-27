@@ -1,22 +1,23 @@
 @import '../../css/Variable.styl'
 
 .cardPopup
-  position fixed
-  top calc(50% - 113px)
-  left 0
   display flex
   justify-content center
-  width 100%
+  left 50%
+  position fixed
+  top 50%
+  width 50%
   z-index 32
   &__container
+    background lightGrey2
     border 0
     border-radius standardBorderRadius
-    width 800px
-    background lightGrey
     box-shadow shadow-all
+    width 800px
+    overflow visible
   &__border
-    border-top-right-radius standardBorderRadius
-    border-top-left-radius standardBorderRadius
+    border-start-end-radius standardBorderRadius
+    border-start-start-radius standardBorderRadius
     width 100%
     height standardSpacing
   &__header
@@ -33,13 +34,45 @@
       margin-inline-start auto
   &__body
     display flex
+    overflow visible
+    flex 1
     align-items center
     padding 0 pageSpacing pageSpacing
     &__close_btn
       margin-inline-start auto
+
+body:not(.tox-fullscreen) .cardPopup
+  transform translate(-50%, -50%)
+
+.callpopup
+  width 300px
+  &__text
+    margin-bottom standardSpacing
+  &__body
+    width 100%
+    &__btn
+      margin textSpacing standardSpacing
+      display flex
+      justify-content flex-end
+      & > .iconbutton
+        margin-inline-start standardSpacing
+
+.openCallButton
+  margin-inline-start standardSpacing
+  // FIXME - MB - 2022-01-05 - this should be removed when a LinkButton is created
+  // see https://github.com/tracim/tracim/issues/5242
+
 @media (max-width: max-xs)
   .cardPopup
+    width 90%
     &__header
       padding standardSpacing
     &__body
       padding 0 standardSpacing standardSpacing
+
+
+// INFO - GB - 2022-01-27 - The commands below are fallbacks because border-start-end-radius and border-start-start-radius are new
+// and have a global usage below 90% according to https://caniuse.com/. When the global usage is higher, we can delete the fallbacks.
+.cardPopup__border
+  border-top-right-radius standardBorderRadius
+  border-top-left-radius standardBorderRadius

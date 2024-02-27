@@ -1,23 +1,10 @@
-.callpopup
-  width 300px
-  &__text
-    margin-bottom standardSpacing
-  &__body
-    width 100%
-    &__btn
-      margin textSpacing standardSpacing
-      display flex
-      justify-content flex-end
-      & > .iconbutton
-        margin-inline-start standardSpacing
-
 .uploadPopup
   .cardPopup__container
     width 400px
 
 .profile
   &__text__loading
-    background-color lightGrey
+    background-color lightGrey2
     height 20px
     width 200px
     margin standardSpacing
@@ -25,7 +12,6 @@
     width 400px
   &__popup_select_cover
     width 50%
-    margin-left -25%
   &__cover
     height 150px
     width 100%
@@ -38,25 +24,28 @@
     &__changeBtn
       position absolute
       bottom standardSpacing
-      right pageSpacing
       background-color offWhite
       &:hover
-        background-color lightGrey
+        background-color lightGrey2
     &__loading
       margin standardSpacing
     &__image
       width 100%
       height 100%
       object-position 50% 50%
-      object-fit fill
+      object-fit cover
   &__mainBar
     height headerHeight
-    padding-left pageSpacing
+    padding-inline-start pageSpacing
     background-color offWhite
     display flex
-    &__callBtn
-      align-self start
-      margin standardSpacing pageSpacing standardSpacing
+    &__btnGrp
+      display flex
+      flex-direction row
+      margin standardSpacing pageSpacing
+      &__btn
+        align-self start
+        margin 0 standardSpacing
     &__avatar
       position relative
       &__medium
@@ -67,13 +56,12 @@
       &__changeBtn
         position absolute
         bottom -15px
-        right -5px
         width 25px
         height 25px
         & .iconbutton__icon
           margin 0px
     &__info
-      margin-left standardSpacing
+      margin-inline-start standardSpacing
       font-size titleFontSize
       align-self center
       flex 1
@@ -89,6 +77,7 @@
           white-space pre
         &__username
           overflow hidden
+          unicode-bidi plaintext
           text-overflow ellipsis
           &__wrapper
             max-width 50%
@@ -105,23 +94,47 @@
       background-color offWhite
       height max-content
       min-height 300px
-      border borderStyle
       border-radius standardBorderRadius
       padding standardSpacing
     &__information
-      margin pageSpacing 0 pageSpacing pageSpacing
+      margin-top pageSpacing
+      margin-inline-end 0
+      margin-bottom pageSpacing
+      margin-inline-start pageSpacing
       width 30%
     &__page
-      margin pageSpacing pageSpacing pageSpacing standardSpacing
+      margin-top pageSpacing
+      margin-inline-end pageSpacing
+      margin-bottom pageSpacing
+      margin-inline-start standardSpacing
       width 70%
     &__loading
-      background-color veryLightGrey
+      background-color lightGrey2
       height 200px
       margin standardSpacing
   &__customForm__submit
     position absolute
     top 0
+
+.DisplaySchemaPropertyString__label
+  white-space nowrap
+  margin-inline-end textSpacing
+
+[dir=ltr] .profile
+  &__cover__changeBtn
+    right pageSpacing
+  &__customForm__submit
     right 0
+  &__mainBar__avatar__changeBtn
+    right -5px
+
+[dir=rtl] .profile
+  &__cover__changeBtn
+    left pageSpacing
+  &__customForm__submit
+    left 0
+  &__mainBar__avatar__changeBtn
+    left -5px
 
 @media (max-width: max-sm)
   .profile
@@ -132,7 +145,7 @@
 
     &__mainBar
       height 50px
-      padding-left standardSpacing
+      padding-inline-start standardSpacing
       &__avatar
         &__big
           display none

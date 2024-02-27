@@ -1,25 +1,26 @@
 import { UPDATE, LANG } from '../action-creator.sync.js'
-import flagEn from '../img/flag_en.png'
-import flagFr from '../img/flag_fr.png'
-import flagPt from '../img/flag_pt.png'
-import flagDe from '../img/flag_de.png'
 
 const defaultLang = [{
+  id: 'de',
+  label: 'Deutsch'
+}, {
   id: 'en',
-  label: 'English',
-  icon: flagEn
+  label: 'English'
+}, {
+  id: 'es',
+  label: 'Español'
 }, {
   id: 'fr',
-  label: 'Français',
-  icon: flagFr
+  label: 'Français'
+}, {
+  id: 'nb_NO',
+  label: 'Norsk'
 }, {
   id: 'pt',
-  label: 'Português',
-  icon: flagPt
+  label: 'Português'
 }, {
-  id: 'de',
-  label: 'Deutsch',
-  icon: flagDe
+  id: 'ar',
+  label: 'العربية'
 }]
 
 export function lang (state = defaultLang, action) {

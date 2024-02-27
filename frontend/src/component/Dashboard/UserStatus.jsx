@@ -1,5 +1,11 @@
 import React from 'react'
-import { BtnSwitch, Icon, ROLE_LIST } from 'tracim_frontend_lib'
+import { Link } from 'react-router-dom'
+import {
+  Icon,
+  PAGE,
+  ROLE_LIST
+} from 'tracim_frontend_lib'
+import EmailNotificationTypeButton from '../EmailNotificationTypeButton.jsx'
 
 require('./UserStatus.styl')
 
@@ -14,7 +20,7 @@ export const UserStatus = props => {
         <Icon
           color={myRole.hexcolor}
           customClass='userstatus__role__icon'
-          icon={`fa-fw ${myRole.faIcon}`}
+          icon={myRole.faIcon}
           title={props.t('Your role in the space')}
         />
         <div className='userstatus__role__text' title={props.t('Your role in the space')}>
@@ -24,29 +30,19 @@ export const UserStatus = props => {
 
       <div className='userstatus__informations'>
         {props.displayNotifBtn && (
-          <div
-            className='userstatus__informations__notification primaryColorFontHover'
-            title={props.t('You can change your notification status by clicking here')}
-          >
-            <BtnSwitch
-              checked={mySelf.doNotify}
-              onChange={mySelf.doNotify ? props.onClickRemoveNotify : props.onClickAddNotify}
-              smallSize
-            />
-
-            <div
-              className='userstatus__informations__notification__text'
-              onClick={mySelf.doNotify ? props.onClickRemoveNotify : props.onClickAddNotify}
-            >
-              {props.t('Email notifications')}
-            </div>
-          </div>
+          <EmailNotificationTypeButton
+            onClickChangeEmailNotificationType={props.onClickChangeEmailNotificationType}
+            currentEmailNotificationType={mySelf.emailNotificationType}
+          />
         )}
 
         {props.displaySubscriptionRequestsInformation && (
-          <div className='userstatus__informations__requests'>
+          <Link
+            className='userstatus__informations__requests'
+            to={PAGE.WORKSPACE.ADVANCED_DASHBOARD(props.currentWorkspace.id)}
+          >
             <Icon
-              icon='fa-fw fas fa-sign-in-alt'
+              icon='fas fa-sign-in-alt'
               title={props.t('{{newRequests}} new requests', {
                 newRequests: props.newSubscriptionRequestsNumber
               })}
@@ -56,7 +52,7 @@ export const UserStatus = props => {
                 newRequests: props.newSubscriptionRequestsNumber
               })}
             </div>
-          </div>
+          </Link>
         )}
       </div>
     </div>

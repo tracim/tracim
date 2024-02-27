@@ -8,5 +8,6 @@
   "Agenda": "Agenda",
   "Some agenda could not be loaded": "Some agenda could not be loaded",
   "My agendas": "My agendas",
-  "Some information was modified by {{author}}": "Some information was modified by {{author}}"
+  "Some information was modified by {{author}}": "Some information was modified by {{author}}",
+  "Error while loading pre-filled agenda event information": "Error while loading pre-filled agenda event information"
 }

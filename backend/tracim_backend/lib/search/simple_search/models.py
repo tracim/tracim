@@ -4,13 +4,13 @@ from tracim_backend.lib.search.models import ContentSearchResponse
 from tracim_backend.lib.search.models import SearchedContent
 from tracim_backend.lib.search.models import SearchedDigestComment
 from tracim_backend.lib.search.models import SearchedDigestContent
+from tracim_backend.lib.search.models import SearchedDigestTodo
 from tracim_backend.lib.search.models import SearchedDigestUser
 from tracim_backend.lib.search.models import SearchedDigestWorkspace
 from tracim_backend.models.context_models import ContentInContext
 
 
 class SimpleContentSearchResponse(ContentSearchResponse):
-
     DEFAULT_SCORE = 1
 
     def __init__(self, content_list: typing.List[ContentInContext], total_hits: int):
@@ -30,9 +30,14 @@ class SimpleContentSearchResponse(ContentSearchResponse):
                 SearchedDigestComment(content_id=comment.content_id, parent_id=comment.parent_id)
                 for comment in content.comments
             ]
+            todos = [
+                SearchedDigestTodo(content_id=todo.content_id, parent_id=todo.parent_id)
+                for todo in content.todos
+            ]
 
             workspace = SearchedDigestWorkspace(
-                workspace_id=content.workspace.workspace_id, label=content.workspace.label
+                workspace_id=content.workspace.workspace_id,
+                label=content.workspace.label,
             )
             last_modifier = SearchedDigestUser(
                 user_id=content.last_modifier.user_id,
@@ -57,6 +62,8 @@ class SimpleContentSearchResponse(ContentSearchResponse):
                 path=path,
                 comments=comments,
                 comment_count=len(comments),
+                todos=todos,
+                todo_count=len(todos),
                 author=author,
                 last_modifier=last_modifier,
                 sub_content_types=content.sub_content_types,

@@ -14,14 +14,14 @@ describe('<WorkspaceMembersList />', () => {
       user_id: 0,
       user: {
         role: 'workspace-manager',
-        doNotify: true,
+        emailNotificationType: 'summary',
         public_name: 'randomPublicName1'
       }
     }, {
       user_id: 1,
       user: {
         role: 'content-manager',
-        doNotify: true,
+        emailNotificationType: 'summary',
         public_name: 'randomPublicName2'
       }
     }],

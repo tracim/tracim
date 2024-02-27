@@ -18,8 +18,10 @@ if (!global.window && !global.document) {
     url: 'http://localhost'
   })
 
+  global.self = global
   global.window = window
   global.document = window.document
+  global.Element = window.Element
   global.navigator = window.navigator
   global.GLOBAL_dispatchEvent = () => {}
   global.localStorage = {

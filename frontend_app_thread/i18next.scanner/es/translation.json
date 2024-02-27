@@ -1,0 +1,18 @@
+{
+  "Delete": "Suprimir",
+  "A content with the same name already exists": "Ya existe un contenido con el mismo nombre",
+  "Validate and create": "Validar y crear",
+  "Error while creating thread": "Error al crear la discusión",
+  "Topic's subject": "Tema de la discusión",
+  "New Thread": "Nueva discusión",
+  "Threads": "Discusión",
+  "Start a topic": "Iniciar una discusión",
+  "Thread": "Discusión",
+  "thread": "Discusión",
+  "threads": "Discusiones",
+  "The content has been modified by {{author}}": "El contenido fue modificado por {{author}}",
+  "The link has been copied to clipboard": "Enlace copiado en el portapapeles",
+  "Copy content link": "Copiar enlace al contenido",
+  "Copy news link": "Copiar enlace al contenido",
+  "Turn into content": ""
+}

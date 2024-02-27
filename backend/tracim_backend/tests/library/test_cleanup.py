@@ -1,18 +1,18 @@
 from pathlib import Path
-import tempfile
-
 import pytest
 from sqlalchemy.orm.exc import NoResultFound
+import tempfile
 import transaction
 
 from tracim_backend import ContentNotFound
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.applications.share.models import ContentShare
 from tracim_backend.applications.upload_permissions.models import UploadPermission
 from tracim_backend.lib.cleanup.cleanup import CleanupLib
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import RevisionReadStatus
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.favorites import FavoriteContent
 from tracim_backend.models.revision_protection import new_revision
@@ -81,7 +81,6 @@ class TestCleanupLib(object):
         workspace_api_factory,
         share_lib_factory,
     ) -> None:
-
         content_api = content_api_factory.get(
             show_deleted=True, show_active=True, show_archived=True
         )
@@ -105,7 +104,11 @@ class TestCleanupLib(object):
         )
         file_id = file_.content_id
         comment = content_api.create_comment(
-            workspace=test_workspace, parent=file_, content="Toto", do_save=True, do_notify=False
+            workspace=test_workspace,
+            parent=file_,
+            content="Toto",
+            do_save=True,
+            do_notify=False,
         )
         comment_id = comment.content_id
         share_api = share_lib_factory.get()
@@ -113,9 +116,9 @@ class TestCleanupLib(object):
         share_id = shares[0].share_id
         session.flush()
         transaction.commit()
-        assert content_api.get_one(folder_id, content_type=content_type_list.Any_SLUG)
-        assert content_api.get_one(file_id, content_type=content_type_list.Any_SLUG)
-        assert content_api.get_one(comment_id, content_type=content_type_list.Any_SLUG)
+        assert content_api.get_one(folder_id, content_type=ContentTypeSlug.ANY)
+        assert content_api.get_one(file_id, content_type=ContentTypeSlug.ANY)
+        assert content_api.get_one(comment_id, content_type=ContentTypeSlug.ANY)
         assert session.query(ContentShare).filter(ContentShare.share_id == share_id).one()
 
         with unprotected_content_revision(session) as unprotected_session:
@@ -124,11 +127,11 @@ class TestCleanupLib(object):
             session.flush()
         transaction.commit()
         with pytest.raises(ContentNotFound):
-            content_api.get_one(folder_id, content_type=content_type_list.Any_SLUG)
+            content_api.get_one(folder_id, content_type=ContentTypeSlug.ANY)
         with pytest.raises(ContentNotFound):
-            content_api.get_one(file_id, content_type=content_type_list.Any_SLUG)
+            content_api.get_one(file_id, content_type=ContentTypeSlug.ANY)
         with pytest.raises(ContentNotFound):
-            content_api.get_one(comment_id, content_type=content_type_list.Any_SLUG)
+            content_api.get_one(comment_id, content_type=ContentTypeSlug.ANY)
         with pytest.raises(NoResultFound):
             session.query(ContentShare).filter(ContentShare.share_id == share_id).one()
 
@@ -142,7 +145,6 @@ class TestCleanupLib(object):
         share_lib_factory,
         upload_permission_lib_factory,
     ) -> None:
-
         content_api = content_api_factory.get(
             show_deleted=True, show_active=True, show_archived=True
         )
@@ -176,7 +178,11 @@ class TestCleanupLib(object):
         )
         file_id = file_.content_id
         comment = content_api.create_comment(
-            workspace=test_workspace, parent=file_, content="Toto", do_save=True, do_notify=False
+            workspace=test_workspace,
+            parent=file_,
+            content="Toto",
+            do_save=True,
+            do_notify=False,
         )
         comment_id = comment.content_id
         share_api = share_lib_factory.get()
@@ -189,9 +195,9 @@ class TestCleanupLib(object):
         upload_permission_id = upload_permissions[0].upload_permission_id
         session.flush()
         transaction.commit()
-        assert content_api.get_one(folder_id, content_type=content_type_list.Any_SLUG)
-        assert content_api.get_one(file_id, content_type=content_type_list.Any_SLUG)
-        assert content_api.get_one(comment_id, content_type=content_type_list.Any_SLUG)
+        assert content_api.get_one(folder_id, content_type=ContentTypeSlug.ANY)
+        assert content_api.get_one(file_id, content_type=ContentTypeSlug.ANY)
+        assert content_api.get_one(comment_id, content_type=ContentTypeSlug.ANY)
         assert session.query(ContentShare).filter(ContentShare.share_id == share_id).one()
         assert (
             session.query(UploadPermission)
@@ -206,21 +212,21 @@ class TestCleanupLib(object):
         with pytest.raises(NoResultFound):
             session.query(Workspace).filter(Workspace.workspace_id == workspace_id).one()
         with pytest.raises(NoResultFound):
-            session.query(UserRoleInWorkspace).filter(
-                UserRoleInWorkspace.workspace_id == workspace_id
+            session.query(UserWorkspaceConfig).filter(
+                UserWorkspaceConfig.workspace_id == workspace_id
             ).one()
         with pytest.raises(NoResultFound):
             session.query(UploadPermission).filter(
                 UploadPermission.workspace_id == workspace_id
             ).one()
         with pytest.raises(ContentNotFound):
-            content_api.get_one(folder2_id, content_type=content_type_list.Any_SLUG)
+            content_api.get_one(folder2_id, content_type=ContentTypeSlug.ANY)
         with pytest.raises(ContentNotFound):
-            content_api.get_one(folder_id, content_type=content_type_list.Any_SLUG)
+            content_api.get_one(folder_id, content_type=ContentTypeSlug.ANY)
         with pytest.raises(ContentNotFound):
-            content_api.get_one(file_id, content_type=content_type_list.Any_SLUG)
+            content_api.get_one(file_id, content_type=ContentTypeSlug.ANY)
         with pytest.raises(ContentNotFound):
-            content_api.get_one(comment_id, content_type=content_type_list.Any_SLUG)
+            content_api.get_one(comment_id, content_type=ContentTypeSlug.ANY)
         with pytest.raises(NoResultFound):
             session.query(ContentShare).filter(ContentShare.share_id == share_id).one()
         with pytest.raises(NoResultFound):
@@ -239,7 +245,6 @@ class TestCleanupLib(object):
         share_lib_factory,
         upload_permission_lib_factory,
     ) -> None:
-
         content_api = content_api_factory.get(
             show_deleted=True, show_active=True, show_archived=True
         )
@@ -275,7 +280,11 @@ class TestCleanupLib(object):
         content_api.add_favorite(folder, do_save=True)
         file_id = file_.content_id
         comment = content_api.create_comment(
-            workspace=test_workspace, parent=file_, content="Toto", do_save=True, do_notify=False
+            workspace=test_workspace,
+            parent=file_,
+            content="Toto",
+            do_save=True,
+            do_notify=False,
         )
         comment_id = comment.content_id
         share_api = share_lib_factory.get()
@@ -288,9 +297,9 @@ class TestCleanupLib(object):
         upload_permission_id = upload_permissions[0].upload_permission_id
         session.flush()
         transaction.commit()
-        assert content_api.get_one(folder_id, content_type=content_type_list.Any_SLUG)
-        assert content_api.get_one(file_id, content_type=content_type_list.Any_SLUG)
-        assert content_api.get_one(comment_id, content_type=content_type_list.Any_SLUG)
+        assert content_api.get_one(folder_id, content_type=ContentTypeSlug.ANY)
+        assert content_api.get_one(file_id, content_type=ContentTypeSlug.ANY)
+        assert content_api.get_one(comment_id, content_type=ContentTypeSlug.ANY)
         assert session.query(ContentShare).filter(ContentShare.share_id == share_id).one()
         assert (
             session.query(UploadPermission)
@@ -307,21 +316,21 @@ class TestCleanupLib(object):
         # INFO - G.M - 2019-12-20 - workspace is not deleted by this method
         session.query(Workspace).filter(Workspace.workspace_id == workspace_id).one()
         with pytest.raises(NoResultFound):
-            session.query(UserRoleInWorkspace).filter(
-                UserRoleInWorkspace.workspace_id == workspace_id
+            session.query(UserWorkspaceConfig).filter(
+                UserWorkspaceConfig.workspace_id == workspace_id
             ).one()
         with pytest.raises(NoResultFound):
             session.query(UploadPermission).filter(
                 UploadPermission.workspace_id == workspace_id
             ).one()
         with pytest.raises(ContentNotFound):
-            content_api.get_one(folder2_id, content_type=content_type_list.Any_SLUG)
+            content_api.get_one(folder2_id, content_type=ContentTypeSlug.ANY)
         with pytest.raises(ContentNotFound):
-            content_api.get_one(folder_id, content_type=content_type_list.Any_SLUG)
+            content_api.get_one(folder_id, content_type=ContentTypeSlug.ANY)
         with pytest.raises(ContentNotFound):
-            content_api.get_one(file_id, content_type=content_type_list.Any_SLUG)
+            content_api.get_one(file_id, content_type=ContentTypeSlug.ANY)
         with pytest.raises(ContentNotFound):
-            content_api.get_one(comment_id, content_type=content_type_list.Any_SLUG)
+            content_api.get_one(comment_id, content_type=ContentTypeSlug.ANY)
         with pytest.raises(NoResultFound):
             session.query(ContentShare).filter(ContentShare.share_id == share_id).one()
         with pytest.raises(NoResultFound):
@@ -344,7 +353,6 @@ class TestCleanupLib(object):
         share_lib_factory,
         upload_permission_lib_factory,
     ) -> None:
-
         content_api = content_api_factory.get(
             show_deleted=True, show_active=True, show_archived=True
         )
@@ -368,7 +376,10 @@ class TestCleanupLib(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=file_):
             content_api.update_file_data(
-                file_, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                file_,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.mark_read(file_)
         file_id = file_.content_id
@@ -378,7 +389,7 @@ class TestCleanupLib(object):
         assert len(revisions) == 2
         first_revision_id = revisions[0].revision_id
         second_revision_id = revisions[1].revision_id
-        content = content_api.get_one(file_id, content_type=content_type_list.Any_SLUG)
+        content = content_api.get_one(file_id, content_type=ContentTypeSlug.ANY)
         assert content
         assert content.revision.revision_id == second_revision_id
         assert (
@@ -443,7 +454,6 @@ class TestCleanupLib(object):
         share_lib_factory,
         upload_permission_lib_factory,
     ) -> None:
-
         content_api = content_api_factory.get(
             show_deleted=True, show_active=True, show_archived=True
         )
@@ -467,7 +477,10 @@ class TestCleanupLib(object):
         )
         with new_revision(session=session, tm=transaction.manager, content=file_):
             content_api.update_file_data(
-                file_, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+                file_,
+                "Test_file.txt",
+                new_mimetype="plain/text",
+                new_content=b"Test file",
             )
         content_api.mark_read(file_)
         file_id = file_.content_id
@@ -477,7 +490,7 @@ class TestCleanupLib(object):
         assert len(revisions) == 2
         first_revision_id = revisions[0].revision_id
         second_revision_id = revisions[1].revision_id
-        content = content_api.get_one(file_id, content_type=content_type_list.Any_SLUG)
+        content = content_api.get_one(file_id, content_type=ContentTypeSlug.ANY)
         assert content
         assert content.revision.revision_id == second_revision_id
         assert (

@@ -2,11 +2,13 @@
   margin-bottom 0
 
 .table tr:nth-child(even) // @fixme Côme - 2018/09/13 - refactor this rule, it should not impact the whole project
-  background-color lightGrey
+  background-color lightGrey2
 
 .account
+  &.pageContentGeneric
+    height unset
   &__delimiter
-    margin auto
+    margin standardSpacing auto
   &__userpreference
     display flex
     padding-top standardSpacing
@@ -16,8 +18,14 @@
       width 80%
       min-height 500px
       background-color offWhite
+      flex 1
       .spaceconfig
         &__table
+          overflow auto
+          & th
+            font-weight normal
+            &.titleListHeader
+              padding 0
           &__role
             display flex
             align-items center
@@ -32,7 +40,7 @@
       & .agendaInfo__header
         font-weight normal
         font-size titleFontSize
-        margin 0
+        margin-top 0
 
 
 @media (max-width: max-md)

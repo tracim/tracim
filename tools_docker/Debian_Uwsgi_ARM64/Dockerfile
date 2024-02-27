@@ -35,6 +35,7 @@ RUN apt-get install -qy --no-install-recommends \
 # - installs optional dependencies
 ####
 FROM base AS build_backend
+ENV SETUPTOOLS_USE_DISTUTILS=stdlib
 ARG PACKAGE_DIR
 # Specific ARM64 requirements to disable VTK support
 COPY requirements-full-preview-generator_ARM64.txt /tracim/backend/requirements-full-preview-generator.txt
@@ -51,6 +52,7 @@ RUN apt-get install -qy $(cat "${PACKAGE_DIR}/build_backend_packages.list") \
     -r requirements-storage-s3.txt \
     -r requirements-full-preview-generator.txt \
     -e "."
+RUN cp -r /tracim/frontend/dist/assets/font/Nunito/ /usr/share/fonts/nunito
 
 
 ###
@@ -82,7 +84,7 @@ FROM base
 
 LABEL org.opencontainers.image.authors="contact@tracim.fr"
 
-ENV DEFAULT_APP_LIST="contents/thread,contents/file,contents/html-document,contents/folder,share_content,upload_permission,gallery"
+ENV DEFAULT_APP_LIST="contents/thread,contents/file,contents/html-document,contents/folder,contents/kanban,contents/todo,share_content,upload_permission,gallery"
 ENV START_WEBDAV=1
 ENV START_CALDAV=1
 ENV ENABLE_COLLABORATIVE_DOCUMENT_EDITION=0
@@ -108,6 +110,8 @@ RUN printf "Package: condure\nPin: version *\nPin-Priority: -1" > /etc/apt/prefe
 COPY --from=build_backend /tracim /tracim
 # backend dependencies installed through pip
 COPY --from=build_backend /usr/local /usr/local
+# backend font to generate avatars
+COPY --from=build_backend /usr/share/fonts/nunito /usr/share/fonts/nunito
 # Tracim code: frontend
 COPY --from=build_frontend /tracim/frontend/dist /tracim/frontend/dist
 # backend translation

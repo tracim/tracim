@@ -7,7 +7,8 @@ import { defaultDebug, PAGE } from 'tracim_frontend_lib'
 import {
   mockGetContents200,
   mockGetWorkspaceDetail200,
-  mockGetFolderDetailDetail200
+  mockGetFolderDetailDetail200,
+  mockGetWorkspaceContentList
 } from '../apiMock.js'
 
 describe('<Gallery />', () => {
@@ -31,6 +32,11 @@ describe('<Gallery />', () => {
         history: {
           location: {
             search: `?folder_ids=${folderId}`
+          }
+        },
+        system: {
+          config: {
+            email_notification_activated: false
           }
         },
         translation: ''
@@ -80,9 +86,7 @@ describe('<Gallery />', () => {
         src: 'mock.com/3.jpg',
         contentId: 3,
         fileName: 'imageThree',
-        lightBoxUrlList: [
-          'mock.com/big/3.jpg'
-        ],
+        lightBoxUrl: 'mock.com/big/3.jpg',
         previewUrlForThumbnail: [
           'mock.com/small/3.jpg'
         ],
@@ -105,11 +109,11 @@ describe('<Gallery />', () => {
     describe('getPreviousImageUrl()', () => {
       it('should return the previous imagePreview when filSelected > 0', () => {
         wrapper.setState({ displayedPictureIndex: 1 })
-        expect(wrapper.instance().getPreviousImageUrl()).to.equal(stateMock.imagePreviewList[0].lightBoxUrlList[0])
+        expect(wrapper.instance().getPreviousImageUrl()).to.equal(stateMock.imagePreviewList[0].lightBoxUrl)
       })
       it('should return the last imagePreview when displayedPictureIndex === 0', () => {
         wrapper.setState({ displayedPictureIndex: 0 })
-        expect(wrapper.instance().getPreviousImageUrl()).to.equal(stateMock.imagePreviewList[stateMock.imagePreviewList.length - 1].lightBoxUrlList[0])
+        expect(wrapper.instance().getPreviousImageUrl()).to.equal(stateMock.imagePreviewList[stateMock.imagePreviewList.length - 1].lightBoxUrl)
       })
       it('should return undefined when imagePreviewList length <= 1', () => {
         wrapper.setState({ imagePreviewList: [] })
@@ -121,11 +125,11 @@ describe('<Gallery />', () => {
     describe('getNextImageUrl()', () => {
       it('should return the next imagePreview when filSelected < imagePreviewList.length', () => {
         wrapper.setState({ displayedPictureIndex: 1 })
-        expect(wrapper.instance().getNextImageUrl()).to.equal(stateMock.imagePreviewList[2].lightBoxUrlList[0])
+        expect(wrapper.instance().getNextImageUrl()).to.equal(stateMock.imagePreviewList[2].lightBoxUrl)
       })
       it('should return the first imagePreview when filSelected === imagePreviewList.length-1', () => {
         wrapper.setState({ displayedPictureIndex: stateMock.imagePreviewList.length - 1 })
-        expect(wrapper.instance().getNextImageUrl()).to.equal(stateMock.imagePreviewList[0].lightBoxUrlList[0])
+        expect(wrapper.instance().getNextImageUrl()).to.equal(stateMock.imagePreviewList[0].lightBoxUrl)
       })
       it('should return undefined when imagePreviewList length <= 1', () => {
         wrapper.setState({ imagePreviewList: [] })
@@ -246,6 +250,7 @@ describe('<Gallery />', () => {
 
     describe('buildBreadcrumbs()', () => {
       it('should build the correct breadcrumbsList when empty workspace gallery', () => {
+        mockGetWorkspaceContentList(props.data.config.apiUrl, 0, 0)
         wrapper.setState({ imagePreviewList: [], folderId: null })
         wrapper.instance().buildBreadcrumbs(stateMock.content.workspaceLabel, { fileName: '', folderParentIdList: [] }, true)
         expect(wrapper.state().breadcrumbsList.length).to.equal(2)
@@ -254,6 +259,7 @@ describe('<Gallery />', () => {
       })
 
       it('should build the correct breadcrumbsList when workspace gallery', () => {
+        mockGetWorkspaceContentList(props.data.config.apiUrl, 0, 0)
         wrapper.setState({ imagePreviewList: stateMock.imagePreviewList, folderId: null })
         wrapper.instance().buildBreadcrumbs(stateMock.content.workspaceLabel, { fileName: '', folderParentIdList: [] }, false)
         expect(wrapper.state().breadcrumbsList.length).to.equal(3)

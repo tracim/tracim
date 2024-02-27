@@ -1,7 +1,7 @@
 import React from 'react'
 import { Provider } from 'react-redux'
 import configureMockStore from 'redux-mock-store'
-import { withRouterMock } from '../../hocMock/withRouter'
+import { RouterMock, withRouterMock } from '../../hocMock/withRouter'
 import { translateMock } from '../../hocMock/translate.js'
 import { expect } from 'chai'
 import { Account as AdminAccountWithoutHOC } from '../../../src/container/AdminAccount.jsx'
@@ -26,12 +26,16 @@ import { mount } from 'enzyme'
 import {
   mockGetUser200,
   mockGetUserCalendar200,
-  mockPutUserWorkspaceDoNotify204,
   mockPutUserPassword204,
   mockPutUserPassword403
 } from '../../apiMock'
+import { reactstrapPopoverHack } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.standalone.js'
 
 describe('In <Account /> at AdminAccount.jsx', () => {
+  reactstrapPopoverHack(document, 'popoverFullName')
+  reactstrapPopoverHack(document, 'popoverUsername')
+  reactstrapPopoverHack(document, 'popoverPageTitle')
+
   const newFlashMessageInfoCallBack = sinon.spy()
   const newFlashMessageWarningCallBack = sinon.spy()
   const setBreadcrumbsCallBack = sinon.spy()
@@ -83,8 +87,9 @@ describe('In <Account /> at AdminAccount.jsx', () => {
 
   const AdminAccountWithHOC1 = withRouterMock(translateMock()(AdminAccountWithoutHOC))
   const AdminAccountWithHOC2 = () => <Provider store={store}><AdminAccountWithHOC1 {...props} /></Provider>
+  const AdminAccountWithHOC3 = () => <RouterMock> <AdminAccountWithHOC2 /> </RouterMock>
 
-  const wrapper = mount(<AdminAccountWithHOC2 {...props} />)
+  const wrapper = mount(<AdminAccountWithHOC3 {...props} />)
   const adminAccountWrapper = wrapper.find(AdminAccountWithoutHOC)
   const adminAccountInstance = adminAccountWrapper.instance()
 
@@ -165,17 +170,6 @@ describe('In <Account /> at AdminAccount.jsx', () => {
       it('should call newFlashMessageWarningCallBack with invalid new Name', (done) => {
         adminAccountInstance.handleSubmitPersonalData('d', '', '').then(() => {
           expect(newFlashMessageWarningCallBack.called).to.equal(true)
-        }).then(done, done)
-      })
-    })
-
-    describe('handleChangeSubscriptionNotif', () => {
-      it('should call newFlashMessageWarningCallBack with invalid workspaceId', (done) => {
-        mockPutUserWorkspaceDoNotify204(FETCH_CONFIG.apiUrl, adminAccountWrapper.state().userToEditId, 1, true)
-
-        adminAccountInstance.handleChangeSubscriptionNotif(0, 'activate').then(() => {
-          expect(newFlashMessageWarningCallBack.called).to.equal(true)
-          restoreHistoryCallBack([newFlashMessageWarningCallBack])
         }).then(done, done)
       })
     })

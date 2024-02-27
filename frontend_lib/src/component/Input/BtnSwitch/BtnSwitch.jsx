@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 
 export const BtnSwitch = props =>
   <div
-    className={classnames('btnswitch', { disabled: props.disabled, smallSize: props.smallSize })}
+    className={classnames('btnswitch', { disabled: props.disabled, smallSize: props.smallSize, rightAligned: props.isRightAligned })}
     title={props.checked ? props.activeLabel : props.inactiveLabel}
   >
     <label
@@ -28,9 +28,9 @@ export const BtnSwitch = props =>
         }}
         disabled={props.disabled}
       />
-      <span className={classnames('slider round', { primaryColorBg: props.checked && !props.disabled, defaultBg: !props.checked || props.disabled })} />
+      <span className={classnames('slider round', { primaryColorBg: props.checked, defaultBg: !props.checked, disabled: props.disabled })} />
     </label>
-    <div className='btnswitch__text'>
+    <div className={classnames('btnswitch__text', { disabled: props.disabled })}>
       {props.checked ? props.activeLabel : props.inactiveLabel}
     </div>
   </div>
@@ -38,19 +38,21 @@ export const BtnSwitch = props =>
 export default BtnSwitch
 
 BtnSwitch.propTypes = {
-  checked: PropTypes.bool,
-  onChange: PropTypes.func,
   activeLabel: PropTypes.string,
-  inactiveLabel: PropTypes.string,
+  checked: PropTypes.bool,
   disabled: PropTypes.bool,
+  inactiveLabel: PropTypes.string,
+  isRightAligned: PropTypes.bool,
+  onChange: PropTypes.func,
   smallSize: PropTypes.bool
 }
 
 BtnSwitch.defaultProps = {
-  checked: false,
-  onChange: () => {},
   activeLabel: '',
-  inactiveLabel: '',
+  checked: false,
   disabled: false,
+  inactiveLabel: '',
+  isRightAligned: false,
+  onChange: () => {},
   smallSize: false
 }

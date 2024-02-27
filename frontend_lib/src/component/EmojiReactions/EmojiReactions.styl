@@ -1,4 +1,4 @@
-@import "../../css/Variable.styl"
+@import '../../css/Variable.styl'
 
 .EmojiPickerPopover .popover
   max-width unset
@@ -12,31 +12,31 @@
   overflow auto
 
 .EmojiReactionButton__button, .EmojiReactionButton__buttonpicker
-  background transparent
   border-radius standardBorderRadius
   white-space pre
   &:not(:disabled)
     cursor pointer
+  &:not(.primaryColorBgOpacity)
+    background transparent
 
 .EmojiReactionButton__button
-  border-width 1px
-  border-style solid
+  border none
   font-size metadataFontSize
   margin-inline-end textSpacing
   padding 3px
-
-  &:not(.highlighted)
-    color fontColor
+  &:not(.primaryColorBgOpacity)
+    background-color lightGrey2
 
   &:hover:not(:disabled)
-    color fontColor
+    filter brightness(0.95)
 
   &__value
     font-family 'Segoe UI Emoji', 'Segoe UI Symbol', 'Segoe UI', 'Apple Color Emoji', 'Twemoji Mozilla', 'Noto Color Emoji', 'Android Emoji', sans-serif
+
   &__count
     display inline-block
-    text-align right
-
+    text-align end
+    margin-inline-start textSpacing
     @media (min-width: min-lg)
       min-width 1.5ex // INFO - RJ - 2021-03-17 - prevent the button from resizing when the count changes
 
@@ -46,12 +46,17 @@
 .EmojiReactionButton__buttonpicker
   color grey
   border none
+  color darkGrey2
+  &:hover:not(:disabled)
+    color fontColor
   &.active
     color fontColor
 
 .EmojiReactionButton__button:hover:not(.highlighted):not(:disabled), .EmojiReactionButton__buttonpicker:hover:not(.active):not(:disabled)
   color fontColor
 
+.emoji-mart
+  border none
 .emoji-mart button, .emoji-mart-category button.emoji-mart-emoji span
   // INFO - RJ - 2021-03-18 - This class is intentionally specific to overwrite emoji-mart's own CSS rule
   cursor pointer

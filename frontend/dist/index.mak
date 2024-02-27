@@ -12,10 +12,12 @@
     <link class="tracim__favicon" rel="icon" type="image/png" sizes="16x16" href="/assets/branding/images/favicon/tracim-16x16.png?token=${cache_token}" nonce="${csp_nonce}">
     <link rel="manifest" href="/assets/branding/manifest.json?token=${cache_token}" nonce="${csp_nonce}">
 
+    <link rel="stylesheet" type="text/css" href="/assets/prism/prism.min.css?token=${cache_token}" nonce="${csp_nonce}">
+
     <link rel="stylesheet" type="text/css" href="/assets/font/fontawesome-free-5.15.2-web/css/all.css?token=${cache_token}" nonce="${csp_nonce}">
     <link rel="stylesheet" type="text/css" href="/assets/font/fontawesome-free-5.15.2-web/css/regular.css?token=${cache_token}" nonce="${csp_nonce}">
 
-    <link rel="stylesheet" type="text/css" href="/assets/bootstrap/bootstrap-4.0.0-beta.css?token=${cache_token}" nonce="${csp_nonce}">
+    <link rel="stylesheet" type="text/css" href="/assets/bootstrap/bootstrap.min.css?token=${cache_token}" nonce="${csp_nonce}">
     <link rel="stylesheet" type="text/css" href="/assets/branding/${website__welcome_page_style}?token=${cache_token}" nonce="${csp_nonce}">
 
     <!-- Apple icons -->
@@ -50,6 +52,10 @@
       ${html_class.replace("{state}", "")} { ${param}: ${primary_color_str}; }
       ${html_class.replace("{state}", "Darken")} { ${param}: ${primary_color_darken_str}; }
       ${html_class.replace("{state}", "Lighten")} { ${param}: ${primary_color_lighten_str}; }
+      <% html_class = ".primaryColorBg{state}Opacity"%>
+      ${html_class.replace("{state}", "")} { ${param}: ${primary}26; }
+      ${html_class.replace("{state}", "Darken")} { ${param}: ${primary_color_darken_str}26; }
+      ${html_class.replace("{state}", "Lighten")} { ${param}: ${primary_color_lighten_str}26; }
       <% html_class = ".primaryColorBg{state}Hover:hover"%>
       ${html_class.replace("{state}", "")} { ${param}: ${primary}; }
       ${html_class.replace("{state}", "Darken")} { ${param}: ${primary_color_darken_str}; }
@@ -73,27 +79,31 @@
 
       <%
         sidebar = colors["sidebar"]
+        sidebarLogo = colors["sidebar/logo"]
+        sidebarFont = colors["sidebar/font"]
       %>
       :root {
-          --sidebarColor: ${sidebar.web};
-          --sidebarColorDarken: ${sidebar.darken.web};
-          --sidebarColorLighten: ${sidebar.lighten.web};
+        --sidebarColor: ${sidebar.web};
+        --sidebarColorDarken: ${sidebar.darken.web};
+        --sidebarColorLighten: ${sidebar.lighten.web};
+        --sidebarLogoColor: ${sidebarLogo.web};
+        --sidebarFontColor: ${sidebarFont.web};
       }
     </style>
 
     <style nonce="${csp_nonce}">
       @font-face {
-        font-family: "Quicksand";
-        src: url("/assets/font/Quicksand/Quicksand-Regular.ttf");
+        font-family: "Nunito";
+        src: url("/assets/font/Nunito/Nunito-Regular.ttf");
       }
       @font-face {
-        font-family: "Quicksand";
-        src: url("/assets/font/Quicksand/Quicksand-Bold.ttf");
+        font-family: "Nunito";
+        src: url("/assets/font/Nunito/Nunito-Bold.ttf");
         font-weight: bold;
       }
 
       body {
-        font-family: Quicksand;
+        font-family: Nunito;
       }
     </style>
 
@@ -110,40 +120,27 @@
       -->
     <div id="welcome"><%include file="assets/branding/${website__welcome_page}" /></div>
     <script type="text/javascript" src="/app/tracim_frontend_vendors.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <script type="text/javascript" src="/app/tracim_frontend_lib.lib.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <script type="text/javascript" src="/app/tracim_frontend_lib.style.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/app/tracim_frontend_lib.lib.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/app/tracim_frontend_lib.style.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
 
     % for custom_toolbox_file in custom_toolbox_files:
     <script type="text/javascript" src="/custom_toolbox-assets/${custom_toolbox_file.name}?token=${cache_token}" nonce="${csp_nonce}"></script>
     % endfor
 
-    <script type="text/javascript" src="/assets/tracim.vendors~app.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <script type="text/javascript" src="/assets/tracim.app.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/assets/tracim.vendors~main.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/assets/tracim.main.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
 
-    <script type="text/javascript" src="/app/workspace.app.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/app/workspace.app.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
 
     % for app in applications:
-    <script type="text/javascript" src="/app/${app.minislug}.app.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/app/${app.minislug}.app.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     %endfor
-    <script type="text/javascript" src="/app/share_folder.app.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <script type="text/javascript" src="/app/admin_workspace_user.app.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <script type="text/javascript" src="/app/workspace_advanced.app.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/app/share_folder.app.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/app/admin_workspace_user.app.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/app/workspace_advanced.app.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
 
-    <script type="text/javascript" src="/assets/bootstrap/jquery-3.2.1.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <script type="text/javascript" src="/assets/bootstrap/popper-1.12.3.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <script type="text/javascript" src="/assets/bootstrap/bootstrap-4.0.0-beta.2.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-
-    <script type="text/javascript" src="/assets/tinymce-4.7.13/js/tinymce/jquery.tinymce.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <script type="text/javascript" src="/assets/tinymce-4.7.13/js/tinymce/tinymce.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <script type="text/javascript" src="/assets/tinymce-4.7.13/js/tinymce/themes/modern/theme.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-
-    % for plugin in glob("assets/tinymce-4.7.13/js/tinymce/plugins/*/plugin.min.js"):
-    <script type="text/javascript" src="/${plugin}?token=${cache_token}" nonce="${csp_nonce}"></script>
-    %endfor
-
-    % for lang in glob("assets/tinymce-4.7.13/js/tinymce/langs/*.js"):
-    <script type="text/javascript" src="/${lang}?token=${cache_token}" nonce="${csp_nonce}"></script>
-    %endfor
-
+    <script type="text/javascript" src="/assets/bootstrap/jquery-3.5.1.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/assets/bootstrap/popper-1.16.1.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/assets/bootstrap/bootstrap.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
   </body>
 </html>

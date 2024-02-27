@@ -12,6 +12,7 @@ import { appList } from '../../hocMock/redux/appList/appList.js'
 import { mockPutContentNotificationAsRead204 } from '../../apiMock.js'
 import { FETCH_CONFIG } from '../../../src/util/helper.js'
 import { isFunction } from '../../hocMock/helper'
+import { globalManagerAsMember } from '../../fixture/user/globalManagerAsMember.js'
 
 describe('<OpenContentApp />', () => {
   const dispatchCustomEventSpy = sinon.spy()
@@ -67,7 +68,13 @@ describe('<OpenContentApp />', () => {
   }
   mockPutContentNotificationAsRead204(FETCH_CONFIG.apiUrl, user.userId, 1, 1).persist()
 
-  const mapStateToProps = { contentType, user, currentWorkspace: firstWorkspace }
+  // INFO - CH - 2023-11-29 - memberList property of currentWorkspace is set afterward by the GET
+  //  /api/user/:id/workspaces/all/settings. Se we add it manually
+  const currentWorkspaceWithMember = {
+    ...firstWorkspace,
+    memberList: [globalManagerAsMember]
+  }
+  const mapStateToProps = { contentType, user, currentWorkspace: currentWorkspaceWithMember }
   const ComponentWithHoc = withRouterMock(connectMock(mapStateToProps, dispatchMock)(OpenContentAppWithoutHOC))
   const wrapper = mount(<ComponentWithHoc {...props} />)
   const wrapperInstance = wrapper.find(OpenContentAppWithoutHOC)

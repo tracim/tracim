@@ -6,12 +6,12 @@ import {
   CONTENT_TYPE,
   Icon,
   ListItemWrapper,
-  FilenameWithExtension,
+  FilenameWithBadges,
+  TimedEvent,
+  getRevisionTypeLabel,
   PAGE
 } from 'tracim_frontend_lib'
 import { Link } from 'react-router-dom'
-import TimedEvent from '../TimedEvent.jsx'
-import { getRevisionTypeLabel } from '../../util/helper.js'
 
 require('./AdvancedSearchContentList.styl')
 
@@ -30,7 +30,7 @@ export const AdvancedSearchContentList = props => {
   const numberCommentsTitle = (numberComments) => {
     if (numberComments === 0) return props.t('0 comments')
     if (numberComments === 1) return props.t('{{numberComments}} comment', { numberComments: numberComments })
-    else return props.t('{{numberComments}} comments', { numberComments: numberComments })
+    else return props.t('{{count}} comments', { count: numberComments })
   }
 
   return (
@@ -50,7 +50,7 @@ export const AdvancedSearchContentList = props => {
             {props.t('Last Modification')}
           </div>
           <div className='advancedSearchContent__information'>
-            {props.t('Information_plural')}
+            {props.t('Information__plural')}
           </div>
         </div>
       )}
@@ -78,7 +78,7 @@ export const AdvancedSearchContentList = props => {
               <div className='advancedSearchContent__wrapper'>
                 <div className='advancedSearchContent__type__content'>
                   <Icon
-                    icon={`fa-fw ${searchItem.contentType.faIcon}`}
+                    icon={searchItem.contentType.faIcon}
                     title={props.t(searchItem.contentType.label)}
                     color={searchItem.contentType.hexcolor}
                   />
@@ -86,7 +86,7 @@ export const AdvancedSearchContentList = props => {
                 </div>
 
                 <div className='advancedSearchContent__name_path'>
-                  <FilenameWithExtension file={searchItem} />
+                  <FilenameWithBadges file={searchItem} />
                   <Breadcrumbs
                     breadcrumbsList={searchItem.breadcrumbsList || []}
                     keepLastBreadcrumbAsLink
@@ -109,7 +109,7 @@ export const AdvancedSearchContentList = props => {
                     <div>
                       <span className='advancedSearchContent__information__comments'>
                         <Icon
-                          icon='fa-fw far fa-comment'
+                          icon='far fa-comment'
                           title={numberCommentsTitle(searchItem.commentCount)}
                         />
                         <span
@@ -120,7 +120,7 @@ export const AdvancedSearchContentList = props => {
                       </span>
                       <span className='advancedSearchContent__information__status'>
                         <Icon
-                          icon={`fa-fw ${searchItem.contentType.status.faIcon}`}
+                          icon={searchItem.contentType.status.faIcon}
                           title={props.t(searchItem.contentType.status.label)}
                           color={searchItem.contentType.status.hexcolor}
                         />

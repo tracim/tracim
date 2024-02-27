@@ -5,6 +5,7 @@ import sinon from 'sinon'
 import { addWorkspaceSubscription, updateWorkspaceSubscription, removeWorkspaceSubscription } from '../../../src/action-creator.sync.js'
 import { ReduxTlmDispatcher as ReduxTlmDispatcherWithoutHOC } from '../../../src/container/ReduxTlmDispatcher.jsx'
 import { user } from '../../hocMock/redux/user/user'
+import { workspaceList } from '../../hocMock/redux/workspaceList/workspaceList.js'
 
 const createSubscription = (userId) => {
   return {
@@ -14,7 +15,8 @@ const createSubscription = (userId) => {
     },
     author: {
       user_id: userId
-    }
+    },
+    workspaceList: workspaceList.workspaceList
   }
 }
 

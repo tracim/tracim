@@ -27,7 +27,7 @@ describe('New share download form', () => {
     }).then(promise => {
       cy.visitPage({
         pageName: PAGES.CONTENT_OPEN,
-        params: { workspaceId: workspaceId, contentType: 'file', contentId: contentId }
+        params: { contentId }
       })
       cy.get('[data-cy=popin_right_part_share]').should('be.visible').click()
     })

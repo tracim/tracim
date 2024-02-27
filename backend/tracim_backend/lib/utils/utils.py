@@ -1,35 +1,45 @@
 # -*- coding: utf-8 -*-
+from urllib.parse import urlencode
+from urllib.parse import urljoin
+
+from babel import UnknownLocaleError
+from babel.dates import format_date
 from collections import OrderedDict
+from colour import Color
 import datetime
 import email
 import importlib
+import json
+import jsonschema
+from jsonschema import SchemaError
+from jsonschema import ValidationError as JsonSchemaValidationError
+from jsonschema.validators import validator_for
+from marshmallow import ValidationError as MarshmallowValidationError
 import os
 from os.path import normpath as base_normpath
 import pkgutil
+import pytz
 import random
+from sqlakeyset import unserialize_bookmark
 import string
 import sys
 import types
-from typing import TYPE_CHECKING
+import typing
 from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Optional
-from urllib.parse import urlencode
-from urllib.parse import urljoin
+from typing import TYPE_CHECKING
 import uuid
-
-from colour import Color
-from git import InvalidGitRepositoryError
-from marshmallow import ValidationError
-import pytz
-from sqlakeyset import unserialize_bookmark
 
 from tracim_backend.exceptions import NotAFileError
 from tracim_backend.exceptions import NotReadableDirectory
 from tracim_backend.exceptions import NotReadableFile
 from tracim_backend.exceptions import NotWritableDirectory
+from tracim_backend.exceptions import TracimValidationFailed
+from tracim_backend.exceptions import UnvalidCustomPropertiesSchema
+from tracim_backend.exceptions import UnvalidJsonFile
 
 if TYPE_CHECKING:
     from tracim_backend.config import CFG
@@ -140,7 +150,8 @@ DEFAULT_PASSWORD_GEN_CHAR_LENGTH = 12
 
 
 def password_generator(
-    length: int = DEFAULT_PASSWORD_GEN_CHAR_LENGTH, chars: str = ALLOWED_AUTOGEN_PASSWORD_CHAR
+    length: int = DEFAULT_PASSWORD_GEN_CHAR_LENGTH,
+    chars: str = ALLOWED_AUTOGEN_PASSWORD_CHAR,
 ) -> str:
     """
     :param length: length of the new password
@@ -150,12 +161,12 @@ def password_generator(
     return "".join(random.choice(chars) for char_number in range(length))
 
 
-COLOR_DARKEN_SCALE_FACTOR = 0.85
+COLOR_DARKEN_SCALE_FACTOR = 0.9
 COLOR_LIGHTEN_SCALE_FACTOR = 1.15
 
 
 def clamp(val: float, minimum: float = 0.0, maximum: float = 1.0) -> float:
-    """ Fix value between min an max"""
+    """Fix value between min an max"""
     if val < minimum:
         return minimum
     if val > maximum:
@@ -210,7 +221,10 @@ def string_to_list(
 
 
 def string_to_unique_item_list(
-    base_string: str, separator: str, cast_func: Callable[[str], Any], do_strip: bool = False,
+    base_string: str,
+    separator: str,
+    cast_func: Callable[[str], Any],
+    do_strip: bool = False,
 ) -> List[Any]:
     """
     Convert a string to a list of separated item of one type according
@@ -235,14 +249,13 @@ def string_to_unique_item_list(
 
 
 def deprecated(func: Callable):
-    """ Dummy deprecated function"""
+    """Dummy deprecated function"""
     # TODO - G.M - 2018-12-04 - Replace this with a true deprecated function ?
     return func
 
 
 def core_convert_file_name_to_display(string: str) -> str:
-    """
-    """
+    """ """
     REPLACE_CHARS = {"/": "⧸", "\\": "⧹"}
 
     for key, value in REPLACE_CHARS.items():
@@ -260,7 +273,15 @@ def webdav_convert_file_name_to_display(string: str) -> str:
     isn't limited in his naming choice
     """
     string = core_convert_file_name_to_display(string)
-    REPLACE_CHARS = {":": "∶", "*": "∗", "?": "ʔ", '"': "ʺ", "<": "❮", ">": "❯", "|": "∣"}
+    REPLACE_CHARS = {
+        ":": "∶",
+        "*": "∗",
+        "?": "ʔ",
+        '"': "ʺ",
+        "<": "❮",
+        ">": "❯",
+        "|": "∣",
+    }
 
     for key, value in REPLACE_CHARS.items():
         string = string.replace(key, value)
@@ -328,7 +349,10 @@ def is_dir_writable(path: str) -> bool:
     the process)
     """
     if not os.access(
-        path=path, mode=os.W_OK | os.X_OK, dir_fd=None, effective_ids=os.supports_effective_ids
+        path=path,
+        mode=os.W_OK | os.X_OK,
+        dir_fd=None,
+        effective_ids=os.supports_effective_ids,
     ):
         raise NotWritableDirectory("{} is not a writable directory".format(path))
     return True
@@ -340,7 +364,10 @@ def is_dir_readable(path: str) -> bool:
     the process)
     """
     if not os.access(
-        path=path, mode=os.R_OK | os.X_OK, dir_fd=None, effective_ids=os.supports_effective_ids
+        path=path,
+        mode=os.R_OK | os.X_OK,
+        dir_fd=None,
+        effective_ids=os.supports_effective_ids,
     ):
         raise NotReadableDirectory("{} is not a readable directory".format(path))
     return True
@@ -423,52 +450,40 @@ def find_all_submodule_path(module: types.ModuleType) -> List[str]:
     return module_path_list
 
 
-def get_cache_token(path: str) -> str:
+def get_cache_token() -> str:
     """
     Get cache token, if git repository work use last commit hash, else use autogenerated id
-    :param path:  path of git repository
     :return: commit hash or autogenerated uuid
     """
-    cache_token = get_current_git_hash(path)
-    if not cache_token:
+    cache_token = get_current_git_hash()
+    if cache_token == "":
         cache_token = str(uuid.uuid4().hex)
     return cache_token
 
 
-def get_current_git_hash(path: str) -> Optional[str]:
+def get_current_git_hash() -> Optional[str]:
     """
-    Get git hash of current code if available, else return None
-    :param path:  path of git repository
-    :return: commit hash or None
+    Get git hash of current code if available else return ""
+    :return: commit short hash or ""
     """
-    try:
-        import git
-
-        repo = git.Repo(path, search_parent_directories=True)
-    except (ImportError, InvalidGitRepositoryError):
-        return None
-    return repo.head.object.hexsha[:10]
+    token = os.popen("git rev-parse HEAD").read()
+    return token[:7]
 
 
-def get_build_version(path: str) -> str:
+def get_build_version() -> str:
     """
     Get either tag or commit hash linked to current commit
-    :param path: path of git repository
     :return: tag or commit hash
     """
-    try:
-        import git
+    last_commit = os.popen("git rev-parse HEAD").read()
+    return_value = os.system(f"git describe --exact-match {last_commit}")
 
-        repo = git.Repo(path, search_parent_directories=True)
-    except (ImportError, InvalidGitRepositoryError):
-        return UNKNOWN_BUILD_VERSION
-
-    try:
-        # INFO - G.M - 2020-01-13 - return first associated tag to head commit
-        return next((tag for tag in repo.tags if tag.commit == repo.head.commit))
-    except StopIteration:
-        # INFO - G.M - 2020-01-13 - return the 10 first letter of current commit hash
-        return repo.head.object.hexsha[:10]
+    if return_value:
+        hash = get_current_git_hash()
+        if hash == "":
+            return UNKNOWN_BUILD_VERSION
+        return hash
+    return os.popen(f"git describe --exact-match {last_commit}").read()
 
 
 def validate_page_token(page_token: str) -> None:
@@ -478,4 +493,77 @@ def validate_page_token(page_token: str) -> None:
     try:
         unserialize_bookmark(page_token)
     except Exception as e:
-        raise ValidationError('Page token "{}" is not a valid page token'.format(page_token)) from e
+        raise MarshmallowValidationError(
+            'Page token "{}" is not a valid page token'.format(page_token)
+        ) from e
+
+
+def validate_json(json_file_path: str) -> Dict[str, Any]:
+    with open(json_file_path) as json_file:
+        return json.load(json_file)
+
+
+class CustomPropertiesValidator:
+    def validate_valid_json_file(self, file_path: str) -> Dict[str, Any]:
+        is_file_exist(file_path)
+        is_file_readable(file_path)
+        try:
+            return validate_json(file_path)
+        except json.JSONDecodeError as exc:
+            raise UnvalidJsonFile("{} is not a valid json file".format(file_path)) from exc
+
+    def validate_json_schema(self, json_schema: Dict[str, Any]):
+        # INFO - G.M - 2021-01-13 Check here schema with jsonschema meta-schema to:
+        # - prevent an invalid json-schema
+        # - ensure that validation of content will not failed due to invalid schema.
+        # - ensure the json-schema will be correctly processed by the frontend (specific tracim constraints)
+        try:
+            cls = validator_for(json_schema)
+            cls.check_schema(json_schema)
+        except SchemaError as exc:
+            raise UnvalidCustomPropertiesSchema("Unvalid json-schema.") from exc
+
+        properties = json_schema.get("properties")
+        if not properties:
+            raise UnvalidCustomPropertiesSchema('Missing "properties" key at json root.')
+
+        missing_or_empty_title_properties = []
+        for property_name, value in properties.items():
+            if "title" not in value or not value.get("title"):
+                missing_or_empty_title_properties.append(property_name)
+
+        if missing_or_empty_title_properties:
+            raise UnvalidCustomPropertiesSchema(
+                'Missing or empty "title" key in these properties : {}.'.format(
+                    ",".join(missing_or_empty_title_properties)
+                )
+            )
+
+    def validate_data(self, params: Dict[str, Any], json_schema: Dict[str, Any]):
+        try:
+            jsonschema.validate(params, schema=json_schema)
+        except JsonSchemaValidationError as exc:
+            raise TracimValidationFailed(
+                'JSONSchema Validation Failed: {}: "{}"'.format(
+                    "> ".join([str(item) for item in exc.absolute_path]), exc.message
+                )
+            ) from exc
+
+
+def date_as_lang(
+    datetime_obj: datetime,
+    locale: typing.Optional[str] = None,
+    default_locale: typing.Optional[str] = None,
+) -> str:
+    """Helper to ensure the date conversion to language format does not fail"""
+    if locale:
+        try:
+            return format_date(datetime_obj, locale=locale)
+        except UnknownLocaleError:
+            pass
+    if default_locale:
+        try:
+            return format_date(datetime_obj, locale=default_locale)
+        except UnknownLocaleError:
+            pass
+    return format_date(datetime_obj)

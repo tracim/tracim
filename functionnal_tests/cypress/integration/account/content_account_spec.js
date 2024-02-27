@@ -1,18 +1,23 @@
-import { PAGES } from '../../support/urls_commands'
+import { PAGES, URLS } from '../../support/urls_commands'
 import { SELECTORS as s } from '../../support/generic_selector_commands'
 import baseUser from '../../fixtures/baseUser.json'
+import defaultAdmin from '../../fixtures/defaultAdmin.json'
 
 
 
 describe('Account page', () => {
   beforeEach(() => {
-    cy.cancelXHR()
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('users')
     cy.visitPage({ pageName: PAGES.ACCOUNT })
     cy.log('Todo must be reworked')
   })
+
+  afterEach(() => {
+    cy.cancelXHR()
+  })
+
   const validateButton = 'Validate'
 
   describe('Account header', () => {
@@ -64,7 +69,7 @@ describe('Account page', () => {
         .find('[data-cy=menusubcomponent__list__password]')
         .should('be.visible')
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
-        .find('[data-cy=menusubcomponent__list__agenda]')
+        .find('[data-cy=menusubcomponent__list__configurationLinks]')
         .should('be.visible')
     })
     it('should have profile field visible', () => {
@@ -127,12 +132,21 @@ describe('Account page', () => {
         .should('have.class', 'fa-check')
     })
 
-    it('should have agenda field visible', () => {
+    it('should have agenda link visible', () => {
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
-        .find('[data-cy=menusubcomponent__list__agenda]')
+        .find('[data-cy=menusubcomponent__list__configurationLinks]')
         .click()
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
         .find('.agendaInfo__content__link__url')
+        .click()
+    })
+
+    it('should have webdav link visible', () => {
+      cy.getTag({ selectorName: s.TRACIM_CONTENT })
+        .find('[data-cy=menusubcomponent__list__configurationLinks]')
+        .click()
+      cy.getTag({ selectorName: s.TRACIM_CONTENT })
+        .find('.webdavInfo__content__link__url')
         .click()
     })
   })
@@ -244,10 +258,14 @@ describe('Account page', () => {
       })
     })
 
-    describe('Space management', () => {
+    // TODO - MP - 2022-07-04 - Unstable test
+    // see: https://github.com/tracim/tracim/issues/5344
+    describe.skip('Space management', () => {
       it('Allows leaving a space', () => {
         cy.get('[data-cy=menusubcomponent__list__spacesConfig]')
           .click()
+        cy.get('.spaceconfig__sectiontitle').should('be.visible')
+        cy.contains('.spaceconfig__table__spacename', 'My space')
         cy.get('[data-cy=spaceconfig__table__leave_space_cell] button')
           .click()
 
@@ -263,6 +281,23 @@ describe('Account page', () => {
         cy.contains('.account__userpreference__setting__spacename', 'You are not a member of any space yet')
       })
     })
+  })
+})
 
+describe('Profile link button', () => {
+  beforeEach(() => {
+    cy.resetDB()
+    cy.setupBaseDB()
+    cy.loginAs('administrators')
+  })
+
+  afterEach(() => {
+    cy.cancelXHR()
+  })
+
+  it("should redirect to user's public profile", () => {
+    cy.visitPage({ pageName: PAGES.ACCOUNT })
+    cy.get('.userinfo__profile_button').click()
+    cy.url().should('include', URLS[PAGES.PROFILE]({ userId: defaultAdmin.user_id }));
   })
 })

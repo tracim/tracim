@@ -51,7 +51,9 @@ def upgrade():
         sa.Column("author_id", sa.Integer(), nullable=False),
         sa.Column("created", sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(
-            ["author_id"], ["users.user_id"], name=op.f("fk_content_tag_author_id_users")
+            ["author_id"],
+            ["users.user_id"],
+            name=op.f("fk_content_tag_author_id_users"),
         ),
         sa.ForeignKeyConstraint(
             ["content_id"],

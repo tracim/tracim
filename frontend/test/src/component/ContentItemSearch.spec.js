@@ -30,7 +30,7 @@ describe('<ContentItemSearch />', () => {
     )
 
     it(`should display the lastModificationTime: ${props.lastModificationTime}`, () =>
-      expect(wrapper.find('div.content__lastModification')).to.text().contains(props.lastModificationTime)
+      expect(wrapper.find('div.content__search__lastModification')).to.text().contains(props.lastModificationTime)
     )
 
     it(`should display the status label: ${status.label} in a div`, () =>
@@ -58,7 +58,7 @@ describe('<ContentItemSearch />', () => {
     )
 
     it(`the div .content__lastModification should have the title: ${props.lastModificationFormated}`, () =>
-      expect(wrapper.find('div.content__lastModification').prop('title')).to.equal(props.lastModificationFormated)
+      expect(wrapper.find('div.content__search__lastModification').prop('title')).to.equal(props.lastModificationFormated)
     )
 
     it(`the div .content__status should have the title: ${status.label}`, () =>

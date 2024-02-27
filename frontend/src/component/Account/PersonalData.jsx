@@ -7,10 +7,8 @@ import {
   ALLOWED_CHARACTERS_USERNAME,
   IconButton
 } from 'tracim_frontend_lib'
-
-import {
-  editableUserAuthTypeList
-} from '../../util/helper.js'
+import DropdownLang from '../DropdownLang.jsx'
+import { serializeUserProps, UserReadOnlyFields } from '../../reducer/user.js'
 
 require('./PersonalData.styl')
 
@@ -21,8 +19,21 @@ export class PersonalData extends React.Component {
       newPublicName: '',
       newUsername: '',
       newEmail: '',
+      newLang: props.user ? props.user.lang : '',
       checkPassword: ''
     }
+  }
+
+  isDisabled = field => {
+    if (this.props.system?.config?.user__read_only_fields?.[this.props.userAuthType] === undefined) {
+      return false
+    }
+
+    const serializedSystemConfigReadOnlyFieldList =
+      this.props.system.config.user__read_only_fields[this.props.userAuthType]
+        .map(p => serializeUserProps[p])
+
+    return serializedSystemConfigReadOnlyFieldList.includes(field)
   }
 
   handleChangePublicName = e => this.setState({ newPublicName: e.target.value })
@@ -32,7 +43,12 @@ export class PersonalData extends React.Component {
     this.props.onChangeUsername(e.target.value)
   }
 
-  handleChangeEmail = e => this.setState({ newEmail: e.target.value })
+  handleChangeLang = newLang => this.setState({ newLang })
+
+  handleChangeEmail = e => {
+    const email = e.target.value.trim()
+    this.setState({ newEmail: email })
+  }
 
   handleChangeCheckPassword = e => this.setState({ checkPassword: e.target.value })
 
@@ -44,7 +60,7 @@ export class PersonalData extends React.Component {
       return
     }
 
-    await props.onClickSubmit(state.newPublicName, state.newUsername, state.newEmail, state.checkPassword) && this.setState({
+    await props.onClickSubmit(state.newPublicName, state.newUsername, state.newEmail, state.checkPassword, state.newLang) && this.setState({
       newPublicName: '',
       newUsername: '',
       newEmail: '',
@@ -57,7 +73,7 @@ export class PersonalData extends React.Component {
     return (
       <div className='account__userpreference__setting__personaldata'>
         <div className='personaldata__sectiontitle subTitle'>
-          {(props.displayAdminInfo
+          {(props.isAdmin
             ? props.t('Change the account settings')
             : props.t('Change my account settings')
           )}
@@ -67,12 +83,13 @@ export class PersonalData extends React.Component {
           <label>
             {props.t('New full name:')}
             <input
-              className='personaldata__form__txtinput primaryColorBorderLighten form-control'
+              className='personaldata__form__txtinput form-control'
               type='text'
               data-cy='personaldata__form__txtinput__fullname'
               placeholder={props.userPublicName}
               value={state.newPublicName}
               onChange={this.handleChangePublicName}
+              disabled={this.isDisabled(UserReadOnlyFields.PUBLIC_NAME)}
             />
           </label>
 
@@ -80,12 +97,13 @@ export class PersonalData extends React.Component {
             <label>
               {props.t('New username:')}
               <input
-                className='personaldata__form__txtinput primaryColorBorderLighten form-control'
+                className='personaldata__form__txtinput form-control'
                 type='text'
                 data-cy='personaldata__form__txtinput__username'
                 placeholder={props.userUsername}
                 value={state.newUsername}
                 onChange={this.handleChangeUserName}
+                disabled={this.isDisabled(UserReadOnlyFields.USERNAME)}
               />
             </label>
             {!props.isUsernameValid && (
@@ -101,32 +119,45 @@ export class PersonalData extends React.Component {
             )}
           </div>
 
-          {editableUserAuthTypeList.includes(props.userAuthType) && (
+          <div>
+            <label>
+              {props.t('New email:')}
+              <input
+                className='personaldata__form__txtinput withAdminMsg form-control'
+                type='email'
+                data-cy='personaldata__form__txtinput__email'
+                placeholder={props.userEmail}
+                value={state.newEmail}
+                onChange={this.handleChangeEmail}
+                disabled={this.isDisabled(UserReadOnlyFields.EMAIL)}
+              />
+            </label>
+          </div>
+
+          {!props.isAdmin && (
             <div>
-              <label>
-                {props.t('New email:')}
-                <input
-                  className='personaldata__form__txtinput withAdminMsg primaryColorBorderLighten form-control'
-                  type='email'
-                  data-cy='personaldata__form__txtinput__email'
-                  placeholder={props.userEmail}
-                  value={state.newEmail}
-                  onChange={this.handleChangeEmail}
-                />
-              </label>
+              {props.t('New language:')}
+              <DropdownLang
+                langList={props.langList}
+                langActiveId={state.newLang}
+                onChangeLang={this.handleChangeLang}
+              />
             </div>
           )}
 
           {(state.newEmail !== '' || state.newUsername !== '') && (
             <div>
               <label>
-                {props.displayAdminInfo ? props.t("Administrator's password:") : props.t('Type your password:')}
+                {props.isAdmin ? props.t("Administrator's password:") : props.t('Type your password:')}
                 <input
-                  className='personaldata__form__txtinput checkPassword primaryColorBorderLighten form-control'
+                  className='personaldata__form__txtinput checkPassword form-control'
                   type='password'
                   value={state.checkPassword}
                   onChange={this.handleChangeCheckPassword}
-                  disabled={state.newEmail === '' && state.newUsername === ''}
+                  disabled={
+                    (this.isDisabled(UserReadOnlyFields.EMAIL) && this.isDisabled(UserReadOnlyFields.USERNAME)) ||
+                    (state.newEmail === '' && state.newUsername === '')
+                  }
                 />
               </label>
             </div>
@@ -155,7 +186,8 @@ PersonalData.propTypes = {
   onClickSubmit: PropTypes.func,
   onChangeUsername: PropTypes.func,
   isUsernameValid: PropTypes.bool,
-  displayAdminInfo: PropTypes.bool
+  isAdmin: PropTypes.bool,
+  langList: PropTypes.array
 }
 
 PersonalData.defaultProps = {
@@ -164,10 +196,11 @@ PersonalData.defaultProps = {
   userPublicName: '',
   isUsernameValid: true,
   userAuthType: '',
-  onClickSubmit: () => {},
-  onChangeUsername: () => {},
-  displayAdminInfo: false
+  onClickSubmit: () => { },
+  onChangeUsername: () => { },
+  isAdmin: false,
+  langList: [{ id: '', label: '' }]
 }
 
-const mapStateToProps = () => ({}) // connect for .dispatch()
+const mapStateToProps = ({ user, system }) => ({ user, system })
 export default connect(mapStateToProps)(translate()(PersonalData))

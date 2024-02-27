@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# DEPRECATED - CH - 2021-12-29 - Since Tracim now only uses optimized bundles, this script is deprecated
+
 # Main in bottom
 
 YELLOW='\033[1;33m'

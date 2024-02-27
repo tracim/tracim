@@ -8,15 +8,16 @@ import {
   CUSTOM_EVENT,
   SingleChoiceList,
   handleFetchResult,
+  Popover,
   ROLE_LIST,
-  sortWorkspaceList,
   sendGlobalFlashMessage,
+  SORT_BY,
+  SORT_ORDER,
+  sortListBy,
   SPACE_TYPE,
   SPACE_TYPE_LIST,
   TracimComponent
 } from 'tracim_frontend_lib'
-import { Popover, PopoverBody } from 'reactstrap'
-import { isMobile } from 'react-device-detect'
 import {
   getAllowedSpaceTypes,
   getUserSpaces,
@@ -47,7 +48,6 @@ export class PopupCreateWorkspace extends React.Component {
       newType: '',
       newName: '',
       parentOptions: [],
-      popoverDefaultRoleInfoOpen: false,
       showWarningMessage: false
     }
 
@@ -110,7 +110,12 @@ export class PopupCreateWorkspace extends React.Component {
             })
           }
 
-          addSpacesToList(0, createSpaceTree(sortWorkspaceList(fetchGetUserSpaces.body)))
+          addSpacesToList(0, createSpaceTree(sortListBy(
+            fetchGetUserSpaces.body,
+            SORT_BY.LABEL,
+            SORT_ORDER.ASCENDING,
+            state.loggedUser.lang
+          )))
 
           this.setState({ parentOptions: spaceList, newParentSpace: spaceList[0], isFirstStep: false })
           break
@@ -156,10 +161,6 @@ export class PopupCreateWorkspace extends React.Component {
     }
   }
 
-  handleTogglePopoverDefaultRoleInfo = () => {
-    this.setState(prev => ({ popoverDefaultRoleInfoOpen: !prev.popoverDefaultRoleInfoOpen }))
-  }
-
   getTypeList = async () => {
     const fetchGetAllowedSpaceTypes = await handleFetchResult(await getAllowedSpaceTypes(this.state.config.apiUrl))
 
@@ -179,7 +180,7 @@ export class PopupCreateWorkspace extends React.Component {
 
   render () {
     const { props, state } = this
-    const buttonStyleCallToAction = 'btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
+    const buttonStyleCallToAction = 'btn highlightBtn primaryColorBg primaryColorBgDarkenHover'
     const areParentSpacesVisible = state.config.system.config.ui__spaces__creation__parent_space_choice__visible
 
     return (
@@ -260,17 +261,9 @@ export class PopupCreateWorkspace extends React.Component {
                   </button>
 
                   <Popover
-                    placement='bottom'
-                    isOpen={state.popoverDefaultRoleInfoOpen}
-                    target='popoverDefaultRoleInfo'
-                    // INFO - GB - 2020-109 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
-                    toggle={this.handleTogglePopoverDefaultRoleInfo} // eslint-disable-line react/jsx-handler-names
-                    trigger={isMobile ? 'focus' : 'hover'}
-                  >
-                    <PopoverBody>
-                      {props.t('This is the role that members will have by default when they join your space (for open and on request spaces only).')}
-                    </PopoverBody>
-                  </Popover>
+                    targetId='popoverDefaultRoleInfo'
+                    popoverBody={props.t('This is the role that members will have by default when they join your space (for open and on request spaces only).')}
+                  />
                 </div>
 
                 <SingleChoiceList
@@ -281,7 +274,7 @@ export class PopupCreateWorkspace extends React.Component {
 
                 <div className='newSpace__button'>
                   <button
-                    className='btn primaryColorBorder outlineTextBtn primaryColorBgHover primaryColorBorderDarkenHover newSpace__button__back'
+                    className='btn primaryColorBgHover newSpace__button__back'
                     disabled={!state.newName || state.newName.length === 0 || !state.newType || state.newType.length === 0}
                     onClick={this.handleClickNextOrBack}
                     title={props.t('Back')}

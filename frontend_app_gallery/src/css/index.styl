@@ -1,4 +1,4 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
+@import '~tracim_frontend_lib/src/css/Variable.styl'
 
 .carousel
   &__main
@@ -6,7 +6,7 @@
   &__thumbnail
     height 157px
     margin-top standardSpacing
-    background-color #f0f0f0
+    background-color lightGrey2
     & > .slick-list
       height 100%
     & .slick-current
@@ -61,14 +61,16 @@
     display block
     top 0
     z-index 1
-    & i
+    & i.fa
       position absolute
       top calc(50% - 20px)
       left 50%
-      transform translateX(-50%)
+      // INFO - SG - 2022-02-16 - forcing the scale to (1, 1)
+      // as the prev/next arrows aren't reversed with react-slick when dir="rtl"
+      transform translateX(-50%) scale(1, 1)
       font-size bigIconSize
     &:hover
-      background-color rgba(0, 0, 0, 0.1)
+      background-color secodaryButtonHover
       border-radius standardBorderRadius
     &.arrownext
       right -20px
@@ -97,6 +99,8 @@
         background-color rgba(0, 0, 0, 0.5)
         &:hover
           color #FFFFFF
+        & > i
+          display flex
   &__delete__file__popup
     & .cardPopup__container
       width 400px
@@ -145,8 +149,8 @@
 .ril
   &__toolbarRightSide
     width 100%
-    padding-right standardSpacing
-    text-align right
+    padding-inline-end standardSpacing
+    text-align end
     & button
       height 35px
       width 40px
@@ -163,6 +167,10 @@
 
 .slick-slide > div
   height 100%
+
+// NOTE 2022-02-17 - SG - disable react-slick rtl handling as it is buggy.
+[dir='rtl'] .slick-slide
+  float left !important
 
 .carousel__main .slick-track
   // INFO - GM - 2019-01-20 - 391px is the size of others elements which aren't responsive (header, app header, thumbnails...)

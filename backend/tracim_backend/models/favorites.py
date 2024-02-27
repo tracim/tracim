@@ -17,7 +17,11 @@ class FavoriteContent(CreationDateMixin, DeclarativeBase):
     user = relationship("User", remote_side=[User.user_id], foreign_keys=[user_id])
     content_id = Column(
         Integer,
-        ForeignKey("content.id", onupdate="CASCADE", ondelete="CASCADE",),
+        ForeignKey(
+            "content.id",
+            onupdate="CASCADE",
+            ondelete="CASCADE",
+        ),
         nullable=False,
         primary_key=True,
     )

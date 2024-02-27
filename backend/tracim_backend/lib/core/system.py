@@ -1,11 +1,11 @@
-import datetime
-from pathlib import PurePath
-import typing
 from urllib.parse import quote
 from urllib.parse import urljoin
 
+import datetime
 from importlib_metadata import metadata
+from pathlib import PurePath
 from sqlalchemy.orm import Session
+import typing
 
 from tracim_backend.apps import COLLABORATIVE_DOCUMENT_EDITION__APP_SLUG
 from tracim_backend.config import CFG
@@ -16,27 +16,37 @@ from tracim_backend.exceptions import UsernameAlreadyExists
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.context_models import AboutModel
 from tracim_backend.models.context_models import ConfigModel
 from tracim_backend.models.context_models import ErrorCodeModel
 from tracim_backend.models.context_models import UsageConditionModel
+from tracim_backend.models.database_version import MigrateVersion
 
 
 class SystemApi(object):
-    def __init__(
-        self, config: CFG, session: Session,
-    ):
+    def __init__(self, config: CFG, session: Session):
         self._config = config
         self._session = session
 
     def get_about(self) -> AboutModel:
-        # TODO - G.M - 2018-09-26 - Set version correctly
+        database_schema_version = None
+        try:
+            database_schema_version = self._session.query(MigrateVersion).one().version_num
+        except Exception:
+            logger.warning(
+                self,
+                "Unable to get database schema version ! Alembic seems to not be properly set up.",
+                exc_info=True,
+            )
+
         return AboutModel(
             name="Tracim",
             version=metadata("tracim_backend")["Version"],
             build_version=self._config.BUILD_VERSION,
             datetime=datetime.datetime.now(),
             website=metadata("tracim_backend")["Home-page"],
+            database_schema_version=database_schema_version,
         )
 
     def get_config(self) -> ConfigModel:
@@ -68,9 +78,16 @@ class SystemApi(object):
             translation_service__target_languages=self._config.TRANSLATION_SERVICE__TARGET_LANGUAGES,
             user__self_registration__enabled=self._config.USER__SELF_REGISTRATION__ENABLED,
             ui__spaces__creation__parent_space_choice__visible=self._config.UI__SPACES__CREATION__PARENT_SPACE_CHOICE__VISIBLE,
+            ui__notes__code_sample_languages=self._config.UI__NOTES__CODE_SAMPLE_LANGUAGES,
             limitation__maximum_online_users_message=self._config.LIMITATION__MAXIMUM_ONLINE_USERS_MESSAGE,
             call__enabled=self._config.CALL__ENABLED,
             call__unanswered_timeout=self._config.CALL__UNANSWERED_TIMEOUT,
+            auth_types=[auth_type.value for auth_type in self._config.AUTH_TYPES],
+            saml_idp_list=[idp.to_dict() for idp in self._config.SAML_IDP_LIST],
+            user__read_only_fields={
+                auth_type.value: [fields.value for fields in fields_list]
+                for auth_type, fields_list in self._config.USER__READ_ONLY_FIELDS.items()
+            },
         )
 
     def get_usage_conditions_files(self) -> typing.List[UsageConditionModel]:

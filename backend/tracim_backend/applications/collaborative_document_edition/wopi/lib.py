@@ -1,11 +1,10 @@
+from sqlalchemy.orm import Session
 import typing
 
-from sqlalchemy.orm import Session
-
-from tracim_backend.applications.collaborative_document_edition.wopi.models import WopiCheckFileInfo
 from tracim_backend.applications.collaborative_document_edition.wopi.models import (
     WopiLastModifiedTime,
 )
+from tracim_backend.applications.collaborative_document_edition.wopi.models import WopiCheckFileInfo
 from tracim_backend.config import CFG
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content

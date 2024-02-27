@@ -2,17 +2,16 @@
   overflow auto
   height 100%
   > .ScrollToBottomContents
-    height 100%
     display flex
     flex-direction column
+    height 100%
     & > .tabBar
       margin-bottom pageSpacing
   &__showMoreButton
     margin-block-end standardSpacing
     margin-inline-start auto
     margin-inline-end auto
-  &__empty
-    margin 0 pageSpacing
+    margin-bottom standardSpacing
   & .feedItem
     margin-block-end standardSpacing
   &__reorder
@@ -21,18 +20,21 @@
     margin 0 pageSpacing
     padding-bottom pageSpacing
     & textarea
-      border borderStyle
       border-radius standardBorderRadius
       padding textSpacing
       width 100%
       order 2
       &:focus
         outline-color publicationColor
-    & .mce-container
+      &:disabled
+        border borderStyle
+    & .tox-container
       order 2
     & .autocomplete
       order 1
-
+      top 55px
+      margin-top 25px
+      z-index 1
 
 @media (max-width: max-xs)
   .publications

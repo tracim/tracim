@@ -5,7 +5,8 @@ from tracim_backend.lib.core.event import BaseLiveMessageBuilder
 from tracim_backend.lib.core.event import EventApi
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import EmailNotificationType
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import Event
@@ -13,9 +14,9 @@ from tracim_backend.models.event import OperationType
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.tests.fixtures import *  # noqa F403,F401
-from tracim_backend.tests.utils import RoleApiFactory
 from tracim_backend.tests.utils import SubscriptionLibFactory
 from tracim_backend.tests.utils import UserApiFactory
+from tracim_backend.tests.utils import UserWorkspaceConfigApiFactory
 from tracim_backend.tests.utils import WorkspaceApiFactory
 from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import UserSchema
@@ -25,7 +26,10 @@ from tracim_backend.views.core_api.schemas import WorkspaceSubscriptionSchema
 
 
 def create_workspace_and_users(
-    access_type: WorkspaceAccessType, user_api_factory, workspace_api_factory, role_api_factory,
+    access_type: WorkspaceAccessType,
+    user_api_factory,
+    workspace_api_factory,
+    user_workspace_config_api_factory,
 ):
     """
     Create a workspace, a member and a non member user
@@ -59,9 +63,12 @@ def create_workspace_and_users(
     my_workspace = workspace_api.create_workspace(
         "test workspace", access_type=access_type, save_now=True
     )
-    rapi = role_api_factory.get(current_user=event_initiator)
-    role = rapi.create_one(
-        same_workspace_user, my_workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False
+    user_workspace_config_api = user_workspace_config_api_factory.get(current_user=event_initiator)
+    role = user_workspace_config_api.create_one(
+        same_workspace_user,
+        my_workspace,
+        UserWorkspaceConfig.WORKSPACE_MANAGER,
+        email_notification_type=EmailNotificationType.NONE,
     )
     transaction.commit()
     return (my_workspace, same_workspace_user, role, other_user, event_initiator)
@@ -69,19 +76,29 @@ def create_workspace_and_users(
 
 @pytest.fixture
 def workspace_and_users(
-    user_api_factory, workspace_api_factory, role_api_factory,
+    user_api_factory,
+    workspace_api_factory,
+    user_workspace_config_api_factory,
 ):
     return create_workspace_and_users(
-        WorkspaceAccessType.CONFIDENTIAL, user_api_factory, workspace_api_factory, role_api_factory
+        WorkspaceAccessType.CONFIDENTIAL,
+        user_api_factory,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
     )
 
 
 @pytest.fixture
 def accessible_workspace_and_users(
-    user_api_factory, workspace_api_factory, role_api_factory,
+    user_api_factory,
+    workspace_api_factory,
+    user_workspace_config_api_factory,
 ):
     return create_workspace_and_users(
-        WorkspaceAccessType.OPEN, user_api_factory, workspace_api_factory, role_api_factory
+        WorkspaceAccessType.OPEN,
+        user_api_factory,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
     )
 
 
@@ -158,7 +175,13 @@ class TestEventReceiver:
     def test_unit__get_receiver_ids_user_event__nominal_case(
         self, session, workspace_and_users, admin_user, user_api_factory, app_config
     ):
-        (my_workspace, same_workspace_user, _, other_user, event_initiator) = workspace_and_users
+        (
+            my_workspace,
+            same_workspace_user,
+            _,
+            other_user,
+            event_initiator,
+        ) = workspace_and_users
         user_api = user_api_factory.get()
         fields = {
             Event.AUTHOR_FIELD: UserSchema()
@@ -186,7 +209,13 @@ class TestEventReceiver:
         workspace_api_factory,
         app_config,
     ):
-        (my_workspace, same_workspace_user, _, other_user, event_initiator) = workspace_and_users
+        (
+            my_workspace,
+            same_workspace_user,
+            _,
+            other_user,
+            event_initiator,
+        ) = workspace_and_users
         workspace_api = workspace_api_factory.get()
         workspace_in_context = workspace_api.get_workspace_with_context(my_workspace)
         user_api = user_api_factory.get()
@@ -296,15 +325,21 @@ class TestEventReceiver:
         admin_user,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         app_config,
     ):
-        (my_workspace, same_workspace_user, role, other_user, event_initiator) = workspace_and_users
+        (
+            my_workspace,
+            same_workspace_user,
+            role,
+            other_user,
+            event_initiator,
+        ) = workspace_and_users
         workspace_api = workspace_api_factory.get()
         workspace_in_context = workspace_api.get_workspace_with_context(my_workspace)
-        rapi = role_api_factory.get()
+        user_workspace_config_api = user_workspace_config_api_factory.get()
         user_api = user_api_factory.get()
-        role_in_context = rapi.get_user_role_workspace_with_context(role)
+        config_in_context = user_workspace_config_api.get_user_workspace_config_with_context(role)
         fields = {
             Event.AUTHOR_FIELD: UserSchema()
             .dump(user_api.get_user_with_context(event_initiator))
@@ -314,7 +349,7 @@ class TestEventReceiver:
             .data,
             Event.CLIENT_TOKEN_FIELD: "test",
             Event.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context).data,
-            Event.MEMBER_FIELD: WorkspaceMemberDigestSchema().dump(role_in_context).data,
+            Event.MEMBER_FIELD: WorkspaceMemberDigestSchema().dump(config_in_context).data,
         }
         event = Event(
             entity_type=EntityType.WORKSPACE_MEMBER,
@@ -336,7 +371,7 @@ class TestEventReceiver:
         admin_user,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         app_config,
     ):
         (
@@ -348,9 +383,9 @@ class TestEventReceiver:
         ) = accessible_workspace_and_users
         workspace_api = workspace_api_factory.get()
         workspace_in_context = workspace_api.get_workspace_with_context(my_workspace)
-        rapi = role_api_factory.get()
+        user_workspace_config_api = user_workspace_config_api_factory.get()
         user_api = user_api_factory.get()
-        role_in_context = rapi.get_user_role_workspace_with_context(role)
+        config_in_context = user_workspace_config_api.get_user_workspace_config_with_context(role)
         fields = {
             Event.AUTHOR_FIELD: UserSchema()
             .dump(user_api.get_user_with_context(event_initiator))
@@ -360,7 +395,7 @@ class TestEventReceiver:
             .data,
             Event.CLIENT_TOKEN_FIELD: "test",
             Event.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context).data,
-            Event.MEMBER_FIELD: WorkspaceMemberDigestSchema().dump(role_in_context).data,
+            Event.MEMBER_FIELD: WorkspaceMemberDigestSchema().dump(config_in_context).data,
         }
         event = Event(
             entity_type=EntityType.WORKSPACE_MEMBER,
@@ -383,11 +418,17 @@ class TestEventReceiver:
         content_api_factory,
         admin_user,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_and_users,
         app_config,
     ):
-        (my_workspace, same_workspace_user, role, other_user, event_initiator) = workspace_and_users
+        (
+            my_workspace,
+            same_workspace_user,
+            role,
+            other_user,
+            event_initiator,
+        ) = workspace_and_users
         workspace_api = workspace_api_factory.get()
         user_api = user_api_factory.get()
         workspace_in_context = workspace_api.get_workspace_with_context(my_workspace)
@@ -429,7 +470,7 @@ class TestEventReceiver:
         subscription_lib_factory: SubscriptionLibFactory,
         admin_user: User,
         workspace_api_factory: WorkspaceApiFactory,
-        role_api_factory: RoleApiFactory,
+        user_workspace_config_api_factory: UserWorkspaceConfigApiFactory,
         app_config,
     ):
         user_api = user_api_factory.get()
@@ -468,12 +509,18 @@ class TestEventReceiver:
         )
         workspace_in_context = workspace_api.get_workspace_with_context(my_workspace)
         subscription_lib = subscription_lib_factory.get(current_user=subscriber)
-        rapi = role_api_factory.get(current_user=subscriber)
-        rapi.create_one(
-            workspace_content_manager, my_workspace, UserRoleInWorkspace.CONTENT_MANAGER, False
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=subscriber)
+        user_workspace_config_api.create_one(
+            workspace_content_manager,
+            my_workspace,
+            UserWorkspaceConfig.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
         )
-        rapi.create_one(
-            workspace_manager, my_workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False
+        user_workspace_config_api.create_one(
+            workspace_manager,
+            my_workspace,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
         )
         subscription = subscription_lib.submit_subscription(my_workspace)
         transaction.commit()
@@ -503,7 +550,7 @@ class TestEventReceiver:
         subscription_lib_factory: SubscriptionLibFactory,
         admin_user: User,
         workspace_api_factory: WorkspaceApiFactory,
-        role_api_factory: RoleApiFactory,
+        user_workspace_config_api_factory: UserWorkspaceConfigApiFactory,
         app_config,
     ):
         user_api = user_api_factory.get()
@@ -542,12 +589,18 @@ class TestEventReceiver:
         )
         workspace_in_context = workspace_api.get_workspace_with_context(my_workspace)
         subscription_lib = subscription_lib_factory.get(current_user=subscriber)
-        rapi = role_api_factory.get(current_user=subscriber)
-        rapi.create_one(
-            workspace_content_manager, my_workspace, UserRoleInWorkspace.CONTENT_MANAGER, False
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=subscriber)
+        user_workspace_config_api.create_one(
+            workspace_content_manager,
+            my_workspace,
+            UserWorkspaceConfig.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
         )
-        rapi.create_one(
-            workspace_manager, my_workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False
+        user_workspace_config_api.create_one(
+            workspace_manager,
+            my_workspace,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
         )
         subscription = subscription_lib.submit_subscription(my_workspace)
         subscription_lib.reject_subscription(subscription)
@@ -574,23 +627,31 @@ class TestEventReceiver:
 
 @pytest.mark.usefixtures("base_fixture")
 class TestEventApi:
-    def test__message_history_creation_with_workspace_join_hook__ok__nominal_case(
+    def test__message_delete_message_for_workspace__ok__add_leave_workspace(
         self,
         session,
         app_config,
         admin_user,
         workspace_and_users,
         message_helper,
-        role_api_factory,
+        user_workspace_config_api_factory,
         workspace_api_factory,
     ):
         """
-        Test hook on workspace_join about adding previous workspace event as user messages,
+        Test hook on workspace_join/workspace_leaver about
+        - adding previous workspace event as user messages,
+        - removing previous workspace event as user messages,
         Default tracim config should add all previous event as user message without sent set.
         Please notice that only those message are generated in this test, MessageBuilder is disabled
         in this test context, so only created message are historic one.
         """
-        (my_workspace, same_workspace_user, _, other_user, event_initiator) = workspace_and_users
+        (
+            my_workspace,
+            same_workspace_user,
+            _,
+            other_user,
+            event_initiator,
+        ) = workspace_and_users
         default_workspace_messages = message_helper.last_user_workspace_messages(
             100, my_workspace.workspace_id, other_user.user_id
         )
@@ -601,8 +662,156 @@ class TestEventApi:
         wapi.update_workspace(my_workspace, label="Foo bar")
         transaction.commit()
 
-        rapi = role_api_factory.get(current_user=event_initiator)
-        rapi.create_one(other_user, my_workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get(
+            current_user=event_initiator
+        )
+        user_workspace_config_api.create_one(
+            other_user,
+            my_workspace,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        transaction.commit()
+
+        workspace_message_other_user = message_helper.last_user_workspace_messages(
+            100, my_workspace.workspace_id, other_user.user_id
+        )
+        assert len(workspace_message_other_user) > len(default_workspace_messages)
+
+        user_workspace_config_api.delete_one(other_user.user_id, my_workspace.workspace_id)
+        transaction.commit()
+
+        # workspace event are deleted
+        workspace_message_other_user = message_helper.last_user_workspace_messages(
+            100, my_workspace.workspace_id, other_user.user_id
+        )
+        assert len(workspace_message_other_user) == len(default_workspace_messages)
+
+        user_workspace_config_api.create_one(
+            other_user,
+            my_workspace,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        transaction.commit()
+
+        # workspace event are recreated
+        workspace_message_other_user = message_helper.last_user_workspace_messages(
+            100, my_workspace.workspace_id, other_user.user_id
+        )
+        assert len(workspace_message_other_user) > len(default_workspace_messages)
+
+    def test__message_delete_message_for_workspace__ok__workspace_deletion_undeletion(
+        self,
+        session,
+        app_config,
+        admin_user,
+        workspace_and_users,
+        message_helper,
+        user_workspace_config_api_factory,
+        workspace_api_factory,
+    ):
+        """
+        Test hook on workspace_join/workspace_deleted/workspace_undeleted about
+        - adding previous workspace event as user messages,
+        - removing previous workspace event as user messages,
+        Default tracim config should add all previous event as user message without sent set.
+        Please notice that only those message are generated in this test, MessageBuilder is disabled
+        in this test context, so only created message are historic one.
+        """
+        (
+            my_workspace,
+            same_workspace_user,
+            _,
+            other_user,
+            event_initiator,
+        ) = workspace_and_users
+        default_workspace_messages = message_helper.last_user_workspace_messages(
+            100, my_workspace.workspace_id, other_user.user_id
+        )
+        assert default_workspace_messages == []
+
+        # Let's make a change before other_user joins the space
+        wapi = workspace_api_factory.get(current_user=event_initiator)
+        wapi.update_workspace(my_workspace, label="Foo bar")
+        transaction.commit()
+
+        user_workspace_config_api = user_workspace_config_api_factory.get(
+            current_user=event_initiator
+        )
+        user_workspace_config_api.create_one(
+            other_user,
+            my_workspace,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        transaction.commit()
+
+        workspace_message_other_user = message_helper.last_user_workspace_messages(
+            100, my_workspace.workspace_id, other_user.user_id
+        )
+        assert len(workspace_message_other_user) > len(default_workspace_messages)
+
+        wapi.delete(workspace=my_workspace)
+        transaction.commit()
+
+        # workspace event are deleted
+        workspace_message_other_user = message_helper.last_user_workspace_messages(
+            100, my_workspace.workspace_id, other_user.user_id
+        )
+        assert len(workspace_message_other_user) == len(default_workspace_messages)
+
+        wapi.undelete(workspace=my_workspace)
+        transaction.commit()
+
+        # workspace event are recreated
+        workspace_message_other_user = message_helper.last_user_workspace_messages(
+            100, my_workspace.workspace_id, other_user.user_id
+        )
+        assert len(workspace_message_other_user) > len(default_workspace_messages)
+
+    def test__message_history_creation_with_workspace_join_hook__ok__nominal_case(
+        self,
+        session,
+        app_config,
+        admin_user,
+        workspace_and_users,
+        message_helper,
+        user_workspace_config_api_factory,
+        workspace_api_factory,
+    ):
+        """
+        Test hook on workspace_join about adding previous workspace event as user messages,
+        Default tracim config should add all previous event as user message without sent set.
+        Please notice that only those message are generated in this test, MessageBuilder is disabled
+        in this test context, so only created message are historic one.
+        """
+        (
+            my_workspace,
+            same_workspace_user,
+            _,
+            other_user,
+            event_initiator,
+        ) = workspace_and_users
+        default_workspace_messages = message_helper.last_user_workspace_messages(
+            100, my_workspace.workspace_id, other_user.user_id
+        )
+        assert default_workspace_messages == []
+
+        # Let's make a change before other_user joins the space
+        wapi = workspace_api_factory.get(current_user=event_initiator)
+        wapi.update_workspace(my_workspace, label="Foo bar")
+        transaction.commit()
+
+        user_workspace_config_api = user_workspace_config_api_factory.get(
+            current_user=event_initiator
+        )
+        user_workspace_config_api.create_one(
+            other_user,
+            my_workspace,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
 
         workspace_message_at_workspace_join = message_helper.last_user_workspace_messages(
@@ -627,7 +836,7 @@ class TestEventApi:
         admin_user,
         workspace_and_users,
         message_helper,
-        role_api_factory,
+        user_workspace_config_api_factory,
         max_message_generated,
         workspace_api_factory,
     ):
@@ -636,7 +845,13 @@ class TestEventApi:
         config parameter to 0 to avoid hook creating itself the required messages itself.
         Case where max_message_generated > 0
         """
-        (my_workspace, same_workspace_user, _, other_user, event_initiator) = workspace_and_users
+        (
+            my_workspace,
+            same_workspace_user,
+            _,
+            other_user,
+            event_initiator,
+        ) = workspace_and_users
         # default
         default_workspace_messages = message_helper.last_user_workspace_messages(
             100, my_workspace.workspace_id, other_user.user_id
@@ -663,8 +878,15 @@ class TestEventApi:
 
         # join workspace: should not generate message as the automatic history is disabled
         # in this test
-        rapi = role_api_factory.get(current_user=event_initiator)
-        rapi.create_one(other_user, my_workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get(
+            current_user=event_initiator
+        )
+        user_workspace_config_api.create_one(
+            other_user,
+            my_workspace,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         last_messages = message_helper.last_user_workspace_messages(
             100, my_workspace.workspace_id, other_user.user_id
@@ -716,7 +938,7 @@ class TestEventApi:
         admin_user,
         workspace_and_users,
         message_helper,
-        role_api_factory,
+        user_workspace_config_api_factory,
         max_message_generated,
     ):
         """
@@ -724,7 +946,13 @@ class TestEventApi:
         config parameter to 0 to avoid hook creating itself the required messages itself.
         Case where max_message_generated == 0 or -1 (infinite)
         """
-        (my_workspace, same_workspace_user, _, other_user, event_initiator) = workspace_and_users
+        (
+            my_workspace,
+            same_workspace_user,
+            _,
+            other_user,
+            event_initiator,
+        ) = workspace_and_users
         # default
         default_workspace_messages = message_helper.last_user_workspace_messages(
             100, my_workspace.workspace_id, other_user.user_id
@@ -732,8 +960,15 @@ class TestEventApi:
         assert default_workspace_messages == []
 
         # join workspace: should not generated message these feature are disabled
-        rapi = role_api_factory.get(current_user=event_initiator)
-        rapi.create_one(other_user, my_workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get(
+            current_user=event_initiator
+        )
+        user_workspace_config_api.create_one(
+            other_user,
+            my_workspace,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         last_messages = message_helper.last_user_workspace_messages(
             100, my_workspace.workspace_id, other_user.user_id

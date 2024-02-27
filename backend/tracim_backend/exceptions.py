@@ -118,7 +118,7 @@ class AgendaServerConnectionError(TracimException):
     pass
 
 
-class CannotCreateAgenda(TracimException):
+class CannotCreateAgendaResource(TracimException):
     pass
 
 
@@ -139,6 +139,14 @@ class AgendaException(TracimException):
 
 
 class UnknownAgendaType(AgendaException):
+    pass
+
+
+class UnvalidJsonFile(TracimException):
+    pass
+
+
+class UnvalidCustomPropertiesSchema(TracimException):
     pass
 
 
@@ -208,6 +216,10 @@ class InsufficientUserRoleInWorkspace(TracimException):
 
 class InsufficientUserProfile(TracimException):
     error_code = ErrorCode.INSUFFICIENT_USER_PROFILE
+
+
+class ReadOnlyFieldException(TracimException):
+    error_code = ErrorCode.CANT_EDIT_READONLY_FIELD
 
 
 class InvalidWorkspaceAccessType(TracimException):
@@ -315,8 +327,16 @@ class ContentNotFound(TracimException):
     error_code = ErrorCode.CONTENT_NOT_FOUND
 
 
+class ContentRevisionNotFound(TracimException):
+    error_code = ErrorCode.CONTENT_NOT_FOUND
+
+
 class FavoriteContentNotFound(TracimException):
     error_code = ErrorCode.FAVORITE_CONTENT_NOT_FOUND
+
+
+class TodoNotFound(TracimException):
+    error_code = ErrorCode.TODO_NOT_FOUND
 
 
 class ContentTypeNotAllowed(TracimException):
@@ -670,3 +690,7 @@ class UserCallTransitionNotAllowed(TracimException):
 
 class UserCallNotFound(NotFound):
     error_code = ErrorCode.USER_CALL_NOT_FOUND
+
+
+class InvalidMention(TracimException):
+    error_code = ErrorCode.INVALID_MENTION

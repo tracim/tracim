@@ -13,7 +13,7 @@ export const SingleChoiceList = props => {
               <input
                 id={`${listItem.slug}_${radioHash}`}
                 type='radio'
-                // INFO - GB - 2020-10-06 - The line bellow is to have a unique name for radio buttons in case this component is displayed twice on the same page
+                // INFO - GB - 2020-10-06 - The line below is to have a unique name for radio buttons in case this component is displayed twice on the same page
                 name={`role_${radioHash}`}
                 value={listItem.slug}
                 checked={listItem.slug === props.currentValue}

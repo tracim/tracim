@@ -1590,6 +1590,9 @@ function showEventForm(date, allDay, calEvent, jsEvent, mod, repeatOne, confirmR
 	var color='';
 	if(mod=='new')
 	{
+		if (globalPreFilledAgendaEventDescription) {
+			$('#note').val(globalPreFilledAgendaEventDescription).trigger('autosize.resize');
+		}
 		var activeCollection = $('#ResourceCalDAVList').find('.resourceCalDAV_item.resourceCalDAV_item_selected');
 		if(activeCollection.length>0 && !globalResourceCalDAVList.getEventCollectionByUID(activeCollection.attr('data-id')).permissions.read_only)
 			color=rgbToHex(activeCollection.children('.resourceCalDAVColor').css('background-color'));

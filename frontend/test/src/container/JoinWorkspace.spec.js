@@ -2,21 +2,31 @@ import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
 
-import { SPACE_TYPE, SUBSCRIPTION_TYPE, TextInput } from 'tracim_frontend_lib'
+import { SPACE_TYPE, SUBSCRIPTION_TYPE, FilterBar } from 'tracim_frontend_lib'
 import { JoinWorkspace as JoinWorkspaceWithoutHOC } from '../../../src/container/JoinWorkspace.jsx'
 import { user } from '../../hocMock/redux/user/user.js'
 
 const wrapJoinWorkspaceComponent = (props) => {
   const wrapper = shallow(<JoinWorkspaceWithoutHOC {...props} />)
-  wrapper.instance().loadSubscriptionList = () => {}
+  wrapper.instance().loadSubscriptionList = () => { }
   return wrapper
 }
 
 describe('<JoinWorkspace />', () => {
   const props = {
+    system: {
+      config: {
+        email_notification_activated: false
+      }
+    },
     user: user,
     history: {
-      push: () => {}
+      location: {
+        state: {
+          fromSearch: false
+        }
+      },
+      push: () => { }
     },
     t: key => key,
     registerCustomEventHandlerList: () => { },
@@ -87,7 +97,7 @@ describe('<JoinWorkspace />', () => {
     ]
     testCases.forEach(testCase => {
       it(`should keep ${testCase.spaceCount} space(s) for "${testCase.filter}"`, () => {
-        wrapper.find(TextInput).simulate('change', { target: { value: testCase.filter } })
+        wrapper.find(FilterBar).simulate('change', { target: { value: testCase.filter } })
         // NOTE S.G. - 2020-10826 : need +1 as there is always the header
         expect(wrapper.find('.joinWorkspace__content__workspaceList__item').length).to.equal(testCase.spaceCount + 1)
       })

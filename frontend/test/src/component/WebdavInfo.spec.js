@@ -1,7 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import { WebdavInfo } from '../../../src/component/Dashboard/WebdavInfo.jsx'
+import { WebdavInfo } from '../../../src/component/Account/WebdavInfo.jsx'
 
 describe('<WebdavInfo />', () => {
   const props = {

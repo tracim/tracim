@@ -5,7 +5,6 @@ import PropTypes from 'prop-types'
 
 import {
   getLoggedUserCalendar,
-  getWorkspaceMemberList,
   getWorkspaceDetail
 } from '../action-creator.async.js'
 import {
@@ -13,10 +12,15 @@ import {
   setWorkspaceAgendaUrl,
   setWorkspaceDetail,
   setWorkspaceLoaded,
-  setWorkspaceMemberList
+  setUserRoleList
 } from '../action-creator.sync.js'
-
-import { PAGE } from 'tracim_frontend_lib'
+import { FETCH_CONFIG } from '../util/helper.js'
+import {
+  getSpaceUserRoleList,
+  handleFetchResult,
+  PAGE,
+  Loading
+} from 'tracim_frontend_lib'
 
 class WorkspacePage extends React.Component {
   constructor (props) {
@@ -27,23 +31,23 @@ class WorkspacePage extends React.Component {
   async updateCurrentWorkspace () {
     const { props } = this
 
-    const requestMemberList = props.dispatch(getWorkspaceMemberList(props.workspaceId))
+    const requestUserRoleList = handleFetchResult(await getSpaceUserRoleList(FETCH_CONFIG.apiUrl, props.workspaceId))
     const requestWorkspaceDetail = props.dispatch(getWorkspaceDetail(props.workspaceId))
 
-    const [responseMemberList, responseWorkspaceDetail] = await Promise.all([
-      requestMemberList, requestWorkspaceDetail
+    const [responseUserRoleList, responseWorkspaceDetail] = await Promise.all([
+      requestUserRoleList, requestWorkspaceDetail
     ])
 
-    if (responseMemberList.status === 200 && responseWorkspaceDetail.status === 200) {
-      props.dispatch(setWorkspaceMemberList(responseMemberList.json))
+    if (responseUserRoleList.apiResponse.status === 200 && responseWorkspaceDetail.status === 200) {
       props.dispatch(setWorkspaceDetail(responseWorkspaceDetail.json))
+      props.dispatch(setUserRoleList(responseUserRoleList.body))
       props.dispatch(setWorkspaceLoaded())
 
       if (props.appList.some(a => a.slug === 'agenda') && responseWorkspaceDetail.json.agenda_enabled) {
         this.loadCalendarDetail()
       }
     } else {
-      switch (responseMemberList.status) {
+      switch (responseUserRoleList.apiResponse.status) {
         case 200: break
         case 400: break
         default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('member list')}`, 'warning')); break
@@ -94,7 +98,7 @@ class WorkspacePage extends React.Component {
       props.contentType.length > 0 &&
       Number(props.workspaceId) === Number(props.currentWorkspace.id)
       ? this.props.children
-      : null
+      : <div className='spacePage__loader'><Loading /></div>
   }
 }
 

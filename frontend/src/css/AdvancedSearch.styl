@@ -1,15 +1,13 @@
 .advancedSearch
-  padding-inline-end 0px
-  padding-bottom 0px
   overflow-x hidden
-  &__wrapper
-    height "calc(100vh - %s)" % (headerHeight + 69) // 69px is the PageTitle height
+
   &__page
     display flex
-    min-height calc(100% - 40px) // 40px is the search input height
+    flex 1
+
   & .search
-    margin-inline-end 30px
     width 100%
+
   &__input
     display flex
     &__type
@@ -21,20 +19,18 @@
         margin 0px standardSpacing
   &__content
     flex 1
-    padding-inline-end 30px
     width 100%
+
     &__detail
-      display flex
-      margin-top 15px
-      margin-inline-start 25px
-      color lightDarkGrey
-      height 45px
       align-items center
-      &__count
-        flex 1
-      &__filter
-        margin-inline-end 0px
+      color darkGrey2
+      display flex
+      height 45px
+      margin-top standardSpacing
+
+      &__filter_button
         margin-inline-start auto
+
     &__empty
       margin-top 50px
       font-weight bold

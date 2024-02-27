@@ -7,7 +7,15 @@
   // A better solution should be found to avoid nesting links and to harmonize with the advanced searchbar
   // see this ticket https://github.com/tracim/tracim/issues/4232
   z-index 2
+  overflow hidden
+  text-overflow ellipsis
   &:hover
     color fontColor
   & span:hover
     text-decoration underline
+
+@media (max-width max-sm)
+  .profileNavigation
+    max-width 60px
+    overflow hidden
+    text-overflow ellipsis

@@ -11,7 +11,8 @@ from webtest import TestResponse
 
 from tracim_backend.error import ErrorCode
 from tracim_backend.models.auth import Profile
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import EmailNotificationType
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
@@ -28,12 +29,11 @@ class TestAccountEndpoint(object):
         workspace_api_factory,
         user_api_factory,
         content_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         session,
         web_testapp,
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -77,13 +77,12 @@ class TestAccountKnownMembersEndpoint(object):
         workspace_api_factory,
         user_api_factory,
         content_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         session,
         web_testapp,
         admin_user,
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -112,7 +111,10 @@ class TestAccountKnownMembersEndpoint(object):
         transaction.commit()
         int(admin_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"acp": "bob"}
         res = web_testapp.get("/api/users/me/known_members", status=307, params=params).follow(
             status=200
@@ -121,24 +123,23 @@ class TestAccountKnownMembersEndpoint(object):
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["has_avatar"] is False
+        assert res[0]["has_avatar"] is True
 
         assert res[1]["user_id"] == test_user2.user_id
         assert res[1]["public_name"] == test_user2.display_name
-        assert res[1]["has_avatar"] is False
+        assert res[1]["has_avatar"] is True
 
     def test_api__get_user__ok_200__admin__by_name_exclude_user(
         self,
         workspace_api_factory,
         user_api_factory,
         content_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         session,
         web_testapp,
         admin_user,
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -168,7 +169,10 @@ class TestAccountKnownMembersEndpoint(object):
         transaction.commit()
         int(admin_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"acp": "bob", "exclude_user_ids": str(test_user2.user_id)}
         res = web_testapp.get("/api/users/me/known_members", status=307, params=params).follow(
             status=200
@@ -177,20 +181,19 @@ class TestAccountKnownMembersEndpoint(object):
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["has_avatar"] is False
+        assert res[0]["has_avatar"] is True
 
     def test_api__get_user__err_403__admin__too_small_acp(
         self,
         workspace_api_factory,
         user_api_factory,
         content_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         session,
         web_testapp,
         admin_user,
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -218,7 +221,10 @@ class TestAccountKnownMembersEndpoint(object):
         transaction.commit()
         int(admin_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"acp": "t"}
         res = web_testapp.get("/api/users/me/known_members", status=307, params=params).follow(
             status=400
@@ -232,12 +238,11 @@ class TestAccountKnownMembersEndpoint(object):
         workspace_api_factory,
         user_api_factory,
         content_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         session,
         web_testapp,
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -275,9 +280,19 @@ class TestAccountKnownMembersEndpoint(object):
         uapi.save(test_user2)
         uapi.save(test_user3)
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        role_api.create_one(test_user2, workspace, UserRoleInWorkspace.READER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        user_workspace_config_api.create_one(
+            test_user2,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         int(test_user.user_id)
 
@@ -290,11 +305,11 @@ class TestAccountKnownMembersEndpoint(object):
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["has_avatar"] is False
+        assert res[0]["has_avatar"] is True
 
         assert res[1]["user_id"] == test_user2.user_id
         assert res[1]["public_name"] == test_user2.display_name
-        assert res[1]["has_avatar"] is False
+        assert res[1]["has_avatar"] is True
 
 
 def follow_put_json(response: TestResponse, **kw):
@@ -319,12 +334,11 @@ class TestSetEmailEndpoint(object):
         workspace_api_factory,
         user_api_factory,
         content_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         session,
         web_testapp,
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -368,12 +382,11 @@ class TestSetEmailEndpoint(object):
         workspace_api_factory,
         user_api_factory,
         content_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         session,
         web_testapp,
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -398,7 +411,10 @@ class TestSetEmailEndpoint(object):
         assert res["email"] == "test@test.test"
 
         # Set password
-        params = {"email": "mysuperemail@email.fr", "loggedin_user_password": "badpassword"}
+        params = {
+            "email": "mysuperemail@email.fr",
+            "loggedin_user_password": "badpassword",
+        }
         res = follow_put_json(
             web_testapp.put_json("/api/users/me/email", params=params, status=307),
             status=403,
@@ -417,12 +433,11 @@ class TestSetEmailEndpoint(object):
         workspace_api_factory,
         user_api_factory,
         content_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         session,
         web_testapp,
     ):
-
         uapi = user_api_factory.get()
 
         profile = Profile.USER
@@ -447,7 +462,10 @@ class TestSetEmailEndpoint(object):
         assert res["email"] == "test@test.test"
 
         # Set password
-        params = {"email": "mysuperemail@email.fr", "loggedin_user_password": "password"}
+        params = {
+            "email": "mysuperemail@email.fr",
+            "loggedin_user_password": "password",
+        }
         follow_put_json(
             web_testapp.put_json("/api/users/me/email", params=params, status=307),
             status=200,

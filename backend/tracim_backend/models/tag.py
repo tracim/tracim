@@ -46,7 +46,11 @@ class TagOnContent(CreationDateMixin, DeclarativeBase):
 
     tag_id = Column(
         Integer,
-        ForeignKey("tag.tag_id", onupdate="CASCADE", ondelete="CASCADE",),
+        ForeignKey(
+            "tag.tag_id",
+            onupdate="CASCADE",
+            ondelete="CASCADE",
+        ),
         primary_key=True,
     )
 

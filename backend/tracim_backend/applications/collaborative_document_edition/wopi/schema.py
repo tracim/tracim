@@ -1,13 +1,14 @@
 from datetime import datetime
-import typing
-
 import marshmallow
 from marshmallow import post_load
+import typing
 
 
 class WopiPutHeadersSchema(marshmallow.Schema):
     wopi_lool_timestamp = marshmallow.fields.DateTime(
-        required=False, load_from="X-LOOL-WOPI-Timestamp", dump_to="X-LOOL-WOPI-Timestamp"
+        required=False,
+        load_from="X-LOOL-WOPI-Timestamp",
+        dump_to="X-LOOL-WOPI-Timestamp",
     )
 
     @post_load

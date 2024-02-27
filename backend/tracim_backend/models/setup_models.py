@@ -1,7 +1,5 @@
 # import or define all models here to ensure they are attached to the
 # Base.metadata prior to any initialization routines
-import typing
-
 from pyramid.config import Configurator
 from sqlalchemy import engine_from_config
 from sqlalchemy.engine import Engine
@@ -10,6 +8,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm import configure_mappers
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
+import typing
 import zope.sqlalchemy
 
 from tracim_backend.applications.share.models import ContentShare  # noqa: F401
@@ -121,9 +120,6 @@ def init_models(configurator: Configurator, app_config: "CFG") -> None:
 
     # use pyramid_tm to hook the transaction lifecycle to the request
     configurator.include("pyramid_tm")
-
-    # use pyramid_retry to retry a request when transient exceptions occur
-    configurator.include("pyramid_retry")
 
     session_factory = get_session_factory(get_engine(app_config))
     configurator.registry["dbsession_factory"] = session_factory

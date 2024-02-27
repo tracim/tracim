@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
-require('./TextInput.styl')
+import classnames from 'classnames'
 
 // NOTE - S.G - 2020-10-26
 // A thin-layer around <input type='text'> that sets the Tracim style and behaviour
@@ -16,18 +15,23 @@ export class TextInput extends React.Component {
   render () {
     const { props } = this
     return (
-      <div className='textinput__box'>
+      <div
+        className={classnames('textInputComponent', props.className)}
+      >
         <input
           autoFocus={props.autoFocus}
           type='text'
-          className='textinput__text form-control primaryColorBorder'
+          className={classnames('textInputComponent__text', props.inputClassName)}
           onChange={props.onChange}
           disabled={props.disabled}
           placeholder={props.placeholder}
           onKeyPress={this.handleValidateIfEnterKey}
           value={props.value}
+          data-cy='textInputComponent__text'
         />
-        {props.icon && <i className={`fas fa-fw fa-${props.icon} textinput__icon`} />}
+        {props.icon && (
+          <i className={`fas fa-fw fa-${props.icon} textInputComponent__icon`} />
+        )}
       </div>
     )
   }
@@ -36,6 +40,8 @@ export class TextInput extends React.Component {
 TextInput.propTypes = {
   onChange: PropTypes.func.isRequired,
   value: PropTypes.string.isRequired,
+  className: PropTypes.string,
+  inputClassName: PropTypes.string,
   autoFocus: PropTypes.bool,
   onValidate: PropTypes.func,
   disabled: PropTypes.bool,
@@ -45,6 +51,8 @@ TextInput.propTypes = {
 }
 
 TextInput.defaultProps = {
+  className: '',
+  inputClassName: '',
   autoFocus: false,
   onValidate: undefined,
   disabled: false,

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import logging
-import typing
-
 from mako.template import Template
 from sqlalchemy.orm import Session
+import typing
 
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import EmailTemplateError
@@ -26,7 +26,7 @@ from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import WorkspaceInContext
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 
 
 class EmailNotifier(INotifier):
@@ -51,11 +51,11 @@ class EmailNotifier(INotifier):
             self.config.EMAIL__NOTIFICATION__SMTP__PORT,
             self.config.EMAIL__NOTIFICATION__SMTP__USER,
             self.config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
-            self.config.EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL,
+            self.config.EMAIL__NOTIFICATION__SMTP__ENCRYPTION,
+            self.config.EMAIL__NOTIFICATION__SMTP__AUTHENTICATION,
         )
 
     def notify_content_update(self, content: Content):
-
         if content.get_last_action().id not in self.config.EMAIL__NOTIFICATION__NOTIFIED_EVENTS:
             logger.info(
                 self,
@@ -119,12 +119,12 @@ class EmailNotifier(INotifier):
                 self._user.user_id, content.content_id
             )
         except Exception:
-            logger.exception(self, "Exception catched during email notification")
+            logger.exception(self, "Exception has been caught during email notification")
 
 
 class EmailManager(object):
     """
-    Compared to Notifier, this class is independant from the HTTP request thread
+    Compared to Notifier, this class is independent from the HTTP request thread
     This class will build Email and send it for both created account and content
     update
     """
@@ -142,7 +142,7 @@ class EmailManager(object):
 
     def _get_sender(self, user: User = None) -> EmailAddress:
         """
-        Return sender EmailAdress object, which permit to get rfc compliant address:
+        Return sender EmailAddress object, which permit to get rfc compliant address:
         "Bob Dylan (via Tracim) <notification@mail.com>"
         :param user: user to extract display name
         :return: sender string
@@ -197,6 +197,7 @@ class EmailManager(object):
         # FIXME - D.A. - 2014-11-05
         # Dirty import. It's here in order to avoid circular import
         from tracim_backend.lib.core.content import ContentApi
+        from tracim_backend.lib.core.mention import DescriptionMentionParser
         from tracim_backend.lib.core.user import UserApi
 
         user = UserApi(None, config=self.config, session=self.session).get_one(event_actor_id)
@@ -209,9 +210,9 @@ class EmailManager(object):
             config=self.config,
             show_archived=True,
             show_deleted=True,
-        ).get_one(event_content_id, content_type_list.Any_SLUG)
+        ).get_one(event_content_id, ContentTypeSlug.ANY.value)
         workspace_api = WorkspaceApi(session=self.session, current_user=user, config=self.config)
-        workpace_in_context = workspace_api.get_workspace_with_context(
+        workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(content.workspace_id)
         )
         main_content = content.parent if content.type == content_type_list.Comment.slug else content
@@ -254,7 +255,7 @@ class EmailManager(object):
             _ = translator.get_translation
             # INFO - G.M - 2017-11-15 - set content_id in header to permit reply
             # references can have multiple values, but only one in this case.
-            replyto_addr = self.config.EMAIL__NOTIFICATION__REPLY_TO__EMAIL.replace(
+            reply_to_addr = self.config.EMAIL__NOTIFICATION__REPLY_TO__EMAIL.replace(
                 "{content_id}", str(main_content.content_id)
             )
 
@@ -291,18 +292,25 @@ class EmailManager(object):
                 role,
                 content_in_context,
                 parent_in_context,
-                workpace_in_context,
+                workspace_in_context,
                 user,
                 translator,
+            )
+
+            body_html = DescriptionMentionParser.get_email_html_from_html_with_mention_tags(
+                session=self.session,
+                cfg=self.config,
+                translator=translator,
+                html=body_html,
             )
 
             message = EmailNotificationMessage(
                 subject=subject,
                 from_header=self._get_sender(user),
                 to_header=EmailAddress(role.user.display_name, role.user.email),
-                reply_to=EmailAddress(reply_to_label, replyto_addr),
+                reply_to=EmailAddress(reply_to_label, reply_to_addr),
                 # INFO - G.M - 2017-11-15
-                # References can theorically have label, but in pratice, references
+                # References can theoretically have label, but in practice, references
                 # contains only message_id from parents post in thread.
                 # To link this email to a content we create a virtual parent
                 # in reference who contain the content_id.
@@ -325,7 +333,10 @@ class EmailManager(object):
             send_email_through(self.config, email_sender.send_mail, message)
 
     def notify_created_account(
-        self, user: User, password: typing.Optional[str], origin_user: typing.Optional[User] = None
+        self,
+        user: User,
+        password: typing.Optional[str],
+        origin_user: typing.Optional[User] = None,
     ) -> None:
         """
         Send created account email to given user.
@@ -356,7 +367,9 @@ class EmailManager(object):
         }
         translator = Translator(self.config, default_lang=user.lang)
         body_html = self._render_template(
-            mako_template_filepath=html_template_file_path, context=context, translator=translator
+            mako_template_filepath=html_template_file_path,
+            context=context,
+            translator=translator,
         )
         message = EmailNotificationMessage(
             subject=subject,
@@ -367,7 +380,9 @@ class EmailManager(object):
         )
 
         send_email_through(
-            config=self.config, sendmail_callable=email_sender.send_mail, message=message
+            config=self.config,
+            sendmail_callable=email_sender.send_mail,
+            message=message,
         )
 
     def notify_reset_password(self, user: User, reset_password_token: str) -> None:
@@ -402,7 +417,9 @@ class EmailManager(object):
         }
 
         body_html = self._render_template(
-            mako_template_filepath=html_template_file_path, context=context, translator=translator
+            mako_template_filepath=html_template_file_path,
+            context=context,
+            translator=translator,
         )
         message = EmailNotificationMessage(
             subject=subject,
@@ -412,7 +429,9 @@ class EmailManager(object):
             lang=translator.default_lang,
         )
         send_email_through(
-            config=self.config, sendmail_callable=email_sender.send_mail, message=message
+            config=self.config,
+            sendmail_callable=email_sender.send_mail,
+            message=message,
         )
 
     def _render_template(
@@ -447,14 +466,13 @@ class EmailManager(object):
 
     def _build_context_for_content_update(
         self,
-        role: UserRoleInWorkspace,
+        role: UserWorkspaceConfig,
         content_in_context: ContentInContext,
         parent_in_context: typing.Optional[ContentInContext],
         workspace_in_context: WorkspaceInContext,
         actor: User,
         translator: Translator,
     ):
-
         _ = translator.get_translation
         content = content_in_context.content
         action = content.get_last_action().id
@@ -463,17 +481,6 @@ class EmailManager(object):
         workspace_url = workspace_in_context.frontend_url
         role_label = role.role_as_label()
         logo_url = get_email_logo_frontend_url(self.config)
-
-        # FIXME: remove/readapt assert to debug easily broken case
-        # assert user
-        # assert workspace
-        # assert main_title
-        # assert status_label
-        # # assert status_icon_url
-        # assert role_label
-        # # assert content_intro
-        # assert content_text or content_text == content.description
-        # assert logo_url
 
         return {
             "user": role.user,
@@ -493,7 +500,7 @@ class EmailManager(object):
     def _build_email_body_for_content(
         self,
         mako_template_filepath: str,
-        role: UserRoleInWorkspace,
+        user_workspace_config: UserWorkspaceConfig,
         content_in_context: ContentInContext,
         parent_in_context: typing.Optional[ContentInContext],
         workspace_in_context: WorkspaceInContext,
@@ -516,10 +523,11 @@ class EmailManager(object):
          this method must be called one time for text and one time for html
         """
         logger.debug(
-            self, "Building email content from MAKO template {}".format(mako_template_filepath)
+            self,
+            "Building email content from MAKO template {}".format(mako_template_filepath),
         )
         context = self._build_context_for_content_update(
-            role=role,
+            role=user_workspace_config,
             content_in_context=content_in_context,
             parent_in_context=parent_in_context,
             workspace_in_context=workspace_in_context,
@@ -527,7 +535,9 @@ class EmailManager(object):
             translator=translator,
         )
         body_content = self._render_template(
-            mako_template_filepath=mako_template_filepath, context=context, translator=translator
+            mako_template_filepath=mako_template_filepath,
+            context=context,
+            translator=translator,
         )
         return body_content
 
@@ -543,7 +553,8 @@ def get_email_manager(config: CFG, session: Session):
         config.EMAIL__NOTIFICATION__SMTP__PORT,
         config.EMAIL__NOTIFICATION__SMTP__USER,
         config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
-        config.EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL,
+        config.EMAIL__NOTIFICATION__SMTP__ENCRYPTION,
+        config.EMAIL__NOTIFICATION__SMTP__AUTHENTICATION,
     )
 
     return EmailManager(config=config, smtp_config=smtp_config, session=session)

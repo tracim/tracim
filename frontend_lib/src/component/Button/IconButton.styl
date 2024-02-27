@@ -17,12 +17,9 @@
   &-light
     color offWhite
 
-  &__text-with-icon
-    padding-left 5px
+  &__text_with_icon
+    padding-inline-start textSpacing
     white-space pre
-
-  &__icon
-    margin-inline-end 5px
 
   &__label
     display inline
@@ -37,10 +34,9 @@
       background-color var(--primaryDarkColor)
 
   &-secondary
-    background-color transparent
-    border-width 1px
+    background-color lightGrey2
     &:hover
-      background-color rgba(0, 0, 0, 0.1)
+      background-color secodaryButtonHover
     &-light
       border-color offWhite
     &-dark
@@ -53,9 +49,9 @@
     &:hover
       text-decoration underline
     &-light
-      color lightDarkGrey
+      color darkGrey2
       &:hover
-        color darkGrey
+        color offBlack
     &-dark
       color fontColor
       &:hover
@@ -74,10 +70,12 @@
       border-color var(--primaryDarkColor)
       background-color offWhite
       &:hover
-        background-color lightGrey
+        background-color lightGrey2
 
 @media (min-width: min-xs) && (max-width: max-xs)
   .iconbutton
+    &__icon
+      margin 0
     &__label
       display none
       &-mobile

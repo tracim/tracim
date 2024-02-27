@@ -18,9 +18,15 @@
   display flex
   align-items center
   &__text
-    margin-left standardSpacing
+    margin-inline standardSpacing
     text-overflow ellipsis
     overflow hidden
+
+    &.disabled
+      color darkGrey1
+
+  &.rightAligned
+    flex-direction row-reverse
 
 .switch
   position relative
@@ -29,8 +35,8 @@
   width 60px
   height 34px
 
-.switch input
-  display none
+  & input
+    display none
 
 .slider
   position absolute
@@ -42,19 +48,23 @@
   -webkit-transition .4s
   transition .4s
 
-.slider:before
-  position absolute
-  content ""
-  height 26px
-  width 26px
-  left 4px
-  bottom 4px
-  background-color white
-  -webkit-transition .4s
-  transition .4s
+  &.defaultBg
+    background-color darkGrey1
 
-.slider.defaultBg
-  background-color #ccc
+  &.disabled
+    background-color lightGrey1
+    cursor not-allowed
+
+  &:before
+    position absolute
+    content ""
+    height 26px
+    width 26px
+    left 4px
+    bottom 4px
+    background-color white
+    -webkit-transition .4s
+    transition .4s
 
 input:focus + .slider
   box-shadow 0 0 1px offWhite
@@ -69,4 +79,4 @@ input:checked + .slider:before
   border-radius 34px
 
 .slider.round:before
-  border-radius: 50%
+  border-radius 50%

@@ -1,8 +1,7 @@
-import typing
-
 from sqlalchemy import and_
 from sqlalchemy.orm import Query
 from sqlalchemy.orm.exc import NoResultFound
+import typing
 
 from tracim_backend.exceptions import TagAlreadyExistsError
 from tracim_backend.exceptions import TagNotFound
@@ -53,7 +52,7 @@ class TagLib:
     def get_one(
         self,
         tag_id: typing.Optional[int] = None,
-        tag_name: typing.Optional[int] = None,
+        tag_name: typing.Optional[str] = None,
         workspace_id: typing.Optional[int] = None,
         content_id: typing.Optional[int] = None,
     ) -> Tag:
@@ -70,7 +69,9 @@ class TagLib:
         return tag
 
     def get_all(
-        self, workspace_id: typing.Optional[int] = None, content_id: typing.Optional[int] = None,
+        self,
+        workspace_id: typing.Optional[int] = None,
+        content_id: typing.Optional[int] = None,
     ) -> typing.List[Tag]:
         query = self.base_filter(
             self._base_query(), workspace_id=workspace_id, content_id=content_id
@@ -112,7 +113,10 @@ class TagLib:
 
         except TagNotFound:
             tag = self.add(
-                user=user, workspace=content.workspace, tag_name=tag_name, do_save=do_save
+                user=user,
+                workspace=content.workspace,
+                tag_name=tag_name,
+                do_save=do_save,
             )
 
         content_tag = TagOnContent(author=user, tag=tag, content=content)

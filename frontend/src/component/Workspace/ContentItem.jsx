@@ -10,9 +10,11 @@ import {
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import {
   ROLE,
-  FilenameWithExtension,
+  ComposedIcon,
+  FilenameWithBadges,
   ListItemWrapper,
-  ComposedIcon
+  getRevisionTypeLabel,
+  TimedEvent
 } from 'tracim_frontend_lib'
 
 class ContentItem extends React.Component {
@@ -54,7 +56,7 @@ class ContentItem extends React.Component {
               title={props.t(props.contentType.label)}
               style={{
                 color: props.contentType.hexcolor,
-                paddingRight: props.isShared ? 'unset' : '10px'
+                paddingInlineEnd: props.isShared ? 'unset' : '10px'
               }}
             >
               {(props.isShared
@@ -72,11 +74,22 @@ class ContentItem extends React.Component {
                 )
               )}
             </div>
-            <FilenameWithExtension file={props} customClass='content__name' />
+            <FilenameWithBadges file={props} isTemplate={props.isTemplate} customClass='content__name' />
           </div>
 
+          <TimedEvent
+            customClass='content__lastModification'
+            operation={getRevisionTypeLabel(props.currentRevisionType, props.t)}
+            date={props.modified}
+            lang={props.lang}
+            author={{
+              publicName: props.lastModifier.public_name,
+              userId: props.lastModifier.user_id
+            }}
+          />
+
           {props.userRoleIdInWorkspace >= ROLE.contributor.id && (
-            <div className='d-none d-md-block' title={props.t('Actions')}>
+            <div className='d-none d-md-block content__actions' title={props.t('Actions')}>
               <BtnExtandedAction
                 userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                 onClickExtendedAction={{
@@ -151,26 +164,31 @@ const contentItemDragAndDropSourceCollect = (connect, monitor) => ({
 export default DragSource(DRAG_AND_DROP.CONTENT_ITEM, contentItemDragAndDropSource, contentItemDragAndDropSourceCollect)(translate()(ContentItem))
 
 ContentItem.propTypes = {
-  statusSlug: PropTypes.string.isRequired,
+  contentType: PropTypes.object,
   customClass: PropTypes.string,
   label: PropTypes.string,
+  faIcon: PropTypes.string,
   fileName: PropTypes.string,
   fileExtension: PropTypes.string,
-  contentType: PropTypes.object,
+  isShared: PropTypes.bool,
+  isTemplate: PropTypes.bool,
   onClickItem: PropTypes.func,
-  faIcon: PropTypes.string,
   read: PropTypes.bool,
+  statusSlug: PropTypes.string.isRequired,
   urlContent: PropTypes.string,
   userRoleIdInWorkspace: PropTypes.number,
-  isShared: PropTypes.bool
+  modified: PropTypes.string.isRequired,
+  lang: PropTypes.string.isRequired,
+  currentRevisionType: PropTypes.string.isRequired
 }
 
 ContentItem.defaultProps = {
-  label: '',
   customClass: '',
+  isShared: false,
+  isTemplate: false,
+  label: '',
   onClickItem: () => {},
   read: false,
   urlContent: '',
-  userRoleIdInWorkspace: ROLE.reader.id,
-  isShared: false
+  userRoleIdInWorkspace: ROLE.reader.id
 }

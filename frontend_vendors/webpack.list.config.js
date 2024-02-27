@@ -9,6 +9,7 @@ module.exports = {
     filename: 'list.js',
     libraryTarget: 'commonjs2'
   },
+  mode: 'production',
   externals: [
     (context, request, callback) => {
       // RJ - 2020-11-02 - NOTE

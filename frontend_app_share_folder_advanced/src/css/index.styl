@@ -1,18 +1,15 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
+@import '~tracim_frontend_lib/src/css/Variable.styl'
 
 .share_folder_advanced
-  height "calc(100% - %s)" % headerHeight
   &__content
     width 100%
-    padding standardSpacing 0
+    padding pageSpacing
     overflow auto
     &__title
       display flex
       justify-content space-between
       align-items center
-      margin standardSpacing 20px
       padding-bottom standardSpacing
-      border-bottom borderStyle
       font-size titleFontSize
     &__btnupload
       margin auto 0
@@ -23,7 +20,6 @@
   &__contentpage
     &__content
       width 100%
-      height calc(100% - 63px) // 63px = app header height
       overflow-y auto
       overflow-x hidden
 
@@ -43,7 +39,7 @@
       border none
       cursor pointer
       margin auto
-      color mediumDarkGrey
+      color darkGrey1
       &:focus
         box-shadow 0 0 0 0
         border 0 none
@@ -63,7 +59,7 @@
       border-radius standardBorderRadius
       border-color lightgray
       background-color white
-      padding-left 5px
+      padding-inline-start textSpacing
       color grey
       & > i
         margin auto
@@ -80,15 +76,18 @@
     &__link
       color grey
       text-decoration underline
-      margin-left auto
-      padding-right 36px
+      margin-inline-start auto
+      padding-inline-end 36px
       cursor pointer
       &:hover
         color fontColor
   &__newBtn
     margin-top 15px
-    margin-right 55px
+    margin-inline-end 55px
   &__btnCancel
-    margin 15px 15px 0 auto
+    margin-top 15px
+    margin-inline-end 15px
+    margin-bottom 0
+    margin-inline-start auto
   &__emailWarning
     margin 25px

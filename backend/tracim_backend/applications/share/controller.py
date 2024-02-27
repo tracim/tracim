@@ -1,14 +1,12 @@
+from hapic.data import HapicFile
 from http import HTTPStatus
+from pyramid.config import Configurator
 import typing
 
-from hapic.data import HapicFile
-from pyramid.config import Configurator
-
-from tracim_backend.app_models.contents import FILE_TYPE
-from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.applications.share.authorization import has_public_download_enabled
 from tracim_backend.applications.share.lib import ShareLib
-from tracim_backend.applications.share.models import ContentShare
+from tracim_backend.applications.share.models import ContentShare  # noqa: F401
 from tracim_backend.applications.share.models_in_context import ContentShareInContext
 from tracim_backend.applications.share.schema import ContentShareInfoSchema
 from tracim_backend.applications.share.schema import ContentShareSchema
@@ -19,7 +17,7 @@ from tracim_backend.applications.share.schema import SharePasswordBodySchema
 from tracim_backend.applications.share.schema import SharePasswordFormSchema
 from tracim_backend.applications.share.schema import ShareTokenPathSchema
 from tracim_backend.applications.share.schema import ShareTokenWithFilenamePathSchema
-from tracim_backend.config import CFG
+from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
 from tracim_backend.exceptions import ContentShareNotFound
 from tracim_backend.exceptions import ContentTypeNotAllowed
@@ -45,7 +43,7 @@ SWAGGER_TAG__CONTENT_SHARE_SECTION = "Share"
 SWAGGER_TAG__CONTENT_FILE_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__CONTENT_ENDPOINTS, SWAGGER_TAG__CONTENT_SHARE_SECTION
 )
-shareables_content_type = [FILE_TYPE]
+shareables_content_type = [ContentTypeSlug.FILE.value]
 is_shareable_content_type = ContentTypeChecker(shareables_content_type)
 
 
@@ -70,7 +68,9 @@ class ShareController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ShareLib(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
         shares_content = api.share_content(
             request.current_content,
@@ -118,7 +118,9 @@ class ShareController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ShareLib(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
         api.disable_content_share(request.current_content, hapic_data.path.share_id)
         return
@@ -144,7 +146,7 @@ class ShareController(Controller):
         # we should considered do these check at decorator level
         content = ContentApi(
             current_user=None, session=request.dbsession, config=app_config
-        ).get_one(content_share.content_id, content_type=content_type_list.Any_SLUG)
+        ).get_one(content_share.content_id, content_type=ContentTypeSlug.ANY.value)
         workspace_api = WorkspaceApi(
             current_user=None, session=request.dbsession, config=app_config
         )
@@ -176,7 +178,7 @@ class ShareController(Controller):
         api.check_password(content_share, password=hapic_data.body.password)
         content = ContentApi(
             current_user=None, session=request.dbsession, config=app_config
-        ).get_one(content_share.content_id, content_type=content_type_list.Any_SLUG)
+        ).get_one(content_share.content_id, content_type=ContentTypeSlug.ANY.value)
         workspace_api = WorkspaceApi(
             current_user=None, session=request.dbsession, config=app_config
         )
@@ -230,7 +232,7 @@ class ShareController(Controller):
         api.check_password(content_share, password=password)
         content = ContentApi(
             current_user=None, session=request.dbsession, config=app_config
-        ).get_one(content_share.content_id, content_type=content_type_list.Any_SLUG)
+        ).get_one(content_share.content_id, content_type=ContentTypeSlug.ANY.value)
         workspace_api = WorkspaceApi(
             current_user=None, session=request.dbsession, config=app_config
         )
@@ -281,7 +283,9 @@ class ShareController(Controller):
 
         # public download api
         configurator.add_route(
-            "guest_download_info", "/public/guest-download/{share_token}", request_method="GET"
+            "guest_download_info",
+            "/public/guest-download/{share_token}",
+            request_method="GET",
         )
         configurator.add_view(self.guest_download_info, route_name="guest_download_info")
 

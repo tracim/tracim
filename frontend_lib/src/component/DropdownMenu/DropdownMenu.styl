@@ -2,13 +2,14 @@
 
 .dropdown
   color fontColor
+  height 100%
   &.transparentButton
     padding 0
 
 .dropdownMenu
   padding 0
   &__image
-    margin-right standardSpacing
+    margin-inline-end standardSpacing
     width 20px
     height 15px
     vertical-align middle
@@ -28,16 +29,23 @@
       color fontColor
       text-decoration none
   & i
-    margin-right textSpacing
+    margin-inline-end textSpacing
   &:hover:not(:active)
-    background-color grey-hover
+    background-color lightGrey1
+  & .collapseNavbar
+    height 100%
+    width 100%
+    text-align start
 
-.dropdownMenuButton.btn
-  display flex
-  align-items center
-  padding standardSpacing
-  height 100%
-  & i
-    margin-right textSpacing
-  &::after
-    margin-right textSpacing
+.dropdownMenuButton
+  cursor pointer
+  &.btn
+    display flex
+    align-items center
+    padding standardSpacing
+    height 100%
+    & i
+      margin-inline-end textSpacing
+    &::after
+      margin-inline-end textSpacing
+      margin-inline-start textSpacing

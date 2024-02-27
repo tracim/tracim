@@ -15,7 +15,7 @@ EOF
 
 database_type="sqlite"
 while :; do
-    case $1 in
+    case "$1" in
         -h|--help)
             show_help
             exit
@@ -120,14 +120,14 @@ echo "Database type: '$database_type', service: '$database_service'"
 teardown () {
     if [ -n "$backend_pid" ]; then kill "$backend_pid"; fi
     pushd "$script_dir/backend"
-    docker-compose stop
+    docker compose stop pushpin
 }
 
 run_docker_services () {
     if [ -z "$database_service" ]; then
-        docker-compose up -d pushpin
+        docker compose up -d pushpin
     else
-        docker-compose up -d pushpin "$database_service"
+        docker compose up -d pushpin "$database_service"
         sleep 2
     fi
 }

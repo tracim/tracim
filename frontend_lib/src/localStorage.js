@@ -1,25 +1,28 @@
 export const LOCAL_STORAGE_FIELD = {
+  COMMENT: 'comment',
   RAW_CONTENT: 'rawContent',
-  COMMENT: 'comment'
+  TODO: 'todo'
 }
 
-export const generateLocalStorageContentId = (workspaceId, contentId, contentType, field) => `${workspaceId}/${contentId}/${contentType}_${field}`
+export function generateLocalStorageContentId (contentType, contentId, workspaceId, field) {
+  return `${workspaceId}/${contentId}/${contentType}_${field}`
+}
 
-export function getLocalStorageItem (contentType, content, field) {
+export function getLocalStorageItem (contentType, contentId, workspaceId, field) {
   return localStorage.getItem(
-    generateLocalStorageContentId(content.workspace_id, content.content_id, contentType, field)
+    generateLocalStorageContentId(contentType, contentId, workspaceId, field)
   )
 }
 
-export function removeLocalStorageItem (contentType, content, field) {
+export function removeLocalStorageItem (contentType, contentId, workspaceId, field) {
   localStorage.removeItem(
-    generateLocalStorageContentId(content.workspace_id, content.content_id, contentType, field)
+    generateLocalStorageContentId(contentType, contentId, workspaceId, field)
   )
 }
 
 export function setLocalStorageItem (contentType, contentId, workspaceId, field, value) {
   localStorage.setItem(
-    generateLocalStorageContentId(workspaceId, contentId, contentType, field),
+    generateLocalStorageContentId(contentType, contentId, workspaceId, field),
     value
   )
 }

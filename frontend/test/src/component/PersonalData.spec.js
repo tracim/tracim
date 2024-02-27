@@ -4,6 +4,7 @@ import { shallow } from 'enzyme'
 import { IconButton } from 'tracim_frontend_lib'
 import sinon from 'sinon'
 import { PersonalData as PersonalDataWithoutHOC } from '../../../src/component/Account/PersonalData.jsx'
+import { user } from '../../hocMock/redux/user/user.js'
 
 describe('<PersonalData />', () => {
   const onClickSubmitCallBack = sinon.spy()
@@ -12,9 +13,17 @@ describe('<PersonalData />', () => {
   const props = {
     onClickSubmit: onClickSubmitCallBack,
     displayAdminInfo: false,
-    userAuthType: 'randomUserAuthType',
+    userAuthType: 'internal',
     isUsernameValid: true,
-    onChangeUsername: onChangeUsernameCallBack
+    langList: [{
+      id: 'fr',
+      label: 'French'
+    }, {
+      id: 'en',
+      label: 'English'
+    }],
+    onChangeUsername: onChangeUsernameCallBack,
+    user: user
   }
 
   const wrapper = shallow(<PersonalDataWithoutHOC {...props} t={key => key} />)
@@ -25,6 +34,21 @@ describe('<PersonalData />', () => {
       expect(wrapper.find('.personaldata__form__txtinput__msgerror').length).to.equal(1)
       wrapper.setProps({ isUsernameValid: props.isUsernameValid })
     })
+
+    it('should display allowed inputs if parameter userAuthType is "internal"', () => {
+      expect(wrapper.find('[data-cy="personaldata__form__txtinput__fullname"]').prop('disabled')).to.equal(false)
+      expect(wrapper.find('[data-cy="personaldata__form__txtinput__username"]').prop('disabled')).to.equal(false)
+      expect(wrapper.find('[data-cy="personaldata__form__txtinput__email"]').prop('disabled')).to.equal(false)
+    })
+
+    // Deprecated test
+    // it('should display disabled inputs if parameter userAuthType is not "internal"', () => {
+    //   wrapper.setProps({ userAuthType: 'ldap' })
+    //   expect(wrapper.find('[data-cy="personaldata__form__txtinput__fullname"]').prop('disabled')).to.equal(true)
+    //   expect(wrapper.find('[data-cy="personaldata__form__txtinput__username"]').prop('disabled')).to.equal(true)
+    //   expect(wrapper.find('[data-cy="personaldata__form__txtinput__email"]').prop('disabled')).to.equal(true)
+    //   wrapper.setProps({ userAuthType: props.userAuthType })
+    // })
   })
 
   describe('handlers', () => {

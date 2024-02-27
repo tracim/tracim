@@ -224,7 +224,7 @@ export class PublicProfile extends React.Component {
   handleChangeCoverClick = () => this.setState({ displayedPopup: POPUP_DISPLAY_STATE.COVER })
 
   updateFileUploadProgress = (e) => {
-    const fileUploadProgressPercentage = 100 * (e.loaded / e.total)
+    const fileUploadProgressPercentage = Math.round(100 * (e.loaded / e.total))
     this.setState({ fileUploadProgressPercentage })
   }
 
@@ -515,7 +515,7 @@ export class PublicProfile extends React.Component {
                 ? (
                   <CustomFormManager
                     title={props.t('Personal Page')}
-                    submitButtonClass='profile__customForm__submit primaryColorBorder'
+                    submitButtonClass='profile__customForm__submit'
                     schemaObject={state.personalPageSchemaObject}
                     uiSchemaObject={state.uiSchemaObject}
                     dataSchemaObject={state.personalPageDataSchema}

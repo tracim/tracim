@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 from abc import ABC
 import argparse
-import typing
-
 from marshmallow import ValidationError
 from marshmallow.validate import Validator
 from pyramid.scripting import AppEnvironment
+import typing
 
 from tracim_backend.app_models.validator import user_email_validator
 from tracim_backend.app_models.validator import user_lang_validator
@@ -38,7 +37,6 @@ class ValidatorType:
 
 class UserCommand(AppContextCommand, ABC):
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
-
         parser = super().get_parser(prog_name)
         parser.add_argument(
             "-e",
@@ -68,7 +66,7 @@ class UserCommand(AppContextCommand, ABC):
         )
         parser.add_argument(
             "--allowed_space",
-            help="set thes user's allowed space in bytes",
+            help="set the user's allowed space in bytes",
             dest="allowed_space",
             required=False,
             default=None,
@@ -140,7 +138,7 @@ class CreateUserCommand(UserCommand):
         if not parsed_args.password and parsed_args.send_email:
             parsed_args.password = password_generator()
         try:
-            user = self._user_api.create_user(
+            self._user_api.create_user(
                 email=parsed_args.email,
                 name=parsed_args.public_name,
                 password=parsed_args.password,
@@ -153,7 +151,6 @@ class CreateUserCommand(UserCommand):
                 do_save=True,
                 do_notify=parsed_args.send_email,
             )
-            self._user_api.execute_created_user_actions(user)
         except TracimException as exc:
             self._session.rollback()
             print("Error: " + str(exc))
@@ -188,7 +185,7 @@ class UpdateUserCommand(UserCommand):
         if parsed_args.profile:
             profile = Profile.get_profile_from_slug(parsed_args.profile)
         try:
-            user = self._user_api.update(
+            self._user_api.update(
                 user=user,
                 email=parsed_args.email,
                 name=parsed_args.public_name,
@@ -199,7 +196,6 @@ class UpdateUserCommand(UserCommand):
                 profile=profile,
                 do_save=True,
             )
-            self._user_api.execute_created_user_actions(user)
         except TracimException as exc:
             self._session.rollback()
             print("Error: " + str(exc))

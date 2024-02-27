@@ -9,7 +9,7 @@
   <link rel='stylesheet' type='text/css' href='./assets/font/fontawesome-free-5.15.2-web/css/all.css'>
   <link rel='stylesheet' type='text/css' href='./assets/font/fontawesome-free-5.15.2-web/css/regular.css'>
 
-  <link rel="stylesheet" type="text/css" href="./assets/bootstrap/bootstrap-4.0.0-beta.css">
+  <link rel="stylesheet" type="text/css" href="./assets/bootstrap/bootstrap.min.css">
 
   <style>
     .primaryColorFont {
@@ -89,18 +89,18 @@
 
   <style>
     @font-face {
-      font-family: 'Quicksand';
-      src: url('/assets/font/Quicksand/Quicksand-Regular.ttf');
+      font-family: 'Nunito';
+      src: url('/assets/font/Nunito/Nunito-Regular.ttf');
     }
 
     @font-face {
-      font-family: 'Quicksand';
-      src: url('/assets/font/Quicksand/Quicksand-Bold.ttf');
+      font-family: 'Nunito';
+      src: url('/assets/font/Nunito/Nunito-Bold.ttf');
       font-weight: bold;
     }
 
     body {
-      font-family: Quicksand;
+      font-family: Nunito;
     }
   </style>
 
@@ -115,26 +115,20 @@
 </head>
 
 <body>
-  <script src="./assets/bootstrap/jquery-3.2.1.js"></script>
-  <script src="./assets/bootstrap/popper-1.12.3.js"></script>
-  <script src="./assets/bootstrap/bootstrap-4.0.0-beta.2.js"></script>
+  <script src="./assets/bootstrap/jquery-3.5.1.min.js"></script>
+  <script src="./assets/bootstrap/popper-1.16.1.min.js"></script>
+  <script src="./assets/bootstrap/bootstrap.min.js"></script>
 
   <div id='content'></div>
 
-  <!--
-  INFO - CH - 2021-01-14
-  since servdev uses standalone frontend_lib build, you should not include frontend_lib directly in the page
-  it is already in the bundles
-  same for frontend_vendor
-  -->
-<!--  <script type='text/javascript' src='./app/tracim_frontend_vendors.js'></script>-->
-<!--  <script type='text/javascript' src='./app/tracim_frontend_lib.lib.js'></script>-->
+  <script type='text/javascript' src='./app/tracim_frontend_vendors.js'></script>
+  <script type='text/javascript' src='./app/tracim_frontend_lib.lib.optimized.js'></script>
 
-  <script type='text/javascript' src='./app/tracim_frontend_lib.style.js'></script>
+  <script type='text/javascript' src='./app/tracim_frontend_lib.style.optimized.js'></script>
 
-  <script src='./kanban.app.standalone.js'></script>
+  <script src='./kanban.app.optimized.js'></script>
 
-  <script type='text/javascript' src='./assets/tinymce-4.7.13/js/tinymce/jquery.tinymce.min.js'></script>
-  <script type='text/javascript' src='./assets/tinymce-4.7.13/js/tinymce/tinymce.min.js'></script>
+  <script type='text/javascript' src='./assets/tinymce-5.10.3/js/tinymce/jquery.tinymce.min.js'></script>
+  <script type='text/javascript' src='./assets/tinymce-5.10.3/js/tinymce/tinymce.min.js'></script>
 </body>
 </html>

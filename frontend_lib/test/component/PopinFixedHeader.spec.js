@@ -6,7 +6,8 @@ import PopinFixedHeader from '../../src/component/PopinFixed/PopinFixedHeader'
 import { ROLE } from '../../src/helper.js'
 import sinon from 'sinon'
 
-describe('<PopinFixedHeader />', () => {
+// TODO - MP - 2022-06-07 - https://github.com/tracim/tracim/issues/5697
+describe.skip('<PopinFixedHeader />', () => {
   const onClickCloseBtnCallBack = sinon.spy()
   const onValidateChangeTitleCallBack = sinon.spy()
 

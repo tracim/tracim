@@ -9,8 +9,8 @@ export const Information = props => {
   return (
     <div className='Information__dynamicData'>
       <CustomFormManager
-        title={props.t('Information_plural')}
-        submitButtonClass='profile__customForm__submit primaryColorBorder'
+        title={props.t('Information__plural')}
+        submitButtonClass='profile__customForm__submit'
         schemaObject={props.schemaObject}
         uiSchemaObject={props.uiSchemaObject}
         dataSchemaObject={props.dataSchemaObject}

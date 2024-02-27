@@ -10,12 +10,9 @@ import {
   PageTitle,
   PageWrapper,
   TracimComponent,
-  FavoriteButton,
-  FAVORITE_STATE,
-  getContentComment,
   getContentPath,
-  Icon,
-  ListItemWrapper
+  Loading,
+  handleFetchResult
 } from 'tracim_frontend_lib'
 
 import {
@@ -30,77 +27,20 @@ import {
   getFavoriteContentList,
   deleteContentFromFavoriteList
 } from '../action-creator.async.js'
+
 import {
   FETCH_CONFIG
 } from '../util/helper.js'
 
-import ContentListItem from '../component/ContentListItem.jsx'
-import ContentType from '../component/ContentType.jsx'
-
-const FavoritesHeader = translate()(props => {
-  return (
-    <div className='favoritesHeader content__header'>
-      <div className='favoritesHeader__type'>
-        {props.t('Type')}
-      </div>
-      <div className='favoritesHeader__title'>
-        {props.t('Title and path')}
-      </div>
-      {/* Header for windows smaller than max-sm */}
-      <div className='favoritesHeader__title-max-sm'>
-        {props.t('Title')}
-      </div>
-      <div className='favoritesHeader__modification'>
-        {props.t('Last Modification')}
-      </div>
-      <div className='favoritesHeader__information'>
-        {props.t('Information_plural')}
-      </div>
-      <div className='favoritesHeader__favoriteButton'>
-        {props.t('Favorite')}
-      </div>
-    </div>
-  )
-})
-
-const UnavailableContent = translate()(props => {
-  return (
-    <ListItemWrapper
-      label={props.label}
-      read
-      contentType={props.contentTypeInfo}
-      isLast={props.isLast}
-      isFirst={props.isFirst}
-      customClass='unavailableContent contentListItem'
-    >
-      <ContentType
-        contentTypeInfo={props.contentTypeInfo}
-        customClass='contentListItem__type'
-      />
-      <div className='contentListItem__name_path unavailableContent__name_warning'>
-        {props.label}
-        <span className='unavailableContent__warning'>
-          <Icon
-            icon='fa-fw fas fa-exclamation-triangle'
-            title={props.t('Warning')}
-          />
-          &nbsp;
-          {props.t('content is not available')}
-        </span>
-      </div>
-      {props.children}
-    </ListItemWrapper>
-  )
-})
+import FavoritesTable from './tables/FavoritesTable/FavoritesTable.jsx'
 
 export class Favorites extends React.Component {
   constructor (props) {
     super(props)
 
     this.state = {
-      contentCommentsCountList: [],
-      contentBreadcrumbsList: [],
-      hasLoadedFavoriteList: false
+      isLoading: true,
+      favoriteList: []
     }
 
     props.registerCustomEventHandlerList([
@@ -115,7 +55,7 @@ export class Favorites extends React.Component {
 
   setHeadTitle = () => {
     const { props } = this
-    const headTitle = buildHeadTitle([props.t('Favorites')])
+    const headTitle = buildHeadTitle([props.t('My favorites')])
     props.dispatch(setHeadTitle(headTitle))
   }
 
@@ -125,7 +65,7 @@ export class Favorites extends React.Component {
     props.dispatch(setBreadcrumbs([{
       link: PAGE.FAVORITES,
       type: BREADCRUMBS_TYPE.CORE,
-      label: props.t('Favorites'),
+      label: props.t('My favorites'),
       isALink: true
     }]))
   }
@@ -134,6 +74,29 @@ export class Favorites extends React.Component {
     this.setHeadTitle()
     this.buildBreadcrumbs()
     this.loadFavoriteList()
+  }
+
+  componentDidUpdate (prevProps) {
+    if (prevProps.workspaceList.length === 0 && this.props.workspaceList.length > 0) {
+      this.addWorkspaceToBreadcrumbsPath()
+    }
+  }
+
+  addWorkspaceToBreadcrumbsPath () {
+    const { props, state } = this
+    if (props.workspaceList.length === 0) return
+
+    const favoriteWithFullBreadcrumbsList = state.favoriteList
+      .map(favorite => {
+        const workspace = props.workspaceList.find(ws => ws.id === favorite.content.workspace_id)
+        return {
+          ...favorite,
+          breadcrumbs: [{ label: workspace.label }].concat(favorite.breadcrumbs)
+        }
+      })
+
+    this.setState({ isLoading: false })
+    props.dispatch(setFavoriteList(favoriteWithFullBreadcrumbsList))
   }
 
   loadFavoriteList = async () => {
@@ -147,41 +110,25 @@ export class Favorites extends React.Component {
       props.dispatch(newFlashMessage(props.t('An error has happened while fetching favorites'), 'warning'))
       return
     }
-    const favoriteList = fetchFavoriteList.json.items
-    // Get comments (for their count in info)
-    const commentsFetchList = favoriteList.map(async favorite => {
-      if (!favorite.content) return null
-      // NOTE - S.G. - 2021-04-01 - here we have the favorite as returned by the backend
-      // hence the snake-case properties
-      const response = await getContentComment(
-        FETCH_CONFIG.apiUrl,
-        favorite.content.workspace_id,
-        favorite.content_id
-      )
-      if (!response.ok) return null
-      return (await response.json()).length
-    })
-    const contentCommentsCountList = await Promise.all(commentsFetchList)
 
-    // Get the contents' paths (for breadcrumbs)
-    const contentBreadcrumbsFetchList = favoriteList.map(async favorite => {
-      if (!favorite.content) return null
-      // NOTE - S.G. - 2021-04-01 - here we have the favorite as returned by the backend
-      // hence the snake-case properties
-      const response = await getContentPath(FETCH_CONFIG.apiUrl, favorite.content_id)
-      if (!response.ok) return []
+    // INFO - Ch - 2023-11-29 - Get the contents' paths (for breadcrumbs)
+    const favoriteWithIncompleteBreadcrumbsList = await Promise.all(fetchFavoriteList.json.items
+      .filter(f => f.content !== null && f.content !== undefined)
+      .map(async favorite => {
+        try {
+          const response = await handleFetchResult(
+            await getContentPath(FETCH_CONFIG.apiUrl, favorite.content_id)
+          )
+          return { ...favorite, breadcrumbs: response.body.items }
+        } catch (e) {
+          console.error('Error in loadFavoriteList', favorite, e)
+          return { ...favorite, breadcrumbs: [] }
+        }
+      }))
 
-      const workspace = props.workspaceList.find(ws => ws.id === favorite.content.workspace_id)
-
-      return [{ label: workspace.label }].concat((await response.json()).items)
-    })
-    const contentBreadcrumbsList = await Promise.all(contentBreadcrumbsFetchList)
-
-    this.setState({ contentCommentsCountList, contentBreadcrumbsList, hasLoadedFavoriteList: true })
-    props.dispatch(setFavoriteList(favoriteList))
+    this.setState({ favoriteList: favoriteWithIncompleteBreadcrumbsList })
+    this.addWorkspaceToBreadcrumbsPath()
   }
-
-  getAvailableFavoriteList = (favoriteList) => favoriteList.filter(favorite => favorite.content)
 
   handleClickRemoveFromFavoriteList = async (favorite) => {
     const { props } = this
@@ -203,82 +150,28 @@ export class Favorites extends React.Component {
     return favorite.content ? favorite.content.label : favorite.originalLabel
   }
 
-  getAvailableContentType = (favorite) => {
-    return favorite.content ? favorite.content.type : favorite.originalType
-  }
-
-  getFavoriteComponent = (favorite, index) => {
-    // A favorite can point to an unavailable content (changed space access, deleted…)
-    // In this case a special component is displayed for the favorite
-    const { props, state } = this
-    const favoriteButton = (
-      <FavoriteButton
-        favoriteState={FAVORITE_STATE.FAVORITE}
-        onClickRemoveFromFavoriteList={() => this.handleClickRemoveFromFavoriteList(favorite)}
-        onClickAddToFavoriteList={() => {}}
-        customClass='favorites__item__favoriteButton'
-      />
-    )
-    const isLast = index === props.favoriteList.length - 1
-    const isFirst = index === 0
-    if (!favorite.content) {
-      const contentTypeInfo = props.contentType.find(info => info.slug === favorite.originalType)
-      return (
-        <UnavailableContent
-          contentTypeInfo={contentTypeInfo}
-          label={favorite.originalLabel}
-          key={favorite.contentId}
-          isLast={isLast}
-          isFirst={isFirst}
-        >
-          {favoriteButton}
-        </UnavailableContent>
-      )
-    }
-    const contentTypeInfo = props.contentType.find(info => info.slug === favorite.content.type)
-    return (
-      <ContentListItem
-        content={favorite.content}
-        contentTypeInfo={contentTypeInfo}
-        userLang={props.user.lang}
-        key={favorite.contentId}
-        isLast={isLast}
-        isFirst={isFirst}
-        breadcrumbsList={state.contentBreadcrumbsList[index]}
-        commentsCount={state.contentCommentsCountList[index]}
-        customClass='favorites__item'
-        dataCy='favorites__item'
-      >
-        {favoriteButton}
-      </ContentListItem>
-    )
-  }
-
   render () {
     const { props, state } = this
-    // NOTE - S.G. - 2021-04-02 - added as if a favorite list is present then one
-    // favorite content is made unavailable, the list is not sync-ed and shouldn't be used
-    // until it has been re-loaded by this component.
-    if (!state.hasLoadedFavoriteList) return null
+
     return (
       <div className='tracim__content-scrollview'>
         <PageWrapper customClass='favorites__wrapper'>
           <PageTitle
-            title={props.t('Favorites')}
+            title={props.t('My favorites')}
             icon='far fa-star'
             breadcrumbsList={props.breadcrumbs}
+            isEmailNotifActivated={props.system.config.email_notification_activated}
           />
-          {props.favoriteList.length > 0
-            ? (
-              <PageContent>
-                <FavoritesHeader />
-                {props.favoriteList.map((favorite, index) => this.getFavoriteComponent(favorite, index))}
-              </PageContent>
-            )
+
+          {state.isLoading
+            ? <Loading />
             : (
-              <div className='pageContentGeneric favorites__no_favorite'>
-                {props.t('You did not add any content as favorite yet.')}
-              </div>
+              <PageContent>
+                <FavoritesTable
+                  favoriteList={props.favoriteList}
+                  onFavoriteButtonClick={this.handleClickRemoveFromFavoriteList}
+                />
+              </PageContent>
             )}
         </PageWrapper>
       </div>
@@ -286,11 +179,11 @@ export class Favorites extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, favoriteList, contentType, workspaceList }) => ({
+const mapStateToProps = ({ breadcrumbs, user, favoriteList, system, workspaceList }) => ({
   breadcrumbs,
   user,
   favoriteList,
-  contentType,
+  system,
   workspaceList
 })
 export default connect(mapStateToProps)(translate()(TracimComponent(Favorites)))

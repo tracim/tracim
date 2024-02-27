@@ -24,7 +24,7 @@ export const AdvancedSearchUserList = props => {
             {props.t('Full name')}
           </div>
           <div className='advancedSearchUser__information'>
-            {props.t('Information_plural')}
+            {props.t('Information__plural')}
           </div>
         </div>
       )}
@@ -61,7 +61,7 @@ export const AdvancedSearchUserList = props => {
             {searchItem.username && (
               <div className='advancedSearchUser__information'>
                 <Icon
-                  icon='fa-fw fas fa-at'
+                  icon='fas fa-at'
                   title={props.t('Username')}
                 />
                 <span title={searchItem.username}>{searchItem.username}</span>

@@ -7,13 +7,9 @@ import { appContentFactory } from '../../appContentFactory.js'
 import { CUSTOM_EVENT } from '../../customEvent.js'
 import { CONTENT_TYPE } from '../../helper.js'
 import CardPopup from '../CardPopup/CardPopup.jsx'
-import IconButton from '../Button/IconButton.jsx'
 import CommentArea from './CommentArea.jsx'
 
 // require('./EditCommentPopup.styl') // see https://github.com/tracim/tracim/issues/1156
-
-const wysiwygId = 'wysiwygTimelineCommentEdit'
-const wysiwygIdSelector = `#${wysiwygId}`
 
 export class EditCommentPopup extends React.Component {
   constructor (props) {
@@ -28,16 +24,8 @@ export class EditCommentPopup extends React.Component {
     }
   }
 
-  componentWillUnmount () {
-    globalThis.tinymce.remove(wysiwygIdSelector)
-  }
-
   handleAllAppChangeLanguage = (data) => {
     this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, true)
-  }
-
-  searchForMentionOrLinkInQuery = async (query) => {
-    return await this.props.searchForMentionOrLinkInQuery(query, this.props.workspaceId)
   }
 
   render () {
@@ -49,43 +37,32 @@ export class EditCommentPopup extends React.Component {
         customColor={props.customColor}
         onClose={props.onClickClose}
         label={props.t('Edit comment')}
-        faIcon='far fa-fw fa-edit'
+        faIcon='fas fa-edit'
       >
         <CommentArea
           apiUrl={props.apiUrl}
           contentId={props.commentId}
           contentType={CONTENT_TYPE.COMMENT}
-          hideSendButtonAndOptions
-          id={wysiwygId}
-          newComment={state.newComment}
-          wysiwygIdSelector={wysiwygIdSelector}
-          searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
-          lang={props.loggedUserLanguage}
+          onClickSubmit={(comment, fileList) => {
+            props.onClickValidate(comment, props.commentId, props.parentId)
+            return true
+          }}
           workspaceId={props.workspaceId}
-          wysiwyg
+          // End of required props /////////////////////////////////////////////
+          codeLanguageList={props.codeLanguageList}
+          customClass='editCommentPopup'
+          customColor={props.customColor}
+          isAdvancedEdition
+          isDisplayedAdvancedEditionButton={false}
+          isDisplayedCancelButton
+          isDisplayedUploadFileButton={false}
+          language={props.user.lang}
+          memberList={props.memberList}
+          newComment={state.newComment}
+          onClickWithstand={props.onClickClose}
+          submitLabel={props.t('Send')}
+          withstandLabel={props.t('Cancel')}
         />
-
-        <div className='editCommentPopup__buttons'>
-          <IconButton
-            color={props.customColor}
-            icon='fas fa-times'
-            intent='secondary'
-            mode='dark'
-            onClick={props.onClickClose}
-            text={props.t('Cancel')}
-            type='button'
-          />
-          <IconButton
-            color={props.customColor}
-            disabled={state.newComment === ''}
-            icon='far fa-paper-plane'
-            intent='primary'
-            mode='light'
-            onClick={() => props.onClickValidate(state.newComment)}
-            text={props.t('Send')}
-            type='button'
-          />
-        </div>
       </CardPopup>
     )
   }
@@ -93,20 +70,26 @@ export class EditCommentPopup extends React.Component {
 export default translate()(appContentFactory(TracimComponent(EditCommentPopup)))
 
 EditCommentPopup.propTypes = {
+  apiUrl: PropTypes.string.isRequired,
   comment: PropTypes.string.isRequired,
   onClickClose: PropTypes.func.isRequired,
   onClickValidate: PropTypes.func.isRequired,
-  apiUrl: PropTypes.string,
+  codeLanguageList: PropTypes.array,
+  commentId: PropTypes.number,
   customColor: PropTypes.string,
-  loggedUserLanguage: PropTypes.string,
-  workspaceId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  commentId: PropTypes.number
+  memberList: PropTypes.array,
+  parentId: PropTypes.number,
+  user: PropTypes.object,
+  // NOTE - MP - 2023-01-06 - There is no workspaceId in string
+  workspaceId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 }
 
 EditCommentPopup.defaultProps = {
-  apiUrl: '',
+  codeLanguageList: [],
+  commentId: 0,
   customColor: undefined,
-  loggedUserLanguage: 'en',
-  workspaceId: undefined,
-  commentId: 0
+  memberList: [],
+  parentId: 0,
+  user: undefined,
+  workspaceId: undefined
 }

@@ -5,8 +5,8 @@
 # here : https://groups.google.com/forum/#!topic/pylons-discuss/2Sw4OkOnZcE
 from pyramid.events import NewResponse
 
-from tracim_backend.config import CFG
-from tracim_backend.lib.utils.authentification import CLIENT_TOKEN_HEADER
+from tracim_backend.config import CFG  # noqa: F401
+from tracim_backend.lib.utils.authentication import CLIENT_TOKEN_HEADER
 
 
 def add_cors_support(config):
@@ -62,7 +62,7 @@ def set_cors_headers(request, response):
 
 def cors_options_view(context, request):
     response = request.response
-    # @TODO Côme - 2018/09/04 - I commented the test bellow because I can't work with for editing a file in app file.
+    # @TODO Côme - 2018/09/04 - I commented the test below because I can't work with for editing a file in app file.
     # I checked with GM and this test might require some fixes
     # if 'Access-Control-Request-Headers' in request.headers:
     response.headers[

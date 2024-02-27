@@ -18,14 +18,15 @@ const PAGES = {
   PUBLICATION: 'publication',
   PROFILE: 'profile',
   WORKSPACE_RECENT_ACTIVITIES: 'workspaceRecentActivities',
-  FAVORITES: 'favorites'
+  FAVORITES: 'favorites',
+  FILE: 'file'
 }
 
 const URLS = {
   [PAGES.HOME]: () => '/ui',
   [PAGES.LOGIN]: ({ loginParam }) => `/ui/login${loginParam}`,
   [PAGES.CONTENTS]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/contents/`,
-  [PAGES.CONTENT_OPEN]: ({ workspaceId, contentType, contentId }) => `/ui/workspaces/${workspaceId}/contents/${contentType}/${contentId}`,
+  [PAGES.CONTENT_OPEN]: ({ contentId }) => `/ui/contents/${contentId}`,
   [PAGES.DASHBOARD]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/dashboard/`,
   [PAGES.ADVANCED_DASHBOARD]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/advanced_dashboard`,
   [PAGES.WORKSPACE_RECENT_ACTIVITIES]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/recent-activities/`,
@@ -41,7 +42,8 @@ const URLS = {
   [PAGES.RECENT_ACTIVITIES]: () => '/ui/recent-activities',
   [PAGES.PUBLICATION]: ({ workspaceId }) => `/ui/workspaces/${workspaceId}/publications`,
   [PAGES.PROFILE]: ({ userId }) => `/ui/users/${userId}/profile`,
-  [PAGES.FAVORITES]: () => 'ui/favorites'
+  [PAGES.FAVORITES]: () => 'ui/favorites',
+  [PAGES.FILE]: ({ workspaceId, fileId }) => `/ui/workspaces/${workspaceId}/contents/file/${fileId}`
 }
 
 /**

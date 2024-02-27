@@ -24,7 +24,7 @@ describe('At file properties', () => {
     cy.loginAs('administrators')
     cy.visitPage({
       pageName: PAGES.CONTENT_OPEN,
-      params: { workspaceId: workspaceId, contentType: 'file', contentId: fileId }
+      params: { contentId: fileId }
     })
     cy.get('[data-cy=popin_right_part_properties]').click()
   })

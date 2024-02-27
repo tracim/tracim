@@ -12,19 +12,22 @@ const DropdownMenu = props => {
         className={classnames(
           'btn dropdown-toggle',
           'dropdownMenuButton',
-          props.isButton ? 'primaryColorBorder' : 'transparentButton',
+          { transparentButton: !props.isButton },
           props.buttonCustomClass
         )}
         data-cy={props.buttonDataCy}
         data-toggle='dropdown'
         disabled={props.buttonDisabled}
         onClick={e => { e.stopPropagation(); props.buttonClick() }}
-        title={props.buttonTooltip ? props.buttonTooltip : ((typeof props.buttonLabel) === 'string' ? props.buttonLabel : undefined)}
+        title={
+          props.buttonTooltip
+            ? props.buttonTooltip
+            : ((typeof props.buttonLabel) === 'string' ? props.buttonLabel : undefined)
+        }
         type='button'
       >
         {props.buttonOpts}
         {props.buttonIcon && <i className={`fa-fw ${props.buttonIcon}`} style={{ color: props.buttonIconColor }} />}
-        {props.buttonImage && <img className='dropdownMenu__image' src={props.buttonImage} />}
         {props.buttonLabel && <span>{props.buttonLabel}</span>}
       </button>
 
@@ -51,7 +54,6 @@ DropdownMenu.propTypes = {
   buttonDisabled: PropTypes.bool,
   buttonIcon: PropTypes.string,
   buttonIconColor: PropTypes.string,
-  buttonImage: PropTypes.string,
   buttonLabel: PropTypes.string,
   buttonOpts: PropTypes.node,
   buttonTooltip: PropTypes.string,
@@ -67,7 +69,6 @@ DropdownMenu.defaultProps = {
   buttonDisabled: false,
   buttonIcon: '',
   buttonIconColor: '',
-  buttonImage: '',
   buttonLabel: '',
   buttonTooltip: '',
   menuCustomClass: '',

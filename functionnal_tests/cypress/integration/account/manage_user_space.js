@@ -4,7 +4,7 @@ import { PAGES as p } from '../../support/urls_commands'
 describe('Account page', () => {
   const createOneSpace = (cy, spaceName) => {
     cy.visitPage({ pageName: p.ACCOUNT })
-    cy.get('[data-cy=sidebarCreateWorkspaceBtn]')
+    cy.get('[data-cy=sidebarCreateSpaceBtn]')
       .should('be.visible')
       .click()
     cy.contains('.cardPopup__header__title', 'New space')
@@ -21,7 +21,8 @@ describe('Account page', () => {
     cy.get('.newSpace__button .btn').last().should('be.visible').click()
   }
 
-  describe('Changing account preferences', () => {
+  describe.skip('Changing account preferences', () => {
+  // FIXME - MB - 2022-02-02 - Unstable test, see https://github.com/tracim/tracim/issues/5344
     describe('Manage user space popup', () => {
       beforeEach(() => {
         cy.cancelXHR()
@@ -32,8 +33,7 @@ describe('Account page', () => {
         createOneSpace(cy, 'newSpaceName2')
         createOneSpace(cy, 'newSpaceName3')
         cy.visitPage({ pageName: p.ADMIN_USER })
-        cy.get('.adminUser__table__tr__td-link').last()
-          .click()
+        cy.contains('.adminUser__table__tr__td-link', 'John Doe').click()
         cy.get('[data-cy=menusubcomponent__list__spacesConfig]')
           .should('be.visible')
           .click()
@@ -53,7 +53,7 @@ describe('Account page', () => {
       })
 
       it('Filter spaces', () => {
-        cy.get('.textinput__text.form-control').first().should('be.visible').type('2')
+        cy.get('.textInputComponent__text.form-control').first().should('be.visible').type('2')
         cy.get('[data-cy=spaceconfig__add_to_space]').should('have.length', 2)
       })
 

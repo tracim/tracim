@@ -4,7 +4,6 @@
 import email
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-
 import pytest
 from rq import SimpleWorker
 import transaction
@@ -16,10 +15,18 @@ from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
 from tracim_backend.lib.rq import RqQueueName
 from tracim_backend.lib.rq import get_redis_connection
 from tracim_backend.lib.rq import get_rq_queue
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
-@pytest.mark.parametrize("config_section", [{"name": "mail_test"}], indirect=True)
+@pytest.mark.parametrize(
+    "config_section",
+    [
+        {"name": "mail_test"},  # unencrypted, authenticated
+        {"name": "mail_test_anonymous"},  # unencrypted, anonymous
+    ],
+    indirect=True,
+)
 class TestEmailSender(object):
     def test__func__connect_disconnect__ok__nominal_case(self, app_config, mailhog):
         smtp_config = SmtpConfiguration(
@@ -27,7 +34,8 @@ class TestEmailSender(object):
             app_config.EMAIL__NOTIFICATION__SMTP__PORT,
             app_config.EMAIL__NOTIFICATION__SMTP__USER,
             app_config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
-            app_config.EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL,
+            app_config.EMAIL__NOTIFICATION__SMTP__ENCRYPTION,
+            app_config.EMAIL__NOTIFICATION__SMTP__AUTHENTICATION,
         )
         sender = EmailSender(app_config, smtp_config, True)
         sender.connect()
@@ -39,7 +47,8 @@ class TestEmailSender(object):
             app_config.EMAIL__NOTIFICATION__SMTP__PORT,
             app_config.EMAIL__NOTIFICATION__SMTP__USER,
             app_config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
-            app_config.EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL,
+            app_config.EMAIL__NOTIFICATION__SMTP__ENCRYPTION,
+            app_config.EMAIL__NOTIFICATION__SMTP__AUTHENTICATION,
         )
         sender = EmailSender(app_config, smtp_config, True)
 
@@ -84,7 +93,8 @@ class TestEmailSender(object):
             app_config.EMAIL__NOTIFICATION__SMTP__PORT,
             app_config.EMAIL__NOTIFICATION__SMTP__USER,
             app_config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
-            app_config.EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL,
+            app_config.EMAIL__NOTIFICATION__SMTP__ENCRYPTION,
+            app_config.EMAIL__NOTIFICATION__SMTP__AUTHENTICATION,
         )
         sender = EmailSender(app_config, smtp_config, True)
         html = """\
@@ -164,24 +174,42 @@ class TestNotificationsSync(object):
         workspace_api_factory,
         content_api_factory,
         mailhog,
+        user_workspace_config_api_factory,
         content_type_list,
     ):
-        uapi = user_api_factory.get(current_user=None)
-        current_user = uapi.get_one_by_email("admin@admin.admin")
-        # set admin as french, useful to verify if i18n work properly
-        current_user.lang = "fr"
+        user_api = user_api_factory.get(current_user=None)
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=None)
+        current_user = user_api.get_one_by_email("admin@admin.admin")
         # Create new user with notification enabled on w1 workspace
-        wapi = workspace_api_factory.get(current_user=current_user)
-        workspace = wapi.get_one_by_filemanager_filename("Recipes.space")
-        user = uapi.get_one_by_email("bob@fsf.local")
-        wapi.enable_notifications(user, workspace)
+        space_api = workspace_api_factory.get(current_user=current_user)
+        workspace = space_api.get_one_by_filemanager_filename("Recipes.space")
+        user = user_api.get_one_by_email("bob@fsf.local")
+
+        role = user_workspace_config_api.get_one(
+            user_id=current_user.user_id,
+            workspace_id=workspace.workspace_id,
+        )
+        user_workspace_config_api.update_role(
+            role=role,
+            email_notification_type_value=EmailNotificationType.INDIVIDUAL.value,
+            save_now=True,
+        )
 
         api = content_api_factory.get(current_user=user)
         item = api.create(
-            content_type_list.Folder.slug, workspace, None, "parent", do_save=True, do_notify=False
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="parent",
+            do_save=True,
+            do_notify=False,
         )
         api.create(
-            content_type_list.File.slug, workspace, item, "file1", do_save=True, do_notify=True
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace,
+            parent=item,
+            label="file1",
+            do_save=True,
+            do_notify=True,
         )
 
         # check mail received
@@ -202,30 +230,51 @@ class TestNotificationsSync(object):
         workspace_api_factory,
         content_api_factory,
         mailhog,
+        user_workspace_config_api_factory,
         content_type_list,
     ):
-        uapi = user_api_factory.get(current_user=None)
-        current_user = uapi.get_one_by_email("admin@admin.admin")
+        user_api = user_api_factory.get(current_user=None)
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=None)
+        current_user = user_api.get_one_by_email("admin@admin.admin")
         # set admin as french, useful to verify if i18n work properly
         current_user.lang = "fr"
         # Create new user with notification enabled on w1 workspace
-        wapi = workspace_api_factory.get(current_user=current_user)
-        workspace = wapi.get_one_by_filemanager_filename("Recipes.space")
-        user = uapi.get_one_by_email("bob@fsf.local")
-        wapi.enable_notifications(user, workspace)
+        space_api = workspace_api_factory.get(current_user=current_user)
+        workspace = space_api.get_one_by_filemanager_filename("Recipes.space")
+        user = user_api.get_one_by_email("bob@fsf.local")
+
+        role = user_workspace_config_api.get_one(
+            user_id=current_user.user_id,
+            workspace_id=workspace.workspace_id,
+        )
+        user_workspace_config_api.update_role(
+            role=role,
+            email_notification_type_value=EmailNotificationType.INDIVIDUAL.value,
+            save_now=True,
+        )
 
         api = content_api_factory.get(current_user=user)
         item = api.create(
-            content_type_list.Folder.slug, workspace, None, "parent", do_save=True, do_notify=False
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="parent",
+            do_save=True,
+            do_notify=False,
         )
         item2 = api.create(
-            content_type_list.File.slug, workspace, item, "file1", do_save=True, do_notify=False
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace,
+            parent=item,
+            label="file1",
+            do_save=True,
+            do_notify=False,
         )
         api.create_comment(parent=item2, content="My super comment", do_save=True, do_notify=True)
         transaction.commit()
 
         # check mail received
         response = mailhog.get_mailhog_mails()
+        assert len(response) > 0
         headers = response[0]["Content"]["Headers"]
         assert headers["From"][0] == '"Bob i. via Tracim" <test_user_from+3@localhost>'
         assert headers["To"][0] == "Global manager <admin@admin.admin>"
@@ -291,23 +340,43 @@ class TestNotificationsAsync(object):
         workspace_api_factory,
         content_api_factory,
         mailhog,
+        user_workspace_config_api_factory,
         app_config,
         content_type_list,
     ):
-        uapi = user_api_factory.get(current_user=None)
-        current_user = uapi.get_one_by_email("admin@admin.admin")
+        user_api = user_api_factory.get(current_user=None)
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=None)
+        current_user = user_api.get_one_by_email("admin@admin.admin")
         # Create new user with notification enabled on w1 workspace
-        wapi = workspace_api_factory.get(current_user=current_user)
-        workspace = wapi.get_one_by_filemanager_filename("Recipes.space")
-        user = uapi.get_one_by_email("bob@fsf.local")
-        wapi.enable_notifications(user, workspace)
+        space_api = workspace_api_factory.get(current_user=current_user)
+        workspace = space_api.get_one_by_filemanager_filename("Recipes.space")
+        user = user_api.get_one_by_email("bob@fsf.local")
+
+        role = user_workspace_config_api.get_one(
+            user_id=current_user.user_id,
+            workspace_id=workspace.workspace_id,
+        )
+        user_workspace_config_api.update_role(
+            role=role,
+            email_notification_type_value=EmailNotificationType.INDIVIDUAL.value,
+            save_now=True,
+        )
 
         api = content_api_factory.get(current_user=user)
         item = api.create(
-            content_type_list.Folder.slug, workspace, None, "parent", do_save=True, do_notify=False
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="parent",
+            do_save=True,
+            do_notify=False,
         )
         api.create(
-            content_type_list.File.slug, workspace, item, "file1", do_save=True, do_notify=True
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace,
+            parent=item,
+            label="file1",
+            do_save=True,
+            do_notify=True,
         )
         # Send mail async from redis queue
         redis = get_redis_connection(app_config)
@@ -316,6 +385,7 @@ class TestNotificationsAsync(object):
         worker.work(burst=True)
         # check mail received
         response = mailhog.get_mailhog_mails()
+        assert len(response) > 0
         headers = response[0]["Content"]["Headers"]
         assert headers["From"][0] == '"Bob i. via Tracim" <test_user_from+3@localhost>'
         assert headers["To"][0] == "Global manager <admin@admin.admin>"

@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
-import argparse
-import re
-import traceback
-import typing
-
 from alembic import command as alembic_command
 from alembic.config import Config
+import argparse
 from depot.io.utils import FileIntent
 from depot.manager import DepotManager
+import pluggy
 from pyramid.paster import get_appsettings
+import re
 from sqlalchemy import text
 from sqlalchemy.engine import reflection
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
+import traceback
 import transaction
+import typing
 
 from tracim_backend.command import AppContextCommand
 from tracim_backend.config import CFG
@@ -21,14 +21,44 @@ from tracim_backend.exceptions import DatabaseInitializationFailed
 from tracim_backend.exceptions import ForceArgumentNeeded
 from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.fixtures.content import Content as ContentFixture
-from tracim_backend.fixtures.users import Base as BaseFixture
+from tracim_backend.lib.core.plugins import init_plugin_manager
+from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.request import TracimContext
+from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.meta import DeclarativeBase
+from tracim_backend.models.setup_models import create_dbsession_for_context
 from tracim_backend.models.setup_models import get_engine
 from tracim_backend.models.setup_models import get_session_factory
 from tracim_backend.models.setup_models import get_tm_session
+from tracim_backend.models.tracim_session import TracimSession
+
+
+# FIXEME: Factorize with CustomTracimContext in monitor.py
+class CustomTracimContext(TracimContext):
+    def __init__(self, config: CFG) -> None:
+        super().__init__()
+        self._app_config = config
+        self._plugin_manager = init_plugin_manager(config)
+        self._session = None
+
+    @property
+    def app_config(self) -> CFG:
+        return self._app_config
+
+    @property
+    def current_user(self) -> None:
+        return None
+
+    @property
+    def dbsession(self) -> TracimSession:
+        return self._session
+
+    @property
+    def plugin_manager(self) -> pluggy.PluginManager:
+        return self._plugin_manager
 
 
 class InitializeDBCommand(AppContextCommand):
@@ -78,14 +108,23 @@ class InitializeDBCommand(AppContextCommand):
         session_factory = get_session_factory(engine)
         print("- Populate database with default data -")
         with transaction.manager:
-            dbsession = get_tm_session(session_factory, transaction.manager)
+            context = CustomTracimContext(app_config)
+            dbsession = create_dbsession_for_context(session_factory, transaction.manager, context)
+            context._session = dbsession
             try:
-                fixtures = [BaseFixture]
-                fixtures_loader = FixturesLoader(dbsession, app_config)
-                fixtures_loader.loads(fixtures)
+                user_api = UserApi(current_user=None, session=dbsession, config=app_config)
+                app_config.configure_filedepot()
+                user_api.create_user(
+                    name="Global manager",
+                    username="TheAdmin",
+                    email="admin@admin.admin",
+                    password="admin@admin.admin",
+                    profile=Profile.ADMIN,
+                    do_notify=False,
+                )
                 transaction.commit()
                 if add_test_data:
-                    app_config.configure_filedepot()
+                    fixtures_loader = FixturesLoader(dbsession, app_config)
                     fixtures = [ContentFixture]
                     fixtures_loader.loads(fixtures)
                 transaction.commit()
@@ -174,7 +213,11 @@ class MigrateMysqlCharsetCommand(AppContextCommand):
             default=None,
         )
         parser.add_argument(
-            "--charset", help="set database charset", dest="charset", required=False, default=None,
+            "--charset",
+            help="set database charset",
+            dest="charset",
+            required=False,
+            default=None,
         )
         return parser
 
@@ -193,8 +236,10 @@ class MigrateMysqlCharsetCommand(AppContextCommand):
         if not engine.dialect.name.startswith("mysql"):
             raise ValueError("This command is only supported on Mysql/Mariadb databases")
         logger.info(self, "Database not deleted")
-        set_database = "ALTER DATABASE {database} CHARACTER SET {charset} COLLATE {collation};".format(
-            database=database_name, charset=charset, collation=collation
+        set_database = (
+            "ALTER DATABASE {database} CHARACTER SET {charset} COLLATE {collation};".format(
+                database=database_name, charset=charset, collation=collation
+            )
         )
         logger.debug(self, set_database)
         engine.execute(set_database)
@@ -362,7 +407,10 @@ class MigrateStorageCommand(AppContextCommand):
         new_storage_type = new_cfg.UPLOADED_FILES__STORAGE__STORAGE_TYPE
         print(
             "Migration of storage from {}({}) to {}({}) started".format(
-                original_storage_name, original_storage_type, new_storage_name, new_storage_type
+                original_storage_name,
+                original_storage_type,
+                new_storage_name,
+                new_storage_type,
             )
         )
 
@@ -391,6 +439,9 @@ class MigrateStorageCommand(AppContextCommand):
             transaction.commit()
         print(
             "Migration of storage finished from {}({}) to {}({})".format(
-                original_storage_name, original_storage_type, new_storage_name, new_storage_type
+                original_storage_name,
+                original_storage_type,
+                new_storage_name,
+                new_storage_type,
             )
         )

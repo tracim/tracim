@@ -1,11 +1,12 @@
-import typing
-
 import marshmallow
 from marshmallow import post_load
+import typing
 
+from tracim_backend.app_models.validator import agenda_resource_type_validator
 from tracim_backend.app_models.validator import agenda_type_validator
 from tracim_backend.app_models.validator import regex_string_as_list_of_int
 from tracim_backend.app_models.validator import regex_string_as_list_of_string
+from tracim_backend.applications.agenda.models import AgendaResourceType
 from tracim_backend.applications.agenda.models import AgendaType
 from tracim_backend.models.context_models import Agenda
 from tracim_backend.models.context_models import AgendaFilterQuery
@@ -26,6 +27,10 @@ class AgendaSchema(marshmallow.Schema):
         default=None,
         allow_none=True,
     )
+    resource_type = StrippedString(
+        validate=agenda_resource_type_validator,
+        example=AgendaResourceType.addressbook.value,
+    )
 
     @post_load
     def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -36,7 +41,9 @@ class AgendaFilterQuerySchema(marshmallow.Schema):
     workspace_ids = StrippedString(
         validate=regex_string_as_list_of_int,
         example="1,5",
-        description="comma separated list of included workspace ids",
+        description="comma separated list of included workspace ids, "
+        "setting this parameters will disable"
+        "showing of user personals agenda",
         default="",
         allow_none=True,
     )
@@ -47,7 +54,24 @@ class AgendaFilterQuerySchema(marshmallow.Schema):
             [agenda_type.value for agenda_type in AgendaType]
         ),
     )
+    resource_types = StrippedString(
+        validate=regex_string_as_list_of_string,
+        example="private,workspace",
+        description="comma separated list of resource type, can contain any value in {}".format(
+            [resource_type.value for resource_type in AgendaResourceType]
+        ),
+        default="calendar",
+        missing=None,
+    )
 
     @post_load
     def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return AgendaFilterQuery(**data)
+
+
+class PreFilledAgendaEventSchema(marshmallow.Schema):
+    description = marshmallow.fields.String(
+        description="the text with which new agenda events shall be pre-filled",
+        required=True,
+        allow_none=True,
+    )

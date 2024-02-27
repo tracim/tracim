@@ -1,7 +1,6 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
+@import '~tracim_frontend_lib/src/css/Variable.styl'
 
 .newSpace
-  top 15%
   max-height 80%
   &__menu
     width 100%
@@ -19,17 +18,17 @@
     margin-bottom 1.5rem
     &__icon
       font-size bigIconSize
-      margin-left 0.25rem
-      margin-right 1rem
+      margin-inline-start 0.25rem
+      margin-inline-end 1rem
     &__name
       font-size titleFontSize
   &__input
     width 100%
-    border borderStyle
+    border none
     border-radius standardBorderRadius
     min-height 38px
     &[type='text']
-      padding-left standardSpacing
+      padding-inline-start standardSpacing
     &>div
       margin 0
       border none
@@ -42,7 +41,7 @@
     margin standardSpacing 0
     display flex
     &__info
-      margin-left 5px
+      margin-inline-start textSpacing
       color grey
       padding 0
   &__button
@@ -50,19 +49,18 @@
     justify-content flex-end
     margin-top 20px
     &__back
-      margin-right auto
+      margin-inline-end auto
   &__icon
     &__right
-      margin-left 5px
+      margin-inline-start textSpacing
     &__left
-      margin-right 5px
+      margin-inline-end textSpacing
   &__warningMessage
     font-size metadataFontSize
     margin 5px 0
 
 @media (max-width: max-xs)
   .newSpace
-    top "calc(5px + %s)" % headerHeight
     max-height "calc(100% - %s)" % headerHeight
     & .cardPopup
       &__container

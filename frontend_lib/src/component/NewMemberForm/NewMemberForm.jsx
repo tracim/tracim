@@ -11,12 +11,17 @@ import SingleChoiceList from '../Input/SingleChoiceList/SingleChoiceList.jsx'
 export const NewMemberForm = props => {
   return (
     <div className='memberlist__form'>
-      <div className='memberlist__form__close' onClick={props.onClickCloseAddMemberBtn}>
-        <i className='fas fa-times' />
-      </div>
-
       <div className='memberlist__form__member'>
-        <div className='memberlist__form__title'>{props.t('Add a member')}</div>
+        <div className='memberlist__form__title'>
+          {props.t('Add a member')}
+          <div
+            className='memberlist__form__close'
+            onClick={props.onClickCloseAddMemberBtn}
+            title={props.t('Close')}
+          >
+            <i className='fas fa-times' />
+          </div>
+        </div>
 
         <div className='memberlist__form__member__name'>
           <label className='name__label' htmlFor='addmember'>
@@ -37,7 +42,7 @@ export const NewMemberForm = props => {
 
           {props.autoCompleteActive && props.publicName.length >= 2 && (
             // Côme - 2018/10/18 - see https://github.com/tracim/tracim/issues/1021 for details about theses tests
-            <div className='autocomplete primaryColorBorder'>
+            <div className='autocomplete'>
               {props.searchedKnownMemberList.length > 0
                 ? props.searchedKnownMemberList.filter((u, i) => i < 5).map(u => // only displays the first 5
                   <div
@@ -110,7 +115,7 @@ export const NewMemberForm = props => {
           )}
 
           {(props.canSendInviteNewUser && props.userRoleIdInWorkspace >= ROLE.workspaceManager.id) && (
-            props.emailNotifActivated
+            props.isEmailNotifActivated
               ? (
                 <div className='name__adminmsg'>
                   <i className='name__adminmsg__icon far fa-fw fa-lightbulb-o' />
@@ -168,7 +173,7 @@ NewMemberForm.propTypes = {
   onClickAutoComplete: PropTypes.func,
   userRoleIdInWorkspace: PropTypes.number,
   canSendInviteNewUser: PropTypes.bool,
-  emailNotifActivated: PropTypes.bool,
+  isEmailNotifActivated: PropTypes.bool,
   roleList: PropTypes.arrayOf(PropTypes.object),
   autoCompleteClicked: PropTypes.bool,
   onClickBtnValidate: PropTypes.func,
@@ -185,7 +190,7 @@ NewMemberForm.defaultProps = {
   isEmail: false,
   userRoleIdInWorkspace: 0,
   canSendInviteNewUser: false,
-  emailNotifActivated: false,
+  isEmailNotifActivated: false,
   roleList: [],
   autoCompleteClicked: false,
   autoCompleteActive: false,

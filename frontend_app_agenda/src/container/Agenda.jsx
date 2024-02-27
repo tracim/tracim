@@ -5,7 +5,7 @@ import {
   addAllResourceI18n,
   handleFetchResult,
   getWorkspaceDetail,
-  getWorkspaceMemberList,
+  getSpaceUserRoleList,
   sendGlobalFlashMessage,
   PageContent,
   PageTitle,
@@ -19,7 +19,7 @@ import {
   TracimComponent
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
-import { getAgendaList } from '../action.async.js'
+import { getAgendaList, getPreFilledAgendaEvent } from '../action.async.js'
 
 export class Agenda extends React.Component {
   constructor (props) {
@@ -35,6 +35,7 @@ export class Agenda extends React.Component {
       content: param.content,
       userWorkspaceList: [],
       userWorkspaceListLoaded: false,
+      preFilledAgendaEvent: null,
       breadcrumbsList: [],
       appMounted: false,
       editionAuthor: '',
@@ -129,6 +130,7 @@ export class Agenda extends React.Component {
     console.log('%c<Agenda> did mount', `color: ${state.config.hexcolor}`)
 
     this.loadAgendaList(state.config.appConfig.workspaceId)
+    this.loadPrefilledAgendaEvent()
     if (state.config.appConfig.workspaceId !== null) {
       await this.loadWorkspaceData()
     } else {
@@ -181,6 +183,19 @@ export class Agenda extends React.Component {
     }
   }
 
+  async loadPrefilledAgendaEvent () {
+    const fetchGetPreFilledAgendaEvent = await handleFetchResult(
+      await getPreFilledAgendaEvent(this.state.config.apiUrl)
+    )
+
+    if (fetchGetPreFilledAgendaEvent.apiResponse.ok) {
+      this.setState({ preFilledAgendaEvent: fetchGetPreFilledAgendaEvent.body })
+    } else {
+      sendGlobalFlashMessage(this.props.t('Error while loading pre-filled agenda event information'))
+      this.setState({ preFilledAgendaEvent: {} })
+    }
+  }
+
   // INFO - CH - 2019-04-09 - This function is complicated because, right now, the only way to get the user's role
   // on a workspace is to extract it from the members list that workspace
   // see https://github.com/tracim/tracim/issues/1581
@@ -190,8 +205,8 @@ export class Agenda extends React.Component {
       agendaList
         .filter(a => a.agenda_type === 'workspace')
         .map(async a => {
-          const fetchWorkspaceMemberList = await handleFetchResult(await getWorkspaceMemberList(state.config.apiUrl, a.workspace_id))
-          return fetchWorkspaceMemberList
+          const fetchWorkspaceUserRoleList = await handleFetchResult(await getSpaceUserRoleList(state.config.apiUrl, a.workspace_id))
+          return fetchWorkspaceUserRoleList
         })
     )
 
@@ -283,7 +298,7 @@ export class Agenda extends React.Component {
   render () {
     const { props, state } = this
 
-    if (!state.isVisible || !state.userWorkspaceListLoaded) return null
+    if (!state.isVisible || !state.userWorkspaceListLoaded || !state.preFilledAgendaEvent) return null
 
     const config = {
       globalAccountSettings: {
@@ -299,6 +314,7 @@ export class Agenda extends React.Component {
         }))
       },
       userLang: state.loggedUser.lang,
+      preFilledAgendaEvent: state.preFilledAgendaEvent,
       shouldShowCaldavzapSidebar: state.config.appConfig.forceShowSidebar
     }
 
@@ -326,6 +342,7 @@ export class Agenda extends React.Component {
           title={pageTitle}
           icon='fas fa-calendar-alt'
           breadcrumbsList={state.breadcrumbsList}
+          isEmailNotifActivated={state.config.system.config.email_notification_activated}
         />
 
         <div className='agendaPage__warningMessage'>

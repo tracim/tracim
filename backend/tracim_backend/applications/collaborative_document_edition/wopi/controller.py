@@ -1,16 +1,15 @@
 # coding=utf-8
 from datetime import timezone
-from http import HTTPStatus
-import typing
-
 from hapic.data import HapicData
 from hapic.data import HapicFile
+from http import HTTPStatus
 from pyramid.config import Configurator
 from pyramid.response import Response
 from pyramid.traversal import DefaultRootFactory
 import transaction
+import typing
 
-from tracim_backend import CFG
+from tracim_backend import CFG  # noqa: F401
 from tracim_backend import TracimRequest
 from tracim_backend import hapic
 from tracim_backend.applications.collaborative_document_edition.data import (
@@ -20,21 +19,21 @@ from tracim_backend.applications.collaborative_document_edition.data import (
     SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS,
 )
 from tracim_backend.applications.collaborative_document_edition.wopi.lib import WopiLib
-from tracim_backend.applications.collaborative_document_edition.wopi.models import WopiCheckFileInfo
 from tracim_backend.applications.collaborative_document_edition.wopi.models import (
     WopiLastModifiedTime,
 )
+from tracim_backend.applications.collaborative_document_edition.wopi.models import WopiCheckFileInfo
 from tracim_backend.applications.collaborative_document_edition.wopi.schema import (
     WOPICheckFileInfoSchema,
+)
+from tracim_backend.applications.collaborative_document_edition.wopi.schema import (
+    WOPITokenQuerySchema,
 )
 from tracim_backend.applications.collaborative_document_edition.wopi.schema import (
     WopiPutHeadersSchema,
 )
 from tracim_backend.applications.collaborative_document_edition.wopi.schema import (
     WopiPutResponseSchema,
-)
-from tracim_backend.applications.collaborative_document_edition.wopi.schema import (
-    WOPITokenQuerySchema,
 )
 from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
 from tracim_backend.exceptions import TracimFileNotFound
@@ -68,7 +67,10 @@ class WOPIController(Controller):
     @hapic.input_query(WOPITokenQuerySchema())
     @hapic.output_file([])
     def get_content(
-        self, context: DefaultRootFactory, request: TracimRequest, hapic_data: HapicData = None
+        self,
+        context: DefaultRootFactory,
+        request: TracimRequest,
+        hapic_data: HapicData = None,
     ) -> HapicFile:
         """
         WOPI GetFile endpoint :
@@ -86,7 +88,8 @@ class WOPIController(Controller):
         except CannotGetDepotFileDepotCorrupted as exc:
             raise TracimFileNotFound(
                 "file related to revision {} of content {} not found in depot.".format(
-                    request.current_content.cached_revision_id, request.current_content.content_id
+                    request.current_content.cached_revision_id,
+                    request.current_content.content_id,
                 )
             ) from exc
 
@@ -96,7 +99,10 @@ class WOPIController(Controller):
     @hapic.input_query(WOPITokenQuerySchema())
     @hapic.output_body(WOPICheckFileInfoSchema())
     def check_file_info(
-        self, context: DefaultRootFactory, request: TracimRequest, hapic_data: HapicData = None
+        self,
+        context: DefaultRootFactory,
+        request: TracimRequest,
+        hapic_data: HapicData = None,
     ) -> WopiCheckFileInfo:
         """
         WOPI CheckFileInfo endpoint
@@ -104,7 +110,9 @@ class WOPIController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         return WopiLib(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         ).check_file_info(request.current_content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_WOPI_ENDPOINTS])
@@ -114,7 +122,10 @@ class WOPIController(Controller):
     @hapic.input_headers(WopiPutHeadersSchema())
     @hapic.output_body(WopiPutResponseSchema())
     def put_content(
-        self, context: DefaultRootFactory, request: TracimRequest, hapic_data: HapicData = None
+        self,
+        context: DefaultRootFactory,
+        request: TracimRequest,
+        hapic_data: HapicData = None,
     ) -> typing.Union[WopiLastModifiedTime, Response]:
         """
         WOPI PutRelativeFile endpoint
@@ -146,7 +157,9 @@ class WOPIController(Controller):
             config=app_config,
         )
         with new_revision(
-            session=request.dbsession, tm=transaction.manager, content=request.current_content
+            session=request.dbsession,
+            tm=transaction.manager,
+            content=request.current_content,
         ):
             api.update_file_data(
                 item=request.current_content,
@@ -157,11 +170,12 @@ class WOPIController(Controller):
             api.save(request.current_content)
 
         return WopiLib(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         ).last_modified_time(request.current_content)
 
     def bind(self, configurator: Configurator) -> None:
-
         # Get content
         configurator.add_route(
             "wopi_get_content", "/{}/contents".format(WOPI_FILES), request_method="GET"

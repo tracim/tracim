@@ -10,27 +10,41 @@
   background-color rgba(240, 240, 240, 0.2)
 .popupCreateContent
   position fixed
-  left 0
   display flex
   justify-content center
-  width 100%
   .cardPopup__container
     border 0
     border-radius standardBorderRadius
     width popupWidth
-    background lightGrey
+    background lightGrey2
     box-shadow shadow-all
   .createcontent
     width 100%
     &__form
       &__input
         width 100%
-        border borderStyle
+        border none
         border-radius standardBorderRadius
         margin-bottom standardSpacing
         padding textSpacing
       &__button
         display flex
         justify-content flex-end
+        &:disabled
+          cursor not-allowed
+      &__template
+        margin-bottom standardSpacing
+        &[type='text']
+          padding-inline-start standardSpacing
+        &>div
+          margin 0
+          border none
+          cursor text
+        &:focus
+          border 1px solid lightBlue
+          outline none
+        & div:last-child
+          margin-bottom 0
+          margin-top 0
         &:disabled
           cursor not-allowed

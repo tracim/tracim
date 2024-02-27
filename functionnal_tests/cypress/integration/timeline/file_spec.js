@@ -18,7 +18,7 @@ describe('Timeline', () => {
       cy.createThread(threadTitle, workspace.workspace_id).then(thread => {
         cy.visitPage({
           pageName: PAGES.CONTENT_OPEN,
-          params: { workspaceId: workspace.workspace_id, contentType: 'thread', contentId: thread.content_id }
+          params: { contentId: thread.content_id }
         })
       })
       cy.get(addFileButton).should('be.enabled').click()
@@ -40,7 +40,7 @@ describe('Timeline', () => {
     })
 
     it('should be able to open as a content', () => {
-      cy.get('.comment__body__content__header__actions').click()
+      cy.get('.timeline__comment__body__content__header__actions').click()
       cy.get('.iconbutton[title="Open as content"]').click()
       cy.url().should('include', '/contents/file')
     })
@@ -57,6 +57,6 @@ describe('Timeline', () => {
       .click()
     cy.contains(submitButton, 'Send').click()
 
-    cy.get('.comment').should('have.length.gt', 1)
+    cy.get('.timeline__comment').should('have.length.gt', 1)
   })
 })

@@ -9,7 +9,7 @@
     &__item
       display flex
       padding standardSpacing
-      background-color mediumGrey
+      background-color lightGrey1
       border-radius standardBorderRadius
       flex 1
       overflow hidden
@@ -20,31 +20,41 @@
         text-overflow ellipsis
         overflow hidden
         flex 1
-        text-align left
+        text-align start
         white-space pre
       &__circle
         width 10px
         height 10px
         top calc(50% - 5px)
         position absolute
-        background-color veryLightGrey
+        background-color lightGrey2
         border-radius standardBorderRadius
         left 10px
       &__triangleIcon
         font-size 40px
         transform rotate(58deg)
         transform-origin top
-        margin-right -14px
+        margin-inline-end -14px
         position relative
         left 16px
         top 15px
-        color mediumGrey
+        color lightGrey1
       &__wrapper
         position relative
         display flex
         flex-direction row
-        margin-left standardSpacing
+        margin-inline-start standardSpacing
         margin-bottom standardSpacing
+
+[dir=rtl]
+  .tagList__list__item
+    &__circle
+      right 10px
+    &__triangleIcon
+      left 9px
+      top 2px
+  #triangeIcon
+    transform none
 
 @media (max-width: max-lg)
   .tagList

@@ -1,7 +1,6 @@
-import i18n, { getBrowserLang } from './i18n.js'
+import i18n from './i18n.js'
 import {
   FETCH_CONFIG as LIB_FETCH_CONFIG,
-  naturalCompareLabels,
   PAGE,
   PROFILE_LIST,
   ROLE
@@ -16,9 +15,6 @@ export const MINIMUM_CHARACTERS_PUBLIC_NAME = 3
 export const NO_ACTIVE_SPACE_ID = -1
 
 export const history = require('history').createBrowserHistory()
-
-// this function is declared in i18n to avoid cyclic imports and reexported here for consistency
-export { getBrowserLang }
 
 export const FETCH_CONFIG = {
   headers: LIB_FETCH_CONFIG.headers,
@@ -129,6 +125,29 @@ export const unLoggedAllowedPageList = [
   PAGE.GUEST_DOWNLOAD('')
 ]
 
+export const EMAIL_NOTIFICATION_TYPE = {
+  INDIVIDUAL: 'individual',
+  SUMMARY: 'summary',
+  NONE: 'none'
+}
+
+/**
+ * Function to initialize a custom element
+ * @param {String} htmlTag tag name that will be replaced with the HTML Element
+ * @param {HTMLElement} htmlElement HTML element that whill replace the tag name
+ */
+export const initializeCustomElements = (htmlTag, htmlElement) => {
+  if (window.customElements) {
+    if (!window.customElements.get(htmlTag)) {
+      window.customElements.define(htmlTag, htmlElement)
+    }
+  } else {
+    window.alert(i18n.t(
+      'Tracim doesn\'t support the current version of your browser. Please upgrade your browser.'
+    ))
+  }
+}
+
 export const findUserRoleIdInWorkspace = (userId, memberList, roleList) => {
   const user = memberList.find(u => u.id === userId) || { role: ROLE.reader.slug }
   return (roleList.find(r => user.role === r.slug) || { id: 1 }).id
@@ -138,7 +157,7 @@ export const COOKIE_FRONTEND = {
   LAST_CONNECTION: 'lastConnection',
   DEFAULT_LANGUAGE: 'defaultLanguage',
   DEFAULT_EXPIRE_TIME: 180,
-  HIDE_USERNAME_POPUP: 'hideUsernamePopup'
+  SHOW_USERNAME_POPUP: 'showUsernamePopup'
 }
 
 export const getUserProfile = slug => PROFILE_LIST.find(p => slug === p.slug) || {}
@@ -151,8 +170,8 @@ export const DRAG_AND_DROP = {
   CONTENT_ITEM: 'contentItem'
 }
 
-// Côme - 2018/09/19 - the object bellow is a temporary hack to be able to generate translation keys that only exists in backend
-// and are returned through api.
+// INFO - CH - 2018/09/19 - the object below is a temporary hack to be able to generate translation keys that only
+// exists in backend and are returned through api.
 // We will later implement a better solution
 // this const isn't exported since it's only purpose is to generate key trads through i18n.scanner
 const backendTranslationKeyList = [ // eslint-disable-line no-unused-vars
@@ -164,35 +183,19 @@ const backendTranslationKeyList = [ // eslint-disable-line no-unused-vars
   i18n.t('Deprecated')
 ]
 
-export const ALL_CONTENT_TYPES = 'html-document,file,thread,folder,comment'
-
-export const compareContents = (a, b, lang) => {
-  if (a.type === 'folder' && b.type !== 'folder') return -1
-  if (b.type === 'folder' && a.type !== 'folder') return 1
-  return naturalCompareLabels(a, b, lang)
-}
-
-export const CONTENT_NAMESPACE = {
-  CONTENT: 'content',
-  UPLOAD: 'upload',
-  PUBLICATION: 'publication'
-}
-
-export const sortContentList = (workspaceContents, lang) => {
-  return workspaceContents.sort((a, b) => compareContents(a, b, lang))
-}
+export const ALL_CONTENT_TYPES = 'html-document,file,thread,folder,comment,kanban,todo'
 
 export const toggleFavicon = (hasUnreadNotification, hasUnreadMention) => {
   const originalHrefAttribute = 'originalHrefAttribute'
 
-  document.getElementsByClassName('tracim__favicon').forEach(favicon => {
+  Array.from(document.getElementsByClassName('tracim__favicon')).forEach(favicon => {
     if (!(hasUnreadNotification || hasUnreadMention)) {
       favicon.href = favicon.getAttribute(originalHrefAttribute)
       favicon.removeAttribute(originalHrefAttribute)
       return
     }
-    const faviconSize = favicon.sizes[0].split('x')[0]
 
+    const faviconSize = favicon.sizes[0].split('x')[0]
     const canvas = document.createElement('canvas')
     canvas.width = faviconSize
     canvas.height = faviconSize
@@ -248,48 +251,15 @@ export const parseSearchUrl = (parsedQuery) => {
   return searchObject
 }
 
-export const handleClickCopyLink = (content) => {
-  // INFO - GB - 2020-11-20 - Algorithm based on
-  // https://stackoverflow.com/questions/55190650/copy-link-on-button-click-into-clipboard-not-working
-  const tmp = document.createElement('textarea')
-  document.body.appendChild(tmp)
-  tmp.value = `${window.location.origin}${PAGE.WORKSPACE.CONTENT(
-    content.workspaceId || content.workspace_id,
-    content.content_type || content.type,
-    content.id || content.content_id
-  )}`
-  tmp.select()
-  document.execCommand('copy')
-  document.body.removeChild(tmp)
-}
-
-export const getRevisionTypeLabel = (revisionType, t) => {
-  switch (revisionType) {
-    case 'revision':
-      return t('modified')
-    case 'creation':
-      return t('created')
-    case 'edition':
-      return t('modified')
-    case 'deletion':
-      return t('deleted')
-    case 'undeletion':
-      return t('undeleted')
-    case 'mention':
-      return t('mention made')
-    case 'content-comment':
-      return t('commented')
-    case 'status-update':
-      return t('status modified')
-    case 'move':
-      return t('moved')
-    case 'copy':
-      return t('copied')
-    case 'unknown':
-      return t('unknown')
-  }
-
-  return revisionType
-}
-
 export const WELCOME_ELEMENT_ID = 'welcome'
+
+export const computeShortDate = (date, t) => {
+  const msElapsed = Date.now() - new Date(date).getTime()
+  if (msElapsed < 60000) return Math.round(msElapsed / 1000) + ' ' + t('sec')
+  if (msElapsed < 3600000) return Math.round(msElapsed / 60000) + ' ' + t('min')
+  if (msElapsed < 3600000 * 24) return Math.round(msElapsed / 3600000) + ' ' + t('hr')
+  if (msElapsed < 3600000 * 24 * 7) return Math.round(msElapsed / (3600000 * 24)) + ' ' + t('d')
+  if (msElapsed < 3600000 * 24 * 30) return Math.round(msElapsed / (3600000 * 24 * 7)) + ' ' + t('w')
+  if (msElapsed < 3600000 * 24 * 365) return Math.round(msElapsed / (3600000 * 24 * 20)) + ' ' + t('mth')
+  return Math.round(msElapsed / (3600000 * 24 * 365)) + ' ' + t('y')
+}

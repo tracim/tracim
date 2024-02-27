@@ -16,11 +16,11 @@ describe('Login page', function () {
     cy.visitPage({ pageName: p.LOGIN, params: { loginParam: '' }, waitForTlm: false })
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
-      .find('input[type=text]')
+      .find('input[type=email]')
       .should('be.visible')
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
-      .find('input[type=text]')
+      .find('input[type=email]')
       .type(defaultAdmin.email)
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
@@ -32,18 +32,15 @@ describe('Login page', function () {
       .type(defaultAdmin.password)
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
-      .find('.loginpage__main__form__btnsubmit')
+      .find('.classicLoginAuthForm__btnsubmit')
       .should('be.visible')
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
-      .find('.loginpage__main__form__btnsubmit')
+      .find('.classicLoginAuthForm__btnsubmit')
       .click()
 
-    cy.get('.menuprofil__dropdown__name.btn')
-      .click()
-
-    cy.getTag({ selectorName: s.HEADER })
-      .find('[data-cy="menuprofil__dropdown__logout__link"]')
+    cy.get('.sidebar__item__menu').first().should('be.visible').click()
+    cy.get('[data-cy="sidebar__logout__item"]')
       .click()
   })
 
@@ -51,11 +48,11 @@ describe('Login page', function () {
     cy.visitPage({ pageName: p.LOGIN, params: { loginParam: '' }, waitForTlm: false })
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
-      .find('input[type=text]')
+      .find('input[type=email]')
       .should('be.visible')
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
-      .find('input[type=text]')
+      .find('input[type=email]')
       .type(defaultAdmin.username)
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
@@ -67,18 +64,15 @@ describe('Login page', function () {
       .type(defaultAdmin.password)
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
-      .find('.loginpage__main__form__btnsubmit')
+      .find('.classicLoginAuthForm__btnsubmit')
       .should('be.visible')
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
-      .find('.loginpage__main__form__btnsubmit')
+      .find('.classicLoginAuthForm__btnsubmit')
       .click()
 
-    cy.get('.menuprofil__dropdown__name.btn')
-      .click()
-
-    cy.getTag({ selectorName: s.HEADER })
-    .find('[data-cy="menuprofil__dropdown__logout__link"]')
+    cy.get('.sidebar__item__menu').first().should('be.visible').click()
+    cy.get('[data-cy="sidebar__logout__item"]')
       .click()
   })
 })

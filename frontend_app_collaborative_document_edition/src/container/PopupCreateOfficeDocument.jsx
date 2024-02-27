@@ -1,14 +1,16 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import {
-  CardPopupCreateContent,
-  handleFetchResult,
-  addAllResourceI18n,
-  RadioBtnGroup,
-  buildHeadTitle,
-  sendGlobalFlashMessage,
+  CONTENT_TYPE,
   CUSTOM_EVENT,
-  TracimComponent
+  CardPopupCreateContent,
+  RadioBtnGroup,
+  TracimComponent,
+  addAllResourceI18n,
+  appContentFactory,
+  buildHeadTitle,
+  handleFetchResult,
+  sendGlobalFlashMessage
 } from 'tracim_frontend_lib'
 import {
   postCollaborativeDocumentFromTemplate,
@@ -16,6 +18,7 @@ import {
 } from '../action.async.js'
 import i18n from '../i18n.js'
 import {
+  FILE_TYPES,
   getAvaibleFileTypes,
   getTemplateFromFileType,
   getIconUrlFromFileType,
@@ -29,6 +32,7 @@ export class PopupCreateCollaborativeDocument extends React.Component {
     super(props)
 
     const param = props.data || debug
+    props.setApiUrl(param.config.apiUrl)
 
     this.state = {
       appName: 'collaborative_document_edition',
@@ -98,14 +102,36 @@ export class PopupCreateCollaborativeDocument extends React.Component {
 
   handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
+  handleChangeTemplate = (template, { action }) => {
+    // NOTE - MP - 2022-06-07 - Clear is an action type of react-select
+    // see https://react-select.com/props#prop-types
+    if (action !== 'clear') {
+      if (template.content_id !== -1) {
+        this.setState(prevState => ({
+          templateId: template.content_id,
+          templateName: template.label,
+          newContentName: `${template.label} ${prevState.newContentName}`
+        }))
+      }
+    } else {
+      this.setState({
+        templateId: null,
+        templateName: null
+      })
+    }
+  }
+
   handleValidate = async () => {
     const { state, props } = this
     const { PAGE } = this.props.data.config
 
-    const templateName = getTemplateFromFileType(state.software, state.selectedOption.value, state.availableTemplates)
     const filename = state.newContentName + getExtensionFromFileType(state.software, state.selectedOption.value)
+    // NOTE - MP - 2022-07-11 - templateName is a variable that stores the name of the default
+    // template. Therefore, if we use a custom template, we won't use it.
+    const templateName = getTemplateFromFileType(state.software, state.selectedOption.value, state.availableTemplates)
+
     const request = postCollaborativeDocumentFromTemplate(
-      state.config.apiUrl, state.workspaceId, state.folderId, state.config.slug, filename, templateName
+      state.config.apiUrl, state.workspaceId, state.folderId, state.selectedOption.value, filename, templateName, state.templateId
     )
 
     const response = await handleFetchResult(await request)
@@ -150,7 +176,19 @@ export class PopupCreateCollaborativeDocument extends React.Component {
     })
   }
 
-  setSelectedOption = fileType => this.setState({ selectedOption: fileType })
+  setSelectedOption = (fileType) => {
+    this.setState({ selectedOption: fileType })
+
+    this.props.getTemplateList(this.setState.bind(this), CONTENT_TYPE.FILE).then(
+      () => {
+        const templateList = this.state.templateList.filter(template => {
+          return template.file_extension === FILE_TYPES.collabora[fileType.value].ext
+        })
+
+        this.setState({ templateList: templateList })
+      }
+    )
+  }
 
   buildOptions () {
     const { props, state } = this
@@ -170,13 +208,16 @@ export class PopupCreateCollaborativeDocument extends React.Component {
   render () {
     return (
       <CardPopupCreateContent
+        btnValidateLabel={this.props.t('Validate and create')}
+        contentName={this.state.newContentName}
+        customColor={this.state.config.hexcolor}
+        displayTemplateList
+        faIcon={this.state.config.faIcon}
+        onChangeTemplate={this.handleChangeTemplate}
         onClose={this.handleClose}
         onValidate={this.handleValidate}
         label={this.props.t('New Office Document')}
-        customColor={this.state.config.hexcolor}
-        faIcon={this.state.config.faIcon}
-        btnValidateLabel={this.props.t('Validate and create')}
-        contentName={this.state.newContentName}
+        templateList={this.state.templateList}
       >
         <input
           type='text'
@@ -200,4 +241,4 @@ export class PopupCreateCollaborativeDocument extends React.Component {
   }
 }
 
-export default translate()(TracimComponent(PopupCreateCollaborativeDocument))
+export default translate()(appContentFactory(TracimComponent(PopupCreateCollaborativeDocument)))

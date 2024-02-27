@@ -1,16 +1,15 @@
+from babel.dates import format_date
+from babel.dates import format_time
 import cgi
 from datetime import datetime
 from smtplib import SMTPException
 from smtplib import SMTPRecipientsRefused
-import typing
-import uuid
-
-from babel.dates import format_date
-from babel.dates import format_time
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 import transaction
+import typing
+import uuid
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.applications.upload_permissions.email_manager import (
@@ -130,7 +129,8 @@ class UploadPermissionLib(object):
             config.EMAIL__NOTIFICATION__SMTP__PORT,
             config.EMAIL__NOTIFICATION__SMTP__USER,
             config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
-            config.EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL,
+            config.EMAIL__NOTIFICATION__SMTP__ENCRYPTION,
+            config.EMAIL__NOTIFICATION__SMTP__AUTHENTICATION,
         )
 
         return UploadPermissionEmailManager(config=config, smtp_config=smtp_config, session=session)
@@ -307,7 +307,9 @@ class UploadPermissionLib(object):
 
         if do_notify:
             workspace_lib = WorkspaceApi(
-                config=self._config, current_user=upload_permission.author, session=self._session
+                config=self._config,
+                current_user=upload_permission.author,
+                session=self._session,
             )
             self._notify_uploaded_contents(
                 uploader_username=uploader_username,

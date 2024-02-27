@@ -7,9 +7,11 @@ import sinon from 'sinon'
 import { ROLE } from '../../src/helper.js'
 import { commentList } from '../fixture/contentCommentList.js'
 import { revisionList } from '../fixture/contentRevisionList.js'
+import { reactstrapPopoverHack } from '../testHelper.js'
+
+const nock = require('nock')
 
 describe('<Timeline />', () => {
-  const onClickWysiwygBtnCallBack = sinon.spy()
   const onClickRevisionBtnCallBack = sinon.spy()
   const onClickRestoreArchivedCallBack = sinon.spy()
   const onClickRestoreDeletedCallBack = sinon.spy()
@@ -17,7 +19,7 @@ describe('<Timeline />', () => {
   const props = {
     timelineData: [...revisionList, ...commentList],
     newComment: 'randomNewComment',
-    apiUrl: '/',
+    apiUrl: 'http://fake.url/api',
     disableComment: false,
     customClass: 'randomCustomClass',
     customColor: 'red',
@@ -26,8 +28,6 @@ describe('<Timeline />', () => {
       name: 'randomNameLogin',
       userRoleIdInWorkspace: ROLE.contentManager.id
     },
-    wysiwyg: false,
-    onClickWysiwygBtn: onClickWysiwygBtnCallBack,
     onClickRevisionBtn: onClickRevisionBtnCallBack,
     allowClickOnRevision: true,
     shouldScrollToBottom: true,
@@ -49,6 +49,16 @@ describe('<Timeline />', () => {
     canFetchMoreTimelineItems: () => false
   }
 
+  function mockReactions () {
+    for (const comment of commentList) {
+      nock(props.apiUrl).get(`/workspaces/${props.workspaceId}/contents/${comment.content_id}/reactions`).reply(200, [])
+      reactstrapPopoverHack(document, `createdDistance_${comment.content_id}`)
+      reactstrapPopoverHack(document, `modificationDate_${comment.content_id}`)
+    }
+  }
+
+  mockReactions()
+
   const TimelineWithHOC = withRouterMock(Timeline)
   const wrapper = mount(<TimelineWithHOC {...props} />, { wrappingComponent: RouterMock })
 
@@ -58,13 +68,6 @@ describe('<Timeline />', () => {
       wrapper.setProps({ disableComment: true })
       expect(wrapper.find('.commentArea__advancedtext__btn').prop('disabled')).to.equal(true)
       wrapper.setProps({ disableComment: false })
-    })
-  })
-
-  describe('Handlers', () => {
-    it('onClickWysiwygBtnCallBack should be called when the advancedText button is clicked', () => {
-      wrapper.find(`.${props.customClass}__texteditor__advancedtext__btn`).simulate('click')
-      expect(onClickWysiwygBtnCallBack.called).to.equal(true)
     })
   })
 })

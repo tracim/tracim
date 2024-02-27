@@ -1,12 +1,12 @@
 import React from 'react'
 import {
   ADVANCED_SEARCH_TYPE,
-  CONTENT_NAMESPACE,
   FETCH_CONFIG,
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
   history
 } from './util/helper.js'
+
 import { parseISO } from 'date-fns'
 import i18n from './util/i18n.js'
 import * as Cookies from 'js-cookie'
@@ -39,7 +39,7 @@ import {
   USER_PUBLIC_NAME,
   USER_REQUEST_PASSWORD,
   USER_USERNAME,
-  USER_WORKSPACE_DO_NOTIFY,
+  USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
   USER_WORKSPACE_LIST,
   WORKSPACE,
   WORKSPACE_AGENDA_URL,
@@ -50,10 +50,9 @@ import {
   WORKSPACE_CONTENT_SHARE_FOLDER,
   WORKSPACE_DETAIL,
   WORKSPACE_LIST,
-  WORKSPACE_MEMBER_ADD,
-  WORKSPACE_MEMBER_LIST,
-  WORKSPACE_MEMBER_REMOVE,
-  WORKSPACE_MEMBER_UPDATE,
+  ADD_USER_ROLE,
+  REMOVE_USER_ROLE,
+  UPDATE_USER_ROLE,
   WORKSPACE_PUBLICATION_LIST,
   WORKSPACE_READ_STATUS,
   ACCESSIBLE_WORKSPACE_LIST,
@@ -64,9 +63,11 @@ import {
   USER_PUBLIC_PROFILE,
   FAVORITE_LIST,
   FAVORITE,
-  UNREAD_NOTIFICATION_COUNT
+  UNREAD_NOTIFICATION_COUNT,
+  USER_WORKSPACE_CONFIG_LIST
 } from './action-creator.sync.js'
 import {
+  CONTENT_NAMESPACE,
   ErrorFlashMessageTemplateHtml,
   NUMBER_RESULTS_BY_PAGE,
   PAGE,
@@ -120,10 +121,16 @@ const fetchWrapper = async ({ url, param, actionName, dispatch }) => {
       }
       if (status >= 400 && status <= 499) return fetchResult.json()
       if (status >= 500 && status <= 599) {
-        dispatch(newFlashMessage(i18n.t('Unexpected error, please inform an administrator'), 'danger', 8000))
+        const errorData = await fetchResult.json()
+        let errorDetails = ''
+        if (errorData && errorData.code && errorData.message) {
+          errorDetails = `${errorData.code}: ${errorData.message}`
+        }
+        dispatch(newFlashMessage(
+          <ErrorFlashMessageTemplateHtml errorMsg={errorDetails} />, 'danger', 8000
+        ))
         return
       }
-
       dispatch(newFlashMessage(
         <ErrorFlashMessageTemplateHtml errorMsg={`Unknown http status ${fetchResult.status}`} />, 'danger', 300000
       ))
@@ -268,9 +275,9 @@ export const getUserConfiguration = userId => dispatch => {
   })
 }
 
-export const getUserWorkspaceList = (userId, showOwnedWorkspace) => async dispatch => {
+export const getUserWorkspaceConfigList = (userId) => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspaces?show_owned_workspace=${showOwnedWorkspace ? 1 : 0}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspaces/all/settings`,
     param: {
       credentials: 'include',
       headers: {
@@ -298,9 +305,9 @@ export const getUserIsConnected = () => async dispatch => {
   })
 }
 
-export const getMyselfKnownMember = (userNameToSearch, workspaceIdToExclude) => dispatch => {
+export const getMyselfAllKnownMember = () => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/known_members?acp=${userNameToSearch}&exclude_workspace_ids=${workspaceIdToExclude}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/me/known_members`,
     param: {
       credentials: 'include',
       headers: {
@@ -372,7 +379,9 @@ export const putUserUsername = (user, newUsername, checkPassword) => dispatch =>
   })
 }
 
-export const putMyselfEmail = (newEmail, checkPassword) => dispatch => {
+export const putMyselfEmail = (newEmailWithoutTrim, checkPassword) => dispatch => {
+  const newEmail = newEmailWithoutTrim.trim()
+
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/me/email`,
     param: {
@@ -391,7 +400,9 @@ export const putMyselfEmail = (newEmail, checkPassword) => dispatch => {
   })
 }
 
-export const putUserEmail = (user, newEmail, checkPassword) => dispatch => {
+export const putUserEmail = (user, newEmailWithoutTrim, checkPassword) => dispatch => {
+  const newEmail = newEmailWithoutTrim.trim()
+
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${user.userId}/email`,
     param: {
@@ -470,39 +481,45 @@ export const putUserLang = (user, newLang) => dispatch => {
   })
 }
 
-export const putMyselfWorkspaceDoNotify = (workspaceId, doNotify) => dispatch => {
+export const putMyselfWorkspaceEmailNotificationType = (workspaceId, emailNotificationType) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${workspaceId}/notifications/${doNotify ? 'activate' : 'deactivate'}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${workspaceId}/email_notification_type`,
     param: {
       credentials: 'include',
       headers: {
         ...FETCH_CONFIG.headers
       },
-      method: 'PUT'
+      method: 'PUT',
+      body: JSON.stringify({
+        email_notification_type: emailNotificationType
+      })
     },
-    actionName: USER_WORKSPACE_DO_NOTIFY,
+    actionName: USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
     dispatch
   })
 }
 
-export const putUserWorkspaceDoNotify = (user, workspaceId, doNotify) => dispatch => {
+export const putUserWorkspaceEmailNotificationType = (user, workspaceId, emailNotificationType) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${user.userId}/workspaces/${workspaceId}/notifications/${doNotify ? 'activate' : 'deactivate'}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.userId}/workspaces/${workspaceId}/email_notification_type`,
     param: {
       credentials: 'include',
       headers: {
         ...FETCH_CONFIG.headers
       },
-      method: 'PUT'
+      method: 'PUT',
+      body: JSON.stringify({
+        email_notification_type: emailNotificationType
+      })
     },
-    actionName: USER_WORKSPACE_DO_NOTIFY,
+    actionName: USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
     dispatch
   })
 }
 
-export const getMyselfWorkspaceList = (showOwnedWorkspace) => dispatch => {
+export const getMyselfWorkspaceConfigList = () => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces?show_owned_workspace=${showOwnedWorkspace ? 1 : 0}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/all/settings`,
     param: {
       credentials: 'include',
       headers: {
@@ -510,7 +527,7 @@ export const getMyselfWorkspaceList = (showOwnedWorkspace) => dispatch => {
       },
       method: 'GET'
     },
-    actionName: WORKSPACE_LIST,
+    actionName: USER_WORKSPACE_CONFIG_LIST,
     dispatch
   })
 }
@@ -541,21 +558,6 @@ export const getWorkspaceDetail = (workspaceId) => dispatch => {
       method: 'GET'
     },
     actionName: WORKSPACE_DETAIL,
-    dispatch
-  })
-}
-
-export const getWorkspaceMemberList = (workspaceId, showDisabledUser = false) => dispatch => {
-  return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/members${showDisabledUser ? '?show_disabled_user=1' : ''}`,
-    param: {
-      credentials: 'include',
-      headers: {
-        ...FETCH_CONFIG.headers
-      },
-      method: 'GET'
-    },
-    actionName: WORKSPACE_MEMBER_LIST,
     dispatch
   })
 }
@@ -650,7 +652,7 @@ export const getMyselfWorkspaceReadStatusList = workspaceId => dispatch => {
   })
 }
 
-export const postWorkspaceMember = (workspaceId, newMember) => dispatch => {
+export const postUserRole = (workspaceId, newMember) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/members`,
     param: {
@@ -666,12 +668,12 @@ export const postWorkspaceMember = (workspaceId, newMember) => dispatch => {
         role: newMember.role
       })
     },
-    actionName: WORKSPACE_MEMBER_ADD,
+    actionName: ADD_USER_ROLE,
     dispatch
   })
 }
 
-export const deleteWorkspaceMember = (workspaceId, memberId) => dispatch => {
+export const deleteUserRole = (workspaceId, memberId) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/members/${memberId}`,
     param: {
@@ -679,12 +681,12 @@ export const deleteWorkspaceMember = (workspaceId, memberId) => dispatch => {
       headers: { ...FETCH_CONFIG.headers },
       method: 'DELETE'
     },
-    actionName: WORKSPACE_MEMBER_REMOVE,
+    actionName: REMOVE_USER_ROLE,
     dispatch
   })
 }
 
-export const updateWorkspaceMember = (workspaceId, memberId, newRole) => dispatch => {
+export const updateUserRole = (workspaceId, memberId, newRole) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/members/${memberId}`,
     param: {
@@ -695,7 +697,7 @@ export const updateWorkspaceMember = (workspaceId, memberId, newRole) => dispatc
         role: newRole
       })
     },
-    actionName: WORKSPACE_MEMBER_UPDATE,
+    actionName: UPDATE_USER_ROLE,
     dispatch
   })
 }
@@ -958,15 +960,41 @@ export const getNotificationList = (
   return fetchGetNotificationWall
 }
 
-export const putNotificationAsRead = (userId, eventId) => dispatch => {
+/**
+ * Put a list of notifications as read
+ * @param {String} userId
+ * @param {int[]} notificationIdList
+ * @returns
+ */
+export const putNotificationListAsRead = (userId, notificationIdList) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/${eventId}/read`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/read` +
+      `?event_ids=${notificationIdList.join(',')}`,
     param: {
       credentials: 'include',
       headers: FETCH_CONFIG.headers,
       method: 'PUT'
     },
-    actionName: NOTIFICATION,
+    actionName: NOTIFICATION_LIST,
+    dispatch
+  })
+}
+
+/**
+ * Put a list of space notifications as read
+ * @param {String} userId
+ * @param {int[]} spaceIdList
+ * @returns
+ */
+export const putSpaceListAsRead = (userId, spaceIdList) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/read?space_ids=${spaceIdList.join(',')}`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'PUT'
+    },
+    actionName: NOTIFICATION_LIST,
     dispatch
   })
 }
@@ -1392,6 +1420,7 @@ export const logoutUser = (history) => async (dispatch) => {
     dispatch(setUserDisconnected())
     GLOBAL_dispatchEvent(CUSTOM_EVENT.USER_DISCONNECTED, {})
     history.push(PAGE.LOGIN)
+    Cookies.remove(COOKIE_FRONTEND.SHOW_USERNAME_POPUP)
   } else {
     dispatch(newFlashMessage(i18n.t('Disconnection error', 'danger')))
   }

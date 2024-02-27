@@ -3,8 +3,6 @@
 
 from datetime import datetime
 import enum
-import typing
-
 from marshmallow import ValidationError
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
@@ -12,11 +10,12 @@ from sqlalchemy import Index
 from sqlalchemy import Sequence
 from sqlalchemy.ext.indexable import index_property
 from sqlalchemy.orm import relationship
-from sqlalchemy.types import JSON
 from sqlalchemy.types import DateTime
 from sqlalchemy.types import Enum
 from sqlalchemy.types import Integer
+from sqlalchemy.types import JSON
 from sqlalchemy.types import String
+import typing
 
 from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
@@ -30,6 +29,8 @@ class OperationType(enum.Enum):
     MODIFIED = "modified"
     DELETED = "deleted"
     UNDELETED = "undeleted"
+    COPIED = "copied"
+    MOVED = "moved"
 
     def __str__(self) -> str:
         return self.value

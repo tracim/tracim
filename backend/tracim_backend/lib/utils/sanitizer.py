@@ -1,7 +1,6 @@
-import typing
-
 from bs4 import BeautifulSoup
 from bs4 import Tag
+import typing
 
 from tracim_backend.lib.mail_fetcher.email_processing.sanitizer_config.attrs_whitelist import (
     ATTRS_WHITELIST,
@@ -19,7 +18,7 @@ from tracim_backend.lib.mail_fetcher.email_processing.sanitizer_config.tag_white
     TAG_WHITELIST,
 )
 
-ALLOWED_EMPTY_TAGS = ["video", "img", "source", "iframe"]
+ALLOWED_EMPTY_TAGS = ["video", "img", "source", "iframe", "html-mention"]
 
 
 class HtmlSanitizerConfig(object):

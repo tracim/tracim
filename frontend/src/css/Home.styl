@@ -11,7 +11,6 @@
       width 100%
       &__title
         font-weight bold
-        text-align center
         margin-bottom standardSpacing
       &__input
         margin textSpacing 0
@@ -19,21 +18,21 @@
         margin-top standardSpacing
         display flex
         &__input
-          margin auto textSpacing
+          margin auto textSpacing auto 0
       &__smallmsg
         font-size metadataFontSize
       &__btn
         margin-top standardSpacing
         display flex
-        margin-left auto
+        margin-inline-start auto
         align-items center
     &__errorMsg
       font-size metadataFontSize
-      margin-right textSpacing
-      text-align right
+      margin-inline-end textSpacing
+      text-align end
       color errorRed
     &__errorIcon
-      margin-right textSpacing
+      margin-inline-end textSpacing
     &__infoMsg
       font-size metadataFontSize
-      text-align right
+      text-align end

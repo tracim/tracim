@@ -1,20 +1,19 @@
 from datetime import datetime
-import os
-import sys
-import threading
-import time
-from xml.etree import ElementTree
-
 import ldap3
+import os
 from pyramid.registry import Registry
 from pyramid.threadlocal import get_current_registry
 from pyramid_ldap3 import ConnectionManager
 from pyramid_ldap3 import Connector
 from pyramid_ldap3 import _LDAPQuery
+import sys
+import threading
+import time
 import transaction
 from wsgidav import compat
 from wsgidav import util
 from wsgidav.middleware import BaseMiddleware
+from xml.etree import ElementTree
 import yaml
 
 from tracim_backend.config import CFG
@@ -63,7 +62,8 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
         """"""
         verbose = self._config.get("verbose", 2)
         self.last_request_time = "{0}_{1}".format(
-            datetime.utcnow().strftime("%Y-%m-%d_%H-%M-%S"), int(round(time.time() * 1000))
+            datetime.utcnow().strftime("%Y-%m-%d_%H-%M-%S"),
+            int(round(time.time() * 1000)),
         )
 
         method = environ["REQUEST_METHOD"]
@@ -118,7 +118,8 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
         # Dump request headers
         if dumpRequest:
             print(
-                "<%s> --- %s Request ---" % (threading.currentThread().ident, method), file=self.out
+                "<%s> --- %s Request ---" % (threading.currentThread().ident, method),
+                file=self.out,
             )
             for k, v in environ.items():
                 if k == k.upper():
@@ -148,7 +149,11 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
             if first_yield and dumpResponse:
                 print(
                     "<%s> --- %s Response(%s): ---"
-                    % (threading.currentThread().ident, method, sub_app_start_response.status),
+                    % (
+                        threading.currentThread().ident,
+                        method,
+                        sub_app_start_response.status,
+                    ),
                     file=self.out,
                 )
                 headersdict = dict(sub_app_start_response.response_headers)
@@ -294,8 +299,8 @@ class TracimEnv(BaseMiddleware):
     def setup_ldap(self, registry: Registry, app_config: CFG):
         manager = ConnectionManager(
             uri=app_config.LDAP_URL,
-            bind=app_config.LDAP_BIND_DN,
-            passwd=app_config.LDAP_BIND_PASS,
+            bind=app_config.LDAP_BIND_DN if not app_config.LDAP_BIND_ANONYMOUS else "",
+            passwd=app_config.LDAP_BIND_PASS if not app_config.LDAP_BIND_ANONYMOUS else "",
             tls=app_config.LDAP_TLS,
             use_pool=app_config.LDAP_USE_POOL,
             pool_size=app_config.LDAP_POOL_SIZE,

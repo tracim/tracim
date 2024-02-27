@@ -1,40 +1,38 @@
 import React from 'react'
-import WorkspaceAdvancedConfiguration from '../component/WorkspaceAdvancedConfiguration.jsx'
+import SpaceAdvancedConfiguration from '../component/SpaceAdvancedConfiguration.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
-  handleLinksBeforeSave,
-  TracimComponent,
-  TLM_ENTITY_TYPE as TLM_ET,
+  CUSTOM_EVENT,
+  PAGE,
+  PROFILE,
+  ROLE_LIST,
+  ROLE,
+  SPACE_TYPE,
   TLM_CORE_EVENT_TYPE as TLM_CET,
-  appContentFactory,
-  addAllResourceI18n,
-  handleFetchResult,
+  TLM_ENTITY_TYPE as TLM_ET,
+  FilterBar,
+  Loading,
   PopinFixed,
   PopinFixedContent,
   PopinFixedRightPart,
-  CUSTOM_EVENT,
-  removeAtInUsername,
-  getWorkspaceDetail,
-  sendGlobalFlashMessage,
+  PopinFixedRightPartContent,
+  TagList,
+  TracimComponent,
+  addAllResourceI18n,
+  appContentFactory,
   deleteWorkspace,
   getMyselfKnownMember,
-  PAGE,
-  SPACE_TYPE,
-  PopinFixedRightPartContent,
-  PROFILE,
-  ROLE,
-  tinymceAutoCompleteHandleInput,
-  tinymceAutoCompleteHandleKeyUp,
-  tinymceAutoCompleteHandleKeyDown,
-  tinymceAutoCompleteHandleClickItem,
-  tinymceAutoCompleteHandleSelectionChange,
-  TagList
+  getSpaceUserRoleList,
+  getWorkspaceDetail,
+  handleFetchResult,
+  removeAtInUsername,
+  sendGlobalFlashMessage,
+  stringIncludes
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
   getSubscriptionRequestList,
-  getWorkspaceMember,
   putLabel,
   putDefaultRole,
   putDescription,
@@ -45,7 +43,7 @@ import {
   putUploadEnabled,
   putMemberRole,
   deleteMember,
-  postWorkspaceMember,
+  postUserRole,
   getAppList,
   putPublicationEnabled
 } from '../action.async.js'
@@ -68,6 +66,7 @@ export class WorkspaceAdvanced extends React.Component {
       autoCompleteCursorPosition: 0,
       autoCompleteItemList: [],
       isAutoCompleteActivated: false,
+      isOptionalFeaturesLoading: false,
       isVisible: true,
       config: param.config,
       loggedUser: param.loggedUser,
@@ -77,15 +76,17 @@ export class WorkspaceAdvanced extends React.Component {
         id: '',
         personalData: '',
         publicName: '',
-        role: '',
+        role: param.content.defaultRole,
         avatarUrl: '',
         isEmail: false
       },
+      isLoadingMembers: true,
       autoCompleteFormNewMemberActive: false,
       autoCompleteClicked: false,
       searchedKnownMemberList: [],
       displayPopupValidateDeleteWorkspace: false,
-      subscriptionRequestList: []
+      subscriptionRequestList: [],
+      userFilter: ''
     }
 
     // i18n has been init, add resources from frontend
@@ -153,7 +154,7 @@ export class WorkspaceAdvanced extends React.Component {
           user: data.fields.user,
           workspace_id: data.fields.workspace.workspace_id,
           workspace: data.fields.workspace,
-          do_notify: data.fields.member.do_notify,
+          email_notification_type: data.fields.member.email_notification_type,
           is_active: data.fields.user.is_active,
           role: data.fields.member.role
         }]
@@ -176,7 +177,7 @@ export class WorkspaceAdvanced extends React.Component {
             user: data.fields.user,
             workspace_id: data.fields.workspace.workspace_id,
             workspace: data.fields.workspace,
-            do_notify: data.fields.member.do_notify,
+            email_notification_type: data.fields.member.email_notification_type,
             is_active: data.fields.user.is_active,
             role: data.fields.member.role
           }
@@ -251,6 +252,11 @@ export class WorkspaceAdvanced extends React.Component {
     if (prevState.content && state.content && prevState.content.workspace_id !== state.content.workspace_id) {
       this.loadContent()
     }
+
+    // INFO - AJ (from CH) - 2022 06 17 - empty string is the default value for the property content.defaultRole in the state
+    if (prevState.content.defaultRole === '' && state.content.defaultRole !== '') {
+      this.setState(prev => ({ newMember: { ...prev.newMember, role: prev.content.defaultRole } }))
+    }
   }
 
   componentWillUnmount () {
@@ -262,7 +268,7 @@ export class WorkspaceAdvanced extends React.Component {
     const { props, state } = this
 
     const fetchWorkspaceDetail = handleFetchResult(await getWorkspaceDetail(state.config.apiUrl, state.content.workspace_id))
-    const fetchWorkspaceMember = handleFetchResult(await getWorkspaceMember(state.config.apiUrl, state.content.workspace_id, false))
+    const fetchWorkspaceMember = handleFetchResult(await getSpaceUserRoleList(state.config.apiUrl, state.content.workspace_id, false))
     const fetchAppList = handleFetchResult(await getAppList(state.config.apiUrl))
 
     const [resDetail, resMember, resAppList] = await Promise.all([fetchWorkspaceDetail, fetchWorkspaceMember, fetchAppList])
@@ -280,15 +286,27 @@ export class WorkspaceAdvanced extends React.Component {
       resAppList.body = []
     }
 
-    this.setState({
+    this.setState(prev => ({
       content: {
+        ...prev.content,
         ...resDetail.body,
-        memberList: resMember.body,
+        memberList: resMember.body
+          .map(m => {
+            const newMember = { ...m }
+            const user = newMember.user
+            newMember.user = {
+              ...user,
+              id: user.user_id,
+              publicName: user.public_name
+            }
+            return newMember
+          }),
         appAgendaAvailable: resAppList.body.some(a => a.slug === 'agenda'),
         appDownloadAvailable: resAppList.body.some(a => a.slug === 'share_content'),
         appUploadAvailable: resAppList.body.some(a => a.slug === 'upload_permission')
       }
-    })
+    }))
+    this.setState({ isLoadingMembers: false })
   }
 
   loadSubscriptionRequestList = async () => {
@@ -325,32 +343,20 @@ export class WorkspaceAdvanced extends React.Component {
 
   handleClickToggleFormNewMember = () => this.setState(prev => ({ displayFormNewMember: !prev.displayFormNewMember }))
 
-  handleChangeDescription = e => {
-    const newDescription = e.target.value
-    this.setState(prev => ({ content: { ...prev.content, description: newDescription } }))
-  }
-
-  handleClickValidateNewDescription = async () => {
+  handleClickValidateNewDescription = async (textToSend) => {
     const { props, state } = this
-    let newDescription
-    try {
-      newDescription = await handleLinksBeforeSave(tinymce.get(WORKSPACE_DESCRIPTION_TEXTAREA_ID).getContent(), state.config.apiUrl)
-      // RJ - NOTE - 2021-06-24
-      // We are using tinymce's getContent() method and not
-      // state.content.description here because it has an outdated
-      // value after autocompleting a content.
-      // This is also what does appContentFactory after saving a new advanced comment
-      // (see saveCommentAsText in appContentFactory.js)
-      // We might want to look into it later
-    } catch (e) {
-      return Promise.reject(e.message || props.t('Error while saving the new version'))
-    }
 
-    const fetchPutDescription = await handleFetchResult(await putDescription(state.config.apiUrl, state.content, newDescription))
+    const fetchResultSaveDescription = await handleFetchResult(
+      await putDescription(state.config.apiUrl, state.content, textToSend)
+    )
 
-    switch (fetchPutDescription.apiResponse.status) {
-      case 200: sendGlobalFlashMessage(props.t('Save successful'), 'info'); break
-      default: sendGlobalFlashMessage(props.t('Error while saving the new description'))
+    switch (fetchResultSaveDescription.apiResponse.status) {
+      case 200:
+        sendGlobalFlashMessage(props.t('Save successful'), 'info')
+        return true
+      default:
+        sendGlobalFlashMessage(props.t('Error while saving the new description'))
+        return false
     }
   }
 
@@ -365,7 +371,17 @@ export class WorkspaceAdvanced extends React.Component {
     )
 
     switch (fetchPutDefaultRole.apiResponse.status) {
-      case 200: sendGlobalFlashMessage(props.t('Save successful'), 'info'); break
+      case 200:
+      {
+        sendGlobalFlashMessage(props.t('Save successful'), 'info')
+        this.setState(prev => ({
+          newMember: {
+            ...prev.newMember,
+            role: state.content.default_user_role
+          }
+        }))
+        break
+      }
       default: sendGlobalFlashMessage(props.t('Error while saving new default role'))
     }
   }
@@ -387,6 +403,8 @@ export class WorkspaceAdvanced extends React.Component {
     const { props, state } = this
     const newAgendaEnabledValue = !state.content.agenda_enabled
 
+    this.setState({ isOptionalFeaturesLoading: true })
+
     const fetchToggleAgendaEnabled = await handleFetchResult(await putAgendaEnabled(state.config.apiUrl, state.content, newAgendaEnabledValue))
 
     switch (fetchToggleAgendaEnabled.apiResponse.status) {
@@ -404,11 +422,14 @@ export class WorkspaceAdvanced extends React.Component {
           'warning'
         )
     }
+    this.setState({ isOptionalFeaturesLoading: false })
   }
 
   handleToggleUploadEnabled = async () => {
     const { props, state } = this
     const newUploadEnabledValue = !state.content.public_upload_enabled
+
+    this.setState({ isOptionalFeaturesLoading: true })
 
     const fetchToggleUploadEnabled = await handleFetchResult(await putUploadEnabled(state.config.apiUrl, state.content, newUploadEnabledValue))
 
@@ -427,11 +448,15 @@ export class WorkspaceAdvanced extends React.Component {
           'warning'
         )
     }
+
+    this.setState({ isOptionalFeaturesLoading: false })
   }
 
   handleToggleDownloadEnabled = async () => {
     const { props, state } = this
     const newDownloadEnabledValue = !state.content.public_download_enabled
+
+    this.setState({ isOptionalFeaturesLoading: true })
 
     const fetchToggleDownloadEnabled = await handleFetchResult(await putDownloadEnabled(state.config.apiUrl, state.content, newDownloadEnabledValue))
 
@@ -450,11 +475,15 @@ export class WorkspaceAdvanced extends React.Component {
           'warning'
         )
     }
+
+    this.setState({ isOptionalFeaturesLoading: false })
   }
 
   handleTogglePublicationEnabled = async () => {
     const { props, state } = this
     const newPublicationEnabledValue = !state.content.publication_enabled
+
+    this.setState({ isOptionalFeaturesLoading: true })
 
     const fetchTogglePublicationEnabled = await handleFetchResult(await putPublicationEnabled(state.config.apiUrl, state.content, newPublicationEnabledValue))
 
@@ -473,6 +502,8 @@ export class WorkspaceAdvanced extends React.Component {
           'warning'
         )
     }
+
+    this.setState({ isOptionalFeaturesLoading: false })
   }
 
   handleClickNewMemberRole = slugRole => this.setState(prev => ({ newMember: { ...prev.newMember, role: slugRole } }))
@@ -513,11 +544,6 @@ export class WorkspaceAdvanced extends React.Component {
     }))
   }
 
-  handleClickAutoComplete = () => this.setState({
-    autoCompleteFormNewMemberActive: false,
-    autoCompleteClicked: true
-  })
-
   handleSearchUser = async userNameToSearch => {
     const { props, state } = this
     const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(state.config.apiUrl, userNameToSearch, null, state.content.workspace_id))
@@ -536,51 +562,6 @@ export class WorkspaceAdvanced extends React.Component {
         break
       default: sendGlobalFlashMessage(props.t('Error while removing member'))
     }
-  }
-
-  handleTinyMceInput = (e, position) => {
-    tinymceAutoCompleteHandleInput(
-      e,
-      this.setState.bind(this),
-      this.searchForMentionOrLinkInQuery,
-      this.state.isAutoCompleteActivated
-    )
-  }
-
-  handleTinyMceKeyUp = event => {
-    const { state } = this
-
-    tinymceAutoCompleteHandleKeyUp(
-      event,
-      this.setState.bind(this),
-      state.isAutoCompleteActivated,
-      this.searchForMentionOrLinkInQuery
-    )
-  }
-
-  handleTinyMceKeyDown = event => {
-    const { state } = this
-
-    tinymceAutoCompleteHandleKeyDown(
-      event,
-      this.setState.bind(this),
-      state.isAutoCompleteActivated,
-      state.autoCompleteCursorPosition,
-      state.autoCompleteItemList,
-      this.searchForMentionOrLinkInQuery
-    )
-  }
-
-  handleTinyMceSelectionChange = () => {
-    tinymceAutoCompleteHandleSelectionChange(
-      this.setState.bind(this),
-      this.searchForMentionOrLinkInQuery,
-      this.state.isAutoCompleteActivated
-    )
-  }
-
-  searchForMentionOrLinkInQuery = async (query) => {
-    return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
   }
 
   handleClickValidateNewMember = async () => {
@@ -602,25 +583,25 @@ export class WorkspaceAdvanced extends React.Component {
       this.setState({ newMember: { ...state.newMember, id: newMemberInKnownMemberList.user_id } })
     }
 
-    const fetchWorkspaceNewMember = await handleFetchResult(await postWorkspaceMember(state.config.apiUrl, state.content.workspace_id, {
+    const fetchWorkspaceNewMember = await handleFetchResult(await postUserRole(state.config.apiUrl, state.content.workspace_id, {
       id: state.newMember.id || newMemberInKnownMemberList ? newMemberInKnownMemberList.user_id : null,
-      email: state.newMember.isEmail ? state.newMember.personalData : '',
+      email: state.newMember.isEmail ? state.newMember.personalData.trim() : '',
       username: state.newMember.isEmail ? '' : state.newMember.personalData,
       role: state.newMember.role
     }))
 
-    this.setState({
+    this.setState(prev => ({
       newMember: {
         id: '',
         personalData: '',
         publicName: '',
-        role: '',
+        role: prev.content ? prev.content.defaultRole : prev.newMember.role,
         avatarUrl: '',
         isEmail: false
       },
       autoCompleteFormNewMemberActive: false,
       displayFormNewMember: false
-    })
+    }))
 
     switch (fetchWorkspaceNewMember.apiResponse.status) {
       case 200:
@@ -698,6 +679,31 @@ export class WorkspaceAdvanced extends React.Component {
 
   getMenuItemList = () => {
     const { props, state } = this
+
+    const filterMemberList = () => {
+      if (state.userFilter === '') return state.content.memberList
+
+      return state.content.memberList.filter(member => {
+        if (!member.user) return false
+
+        const userRole = ROLE_LIST.find(type => type.slug === member.role) || { label: '' }
+
+        const includesFilter = stringIncludes(state.userFilter)
+
+        const hasFilterMatchOnPublicName = includesFilter(member.user.public_name)
+        const hasFilterMatchOnUsername = includesFilter(member.user.username)
+        const hasFilterMatchOnRole = userRole && includesFilter(props.t(userRole.label))
+
+        return (
+          hasFilterMatchOnPublicName ||
+          hasFilterMatchOnUsername ||
+          hasFilterMatchOnRole
+        )
+      })
+    }
+
+    const filteredMemberList = filterMemberList()
+
     const memberlistObject = {
       id: 'members_list',
       label: props.t('Members List'),
@@ -707,33 +713,50 @@ export class WorkspaceAdvanced extends React.Component {
           label={props.t('Members List')}
           showTitle={!state.displayFormNewMember}
         >
-          <WorkspaceMembersList
-            displayFormNewMember={state.displayFormNewMember}
-            memberList={state.content.memberList}
-            roleList={state.config.roleList}
-            apiUrl={props.data.config.apiUrl}
-            onClickNewRole={this.handleClickNewRole}
-            loggedUser={state.loggedUser}
-            onClickDeleteMember={this.handleClickDeleteMember}
-            onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
-            newMemberName={state.newMember.publicName}
-            isEmail={state.newMember.isEmail}
-            onChangeNewMemberName={this.handleChangeNewMemberName}
-            searchedKnownMemberList={state.searchedKnownMemberList}
-            onClickKnownMember={this.handleClickKnownMember}
-            newMemberRole={state.newMember.role}
-            onClickNewMemberRole={this.handleClickNewMemberRole}
-            onClickValidateNewMember={this.handleClickValidateNewMember}
-            autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
-            emailNotifActivated={state.config.system.config.email_notification_activated}
-            canSendInviteNewUser={
-              [state.config.profileObject.administrator.slug, state.config.profileObject.manager.slug].includes(state.loggedUser.profile)
-            }
-            userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
-            userProfile={state.loggedUser.profile}
-            autoCompleteClicked={state.autoCompleteClicked}
-            onClickAutoComplete={this.handleClickAutoComplete}
+          <FilterBar
+            customClass='workspace_advanced__filterBar'
+            onChange={e => {
+              const newFilter = e.target.value
+              this.setState({ userFilter: newFilter })
+            }}
+            value={state.userFilter}
+            placeholder={props.t('Filter users')}
           />
+
+          {
+            state.isLoadingMembers
+              ? <Loading />
+              : (
+                <WorkspaceMembersList
+                  displayFormNewMember={state.displayFormNewMember}
+                  memberList={filteredMemberList}
+                  roleList={state.config.roleList}
+                  apiUrl={props.data.config.apiUrl}
+                  onClickNewRole={this.handleClickNewRole}
+                  loggedUser={state.loggedUser}
+                  onClickDeleteMember={this.handleClickDeleteMember}
+                  onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
+                  newMemberName={state.newMember.publicName}
+                  isEmail={state.newMember.isEmail}
+                  onChangeNewMemberName={this.handleChangeNewMemberName}
+                  searchedKnownMemberList={state.searchedKnownMemberList}
+                  onClickKnownMember={this.handleClickKnownMember}
+                  newMemberRole={state.newMember.role}
+                  onClickNewMemberRole={this.handleClickNewMemberRole}
+                  onClickValidateNewMember={this.handleClickValidateNewMember}
+                  autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
+                  isEmailNotifActivated={state.config.system.config.email_notification_activated}
+                  canSendInviteNewUser={
+                    [state.config.profileObject.administrator.slug, state.config.profileObject.manager.slug].includes(state.loggedUser.profile)
+                  }
+                  userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+                  userProfile={state.loggedUser.profile}
+                  autoCompleteClicked={state.autoCompleteClicked}
+                  onClickAutoComplete={this.handleClickAutoComplete}
+                  role={state.newMember.role}
+                />
+              )
+          }
         </PopinFixedRightPartContent>
       )
     }
@@ -774,6 +797,7 @@ export class WorkspaceAdvanced extends React.Component {
             onToggleUploadEnabled={this.handleToggleUploadEnabled}
             publicationEnabled={state.content.publication_enabled}
             onTogglePublicationEnabled={this.handleTogglePublicationEnabled}
+            isLoading={state.isOptionalFeaturesLoading}
           />
         </PopinFixedRightPartContent>
       )
@@ -788,6 +812,7 @@ export class WorkspaceAdvanced extends React.Component {
         >
           <TagList
             apiUrl={state.config.apiUrl}
+            customColor={state.config.hexcolor}
             workspaceId={state.content.workspace_id}
             contentId={state.content.content_id}
             userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
@@ -824,7 +849,7 @@ export class WorkspaceAdvanced extends React.Component {
         customColor={state.config.hexcolor}
       >
         <PopinFixedContent
-          componentTitle={<div>{state.content.label}</div>}
+          componentTitle={<span className='componentTitle'>{state.content.label}</span>}
           config={state.config}
           content={state.content}
           customClass={`${state.config.slug}__contentpage`}
@@ -837,35 +862,35 @@ export class WorkspaceAdvanced extends React.Component {
             state.loggedUser.profile === PROFILE.administrator.slug
           }
         >
-          <WorkspaceAdvancedConfiguration
+          <SpaceAdvancedConfiguration
             apiUrl={state.config.apiUrl}
+            onClickSubmit={this.handleClickValidateNewDescription}
+            // End of required props ///////////////////////////////////////////////////////////////
+            agendaUrl={state.content.agendaUrl}
+            autoCompleteCursorPosition={state.autoCompleteCursorPosition}
+            autoCompleteItemList={state.autoCompleteItemList}
+            codeLanguageList={state.config.system.config.ui__notes__code_sample_languages}
+            customColor={state.config.hexcolor}
+            defaultRole={state.content.default_user_role}
+            description={state.content.description}
+            displayPopupValidateDeleteWorkspace={state.displayPopupValidateDeleteWorkspace}
+            isAppAgendaAvailable={state.content.appAgendaAvailable}
+            isAutoCompleteActivated={state.isAutoCompleteActivated}
+            isCurrentSpaceAgendaEnabled={state.content.agenda_enabled}
             isReadOnlyMode={
               state.loggedUser.userRoleIdInWorkspace < ROLE.workspaceManager.id &&
               state.loggedUser.profile !== PROFILE.administrator.slug
             }
+            key='workspace_advanced'
+            lang={state.loggedUser.lang}
+            memberList={state.content.memberList ? state.content.memberList.map(m => m.user) : []}
             textareaId={WORKSPACE_DESCRIPTION_TEXTAREA_ID}
-            autoCompleteCursorPosition={state.autoCompleteCursorPosition}
-            autoCompleteItemList={state.autoCompleteItemList}
-            customColor={state.config.hexcolor}
-            description={state.content.description}
-            defaultRole={state.content.default_user_role}
-            displayPopupValidateDeleteWorkspace={state.displayPopupValidateDeleteWorkspace}
-            isAutoCompleteActivated={state.isAutoCompleteActivated}
-            onClickAutoCompleteItem={(item) => {
-              tinymceAutoCompleteHandleClickItem(item, this.setState.bind(this))
-            }}
-            onClickValidateNewDescription={this.handleClickValidateNewDescription}
+            onChangeNewDefaultRole={this.handleChangeNewDefaultRole}
             onClickClosePopupDeleteWorkspace={this.handleClickClosePopupDeleteWorkspace}
             onClickDeleteWorkspaceBtn={this.handleClickDeleteWorkspaceBtn}
             onClickValidateNewDefaultRole={this.handleClickValidateNewDefaultRole}
+            onClickValidateNewDescription={this.handleClickValidateNewDescription}
             onClickValidatePopupDeleteWorkspace={this.handleClickValidateDeleteWorkspace}
-            onChangeDescription={this.handleChangeDescription}
-            onChangeNewDefaultRole={this.handleChangeNewDefaultRole}
-            key='workspace_advanced'
-            onTinyMceInput={this.handleTinyMceInput}
-            onTinyMceKeyDown={this.handleTinyMceKeyDown}
-            onTinyMceKeyUp={this.handleTinyMceKeyUp}
-            onTinyMceSelectionChange={this.handleTinyMceSelectionChange}
           />
 
           <PopinFixedRightPart

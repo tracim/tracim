@@ -1,7 +1,6 @@
 from datetime import datetime
-import typing
-
 import marshmallow
+import typing
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.validator import bool_as_int_validator
@@ -116,7 +115,9 @@ class ContentSearchQuerySchema(marshmallow.Schema):
     # However, in functional tests, since apps are not enabled, filterable_content_types is empty
     # and tests break.
     content_types = StringList(
-        marshmallow.fields.String(), required=False, description="content_types to show",
+        marshmallow.fields.String(),
+        required=False,
+        description="content_types to show",
     )
     show_archived = marshmallow.fields.Int(
         example=0,
@@ -160,10 +161,14 @@ class AdvancedContentSearchQuerySchema(ContentSearchQuerySchema):
         description="select contents in these workspaces",
     )
     author__public_names = StringList(
-        marshmallow.fields.String(), required=False, description="select contents by these authors",
+        marshmallow.fields.String(),
+        required=False,
+        description="select contents by these authors",
     )
     last_modifier__public_names = StringList(
-        marshmallow.fields.String(), required=False, description="select contents by these authors",
+        marshmallow.fields.String(),
+        required=False,
+        description="select contents by these authors",
     )
     file_extensions = StringList(
         marshmallow.fields.String(),
@@ -206,8 +211,11 @@ class ContentSearchSchema(ContentDigestSchema, UserInfoContentAbstractSchema):
     path = marshmallow.fields.List(marshmallow.fields.Nested(ContentMinimalSchema))
     is_active = marshmallow.fields.Boolean()
     comment_count = marshmallow.fields.Integer(example=12, validate=positive_int_validator)
+    todo_count = marshmallow.fields.Integer(example=5, validate=positive_int_validator)
     content_size = marshmallow.fields.Integer(
-        example=1200, description="Content size in bytes", validate=positive_int_validator
+        example=1200,
+        description="Content size in bytes",
+        validate=positive_int_validator,
     )
 
 
@@ -224,17 +232,26 @@ class FacetCountSchema(marshmallow.Schema):
 
 class DateRangeSchema(marshmallow.Schema):
     date_from = marshmallow.fields.DateTime(
-        load_from="from", dump_to="from", format=DATETIME_FORMAT, required=False, missing=None
+        load_from="from",
+        dump_to="from",
+        format=DATETIME_FORMAT,
+        required=False,
+        missing=None,
     )
     date_to = marshmallow.fields.DateTime(
-        load_from="to", dump_to="to", format=DATETIME_FORMAT, required=False, missing=None
+        load_from="to",
+        dump_to="to",
+        format=DATETIME_FORMAT,
+        required=False,
+        missing=None,
     )
 
 
 class ContentFacetsSchema(marshmallow.Schema):
     workspace_names = marshmallow.fields.List(
         marshmallow.fields.Nested(
-            FacetCountSchema(), description="search matches contents in these workspaces"
+            FacetCountSchema(),
+            description="search matches contents in these workspaces",
         )
     )
     author__public_names = marshmallow.fields.List(
@@ -245,7 +262,8 @@ class ContentFacetsSchema(marshmallow.Schema):
     )
     content_types = marshmallow.fields.List(
         marshmallow.fields.Nested(
-            FacetCountSchema(), description="search matches contents with these content types"
+            FacetCountSchema(),
+            description="search matches contents with these content types",
         )
     )
     last_modifier__public_names = marshmallow.fields.List(
@@ -256,12 +274,14 @@ class ContentFacetsSchema(marshmallow.Schema):
     )
     file_extensions = marshmallow.fields.List(
         marshmallow.fields.Nested(
-            FacetCountSchema(), description="search matches contents with these file extensions"
+            FacetCountSchema(),
+            description="search matches contents with these file extensions",
         )
     )
     statuses = marshmallow.fields.List(
         marshmallow.fields.Nested(
-            FacetCountSchema(), description="search matches contents with these statuses"
+            FacetCountSchema(),
+            description="search matches contents with these statuses",
         )
     )
     tags = marshmallow.fields.List(

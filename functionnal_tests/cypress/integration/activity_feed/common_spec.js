@@ -1,4 +1,4 @@
-import { PAGES, URLS } from '../../support/urls_commands.js'
+import { PAGES } from '../../support/urls_commands.js'
 
 const activityPages = [
   { name: 'Personal', page: PAGES.RECENT_ACTIVITIES, initialItemCount: 3 },
@@ -117,13 +117,13 @@ for (const pageTestCase of activityPages) {
       })
 
       it('should have a title link, clicking on it opens the content', () => {
-        cy.get('[data-cy=FilenameWithExtension__label]').click()
-        cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ workspaceId, contentType: 'file', contentId: fileId }))
+        cy.get('[data-cy=FilenameWithBadges__label]').click()
+        cy.location('pathname').should('be.equal', `/ui/workspaces/${workspaceId}/contents/file/${fileId}`)
       })
 
       it('should have a preview, clicking on it opens the content', () => {
         cy.get('.feedItem__preview__image > img').click()
-        cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ workspaceId, contentType: 'file', contentId: fileId }))
+        cy.location('pathname').should('be.equal', `/ui/workspaces/${workspaceId}/contents/file/${fileId}`)
       })
 
       it('should have a button on last activity, clicking on it opens a short history', () => {
@@ -159,7 +159,7 @@ for (const pageTestCase of activityPages) {
 
         cy.get('.feedItem__preview__overflow').should('not.exist')
 
-        cy.get('.feedItem__preview__html')
+        cy.get('.feedItem__preview')
           .should('contain.text', smallContent)
       })
 
@@ -197,9 +197,9 @@ for (const pageTestCase of activityPages) {
 
         cy.get('.feedItem__preview__overflow').should('be.visible')
 
-        cy.get('.feedItem__preview__html')
+        cy.get('.feedItem__preview')
           .click()
-        cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ workspaceId, contentType: 'html-document', contentId: contentId }))
+        cy.location('pathname').should('be.equal', `/ui/workspaces/${workspaceId}/contents/html-document/${contentId}`)
       })
 
       it('A translation button should be visible', function () {

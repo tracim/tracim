@@ -3,36 +3,39 @@ import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import { withRouter } from 'react-router-dom'
 import {
-  TracimComponent,
-  TLM_ENTITY_TYPE as TLM_ET,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  PageWrapper,
-  PageContent,
-  IconButton,
   BREADCRUMBS_TYPE,
   COLORS,
   CUSTOM_EVENT,
+  PAGE,
+  PROFILE,
   ROLE,
   ROLE_LIST,
-  PROFILE,
-  buildHeadTitle,
-  PAGE,
-  removeAtInUsername,
   SPACE_TYPE,
-  addExternalLinksIcons
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  getMyselfKnownMember,
+  handleFetchResult,
+  IconButton,
+  Loading,
+  PageContent,
+  PageWrapper,
+  TracimComponent,
+  buildHeadTitle,
+  removeAtInUsername,
+  addExternalLinksIcons,
+  getSpaceUserRoleList
 } from 'tracim_frontend_lib'
 import {
-  getMyselfKnownMember,
   getSubscriptions,
-  postWorkspaceMember,
-  deleteWorkspaceMember,
-  putMyselfWorkspaceDoNotify
+  postUserRole,
+  deleteUserRole,
+  putMyselfWorkspaceEmailNotificationType
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
-  updateUserWorkspaceSubscriptionNotif,
   setBreadcrumbs,
-  setHeadTitle
+  setHeadTitle,
+  setUserRoleList
 } from '../action-creator.sync.js'
 import appFactory from '../util/appFactory.js'
 import {
@@ -42,13 +45,11 @@ import {
 import UserStatus from '../component/Dashboard/UserStatus.jsx'
 import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
 import MemberList from '../component/Dashboard/MemberList.jsx'
-import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
-import WebdavInfo from '../component/Dashboard/WebdavInfo.jsx'
 import TabBar from '../component/TabBar/TabBar.jsx'
 import WorkspaceRecentActivities from './WorkspaceRecentActivities.jsx'
 import { HACK_COLLABORA_CONTENT_TYPE } from './WorkspaceContent.jsx'
 
-const ALWAYS_ALLOWED_BUTTON_SLUGS = ['contents/all', 'agenda']
+const ALWAYS_ALLOWED_BUTTON_SLUGS = ['contents/all', 'agenda', 'gallery']
 
 export class Dashboard extends React.Component {
   constructor (props) {
@@ -60,9 +61,10 @@ export class Dashboard extends React.Component {
         avatarUrl: '',
         personalData: '',
         publicName: '',
-        role: '',
+        role: props.currentWorkspace.defaultRole,
         isEmail: false
       },
+      isMemberListLoading: false,
       displayNewMemberForm: false,
       autoCompleteFormNewMemberActive: false,
       searchedKnownMemberList: [],
@@ -98,10 +100,43 @@ export class Dashboard extends React.Component {
     this.setHeadTitle()
     this.loadNewRequestNumber()
     this.buildBreadcrumbs()
+    if (this.currentWorkspace !== undefined && this.currentWorkspace.memberList === undefined) {
+      this.updateWorkspaceList()
+    }
   }
 
-  async componentDidUpdate (prevProps, prevState) {
+  async updateWorkspaceList () {
     const { props } = this
+
+    const requestUserRoleList = await getSpaceUserRoleList(FETCH_CONFIG.apiUrl, props.currentWorkspace.id)
+
+    const responseUserRoleList = await handleFetchResult(requestUserRoleList)
+
+    if (responseUserRoleList.apiResponse.status === 200) {
+      props.dispatch(setUserRoleList(responseUserRoleList.body))
+    } else {
+      switch (responseUserRoleList.apiResponse.status) {
+        case 200: break
+        case 400: break
+        default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('member list')}`, 'warning')); break
+      }
+    }
+  }
+
+  async componentDidUpdate (prevProps) {
+    const { props } = this
+
+    // INFO - CH - 2022 06 16 - empty string is the default value for the property currentWorkspace.defaultRole in the reducer
+    if (prevProps.currentWorkspace.defaultRole === '' && props.currentWorkspace.defaultRole !== '') {
+      this.setState(prev => ({ newMember: { ...prev.newMember, role: props.currentWorkspace.defaultRole } }))
+    }
+
+    if (prevProps.currentWorkspace.defaultRole !== '' && props.currentWorkspace.defaultRole === '') {
+      this.setState(prev => ({ newMember: { ...prev.newMember, role: props.currentWorkspace.defaultRole } }))
+    }
+    if (props.currentWorkspace !== undefined && props.currentWorkspace.memberList === undefined) {
+      this.updateWorkspaceList()
+    }
 
     if (!prevProps.match || !props.match || prevProps.currentWorkspace.id === props.currentWorkspace.id) return
     if (prevProps.system.config.instance_name !== props.system.config.instance_name) this.setHeadTitle()
@@ -115,7 +150,7 @@ export class Dashboard extends React.Component {
         avatarUrl: '',
         personalData: '',
         publicName: '',
-        role: '',
+        role: props.currentWorkspace.defaultRole,
         isEmail: false
       }
     })
@@ -130,8 +165,11 @@ export class Dashboard extends React.Component {
 
   loadNewRequestNumber = async () => {
     const { props } = this
+    const spaceMemberList = (props.workspaceList.find(workspace => workspace.id === props.currentWorkspace.id) || {}).memberList || []
+    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(
+      props.user.userId, spaceMemberList, ROLE_LIST
+    )
 
-    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
     if (userRoleIdInWorkspace < ROLE.workspaceManager.id) return
 
     const fetchGetWorkspaceSubscriptions = await props.dispatch(getSubscriptions(props.currentWorkspace.id))
@@ -189,16 +227,27 @@ export class Dashboard extends React.Component {
 
   handleClickCloseAddMemberBtn = () => this.setState({ displayNewMemberForm: false })
 
-  handleToggleNotifBtn = () => this.setState(prevState => ({ displayNotifBtn: !prevState.displayNotifBtn }))
-
   handleToggleWebdavBtn = () => this.setState(prevState => ({ displayWebdavBtn: !prevState.displayWebdavBtn }))
 
   handleSearchUser = async personalDataToSearch => {
     const { props } = this
-    const fetchUserKnownMemberList = await props.dispatch(getMyselfKnownMember(personalDataToSearch, props.currentWorkspace.id))
-    switch (fetchUserKnownMemberList.status) {
-      case 200: this.setState({ searchedKnownMemberList: fetchUserKnownMemberList.json }); break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('known members list')}`, 'warning')); break
+    // INFO - CH - 2023-11-23 - getMyselfKnownMember is an async function from frontend_lib. It doesn't return
+    // the same objects as async function in frontend/. This explains the handleFetchResult, the .apiResponse
+    // and the .body
+    const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(
+      FETCH_CONFIG.apiUrl,
+      personalDataToSearch,
+      null,
+      props.currentWorkspace.id
+    ))
+    switch (fetchUserKnownMemberList.apiResponse.status) {
+      case 200: this.setState({ searchedKnownMemberList: fetchUserKnownMemberList.body }); break
+      default:
+        props.dispatch(newFlashMessage(
+          `${props.t('An error has happened while getting')} ${props.t('known members list')}`,
+          'warning'
+        ))
+        break
     }
   }
 
@@ -258,15 +307,17 @@ export class Dashboard extends React.Component {
       return false
     }
 
+    this.setState({ isMemberListLoading: true })
+
     const newMemberInKnownMemberList = state.searchedKnownMemberList.find(u => u.user_id === state.newMember.id)
 
     if (state.newMember.id === '' && newMemberInKnownMemberList) { // this is to force sending the id of the user to the api if he exists
       this.setState({ newMember: { ...state.newMember, id: newMemberInKnownMemberList.user_id } })
     }
 
-    const fetchWorkspaceNewMember = await props.dispatch(postWorkspaceMember(props.currentWorkspace.id, {
+    const fetchWorkspaceNewMember = await props.dispatch(postUserRole(props.currentWorkspace.id, {
       id: state.newMember.id || newMemberInKnownMemberList ? newMemberInKnownMemberList.user_id : null,
-      email: state.newMember.isEmail ? state.newMember.personalData : '',
+      email: state.newMember.isEmail ? state.newMember.personalData.trim() : '',
       username: state.newMember.isEmail ? '' : state.newMember.personalData,
       role: state.newMember.role
     }))
@@ -277,12 +328,14 @@ export class Dashboard extends React.Component {
         avatarUrl: '',
         personalData: '',
         publicName: '',
-        role: '',
+        role: props.currentWorkspace.defaultRole,
         isEmail: false
       },
       autoCompleteFormNewMemberActive: false,
       displayNewMemberForm: false
     })
+
+    this.setState({ isMemberListLoading: false })
 
     switch (fetchWorkspaceNewMember.status) {
       case 200:
@@ -319,13 +372,17 @@ export class Dashboard extends React.Component {
   handleClickRemoveMember = async memberId => {
     const { props } = this
 
-    const fetchWorkspaceRemoveMember = await props.dispatch(deleteWorkspaceMember(props.currentWorkspace.id, memberId))
+    this.setState({ isMemberListLoading: true })
+
+    const fetchWorkspaceRemoveMember = await props.dispatch(deleteUserRole(props.currentWorkspace.id, memberId))
     switch (fetchWorkspaceRemoveMember.status) {
       case 204:
         props.dispatch(newFlashMessage(props.t('Member removed'), 'info'))
         break
       default: props.dispatch(newFlashMessage(props.t('Error while removing member'), 'warning')); break
     }
+
+    this.setState({ isMemberListLoading: false })
   }
 
   handleClickOpenAdvancedDashboard = () => {
@@ -340,28 +397,38 @@ export class Dashboard extends React.Component {
     this.setState({ advancedDashboardOpenedId: props.currentWorkspace.id })
   }
 
-  handleClickAddNotification = async () => {
+  handleClickChangeEmailNotificationType = async (emailNotificationType) => {
     const { props } = this
-    const fetchWorkspaceUserAddNotification = await props.dispatch(putMyselfWorkspaceDoNotify(props.currentWorkspace.id, true))
-    switch (fetchWorkspaceUserAddNotification.status) {
-      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.userId, props.currentWorkspace.id, true)); break
-      default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
-    }
-  }
 
-  handleClickRemoveNotification = async () => {
-    const { props } = this
-    const fetchWorkspaceUserAddNotification = await props.dispatch(putMyselfWorkspaceDoNotify(props.currentWorkspace.id, false))
-    switch (fetchWorkspaceUserAddNotification.status) {
-      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.userId, props.currentWorkspace.id, false)); break
-      default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
+    let fetchChangeEmailNotificationType
+    try {
+      fetchChangeEmailNotificationType = await props.dispatch(putMyselfWorkspaceEmailNotificationType(
+        props.currentWorkspace.id, emailNotificationType
+      ))
+    } catch (e) {
+      props.dispatch(newFlashMessage(props.t('Error while changing email subscription'), 'warning'))
+      console.error(
+        'Error while changing email subscription. handleClickChangeEmailNotificationType.',
+        fetchChangeEmailNotificationType
+      )
     }
   }
 
   render () {
     const { props, state } = this
 
-    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
+    if (props.currentWorkspace.memberList === undefined) {
+      return (
+        <Loading
+          height={100}
+          width={100}
+        />
+      )
+    }
+
+    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(
+      props.user.userId, props.currentWorkspace.memberList, ROLE_LIST
+    )
 
     // INFO - GB - 2019-08-29 - these filters are made temporarily by the frontend, but may change to have all the intelligence in the backend
     // https://github.com/tracim/tracim/issues/2326
@@ -376,6 +443,7 @@ export class Dashboard extends React.Component {
       })
     }
 
+    // INFO - MP - 06-09-2022 - Build the application list buttons
     contentTypeButtonList = contentTypeButtonList.concat(props.contentType.length > 0 // INFO - CH - 2019-04-03 - wait for content type api to have responded
       ? props.appList
         .filter(app => userRoleIdInWorkspace === ROLE.contributor.id ? app.slug !== 'contents/folder' : true)
@@ -383,6 +451,7 @@ export class Dashboard extends React.Component {
         .filter(app => app.slug !== 'contents/share_folder')
         .filter(app => app.slug !== 'share_content')
         .filter(app => app.slug !== 'upload_permission')
+        .filter(app => app.slug !== 'contents/todo')
         .map(app => {
           const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || { creationLabel: '', slug: '' }
           // INFO - CH - 2019-04-03 - hard coding some agenda properties for now since some end points requires some clarifications
@@ -425,15 +494,6 @@ export class Dashboard extends React.Component {
       : []
     )
 
-    // INFO - CH - 2019-04-03 - hard coding the button "explore contents" since it is not an app for now
-    contentTypeButtonList.push({
-      slug: 'content/all', // INFO - CH - 2019-04-03 - This will be overridden but it avoid a unique key warning
-      ...props.currentWorkspace.sidebarEntryList.find(se => se.slug === 'contents/all'),
-      creationLabel: props.t('Explore contents'),
-      route: PAGE.WORKSPACE.CONTENT_LIST(props.currentWorkspace.id),
-      hexcolor: '#999' // INFO - CH - 2019-04-08 - different color from sidebar because it is more readable here
-    })
-
     const description = addExternalLinksIcons(props.currentWorkspace.description.trim())
 
     return (
@@ -443,6 +503,7 @@ export class Dashboard extends React.Component {
             <TabBar
               currentSpace={props.currentWorkspace}
               breadcrumbs={props.breadcrumbs}
+              isEmailNotifActivated={props.system.config.email_notification_activated}
             />
 
             <PageContent>
@@ -462,30 +523,23 @@ export class Dashboard extends React.Component {
                         </div>
                       )
                     )}
-                    <div className='dashboard__workspace__detail__buttons'>
-                      <IconButton
-                        icon='fas fa-fw fa-cog'
-                        text={props.t('Space settings')}
-                        onClick={this.handleClickOpenAdvancedDashboard}
-                      />
-                    </div>
                   </div>
-                  {props.currentWorkspace && props.currentWorkspace.id && <WorkspaceRecentActivities workspaceId={props.currentWorkspace.id} />}
+                  {props.currentWorkspace && props.currentWorkspace.id && (
+                    <WorkspaceRecentActivities workspaceId={props.currentWorkspace.id} />
+                  )}
                 </div>
 
                 <div className='dashboard__workspace__rightMenu'>
                   <UserStatus
                     user={props.user}
-                    currentWorkspace={props.currentWorkspace}
+                    currentWorkspace={props.workspaceList.find(workspace => workspace.id === props.currentWorkspace.id)}
                     displayNotifBtn={props.system.config.email_notification_activated}
                     displaySubscriptionRequestsInformation={
                       userRoleIdInWorkspace >= ROLE.workspaceManager.id &&
                       props.currentWorkspace.accessType === SPACE_TYPE.onRequest.slug
                     }
                     newSubscriptionRequestsNumber={state.newSubscriptionRequestsNumber}
-                    onClickToggleNotifBtn={this.handleToggleNotifBtn}
-                    onClickAddNotify={this.handleClickAddNotification}
-                    onClickRemoveNotify={this.handleClickRemoveNotification}
+                    onClickChangeEmailNotificationType={this.handleClickChangeEmailNotificationType}
                     t={props.t}
                   />
 
@@ -503,9 +557,19 @@ export class Dashboard extends React.Component {
                           onClickBtn={() => props.history.push(app.route)}
                           appSlug={app.slug}
                           key={app.slug}
+                          dataCy={`create_${app.slug}`}
                         />
                       )
                     })}
+
+                    <IconButton
+                      icon='fas fa-fw fa-cog'
+                      text={(userRoleIdInWorkspace >= ROLE.contentManager.id
+                        ? props.t('Space settings')
+                        : props.t('Space information')
+                      )}
+                      onClick={this.handleClickOpenAdvancedDashboard}
+                    />
                   </div>
 
                   <MemberList
@@ -518,10 +582,9 @@ export class Dashboard extends React.Component {
                     autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
                     publicName={state.newMember.publicName}
                     isEmail={state.newMember.isEmail}
+                    isLoading={state.isMemberListLoading}
                     onChangePersonalData={this.handleChangePersonalData}
                     onClickKnownMember={this.handleClickKnownMember}
-                    // createAccount={state.newMember.createAccount}
-                    // onChangeCreateAccount={this.handleChangeNewMemberCreateAccount}
                     role={state.newMember.role}
                     onChangeRole={this.handleChangeNewMemberRole}
                     onClickValidateNewMember={this.handleClickValidateNewMember}
@@ -531,29 +594,11 @@ export class Dashboard extends React.Component {
                     onClickRemoveMember={this.handleClickRemoveMember}
                     userRoleIdInWorkspace={userRoleIdInWorkspace}
                     canSendInviteNewUser={[PROFILE.administrator.slug, PROFILE.manager.slug].includes(props.user.profile)}
-                    emailNotifActivated={props.system.config.email_notification_activated}
+                    isEmailNotifActivated={props.system.config.email_notification_activated}
                     autoCompleteClicked={state.autoCompleteClicked}
                     onClickAutoComplete={this.handleClickAutoComplete}
                     t={props.t}
                   />
-
-                  {props.appList.some(a => a.slug === 'agenda') && props.currentWorkspace.agendaEnabled && (
-                    <AgendaInfo
-                      customClass='dashboard__section'
-                      introText={props.t('Use this link to integrate this agenda to your')}
-                      caldavText={props.t('CalDAV compatible software')}
-                      agendaUrl={props.currentWorkspace.agendaUrl}
-                    />
-                  )}
-
-                  {props.system.config.webdav_enabled && (
-                    <WebdavInfo
-                      customClass='dashboard__section'
-                      introText={props.t('Use this link to integrate Tracim in your file explorer')}
-                      webdavText={props.t('(protocole WebDAV)')}
-                      webdavUrl={props.system.config.webdav_url}
-                    />
-                  )}
                 </div>
               </div>
             </PageContent>
@@ -564,7 +609,7 @@ export class Dashboard extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, contentType, appList, currentWorkspace, system }) => ({
-  breadcrumbs, user, contentType, appList, currentWorkspace, system
+const mapStateToProps = ({ breadcrumbs, user, knownMemberList, contentType, appList, currentWorkspace, system }) => ({
+  breadcrumbs, user, knownMemberList, contentType, appList, currentWorkspace, system
 })
 export default connect(mapStateToProps)(withRouter(appFactory(translate()(TracimComponent(Dashboard)))))

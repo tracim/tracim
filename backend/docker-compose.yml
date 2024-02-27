@@ -2,7 +2,7 @@
 # Also useful for local development.
 # By default the mysql & mariadb databases will be lost when the container is exited (see TMPFS_DIR).
 # WARNING: This file is meant for testing only and mustn't be used as-is for production environments.
-# Production-ready docker-compose examples are available in the "tools_docker" directory of the Tracim repository.
+# Production-ready docker compose examples are available in the "tools_docker" directory of the Tracim repository.
 version: '3'
 services:
   pushpin:
@@ -26,6 +26,7 @@ services:
     environment:
       discovery.type: single-node
       cluster.routing.allocation.disk.threshold_enabled: "false"
+      ES_JAVA_OPTS: "-Xms4g -Xmx4g"
   mailhog:
     image: mailhog/mailhog:v1.0.1
     ports:
@@ -43,34 +44,7 @@ services:
       POSTGRES_DB: ${DATABASE_NAME}
       POSTGRES_USER: user
       POSTGRES_PASSWORD: secret
-  mysql:
-    image: mysql:8.0
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_DATABASE: ${DATABASE_NAME}
-      MYSQL_USER: user
-      MYSQL_PASSWORD: secret
-      MYSQL_RANDOM_ROOT_PASSWORD: "true"
-    tmpfs:
-      - ${TMPFS_DIR}
-    command:
-      - "--character-set-server=utf8mb4"
-      - "--collation-server=utf8mb4_0900_ai_ci"
-  mariadb:
-    image: mariadb/server:10.3
-    ports:
-      - "3307:3306"
-    environment:
-      MARIADB_DATABASE: ${DATABASE_NAME}
-      MARIADB_USER: user
-      MARIADB_PASSWORD: secret
-      MARIADB_RANDOM_ROOT_PASSWORD: "true"
-    command:
-      - "--character-set-server=utf8mb4"
-      - "--collation-server=utf8mb4_unicode_520_ci"
-    tmpfs:
-      - ${TMPFS_DIR}
+    command: postgres -c fsync=off -c full_page_writes=off -c synchronous_commit=OFF -c shared_preload_libraries=pg_stat_statements
   redis:
     image: redis:alpine3.12
     ports:

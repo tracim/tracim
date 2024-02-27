@@ -10,27 +10,22 @@ import {
   NOTIFICATION_LIST,
   READ,
   readContentNotification,
-  readNotification,
   readNotificationList,
+  readEveryNotification,
   SET,
   setNextPage,
-  setNotificationList,
   UPDATE,
   updateNotification
 } from '../../../src/action-creator.sync.js'
 import notificationPage, {
-  belongsToGroup,
-  hasSameAuthor,
-  hasSameContent,
-  hasSameWorkspace,
-  serializeNotification,
-  sortByCreatedDate
+  serializeNotification
 } from '../../../src/reducer/notificationPage.js'
 import { globalManagerFromApi } from '../../fixture/user/globalManagerFromApi.js'
 import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
 import { serialize } from 'tracim_frontend_lib'
 import { serializeUserProps } from '../../../src/reducer/user.js'
 import { serializeWorkspaceListProps } from '../../../src/reducer/workspaceList.js'
+import { workspaceList } from '../../hocMock/redux/workspaceList/workspaceList.js'
 
 const TLM = {
   created: '2020-07-23T12:44:50Z',
@@ -48,7 +43,7 @@ const notification = {
   author: {
     publicName: globalManagerFromApi.public_name,
     userId: globalManagerFromApi.user_id,
-    hasAvatar: false,
+    hasAvatar: true,
     hasCover: false
   },
   content: null,
@@ -77,7 +72,7 @@ const mention = {
   author: {
     publicName: globalManagerFromApi.public_name,
     userId: globalManagerFromApi.user_id,
-    hasAvatar: false,
+    hasAvatar: true,
     hasCover: false
   },
   content: null,
@@ -90,34 +85,33 @@ const mention = {
   user: serialize(globalManagerFromApi, serializeUserProps)
 }
 
+const DEFAULT_UNREAD_NOTIFICATION_COUNT = 10
+const DEFAULT_UNREAD_MENTION_COUNT = 5
+
 describe('reducer notificationPage.js', () => {
   describe('actions', () => {
     const initialState = {
       list: [],
       hasNextPage: false,
       nextPageToken: '',
-      unreadNotificationCount: 0,
-      unreadMentionCount: 0
+      // NOTE - MP - 2023-04-17 - Defining unreadNotificationCount and unreadMentionCount as bigger
+      // than 0 is necessary to test the good behavior of the reducer when theses values doesn't
+      // correspond to the number of unread notifications in the list. (typically when the user
+      // haven't loaded the full list of notifications)
+      unreadNotificationCount: DEFAULT_UNREAD_NOTIFICATION_COUNT,
+      unreadMentionCount: DEFAULT_UNREAD_MENTION_COUNT
     }
 
-    describe(`${SET}/${NOTIFICATION_LIST}`, () => {
-      const listOfNotification = notificationPage(initialState, setNotificationList([TLM]))
-
-      it('should return the list of notification from the objects passed as parameter', () => {
-        expect(listOfNotification).to.deep.equal({ ...initialState, list: [notification] })
-      })
-    })
-
     describe(`${ADD}/${NOTIFICATION}`, () => {
-      const listOfNotification = notificationPage(initialState, addNotification(TLM))
-      const listOfMention = notificationPage(initialState, addNotification(TLMMention))
+      const listOfNotification = notificationPage(initialState, addNotification(TLM, workspaceList.workspaceList))
+      const listOfMention = notificationPage(initialState, addNotification(TLMMention, workspaceList.workspaceList))
 
       it('should return the list of notification added from the object passed as parameter', () => {
         expect(listOfNotification).to.deep.equal({
           ...initialState,
           list: [notification],
-          unreadMentionCount: 0,
-          unreadNotificationCount: 1
+          unreadMentionCount: DEFAULT_UNREAD_MENTION_COUNT,
+          unreadNotificationCount: DEFAULT_UNREAD_NOTIFICATION_COUNT + 1
         })
       })
 
@@ -125,8 +119,8 @@ describe('reducer notificationPage.js', () => {
         expect(listOfMention).to.deep.equal({
           ...initialState,
           list: [mention],
-          unreadMentionCount: 1,
-          unreadNotificationCount: 1
+          unreadMentionCount: DEFAULT_UNREAD_MENTION_COUNT + 1,
+          unreadNotificationCount: DEFAULT_UNREAD_NOTIFICATION_COUNT + 1
         })
       })
     })
@@ -135,15 +129,41 @@ describe('reducer notificationPage.js', () => {
       const listOfNotification = notificationPage(initialState, updateNotification(notification.id, [notification, notification]))
 
       it('should return the list of notification with the notification replaced by the list', () => {
-        expect(listOfNotification).to.deep.equal({ ...initialState, list: [notification, notification] })
+        expect(listOfNotification).to.deep.equal({
+          ...initialState,
+          list: [notification, notification]
+        })
       })
     })
 
     describe(`${READ}/${NOTIFICATION}`, () => {
-      const listOfNotification = notificationPage({ ...initialState, list: [notification], unreadNotificationCount: 1 }, readNotification(notification.id))
-
-      it('should return the list of objects passed as parameter', () => {
-        expect(listOfNotification).to.deep.equal({ ...initialState, list: [{ ...notification, read: true }], unreadNotificationCount: 0 })
+      const testCases = [
+        {
+          type: notification,
+          expectedResult: {
+            ...initialState,
+            list: [{ ...notification, read: true }],
+            unreadNotificationCount: DEFAULT_UNREAD_NOTIFICATION_COUNT - 1
+          },
+          description: 'notification'
+        },
+        {
+          type: mention,
+          expectedResult: {
+            ...initialState,
+            list: [{ ...mention, read: true }],
+            unreadMentionCount: DEFAULT_UNREAD_MENTION_COUNT - 1,
+            unreadNotificationCount: DEFAULT_UNREAD_NOTIFICATION_COUNT - 1
+          },
+          description: 'mention'
+        }
+      ]
+      testCases.forEach(testCase => {
+        it(`should read a ${testCase.description} in a flat list`, () => {
+          const initState = { ...initialState, list: [testCase.type] }
+          const resultList = notificationPage(initState, readNotificationList([testCase.type.id]))
+          expect(resultList).to.deep.equal(testCase.expectedResult)
+        })
       })
     })
 
@@ -153,30 +173,51 @@ describe('reducer notificationPage.js', () => {
         content: { label: 'test', id: 5 }
       }
       const listOfNotification = notificationPage(
-        { ...initialState, list: [notificationWithContent], unreadNotificationCount: 1 },
+        { ...initialState, list: [notificationWithContent] },
         readContentNotification(5)
       )
 
       it('should return the list of objects with read set as true and counts as 0', () => {
         expect(listOfNotification).to.deep.equal(
-          { ...initialState, list: [{ ...notificationWithContent, read: true }], unreadNotificationCount: 0 })
+          {
+            ...initialState,
+            list: [{ ...notificationWithContent, read: true }],
+            unreadNotificationCount: DEFAULT_UNREAD_NOTIFICATION_COUNT - 1
+          })
       })
     })
 
     describe(`${READ}/${NOTIFICATION_LIST}`, () => {
-      const listOfNotification = notificationPage({ ...initialState, list: [notification], unreadNotificationCount: 1 }, readNotificationList())
+      const listOfNotification = notificationPage(
+        { ...initialState, list: [notification] },
+        readEveryNotification()
+      )
 
-      it('should return the list of objects passed as parameter', () => {
-        expect(listOfNotification).to.deep.equal({ ...initialState, list: [{ ...notification, read: true }], unreadNotificationCount: 0 })
+      it('should read every notification in a flat list', () => {
+        expect(listOfNotification).to.deep.equal(
+          {
+            ...initialState,
+            list: [{ ...notification, read: true }],
+            unreadNotificationCount: 0,
+            unreadMentionCount: 0
+          }
+        )
       })
     })
 
     describe(`${APPEND}/${NOTIFICATION_LIST}`, () => {
-      const listOfNotification = notificationPage({ ...initialState, list: [notification] }, appendNotificationList([{ ...TLM, event_id: 999 }]))
+      const listOfNotification = notificationPage(
+        { ...initialState, list: [notification] },
+        appendNotificationList(-1, [{ ...TLM, event_id: 999 }], workspaceList.workspaceList)
+      )
 
-      it('should return the list of notifications appended with the list passed as parameter', () => {
-        expect(listOfNotification).to.deep.equal({ ...initialState, list: [notification, { ...notification, id: 999 }] })
-      })
+      it('should return the list of notifications appended with the list passed as parameter',
+        () => {
+          expect(listOfNotification).to.deep.equal(
+            { ...initialState, list: [notification, { ...notification, id: 999 }] }
+          )
+        }
+      )
     })
 
     describe(`${SET}/${NEXT_PAGE}`, () => {
@@ -196,114 +237,5 @@ describe('serializeNotification', () => {
 
   it('should return an object (in camelCase)', () => {
     expect(serializeNotification(TLMMention)).to.deep.equal(mention)
-  })
-})
-
-describe('hasSameAuthor', () => {
-  it('should return false if list has a null or undefined element', () => {
-    expect(hasSameAuthor([null, { userId: 1 }, { userId: 1 }])).to.be.equal(false)
-  })
-
-  it('should return false if a element has a different author id', () => {
-    expect(hasSameAuthor([{ userId: 2 }, { userId: 1 }])).to.be.equal(false)
-  })
-
-  it('should return true if all elements has same authorid', () => {
-    expect(hasSameAuthor([{ userId: 1 }, { userId: 1 }])).to.be.equal(true)
-  })
-})
-
-describe('hasSameWorkspace', () => {
-  it('should return false if list has a null or undefined element', () => {
-    expect(hasSameWorkspace([null, { id: 1 }, { id: 1 }])).to.be.equal(false)
-  })
-
-  it('should return false if a element has a different workspace id', () => {
-    expect(hasSameWorkspace([{ id: 2 }, { id: 1 }])).to.be.equal(false)
-  })
-
-  it('should return true if all elements has same workspace id', () => {
-    expect(hasSameWorkspace([{ id: 1 }, { id: 1 }])).to.be.equal(true)
-  })
-})
-
-describe('hasSameContent', () => {
-  it('should return false if list has a element with null or undefined content', () => {
-    expect(hasSameContent([
-      { content: null },
-      { content: { id: 1, parentId: 2 }, type: 'content' },
-      { content: { id: 1, parentId: 2 }, type: 'content' }
-    ])).to.be.equal(false)
-  })
-
-  describe('only with contents', () => {
-    it('should return false if a element has a different content id', () => {
-      expect(hasSameContent([
-        { content: { id: 2, parentId: 2 }, type: 'content' },
-        { content: { id: 1, parentId: 2 }, type: 'content' }
-      ])).to.be.equal(false)
-    })
-
-    it('should return true if all elements has same content id', () => {
-      expect(hasSameContent([
-        { content: { id: 1, parentId: 2 }, type: 'content' },
-        { content: { id: 1, parentId: 3 }, type: 'content' }
-      ])).to.be.equal(true)
-    })
-  })
-
-  describe('with contents and comments', () => {
-    it('should return false if a element has a different content id or parentId', () => {
-      expect(hasSameContent([
-        { content: { id: 2, parentId: 3 }, type: 'content' },
-        { content: { id: 1, parentId: 3 }, type: 'comment' }
-      ])).to.be.equal(false)
-    })
-
-    it('should return true if all elements has same content', () => {
-      expect(hasSameContent([
-        { content: { id: 2, parentId: 3 }, type: 'content' },
-        { content: { id: 1, parentId: 2 }, type: 'comment' }
-      ])).to.be.equal(true)
-    })
-  })
-
-  describe('only with comments', () => {
-    it('should return false if a element has a different content id or parentId', () => {
-      expect(hasSameContent([
-        { content: { id: 2, parentId: 1 }, type: 'comment' },
-        { content: { id: 1, parentId: 2 }, type: 'comment' }
-      ])).to.be.equal(false)
-    })
-
-    it('should return true if all elements has same content', () => {
-      expect(hasSameContent([
-        { content: { id: 2, parentId: 3 }, type: 'comment' },
-        { content: { id: 1, parentId: 3 }, type: 'comment' }
-      ])).to.be.equal(true)
-    })
-  })
-})
-
-describe('belongsToGroup', () => {
-  const defaultElement = {
-    author: { userId: 1 },
-    content: { id: 2 },
-    type: 'content',
-    workspace: { id: 3 }
-  }
-
-  it('should return false if groupedNotification is null', () => {
-    expect(belongsToGroup(defaultElement, null, 2)).to.be.equal(false)
-  })
-
-  it('should return false if groupedNotification has no group', () => {
-    expect(belongsToGroup(defaultElement, {}, 2)).to.be.equal(false)
-  })
-})
-
-describe('sortByCreatedDate', () => {
-  it('should return the array sorted by created', () => {
-    expect(sortByCreatedDate([{ created: 5 }, { created: 2 }, { created: 9 }])).to.deep.equal([{ created: 9 }, { created: 5 }, { created: 2 }])
   })
 })

@@ -11,7 +11,8 @@ describe('operation :: workspace > create_new > html-document', function () {
   beforeEach(function () {
     cy.loginAs('administrators')
   })
-  it('dashboard > button', function () {
+  it.skip('dashboard > button', function () {
+    // FIXME - RJ - 2022-02-16 - disabled test (see #5436)
     cy.visitPage({
       pageName: p.DASHBOARD,
       params: { workspaceId: 1 }

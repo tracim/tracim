@@ -1,12 +1,15 @@
 import { v4 as uuidv4 } from 'uuid'
 import React from 'react'
 import i18n from './i18n.js'
-import { formatDistance, isAfter } from 'date-fns'
+import { format, formatDistance } from 'date-fns'
 import color from 'color'
 import dateFnsFr from 'date-fns/locale/fr'
 import dateFnsEn from 'date-fns/locale/en-US'
 import dateFnsPt from 'date-fns/locale/pt'
 import dateFnsDe from 'date-fns/locale/de'
+import dateFnsAr from 'date-fns/locale/ar-SA'
+import dateFnsEs from 'date-fns/locale/es'
+import dateFnsNbNO from 'date-fns/locale/nb'
 
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -33,7 +36,8 @@ export const PAGE = {
     GALLERY: (idws = ':idws') => `/ui/workspaces/${idws}/gallery`,
     RECENT_ACTIVITIES: (idws = ':idws') => `/ui/workspaces/${idws}/recent-activities`,
     PUBLICATION: (idws = ':idws', idcts = ':idcts') => `/ui/workspaces/${idws}/publications/${idcts}`,
-    PUBLICATIONS: (idws = ':idws') => `/ui/workspaces/${idws}/publications`
+    PUBLICATIONS: (idws = ':idws') => `/ui/workspaces/${idws}/publications`,
+    FOLDER_OPEN: (idws = ':idws', folderList) => `/ui/workspaces/${idws}/contents?folder_open=${folderList.toString()}`
   },
   LOGIN: '/ui/login',
   FORGOT_PASSWORD: '/ui/forgot-password',
@@ -55,15 +59,27 @@ export const PAGE = {
   RECENT_ACTIVITIES: '/ui/recent-activities',
   ONLINE_EDITION: (contentId) => `/api/collaborative-document-edition/wopi/files/${contentId}`,
   PUBLIC_PROFILE: (userId = ':userid') => `/ui/users/${userId}/profile`,
-  FAVORITES: '/ui/favorites'
+  FAVORITES: '/ui/favorites',
+  TODO: '/ui/todos'
 }
 
 export const DATE_FNS_LOCALE = {
   fr: dateFnsFr,
   en: dateFnsEn,
   pt: dateFnsPt,
-  de: dateFnsDe
+  de: dateFnsDe,
+  ar: dateFnsAr,
+  es: dateFnsEs,
+  nb_NO: dateFnsNbNO
 }
+
+// INFO - MP - 2022-06-09 - This array must stay synchronized with the supported extensions
+export const COLLABORA_EXTENSIONS = [
+  '.odg',
+  '.odp',
+  '.ods',
+  '.odt'
+]
 
 export const generateFetchResponse = async fetchResult => {
   const resultJson = await fetchResult.clone().json()
@@ -120,8 +136,6 @@ export const displayDistanceDate = (dateToDisplay, lang) => {
     { locale: DATE_FNS_LOCALE[lang], addSuffix: true }
   )
 }
-
-export const convertBackslashNToBr = msg => msg.replace(/\n/g, '<br />')
 
 export const BREADCRUMBS_TYPE = {
   CORE: 'CORE',
@@ -183,6 +197,16 @@ export const revisionTypeList = [{
   faIcon: 'far fa-copy',
   tradKey: i18n.t('Item copied'),
   label: 'Item copied'
+}, {
+  id: 'mark-as-template',
+  faIcon: 'fas fa-clipboard',
+  tradKey: i18n.t('Item marked as template'),
+  label: 'Item marked as template'
+}, {
+  id: 'unmark-as-template',
+  faIcon: 'fas fa-paste',
+  tradKey: i18n.t('Item unmarked as template'),
+  label: 'Item unmarked as template'
 }]
 
 const WORKSPACE_MANAGER = {
@@ -445,10 +469,12 @@ export const displayFileSize = (bytes, decimals) => {
 
 export const parserStringToList = (string, separatorList = [',', ';', '\n']) => {
   let parsedString = string
+
   separatorList.forEach(separator => {
     parsedString = parsedString.split(separator).join(',')
   })
-  return parsedString.split(',').filter(notEmptyString => notEmptyString !== '')
+
+  return parsedString.split(',').map(str => str.trim()).filter(notEmptyString => notEmptyString !== '')
 }
 
 // INFO - GB - 2021-09-16 - This function checks if the string looks like an email (username@domain)
@@ -492,6 +518,13 @@ export const IMG_LOAD_STATE = {
   ERROR: 'error'
 }
 
+export const STATUSES = {
+  OPEN: 'open',
+  VALIDATED: 'closed-validated',
+  CANCELLED: 'closed-unvalidated',
+  DEPRECATED: 'closed-deprecated'
+}
+
 export const buildTracimLiveMessageEventType = (entityType, coreEntityType, optionalSubType = null) => `${entityType}.${coreEntityType}${optionalSubType ? `.${optionalSubType}` : ''}`
 
 // INFO - CH - 2019-06-11 - This object must stay synchronized with the slugs of /api/system/content_types
@@ -501,11 +534,10 @@ export const CONTENT_TYPE = {
   THREAD: 'thread',
   FOLDER: 'folder',
   COMMENT: 'comment',
-  KANBAN: 'kanban'
+  KANBAN: 'kanban',
+  TODO: 'todo'
 }
 
-// FIXME - CH - 20210324 - this constant is a duplicate from frontend/src/util/helper.js
-// see https://github.com/tracim/tracim/issues/4340
 export const CONTENT_NAMESPACE = {
   CONTENT: 'content',
   UPLOAD: 'upload',
@@ -516,20 +548,6 @@ export const TIMELINE_TYPE = {
   COMMENT: CONTENT_TYPE.COMMENT,
   COMMENT_AS_FILE: `${CONTENT_TYPE.COMMENT}AsFile`,
   REVISION: 'revision'
-}
-
-export const sortTimelineByDate = (timeline) => {
-  return timeline.sort((a, b) => {
-    // INFO - GB - 2021-12-07 - since we don't have the millisecond from backend, we can
-    // have contents created at the same second. So we sort on revision_id for revision,
-    // content_id for comments and we choose revision over comments if we have to sort between both.
-    if (a.created_raw === b.created_raw) {
-      if (a.revision_id && b.revision_id) return parseInt(a.revision_id) - parseInt(b.revision_id)
-      if (!a.revision_id && !b.revision_id) return parseInt(a.content_id) - parseInt(b.content_id)
-      else return a.revision_id ? -1 : 1
-    }
-    return isAfter(new Date(a.created_raw), new Date(b.created_raw)) ? 1 : -1
-  })
 }
 
 export const addRevisionFromTLM = (data, timeline, lang, isTokenClient = true) => {
@@ -590,7 +608,7 @@ export const getCurrentContentVersionNumber = (appFeatureMode, content, timeline
 
 export const MINIMUM_CHARACTERS_USERNAME = 3
 export const MAXIMUM_CHARACTERS_USERNAME = 255
-export const ALLOWED_CHARACTERS_USERNAME = 'azAZ09-_'
+export const ALLOWED_CHARACTERS_USERNAME = 'azAZ09-_.'
 export const CHECK_USERNAME_DEBOUNCE_WAIT = 250
 
 export const NUMBER_RESULTS_BY_PAGE = 15
@@ -621,8 +639,8 @@ export const checkUsernameValidity = async (apiUrl, username, props) => {
     }
   }
 
-  // INFO - GB - 2020-06-08 The allowed characters are azAZ09-_
-  if (!(/^[A-Za-z0-9_-]*$/.test(username))) {
+  // INFO - GB - 2020-06-08 The allowed characters are azAZ09-_.
+  if (!(/^[A-Za-z0-9_.-]*$/.test(username))) {
     return {
       isUsernameValid: false,
       usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
@@ -657,11 +675,26 @@ export const checkUsernameValidity = async (apiUrl, username, props) => {
   }
 }
 
-export const formatAbsoluteDate = (rawDate, lang, options = {}) => new Date(rawDate).toLocaleString(lang, options)
+/**
+ * INFO - G.B. - 2022-09-10
+ * @param {*} rawDate Date to format
+ * @param {*} lang Locale lang
+ * @param {*} formatTime To see the different format time: https://date-fns.org/v2.29.2/docs/format
+ * @returns
+ */
+export const formatAbsoluteDate = (rawDate, lang = 'en', formatTime) => {
+  if (!rawDate) return
+  return format(new Date(rawDate), formatTime || 'Pp', { locale: DATE_FNS_LOCALE[lang] })
+}
 
-// Equality test done as numbers with the following rules:
-// - strings are converted to numbers before comparing
-// - undefined and null are converted to 0 before comparing
+/**
+ * Equality test done as numbers with the following rules:
+ * - strings are converted to numbers before comparing
+ * - undefined and null are converted to 0 before comparing
+ * @param {*} var1 number 1 to test
+ * @param {*} var2 number 2 to test
+ * @returns
+ */
 export const permissiveNumberEqual = (var1, var2) => {
   return Number(var1 || 0) === Number(var2 || 0)
 }
@@ -688,24 +721,10 @@ export const createSpaceTree = spaceList => {
   return newSpaceList
 }
 
-export const naturalCompareLabels = (itemA, itemB, lang) => {
-  // 2020-09-04 - RJ - WARNING. Option ignorePunctuation is seducing but makes the sort unstable.
-  return naturalCompare(itemA, itemB, lang, 'label')
-}
-
 export const naturalCompare = (itemA, itemB, lang, field) => {
   // 2020-09-04 - RJ - WARNING. Option ignorePunctuation is seducing but makes the sort unstable.
-  return itemA[field].localeCompare(itemB[field], lang, { numeric: true })
-}
-
-export const sortWorkspaceList = (workspaceList, lang) => {
-  return workspaceList.sort((a, b) => {
-    let res = naturalCompareLabels(a, b, lang)
-    if (!res) {
-      res = getSpaceId(a) - getSpaceId(b)
-    }
-    return res
-  })
+  const locale = lang ? lang.replaceAll('_', '-') : undefined
+  return itemA[field].localeCompare(itemB[field], locale, { numeric: true })
 }
 
 export const humanAndList = (list) => {
@@ -759,33 +778,30 @@ export const scrollIntoViewIfNeeded = (elementToScrollTo, fixedContainer) => {
 export const darkenColor = (c) => color(c).darken(0.15).hex()
 export const lightenColor = (c) => color(c).lighten(0.15).hex()
 
-export const htmlCodeToDocumentFragment = (htmlCode) => {
-  // NOTE - RJ - 2021-04-28 - <template> provides a convenient content property.
-  // See https://stackoverflow.com/questions/8202195/using-document-createdocumentfragment-and-innerhtml-to-manipulate-a-dom
-  const template = document.createElement('template')
-  template.innerHTML = htmlCode
-  return template.content
-}
-
 export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
   const workspaceId = content.workspace_id || content.workspaceId
   const contentId = content.content_id || content.contentId
   const fetchGetContentPath = await handleFetchResult(await getContentPath(apiUrl, contentId))
 
   switch (fetchGetContentPath.apiResponse.status) {
-    case 200:
+    case 200: {
+      const contentPathList = fetchGetContentPath.body.items.map(content => content.content_id)
       return fetchGetContentPath.body.items.map(crumb => ({
-        link: PAGE.WORKSPACE.CONTENT(workspaceId, crumb.content_type, crumb.content_id),
+        link: crumb.content_type === CONTENT_TYPE.FOLDER
+          ? PAGE.WORKSPACE.FOLDER_OPEN(workspaceId, contentPathList)
+          : PAGE.WORKSPACE.CONTENT(workspaceId, crumb.content_type, crumb.content_id),
         label: crumb.label,
         type: BREADCRUMBS_TYPE.APP_FEATURE,
         isALink: true
       }))
+    }
     default:
       console.error('Error getting breadcrumbs data', fetchGetContentPath)
       throw new Error('Error getting breadcrumbs data')
   }
 }
 
+// NOTE - MP - 2022-05-31 - Type can be 'info', 'warning' or 'error'
 export const sendGlobalFlashMessage = (msg, type = 'warning', delay = undefined) => GLOBAL_dispatchEvent({
   type: CUSTOM_EVENT.ADD_FLASH_MSG,
   data: {
@@ -843,4 +859,95 @@ export const USER_CALL_STATE = {
   DECLINED: 'declined',
   CANCELLED: 'cancelled',
   UNANSWERED: 'unanswered'
+}
+
+export const USERNAME_ALLOWED_CHARACTERS_REGEX = /[a-zA-Z0-9\-_]/
+
+const seekUsernameEnd = (text, offset) => {
+  while (offset < text.length && USERNAME_ALLOWED_CHARACTERS_REGEX.test(text[offset])) {
+    offset++
+  }
+
+  return offset
+}
+
+export const autoCompleteItem = (text, item, cursorPos, endCharacter) => {
+  let character, keyword
+  let textBegin, textEnd
+
+  if (item.content_id) {
+    character = '#'
+    keyword = item.content_id
+  } else {
+    character = '@'
+    keyword = item.mention
+  }
+
+  const charAtCursor = cursorPos - 1
+  const posAt = text.lastIndexOf(character, charAtCursor)
+
+  if (posAt > -1) {
+    const end = seekUsernameEnd(text, cursorPos)
+    textBegin = text.substring(0, posAt) + character + keyword + endCharacter
+    textEnd = text.substring(end)
+  } else {
+    console.log(`Error in autocompletion: did not find ${character}`)
+    textBegin = `${text} ${character}${keyword}${endCharacter}`
+    textEnd = ''
+  }
+
+  return { textBegin, textEnd }
+}
+
+export const handleClickCopyLink = (contentId) => {
+  // INFO - G.B. - 2022-08-26 - document.execCommand() is deprecated, but the alternative navigator.clipboard is
+  // not compatible with all browsers versions at this time, so a fallback was made to the old algorithm
+  const link = `${window.location.origin}${PAGE.CONTENT(contentId)}`
+  if (!navigator.clipboard) {
+    const tmp = document.createElement('textarea')
+    document.body.appendChild(tmp)
+    tmp.value = link
+    tmp.select()
+    document.execCommand('copy')
+    document.body.removeChild(tmp)
+  } else navigator.clipboard.writeText(link)
+}
+
+// INFO - ML - 2022-11-22 - Generates a function testing if 'b' includes 'a', ignoring letter case
+// Useful when you have to test if a single string is included in multiple others
+// Usage: const fn = stringIncludes('bc'); fn('abcd') -> Outputs: true
+export const stringIncludes = (a) => {
+  return (b) => {
+    if (!a || !b) return false
+    return b.toUpperCase().includes(a.toUpperCase())
+  }
+}
+
+export const getRevisionTypeLabel = (revisionType, t) => {
+  switch (revisionType) {
+    case 'revision':
+      return t('modified')
+    case 'creation':
+      return t('created')
+    case 'edition':
+      return t('modified')
+    case 'deletion':
+      return t('deleted')
+    case 'undeletion':
+      return t('undeleted')
+    case 'mention':
+      return t('mention made')
+    case 'content-comment':
+      return t('commented')
+    case 'status-update':
+      return t('status modified')
+    case 'move':
+      return t('moved')
+    case 'copy':
+      return t('copied')
+    case 'unknown':
+      return t('unknown')
+  }
+
+  return revisionType
 }

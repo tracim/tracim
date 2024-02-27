@@ -1,7 +1,7 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
+@import '~tracim_frontend_lib/src/css/Variable.styl'
 
 .custom-form
-  height "calc(100% - %s)" % headerHeight
+  height 100%
   &__header
     &__editionmode
       display none
@@ -12,7 +12,7 @@
     & > i
       font-size titleFontSize
   .selectStatus
-    margin-right standardSpacing
+    margin-inline-end standardSpacing
   &__contentpage
     width 100%
     &__left
@@ -37,11 +37,11 @@
         background-color #fee498
         border-radius standardBorderRadius
         &__msg > i
-          margin-right 8px
+          margin-inline-end textSpacing
         &__btnrestore
           cursor pointer
           & > i
-            margin-right 8px
+            margin-inline-end textSpacing
           &.link
             color #453d9b
             &:hover
@@ -51,10 +51,10 @@
         display flex
         justify-content flex-end
         align-items center
-        text-align right
+        text-align end
         opacity 0.7
       &__lastversion
-        margin-left standardSpacing
+        margin-inline-start standardSpacing
         font-weight bold
       &__text
         font-size metadataFontSize
@@ -64,9 +64,9 @@
       min-height 70px
       &__item
         &__content
-          color darkGrey
+          color offBlack
       &__version
-        background-color grey-hover
+        background-color lightGrey1
         &__btn
           padding 5px 25px
           border-radius standardBorderRadius
@@ -74,8 +74,8 @@
           color white
           font-size 17px
           & > i
-            margin-right standardSpacing
-            color darkGrey
+            margin-inline-end standardSpacing
+            color offBlack
             font-size titleFontSize
         &__date
           color fontColor
@@ -85,10 +85,6 @@
   .timeline__messagelist
     flex 0
     min-height 0
-
-.received
-  .timeline__messagelist__item__content
-    background-color htmlColor
 
 i
   &.glyphicon

@@ -1,39 +1,21 @@
-import React, { useEffect } from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import {
-  AutoComplete,
   DateInput,
   IconButton,
-  TextInput
+  TextInput,
+  TinyEditor
 } from 'tracim_frontend_lib'
 
 function KanbanCardEditor (props) {
   const { card } = props
 
-  const [title, setTitle] = React.useState(card.title || '')
-  const [description, setDescription] = React.useState(card.description || '')
-  const [bgColor, setBgColor] = React.useState(card.bgColor || props.customColor)
-  const [deadline, setDeadline] = React.useState(card.deadline || '')
-  const [freeInput, setFreeInput] = React.useState(card.freeInput || '')
-
-  const descriptionEditionId = 'descriptionEditionWysiwyg'
-  const descriptionEditionSelector = `#${descriptionEditionId}`
-
-  useEffect(() => {
-    globalThis.wysiwyg(
-      descriptionEditionSelector,
-      props.i18n.language,
-      setDescription,
-      props.onTinyMceInput,
-      props.onTinyMceKeyDown,
-      props.onTinyMceKeyUp,
-      props.onTinyMceSelectionChange,
-      props.focusOnDescription
-    )
-
-    return () => globalThis.tinymce.remove(descriptionEditionSelector)
-  }, [])
+  const [title, setTitle] = useState(card.title || '')
+  const [description, setDescription] = useState(card.description || '')
+  const [bgColor, setBgColor] = useState(card.bgColor || props.customColor)
+  const [deadline, setDeadline] = useState(card.deadline || '')
+  const [freeInput, setFreeInput] = useState(card.freeInput || '')
 
   function handleValidate (e) {
     e.preventDefault()
@@ -65,26 +47,22 @@ function KanbanCardEditor (props) {
         </div>
 
         <div className='kanban__KanbanPopup__description'>
-          <label htmlFor={descriptionEditionId}>{props.t('Description:')}</label>
-          <div>
-            {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
-              <AutoComplete
-                apiUrl={props.apiUrl}
-                autoCompleteItemList={props.autoCompleteItemList}
-                autoCompleteCursorPosition={props.autoCompleteCursorPosition}
-                onClickAutoCompleteItem={props.onClickAutoCompleteItem}
-                delimiterIndex={props.autoCompleteItemList.filter(item => item.isCommon).length - 1}
-              />
-            )}
-            <textarea
-              autoFocus={props.focusOnDescription}
-              id={descriptionEditionId}
-              placeholder={props.t('Description')}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows='3'
-            />
-          </div>
+          <label>{props.t('Description:')}</label>
+          <TinyEditor
+            apiUrl={props.apiUrl}
+            setContent={setDescription}
+            // End of required props ///////////////////////////////////////////////////////////////
+            codeLanguageList={props.codeLanguageList}
+            content={description}
+            height={200}
+            isAdvancedEdition
+            isMentionEnabled={false}
+            language={props.language}
+            maxHeight={300}
+            userList={props.memberList}
+            minHeight={200}
+            placeholder={props.t('Description of the card')}
+          />
         </div>
 
         <div className='kanban__KanbanPopup__bgColor'>
@@ -108,7 +86,7 @@ function KanbanCardEditor (props) {
         </div>
 
         <div className='kanban__KanbanPopup__freeInput'>
-          <label htmlFor='kanban__KanbanPopup__freeInput'>{props.t('Value:')}</label>
+          <label htmlFor='kanban__KanbanPopup__freeInput'>{props.t('Open field:')}</label>
           <TextInput
             id='kanban__KanbanPopup__freeInput'
             onChange={(e) => setFreeInput(e.target.value)}
@@ -142,36 +120,22 @@ function KanbanCardEditor (props) {
 export default translate()(KanbanCardEditor)
 
 KanbanCardEditor.propTypes = {
+  apiUrl: PropTypes.string.isRequired,
   card: PropTypes.object.isRequired,
   onValidate: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
-  apiUrl: PropTypes.string,
-  autoCompleteCursorPosition: PropTypes.number,
-  autoCompleteItemList: PropTypes.array,
+  // End of required props /////////////////////////////////////////////////////////////////////////
+  codeLanguageList: PropTypes.array,
   customColor: PropTypes.string,
   focusOnDescription: PropTypes.bool,
-  i18n: PropTypes.object,
-  isAutoCompleteActivated: PropTypes.bool,
-  onClickAutoCompleteItem: PropTypes.func,
-  onTinyMceInput: PropTypes.func,
-  onTinyMceKeyDown: PropTypes.func,
-  onTinyMceKeyUp: PropTypes.func,
-  onTinyMceSelectionChange: PropTypes.func
+  language: PropTypes.string,
+  memberList: PropTypes.array
 }
 
 KanbanCardEditor.defaultProps = {
-  apiUrl: '',
-  autoCompleteCursorPosition: 0,
-  autoCompleteItemList: [],
+  codeLanguageList: [],
   customColor: '',
   focusOnDescription: false,
-  i18n: {
-    language: 'en'
-  },
-  isAutoCompleteActivated: false,
-  onClickAutoCompleteItem: () => {},
-  onTinyMceInput: () => {},
-  onTinyMceKeyDown: () => {},
-  onTinyMceKeyUp: () => {},
-  onTinyMceSelectionChange: () => {}
+  language: 'en',
+  memberList: []
 }

@@ -1,17 +1,16 @@
 from abc import abstractmethod
 import copy
-from typing import List
-from typing import Type
-
 from sqlalchemy.orm.session import Session
 import transaction
+from typing import List
+from typing import Type
 
 from tracim_backend.config import CFG
 
 
 class Fixture(object):
 
-    """ Fixture classes (list) required for this fixtures"""
+    """Fixture classes (list) required for this fixtures"""
 
     require = NotImplemented
 

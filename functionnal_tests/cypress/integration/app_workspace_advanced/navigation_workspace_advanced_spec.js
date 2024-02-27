@@ -28,7 +28,7 @@ describe('App Workspace Advanced', function () {
     beforeEach(() => {
       cy.visitPage({ pageName: PAGES.DASHBOARD, params: { workspaceId } })
       cy.contains('.pageTitleGeneric__title__label', workspaceLabel)
-      cy.get('.dashboard__workspace__detail__buttons .iconbutton').click()
+      cy.get('.dashboard__workspace__rightMenu__contents .fa-cog').click()
     })
 
     it('should open when clicking on the button', () => {
@@ -54,9 +54,5 @@ describe('App Workspace Advanced', function () {
         .should('be.visible')
     })
 
-    it('should redirect to adiministrator page when closing', () => {
-      cy.get('.workspace_advanced__contentpage__header [data-cy=popinFixed__header__button__close]').click()
-      cy.contains('.pageTitleGeneric__title__label', 'Space management')
-    })
   })
 })

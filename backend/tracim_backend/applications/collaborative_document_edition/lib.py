@@ -4,9 +4,8 @@ import mimetypes
 import os
 from os.path import isfile
 from os.path import join
-import typing
-
 from sqlalchemy.orm import Session
+import typing
 
 from tracim_backend import CFG
 from tracim_backend.applications.collaborative_document_edition.models import (
@@ -49,7 +48,9 @@ class CollaborativeDocumentEditionLib(ABC):
         self._user = current_user
         self._config = config
 
-    def get_supported_file_types(self) -> typing.List[CollaborativeDocumentEditionFileType]:
+    def get_supported_file_types(
+        self,
+    ) -> typing.List[CollaborativeDocumentEditionFileType]:
         """
         Get list of supported file type for collaborative editions.
         The list is obtained by calling _get_supported_file_types() then filtering it with
@@ -62,7 +63,9 @@ class CollaborativeDocumentEditionLib(ABC):
         return [file_type for file_type in file_types if file_type.extension in enabled_extensions]
 
     @abstractmethod
-    def _get_supported_file_types(self) -> typing.List[CollaborativeDocumentEditionFileType]:
+    def _get_supported_file_types(
+        self,
+    ) -> typing.List[CollaborativeDocumentEditionFileType]:
         """
         Get list of supported file type for collaborative editions
         """
@@ -84,13 +87,18 @@ class CollaborativeDocumentEditionLib(ABC):
         try:
             is_dir_exist(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR)
             is_dir_readable(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR)
-        except (NotADirectoryError) as exc:
+        except NotADirectoryError as exc:
             raise FileTemplateNotAvailable from exc
 
         template_filenames = [
             entry
             for entry in os.listdir(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR)
-            if isfile(join(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR, entry))
+            if isfile(
+                join(
+                    self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR,
+                    entry,
+                )
+            )
         ]
 
         if not self._config.COLLABORATIVE_DOCUMENT_EDITION__ENABLED_EXTENSIONS:
@@ -104,12 +112,14 @@ class CollaborativeDocumentEditionLib(ABC):
         ]
 
     def _get_file_template_path(self, template_filename: str) -> str:
-        template_path = os.path.join(
-            self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR, template_filename
-        )
+        """
+        return path of the file template
+        """
+        file_path = self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR
+        template_path = os.path.join(file_path, template_filename)
         try:
-            is_dir_exist(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR)
-            is_dir_readable(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR)
+            is_dir_exist(file_path)
+            is_dir_readable(file_path)
             is_file_exist(template_path)
             is_file_readable(template_path)
         except (NotADirectoryError, NotAFileError, NotReadableFile) as exc:
@@ -130,7 +140,10 @@ class CollaborativeDocumentEditionLib(ABC):
         api = ContentApi(config=self._config, session=self._session, current_user=self._user)
         with open(self._get_file_template_path(template_filename), "rb") as file:
             api.update_file_data(
-                content, new_filename=content.file_name, new_mimetype=new_mimetype, new_content=file
+                content,
+                new_filename=content.file_name,
+                new_mimetype=new_mimetype,
+                new_content=file,
             )
         return content
 

@@ -10,6 +10,7 @@ from tracim_backend.config import CFG
 from tracim_backend.lib.core.plugins import hookspec
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import User
+from tracim_backend.models.event import OperationType
 from tracim_backend.models.tracim_session import TracimSession
 
 
@@ -19,6 +20,15 @@ class TracimContextHookSpec:
     Don't assume that there is only one active context at one point in time if
     the WSGI app is launched with threads.
     """
+
+    @hookspec
+    def on_batched_events_finished(
+        self, operation_type: OperationType, obj: object, context: TracimContext
+    ) -> None:
+        """
+        Called when batched_events context manager is finished.
+        """
+        pass
 
     @hookspec
     def on_context_current_user_set(self, user: User, context: TracimContext) -> None:

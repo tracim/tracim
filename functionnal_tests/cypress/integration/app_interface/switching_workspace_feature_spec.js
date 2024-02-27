@@ -38,7 +38,7 @@ describe('Switching between workspaces', () => {
   })
 
   describe('between content list', () => {
-    it.only('should reload contents', () => {
+    it('should reload contents', () => {
       cy.visitPage({ pageName: p.CONTENTS, params: { workspaceId: workspaceId } })
       cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: htmlDocTitle } })
       cy.getTag({ selectorName: s.WORKSPACE_MENU, params: { workspaceId: secondWorkspaceId } }).click()

@@ -1,16 +1,4 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
-
-// -----------------------------------------------------
-// border management for Workspace container
-
-.folder__header
-  border borderStyle
-.folder + .content, .content + .content
-  border-bottom 0
-.folder__content > .content, .folder__content > .folder
-  border-bottom 0
-.folder:not(.active).item-last
-  border-bottom borderStyle
+@import '~tracim_frontend_lib/src/css/Variable.styl'
 
 folderclose()
   height 0
@@ -18,17 +6,24 @@ folderclose()
   opacity 0
 
 folderopen()
-  height 100%
+  height fit-content
+  height -moz-fit-content
   opacity 1
   visibility visible
   transition opacity 0.3s
 
+[dir=ltr] .folder__header__triangleborder
+  left -1px
+
+[dir=rtl] .folder__header__triangleborder
+  right -1px
+
 .folder
-  padding-left 20px
+  padding-inline-start 20px
   .folder__header
     folderopen()
     &:hover
-      background-color grey-hover
+      background-color lightGrey1
   > .folder__content
     folderclose()
     & > .file, > .folder
@@ -42,27 +37,25 @@ folderopen()
     position relative
     display flex
     align-items center
-    margin-left -20px
+    margin-inline-start -20px
     border-bottom 0
     padding standardSpacing 0
-    background-color lightGrey
+    background-color offWhite
     cursor pointer
     &:hover
       .folder__header__triangleborder
-        border-top-color inherit
         &__triangle
           // INFO - CH - 2019-08-07 - In the HTML, the .folder__header__triangleborder__triangle class also has .primaryColorFontLighten
           // So it always has it's font in the primary color but only uses it as border color on mousehover through "currentColor"
           border-top-color currentColor
-          color grey-hover
+          color lightGrey1
     &__triangleborder
       display none
       position absolute
       bottom -16px
-      left -1px
       border-style solid
       border-width 16px 21px 0 21px
-      border-color grey transparent transparent transparent
+      border-color transparent
       z-index 1
       &__triangle
         display none
@@ -71,7 +64,7 @@ folderopen()
         left -20px
         border-style solid
         border-width 15px 20px 0 20px
-        border-color lightGrey transparent transparent transparent
+        border-color offWhite transparent transparent transparent
       &.open
         display block
         .folder__header__triangleborder__triangle
@@ -87,34 +80,43 @@ folderopen()
     &__dragPreview
       display flex
       align-items center
-      flex 1
+      flex 11
       width 0 // INFO - CH - 2019-06-06 - this allows the text-overflow ellipsis
+    &__lastModification
+      flex 4
+      white-space nowrap
+      overflow hidden
+      text-overflow ellipsis
+      margin-inline-end standardSpacing
+      color fontColor
+      padding textSpacing
     &__icon
-      flex-grow 0
+      flex 1
       padding 0 standardSpacing
       font-size bigIconSize
-      color darkGrey
-      text-align center
+      color offBlack
     &__name
       display flex
       overflow hidden
       align-items center
-      flex 1
+      flex 11
       white-space nowrap
       span
         flex 1
         text-overflow ellipsis
         overflow hidden
       i
-        margin-right: 1ex
-      color darkGrey
+        margin-inline-end 1ex
+      color offBlack
       font-weight bold
       ^[0].read > div > ^[1] &, ^[0].read > ^[1] & // renders .folder.read > .folder__header .folder__header__name
         font-weight normal
     &__content
       position relative
-    &__button
-      flex-grow 0
+    &__button, .shareFolder__header__button
+      flex 2
+      display flex
+      justify-content flex-end
       &__advancedbtn
         position relative
       &__addbtn
@@ -124,41 +126,37 @@ folderopen()
         &:hover > .folder__header__name__addbtn__text
           color offWhite
         &__text
-          margin-right standardSpacing
+          margin-inline-end standardSpacing
           &::after
-            margin-left 20px
-          &-desktop
-            display inline
-          &-responsive
-            display none
-            &__iconplus.fas.fa-plus
-              margin 0
+            margin-inline-start 20px
       .addbtn__subdropdown
         padding 0
     &__status
-      flex-grow 0
-      padding 0 standardSpacing
+      flex 2
+      padding 0 textSpacing
       width 140px
+.folder__header div.shareFolder__header__button
+  flex 6
 
 @media (min-width: min-sm) and (max-width: max-sm)
   .folder
     &__header
       &__button__addbtn__text
-        margin-right standardSpacing
+        margin-inline-end standardSpacing
       &__status
         display none
 
 @media (max-width: max-xs)
   .folder
     &__header
-      &__button__addbtn__text
-        margin-right standardSpacing
       &__status
         display none
       &__button__addbtn__text
-        &-desktop
-          display none
-        &-responsive
-          display inline
+        margin-inline-end standardSpacing
         &::after
           display none // hide the dropdown triangle
+
+@media (max-width: max-md)
+  .folder__header
+    &__lastModification
+      display none

@@ -5,6 +5,7 @@ import typing
 
 from tracim_backend.config import CFG
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
+from tracim_backend.lib.mail_notifier.utils import SmtpEncryption
 from tracim_backend.lib.rq import RqQueueName
 from tracim_backend.lib.rq import get_redis_connection
 from tracim_backend.lib.rq import get_rq_queue
@@ -12,7 +13,9 @@ from tracim_backend.lib.utils.logger import logger
 
 
 def send_email_through(
-    config: CFG, sendmail_callable: typing.Callable[[MIMEMultipart], None], message: MIMEMultipart
+    config: CFG,
+    sendmail_callable: typing.Callable[[MIMEMultipart], None],
+    message: MIMEMultipart,
 ) -> None:
     """
     Send mail encapsulation to send it in async or sync mode.
@@ -60,7 +63,7 @@ class EmailSender(object):
         if not self._smtp_connection:
             log = "Connecting to SMTP server {}"
             logger.info(self, log.format(self._smtp_config.server))
-            if self._smtp_config.use_implicit_ssl:
+            if self._smtp_config.encryption == SmtpEncryption.SMTPS:
                 self._smtp_connection = smtplib.SMTP_SSL(
                     self._smtp_config.server, self._smtp_config.port
                 )
@@ -70,9 +73,7 @@ class EmailSender(object):
                 )
             self._smtp_connection.ehlo()
 
-            # TODO - G.M - 2020-04-02 - Starttls usage should be explicit in configuration, see
-            # https://github.com/tracim/tracim/issues/2815
-            if self._smtp_config.login and not self._smtp_config.use_implicit_ssl:
+            if self._smtp_config.encryption == SmtpEncryption.DEFAULT:
                 try:
                     starttls_result = self._smtp_connection.starttls()
 
@@ -81,7 +82,8 @@ class EmailSender(object):
 
                     log = "SMTP Start TLS return code: {} with message: {}"
                     logger.debug(
-                        self, log.format(starttls_result[0], starttls_result[1].decode("utf-8"))
+                        self,
+                        log.format(starttls_result[0], starttls_result[1].decode("utf-8")),
                     )
                 except smtplib.SMTPResponseException as exc:
                     log = "SMTP start TLS return error code: {} with message: {}"
@@ -90,7 +92,7 @@ class EmailSender(object):
                     log = "Unexpected exception during SMTP start TLS process"
                     logger.exception(self, log)
 
-            if self._smtp_config.login:
+            if self._smtp_config.authentication:
                 try:
                     login_res = self._smtp_connection.login(
                         self._smtp_config.login, self._smtp_config.password
@@ -107,7 +109,8 @@ class EmailSender(object):
                     log = "SMTP auth return error code: {} with message: {}"
                     logger.error(self, log.format(exc.smtp_code, exc.smtp_error.decode("utf-8")))
                     logger.error(
-                        self, "check your auth params combinaison " "(login/password) for SMTP"
+                        self,
+                        "check your auth params combinaison " "(login/password) for SMTP",
                     )
                 except smtplib.SMTPResponseException as exc:
                     log = "SMTP login return error code: {} with message: {}"

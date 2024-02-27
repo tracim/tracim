@@ -2,12 +2,22 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import Radium from 'radium'
+import i18n from '../../i18n.js'
+import { Link } from 'react-router-dom'
+import { translate } from 'react-i18next'
 import Comment from './Comment.jsx'
 import Revision from './Revision.jsx'
-import { translate } from 'react-i18next'
-import i18n from '../../i18n.js'
-import { ROLE, formatAbsoluteDate, displayDistanceDate, TIMELINE_TYPE } from '../../helper.js'
-import { handleInvalidMentionInComment } from '../../mentionOrLink.js'
+import {
+  PAGE,
+  ROLE,
+  TIMELINE_TYPE,
+  darkenColor,
+  displayDistanceDate,
+  formatAbsoluteDate
+} from '../../helper.js'
+import {
+  replaceHTMLElementWithMention
+} from '../../mentionOrLink.js'
 import { TRANSLATION_STATE } from '../../translation.js'
 import PromptMessage from '../PromptMessage/PromptMessage.jsx'
 import { CUSTOM_EVENT } from '../../customEvent.js'
@@ -62,51 +72,23 @@ export class Timeline extends React.Component {
     this.setState({ showEditCommentPopup: true, newComment: comment })
   }
 
-  handleClickValidateEditComment = (comment) => {
+  handleClickValidateEditComment = (comment, commentId, parentId) => {
     const { props } = this
-    if (!handleInvalidMentionInComment(
-      props.memberList,
-      true,
-      comment,
-      this.setState.bind(this)
-    )) {
-      this.handleClickValidateAnywayEditComment()
-    }
-  }
-
-  handleClickValidateAnywayEditComment = () => {
-    const { props, state } = this
     this.setState({
       invalidMentionList: [],
       showEditCommentPopup: false,
       showInvalidMentionPopupInComment: false
     })
-    props.onClickEditComment(state.newComment)
-  }
-
-  handleCloseInvalidMentionPopup = () => {
-    const { props } = this
-    props.showInvalidMentionPopup
-      ? props.onClickCancelSave()
-      : this.setState({ showInvalidMentionPopupInComment: false })
-  }
-
-  handleValidateInvalidMentionPopup = () => {
-    const { props } = this
-    props.showInvalidMentionPopup
-      ? props.onClickSaveAnyway()
-      : this.handleClickValidateAnywayEditComment()
+    props.onClickEditComment(comment, commentId, parentId)
   }
 
   render () {
     const { props, state } = this
 
     if (!Array.isArray(props.timelineData)) {
-      console.log('Error in Timeline.jsx, props.timelineData is not an array. timelineData: ', props.timelineData)
+      console.error('Error in Timeline.jsx, props.timelineData is not an array. timelineData: ', props.timelineData)
       return null
     }
-
-    const disableComment = props.disableComment || props.loading
 
     return (
       <div className={classnames('timeline')}>
@@ -142,7 +124,7 @@ export class Timeline extends React.Component {
         <ScrollToBottomWrapper
           customClass={classnames(`${props.customClass}__messagelist`, 'timeline__messagelist')}
           shouldScrollToBottom={props.shouldScrollToBottom}
-          isLastItemAddedFromCurrentToken={props.isLastTimelineItemCurrentToken && props.newComment === ''}
+          isLastItemAddedFromCurrentToken={props.isLastTimelineItemCurrentToken}
         >
           {!props.loading && props.canLoadMoreTimelineItems() && (
             <IconButton
@@ -168,7 +150,8 @@ export class Timeline extends React.Component {
                     workspaceId={Number(props.workspaceId)}
                     author={content.author}
                     loggedUser={props.loggedUser}
-                    created={content.created_raw || content.created}
+                    creationDate={content.created_raw || content.created}
+                    modificationDate={content.modified}
                     text={content.translationState === TRANSLATION_STATE.TRANSLATED ? content.translatedRawContent : content.raw_content}
                     fromMe={props.loggedUser.userId === content.author.user_id}
                     key={`comment_${content.content_id}`}
@@ -209,12 +192,18 @@ export class Timeline extends React.Component {
         {state.showEditCommentPopup && (
           <EditCommentPopup
             apiUrl={props.apiUrl}
-            comment={state.newComment.raw_content}
+            codeLanguageList={props.codeLanguageList}
+            comment={replaceHTMLElementWithMention(
+              props.memberList,
+              state.newComment.raw_content
+            )}
             commentId={state.newComment.content_id}
             customColor={props.customColor}
-            loggedUserLanguage={props.loggedUser.lang}
-            onClickValidate={this.handleClickValidateEditComment}
+            user={props.loggedUser}
+            memberList={props.memberList}
             onClickClose={() => this.setState({ showEditCommentPopup: false })}
+            onClickValidate={this.handleClickValidateEditComment}
+            parentId={state.newComment.parent_id}
             workspaceId={props.workspaceId}
           />
         )}
@@ -229,30 +218,42 @@ export class Timeline extends React.Component {
           />
         )}
 
-        {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
+        {!props.loading && props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && !props.showParticipateButton && (
           <div className='timeline__texteditor'>
             <CommentArea
               apiUrl={props.apiUrl}
               contentId={props.contentId}
               contentType={props.contentType}
+              onClickSubmit={props.onClickSubmit}
+              workspaceId={props.workspaceId}
+              // End of required props /////////////////////////////////////////
+              codeLanguageList={props.codeLanguageList}
               customClass={props.customClass}
               customColor={props.customColor}
-              disableComment={disableComment}
-              id={`wysiwygTimelineComment${props.id}`}
+              disableComment={props.disableComment}
               invalidMentionList={props.invalidMentionList}
-              lang={props.loggedUser.lang}
-              newComment={props.newComment}
-              onClickCancelSave={props.onClickCancelSave}
-              onClickSaveAnyway={props.onClickSaveAnyway}
-              onClickValidateNewCommentBtn={props.onClickValidateNewCommentBtn}
-              onClickWysiwygBtn={props.onClickWysiwygBtn}
-              searchForMentionOrLinkInQuery={props.searchForMentionOrLinkInQuery}
-              showInvalidMentionPopup={props.showInvalidMentionPopup}
-              workspaceId={props.workspaceId}
-              wysiwyg={props.wysiwyg}
-              wysiwygIdSelector={props.wysiwygIdSelector}
+              isFileCommentLoading={props.isFileCommentLoading}
+              language={props.loggedUser.lang}
+              memberList={props.memberList}
+              multipleFiles
+              placeholder={props.t('Write an answer...')}
+              submitLabel={props.t('Send')}
             />
           </div>
+        )}
+
+        {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && props.showParticipateButton && (
+          <Link
+            style={{
+              '--appTypeColor': props.customColor,
+              '--appTypeDarkColor': darkenColor(props.customColor)
+            }}
+            className='timeline__participate'
+            to={PAGE.CONTENT(props.contentId)}
+          >
+            <i className='fa-fw fas fa-bullhorn' />
+            {props.t('Participate')}
+          </Link>
         )}
       </div>
     )
@@ -262,82 +263,76 @@ export class Timeline extends React.Component {
 export default translate()(Radium(TracimComponent(Timeline)))
 
 Timeline.propTypes = {
-  timelineData: PropTypes.array.isRequired,
   apiUrl: PropTypes.string.isRequired,
+  contentId: PropTypes.number.isRequired,
+  contentType: PropTypes.string.isRequired,
+  loggedUser: PropTypes.object.isRequired,
+  onClickRestoreComment: PropTypes.func.isRequired,
+  onClickSubmit: PropTypes.func.isRequired,
+  onClickTranslateComment: PropTypes.func.isRequired,
+  timelineData: PropTypes.array.isRequired,
+  translationTargetLanguageCode: PropTypes.string.isRequired,
+  translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
   workspaceId: PropTypes.number.isRequired,
-  newComment: PropTypes.string.isRequired,
-  onClickValidateNewCommentBtn: PropTypes.func.isRequired,
+  // End of required props /////////////////////////////////////////////////////
+  allowClickOnRevision: PropTypes.bool,
   availableStatusList: PropTypes.array,
-  deprecatedStatus: PropTypes.object,
-  disableComment: PropTypes.bool,
+  canLoadMoreTimelineItems: PropTypes.func,
+  codeLanguageList: PropTypes.array,
   customClass: PropTypes.string,
   customColor: PropTypes.string,
+  deprecatedStatus: PropTypes.object,
+  disableComment: PropTypes.bool,
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  isDeprecated: PropTypes.bool,
-  loggedUser: PropTypes.object.isRequired,
-  memberList: PropTypes.array,
-  wysiwyg: PropTypes.bool,
-  onClickWysiwygBtn: PropTypes.func,
-  onClickRevisionBtn: PropTypes.func,
-  allowClickOnRevision: PropTypes.bool,
   invalidMentionList: PropTypes.array,
-  shouldScrollToBottom: PropTypes.bool,
-  isLastTimelineItemCurrentToken: PropTypes.bool,
   isArchived: PropTypes.bool,
-  onClickRestoreArchived: PropTypes.func,
   isDeleted: PropTypes.bool,
-  onClickCancelSave: PropTypes.func,
-  onClickRestoreDeleted: PropTypes.func,
-  onClickSaveAnyway: PropTypes.func,
-  searchForMentionOrLinkInQuery: PropTypes.func,
-  showInvalidMentionPopup: PropTypes.bool,
-  onClickEditComment: PropTypes.func,
+  isDeprecated: PropTypes.bool,
+  isFileCommentLoading: PropTypes.bool,
+  isLastTimelineItemCurrentToken: PropTypes.bool,
+  loading: PropTypes.bool,
+  memberList: PropTypes.array,
+  onChangeTranslationTargetLanguageCode: PropTypes.func,
   onClickDeleteComment: PropTypes.func,
+  onClickEditComment: PropTypes.func,
   onClickOpenFileComment: PropTypes.func,
-  onClickTranslateComment: PropTypes.func.isRequired,
-  onClickRestoreComment: PropTypes.func.isRequired,
-  translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
-  translationTargetLanguageCode: PropTypes.string.isRequired,
+  onClickRestoreArchived: PropTypes.func,
+  onClickRestoreDeleted: PropTypes.func,
+  onClickRevisionBtn: PropTypes.func,
   onClickShowMoreTimelineItems: PropTypes.func,
-  canLoadMoreTimelineItems: PropTypes.func,
-  contentId: PropTypes.number,
-  contentType: PropTypes.string,
-  wysiwygIdSelector: PropTypes.string
+  shouldScrollToBottom: PropTypes.bool,
+  showParticipateButton: PropTypes.bool
 }
 
 Timeline.defaultProps = {
+  allowClickOnRevision: true,
   availableStatusList: [],
+  canLoadMoreTimelineItems: () => false,
+  codeLanguageList: [],
+  customClass: '',
+  customColor: '',
   deprecatedStatus: {
     faIcon: ''
   },
   disableComment: false,
-  customClass: '',
-  customColor: '',
   id: '',
-  isDeprecated: false,
-  memberList: [],
-  timelineData: [],
-  wysiwyg: false,
-  onClickWysiwygBtn: () => { },
-  onClickRevisionBtn: () => { },
-  allowClickOnRevision: true,
   invalidMentionList: [],
-  shouldScrollToBottom: true,
-  isLastTimelineItemCurrentToken: false,
   isArchived: false,
   isDeleted: false,
-  onClickCancelSave: () => { },
-  onClickSaveAnyway: () => { },
-  searchForMentionOrLinkInQuery: () => { },
-  showInvalidMentionPopup: false,
-  onClickTranslateComment: content => { },
+  isDeprecated: false,
+  isFileCommentLoading: false,
+  isLastTimelineItemCurrentToken: false,
+  loading: false,
+  memberList: [],
+  onChangeTranslationTargetLanguageCode: () => { },
   onClickDeleteComment: () => { },
-  onClickRestoreComment: content => { },
   onClickEditComment: () => { },
   onClickOpenFileComment: () => { },
+  onClickRestoreComment: content => { },
+  onClickRevisionBtn: () => { },
   onClickShowMoreTimelineItems: () => { },
-  canLoadMoreTimelineItems: () => false,
-  contentId: 0,
-  contentType: '',
-  wysiwygIdSelector: ''
+  onClickTranslateComment: content => { },
+  shouldScrollToBottom: true,
+  showParticipateButton: false,
+  timelineData: []
 }

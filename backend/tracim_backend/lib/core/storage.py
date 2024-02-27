@@ -1,17 +1,16 @@
 from contextlib import contextmanager
 from datetime import datetime
-import os
-import tempfile
-import typing
-
 from depot.fields.upload import UploadedFile
 from depot.io.interfaces import StoredFile
 from depot.manager import DepotManager
 import filelock
 from hapic.data import HapicFile
+import os
 from preview_generator.exception import UnavailablePreviewType
 from preview_generator.exception import UnsupportedMimeType
 from preview_generator.manager import PreviewManager
+import tempfile
+import typing
 
 from tracim_backend.config import CFG
 from tracim_backend.config import DepotFileStorageType
@@ -45,7 +44,9 @@ class StorageLib:
             return self.uploaded_file_depot.get(depot_file)
         except IOError as exc:
             logger.warning(
-                self, "Unable to get content filepath, depot is corrupted", exc_info=True
+                self,
+                "Unable to get content filepath, depot is corrupted",
+                exc_info=True,
             )
             raise CannotGetDepotFileDepotCorrupted(
                 "depot file {} is not accessible, depot seems corrupted".format(depot_file.file_id)
@@ -104,7 +105,9 @@ class StorageLib:
             yield from self._get_valid_content_filepath_legacy(depot_stored_file)
         else:
             yield from self._get_valid_content_filepath(
-                depot_stored_file, file_extension=file_extension, prefix=temporary_prefix
+                depot_stored_file,
+                file_extension=file_extension,
+                prefix=temporary_prefix,
             )
 
     @contextmanager
@@ -127,7 +130,8 @@ class StorageLib:
         """
         try:
             yield from self.get_filepath(
-                depot_file, file_extension=original_file_extension,
+                depot_file,
+                file_extension=original_file_extension,
             )
         except UnavailablePreviewType as exc:
             raise TracimUnavailablePreviewType(
@@ -279,7 +283,8 @@ class StorageLib:
         ):
             raise PageOfPreviewNotFound(
                 "page {page_number} of depot_file {file_id} does not exist".format(
-                    page_number=preview_generator_page_number, file_id=depot_file.file_id
+                    page_number=preview_generator_page_number,
+                    file_id=depot_file.file_id,
                 )
             )
         return preview_generator_page_number
@@ -299,15 +304,18 @@ class StorageLib:
 
         file_label = "{prefix}-{file_id}".format(prefix=prefix, file_id=depot_stored_file.file_id)
         base_path = "{temp_dir}/{file_label}".format(
-            temp_dir=tempfile.gettempdir(), file_label=file_label,
+            temp_dir=tempfile.gettempdir(),
+            file_label=file_label,
         )
 
         file_path = "{base_path}{file_extension}".format(
-            base_path=base_path, file_extension=file_extension,
+            base_path=base_path,
+            file_extension=file_extension,
         )
 
         lockfile_path = "{base_path}{file_extension}".format(
-            base_path=base_path, file_extension=".lock",
+            base_path=base_path,
+            file_extension=".lock",
         )
         # FIXME - G.M - 2020-01-05 - This will create a lockfile for
         # each depot file we do need (each content revision)
@@ -327,7 +335,10 @@ class StorageLib:
                 # note: this base path is configurable through an envirnoment var according
                 # to the Python doc:
                 # https://docs.python.org/3/library/tempfile.html#tempfile.gettempdir
-                with open(file_path, "wb",) as tmp:
+                with open(
+                    file_path,
+                    "wb",
+                ) as tmp:
                     tmp.write(depot_stored_file.read())
                     tmp.flush()
                     yield file_path

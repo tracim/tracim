@@ -15,6 +15,7 @@ import {
 } from '../../helper.js'
 import IconButton from '../Button/IconButton.jsx'
 import { isMobile } from 'react-device-detect'
+import onClickOutside from 'react-onclickoutside'
 
 // require('./NewTagForm.styl') // see https://github.com/tracim/tracim/issues/1156
 
@@ -34,6 +35,12 @@ export class NewTagForm extends React.Component {
       ? await this.handleClickBtnValidateContent()
       : await this.handleClickBtnValidateSpace()
     this.setState({ tagName: '', autoCompleteActive: false })
+  }
+
+  handleClickOutside = (event) => {
+    const inputField = document.getElementById('addTag')
+
+    this.setState({ autoCompleteActive: inputField.contains(event.target) })
   }
 
   handleClickBtnValidateContent = async () => {
@@ -172,6 +179,7 @@ export class NewTagForm extends React.Component {
             className='name__input form-control'
             id='addTag'
             placeholder={props.t('Add a tag here...')}
+            onFocus={() => this.setState({ autoCompleteActive: true })}
             data-cy='add_tag'
             value={state.tagName}
             onChange={(e) => this.setState({ tagName: e.target.value, autoCompleteActive: true })}
@@ -195,16 +203,17 @@ export class NewTagForm extends React.Component {
 
         <div className='tagList__form__submitBtn'>
           <IconButton
-            intent='primary'
-            mode='light'
+            color={props.customColor}
+            dataCy='validate_tag'
             disabled={
               !state.tagName ||
               (!props.contentId && tagExitsInSpace) ||
               (props.contentId && !tagExitsInSpace && (props.userRoleIdInWorkspace < ROLE.contentManager.id && props.userProfile !== PROFILE.administrator.slug))
             }
             icon='fas fa-check'
+            intent='primary'
+            mode='light'
             onClick={this.handleClickBtnValidate}
-            dataCy='validate_tag'
             text={this.getSubmitButtonLabel(tagExitsInSpace)}
           />
         </div>
@@ -213,13 +222,14 @@ export class NewTagForm extends React.Component {
   }
 }
 
-export default translate()(NewTagForm)
+export default translate()(onClickOutside(NewTagForm))
 
 NewTagForm.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   contentId: PropTypes.number.isRequired,
   workspaceId: PropTypes.number.isRequired,
   contentTagList: PropTypes.array,
+  customColor: PropTypes.string,
   spaceTaglist: PropTypes.array,
   userRoleIdInWorkspace: PropTypes.number,
   userProfile: PropTypes.string
@@ -227,6 +237,7 @@ NewTagForm.propTypes = {
 
 NewTagForm.defaultProps = {
   contentTagList: [],
+  customColor: '',
   spaceTaglist: [],
   userRoleIdInWorkspace: ROLE.reader.id,
   userProfile: PROFILE.user.slug

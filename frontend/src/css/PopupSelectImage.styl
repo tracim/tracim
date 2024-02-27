@@ -1,12 +1,7 @@
 @import '~tracim_frontend_lib/src/css/Variable.styl'
 
 .PopupSelectImage
-  position fixed
-  top 25%
-  left 50%
-  margin-left -12.5%
   width 25%
-  z-index zIndexOverHeader
   .cardPopup__body
     display flex
     flex-direction column
@@ -31,8 +26,8 @@
     width 100%
     margin-top standardSpacing
     &__back
-      margin-left 0
-      margin-right auto
+      margin-inline-start 0
+      margin-inline-end auto
     &__validate
-      margin-left auto
-      margin-right 0
+      margin-inline-start auto
+      margin-inline-end 0

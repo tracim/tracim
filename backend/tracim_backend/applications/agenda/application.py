@@ -1,10 +1,11 @@
+from hapic.ext.pyramid import PyramidContext
 from http import HTTPStatus
+from pluggy import PluginManager
+from pyramid.config import Configurator
 import typing
 
-from hapic.ext.pyramid import PyramidContext
-from pyramid.config import Configurator
-
 from tracim_backend.applications.agenda.authorization import add_www_authenticate_header_for_caldav
+from tracim_backend.applications.agenda.lib import AgendaHooks
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import CaldavNotAuthenticated
 from tracim_backend.exceptions import CaldavNotAuthorized
@@ -28,18 +29,31 @@ class AgendaApp(TracimApplication):
         app_config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER = app_config.get_raw_config(
             "caldav.radicale.storage.filesystem_folder", default_caldav_storage_dir
         )
-        app_config.CALDAV__RADICALE__AGENDA_DIR = "agenda"
-        app_config.CALDAV__RADICALE__WORKSPACE_SUBDIR = "workspace"
-        app_config.CALDAV__RADICALE__USER_SUBDIR = "user"
-        app_config.CALDAV__RADICALE__BASE_PATH = "/{}/".format(
-            app_config.CALDAV__RADICALE__AGENDA_DIR
+
+        app_config.CALDAV__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH = app_config.get_raw_config(
+            "caldav.pre_filled_event.description_file_path",
+            "",
         )
-        app_config.CALDAV__RADICALE__USER_PATH = "/{}/{}/".format(
-            app_config.CALDAV__RADICALE__AGENDA_DIR, app_config.CALDAV__RADICALE__USER_SUBDIR
+
+        # INFO - G.M - 2021-12-07 - internal config param to configure installed agenda hierarchy
+        app_config.RADICALE__CALENDAR_DIR = "agenda"
+        app_config.RADICALE__ADDRESSBOOK_DIR = "addressbook"
+        app_config.RADICALE__USER_RESOURCE_DIR_PATTERN = "user_{user_id}"
+        app_config.RADICALE__USER_RESOURCE_PATTERN = "{owner_type}_{owner_id}_{resource_type}"
+        app_config.RADICALE__WORKSPACE_SUBDIR = "workspace"
+        app_config.RADICALE__USER_SUBDIR = "user"
+
+        app_config.RADICALE__LOCAL_PATH_STORAGE = "{}/{}".format(
+            app_config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER, "collection-root"
         )
-        app_config.CALDAV_RADICALE_WORKSPACE_PATH = "/{}/{}/".format(
-            app_config.CALDAV__RADICALE__AGENDA_DIR, app_config.CALDAV__RADICALE__WORKSPACE_SUBDIR
+        # Path:
+        app_config.RADICALE__WORKSPACE_AGENDA_PATH_PATTERN = (
+            "/{resource_type_dir}/{workspace_subdir}/{workspace_id}"
         )
+        app_config.RADICALE__USER_AGENDA_PATH_PATTERN = (
+            "/{resource_type_dir}/{user_subdir}/{user_id}"
+        )
+        app_config.RADICALE__USER_RESOURCE_PATH_PATTERN = "/{user_resource_dir}/{user_resource}"
 
     def check_config(self, app_config: CFG) -> None:
         """
@@ -62,6 +76,18 @@ class AgendaApp(TracimApplication):
             app_config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
             writable=True,
         )
+
+        if app_config.CALDAV__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH:
+            app_config.check_file_path_param(
+                "CALDAV__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH",
+                app_config.CALDAV__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH,
+                readable=True,
+            )
+            with open(app_config.CALDAV__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH) as f:
+                app_config.CALDAV__PRE_FILLED_EVENT__DESCRIPTION = f.read()
+        else:
+            app_config.CALDAV__PRE_FILLED_EVENT__DESCRIPTION = None
+
         radicale_storage_type = app_config.settings.get("caldav.radicale.storage.type")
         if radicale_storage_type != "multifilesystem":
             raise ConfigurationError(
@@ -96,10 +122,7 @@ class AgendaApp(TracimApplication):
         context.handle_exception(CaldavNotAuthenticated, HTTPStatus.UNAUTHORIZED)
         # controller
         radicale_proxy_controller = RadicaleProxyController(
-            proxy_base_address=app_config.CALDAV__RADICALE_PROXY__BASE_URL,
-            radicale_base_path=app_config.CALDAV__RADICALE__BASE_PATH,
-            radicale_user_path=app_config.CALDAV__RADICALE__USER_PATH,
-            radicale_workspace_path=app_config.CALDAV_RADICALE_WORKSPACE_PATH,
+            proxy_base_address=app_config.CALDAV__RADICALE_PROXY__BASE_URL
         )
         agenda_controller = AgendaController()
         configurator.include(agenda_controller.bind, route_prefix=BASE_API)
@@ -109,6 +132,10 @@ class AgendaApp(TracimApplication):
         self, app_config: CFG
     ) -> typing.Tuple[typing.Tuple[str, str], ...]:
         return (("frame-src", "'self'"),)
+
+    def register_tracim_plugin(self, plugin_manager: PluginManager) -> None:
+        """Entry point for this plugin."""
+        plugin_manager.register(AgendaHooks())
 
 
 def create_app() -> TracimApplication:

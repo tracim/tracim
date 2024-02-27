@@ -42,7 +42,7 @@ describe('Create tags', () => {
       cy.visitPage({ pageName: PAGES.DASHBOARD, params: { workspaceId } })
       cy.contains('.userstatus__role__text', 'Space manager')
       cy.getTag({ selectorName: SELECTORS.WORKSPACE_DASHBOARD })
-        .find('.dashboard__workspace__detail__buttons .iconbutton')
+        .find('.dashboard__workspace__rightMenu__contents .fa-cog')
         .click()
       cy.get('[data-cy=popin_right_part_tag').click()
 
@@ -59,7 +59,7 @@ describe('Create tags', () => {
     it('should delete the tag and show it in space settings', () => {
       cy.visitPage({
         pageName: PAGES.CONTENT_OPEN,
-        params: { workspaceId, contentType: 'file', contentId }
+        params: { contentId }
       })
       cy.get('[data-cy=popin_right_part_tag]').click()
 

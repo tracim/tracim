@@ -24,7 +24,7 @@ function logerror {
 
 dev=""
 if [ "$1" = "-d" ]; then
-    dev="-dev"
+    dev=":dev"
 fi
 
 log "building frontend_vendors"

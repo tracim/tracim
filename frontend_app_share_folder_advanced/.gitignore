@@ -4,4 +4,7 @@
 node_modules/
 dist/share_folder.app.js
 dist/share_folder.app.standalone.js
+dist/share_folder.app.optimized.js
+dist/*.LICENSE.txt
 src/debug.js
+test/fixture/defaultProps.js

@@ -1,12 +1,10 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
-import { Popover, PopoverBody } from 'reactstrap'
-import { isMobile } from 'react-device-detect'
 import { generateRandomPassword } from '../../helper.js'
 import ComposedIcon from '../Icon/ComposedIcon.jsx'
-
-const color = require('color')
+import IconButton from '../Button/IconButton.jsx'
+import Popover from '../Popover/Popover.jsx'
 
 export class NewShareDownload extends React.Component {
   constructor (props) {
@@ -14,15 +12,8 @@ export class NewShareDownload extends React.Component {
 
     this.state = {
       isPasswordActive: false,
-      popoverMultipleEmailsOpen: false,
       hidePassword: true
     }
-  }
-
-  togglePopoverMultipleEmails = () => {
-    this.setState(prevState => ({
-      popoverMultipleEmailsOpen: !prevState.popoverMultipleEmailsOpen
-    }))
   }
 
   handleTogglePasswordVisibility = () => {
@@ -74,14 +65,9 @@ export class NewShareDownload extends React.Component {
           </button>
 
           <Popover
-            placement='bottom'
-            isOpen={state.popoverMultipleEmailsOpen}
-            target='popoverMultipleEmails'
-            toggle={this.togglePopoverMultipleEmails}
-            trigger={isMobile ? 'focus' : 'hover'}
-          >
-            <PopoverBody>{props.t('To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.')}</PopoverBody>
-          </Popover>
+            targetId='popoverMultipleEmails'
+            popoverBody={props.t('To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.')}
+          />
         </div>
 
         {state.isPasswordActive
@@ -138,37 +124,29 @@ export class NewShareDownload extends React.Component {
           )}
 
         <div className='shareDownload__buttons'>
-          <button
-            className='shareDownload__buttons__cancel btn outlineTextBtn'
+          <IconButton
+            customClass='shareDownload__buttons__cancel'
+            color={props.hexcolor}
+            icon='fas fa-times'
             key='cancelNewShare'
             onClick={props.onClickCancelButton}
-            style={{
-              borderColor: props.hexcolor,
-              ':hover': {
-                backgroundColor: props.hexcolor
-              }
-            }}
-          >
-            {props.t('Cancel')}
-          </button>
+            text={props.t('Cancel')}
+          />
 
-          <button
-            className='shareDownload__buttons__newBtn btn highlightBtn'
-            key='newShareDownload'
-            onClick={() => props.onClickNewShare(state.isPasswordActive)}
+          <IconButton
+            customClass='shareDownload__buttons__newBtn'
+            color={props.hexcolor}
             disabled={props.shareEmails === '' || (state.isPasswordActive && props.sharePassword === '')}
-            style={{
-              backgroundColor: props.hexcolor,
-              ':hover': {
-                backgroundColor: color(props.hexcolor).darken(0.15).hex()
-              }
-            }}
-          >
-            {props.t('Validate')}
-          </button>
+            icon='fas fa-check'
+            intent='primary'
+            key='newShareDownload'
+            mode='light'
+            onClick={() => props.onClickNewShare(state.isPasswordActive)}
+            text={props.t('Validate')}
+          />
         </div>
 
-        {!props.emailNotifActivated && (
+        {!props.isEmailNotifActivated && (
           <div className='shareDownload__emailWarning'>
             <ComposedIcon
               mainIcon='far fa-envelope'

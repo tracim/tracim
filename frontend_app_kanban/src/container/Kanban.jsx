@@ -1,36 +1,42 @@
 import React from 'react'
 import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
+import { uniqBy } from 'lodash'
 import {
-  appContentFactory,
-  addAllResourceI18n,
   APP_FEATURE_MODE,
   BREADCRUMBS_TYPE,
-  buildContentPathBreadcrumbs,
   CONTENT_TYPE,
-  handleFetchResult,
-  handleInvalidMentionInComment,
+  CUSTOM_EVENT,
+  FAVORITE_STATE,
   PAGE,
+  ROLE_LIST,
+  ROLE,
+  SORT_BY,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_SUB_TYPE as TLM_ST,
+  FilenameWithBadges,
   PopinFixed,
   PopinFixedContent,
   PopinFixedRightPart,
   PopinFixedRightPartContent,
+  TagList,
   Timeline,
-  CUSTOM_EVENT,
-  LOCAL_STORAGE_FIELD,
-  getLocalStorageItem,
-  buildHeadTitle,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_ENTITY_TYPE as TLM_ET,
-  TLM_SUB_TYPE as TLM_ST,
+  ToDoManagement,
   TracimComponent,
-  getOrCreateSessionClientToken,
-  FAVORITE_STATE,
-  ROLE,
+  addAllResourceI18n,
+  appContentFactory,
+  buildContentPathBreadcrumbs,
+  buildHeadTitle,
   getFileContent,
   getFileRevision,
-  TagList,
-  putMyselfFileRead
+  getOrCreateSessionClientToken,
+  getToDo,
+  handleClickCopyLink,
+  handleFetchResult,
+  putMyselfFileRead,
+  sendGlobalFlashMessage,
+  sortListByMultipleCriteria
 } from 'tracim_frontend_lib'
 
 import KanbanComponent from '../component/Kanban.jsx'
@@ -49,24 +55,27 @@ export class Kanban extends React.Component {
     this.state = {
       appName: 'kanban',
       breadcrumbsList: [],
-      fullscreen: false,
-      isVisible: true,
       config: param.config,
-      loggedUser: param.loggedUser,
       content: param.content,
       currentContentRevisionId: param.content.current_revision_id,
-      newComment: '',
-      loading: false,
-      newContent: {},
-      timelineWysiwyg: false,
+      editionAuthor: '',
       externalTranslationList: [
         props.t('Create a Kanban board')
       ],
-      showRefreshWarning: false,
-      editionAuthor: '',
+      fullscreen: false,
       invalidMentionList: [],
+      isFileCommentLoading: false,
+      isTemplate: false,
+      isVisible: true,
+      lockedToDoList: [],
+      loggedUser: param.loggedUser,
+      loading: false,
+      newContent: {},
       showInvalidMentionPopupInComment: false,
-      translationTargetLanguageCode: param.loggedUser.lang
+      showProgress: true,
+      showRefreshWarning: false,
+      translationTargetLanguageCode: param.loggedUser.lang,
+      toDoList: []
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
 
@@ -85,7 +94,11 @@ export class Kanban extends React.Component {
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.KANBAN, handler: this.handleContentChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.KANBAN, handler: this.handleContentChanged },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.KANBAN, handler: this.handleContentChanged }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.KANBAN, handler: this.handleContentChanged },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoChanged },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoDeleted },
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified }
     ])
   }
 
@@ -114,9 +127,12 @@ export class Kanban extends React.Component {
   handleAllAppChangeLanguage = data => {
     const { props } = this
     console.log('%c<Kanban> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
-    props.appContentCustomEventHandlerAllAppChangeLanguage(
-      data, this.setState.bind(this), i18n, this.state.timelineWysiwyg, this.handleChangeNewComment
-    )
+    props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n)
+  }
+
+  handleChangeMarkedTemplate = (isTemplate) => {
+    const { props, state } = this
+    props.appContentMarkAsTemplate(this.setState.bind(this), state.content, isTemplate)
   }
 
   handleClickShowRevision = async revision => {
@@ -150,6 +166,66 @@ export class Kanban extends React.Component {
     this.loadContent()
   }
 
+  handleMemberModified = async data => {
+    const { state } = this
+    if (data.fields.user.user_id !== state.loggedUser.userId) return
+
+    const newUserRoleId = ROLE_LIST.find(r => data.fields.member.role === r.slug).id
+
+    this.setState(prev => ({ ...prev, loggedUser: { ...prev.loggedUser, userRoleIdInWorkspace: newUserRoleId } }))
+  }
+
+  handleToDoCreated = async data => {
+    const { state } = this
+    if (data.fields.content.parent.content_id !== state.content.content_id) return
+
+    const fecthGetToDo = await handleFetchResult(await getToDo(
+      state.config.apiUrl,
+      data.fields.workspace.workspace_id,
+      data.fields.content.parent.content_id,
+      data.fields.content.content_id
+    ))
+
+    this.setState(prevState => ({
+      toDoList: sortListByMultipleCriteria(
+        uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'content_id'),
+        [SORT_BY.STATUS, SORT_BY.CREATION_DATE, SORT_BY.ID]
+      )
+    }))
+  }
+
+  handleToDoChanged = async data => {
+    const { state } = this
+    if (data.fields.content.parent.content_id !== state.content.content_id) return
+
+    // INFO - MP - 2022-07-19 - We fetch the to do data because we don't trust Redux
+    // therefore we only update the to do when we fetch a TLM. Gives the impression
+    // of lags
+    const fecthGetToDo = await handleFetchResult(await getToDo(
+      state.config.apiUrl,
+      data.fields.workspace.workspace_id,
+      data.fields.content.parent.content_id,
+      data.fields.content.content_id
+    ))
+
+    this.setState(prevState => ({
+      toDoList: prevState.toDoList.map(toDo => toDo.content_id === data.fields.content.content_id ? fecthGetToDo.body : toDo),
+      lockedToDoList: prevState.lockedToDoList.filter(toDoId => toDoId !== data.fields.content.content_id)
+    }))
+  }
+
+  handleToDoDeleted = data => {
+    const { state } = this
+    if (data.fields.content.parent.content_id !== state.content.content_id) return
+
+    this.setState(prevState => ({
+      toDoList: prevState.toDoList.filter(toDo => toDo.content_id !== data.fields.content.content_id),
+      lockedToDoList: prevState.lockedToDoList.filter(toDoId => toDoId !== data.fields.content.content_id)
+    }))
+  }
+
+  // TLM Handlers
+
   handleContentChanged = data => {
     const { state } = this
     if (data.fields.content.content_id !== state.content.content_id) return
@@ -176,14 +252,6 @@ export class Kanban extends React.Component {
 
   updateTimelineAndContent () {
     const { props } = this
-    this.setState({
-      newComment: getLocalStorageItem(
-        this.state.appName,
-        this.state.content,
-        LOCAL_STORAGE_FIELD.COMMENT
-      ) || ''
-    })
-
     this.loadContent()
     props.loadTimeline(getFileRevision, this.state.content)
   }
@@ -199,51 +267,79 @@ export class Kanban extends React.Component {
           label={props.t('Timeline')}
         >
           <Timeline
+            apiUrl={state.config.apiUrl}
             contentId={state.content.content_id}
             contentType={state.content.content_type}
-            loading={props.loadingTimeline}
-            customClass={`${state.config.slug}__contentpage`}
-            customColor={state.config.hexcolor}
-            apiUrl={state.config.apiUrl}
             loggedUser={state.loggedUser}
-            timelineData={props.timeline}
-            memberList={state.config.workspace.memberList}
-            newComment={state.newComment}
-            disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
-            availableStatusList={state.config.availableStatuses}
-            wysiwyg={state.timelineWysiwyg}
-            onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
-            onClickWysiwygBtn={this.handleToggleWysiwyg}
-            onClickRevisionBtn={this.handleClickShowRevision}
-            shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
-            isLastTimelineItemCurrentToken={props.isLastTimelineItemCurrentToken}
-            key='Timeline'
-            invalidMentionList={state.invalidMentionList}
-            onClickCancelSave={this.handleCancelSave}
-            onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
-            wysiwygIdSelector='#wysiwygTimelineComment'
-            showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
-            searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
-            workspaceId={state.content.workspace_id}
+            onClickRestoreComment={props.handleRestoreComment}
+            onClickSubmit={this.handleClickValidateNewComment}
             onClickTranslateComment={(comment, languageCode = null) => props.handleTranslateComment(
               comment,
               state.content.workspace_id,
               languageCode || state.translationTargetLanguageCode
             )}
-            onClickRestoreComment={props.handleRestoreComment}
-            onClickEditComment={this.handleClickEditComment}
-            onClickDeleteComment={this.handleClickDeleteComment}
-            onClickOpenFileComment={this.handleClickOpenFileComment}
+            timelineData={props.timeline}
             translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
             translationTargetLanguageCode={state.translationTargetLanguageCode}
-            onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
-            onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
+            workspaceId={state.content.workspace_id}
+            // End of required props ///////////////////////////////////////////
+            availableStatusList={state.config.availableStatuses}
             canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
+            codeLanguageList={state.config.system.config.ui__notes__code_sample_languages}
+            customClass={`${state.config.slug}__contentpage`}
+            customColor={state.config.hexcolor}
+            disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
+            invalidMentionList={state.invalidMentionList}
+            isFileCommentLoading={state.isFileCommentLoading}
+            isLastTimelineItemCurrentToken={props.isLastTimelineItemCurrentToken}
+            loading={props.loadingTimeline}
+            memberList={state.config.workspace.memberList}
+            onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
+            onClickDeleteComment={this.handleClickDeleteComment}
+            onClickEditComment={this.handleClickEditComment}
+            onClickOpenFileComment={this.handleClickOpenFileComment}
+            onClickRevisionBtn={this.handleClickShowRevision}
+            onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
+            shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
           />
         </PopinFixedRightPartContent>
       ) : null
     }
-    const tag = {
+
+    const menuItemList = [timelineObject]
+
+    if (state.config.toDoEnabled) {
+      const toDoObject = {
+        id: 'todo',
+        label: props.t('Tasks'),
+        icon: 'fas fa-check-square',
+        children: (
+          <PopinFixedRightPartContent
+            label={props.t('Tasks')}
+            toDoList={state.toDoList}
+            showProgress={state.showProgress}
+          >
+            <ToDoManagement
+              apiUrl={state.config.apiUrl}
+              contentId={state.content.content_id}
+              customColor={state.config.hexcolor}
+              lockedToDoList={state.lockedToDoList}
+              memberList={state.config.workspace.memberList}
+              onClickChangeStatusToDo={this.handleChangeStatusToDo}
+              onClickDeleteToDo={this.handleDeleteToDo}
+              onClickSaveNewToDo={this.handleSaveNewToDo}
+              displayProgressBarStatus={this.setShowProgressBarStatus}
+              user={state.loggedUser}
+              toDoList={state.toDoList}
+              workspaceId={state.content.workspace_id}
+            />
+          </PopinFixedRightPartContent>
+        )
+      }
+      menuItemList.push(toDoObject)
+    }
+
+    const tagObject = {
       id: 'tag',
       label: props.t('Tags'),
       icon: 'fas fa-tag',
@@ -253,6 +349,7 @@ export class Kanban extends React.Component {
         >
           <TagList
             apiUrl={state.config.apiUrl}
+            customColor={state.config.hexcolor}
             workspaceId={state.content.workspace_id}
             contentId={state.content.content_id}
             userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
@@ -261,7 +358,9 @@ export class Kanban extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
-    return [timelineObject, tag]
+    menuItemList.push(tagObject)
+
+    return menuItemList
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -281,23 +380,7 @@ export class Kanban extends React.Component {
           : state.content.current_revision_id
       })
     }
-
-    if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
   }
-
-  componentWillUnmount () {
-    console.log('%c<Kanban> will Unmount', `color: ${this.state.config.hexcolor}`)
-    globalThis.tinymce.remove('#wysiwygTimelineComment')
-  }
-
-  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: CUSTOM_EVENT.ADD_FLASH_MSG,
-    data: {
-      msg: msg,
-      type: 'warning',
-      delay: undefined
-    }
-  })
 
   setHeadTitle = (contentName) => {
     const { state } = this
@@ -322,6 +405,7 @@ export class Kanban extends React.Component {
     )
     this.setState({
       content: response.body,
+      isTemplate: response.body.is_template,
       currentContentRevisionId: response.body.current_revision_id,
       loadingContent: false
     })
@@ -329,6 +413,7 @@ export class Kanban extends React.Component {
     this.buildBreadcrumbs(response.body)
 
     await putMyselfFileRead(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+    if (state.config.toDoEnabled) this.props.getToDoList(this.setState.bind(this), state.content.workspace_id, state.content.content_id)
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
   }
 
@@ -353,6 +438,39 @@ export class Kanban extends React.Component {
     }
   }
 
+  handleSaveNewToDo = (assignedUserId, toDo) => {
+    const { state, props } = this
+    props.appContentSaveNewToDo(state.content.workspace_id, state.content.content_id, assignedUserId, toDo, this.setState.bind(this))
+    this.setState({ showProgress: true })
+  }
+
+  handleDeleteToDo = (toDo) => {
+    const { state, props } = this
+    props.appContentDeleteToDo(
+      state.content.workspace_id,
+      state.content.content_id,
+      toDo.content_id,
+      this.setState.bind(this),
+      state.lockedToDoList
+    )
+  }
+
+  handleChangeStatusToDo = (toDo, status) => {
+    const { state, props } = this
+    props.appContentChangeStatusToDo(
+      state.content.workspace_id,
+      state.content.content_id,
+      toDo.content_id,
+      status,
+      this.setState.bind(this),
+      state.lockedToDoList
+    )
+  }
+
+  setShowProgressBarStatus = (showProgressStatus) => {
+    this.setState({ showProgress: showProgressStatus })
+  }
+
   handleClickBtnCloseApp = () => {
     this.setState({ isVisible: false })
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
@@ -373,43 +491,25 @@ export class Kanban extends React.Component {
     props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
   }
 
-  searchForMentionOrLinkInQuery = async (query) => {
-    return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
-  }
-
-  handleClickValidateNewCommentBtn = (comment, commentAsFileList) => {
-    const { state } = this
-
-    if (!handleInvalidMentionInComment(
-      state.config.workspace && state.config.workspace.memberList,
-      state.timelineWysiwyg,
-      comment,
-      this.setState.bind(this)
-    )) {
-      this.handleClickValidateAnywayNewComment(comment, commentAsFileList)
-      return true
-    }
-    return false
-  }
-
-  handleClickValidateAnywayNewComment = (comment, commentAsFileList) => {
+  handleClickValidateNewComment = async (comment, commentAsFileList) => {
     const { props, state } = this
-    try {
-      props.appContentSaveNewComment(
-        state.content,
-        state.timelineWysiwyg,
-        comment,
-        commentAsFileList,
-        this.setState.bind(this),
-        state.config.slug,
-        state.loggedUser.username
-      )
-    } catch (e) {
-      this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
-    }
+    await props.appContentSaveNewCommentText(
+      state.content,
+      comment
+    )
+    await props.appContentSaveNewCommentFileList(
+      this.setState.bind(this),
+      state.content,
+      commentAsFileList
+    )
+    return true
   }
 
-  handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
+  handleClickCopyLink = () => {
+    const { props, state } = this
+    handleClickCopyLink(state.content.content_id)
+    sendGlobalFlashMessage(props.t('The link has been copied to clipboard'), 'info')
+  }
 
   handleCancelSave = () => this.setState({ showInvalidMentionPopupInComment: false })
 
@@ -439,16 +539,19 @@ export class Kanban extends React.Component {
   }
 
   handleClickFullscreen = () => {
+    if (!this.state.fullscreen) {
+      GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.HIDE_SIDEBAR, data: {} })
+    }
     this.setState(prevState => ({ fullscreen: !prevState.fullscreen }))
   }
 
-  handleClickEditComment = (comment) => {
+  handleClickEditComment = (comment, contentId, parentId) => {
     const { props, state } = this
     props.appContentEditComment(
       state.content.workspace_id,
-      comment.parent_id,
-      comment.content_id,
-      state.loggedUser.username
+      parentId,
+      contentId,
+      comment
     )
   }
 
@@ -516,6 +619,22 @@ export class Kanban extends React.Component {
         customColor={state.config.hexcolor}
       >
         <PopinFixedContent
+          actionList={[
+            {
+              icon: 'fas fa-link',
+              label: props.t('Copy content link'),
+              onClick: this.handleClickCopyLink,
+              showAction: true,
+              dataCy: 'popinListItem__copyLink'
+            }, {
+              icon: 'far fa-trash-alt',
+              label: props.t('Delete'),
+              onClick: this.handleClickDelete,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              disabled: readOnly,
+              dataCy: 'popinListItem__delete'
+            }
+          ]}
           headerButtons={[
             {
               icon: 'fas fa-expand-arrows-alt',
@@ -530,27 +649,20 @@ export class Kanban extends React.Component {
           breadcrumbsList={state.breadcrumbsList}
           content={state.content}
           config={state.config}
-          componentTitle={<div>{state.content.label}</div>}
           customClass={`${state.config.slug}__contentpage`}
           disableChangeTitle={!state.content.is_editable}
           isRefreshNeeded={state.showRefreshWarning}
+          isTemplate={state.isTemplate}
           contentVersionNumber={contentVersionNumber}
           lastVersion={lastVersionNumber}
           loggedUser={state.loggedUser}
           onChangeStatus={this.handleChangeStatus}
           onClickCloseBtn={this.handleClickBtnCloseApp}
+          onClickChangeMarkedTemplate={this.handleChangeMarkedTemplate}
           onValidateChangeTitle={this.handleSaveEditTitle}
-          actionList={[
-            {
-              icon: 'far fa-trash-alt',
-              label: props.t('Delete'),
-              onClick: this.handleClickDelete,
-              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
-              disabled: readOnly,
-              dataCy: 'popinListItem__delete'
-            }
-          ]}
           showReactions
+          showMarkedAsTemplate
+          componentTitle={<FilenameWithBadges file={state.content} isTemplate={state.isTemplate} />}
           favoriteState={props.isContentInFavoriteList(state.content, state)
             ? FAVORITE_STATE.FAVORITE
             : FAVORITE_STATE.NOT_FAVORITE}
@@ -564,10 +676,12 @@ export class Kanban extends React.Component {
           <KanbanComponent
             config={state.config}
             content={state.content}
+            // End of required props ///////////////////////////////////////////
             editionAuthor={state.editionAuthor}
             fullscreen={state.fullscreen}
             isNewContentRevision={!!state.currentContentRevisionId}
             isRefreshNeeded={state.showRefreshWarning}
+            language={state.loggedUser.lang}
             mode={state.mode}
             onClickFullscreen={this.handleClickFullscreen}
             onClickLastVersion={this.handleClickLastVersion}

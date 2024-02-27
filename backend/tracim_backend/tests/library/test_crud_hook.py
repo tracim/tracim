@@ -1,14 +1,13 @@
-from unittest.mock import MagicMock
-
 import pytest
 import transaction
+from unittest.mock import MagicMock
 
 from tracim_backend.lib.core.plugins import hookimpl
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
@@ -70,22 +69,22 @@ class UserRoleInWorkspaceHookImpl:
         self.mock_hooks = MagicMock()
 
     @hookimpl
-    def on_user_role_in_workspace_created(
-        self, role: UserRoleInWorkspace, context: TracimContext
+    def on_user_config_in_workspace_created(
+        self, user_workspace_config: UserWorkspaceConfig, context: TracimContext
     ) -> None:
-        self.mock_hooks("created", role=role, context=context)
+        self.mock_hooks("created", user_workspace_config=user_workspace_config, context=context)
 
     @hookimpl
-    def on_user_role_in_workspace_modified(
-        self, role: UserRoleInWorkspace, context: TracimContext
+    def on_user_config_in_workspace_modified(
+        self, user_workspace_config: UserWorkspaceConfig, context: TracimContext
     ) -> None:
-        self.mock_hooks("modified", role=role, context=context)
+        self.mock_hooks("modified", user_workspace_config=user_workspace_config, context=context)
 
     @hookimpl
-    def on_user_role_in_workspace_deleted(
-        self, role: UserRoleInWorkspace, context: TracimContext
+    def on_user_config_in_workspace_deleted(
+        self, user_workspace_config: UserWorkspaceConfig, context: TracimContext
     ) -> None:
-        self.mock_hooks("deleted", role=role, context=context)
+        self.mock_hooks("deleted", user_workspace_config=user_workspace_config, context=context)
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -128,7 +127,6 @@ class TestDatabaseCrudHookCaller:
         hook.mock_hooks.assert_called_with("deleted", workspace=workspace, context=session.context)
 
     def test_unit__crud_caller__ok__user_role_in_workspace(self, session):
-
         hook = UserRoleInWorkspaceHookImpl()
         session.context.plugin_manager.register(hook)
 
@@ -137,19 +135,27 @@ class TestDatabaseCrudHookCaller:
         session.add(workspace)
         session.flush()
 
-        role = UserRoleInWorkspace(role=UserRoleInWorkspace.READER, user=owner, workspace=workspace)
-        session.add(role)
+        user_workspace_config = UserWorkspaceConfig(
+            role=UserWorkspaceConfig.READER, user=owner, workspace=workspace
+        )
+        session.add(user_workspace_config)
         session.flush()
-        hook.mock_hooks.assert_called_with("created", role=role, context=session.context)
+        hook.mock_hooks.assert_called_with(
+            "created", user_workspace_config=user_workspace_config, context=session.context
+        )
 
-        role.role = UserRoleInWorkspace.WORKSPACE_MANAGER
-        session.add(role)
+        user_workspace_config.role = UserWorkspaceConfig.WORKSPACE_MANAGER
+        session.add(user_workspace_config)
         session.flush()
-        hook.mock_hooks.assert_called_with("modified", role=role, context=session.context)
+        hook.mock_hooks.assert_called_with(
+            "modified", user_workspace_config=user_workspace_config, context=session.context
+        )
 
-        session.delete(role)
+        session.delete(user_workspace_config)
         session.flush()
-        hook.mock_hooks.assert_called_with("deleted", role=role, context=session.context)
+        hook.mock_hooks.assert_called_with(
+            "deleted", user_workspace_config=user_workspace_config, context=session.context
+        )
 
     def test_unit__crud_caller__ok__content(self, session):
         hook = ContentHookImpl()
@@ -173,7 +179,9 @@ class TestDatabaseCrudHookCaller:
         hook.mock_hooks.assert_called_with("created", content=content, context=session.context)
 
         with new_revision(
-            session=session, tm=transaction.manager, content=content,
+            session=session,
+            tm=transaction.manager,
+            content=content,
         ):
             content.label = "Bar"
 

@@ -49,8 +49,8 @@ export class MainPreview extends React.Component {
         )
 
         const imgContainerWidth = imgContainer.clientHeight - (
-          parseFloat(imgContainerStyle.paddingLeft) +
-          parseFloat(imgContainerStyle.paddingRight)
+          parseFloat(imgContainerStyle.paddingInlineStart) +
+          parseFloat(imgContainerStyle.paddingInlineEnd)
         )
 
         let width = Math.min(img.naturalWidth, imgContainerHeight)
@@ -135,14 +135,12 @@ export default translate()(MainPreview)
 
 MainPreview.propTypes = {
   previewSrc: PropTypes.string,
-  index: PropTypes.number,
   onClickShowImageRaw: PropTypes.func,
   rotationAngle: PropTypes.number
 }
 
 MainPreview.defaultProps = {
   previewSrc: '',
-  index: 0,
   onClickShowImageRaw: () => {},
   rotationAngle: 0
 }

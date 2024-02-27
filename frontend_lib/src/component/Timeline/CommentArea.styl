@@ -1,9 +1,9 @@
 @import '../../css/Variable.styl'
 
+textarea
+  unicode-bidi plaintext
+
 .textarea
-  position relative
-  flex 0 1 auto
-  margin 20px
   &__autocomplete
     position absolute
     width 100%
@@ -24,7 +24,7 @@
       padding 1px standardSpacing
       cursor pointer
       &__active
-        background-color grey-hover
+        background-color lightGrey1
 
 .commentArea
     &__mentions
@@ -38,27 +38,34 @@
       border-radius standardBorderRadius
       &__delimiter
         height 2px
-        margin 5px 20px
+        margin textSpacing standardSpacing
         background-color grey
       &__item
         padding 1px standardSpacing
         cursor pointer
         &__active
-          background-color grey-hover
+          background-color lightGrey1
     &__textinput
+      position relative
       width 100%
       min-height 80px
+      // NOTE - GB - 2022-04-12 - TinyMCE' UI without the content is 96px
+      // TinyMCE 5 is not high enough so we fixed 80px for text edition area
+      & .tox-edit-area
+        min-height 80px
       & > textarea
         border-radius standardBorderRadius
-        border borderStyle
+        border none
         padding textSpacing
         height 80px
         width 100%
+        &:disabled
+          border borderStyle
     &__wrapper
       display flex
       align-items flex-start
       justify-content flex-end
-      margin-top textSpacing
+      margin-top standardSpacing
       height 42px
     &__advancedtext
       width 100%
@@ -68,7 +75,12 @@
         &:disabled
           cursor not-allowed
           &:hover
-            color mediumDarkGrey
+            color darkGrey1
     &__submit
       display flex
       align-items center
+      &__btn
+        margin-inline-start textSpacing
+    &__withstand
+      &__btn
+        margin-inline-start textSpacing

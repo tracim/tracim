@@ -1,11 +1,10 @@
 import collections
 import importlib
 import pkgutil
+import pluggy
 import sys
 import types
 import typing
-
-import pluggy
 
 from tracim_backend.config import CFG
 from tracim_backend.lib.utils.logger import logger
@@ -63,7 +62,9 @@ def _load_spec(plugin_manager: pluggy.PluginManager) -> None:
             plugin_manager.add_hookspecs(class_)
 
 
-def _load_plugins(plugin_manager: pluggy.PluginManager,) -> typing.Dict[str, types.ModuleType]:
+def _load_plugins(
+    plugin_manager: pluggy.PluginManager,
+) -> typing.Dict[str, types.ModuleType]:
     """
     Loads all tracim_backend_plugin
     :param force: plugin will not be reloaded if already loaded if force is not true.
@@ -113,11 +114,13 @@ def init_plugin_manager(app_config: CFG) -> pluggy.PluginManager:
     # Static plugins, imported here to avoid circular reference with hookimpl
     from tracim_backend.lib.core.event import EventBuilder
     from tracim_backend.lib.core.event import EventPublisher
-    from tracim_backend.lib.search.search_factory import SearchFactory
+    from tracim_backend.lib.core.event import MessageHooks
     import tracim_backend.lib.core.mention as mention
+    from tracim_backend.lib.search.search_factory import SearchFactory
 
     plugin_manager.register(EventBuilder(app_config))
     plugin_manager.register(EventPublisher(app_config))
+    plugin_manager.register(MessageHooks())
     mention.register_tracim_plugin(plugin_manager)
     search_api = SearchFactory.get_search_lib(session=None, config=app_config, current_user=None)
     search_api.register_plugins(plugin_manager)

@@ -60,14 +60,47 @@ export const getFileChildContent = (apiUrl, workspaceId, contentId, pageToken = 
   return baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents?${queryParam}`)
 }
 
+export const postToDo = (apiUrl, workspaceId, contentId, assignedUserId, toDo) =>
+  baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/todos`, {
+    assignee_id: assignedUserId,
+    raw_content: toDo
+  })
+
+export const deleteToDo = (apiUrl, workspaceId, contentId, toDoId) =>
+  baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/todos/${toDoId}`)
+
+export const putToDo = (apiUrl, workspaceId, contentId, toDoId, status) =>
+  baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/todos/${toDoId}`, {
+    status: status
+  })
+
+export const getToDo = (apiUrl, workspaceId, contentId, toDoId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/todos/${toDoId}`)
+
+export const getToDoList = (apiUrl, workspaceId, contentId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/todos`)
+
+export const getToDoListForUser = (apiUrl, userId) =>
+  baseFetch('GET', `${apiUrl}/users/${userId}/todos`)
+
 export const putEditStatus = (apiUrl, workspaceId, contentId, appSlug, newStatus) =>
   // INFO - CH - 2019-01-03 - Check the -s added to the app slug. This is and should stay consistent with app features
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/${appSlug}s/${contentId}/status`, {
     status: newStatus
   })
 
+export const putContentTemplate = (apiUrl, workspaceId, contentId, isTemplate) =>
+  baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/template`, {
+    is_template: isTemplate
+  })
+
 export const putContentArchived = (apiUrl, workspaceId, contentId) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/archived`)
+
+export const putChangeContentNamespace = (apiUrl, workspaceId, contentId, type) =>
+  baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/threads/${contentId}/namespace`, {
+    content_namespace: type
+  })
 
 export const putContentDeleted = (apiUrl, workspaceId, contentId) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/trashed`)
@@ -78,7 +111,13 @@ export const putContentRestoreArchive = (apiUrl, workspaceId, contentId) =>
 export const putContentRestoreDelete = (apiUrl, workspaceId, contentId) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/trashed/restore`)
 
-export const getMyselfKnownMember = (apiUrl, userNameToSearch, workspaceIdToInclude, workspaceIdToExclude, limit = 0) => {
+export const getMyselfKnownMember = (
+  apiUrl,
+  userNameToSearch,
+  workspaceIdToInclude,
+  workspaceIdToExclude,
+  limit = 0
+) => {
   let opts = ''
   if (workspaceIdToInclude) opts += `&include_workspace_ids=${workspaceIdToInclude}`
   if (workspaceIdToExclude) opts += `&exclude_workspace_ids=${workspaceIdToExclude}`
@@ -111,8 +150,14 @@ export const getReservedUsernames = async (apiUrl) =>
 export const getWorkspaceDetail = (apiUrl, workspaceId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}`)
 
-export const getWorkspaceMemberList = (apiUrl, workspaceId) =>
-  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/members`)
+export const getSpaceUserRoleList = (apiUrl, spaceId, showDisabledUser = false) =>
+  baseFetch(
+    'GET',
+    `${apiUrl}/workspaces/${spaceId}/role${showDisabledUser ? '?show_disabled_user=1' : ''}`
+  )
+
+export const getSpaceMemberFromId = (apiUrl, spaceId, userId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${spaceId}/members/${userId}`)
 
 export const deleteWorkspace = (apiUrl, workspaceId) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/trashed`)
@@ -156,6 +201,12 @@ export const putMyselfFileRead = (apiUrl, workspaceId, contentId) =>
 export const getContent = (apiUrl, contentId) =>
   baseFetch('GET', `${apiUrl}/contents/${contentId}`)
 
+export const getTemplateList = (apiUrl, templateType) =>
+  baseFetch('GET', `${apiUrl}/users/me/template_contents?type=${templateType}`)
+
+export const getComment = (apiUrl, workspaceId, contentId, commentId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments/${commentId}`)
+
 export const getContentReactionList = (apiUrl, workspaceId, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/reactions`)
 
@@ -165,8 +216,8 @@ export const postContentReaction = (apiUrl, workspaceId, contentId, value) =>
 export const deleteContentReaction = (apiUrl, workspaceId, contentId, reactionId) =>
   baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/reactions/${reactionId}`)
 
-export const getWorkspaceContent = (apiUrl, workspaceId, contentType, contentId) =>
-  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/${contentType}/${contentId}`)
+export const getSpaceContent = (apiUrl, workspaceId, contentType, contentId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/${contentType}s/${contentId}`)
 
 export const getCommentTranslated = (apiUrl, workspaceId, contentId, commentId, targetLanguageCode) => {
   const name = `comment-${commentId}.html`
@@ -233,6 +284,7 @@ export const postRawFileContent = (
   content,
   mimetype = 'text/plain',
   parentId = null,
+  templateId = null,
   contentType = CONTENT_TYPE.FILE,
   contentNamespace = CONTENT_NAMESPACE.CONTENT
 ) => {
@@ -241,5 +293,9 @@ export const postRawFileContent = (
   formData.append('content_namespace', contentNamespace)
   formData.append('content_type', contentType)
   if (parentId) formData.append('parent_id', parentId)
+  if (templateId) formData.append('template_id', templateId)
   return baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/files`, formData)
 }
+
+export const getFileRevisionPreviewInfo = (apiUrl, workspaceId, contentId, revisionId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/revisions/${revisionId}/preview_info`)

@@ -35,13 +35,13 @@ describe('Workspace', () => {
       .get('.dashboard')
       .contains('.pageTitleGeneric__title__label', spaceTitle)
 
-    cy.get(`.sidebar__content__navigation__item__name[title="${spaceTitle}"]`)
+    cy.get(`.sidebar__item__name[title="${spaceTitle}"]`)
       .should('exist')
   })
 
   const getWorkspaceItemByName = (cy, spaceTitle) => (
-    cy.get(`.sidebar__content__navigation__item__name[title="${spaceTitle}"]`)
-      .parents('li.sidebar__content__navigation__item')
+    cy.get(`.sidebar__item__name[title="${spaceTitle}"]`)
+      .parents('li.sidebar__item')
   )
 
   describe('Creating a workspace while a lot of workspace are already created', () => {
@@ -60,7 +60,7 @@ describe('Workspace', () => {
     it.skip('should scroll to the new workspace in the sidebar', () => {
       cy.visitPage({ pageName: p.HOME })
       cy.get('.sidebar__scrollview').scrollTo('bottom')
-      cy.get('[data-cy=sidebarCreateWorkspaceBtn]').should('be.visible').click()
+      cy.get('[data-cy=sidebarCreateSpaceBtn]').should('be.visible').click()
       createOneSpace(cy, newSpaceName)
       getWorkspaceItemByName(cy, newSpaceName).should('be.visible')
     })

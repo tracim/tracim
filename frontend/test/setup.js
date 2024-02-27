@@ -30,7 +30,7 @@ if (!global.window && !global.document) {
   global.window = window
   global.document = window.document
   global.navigator = window.navigator
-  global.DOMParser = window.DOMParser
+  global.window.alert = () => {}
   global.GLOBAL_primaryColor = globalPrimaryColor.hex
   global.lastCustomEventTypes = new Set()
   global.GLOBAL_dispatchEvent = global.document.dispatchEvent = (e) => { global.lastCustomEventTypes.add(e.type) }
@@ -42,6 +42,7 @@ if (!global.window && !global.document) {
   global.Audio = window.Audio
   global.Notification = window.Notification
   global.FormData = window.FormData
+  global.self = global
 }
 
 Enzyme.configure({ adapter: new Adapter() })

@@ -23,10 +23,12 @@ if (!global.window && !global.document) {
   global.CustomEvent = window.CustomEvent
   global.window = window
   global.document = window.document
+  global.Element = window.Element
   global.navigator = window.navigator
   global.GLOBAL_dispatchEvent = () => {}
   global.GLOBAL_primaryColor = '#aaaaaa'
   global.FormData = window.FormData
+  global.self = global
 
   const nodeCrypto = require('crypto')
   global.crypto = {

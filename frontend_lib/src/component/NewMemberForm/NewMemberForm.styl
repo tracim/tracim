@@ -6,11 +6,11 @@
   height 100%
   width 100%
   &__title
+    display flex
     font-size titleFontSize
     margin-bottom 25px
+    justify-content space-between
   &__close
-    position absolute
-    right 20px
     font-size titleFontSize
     z-index 1
     & > i
@@ -29,11 +29,7 @@
         font-size metadataFontSize
       .autocomplete
         position absolute
-        width 300px
-        background-color offWhite
-        border-radius standardBorderRadius
-        border-width 1px
-        border-style solid
+        min-width 300px
         z-index 1
         &__item
           display flex
@@ -41,13 +37,13 @@
           cursor pointer
           padding 5px 8px
           &:hover
-            background-color: grey-hover
+            background-color lightGrey1
           &:first-child
-            border-top-left-radius 10px
-            border-top-right-radius 10px
+            border-start-start-radius 10px
+            border-start-end-radius 10px
           &:last-child
-            border-bottom-left-radius 10px
-            border-bottom-right-radius 10px
+            border-end-start-radius 10px
+            border-end-end-radius 10px
           &__avatar
             width 45px
             height 45px
@@ -55,21 +51,22 @@
           &__icon
             font-size bigIconSize
           &__name
-            margin-left 15px
+            margin-inline-start 15px
             overflow hidden
             text-overflow ellipsis
             white-space nowrap
             &__username
-              font-size metadataFontSize
               color grey
+              font-size metadataFontSize
               overflow hidden
               text-overflow ellipsis
+              unicode-bidi plaintext
             &__unknownuser
+              unicode-bidi plaintext
               &__msg
                 color grey
                 font-size metadataFontSize
     .name__input
-      border borderStyle
       border-radius standardBorderRadius
       padding standardSpacing
       width 100%
@@ -88,3 +85,31 @@
   &__submitbtn
     display flex
     justify-content flex-end
+
+// INFO - GB - 2022-01-27 - The commands below are fallbacks because border-start-end-radius, border-end-start-radius
+// border-start-start-radius and border-end-end-radius are new and have a global usage below 90% according to
+// https://caniuse.com/. When the global usage is higher, we can delete the fallbacks.
+.memberlist__form__member__name.autocomplete__item
+  &:first-child
+    border-top-left-radius 10px
+    border-top-right-radius 10px
+  &:last-child
+    border-bottom-left-radius 10px
+    border-bottom-right-radius 10px
+
+.autocomplete
+  background-color offWhite
+  border-radius standardBorderRadius
+  box-shadow shadow-all
+  font-size metadataFontSize
+  left 0
+  padding 3px 0
+  width 100%
+  &__item
+    align-items baseline
+    cursor pointer
+    display flex
+    flex-direction row
+    padding 1px 5px
+    &:hover
+      background-color lightGrey1

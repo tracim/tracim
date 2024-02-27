@@ -3,10 +3,12 @@ import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import { UserInfo as UserInfoWithoutHOC } from '../../../src/component/Account/UserInfo.jsx'
 import { PROFILE } from 'tracim_frontend_lib'
+import { withRouterMock } from '../../hocMock/withRouter'
 
 describe('<UserInfo />', () => {
   const props = {
     user: {
+      userId: 1,
       publicName: 'randomPublicName',
       username: 'randomUsername',
       email: 'randomEmail',
@@ -14,7 +16,8 @@ describe('<UserInfo />', () => {
     }
   }
 
-  const wrapper = shallow(<UserInfoWithoutHOC {...props} t={key => key} />)
+  const UserInfoWithHOC = withRouterMock(UserInfoWithoutHOC)
+  const wrapper = shallow(<UserInfoWithHOC {...props} t={key => key} />).dive()
 
   describe('static design', () => {
     it('should display the publicName of the user in a div', () =>

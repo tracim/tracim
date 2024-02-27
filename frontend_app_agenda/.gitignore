@@ -5,5 +5,8 @@ dist/app
 dist/assets
 dist/agenda.app.js
 dist/agenda.app.standalone.js
+dist/agenda.app.optimized.js
+dist/*.LICENSE.txt
 node_modules/
 src/debug.js
+test/fixture/defaultProps.js

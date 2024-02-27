@@ -1,4 +1,5 @@
-import { PAGES } from '../../support/urls_commands'
+import { PAGES } from '../../support/urls_commands.js'
+import { SELECTORS } from '../../support/generic_selector_commands.js'
 
 const publishButton = '.commentArea__submit__btn'
 const text = 'Hello, world'
@@ -14,8 +15,11 @@ describe('Publications', () => {
         params: { workspaceId: workspace.workspace_id },
         waitForTlm: true
       })
-      cy.get('#wysiwygTimelineCommentPublication').type(text)
+      cy.inputInTinyMCE(text)
       cy.contains(publishButton, 'Publish').click()
+      cy.getTag({ selectorName: SELECTORS.CARD_POPUP_BODY })
+          .get('[data-cy=popup__createcontent__form__button]')
+          .click()
     })
   })
 

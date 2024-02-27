@@ -3,23 +3,28 @@ import pytest
 from tracim_backend import AuthType
 from tracim_backend.exceptions import UserRoleNotFound
 from tracim_backend.lib.core.plugins import hookimpl
-from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.request import TracimContext
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import EmailNotificationType
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.tests.fixtures import *  # noqa:F401,F403
 
 
 class RemoveFromAllSpacesPlugin:
     @hookimpl
-    def on_user_role_in_workspace_deleted(
-        self, role: UserRoleInWorkspace, context: TracimContext
+    def on_user_config_in_workspace_deleted(
+        self, user_workspace_config: UserWorkspaceConfig, context: TracimContext
     ) -> None:
         wapi = WorkspaceApi(context.dbsession, None, context.app_config)
-        rapi = RoleApi(context.dbsession, None, context.app_config)
-        for workspace in wapi.get_all_for_user(role.user):
-            rapi.delete_one(role.user.user_id, workspace.workspace_id, flush=False)
+        user_workspace_config_api = UserWorkspaceConfigApi(
+            context.dbsession, None, context.app_config
+        )
+        for workspace in wapi.get_all_for_user(user_workspace_config.user):
+            user_workspace_config_api.delete_one(
+                user_workspace_config.user.user_id, workspace.workspace_id, flush=False
+            )
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -30,7 +35,7 @@ class TestChildRemovalPlugin(object):
         session,
         app_config,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         user_api_factory,
         load_child_removal_plugin,
     ):
@@ -43,23 +48,39 @@ class TestChildRemovalPlugin(object):
                 label="parent", default_user_role=WorkspaceRoles.READER
             )
             child_workspace = wapi.create_workspace(
-                label="child", parent=parent_workspace, default_user_role=WorkspaceRoles.CONTRIBUTOR
+                label="child",
+                parent=parent_workspace,
+                default_user_role=WorkspaceRoles.CONTRIBUTOR,
             )
             grandson_workspace = wapi.create_workspace(
-                label="grandson", parent=child_workspace, default_user_role=WorkspaceRoles.READER
+                label="grandson",
+                parent=child_workspace,
+                default_user_role=WorkspaceRoles.READER,
             )
             uapi = user_api_factory.get()
             user_1 = uapi.create_user(
-                email="u.1@u.u", auth_type=AuthType.INTERNAL, do_save=True, do_notify=False
+                email="u.1@u.u",
+                auth_type=AuthType.INTERNAL,
+                do_save=True,
+                do_notify=False,
             )
-            role_api = role_api_factory.get()
+            user_workspace_config_api = user_workspace_config_api_factory.get()
             for workspace in (parent_workspace, child_workspace, grandson_workspace):
-                role_api.create_one(user_1, workspace, WorkspaceRoles.CONTENT_MANAGER.level, False)
-            role_api.delete_one(user_1.user_id, parent_workspace.workspace_id)
+                user_workspace_config_api.create_one(
+                    user_1,
+                    workspace,
+                    WorkspaceRoles.CONTENT_MANAGER.level,
+                    email_notification_type=EmailNotificationType.NONE,
+                )
+            user_workspace_config_api.delete_one(user_1.user_id, parent_workspace.workspace_id)
             with pytest.raises(UserRoleNotFound):
-                assert role_api.get_one(user_1.user_id, child_workspace.workspace_id)
+                assert user_workspace_config_api.get_one(
+                    user_1.user_id, child_workspace.workspace_id
+                )
             with pytest.raises(UserRoleNotFound):
-                assert role_api.get_one(user_1.user_id, grandson_workspace.workspace_id)
+                assert user_workspace_config_api.get_one(
+                    user_1.user_id, grandson_workspace.workspace_id
+                )
 
     def test__remove_user_from_descendant_workspaces__ok__also_removed_in_another_plugin(
         self,
@@ -67,7 +88,7 @@ class TestChildRemovalPlugin(object):
         session,
         app_config,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         user_api_factory,
         load_child_removal_plugin,
         test_context,
@@ -82,20 +103,36 @@ class TestChildRemovalPlugin(object):
                 label="parent", default_user_role=WorkspaceRoles.READER
             )
             child_workspace = wapi.create_workspace(
-                label="child", parent=parent_workspace, default_user_role=WorkspaceRoles.CONTRIBUTOR
+                label="child",
+                parent=parent_workspace,
+                default_user_role=WorkspaceRoles.CONTRIBUTOR,
             )
             grandson_workspace = wapi.create_workspace(
-                label="grandson", parent=child_workspace, default_user_role=WorkspaceRoles.READER
+                label="grandson",
+                parent=child_workspace,
+                default_user_role=WorkspaceRoles.READER,
             )
             uapi = user_api_factory.get()
             user_1 = uapi.create_user(
-                email="u.1@u.u", auth_type=AuthType.INTERNAL, do_save=True, do_notify=False
+                email="u.1@u.u",
+                auth_type=AuthType.INTERNAL,
+                do_save=True,
+                do_notify=False,
             )
-            role_api = role_api_factory.get()
+            user_workspace_config_api = user_workspace_config_api_factory.get()
             for workspace in (parent_workspace, child_workspace, grandson_workspace):
-                role_api.create_one(user_1, workspace, WorkspaceRoles.CONTENT_MANAGER.level, False)
-            role_api.delete_one(user_1.user_id, parent_workspace.workspace_id)
+                user_workspace_config_api.create_one(
+                    user_1,
+                    workspace,
+                    WorkspaceRoles.CONTENT_MANAGER.level,
+                    email_notification_type=EmailNotificationType.NONE,
+                )
+            user_workspace_config_api.delete_one(user_1.user_id, parent_workspace.workspace_id)
             with pytest.raises(UserRoleNotFound):
-                assert role_api.get_one(user_1.user_id, child_workspace.workspace_id)
+                assert user_workspace_config_api.get_one(
+                    user_1.user_id, child_workspace.workspace_id
+                )
             with pytest.raises(UserRoleNotFound):
-                assert role_api.get_one(user_1.user_id, grandson_workspace.workspace_id)
+                assert user_workspace_config_api.get_one(
+                    user_1.user_id, grandson_workspace.workspace_id
+                )

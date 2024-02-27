@@ -2,13 +2,12 @@
 """
 Tests for /api/users subpath endpoints.
 """
-import io
-import typing
-
 from PIL import Image
 from depot.io.utils import FileIntent
+import io
 import pytest
 import transaction
+import typing
 from webtest import TestApp
 
 from tracim_backend import AuthType
@@ -17,7 +16,8 @@ from tracim_backend.exceptions import EmailAlreadyExists
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import EmailNotificationType
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.roles import WorkspaceRoles
@@ -43,7 +43,7 @@ class TestUserReadStatusEndpoint(object):
         workspace_api_factory,
         user_api_factory,
         admin_user,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         content_api_factory,
         web_testapp,
@@ -66,76 +66,98 @@ class TestUserReadStatusEndpoint(object):
             do_save=True,
             do_notify=False,
         )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get()
         main_folder_workspace2 = api.create(
-            content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace2,
+            label="Helpa",
+            do_save=True,
         )
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         secondly_created = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another creation_order_test",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="another creation_order_test",
+            do_save=True,
         )
         # update order test
         firstly_created_but_recently_updated = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="update_order_test",
+            do_save=True,
         )
         secondly_created_but_not_updated = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another update_order_test",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="another update_order_test",
+            do_save=True,
         )
         with new_revision(
-            session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
+            session=session,
+            tm=transaction.manager,
+            content=firstly_created_but_recently_updated,
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
         # comment change order
         firstly_created_but_recently_commented = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is randomized label content",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="this is randomized label content",
+            do_save=True,
         )
         secondly_created_but_not_commented = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is another randomized label content",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="this is another randomized label content",
+            do_save=True,
         )
-        api.create_comment(
-            workspace, firstly_created_but_recently_commented, "juste a super comment", True
+        comment = api.create_comment(
+            workspace,
+            firstly_created_but_recently_commented,
+            "juste a super comment",
+            True,
         )
         api.create(
-            content_type_list.Page.slug,
-            workspace2,
-            main_folder_workspace2,
-            "content_workspace_2",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace2,
+            parent=main_folder_workspace2,
+            label="content_workspace_2",
+            do_save=True,
         )
         session.flush()
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
@@ -143,29 +165,34 @@ class TestUserReadStatusEndpoint(object):
             status=200,
         )
         res = res.json_body
-        assert len(res) == 7
+        assert len(res) == 8
+        parsed_elems = []
         for elem in res:
             assert isinstance(elem["content_id"], int)
             assert isinstance(elem["read_by_user"], bool)
-        # comment is newest than page2
-        assert res[0]["content_id"] == firstly_created_but_recently_commented.content_id
-        assert res[1]["content_id"] == secondly_created_but_not_commented.content_id
-        # last updated content is newer than other one despite creation
-        # of the other is more recent
-        assert res[2]["content_id"] == firstly_created_but_recently_updated.content_id
-        assert res[3]["content_id"] == secondly_created_but_not_updated.content_id
-        # creation order is inverted here as last created is last active
-        assert res[4]["content_id"] == secondly_created.content_id
-        assert res[5]["content_id"] == firstly_created.content_id
-        # folder subcontent modification does not change folder order
-        assert res[6]["content_id"] == main_folder.content_id
+            # check only valid content
+            assert elem["content_id"] in (
+                firstly_created_but_recently_commented.content_id,
+                secondly_created_but_not_commented.content_id,
+                firstly_created_but_recently_updated.content_id,
+                secondly_created_but_not_updated.content_id,
+                secondly_created.content_id,
+                firstly_created.content_id,
+                main_folder.content_id,
+                comment.content_id,
+            )
+            # check duplicate
+            assert elem["content_id"] not in [
+                parsed_elem["content_id"] for parsed_elem in parsed_elems
+            ]
+            parsed_elems.append(elem)
 
     def test_api__get_read_status__ok__200__user_itself(
         self,
         workspace_api_factory,
         admin_user,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         content_api_factory,
         web_testapp,
@@ -187,71 +214,90 @@ class TestUserReadStatusEndpoint(object):
             do_save=True,
             do_notify=False,
         )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get()
         main_folder_workspace2 = api.create(
-            content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace2,
+            label="Helpa",
+            do_save=True,
         )
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another creation_order_test",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="another creation_order_test",
+            do_save=True,
         )
         # update order test
         firstly_created_but_recently_updated = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="update_order_test",
+            do_save=True,
         )
         api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another update_order_test",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="another update_order_test",
+            do_save=True,
         )
         with new_revision(
-            session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
+            session=session,
+            tm=transaction.manager,
+            content=firstly_created_but_recently_updated,
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
         # comment change order
         firstly_created_but_recently_commented = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is randomized label content",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="this is randomized label content",
+            do_save=True,
         )
         api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is another randomized label content",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="this is another randomized label content",
+            do_save=True,
         )
         api.create_comment(
-            workspace, firstly_created_but_recently_commented, "juste a super comment", True
+            workspace,
+            firstly_created_but_recently_commented,
+            "juste a super comment",
+            True,
         )
         api.create(
-            content_type_list.Page.slug,
-            workspace2,
-            main_folder_workspace2,
-            "content_workspace_2",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace2,
+            parent=main_folder_workspace2,
+            label="content_workspace_2",
+            do_save=True,
         )
         session.flush()
         transaction.commit()
@@ -276,26 +322,26 @@ class TestUserReadStatusEndpoint(object):
         )
         res = web_testapp.get(url=url, status=200, params=params)
         res = res.json_body
+
         assert len(res) == 4
+        parsed_elems = []
         for elem in res:
             assert isinstance(elem["content_id"], int)
             assert isinstance(elem["read_by_user"], bool)
-        # comment is newest than page2
-        assert res[0]["content_id"] == firstly_created_but_recently_commented.content_id
-        # last updated content is newer than other one despite creation
-        # of the other is more recent
-        assert res[1]["content_id"] == firstly_created_but_recently_updated.content_id
-        # creation order is inverted here as last created is last active
-        assert res[2]["content_id"] == firstly_created.content_id
-        # folder subcontent modification does not change folder order
-        assert res[3]["content_id"] == main_folder.content_id
+            # check only valid content
+            assert elem["content_id"] in selected_contents_id
+            # check duplicate
+            assert elem["content_id"] not in [
+                parsed_elem["content_id"] for parsed_elem in parsed_elems
+            ]
+            parsed_elems.append(elem)
 
     def test_api__get_read_status__err__403__other_user(
         self,
         workspace_api_factory,
         user_api_factory,
         admin_user,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         content_api_factory,
         web_testapp,
@@ -318,71 +364,90 @@ class TestUserReadStatusEndpoint(object):
             do_save=True,
             do_notify=False,
         )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get()
         main_folder_workspace2 = api.create(
-            content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace2,
+            label="Helpa",
+            do_save=True,
         )
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another creation_order_test",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="another creation_order_test",
+            do_save=True,
         )
         # update order test
         firstly_created_but_recently_updated = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="update_order_test",
+            do_save=True,
         )
         api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another update_order_test",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="another update_order_test",
+            do_save=True,
         )
         with new_revision(
-            session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
+            session=session,
+            tm=transaction.manager,
+            content=firstly_created_but_recently_updated,
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
         # comment change order
         firstly_created_but_recently_commented = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is randomized label content",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="this is randomized label content",
+            do_save=True,
         )
         api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is another randomized label content",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="this is another randomized label content",
+            do_save=True,
         )
         api.create_comment(
-            workspace, firstly_created_but_recently_commented, "juste a super comment", True
+            workspace,
+            firstly_created_but_recently_commented,
+            "juste a super comment",
+            True,
         )
         api.create(
-            content_type_list.Page.slug,
-            workspace2,
-            main_folder_workspace2,
-            "content_workspace_2",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace2,
+            parent=main_folder_workspace2,
+            label="content_workspace_2",
+            do_save=True,
         )
         session.flush()
         transaction.commit()
@@ -423,7 +488,7 @@ class TestUserSetContentAsRead(object):
         admin_user,
         workspace_api_factory,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         content_api_factory,
         web_testapp,
@@ -444,28 +509,45 @@ class TestUserSetContentAsRead(object):
             do_save=True,
             do_notify=False,
         )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get()
         api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_unread(firstly_created)
         api2.mark_unread(firstly_created)
         session.flush()
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # before
+        params = {"content_ids": firstly_created.content_id}
         res = web_testapp.get(
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -476,6 +558,7 @@ class TestUserSetContentAsRead(object):
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is False
@@ -492,25 +575,17 @@ class TestUserSetContentAsRead(object):
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is True
 
-        res = web_testapp.get(
-            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
-                user_id=admin_user.user_id, workspace_id=workspace.workspace_id
-            ),
-            status=200,
-        )
-        assert res.json_body[0]["content_id"] == firstly_created.content_id
-        assert res.json_body[0]["read_by_user"] is False
-
     def test_api_set_content_as_read__ok__200__admin_workspace_do_not_exist(
         self,
         workspace_api_factory,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         content_api_factory,
         web_testapp,
@@ -532,27 +607,44 @@ class TestUserSetContentAsRead(object):
             do_save=True,
             do_notify=False,
         )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get()
         api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_unread(firstly_created)
         api2.mark_unread(firstly_created)
         session.flush()
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # read
         res = web_testapp.put(
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read".format(
-                workspace_id=4000, content_id=firstly_created.content_id, user_id=test_user.user_id
+                workspace_id=4000,
+                content_id=firstly_created.content_id,
+                user_id=test_user.user_id,
             ),
             status=400,
         )
@@ -564,7 +656,7 @@ class TestUserSetContentAsRead(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         content_api_factory,
         web_testapp,
@@ -586,27 +678,44 @@ class TestUserSetContentAsRead(object):
             do_save=True,
             do_notify=False,
         )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get()
         api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_unread(firstly_created)
         api2.mark_unread(firstly_created)
         session.flush()
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # read
         res = web_testapp.put(
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/read".format(
-                workspace_id=workspace.workspace_id, content_id=4000, user_id=test_user.user_id
+                workspace_id=workspace.workspace_id,
+                content_id=4000,
+                user_id=test_user.user_id,
             ),
             status=400,
         )
@@ -618,7 +727,7 @@ class TestUserSetContentAsRead(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         content_api_factory,
         web_testapp,
@@ -640,16 +749,28 @@ class TestUserSetContentAsRead(object):
             do_save=True,
             do_notify=False,
         )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get()
         api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_unread(firstly_created)
         api2.mark_unread(firstly_created)
@@ -658,10 +779,12 @@ class TestUserSetContentAsRead(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         # before
+        params = {"content_ids": firstly_created.content_id}
         res = web_testapp.get(
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -680,6 +803,7 @@ class TestUserSetContentAsRead(object):
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -690,7 +814,7 @@ class TestUserSetContentAsRead(object):
         workspace_api_factory,
         admin_user,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         content_api_factory,
         web_testapp,
@@ -712,16 +836,28 @@ class TestUserSetContentAsRead(object):
             do_save=True,
             do_notify=False,
         )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get()
         api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_unread(firstly_created)
         api2.mark_unread(firstly_created)
@@ -747,7 +883,7 @@ class TestUserSetContentAsRead(object):
         admin_user,
         workspace_api_factory,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         content_api_factory,
         web_testapp,
@@ -769,15 +905,27 @@ class TestUserSetContentAsRead(object):
             do_save=True,
             do_notify=False,
         )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get()
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         comments = api.create_comment(workspace, firstly_created, "juste a super comment", True)
         api.mark_unread(firstly_created)
@@ -785,12 +933,17 @@ class TestUserSetContentAsRead(object):
         session.flush()
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # before
+        params = {"content_ids": firstly_created.content_id}
         res = web_testapp.get(
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -800,6 +953,7 @@ class TestUserSetContentAsRead(object):
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -817,6 +971,7 @@ class TestUserSetContentAsRead(object):
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is True
@@ -826,6 +981,7 @@ class TestUserSetContentAsRead(object):
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is False
@@ -835,14 +991,13 @@ class TestUserSetContentAsRead(object):
         workspace_api_factory,
         admin_user,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         content_api_factory,
         web_testapp,
         session,
     ):
         # init DB
-
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
 
@@ -857,28 +1012,44 @@ class TestUserSetContentAsRead(object):
             do_save=True,
             do_notify=False,
         )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get()
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         comments = api.create_comment(workspace, firstly_created, "juste a super comment", True)
         api.mark_read(firstly_created)
         api.mark_unread(comments)
         session.flush()
         transaction.commit()
-
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {"content_ids": firstly_created.content_id}
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # before
         res = web_testapp.get(
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -889,6 +1060,7 @@ class TestUserSetContentAsRead(object):
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is False
@@ -905,6 +1077,7 @@ class TestUserSetContentAsRead(object):
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is True
@@ -914,6 +1087,7 @@ class TestUserSetContentAsRead(object):
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is False
@@ -930,7 +1104,7 @@ class TestUserSetContentAsUnread(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         content_api_factory,
         web_testapp,
@@ -953,28 +1127,45 @@ class TestUserSetContentAsUnread(object):
             do_save=True,
             do_notify=False,
         )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get()
         api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_read(firstly_created)
         api2.mark_read(firstly_created)
         session.flush()
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # before
+        params = {"content_ids": firstly_created.content_id}
         res = web_testapp.get(
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -984,6 +1175,7 @@ class TestUserSetContentAsUnread(object):
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -1002,6 +1194,7 @@ class TestUserSetContentAsUnread(object):
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -1011,6 +1204,7 @@ class TestUserSetContentAsUnread(object):
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -1020,7 +1214,7 @@ class TestUserSetContentAsUnread(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         content_api_factory,
         web_testapp,
@@ -1043,27 +1237,44 @@ class TestUserSetContentAsUnread(object):
             do_save=True,
             do_notify=False,
         )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get()
         api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_read(firstly_created)
         api2.mark_read(firstly_created)
         session.flush()
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # unread
         res = web_testapp.put(
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread".format(
-                workspace_id=4000, content_id=firstly_created.content_id, user_id=test_user.user_id
+                workspace_id=4000,
+                content_id=firstly_created.content_id,
+                user_id=test_user.user_id,
             ),
             status=400,
         )
@@ -1075,7 +1286,7 @@ class TestUserSetContentAsUnread(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         content_api_factory,
         web_testapp,
@@ -1097,28 +1308,45 @@ class TestUserSetContentAsUnread(object):
             do_save=True,
             do_notify=False,
         )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get()
         api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_read(firstly_created)
         api2.mark_read(firstly_created)
         session.flush()
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
 
         # unread
         res = web_testapp.put(
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/{content_id}/unread".format(
-                workspace_id=workspace.workspace_id, content_id=4000, user_id=test_user.user_id
+                workspace_id=workspace.workspace_id,
+                content_id=4000,
+                user_id=test_user.user_id,
             ),
             status=400,
         )
@@ -1130,7 +1358,7 @@ class TestUserSetContentAsUnread(object):
         self,
         workspace_api_factory,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         content_api_factory,
         web_testapp,
@@ -1152,16 +1380,28 @@ class TestUserSetContentAsUnread(object):
             do_save=True,
             do_notify=False,
         )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get()
         api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_read(firstly_created)
         api2.mark_read(firstly_created)
@@ -1170,11 +1410,13 @@ class TestUserSetContentAsUnread(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         # before
+        params = {"content_ids": firstly_created.content_id}
         res = web_testapp.get(
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is True
@@ -1193,6 +1435,7 @@ class TestUserSetContentAsUnread(object):
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is False
@@ -1202,7 +1445,7 @@ class TestUserSetContentAsUnread(object):
         admin_user,
         workspace_api_factory,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         content_api_factory,
         web_testapp,
@@ -1224,16 +1467,28 @@ class TestUserSetContentAsUnread(object):
             do_save=True,
             do_notify=False,
         )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get()
         api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_read(firstly_created)
         api2.mark_read(firstly_created)
@@ -1269,22 +1524,33 @@ class TestUserSetContentAsUnread(object):
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         api = content_api_factory.get()
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         comments = api.create_comment(workspace, firstly_created, "juste a super comment", True)
         api.mark_read(firstly_created)
         api.mark_read(comments)
         session.flush()
         transaction.commit()
-
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {"content_ids": firstly_created.content_id}
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/users/1/workspaces/{}/contents/read_status".format(workspace.workspace_id),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is True
@@ -1298,6 +1564,7 @@ class TestUserSetContentAsUnread(object):
         res = web_testapp.get(
             "/api/users/1/workspaces/{}/contents/read_status".format(workspace.workspace_id),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is False
@@ -1316,22 +1583,34 @@ class TestUserSetContentAsUnread(object):
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         api = content_api_factory.get()
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         comments = api.create_comment(workspace, firstly_created, "juste a super comment", True)
         api.mark_read(firstly_created)
         api.mark_read(comments)
         session.flush()
         transaction.commit()
+        params = {"content_ids": firstly_created.content_id}
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/users/1/workspaces/{}/contents/read_status".format(workspace.workspace_id),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is True
@@ -1345,6 +1624,7 @@ class TestUserSetContentAsUnread(object):
         res = web_testapp.get(
             "/api/users/1/workspaces/{}/contents/read_status".format(workspace.workspace_id),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is False
@@ -1362,7 +1642,7 @@ class TestUserSetWorkspaceAsRead(object):
         workspace_api_factory,
         content_type_list,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         session,
         content_api_factory,
         web_testapp,
@@ -1383,16 +1663,28 @@ class TestUserSetWorkspaceAsRead(object):
             do_save=True,
             do_notify=False,
         )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get()
         api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_unread(main_folder)
         api.mark_unread(firstly_created)
@@ -1401,21 +1693,23 @@ class TestUserSetWorkspaceAsRead(object):
         session.flush()
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
         )
-        assert res.json_body[0]["content_id"] == firstly_created.content_id
-        assert res.json_body[0]["read_by_user"] is False
-        assert res.json_body[1]["content_id"] == main_folder.content_id
-        assert res.json_body[1]["read_by_user"] is False
+        for elem in res.json_body:
+            assert elem["content_id"] == firstly_created.content_id or main_folder.content_id
+            assert elem["read_by_user"] is False
+
         web_testapp.put(
             "/api/users/{user_id}/workspaces/{workspace_id}/read".format(
                 workspace_id=workspace.workspace_id,
-                content_id=firstly_created.content_id,
                 user_id=test_user.user_id,
             )
         )
@@ -1425,17 +1719,16 @@ class TestUserSetWorkspaceAsRead(object):
             ),
             status=200,
         )
-        assert res.json_body[0]["content_id"] == firstly_created.content_id
-        assert res.json_body[0]["read_by_user"] is True
-        assert res.json_body[1]["content_id"] == main_folder.content_id
-        assert res.json_body[1]["read_by_user"] is True
+        for elem in res.json_body:
+            assert elem["content_id"] == firstly_created.content_id or main_folder.content_id
+            assert elem["read_by_user"] is True
 
     def test_api_set_content_as_read__ok__200__user_itself(
         self,
         workspace_api_factory,
         content_type_list,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         session,
         content_api_factory,
         web_testapp,
@@ -1456,16 +1749,28 @@ class TestUserSetWorkspaceAsRead(object):
             do_save=True,
             do_notify=False,
         )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get()
         api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_unread(main_folder)
         api.mark_unread(firstly_created)
@@ -1481,14 +1786,13 @@ class TestUserSetWorkspaceAsRead(object):
             ),
             status=200,
         )
-        assert res.json_body[0]["content_id"] == firstly_created.content_id
-        assert res.json_body[0]["read_by_user"] is False
-        assert res.json_body[1]["content_id"] == main_folder.content_id
-        assert res.json_body[1]["read_by_user"] is False
+        for elem in res.json_body:
+            assert elem["content_id"] == firstly_created.content_id or main_folder.content_id
+            assert elem["read_by_user"] is False
+
         web_testapp.put(
             "/api/users/{user_id}/workspaces/{workspace_id}/read".format(
                 workspace_id=workspace.workspace_id,
-                content_id=firstly_created.content_id,
                 user_id=test_user.user_id,
             )
         )
@@ -1498,10 +1802,9 @@ class TestUserSetWorkspaceAsRead(object):
             ),
             status=200,
         )
-        assert res.json_body[0]["content_id"] == firstly_created.content_id
-        assert res.json_body[0]["read_by_user"] is True
-        assert res.json_body[1]["content_id"] == main_folder.content_id
-        assert res.json_body[1]["read_by_user"] is True
+        for elem in res.json_body:
+            assert elem["content_id"] == firstly_created.content_id or main_folder.content_id
+            assert elem["read_by_user"] is True
 
     def test_api_set_content_as_read__err__403__other_user(
         self,
@@ -1509,7 +1812,7 @@ class TestUserSetWorkspaceAsRead(object):
         content_type_list,
         user_api_factory,
         admin_user,
-        role_api_factory,
+        user_workspace_config_api_factory,
         session,
         content_api_factory,
         web_testapp,
@@ -1530,16 +1833,28 @@ class TestUserSetWorkspaceAsRead(object):
             do_save=True,
             do_notify=False,
         )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api = content_api_factory.get()
         api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_unread(main_folder)
         api.mark_unread(firstly_created)
@@ -1552,7 +1867,6 @@ class TestUserSetWorkspaceAsRead(object):
         res = web_testapp.put(
             "/api/users/{user_id}/workspaces/{workspace_id}/read".format(
                 workspace_id=workspace.workspace_id,
-                content_id=firstly_created.content_id,
                 user_id=admin_user.user_id,
             ),
             status=403,
@@ -1564,16 +1878,16 @@ class TestUserSetWorkspaceAsRead(object):
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
-class TestUserEnableWorkspaceNotification(object):
+class TestUserChangeEmailNotification(object):
     """
-    Tests for /api/users/{user_id}/workspaces/{workspace_id}/notifications/activate
+    Tests for /api/users/{user_id}/workspaces/{workspace_id}/email_notification_type
     """
 
-    def test_api_enable_user_workspace_notification__ok__200__admin(
+    def test_api_change_email_notification__ok__200__admin(
         self,
         workspace_api_factory,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         session,
         content_api_factory,
         web_testapp,
@@ -1594,28 +1908,40 @@ class TestUserEnableWorkspaceNotification(object):
             do_save=True,
             do_notify=False,
         )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
-        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
-        assert role.do_notify is False
+        role = user_workspace_config_api.get_one(test_user.user_id, workspace.workspace_id)
+        assert role.email_notification_type == EmailNotificationType.NONE
         session.close()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        params = {
+            "email_notification_type": EmailNotificationType.SUMMARY.value,
+        }
         web_testapp.put_json(
-            "/api/users/{user_id}/workspaces/{workspace_id}/notifications/activate".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/email_notification_type".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=204,
         )
-        rapi = role_api_factory.get()
-        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
-        assert role.do_notify is True
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        role = user_workspace_config_api.get_one(test_user.user_id, workspace.workspace_id)
+        assert role.email_notification_type == EmailNotificationType.SUMMARY
 
-    def test_api_enable_user_workspace_notification__ok__200__user_itself(
+    def test_api_change_email_notification__ok__200__user_itself(
         self,
         workspace_api_factory,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         session,
         content_api_factory,
         web_testapp,
@@ -1636,28 +1962,37 @@ class TestUserEnableWorkspaceNotification(object):
             do_save=True,
             do_notify=False,
         )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
-        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
-        assert role.do_notify is False
+        role = user_workspace_config_api.get_one(test_user.user_id, workspace.workspace_id)
+        assert role.email_notification_type == EmailNotificationType.NONE
         session.close()
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
+        params = {
+            "email_notification_type": EmailNotificationType.SUMMARY.value,
+        }
         web_testapp.put_json(
-            "/api/users/{user_id}/workspaces/{workspace_id}/notifications/activate".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/email_notification_type".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=204,
         )
-        rapi = role_api_factory.get()
-        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
-        assert role.do_notify is True
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        role = user_workspace_config_api.get_one(test_user.user_id, workspace.workspace_id)
+        assert role.email_notification_type == EmailNotificationType.SUMMARY
 
-    def test_api_enable_user_workspace_notification__err__403__other_user(
+    def test_api_change_email_notification__err__403__other_user(
         self,
         workspace_api_factory,
         user_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         session,
         content_api_factory,
         web_testapp,
@@ -1688,161 +2023,31 @@ class TestUserEnableWorkspaceNotification(object):
             do_save=True,
             do_notify=False,
         )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=False)
-        rapi.create_one(test_user2, workspace, UserRoleInWorkspace.READER, with_notif=False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        user_workspace_config_api.create_one(
+            test_user2,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
-        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
-        assert role.do_notify is False
+        role = user_workspace_config_api.get_one(test_user.user_id, workspace.workspace_id)
+        assert role.email_notification_type == EmailNotificationType.NONE
         web_testapp.authorization = ("Basic", ("test2@test2.test2", "password"))
+        params = {
+            "email_notification_type": EmailNotificationType.SUMMARY.value,
+        }
         res = web_testapp.put_json(
-            "/api/users/{user_id}/workspaces/{workspace_id}/notifications/activate".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/email_notification_type".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
-            status=403,
-        )
-        assert isinstance(res.json, dict)
-        assert "code" in res.json.keys()
-        assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
-
-
-@pytest.mark.usefixtures("base_fixture")
-@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
-class TestUserDisableWorkspaceNotification(object):
-    """
-    Tests for /api/users/{user_id}/workspaces/{workspace_id}/notifications/deactivate
-    """
-
-    def test_api_disable_user_workspace_notification__ok__200__admin(
-        self,
-        workspace_api_factory,
-        user_api_factory,
-        role_api_factory,
-        session,
-        content_api_factory,
-        web_testapp,
-    ):
-        # init DB
-
-        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
-        uapi = user_api_factory.get()
-
-        profile = Profile.USER
-        test_user = uapi.create_user(
-            email="test@test.test",
-            password="password",
-            name="bob",
-            profile=profile,
-            timezone="Europe/Paris",
-            lang="fr",
-            do_save=True,
-            do_notify=False,
-        )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=True)
-        transaction.commit()
-        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
-        assert role.do_notify is True
-        session.close()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        web_testapp.put_json(
-            "/api/users/{user_id}/workspaces/{workspace_id}/notifications/deactivate".format(
-                user_id=test_user.user_id, workspace_id=workspace.workspace_id
-            ),
-            status=204,
-        )
-        rapi = role_api_factory.get()
-        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
-        assert role.do_notify is False
-
-    def test_api_disable_user_workspace_notification__ok__200__user_itself(
-        self,
-        workspace_api_factory,
-        user_api_factory,
-        role_api_factory,
-        session,
-        content_api_factory,
-        web_testapp,
-    ):
-        # init DB
-
-        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
-        uapi = user_api_factory.get()
-
-        profile = Profile.USER
-        test_user = uapi.create_user(
-            email="test@test.test",
-            password="password",
-            name="bob",
-            profile=profile,
-            timezone="Europe/Paris",
-            lang="fr",
-            do_save=True,
-            do_notify=False,
-        )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=True)
-        transaction.commit()
-        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
-        assert role.do_notify is True
-        session.close()
-        web_testapp.authorization = ("Basic", ("test@test.test", "password"))
-        web_testapp.put_json(
-            "/api/users/{user_id}/workspaces/{workspace_id}/notifications/deactivate".format(
-                user_id=test_user.user_id, workspace_id=workspace.workspace_id
-            ),
-            status=204,
-        )
-        rapi = role_api_factory.get()
-        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
-        assert role.do_notify is False
-
-    def test_api_disable_user_workspace_notification__err__403__other_user(
-        self,
-        workspace_api_factory,
-        user_api_factory,
-        role_api_factory,
-        session,
-        content_api_factory,
-        web_testapp,
-    ):
-        # init DB
-
-        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
-        uapi = user_api_factory.get()
-
-        profile = Profile.USER
-        test_user = uapi.create_user(
-            email="test@test.test",
-            password="password",
-            name="bob",
-            profile=profile,
-            timezone="Europe/Paris",
-            lang="fr",
-            do_save=True,
-            do_notify=False,
-        )
-        test_user2 = uapi.create_user(
-            email="test2@test2.test2",
-            password="password",
-            name="boby",
-            profile=profile,
-            timezone="Europe/Paris",
-            lang="fr",
-            do_save=True,
-            do_notify=False,
-        )
-        rapi = role_api_factory.get()
-        rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, with_notif=True)
-        rapi.create_one(test_user2, workspace, UserRoleInWorkspace.READER, with_notif=False)
-        transaction.commit()
-        role = rapi.get_one(test_user.user_id, workspace.workspace_id)
-        assert role.do_notify is True
-        web_testapp.authorization = ("Basic", ("test2@test2.test2", "password"))
-        res = web_testapp.put_json(
-            "/api/users/{user_id}/workspaces/{workspace_id}/notifications/deactivate".format(
-                user_id=test_user.user_id, workspace_id=workspace.workspace_id
-            ),
+            params=params,
             status=403,
         )
         assert isinstance(res.json, dict)
@@ -1864,7 +2069,7 @@ class TestUserWorkspaceEndpoint(object):
         admin_user,
         application_api_factory,
         web_testapp,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ):
         """
         Check obtain all workspaces reachables for user with different filter
@@ -1888,19 +2093,32 @@ class TestUserWorkspaceEndpoint(object):
         )
         workspace_api_test_user = workspace_api_factory.get(test_user)
         role_only_workspace = workspace_api_test_user.create_workspace(label="role_only")
-        rapi = role_api_factory.get()
-        rapi.create_one(admin_user, role_only_workspace, UserRoleInWorkspace.READER, False)
-        rapi.create_one(
-            test_user, owned_only_workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            admin_user,
+            role_only_workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        user_workspace_config_api.create_one(
+            test_user,
+            owned_only_workspace,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
-        rapi_test_user = role_api_factory.get(test_user)
+        rapi_test_user = user_workspace_config_api_factory.get(test_user)
         rapi_test_user.delete_one(admin_user.user_id, owned_only_workspace.workspace_id)
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {}
         res = web_testapp.get(
-            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+            "/api/users/{}/workspaces".format(admin_user.user_id),
+            status=200,
+            params=params,
         )
         workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
         assert set(workspaces_ids) == {
@@ -1911,7 +2129,9 @@ class TestUserWorkspaceEndpoint(object):
 
         params = {"show_workspace_with_role": "1", "show_owned_workspace": "1"}
         res = web_testapp.get(
-            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+            "/api/users/{}/workspaces".format(admin_user.user_id),
+            status=200,
+            params=params,
         )
         workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
         assert set(workspaces_ids) == {
@@ -1922,7 +2142,9 @@ class TestUserWorkspaceEndpoint(object):
 
         params = {"show_workspace_with_role": "1", "show_owned_workspace": "0"}
         res = web_testapp.get(
-            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+            "/api/users/{}/workspaces".format(admin_user.user_id),
+            status=200,
+            params=params,
         )
         workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
         assert set(workspaces_ids) == {
@@ -1932,7 +2154,9 @@ class TestUserWorkspaceEndpoint(object):
 
         params = {"show_workspace_with_role": "0", "show_owned_workspace": "1"}
         res = web_testapp.get(
-            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+            "/api/users/{}/workspaces".format(admin_user.user_id),
+            status=200,
+            params=params,
         )
         workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
         assert set(workspaces_ids) == {
@@ -1942,7 +2166,9 @@ class TestUserWorkspaceEndpoint(object):
 
         params = {"show_workspace_with_role": "0", "show_owned_workspace": "0"}
         res = web_testapp.get(
-            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+            "/api/users/{}/workspaces".format(admin_user.user_id),
+            status=200,
+            params=params,
         )
         workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
         assert set(workspaces_ids) == set()
@@ -1954,7 +2180,7 @@ class TestUserWorkspaceEndpoint(object):
         admin_user,
         application_api_factory,
         web_testapp,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ):
         """
         Check the retrieval of all workspaces reachable by user with different filters
@@ -1982,19 +2208,32 @@ class TestUserWorkspaceEndpoint(object):
         role_only_workspace = workspace_api_test_user.create_workspace(
             label="role_only", parent=owned_only_workspace
         )
-        rapi = role_api_factory.get()
-        rapi.create_one(admin_user, role_only_workspace, UserRoleInWorkspace.READER, False)
-        rapi.create_one(
-            test_user, owned_only_workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            admin_user,
+            role_only_workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        user_workspace_config_api.create_one(
+            test_user,
+            owned_only_workspace,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
-        rapi_test_user = role_api_factory.get(test_user)
+        rapi_test_user = user_workspace_config_api_factory.get(test_user)
         rapi_test_user.delete_one(admin_user.user_id, owned_only_workspace.workspace_id)
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {}
         res = web_testapp.get(
-            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+            "/api/users/{}/workspaces".format(admin_user.user_id),
+            status=200,
+            params=params,
         )
         workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
         assert set(workspaces_ids) == {
@@ -2005,7 +2244,9 @@ class TestUserWorkspaceEndpoint(object):
 
         params = {"show_workspace_with_role": "1", "show_owned_workspace": "1"}
         res = web_testapp.get(
-            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+            "/api/users/{}/workspaces".format(admin_user.user_id),
+            status=200,
+            params=params,
         )
         workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
         assert set(workspaces_ids) == {
@@ -2013,9 +2254,15 @@ class TestUserWorkspaceEndpoint(object):
             owned_only_workspace.workspace_id,
             owned_and_role_workspace.workspace_id,
         }
-        params = {"show_workspace_with_role": "1", "show_owned_workspace": "1", "parent_ids": "0"}
+        params = {
+            "show_workspace_with_role": "1",
+            "show_owned_workspace": "1",
+            "parent_ids": "0",
+        }
         res = web_testapp.get(
-            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+            "/api/users/{}/workspaces".format(admin_user.user_id),
+            status=200,
+            params=params,
         )
         workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
         assert set(workspaces_ids) == {owned_and_role_workspace.workspace_id}
@@ -2025,14 +2272,18 @@ class TestUserWorkspaceEndpoint(object):
             "parent_ids": role_only_workspace.workspace_id,
         }
         res = web_testapp.get(
-            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+            "/api/users/{}/workspaces".format(admin_user.user_id),
+            status=200,
+            params=params,
         )
         workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
         assert set(workspaces_ids) == set()
 
         params = {"show_workspace_with_role": "1", "show_owned_workspace": "0"}
         res = web_testapp.get(
-            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+            "/api/users/{}/workspaces".format(admin_user.user_id),
+            status=200,
+            params=params,
         )
         workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
         assert set(workspaces_ids) == {
@@ -2040,7 +2291,10 @@ class TestUserWorkspaceEndpoint(object):
             owned_and_role_workspace.workspace_id,
         }
         parent_ids = ",".join(
-            [str(role_only_workspace.workspace_id), str(owned_only_workspace.workspace_id)]
+            [
+                str(role_only_workspace.workspace_id),
+                str(owned_only_workspace.workspace_id),
+            ]
         )
         params = {
             "show_workspace_with_role": "1",
@@ -2048,7 +2302,9 @@ class TestUserWorkspaceEndpoint(object):
             "parent_ids": parent_ids,
         }
         res = web_testapp.get(
-            "/api/users/{}/workspaces".format(admin_user.user_id), status=200, params=params
+            "/api/users/{}/workspaces".format(admin_user.user_id),
+            status=200,
+            params=params,
         )
         workspaces_ids = [workspace["workspace_id"] for workspace in res.json_body]
         assert set(workspaces_ids) == {role_only_workspace.workspace_id}
@@ -2070,7 +2326,10 @@ class TestUserWorkspaceEndpoint(object):
         grandson2_1_1 = workspace_api.create_workspace("grandson2_1_1", parent=child2_1)
         grandson1_2_2 = workspace_api.create_workspace("grandson1_2_1", parent=child1_2)
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         implicit_all = web_testapp.get("/api/users/{}/workspaces".format(user.user_id), status=200)
         assert len(implicit_all.json_body) == 8
 
@@ -2106,7 +2365,9 @@ class TestUserWorkspaceEndpoint(object):
         assert res.json_body[0]["workspace_id"] == grandson1_2_2.workspace_id
 
         res = web_testapp.get(
-            "/api/users/{}/workspaces".format(user.user_id), status=200, params={"parent_ids": "0"}
+            "/api/users/{}/workspaces".format(user.user_id),
+            status=200,
+            params={"parent_ids": "0"},
         )
         assert len(res.json_body) == 2
         assert res.json_body[0]["workspace_id"] == parent1.workspace_id
@@ -2150,7 +2411,10 @@ class TestUserWorkspaceEndpoint(object):
         default_sidebar_entry = app_api.get_default_workspace_menu_entry(
             workspace=workspace, app_config=app_config
         )  # nope8
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/users/1/workspaces", status=200)
         res = res.json_body
         workspace = res[0]
@@ -2173,7 +2437,10 @@ class TestUserWorkspaceEndpoint(object):
         Check obtain all workspaces reachables for one user
         with another non-admin user auth.
         """
-        web_testapp.authorization = ("Basic", ("lawrence-not-real-email@fsf.local", "foobarbaz"))
+        web_testapp.authorization = (
+            "Basic",
+            ("lawrence-not-real-email@fsf.local", "foobarbaz"),
+        )
         res = web_testapp.get("/api/users/1/workspaces", status=403)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
@@ -2202,7 +2469,10 @@ class TestUserWorkspaceEndpoint(object):
         not exist
         with a correct user auth.
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/users/5/workspaces", status=400)
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
@@ -2290,7 +2560,9 @@ class TestUserWorkspaceEndpoint(object):
         """
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace(
-            label="Foo", access_type=WorkspaceAccessType.OPEN, default_user_role=default_user_role
+            label="Foo",
+            access_type=WorkspaceAccessType.OPEN,
+            default_user_role=default_user_role,
         )
         user_credentials = "john.doe@world.biz"
         user = user_api_factory.get().create_user(
@@ -2308,12 +2580,14 @@ class TestUserWorkspaceEndpoint(object):
         assert result["workspace_id"] == workspace.workspace_id
         assert result["label"] == "Foo"
         member = web_testapp.get(
-            "/api/workspaces/{}/members/{}".format(workspace.workspace_id, user.user_id), status=200
+            "/api/workspaces/{}/members/{}".format(workspace.workspace_id, user.user_id),
+            status=200,
         ).json_body
         assert member["role"] == default_user_role.label
 
     @pytest.mark.parametrize(
-        "access_type", [WorkspaceAccessType.ON_REQUEST, WorkspaceAccessType.CONFIDENTIAL]
+        "access_type",
+        [WorkspaceAccessType.ON_REQUEST, WorkspaceAccessType.CONFIDENTIAL],
     )
     def test_api__join_workspace__ok_400__wrong_access_type(
         self,
@@ -2345,7 +2619,9 @@ class TestUserWorkspaceEndpoint(object):
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize(
-    "config_section", [{"name": "functional_test_with_allowed_space_limitation"}], indirect=True
+    "config_section",
+    [{"name": "functional_test_with_allowed_space_limitation"}],
+    indirect=True,
 )
 class TestUserEndpointWithAllowedSpaceLimitation(object):
     # -*- coding: utf-8 -*-
@@ -2371,7 +2647,10 @@ class TestUserEndpointWithAllowedSpaceLimitation(object):
         transaction.commit()
         user_id = int(test_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["user_id"] == user_id
@@ -2387,7 +2666,10 @@ class TestUserEndpointWithAllowedSpaceLimitation(object):
         assert res["allowed_space"] == 134217728
 
     def test_api__create_user__ok_200__full_admin(self, web_testapp, user_api_factory):
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "email": "test@test.test",
             "password": "mysuperpassword",
@@ -2414,7 +2696,9 @@ class TestUserEndpointWithAllowedSpaceLimitation(object):
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize(
-    "config_section", [{"name": "functional_test_self_registration_active"}], indirect=True
+    "config_section",
+    [{"name": "functional_test_self_registration_active"}],
+    indirect=True,
 )
 class TestUserEndpointWithRegistrationActive(object):
     # -*- coding: utf-8 -*-
@@ -2446,7 +2730,7 @@ class TestUserEndpointWithRegistrationActive(object):
         response = mailhog.get_mailhog_mails()
         assert len(response) == 1
 
-    def test_api__register_user__ok_200__minimal(self, web_testapp, user_api_factory):
+    def test_api__register_user__ok_200__simple(self, web_testapp, user_api_factory):
         params = {
             "email": "test@test.test",
             "password": "mysuperpassword",
@@ -2460,6 +2744,41 @@ class TestUserEndpointWithRegistrationActive(object):
         assert res["profile"] == "users"
         assert res["email"] == "test@test.test"
         assert res["public_name"] == "test user"
+        assert res["username"] is None
+        assert res["timezone"] == ""
+        assert res["lang"] is None
+        assert res["allowed_space"] == 134217728
+
+    def test_api__register_user__ok_200__minimal(self, web_testapp, user_api_factory):
+        params = {
+            "email": "test@test.test",
+        }
+        res = web_testapp.post_json("/api/users/register", status=200, params=params)
+        res = res.json_body
+        assert res["user_id"]
+        assert res["created"]
+        assert res["is_active"] is True
+        assert res["profile"] == "users"
+        assert res["email"] == "test@test.test"
+        assert res["public_name"] == "test"
+        assert res["username"] is None
+        assert res["timezone"] == ""
+        assert res["lang"] is None
+        assert res["allowed_space"] == 134217728
+
+    def test_api__register_user__ok_200__minimal_rfc_email(self, web_testapp, user_api_factory):
+        params = {
+            "email": "test_user <test@test.test>",
+            "password": "mysuperpassword",
+        }
+        res = web_testapp.post_json("/api/users/register", status=200, params=params)
+        res = res.json_body
+        assert res["user_id"]
+        assert res["created"]
+        assert res["is_active"] is True
+        assert res["profile"] == "users"
+        assert res["email"] == "test@test.test"
+        assert res["public_name"] == "test_user"
         assert res["username"] is None
         assert res["timezone"] == ""
         assert res["lang"] is None
@@ -2481,7 +2800,10 @@ class TestUserEndpointTrustedUserDefaultProfile(object):
     def test_api__create_user__ok_200__full_admin_default_profile(
         self, web_testapp, user_api_factory
     ):
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "email": "test@test.test",
             "password": "mysuperpassword",
@@ -2511,7 +2833,9 @@ class TestUserEndpointTrustedUserDefaultProfile(object):
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize(
-    "config_section", [{"name": "functional_test_with_allowed_space_limitation"}], indirect=True
+    "config_section",
+    [{"name": "functional_test_with_allowed_space_limitation"}],
+    indirect=True,
 )
 class TestUserDiskSpace(object):
     # -*- coding: utf-8 -*-
@@ -2550,7 +2874,7 @@ class TestUserDiskSpace(object):
         res = res.json_body
         assert res["used_space"] == 6210
         assert res["user"]["public_name"] == "bob"
-        assert res["user"]["has_avatar"] is False
+        assert res["user"]["has_avatar"] is True
         assert res["allowed_space"] == 134217728
 
 
@@ -2580,7 +2904,10 @@ class TestUserEndpoint(object):
         transaction.commit()
         user_id = int(test_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["user_id"] == user_id
@@ -2661,7 +2988,10 @@ class TestUserEndpoint(object):
     def test_api__create_user__ok_200__full_admin(
         self, web_testapp, user_api_factory, event_helper
     ):
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "email": "test@test.test",
             "password": "mysuperpassword",
@@ -2690,6 +3020,32 @@ class TestUserEndpoint(object):
         author = web_testapp.get("/api/users/1", status=200).json_body
         assert last_event.fields["author"] == UserDigestSchema().dump(author).data
 
+    def test_api__create_user__ok_200__minimal_rfc_email(
+        self, web_testapp, user_api_factory, event_helper
+    ):
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        params = {
+            "email": "toto <test@test.test>",
+            "email_notification": False,
+        }
+        res = web_testapp.post_json("/api/users", status=200, params=params)
+        res = res.json_body
+        assert res["user_id"]
+        assert res["created"]
+        assert res["is_active"] is True
+        assert res["email"] == "test@test.test"
+        assert res["public_name"] == "toto"
+
+        last_event = event_helper.last_event
+        assert last_event.event_type == "user.created"
+        assert last_event.fields["user"] == UserDigestSchema().dump(res).data
+        assert last_event.fields["client_token"] is None
+        author = web_testapp.get("/api/users/1", status=200).json_body
+        assert last_event.fields["author"] == UserDigestSchema().dump(author).data
+
     @pytest.mark.parametrize("public_name_value", ("🐻‍❄👨‍👨‍👧‍👧️ Emoji Lover",))
     def test_api__create_user__ok_200__with_emoji_as_public_name(
         self, web_testapp, user_api_factory, event_helper, public_name_value
@@ -2698,7 +3054,10 @@ class TestUserEndpoint(object):
         Non-regression test for emoji char in users table. Emoji use to not work
         in user table for mysql/mariadb due to specific hack.
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "email": "test@test.test",
             "password": "mysuperpassword",
@@ -2717,7 +3076,10 @@ class TestUserEndpoint(object):
         self, web_testapp, user_api_factory, email_required, status
     ):
         web_testapp.app.registry.settings["CFG"].EMAIL__REQUIRED = email_required
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "password": "mysuperpassword",
             "profile": "users",
@@ -2732,7 +3094,10 @@ class TestUserEndpoint(object):
     def test_api__create_user__err_400__with_no_username_and_no_email(
         self, web_testapp, user_api_factory, app_config
     ):
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "password": "mysuperpassword",
             "profile": "users",
@@ -2749,7 +3114,10 @@ class TestUserEndpoint(object):
     def test_api__create_user__ok_200__full_admin_with_allowed_space(
         self, web_testapp, user_api_factory
     ):
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "email": "test@test.test",
             "password": "mysuperpassword",
@@ -2782,7 +3150,10 @@ class TestUserEndpoint(object):
     def test_api__create_user__ok_200__full_admin_default_profile(
         self, web_testapp, user_api_factory
     ):
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "email": "test@test.test",
             "password": "mysuperpassword",
@@ -2810,7 +3181,10 @@ class TestUserEndpoint(object):
         assert user.validate_password("mysuperpassword")
 
     def test_api__create_user__ok_200__email_treated_as_lowercase(self, web_testapp):
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "email": "ThisIsAnEmailWithUppercaseCharacters@Test.Test",
             "password": "mysuperpassword",
@@ -2869,8 +3243,15 @@ class TestUserEndpoint(object):
         assert res["code"] == ErrorCode.EMAIL_ALREADY_EXISTS
 
     def test_api__create_user__ok_200__limited_admin(self, web_testapp, user_api_factory):
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"email": "test@test.test", "email_notification": False, "password": None}
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        params = {
+            "email": "test@test.test",
+            "email_notification": False,
+            "password": None,
+        }
         res = web_testapp.post_json("/api/users", status=200, params=params)
         res = res.json_body
         assert res["user_id"]
@@ -2890,7 +3271,10 @@ class TestUserEndpoint(object):
         assert user.password is None
 
     def test_api__update_user__ok_200__infos(self, web_testapp, user_api_factory, event_helper):
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "email": "test@test.test",
             "password": "mysuperpassword",
@@ -2906,7 +3290,11 @@ class TestUserEndpoint(object):
         res = web_testapp.put_json(
             "/api/users/{}".format(user_id),
             status=200,
-            params={"timezone": "Europe/London", "lang": "en", "public_name": "John Doe"},
+            params={
+                "timezone": "Europe/London",
+                "lang": "en",
+                "public_name": "John Doe",
+            },
         ).json_body
         assert res["timezone"] == "Europe/London"
         assert res["lang"] == "en"
@@ -2930,7 +3318,10 @@ class TestUserEndpoint(object):
         )
         uapi.save(test_user)
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "email": "test@test.test",
             "password": "mysuperpassword",
@@ -2988,7 +3379,10 @@ class TestUserWithNotificationEndpoint(object):
     def test_api__create_user__ok_200__full_admin_with_notif(
         self, web_testapp, user_api_factory, mailhog
     ):
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "email": "test@test.test",
             "password": "mysuperpassword",
@@ -3026,7 +3420,10 @@ class TestUserWithNotificationEndpoint(object):
     def test_api__create_user__ok_200__limited_admin_with_notif(
         self, web_testapp, user_api_factory, mailhog
     ):
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"email": "test@test.test", "email_notification": True}
         res = web_testapp.post_json("/api/users", status=200, params=params)
         res = res.json_body
@@ -3071,7 +3468,10 @@ class TestUserWithNotificationEndpoint(object):
         transaction.commit()
         user_id = int(test_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.put("/api/users/{}/trashed".format(user_id), status=204)
         res = web_testapp.get("/api/users/{}".format(user_id), status=200).json_body
         assert res["is_deleted"] is True
@@ -3079,7 +3479,10 @@ class TestUserWithNotificationEndpoint(object):
         assert last_event.event_type == "user.deleted"
 
     def test_api_delete_user__err_400__admin_itself(self, web_testapp, admin_user):
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.put("/api/users/{}/trashed".format(admin_user.user_id), status=400)
         assert res.json_body["code"] == ErrorCode.USER_CANT_DELETE_HIMSELF
         res = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200).json_body
@@ -3111,19 +3514,22 @@ class TestUsersEndpoint(object):
         uapi.save(test_user)
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/users", status=200)
         res = res.json_body
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["has_avatar"] is False
+        assert res[0]["has_avatar"] is True
         assert res[0]["email"] == test_user.email
 
         assert res[1]["user_id"] == admin_user.user_id
         assert res[1]["public_name"] == admin_user.display_name
         assert res[1]["username"] == admin_user.username
-        assert res[1]["has_avatar"] is False
+        assert res[1]["has_avatar"] is True
         assert res[1]["email"] == admin_user.email
 
     def test_api__get_user__err_403__normal_user(self, user_api_factory, web_testapp):
@@ -3185,20 +3591,25 @@ class TestKnownMembersEndpoint(object):
         transaction.commit()
         user_id = int(admin_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"acp": "bob"}
         res = web_testapp.get(
-            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params
+            "/api/users/{user_id}/known_members".format(user_id=user_id),
+            status=200,
+            params=params,
         )
         res = res.json_body
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["has_avatar"] is False
+        assert res[0]["has_avatar"] is True
 
         assert res[1]["user_id"] == test_user2.user_id
         assert res[1]["public_name"] == test_user2.display_name
-        assert res[1]["has_avatar"] is False
+        assert res[1]["has_avatar"] is True
 
     def test_api__get_user__ok_200__admin__by_name_exclude_user(
         self, web_testapp, user_api_factory, admin_user
@@ -3231,19 +3642,29 @@ class TestKnownMembersEndpoint(object):
         transaction.commit()
         user_id = int(admin_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"acp": "bob", "exclude_user_ids": str(test_user2.user_id)}
         res = web_testapp.get(
-            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params
+            "/api/users/{user_id}/known_members".format(user_id=user_id),
+            status=200,
+            params=params,
         )
         res = res.json_body
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["has_avatar"] is False
+        assert res[0]["has_avatar"] is True
 
     def test_api__get_user__ok_200__admin__by_name_exclude_workspace(
-        self, user_api_factory, workspace_api_factory, admin_user, role_api_factory, web_testapp
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        admin_user,
+        user_workspace_config_api_factory,
+        web_testapp,
     ):
         uapi = user_api_factory.get()
         profile = Profile.USER
@@ -3270,27 +3691,47 @@ class TestKnownMembersEndpoint(object):
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        role_api.create_one(test_user2, workspace2, UserRoleInWorkspace.READER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        user_workspace_config_api.create_one(
+            test_user2,
+            workspace2,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         uapi.save(test_user)
         uapi.save(test_user2)
         transaction.commit()
         user_id = int(admin_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"acp": "bob", "exclude_workspace_ids": str(workspace2.workspace_id)}
         res = web_testapp.get(
-            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params
+            "/api/users/{user_id}/known_members".format(user_id=user_id),
+            status=200,
+            params=params,
         )
         res = res.json_body
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["has_avatar"] is False
+        assert res[0]["has_avatar"] is True
 
     def test_api__get_user__ok_200__admin__by_name_exclude_workspace_and_user(
-        self, admin_user, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
+        self,
+        admin_user,
+        user_api_factory,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
+        web_testapp,
     ):
         uapi = user_api_factory.get()
         profile = Profile.USER
@@ -3327,32 +3768,57 @@ class TestKnownMembersEndpoint(object):
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        role_api.create_one(test_user2, workspace2, UserRoleInWorkspace.READER, False)
-        role_api.create_one(test_user3, workspace, UserRoleInWorkspace.READER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        user_workspace_config_api.create_one(
+            test_user2,
+            workspace2,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        user_workspace_config_api.create_one(
+            test_user3,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         uapi.save(test_user)
         uapi.save(test_user2)
         transaction.commit()
         user_id = int(admin_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "acp": "bob",
             "exclude_workspace_ids": str(workspace2.workspace_id),
             "exclude_user_ids": str(test_user3.user_id),
         }
         res = web_testapp.get(
-            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params
+            "/api/users/{user_id}/known_members".format(user_id=user_id),
+            status=200,
+            params=params,
         )
         res = res.json_body
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["has_avatar"] is False
+        assert res[0]["has_avatar"] is True
 
     def test_api__get_user__ok_200__admin__by_name_include_workspace_and__exclude_user(
-        self, admin_user, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
+        self,
+        admin_user,
+        user_api_factory,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
+        web_testapp,
     ):
         uapi = user_api_factory.get()
         profile = Profile.USER
@@ -3389,34 +3855,57 @@ class TestKnownMembersEndpoint(object):
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        role_api.create_one(test_user2, workspace2, UserRoleInWorkspace.READER, False)
-        role_api.create_one(test_user3, workspace, UserRoleInWorkspace.READER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        user_workspace_config_api.create_one(
+            test_user2,
+            workspace2,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        user_workspace_config_api.create_one(
+            test_user3,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         uapi.save(test_user)
         uapi.save(test_user2)
         transaction.commit()
         user_id = int(admin_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {
             "acp": "bob",
             "include_workspace_ids": str(workspace.workspace_id),
             "exclude_user_ids": str(test_user3.user_id),
         }
         res = web_testapp.get(
-            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params
+            "/api/users/{user_id}/known_members".format(user_id=user_id),
+            status=200,
+            params=params,
         )
         res = res.json_body
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["has_avatar"] is False
+        assert res[0]["has_avatar"] is True
 
     def test_api__known_members_fails_when_both_including_and_excluding_workspaces(
         self, admin_user, web_testapp
     ):
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.get(
             "/api/users/{user_id}/known_members".format(user_id=admin_user.user_id),
             status=400,
@@ -3458,16 +3947,21 @@ class TestKnownMembersEndpoint(object):
         transaction.commit()
         user_id = int(admin_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"acp": "bob"}
         res = web_testapp.get(
-            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params
+            "/api/users/{user_id}/known_members".format(user_id=user_id),
+            status=200,
+            params=params,
         )
         res = res.json_body
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["has_avatar"] is False
+        assert res[0]["has_avatar"] is True
 
     def test_api__get_user__ok_200__admin__by_email(
         self, user_api_factory, admin_user, web_testapp
@@ -3499,20 +3993,25 @@ class TestKnownMembersEndpoint(object):
         transaction.commit()
         user_id = int(admin_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"acp": "test"}
         res = web_testapp.get(
-            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params
+            "/api/users/{user_id}/known_members".format(user_id=user_id),
+            status=200,
+            params=params,
         )
         res = res.json_body
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["has_avatar"] is False
+        assert res[0]["has_avatar"] is True
 
         assert res[1]["user_id"] == test_user2.user_id
         assert res[1]["public_name"] == test_user2.display_name
-        assert res[1]["has_avatar"] is False
+        assert res[1]["has_avatar"] is True
 
     def test_api__get_user__err_403__admin__too_small_acp(
         self, user_api_factory, admin_user, web_testapp
@@ -3543,17 +4042,26 @@ class TestKnownMembersEndpoint(object):
         transaction.commit()
         user_id = int(admin_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"acp": "t"}
         res = web_testapp.get(
-            "/api/users/{user_id}/known_members".format(user_id=user_id), status=400, params=params
+            "/api/users/{user_id}/known_members".format(user_id=user_id),
+            status=400,
+            params=params,
         )
         assert isinstance(res.json, dict)
         assert "code" in res.json.keys()
         assert res.json_body["code"] == ErrorCode.ACP_STRING_TOO_SHORT
 
     def test_api__get_user__ok_200__normal_user_by_email(
-        self, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
+        web_testapp,
     ):
         uapi = user_api_factory.get()
         profile = Profile.USER
@@ -3592,26 +4100,136 @@ class TestKnownMembersEndpoint(object):
         uapi.save(test_user3)
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        role_api.create_one(test_user2, workspace, UserRoleInWorkspace.READER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        user_workspace_config_api.create_one(
+            test_user2,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         user_id = int(test_user.user_id)
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         params = {"acp": "test"}
         res = web_testapp.get(
-            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params
+            "/api/users/{user_id}/known_members".format(user_id=user_id),
+            status=200,
+            params=params,
         )
         res = res.json_body
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["has_avatar"] is False
+        assert res[0]["has_avatar"] is True
 
         assert res[1]["user_id"] == test_user2.user_id
         assert res[1]["public_name"] == test_user2.display_name
-        assert res[1]["has_avatar"] is False
+        assert res[1]["has_avatar"] is True
+
+    def test_api__get_known_users__ok_200__no_query_parameters(
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
+        web_testapp,
+    ):
+        uapi = user_api_factory.get()
+        profile = Profile.USER
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        test_user2 = uapi.create_user(
+            email="test2@test2.test2",
+            password="password",
+            name="bob2",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        test_user3 = uapi.create_user(
+            email="test3@test3.test3",
+            password="password",
+            name="bob3",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        uapi.save(test_user2)
+        uapi.save(test_user3)
+
+        workspace1 = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace1,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        user_workspace_config_api.create_one(
+            test_user2,
+            workspace1,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        transaction.commit()
+        workspace2 = workspace_api_factory.get().create_workspace("test workspace2", save_now=True)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace2,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        user_workspace_config_api.create_one(
+            test_user3,
+            workspace2,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        transaction.commit()
+
+        user_id = int(test_user3.user_id)
+
+        web_testapp.authorization = ("Basic", (test_user3.email, "password"))
+        res = web_testapp.get(
+            "/api/users/{user_id}/known_members".format(user_id=user_id),
+            status=200,
+        )
+        res = res.json_body
+
+        print(res)
+        assert len(res) == 3
+
+        assert res[1]["user_id"] == test_user.user_id
+        assert res[1]["public_name"] == test_user.display_name
+        assert res[1]["has_avatar"] is True
+        assert len(res[1]["workspace_ids"]) == 1
+        assert workspace2.workspace_id in res[1]["workspace_ids"]
+
+        assert res[2]["user_id"] == test_user3.user_id
+        assert res[2]["public_name"] == test_user3.display_name
+        assert res[2]["has_avatar"] is True
+        assert len(res[2]["workspace_ids"]) == 1
+        assert workspace2.workspace_id in res[2]["workspace_ids"]
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -3671,7 +4289,11 @@ class TestKnownContent(object):
 
         # NOTE - RJ - 2021-06-11 - no request should return a comment
         comment = content_api.create_comment(
-            workspace=workspace2, parent=test_file, content="hello", do_save=True, do_notify=False,
+            workspace=workspace2,
+            parent=test_file,
+            content="hello",
+            do_save=True,
+            do_notify=False,
         )
 
         session.add(comment)
@@ -3680,7 +4302,10 @@ class TestKnownContent(object):
 
         user_id = int(admin_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
 
         params = {"acp": "", "limit": 15}
         res = web_testapp.get(
@@ -3726,7 +4351,11 @@ class TestKnownMembersEndpointKnownMembersFilterDisabled(object):
     """
 
     def test_api__get_user__ok_200__show_all_members(
-        self, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
+        web_testapp,
     ):
         uapi = user_api_factory.get()
         profile = Profile.USER
@@ -3765,31 +4394,43 @@ class TestKnownMembersEndpointKnownMembersFilterDisabled(object):
         uapi.save(test_user3)
 
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        role_api.create_one(test_user2, workspace, UserRoleInWorkspace.READER, False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        user_workspace_config_api.create_one(
+            test_user2,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         user_id = int(test_user.user_id)
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         params = {"acp": "test"}
         res = web_testapp.get(
-            "/api/users/{user_id}/known_members".format(user_id=user_id), status=200, params=params
+            "/api/users/{user_id}/known_members".format(user_id=user_id),
+            status=200,
+            params=params,
         )
         res = res.json_body
 
         assert len(res) == 3
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["has_avatar"] is False
+        assert res[0]["has_avatar"] is True
 
         assert res[1]["user_id"] == test_user2.user_id
         assert res[1]["public_name"] == test_user2.display_name
-        assert res[1]["has_avatar"] is False
+        assert res[1]["has_avatar"] is True
 
         assert res[2]["user_id"] == test_user3.user_id
         assert res[2]["public_name"] == test_user3.display_name
-        assert res[2]["has_avatar"] is False
+        assert res[2]["has_avatar"] is True
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -3823,14 +4464,20 @@ class TestSetEmailPasswordLdapEndpoint(object):
         transaction.commit()
         user_id = int(test_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # check before
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["email"] == "test@test.test"
 
         # Set password
-        params = {"email": "mysuperemail@email.fr", "loggedin_user_password": "admin@admin.admin"}
+        params = {
+            "email": "mysuperemail@email.fr",
+            "loggedin_user_password": "admin@admin.admin",
+        }
         res = web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=400)
         assert res.json_body["code"] == ErrorCode.EXTERNAL_AUTH_USER_EMAIL_MODIFICATION_UNALLOWED
         # Check After
@@ -3859,7 +4506,10 @@ class TestSetEmailPasswordLdapEndpoint(object):
         transaction.commit()
         user_id = int(test_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # check before
         user = uapi.get_one(user_id)
         assert not user.validate_password("mynewpassword")
@@ -3906,14 +4556,20 @@ class TestSetEmailEndpoint(object):
         transaction.commit()
         user_id = int(test_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # check before
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["email"] == "test@test.test"
 
         # Set password
-        params = {"email": "mysuperemail@email.fr", "loggedin_user_password": "admin@admin.admin"}
+        params = {
+            "email": "mysuperemail@email.fr",
+            "loggedin_user_password": "admin@admin.admin",
+        }
         web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=200)
         # Check After
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
@@ -3937,14 +4593,20 @@ class TestSetEmailEndpoint(object):
         transaction.commit()
         user_id = int(test_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # check before
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["email"] == "test@test.test"
 
         # Set password
-        params = {"email": "admin@admin.admin", "loggedin_user_password": "admin@admin.admin"}
+        params = {
+            "email": "admin@admin.admin",
+            "loggedin_user_password": "admin@admin.admin",
+        }
         res = web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=400)
         assert res.json_body
         assert "code" in res.json_body
@@ -3973,14 +4635,20 @@ class TestSetEmailEndpoint(object):
         transaction.commit()
         user_id = int(test_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # check before
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["email"] == "test@test.test"
 
         # Set password
-        params = {"email": "mysuperemail@email.fr", "loggedin_user_password": "badpassword"}
+        params = {
+            "email": "mysuperemail@email.fr",
+            "loggedin_user_password": "badpassword",
+        }
         res = web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=403)
         assert res.json_body
         assert "code" in res.json_body
@@ -4010,14 +4678,20 @@ class TestSetEmailEndpoint(object):
         transaction.commit()
         user_id = int(test_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # check before
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert res["email"] == "test@test.test"
 
         # Set password
-        params = {"email": "thatisnotandemail", "loggedin_user_password": "admin@admin.admin"}
+        params = {
+            "email": "thatisnotandemail",
+            "loggedin_user_password": "admin@admin.admin",
+        }
         res = web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=400)
         # TODO - G.M - 2018-09-10 - Handled by marshmallow schema
         assert res.json_body
@@ -4053,7 +4727,10 @@ class TestSetEmailEndpoint(object):
         assert res["email"] == "test@test.test"
 
         # Set password
-        params = {"email": "mysuperemail@email.fr", "loggedin_user_password": "password"}
+        params = {
+            "email": "mysuperemail@email.fr",
+            "loggedin_user_password": "password",
+        }
         web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=200)
         web_testapp.authorization = ("Basic", ("mysuperemail@email.fr", "password"))
         # Check After
@@ -4092,7 +4769,10 @@ class TestSetEmailEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("test2@test2.test2", "password"))
         # Set password
-        params = {"email": "mysuperemail@email.fr", "loggedin_user_password": "password"}
+        params = {
+            "email": "mysuperemail@email.fr",
+            "loggedin_user_password": "password",
+        }
         res = web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=403)
         assert res.json_body
         assert "code" in res.json_body
@@ -4126,7 +4806,10 @@ class TestSetUsernameEndpoint(object):
         transaction.commit()
         user_id = int(test_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # check before
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
@@ -4160,7 +4843,10 @@ class TestSetUsernameEndpoint(object):
         transaction.commit()
         user_id = int(test_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # check before
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
@@ -4198,7 +4884,10 @@ class TestSetUsernameEndpoint(object):
         transaction.commit()
         user_id = int(test_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # check before
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
@@ -4237,14 +4926,20 @@ class TestSetUsernameEndpoint(object):
         transaction.commit()
         user_id = int(test_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # check before
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
         assert not res["username"]
 
         # Set password
-        params = {"username": "This is not correct", "loggedin_user_password": "admin@admin.admin"}
+        params = {
+            "username": "This is not correct",
+            "loggedin_user_password": "admin@admin.admin",
+        }
         res = web_testapp.put_json(
             "/api/users/{}/username".format(user_id), params=params, status=400
         )
@@ -4361,7 +5056,10 @@ class TestSetPasswordEndpoint(object):
         transaction.commit()
         user_id = int(test_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # check before
         user = uapi.get_one(user_id)
         assert user.validate_password("password")
@@ -4400,7 +5098,10 @@ class TestSetPasswordEndpoint(object):
         transaction.commit()
         user_id = int(test_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # check before
         user = uapi.get_one(user_id)
         assert user.validate_password("password")
@@ -4444,7 +5145,10 @@ class TestSetPasswordEndpoint(object):
         transaction.commit()
         user_id = int(test_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # check before
         user = uapi.get_one(user_id)
         assert user.validate_password("password")
@@ -4540,7 +5244,10 @@ class TestSetPasswordEndpoint(object):
 
         web_testapp.authorization = ("Basic", ("test2@test2.test2", "password"))
         # Set password
-        params = {"email": "mysuperemail@email.fr", "loggedin_user_password": "password"}
+        params = {
+            "email": "mysuperemail@email.fr",
+            "loggedin_user_password": "password",
+        }
         res = web_testapp.put_json("/api/users/{}/email".format(user_id), params=params, status=403)
         assert res.json_body
         assert "code" in res.json_body
@@ -4574,7 +5281,10 @@ class TestSetUserInfoEndpoint(object):
         transaction.commit()
         user_id = int(test_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # check before
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
@@ -4699,7 +5409,10 @@ class TestSetUserProfileEndpoint(object):
         transaction.commit()
         user_id = int(test_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # check before
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
@@ -4722,7 +5435,10 @@ class TestSetUserProfileEndpoint(object):
 
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # check before
         res = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200)
         res = res.json_body
@@ -4731,7 +5447,9 @@ class TestSetUserProfileEndpoint(object):
         # Set params
         params = {"profile": "users"}
         res = web_testapp.put_json(
-            "/api/users/{}/profile".format(admin_user.user_id), params=params, status=400
+            "/api/users/{}/profile".format(admin_user.user_id),
+            params=params,
+            status=400,
         )
         assert res.json_body["code"] == ErrorCode.USER_CANT_CHANGE_IS_OWN_PROFILE
         # Check After
@@ -4811,7 +5529,10 @@ class TestSetUserAllowedSpaceEndpoint(object):
         transaction.commit()
         user_id = int(test_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # check before
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
@@ -4903,7 +5624,10 @@ class TestSetUserEnableDisableEndpoints(object):
         transaction.commit()
         user_id = int(test_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # check before
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
@@ -4935,7 +5659,10 @@ class TestSetUserEnableDisableEndpoints(object):
         transaction.commit()
         user_id = int(test_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # check before
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
@@ -4951,7 +5678,10 @@ class TestSetUserEnableDisableEndpoints(object):
     def test_api_disable_user__err_400__cant_disable_myself_admin(self, admin_user, web_testapp):
         user_id = int(admin_user.user_id)
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         # check before
         res = web_testapp.get("/api/users/{}".format(user_id), status=200)
         res = res.json_body
@@ -5089,7 +5819,10 @@ class TestUserEnpointsLDAPAuth(object):
     def test_api_set_user_password__err__400__setting_password_unallowed_for_ldap_user(
         self, web_testapp
     ):
-        web_testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
+        web_testapp.authorization = (
+            "Basic",
+            ("professor@planetexpress.com", "professor"),
+        )
         res = web_testapp.get("/api/auth/whoami", status=200)
         user_id = res.json_body["user_id"]
         # Set password
@@ -5107,7 +5840,10 @@ class TestUserEnpointsLDAPAuth(object):
 
     @pytest.mark.ldap
     def test_api_set_user_email__err__400__setting_email_unallowed_for_ldap_user(self, web_testapp):
-        web_testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
+        web_testapp.authorization = (
+            "Basic",
+            ("professor@planetexpress.com", "professor"),
+        )
         res = web_testapp.get("/api/auth/whoami", status=200)
         user_id = res.json_body["user_id"]
         # Set password
@@ -5122,10 +5858,13 @@ class TestUserEnpointsLDAPAuth(object):
 
     @pytest.mark.ldap
     def test_api__create_user__ok_200__full_admin(self, web_testapp, user_api_factory):
-        web_testapp.authorization = ("Basic", ("hubert@planetexpress.com", "professor"))
+        web_testapp.authorization = (
+            "Basic",
+            ("professor@planetexpress.com", "professor"),
+        )
         web_testapp.get("/api/auth/whoami", status=200)
         api = user_api_factory.get(current_user=None)
-        user = api.get_one_by_email("hubert@planetexpress.com")
+        user = api.get_one_by_email("professor@planetexpress.com")
         api.update(user, auth_type=user.auth_type, profile=Profile.ADMIN)
         api.save(user)
         transaction.commit()
@@ -5160,7 +5899,10 @@ class TestUserFollowerEndpoint(object):
         admin_user: User,
         bob_user: User,
     ) -> None:
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.post_json(
             "/api/users/{user_id}/following".format(user_id=admin_user.user_id),
             params={"user_id": bob_user.user_id},
@@ -5175,7 +5917,10 @@ class TestUserFollowerEndpoint(object):
         bob_user: User,
     ) -> None:
         # With
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.post_json(
             "/api/users/{user_id}/following".format(user_id=admin_user.user_id),
             params={"user_id": bob_user.user_id},
@@ -5235,9 +5980,13 @@ class TestUserFollowerEndpoint(object):
         transaction.commit()
 
         # When
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
-            "/api/users/{user_id}/following".format(user_id=admin_user.user_id), status=200
+            "/api/users/{user_id}/following".format(user_id=admin_user.user_id),
+            status=200,
         )
 
         # Then
@@ -5266,7 +6015,10 @@ class TestUserFollowerEndpoint(object):
         transaction.commit()
 
         # When
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/users/{user_id}/following?user_id={followed_id}".format(
                 user_id=admin_user.user_id, followed_id=riyad_user.user_id
@@ -5311,9 +6063,13 @@ class TestUserFollowerEndpoint(object):
         transaction.commit()
 
         # When
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
-            "/api/users/{user_id}/following?count=5".format(user_id=admin_user.user_id), status=200
+            "/api/users/{user_id}/following?count=5".format(user_id=admin_user.user_id),
+            status=200,
         )
 
         # Then
@@ -5340,21 +6096,27 @@ class TestUserFollowerEndpoint(object):
         transaction.commit()
 
         # When admin read api it is ok
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.get(
-            "/api/users/{user_id}/following".format(user_id=bob_user.user_id), status=200
+            "/api/users/{user_id}/following".format(user_id=bob_user.user_id),
+            status=200,
         )
 
         # When bob read api it is ok
         web_testapp.authorization = ("Basic", ("bob@test.test", "password"))
         web_testapp.get(
-            "/api/users/{user_id}/following".format(user_id=bob_user.user_id), status=200
+            "/api/users/{user_id}/following".format(user_id=bob_user.user_id),
+            status=200,
         )
 
         # When riyad read api it is forbidden
         web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
         web_testapp.get(
-            "/api/users/{user_id}/following".format(user_id=bob_user.user_id), status=403
+            "/api/users/{user_id}/following".format(user_id=bob_user.user_id),
+            status=403,
         )
 
     def test_api__delete_follower__ok_201__nominal_case(
@@ -5365,7 +6127,10 @@ class TestUserFollowerEndpoint(object):
         bob_user: User,
     ) -> None:
         # With
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.post_json(
             "/api/users/{user_id}/following".format(user_id=admin_user.user_id),
             params={"user_id": bob_user.user_id},
@@ -5388,7 +6153,10 @@ class TestUserFollowerEndpoint(object):
         bob_user: User,
     ) -> None:
         # When Then
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.delete(
             "/api/users/{user_id}/following/{leader_id}".format(
                 user_id=admin_user.user_id, leader_id=bob_user.user_id
@@ -5409,9 +6177,13 @@ class TestUserFollowerEndpoint(object):
         transaction.commit()
 
         # When
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
-            "/api/users/{user_id}/followers".format(user_id=bob_user.user_id), status=200
+            "/api/users/{user_id}/followers".format(user_id=bob_user.user_id),
+            status=200,
         )
 
         # Then
@@ -5440,7 +6212,10 @@ class TestUserFollowerEndpoint(object):
         transaction.commit()
 
         # When
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/users/{user_id}/followers?user_id={follower_id}".format(
                 user_id=bob_user.user_id, follower_id=riyad_user.user_id
@@ -5485,9 +6260,13 @@ class TestUserFollowerEndpoint(object):
         transaction.commit()
 
         # When
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
-            "/api/users/{user_id}/followers?count=5".format(user_id=admin_user.user_id), status=200
+            "/api/users/{user_id}/followers?count=5".format(user_id=admin_user.user_id),
+            status=200,
         )
 
         # Then
@@ -5514,21 +6293,27 @@ class TestUserFollowerEndpoint(object):
         transaction.commit()
 
         # When admin read api it is ok
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         web_testapp.get(
-            "/api/users/{user_id}/followers".format(user_id=riyad_user.user_id), status=200
+            "/api/users/{user_id}/followers".format(user_id=riyad_user.user_id),
+            status=200,
         )
 
         # When riyad read api it is forbidden
         web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
         web_testapp.get(
-            "/api/users/{user_id}/followers".format(user_id=riyad_user.user_id), status=200
+            "/api/users/{user_id}/followers".format(user_id=riyad_user.user_id),
+            status=200,
         )
 
         # When bob read api it is ok
         web_testapp.authorization = ("Basic", ("bob@test.test", "password"))
         web_testapp.get(
-            "/api/users/{user_id}/followers".format(user_id=riyad_user.user_id), status=403
+            "/api/users/{user_id}/followers".format(user_id=riyad_user.user_id),
+            status=403,
         )
 
 
@@ -5560,10 +6345,16 @@ class TestAboutUserEndpoint(object):
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
         content_api = content_api_factory.get()
         content_api.create(
-            content_type_list.Page.slug, workspace, None, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            label="creation_order_test",
+            do_save=True,
         )
         content = content_api.create(
-            content_type_list.Page.slug, workspace, None, "another creation_order_test", "", True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            label="another creation_order_test",
+            do_save=True,
         )
         with new_revision(session=session, tm=transaction.manager, content=content):
             content.description = "Just an update"
@@ -5571,7 +6362,10 @@ class TestAboutUserEndpoint(object):
         transaction.commit()
 
         # When
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/users/{user_id}/about".format(user_id=admin_user.user_id), status=200
         )
@@ -5587,7 +6381,10 @@ class TestAboutUserEndpoint(object):
         assert res.json_body["authored_content_revisions_space_count"] == 1
 
     def test_api__get_about_user__err_user_not_existing(self, web_testapp: TestApp) -> None:
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/users/2/about", status=400)
         assert res.json_body["code"] == ErrorCode.USER_NOT_FOUND
 
@@ -5609,9 +6406,9 @@ class TestUserAvatarEndpoints:
     def test_api__get_user_avatar__ok_200__nominal_case(
         self, admin_user: User, web_testapp
     ) -> None:
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get(
-            "/api/users/{}/avatar/raw/something.jpg".format(admin_user.user_id), status=400
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
         )
         image = create_1000px_png_test_image()
         web_testapp.put(
@@ -5620,25 +6417,37 @@ class TestUserAvatarEndpoints:
             status=204,
         )
         res = web_testapp.get(
-            "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, image.name), status=200,
+            "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, image.name),
+            status=200,
         )
         assert res.body == image.getvalue()
         assert res.content_type == "image/png"
         new_image = Image.open(io.BytesIO(res.body))
         assert 1000, 1000 == new_image.size
 
-    def test_api__get_user_avatar__err_400__no_avatar(self, admin_user: User, web_testapp) -> None:
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get(
-            "/api/users/{}/avatar/raw/something.jpg".format(admin_user.user_id), status=400
+    def test_api__get_user_avatar__ok__create_avatar(self, admin_user: User, web_testapp) -> None:
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
         )
-        assert res.json_body["code"] == ErrorCode.USER_IMAGE_NOT_FOUND
+        res = web_testapp.get(
+            "/api/users/{}/avatar/raw/something.jpg".format(admin_user.user_id),
+            status=200,
+        )
+        res = web_testapp.get(
+            "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, "something.jpg"),
+            status=200,
+        )
+        assert res.content_type == "image/svg+xml"
 
     def test_api__set_user_avatar__ok__nominal_case(self, admin_user: User, web_testapp) -> None:
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
 
         res = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200)
-        assert res.json_body["has_avatar"] is False
+        assert res.json_body["has_avatar"] is True
 
         image = create_1000px_png_test_image()
         web_testapp.put(
@@ -5653,7 +6462,10 @@ class TestUserAvatarEndpoints:
         assert res.json_body["has_avatar"] is True
 
     def test_api__set_user_avatar__err__no_file(self, admin_user: User, web_testapp) -> None:
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         image = create_1000px_png_test_image()
         res = web_testapp.put(
             "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, image.name),
@@ -5663,7 +6475,10 @@ class TestUserAvatarEndpoints:
         assert res.json_body["code"] == ErrorCode.NO_FILE_VALIDATION_ERROR
 
     def test_api__set_user_avatar__err__wrong_mimetype(self, admin_user: User, web_testapp) -> None:
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         image = create_1000px_png_test_image()
         image.name = "test.ogg"  # we say the content we give is ogg.
         res = web_testapp.put(
@@ -5679,12 +6494,10 @@ class TestUserAvatarEndpoints:
         """
         get 256x256 preview of a avatar
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get(
-            "/api/users/{}/avatar/preview/jpg/256x256/something.jpg".format(admin_user.user_id),
-            status=400,
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
         )
-        assert res.json_body["code"] == ErrorCode.USER_IMAGE_NOT_FOUND
 
         image = create_png_test_image(500, 100)
         web_testapp.put(
@@ -5720,9 +6533,13 @@ class TestUserCoverEndpoints:
     """
 
     def test_api__get_user_cover__ok_200__nominal_case(self, admin_user: User, web_testapp) -> None:
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
-            "/api/users/{}/cover/raw/something.jpg".format(admin_user.user_id), status=400
+            "/api/users/{}/cover/raw/something.jpg".format(admin_user.user_id),
+            status=400,
         )
         image = create_1000px_png_test_image()
         web_testapp.put(
@@ -5731,7 +6548,8 @@ class TestUserCoverEndpoints:
             status=204,
         )
         res = web_testapp.get(
-            "/api/users/{}/cover/raw/{}".format(admin_user.user_id, image.name), status=200,
+            "/api/users/{}/cover/raw/{}".format(admin_user.user_id, image.name),
+            status=200,
         )
         assert res.body == image.getvalue()
         assert res.content_type == "image/png"
@@ -5739,14 +6557,21 @@ class TestUserCoverEndpoints:
         assert 1000, 1000 == new_image.size
 
     def test_api__get_user_avatar__err_400__no_avatar(self, admin_user: User, web_testapp) -> None:
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
-            "/api/users/{}/cover/raw/something.jpg".format(admin_user.user_id), status=400
+            "/api/users/{}/cover/raw/something.jpg".format(admin_user.user_id),
+            status=400,
         )
         assert res.json_body["code"] == ErrorCode.USER_IMAGE_NOT_FOUND
 
     def test_api__set_user_cover__ok__nominal_case(self, admin_user: User, web_testapp) -> None:
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200)
         assert res.json_body["has_cover"] is False
         image = create_1000px_png_test_image()
@@ -5762,7 +6587,10 @@ class TestUserCoverEndpoints:
         assert res.json_body["has_cover"] is True
 
     def test_api__set_user_cover__err__no_file(self, admin_user: User, web_testapp) -> None:
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         image = create_1000px_png_test_image()
         res = web_testapp.put(
             "/api/users/{}/cover/raw/{}".format(admin_user.user_id, image.name),
@@ -5772,7 +6600,10 @@ class TestUserCoverEndpoints:
         assert res.json_body["code"] == ErrorCode.NO_FILE_VALIDATION_ERROR
 
     def test_api__set_user_cover__err__wrong_mimetype(self, admin_user: User, web_testapp) -> None:
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         image = create_1000px_png_test_image()
         image.name = "test.ogg"  # we say the content we give is ogg.
         res = web_testapp.put(
@@ -5788,7 +6619,10 @@ class TestUserCoverEndpoints:
         """
         get 256x256 preview of a avatar
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
 
         res = web_testapp.get(
             "/api/users/{}/cover/preview/jpg/256x256/something.jpg".format(bob_user.user_id),
@@ -5813,7 +6647,8 @@ class TestUserCoverEndpoints:
         assert 1300, 150 == new_image.size
 
         res2 = web_testapp.get(
-            "/api/users/{}/cover/preview/jpg/{}".format(bob_user.user_id, "image.jpg"), status=200,
+            "/api/users/{}/cover/preview/jpg/{}".format(bob_user.user_id, "image.jpg"),
+            status=200,
         )
         assert res2.body == res.body
         assert res2.content_type == "image/jpeg"

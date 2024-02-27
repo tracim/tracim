@@ -19,7 +19,10 @@ def upgrade():
     # and it's very complicated to drop/delete index in a working way to be sure getting the correct index name here.
     if dialect.name != "mysql":
         op.create_index(
-            "idx__content_revisions__content_id", "content_revisions", ["content_id"], unique=False
+            "idx__content_revisions__content_id",
+            "content_revisions",
+            ["content_id"],
+            unique=False,
         )
         op.create_index(
             "idx__content_revisions__workspace_id",

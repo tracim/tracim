@@ -1,4 +1,4 @@
-import { SELECTORS as s, formatTag } from '../../support/generic_selector_commands'
+import { SELECTORS as s } from '../../support/generic_selector_commands'
 import { PAGES as p } from '../../support/urls_commands.js'
 
 describe('App File', () => {
@@ -8,7 +8,7 @@ describe('App File', () => {
   const fullFilename_2 = 'artikodin.png'
   const fullFilename_3 = 'newname'
   const contentType = 'image/png'
-  const comment = "This is a comment"
+  const comment = 'This is a comment'
   let workspaceId
   let secondContentId
 
@@ -39,15 +39,18 @@ describe('App File', () => {
       it('should write a comment and check if it is there after switching apps, as well as the revisions', () => {
         cy.visitPage({
           pageName: p.CONTENT_OPEN,
-          params: { workspaceId: workspaceId, contentType: 'file', contentId: secondContentId }
+          params: { contentId: secondContentId }
         })
 
-        cy.contains('.breadcrumbs__item', fullFilename_3)
+        cy.contains('.wsContentGeneric__header__titleWrapper', fullFilename_3)
 
         cy.get('[data-cy="revision_data_1"]').should('be.visible')
         cy.get('[data-cy="revision_data_4"]').should('be.visible')
 
-        cy.get('.commentArea__textinput').type(comment)
+        cy.getActiveTinyMCEEditor()
+          .then(editor => {
+            editor.setContent(comment)
+          })
         cy.get('[data-cy="commentArea__comment__send"').click()
 
         // INFO - MB - 2021-11-18 - Switching to another file app
@@ -70,7 +73,10 @@ describe('App File', () => {
         cy.contains('.breadcrumbs__item', fullFilename_3)
         cy.get('[data-cy="revision_data_1"]').should('be.visible')
         cy.get('[data-cy="revision_data_4"]').should('be.visible')
-        cy.get('.comment__body__content__text').contains(comment)
+        cy.get('.timeline__comment__body__content__text').contains(comment)
+        // INFO - FS - 2023-10-26 - adding wait() here because without it, the test randomly fails because of an error related
+        // to tinymce. The same error seems to happend in publication/options_spec.js too
+        cy.wait(3000)
       })
     })
   })

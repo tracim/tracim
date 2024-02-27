@@ -1,5 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
+import { isEqual } from 'lodash'
 import Radium from 'radium'
 import debounce from 'lodash/debounce'
 import i18n from '../i18n.js'
@@ -19,7 +20,10 @@ import {
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
   CHECK_USERNAME_DEBOUNCE_WAIT,
-  PAGE
+  PAGE,
+  SORT_BY,
+  SORT_ORDER,
+  sortListBy
 } from 'tracim_frontend_lib'
 import {
   debug,
@@ -48,6 +52,9 @@ export class AdminWorkspaceUser extends React.Component {
 
     this.state = {
       appName: 'admin_workspace_user',
+      breadcrumbsList: [],
+      displayedSpaceList: [],
+      displayedUserList: [],
       isVisible: true,
       config: param.config,
       loggedUser: param.loggedUser,
@@ -56,8 +63,10 @@ export class AdminWorkspaceUser extends React.Component {
       usernameInvalidMsg: '',
       popupDeleteWorkspaceDisplay: false,
       workspaceToDelete: null,
-      workspaceIdOpened: null,
-      breadcrumbsList: []
+      loaded: false,
+      selectedSpaceSortCriteria: SORT_BY.ID,
+      selectedUserSortCriteria: SORT_BY.PUBLIC_NAME,
+      sortOrder: SORT_ORDER.ASCENDING
     }
 
     // i18n has been init, add resources from frontend
@@ -111,17 +120,37 @@ export class AdminWorkspaceUser extends React.Component {
   }
 
   refreshAll = async () => {
+    this.setState({ loaded: false })
     this.updateTitleAndBreadcrumbs()
     if (this.state.config.type === 'workspace') {
       await this.loadSpaceContent()
     } else if (this.state.config.type === 'user') {
       await this.loadUserContent()
     }
+    this.setState({ loaded: true })
+  }
+
+  sortUserList (userList) {
+    return userList.sort((u1, u2) => {
+      const u1PublicName = (u1.public_name || '').toLowerCase()
+      const u2PublicName = (u2.public_name || '').toLowerCase()
+      const u1username = (u1.username || '').toLowerCase()
+      const u2username = (u2.username || '').toLowerCase()
+
+      if (u1PublicName < u2PublicName) return -1
+      if (u1PublicName > u2PublicName) return 1
+      if (u1username < u2username) return -1
+      if (u1username > u2username) return 1
+
+      return u1.user_id - u2.user_id
+    })
   }
 
   async componentDidMount () {
     console.log('%c<AdminWorkspaceUser> did mount', `color: ${this.state.config.hexcolor}`)
     await this.refreshAll()
+    this.setDisplayedSpaceList()
+    this.setDisplayedUserList()
   }
 
   componentWillUnmount () {
@@ -135,6 +164,60 @@ export class AdminWorkspaceUser extends React.Component {
     if (prevState.config.type !== state.config.type) {
       await this.refreshAll()
     }
+    if (!isEqual(state.content.workspaceList, prevState.content.workspaceList)) this.setDisplayedSpaceList()
+    if (!isEqual(state.content.userList, prevState.content.userList)) this.setDisplayedUserList()
+  }
+
+  setDisplayedSpaceList = () => {
+    const { state } = this
+
+    const sortedList = sortListBy(
+      state.content.workspaceList,
+      state.selectedSpaceSortCriteria,
+      state.sortOrder,
+      state.loggedUser.lang
+    )
+
+    this.setState({ displayedSpaceList: sortedList })
+  }
+
+  setDisplayedUserList = () => {
+    const { state } = this
+
+    const sortedList = sortListBy(
+      state.content.userList,
+      state.selectedUserSortCriteria,
+      state.sortOrder,
+      state.loggedUser.lang
+    )
+
+    this.setState({ displayedUserList: sortedList })
+  }
+
+  handleClickSpaceTitleToSort = (criterion) => {
+    this.setState(prev => {
+      const sortOrder = prev.selectedSpaceSortCriteria === criterion && prev.sortOrder === SORT_ORDER.ASCENDING
+        ? SORT_ORDER.DESCENDING
+        : SORT_ORDER.ASCENDING
+      return {
+        displayedSpaceList: sortListBy(prev.displayedSpaceList, criterion, sortOrder, prev.loggedUser.lang),
+        selectedSpaceSortCriteria: criterion,
+        sortOrder: sortOrder
+      }
+    })
+  }
+
+  handleClickUserTitleToSort = (criterion) => {
+    this.setState(prev => {
+      const sortOrder = prev.selectedUserSortCriteria === criterion && prev.sortOrder === SORT_ORDER.ASCENDING
+        ? SORT_ORDER.DESCENDING
+        : SORT_ORDER.ASCENDING
+      return {
+        displayedUserList: sortListBy(prev.displayedUserList, criterion, sortOrder, prev.loggedUser.lang),
+        selectedUserSortCriteria: criterion,
+        sortOrder: sortOrder
+      }
+    })
   }
 
   setHeadTitle = (title) => {
@@ -190,7 +273,7 @@ export class AdminWorkspaceUser extends React.Component {
         this.setState(prev => ({
           content: {
             ...prev.content,
-            userList
+            userList: this.sortUserList(userList)
           }
         }))
         break
@@ -226,10 +309,26 @@ export class AdminWorkspaceUser extends React.Component {
   handleDeleteSpace = async () => {
     const { props, state } = this
 
+    const workspaceList = state.content.workspaceList
+    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === state.workspaceToDelete)
+
     const deleteSpaceResponse = await handleFetchResult(await deleteWorkspace(state.config.apiUrl, state.workspaceToDelete))
     if (deleteSpaceResponse.status !== 204) {
       sendGlobalFlashMessage(props.t('Error while deleting space'))
+    } else {
+      const newSpaceList = [
+        ...workspaceList.slice(0, workspaceIndex),
+        ...workspaceList.slice(workspaceIndex + 1)
+      ]
+
+      this.setState(prev => ({
+        content: {
+          ...prev.content,
+          workspaceList: newSpaceList
+        }
+      }))
     }
+
     this.handleClosePopupDeleteSpace()
   }
 
@@ -388,8 +487,9 @@ export class AdminWorkspaceUser extends React.Component {
     }
   }
 
-  handleClickAddUser = async (name, username, email, profile, password) => {
+  handleClickAddUser = async (name, username, emailWithoutTrim, profile, password) => {
     const { props, state } = this
+    const email = emailWithoutTrim.trim()
 
     if (name.length < MINIMUM_CHARACTERS_PUBLIC_NAME) {
       sendGlobalFlashMessage(
@@ -450,7 +550,8 @@ export class AdminWorkspaceUser extends React.Component {
     }
   }
 
-  handleClickCreateUserAndAddToSpaces = async (publicName, username, email, profile, password) => {
+  handleClickCreateUserAndAddToSpaces = async (publicName, username, emailWithoutTrim, profile, password) => {
+    const email = emailWithoutTrim.trim()
     const userId = await this.handleClickAddUser(publicName, username, email, profile, password)
     if (userId > 0) this.state.config.history.push(PAGE.ADMIN.USER_EDIT(userId), 'spacesConfig')
   }
@@ -462,7 +563,7 @@ export class AdminWorkspaceUser extends React.Component {
     this.setState(prev => ({
       content: {
         ...prev.content,
-        userList: [...prev.content.userList, detailedUser]
+        userList: this.sortUserList([...prev.content.userList, detailedUser])
       }
     }))
   }
@@ -475,7 +576,7 @@ export class AdminWorkspaceUser extends React.Component {
     this.setState(prev => ({
       content: {
         ...prev.content,
-        userList: prev.content.userList.map(u => u.user_id === tlmUser.user_id ? detailedUser : u)
+        userList: this.sortUserList(prev.content.userList.map(u => u.user_id === tlmUser.user_id ? detailedUser : u))
       }
     }))
   }
@@ -488,15 +589,6 @@ export class AdminWorkspaceUser extends React.Component {
         userList: prev.content.userList.filter(u => u.user_id !== tlmUser.user_id)
       }
     }))
-  }
-
-  handleClickSpace = workspaceId => {
-    const { state } = this
-    if (state.workspaceIdOpened === null) {
-      state.config.history.push(PAGE.WORKSPACE.ADVANCED_DASHBOARD(workspaceId), { from: 'adminSpaceList' })
-    } else GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_CONTENT('workspace_advanced'), data: { workspace_id: workspaceId } })
-
-    this.setState({ workspaceIdOpened: workspaceId })
   }
 
   handleClickNewSpace = () => {
@@ -528,19 +620,24 @@ export class AdminWorkspaceUser extends React.Component {
       <div>
         {state.config.type === 'workspace' && (
           <AdminWorkspace
-            workspaceList={state.content.workspaceList}
-            onClickWorkspace={this.handleClickSpace}
+            loaded={state.loaded}
+            workspaceList={state.displayedSpaceList}
             onClickNewWorkspace={this.handleClickNewSpace}
             onClickDeleteWorkspace={this.handleOpenPopupDeleteSpace}
             breadcrumbsList={state.breadcrumbsList}
+            isEmailNotifActivated={state.config.system.config.email_notification_activated}
+            onClickTitle={this.handleClickSpaceTitleToSort}
+            isOrderAscending={state.sortOrder === SORT_ORDER.ASCENDING}
+            selectedSortCriterion={state.selectedSpaceSortCriteria}
           />
         )}
 
         {state.config.type === 'user' && (
           <AdminUser
-            userList={state.content.userList}
+            loaded={state.loaded}
+            userList={state.displayedUserList}
             loggedUserId={state.loggedUser.userId}
-            emailNotifActivated={state.config.system.config.email_notification_activated}
+            isEmailNotifActivated={state.config.system.config.email_notification_activated}
             onClickToggleUserBtn={this.handleToggleUser}
             onChangeProfile={this.handleUpdateProfile}
             onClickAddUser={this.handleClickAddUser}
@@ -550,6 +647,9 @@ export class AdminWorkspaceUser extends React.Component {
             isUsernameValid={state.isUsernameValid}
             usernameInvalidMsg={state.usernameInvalidMsg}
             isEmailRequired={state.config.system.config.email_required}
+            onClickTitle={this.handleClickUserTitleToSort}
+            isOrderAscending={state.sortOrder === SORT_ORDER.ASCENDING}
+            selectedSortCriterion={state.selectedUserSortCriteria}
           />
         )}
 

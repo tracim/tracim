@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-
 from freezegun import freeze_time
 import pytest
 import transaction
@@ -211,7 +210,6 @@ class TestUserModel(object):
         assert user.__unicode__() == name
 
     def test__unit__unicode__ok__no_display_name(self):
-
         email = "tracim@trac.im"
 
         user = User()

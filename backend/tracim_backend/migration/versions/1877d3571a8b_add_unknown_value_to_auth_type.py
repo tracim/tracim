@@ -21,7 +21,6 @@ users = sa.Table("users", sa.MetaData(), sa.Column("auth_type"))
 
 
 def upgrade():
-
     if op.get_context().dialect.name == "postgresql":
         # INFO - G.M - 2018-11-27 - TO modify type in postgresq, we should
         # create a new one set column type to this new one and remove old one

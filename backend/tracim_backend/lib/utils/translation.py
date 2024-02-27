@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
+from babel.core import default_locale
 from enum import Enum
 import glob
 import json
 import pathlib
 import typing
-
-from babel.core import default_locale
 
 from tracim_backend.exceptions import NotReadableFile
 from tracim_backend.exceptions import TranslationConfigurationError
@@ -83,7 +82,10 @@ class Translator(object):
                 lang
             ] = cls._get_translation_from_file(file)
             global_backend_langs.append(lang)
-        logger.debug(cls, "Supported Backend language (Global): " + ",".join(global_backend_langs))
+        logger.debug(
+            cls,
+            "Supported Backend language (Global): " + ",".join(global_backend_langs),
+        )
 
         # custom_properties translations
         custom_properties_langs = []
@@ -138,14 +140,17 @@ class Translator(object):
         return message, False
 
     def get_translation(
-        self, message: str, lang: str = None, source: typing.Optional[TranslationSource] = None
+        self,
+        message: str,
+        lang: str = None,
+        source: typing.Optional[TranslationSource] = None,
     ) -> str:
         """
         Return translation according to lang
         """
         source = source or self.default_source
         lang = lang or self.default_lang
-        for l in (lang, self.fallback_lang):
+        for l in (lang, self.fallback_lang):  # noqa: E741
             translated_message, translation_found = self._get_translation(l, message, source=source)
             if translation_found:
                 return translated_message

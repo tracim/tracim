@@ -1,6 +1,18 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
+@import '~tracim_frontend_lib/src/css/Variable.styl'
 
 .adminWorkspace
+  &__searchBar
+    border 1px solid lightGrey1
+    background-color offWhite
+    margin-top standardSpacing
+    margin-bottom standardSpacing * 2
+    border-radius standardBorderRadius
+    padding 0 standardSpacing
+  &__searchBar:focus-within
+    border 1px solid lightBlue
+  &__searchBar .textInputComponent:focus-within
+    border 0
+
   &__description
     margin-bottom standardSpacing
   &__delimiter
@@ -13,20 +25,27 @@
     table-layout fixed
     &__tr
       &:hover, &:nth-child(even):hover
-        background-color grey-hover
+        background-color lightGrey1
       &__td-link
         max-width 0
         white-space nowrap
         overflow hidden
         text-overflow ellipsis
-        cursor pointer
         &:not(:hover)
           color inherit
+        &__link
+          color inherit
+          margin -20px auto
+          padding 20px
       &__td-description
         max-width 0
         white-space nowrap
         overflow hidden
         text-overflow ellipsis
+      & > td
+        unicode-bidi plaintext
+  &__table__delete__icon
+    margin-inline-end 0.75rem
 
 .adminUser
   & .table
@@ -36,19 +55,38 @@
       overflow hidden
     & th
       vertical-align middle
+      text-align start
+      font-weight normal
+      padding standardSpacing 0
+      &.adminUser__table__active
+        padding standardSpacing
+  &__searchBar
+    border 1px solid lightGrey1
+    background-color offWhite
+    margin-top standardSpacing
+    margin-bottom standardSpacing * 2
+    border-radius standardBorderRadius
+    padding 0 standardSpacing
+  &__searchBar:focus-within
+    border 1px solid lightBlue
+  &__searchBar .textInputComponent:focus-within
+    border 0
+
   &__description
     margin-bottom standardSpacing
   &__adduser
     display flex
     align-items center
+    &__button
+      margin-inline-end standardSpacing
     &__emailstate
       margin-inline-end standardSpacing
       color fontColor
     &__form
       margin-top standardSpacing
-      border borderStyle
       border-radius standardBorderRadius
       padding 0 standardSpacing standardSpacing
+      background-color lightGrey2
       &__submit__spaces
         margin-inline-end standardSpacing
       &__userData
@@ -63,14 +101,14 @@
               &__errorMsg
                 width 300px
                 font-size metadataFontSize
-                text-align right
+                text-align end
                 color errorRed
               &__errorIcon
-                margin-right textSpacing
+                margin-inline-end textSpacing
               &__errorInfo
                 width 300px
                 font-size metadataFontSize
-                text-align right
+                text-align end
           &__info
             color grey
             &__icon
@@ -108,7 +146,7 @@
   &__table
     &__tr
       &:hover, &:nth-child(even):hover
-        background-color grey-hover
+        background-color lightGrey1
       &.user-deactivated
         color grey
       &__td-link
@@ -119,24 +157,39 @@
         &:not(:hover)
           color inherit
         & > i
-          margin-right textSpacing
+          margin-inline-end textSpacing
+        & .profileNavigation:hover
+          text-decoration underline
     &__active
-      width 17%
+      width 10%
     &__profile
-      width 62px // 62px it's the size of avatar's profile
+      // INFO - GB - 2022-01-05 - 12px = 0.75rem is the bootstrap padding for ".table td, .table th" + fa-fw correction
+      width bigIconSize + (2 * 14.5px)
+      &__icon
+        vertical-align middle
+        font-size bigIconSize
     &__fullName
-      width 18%
-    &__useername
-      width 17%
-    &__email
-      width 18%
+      width 20%
+    &__username, &__line__username
+      width 20%
+    &__user
+      display none
+    &__email, &__line__email
+      width 20%
     &__canCreate
       width 15%
     &__administrator
       width 15%
+    &__line
+      &__username
+        direction ltr
+      &__email
+        direction ltr
 
 .adminWorkspace
   &__workspaceTable
+    & th
+      text-align start
     & .table
       &__id
         width 5%
@@ -144,9 +197,11 @@
       &__type
         text-align center
         & i
-          font-size titleFontSize
+          font-size bigIconSize
+          &.titleListHeader__icon
+            font-size standardFontSize
         & .label
-          font-size standardSpacing
+          font-size metadataFontSize
       &__sharedSpace
         width 15%
       &__description
@@ -156,6 +211,8 @@
         text-align center
       &__delete
         width 10%
+        vertical-align middle
+        font-weight normal
 
 .adminUser
   &__right
@@ -168,11 +225,11 @@
     float left
 
 .formInfo > span
-  margin-right 0.5%
-  margin-left 0.5%
+  margin-inline-start 0.5%
+  margin-inline-end 0.5%
 
 .formInfo > button
-  margin-left 2%
+  margin-inline-start 2%
 
 .fieldInfo
   & input
@@ -191,6 +248,22 @@
         &__delete
           width 15%
 
+@media (max-width: max-sm)
+  .adminUser
+    &__table
+      &__profile
+        // INFO - GB - 2022-01-05 - 12px = 0.75rem is the bootstrap padding for ".table td, .table th" + fa-fw correction
+        width standardFontSize + (2 * 14.5px)
+        &__icon
+          font-size standardFontSize
+      &__fullName
+        display none
+      &__username, &__line__username
+        display none
+      &__user
+        display table-cell
+        width 35%
+
 @media (max-width: max-xs)
   .adminWorkspace
     &__workspaceTable
@@ -206,3 +279,8 @@
           width 30%
         &__delete
           width 30%
+        &__type
+          & i
+            font-size standardFontSize
+          & .label
+            display none

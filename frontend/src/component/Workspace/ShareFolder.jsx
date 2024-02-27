@@ -51,7 +51,7 @@ class ShareFolder extends React.Component {
           onClick={() => props.onClickShareFolder()}
           title={props.t('Received files')}
         >
-          <div className='folder__header__triangleborder'>
+          <div className={classnames('folder__header__triangleborder', { open: props.isOpen && folderContentList.length > 0 })}>
             <div className='folder__header__triangleborder__triangle' />
           </div>
 
@@ -69,12 +69,12 @@ class ShareFolder extends React.Component {
             </div>
           </div>
 
-          <div className='folder__header__button'>
+          <div className='shareFolder__header__button'>
             <div className='d-none d-md-flex' title={props.t('Actions')}>
               {props.userRoleIdInWorkspace >= ROLE.contentManager.id && (
                 <DropdownMenu
                   buttonIcon='fas fa-ellipsis-h'
-                  buttonCustomClass='extandedaction outlineTextBtn primaryColorBgHover primaryColorBorderDarkenHover'
+                  buttonCustomClass='extandedaction primaryColorBgHover'
                   buttonDataCy='extended_action'
                   isButton
                 >
@@ -115,6 +115,8 @@ class ShareFolder extends React.Component {
                 isLast={index === props.shareFolderContentList.length - 1}
                 key={content.id}
                 t={props.t}
+                selectedSortCriterion={props.selectedSortCriterion}
+                sortOrder={props.sortOrder}
               />
             )
             : (
@@ -154,10 +156,19 @@ class ShareFolder extends React.Component {
 export default translate()(withRouter(ShareFolder))
 
 ShareFolder.propTypes = {
-  loading: PropTypes.bool,
-  folderData: PropTypes.object,
-  app: PropTypes.array,
-  lang: PropTypes.string,
+  isLast: PropTypes.bool.isRequired,
   onClickShareFolder: PropTypes.func.isRequired,
-  isLast: PropTypes.bool.isRequired
+  app: PropTypes.array,
+  folderData: PropTypes.object,
+  isOpen: PropTypes.bool,
+  lang: PropTypes.string,
+  loading: PropTypes.bool
+}
+
+ShareFolder.defaultProps = {
+  app: [],
+  folderData: {},
+  isOpen: false,
+  lang: '',
+  loading: false
 }

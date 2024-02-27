@@ -3,13 +3,13 @@ import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import IconButton from '../Button/IconButton.jsx'
 
-require('./TagList.styl')
+// require('./TagList.styl')  // see https://github.com/tracim/tracim/issues/1156
 
 export const Tag = props => {
   return (
     <div className='tagList__list__item__wrapper'>
       <div className='tagList__list__item__triangle'>
-        <i className='fas fa-play tagList__list__item__triangleIcon' />
+        <i className='fas fa-play tagList__list__item__triangleIcon' id='triangeIcon' />
         <span className='tagList__list__item__circle' />
       </div>
       <div className='tagList__list__item'>

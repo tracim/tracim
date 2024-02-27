@@ -1,5 +1,4 @@
 import { PAGES as p } from '../../support/urls_commands'
-import { SELECTORS as s } from '../../support/generic_selector_commands'
 
 describe('Space settings in reader mode', () => {
   let workspaceId
@@ -13,19 +12,10 @@ describe('Space settings in reader mode', () => {
     cy.fixture('baseWorkspace').as('workspace').then(workspace => {
       workspaceId = workspace.workspace_id
 
-      cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
-
-      // INFO - MP - 2021-11-05 - If the page isn't loaded after 30s
-      // there is a problem somewhere
-      cy.get('.userstatus__role__text', { timeout: 30000 })
-        .contains('Space manager')
-
-      cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-        .find('.dashboard__workspace__detail__buttons .iconbutton')
-        .click()
+      cy.visitPage({ pageName: p.ADVANCED_DASHBOARD, params: { workspaceId } })
 
       // INFO - MP - 2021-11-05 - Test the tag manipulation
-      cy.get('[data-cy=popin_right_part_tag').click()
+      cy.get('[data-cy=popin_right_part_tag]').click()
       cy.get('[data-cy=add_tag]').type('Tag')
       cy.get('[data-cy=validate_tag]').click()
 
@@ -56,16 +46,7 @@ describe('Space settings in reader mode', () => {
 
   beforeEach(() => {
     cy.loginAs('users')
-    cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
-
-    // INFO - MP - 2021-11-05 - If the page isn't loaded after 30s
-    // there is a problem somewhere
-    cy.get('.userstatus__role__text', { timeout: 30000 })
-      .contains('Reader')
-
-    cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-      .find('.dashboard__workspace__detail__buttons .iconbutton')
-      .click()
+    cy.visitPage({ pageName: p.ADVANCED_DASHBOARD, params: { workspaceId } })
   })
 
   afterEach(function () {
@@ -101,5 +82,12 @@ describe('Space settings in reader mode', () => {
     cy.get('.tagList__form__tag').should('not.exist')
     cy.get('[data-cy=IconButton_DeleteTagFromSpace]').should('not.exist')
     cy.get('.tagList__list__item__info').contains('Tag')
+  })
+
+  it('should have the proper button label', () => {
+    cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
+    cy.contains('.pageTitleGeneric__title__label', 'My space')
+    cy.contains('.userstatus__role__text', 'Reader')
+    cy.contains('.dashboard__workspace__rightMenu__contents', 'Space information')
   })
 })

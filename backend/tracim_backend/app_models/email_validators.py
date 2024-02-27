@@ -43,7 +43,6 @@ class TracimEmailValidator(Validator):
 
 
 class RFCEmailValidator(TracimEmailValidator):
-
     default_message = "Not a valid rfc email address."
 
     def __call__(self, value):

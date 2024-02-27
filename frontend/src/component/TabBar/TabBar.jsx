@@ -22,27 +22,31 @@ export const TabBar = props => {
         icon={spaceType.faIcon}
         breadcrumbsList={props.breadcrumbs}
         iconTooltip={spaceType.label}
+        isEmailNotifActivated={props.isEmailNotifActivated}
       />
 
-      <Tab
-        page={PAGE.WORKSPACE.DASHBOARD(props.currentSpace.id)}
-        icon='fas fa-fw fa-tachometer-alt'
-        label={props.t('Dashboard')}
-      />
-
-      {props.currentSpace.publicationEnabled && (
+      <div className='tabBar__tabs'>
         <Tab
-          page={PAGE.WORKSPACE.PUBLICATIONS(props.currentSpace.id)}
-          icon='fas fa-fw fa-stream'
-          label={props.t('News')}
+          page={PAGE.WORKSPACE.DASHBOARD(props.currentSpace.id)}
+          icon='fas fa-fw fa-tachometer-alt'
+          label={props.t('Dashboard')}
         />
-      )}
 
-      <Tab
-        page={PAGE.WORKSPACE.CONTENT_LIST(props.currentSpace.id)}
-        icon='fas fa-fw fa-th'
-        label={props.t('Contents')}
-      />
+        {props.currentSpace.publicationEnabled && (
+          <Tab
+            page={PAGE.WORKSPACE.PUBLICATIONS(props.currentSpace.id)}
+            icon='fas fa-fw fa-stream'
+            label={props.t('News')}
+          />
+        )}
+
+        <Tab
+          page={PAGE.WORKSPACE.CONTENT_LIST(props.currentSpace.id)}
+          icon='fas fa-fw fa-th'
+          label={props.t('Contents')}
+          dataCy='tabBar__content_tab'
+        />
+      </div>
     </div>
   )
 }
@@ -51,5 +55,10 @@ export default translate()(TabBar)
 
 TabBar.propTypes = {
   currentSpace: PropTypes.object.isRequired,
-  breadcrumbs: PropTypes.array.isRequired
+  breadcrumbs: PropTypes.array.isRequired,
+  isEmailNotifActivated: PropTypes.bool
+}
+
+TabBar.defaultProps = {
+  isEmailNotifActivated: false
 }
