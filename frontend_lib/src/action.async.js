@@ -237,6 +237,10 @@ export const deleteContentFromFavoriteList = (apiUrl, userId, contentId) => {
   return baseFetch('DELETE', `${apiUrl}/users/${userId}/favorite-contents/${contentId}`)
 }
 
+export const deleteContentPermanently = (apiUrl, workspaceId, contentId) => {
+  return baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/permanently`)
+}
+
 export const getGenericWorkspaceContent = (apiUrl, workspaceId, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}`)
 

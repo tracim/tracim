@@ -6,6 +6,7 @@ import {
   APP_FEATURE_MODE,
   BREADCRUMBS_TYPE,
   CONTENT_TYPE,
+  ConfirmPopup,
   CUSTOM_EVENT,
   FAVORITE_STATE,
   PAGE,
@@ -74,6 +75,7 @@ export class Kanban extends React.Component {
       showInvalidMentionPopupInComment: false,
       showProgress: true,
       showRefreshWarning: false,
+      showPermanentlyDeletePopup: false,
       translationTargetLanguageCode: param.loggedUser.lang,
       toDoList: []
     }
@@ -505,6 +507,16 @@ export class Kanban extends React.Component {
     return true
   }
 
+  handleClickPermanentlyDeleteButton = () => {
+    this.setState(prev => ({ showPermanentlyDeletePopup: !prev.showPermanentlyDeletePopup }))
+  }
+
+  handleValidatePermanentlyDeleteButton = () => {
+    const { state } = this
+    this.props.appContentDeletePermanently(state.content.workspace_id, state.content.content_id, this.handleClickBtnCloseApp)
+    this.handleClickPermanentlyDeleteButton()
+  }
+
   handleClickCopyLink = () => {
     const { props, state } = this
     handleClickCopyLink(state.content.content_id)
@@ -633,6 +645,23 @@ export class Kanban extends React.Component {
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
               disabled: readOnly,
               dataCy: 'popinListItem__delete'
+            },
+            {
+              icon: '',
+              label: '',
+              onClick: () => {},
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              disabled: false,
+              separatorLine: true,
+              dataCy: 'popinListItem__separatorLine'
+            },
+            {
+              icon: 'far fa-trash-alt iconbutton__icon',
+              label: props.t('Permanently delete'),
+              onClick: this.handleClickPermanentlyDeleteButton,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              disabled: false,
+              dataCy: 'popinListItem__permanentlyDelete'
             }
           ]}
           headerButtons={[
@@ -695,6 +724,15 @@ export class Kanban extends React.Component {
             menuItemList={this.getMenuItemList()}
           />
         </PopinFixedContent>
+        {state.showPermanentlyDeletePopup && (
+          <ConfirmPopup
+            customColor={props.customColor}
+            confirmLabel={props.t('Permanently delete')}
+            confirmIcon='far fa-trash-alt iconbutton__icon'
+            onConfirm={this.handleValidatePermanentlyDeleteButton}
+            onCancel={this.handleClickPermanentlyDeleteButton}
+          />
+        )}
       </PopinFixed>
     )
   }

@@ -8,6 +8,7 @@ import {
   BREADCRUMBS_TYPE,
   CONTENT_TYPE,
   CUSTOM_EVENT,
+  ConfirmPopup,
   FAVORITE_STATE,
   LOCAL_STORAGE_FIELD,
   PAGE,
@@ -85,6 +86,7 @@ export class HtmlDocument extends React.Component {
       loggedUser: param.loggedUser,
       mode: APP_FEATURE_MODE.VIEW,
       showRefreshWarning: false,
+      showPermanentlyDeletePopup: false,
       editionAuthor: '',
       invalidMentionList: [],
       oldInvalidMentionList: [],
@@ -718,6 +720,16 @@ export class HtmlDocument extends React.Component {
     )
   }
 
+  handleClickPermanentlyDeleteButton = () => {
+    this.setState(prev => ({ showPermanentlyDeletePopup: !prev.showPermanentlyDeletePopup }))
+  }
+
+  handleValidatePermanentlyDeleteButton = () => {
+    const { state } = this
+    this.props.appContentDeletePermanently(state.content.workspace_id, state.content.content_id, this.handleClickBtnCloseApp)
+    this.handleClickPermanentlyDeleteButton()
+  }
+
   setShowProgressBarStatus = (showProgressStatus) => {
     this.setState({ showProgress: showProgressStatus })
   }
@@ -957,6 +969,23 @@ export class HtmlDocument extends React.Component {
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
               disabled: state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted,
               dataCy: 'popinListItem__delete'
+            },
+            {
+              icon: '',
+              label: '',
+              onClick: () => {},
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              disabled: false,
+              separatorLine: true,
+              dataCy: 'popinListItem__separatorLine'
+            },
+            {
+              icon: 'far fa-trash-alt iconbutton__icon',
+              label: props.t('Permanently delete'),
+              onClick: this.handleClickPermanentlyDeleteButton,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              disabled: false,
+              dataCy: 'popinListItem__permanentlyDelete'
             }
           ]}
           appMode={state.mode}
@@ -1063,6 +1092,15 @@ export class HtmlDocument extends React.Component {
             menuItemList={this.getMenuItemList()}
           />
         </PopinFixedContent>
+        {state.showPermanentlyDeletePopup && (
+          <ConfirmPopup
+            customColor={props.customColor}
+            confirmLabel={props.t('Permanently delete')}
+            confirmIcon='far fa-trash-alt iconbutton__icon'
+            onConfirm={this.handleValidatePermanentlyDeleteButton}
+            onCancel={this.handleClickPermanentlyDeleteButton}
+          />
+        )}
       </PopinFixed>
     )
   }

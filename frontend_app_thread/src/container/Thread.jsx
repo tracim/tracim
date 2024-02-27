@@ -8,6 +8,7 @@ import {
   buildContentPathBreadcrumbs,
   CONTENT_NAMESPACE,
   CONTENT_TYPE,
+  ConfirmPopup,
   handleClickCopyLink,
   handleFetchResult,
   PAGE,
@@ -59,6 +60,7 @@ export class Thread extends React.Component {
         props.t('Start a topic')
       ],
       showRefreshWarning: false,
+      showPermanentlyDeletePopup: false,
       editionAuthor: '',
       invalidMentionList: [],
       showInvalidMentionPopupInComment: false,
@@ -113,6 +115,16 @@ export class Thread extends React.Component {
     const { props } = this
     console.log('%c<Thread> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
     props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n)
+  }
+
+  handleClickPermanentlyDeleteButton = () => {
+    this.setState(prev => ({ showPermanentlyDeletePopup: !prev.showPermanentlyDeletePopup }))
+  }
+
+  handleValidatePermanentlyDeleteButton = () => {
+    const { state } = this
+    this.props.appContentDeletePermanently(state.content.workspace_id, state.content.content_id, this.handleClickBtnCloseApp)
+    this.handleClickPermanentlyDeleteButton()
   }
 
   // TLM Handlers
@@ -375,6 +387,23 @@ export class Thread extends React.Component {
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
               disabled: state.content.is_archived || state.content.is_deleted,
               dataCy: 'popinListItem__delete'
+            },
+            {
+              icon: '',
+              label: '',
+              onClick: () => {},
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              disabled: false,
+              separatorLine: true,
+              dataCy: 'popinListItem__separatorLine'
+            },
+            {
+              icon: 'far fa-trash-alt iconbutton__icon',
+              label: props.t('Permanently delete'),
+              onClick: this.handleClickPermanentlyDeleteButton,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              disabled: false,
+              dataCy: 'popinListItem__permanentlyDelete'
             }
           ]}
           showReactions
@@ -462,6 +491,15 @@ export class Thread extends React.Component {
             ) : null}
           </div>
         </PopinFixedContent>
+        {state.showPermanentlyDeletePopup && (
+          <ConfirmPopup
+            customColor={props.customColor}
+            confirmLabel={props.t('Permanently delete')}
+            confirmIcon='far fa-trash-alt iconbutton__icon'
+            onConfirm={this.handleValidatePermanentlyDeleteButton}
+            onCancel={this.handleClickPermanentlyDeleteButton}
+          />
+        )}
       </PopinFixed>
     )
   }

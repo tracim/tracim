@@ -247,6 +247,14 @@ export const PopinFixedHeader = (props) => {
                 <i className={`fa-fw fa-fw ${action.icon}`} />
                 {action.label}
               </a>
+            ) : action.separatorLine ? (
+              <hr
+                className='dropdownMenuSeparatorLine'
+                key='separatorLine'
+                disabled={action.disabled}
+                showAction={action.showAction}
+                dataCy={action.dataCy}
+              />
             ) : (
               <IconButton
                 disabled={action.disabled}

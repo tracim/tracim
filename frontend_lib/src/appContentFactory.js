@@ -44,6 +44,7 @@ import {
   deleteComment,
   deleteToDo,
   deleteContentFromFavoriteList,
+  deleteContentPermanently,
   getComment,
   getCommentTranslated,
   getContent,
@@ -452,6 +453,21 @@ export function appContentFactory (WrappedComponent) {
 
       if (response.status !== 204) {
         sendGlobalFlashMessage(i18n.t('Error while deleting the comment'))
+      }
+
+      return response
+    }
+
+    appContentDeletePermanently = async (workspaceId, contentId, toCloseApp) => {
+      this.checkApiUrl()
+
+      const response = await handleFetchResult(await deleteContentPermanently(this.apiUrl, workspaceId, contentId))
+
+      if (response.status !== 204) {
+        sendGlobalFlashMessage(i18n.t('Error while deleting the content'))
+      } else {
+        sendGlobalFlashMessage(i18n.t('The content has been deleted'), '')
+        toCloseApp()
       }
 
       return response
@@ -1111,6 +1127,7 @@ export function appContentFactory (WrappedComponent) {
           appContentChangeTitle={this.appContentChangeTitle}
           appContentChangeComment={this.appContentChangeComment}
           appContentDeleteComment={this.appContentDeleteComment}
+          appContentDeletePermanently={this.appContentDeletePermanently}
           appContentDeleteToDo={this.appContentDeleteToDo}
           appContentEditComment={this.appContentEditComment}
           appContentMarkAsTemplate={this.appContentMarkAsTemplate}
