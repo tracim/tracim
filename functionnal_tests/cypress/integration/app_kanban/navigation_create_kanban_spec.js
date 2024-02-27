@@ -35,6 +35,6 @@ describe('navigate :: workspace > create_new > kanban', function () {
     cy.get('[data-cy=popup__createcontent__form__button]').should('be.disabled')
     cy.get('[data-cy=createcontent__form__input]').type('"Hello double-quote"')
     cy.get('[data-cy=popup__createcontent__form__button]').should('be.enabled').click()
-    cy.get('.kanban__columnAdder > span').should('be.visible')
+    cy.get('.kanban__columnAdder > p').should('be.visible')
   })
 })
