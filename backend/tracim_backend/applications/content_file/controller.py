@@ -67,11 +67,13 @@ SWAGGER_TAG__CONTENT_FILE_SECTION = "Files"
 SWAGGER_TAG__CONTENT_FILE_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__CONTENT_ENDPOINTS, SWAGGER_TAG__CONTENT_FILE_SECTION
 )
-is_file_content = ContentTypeChecker([
-    ContentTypeSlug.FILE.value,
-    ContentTypeSlug.KANBAN.value,
-    ContentTypeSlug.LOGBOOK.value,
-])
+is_file_content = ContentTypeChecker(
+    [
+        ContentTypeSlug.FILE.value,
+        ContentTypeSlug.KANBAN.value,
+        ContentTypeSlug.LOGBOOK.value,
+    ]
+)
 can_create_file = OrAuthorizationChecker(
     ContentTypeCreationChecker(content_type_list, ContentTypeSlug.FILE.value),
     ContentTypeCreationChecker(content_type_list, ContentTypeSlug.KANBAN.value),
