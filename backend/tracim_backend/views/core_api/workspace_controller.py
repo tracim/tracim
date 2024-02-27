@@ -950,7 +950,7 @@ class WorkspaceController(Controller):
         content = api.get_one(path_data.content_id, content_type=ContentTypeSlug.ANY.value)
 
         if session.bind.dialect.name == "sqlite":
-            listen(Engine, "connect", enable_sqlite_foreign_keys)
+            session.execute("PRAGMA foreign_keys=ON")
 
         cleanup_lib = CleanupLib(session, app_config)
 
@@ -964,7 +964,7 @@ class WorkspaceController(Controller):
             session.flush()
 
         if session.bind.dialect.name == "sqlite":
-            listen(Engine, "connect", disable_sqlite_foreign_keys)
+            session.execute("PRAGMA foreign_keys=OFF")
 
         return
 
