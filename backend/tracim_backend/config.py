@@ -293,6 +293,7 @@ class CFG(object):
             "contents/html-document,"
             "contents/folder,"
             "contents/kanban,"
+            "contents/logbook,"
             "contents/todo,"
             "agenda,"
             "share_content,"
