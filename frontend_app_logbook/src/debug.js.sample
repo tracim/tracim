@@ -5,7 +5,7 @@ export const debug = {
   config: {
     ...defaultDebug.config,
     slug: 'logbook',
-    faIcon: 'fas fa-newspaper',
+    faIcon: 'fas fa-sort-numeric-up',
     hexcolor: '#ff4081',
     creationLabel: 'Start a logbook',
     label: 'Logbook',
