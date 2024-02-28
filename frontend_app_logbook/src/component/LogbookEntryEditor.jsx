@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import { format } from "date-fns";
+import { format } from 'date-fns'
 import {
   DateInput,
   IconButton,
