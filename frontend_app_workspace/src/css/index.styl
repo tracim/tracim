@@ -9,7 +9,10 @@
       width 32rem
       overflow hidden
     &__body
-      max-height calc(100% - 32px)
+      // NOTE - M.L. - 2024-2-27 - Top border is explicitly 10px.
+      //  header has 60px of padding and 36px of content
+      //  This however becomes invalid on font-size change in the header
+      max-height calc(100% - 10px - 96px)
       overflow auto
       align-items baseline
   &__title
