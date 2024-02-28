@@ -16,7 +16,7 @@ const LogbookEntry = (props) => {
       <div className='logbook__timeline__entries__entry__dot' />
       <div
         className='logbook__timeline__entries__entry__arrow'
-        style={{ borderRight: `0.5rem solid ${props.entry.bgColor}` }}
+        style={{ borderRightColor: `${props.entry.bgColor}` }}
       />
       <div className='logbook__timeline__entries__entry__data'>
         <div className='logbook__timeline__entries__entry__data__header'>
