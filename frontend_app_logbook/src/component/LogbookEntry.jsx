@@ -42,13 +42,19 @@ const LogbookEntry = (props) => {
           dangerouslySetInnerHTML={{ __html: props.entry.description }}
         />
         {!props.readOnly && (
-          <div className='logbook__timeline__entries__entry__data__edit'>
+          <div className='logbook__timeline__entries__entry__data__buttons'>
             <IconButton
-              customClass='logbook__timeline__entries__entry__data__header__edit__button'
+              customClass='logbook__timeline__entries__entry__data__buttons__edit'
               text={props.t('Edit entry')}
               textMobile={props.t('Edit entry')}
               icon='fa-fw fas fa-pencil-alt'
               onClick={() => props.onEditEntry(props.entry)}
+            />
+            <IconButton
+              customClass='logbook__timeline__entries__entry__data__buttons__delete'
+              title={props.t('Delete entry')}
+              icon='fa-fw far fa-trash-alt'
+              onClick={() => props.onRemoveEntry(props.entry)}
             />
           </div>
         )}

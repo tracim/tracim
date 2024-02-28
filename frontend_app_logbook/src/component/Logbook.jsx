@@ -41,7 +41,8 @@ const replaceEntryInLogbook = (logbook, newEntry) => {
 }
 
 const removeEntryFromLogbook = (logbook, entryToRemove) => {
-  return logbook.entries.filter(entry => entry.id !== entryToRemove.id)
+  logbook.entries = logbook.entries.filter(entry => entry.id !== entryToRemove.id)
+  return logbook
 }
 
 export class Logbook extends React.Component {
