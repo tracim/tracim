@@ -18,7 +18,6 @@
   "Title:": "عنوان:",
   "Description:": "وصف:",
   "Color:": "اللون:",
-  "Deadline:": "الموعد النهائي:",
   "Validate": "اعتماد",
   "Tasks": "",
   "The link has been copied to clipboard": "تم نسخ الرابط إلى الحافظة",
@@ -37,5 +36,7 @@
   "New Logbook board": "",
   "Error while creating logbook": "",
   "Logbook's name": "",
-  "New Logbook": ""
+  "New Logbook": "",
+  "Delete entry": "",
+  "Date and time:": ""
 }

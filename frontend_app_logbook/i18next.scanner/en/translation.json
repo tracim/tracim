@@ -7,7 +7,6 @@
   "Title:": "Title:",
   "Description:": "Description:",
   "Color:": "Colour:",
-  "Deadline:": "Deadline:",
   "Cancel": "Cancel",
   "Validate": "Validate",
   "Timeline": "Timeline",
@@ -37,5 +36,7 @@
   "New Logbook board": "New Logbook board",
   "Error while creating logbook": "Error while creating logbook",
   "Logbook's name": "Logbook's name",
-  "New Logbook": "New Logbook"
+  "New Logbook": "New Logbook",
+  "Delete entry": "Delete entry",
+  "Date and time:": "Date and time:"
 }

@@ -34,7 +34,7 @@ const LogbookEntry = (props) => {
               customClass='logbook__timeline__entries__entry__data__header__date__icon'
               icon='far fa-clock'
             />
-            {formatAbsoluteDate(new Date(props.entry.deadline), props.language, 'PPpp')}
+            {formatAbsoluteDate(new Date(props.entry.datetime), props.language, 'PPpp')}
           </span>
         </div>
         <div

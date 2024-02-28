@@ -14,7 +14,7 @@ function LogbookEntryEditor (props) {
   const [title, setTitle] = useState(entry.title || '')
   const [description, setDescription] = useState(entry.description || 'This is a description')
   const [bgColor, setBgColor] = useState(entry.bgColor || '#e8e8e8')
-  const [deadline, setDeadline] = useState(entry.deadline || getCurrentDateTime())
+  const [datetime, setDatetime] = useState(entry.datetime || getCurrentDateTime())
   const [freeInput, setFreeInput] = useState(entry.freeInput || '')
 
   // NOTE - M.L. - 2024-02-28 - This function is required due to the very specific format requested
@@ -33,7 +33,7 @@ function LogbookEntryEditor (props) {
       title,
       description: descriptionText,
       bgColor,
-      deadline,
+      datetime,
       freeInput
     })
   }
@@ -80,13 +80,13 @@ function LogbookEntryEditor (props) {
           />
         </div>
 
-        <div className='logbook__LogbookPopup__deadline'>
-          <label htmlFor='logbook__LogbookPopup__deadline'>{props.t('Deadline:')}</label>
+        <div className='logbook__LogbookPopup__datetime'>
+          <label htmlFor='logbook__LogbookPopup__datetime'>{props.t('Date and time:')}</label>
           <DateInput
-            id='logbook__LogbookPopup__deadline'
-            onChange={(e) => setDeadline(e.target.value)}
+            id='logbook__LogbookPopup__datetime'
+            onChange={(e) => setDatetime(e.target.value)}
             onValidate={handleValidate}
-            value={deadline}
+            value={datetime}
             type='datetime-local'
             step={1}
           />

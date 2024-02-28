@@ -7,7 +7,6 @@
   "Title:": "Titre :",
   "Description:": "Description :",
   "Color:": "Couleur :",
-  "Deadline:": "Échéance :",
   "Cancel": "Annuler",
   "Validate": "Valider",
   "Timeline": "Historique",
@@ -37,5 +36,7 @@
   "New Logbook board": "",
   "Error while creating logbook": "",
   "Logbook's name": "",
-  "New Logbook": ""
+  "New Logbook": "",
+  "Delete entry": "",
+  "Date and time:": ""
 }

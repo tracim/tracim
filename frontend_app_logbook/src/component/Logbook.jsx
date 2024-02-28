@@ -157,7 +157,7 @@ export class Logbook extends React.Component {
 
   async save (newLogbook) {
     const { props } = this
-    newLogbook.entries.toSorted((a, b) => new Date(b.deadline) - new Date(a.deadline))
+    newLogbook.entries.toSorted((a, b) => new Date(b.datetime) - new Date(a.datetime))
     const fetchResultSaveLogbook = await handleFetchResult(
       await putRawFileContent(
         props.config.apiUrl,
@@ -248,7 +248,7 @@ export class Logbook extends React.Component {
                   <>
                     <div className='logbook__timeline__bar' />
                     <div className='logbook__timeline__entries'>
-                      {state.logbook.entries.toSorted((a, b) => new Date(b.deadline) - new Date(a.deadline)).map((entry, id) =>
+                      {state.logbook.entries.toSorted((a, b) => new Date(b.datetime) - new Date(a.datetime)).map((entry, id) =>
                         <LogbookEntry
                           customColor={props.config.hexcolor}
                           readOnly={!changesAllowed}

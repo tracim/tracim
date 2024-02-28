@@ -17,7 +17,6 @@
   "Timeline": "Revisiones",
   "Description:": "Descripción:",
   "Color:": "Color:",
-  "Deadline:": "Plazo:",
   "Last version": "Última versión",
   "Exit fullscreen mode": "Salir del modo de pantalla completa",
   "Tasks": "Tareas",
@@ -37,5 +36,7 @@
   "New Logbook board": "",
   "Error while creating logbook": "",
   "Logbook's name": "",
-  "New Logbook": ""
+  "New Logbook": "",
+  "Delete entry": "",
+  "Date and time:": ""
 }
