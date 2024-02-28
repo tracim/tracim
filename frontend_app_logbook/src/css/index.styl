@@ -117,58 +117,6 @@ cardWidth = 280px
         & button
           margin-inline-end standardSpacing
 
-      &__board
-        flex 1
-        overflow-x auto
-        overflow-y hidden
-
-        &.hidden
-          display none
-
-        &__column
-          display flex
-          flex-direction row
-          border-bottom 3px solid
-          padding-bottom standardSpacing
-          margin-bottom standardSpacing
-          align-items baseline
-          justify-content space-evenly
-          text-align start
-          &__title
-            width 180px
-            text-overflow ellipsis
-            overflow hidden
-            white-space nowrap
-            flex 1
-            unicode-bidi plaintext
-            & > strong
-              font-size titleFontSize
-              flex 1
-              cursor pointer
-              overflow hidden
-              text-overflow ellipsis
-            &__actions.dropdownMenuButton
-              color fontColor
-              padding 0
-              &::after
-                display none
-          & button:hover
-            background-color lightGrey1
-          &.buttonHidden
-            .dropdown, .logbook_addCard
-              display none
-          &.readOnly
-            strong
-              cursor auto
-
-        & .react-kanban-board
-          direction ltr
-          height 100%
-          overflow-x visible
-          padding standardSpacing
-          & > div
-            height 100%
-
       &__toolbar
         position absolute
         top standardSpacing
@@ -180,29 +128,6 @@ cardWidth = 280px
         &:empty
           display none
 
-      & .react-kanban-column-header
-        display flex
-        flex-direction row
-        > :first-child
-          flex 1
-        > :last-child
-          display inline-block
-          border-radius standardBorderRadius
-          cursor default
-
-      & .react-kanban-column
-        padding standardSpacing
-        background-color lightGrey2
-        border-radius standardBorderRadius
-        margin 0 textSpacing
-        min-width 315px
-        text-align center
-        & > :last-child
-          overflow hidden
-          // INFO - GB - 2021-12-20 - The css rule below is !important because it overrides the library style
-          height calc(100% - 43px) !important
-          &:hover
-            overflow-y auto
   &__LogbookPopup
     max-height 80%
     &.hidden
@@ -270,25 +195,6 @@ cardWidth = 280px
       justify-content flex-end
       & > .iconbutton
         margin-inline-start standardSpacing
-
-  &__columnAdder
-    border 1px lightGrey1 dashed
-    min-width cardWidth
-    max-height 70px
-    margin 0 textSpacing
-    text-align-last center
-    display flex
-    border-radius standardBorderRadius
-    flex-direction column
-    cursor pointer
-    &.disabled
-      cursor not-allowed
-      opacity 0.5
-
-    &:hover
-      background-color lightGrey2
-    & > *
-      margin auto
 
 [dir=ltr] .logbook
   &__contentpage
