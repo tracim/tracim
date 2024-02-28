@@ -6,7 +6,7 @@ export const debug = {
     ...defaultDebug.config,
     slug: 'logbook',
     faIcon: 'fas fa-newspaper',
-    hexcolor: '#197474',
+    hexcolor: '#ff4081',
     creationLabel: 'Start a logbook',
     label: 'Logbook',
     workspace: {
@@ -15,7 +15,7 @@ export const debug = {
   },
   content: {
     ...defaultDebug.content,
-    content_id: 25,
+    content_id: 3,
     content_type: 'logbook',
     workspace_id: 1
   },
