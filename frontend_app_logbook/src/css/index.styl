@@ -15,9 +15,6 @@ cardWidth = 280px
   &__timeline
     width 100%
     height 100%
-    // HACK - M.L. - 2024-02-28 - This is so it is still viewable on mobile, a better solution should be implemented
-    //  https://github.com/tracim/tracim/issues/6382
-    min-height 300px
     display flex
     flex-direction row
     margin-top standardSpacing
@@ -32,7 +29,6 @@ cardWidth = 280px
       $multiple = 4
       padding-inline-start '%s' % (4 * standardSpacing)
       width 100%
-      max-width 700px
       height 100%
       overflow-y auto
       padding-inline-end standardSpacing
@@ -94,6 +90,22 @@ cardWidth = 280px
             justify-content end
             &__edit
               margin-inline-end standardSpacing
+
+@media (max-width: max-sm)
+  .logbook
+    &__timeline
+      &__bar
+        visibility hidden
+      &__entries
+        padding-inline-start standardSpacing
+        padding-inline-end 0
+
+@media (max-width: max-lg)
+  .logbook
+    &__timeline
+      &__entries
+        overflow-y hidden
+        position static
 
 .logbook
   &__contentpage
