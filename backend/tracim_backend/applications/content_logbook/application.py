@@ -51,7 +51,7 @@ def create_app() -> TracimApplication:
     return ContentLogbookApp(
         label="Logbooks",
         slug="contents/{}".format(ContentTypeSlug.LOGBOOK.value),
-        fa_icon="fas fa-sort-numeric-up",
+        fa_icon="fas fa-book",
         config={},
         main_route="",
     )
