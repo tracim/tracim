@@ -37,5 +37,6 @@
   "Cancel": "Cancel",
   "Validate": "Validate",
   "Permanently delete": "Permanently delete",
-  "This content will be deleted permanently and won't be restorable": "This content will be deleted permanently and won't be restorable"
+  "Yes, delete permanently": "Yes, delete permanently",
+  "Warning: this operation cannot be rolled back": "Warning: this operation cannot be rolled back"
 }

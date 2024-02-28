@@ -66,5 +66,6 @@
   "Preview loading...": "Forhåndsviser …",
   " of ": " av ",
   "Permanently delete": "",
-  "This content will be deleted permanently and won't be restorable": ""
+  "Yes, delete permanently": "",
+  "Warning: this operation cannot be rolled back": ""
 }

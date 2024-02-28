@@ -47,5 +47,6 @@
   "Description of the card": "Description de la carte",
   "Open field:": "Champ libre :",
   "Permanently delete": "Supprimer définitivement",
-  "This content will be deleted permanently and won't be restorable": "Ce contenu sera supprimé définitivement et ne pourra pas être restauré"
+  "Yes, delete permanently": "Oui, supprimer définitivement",
+  "Warning: this operation cannot be rolled back": "Attention : cette opération ne peut pas être annulée"
 }

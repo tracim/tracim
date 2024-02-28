@@ -47,5 +47,6 @@
   "Description of the card": "Descripción de la tarjeta",
   "Open field:": "",
   "Permanently delete": "",
-  "This content will be deleted permanently and won't be restorable": ""
+  "Yes, delete permanently": "",
+  "Warning: this operation cannot be rolled back": ""
 }

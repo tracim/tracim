@@ -273,6 +273,6 @@
   "{{count}} files selected": "{{count}} fichier sélectionné",
   "{{count}} files selected_plural": "{{count}} fichiers sélectionnés",
   "Error while deleting the content": "Erreur lors de la suppression du contenu",
-  "The content has been deleted": "Le contenu a été supprimer",
+  "The content has been deleted": "Le contenu a été supprimé",
   "Error while changing content type": "Erreur lors du changement de type de contenu"
 }

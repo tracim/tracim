@@ -1227,10 +1227,10 @@ export class File extends React.Component {
               dataCy: 'popinListItem__delete'
             },
             {
-              icon: 'far fa-trash-alt iconbutton__icon',
+              icon: 'fas fa-exclamation-triangle',
               label: props.t('Permanently delete'),
               onClick: this.handleClickPermanentlyDeleteButton,
-              showAction: state.loggedUser.profile === PROFILE.administrator.slug,
+              showAction: state.loggedUser.profile === PROFILE.administrator.slug && state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
               disabled: false,
               separatorLine: true,
               dataCy: 'popinListItem__permanentlyDelete'
@@ -1348,11 +1348,12 @@ export class File extends React.Component {
         {state.showPermanentlyDeletePopup && (
           <ConfirmPopup
             customColor={props.customColor}
-            confirmLabel={props.t('Permanently delete')}
-            confirmIcon='far fa-trash-alt iconbutton__icon'
+            confirmLabel={props.t('Yes, delete permanently')}
+            confirmIcon='fas fa-exclamation-triangle'
             onConfirm={this.handleClickValidatePermanentlyDeleteButton}
             onCancel={this.handleClickPermanentlyDeleteButton}
-            msg={props.t('This content will be deleted permanently and won\'t be restorable')}
+            msg={props.t('Warning: this operation cannot be rolled back')}
+            titleLabel={props.t('Permanently delete')}
           />
         )}
       </PopinFixed>

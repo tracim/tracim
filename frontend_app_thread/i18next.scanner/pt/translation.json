@@ -16,5 +16,6 @@
   "Copy news link": "Copiar ligação do conteúdo",
   "Turn into content": "",
   "Permanently delete": "",
-  "This content will be deleted permanently and won't be restorable": ""
+  "Yes, delete permanently": "",
+  "Warning: this operation cannot be rolled back": ""
 }

@@ -66,5 +66,6 @@
   "The link has been copied to clipboard": "Lien copié dans le presse-papiers",
   "Copy content link": "Copier le lien du contenu",
   "Permanently delete": "Supprimer définitivement",
-  "This content will be deleted permanently and won't be restorable": "Ce contenu sera supprimé définitivement et ne pourra pas être restauré"
+  "Yes, delete permanently": "Oui, supprimer définitivement",
+  "Warning: this operation cannot be rolled back": "Attention : cette opération ne peut pas être annulée"
 }

@@ -66,5 +66,6 @@
   "The link has been copied to clipboard": "Enlace copiado en el portapapeles",
   "Copy content link": "Copiar enlace al contenido",
   "Permanently delete": "",
-  "This content will be deleted permanently and won't be restorable": ""
+  "Yes, delete permanently": "",
+  "Warning: this operation cannot be rolled back": ""
 }

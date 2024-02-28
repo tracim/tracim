@@ -66,5 +66,6 @@
   "The link has been copied to clipboard": "تم نسخ الرابط إلى الحافظة",
   "Copy content link": "نسخ رابط المحتوى",
   "Permanently delete": "",
-  "This content will be deleted permanently and won't be restorable": ""
+  "Yes, delete permanently": "",
+  "Warning: this operation cannot be rolled back": ""
 }
