@@ -1,12 +1,23 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
+import { format } from "date-fns";
 import {
   DateInput,
   IconButton,
   TextInput,
   TinyEditor
 } from 'tracim_frontend_lib'
+
+// NOTE - M.L. - 2024-02-28 - This function is required due to the very specific format requested
+//  by the 'datetime-local' input type
+function toDatetimeLocal (date) {
+  return format(new Date(date), "yyyy-MM-dd'T'hh:mm:ss")
+}
+
+function getCurrentDateTime () {
+  return format(new Date(), "yyyy-MM-dd'T'hh:mm:ss")
+}
 
 function LogbookEntryEditor (props) {
   const { entry } = props
@@ -16,12 +27,6 @@ function LogbookEntryEditor (props) {
   const [bgColor, setBgColor] = useState(entry.bgColor || '#e8e8e8')
   const [datetime, setDatetime] = useState(entry.datetime || getCurrentDateTime())
   const [freeInput, setFreeInput] = useState(entry.freeInput || '')
-
-  // NOTE - M.L. - 2024-02-28 - This function is required due to the very specific format requested
-  //  by the 'datetime-local' input type
-  function getCurrentDateTime () {
-    return new Date().toISOString().replaceAll('Z', '')
-  }
 
   function handleValidate (e) {
     e.preventDefault()
@@ -33,7 +38,7 @@ function LogbookEntryEditor (props) {
       title,
       description: descriptionText,
       bgColor,
-      datetime,
+      datetime: new Date(datetime),
       freeInput
     })
   }
@@ -86,7 +91,7 @@ function LogbookEntryEditor (props) {
             id='logbook__LogbookPopup__datetime'
             onChange={(e) => setDatetime(e.target.value)}
             onValidate={handleValidate}
-            value={datetime}
+            value={toDatetimeLocal(datetime)}
             type='datetime-local'
             step={1}
           />
