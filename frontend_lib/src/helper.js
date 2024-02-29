@@ -535,7 +535,9 @@ export const CONTENT_TYPE = {
   FOLDER: 'folder',
   COMMENT: 'comment',
   KANBAN: 'kanban',
-  TODO: 'todo'
+  TODO: 'todo',
+  LOGBOOK: 'logbook',
+  LOGBOOK_ENTRY: 'logbook-entry'
 }
 
 export const CONTENT_NAMESPACE = {

@@ -271,5 +271,8 @@
   "moved": "moved",
   "copied": "copied",
   "unknown": "unknown",
-  "UnknownRole": "Unknown Role"
+  "UnknownRole": "Unknown Role",
+  "Error while deleting the content": "Error while deleting the content",
+  "The content has been deleted": "The content has been deleted",
+  "Error while changing content type": "Error while changing content type"
 }

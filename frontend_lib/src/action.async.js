@@ -60,6 +60,16 @@ export const getFileChildContent = (apiUrl, workspaceId, contentId, pageToken = 
   return baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents?${queryParam}`)
 }
 
+export const getLogbookChildEntries = (apiUrl, workspaceId, contentId, pageToken = '', count = 0, sort = 'created:asc') => {
+  const queryParam = (
+    `parent_ids=${contentId}` +
+    '&content_type=logbook-entry' +
+    `&namespaces_filter=${CONTENT_NAMESPACE.CONTENT},${CONTENT_NAMESPACE.PUBLICATION}` +
+    `&page_token=${pageToken}&count=${count}&sort=${sort}`
+  )
+  return baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents?${queryParam}`)
+}
+
 export const postToDo = (apiUrl, workspaceId, contentId, assignedUserId, toDo) =>
   baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/todos`, {
     assignee_id: assignedUserId,
@@ -240,6 +250,10 @@ export const postContentToFavoriteList = (apiUrl, userId, contentId) => {
 
 export const deleteContentFromFavoriteList = (apiUrl, userId, contentId) => {
   return baseFetch('DELETE', `${apiUrl}/users/${userId}/favorite-contents/${contentId}`)
+}
+
+export const deleteContentPermanently = (apiUrl, workspaceId, contentId) => {
+  return baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/permanently`)
 }
 
 export const getGenericWorkspaceContent = (apiUrl, workspaceId, contentId) =>

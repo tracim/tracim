@@ -45,5 +45,8 @@
   "The link has been copied to clipboard": "Link copied to clipboard",
   "Copy content link": "Copy content link",
   "Description of the card": "Description of the card",
-  "Open field:": "Open field:"
+  "Open field:": "Open field:",
+  "Permanently delete": "Permanently delete",
+  "Yes, delete permanently": "Yes, delete permanently",
+  "Warning: this operation cannot be rolled back": "Warning: this operation cannot be rolled back"
 }

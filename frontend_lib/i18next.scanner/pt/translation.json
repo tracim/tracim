@@ -271,5 +271,8 @@
   "moved": "Movido",
   "copied": "Copiado",
   "unknown": "Desconhecido",
-  "UnknownRole": "Função desconhecida"
+  "UnknownRole": "Função desconhecida",
+  "Error while deleting the content": "",
+  "The content has been deleted": "",
+  "Error while changing content type": ""
 }
