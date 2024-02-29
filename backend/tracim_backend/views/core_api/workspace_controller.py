@@ -936,6 +936,7 @@ class WorkspaceController(Controller):
         """
         Delete a content permanently. This route is for administrators.
         """
+        # INFO - F.S - 2024-02-29 - With sqlite if the content deleted is the last created, the next content created will have the same id
         app_config = request.registry.settings["CFG"]  # type: CFG
         session = request.dbsession
         path_data = hapic_data.path
