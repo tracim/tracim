@@ -25,7 +25,7 @@ function LogbookEntryEditor (props) {
   const [title, setTitle] = useState(entry.title || '')
   const [description, setDescription] = useState(entry.description || '')
   const [bgColor, setBgColor] = useState(entry.bgColor || '#e8e8e8')
-  const [datetime, setDatetime] = useState(entry.datetime || getCurrentDateTime())
+  const [datetime, setDatetime] = useState((entry.datetime && toDatetimeLocal(entry.datetime)) || getCurrentDateTime())
   const [freeInput, setFreeInput] = useState(entry.freeInput || '')
 
   function handleValidate (e) {
@@ -91,7 +91,7 @@ function LogbookEntryEditor (props) {
             id='logbook__LogbookPopup__datetime'
             onChange={(e) => setDatetime(e.target.value)}
             onValidate={handleValidate}
-            value={toDatetimeLocal(datetime)}
+            value={datetime}
             type='datetime-local'
             step={1}
           />
