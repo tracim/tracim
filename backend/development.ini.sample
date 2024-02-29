@@ -82,6 +82,7 @@ basic_setup.session_secret = change_this_value_please!
 #   which is editable through Tracim.
 # - contents/folder -> allow to put content into folder.
 # - contents/kanban -> allow to work with kanban-styled boards. It requires content/file to be enabled.
+# - contents/logbook -> allow to create a logbook with time specific entries. It requires content/file to be enabled.
 # - contents/todo -> allow to use todos on contents
 # - agenda -> add caldav agenda feature (specific process need to be started)
 # - collaborative_document_edition -> add support for collaborative document edition,
@@ -90,7 +91,7 @@ basic_setup.session_secret = change_this_value_please!
 # - upload_permission -> allow external with permission to upload some file in a space.
 # - gallery -> add gallery app in Tracim
 # default app.enabled config explicit list config:
-; app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,contents/kanban,contents/todo,agenda,share_content,upload_permission,gallery
+; app.enabled = contents/logbook,contents/thread,contents/file,contents/html-document,contents/folder,contents/kanban,contents/todo,agenda,share_content,upload_permission,gallery
 # With all apps (add collaborative document edition):
 # app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,contents/kanban,contents/todo,agenda,collaborative_document_edition,share_content,upload_permission,gallery
 
