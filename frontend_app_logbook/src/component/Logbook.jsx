@@ -94,24 +94,29 @@ export class Logbook extends React.Component {
     this.setState({ logbookState: LOGBOOK_STATE.LOADING })
     const { props } = this
 
-    const fetchRawFileContent = await handleFetchResult(
-      await getRawFileContent(
-        props.config.apiUrl,
-        props.content.workspace_id,
-        props.content.content_id,
-        props.content.current_revision_id,
-        props.content.label + LOGBOOK_FILE_EXTENSION
-      ),
-      true
-    )
+    try {
+      const fetchRawFileContent = await handleFetchResult(
+        await getRawFileContent(
+          props.config.apiUrl,
+          props.content.workspace_id,
+          props.content.content_id,
+          props.content.current_revision_id,
+          props.content.label + LOGBOOK_FILE_EXTENSION
+        ),
+        true
+      )
 
-    if (fetchRawFileContent.apiResponse.ok && fetchRawFileContent.body.entries) {
-      this.setState({
-        logbookState: LOGBOOK_STATE.LOADED,
-        logbookInitiallyLoaded: true,
-        logbook: fetchRawFileContent.body
-      })
-    } else {
+      if (fetchRawFileContent.apiResponse.ok && fetchRawFileContent.body.entries) {
+        this.setState({
+          logbookState: LOGBOOK_STATE.LOADED,
+          logbookInitiallyLoaded: true,
+          logbook: fetchRawFileContent.body
+        })
+      } else {
+        this.setState({ logbookState: LOGBOOK_STATE.ERROR })
+      }
+    } catch (e) {
+      console.error(e)
       this.setState({ logbookState: LOGBOOK_STATE.ERROR })
     }
   }
@@ -159,6 +164,7 @@ export class Logbook extends React.Component {
     const { props } = this
     const sortedLogbook = newLogbook
     sortedLogbook.entries = newLogbook.entries.toSorted((a, b) => new Date(b.datetime) - new Date(a.datetime))
+
     const fetchResultSaveLogbook = await handleFetchResult(
       await putRawFileContent(
         props.config.apiUrl,
