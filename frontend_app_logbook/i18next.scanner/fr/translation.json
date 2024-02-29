@@ -37,5 +37,7 @@
   "Logbook's name": "Nom du journal",
   "New Logbook": "Nouveau journal",
   "Delete entry": "Supprimer l'entrée",
-  "Date and time:": "Date et heure"
+  "Date and time:": "Date et heure",
+  "Invalid date": "Date invalide",
+  "New Logbook board": ""
 }
