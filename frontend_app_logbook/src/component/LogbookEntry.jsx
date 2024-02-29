@@ -5,7 +5,6 @@ import {
   formatAbsoluteDate,
   Icon,
   IconButton,
-  sendGlobalFlashMessage
 } from 'tracim_frontend_lib'
 
 const LogbookEntry = (props) => {
@@ -14,7 +13,6 @@ const LogbookEntry = (props) => {
       return formatAbsoluteDate(new Date(props.entry.datetime), props.language, 'PPpp')
     } catch (e) {
       console.error(e)
-      sendGlobalFlashMessage(props.t('Invalid date'))
       return ""
     }
   }
@@ -45,7 +43,7 @@ const LogbookEntry = (props) => {
               customClass='logbook__timeline__entries__entry__data__header__date__icon'
               icon='far fa-clock'
             />
-            {formatAbsoluteDate(new Date(props.entry.datetime), props.language, 'PPpp')}
+            {formatDate()}
           </span>
         </div>
         <div
