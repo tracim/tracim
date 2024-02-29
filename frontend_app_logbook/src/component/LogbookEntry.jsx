@@ -4,10 +4,21 @@ import { translate } from 'react-i18next'
 import {
   formatAbsoluteDate,
   Icon,
-  IconButton
+  IconButton,
+  sendGlobalFlashMessage
 } from 'tracim_frontend_lib'
 
 const LogbookEntry = (props) => {
+  function formatDate () {
+    try {
+      return formatAbsoluteDate(new Date(props.entry.datetime), props.language, 'PPpp')
+    } catch (e) {
+      console.error(e)
+      sendGlobalFlashMessage(props.t('Invalid date'))
+      return ""
+    }
+  }
+
   return (
     <div
       className='logbook__timeline__entries__entry'

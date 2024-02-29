@@ -6,7 +6,8 @@ import {
   DateInput,
   IconButton,
   TextInput,
-  TinyEditor
+  TinyEditor,
+  sendGlobalFlashMessage
 } from 'tracim_frontend_lib'
 
 // NOTE - M.L. - 2024-02-28 - This function is required due to the very specific format requested
@@ -32,13 +33,17 @@ function LogbookEntryEditor (props) {
     e.preventDefault()
 
     const descriptionText = description.target ? description.target.value : description
-
+    const newDate = new Date(datetime)
+    if (isNaN(newDate)) {
+      sendGlobalFlashMessage(props.t('Invalid date'))
+      return
+    }
     props.onValidate({
       ...entry,
       title,
       description: descriptionText,
       bgColor,
-      datetime: new Date(datetime),
+      datetime: newDate,
       freeInput
     })
   }
