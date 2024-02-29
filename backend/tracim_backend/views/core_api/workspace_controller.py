@@ -33,7 +33,6 @@ from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import can_create_content
-from tracim_backend.lib.utils.authorization import can_delete_content_permanently
 from tracim_backend.lib.utils.authorization import can_delete_workspace
 from tracim_backend.lib.utils.authorization import can_leave_workspace
 from tracim_backend.lib.utils.authorization import can_modify_workspace
@@ -46,6 +45,7 @@ from tracim_backend.lib.utils.authorization import is_content_manager
 from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
 from tracim_backend.lib.utils.authorization import is_trusted_user
+from tracim_backend.lib.utils.authorization import is_workspace_manager
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.lib.utils.utils import password_generator
@@ -929,7 +929,7 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_TRASH_AND_RESTORE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
-    @check_right(can_delete_content_permanently)
+    @check_right(is_workspace_manager)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def delete_content_permanently(self, context, request: TracimRequest, hapic_data=None):

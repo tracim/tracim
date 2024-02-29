@@ -975,7 +975,7 @@ export class HtmlDocument extends React.Component {
               icon: 'fas fa-exclamation-triangle',
               label: props.t('Permanently delete'),
               onClick: this.handleClickPermanentlyDeleteButton,
-              showAction: state.loggedUser.profile === PROFILE.administrator.slug && state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.workspaceManager.id,
               disabled: false,
               separatorLine: true,
               dataCy: 'popinListItem__permanentlyDelete'
