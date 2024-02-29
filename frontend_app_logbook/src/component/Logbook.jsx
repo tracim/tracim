@@ -157,14 +157,14 @@ export class Logbook extends React.Component {
 
   async save (newLogbook) {
     const { props } = this
-    newLogbook.entries.toSorted((a, b) => new Date(b.datetime) - new Date(a.datetime))
+    const sortedLogbook = newLogbook.entries.toSorted((a, b) => new Date(b.datetime) - new Date(a.datetime))
     const fetchResultSaveLogbook = await handleFetchResult(
       await putRawFileContent(
         props.config.apiUrl,
         props.content.workspace_id,
         props.content.content_id,
         props.content.label + LOGBOOK_FILE_EXTENSION,
-        JSON.stringify(newLogbook),
+        JSON.stringify(sortedLogbook),
         LOGBOOK_MIME_TYPE
       )
     )
