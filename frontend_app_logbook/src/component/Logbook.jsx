@@ -113,6 +113,7 @@ export class Logbook extends React.Component {
           logbook: fetchRawFileContent.body
         })
       } else {
+        console.error(fetchRawFileContent)
         this.setState({ logbookState: LOGBOOK_STATE.ERROR })
       }
     } catch (e) {
