@@ -14,5 +14,8 @@
   "The link has been copied to clipboard": "Lien copié dans le presse-papiers",
   "Copy content link": "Copier le lien du contenu",
   "Copy news link": "Copier le lien de l'actualité",
-  "Turn into content": "Transformer en contenu"
+  "Turn into content": "Transformer en contenu",
+  "Permanently delete": "Supprimer définitivement",
+  "Yes, delete permanently": "Oui, supprimer définitivement",
+  "Warning: this operation cannot be rolled back": "Attention : cette opération ne peut pas être annulée"
 }

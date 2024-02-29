@@ -35,5 +35,8 @@
   "The link has been copied to clipboard": "تم نسخ الرابط إلى الحافظة",
   "Copy content link": "نسخ رابط المحتوى",
   "Cancel": "",
-  "Validate": ""
+  "Validate": "",
+  "Permanently delete": "",
+  "Yes, delete permanently": "",
+  "Warning: this operation cannot be rolled back": ""
 }

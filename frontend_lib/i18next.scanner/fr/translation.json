@@ -1,10 +1,4 @@
 {
-  "{{count}} files selected_0": "{{count}} fichier sélectionné",
-  "{{count}} files selected_1": "{{count}} fichiers sélectionnés",
-  "{{count}} files selected_2": "{{count}} fichiers sélectionnés",
-  "{{count}} tasks performed on {{numberOfTasks}}_0": "{{count}} tâche effectuée sur {{numberOfTasks}}",
-  "{{count}} tasks performed on {{numberOfTasks}}_1": "{{count}} tâches effectuées sur {{numberOfTasks}}",
-  "{{count}} tasks performed on {{numberOfTasks}}_2": "{{count}} tâches effectuées sur {{numberOfTasks}}",
   "{{user}}'s profile": "Profil de {{user}}",
   "Add": "Ajouter",
   "Add a tag here...": "Ajouter une étiquette ici…",
@@ -273,5 +267,12 @@
   "moved": "déplacé",
   "copied": "copié",
   "unknown": "inconnu",
-  "UnknownRole": "RôleInconnu"
+  "UnknownRole": "RôleInconnu",
+  "{{count}} tasks performed on {{numberOfTasks}}": "{{count}} tâche effectuée sur {{numberOfTasks}}",
+  "{{count}} tasks performed on {{numberOfTasks}}_plural": "{{count}} tâches effectuées sur {{numberOfTasks}}",
+  "{{count}} files selected": "{{count}} fichier sélectionné",
+  "{{count}} files selected_plural": "{{count}} fichiers sélectionnés",
+  "Error while deleting the content": "Erreur lors de la suppression du contenu",
+  "The content has been deleted": "Le contenu a été supprimé",
+  "Error while changing content type": "Erreur lors du changement de type de contenu"
 }

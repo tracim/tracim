@@ -45,5 +45,8 @@
   "The link has been copied to clipboard": "Link in die Zwischenablage kopiert",
   "Copy content link": "Link zum Inhalt kopieren",
   "Description of the card": "Beschreibung der Karte",
-  "Open field:": ""
+  "Open field:": "",
+  "Permanently delete": "",
+  "Yes, delete permanently": "",
+  "Warning: this operation cannot be rolled back": ""
 }

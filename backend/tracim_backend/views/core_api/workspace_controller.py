@@ -26,6 +26,7 @@ from tracim_backend.exceptions import UserRoleNotFound
 from tracim_backend.exceptions import WorkspaceFeatureDisabled
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.extensions import hapic
+from tracim_backend.lib.cleanup.cleanup import CleanupLib
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.subscription import SubscriptionLib
 from tracim_backend.lib.core.user import UserApi
@@ -44,6 +45,7 @@ from tracim_backend.lib.utils.authorization import is_content_manager
 from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
 from tracim_backend.lib.utils.authorization import is_trusted_user
+from tracim_backend.lib.utils.authorization import is_workspace_manager
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.lib.utils.utils import password_generator
@@ -59,6 +61,7 @@ from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import WorkspaceSubscription
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.roles import WorkspaceRoles
+from tracim_backend.models.tracim_session import unprotected_content_revision
 from tracim_backend.models.utils import get_sort_expression
 from tracim_backend.views import BASE_API
 from tracim_backend.views.controllers import Controller
@@ -924,6 +927,45 @@ class WorkspaceController(Controller):
         )
         return api.get_templates(user=user, template_type=hapic_data.query["type"])
 
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_TRASH_AND_RESTORE_ENDPOINTS])
+    @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
+    @check_right(is_workspace_manager)
+    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def delete_content_permanently(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Delete a content permanently. This route is for administrators.
+        """
+        # INFO - F.S - 2024-02-29 - With sqlite if the content deleted is the last created, the next content created will have the same id
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        session = request.dbsession
+        path_data = hapic_data.path
+
+        api = ContentApi(
+            config=app_config, session=session, current_user=request.current_user, show_deleted=True
+        )
+
+        content = api.get_one(path_data.content_id, content_type=ContentTypeSlug.ANY.value)
+
+        if session.bind.dialect.name == "sqlite":
+            session.execute("PRAGMA foreign_keys=ON")
+
+        cleanup_lib = CleanupLib(session, app_config)
+
+        cleanup_lib.soft_delete_content(content)
+        session.flush()
+        session.expire_all()
+
+        with unprotected_content_revision(session) as session:
+            cleanup_lib_unprotected = CleanupLib(session, app_config)
+            cleanup_lib_unprotected.delete_content(content)
+            session.flush()
+
+        if session.bind.dialect.name == "sqlite":
+            session.execute("PRAGMA foreign_keys=OFF")
+
+        return
+
     def bind(self, configurator: Configurator) -> None:
         """
         Create all routes and views using
@@ -1125,4 +1167,14 @@ class WorkspaceController(Controller):
         )
         configurator.add_view(
             self.get_workspace_content_path, route_name="get_workspace_content_path"
+        )
+
+        # Permanent delete
+        configurator.add_route(
+            "delete_content_permanently",
+            "/workspaces/{workspace_id}/contents/{content_id}/permanently",
+            request_method="DELETE",
+        )
+        configurator.add_view(
+            self.delete_content_permanently, route_name="delete_content_permanently"
         )

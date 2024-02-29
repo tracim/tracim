@@ -45,5 +45,8 @@
   "Error, the space exceed its maximum size": "Rommet er nå større enn det som tillates",
   "Title:": "Navn:",
   "Description of the card": "",
-  "Open field:": ""
+  "Open field:": "",
+  "Permanently delete": "",
+  "Yes, delete permanently": "",
+  "Warning: this operation cannot be rolled back": ""
 }
