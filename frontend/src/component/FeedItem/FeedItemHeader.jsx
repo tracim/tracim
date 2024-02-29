@@ -167,9 +167,9 @@ export class FeedItemHeader extends React.Component {
                 customClass='feedItemHeader__actionMenu__item'
                 disabled={props.content.is_archived || props.content.is_deleted}
                 icon='far fa-comments'
-                text={props.t('Turn into content')}
-                textMobile={props.t('Turn into content')}
-                label={props.t('Turn into content')}
+                text={props.t('Turn into thread')}
+                textMobile={props.t('Turn into thread')}
+                label={props.t('Turn into thread')}
                 key={`content-type-${contentId}`}
                 onClick={props.onClickChangeContentType}
                 dataCy='popinListItem__content_type'
