@@ -4,7 +4,7 @@ import { translate } from 'react-i18next'
 import {
   formatAbsoluteDate,
   Icon,
-  IconButton,
+  IconButton
 } from 'tracim_frontend_lib'
 
 const LogbookEntry = (props) => {
@@ -13,7 +13,7 @@ const LogbookEntry = (props) => {
       return formatAbsoluteDate(new Date(props.entry.datetime), props.language, 'PPpp')
     } catch (e) {
       console.error(e)
-      return ""
+      return ''
     }
   }
 
