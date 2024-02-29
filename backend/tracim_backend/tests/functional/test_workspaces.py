@@ -6417,6 +6417,62 @@ class TestWorkspaceContentsWithFixture(object):
         assert [content for content in new_active_contents if content["content_id"] == 13]
         assert not [content for content in new_archived_contents if content["content_id"] == 13]
 
+    def test_api__delete_permanently_content_file__ok_200__nominal_case(self, web_testapp) -> None:
+        """
+        delete content permanently
+        delete permanently file Apple_pie ( content_id: 8 )
+        """
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        params = {
+            "parent_ids": 3,
+            "show_archived": 1,
+            "show_deleted": 1,
+            "show_active": 1,
+        }
+        active_contents = web_testapp.get(
+            "/api/workspaces/2/contents", params=params, status=200
+        ).json_body["items"]
+        assert [content for content in active_contents if content["content_id"] == 8]
+
+        web_testapp.delete("/api/workspaces/2/contents/8/permanently", status=204)
+
+        active_contents = web_testapp.get(
+            "/api/workspaces/2/contents", params=params, status=200
+        ).json_body["items"]
+        assert not [content for content in active_contents if content["content_id"] == 8]
+
+    def test_api__delete_permanently_content__err_403__try_to_delete_as_content_manager(
+        self, web_testapp
+    ) -> None:
+        """
+        delete content permanently
+        delete permanently thread Best Cake ( content_id: 7 )
+        """
+        web_testapp.authorization = (
+            "Basic",
+            ("bob@fsf.local", "foobarbaz"),
+        )
+        params = {
+            "parent_ids": 3,
+            "show_archived": 1,
+            "show_deleted": 1,
+            "show_active": 1,
+        }
+        active_contents = web_testapp.get(
+            "/api/workspaces/2/contents", params=params, status=200
+        ).json_body["items"]
+        assert [content for content in active_contents if content["content_id"] == 7]
+
+        web_testapp.delete("/api/workspaces/2/contents/7/permanently", status=403)
+
+        active_contents = web_testapp.get(
+            "/api/workspaces/2/contents", params=params, status=200
+        ).json_body["items"]
+        assert [content for content in active_contents if content["content_id"] == 7]
+
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)

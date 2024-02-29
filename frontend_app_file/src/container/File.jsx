@@ -35,7 +35,6 @@ import {
   buildHeadTitle,
   ROLE,
   ROLE_LIST,
-  PROFILE,
   APP_FEATURE_MODE,
   computeProgressionPercentage,
   FILE_PREVIEW_STATE,

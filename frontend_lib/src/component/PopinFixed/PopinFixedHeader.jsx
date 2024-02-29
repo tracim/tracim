@@ -256,7 +256,7 @@ export const PopinFixedHeader = (props) => {
                 label={action.label}
                 key={action.label}
                 onClick={action.onClick} // eslint-disable-line react/jsx-handler-names
-                customClass={action.separatorLine ? classnames('transparentButton', 'dropdownMenuSeparatorLine') : 'transparentButton'}
+                customClass={classnames('transparentButton', { dropdownMenuSeparatorLine: action.separatorLine })}
                 showAction={action.showAction}
                 dataCy={action.dataCy}
               />

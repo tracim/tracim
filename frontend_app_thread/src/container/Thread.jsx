@@ -27,7 +27,6 @@ import {
   sendGlobalFlashMessage,
   FAVORITE_STATE,
   ROLE,
-  PROFILE,
   COLORS,
   SelectStatus
 } from 'tracim_frontend_lib'
