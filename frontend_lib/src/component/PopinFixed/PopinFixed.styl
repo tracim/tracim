@@ -285,6 +285,23 @@ responsiveColumnStyle()
     & span
       display none
   .wsContentGeneric
+    &__header:has(input)
+      display list-item
+      height fit-content
+      .dropdown
+        display inline-block
+        height 24px
+    .kanban__contentpage__header:has(input)
+        padding-bottom 60px
+    .logbook__contentpage__header:has(input)
+        padding-bottom 60px
+    &__header__close
+      display inline-block
+      height 24px
+    &__header__reactions
+      display inline-block
+    &__header__titleWrapper:has(input)
+      display inherit
     &.sidebarVisible
       max-width 100%
     &__option
