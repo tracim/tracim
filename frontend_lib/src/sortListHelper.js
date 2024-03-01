@@ -1,6 +1,7 @@
 import {
   CONTENT_TYPE,
-  STATUSES
+  STATUSES,
+  stripEmojis
 } from './helper.js'
 import { isAfter } from 'date-fns'
 
@@ -162,8 +163,8 @@ const sortById = (list) => {
 
 const sortByLabel = (list, lang) => {
   return list.sort((a, b) => {
-    const aLabel = a.label || a.originalLabel
-    const bLabel = b.label || b.originalLabel
+    const aLabel = stripEmojis(a.label || a.originalLabel).trim()
+    const bLabel = stripEmojis(b.label || b.originalLabel).trim()
 
     return compareStrings(aLabel, bLabel, lang)
   })
