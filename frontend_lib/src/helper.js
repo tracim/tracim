@@ -536,7 +536,7 @@ export const CONTENT_TYPE = {
   COMMENT: 'comment',
   KANBAN: 'kanban',
   TODO: 'todo',
-  LOGBOOK: 'logbook',
+  LOGBOOK: 'logbook'
 }
 
 export const CONTENT_NAMESPACE = {
