@@ -246,7 +246,7 @@ requests==2.25.1
     #   pubcontrol
     #   tracim-backend (setup.py)
     #   webpreview
-rq==1.15.1
+rq==1.9.0
     # via tracim-backend (setup.py)
 six==1.16.0
     # via
