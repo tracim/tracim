@@ -4,10 +4,10 @@
 
 ### ✨ New Features
 
-- New Logbook content: A logbook is a type of content that features logbook entries. It displays these entries chronologically as a timeline, with an emphasis on the time and the order.
-- Added real delete of content for workspace manager
-- Added transformation from news into thread
-- The state of the sidebar is now saved in the browser
+- New content: Logbook. A logbook is a type of content that features logbook entries. These entries are displayed as a timeline, with an emphasis on the time and the order, most recent at the top.
+- Add possibility to really delete content, accessible to space managers.
+- Add functionality to transform news into thread
+- The cache of the browser used now saves the states of the navigation sidebar. Hidden sub-spaces will stay hidden.
 
 ### 🐛 Fixed Issues
 
