@@ -537,7 +537,6 @@ export const CONTENT_TYPE = {
   KANBAN: 'kanban',
   TODO: 'todo',
   LOGBOOK: 'logbook',
-  LOGBOOK_ENTRY: 'logbook-entry'
 }
 
 export const CONTENT_NAMESPACE = {
