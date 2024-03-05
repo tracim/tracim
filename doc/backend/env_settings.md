@@ -28,6 +28,7 @@ To update the list below you will need to:
 | TRACIM_API__KEY                                                           | api.key                                                        | API__KEY                                                           |
 | TRACIM_SESSION__TYPE                                                      | session.type                                                   | SESSION__TYPE                                                      |
 | TRACIM_SESSION__URL                                                       | session.url                                                    | SESSION__URL                                                       |
+| TRACIM_SESSION__URLS                                                      | session.urls                                                   | SESSION__URLS                                                      |
 | TRACIM_SESSION__DATA_DIR                                                  | session.data_dir                                               | SESSION__DATA_DIR                                                  |
 | TRACIM_SESSION__LOCK_DIR                                                  | session.lock_dir                                               | SESSION__LOCK_DIR                                                  |
 | TRACIM_SESSION__HTTPONLY                                                  | session.httponly                                               | SESSION__HTTPONLY                                                  |

@@ -446,6 +446,7 @@ class CFG(object):
         default_session_lock_dir = self.here_macro_replace("%(here)s/sessions_lock")
         self.SESSION__TYPE = self.get_raw_config("session.type", "file")
         self.SESSION__URL = self.get_raw_config("session.url")
+        self.SESSION__URLS = self.get_raw_config("session.urls")
         self.SESSION__DATA_DIR = self.get_raw_config("session.data_dir", default_session_data_dir)
         self.SESSION__LOCK_DIR = self.get_raw_config("session.lock_dir", default_session_lock_dir)
         self.SESSION__HTTPONLY = asbool(self.get_raw_config("session.httponly", "True"))
@@ -1153,6 +1154,14 @@ class CFG(object):
             )
             self.check_directory_path_param(
                 "SESSION__DATA_DIR", self.SESSION__DATA_DIR, writable=True
+            )
+        elif self.SESSION__TYPE in [
+            "ext:rediscluster"
+        ]:
+            self.check_mandatory_param(
+                "SESSION__URLS",
+                self.SESSION__URLS,
+                when_str="if session type is {}".format(self.SESSION__TYPE)
             )
         elif self.SESSION__TYPE in [
             "ext:database",
