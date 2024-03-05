@@ -1155,13 +1155,11 @@ class CFG(object):
             self.check_directory_path_param(
                 "SESSION__DATA_DIR", self.SESSION__DATA_DIR, writable=True
             )
-        elif self.SESSION__TYPE in [
-            "ext:rediscluster"
-        ]:
+        elif self.SESSION__TYPE in ["ext:rediscluster"]:
             self.check_mandatory_param(
                 "SESSION__URLS",
                 self.SESSION__URLS,
-                when_str="if session type is {}".format(self.SESSION__TYPE)
+                when_str="if session type is {}".format(self.SESSION__TYPE),
             )
         elif self.SESSION__TYPE in [
             "ext:database",
