@@ -104,6 +104,13 @@ const kanbanDeTranslation = require('../../dist/app/kanban_de_translation.json')
 const kanbanArTranslation = require('../../dist/app/kanban_ar_translation.json')
 const kanbanEsTranslation = require('../../dist/app/kanban_es_translation.json')
 const kanbanNbNOTranslation = require('../../dist/app/kanban_nb_NO_translation.json')
+const logbookEnTranslation = require('../../dist/app/logbook_en_translation.json')
+const logbookFrTranslation = require('../../dist/app/logbook_fr_translation.json')
+const logbookPtTranslation = require('../../dist/app/logbook_pt_translation.json')
+const logbookDeTranslation = require('../../dist/app/logbook_de_translation.json')
+const logbookArTranslation = require('../../dist/app/logbook_ar_translation.json')
+const logbookEsTranslation = require('../../dist/app/logbook_es_translation.json')
+const logbookNbNOTranslation = require('../../dist/app/logbook_nb_NO_translation.json')
 
 i18n
   .use(reactI18nextModule)
@@ -132,7 +139,8 @@ i18n
           ...collaborativeDocumentEditionEnTranslation,
           ...shareFolderEnTranslation, // share folder
           ...galleryEnTranslation, // gallery
-          ...kanbanEnTranslation // kanban
+          ...kanbanEnTranslation, // kanban
+          ...logbookEnTranslation // logbook
         }
       },
       fr: {
@@ -150,7 +158,8 @@ i18n
           ...collaborativeDocumentEditionFrTranslation,
           ...shareFolderFrTranslation, // share folder
           ...galleryFrTranslation, // gallery
-          ...kanbanFrTranslation // kanban
+          ...kanbanFrTranslation, // kanban
+          ...logbookFrTranslation // logbook
         }
       },
       pt: {
@@ -168,7 +177,8 @@ i18n
           ...collaborativeDocumentEditionPtTranslation,
           ...shareFolderPtTranslation, // share folder
           ...galleryPtTranslation, // gallery
-          ...kanbanPtTranslation // kanban
+          ...kanbanPtTranslation, // kanban
+          ...logbookPtTranslation // logbook
         }
       },
       de: {
@@ -186,7 +196,8 @@ i18n
           ...collaborativeDocumentEditionDeTranslation,
           ...shareFolderDeTranslation, // share folder
           ...galleryDeTranslation, // gallery
-          ...kanbanDeTranslation // kanban
+          ...kanbanDeTranslation, // kanban
+          ...logbookDeTranslation // logbook
         }
       },
       ar: {
@@ -204,7 +215,8 @@ i18n
           ...collaborativeDocumentEditionArTranslation,
           ...shareFolderArTranslation, // share folder
           ...galleryArTranslation, // gallery
-          ...kanbanArTranslation // kanban
+          ...kanbanArTranslation, // kanban
+          ...logbookArTranslation // logbook
         }
       },
       es: {
@@ -222,7 +234,8 @@ i18n
           ...collaborativeDocumentEditionEsTranslation,
           ...shareFolderEsTranslation, // share folder
           ...galleryEsTranslation, // gallery
-          ...kanbanEsTranslation // kanban
+          ...kanbanEsTranslation, // kanban
+          ...logbookEsTranslation // logbook
         }
       },
       nb_NO: {
@@ -240,7 +253,8 @@ i18n
           ...collaborativeDocumentEditionNbNOTranslation,
           ...shareFolderNbNOTranslation, // share folder
           ...galleryNbNOTranslation, // gallery
-          ...kanbanNbNOTranslation // kanban
+          ...kanbanNbNOTranslation, // kanban
+          ...logbookNbNOTranslation // logbook
         }
       }
     }
