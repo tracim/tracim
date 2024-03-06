@@ -243,8 +243,8 @@ export class Logbook extends React.Component {
             {changesAllowed && (
               <IconButton
                 customClass='logbook__new_button'
-                text={props.t('Create a new entry')}
-                textMobile={props.t('Create a new entry')}
+                text={props.t('Create an event')}
+                textMobile={props.t('Create an event')}
                 icon='fas fa-plus'
                 onClick={() => this.handleShowPopIn({})}
               />
@@ -270,7 +270,7 @@ export class Logbook extends React.Component {
                     </div>
                   </>
                 )
-                : (<h2>{props.t('No entry yet')}</h2>)}
+                : (<h2>{props.t('No event yet')}</h2>)}
             </div>
           </div>
           {state.showEditPopIn && (
@@ -278,7 +278,7 @@ export class Logbook extends React.Component {
               customClass={classnames('logbook__LogbookPopup', { hidden: state.logbookState !== LOGBOOK_STATE.LOADED })}
               customColor={props.config.hexcolor}
               faIcon='far fa-id-card'
-              label={state.entryToEdit.id ? props.t('Editing Entry') : props.t('New Entry')}
+              label={state.entryToEdit.id ? props.t('Editing event') : props.t('New event')}
               onClose={this.handleHidePopIn}
             >
               <LogbookEntryEditor

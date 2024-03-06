@@ -76,7 +76,7 @@ function LogbookEntryEditor (props) {
             language={props.language}
             maxHeight={300}
             minHeight={200}
-            placeholder={props.t('Description of the entry')}
+            placeholder={props.t('Description of the event')}
           />
         </div>
 
