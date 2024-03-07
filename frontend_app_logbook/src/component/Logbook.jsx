@@ -179,7 +179,7 @@ export class Logbook extends React.Component {
     if (!fetchResultSaveLogbook.ok) {
       switch (fetchResultSaveLogbook.body.code) {
         case 2044:
-          sendGlobalFlashMessage(props.t('You must change the status or restore this logbook logbook before any change'))
+          sendGlobalFlashMessage(props.t('You must change the status or restore this logbook before any change'))
           break
         default:
           sendGlobalFlashMessage(props.t('Error while saving the new version'))

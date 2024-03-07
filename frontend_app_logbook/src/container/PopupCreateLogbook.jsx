@@ -65,7 +65,7 @@ export class PopupCreateLogbook extends React.Component {
     if (state.config && state.config.workspace) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.SET_HEAD_TITLE,
-        data: { title: buildHeadTitle([props.t('New Logbook'), state.config.workspace.label]) }
+        data: { title: buildHeadTitle([props.t('New logbook'), state.config.workspace.label]) }
       })
     }
   }
@@ -164,7 +164,7 @@ export class PopupCreateLogbook extends React.Component {
         displayTemplateList
         faIcon={this.state.config.faIcon}
         inputPlaceholder={this.props.t("Logbook's name")}
-        label={this.props.t('New Logbook')}
+        label={this.props.t('New logbook')}
         onChangeContentName={this.handleChangeNewContentName}
         onChangeTemplate={this.handleChangeTemplate}
         onClose={this.handleClose}

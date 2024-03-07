@@ -39,7 +39,7 @@ const LogbookEntry = (props) => {
           </div>
           <span className='logbook__timeline__entries__entry__data__header__date'>
             <Icon
-              title={props.t('Time of entry')}
+              title={props.t('Time of event')}
               customClass='logbook__timeline__entries__entry__data__header__date__icon'
               icon='far fa-clock'
             />
