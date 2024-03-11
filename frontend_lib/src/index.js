@@ -65,6 +65,7 @@ import {
   setupCommonRequestHeaders,
   splitFilenameExtension,
   stringIncludes,
+  stripEmojis,
   updateTLMUser
 } from './helper.js'
 
@@ -506,6 +507,7 @@ export {
   sortWithFoldersAtListBeginning,
   splitFilenameExtension,
   stringIncludes,
+  stripEmojis,
   updateTLMUser,
   uploadFile
 }

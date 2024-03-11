@@ -924,6 +924,16 @@ export const stringIncludes = (a) => {
   }
 }
 
+// INFO - ML - 2024-03-01 - This excludes any character that is not of the unicode range of
+//  0020 (start of 'Basic Latin') to 1FFF (end of 'Greek Extended') or not of the unicode range of
+//  3040 (start of 'Hiragana') to DFFF (end of 'Low Surrogates') which are considered to be common characters
+//  /gu trailing indicator is to include unicode characters range
+//  Note that this might exclude some other common characters and does not remove ascii symbol characters
+//  See more at https://www.ling.upenn.edu/courses/Spring_2003/ling538/UnicodeRanges.html
+export const stripEmojis = (str) => {
+  return str.replace(/[^\u{0020}-\u{1FFF}\u{3040}-\u{DFFF}]/gu, '')
+}
+
 export const getRevisionTypeLabel = (revisionType, t) => {
   switch (revisionType) {
     case 'revision':
