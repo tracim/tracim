@@ -60,7 +60,7 @@ export class Logbook extends React.Component {
       currentContentRevisionId: param.content.current_revision_id,
       editionAuthor: '',
       externalTranslationList: [
-        props.t('Create a Logbook')
+        props.t('Create a logbook')
       ],
       fullscreen: false,
       invalidMentionList: [],
