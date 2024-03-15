@@ -165,7 +165,8 @@ export class Dashboard extends React.Component {
 
   loadNewRequestNumber = async () => {
     const { props } = this
-    const spaceMemberList = (props.workspaceList.find(workspace => workspace.id === props.currentWorkspace.id) || {}).memberList || []
+
+    const spaceMemberList = props.workspaceList.find(ws => ws.id === props.currentWorkspace.id)?.memberList || []
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(
       props.user.userId, spaceMemberList, ROLE_LIST
     )
@@ -532,7 +533,7 @@ export class Dashboard extends React.Component {
                 <div className='dashboard__workspace__rightMenu'>
                   <UserStatus
                     user={props.user}
-                    currentWorkspace={props.workspaceList.find(workspace => workspace.id === props.currentWorkspace.id)}
+                    currentWorkspace={props.workspaceList.find(ws => ws.id === props.currentWorkspace.id)}
                     displayNotifBtn={props.system.config.email_notification_activated}
                     displaySubscriptionRequestsInformation={
                       userRoleIdInWorkspace >= ROLE.workspaceManager.id &&
@@ -609,7 +610,7 @@ export class Dashboard extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, knownMemberList, contentType, appList, currentWorkspace, system }) => ({
-  breadcrumbs, user, knownMemberList, contentType, appList, currentWorkspace, system
+const mapStateToProps = ({ breadcrumbs, user, knownMemberList, contentType, appList, currentWorkspace, workspaceList, system }) => ({
+  breadcrumbs, user, knownMemberList, contentType, appList, currentWorkspace, workspaceList, system
 })
 export default connect(mapStateToProps)(withRouter(appFactory(translate()(TracimComponent(Dashboard)))))
