@@ -8,6 +8,7 @@
 - Add possibility to really delete content, accessible to space managers.
 - Add functionality to transform news into thread
 - The cache of the browser used now saves the states of the navigation sidebar. Hidden sub-spaces will stay hidden.
+- Spaces in sidebar are now sorted without considering emoji
 
 ### 🐛 Fixed Issues
 
