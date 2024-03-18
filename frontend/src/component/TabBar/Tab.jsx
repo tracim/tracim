@@ -12,6 +12,7 @@ export const Tab = props => {
       )}
       title={props.label}
       to={props.page}
+      dataCy={props.dataCy}
     >
       <i className={`fa-fw ${props.icon}`} />
       <span className='tab__label'>{props.label}</span>
@@ -24,9 +25,11 @@ export default withRouter(Tab)
 Tab.propTypes = {
   label: PropTypes.string.isRequired,
   page: PropTypes.string.isRequired,
-  icon: PropTypes.string
+  icon: PropTypes.string,
+  dataCy: PropTypes.string
 }
 
 Tab.defaultProps = {
-  icon: ''
+  icon: '',
+  dataCy: ''
 }

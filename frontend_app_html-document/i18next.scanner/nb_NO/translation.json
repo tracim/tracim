@@ -35,5 +35,8 @@
   "note": "notat",
   "Note's title": "Notatnavn",
   "Cancel": "",
-  "Validate": ""
+  "Validate": "",
+  "Permanently delete": "",
+  "Yes, delete permanently": "",
+  "Warning: this operation cannot be rolled back": ""
 }

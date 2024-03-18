@@ -31,7 +31,6 @@
   "New Kanban board": "Nuevo tablero Kanban",
   "Board's name": "Nombre del tablero",
   "Last version": "Última versión",
-  "Value:": "Valor:",
   "Add new column": "Añadir nueva columna",
   "Edit Column": "Editar columna",
   "New Column": "Nueva columna",
@@ -45,5 +44,9 @@
   "Tasks": "Tareas",
   "The link has been copied to clipboard": "Enlace copiado en el portapapeles",
   "Copy content link": "Copiar enlace al contenido",
-  "Description of the card": "Descripción de la tarjeta"
+  "Description of the card": "Descripción de la tarjeta",
+  "Open field:": "",
+  "Permanently delete": "",
+  "Yes, delete permanently": "",
+  "Warning: this operation cannot be rolled back": ""
 }

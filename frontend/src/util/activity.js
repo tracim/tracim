@@ -167,8 +167,13 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
   contentType = parentContentType || content.content_type
 
   // INFO - MP - 2022-10-21 - Override the kanban type since kanban are files
-  if (contentType === CONTENT_TYPE.KANBAN) contentType = CONTENT_TYPE.FILE
-
+  // INFO - ML - 2024-03-04 - Also override the logbook type since logbooks are files
+  if (
+    contentType === CONTENT_TYPE.KANBAN ||
+    contentType === CONTENT_TYPE.LOGBOOK
+  ) {
+    contentType = CONTENT_TYPE.FILE
+  }
   // INFO - SG - 2021-04-16
   // We have to get the parent content as comments shall produce an activity
   // for it and not for the comment.

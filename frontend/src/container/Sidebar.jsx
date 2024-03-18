@@ -35,16 +35,42 @@ import CustomToolboxContainer from '../component/CustomToolboxContainer.jsx'
 const qs = require('query-string')
 export const LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE = 'lockToggleSidebarWhenOpenedOnMobile'
 
+export const SIDEBAR_STATE_LOCAL_STORAGE_KEY = {
+  FOLDED_SPACE_LIST: 'foldedSpaceList',
+  SHOW_SPACE_LIST: 'showSpaceList',
+  SHOW_USER_ITEMS: 'showUserItems'
+}
+export const buildSidebarStateLocalStorageKey = userId => `sidebarState/${userId}`
+export const getSidebarStateLocalStorage = userId => JSON.parse(
+  window.localStorage.getItem(buildSidebarStateLocalStorageKey(userId))
+)
+export const setSidebarStateLocalStorage = (key, newValue, userId) => {
+  if (Object.values(SIDEBAR_STATE_LOCAL_STORAGE_KEY).includes(key) === false) {
+    console.error('setSidebarStateLocalStorage called with unknown key parameter')
+    return
+  }
+  const sidebarStateLocalStorage = getSidebarStateLocalStorage(userId)
+  const newSidebarStateLocalStorage = {
+    ...sidebarStateLocalStorage,
+    [key]: newValue
+  }
+  const localStorageKey = buildSidebarStateLocalStorageKey(userId)
+  window.localStorage.setItem(localStorageKey, JSON.stringify(newSidebarStateLocalStorage))
+}
+
 export class Sidebar extends React.Component {
   constructor (props) {
     super(props)
     this.frameRef = React.createRef()
+
+    const sidebarState = getSidebarStateLocalStorage(props.user.userId)
+
     this.state = {
       activeSpaceId: NO_ACTIVE_SPACE_ID,
-      foldedSpaceList: [],
+      foldedSpaceList: sidebarState?.[SIDEBAR_STATE_LOCAL_STORAGE_KEY.FOLDED_SPACE_LIST] ?? [],
       isSidebarClosed: isMobile,
-      showSpaceList: true,
-      showUserItems: false
+      showSpaceList: sidebarState?.[SIDEBAR_STATE_LOCAL_STORAGE_KEY.SHOW_SPACE_LIST] ?? true,
+      showUserItems: sidebarState?.[SIDEBAR_STATE_LOCAL_STORAGE_KEY.SHOW_USER_ITEMS] ?? false
     }
 
     props.registerCustomEventHandlerList([
@@ -77,12 +103,20 @@ export class Sidebar extends React.Component {
     props.history.push(PAGE.SEARCH_RESULT + '?' + qs.stringify(newUrlSearchObject, { encode: true }))
   }
 
-  handleToggleFoldChildren = (id) => {
-    const { state } = this
-    if (state.foldedSpaceList.find(spaceId => spaceId === id)) {
-      const newFoldedSpaceList = state.foldedSpaceList.filter(spaceId => spaceId !== id)
-      this.setState({ foldedSpaceList: newFoldedSpaceList })
-    } else this.setState(prev => ({ foldedSpaceList: [...prev.foldedSpaceList, id] }))
+  handleToggleFoldSpaceChildren = (spaceId) => {
+    this.setState(prevState => {
+      const isSpaceFolded = !!prevState.foldedSpaceList.find(sId => sId === spaceId)
+
+      const newFoldedSpaceList = isSpaceFolded
+        ? prevState.foldedSpaceList.filter(sId => sId !== spaceId)
+        : [...prevState.foldedSpaceList, spaceId]
+
+      setSidebarStateLocalStorage(
+        SIDEBAR_STATE_LOCAL_STORAGE_KEY.FOLDED_SPACE_LIST, newFoldedSpaceList, this.props.user.userId
+      )
+
+      return { foldedSpaceList: newFoldedSpaceList }
+    })
   }
 
   componentDidMount () {
@@ -150,13 +184,33 @@ export class Sidebar extends React.Component {
 
   handleOpenSidebar = () => this.setState({ isSidebarClosed: false })
 
-  handleClickOpenSpaceList = () => this.setState({ showSpaceList: true })
+  handleClickOpenSpaceList = () => {
+    setSidebarStateLocalStorage(
+      SIDEBAR_STATE_LOCAL_STORAGE_KEY.SHOW_SPACE_LIST, true, this.props.user.userId
+    )
+    this.setState({ showSpaceList: true })
+  }
 
-  handleClickOpenUserItems = () => this.setState({ showUserItems: true })
+  handleClickOpenUserItems = () => {
+    setSidebarStateLocalStorage(
+      SIDEBAR_STATE_LOCAL_STORAGE_KEY.SHOW_USER_ITEMS, true, this.props.user.userId
+    )
+    this.setState({ showUserItems: true })
+  }
 
-  handleClickToggleSpaceList = () => this.setState(previousState => ({ showSpaceList: !previousState.showSpaceList }))
+  handleClickToggleSpaceList = () => this.setState(previousState => {
+    setSidebarStateLocalStorage(
+      SIDEBAR_STATE_LOCAL_STORAGE_KEY.SHOW_SPACE_LIST, !previousState.showSpaceList, this.props.user.userId
+    )
+    return { showSpaceList: !previousState.showSpaceList }
+  })
 
-  handleClickToggleUserItems = () => this.setState(previousState => ({ showUserItems: !previousState.showUserItems }))
+  handleClickToggleUserItems = () => this.setState(previousState => {
+    setSidebarStateLocalStorage(
+      SIDEBAR_STATE_LOCAL_STORAGE_KEY.SHOW_USER_ITEMS, !previousState.showUserItems, this.props.user.userId
+    )
+    return { showUserItems: !previousState.showUserItems }
+  })
 
   handleClickLogout = () => {
     this.props.dispatch(logoutUser(this.props.history))
@@ -256,7 +310,7 @@ export class Sidebar extends React.Component {
           onClickNewSpace={this.handleClickNewSpace}
           onClickOpenSpaceList={this.handleClickOpenSpaceList}
           onClickToggleSpaceList={this.handleClickToggleSpaceList}
-          onToggleFoldChildren={this.handleToggleFoldChildren}
+          onToggleFoldChildren={this.handleToggleFoldSpaceChildren}
           showSpaceList={state.showSpaceList}
           spaceList={props.workspaceList}
           isSpaceListLoaded={props.isSpaceListLoaded}

@@ -1,5 +1,28 @@
 # Changelog
 
+## 4.9.0 / TBA
+
+### ✨ New Features
+
+- New content: Logbook. A logbook is a type of content that features logbook entries. These entries are displayed as a timeline, with an emphasis on the time and the order, most recent at the top.
+- Add possibility to really delete content, accessible to space managers.
+- Add functionality to transform news into thread
+- The cache of the browser used now saves the states of the navigation sidebar. Hidden sub-spaces will stay hidden.
+- Spaces in sidebar are now sorted without considering emoji
+
+### 🐛 Fixed Issues
+
+- Frontend:
+  - Improved responsiveness for workspace creation pop-in on small screen [#6358](https://github.com/tracim/tracim/issues/6358)
+  - Fixed filter input in notification wall overflow since last version of Firefox [#6375](https://github.com/tracim/tracim/issues/6375)
+  - Fixed kanban title with special characters [#5220](https://github.com/tracim/tracim/issues/5220)
+  - Renamed label "value" to "open field" in Kanban [#6354](https://github.com/tracim/tracim/issues/6354)
+  - Fixed real time issues with kanban [#6363](https://github.com/tracim/tracim/issues/6363)
+- Backend:
+  - Fixed LDAP auth issues [#6355](https://github.com/tracim/tracim/issues/6355)
+  - Fixed installation of SAML dependencies [#6365](https://github.com/tracim/tracim/issues/6365)
+  - Improved code quality [#6252](https://github.com/tracim/tracim/issues/6252)
+
 ## 4.8.0 / 2024-01-24
 
 ### ✨ New Features

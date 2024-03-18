@@ -5,6 +5,7 @@ This list is generated using:
 ```bash
 tracimcli dev parameters list --template "| {env_var_name: <74}| {config_file_name: <63}| {config_name: <67}|"
 ```
+⚠️ These are only Tracim environment variables. You can find more environment variables for docker start on the [tracim/tools_docker/README.md](https://github.com/tracim/tracim/blob/master/tools_docker/README.md) page ⚠️
 
 ⚠️ The generated list is based on your `development.ini` file. ⚠️
 

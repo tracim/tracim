@@ -65,6 +65,7 @@ import {
   setupCommonRequestHeaders,
   splitFilenameExtension,
   stringIncludes,
+  stripEmojis,
   updateTLMUser
 } from './helper.js'
 
@@ -207,6 +208,7 @@ import {
   getComment,
   getCommentTranslated,
   getContent,
+  getLogbookChildEntries,
   getContentComment,
   getContentPath,
   getContentTypeList,
@@ -436,6 +438,7 @@ export {
   getComment,
   getCommentTranslated,
   getContent,
+  getLogbookChildEntries,
   getContentComment,
   getContentPath,
   getContentTypeList,
@@ -504,6 +507,7 @@ export {
   sortWithFoldersAtListBeginning,
   splitFilenameExtension,
   stringIncludes,
+  stripEmojis,
   updateTLMUser,
   uploadFile
 }

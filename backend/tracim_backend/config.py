@@ -293,6 +293,7 @@ class CFG(object):
             "contents/html-document,"
             "contents/folder,"
             "contents/kanban,"
+            "contents/logbook,"
             "contents/todo,"
             "agenda,"
             "share_content,"
@@ -319,6 +320,7 @@ class CFG(object):
         # FIXME - G.M - 2020-01-27 - force specific order of apps
         # see issue https://github.com/tracim/tracim/issues/2326
         default_app_order = (
+            "contents/logbook",
             "contents/thread",
             "contents/file",
             "contents/html-document",

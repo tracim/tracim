@@ -44,6 +44,7 @@ import {
   deleteComment,
   deleteToDo,
   deleteContentFromFavoriteList,
+  deleteContentPermanently,
   getComment,
   getCommentTranslated,
   getContent,
@@ -65,7 +66,8 @@ import {
   putContentTemplate,
   putEditContent,
   putEditStatus,
-  putToDo
+  putToDo,
+  putChangeContentNamespace
 } from './action.async.js'
 
 import {
@@ -457,6 +459,21 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
+    appContentDeletePermanently = async (workspaceId, contentId, toCloseApp) => {
+      this.checkApiUrl()
+
+      const response = await handleFetchResult(await deleteContentPermanently(this.apiUrl, workspaceId, contentId))
+
+      if (response.status !== 204) {
+        sendGlobalFlashMessage(i18n.t('Error while deleting the content'))
+      } else {
+        sendGlobalFlashMessage(i18n.t('The content has been deleted'), '')
+        toCloseApp()
+      }
+
+      return response
+    }
+
     appContentSaveNewToDo = async (workspaceId, contentId, assignedUserId, toDo, setState) => {
       this.checkApiUrl()
       const response = await handleFetchResult(await postToDo(this.apiUrl, workspaceId, contentId, assignedUserId, toDo))
@@ -679,6 +696,54 @@ export function appContentFactory (WrappedComponent) {
           break
       }
 
+      return response
+    }
+
+    appContentChangeType = async (content, setState) => {
+      this.checkApiUrl()
+      // INFO - FS - 2024-02-15 - Depending on if the content comes from Publication or Thread the variable name are different
+      let contentId = content.id
+      let workspaceId = content.workspaceId
+      if (contentId === undefined) {
+        contentId = content.content_id
+        workspaceId = content.workspace_id
+      }
+      const response = await handleFetchResult(
+        await putChangeContentNamespace(this.apiUrl, workspaceId, contentId, 'content')
+      )
+      const status = response.ok ? response.status : response.apiResponse.status
+      switch (status) {
+        case 204:
+          setState({ mode: APP_FEATURE_MODE.VIEW })
+          break
+        case 400:
+          switch (response.body.code) {
+            case 3002:
+              sendGlobalFlashMessage(i18n.t('A content with the same name already exists'))
+              break
+            default:
+              GLOBAL_dispatchEvent({
+                type: CUSTOM_EVENT.ADD_FLASH_MSG,
+                data: {
+                  msg: i18n.t('Error while changing content type'),
+                  type: 'warning',
+                  delay: undefined
+                }
+              })
+              break
+          }
+          break
+        default:
+          GLOBAL_dispatchEvent({
+            type: CUSTOM_EVENT.ADD_FLASH_MSG,
+            data: {
+              msg: i18n.t('Error while changing content type'),
+              type: 'warning',
+              delay: undefined
+            }
+          })
+          break
+      }
       return response
     }
 
@@ -1110,7 +1175,9 @@ export function appContentFactory (WrappedComponent) {
           appContentCustomEventHandlerAllAppChangeLanguage={this.appContentCustomEventHandlerAllAppChangeLanguage}
           appContentChangeTitle={this.appContentChangeTitle}
           appContentChangeComment={this.appContentChangeComment}
+          appContentChangeType={this.appContentChangeType}
           appContentDeleteComment={this.appContentDeleteComment}
+          appContentDeletePermanently={this.appContentDeletePermanently}
           appContentDeleteToDo={this.appContentDeleteToDo}
           appContentEditComment={this.appContentEditComment}
           appContentMarkAsTemplate={this.appContentMarkAsTemplate}

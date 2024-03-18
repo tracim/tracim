@@ -59,6 +59,7 @@ function KanbanCardEditor (props) {
             isMentionEnabled={false}
             language={props.language}
             maxHeight={300}
+            userList={props.memberList}
             minHeight={200}
             placeholder={props.t('Description of the card')}
           />
@@ -85,7 +86,7 @@ function KanbanCardEditor (props) {
         </div>
 
         <div className='kanban__KanbanPopup__freeInput'>
-          <label htmlFor='kanban__KanbanPopup__freeInput'>{props.t('Value:')}</label>
+          <label htmlFor='kanban__KanbanPopup__freeInput'>{props.t('Open field:')}</label>
           <TextInput
             id='kanban__KanbanPopup__freeInput'
             onChange={(e) => setFreeInput(e.target.value)}
@@ -135,5 +136,6 @@ KanbanCardEditor.defaultProps = {
   codeLanguageList: [],
   customColor: '',
   focusOnDescription: false,
-  language: 'en'
+  language: 'en',
+  memberList: []
 }

@@ -44,6 +44,7 @@ export const TabBar = props => {
           page={PAGE.WORKSPACE.CONTENT_LIST(props.currentSpace.id)}
           icon='fas fa-fw fa-th'
           label={props.t('Contents')}
+          dataCy='tabBar__content_tab'
         />
       </div>
     </div>
