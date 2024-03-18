@@ -105,8 +105,7 @@ export const PopinFixedHeader = (props) => {
   const filteredHeaderButtons = headerButtons ? headerButtons.filter(action => action.showAction) : []
 
   return (
-    <div className={editTitle
-      ? classnames('wsContentGeneric__header', `${customClass}__header__isEditing`, 'wsContentGeneric__header__isEditing') : classnames('wsContentGeneric__header', `${customClass}__header`)}
+    <div className={classnames('wsContentGeneric__header', `${customClass}__header${editTitle ? '__isEditing' : ''}`, {'wsContentGeneric__header__isEditing': editTitle })}
     >
       <div className='wsContentGeneric__header__titleWithBreadcrumbs'>
         <div className='wsContentGeneric__header__titleWrapper'>
