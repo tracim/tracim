@@ -39,7 +39,7 @@ const LogbookEntry = (props) => {
           </div>
           <span className='logbook__timeline__entries__entry__data__header__date'>
             <Icon
-              title={props.t('Time of entry')}
+              title={props.t('Time of event')}
               customClass='logbook__timeline__entries__entry__data__header__date__icon'
               icon='far fa-clock'
             />
@@ -54,14 +54,14 @@ const LogbookEntry = (props) => {
           <div className='logbook__timeline__entries__entry__data__buttons'>
             <IconButton
               customClass='logbook__timeline__entries__entry__data__buttons__edit'
-              text={props.t('Edit entry')}
-              textMobile={props.t('Edit entry')}
+              text={props.t('Edit')}
+              textMobile={props.t('Edit')}
               icon='fa-fw fas fa-pencil-alt'
               onClick={() => props.onEditEntry(props.entry)}
             />
             <IconButton
               customClass='logbook__timeline__entries__entry__data__buttons__delete'
-              title={props.t('Delete entry')}
+              title={props.t('Delete')}
               icon='fa-fw far fa-trash-alt'
               onClick={() => props.onRemoveEntry(props.entry)}
             />
