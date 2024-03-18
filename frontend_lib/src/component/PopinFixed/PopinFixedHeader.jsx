@@ -106,7 +106,7 @@ export const PopinFixedHeader = (props) => {
 
   return (
     <div className={editTitle
-      ? classnames(classnames('wsContentGeneric__header', `${customClass}__header__isEditing`), 'wsContentGeneric__header__isEditing') : classnames('wsContentGeneric__header', `${customClass}__header`)}
+      ? classnames('wsContentGeneric__header', `${customClass}__header__isEditing`, 'wsContentGeneric__header__isEditing') : classnames('wsContentGeneric__header', `${customClass}__header`)}
     >
       <div className='wsContentGeneric__header__titleWithBreadcrumbs'>
         <div className='wsContentGeneric__header__titleWrapper'>
