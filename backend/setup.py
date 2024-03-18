@@ -40,7 +40,7 @@ requires = [
     "mako",
     "lxml>=4.8.0",
     "redis==4.6.0",
-    "rq>=1.15.0",
+    "rq>=1.9.0",
     "html2text",
     # mail-fetcher
     "markdown",
@@ -50,7 +50,7 @@ requires = [
     "beautifulsoup4",
     # beaker 1.11 is broken: fix does exist but no new release since:
     # https://github.com/bbangert/beaker/commit/889d3055a4ca31b55a0b0681b00f2973b3250d88
-    "beaker<1.11.0",
+    "beaker @ git+https://github.com/algoo/beaker.git",
     "pyramid_beaker",
     "pyramid_ldap3",
     # frontend file serve
