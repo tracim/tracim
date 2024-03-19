@@ -6,6 +6,10 @@ import {
   CardPopupCreateContent
 } from 'tracim_frontend_lib'
 
+
+// INFO - FS - 2024-03-19 - This component is used to wrap the component CardPopupCreateContent
+// in order to manage the newPublicationTitle state and improve performance in the Publications component :
+// https://github.com/tracim/tracim/issues/6408
 export class PopupSetPublicationTitle extends React.Component {
   constructor (props) {
     super(props)

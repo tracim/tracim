@@ -64,7 +64,7 @@ import {
 import TabBar from '../component/TabBar/TabBar.jsx'
 import FeedItemWithPreview, { LINK_TYPE } from './FeedItemWithPreview.jsx'
 
-import PopupSetPublicationTitle from './PopupSetPublicationTitle.jsx'
+import PopupSetPublicationTitle from '../component/Publication/PopupSetPublicationTitle.jsx'
 
 // INFO - G.B. - 2021-10-18 - The value below is used only for local storage, it's a fake id for the
 // publication that is being written but has not been sent yet (i.e. does not have an id)
