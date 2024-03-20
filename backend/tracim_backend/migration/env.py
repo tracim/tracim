@@ -2,15 +2,14 @@
 
 from __future__ import with_statement
 
-import os
-import typing
-
 from alembic import context
 from alembic.operations import MigrateOperation
 from alembic.operations import Operations
+import os
 from sqlalchemy import Enum
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
+import typing
 
 from tracim_backend.exceptions import ConfigurationError
 from tracim_backend.models.meta import metadata
@@ -137,12 +136,16 @@ def run_migrations_online():
 
     """
     engine = engine_from_config(
-        config.get_section(config.config_ini_section), prefix="sqlalchemy.", poolclass=pool.NullPool
+        config.get_section(config.config_ini_section),
+        prefix="sqlalchemy.",
+        poolclass=pool.NullPool,
     )
 
     connection = engine.connect()
     context.configure(
-        connection=connection, target_metadata=target_metadata, version_table="migrate_version"
+        connection=connection,
+        target_metadata=target_metadata,
+        version_table="migrate_version",
     )
 
     try:

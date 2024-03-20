@@ -1,5 +1,4 @@
 import { appListAsSidebarEntry } from '../../hocMock/redux/appList/appListAsSidebarEntry.js'
-import { globalManagerAsMember } from '../user/globalManagerAsMember.js'
 import { serializeWorkspace } from '../../../src/reducer/currentWorkspace.js'
 
 export const firstWorkspaceFromApi = {
@@ -21,6 +20,5 @@ export const firstWorkspaceFromApi = {
 export const firstWorkspace = {
   ...serializeWorkspace(firstWorkspaceFromApi),
   sidebarEntryList: appListAsSidebarEntry(1),
-  memberList: [globalManagerAsMember],
   contentReadStatusList: []
 }

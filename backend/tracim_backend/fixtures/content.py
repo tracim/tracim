@@ -6,10 +6,11 @@ from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.fixtures import Fixture
 from tracim_backend.fixtures.users import Test
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models.auth import User
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import EmailNotificationType
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.revision_protection import new_revision
 
 
@@ -34,7 +35,9 @@ class Content(Fixture):
         reader_content_api = ContentApi(
             current_user=john_the_reader, session=self._session, config=self._config
         )
-        role_api = RoleApi(current_user=admin, session=self._session, config=self._config)
+        user_workspace_config_api = UserWorkspaceConfigApi(
+            current_user=admin, session=self._session, config=self._config
+        )
 
         # Workspaces
         business_workspace = admin_workspace_api.create_workspace(
@@ -48,17 +51,17 @@ class Content(Fixture):
         )
 
         # Workspaces roles
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user=bob,
             workspace=recipe_workspace,
-            role_level=UserRoleInWorkspace.CONTENT_MANAGER,
-            with_notif=False,
+            role_level=UserWorkspaceConfig.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user=john_the_reader,
             workspace=recipe_workspace,
-            role_level=UserRoleInWorkspace.READER,
-            with_notif=False,
+            role_level=UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
         )
         # Folders
 
@@ -232,7 +235,7 @@ class Content(Fixture):
 
         content_api.create_comment(
             parent=best_cake_thread,
-            content="<p>What is for you the best cake ever? <br/> I personnally vote for Chocolate cupcake!</p>",
+            content="<p>What is for you the best cake ever? <br/> I personally vote for Chocolate cupcake!</p>",
             do_save=True,
             do_notify=False,
         )

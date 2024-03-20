@@ -4,11 +4,10 @@
 """
 Simple script to setup require directories for pytests
 """
+from dotenv import load_dotenv
 import os
 from pathlib import Path  # python3 only
 from typing import Optional
-
-from dotenv import load_dotenv
 
 env_path = Path(".") / ".test.env"
 load_dotenv(dotenv_path=env_path)
@@ -79,7 +78,7 @@ test_directories = [
     ("CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER", "caldav storage", False),
 ]
 
-for (env_var_name, description, is_error) in test_directories:
+for env_var_name, description, is_error in test_directories:
     path = get_path(env_var_name)
     if path:
         create_dir(path, description)

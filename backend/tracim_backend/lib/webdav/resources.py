@@ -8,18 +8,18 @@ from os.path import basename
 from os.path import dirname
 import re
 from time import mktime
+import transaction
 import typing
 from typing import List
-
-import transaction
 from wsgidav import compat
+from wsgidav.dav_error import DAVError
 from wsgidav.dav_error import HTTP_FORBIDDEN
 from wsgidav.dav_error import HTTP_REQUEST_ENTITY_TOO_LARGE
-from wsgidav.dav_error import DAVError
 from wsgidav.dav_provider import DAVCollection
 from wsgidav.dav_provider import DAVNonCollection
 from wsgidav.dav_provider import _DAVResource
 
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import FileSizeOverMaxLimitation
@@ -51,8 +51,8 @@ from tracim_backend.models.revision_protection import new_revision
 logger = logging.getLogger()
 
 if typing.TYPE_CHECKING:
-    from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
     from tracim_backend.lib.webdav.dav_provider import TracimDavProvider
+    from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
 
 
 def webdav_check_right(authorization_checker: AuthorizationChecker):
@@ -78,7 +78,11 @@ def get_workspace_resource(
     tracim_context: "WebdavTracimContext",
 ) -> "WorkspaceResource":
     return WorkspaceResource(
-        path=path, environ=environ, workspace=workspace, tracim_context=tracim_context, label=label,
+        path=path,
+        environ=environ,
+        workspace=workspace,
+        tracim_context=tracim_context,
+        label=label,
     )
 
 
@@ -102,7 +106,10 @@ def get_content_resource(
         )
     elif content.depot_file:
         return FileResource(
-            path=path, environ=environ, content=content, tracim_context=tracim_context,
+            path=path,
+            environ=environ,
+            content=content,
+            tracim_context=tracim_context,
         )
     else:
         # Content is assumed to be in raw_content
@@ -118,12 +125,12 @@ class WebdavContainer(ABC):
 
     @abstractmethod
     def createEmptyResource(self, file_name: str):
-        """ Create a empty non-collection sub-resource of the current resource, for example a file on a directory"""
+        """Create a empty non-collection sub-resource of the current resource, for example a file on a directory"""
         pass
 
     @abstractmethod
     def createCollection(self, label: str) -> "FolderResource":
-        """ Create a collection sub-resource of the current resource, for example a dir on a directory or workspace"""
+        """Create a collection sub-resource of the current resource, for example a dir on a directory or workspace"""
         pass
 
     @abstractmethod
@@ -243,7 +250,8 @@ class WorkspaceOnlyContainer(WebdavContainer):
         Access to a specific members
         """
         return self.provider.getResourceInst(
-            "%s/%s" % (self.path, webdav_convert_file_name_to_display(label)), self.environ
+            "%s/%s" % (self.path, webdav_convert_file_name_to_display(label)),
+            self.environ,
         )
 
     def getMemberList(self):
@@ -310,14 +318,14 @@ class ContentOnlyContainer(WebdavContainer):
         if self.content:
             parent_id = self.content.content_id
             children = self.content_api.get_all(
-                content_type=content_type_list.Any_SLUG,
+                content_type=ContentTypeSlug.ANY.value,
                 workspaces=[self.workspace],
                 parent_ids=[parent_id],
                 order_by_properties=["content_id"],
             )
         else:
             children = self.content_api.get_all(
-                content_type=content_type_list.Any_SLUG,
+                content_type=ContentTypeSlug.ANY.value,
                 workspaces=[self.workspace],
                 parent_ids=[0],
                 order_by_properties=["content_id"],
@@ -422,7 +430,8 @@ class ContentOnlyContainer(WebdavContainer):
         Access to a specific members
         """
         return self.provider.getResourceInst(
-            "%s/%s" % (self.path, webdav_convert_file_name_to_display(label)), self.environ
+            "%s/%s" % (self.path, webdav_convert_file_name_to_display(label)),
+            self.environ,
         )
 
     def getMemberList(self) -> typing.List[_DAVResource]:
@@ -634,7 +643,8 @@ class WorkspaceResource(DAVCollection):
 
     def moveRecursive(self, destpath):
         raise DAVError(
-            HTTP_FORBIDDEN, contextinfo="Not allowed to rename or move workspace through webdav"
+            HTTP_FORBIDDEN,
+            contextinfo="Not allowed to rename or move workspace through webdav",
         )
 
     def getMemberNames(self) -> typing.List[str]:
@@ -752,7 +762,6 @@ class FolderResource(DAVCollection):
             raise DAVError(HTTP_FORBIDDEN)
 
     def move_folder(self, destpath: str):
-
         destpath = normpath(destpath)
         self.tracim_context.set_destpath(destpath)
         if normpath(dirname(destpath)) == normpath(dirname(self.path)):
@@ -777,7 +786,8 @@ class FolderResource(DAVCollection):
                 # renaming file if needed
                 if basename(destpath) != self.getDisplayName():
                     self.content_api.update_content(
-                        self.content, webdav_convert_file_name_to_bdd(basename(destpath))
+                        self.content,
+                        webdav_convert_file_name_to_bdd(basename(destpath)),
                     )
                     self.content_api.save(self.content)
                 # move file if needed
@@ -820,7 +830,11 @@ class FileResource(DAVNonCollection):
     """
 
     def __init__(
-        self, path: str, environ: dict, content: Content, tracim_context: "WebdavTracimContext"
+        self,
+        path: str,
+        environ: dict,
+        content: Content,
+        tracim_context: "WebdavTracimContext",
     ) -> None:
         super(FileResource, self).__init__(path, environ)
         self.tracim_context = tracim_context
@@ -891,7 +905,7 @@ class FileResource(DAVNonCollection):
 
     def moveRecursive(self, destpath):
         """As we support recursive move, copymovesingle won't be called, though with copy it'll be called
-            but i have to check if the client ever call that function..."""
+        but i have to check if the client ever call that function..."""
         destpath = normpath(destpath)
         self.tracim_context.set_destpath(destpath)
         if normpath(dirname(destpath)) == normpath(dirname(self.path)):
@@ -949,7 +963,6 @@ class FileResource(DAVNonCollection):
             with new_revision(content=self.content, tm=transaction.manager, session=self.session):
                 # INFO - G.M - 2018-03-09 - First, renaming file if needed
                 if basename(destpath) != self.getDisplayName():
-
                     new_filename = webdav_convert_file_name_to_bdd(basename(destpath))
                     regex_file_extension = re.compile(
                         "(?P<label>.*){}".format(re.escape(self.content.file_extension))
@@ -1062,7 +1075,11 @@ class OtherFileResource(FileResource):
     """
 
     def __init__(
-        self, path: str, environ: dict, content: Content, tracim_context: "WebdavTracimContext"
+        self,
+        path: str,
+        environ: dict,
+        content: Content,
+        tracim_context: "WebdavTracimContext",
     ):
         super(OtherFileResource, self).__init__(
             path, environ, content, tracim_context=tracim_context

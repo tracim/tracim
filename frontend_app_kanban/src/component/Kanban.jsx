@@ -17,11 +17,6 @@ import '@asseinfo/react-kanban/dist/styles.css'
 
 import {
   APP_FEATURE_MODE,
-  tinymceAutoCompleteHandleInput,
-  tinymceAutoCompleteHandleKeyUp,
-  tinymceAutoCompleteHandleKeyDown,
-  tinymceAutoCompleteHandleClickItem,
-  tinymceAutoCompleteHandleSelectionChange,
   IconButton,
   handleFetchResult,
   putRawFileContent,
@@ -38,6 +33,8 @@ import KanbanCard from './KanbanCard.jsx'
 import KanbanCardEditor from './KanbanCardEditor.jsx'
 import KanbanColumnEditor from './KanbanColumnEditor.jsx'
 import KanbanColumnHeader from './KanbanColumnHeader.jsx'
+
+const KANBAN_GET_URL_FILENAME = 'kanban' + KANBAN_FILE_EXTENSION
 
 export const BOARD_STATE = {
   INIT: 'init',
@@ -99,24 +96,27 @@ export class Kanban extends React.Component {
     this.setState({ boardState: BOARD_STATE.LOADING })
     const { props } = this
 
-    const fetchRawFileContent = await handleFetchResult(
-      await getRawFileContent(
-        props.config.apiUrl,
-        props.content.workspace_id,
-        props.content.content_id,
-        props.content.current_revision_id,
-        props.content.label + KANBAN_FILE_EXTENSION
-      ),
-      true
-    )
-
-    if (fetchRawFileContent.apiResponse.ok && fetchRawFileContent.body.columns) {
-      this.setState({
-        boardState: BOARD_STATE.LOADED,
-        boardInitiallyLoaded: true,
-        board: fetchRawFileContent.body
-      })
-    } else {
+    try {
+      const fetchRawFileContent = await handleFetchResult(
+        await getRawFileContent(
+          props.config.apiUrl,
+          props.content.workspace_id,
+          props.content.content_id,
+          props.content.current_revision_id,
+          KANBAN_GET_URL_FILENAME
+        ),
+        true
+      )
+      if (fetchRawFileContent.apiResponse.ok && fetchRawFileContent.body.columns) {
+        this.setState({
+          boardState: BOARD_STATE.LOADED,
+          board: fetchRawFileContent.body || {}
+        })
+      } else {
+        this.setState({ boardState: BOARD_STATE.ERROR })
+      }
+    } catch (error) {
+      console.log(`Got an error while fetching the board's contents: ${error}`)
       this.setState({ boardState: BOARD_STATE.ERROR })
     }
   }
@@ -282,47 +282,6 @@ export class Kanban extends React.Component {
     this.setState({ editedCardInfos: null })
   }
 
-  handleTinyMceInput = (e, position) => {
-    tinymceAutoCompleteHandleInput(
-      e,
-      this.setState.bind(this),
-      this.searchForMentionOrLinkInQuery,
-      this.state.isAutoCompleteActivated
-    )
-  }
-
-  handleTinyMceKeyUp = event => {
-    const { state } = this
-
-    tinymceAutoCompleteHandleKeyUp(
-      event,
-      this.setState.bind(this),
-      state.isAutoCompleteActivated,
-      this.searchForMentionOrLinkInQuery
-    )
-  }
-
-  handleTinyMceKeyDown = event => {
-    const { state } = this
-
-    tinymceAutoCompleteHandleKeyDown(
-      event,
-      this.setState.bind(this),
-      state.isAutoCompleteActivated,
-      state.autoCompleteCursorPosition,
-      state.autoCompleteItemList,
-      this.searchForMentionOrLinkInQuery
-    )
-  }
-
-  handleTinyMceSelectionChange = () => {
-    tinymceAutoCompleteHandleSelectionChange(
-      this.setState.bind(this),
-      this.searchForMentionOrLinkInQuery,
-      this.state.isAutoCompleteActivated
-    )
-  }
-
   render () {
     const { props, state } = this
     const changesAllowed = !props.readOnly && state.boardState === BOARD_STATE.LOADED
@@ -436,16 +395,14 @@ export class Kanban extends React.Component {
               <KanbanCardEditor
                 apiUrl={props.config.apiUrl}
                 card={state.editedCardInfos.card}
-                customColor={props.config.hexcolor}
-                focusOnDescription={state.editedCardInfos.focusOnDescription}
                 onValidate={this.handleCardEdited}
                 onCancel={this.handleCardEditCancel}
-                isAutoCompleteActivated={state.isAutoCompleteActivated}
-                autoCompleteItemList={state.autoCompleteItemList}
-                autoCompleteCursorPosition={state.autoCompleteCursorPosition}
-                onClickAutoCompleteItem={(item) => {
-                  tinymceAutoCompleteHandleClickItem(item, this.setState.bind(this))
-                }}
+                // End of required props ///////////////////////////////////////
+                codeLanguageList={props.config.system.config.ui__notes__code_sample_languages}
+                customColor={props.config.hexcolor}
+                focusOnDescription={state.editedCardInfos.focusOnDescription}
+                language={props.language}
+                memberList={props.config.workspace.memberList}
               />
             </CardPopup>
           )}
@@ -474,10 +431,13 @@ export class Kanban extends React.Component {
 Kanban.propTypes = {
   config: PropTypes.object.isRequired,
   content: PropTypes.object.isRequired,
+  // End of required props /////////////////////////////////////////////////////
+  language: PropTypes.string,
   readOnly: PropTypes.bool
 }
 
 Kanban.defaultProps = {
+  language: 'en',
   readOnly: false
 }
 

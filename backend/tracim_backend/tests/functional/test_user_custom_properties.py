@@ -4,10 +4,9 @@ Tests for endpoints related to user custom properties
 """
 
 import json
-import typing
-
 import pytest
 import transaction
+import typing
 from webtest import TestApp
 
 from tracim_backend.error import ErrorCode

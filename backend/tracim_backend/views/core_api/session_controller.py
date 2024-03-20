@@ -1,20 +1,19 @@
 # coding=utf-8
-from http import HTTPStatus
-
 from hapic.data import HapicData
+from http import HTTPStatus
 from pyramid.config import Configurator
 from pyramid.security import forget
 from pyramid.security import remember
 from pyramid_ldap3 import get_ldap_connector
 
 from tracim_backend import AuthenticationFailed
-from tracim_backend.config import CFG
+from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.live_messages import LiveMessagesLib
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models.auth import AuthType
-from tracim_backend.models.context_models import LoginCredentials
+from tracim_backend.models.context_models import LoginCredentials  # noqa: F401
 from tracim_backend.models.context_models import UserInContext
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import BasicAuthSchema
@@ -48,7 +47,9 @@ class SessionController(Controller):
         if login.email:
             try:
                 user = uapi.authenticate(
-                    login=login.email, password=login.password, ldap_connector=ldap_connector,
+                    login=login.email,
+                    password=login.password,
+                    ldap_connector=ldap_connector,
                 )
             except AuthenticationFailed as exc:
                 if not login.username:
@@ -56,7 +57,9 @@ class SessionController(Controller):
 
         if user is None:
             user = uapi.authenticate(
-                login=login.username, password=login.password, ldap_connector=ldap_connector,
+                login=login.username,
+                password=login.password,
+                ldap_connector=ldap_connector,
             )
 
         remember(request, user.user_id)
@@ -91,7 +94,6 @@ class SessionController(Controller):
         return uapi.get_user_with_context(user)
 
     def bind(self, configurator: Configurator):
-
         # Login
         configurator.add_route("login", "/auth/login", request_method="POST")
         configurator.add_view(self.login, route_name="login")

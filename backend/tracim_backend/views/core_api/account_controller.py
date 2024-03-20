@@ -30,7 +30,9 @@ class AccountController(Controller):
         """
         return HTTPTemporaryRedirect(
             request.url.replace(
-                "/users/me", "/users/{user_id}".format(user_id=request.current_user.user_id), 1
+                "/users/me",
+                "/users/{user_id}".format(user_id=request.current_user.user_id),
+                1,
             )
         )
 
@@ -44,7 +46,9 @@ class AccountController(Controller):
         """
         return HTTPTemporaryRedirect(
             request.url.replace(
-                "/users/me", "/users/{user_id}".format(user_id=request.current_user.user_id), 1
+                "/users/me",
+                "/users/{user_id}".format(user_id=request.current_user.user_id),
+                1,
             )
         )
 

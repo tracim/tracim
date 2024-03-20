@@ -5,16 +5,20 @@ import { Link } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import {
   Breadcrumbs,
+  CONTENT_NAMESPACE,
   CONTENT_TYPE,
   DropdownMenu,
   Icon,
   IconButton,
   PAGE,
+  ROLE,
+  ROLE_LIST,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   FilenameWithBadges,
   TimedEvent
 } from 'tracim_frontend_lib'
+import { findUserRoleIdInWorkspace } from '../../util/helper.js'
 
 require('./FeedItemHeader.styl')
 
@@ -64,6 +68,13 @@ export class FeedItemHeader extends React.Component {
       props.content.currentRevisionType &&
       props.lastModifier
     )
+    const userRoleInWorkspace = findUserRoleIdInWorkspace(
+      props.user.userId,
+      (props.workspaceList.find(workspace => workspace.id === props.workspaceId) || {}).memberList || [],
+      ROLE_LIST
+    )
+    const shouldShowChangeContentTypeButton = userRoleInWorkspace >= ROLE.contentManager.id &&
+      props.content.contentNamespace === CONTENT_NAMESPACE.PUBLICATION && props.showButtonChangeContentType
 
     return (
       <div className='feedItemHeader'>
@@ -123,9 +134,10 @@ export class FeedItemHeader extends React.Component {
               customClass='feedItemHeader__actionMenu__item'
               icon='fas fa-link'
               onClick={props.onClickCopyLink}
-              text={props.t('Copy content link')}
-              textMobile={props.t('Copy content link')}
+              text={props.content.contentNamespace === CONTENT_NAMESPACE.PUBLICATION ? props.t('Copy news link') : props.t('Copy content link')}
+              textMobile={props.content.contentNamespace === CONTENT_NAMESPACE.PUBLICATION ? props.t('Copy news link') : props.t('Copy content link')}
               key={`link-${contentId}`}
+              dataCy='popinListItem__copy_content_link'
             />
 
             {props.allowEdition && (
@@ -144,10 +156,26 @@ export class FeedItemHeader extends React.Component {
               title={props.t('Open as content')}
               to={PAGE.WORKSPACE.CONTENT(props.workspaceId, props.content.type, contentId)}
               key={`open-${contentId}`}
+              dataCy='popinListItem__open_as_content'
             >
               <i className={`fa-fw ${props.contentType.faIcon}`} />
               {props.t('Open as content')}
             </Link>
+
+            {shouldShowChangeContentTypeButton && (
+              <IconButton
+                customClass='feedItemHeader__actionMenu__item'
+                disabled={props.content.is_archived || props.content.is_deleted}
+                icon='far fa-comments'
+                text={props.t('Turn into thread')}
+                textMobile={props.t('Turn into thread')}
+                label={props.t('Turn into thread')}
+                key={`content-type-${contentId}`}
+                onClick={props.onClickChangeContentType}
+                dataCy='popinListItem__content_type'
+              />
+            )}
+
           </DropdownMenu>
         )}
       </div>
@@ -155,7 +183,7 @@ export class FeedItemHeader extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user }) => ({ user })
+const mapStateToProps = ({ user, workspaceList }) => ({ user, workspaceList })
 export default connect(mapStateToProps)(translate()(FeedItemHeader))
 
 FeedItemHeader.propTypes = {
@@ -174,7 +202,9 @@ FeedItemHeader.propTypes = {
   modifiedDate: PropTypes.string,
   onEventClicked: PropTypes.func,
   onClickEdit: PropTypes.func,
-  titleLink: PropTypes.string
+  titleLink: PropTypes.string,
+  onClickChangeContentType: PropTypes.func,
+  showButtonChangeContentType: PropTypes.bool
 }
 
 FeedItemHeader.defaultProps = {
@@ -192,5 +222,7 @@ FeedItemHeader.defaultProps = {
   lastModifier: {},
   modifiedDate: '',
   onClickEdit: () => {},
-  titleLink: null
+  titleLink: null,
+  onClickChangeContentType: () => {},
+  showButtonChangeContentType: false
 }

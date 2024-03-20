@@ -1,7 +1,6 @@
 # coding: utf-8
 from configparser import ConfigParser
 import os
-
 from radicale.config import Configuration as RadicaleConfiguration
 from radicale.config import load as load_radicale_config
 
@@ -91,7 +90,8 @@ class CaldavAppFactory(object):
             if not update_config.get(radicale_section):
                 update_config[radicale_section] = {}
             logger.debug(
-                self, "Prepare overriding radicale config: {} : {}".format(param_name, value)
+                self,
+                "Prepare overriding radicale config: {} : {}".format(param_name, value),
             )
             update_config[radicale_section][radicale_param_config] = value
         logger.debug(self, "Overriding radicale config")

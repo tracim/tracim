@@ -29,6 +29,7 @@ div.tox-tinymce
 div.tox-shadowhost.tox-fullscreen, div.tox.tox-tinymce.tox-fullscreen
   z-index 1050
   margin-inline-start closedSidebarWidth
+  height 100%
   width 'calc(100% - %s)' % closedSidebarWidth !important // INFO - GB - 2022-08-23 - override TinyMCE calculated width
   & ~ .autocomplete
     margin-inline-start closedSidebarWidth + standardSpacing
@@ -57,6 +58,8 @@ div.tox .tox-toolbar
 
 .sidebarpagecontainer
   display flex
+  &.notLoggedIn // INFO - CH - 2023-11-06 - when not logged in, 60px header is displayed
+    height calc(100% - 60px)
 
 .nopadding
   padding 0

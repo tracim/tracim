@@ -4,7 +4,8 @@ import transaction
 
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.core.reaction import ReactionLib
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import EmailNotificationType
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 
@@ -22,7 +23,17 @@ class TestReactionsEndpoint(object):
 
     @pytest.mark.parametrize(
         "admin_reaction_values, ryiad_reaction_values",
-        [((":custom_text:", "😀", "🐧", "🦋",), ("🐧", "🐻‍❄️", "👨‍👨‍👧‍👧"))],
+        [
+            (
+                (
+                    ":custom_text:",
+                    "😀",
+                    "🐧",
+                    "🦋",
+                ),
+                ("🐧", "🐻‍❄️", "👨‍👨‍👧‍👧"),
+            )
+        ],
     )
     def test_api__get_contents_reactions__ok_200__nominal_case(
         self,
@@ -53,7 +64,10 @@ class TestReactionsEndpoint(object):
             reaction_lib.create(riyad_user, folder, reaction, do_save=True)
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/workspaces/{workspace_id}/contents/{content_id}/reactions".format(
                 workspace_id=test_workspace.workspace_id, content_id=folder.content_id
@@ -74,7 +88,8 @@ class TestReactionsEndpoint(object):
             assert reaction_res["value"] == reaction_value
 
     @pytest.mark.parametrize(
-        "reaction_value", SAMPLE_REACTION_LIST,
+        "reaction_value",
+        SAMPLE_REACTION_LIST,
     )
     def test_api__get_one_reaction__ok_200__nominal_case(
         self,
@@ -103,7 +118,10 @@ class TestReactionsEndpoint(object):
         reaction = reaction_lib.create(riyad_user, folder, reaction_value, do_save=True)
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/workspaces/{workspace_id}/contents/{content_id}/reactions/{reaction_id}".format(
                 workspace_id=test_workspace.workspace_id,
@@ -144,11 +162,15 @@ class TestReactionsEndpoint(object):
             do_notify=False,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"value": reaction_value}
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/reactions".format(
-                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
             ),
             status=200,
             params=params,
@@ -165,7 +187,10 @@ class TestReactionsEndpoint(object):
         assert last_event.event_type == "reaction.created"
         author = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200).json_body
         assert last_event.author == UserDigestSchema().dump(author).data
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(test_workspace.workspace_id), status=200
         ).json_body
@@ -200,18 +225,23 @@ class TestReactionsEndpoint(object):
         )
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"value": reaction_value}
         web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/reactions".format(
-                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
             ),
             status=200,
             params=params,
         )
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/reactions".format(
-                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
             ),
             status=400,
             params=params,
@@ -244,11 +274,15 @@ class TestReactionsEndpoint(object):
             do_notify=False,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"value": reaction_value}
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/reactions".format(
-                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
             ),
             status=200,
             params=params,
@@ -285,7 +319,10 @@ class TestReactionsEndpoint(object):
         assert last_event.event_type == "reaction.deleted"
         author = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200).json_body
         assert last_event.author == UserDigestSchema().dump(author).data
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(test_workspace.workspace_id), status=200
         ).json_body
@@ -301,7 +338,7 @@ class TestReactionsEndpoint(object):
         self,
         workspace_api_factory,
         content_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         session,
         web_testapp,
         admin_user,
@@ -315,9 +352,12 @@ class TestReactionsEndpoint(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(
-            riyad_user, test_workspace, UserRoleInWorkspace.CONTRIBUTOR, with_notif=False
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            riyad_user,
+            test_workspace,
+            UserWorkspaceConfig.CONTRIBUTOR,
+            email_notification_type=EmailNotificationType.NONE,
         )
         folder = content_api.create(
             label="test-folder",
@@ -328,11 +368,15 @@ class TestReactionsEndpoint(object):
         )
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"value": reaction_value}
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/reactions".format(
-                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
             ),
             status=200,
             params=params,

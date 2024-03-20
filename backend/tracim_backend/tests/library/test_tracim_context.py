@@ -1,5 +1,4 @@
 from collections import Callable
-
 import pytest
 
 from tracim_backend.lib.utils.request import TracimContext

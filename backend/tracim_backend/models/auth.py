@@ -11,11 +11,6 @@ from datetime import datetime
 import enum
 from hashlib import sha256
 import os
-import time
-import typing
-from typing import TYPE_CHECKING
-import uuid
-
 from sqlalchemy import BigInteger
 from sqlalchemy import CheckConstraint
 from sqlalchemy import Column
@@ -30,6 +25,10 @@ from sqlalchemy.types import DateTime
 from sqlalchemy.types import Enum
 from sqlalchemy.types import Integer
 from sqlalchemy.types import Unicode
+import time
+import typing
+from typing import TYPE_CHECKING
+import uuid
 
 from tracim_backend.exceptions import ExpiredResetPasswordToken
 from tracim_backend.exceptions import InvalidResetPasswordToken
@@ -39,8 +38,8 @@ from tracim_backend.models.mixins import TrashableMixin
 from tracim_backend.models.types import TracimUploadedFileField
 
 if TYPE_CHECKING:
+    from tracim_backend.models.data import UserWorkspaceConfig
     from tracim_backend.models.data import Workspace
-    from tracim_backend.models.data import UserRoleInWorkspace
 __all__ = ["User"]
 
 
@@ -64,6 +63,7 @@ class UserCreationType(str, enum.Enum):
 class AuthType(enum.Enum):
     INTERNAL = "internal"
     LDAP = "ldap"
+    SAML = "saml"
     UNKNOWN = "unknown"
     REMOTE = "remote"
 
@@ -135,6 +135,7 @@ class User(TrashableMixin, DeclarativeBase):
     created = Column(DateTime, default=datetime.utcnow)
 
     user_id = Column(Integer, Sequence("seq__users__user_id"), autoincrement=True, primary_key=True)
+    external_id = Column(Unicode(1024), nullable=True, unique=True)
     email = Column(Unicode(MAX_EMAIL_LENGTH), unique=True, nullable=True)
     username = Column(Unicode(MAX_USERNAME_LENGTH), unique=True, nullable=True)
     display_name = Column(Unicode(MAX_PUBLIC_NAME_LENGTH))
@@ -157,6 +158,7 @@ class User(TrashableMixin, DeclarativeBase):
     reset_password_token_created = Column(DateTime, nullable=True, default=None)
     allowed_space = Column(BigInteger, nullable=False, server_default=str(DEFAULT_ALLOWED_SPACE))
     profile = Column(Enum(Profile), nullable=False, server_default=Profile.NOBODY.name)
+    is_avatar_default = Column(Boolean, default=False, nullable=False)
     avatar = Column(TracimUploadedFileField, unique=False, nullable=True)
     cropped_avatar = Column(TracimUploadedFileField, unique=False, nullable=True)
     cover = Column(TracimUploadedFileField, unique=False, nullable=True)
@@ -165,7 +167,9 @@ class User(TrashableMixin, DeclarativeBase):
         Integer, ForeignKey("users.user_id", ondelete="SET NULL"), nullable=True
     )
     created_users = relationship(
-        "User", post_update=True, backref=backref("creation_author", remote_side=user_id)
+        "User",
+        post_update=True,
+        backref=backref("creation_author", remote_side=user_id),
     )
     creation_type = Column(Enum(UserCreationType), nullable=True)
     connection_status = Column(
@@ -182,7 +186,7 @@ class User(TrashableMixin, DeclarativeBase):
 
     @property
     def has_avatar(self) -> bool:
-        return bool(self.avatar)
+        return True
 
     @property
     def has_cover(self) -> bool:
@@ -271,9 +275,9 @@ class User(TrashableMixin, DeclarativeBase):
             if role.workspace == workspace:
                 return role.role
 
-        return UserRoleInWorkspace.NOT_APPLICABLE
+        return UserWorkspaceConfig.NOT_APPLICABLE
 
-    def get_active_roles(self) -> typing.List["UserRoleInWorkspace"]:
+    def get_active_roles(self) -> typing.List["UserWorkspaceConfig"]:
         """
         :return: list of roles of the user for all not-deleted workspaces
         """
@@ -282,6 +286,14 @@ class User(TrashableMixin, DeclarativeBase):
             if not role.workspace.is_deleted:
                 roles.append(role)
         return roles
+
+    def can_receive_summary_mail(self) -> bool:
+        return (
+            self.email
+            and self.is_active
+            and not self.is_deleted
+            and self.auth_type != AuthType.UNKNOWN
+        )
 
     # Tokens ###
 

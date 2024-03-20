@@ -4,8 +4,8 @@ import pytest
 from tracim_backend.lib.mail_fetcher.email_processing.checkers import HtmlMailQuoteChecker
 from tracim_backend.lib.mail_fetcher.email_processing.checkers import HtmlMailSignatureChecker
 from tracim_backend.lib.mail_fetcher.email_processing.models import BodyMailPart
-from tracim_backend.lib.mail_fetcher.email_processing.models import BodyMailParts
 from tracim_backend.lib.mail_fetcher.email_processing.models import BodyMailPartType
+from tracim_backend.lib.mail_fetcher.email_processing.models import BodyMailParts
 from tracim_backend.lib.mail_fetcher.email_processing.parser import ParsedHTMLMail
 
 
@@ -435,7 +435,6 @@ class TestParsedMail(object):
         assert elements[3].part_type == BodyMailPartType.Signature
 
     def test_other__check_thunderbird_mail_text_only(self):
-
         text_only = """Coucou<br><br><br>"""
         mail = ParsedHTMLMail(text_only)
         elements = mail.get_elements()
@@ -579,7 +578,6 @@ class TestParsedMail(object):
     # and signature are always before quoted one.
 
     def test_other__check_outlook_com_mail_text_only(self):
-
         text_only = """
         <div id="divtagdefaultwrapper"
         style="font-size:12pt;color:#000000;

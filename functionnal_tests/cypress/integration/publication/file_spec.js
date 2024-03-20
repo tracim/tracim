@@ -1,7 +1,6 @@
 import { PAGES } from '../../support/urls_commands'
-import { SELECTORS } from '../../support/generic_selector_commands'
+import { SELECTORS } from '../../support/generic_selector_commands.js'
 
-const publicationInput = '#wysiwygTimelineCommentPublication'
 const publishButton = '.commentArea__submit__btn'
 const addFileButton = '.AddFileToCommentButton'
 
@@ -37,6 +36,9 @@ describe('Publications', () => {
           .click()
         cy.contains('.DisplayFileToUpload__message__text', '1')
         cy.contains(publishButton, 'Publish').click()
+        cy.getTag({ selectorName: SELECTORS.CARD_POPUP_BODY })
+          .get('[data-cy=popup__createcontent__form__button]')
+          .click()
       })
     })
 
@@ -83,8 +85,12 @@ describe('Publications', () => {
           .get('[data-cy=popup__createcontent__form__button]')
           .click()
         cy.contains('.DisplayFileToUpload__message__text', '1')
-        cy.get(publicationInput).type(exampleText)
-        cy.contains(publishButton, 'Publish').click()
+        cy.inputInTinyMCE(exampleText).then(() => {
+          cy.contains(publishButton, 'Publish').click()
+          cy.getTag({ selectorName: SELECTORS.CARD_POPUP_BODY })
+          .get('[data-cy=popup__createcontent__form__button]')
+          .click()
+        })
       })
     })
 
@@ -139,6 +145,9 @@ describe('Publications', () => {
         .get('[data-cy=popup__createcontent__form__button]')
         .click()
       cy.contains(publishButton, 'Publish').click()
+      cy.getTag({ selectorName: SELECTORS.CARD_POPUP_BODY })
+          .get('[data-cy=popup__createcontent__form__button]')
+          .click()
       cy.wait(1000)
       cy.get(addFileButton).click()
       cy.dropFixtureInDropZone(pngFile, 'image/png', '.filecontent__form', `${fileName}.png`)
@@ -146,6 +155,9 @@ describe('Publications', () => {
         .get('[data-cy=popup__createcontent__form__button]')
         .click()
       cy.contains(publishButton, 'Publish').click()
+      cy.getTag({ selectorName: SELECTORS.CARD_POPUP_BODY })
+          .get('[data-cy=popup__createcontent__form__button]')
+          .click()
 
       cy.get('.feedItem').should('have.length.gt', 1)
     })

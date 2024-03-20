@@ -28,7 +28,6 @@ export const PopupCreateContent = (props) => {
         customClass='popupCreateContent'
         customColor={props.customColor}
         onClose={props.onClose}
-        customStyle={props.customStyle}
         faIcon={props.faIcon}
         label={props.label}
       >
@@ -74,7 +73,7 @@ export const PopupCreateContent = (props) => {
                     backgroundColor: color(props.customColor).darken(0.15).hex()
                   }
                 }}
-                disabled={!props.contentName || props.contentName.length === 0}
+                disabled={(!props.contentName || props.contentName.length === 0) && !props.allowEmptyTitle}
               >
                 {props.btnValidateLabel}
               </button>
@@ -98,6 +97,7 @@ PopupCreateContent.propTypes = {
   onClose: PropTypes.func.isRequired,
   onValidate: PropTypes.func.isRequired,
   label: PropTypes.string,
+  allowEmptyTitle: PropTypes.bool,
   templateList: PropTypes.array
 }
 
@@ -109,6 +109,7 @@ PopupCreateContent.defaultProps = {
   inputPlaceHolder: '',
   label: '',
   onChangeTemplate: () => {},
+  allowEmptyTitle: false,
   templateList: []
 }
 

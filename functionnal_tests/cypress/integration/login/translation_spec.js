@@ -9,21 +9,21 @@ describe('Login page', function () {
 
   it('should have translations', () => {
     cy.changeLanguageUnloggedPages('en')
-    cy.contains('.loginpage__main__form__btnsubmit', 'Connection')
+    cy.contains('.classicLoginAuthForm__btnsubmit', 'Connection')
 
     cy.changeLanguageUnloggedPages('fr')
-    cy.contains('.loginpage__main__form__btnsubmit', 'Connexion')
+    cy.contains('.classicLoginAuthForm__btnsubmit', 'Connexion')
 
     cy.changeLanguageUnloggedPages('pt')
-    cy.contains('.loginpage__main__form__btnsubmit', 'Conexão')
+    cy.contains('.classicLoginAuthForm__btnsubmit', 'Conexão')
 
     cy.changeLanguageUnloggedPages('de')
-    cy.contains('.loginpage__main__form__btnsubmit', 'Verbindung')
+    cy.contains('.classicLoginAuthForm__btnsubmit', 'Verbindung')
 
     cy.changeLanguageUnloggedPages('ar')
-    cy.contains('.loginpage__main__form__btnsubmit', 'تسجيل الدخول')
+    cy.contains('.classicLoginAuthForm__btnsubmit', 'تسجيل الدخول')
 
     cy.changeLanguageUnloggedPages('es')
-    cy.contains('.loginpage__main__form__btnsubmit', 'Conexión')
+    cy.contains('.classicLoginAuthForm__btnsubmit', 'Conexión')
   })
 })

@@ -9,7 +9,6 @@ import * as Cookies from 'js-cookie'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import {
   CUSTOM_EVENT,
-  getSpaceMemberList,
   handleFetchResult,
   checkEmailValidity,
   PAGE,
@@ -22,14 +21,13 @@ import {
   newFlashMessage,
   setUserConnected,
   setUserDisconnected,
-  setWorkspaceList,
+  setUserWorkspaceConfigList,
   setContentTypeList,
   setAppList,
   setConfig,
   resetBreadcrumbs,
   setUserConfiguration,
   setUserLang,
-  setWorkspaceListMemberList,
   setUnreadMentionCount,
   setUnreadNotificationCount,
   setHeadTitle,
@@ -39,7 +37,7 @@ import {
   getAppList,
   getConfig,
   getContentTypeList,
-  getMyselfWorkspaceList,
+  getMyselfWorkspaceConfigList,
   getUsageConditions,
   getUserConfiguration,
   getUserMessagesSummary,
@@ -158,29 +156,55 @@ class Login extends React.Component {
     event.preventDefault()
 
     if (name.value === '' || loginTrimmed === '' || password.value === '') {
-      props.dispatch(newFlashMessage(props.t('All fields are required. Please enter a name, an email and a password.'), 'warning'))
+      props.dispatch(
+        newFlashMessage(
+          props.t('All fields are required. Please enter a name, an email and a password.'),
+          'warning',
+          10000
+        )
+      )
       return
     }
 
     if (!checkEmailValidity(loginTrimmed)) {
-      props.dispatch(newFlashMessage(props.t('Invalid email. Please enter a valid email.'), 'warning'))
+      props.dispatch(
+        newFlashMessage(props.t('Invalid email. Please enter a valid email.'), 'warning', 10000)
+      )
       return
     }
 
     if (name.value.length < MINIMUM_CHARACTERS_PUBLIC_NAME) {
-      props.dispatch(newFlashMessage(
-        props.t('Full name must be at least {{minimumCharactersPublicName}} characters', { minimumCharactersPublicName: MINIMUM_CHARACTERS_PUBLIC_NAME }),
-        'warning'))
+      props.dispatch(
+        newFlashMessage(
+          props.t('Full name must be at least {{minimumCharactersPublicName}} characters', {
+            minimumCharactersPublicName: MINIMUM_CHARACTERS_PUBLIC_NAME
+          }),
+          'warning',
+          10000
+        )
+      )
       return
     }
 
     if (password.value.length < 6) {
-      props.dispatch(newFlashMessage(props.t('New password is too short (minimum 6 characters)'), 'warning'))
+      props.dispatch(
+        newFlashMessage(
+          props.t('New password is too short (minimum 6 characters)'),
+          'warning',
+          10000
+        )
+      )
       return
     }
 
     if (password.value.length > 512) {
-      props.dispatch(newFlashMessage(props.t('New password is too long (maximum 512 characters)'), 'warning'))
+      props.dispatch(
+        newFlashMessage(
+          props.t('New password is too long (maximum 512 characters)'),
+          'warning',
+          10000
+        )
+      )
       return
     }
 
@@ -251,7 +275,7 @@ class Login extends React.Component {
 
         this.loadAppList()
         this.loadContentTypeList()
-        this.loadWorkspaceLists()
+        this.loadWorkspaceList()
         this.loadNotificationNotRead(loggedUser.user_id)
         this.loadUserConfiguration(loggedUser.user_id)
         break
@@ -336,37 +360,19 @@ class Login extends React.Component {
     if (fetchGetContentTypeList.status === 200) props.dispatch(setContentTypeList(fetchGetContentTypeList.json))
   }
 
-  loadWorkspaceLists = async () => {
+  loadWorkspaceList = async () => {
     const { props } = this
-    const showOwnedWorkspace = false
 
-    const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList(showOwnedWorkspace))
+    const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceConfigList())
     if (fetchGetWorkspaceList.status === 200) {
-      props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
-      this.loadWorkspaceListMemberList(fetchGetWorkspaceList.json)
+      props.dispatch(setUserWorkspaceConfigList(fetchGetWorkspaceList.json))
     }
 
-    const fetchAccessibleWorkspaceList = await props.dispatch(getAccessibleWorkspaces(props.user.userId))
+    const fetchAccessibleWorkspaceList = await props.dispatch(
+      getAccessibleWorkspaces(props.user.userId)
+    )
     if (fetchAccessibleWorkspaceList.status !== 200) return
     props.dispatch(setAccessibleWorkspaceList(fetchAccessibleWorkspaceList.json))
-  }
-
-  loadWorkspaceListMemberList = async workspaceList => {
-    const { props } = this
-
-    const fetchWorkspaceListMemberList = await Promise.all(
-      workspaceList.map(async ws => ({
-        workspaceId: ws.workspace_id,
-        fetchMemberList: await handleFetchResult(await getSpaceMemberList(FETCH_CONFIG.apiUrl, ws.workspace_id))
-      }))
-    )
-
-    const workspaceListMemberList = fetchWorkspaceListMemberList.map(memberList => ({
-      workspaceId: memberList.workspaceId,
-      memberList: memberList.fetchMemberList.apiResponse.status === 200 ? memberList.fetchMemberList.body : []
-    }))
-
-    props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
   }
 
   loadUserConfiguration = async userId => {

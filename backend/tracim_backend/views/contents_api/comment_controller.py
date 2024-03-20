@@ -1,12 +1,13 @@
 # coding=utf-8
 from http import HTTPStatus
-
 from pyramid.config import Configurator
 import transaction
 
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.config import CFG
+from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import EmptyCommentContentNotAllowed
+from tracim_backend.exceptions import InvalidMention
 from tracim_backend.exceptions import UserNotMemberOfWorkspace
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
@@ -61,9 +62,11 @@ class CommentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         comment = api.get_one(
-            hapic_data.path.comment_id, parent=content, content_type=content_type_list.Comment.slug
+            hapic_data.path.comment_id,
+            parent=content,
+            content_type=content_type_list.Comment.slug,
         )
         return api.get_content_in_context(comment)
 
@@ -80,7 +83,9 @@ class CommentController(Controller):
         Translate a comment
         """
         translation_lib = TranslationLib(
-            config=request.app_config, current_user=request.current_user, session=request.dbsession
+            config=request.app_config,
+            current_user=request.current_user,
+            session=request.dbsession,
         )
         comment_id = hapic_data.path.comment_id
         filename = hapic_data.path.filename
@@ -113,7 +118,7 @@ class CommentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         comments_page = content.get_subcontents(
             page_token=hapic_data.query["page_token"],
             count=hapic_data.query["count"],
@@ -124,6 +129,7 @@ class CommentController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_COMMENT_ENDPOINTS])
     @hapic.handle_exception(EmptyCommentContentNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(InvalidMention, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UserNotMemberOfWorkspace, HTTPStatus.BAD_REQUEST)
     @check_right(is_contributor)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
@@ -142,7 +148,7 @@ class CommentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         comment = api.create_comment(
             content.workspace, content, hapic_data.body.raw_content, do_save=True
         )
@@ -150,6 +156,7 @@ class CommentController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_COMMENT_ENDPOINTS])
     @hapic.handle_exception(EmptyCommentContentNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(InvalidMention, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UserNotMemberOfWorkspace, HTTPStatus.BAD_REQUEST)
     @check_right(can_edit_comment)
     @hapic.input_path(CommentsPathSchema())
@@ -167,11 +174,15 @@ class CommentController(Controller):
             config=request.app_config,
         )
         wapi = WorkspaceApi(
-            current_user=request.current_user, session=request.dbsession, config=request.app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=request.app_config,
         )
         workspace = wapi.get_one(hapic_data.path.workspace_id)
         parent = api.get_one(
-            hapic_data.path.content_id, content_type=content_type_list.Any_SLUG, workspace=workspace
+            hapic_data.path.content_id,
+            content_type=ContentTypeSlug.ANY.value,
+            workspace=workspace,
         )
         comment = api.get_one(
             hapic_data.path.comment_id,
@@ -201,11 +212,15 @@ class CommentController(Controller):
             config=app_config,
         )
         wapi = WorkspaceApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
         workspace = wapi.get_one(hapic_data.path.workspace_id)
         parent = api.get_one(
-            hapic_data.path.content_id, content_type=content_type_list.Any_SLUG, workspace=workspace
+            hapic_data.path.content_id,
+            content_type=ContentTypeSlug.ANY.value,
+            workspace=workspace,
         )
         comment = api.get_one(
             hapic_data.path.comment_id,

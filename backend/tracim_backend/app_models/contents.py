@@ -75,7 +75,6 @@ closed_deprecated_status = ContentStatus(
 
 
 class ContentStatusList(object):
-
     OPEN = open_status
 
     def __init__(self, extend_content_status: typing.List[ContentStatus]):
@@ -89,11 +88,11 @@ class ContentStatusList(object):
         raise ContentStatusNotExist()
 
     def get_all_slugs_values(self) -> typing.List[str]:
-        """ Get all slugs"""
+        """Get all slugs"""
         return [item.slug for item in self._content_status]
 
     def get_all(self) -> typing.List[ContentStatus]:
-        """ Get all status"""
+        """Get all status"""
         return [item for item in self._content_status]
 
     def get_default_status(self) -> ContentStatus:
@@ -168,17 +167,8 @@ class ContentTypeSlug(str, Enum):
     KANBAN = "kanban"
     THREAD = "thread"
     TODO = "todo"
+    LOGBOOK = "logbook"
     ANY = "any"
-
-
-# TODO - G.M - 2022-06-29 - Replace these variable by usage of ContentTypeSlug Enum
-COMMENT_TYPE = ContentTypeSlug.COMMENT.value
-FILE_TYPE = ContentTypeSlug.FILE.value
-FOLDER_TYPE = ContentTypeSlug.FOLDER.value
-HTML_DOCUMENTS_TYPE = ContentTypeSlug.HTML_DOCUMENTS.value
-KANBAN_TYPE = ContentTypeSlug.KANBAN.value
-THREAD_TYPE = ContentTypeSlug.THREAD.value
-TODO_TYPE = ContentTypeSlug.TODO.value
 
 
 # TODO - G.M - 31-05-2018 - Set Better Comment params
@@ -195,9 +185,6 @@ class ContentTypeList(object):
     """
     ContentType List
     """
-
-    # TODO - G.M - 2022-06-29 - Replace this variable by direct usage of ContentTypeSlug.ANY
-    Any_SLUG = ContentTypeSlug.ANY.value
 
     Comment = comment_type
 
@@ -224,6 +211,10 @@ class ContentTypeList(object):
     @property
     def Todo(self) -> TracimContentType:
         return self.get_one_by_slug(ContentTypeSlug.TODO.value)
+
+    @property
+    def Logbook(self) -> TracimContentType:
+        return self.get_one_by_slug(ContentTypeSlug.LOGBOOK.value)
 
     def __init__(self, app_list: typing.List["TracimApplication"]):
         self.app_list = app_list
@@ -280,7 +271,7 @@ class ContentTypeList(object):
         """
         Return all allowed types slug : content_type slug + all alias, any
         and special content_type like comment. Do not return event.
-        Usefull allowed value to perform query to database.
+        Useful allowed value to perform query to database.
         """
         allowed_types_slug = []
         content_types = self._content_types

@@ -1,8 +1,7 @@
 import hashlib
-import typing
-
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import literal
+import typing
 
 from tracim_backend.exceptions import UserCallNotFound
 from tracim_backend.exceptions import UserCallTransitionNotAllowed

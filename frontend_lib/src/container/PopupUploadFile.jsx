@@ -186,7 +186,6 @@ class PopupUploadFile extends React.Component {
         onChangeContentName={() => {}}
         onChangeTemplate={props.onChangeTemplate}
         btnValidateLabel={props.validateLabel || props.t('Validate')}
-        customStyle={{ top: '50%', transform: 'translateY(-50%)' }}
         templateList={props.templateList}
       >
         <div>

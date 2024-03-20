@@ -129,18 +129,6 @@ const mockPutContentItemMove400 = (apiUrl, source) => {
     .reply(400, {})
 }
 
-const mockPutUserWorkspaceDoNotify204 = (apiUrl, userId, workspaceId, doNotify) => {
-  return nock(apiUrl)
-    .put(`/users/${userId}/workspaces/${workspaceId}/notifications/${doNotify ? 'activate' : 'deactivate'}`)
-    .reply(204)
-}
-
-const mockMyselfWorkspaceDoNotify204 = (apiUrl, workspaceId, doNotify) => {
-  return nock(apiUrl)
-    .put(`/users/me/workspaces/${workspaceId}/notifications/${doNotify ? 'activate' : 'deactivate'}`)
-    .reply(204)
-}
-
 const mockGetConfig200 = (apiUrl) => {
   return nock(apiUrl)
     .get('/system/config')
@@ -167,13 +155,13 @@ const mockGetContentType200 = (apiUrl, contentTypes) => {
 
 const mockGetMyselfWorkspaceList200 = (apiUrl, showOwnedWorkspace, workspaceList) => {
   return nock(apiUrl)
-    .get(`/users/me/workspaces?show_owned_workspace=${showOwnedWorkspace ? 1 : 0}`)
+    .get('/users/me/workspaces/all/settings')
     .reply(200, workspaceList)
 }
 
 const mockGetUserWorkspaceList200 = (apiUrl, userId, showOwnedWorkspace, workspaceList) => {
   return nock(apiUrl)
-    .get(`/users/${userId}/workspaces?show_owned_workspace=${showOwnedWorkspace ? 1 : 0}`)
+    .get(`/users/${userId}/workspaces/all/settings`)
     .reply(200, workspaceList)
 }
 
@@ -303,13 +291,11 @@ export {
   mockGetAppList200,
   mockGetConfig200,
   mockGetUserConfig200,
-  mockMyselfWorkspaceDoNotify204,
   mockPostUserLogout204,
   mockPutAllNotificationAsRead204,
   mockPutContentNotificationAsRead204,
   mockPutContentItemMove200,
   mockPutContentItemMove400,
-  mockPutUserWorkspaceDoNotify204,
   mockPutMyselfName200,
   mockPutUserPublicName200,
   mockPutUserUsername200,

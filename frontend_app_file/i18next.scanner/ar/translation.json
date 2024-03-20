@@ -37,7 +37,6 @@
   "Please wait until the upload ends": "انتظر من فضلك حتى انتهاء التحميل",
   "Error while saving the user configuration": "خطأ أثناء حفظ إعدادات المستخدم",
   "Error while saving the new description": "خطأ أثناء حفظ الوصف الجديد",
-  "Error while saving the comment": "خطأ أثناء حفظ التعليق",
   "A content with the same name already exists": "محتوى بنفس الاسم موجود مسبقا",
   "The file is larger than the maximum file size allowed": "حجم الملف يتجاوز الحجم الأقصى المسموح به",
   "Error, the space exceed its maximum size": "خطأ، الفضاء تجاوز حده الأقصى",
@@ -65,5 +64,8 @@
   "Validate and create": "اعتماد و إنشاء",
   "Tasks": "",
   "The link has been copied to clipboard": "تم نسخ الرابط إلى الحافظة",
-  "Copy content link": "نسخ رابط المحتوى"
+  "Copy content link": "نسخ رابط المحتوى",
+  "Permanently delete": "",
+  "Yes, delete permanently": "",
+  "Warning: this operation cannot be rolled back": ""
 }

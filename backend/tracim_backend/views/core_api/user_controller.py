@@ -1,13 +1,13 @@
-from http import HTTPStatus
-import json
-import typing
-
 from hapic import HapicData
 from hapic.data import HapicFile
+from http import HTTPStatus
+import json
 from pyramid.config import Configurator
 from pyramid.response import Response
+import typing
 
-from tracim_backend.config import CFG
+from tracim_backend.config import CFG  # noqa: F401
+from tracim_backend.config import UserReadOnlyFields
 from tracim_backend.error import ErrorCode
 from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
 from tracim_backend.exceptions import CannotUseBothIncludeAndExcludeWorkspaceUsers
@@ -22,6 +22,7 @@ from tracim_backend.exceptions import NotFound
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import PreviewDimNotAllowed
+from tracim_backend.exceptions import ReadOnlyFieldException
 from tracim_backend.exceptions import ReservedUsernameError
 from tracim_backend.exceptions import RoleAlreadyExistError
 from tracim_backend.exceptions import TooManyOnlineUsersError
@@ -34,8 +35,8 @@ from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
 from tracim_backend.exceptions import UserFollowAlreadyDefined
 from tracim_backend.exceptions import UserImageNotFound
-from tracim_backend.exceptions import UsernameAlreadyExists
 from tracim_backend.exceptions import UserSelfRegistrationDisabledException
+from tracim_backend.exceptions import UsernameAlreadyExists
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.extensions import hapic
@@ -49,6 +50,7 @@ from tracim_backend.lib.core.user import DEFAULT_COVER_SIZE
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.user_custom_properties import UserCustomPropertiesApi
 from tracim_backend.lib.core.userconfig import UserConfigApi
+from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import has_personal_access
@@ -66,13 +68,14 @@ from tracim_backend.models.context_models import PaginatedObject
 from tracim_backend.models.context_models import UserMessagesSummary
 from tracim_backend.models.context_models import WorkspaceInContext
 from tracim_backend.models.data import WorkspaceSubscription
-from tracim_backend.models.event import Message
+from tracim_backend.models.event import Message  # noqa: F401
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import AboutUserSchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentIdsQuerySchema
 from tracim_backend.views.core_api.schemas import DeleteFollowedUserPathSchema
+from tracim_backend.views.core_api.schemas import EmailNotificationTypeSchema
 from tracim_backend.views.core_api.schemas import FileQuerySchema
 from tracim_backend.views.core_api.schemas import FollowedUsersSchemaPage
 from tracim_backend.views.core_api.schemas import GetLiveMessageQuerySchema
@@ -89,8 +92,8 @@ from tracim_backend.views.core_api.schemas import SetEmailSchema
 from tracim_backend.views.core_api.schemas import SetPasswordSchema
 from tracim_backend.views.core_api.schemas import SetUserAllowedSpaceSchema
 from tracim_backend.views.core_api.schemas import SetUserInfoSchema
-from tracim_backend.views.core_api.schemas import SetUsernameSchema
 from tracim_backend.views.core_api.schemas import SetUserProfileSchema
+from tracim_backend.views.core_api.schemas import SetUsernameSchema
 from tracim_backend.views.core_api.schemas import SimpleFileSchema
 from tracim_backend.views.core_api.schemas import TracimLiveEventHeaderSchema
 from tracim_backend.views.core_api.schemas import TracimLiveEventQuerySchema
@@ -107,18 +110,20 @@ from tracim_backend.views.core_api.schemas import UserPicturePathSchema
 from tracim_backend.views.core_api.schemas import UserPreviewPicturePathSchema
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceAndContentIdPathSchema
+from tracim_backend.views.core_api.schemas import UserWorkspaceConfigSchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceFilterQuerySchema
 from tracim_backend.views.core_api.schemas import UserWorkspaceIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSubscriptionSchema
+from tracim_backend.views.core_api.schemas import WorkspaceWithUserMemberSchema
+from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_EVENT_ENDPOINTS
+from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_USER_CONFIG_ENDPOINTS
+from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_USER_SUBSCRIPTIONS_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ENABLE_AND_DISABLE_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__NOTIFICATION_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__TRASH_AND_RESTORE_SECTION
-from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_EVENT_ENDPOINTS
-from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_USER_CONFIG_ENDPOINTS
-from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_USER_SUBSCRIPTIONS_SECTION
 
 SWAGGER_TAG__USER_ENDPOINTS = "Users"
 
@@ -157,7 +162,22 @@ ALLOWED__AVATAR_MIMETYPES = [
     "image/bmp",
     "image/x-ms-bmp",
     "image/gif",
+    "image/svg+xml",
 ]
+
+
+def check_has_write_rights(
+    field: UserReadOnlyFields, app_config: CFG, request: TracimRequest
+) -> bool:
+    """
+    Check if user can write provided field (is admin or field is writable)
+    :raise ReadOnlyFieldException if the field is not writable
+    """
+    read_only_fields = app_config.USER__READ_ONLY_FIELDS.get(request.candidate_user.auth_type)
+    if read_only_fields is not None:
+        if field in read_only_fields:
+            raise ReadOnlyFieldException(f"You can't modify the field {field.value}")
+    return True
 
 
 class UserController(Controller):
@@ -165,7 +185,7 @@ class UserController(Controller):
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(UserWorkspaceFilterQuerySchema())
-    @hapic.output_body(WorkspaceSchema(many=True))
+    @hapic.output_body(WorkspaceWithUserMemberSchema(many=True))
     def user_workspace(self, context, request: TracimRequest, hapic_data=None):
         """
         Get list of user workspaces
@@ -183,7 +203,30 @@ class UserController(Controller):
             include_with_role=hapic_data.query.show_workspace_with_role,
             parents_ids=hapic_data.query.parent_ids,
         )
-        return [wapi.get_workspace_with_context(workspace) for workspace in workspaces]
+        return [
+            wapi.get_workspace_with_context(workspace, user=request.candidate_user)
+            for workspace in workspaces
+        ]
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_query(UserWorkspaceFilterQuerySchema())
+    @hapic.output_body(UserWorkspaceConfigSchema(many=True))
+    def user_role_workspace(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Get list of all roles of the given user
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        wapi = UserWorkspaceConfigApi(
+            current_user=request.candidate_user,  # User
+            session=request.dbsession,
+            config=app_config,
+        )
+        return [
+            wapi.get_user_workspace_config_with_context(role)
+            for role in request.candidate_user.get_active_roles()
+        ]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.BAD_REQUEST)
@@ -276,8 +319,7 @@ class UserController(Controller):
             limit=hapic_data.query.limit,
             filter_results=app_config.KNOWN_MEMBERS__FILTER,
         )
-        context_users = [uapi.get_user_with_context(user) for user in users]
-        return context_users
+        return [uapi.get_user_with_context(user) for user in users]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @check_right(has_personal_access)
@@ -306,6 +348,7 @@ class UserController(Controller):
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(EmailAlreadyExists, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ExternalAuthUserEmailModificationDisallowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ReadOnlyFieldException, HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_body(SetEmailSchema())
     @hapic.input_path(UserIdPathSchema())
@@ -318,6 +361,7 @@ class UserController(Controller):
         uapi = UserApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
+        check_has_write_rights(UserReadOnlyFields.EMAIL, app_config, request)
         user = uapi.set_email(
             request.candidate_user,
             hapic_data.body.loggedin_user_password,
@@ -331,6 +375,7 @@ class UserController(Controller):
     @hapic.handle_exception(UsernameAlreadyExists, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ReservedUsernameError, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(TracimValidationFailed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ReadOnlyFieldException, HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_body(SetUsernameSchema())
     @hapic.input_path(UserIdPathSchema())
@@ -343,6 +388,7 @@ class UserController(Controller):
         uapi = UserApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
+        check_has_write_rights(UserReadOnlyFields.USERNAME, app_config, request)
         user = uapi.set_username(
             request.candidate_user,
             hapic_data.body.loggedin_user_password,
@@ -355,6 +401,7 @@ class UserController(Controller):
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
     @hapic.handle_exception(PasswordDoNotMatch, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ExternalAuthUserPasswordModificationDisallowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ReadOnlyFieldException, HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_body(SetPasswordSchema())
     @hapic.input_path(UserIdPathSchema())
@@ -367,6 +414,7 @@ class UserController(Controller):
         uapi = UserApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
+        check_has_write_rights(UserReadOnlyFields.PASSWORD, app_config, request)
         uapi.set_password(
             request.candidate_user,
             hapic_data.body.loggedin_user_password,
@@ -385,6 +433,13 @@ class UserController(Controller):
         Set user info data
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
+        try:
+            check_has_write_rights(UserReadOnlyFields.PUBLIC_NAME, app_config, request)
+        except ReadOnlyFieldException:
+            # NOTE - M.L. - 07/11/2023 - Since public_name is always sent,
+            #  even when only changing the language, this request will fail all the time.
+            #  This allows to make sure the public_name is not modified without blocking the request
+            hapic_data.body.public_name = request.candidate_user.public_name
         uapi = UserApi(
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
@@ -681,38 +736,25 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_NOTIFICATION_ENDPOINTS])
     @check_right(has_personal_access)
     @hapic.input_path(UserWorkspaceIdPathSchema())
+    @hapic.input_body(EmailNotificationTypeSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def enable_workspace_notification(self, context, request: TracimRequest, hapic_data=None):
-        """
-        enable workspace notification
-        """
-        app_config = request.registry.settings["CFG"]  # type: CFG
-        wapi = WorkspaceApi(
-            current_user=request.candidate_user,  # User
-            session=request.dbsession,
-            config=app_config,
-        )
-        workspace = wapi.get_one(hapic_data.path.workspace_id)
-        wapi.enable_notifications(request.candidate_user, workspace)
-        wapi.save(workspace)
+    def change_space_notification(self, context, request: TracimRequest, hapic_data=None):
+        """Change space notification"""
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_NOTIFICATION_ENDPOINTS])
-    @check_right(has_personal_access)
-    @hapic.input_path(UserWorkspaceIdPathSchema())
-    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def disable_workspace_notification(self, context, request: TracimRequest, hapic_data=None):
-        """
-        disable workspace notification
-        """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        wapi = WorkspaceApi(
+        user_id = request.candidate_user.user_id
+        space_id = hapic_data.path.workspace_id
+        user_workspace_config_api = UserWorkspaceConfigApi(
             current_user=request.candidate_user,  # User
             session=request.dbsession,
             config=app_config,
         )
-        workspace = wapi.get_one(hapic_data.path.workspace_id)
-        wapi.disable_notifications(request.candidate_user, workspace)
-        wapi.save(workspace)
+        role_in_space = user_workspace_config_api.get_one(user_id=user_id, workspace_id=space_id)
+        user_workspace_config_api.update_role(
+            role=role_in_space,
+            email_notification_type_value=hapic_data.body["email_notification_type"],
+            save_now=True,
+        )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
     @check_right(has_personal_access)
@@ -1184,7 +1226,8 @@ class UserController(Controller):
             current_user=request.current_user, session=request.dbsession, config=request.app_config
         )
         default_filename = "avatar_{width}x{height}.jpg".format(
-            width=hapic_data.path.width, height=hapic_data.path.height,
+            width=hapic_data.path.width,
+            height=hapic_data.path.height,
         )
         return user_api.get_avatar_preview(
             request.candidate_user.user_id,
@@ -1212,7 +1255,7 @@ class UserController(Controller):
         user_api = UserApi(
             current_user=request.current_user, session=request.dbsession, config=request.app_config
         )
-        default_filename = "avatar.jpg".format(width=width, height=height)
+        default_filename = "avatar.jpg"
         return user_api.get_avatar_preview(
             request.candidate_user.user_id,
             filename=hapic_data.path.filename,
@@ -1288,7 +1331,8 @@ class UserController(Controller):
             current_user=request.current_user, session=request.dbsession, config=request.app_config
         )
         default_filename = "cover_{width}x{height}.jpg".format(
-            width=hapic_data.path.width, height=hapic_data.path.height,
+            width=hapic_data.path.width,
+            height=hapic_data.path.height,
         )
         return user_api.get_cover_preview(
             request.candidate_user.user_id,
@@ -1316,7 +1360,7 @@ class UserController(Controller):
         user_api = UserApi(
             current_user=request.current_user, session=request.dbsession, config=request.app_config
         )
-        default_filename = "cover.jpg".format(width=width, height=height)
+        default_filename = "cover.jpg"
         return user_api.get_cover_preview(
             request.candidate_user.user_id,
             filename=hapic_data.path.filename,
@@ -1385,16 +1429,24 @@ class UserController(Controller):
         # user workspace
         configurator.add_route(
             "get_user_workspace",
-            "/users/{user_id:\d+}/workspaces",
+            "/users/{user_id:\d+}/workspaces",  # noqa: W605
             request_method="GET",  # noqa: W605
         )
         configurator.add_view(self.user_workspace, route_name="get_user_workspace")
         configurator.add_route(
             "post_user_workspace",
-            "/users/{user_id:\d+}/workspaces",
+            "/users/{user_id:\d+}/workspaces",  # noqa: W605
             request_method="POST",  # noqa: W605
         )
         configurator.add_view(self.join_workspace, route_name="post_user_workspace")
+
+        # user role
+        configurator.add_route(
+            "get_user_role_workspace",
+            "/users/{user_id:\d+}/workspaces/all/settings",  # noqa: W605
+            request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(self.user_role_workspace, route_name="get_user_role_workspace")
 
         # user info
         configurator.add_route("user", "/users/{user_id:\d+}", request_method="GET")  # noqa: W605
@@ -1402,7 +1454,7 @@ class UserController(Controller):
 
         # user space info
         configurator.add_route(
-            "user_disk_space", "/users/{user_id:\d+}/disk_space", request_method="GET"
+            "user_disk_space", "/users/{user_id:\d+}/disk_space", request_method="GET"  # noqa: W605
         )  # noqa: W605
         configurator.add_view(self.user_disk_space, route_name="user_disk_space")
 
@@ -1413,7 +1465,7 @@ class UserController(Controller):
         # known members list
         configurator.add_route(
             "known_members",
-            "/users/{user_id:\d+}/known_members",
+            "/users/{user_id:\d+}/known_members",  # noqa: W605
             request_method="GET",  # noqa: W605
         )
         configurator.add_view(self.known_members, route_name="known_members")
@@ -1421,20 +1473,20 @@ class UserController(Controller):
         # known contents list
         configurator.add_route(
             "known_contents",
-            "/users/{user_id:\d+}/known_contents",
+            "/users/{user_id:\d+}/known_contents",  # noqa: W605
             request_method="GET",  # noqa: W605
         )
         configurator.add_view(self.known_contents, route_name="known_contents")
 
         # set user email
         configurator.add_route(
-            "set_user_email", "/users/{user_id:\d+}/email", request_method="PUT"
+            "set_user_email", "/users/{user_id:\d+}/email", request_method="PUT"  # noqa: W605
         )  # noqa: W605
         configurator.add_view(self.set_user_email, route_name="set_user_email")
 
         # set user username
         configurator.add_route(
-            "set_user_username", "/users/{user_id:\d+}/username", request_method="PUT"
+            "set_user_username", "/users/{user_id:\d+}/username", request_method="PUT"  # noqa: W605
         )  # noqa: W605
         configurator.add_view(self.set_user_username, route_name="set_user_username")
 
@@ -1446,7 +1498,7 @@ class UserController(Controller):
 
         # set user_info
         configurator.add_route(
-            "set_user_info", "/users/{user_id:\d+}", request_method="PUT"
+            "set_user_info", "/users/{user_id:\d+}", request_method="PUT"  # noqa: W605
         )  # noqa: W605
         configurator.add_view(self.set_user_infos, route_name="set_user_info")
 
@@ -1460,7 +1512,7 @@ class UserController(Controller):
 
         # enable user
         configurator.add_route(
-            "enable_user", "/users/{user_id:\d+}/enabled", request_method="PUT"
+            "enable_user", "/users/{user_id:\d+}/enabled", request_method="PUT"  # noqa: W605
         )  # noqa: W605
         configurator.add_view(self.enable_user, route_name="enable_user")
 
@@ -1472,14 +1524,14 @@ class UserController(Controller):
 
         # delete user
         configurator.add_route(
-            "delete_user", "/users/{user_id:\d+}/trashed", request_method="PUT"
+            "delete_user", "/users/{user_id:\d+}/trashed", request_method="PUT"  # noqa: W605
         )  # noqa: W605
         configurator.add_view(self.delete_user, route_name="delete_user")
 
         # undelete user
         configurator.add_route(
             "undelete_user",
-            "/users/{user_id:\d+}/trashed/restore",
+            "/users/{user_id:\d+}/trashed/restore",  # noqa: W605
             request_method="PUT",  # noqa: W605
         )
         configurator.add_view(self.undelete_user, route_name="undelete_user")
@@ -1493,7 +1545,7 @@ class UserController(Controller):
         # set user allowed_space
         configurator.add_route(
             "set_user_allowed_space",
-            "/users/{user_id:\d+}/allowed_space",
+            "/users/{user_id:\d+}/allowed_space",  # noqa: W605
             request_method="PUT",  # noqa: W605
         )
         configurator.add_view(self.set_allowed_space, route_name="set_user_allowed_space")
@@ -1530,23 +1582,14 @@ class UserController(Controller):
 
         # enable workspace notification
         configurator.add_route(
-            "enable_workspace_notification",
-            "/users/{user_id:\d+}/workspaces/{workspace_id}/notifications/activate",  # noqa: W605
+            "change_space_notification",
+            "/users/{user_id:\d+}/workspaces/{workspace_id}/email_notification_type",  # noqa: W605
             request_method="PUT",
         )
         configurator.add_view(
-            self.enable_workspace_notification, route_name="enable_workspace_notification"
+            self.change_space_notification, route_name="change_space_notification"
         )
 
-        # enable workspace notification
-        configurator.add_route(
-            "disable_workspace_notification",
-            "/users/{user_id:\d+}/workspaces/{workspace_id}/notifications/deactivate",  # noqa: W605
-            request_method="PUT",
-        )
-        configurator.add_view(
-            self.disable_workspace_notification, route_name="disable_workspace_notification"
-        )
         # TracimLiveMessages notification
         configurator.add_route(
             "live_messages",
@@ -1563,7 +1606,7 @@ class UserController(Controller):
 
         configurator.add_route(
             "messages_summary",
-            "/users/{user_id:\d+}/messages/summary",
+            "/users/{user_id:\d+}/messages/summary",  # noqa: W605
             request_method="GET",  # noqa: W605
         )
         configurator.add_view(self.get_user_messages_summary, route_name="messages_summary")
@@ -1571,7 +1614,7 @@ class UserController(Controller):
         # read a list of messages or every messages for a user
         configurator.add_route(
             "read_messages",
-            "/users/{user_id:\d+}/messages/read",
+            "/users/{user_id:\d+}/messages/read",  # noqa: W605
             request_method="PUT",  # noqa: W605
         )
         configurator.add_view(self.set_user_messages_as_read, route_name="read_messages")
@@ -1579,7 +1622,7 @@ class UserController(Controller):
         # unread a list of messages or every messages for a user
         configurator.add_route(
             "unread_messages",
-            "/users/{user_id:\d+}/messages/unread",
+            "/users/{user_id:\d+}/messages/unread",  # noqa: W605
             request_method="PUT",  # noqa: W605
         )
         configurator.add_view(self.set_user_messages_as_unread, route_name="unread_messages")
@@ -1588,7 +1631,7 @@ class UserController(Controller):
         # DEPRECATED - MP - 2022-09-22 - https://github.com/tracim/tracim/issues/5941
         configurator.add_route(
             "read_message",
-            "/users/{user_id:\d+}/messages/{event_id:\d+}/read",
+            "/users/{user_id:\d+}/messages/{event_id:\d+}/read",  # noqa: W605
             request_method="PUT",  # noqa: W605
         )
         configurator.add_view(self.set_message_as_read, route_name="read_message")
@@ -1597,7 +1640,7 @@ class UserController(Controller):
         # DEPRECATED - MP - 2022-09-22 - https://github.com/tracim/tracim/issues/5941
         configurator.add_route(
             "unread_message",
-            "/users/{user_id:\d+}/messages/{event_id:\d+}/unread",
+            "/users/{user_id:\d+}/messages/{event_id:\d+}/unread",  # noqa: W605
             request_method="PUT",  # noqa: W605
         )
         configurator.add_view(self.set_message_as_unread, route_name="unread_message")
@@ -1616,14 +1659,14 @@ class UserController(Controller):
         # User custom properties
         configurator.add_route(
             "custom_properties_get",
-            "/users/{user_id:\d+}/custom-properties",
+            "/users/{user_id:\d+}/custom-properties",  # noqa: W605
             request_method="GET",  # noqa: W605
         )
         configurator.add_view(self.get_user_custom_properties, route_name="custom_properties_get")
 
         configurator.add_route(
             "custom_properties_post",
-            "/users/{user_id:\d+}/custom-properties",
+            "/users/{user_id:\d+}/custom-properties",  # noqa: W605
             request_method="PUT",  # noqa: W605
         )
         configurator.add_view(self.set_user_custom_properties, route_name="custom_properties_post")
@@ -1631,7 +1674,7 @@ class UserController(Controller):
         # User accessible workspaces (not member of, but can see information about them to subscribe)
         configurator.add_route(
             "get_accessible_workspaces",
-            "/users/{user_id:\d+}/accessible_workspaces",
+            "/users/{user_id:\d+}/accessible_workspaces",  # noqa: W605
             request_method="GET",  # noqa: W605
         )
         configurator.add_view(
@@ -1641,14 +1684,14 @@ class UserController(Controller):
         # User subscriptions
         configurator.add_route(
             "subscriptions_get",
-            "/users/{user_id:\d+}/workspace_subscriptions",
+            "/users/{user_id:\d+}/workspace_subscriptions",  # noqa: W605
             request_method="GET",  # noqa: W605
         )
         configurator.add_view(self.user_subscriptions, route_name="subscriptions_get")
 
         configurator.add_route(
             "subscriptions_put",
-            "/users/{user_id:\d+}/workspace_subscriptions",
+            "/users/{user_id:\d+}/workspace_subscriptions",  # noqa: W605
             request_method="PUT",  # noqa: W605
         )
         configurator.add_view(self.submit_subscription, route_name="subscriptions_put")
@@ -1661,14 +1704,14 @@ class UserController(Controller):
 
         configurator.add_route(
             "create_following",
-            "/users/{user_id:\d+}/following",
+            "/users/{user_id:\d+}/following",  # noqa: W605
             request_method="POST",  # noqa: W605
         )
         configurator.add_view(self.create_following, route_name="create_following")
 
         configurator.add_route(
             "delete_following",
-            "/users/{user_id:\d+}/following/{leader_id:\d+}",
+            "/users/{user_id:\d+}/following/{leader_id:\d+}",  # noqa: W605
             request_method="DELETE",  # noqa: W605
         )
         configurator.add_view(self.delete_following, route_name="delete_following")
@@ -1679,62 +1722,64 @@ class UserController(Controller):
         configurator.add_view(self.followers, route_name="followers")
 
         configurator.add_route(
-            "about_user", "/users/{user_id:\d+}/about", request_method="GET",  # noqa: W605
+            "about_user",
+            "/users/{user_id:\d+}/about",  # noqa: W605
+            request_method="GET",  # noqa: W605
         )
         configurator.add_view(self.about_user, route_name="about_user")
 
         configurator.add_route(
             "sized_preview_avatar",
-            "/users/{user_id:\d+}/avatar/preview/jpg/{width:\d+}x{height:\d+}/{filename:[^/]*}",
+            "/users/{user_id:\d+}/avatar/preview/jpg/{width:\d+}x{height:\d+}/{filename:[^/]*}",  # noqa: W605
             request_method="GET",  # noqa: W605
         )
         configurator.add_view(self.sized_preview_avatar, route_name="sized_preview_avatar")
 
         configurator.add_route(
             "get_preview_avatar",
-            "/users/{user_id:\d+}/avatar/preview/jpg/{filename:[^/]*}",
+            "/users/{user_id:\d+}/avatar/preview/jpg/{filename:[^/]*}",  # noqa: W605
             request_method="GET",  # noqa: W605
         )
         configurator.add_view(self.get_preview_avatar, route_name="get_preview_avatar")
 
         configurator.add_route(
             "get_raw_avatar",
-            "/users/{user_id:\d+}/avatar/raw/{filename:[^/]*}",
+            "/users/{user_id:\d+}/avatar/raw/{filename:[^/]*}",  # noqa: W605
             request_method="GET",  # noqa: W605
         )
         configurator.add_view(self.get_raw_avatar, route_name="get_raw_avatar")
 
         configurator.add_route(
             "put_raw_avatar",
-            "/users/{user_id:\d+}/avatar/raw/{filename:[^/]*}",
+            "/users/{user_id:\d+}/avatar/raw/{filename:[^/]*}",  # noqa: W605
             request_method="PUT",  # noqa: W605
         )
         configurator.add_view(self.put_raw_avatar, route_name="put_raw_avatar")
 
         configurator.add_route(
             "sized_preview_cover",
-            "/users/{user_id:\d+}/cover/preview/jpg/{width:\d+}x{height:\d+}/{filename:[^/]*}",
+            "/users/{user_id:\d+}/cover/preview/jpg/{width:\d+}x{height:\d+}/{filename:[^/]*}",  # noqa: W605
             request_method="GET",  # noqa: W605
         )
         configurator.add_view(self.sized_preview_cover, route_name="sized_preview_cover")
 
         configurator.add_route(
             "get_preview_cover",
-            "/users/{user_id:\d+}/cover/preview/jpg/{filename:[^/]*}",
+            "/users/{user_id:\d+}/cover/preview/jpg/{filename:[^/]*}",  # noqa: W605
             request_method="GET",  # noqa: W605
         )
         configurator.add_view(self.get_preview_cover, route_name="get_preview_cover")
 
         configurator.add_route(
             "get_raw_cover",
-            "/users/{user_id:\d+}/cover/raw/{filename:[^/]*}",
+            "/users/{user_id:\d+}/cover/raw/{filename:[^/]*}",  # noqa: W605
             request_method="GET",  # noqa: W605
         )
         configurator.add_view(self.get_raw_cover, route_name="get_raw_cover")
 
         configurator.add_route(
             "put_raw_cover",
-            "/users/{user_id:\d+}/cover/raw/{filename:[^/]*}",
+            "/users/{user_id:\d+}/cover/raw/{filename:[^/]*}",  # noqa: W605
             request_method="PUT",  # noqa: W605
         )
         configurator.add_view(self.put_raw_cover, route_name="put_raw_cover")

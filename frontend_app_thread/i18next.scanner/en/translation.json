@@ -6,12 +6,16 @@
   "Start a topic": "Start a topic",
   "A content with the same name already exists": "Content with the same name already exists",
   "Error while creating thread": "Error while creating thread",
-  "Error while saving the comment": "Error while saving the comment",
   "Thread": "Thread",
   "thread": "thread",
   "threads": "threads",
   "The content has been modified by {{author}}": "The content has been modified by {{author}}",
   "Delete": "Delete",
   "The link has been copied to clipboard": "Link copied to clipboard",
-  "Copy content link": "Copy content link"
+  "Copy content link": "Copy content link",
+  "Copy news link": "Copy news link",
+  "Turn into thread": "Turn into thread",
+  "Permanently delete": "Permanently delete",
+  "Yes, delete permanently": "Yes, delete permanently",
+  "Warning: this operation cannot be rolled back": "Warning: this operation cannot be rolled back"
 }

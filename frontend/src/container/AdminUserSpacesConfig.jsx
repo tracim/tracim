@@ -8,26 +8,27 @@ import {
   Loading,
   PROFILE,
   ROLE_LIST,
-  serialize,
   SORT_BY,
   sortListByMultipleCriteria,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TracimComponent,
   FilterBar,
-  stringIncludes
+  stringIncludes,
+  serialize
 } from 'tracim_frontend_lib'
-import { serializeWorkspaceListProps } from '../reducer/workspaceList.js'
+import { serializeUserConfig, serializeUserWorkspaceConfig, serializeWorkspaceListProps } from '../reducer/workspaceList.js'
 import { newFlashMessage } from '../action-creator.sync.js'
 import {
-  deleteWorkspaceMember,
+  deleteUserRole,
   getWorkspaceList,
-  postWorkspaceMember,
-  updateWorkspaceMember
+  postUserRole,
+  updateUserRole,
+  getUserWorkspaceConfigList
 } from '../action-creator.async.js'
 import AdminUserSpacesConfigItem from '../component/Account/AdminUserSpacesConfigItem.jsx'
-import { fillMemberList, onlyManager } from '../component/Account/UserSpacesConfig.jsx'
-import { serializeMember } from '../reducer/currentWorkspace.js'
+import { onlyManager } from '../component/Account/UserSpacesConfig.jsx'
+import { serializeWorkspace } from '../reducer/currentWorkspace.js'
 
 const filterSpaceList = (list, filterList) => {
   return list.filter(space =>
@@ -52,7 +53,8 @@ export const AdminUserSpacesConfig = (props) => {
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: handleMemberModified },
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: handleMemberDeleted }
     ])
-  }, [spaceList])
+    getMemberSpacesList()
+  }, [])
 
   useEffect(() => {
     if (props.user.profile !== PROFILE.administrator.slug) props.onClose()
@@ -63,19 +65,11 @@ export const AdminUserSpacesConfig = (props) => {
   }, [props.userToEditId])
 
   useEffect(() => {
-    const availableSpaces = []
-    const memberSpaces = []
-
-    spaceList.forEach(space => {
-      if (!space.memberList || space.memberList.length <= 0) return
-      if (space.memberList.find(u => u.id === props.userToEditId)) memberSpaces.push(space)
-      else availableSpaces.push(space)
-    })
-    setAvailableSpaceList(availableSpaces)
-    setDisplayedAvailableSpaceList(filterSpaceList(availableSpaces, availableSpaceListFilter))
-    setMemberSpaceList(memberSpaces)
-    setDisplayedMemberSpaceList(filterSpaceListWithUserRole(memberSpaces, memberSpaceListFilter))
-  }, [spaceList])
+    const availableSpaceList = spaceList.filter(s => memberSpaceList.some(ms => ms.id === s.id) === false)
+    setAvailableSpaceList(availableSpaceList)
+    setDisplayedAvailableSpaceList(filterSpaceList(availableSpaceList, availableSpaceListFilter))
+    setDisplayedMemberSpaceList(filterSpaceListWithUserRole(memberSpaceList, memberSpaceListFilter))
+  }, [spaceList, memberSpaceList])
 
   useEffect(() => {
     setDisplayedAvailableSpaceList(filterSpaceList(availableSpaceList, availableSpaceListFilter))
@@ -97,11 +91,28 @@ export const AdminUserSpacesConfig = (props) => {
       const hasFilterMatchOnSpaceId = space.id && includesFilter(space.id.toString())
 
       return (
+        filterList === '' ||
         hasFilterMatchOnUserRole ||
         hasFilterMatchOnSpaceLabel ||
         hasFilterMatchOnSpaceId
       )
     })
+  }
+
+  const getMemberSpacesList = async () => {
+    const fetchGetUserWorkspaceList = await props.dispatch(
+      getUserWorkspaceConfigList(props.userToEditId, false)
+    )
+    switch (fetchGetUserWorkspaceList.status) {
+      case 200: {
+        const userSpaceList = fetchGetUserWorkspaceList.json.map(
+          config => serializeUserWorkspaceConfig(config)
+        )
+        setMemberSpaceList(userSpaceList)
+        break
+      }
+      default: props.dispatch(newFlashMessage(props.t('Error while loading user')))
+    }
   }
 
   const getSpaceList = async () => {
@@ -110,13 +121,9 @@ export const AdminUserSpacesConfig = (props) => {
 
     switch (fetchGetSpaceList.status) {
       case 200: {
-        const spaceList = fetchGetSpaceList.json.map(space => serialize(space, serializeWorkspaceListProps))
-        Promise.all(spaceList.map(userSpace => {
-          return props.workspaceList.find(space => space.id === userSpace.id && space.memberList.length > 0) || fillMemberList(userSpace)
-        })).then((spaceListResult) => {
-          setSpaceList(sortListByMultipleCriteria(spaceListResult, [SORT_BY.LABEL, SORT_BY.ID]))
-          setIsLoading(false)
-        })
+        const spaceList = fetchGetSpaceList.json.map(space => serializeWorkspace(space))
+        setSpaceList(sortListByMultipleCriteria(spaceList, [SORT_BY.LABEL, SORT_BY.ID]))
+        setIsLoading(false)
         break
       }
       default: props.dispatch(newFlashMessage(props.t('Error while loading user')))
@@ -124,56 +131,49 @@ export const AdminUserSpacesConfig = (props) => {
   }
 
   const handleMemberModified = (data) => {
-    setSpaceList(spaceList.map(space => {
-      if (space.id === data.fields.workspace.workspace_id) {
-        return {
-          ...space,
-          memberList: space.memberList.map(member => {
-            if (member.id === data.fields.user.user_id) {
-              return { ...member, ...serializeMember({ user: data.fields.user, ...data.fields.member }) }
-            } else {
-              return member
-            }
-          })
-        }
-      } else {
-        return space
-      }
-    }))
-  }
-
-  const handleMemberDeleted = async (data) => {
-    setSpaceList(spaceList.map(space => {
-      if (space.id === data.fields.workspace.workspace_id) {
-        return {
-          ...space,
-          memberList: space.memberList.filter(member => member.id !== data.fields.user.user_id)
-        }
-      } else {
-        return space
-      }
-    }))
-  }
-
-  const handleMemberCreated = async (data) => {
-    const space = spaceList.find(space => space.id === data.fields.workspace.workspace_id)
-
-    if (space.memberList) {
-      setSpaceList(spaceList.map(space => {
+    if (data.fields.user.user_id === props.userToEditId) {
+      setMemberSpaceList(m => m.map(space => {
         if (space.id === data.fields.workspace.workspace_id) {
           return {
             ...space,
-            memberList: [
-              ...space.memberList,
-              serializeMember({ user: data.fields.user, ...data.fields.member })
-            ]
+            memberList: space.memberList.map(member => {
+              if (member.id === data.fields.user.user_id) {
+                return { ...member, ...serializeUserConfig({ user: data.fields.user, ...data.fields.member }) }
+              } else {
+                return member
+              }
+            })
           }
         } else {
           return space
         }
       }))
-    } else {
-      setSpaceList(sortListByMultipleCriteria([...spaceList, fillMemberList(space)], [SORT_BY.LABEL, SORT_BY.ID]))
+    }
+  }
+
+  const handleMemberDeleted = (data) => {
+    if (data.fields.user.user_id === props.userToEditId) {
+      setMemberSpaceList(m => m.filter(space => space.id !== data.fields.workspace.workspace_id))
+    }
+  }
+
+  const handleMemberCreated = (data) => {
+    if (data.fields.user.user_id === props.userToEditId) {
+      setMemberSpaceList(m => {
+        if (!m.find(space => space.id === data.fields.workspace.workspace_id)) {
+          return [
+            ...m,
+            {
+              ...serialize(data.fields.workspace, serializeWorkspaceListProps),
+              memberList: [
+                serializeUserConfig({ user: data.fields.user, ...data.fields.member })
+              ]
+            }
+          ]
+        } else {
+          return m
+        }
+      })
     }
   }
 
@@ -181,7 +181,7 @@ export const AdminUserSpacesConfig = (props) => {
     if (!space.id) return
 
     try {
-      const fetchResult = await props.dispatch(deleteWorkspaceMember(space.id, props.userToEditId))
+      const fetchResult = await props.dispatch(deleteUserRole(space.id, props.userToEditId))
       if (fetchResult.status !== 204) {
         props.dispatch(newFlashMessage(props.t('Error while leaving the space'), 'warning'))
       }
@@ -193,7 +193,7 @@ export const AdminUserSpacesConfig = (props) => {
 
   const handleAddToSpace = async (space) => {
     const fetchPutUserSpaceSubscription = await props.dispatch(
-      postWorkspaceMember(space.id, {
+      postUserRole(space.id, {
         id: props.userToEditId,
         email: props.userEmail,
         username: props.userUsername,
@@ -208,7 +208,7 @@ export const AdminUserSpacesConfig = (props) => {
 
   const handleClickChangeRole = async (space, role) => {
     const fetchUpdateSpaceMember = await props.dispatch(
-      updateWorkspaceMember(space.id, props.userToEditId, role.slug)
+      updateUserRole(space.id, props.userToEditId, role.slug)
     )
     if (fetchUpdateSpaceMember.status !== 200) {
       props.dispatch(newFlashMessage(
@@ -297,7 +297,9 @@ export const AdminUserSpacesConfig = (props) => {
                           <AdminUserSpacesConfigItem
                             emailNotificationActivated={props.system.config.email_notification_activated}
                             key={`memberSpaceList_${space.id}`}
-                            onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
+                            onChangeEmailNotificationType={
+                              emailNotificationType => props.onChangeEmailNotificationType(space.id, emailNotificationType)
+                            }
                             onClickButton={handleLeaveSpace}
                             onClickChangeRole={handleClickChangeRole}
                             onlyManager={onlyManager(props.userToEditId, member, space.memberList)}
@@ -335,10 +337,10 @@ AdminUserSpacesConfig.propTypes = {
   userUsername: PropTypes.string.isRequired,
   onClose: PropTypes.func.isRequired,
   userPublicName: PropTypes.string,
-  onChangeSubscriptionNotif: PropTypes.func
+  onChangeEmailNotificationType: PropTypes.func
 }
 
 AdminUserSpacesConfig.defaultProps = {
-  onChangeSubscriptionNotif: () => { },
+  onChangeEmailNotificationType: () => { },
   userPublicName: ''
 }

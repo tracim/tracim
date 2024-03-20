@@ -14,7 +14,6 @@ import {
   ArchiveDeleteContent,
   SelectStatus,
   displayDistanceDate,
-  convertBackslashNToBr,
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
   removeLocalStorageItem,
@@ -145,18 +144,18 @@ class CustomForm extends React.Component {
       await this.loadContent()
       buildContentPathBreadcrumbs(state.config.apiUrl, state.content, props)
       // tinymce.remove('#wysiwygNewVersion')
-      wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
+      // wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
     }
 
     if (state.mode === MODE.EDIT && prevState.mode !== MODE.EDIT) {
       // tinymce.remove('#wysiwygNewVersion')
-      wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
+      // wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
     }
   }
 
   componentWillUnmount () {
     console.log('%c<CustomForm> will Unmount', `color: ${this.state.config.hexcolor}`)
-    tinymce.remove('#wysiwygTimelineComment')
+    // tinymce.remove('#wysiwygTimelineComment')
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
 
@@ -354,6 +353,8 @@ class CustomForm extends React.Component {
     // setLocalStorageItem(this.state.appName, this.state.content, LOCAL_STORAGE_FIELD.RAW_CONTENT, e.formData)
   }
 
+  convertBackslashNToBr = msg => msg.replace(/\n/g, '<br />')
+
   handleClickValidateNewCommentBtn = async (comment) => {
     const { props, state } = this
 
@@ -361,7 +362,7 @@ class CustomForm extends React.Component {
     // see https://github.com/tracim/tracim/issues/1101
     const newCommentForApi = state.timelineWysiwyg
       ? comment
-      : `<p>${convertBackslashNToBr(comment)}</p>`
+      : `<p>${this.convertBackslashNToBr(comment)}</p>`
 
     const fetchResultSaveNewComment = await handleFetchResult(await postCustomFormNewComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newCommentForApi))
     switch (fetchResultSaveNewComment.apiResponse.status) {
@@ -611,10 +612,14 @@ class CustomForm extends React.Component {
 
           {this.state.config.apiUrl ? (
             <Timeline
+              apiUrl={this.state.config.apiUrl}
+              contentId={this.state.content.content_id}
+              contentType={this.state.content.content_type}
+              workspaceId={this.state.content.workspace_id}
+              onClickSubmit={() => {}}
               customClass={`${config.slug}__contentpage`}
               customColor={this.state.hexcolor}
               loggedUser={loggedUser}
-              apiUrl={this.state.config.apiUrl}
               timelineData={timeline}
               showHeader
               newComment={newComment}

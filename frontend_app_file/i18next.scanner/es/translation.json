@@ -14,7 +14,6 @@
   "Validate and create": "Validar y crear",
   "You have reached your storage limit, you cannot add new files": "Has alcanzado su límite de almacenamiento, no puede añadir nuevos archivos",
   "Preview loading...": "Vista previa cargando…",
-  "Error while saving the comment": "Error al guardar el comentario",
   "The content has been modified by {{author}}": "El contenido fue modificado por {{author}}",
   "The password length must be between 6 and 512 characters and the email(s) must be valid": "La longitud de la contraseña debe estar entre 6 y 512 caracteres y el correo electrónico debe ser válido",
   "Restore": "Restaurar",
@@ -65,5 +64,8 @@
   "of": "de",
   "Tasks": "Tareas",
   "The link has been copied to clipboard": "Enlace copiado en el portapapeles",
-  "Copy content link": "Copiar enlace al contenido"
+  "Copy content link": "Copiar enlace al contenido",
+  "Permanently delete": "",
+  "Yes, delete permanently": "",
+  "Warning: this operation cannot be rolled back": ""
 }

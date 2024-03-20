@@ -1,10 +1,9 @@
 import contextlib
-import typing
-
 import pluggy
 from rq import SimpleWorker
 from rq.local import LocalStack
 import transaction
+import typing
 
 from tracim_backend.config import CFG
 from tracim_backend.lib.core.plugins import init_plugin_manager

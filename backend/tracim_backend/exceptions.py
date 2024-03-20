@@ -218,6 +218,10 @@ class InsufficientUserProfile(TracimException):
     error_code = ErrorCode.INSUFFICIENT_USER_PROFILE
 
 
+class ReadOnlyFieldException(TracimException):
+    error_code = ErrorCode.CANT_EDIT_READONLY_FIELD
+
+
 class InvalidWorkspaceAccessType(TracimException):
     error_code = ErrorCode.INVALID_WORKSPACE_ACCESS_TYPE
 
@@ -320,6 +324,10 @@ class InvalidUserId(InvalidId):
 
 
 class ContentNotFound(TracimException):
+    error_code = ErrorCode.CONTENT_NOT_FOUND
+
+
+class ContentRevisionNotFound(TracimException):
     error_code = ErrorCode.CONTENT_NOT_FOUND
 
 
@@ -682,3 +690,7 @@ class UserCallTransitionNotAllowed(TracimException):
 
 class UserCallNotFound(NotFound):
     error_code = ErrorCode.USER_CALL_NOT_FOUND
+
+
+class InvalidMention(TracimException):
+    error_code = ErrorCode.INVALID_MENTION

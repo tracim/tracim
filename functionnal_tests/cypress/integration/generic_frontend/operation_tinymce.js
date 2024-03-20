@@ -29,23 +29,6 @@ describe('TinyMce text editor', function () {
     })
   })
 
-
-  describe('Button to add a emoji to the created html document', function () {
-    const fileName = 'testEmoji'
-    before(() => {
-      cy.loginAs('users')
-      cy.createHtmlDocument(fileName, 1)
-      cy.visitPage({ pageName: p.CONTENTS, params: { workspaceId: 1 } })
-    })
-
-    it('Should be visible and enabled', function () {
-      cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: fileName } }).click()
-      cy.waitForTinyMCELoaded()
-      cy.get('[title="Emoticons"]').should('be.visible').should('be.enabled')
-    })
-  })
-
-
   describe.skip('Mention autoCompletion', function () {
     describe('Insert a new mention', function () {
       beforeEach(() => {
@@ -124,6 +107,7 @@ describe('TinyMce text editor', function () {
       })
     })
   })
+
   describe('List direction', () => {
     before(() => {
       cy.loginAs('users')
@@ -141,7 +125,10 @@ describe('TinyMce text editor', function () {
           .then(editor => {
             editor.setContent('Hello')
           })
-        cy.get(`[title="${buttonTitle}"]`).click()
+        cy.get('[title="More..."]').eq(0).click()
+        // NOTE - MP - 2023-04-05 - eq(1) corresponds to the second button displayed in the HTML
+        // editor toolbar. The first one is the one from the comment area.
+        cy.get(`[title="${buttonTitle}"]`).eq(1).click()
         cy.get('[data-cy=editionmode__button__submit]').click()
         cy.get(`.html-content > ${domElement}`).invoke('attr', 'dir').should('be.equal', 'auto')
       })

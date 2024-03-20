@@ -1,5 +1,4 @@
 from operator import attrgetter
-
 import pytest
 import transaction
 
@@ -13,7 +12,7 @@ from tracim_backend.tests.fixtures import *  # noqa: F403,F401
 class TestWorkspaceModel(object):
     @pytest.mark.usefixtures("base_fixture")
     def test_unit__workspace_get_size(self, admin_user, session, content_type_list):
-        """ Depot file access thought content property methods. """
+        """Depot file access thought content property methods."""
         workspace = Workspace(label="TEST_WORKSPACE_1", owner=admin_user)
         session.add(workspace)
         session.flush()

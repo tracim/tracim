@@ -4,7 +4,8 @@ import transaction
 
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.core.tag import TagLib
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import EmailNotificationType
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 TAG_URLS = (
@@ -62,10 +63,16 @@ class TestTagsEndpoint(object):
             tag_lib.add_tag_to_content(admin_user, folder, tag, do_save=True)
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         for url in TAG_URLS:
             res = web_testapp.get(
-                url.format(workspace_id=test_workspace.workspace_id, content_id=folder.content_id),
+                url.format(
+                    workspace_id=test_workspace.workspace_id,
+                    content_id=folder.content_id,
+                ),
                 status=200,
             )
             assert len(res.json_body) == len(tag_names)
@@ -102,10 +109,14 @@ class TestTagsEndpoint(object):
         tag = tag_lib.add_tag_to_content(riyad_user, folder, tag_name, do_save=True)
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
             "/api/workspaces/{workspace_id}/tags/{tag_id}".format(
-                workspace_id=test_workspace.workspace_id, tag_id=tag.tag_id,
+                workspace_id=test_workspace.workspace_id,
+                tag_id=tag.tag_id,
             ),
             status=200,
         )
@@ -140,11 +151,15 @@ class TestTagsEndpoint(object):
             do_notify=False,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"tag_name": tag_name}
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/tags".format(
-                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
             ),
             status=200,
             params=params,
@@ -177,18 +192,23 @@ class TestTagsEndpoint(object):
         )
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"tag_name": tag_name}
         web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/tags".format(
-                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
             ),
             status=200,
             params=params,
         )
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/tags".format(
-                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
             ),
             status=400,
             params=params,
@@ -221,11 +241,15 @@ class TestTagsEndpoint(object):
             do_notify=False,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"tag_name": tag_name}
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/tags".format(
-                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
             ),
             status=200,
             params=params,
@@ -234,7 +258,6 @@ class TestTagsEndpoint(object):
         res = web_testapp.get(
             "/api/workspaces/{workspace_id}/tags/{tag_id}".format(
                 workspace_id=test_workspace.workspace_id,
-                content_id=folder.content_id,
                 tag_id=tag_id,
             ),
             status=200,
@@ -242,7 +265,6 @@ class TestTagsEndpoint(object):
         res = web_testapp.delete(
             "/api/workspaces/{workspace_id}/tags/{tag_id}".format(
                 workspace_id=test_workspace.workspace_id,
-                content_id=folder.content_id,
                 tag_id=tag_id,
             ),
             status=204,
@@ -251,7 +273,6 @@ class TestTagsEndpoint(object):
         res = web_testapp.get(
             "/api/workspaces/{workspace_id}/tags/{tag_id}".format(
                 workspace_id=test_workspace.workspace_id,
-                content_id=folder.content_id,
                 tag_id=tag_id,
             ),
             status=400,
@@ -263,7 +284,7 @@ class TestTagsEndpoint(object):
         self,
         workspace_api_factory,
         content_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         session,
         web_testapp,
         admin_user,
@@ -286,11 +307,15 @@ class TestTagsEndpoint(object):
         )
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"tag_name": tag_name}
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/tags".format(
-                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
             ),
             status=200,
             params=params,
@@ -301,7 +326,6 @@ class TestTagsEndpoint(object):
         res = web_testapp.get(
             "/api/workspaces/{workspace_id}/tags/{tag_id}".format(
                 workspace_id=test_workspace.workspace_id,
-                content_id=folder.content_id,
                 tag_id=tag_id,
             ),
             status=200,
@@ -312,7 +336,7 @@ class TestTagsEndpoint(object):
         self,
         workspace_api_factory,
         content_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         session,
         web_testapp,
         admin_user,
@@ -326,8 +350,13 @@ class TestTagsEndpoint(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(riyad_user, test_workspace, UserRoleInWorkspace.READER, with_notif=False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            riyad_user,
+            test_workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         folder = content_api.create(
             label="test-folder",
             content_type_slug=content_type_list.Folder.slug,
@@ -341,7 +370,8 @@ class TestTagsEndpoint(object):
         params = {"tag_name": tag_name}
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/tags".format(
-                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
             ),
             status=403,
             params=params,
@@ -354,7 +384,7 @@ class TestTagsEndpoint(object):
         self,
         workspace_api_factory,
         content_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         session,
         web_testapp,
         admin_user,
@@ -368,8 +398,13 @@ class TestTagsEndpoint(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(riyad_user, test_workspace, UserRoleInWorkspace.READER, with_notif=False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            riyad_user,
+            test_workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         folder = content_api.create(
             label="test-folder",
             content_type_slug=content_type_list.Folder.slug,
@@ -379,11 +414,15 @@ class TestTagsEndpoint(object):
         )
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"tag_name": tag_name}
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents/{content_id}/tags".format(
-                workspace_id=test_workspace.workspace_id, content_id=folder.content_id,
+                workspace_id=test_workspace.workspace_id,
+                content_id=folder.content_id,
             ),
             status=200,
             params=params,
@@ -392,7 +431,6 @@ class TestTagsEndpoint(object):
         res = web_testapp.get(
             "/api/workspaces/{workspace_id}/tags/{tag_id}".format(
                 workspace_id=test_workspace.workspace_id,
-                content_id=folder.content_id,
                 tag_id=tag_id,
             ),
             status=200,
@@ -412,7 +450,6 @@ class TestTagsEndpoint(object):
         res = web_testapp.get(
             "/api/workspaces/{workspace_id}/tags/{tag_id}".format(
                 workspace_id=test_workspace.workspace_id,
-                content_id=folder.content_id,
                 tag_id=tag_id,
             ),
             status=200,
@@ -420,7 +457,8 @@ class TestTagsEndpoint(object):
 
         res = web_testapp.delete(
             "/api/workspaces/{workspace_id}/tags/{tag_id}".format(
-                workspace_id=test_workspace.workspace_id, tag_id=tag_id,
+                workspace_id=test_workspace.workspace_id,
+                tag_id=tag_id,
             ),
             status=403,
         )
@@ -428,7 +466,8 @@ class TestTagsEndpoint(object):
 
         res = web_testapp.get(
             "/api/workspaces/{workspace_id}/tags/{tag_id}".format(
-                workspace_id=test_workspace.workspace_id, tag_id=tag_id,
+                workspace_id=test_workspace.workspace_id,
+                tag_id=tag_id,
             ),
             status=200,
         )
@@ -459,10 +498,15 @@ class TestTagsEndpoint(object):
             do_notify=False,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"tag_name": tag_name}
         res = web_testapp.post_json(
-            "/api/workspaces/{workspace_id}/tags".format(workspace_id=test_workspace.workspace_id,),
+            "/api/workspaces/{workspace_id}/tags".format(
+                workspace_id=test_workspace.workspace_id,
+            ),
             status=200,
             params=params,
         )
@@ -470,7 +514,6 @@ class TestTagsEndpoint(object):
         res = web_testapp.get(
             "/api/workspaces/{workspace_id}/tags/{tag_id}".format(
                 workspace_id=test_workspace.workspace_id,
-                content_id=folder.content_id,
                 tag_id=tag_id,
             ),
             status=200,
@@ -488,7 +531,6 @@ class TestTagsEndpoint(object):
             "/api/workspaces/{workspace_id}/contents/{content_id}/tags".format(
                 workspace_id=test_workspace.workspace_id,
                 content_id=folder.content_id,
-                tag_id=tag_id,
             ),
             status=200,
         )
@@ -500,7 +542,7 @@ class TestTagsEndpoint(object):
         self,
         workspace_api_factory,
         content_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         session,
         web_testapp,
         admin_user,
@@ -514,8 +556,13 @@ class TestTagsEndpoint(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
-        rapi = role_api_factory.get()
-        rapi.create_one(riyad_user, test_workspace, UserRoleInWorkspace.READER, with_notif=False)
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
+            riyad_user,
+            test_workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         folder = content_api.create(
             label="test-folder",
             content_type_slug=content_type_list.Folder.slug,
@@ -525,10 +572,15 @@ class TestTagsEndpoint(object):
         )
         transaction.commit()
 
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         params = {"tag_name": tag_name}
         res = web_testapp.post_json(
-            "/api/workspaces/{workspace_id}/tags".format(workspace_id=test_workspace.workspace_id,),
+            "/api/workspaces/{workspace_id}/tags".format(
+                workspace_id=test_workspace.workspace_id,
+            ),
             status=200,
             params=params,
         )
@@ -536,7 +588,6 @@ class TestTagsEndpoint(object):
         res = web_testapp.get(
             "/api/workspaces/{workspace_id}/tags/{tag_id}".format(
                 workspace_id=test_workspace.workspace_id,
-                content_id=folder.content_id,
                 tag_id=tag_id,
             ),
             status=200,
@@ -557,7 +608,6 @@ class TestTagsEndpoint(object):
             "/api/workspaces/{workspace_id}/contents/{content_id}/tags".format(
                 workspace_id=test_workspace.workspace_id,
                 content_id=folder.content_id,
-                tag_id=tag_id,
             ),
             status=200,
         )

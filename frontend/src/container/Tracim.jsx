@@ -1,5 +1,6 @@
 import React from 'react'
 import i18next from 'i18next'
+import classnames from 'classnames'
 import { connect } from 'react-redux'
 import { translate, Trans } from 'react-i18next'
 import * as Cookies from 'js-cookie'
@@ -27,22 +28,21 @@ import WIPcomponent from './WIPcomponent.jsx'
 import CardPopupUsername from './CardPopupUsername'
 import {
   CUSTOM_EVENT,
-  getSpaceMemberList,
-  handleFetchResult,
+  LIVE_MESSAGE_ERROR_CODE,
+  LIVE_MESSAGE_STATUS,
+  PAGE,
   PROFILE,
-  formatAbsoluteDate,
-  serialize,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  USER_CALL_STATE,
   CardPopup,
   IconButton,
+  LiveMessageManager,
+  Loading,
   TracimComponent,
   buildHeadTitle,
-  LiveMessageManager,
-  LIVE_MESSAGE_STATUS,
-  LIVE_MESSAGE_ERROR_CODE,
-  PAGE,
-  USER_CALL_STATE,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_ENTITY_TYPE as TLM_ET
+  formatAbsoluteDate,
+  serialize
 } from 'tracim_frontend_lib'
 import {
   COOKIE_FRONTEND,
@@ -50,6 +50,7 @@ import {
   SEARCH_TYPE,
   WELCOME_ELEMENT_ID,
   getUserProfile,
+  initializeCustomElements,
   toggleFavicon,
   unLoggedAllowedPageList
 } from '../util/helper.js'
@@ -58,7 +59,7 @@ import {
   getAppList,
   getConfig,
   getContentTypeList,
-  getMyselfWorkspaceList,
+  getMyselfWorkspaceConfigList,
   getUserConfiguration,
   getUserIsConnected,
   putUserLang,
@@ -66,7 +67,8 @@ import {
   getAccessibleWorkspaces,
   putSetIncomingUserCallState,
   putSetOutgoingUserCallState,
-  postCreateUserCall
+  postCreateUserCall,
+  getMyselfAllKnownMember
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -76,15 +78,16 @@ import {
   setContentTypeList,
   setUserConfiguration,
   setUserConnected,
-  setWorkspaceList,
+  setUserWorkspaceConfigList,
   setBreadcrumbs,
   appendBreadcrumbs,
-  setWorkspaceListMemberList,
   setUnreadMentionCount,
   setUnreadNotificationCount,
   setHeadTitle,
-  setAccessibleWorkspaceList
+  setAccessibleWorkspaceList,
+  setKnownMemberList
 } from '../action-creator.sync.js'
+import HTMLMention from '../component/Mention/HTMLMention.js'
 import NotificationWall from './NotificationWall.jsx'
 import AdvancedSearch from './AdvancedSearch.jsx'
 import SimpleSearch from './SimpleSearch.jsx'
@@ -116,6 +119,8 @@ export class Tracim extends React.Component {
       userCall: undefined,
       unansweredCallTimeoutId: -1
     }
+
+    initializeCustomElements('html-mention', HTMLMention)
 
     this.audioCall = new Audio('/assets/branding/incoming-call.ogg')
     this.liveMessageManager = new LiveMessageManager()
@@ -337,7 +342,7 @@ export class Tracim extends React.Component {
   }
 
   handleRefreshWorkspaceListThenRedirect = async data => { // Côme - 2018/09/28 - @fixme this is a hack to force the redirection AFTER the workspaceList is loaded
-    await this.loadWorkspaceLists()
+    await this.loadWorkspaceList()
     this.props.history.push(data.url)
   }
 
@@ -377,7 +382,8 @@ export class Tracim extends React.Component {
         i18n.changeLanguage(fetchUser.lang)
 
         this.loadAppConfig()
-        this.loadWorkspaceLists()
+        this.loadWorkspaceList()
+        this.loadKnownMemberList()
         this.loadNotificationNotRead(fetchUser.user_id)
         this.loadUserConfiguration(fetchUser.user_id)
 
@@ -439,20 +445,16 @@ export class Tracim extends React.Component {
     }
   }
 
-  loadWorkspaceLists = async () => {
+  loadWorkspaceList = async () => {
     const { props } = this
-
-    const showOwnedWorkspace = false
-
-    const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceList(showOwnedWorkspace))
+    const fetchGetWorkspaceList = await props.dispatch(getMyselfWorkspaceConfigList())
 
     if (fetchGetWorkspaceList.status !== 200) return false
+    props.dispatch(setUserWorkspaceConfigList(fetchGetWorkspaceList.json))
 
-    props.dispatch(setWorkspaceList(fetchGetWorkspaceList.json))
-    this.loadWorkspaceListMemberList(fetchGetWorkspaceList.json)
-    this.setState({ workspaceListLoaded: true })
-
-    const fetchAccessibleWorkspaceList = await props.dispatch(getAccessibleWorkspaces(props.user.userId))
+    const fetchAccessibleWorkspaceList = await props.dispatch(
+      getAccessibleWorkspaces(props.user.userId)
+    )
 
     if (fetchAccessibleWorkspaceList.status !== 200) return false
 
@@ -461,22 +463,19 @@ export class Tracim extends React.Component {
     return true
   }
 
-  loadWorkspaceListMemberList = async workspaceList => {
+  loadKnownMemberList = async () => {
     const { props } = this
+    try {
+      const fetchGetKnownMemberList = await props.dispatch(getMyselfAllKnownMember())
 
-    const fetchWorkspaceListMemberList = await Promise.all(
-      workspaceList.map(async ws => ({
-        workspaceId: ws.workspace_id,
-        fetchMemberList: await handleFetchResult(await getSpaceMemberList(FETCH_CONFIG.apiUrl, ws.workspace_id))
-      }))
-    )
+      if (fetchGetKnownMemberList.status !== 200) return false
 
-    const workspaceListMemberList = fetchWorkspaceListMemberList.map(memberList => ({
-      workspaceId: memberList.workspaceId,
-      memberList: memberList.fetchMemberList.apiResponse.status === 200 ? memberList.fetchMemberList.body : []
-    }))
-
-    props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
+      props.dispatch(setKnownMemberList(fetchGetKnownMemberList.json))
+    } catch (e) {
+      console.error('Error in loadKnownMemberList', e)
+      return false
+    }
+    return true
   }
 
   loadNotificationNotRead = async (userId) => {
@@ -558,21 +557,31 @@ export class Tracim extends React.Component {
       )
     }
 
+    // INFO - MP - 2023-03-31 - Displaying a loader here make the loading page flicker
     if (props.user.logged === null) return null // @TODO show loader
 
     if (!props.location.pathname.includes('/ui')) return <Redirect to={PAGE.HOME} />
 
     if (
       !unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url)) && (
-        !props.system.workspaceListLoaded ||
         !props.system.appListLoaded ||
         !props.system.contentTypeListLoaded
       )
-    ) return null // @TODO Côme - 2018/08/22 - should show loader here
+    ) {
+      return (
+        <div className='tracim fullWidthFullHeight' dir={i18next.dir()}>
+          <Loading
+            height={48}
+            width={48}
+          />
+        </div>
+      )
+    }
 
     return (
       <div className='tracim fullWidthFullHeight' dir={i18next.dir()}>
         <Header />
+
         {state.displayConnectionError && (
           <FlashMessage
             className='connection_error'
@@ -734,14 +743,17 @@ export class Tracim extends React.Component {
 
         <ReduxTlmDispatcher />
 
-        <div className='sidebarpagecontainer'>
+        {/* INFO - CH - 2023-11-07 - notLoggedIn based on user.logged is used to reduce height because
+        when not logged in, we display a 60px header. See Header.jsx */}
+        <div className={classnames('sidebarpagecontainer', { notLoggedIn: props.user.logged === false })}>
           <Route
             render={() => (
               <Sidebar
-                onClickNotification={this.handleClickNotificationButton}
-                unreadNotificationCount={props.notificationPage.unreadNotificationCount}
-                unreadMentionCount={props.notificationPage.unreadMentionCount}
                 isNotificationWallOpen={state.isNotificationWallOpen}
+                onClickNotification={this.handleClickNotificationButton}
+                unreadMentionCount={props.notificationPage.unreadMentionCount}
+                unreadNotificationCount={props.notificationPage.unreadNotificationCount}
+                isSpaceListLoaded={props.system.workspaceListLoaded}
               />
             )}
           />

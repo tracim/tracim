@@ -1,8 +1,7 @@
 import argparse
-
 from pyramid.scripting import AppEnvironment
 
-from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.command import AppContextCommand
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.user import UserApi
@@ -23,9 +22,7 @@ class IndexingCommand(AppContextCommand):
         content_api = ContentApi(
             current_user=None, session=context.dbsession, config=context.app_config
         )
-        content = content_api.get_one(
-            content_id=content_id, content_type=content_type_list.Any_SLUG
-        )
+        content = content_api.get_one(content_id=content_id, content_type=ContentTypeSlug.ANY.value)
         ESContentIndexer().index_contents([content], context)
         print('content "{}" correctly indexed.'.format(content_id))
 

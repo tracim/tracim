@@ -4,11 +4,12 @@ from urllib.parse import quote
 from mock import patch
 import pytest
 import transaction
+from unittest import mock
 
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.utils.utils import get_timezones_list
+from tracim_backend.models.mention import TRANSLATED_GROUP_MENTIONS
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
-
 
 """
 Tests for /api/system subpath endpoints.
@@ -27,7 +28,10 @@ class TestApplicationEndpoint(object):
         """
         Get applications list with a registered user.
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/system/applications", status=200)
         res = res.json_body
         app_api = application_api_factory.get()
@@ -68,7 +72,10 @@ class TestContentsTypesEndpoint(object):
         """
         Get system content_types list with a registered user.
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/system/content_types", status=200)
         res = res.json_body
         assert len(res) == len(content_type_list.endpoint_allowed_types())
@@ -120,7 +127,10 @@ class TestTimezonesEndpoint(object):
         """
         Get all timezones list with a registered user.
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/system/timezones", status=200)
         timezones = res.json_body
         timezones_list = get_timezones_list()
@@ -152,12 +162,15 @@ class TestAboutEndpoint(object):
         """
         Get information about Tracim
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/system/about", status=200)
         assert res.json_body["name"] == "Tracim"
         assert res.json_body["version"]
         assert res.json_body["datetime"]
-        assert res.json_body["website"] == "https://www.algoo.fr/fr/tracim"
+        assert res.json_body["website"] == "https://www.tracim.fr"
         assert res.json_body["database_schema_version"] is None
 
     def test_api__get_about__err_401__unregistered_user(self, web_testapp):
@@ -180,6 +193,10 @@ class TestUsernameEndpoints(object):
      - /api/system/reserved-usernames
     """
 
+    @mock.patch(
+        "tracim_backend.lib.core.user.UserApi.get_reserved_usernames",
+        return_value=tuple(["all"]),
+    )
     @pytest.mark.parametrize(
         "username,is_available",
         [
@@ -188,25 +205,36 @@ class TestUsernameEndpoints(object):
             ("Cloclo", True),
             ("anotherOne", True),
             ("all", False),
-            ("tous", False),
-            ("todos", False),
-            ("alle", False),
-            ("الكل", False),
         ],
     )
     def test_api__get_username_availability__ok_200__nominal_case(
-        self, web_testapp, username: str, is_available: bool
+        self,
+        get_reserved_usernames_mock,
+        web_testapp,
+        username: str,
+        is_available: bool,
     ) -> None:
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
-            "/api/system/username-availability?username={}".format(quote(username)), status=200
+            "/api/system/username-availability?username={}".format(quote(username)),
+            status=200,
         )
         assert res.json["available"] == is_available
 
     def test_api__get_reserved_usernames__ok_200__nominal_case(self, web_testapp) -> None:
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/system/reserved-usernames", status=200)
-        assert set(res.json["items"]) == set(("all", "tous", "todos", "alle", "الكل"))
+        assert TRANSLATED_GROUP_MENTIONS["all"] in res.json["items"]
+        assert TRANSLATED_GROUP_MENTIONS["reader"] in res.json["items"]
+        assert TRANSLATED_GROUP_MENTIONS["contributor"] in res.json["items"]
+        assert TRANSLATED_GROUP_MENTIONS["content-manager"] in res.json["items"]
+        assert TRANSLATED_GROUP_MENTIONS["space-manager"] in res.json["items"]
 
 
 @pytest.mark.usefixtures("test_fixture")
@@ -217,13 +245,19 @@ class TestUsageConditions(object):
     """
 
     def test_api__get_usage_conditions__ok_200__empty(self, web_testapp) -> None:
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/system/usage_conditions", status=200)
         assert res.json == {"items": []}
 
     @pytest.mark.parametrize("config_section", [{"name": "usage_condition_test"}], indirect=True)
     def test_api__get_usage_conditions__ok_200__nominal_case(self, web_testapp) -> None:
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/system/usage_conditions", status=200)
         assert res.json == {
             "items": [
@@ -231,7 +265,10 @@ class TestUsageConditions(object):
                     "title": "a super test'with some spécials characters",
                     "url": "http://localhost:6543/assets/branding/a%20super%20test%27with%20some%20sp%C3%A9cials%20characters.txt",
                 },
-                {"title": "hello", "url": "http://localhost:6543/assets/branding/hello.pdf"},
+                {
+                    "title": "hello",
+                    "url": "http://localhost:6543/assets/branding/hello.pdf",
+                },
                 {
                     "title": "way",
                     "url": "http://localhost:6543/assets/branding/we/can/support/subdirectory/this/way.jpg",
@@ -249,8 +286,10 @@ class TestConfigEndpointCollabora(object):
 
     @patch("requests.get")
     def test_api__get_config__ok_200__nominal_case(self, patched_get, web_testapp):
-
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         patched_get.return_value.text = """
         <wopi-discovery>
             <net-zone name="external-http">
@@ -292,7 +331,10 @@ class TestConfigCallJitsi(object):
     """
 
     def test_api__get_config__ok_200__nominal_case(self, web_testapp):
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/system/config", status=200)
         assert res.json_body["call__enabled"] is True
         # INFO - MP - 2021-11-18 - The value received on is 1000 times the value in the configfile
@@ -311,7 +353,10 @@ class TestConfigEndpoint(object):
         """
         Get some config info about tracim
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/system/config", status=200)
         assert res.json_body["email_notification_activated"] is False
         assert res.json_body["new_user_invitation_do_notify"] is True
@@ -418,7 +463,10 @@ class TestErrorCodeEndpoint(object):
     def test_api__get_error_code_endpoint__ok__200__nominal_case(self, web_testapp):
         web_testapp.authorization = (
             "Basic",
-            ("admCollaborativeDocumentEditionFactoryin@admin.admin", "admin@admin.admin"),
+            (
+                "admCollaborativeDocumentEditionFactoryin@admin.admin",
+                "admin@admin.admin",
+            ),
         )
         res = web_testapp.get("/api/system/error_codes", status=200)
         # check if all error_codes are available by checking number of item
@@ -436,7 +484,10 @@ class TestWorkspaceAccessType(object):
         """
         Get the list of allowed workspace access types with a registered user.
         """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/system/workspace_access_types", status=200)
         assert set(res.json["items"]) == set(("confidential", "on_request", "open"))
 
@@ -463,7 +514,10 @@ class TestUserCustomPropertiesSchema(object):
         "config_section", [{"name": "custom_properties_sample_test"}], indirect=True
     )
     def test_api__get_user_custom_properties_schema__ok_200__sample_data(self, web_testapp):
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/system/user-custom-properties-schema", status=200)
         json_schema = res.json_body["json_schema"]
         assert json_schema["title"] == "Test"
@@ -490,7 +544,10 @@ class TestUserCustomPropertiesSchema(object):
         session.add(admin_user)
         session.flush()
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/system/user-custom-properties-schema", status=200)
         json_schema = res.json_body["json_schema"]
         assert json_schema["title"] == "Un Test"
@@ -528,7 +585,10 @@ class TestUserCustomPropertiesUISchema(object):
         "config_section", [{"name": "custom_properties_sample_test"}], indirect=True
     )
     def test_api__get_user_custom_properties_ui_schema__ok_200__sample_data(self, web_testapp):
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/system/user-custom-properties-ui-schema", status=200)
         ui_schema = res.json_body["ui_schema"]
         assert ui_schema == {
@@ -556,7 +616,10 @@ class TestUserCustomPropertiesUISchema(object):
         session.add(admin_user)
         session.flush()
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get("/api/system/user-custom-properties-ui-schema", status=200)
         ui_schema = res.json_body["ui_schema"]
         assert ui_schema == {

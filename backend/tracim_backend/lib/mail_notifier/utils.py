@@ -5,9 +5,8 @@ from email.utils import formatdate
 from email.utils import make_msgid
 from email.utils import parseaddr
 import enum
-import typing
-
 import html2text
+import typing
 
 from tracim_backend.lib.utils.sanitizer import HtmlSanitizer
 
@@ -46,7 +45,7 @@ class EST(object):
     """
     EST = Email Subject Tags - this is a convenient class - no business logic
     here
-    This class is intended to agregate all dynamic content that may be included
+    This class is intended to aggregate all dynamic content that may be included
     in email subjects
     """
 
@@ -57,7 +56,12 @@ class EST(object):
 
     @classmethod
     def all(cls):
-        return [cls.CONTENT_LABEL, cls.CONTENT_STATUS_LABEL, cls.WEBSITE_TITLE, cls.WORKSPACE_LABEL]
+        return [
+            cls.CONTENT_LABEL,
+            cls.CONTENT_STATUS_LABEL,
+            cls.WEBSITE_TITLE,
+            cls.WORKSPACE_LABEL,
+        ]
 
 
 class EmailAddress(object):

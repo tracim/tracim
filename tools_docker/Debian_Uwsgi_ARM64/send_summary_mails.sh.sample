@@ -1,0 +1,6 @@
+#!/bin/bash
+set -a
+. /var/tracim/data/tracim_env_variables_cron
+set +a
+
+<PATH TO tracimcli> periodic send-summary-mails -c <PATH TO development.ini> --since 24

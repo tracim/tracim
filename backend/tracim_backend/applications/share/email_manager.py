@@ -49,7 +49,9 @@ class ShareEmailManager(EmailManager):
                 translator=translator,
             )
             send_email_through(
-                config=self.config, sendmail_callable=email_sender.send_mail, message=message
+                config=self.config,
+                sendmail_callable=email_sender.send_mail,
+                message=message,
             )
         else:
             logger.debug(
@@ -77,7 +79,9 @@ class ShareEmailManager(EmailManager):
                 translator=translator,
             )
             send_email_through(
-                config=self.config, sendmail_callable=email_sender.send_mail, message=message
+                config=self.config,
+                sendmail_callable=email_sender.send_mail,
+                message=message,
             )
 
     def _notify_emitter(
@@ -114,7 +118,9 @@ class ShareEmailManager(EmailManager):
             "share_password": share_password,
         }
         body_html = self._render_template(
-            mako_template_filepath=html_template_file_path, context=context, translator=translator
+            mako_template_filepath=html_template_file_path,
+            context=context,
+            translator=translator,
         )
         message = EmailNotificationMessage(
             subject=subject,
@@ -163,7 +169,9 @@ class ShareEmailManager(EmailManager):
             "receiver": receiver,
         }
         body_html = self._render_template(
-            mako_template_filepath=html_template_file_path, context=context, translator=translator
+            mako_template_filepath=html_template_file_path,
+            context=context,
+            translator=translator,
         )
 
         message = EmailNotificationMessage(

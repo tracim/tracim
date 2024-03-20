@@ -39,7 +39,7 @@ import {
   USER_PUBLIC_NAME,
   USER_REQUEST_PASSWORD,
   USER_USERNAME,
-  USER_WORKSPACE_DO_NOTIFY,
+  USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
   USER_WORKSPACE_LIST,
   WORKSPACE,
   WORKSPACE_AGENDA_URL,
@@ -50,9 +50,9 @@ import {
   WORKSPACE_CONTENT_SHARE_FOLDER,
   WORKSPACE_DETAIL,
   WORKSPACE_LIST,
-  WORKSPACE_MEMBER_ADD,
-  WORKSPACE_MEMBER_REMOVE,
-  WORKSPACE_MEMBER_UPDATE,
+  ADD_USER_ROLE,
+  REMOVE_USER_ROLE,
+  UPDATE_USER_ROLE,
   WORKSPACE_PUBLICATION_LIST,
   WORKSPACE_READ_STATUS,
   ACCESSIBLE_WORKSPACE_LIST,
@@ -63,7 +63,8 @@ import {
   USER_PUBLIC_PROFILE,
   FAVORITE_LIST,
   FAVORITE,
-  UNREAD_NOTIFICATION_COUNT
+  UNREAD_NOTIFICATION_COUNT,
+  USER_WORKSPACE_CONFIG_LIST
 } from './action-creator.sync.js'
 import {
   CONTENT_NAMESPACE,
@@ -274,9 +275,9 @@ export const getUserConfiguration = userId => dispatch => {
   })
 }
 
-export const getUserWorkspaceList = (userId, showOwnedWorkspace) => async dispatch => {
+export const getUserWorkspaceConfigList = (userId) => async dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspaces?show_owned_workspace=${showOwnedWorkspace ? 1 : 0}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspaces/all/settings`,
     param: {
       credentials: 'include',
       headers: {
@@ -304,9 +305,9 @@ export const getUserIsConnected = () => async dispatch => {
   })
 }
 
-export const getMyselfKnownMember = (userNameToSearch, workspaceIdToExclude) => dispatch => {
+export const getMyselfAllKnownMember = () => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/known_members?acp=${userNameToSearch}&exclude_workspace_ids=${workspaceIdToExclude}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/me/known_members`,
     param: {
       credentials: 'include',
       headers: {
@@ -480,39 +481,45 @@ export const putUserLang = (user, newLang) => dispatch => {
   })
 }
 
-export const putMyselfWorkspaceDoNotify = (workspaceId, doNotify) => dispatch => {
+export const putMyselfWorkspaceEmailNotificationType = (workspaceId, emailNotificationType) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${workspaceId}/notifications/${doNotify ? 'activate' : 'deactivate'}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${workspaceId}/email_notification_type`,
     param: {
       credentials: 'include',
       headers: {
         ...FETCH_CONFIG.headers
       },
-      method: 'PUT'
+      method: 'PUT',
+      body: JSON.stringify({
+        email_notification_type: emailNotificationType
+      })
     },
-    actionName: USER_WORKSPACE_DO_NOTIFY,
+    actionName: USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
     dispatch
   })
 }
 
-export const putUserWorkspaceDoNotify = (user, workspaceId, doNotify) => dispatch => {
+export const putUserWorkspaceEmailNotificationType = (user, workspaceId, emailNotificationType) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${user.userId}/workspaces/${workspaceId}/notifications/${doNotify ? 'activate' : 'deactivate'}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${user.userId}/workspaces/${workspaceId}/email_notification_type`,
     param: {
       credentials: 'include',
       headers: {
         ...FETCH_CONFIG.headers
       },
-      method: 'PUT'
+      method: 'PUT',
+      body: JSON.stringify({
+        email_notification_type: emailNotificationType
+      })
     },
-    actionName: USER_WORKSPACE_DO_NOTIFY,
+    actionName: USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
     dispatch
   })
 }
 
-export const getMyselfWorkspaceList = (showOwnedWorkspace) => dispatch => {
+export const getMyselfWorkspaceConfigList = () => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces?show_owned_workspace=${showOwnedWorkspace ? 1 : 0}`,
+    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/all/settings`,
     param: {
       credentials: 'include',
       headers: {
@@ -520,7 +527,7 @@ export const getMyselfWorkspaceList = (showOwnedWorkspace) => dispatch => {
       },
       method: 'GET'
     },
-    actionName: WORKSPACE_LIST,
+    actionName: USER_WORKSPACE_CONFIG_LIST,
     dispatch
   })
 }
@@ -645,7 +652,7 @@ export const getMyselfWorkspaceReadStatusList = workspaceId => dispatch => {
   })
 }
 
-export const postWorkspaceMember = (workspaceId, newMember) => dispatch => {
+export const postUserRole = (workspaceId, newMember) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/members`,
     param: {
@@ -661,12 +668,12 @@ export const postWorkspaceMember = (workspaceId, newMember) => dispatch => {
         role: newMember.role
       })
     },
-    actionName: WORKSPACE_MEMBER_ADD,
+    actionName: ADD_USER_ROLE,
     dispatch
   })
 }
 
-export const deleteWorkspaceMember = (workspaceId, memberId) => dispatch => {
+export const deleteUserRole = (workspaceId, memberId) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/members/${memberId}`,
     param: {
@@ -674,12 +681,12 @@ export const deleteWorkspaceMember = (workspaceId, memberId) => dispatch => {
       headers: { ...FETCH_CONFIG.headers },
       method: 'DELETE'
     },
-    actionName: WORKSPACE_MEMBER_REMOVE,
+    actionName: REMOVE_USER_ROLE,
     dispatch
   })
 }
 
-export const updateWorkspaceMember = (workspaceId, memberId, newRole) => dispatch => {
+export const updateUserRole = (workspaceId, memberId, newRole) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/members/${memberId}`,
     param: {
@@ -690,7 +697,7 @@ export const updateWorkspaceMember = (workspaceId, memberId, newRole) => dispatc
         role: newRole
       })
     },
-    actionName: WORKSPACE_MEMBER_UPDATE,
+    actionName: UPDATE_USER_ROLE,
     dispatch
   })
 }

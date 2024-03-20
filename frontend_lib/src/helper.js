@@ -137,8 +137,6 @@ export const displayDistanceDate = (dateToDisplay, lang) => {
   )
 }
 
-export const convertBackslashNToBr = msg => msg.replace(/\n/g, '<br />')
-
 export const BREADCRUMBS_TYPE = {
   CORE: 'CORE',
   APP_FULLSCREEN: 'APP_FULLSCREEN',
@@ -537,7 +535,8 @@ export const CONTENT_TYPE = {
   FOLDER: 'folder',
   COMMENT: 'comment',
   KANBAN: 'kanban',
-  TODO: 'todo'
+  TODO: 'todo',
+  LOGBOOK: 'logbook'
 }
 
 export const CONTENT_NAMESPACE = {
@@ -610,7 +609,7 @@ export const getCurrentContentVersionNumber = (appFeatureMode, content, timeline
 
 export const MINIMUM_CHARACTERS_USERNAME = 3
 export const MAXIMUM_CHARACTERS_USERNAME = 255
-export const ALLOWED_CHARACTERS_USERNAME = 'azAZ09-_'
+export const ALLOWED_CHARACTERS_USERNAME = 'azAZ09-_.'
 export const CHECK_USERNAME_DEBOUNCE_WAIT = 250
 
 export const NUMBER_RESULTS_BY_PAGE = 15
@@ -641,8 +640,8 @@ export const checkUsernameValidity = async (apiUrl, username, props) => {
     }
   }
 
-  // INFO - GB - 2020-06-08 The allowed characters are azAZ09-_
-  if (!(/^[A-Za-z0-9_-]*$/.test(username))) {
+  // INFO - GB - 2020-06-08 The allowed characters are azAZ09-_.
+  if (!(/^[A-Za-z0-9_.-]*$/.test(username))) {
     return {
       isUsernameValid: false,
       usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
@@ -873,18 +872,6 @@ const seekUsernameEnd = (text, offset) => {
   return offset
 }
 
-export const tinymceRemove = (selector) => {
-  try {
-    globalThis.tinymce.remove(selector)
-  } catch (e) {
-    if (e instanceof TypeError) {
-      console.error('HACK(#5437): removing TinyMCE raised a TypeError exception. If the message looks like "Can\'t access dead object". Ignoring the exception but please fix this.', e)
-    } else {
-      throw e
-    }
-  }
-}
-
 export const autoCompleteItem = (text, item, cursorPos, endCharacter) => {
   let character, keyword
   let textBegin, textEnd
@@ -931,5 +918,47 @@ export const handleClickCopyLink = (contentId) => {
 // Useful when you have to test if a single string is included in multiple others
 // Usage: const fn = stringIncludes('bc'); fn('abcd') -> Outputs: true
 export const stringIncludes = (a) => {
-  return (b) => b && b.toUpperCase().includes(a.toUpperCase())
+  return (b) => {
+    if (!a || !b) return false
+    return b.toUpperCase().includes(a.toUpperCase())
+  }
+}
+
+// INFO - ML - 2024-03-01 - This excludes any character that is not of the unicode range of
+//  0020 (start of 'Basic Latin') to 1FFF (end of 'Greek Extended') or not of the unicode range of
+//  3040 (start of 'Hiragana') to DFFF (end of 'Low Surrogates') which are considered to be common characters
+//  /gu trailing indicator is to include unicode characters range
+//  Note that this might exclude some other common characters and does not remove ascii symbol characters
+//  See more at https://www.ling.upenn.edu/courses/Spring_2003/ling538/UnicodeRanges.html
+export const stripEmojis = (str) => {
+  return str.replace(/[^\u{0020}-\u{1FFF}\u{3040}-\u{DFFF}]/gu, '')
+}
+
+export const getRevisionTypeLabel = (revisionType, t) => {
+  switch (revisionType) {
+    case 'revision':
+      return t('modified')
+    case 'creation':
+      return t('created')
+    case 'edition':
+      return t('modified')
+    case 'deletion':
+      return t('deleted')
+    case 'undeletion':
+      return t('undeleted')
+    case 'mention':
+      return t('mention made')
+    case 'content-comment':
+      return t('commented')
+    case 'status-update':
+      return t('status modified')
+    case 'move':
+      return t('moved')
+    case 'copy':
+      return t('copied')
+    case 'unknown':
+      return t('unknown')
+  }
+
+  return revisionType
 }

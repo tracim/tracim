@@ -7,7 +7,7 @@ import {
   BREADCRUMBS_TYPE,
   COLLABORA_EXTENSIONS,
   CONTENT_TYPE,
-  formatAbsoluteDate,
+  ConfirmPopup,
   handleClickCopyLink,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -16,8 +16,8 @@ import {
   buildContentPathBreadcrumbs,
   appContentFactory,
   addAllResourceI18n,
+  formatAbsoluteDate,
   handleFetchResult,
-  handleInvalidMentionInComment,
   getToDo,
   PopinFixed,
   PopinFixedContent,
@@ -33,7 +33,6 @@ import {
   removeExtensionOfFilename,
   buildFilePreviewUrl,
   buildHeadTitle,
-  tinymceRemove,
   ROLE,
   ROLE_LIST,
   APP_FEATURE_MODE,
@@ -95,7 +94,6 @@ export class File extends React.Component {
       newFile: '',
       newFilePreview: FILE_PREVIEW_STATE.NO_FILE,
       fileCurrentPage: 1,
-      timelineWysiwyg: false,
       mode: APP_FEATURE_MODE.VIEW,
       progressUpload: {
         display: false,
@@ -109,6 +107,7 @@ export class File extends React.Component {
       editionAuthor: '',
       invalidMentionList: [],
       showInvalidMentionPopupInComment: false,
+      showPermanentlyDeletePopup: false,
       translationTargetLanguageCode: param.loggedUser.lang,
       previewInfo: {
         has_jpeg_preview: false,
@@ -171,12 +170,9 @@ export class File extends React.Component {
   }
 
   handleAllAppChangeLanguage = data => {
-    const { state, props } = this
+    const { props } = this
     console.log('%c<File> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
-
-    props.appContentCustomEventHandlerAllAppChangeLanguage(
-      data, this.setState.bind(this), i18n, state.timelineWysiwyg, this.handleChangeNewComment
-    )
+    props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n)
   }
 
   handleMemberModified = async data => {
@@ -322,13 +318,6 @@ export class File extends React.Component {
       )
       this.setState({ previewInfo: previewInfoResponse.body })
     }
-
-    if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymceRemove('#wysiwygTimelineComment')
-  }
-
-  componentWillUnmount () {
-    console.log('%c<File> will Unmount', `color: ${this.state.config.hexcolor}`)
-    tinymceRemove('#wysiwygTimelineComment')
   }
 
   setHeadTitle = (contentName) => {
@@ -500,43 +489,19 @@ export class File extends React.Component {
     props.appContentMarkAsTemplate(this.setState.bind(this), state.content, isTemplate)
   }
 
-  searchForMentionOrLinkInQuery = async (query) => {
-    return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
-  }
-
-  handleClickValidateNewCommentBtn = (comment, commentAsFileList) => {
-    const { state } = this
-
-    if (!handleInvalidMentionInComment(
-      state.config.workspace.memberList,
-      state.timelineWysiwyg,
-      comment,
-      this.setState.bind(this)
-    )) {
-      this.handleClickValidateAnywayNewComment(comment, commentAsFileList)
-      return true
-    }
-    return false
-  }
-
-  handleClickValidateAnywayNewComment = (comment, commentAsFileList) => {
+  handleClickValidateNewComment = async (comment, commentAsFileList) => {
     const { props, state } = this
-    try {
-      props.appContentSaveNewComment(
-        state.content,
-        state.timelineWysiwyg,
-        comment,
-        commentAsFileList,
-        this.setState.bind(this),
-        state.config.slug,
-        state.loggedUser.username
-      )
-    } catch (e) {
-      sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
-    }
+    await props.appContentSaveNewCommentText(
+      state.content,
+      comment
+    )
+    await props.appContentSaveNewCommentFileList(
+      this.setState.bind(this),
+      state.content,
+      commentAsFileList
+    )
+    return true
   }
-
-  handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
 
   handleChangeStatus = async newStatus => {
     const { props, state } = this
@@ -591,13 +556,13 @@ export class File extends React.Component {
     this.setState({ showProgress: showProgressStatus })
   }
 
-  handleClickEditComment = (comment) => {
+  handleClickEditComment = (comment, contentId, parentId) => {
     const { props, state } = this
     props.appContentEditComment(
       state.content.workspace_id,
-      comment.parent_id,
-      comment.content_id,
-      state.loggedUser.username
+      parentId,
+      contentId,
+      comment
     )
   }
 
@@ -686,6 +651,16 @@ export class File extends React.Component {
 
   handleClickDropzoneCancel = () => this.setState({ mode: APP_FEATURE_MODE.VIEW, newFile: '', newFilePreview: FILE_PREVIEW_STATE.NO_FILE })
 
+  handleClickPermanentlyDeleteButton = () => {
+    this.setState(prev => ({ showPermanentlyDeletePopup: !prev.showPermanentlyDeletePopup }))
+  }
+
+  handleClickValidatePermanentlyDeleteButton = () => {
+    const { state } = this
+    this.props.appContentDeletePermanently(state.content.workspace_id, state.content.content_id, this.handleClickBtnCloseApp)
+    this.handleClickPermanentlyDeleteButton()
+  }
+
   handleClickDropzoneValidate = async () => {
     const { props, state } = this
 
@@ -769,7 +744,7 @@ export class File extends React.Component {
 
     shareEmailList = shareEmailList.filter(shareEmail => !invalidEmails.includes(shareEmail))
 
-    if (invalidEmails.length > 0 || shareEmailList === 0) {
+    if (invalidEmails.length > 0 || shareEmailList.length === 0) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
@@ -936,46 +911,40 @@ export class File extends React.Component {
           label={props.t('Timeline')}
         >
           <Timeline
+            apiUrl={state.config.apiUrl}
             contentId={state.content.content_id}
             contentType={state.content.content_type}
-            loading={props.loadingTimeline}
-            customClass={`${state.config.slug}__contentpage`}
-            customColor={state.config.hexcolor}
-            apiUrl={state.config.apiUrl}
             loggedUser={state.loggedUser}
-            timelineData={props.timeline}
-            memberList={state.config.workspace.memberList}
-            disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
-            availableStatusList={state.config.availableStatuses}
-            wysiwyg={state.timelineWysiwyg}
-            onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
-            onClickWysiwygBtn={this.handleToggleWysiwyg}
-            onClickRevisionBtn={this.handleClickShowRevision}
-            shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
-            isLastTimelineItemCurrentToken={props.isLastTimelineItemCurrentToken}
-            key='Timeline'
-            invalidMentionList={state.invalidMentionList}
-            onClickCancelSave={this.handleCancelSave}
-            onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
-            wysiwygIdSelector='#wysiwygTimelineComment'
-            showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
-            searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
-            workspaceId={state.content.workspace_id}
+            onClickRestoreComment={props.handleRestoreComment}
+            onClickSubmit={this.handleClickValidateNewComment}
             onClickTranslateComment={(comment, languageCode = null) => props.handleTranslateComment(
               comment,
               state.content.workspace_id,
               languageCode || state.translationTargetLanguageCode
             )}
-            onClickRestoreComment={props.handleRestoreComment}
-            onClickEditComment={this.handleClickEditComment}
-            onClickDeleteComment={this.handleClickDeleteComment}
-            onClickOpenFileComment={this.handleClickOpenFileComment}
-            translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
+            timelineData={props.timeline}
             translationTargetLanguageCode={state.translationTargetLanguageCode}
-            onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
-            onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
+            translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
+            workspaceId={state.content.workspace_id}
+            // End of required props ///////////////////////////////////////////
+            availableStatusList={state.config.availableStatuses}
             canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
+            codeLanguageList={state.config.system.config.ui__notes__code_sample_languages}
+            customClass={`${state.config.slug}__contentpage`}
+            customColor={state.config.hexcolor}
+            disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
+            invalidMentionList={state.invalidMentionList}
             isFileCommentLoading={state.isFileCommentLoading}
+            isLastTimelineItemCurrentToken={props.isLastTimelineItemCurrentToken}
+            loading={props.loadingTimeline}
+            memberList={state.config.workspace.memberList}
+            onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
+            onClickDeleteComment={this.handleClickDeleteComment}
+            onClickEditComment={this.handleClickEditComment}
+            onClickOpenFileComment={this.handleClickOpenFileComment}
+            onClickRevisionBtn={this.handleClickShowRevision}
+            onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
+            shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
           />
         </PopinFixedRightPartContent>
       ) : null
@@ -1024,6 +993,7 @@ export class File extends React.Component {
         >
           <TagList
             apiUrl={state.config.apiUrl}
+            customColor={state.config.hexcolor}
             workspaceId={state.content.workspace_id}
             contentId={state.content.content_id}
             userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
@@ -1119,7 +1089,7 @@ export class File extends React.Component {
   handleClickNotifyAll = async () => {
     const { state, props } = this
 
-    props.appContentNotifyAll(state.content, this.setState.bind(this), state.config.slug)
+    props.appContentNotifyAll(state.content)
     this.handleCloseNotifyAllMessage()
   }
 
@@ -1254,6 +1224,15 @@ export class File extends React.Component {
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
               disabled: state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted,
               dataCy: 'popinListItem__delete'
+            },
+            {
+              icon: 'fas fa-exclamation-triangle',
+              label: props.t('Permanently delete'),
+              onClick: this.handleClickPermanentlyDeleteButton,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.workspaceManager.id,
+              disabled: false,
+              separatorLine: true,
+              dataCy: 'popinListItem__permanentlyDelete'
             }
           ]}
           appMode={state.mode}
@@ -1365,6 +1344,17 @@ export class File extends React.Component {
             menuItemList={this.getMenuItemList()}
           />
         </PopinFixedContent>
+        {state.showPermanentlyDeletePopup && (
+          <ConfirmPopup
+            customColor={props.customColor}
+            confirmLabel={props.t('Yes, delete permanently')}
+            confirmIcon='fas fa-exclamation-triangle'
+            onConfirm={this.handleClickValidatePermanentlyDeleteButton}
+            onCancel={this.handleClickPermanentlyDeleteButton}
+            msg={props.t('Warning: this operation cannot be rolled back')}
+            titleLabel={props.t('Permanently delete')}
+          />
+        )}
       </PopinFixed>
     )
   }

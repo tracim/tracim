@@ -1,11 +1,11 @@
-import datetime
-from pathlib import PurePath
-import typing
 from urllib.parse import quote
 from urllib.parse import urljoin
 
+import datetime
 from importlib_metadata import metadata
+from pathlib import PurePath
 from sqlalchemy.orm import Session
+import typing
 
 from tracim_backend.apps import COLLABORATIVE_DOCUMENT_EDITION__APP_SLUG
 from tracim_backend.config import CFG
@@ -25,9 +25,7 @@ from tracim_backend.models.database_version import MigrateVersion
 
 
 class SystemApi(object):
-    def __init__(
-        self, config: CFG, session: Session,
-    ):
+    def __init__(self, config: CFG, session: Session):
         self._config = config
         self._session = session
 
@@ -84,6 +82,12 @@ class SystemApi(object):
             limitation__maximum_online_users_message=self._config.LIMITATION__MAXIMUM_ONLINE_USERS_MESSAGE,
             call__enabled=self._config.CALL__ENABLED,
             call__unanswered_timeout=self._config.CALL__UNANSWERED_TIMEOUT,
+            auth_types=[auth_type.value for auth_type in self._config.AUTH_TYPES],
+            saml_idp_list=[idp.to_dict() for idp in self._config.SAML_IDP_LIST],
+            user__read_only_fields={
+                auth_type.value: [fields.value for fields in fields_list]
+                for auth_type, fields_list in self._config.USER__READ_ONLY_FIELDS.items()
+            },
         )
 
     def get_usage_conditions_files(self) -> typing.List[UsageConditionModel]:

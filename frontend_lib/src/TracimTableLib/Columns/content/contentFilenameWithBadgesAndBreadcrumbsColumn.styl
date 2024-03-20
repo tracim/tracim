@@ -1,0 +1,20 @@
+@import '../../../css/Variable.styl'
+
+.contentFilenameColumn
+  &__name_path
+    flex 2
+    text-overflow ellipsis
+    overflow hidden
+    white-space nowrap
+  &__unavailableContent
+    &__name_warning
+      display flex
+      flex-direction column
+    &__warning
+      font-size metadataFontSize
+
+@media (max-width: max-sm)
+  .contentFilenameColumn
+    &__name_path
+      & > .breadcrumbs
+        display none

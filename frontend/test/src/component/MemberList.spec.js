@@ -13,15 +13,15 @@ describe('<MemberList />', () => {
     memberList: [{
       id: 1,
       role: 'workspace-manager',
-      doNotify: true,
+      emailNotificationType: 'summary',
       publicName: 'randomPublicName1',
-      username: 'randomUserame1'
+      username: 'randomUsername1'
     }, {
       id: 0,
       role: 'content-manager',
-      doNotify: true,
+      emailNotificationType: 'summary',
       publicName: 'randomPublicName2',
-      username: 'randomUserame2'
+      username: 'randomUsername2'
     }],
     roleList: [{
       slug: 'workspace-manager'

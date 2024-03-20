@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
+from colorlog import colorlog
 import logging
 import time
 import typing
-
-from colorlog import colorlog
 
 
 class StandardUTCFormatter(logging.Formatter):
@@ -51,7 +50,9 @@ class Logger(object):
         self._logger.critical(msg=self._msg(instance_or_class, message), exc_info=exc_info)
 
     def exception(self, instance_or_class, message: typing.Union[str, Exception]):
-        self._logger.exception(msg=self._msg(instance_or_class, message),)
+        self._logger.exception(
+            msg=self._msg(instance_or_class, message),
+        )
 
 
 logger = Logger("tracim")

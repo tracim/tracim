@@ -18,7 +18,12 @@ def upgrade():
     enum = sa.Enum("PENDING", "ACCEPTED", "REJECTED", name="workspacesubscriptionstate")
     op.create_table(
         "workspace_subscriptions",
-        sa.Column("state", enum, server_default="PENDING", nullable=False,),
+        sa.Column(
+            "state",
+            enum,
+            server_default="PENDING",
+            nullable=False,
+        ),
         sa.Column("created_date", sa.DateTime(), nullable=False),
         sa.Column("workspace_id", sa.Integer(), nullable=False),
         sa.Column("author_id", sa.Integer(), nullable=False),

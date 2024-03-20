@@ -15,7 +15,6 @@
   "Request rejected": "تم رفض الطلب",
   "There are no requests yet.": "لا يوجد أي طلب بعد.",
   "Description": "وصف",
-  "Space's description": "وصف الفضاء",
   "Confirm": "تأكيد",
   "Default role:": "الدور الإفتراضي:",
   "This is the role that members will have by default when they join your space (for open and on request spaces only).": "هذا هو الدور الذي سيتم منحه افتراضيا للأعضاء حين ينضمون إلى فضائك (للفضاءات المفتوحة و الفضاءات تحت الطلب فقط).",
@@ -28,7 +27,6 @@
   "Error while loading space requests": "خطأ أثناء تحميل طلبات الفضاء",
   "Save successful": "تمت عملية الحفظ بنجاح",
   "Error while saving new space label": "خطأ أثناء حفظ الاسم الجديد للفضاء",
-  "Error while saving the new version": "خطأ أثناء حفظ النسخة الجديدة",
   "Error while saving the new description": "خطأ أثناء حفظ الوصف الجديد",
   "Error while saving new default role": "خطأ أثناء حفظ الدور الإفتراضي الجديد",
   "You cannot change this member role because there are no other space managers.": "لا يمكنك تغيير دور هذا العضو لأنه لا يوجد مشرف آخر على هذا الفضاء.",
@@ -60,5 +58,8 @@
   "Tags": "إشارات",
   "Use this link to integrate this agenda to your": "استخدم هذا الرابط لتضمين هذه المفكرة في",
   "CalDAV compatible software": "برنامج متطابق CalDAV",
-  "Filter users": ""
+  "Filter users": "",
+  "Description of the space": "",
+  "This space doesn't have a description yet.": "",
+  "Edit": ""
 }

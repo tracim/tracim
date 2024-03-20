@@ -1,16 +1,20 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import {
-  BtnSwitch,
   Icon,
   PAGE,
   ROLE_LIST
 } from 'tracim_frontend_lib'
+import EmailNotificationTypeButton from '../EmailNotificationTypeButton.jsx'
+import { EMAIL_NOTIFICATION_TYPE } from '../../util/helper'
 
 require('./UserStatus.styl')
 
 export const UserStatus = props => {
-  const mySelf = props.currentWorkspace.memberList.find(m => m.id === props.user.userId) || { role: '' }
+  const mySelf = props.currentWorkspace.memberList.find(m => m.id === props.user.userId) || {
+    role: '', emailNotificationType: EMAIL_NOTIFICATION_TYPE.NONE
+  }
   const myRole = ROLE_LIST.find(r => r.slug === mySelf.role) || { faIcon: '', hexcolor: '', label: '' }
 
   return (
@@ -30,23 +34,10 @@ export const UserStatus = props => {
 
       <div className='userstatus__informations'>
         {props.displayNotifBtn && (
-          <div
-            className='userstatus__informations__notification primaryColorFontHover'
-            title={props.t('You can change your notification status by clicking here')}
-          >
-            <BtnSwitch
-              checked={mySelf.doNotify}
-              onChange={mySelf.doNotify ? props.onClickRemoveNotify : props.onClickAddNotify}
-              smallSize
-            />
-
-            <div
-              className='userstatus__informations__notification__text'
-              onClick={mySelf.doNotify ? props.onClickRemoveNotify : props.onClickAddNotify}
-            >
-              {props.t('Email notifications')}
-            </div>
-          </div>
+          <EmailNotificationTypeButton
+            onClickChangeEmailNotificationType={props.onClickChangeEmailNotificationType}
+            currentEmailNotificationType={mySelf.emailNotificationType}
+          />
         )}
 
         {props.displaySubscriptionRequestsInformation && (
@@ -73,3 +64,25 @@ export const UserStatus = props => {
 }
 
 export default UserStatus
+
+UserStatus.propTypes = {
+  user: PropTypes.object,
+  currentWorkspace: PropTypes.object,
+  displayNotifBtn: PropTypes.bool,
+  displaySubscriptionRequestsInformation: PropTypes.bool,
+  newSubscriptionRequestsNumber: PropTypes.number,
+  onClickChangeEmailNotificationType: PropTypes.func,
+  t: PropTypes.func
+}
+UserStatus.defaultProps = {
+  user: { userId: 0 },
+  currentWorkspace: {
+    memberList: [],
+    id: 0
+  },
+  displayNotifBtn: false,
+  displaySubscriptionRequestsInformation: false,
+  newSubscriptionRequestsNumber: 0,
+  onClickChangeEmailNotificationType: () => {},
+  t: () => {}
+}

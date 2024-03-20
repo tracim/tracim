@@ -125,6 +125,29 @@ export const unLoggedAllowedPageList = [
   PAGE.GUEST_DOWNLOAD('')
 ]
 
+export const EMAIL_NOTIFICATION_TYPE = {
+  INDIVIDUAL: 'individual',
+  SUMMARY: 'summary',
+  NONE: 'none'
+}
+
+/**
+ * Function to initialize a custom element
+ * @param {String} htmlTag tag name that will be replaced with the HTML Element
+ * @param {HTMLElement} htmlElement HTML element that whill replace the tag name
+ */
+export const initializeCustomElements = (htmlTag, htmlElement) => {
+  if (window.customElements) {
+    if (!window.customElements.get(htmlTag)) {
+      window.customElements.define(htmlTag, htmlElement)
+    }
+  } else {
+    window.alert(i18n.t(
+      'Tracim doesn\'t support the current version of your browser. Please upgrade your browser.'
+    ))
+  }
+}
+
 export const findUserRoleIdInWorkspace = (userId, memberList, roleList) => {
   const user = memberList.find(u => u.id === userId) || { role: ROLE.reader.slug }
   return (roleList.find(r => user.role === r.slug) || { id: 1 }).id
@@ -147,8 +170,8 @@ export const DRAG_AND_DROP = {
   CONTENT_ITEM: 'contentItem'
 }
 
-// Côme - 2018/09/19 - the object below is a temporary hack to be able to generate translation keys that only exists in backend
-// and are returned through api.
+// INFO - CH - 2018/09/19 - the object below is a temporary hack to be able to generate translation keys that only
+// exists in backend and are returned through api.
 // We will later implement a better solution
 // this const isn't exported since it's only purpose is to generate key trads through i18n.scanner
 const backendTranslationKeyList = [ // eslint-disable-line no-unused-vars
@@ -226,35 +249,6 @@ export const parseSearchUrl = (parsedQuery) => {
   searchObject.searchType = parsedQuery.s
 
   return searchObject
-}
-
-export const getRevisionTypeLabel = (revisionType, t) => {
-  switch (revisionType) {
-    case 'revision':
-      return t('modified')
-    case 'creation':
-      return t('created')
-    case 'edition':
-      return t('modified')
-    case 'deletion':
-      return t('deleted')
-    case 'undeletion':
-      return t('undeleted')
-    case 'mention':
-      return t('mention made')
-    case 'content-comment':
-      return t('commented')
-    case 'status-update':
-      return t('status modified')
-    case 'move':
-      return t('moved')
-    case 'copy':
-      return t('copied')
-    case 'unknown':
-      return t('unknown')
-  }
-
-  return revisionType
 }
 
 export const WELCOME_ELEMENT_ID = 'welcome'

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
+from depot.manager import DepotManager
+import enum
 from enum import Enum
 import json
-import os
-import typing
-
-from depot.manager import DepotManager
 from jsonschema import SchemaError
+import os
 from paste.deploy.converters import asbool
 from paste.deploy.converters import asint
+import typing
 
 from tracim_backend.app_models.validator import update_validators
 from tracim_backend.apps import load_apps
@@ -35,6 +35,7 @@ from tracim_backend.lib.utils.utils import is_dir_readable
 from tracim_backend.lib.utils.utils import is_dir_writable
 from tracim_backend.lib.utils.utils import is_file_exist
 from tracim_backend.lib.utils.utils import is_file_readable
+from tracim_backend.lib.utils.utils import string_to_list
 from tracim_backend.lib.utils.utils import string_to_unique_item_list
 from tracim_backend.lib.utils.utils import validate_json
 from tracim_backend.models.auth import AuthType
@@ -75,6 +76,13 @@ def create_target_langage(value: str) -> typing.Tuple[str, str]:
 def create_code_sample_langage(language: str) -> typing.Tuple[str, str]:
     value, text = language.split(":")
     return (value, text)
+
+
+class UserReadOnlyFields(enum.Enum):
+    PUBLIC_NAME = "public_name"
+    USERNAME = "username"
+    EMAIL = "email"
+    PASSWORD = "password"
 
 
 class ConfigParam(object):
@@ -157,6 +165,21 @@ class ConfigParam(object):
             return value
 
 
+# INFO - M.L - 2023-10-25 - Using naming SamLIdPConfig instead of SAMLIdpConfig or SamlIdPConfig for readability
+class SamLIdPConfig(object):
+    def __init__(self, displayed_name: str, identifier: str, logo_url: str):
+        self.displayed_name = displayed_name
+        self.identifier = identifier
+        self.logo_url = logo_url
+
+    def to_dict(self):
+        return {
+            "displayed_name": self.displayed_name,
+            "identifier": self.identifier,
+            "logo_url": self.logo_url,
+        }
+
+
 class CFG(object):
     """Object used for easy access to config file parameters."""
 
@@ -174,6 +197,7 @@ class CFG(object):
         self._check_consistency()
         self.check_config_validity()
         logger.debug(self, "CONFIG_PROCESS:5: End of config process")
+        self.SAML_IDP_LIST: typing.List[SamLIdPConfig] = []
 
         app_lib = ApplicationApi(app_list=app_list, show_inactive=True)
         for app in app_lib.get_all():
@@ -193,7 +217,10 @@ class CFG(object):
         return os.path.join(self.FRONTEND__DIST_FOLDER_PATH, "assets", "branding")
 
     def deprecate_parameter(
-        self, parameter_name: str, parameter_value: typing.Any, extended_information: str,
+        self,
+        parameter_name: str,
+        parameter_value: typing.Any,
+        extended_information: str,
     ) -> None:
         """
 
@@ -266,6 +293,7 @@ class CFG(object):
             "contents/html-document,"
             "contents/folder,"
             "contents/kanban,"
+            "contents/logbook,"
             "contents/todo,"
             "agenda,"
             "share_content,"
@@ -286,13 +314,13 @@ class CFG(object):
         enabled_app_slug_list: typing.List[str],
         loaded_apps: typing.Dict[str, TracimApplication],
     ) -> None:
-
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
         # of tracim_backend, Be careful app_list is a global_var
         app_list.clear()
         # FIXME - G.M - 2020-01-27 - force specific order of apps
         # see issue https://github.com/tracim/tracim/issues/2326
         default_app_order = (
+            "contents/logbook",
             "contents/thread",
             "contents/file",
             "contents/html-document",
@@ -398,6 +426,21 @@ class CFG(object):
             cast_func=AuthType,
             do_strip=True,
         )
+        self.USER__READ_ONLY_FIELDS: typing.Dict[AuthType, typing.List[UserReadOnlyFields]] = {}
+        for auth_type in self.AUTH_TYPES:
+            readonly_field_list = string_to_unique_item_list(
+                self.get_raw_config(f"user.profile.read_only_fields.{auth_type.value}"),
+                separator=",",
+                cast_func=UserReadOnlyFields,
+                do_strip=True,
+            )
+            # HACK - M.L - 2023-10-30 - This is to satisfy CFG._check_consistency despite being
+            #  poorly usable
+            self.__setattr__(
+                f"USER__PROFILE__READ_ONLY_FIELDS__{auth_type.value.upper()}", readonly_field_list
+            )
+            self.USER__READ_ONLY_FIELDS[auth_type] = readonly_field_list
+
         self.REMOTE_USER_HEADER = self.get_raw_config("remote_user_header", None)
 
         self.API__KEY = self.get_raw_config("api.key", "", secret=True)
@@ -494,9 +537,7 @@ class CFG(object):
         )
         self.KNOWN_MEMBERS__FILTER = asbool(self.get_raw_config("known_members.filter", "True"))
         self.DEBUG = asbool(self.get_raw_config("debug", "False"))
-        self.BUILD_VERSION = self.get_raw_config(
-            "build_version", get_build_version(os.path.abspath(__file__))
-        )
+        self.BUILD_VERSION = self.get_raw_config("build_version", get_build_version())
         self.PREVIEW__JPG__RESTRICTED_DIMS = asbool(
             self.get_raw_config("preview.jpg.restricted_dims", "False")
         )
@@ -514,9 +555,7 @@ class CFG(object):
         tracim_folder = os.path.dirname(backend_folder)
         backend_i18n_folder = os.path.join(backend_folder, "tracim_backend", "locale")
 
-        self.FRONTEND__CACHE_TOKEN = self.get_raw_config(
-            "frontend.cache_token", get_cache_token(os.path.abspath(__file__))
-        )
+        self.FRONTEND__CACHE_TOKEN = self.get_raw_config("frontend.cache_token", get_cache_token())
 
         self.BACKEND__I18N_FOLDER_PATH = self.get_raw_config(
             "backend.i18n_folder_path", backend_i18n_folder
@@ -542,7 +581,8 @@ class CFG(object):
             self.branding_folder_path, "rich_text_preview.template"
         )
         self.RICH_TEXT_PREVIEW__TEMPLATE_PATH = self.get_raw_config(
-            "rich_text_preview.template_path", default_rich_text_preview_template_file_path
+            "rich_text_preview.template_path",
+            default_rich_text_preview_template_file_path,
         )
 
         default_plugin_folder_path = self.here_macro_replace("%(here)s/plugins")
@@ -683,9 +723,22 @@ class CFG(object):
         )
 
     def _load_live_messages_config(self) -> None:
-        self.LIVE_MESSAGES__CONTROL_ZMQ_URI = self.get_raw_config(
-            "live_messages.control_zmq_uri", "tcp://localhost:5563"
+        self.LIVE_MESSAGES__CONTROL_ZMQ_URI = string_to_list(
+            self.get_raw_config("live_messages.control_zmq_uri", "tcp://localhost:5563"),
+            cast_func=str,
+            separator=",",
         )
+        self.LIVE_MESSAGES__PUSH_ZMQ_URI = string_to_list(
+            self.get_raw_config("live_messages.push_zmq_uri"),
+            cast_func=str,
+            separator=",",
+        )
+        self.LIVE_MESSAGES__PUB_ZMQ_URI = string_to_list(
+            self.get_raw_config("live_messages.pub_zmq_uri"),
+            cast_func=str,
+            separator=",",
+        )
+
         self.LIVE_MESSAGES__STATS_ZMQ_URI = self.get_raw_config(
             "live_messages.stats_zmq_uri", "ipc:///var/run/pushpin/pushpin-stats"
         )
@@ -720,8 +773,8 @@ class CFG(object):
         ###
         # EMAIL related stuff (notification, reply)
         ##
-        self.EMAIL__NOTIFICATION__ENABLED_ON_INVITATION = asbool(
-            self.get_raw_config("email.notification.enabled_on_invitation", "True")
+        self.EMAIL__NOTIFICATION__TYPE_ON_INVITATION = str(
+            self.get_raw_config("email.notification.type_on_invitation", "summary")
         )
 
         # TODO - G.M - 2019-04-05 - keep as parameters
@@ -787,6 +840,12 @@ class CFG(object):
             _("[{website_title}] A password reset has been requested"),
         )
 
+        # Summary
+        self.EMAIL__NOTIFICATION__SUMMARY__TEMPLATE__HTML = self.get_raw_config(
+            "email.notification.summary.template.html",
+            "{}/{}".format(template_dir, "summary_body_html.mak"),
+        )
+
         # TODO - G.M - 2019-01-22 - add feature to process notification email
         # asynchronously see issue https://github.com/tracim/tracim/issues/1345
         self.EMAIL__NOTIFICATION__ACTIVATED = asbool(
@@ -847,7 +906,8 @@ class CFG(object):
             self.get_raw_config("email.reply.use_txt_parsing", "True")
         )
         self.EMAIL__REPLY__LOCKFILE_PATH = self.get_raw_config(
-            "email.reply.lockfile_path", self.here_macro_replace("%(here)s/email_fetcher.lock"),
+            "email.reply.lockfile_path",
+            self.here_macro_replace("%(here)s/email_fetcher.lock"),
         )
         self.NEW_USER__INVITATION__DO_NOTIFY = asbool(
             self.get_raw_config("new_user.invitation.do_notify", "True")
@@ -909,9 +969,10 @@ class CFG(object):
         self.LDAP_BIND_ANONYMOUS = asbool(self.get_raw_config("ldap_bind_anonymous", "False"))
         self.LDAP_TLS = asbool(self.get_raw_config("ldap_tls", "False"))
         self.LDAP_USER_BASE_DN = self.get_raw_config("ldap_user_base_dn")
-        self.LDAP_LOGIN_ATTRIBUTE = self.get_raw_config("ldap_login_attribute", "mail")
+        self.LDAP_MAIL_ATTRIBUTE = self.get_raw_config("ldap_mail_attribute", "mail")
+        self.LDAP_USERNAME_ATTRIBUTE = self.get_raw_config("ldap_username_attribute", "givenName")
         # TODO - G.M - 16-11-2018 - Those prams are only use at account creation
-        self.LDAP_NAME_ATTRIBUTE = self.get_raw_config("ldap_name_attribute", "givenName")
+        self.LDAP_NAME_ATTRIBUTE = self.get_raw_config("ldap_name_attribute", "displayName")
         # TODO - G.M - 2018-12-05 - [ldap_profile]
         # support for profile attribute disabled
         # Should be reenabled later probably with a better code
@@ -920,7 +981,9 @@ class CFG(object):
         # TODO - G.M - 2019-04-05 - keep as parameters
         # or set it as constant,
         # see https://github.com/tracim/tracim/issues/1569
-        self.LDAP_USER_FILTER = "({}=%(login)s)".format(self.LDAP_LOGIN_ATTRIBUTE)
+        self.LDAP_USER_FILTER = "({}=%(login)s)".format(self.LDAP_USERNAME_ATTRIBUTE)
+        if self.EMAIL__REQUIRED:
+            self.LDAP_USER_FILTER = "({}=%(login)s)".format(self.LDAP_MAIL_ATTRIBUTE)
         self.LDAP_USE_POOL = True
         self.LDAP_POOL_SIZE = 10 if self.LDAP_USE_POOL else None
         self.LDAP_POOL_LIFETIME = 3600 if self.LDAP_USE_POOL else None
@@ -933,7 +996,8 @@ class CFG(object):
         )
         default_index_documents_pattern_template = "{index_alias}-{date}"
         self.SEARCH__ELASTICSEARCH__INDEX_PATTERN_TEMPLATE = self.get_raw_config(
-            "search.elasticsearch.index_pattern_template", default_index_documents_pattern_template,
+            "search.elasticsearch.index_pattern_template",
+            default_index_documents_pattern_template,
         )
         self.SEARCH__ELASTICSEARCH__USE_INGEST = asbool(
             self.get_raw_config("search.elasticsearch.use_ingest", "False")
@@ -942,7 +1006,8 @@ class CFG(object):
         allowed_ingest_default_mimetype = ""
         self.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_WHITELIST = string_to_unique_item_list(
             self.get_raw_config(
-                "search.elasticsearch.ingest.mimetype_whitelist", allowed_ingest_default_mimetype,
+                "search.elasticsearch.ingest.mimetype_whitelist",
+                allowed_ingest_default_mimetype,
             ),
             separator=",",
             cast_func=str,
@@ -957,11 +1022,15 @@ class CFG(object):
         self.SEARCH__ELASTICSEARCH__INGEST__SIZE_LIMIT = int(
             self.get_raw_config("search.elasticsearch.ingest.size_limit", "52428800")
         )
-        self.SEARCH__ELASTICSEARCH__HOST = self.get_raw_config(
-            "search.elasticsearch.host", "localhost"
+        self.SEARCH__ELASTICSEARCH__HOST = string_to_list(
+            self.get_raw_config("search.elasticsearch.host", "localhost"),
+            cast_func=str,
+            separator=",",
         )
-        self.SEARCH__ELASTICSEARCH__PORT = int(
-            self.get_raw_config("search.elasticsearch.port", "9200")
+        self.SEARCH__ELASTICSEARCH__PORT = string_to_list(
+            self.get_raw_config("search.elasticsearch.port", "9200"),
+            cast_func=int,
+            separator=",",
         )
         self.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT = int(
             self.get_raw_config("search.elasticsearch.request_timeout", "60")
@@ -1038,7 +1107,9 @@ class CFG(object):
         )
         if self.CALL__ENABLED:
             self.check_mandatory_param(
-                "CALL__PROVIDER", raw_call_provider, when_str="when call is enabled",
+                "CALL__PROVIDER",
+                raw_call_provider,
+                when_str="when call is enabled",
             )
             if self.CALL__PROVIDER == CallProvider.JITSI_MEET:
                 self.check_mandatory_param(
@@ -1078,7 +1149,9 @@ class CFG(object):
         self.check_mandatory_param("SESSION__TYPE", self.SESSION__TYPE)
         if self.SESSION__TYPE == "file":
             self.check_mandatory_param(
-                "SESSION__DATA_DIR", self.SESSION__DATA_DIR, when_str="if session type is file",
+                "SESSION__DATA_DIR",
+                self.SESSION__DATA_DIR,
+                when_str="if session type is file",
             )
             self.check_directory_path_param(
                 "SESSION__DATA_DIR", self.SESSION__DATA_DIR, writable=True
@@ -1114,7 +1187,8 @@ class CFG(object):
             "COLOR__CONFIG_FILE_PATH", self.COLOR__CONFIG_FILE_PATH, readable=True
         )
         self.APPS_COLORS = self.load_and_check_json_file_path_param(
-            "COLOR__CONFIG_FILE_PATH", self.COLOR__CONFIG_FILE_PATH,
+            "COLOR__CONFIG_FILE_PATH",
+            self.COLOR__CONFIG_FILE_PATH,
         )
 
         for required_color in ("primary", "sidebar", "sidebar/font"):
@@ -1218,16 +1292,19 @@ class CFG(object):
         if self.URL_PREVIEW__MAX_CONTENT_LENGTH < 0:
             raise ConfigurationError(
                 'ERROR  "{}" should be a positive value (currently "{}")'.format(
-                    "URL_PREVIEW__MAX_CONTENT_LENGTH", self.URL_PREVIEW__MAX_CONTENT_LENGTH
+                    "URL_PREVIEW__MAX_CONTENT_LENGTH",
+                    self.URL_PREVIEW__MAX_CONTENT_LENGTH,
                 )
             )
 
     def _check_uploaded_files_config_validity(self) -> None:
         self.check_mandatory_param(
-            "UPLOADED_FILES__STORAGE__STORAGE_NAME", self.UPLOADED_FILES__STORAGE__STORAGE_NAME
+            "UPLOADED_FILES__STORAGE__STORAGE_NAME",
+            self.UPLOADED_FILES__STORAGE__STORAGE_NAME,
         )
         self.check_mandatory_param(
-            "UPLOADED_FILES__STORAGE__STORAGE_TYPE", self.UPLOADED_FILES__STORAGE__STORAGE_TYPE
+            "UPLOADED_FILES__STORAGE__STORAGE_TYPE",
+            self.UPLOADED_FILES__STORAGE__STORAGE_TYPE,
         )
         file_storage_type_slugs = [file_storage.slug for file_storage in list(DepotFileStorageType)]
         if self.UPLOADED_FILES__STORAGE__STORAGE_TYPE not in file_storage_type_slugs:
@@ -1273,6 +1350,15 @@ class CFG(object):
         self.check_mandatory_param(
             "LIVE_MESSAGES__CONTROL_ZMQ_URI", self.LIVE_MESSAGES__CONTROL_ZMQ_URI
         )
+
+        if len(self.LIVE_MESSAGES__PUSH_ZMQ_URI) > 0:
+            assert len(self.LIVE_MESSAGES__PUSH_ZMQ_URI) == len(
+                self.LIVE_MESSAGES__CONTROL_ZMQ_URI
+            ), "PUSH ZMQ URI must either be empty or of the same length as CONTROL ZMQ URI"
+        if len(self.LIVE_MESSAGES__PUB_ZMQ_URI) > 0:
+            assert len(self.LIVE_MESSAGES__PUB_ZMQ_URI) == len(
+                self.LIVE_MESSAGES__CONTROL_ZMQ_URI
+            ), "PUB ZMQ URI must either be empty or of the same length as CONTROL ZMQ URI"
 
         self.check_mandatory_param(
             "LIVE_MESSAGES__STATS_ZMQ_URI", self.LIVE_MESSAGES__STATS_ZMQ_URI
@@ -1358,7 +1444,8 @@ class CFG(object):
                 raise ConfigurationError(
                     'ERROR email.notification.smtp.encryption given "{}" is invalid,'
                     "valids values are {}.".format(
-                        self.EMAIL__NOTIFICATION__SMTP__ENCRYPTION, smtp_encryption_str_list
+                        self.EMAIL__NOTIFICATION__SMTP__ENCRYPTION,
+                        smtp_encryption_str_list,
                     )
                 )
 
@@ -1396,7 +1483,8 @@ class CFG(object):
                     raise ConfigurationError(
                         "ERROR: email template for {template_description} "
                         'not found at "{template_path}."'.format(
-                            template_description=template_description, template_path=template_path,
+                            template_description=template_description,
+                            template_path=template_path,
                         )
                     )
 
@@ -1413,7 +1501,9 @@ class CFG(object):
     def _check_ldap_config_validity(self):
         if AuthType.LDAP in self.AUTH_TYPES:
             self.check_mandatory_param(
-                "LDAP_URL", self.LDAP_URL, when_str="when ldap is in available auth method",
+                "LDAP_URL",
+                self.LDAP_URL,
+                when_str="when ldap is in available auth method",
             )
             if not self.LDAP_BIND_ANONYMOUS:
                 self.check_mandatory_param(
@@ -1432,8 +1522,13 @@ class CFG(object):
                 when_str="when ldap is in available auth method",
             )
             self.check_mandatory_param(
-                "LDAP_LOGIN_ATTRIBUTE",
-                self.LDAP_LOGIN_ATTRIBUTE,
+                "LDAP_USERNAME_ATTRIBUTE",
+                self.LDAP_USERNAME_ATTRIBUTE,
+                when_str="when ldap is in available auth method",
+            )
+            self.check_mandatory_param(
+                "LDAP_MAIL_ATTRIBUTE",
+                self.LDAP_MAIL_ATTRIBUTE,
                 when_str="when ldap is in available auth method",
             )
             self.check_mandatory_param(
@@ -1445,7 +1540,6 @@ class CFG(object):
     def _check_search_config_validity(self):
         search_engine_valid = ["elasticsearch", "simple"]
         if self.SEARCH__ENGINE not in search_engine_valid:
-
             search_engine_list_str = ", ".join(
                 '"{}"'.format(engine) for engine in search_engine_valid
             )
@@ -1460,6 +1554,9 @@ class CFG(object):
                 self.SEARCH__ELASTICSEARCH__INDEX_ALIAS_PREFIX,
                 when_str="if elasticsearch search feature is enabled",
             )
+            assert len(self.SEARCH__ELASTICSEARCH__HOST) == len(
+                self.SEARCH__ELASTICSEARCH__PORT
+            ), "There must be the same number of elasticsearch hosts and elasticsearch ports"
 
     def _check_webdav_config_validity(self):
         self.check_mandatory_param("WEBDAV__BASE_URL", self.WEBDAV__BASE_URL)
@@ -1521,7 +1618,6 @@ class CFG(object):
         Translator.init_translations(self)
 
     def configure_filedepot(self) -> None:
-
         # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var
         # of tracim_backend, Be careful DepotManager is a Singleton!
 
@@ -1584,7 +1680,11 @@ class CFG(object):
                 "for tracim for security reasons.{}".format(param_name, value, extended_str),
             )
 
-    def load_and_check_json_file_path_param(self, param_name: str, path: str,) -> dict:
+    def load_and_check_json_file_path_param(
+        self,
+        param_name: str,
+        path: str,
+    ) -> dict:
         """
         Check if path is valid json file and load it
         :param param_name: name of parameter to check
@@ -1601,7 +1701,12 @@ class CFG(object):
             )
             raise ConfigurationError(not_a_valid_json_file_msg.format(path, param_name)) from exc
 
-    def check_file_path_param(self, param_name: str, path: str, readable: bool = True,) -> None:
+    def check_file_path_param(
+        self,
+        param_name: str,
+        path: str,
+        readable: bool = True,
+    ) -> None:
         """
         Check if path exist and if it is a readable file.
         if check fail, raise ConfigurationError

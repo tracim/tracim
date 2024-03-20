@@ -1,7 +1,6 @@
-import sys
-
 from setuptools import find_packages
 from setuptools import setup
+import sys
 
 requires = [
     # pyramid
@@ -49,8 +48,6 @@ requires = [
     "filelock",
     "imapclient",
     "beautifulsoup4",
-    # auth
-    "pyramid_multiauth",
     # beaker 1.11 is broken: fix does exist but no new release since:
     # https://github.com/bbangert/beaker/commit/889d3055a4ca31b55a0b0681b00f2973b3250d88
     "beaker<1.11.0",
@@ -58,6 +55,9 @@ requires = [
     "pyramid_ldap3",
     # frontend file serve
     "pyramid_mako",
+    # SAML
+    "pysaml2>=7.3.1",
+    "elementpath==4.1.5",  # to enforce support for python 3.7 (limited to 4.1.5)
     # i18n
     "Babel",
     "requests",
@@ -138,8 +138,14 @@ setup(
         ],
         "console_scripts": ["tracimcli = tracim_backend.command:main"],
         "tracimcli": [
+            # content
+            "content_delete = tracim_backend.command.cleanup:DeleteContentCommand",
+            "content_show = tracim_backend.command.content:ShowContentTreeCommand",
+            # revision
+            "revision_delete = tracim_backend.command.cleanup:DeleteContentRevisionCommand",
             # workspace
             "space_move = tracim_backend.command.space:MoveSpaceCommand",
+            "space_delete = tracim_backend.command.cleanup:DeleteSpaceCommand",
             # user
             "user_create = tracim_backend.command.user:CreateUserCommand",
             "user_update = tracim_backend.command.user:UpdateUserCommand",
@@ -151,6 +157,8 @@ setup(
             "db update-naming-conventions = tracim_backend.command.database:UpdateNamingConventionsV1ToV2Command",
             "db migrate-mysql-charset = tracim_backend.command.database:MigrateMysqlCharsetCommand",
             "db migrate-storage = tracim_backend.command.database:MigrateStorageCommand",
+            # periodically
+            "periodic send-summary-mails = tracim_backend.command.periodic:SendMailSummariesCommand",
             # search
             "search index-create = tracim_backend.command.search:SearchIndexInitCommand",
             "search index-populate = tracim_backend.command.search:SearchIndexIndexCommand",
@@ -171,6 +179,9 @@ setup(
         ],
     },
     message_extractors={
-        "tracim_backend": [("**.py", "python", None), ("templates/**.mak", "mako", None)]
+        "tracim_backend": [
+            ("**.py", "python", None),
+            ("templates/**.mak", "mako", None),
+        ]
     },
 )

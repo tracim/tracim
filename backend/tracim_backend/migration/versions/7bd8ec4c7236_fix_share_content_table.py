@@ -18,7 +18,9 @@ def upgrade():
     with op.batch_alter_table("content_shares") as batch_op:
         batch_op.alter_column("password", existing_type=sa.VARCHAR(length=128), nullable=True)
         batch_op.alter_column(
-            "enabled", existing_type=sa.Boolean, server_default=sa.sql.expression.literal(True)
+            "enabled",
+            existing_type=sa.Boolean,
+            server_default=sa.sql.expression.literal(True),
         )
     # ### end Alembic commands ###
 

@@ -6,7 +6,6 @@
   "Description": "Beschreibung",
   "Error while rejecting user": "Fehler beim Abweisen von Benutzern",
   "Error while saving new default role": "Fehler beim Speichern einer neuen Standardrolle",
-  "Error while saving the new version": "Fehler beim Speichern der neuen Version",
   "Add a member": "Ein Mitglied hinzufügen",
   "Error while loading members list": "Fehler beim Laden der Mitgliederliste",
   "Save successful": "Erfolgreich speichern",
@@ -20,7 +19,6 @@
   "Error while loading space details": "Fehler beim Laden von Bereichdetails",
   "Error while saving new space label": "Fehler beim Speichern eines neuen Bereichetiketts",
   "Error while adding the member to the space": "Fehler beim Hinzufügen des Mitglieds zum Bereich",
-  "Space's description": "Beschreibung des Bereichs",
   "Delete space": "Bereich löschen",
   "Delete": "Löschen",
   "Unknown user": "Unbekannter Benutzer",
@@ -60,5 +58,8 @@
   "You cannot change this member role because there are no other space managers.": "Sie können diese Mitgliederrolle nicht ändern, da es keine anderen Bereichsmanager gibt.",
   "Use this link to integrate this agenda to your": "Verwenden Sie diesen Link, um den Kalender zu integrieren in",
   "CalDAV compatible software": "CalDAV-kompatible Software",
-  "Filter users": ""
+  "Filter users": "Benutzer filtern",
+  "Description of the space": "Beschreibung des Raums",
+  "This space doesn't have a description yet.": "Dieser Raum hat noch keine Beschreibung.",
+  "Edit": "Bearbeiten"
 }

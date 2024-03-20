@@ -1,6 +1,4 @@
 import enum
-import typing
-
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
@@ -9,6 +7,7 @@ from sqlalchemy import Sequence
 from sqlalchemy import String
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
+import typing
 
 from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
@@ -22,7 +21,6 @@ class CallProvider(enum.Enum):
 
 
 class UserCallState(enum.Enum):
-
     # Initial state
     IN_PROGRESS = "in_progress"
 
@@ -56,7 +54,9 @@ class UserCall(CreationDateMixin, UpdateDateMixin, DeclarativeBase):
     callee_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
     callee = relationship(User, remote_side=[User.user_id], foreign_keys=[callee_id])
     state = Column(
-        Enum(UserCallState), nullable=False, server_default=UserCallState.IN_PROGRESS.name,
+        Enum(UserCallState),
+        nullable=False,
+        server_default=UserCallState.IN_PROGRESS.name,
     )
     url = Column(String(length=URL_MAX_LENGTH), nullable=False)
 

@@ -1,10 +1,7 @@
+from depot.manager import DepotManager
 import logging
 import os
 import pathlib
-import subprocess
-import typing
-
-from depot.manager import DepotManager
 import plaster
 from pyramid import testing
 import pytest
@@ -12,7 +9,9 @@ import requests
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
+import subprocess
 import transaction
+import typing
 from webtest import TestApp
 
 from tracim_backend import CFG
@@ -34,7 +33,6 @@ from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.setup_models import get_session_factory
-from tracim_backend.tests.utils import TEST_CONFIG_FILE_PATH
 from tracim_backend.tests.utils import ApplicationApiFactory
 from tracim_backend.tests.utils import ContentApiFactory
 from tracim_backend.tests.utils import ElasticSearchHelper
@@ -42,12 +40,13 @@ from tracim_backend.tests.utils import EventHelper
 from tracim_backend.tests.utils import MailHogHelper
 from tracim_backend.tests.utils import MessageHelper
 from tracim_backend.tests.utils import RadicaleServerHelper
-from tracim_backend.tests.utils import RoleApiFactory
 from tracim_backend.tests.utils import ShareLibFactory
 from tracim_backend.tests.utils import SubscriptionLibFactory
+from tracim_backend.tests.utils import TEST_CONFIG_FILE_PATH
 from tracim_backend.tests.utils import TracimTestContext
 from tracim_backend.tests.utils import UploadPermissionLibFactory
 from tracim_backend.tests.utils import UserApiFactory
+from tracim_backend.tests.utils import UserWorkspaceConfigApiFactory
 from tracim_backend.tests.utils import WedavEnvironFactory
 from tracim_backend.tests.utils import WorkspaceApiFactory
 from tracim_backend.tests.utils import tracim_plugin_loader
@@ -81,9 +80,18 @@ def rq_database_worker(config_uri, app_config):
     empty_event_queues()
     worker_env = os.environ.copy()
     worker_env["TRACIM_CONF_PATH"] = "{}#rq_worker_test".format(config_uri)
-    base_args = ["rq", "worker", "-q", "-w", "tracim_backend.lib.rq.worker.DatabaseWorker"]
+    base_args = [
+        "rq",
+        "worker",
+        "-q",
+        "-w",
+        "tracim_backend.lib.rq.worker.DatabaseWorker",
+    ]
     queue_name_args = [queue_name.value for queue_name in RqQueueName]
-    worker_process = subprocess.Popen(base_args + queue_name_args, env=worker_env,)
+    worker_process = subprocess.Popen(
+        base_args + queue_name_args,
+        env=worker_env,
+    )
     yield worker_process
     empty_event_queues()
     worker_process.terminate()
@@ -361,8 +369,10 @@ def upload_permission_lib_factory(session, app_config, admin_user) -> UploadPerm
 
 
 @pytest.fixture
-def role_api_factory(session, app_config, admin_user) -> RoleApiFactory:
-    return RoleApiFactory(session, app_config, admin_user)
+def user_workspace_config_api_factory(
+    session, app_config, admin_user
+) -> UserWorkspaceConfigApiFactory:
+    return UserWorkspaceConfigApiFactory(session, app_config, admin_user)
 
 
 @pytest.fixture
@@ -435,10 +445,16 @@ def webdav_provider(app_config: CFG):
 
 @pytest.fixture()
 def webdav_environ_factory(
-    webdav_provider: TracimDavProvider, session: Session, admin_user: User, app_config: CFG,
+    webdav_provider: TracimDavProvider,
+    session: Session,
+    admin_user: User,
+    app_config: CFG,
 ) -> WedavEnvironFactory:
     return WedavEnvironFactory(
-        provider=webdav_provider, session=session, app_config=app_config, admin_user=admin_user,
+        provider=webdav_provider,
+        session=session,
+        app_config=app_config,
+        admin_user=admin_user,
     )
 
 
@@ -500,16 +516,14 @@ def message_helper(session) -> MessageHelper:
 
 @pytest.fixture
 def html_with_nasty_mention() -> str:
-    return "<p> You are not a <img onerror='nastyXSSCall()' alt='member' /> of this workspace <span id='mention-victim'>@victimnotmemberofthisworkspace</span>, are you? </p>"
+    return '<p>You are not a <img onerror="nastyXSSCall()" alt="member" /> of this workspace <html-mention userid="999"></html-mention>, are you? </p>'
 
 
 @pytest.fixture
 def html_with_wrong_user_mention() -> str:
-    return (
-        '<p>Bravo <span id="mention-errormention" class="mention">@userthatdoesnotexist</span></p>'
-    )
+    return '<p>Bravo <html-mention userid="999"></html-mention></p>'
 
 
 @pytest.fixture
 def html_with_empty_mention() -> str:
-    return '<p>Bravo <span id="mention-emptymention" class="mention"></span></p>'
+    return '<p>Bravo <html-mention userid=""></html-mention></p>'

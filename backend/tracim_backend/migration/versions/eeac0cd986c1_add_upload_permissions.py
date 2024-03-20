@@ -24,14 +24,18 @@ def upgrade():
         sa.Column("token", sa.Unicode(length=255), nullable=False),
         sa.Column("upload_permission_group_uuid", sa.Unicode(length=255), nullable=False),
         sa.Column(
-            "type", sa.Enum("EMAIL", "PUBLIC_LINK", name="uploadpermissiontype"), nullable=False
+            "type",
+            sa.Enum("EMAIL", "PUBLIC_LINK", name="uploadpermissiontype"),
+            nullable=False,
         ),
         sa.Column("password", sa.Unicode(length=128), nullable=True),
         sa.Column("enabled", sa.Boolean(), nullable=False),
         sa.Column("created", sa.DateTime(), nullable=False),
         sa.Column("disabled", sa.DateTime(), nullable=True),
         sa.ForeignKeyConstraint(
-            ["author_id"], ["users.user_id"], name=op.f("fk_upload_permissions_author_id_users")
+            ["author_id"],
+            ["users.user_id"],
+            name=op.f("fk_upload_permissions_author_id_users"),
         ),
         sa.ForeignKeyConstraint(
             ["workspace_id"],

@@ -20,7 +20,10 @@ class TestFolderMove(object):
             do_notify=False,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         move_url = "/api/workspaces/{}/contents/{}/move".format(
             workspace.workspace_id, moved_folder.content_id
         )
@@ -52,7 +55,10 @@ class TestFolderMove(object):
             do_notify=False,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         move_url = "/api/workspaces/{}/contents/{}/move".format(
             workspace.workspace_id, moved_folder.content_id
         )
@@ -91,7 +97,10 @@ class TestFolderMove(object):
             do_notify=False,
         )
         transaction.commit()
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         move_url = "/api/workspaces/{}/contents/{}/move".format(
             workspace.workspace_id, moved_folder.content_id
         )

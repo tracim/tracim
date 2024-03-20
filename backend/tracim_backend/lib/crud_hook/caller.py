@@ -5,7 +5,7 @@ from sqlalchemy.orm.session import UOWTransaction
 from tracim_backend.models.auth import User
 from tracim_backend.models.call import UserCall
 from tracim_backend.models.data import Content
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceSubscription
 from tracim_backend.models.reaction import Reaction
@@ -26,9 +26,14 @@ class DatabaseCrudHookCaller:
         # values (primary key...) in the objects
         event.listen(session, "after_flush", self._call_hooks)
 
-    def _call_hooks(self, session: TracimSession, flush_context: UOWTransaction,) -> None:
+    def _call_hooks(
+        self,
+        session: TracimSession,
+        flush_context: UOWTransaction,
+    ) -> None:
         assert session.context, "session must have a context"
         assert session.context.dbsession
+        user_workspace_configs = []
         for obj in session.new:
             if isinstance(obj, User):
                 self._plugin_manager.hook.on_user_created(user=obj, context=session.context)
@@ -36,10 +41,11 @@ class DatabaseCrudHookCaller:
                 self._plugin_manager.hook.on_workspace_created(
                     workspace=obj, context=session.context
                 )
-            elif isinstance(obj, UserRoleInWorkspace):
-                self._plugin_manager.hook.on_user_role_in_workspace_created(
-                    role=obj, context=session.context
+            elif isinstance(obj, UserWorkspaceConfig):
+                self._plugin_manager.hook.on_user_config_in_workspace_created(
+                    user_workspace_config=obj, context=session.context
                 )
+                user_workspace_configs.append(obj)
             elif isinstance(obj, Content):
                 self._plugin_manager.hook.on_content_created(content=obj, context=session.context)
             elif isinstance(obj, WorkspaceSubscription):
@@ -58,6 +64,10 @@ class DatabaseCrudHookCaller:
                 self._plugin_manager.hook.on_user_call_created(
                     user_call=obj, context=session.context
                 )
+        if user_workspace_configs:
+            self._plugin_manager.hook.on_user_config_in_workspaces_created(
+                user_workspace_configs=user_workspace_configs, context=session.context
+            )
 
         for obj in session.dirty:
             # NOTE S.G 2020-05-08: session.dirty contains objects that do not have to be
@@ -73,9 +83,9 @@ class DatabaseCrudHookCaller:
                 self._plugin_manager.hook.on_workspace_modified(
                     workspace=obj, context=session.context
                 )
-            elif isinstance(obj, UserRoleInWorkspace):
-                self._plugin_manager.hook.on_user_role_in_workspace_modified(
-                    role=obj, context=session.context
+            elif isinstance(obj, UserWorkspaceConfig):
+                self._plugin_manager.hook.on_user_config_in_workspace_modified(
+                    user_workspace_config=obj, context=session.context
                 )
             elif isinstance(obj, Content):
                 self._plugin_manager.hook.on_content_modified(content=obj, context=session.context)
@@ -105,9 +115,9 @@ class DatabaseCrudHookCaller:
                 self._plugin_manager.hook.on_workspace_deleted(
                     workspace=obj, context=session.context
                 )
-            elif isinstance(obj, UserRoleInWorkspace):
-                self._plugin_manager.hook.on_user_role_in_workspace_deleted(
-                    role=obj, context=session.context
+            elif isinstance(obj, UserWorkspaceConfig):
+                self._plugin_manager.hook.on_user_config_in_workspace_deleted(
+                    user_workspace_config=obj, context=session.context
                 )
             elif isinstance(obj, Content):
                 self._plugin_manager.hook.on_content_deleted(content=obj, context=session.context)

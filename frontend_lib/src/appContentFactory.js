@@ -7,14 +7,12 @@ import {
   handleFetchResult,
   APP_FEATURE_MODE,
   NUMBER_RESULTS_BY_PAGE,
-  convertBackslashNToBr,
   displayDistanceDate,
   sendGlobalFlashMessage,
   TIMELINE_TYPE,
   CONTENT_TYPE,
   permissiveNumberEqual,
   getOrCreateSessionClientToken,
-  tinymceRemove,
   addRevisionFromTLM,
   stringIncludes
 } from './helper.js'
@@ -28,16 +26,12 @@ import {
 import {
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
-  setLocalStorageItem,
-  removeLocalStorageItem
+  setLocalStorageItem
 } from './localStorage.js'
 
 import {
   addClassToMentionsOfUser,
-  handleMentionsBeforeSave,
-  getInvalidMentionList,
-  getMatchingGroupMentionList,
-  handleLinksBeforeSave
+  getMatchingGroupMentionList
 } from './mentionOrLink.js'
 
 import {
@@ -50,6 +44,7 @@ import {
   deleteComment,
   deleteToDo,
   deleteContentFromFavoriteList,
+  deleteContentPermanently,
   getComment,
   getCommentTranslated,
   getContent,
@@ -57,7 +52,7 @@ import {
   getFavoriteContentList,
   getFileChildContent,
   getMyselfKnownContents,
-  getSpaceMemberList,
+  getSpaceUserRoleList,
   getTemplateList,
   getToDoList,
   postContentToFavoriteList,
@@ -71,7 +66,8 @@ import {
   putContentTemplate,
   putEditContent,
   putEditStatus,
-  putToDo
+  putToDo,
+  putChangeContentNamespace
 } from './action.async.js'
 
 import {
@@ -141,7 +137,7 @@ export function appContentFactory (WrappedComponent) {
 
     checkApiUrl = () => {
       if (!this.apiUrl) {
-        console.error("Warning from appContentFactory. apiUrl hasn't been set. You must call props.setApiUrl in your component's constructor.")
+        console.error('Error from appContentFactory. `apiUrl` hasn\'t been set. You must call `props.setApiUrl` in your component\'s constructor.')
       }
     }
 
@@ -359,21 +355,16 @@ export function appContentFactory (WrappedComponent) {
 
     // INFO - CH - 2019-01-08 - event called by OpenContentApp in case of opening another app feature
     appContentCustomEventHandlerHideApp = setState => {
-      tinymceRemove('#wysiwygTimelineComment')
       setState({
-        isVisible: false,
-        timelineWysiwyg: false
+        isVisible: false
       })
     }
 
     // CH - 2019-31-12 - This event is used to send a new content_id that will trigger data reload through componentDidUpdate
     appContentCustomEventHandlerReloadContent = (newContent, setState, appSlug) => {
-      tinymceRemove('#wysiwygTimelineComment')
-
       setState(prev => ({
         content: { ...prev.content, ...newContent },
         isVisible: true,
-        timelineWysiwyg: false,
         newComment: prev.content.content_id === newContent.content_id
           ? prev.newComment
           : getLocalStorageItem(
@@ -391,13 +382,7 @@ export function appContentFactory (WrappedComponent) {
       loadTimeline()
     }
 
-    // INFO - 2019-01-09 - if param isTimelineWysiwyg is false, param changeNewCommentHandler isn't required
-    appContentCustomEventHandlerAllAppChangeLanguage = (newLang, setState, i18n, isTimelineWysiwyg, changeNewCommentHandler = null) => {
-      if (isTimelineWysiwyg) {
-        tinymceRemove('#wysiwygTimelineComment')
-        globalThis.wysiwyg('#wysiwygTimelineComment', newLang, changeNewCommentHandler)
-      }
-
+    appContentCustomEventHandlerAllAppChangeLanguage = (newLang, setState, i18n) => {
       setState(prev => ({
         loggedUser: {
           ...prev.loggedUser,
@@ -474,6 +459,21 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
+    appContentDeletePermanently = async (workspaceId, contentId, toCloseApp) => {
+      this.checkApiUrl()
+
+      const response = await handleFetchResult(await deleteContentPermanently(this.apiUrl, workspaceId, contentId))
+
+      if (response.status !== 204) {
+        sendGlobalFlashMessage(i18n.t('Error while deleting the content'))
+      } else {
+        sendGlobalFlashMessage(i18n.t('The content has been deleted'), '')
+        toCloseApp()
+      }
+
+      return response
+    }
+
     appContentSaveNewToDo = async (workspaceId, contentId, assignedUserId, toDo, setState) => {
       this.checkApiUrl()
       const response = await handleFetchResult(await postToDo(this.apiUrl, workspaceId, contentId, assignedUserId, toDo))
@@ -523,29 +523,11 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
-    appContentEditComment = async (workspaceId, contentId, commentId, loggedUsername) => {
+    appContentEditComment = async (workspaceId, contentId, commentId, newComment) => {
       this.checkApiUrl()
-      const newCommentForApi = tinymce.get('wysiwygTimelineCommentEdit').getContent()
-      let knownMentions = await this.searchForMentionOrLinkInQuery('', workspaceId)
-      knownMentions = knownMentions.map(member => `@${member.username}`)
-      const invalidMentionList = getInvalidMentionList(newCommentForApi, knownMentions)
-
-      let newCommentForApiWithMention
-      try {
-        newCommentForApiWithMention = handleMentionsBeforeSave(newCommentForApi, loggedUsername, invalidMentionList)
-      } catch (e) {
-        return Promise.reject(e)
-      }
-
-      let newCommentForApiWithMentionAndLink
-      try {
-        newCommentForApiWithMentionAndLink = await handleLinksBeforeSave(newCommentForApiWithMention, this.apiUrl)
-      } catch (e) {
-        return Promise.reject(e)
-      }
 
       const response = await handleFetchResult(
-        await putComment(this.apiUrl, workspaceId, contentId, commentId, newCommentForApiWithMentionAndLink)
+        await putComment(this.apiUrl, workspaceId, contentId, commentId, newComment)
       )
 
       switch (response.apiResponse.status) {
@@ -586,51 +568,28 @@ export function appContentFactory (WrappedComponent) {
       )
     }
 
-    saveCommentAsText = async (content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername, id) => {
-      // @FIXME - Côme - 2018/10/31 - line below is a hack to force send html to api
-      // see https://github.com/tracim/tracim/issues/1101
-      const newCommentForApi = isCommentWysiwyg
-        ? tinymce.get(`wysiwygTimelineComment${id}`).getContent()
-        : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`, { stripPrefix: false })
-      let knownMentions = await this.searchForMentionOrLinkInQuery('', content.workspace_id)
-      knownMentions = knownMentions.map(member => `@${member.username}`)
-      const invalidMentionList = getInvalidMentionList(newCommentForApi, knownMentions)
+    appContentSaveNewCommentText = async (content, newComment) => {
+      this.checkApiUrl()
 
-      let newCommentForApiWithMention
-      try {
-        newCommentForApiWithMention = handleMentionsBeforeSave(newCommentForApi, loggedUsername, invalidMentionList)
-      } catch (e) {
-        return Promise.reject(e)
+      if (newComment === '') {
+        return { apiResponse: { status: 400 }, body: { code: 2003 } }
       }
 
-      let newCommentForApiWithMentionAndLink
-      try {
-        newCommentForApiWithMentionAndLink = await handleLinksBeforeSave(newCommentForApiWithMention, this.apiUrl)
-      } catch (e) {
-        return Promise.reject(e)
-      }
+      const contentToSend = Autolinker.link(newComment, { stripPrefix: false })
 
       const response = await handleFetchResult(
         await postNewComment(
           this.apiUrl,
           content.workspace_id,
           content.content_id,
-          newCommentForApiWithMentionAndLink,
+          contentToSend,
           content.content_namespace
         )
       )
 
       switch (response.apiResponse.status) {
         case 200:
-          setState({ newComment: '', showInvalidMentionPopupInComment: false })
-          if (isCommentWysiwyg) tinymce.get(`wysiwygTimelineComment${id}`).setContent('')
-
-          removeLocalStorageItem(
-            appSlug,
-            content.content_id,
-            content.workspace_id,
-            LOCAL_STORAGE_FIELD.COMMENT
-          )
+          // Nothing to do
           break
         case 400:
           switch (response.body.code) {
@@ -654,7 +613,9 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
-    saveCommentAsFile = async (content, newCommentAsFile) => {
+    appContentSaveNewCommentFile = async (content, file) => {
+      this.checkApiUrl()
+
       const errorMessageList = [
         { status: 400, code: 3002, message: i18n.t('A content with the same name already exists') },
         { status: 400, code: 6002, message: i18n.t('The file is larger than the maximum file size allowed') },
@@ -663,7 +624,7 @@ export function appContentFactory (WrappedComponent) {
       ]
       const parentNamespace = content.contentNamespace ? content.contentNamespace : content.content_namespace
       return uploadFile(
-        newCommentAsFile,
+        file,
         `${this.apiUrl}/workspaces/${content.workspace_id}/files`,
         {
           additionalFormData: {
@@ -678,24 +639,21 @@ export function appContentFactory (WrappedComponent) {
       )
     }
 
-    appContentSaveNewComment = async (
-      content, isCommentWysiwyg, newComment, newCommentAsFileList, setState, appSlug, loggedUsername, id = ''
-    ) => {
+    appContentSaveNewCommentFileList = async (setState, content, fileList) => {
       this.checkApiUrl()
-      if (newComment) {
-        await this.saveCommentAsText(content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername, id)
-      }
 
-      if (newCommentAsFileList && newCommentAsFileList.length > 0) {
-        setState({ isFileCommentLoading: true })
-        const responseList = await Promise.all(
-          newCommentAsFileList.map(newCommentAsFile => this.saveCommentAsFile(content, newCommentAsFile))
-        )
-        const uploadFailedList = responseList.filter(oneUpload => isFileUploadInErrorState(oneUpload))
-        uploadFailedList.forEach(fileInError => sendGlobalFlashMessage(fileInError.errorMessage))
+      setState({ isFileCommentLoading: true })
+      const responseList = await Promise.all(
+        fileList.map(file => this.appContentSaveNewCommentFile(content, file))
+      )
 
-        setState({ newCommentAsFileList: uploadFailedList, isFileCommentLoading: false })
-      }
+      // TODO - MP - 2023-01-11 - Send ONE global flash message for every files in error instead of
+      // one message per file
+      // [#6090}(https://github.com/tracim/tracim/issues/6090)
+      const uploadFailedList = responseList.filter(upload => isFileUploadInErrorState(upload))
+      uploadFailedList.forEach(fileInError => sendGlobalFlashMessage(fileInError.errorMessage))
+
+      setState({ fileList: uploadFailedList, isFileCommentLoading: false })
     }
 
     appContentChangeStatus = async (content, newStatus, appSlug) => {
@@ -738,6 +696,54 @@ export function appContentFactory (WrappedComponent) {
           break
       }
 
+      return response
+    }
+
+    appContentChangeType = async (content, setState) => {
+      this.checkApiUrl()
+      // INFO - FS - 2024-02-15 - Depending on if the content comes from Publication or Thread the variable name are different
+      let contentId = content.id
+      let workspaceId = content.workspaceId
+      if (contentId === undefined) {
+        contentId = content.content_id
+        workspaceId = content.workspace_id
+      }
+      const response = await handleFetchResult(
+        await putChangeContentNamespace(this.apiUrl, workspaceId, contentId, 'content')
+      )
+      const status = response.ok ? response.status : response.apiResponse.status
+      switch (status) {
+        case 204:
+          setState({ mode: APP_FEATURE_MODE.VIEW })
+          break
+        case 400:
+          switch (response.body.code) {
+            case 3002:
+              sendGlobalFlashMessage(i18n.t('A content with the same name already exists'))
+              break
+            default:
+              GLOBAL_dispatchEvent({
+                type: CUSTOM_EVENT.ADD_FLASH_MSG,
+                data: {
+                  msg: i18n.t('Error while changing content type'),
+                  type: 'warning',
+                  delay: undefined
+                }
+              })
+              break
+          }
+          break
+        default:
+          GLOBAL_dispatchEvent({
+            type: CUSTOM_EVENT.ADD_FLASH_MSG,
+            data: {
+              msg: i18n.t('Error while changing content type'),
+              type: 'warning',
+              delay: undefined
+            }
+          })
+          break
+      }
       return response
     }
 
@@ -813,10 +819,11 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
-    appContentNotifyAll = (content, setState, appSlug) => {
-      const notifyAllComment = i18n.t('@all Please notice that I did an important update on this content.')
+    appContentNotifyAll = (content) => {
+      const comment = i18n.t('Please notice that I did an important update on this content.')
+      const commentWithMention = `<html-mention roleid="0"></html-mention> ${comment}`
 
-      this.appContentSaveNewComment(content, false, notifyAllComment, setState, appSlug)
+      this.appContentSaveNewCommentText(content, commentWithMention)
     }
 
     buildTimelineItemComment = (content, loggedUser, initialCommentTranslationState) => ({
@@ -1034,7 +1041,7 @@ export function appContentFactory (WrappedComponent) {
       } else {
         autoCompleteItemList = getMatchingGroupMentionList(keyword)
         const fetchSpaceMemberList = await handleFetchResult(
-          await getSpaceMemberList(this.apiUrl, workspaceId)
+          await getSpaceUserRoleList(this.apiUrl, workspaceId)
         )
 
         const includesKeyword = stringIncludes(keyword)
@@ -1168,11 +1175,14 @@ export function appContentFactory (WrappedComponent) {
           appContentCustomEventHandlerAllAppChangeLanguage={this.appContentCustomEventHandlerAllAppChangeLanguage}
           appContentChangeTitle={this.appContentChangeTitle}
           appContentChangeComment={this.appContentChangeComment}
+          appContentChangeType={this.appContentChangeType}
           appContentDeleteComment={this.appContentDeleteComment}
+          appContentDeletePermanently={this.appContentDeletePermanently}
           appContentDeleteToDo={this.appContentDeleteToDo}
           appContentEditComment={this.appContentEditComment}
           appContentMarkAsTemplate={this.appContentMarkAsTemplate}
-          appContentSaveNewComment={this.appContentSaveNewComment}
+          appContentSaveNewCommentText={this.appContentSaveNewCommentText}
+          appContentSaveNewCommentFileList={this.appContentSaveNewCommentFileList}
           appContentChangeStatus={this.appContentChangeStatus}
           appContentArchive={this.appContentArchive}
           appContentDelete={this.appContentDelete}

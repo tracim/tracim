@@ -76,7 +76,6 @@ describe('appContentFactory.js', () => {
         'appContentDeleteComment',
         'appContentEditComment',
         'appContentNotifyAll',
-        'appContentSaveNewComment',
         'appContentChangeStatus',
         'appContentArchive',
         'appContentDelete',
@@ -155,26 +154,17 @@ describe('appContentFactory.js', () => {
   })
 
   describe('function appContentCustomEventHandlerHideApp', () => {
-    const fakeTinymceRemove = sinon.spy()
-
     before(() => {
-      global.tinymce.remove = fakeTinymceRemove
       wrapper.instance().appContentCustomEventHandlerHideApp(fakeSetState)
     })
 
     after(() => {
-      fakeTinymceRemove.resetHistory()
       fakeSetState.resetHistory()
-    })
-
-    it('should reset the tinymce comment field', () => {
-      sinon.assert.calledWith(fakeTinymceRemove, '#wysiwygTimelineComment')
     })
 
     it('should call setState to hide the app and set back the comment textarea to normal', () => {
       sinon.assert.calledWith(fakeSetState, {
-        isVisible: false,
-        timelineWysiwyg: false
+        isVisible: false
       })
     })
   })
@@ -182,10 +172,8 @@ describe('appContentFactory.js', () => {
   describe('function appContentCustomEventHandlerReloadContent', () => {
     const newContent = { ...fakeContent, content_id: fakeContent.content_id + 1 }
     const initialState = { content: fakeContent }
-    const fakeTinymceRemove = sinon.spy()
 
     before(() => {
-      global.tinymce.remove = fakeTinymceRemove
       wrapper.instance().setState(initialState)
       wrapper.instance().appContentCustomEventHandlerReloadContent(newContent, fakeSetState, appContentSlug)
       const lastSetStateArg = fakeSetState.lastCall.args[0]
@@ -195,13 +183,8 @@ describe('appContentFactory.js', () => {
     })
 
     after(() => {
-      fakeTinymceRemove.resetHistory()
       global.localStorage.getItem.resetHistory()
       fakeSetState.resetHistory()
-    })
-
-    it('should remove the tinymce comment field', () => {
-      sinon.assert.calledWith(fakeTinymceRemove, '#wysiwygTimelineComment')
     })
 
     it('should get the localStorage value', () => {
@@ -234,19 +217,16 @@ describe('appContentFactory.js', () => {
   })
 
   describe('function appContentCustomEventHandlerAllAppChangeLanguage', () => {
-    const fakeTinymceRemove = sinon.spy()
     const fakeI18nChangeLanguage = sinon.spy()
     const fakeI18n = {
       changeLanguage: fakeI18nChangeLanguage
     }
     const newLang = 'en'
-    const dummyChangeNewCommentHandler = () => {}
     const fakeWysiwygConstructor = sinon.spy()
 
     before(() => {
-      global.tinymce.remove = fakeTinymceRemove
       global.wysiwyg = fakeWysiwygConstructor
-      wrapper.instance().appContentCustomEventHandlerAllAppChangeLanguage(newLang, fakeSetState, fakeI18n, false)
+      wrapper.instance().appContentCustomEventHandlerAllAppChangeLanguage(newLang, fakeSetState, fakeI18n)
     })
 
     after(() => {
@@ -261,30 +241,6 @@ describe('appContentFactory.js', () => {
 
     it('should call the function changeLanguage of i18n object', () => {
       sinon.assert.calledWith(fakeI18nChangeLanguage, newLang)
-    })
-
-    describe('with isTimelineWysiwyg to true', () => {
-      const fakeWysiwygConstructor = sinon.spy()
-      before(() => {
-        global.tinymce.remove = fakeTinymceRemove
-        global.wysiwyg = fakeWysiwygConstructor
-        wrapper.instance().appContentCustomEventHandlerAllAppChangeLanguage(newLang, fakeSetState, fakeI18n, true, dummyChangeNewCommentHandler)
-      })
-
-      after(() => {
-        fakeTinymceRemove.resetHistory()
-        fakeWysiwygConstructor.resetHistory()
-        fakeSetState.resetHistory()
-        fakeI18nChangeLanguage.resetHistory()
-      })
-
-      it('should remove the tinymce comment field', () => {
-        sinon.assert.calledWith(fakeTinymceRemove, '#wysiwygTimelineComment')
-      })
-
-      it('should call the tinymce constructor', () => {
-        sinon.assert.calledWith(fakeWysiwygConstructor, '#wysiwygTimelineComment', newLang, dummyChangeNewCommentHandler)
-      })
     })
   })
 
@@ -342,7 +298,7 @@ describe('appContentFactory.js', () => {
     })
   })
 
-  describe('function saveCommentAsText', () => {
+  describe('function appContentSaveNewCommentText', () => {
     describe('on comment save success', async () => {
       let response
       const newComment = 'Edited comment'
@@ -362,14 +318,15 @@ describe('appContentFactory.js', () => {
 
       before(async () => {
         wrapper.instance().checkApiUrl = fakeCheckApiUrl
-        const loggedUser = {
-          username: 'foo',
-          lang: 'en'
-        }
-        const isCommentWysiwyg = true
-        mockPostContentComment200(fakeApiUrl, fakeContent.workspace_id, fakeContent.content_id, newComment, fakeContent.content_namespace)
-        response = await wrapper.instance().saveCommentAsText(
-          fakeContent, isCommentWysiwyg, newComment, fakeSetState, appContentSlug, loggedUser, 'foo'
+        mockPostContentComment200(
+          fakeApiUrl,
+          fakeContent.workspace_id,
+          fakeContent.content_id,
+          newComment,
+          fakeContent.content_namespace
+        )
+        response = await wrapper.instance().appContentSaveNewCommentText(
+          fakeContent, newComment, appContentSlug
         )
       })
 
@@ -380,47 +337,11 @@ describe('appContentFactory.js', () => {
         global.GLOBAL_dispatchEvent.resetHistory()
       })
 
-      it('should reset the tinymce comment field since we set param isCommentWysiwyg to true', () => {
-        sinon.assert.calledWith(fakeTinymceSetContent, '')
-      })
-
-      it('should remove the localStorage value', () => {
-        sinon.assert.calledWith(
-          global.localStorage.removeItem,
-          generateLocalStorageContentId(appContentSlug, fakeContent.content_id, fakeContent.workspace_id, 'comment')
-        )
-      })
-
       it('should return the response from api with handleFetchResponse called on it', () => {
         expect(response)
           .to.have.property('apiResponse')
           .and.have.property('body')
       })
-    })
-  })
-
-  describe('function appContentSaveNewComment', () => {
-    const newComment = 'Edited comment'
-
-    before(() => {
-      wrapper.instance().checkApiUrl = fakeCheckApiUrl
-      const loggedUser = {
-        username: 'foo',
-        lang: 'en'
-      }
-      const fileChildContentList = []
-      const isCommentWysiwyg = true
-      wrapper.instance().appContentSaveNewComment(
-        fakeContent, isCommentWysiwyg, newComment, fileChildContentList, fakeSetState, appContentSlug, loggedUser, 'foo'
-      )
-    })
-
-    after(() => {
-      fakeCheckApiUrl.resetHistory()
-    })
-
-    it('should call the function checkApiUrl', () => {
-      expect(fakeCheckApiUrl.called).to.equal(true)
     })
   })
 

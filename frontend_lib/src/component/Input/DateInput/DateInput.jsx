@@ -16,13 +16,14 @@ export class DateInput extends React.Component {
     return (
       <input
         autoFocus={props.autoFocus}
-        type='date'
+        type={props.type}
         className='dateInput form-control'
         onChange={props.onChange}
         disabled={props.disabled}
         placeholder={props.placeholder}
         onKeyPress={this.handleValidateIfEnterKey}
         value={props.value}
+        step={props.step}
       />
     )
   }
@@ -36,7 +37,9 @@ DateInput.propTypes = {
   disabled: PropTypes.bool,
   placeholder: PropTypes.string,
   customClass: PropTypes.string,
-  icon: PropTypes.string
+  icon: PropTypes.string,
+  type: PropTypes.string,
+  step: PropTypes.number
 }
 
 DateInput.defaultProps = {
@@ -45,7 +48,9 @@ DateInput.defaultProps = {
   disabled: false,
   placeholder: undefined,
   customClass: '',
-  icon: undefined
+  icon: undefined,
+  type: 'date',
+  step: undefined
 }
 
 export default DateInput

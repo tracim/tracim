@@ -185,6 +185,19 @@ function translate_email {
     ./update_i18n_json_file.sh || exit 1
 }
 
+function install_font {
+    log "Installing Tracim font in system..."
+    $SUDO cp -r frontend/dist/assets/font/Nunito/ /usr/share/fonts/nunito
+    $SUDO fc-cache -f
+}
+
+function generate_dev_cert {
+    log "Generating dev certificate for SAML"
+    pushd backend
+    openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout sp.key -out sp.crt -subj "/C=US/ST=State/L=City/O=Organization/CN=example.com"
+    popd
+}
+
 ############################################
 
 # Check if running as root
@@ -197,6 +210,7 @@ else
 fi
 
 install_npm_and_nodejs
+install_font
 cd "$script_dir/backend"  || exit 1
 if [ -z "$IGNORE_APT_INSTALL" ]; then
     install_backend_system_dep
@@ -209,3 +223,4 @@ setup_config_file
 create_require_dirs
 setup_db
 translate_email
+generate_dev_cert

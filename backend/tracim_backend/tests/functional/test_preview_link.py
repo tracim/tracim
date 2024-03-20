@@ -81,7 +81,9 @@ simple_image_jpg_result_endpoint = {
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize(
-    "config_section", [{"name": "functional_test"}], indirect=True,
+    "config_section",
+    [{"name": "functional_test"}],
+    indirect=True,
 )
 class TestUrlPreview(object):
     @responses.activate
@@ -115,7 +117,11 @@ class TestUrlPreview(object):
         ),
     )
     def test_api__url_preview__ok_200__nominal_case(
-        self, link_name, link_content, endpoint_result, web_testapp,
+        self,
+        link_name,
+        link_content,
+        endpoint_result,
+        web_testapp,
     ):
         cache.cache_regions["url_preview"]["enabled"] = False
         responses.add(
@@ -127,9 +133,13 @@ class TestUrlPreview(object):
             stream=True,
         )
         params = {"url": link_name}
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
-            "/api/url-preview?{params}".format(params=urlencode(params)), status=200,
+            "/api/url-preview?{params}".format(params=urlencode(params)),
+            status=200,
         )
         assert res.json_body == endpoint_result
 
@@ -152,16 +162,28 @@ class TestUrlPreview(object):
         ),
     )
     def test_api__url_preview__ok_200__image(
-        self, link_name, endpoint_result, content_type, web_testapp,
+        self,
+        link_name,
+        endpoint_result,
+        content_type,
+        web_testapp,
     ):
         cache.cache_regions["url_preview"]["enabled"] = False
         responses.add(
-            responses.GET, link_name, status=200, content_type=content_type, stream=True,
+            responses.GET,
+            link_name,
+            status=200,
+            content_type=content_type,
+            stream=True,
         )
         params = {"url": link_name}
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
-            "/api/url-preview?{params}".format(params=urlencode(params)), status=200,
+            "/api/url-preview?{params}".format(params=urlencode(params)),
+            status=200,
         )
         assert res.json_body == endpoint_result
 
@@ -178,7 +200,11 @@ class TestUrlPreview(object):
         ),
     )
     def test_api__url_preview__ok_200__no_preview(
-        self, link_name, link_content, endpoint_result, web_testapp,
+        self,
+        link_name,
+        link_content,
+        endpoint_result,
+        web_testapp,
     ):
         responses.add(
             responses.GET,
@@ -189,30 +215,44 @@ class TestUrlPreview(object):
             stream=True,
         )
         params = {"url": link_name}
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
-            "/api/url-preview?{params}".format(params=urlencode(params)), status=200,
+            "/api/url-preview?{params}".format(params=urlencode(params)),
+            status=200,
         )
         assert res.json_body == endpoint_result
 
     @responses.activate
     def test_api__url_preview__err_400__do_not_exist(
-        self, web_testapp,
+        self,
+        web_testapp,
     ):
         params = {"url": "http://thisurldoesnotexist.invalid"}
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
-            "/api/url-preview?{params}".format(params=urlencode(params)), status=400,
+            "/api/url-preview?{params}".format(params=urlencode(params)),
+            status=400,
         )
         assert res.json_body["code"] == ErrorCode.UNAVAILABLE_URL_PREVIEW
 
     @responses.activate
     def test_api__url_preview__err_400__unescaped_space(
-        self, web_testapp,
+        self,
+        web_testapp,
     ):
         params = {"url": "https://example.org.invalid/unescaped%20space"}
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
         res = web_testapp.get(
-            "/api/url-preview?{params}".format(params=urlencode(params)), status=400,
+            "/api/url-preview?{params}".format(params=urlencode(params)),
+            status=400,
         )
         assert res.json_body["code"] == ErrorCode.UNAVAILABLE_URL_PREVIEW

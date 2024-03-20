@@ -1,5 +1,4 @@
 {
-  "Error while saving the comment": "Fehler beim Speichern des Kommentars",
   "Delete": "Löschen",
   "A content with the same name already exists": "Ein Inhalt mit demselben Namen existiert bereits",
   "Error while creating kanban": "Fehler beim Erstellen von Kanban",
@@ -23,8 +22,6 @@
   "Board's name": "Name der Tafel",
   "This content is deleted": "Dieser Inhalt wird gelöscht",
   "Restore": "Wiederherstellen",
-  "Description": "Beschreibung",
-  "Value:": "Wert:",
   "Create a Kanban board": "Eine Kanban-Tafel erstellen",
   "Last version": "Letzte Version",
   "The content has been modified by {{author}}": "Der Inhalt wurde geändert von {{author}}",
@@ -44,7 +41,12 @@
   "The file is larger than the maximum file size allowed": "Die Datei ist größer als die maximal zulässige Dateigröße",
   "Error, the space exceed its maximum size": "Fehler, der Bereich hat seine maximale Größe überschritten",
   "You have reached your storage limit, you cannot add new files": "Sie haben Ihr Speicherlimit erreicht, Sie können keine neuen Dateien hinzufügen",
-  "Tasks": "",
-  "The link has been copied to clipboard": "Der Link wurde in die Clipboard kopiert",
-  "Copy content link": "Link zum Inhalt kopieren"
+  "Tasks": "Aufgaben",
+  "The link has been copied to clipboard": "Link in die Zwischenablage kopiert",
+  "Copy content link": "Link zum Inhalt kopieren",
+  "Description of the card": "Beschreibung der Karte",
+  "Open field:": "",
+  "Permanently delete": "",
+  "Yes, delete permanently": "",
+  "Warning: this operation cannot be rolled back": ""
 }

@@ -1,45 +1,55 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import {
-  AutoComplete,
   IconButton,
-  tinymceRemove
+  TinyEditor,
+  replaceHTMLElementWithMention,
+  searchContentAndReplaceWithTag,
+  searchMentionAndReplaceWithTag
 } from 'tracim_frontend_lib'
 import { translate } from 'react-i18next'
 
 export const SpaceDescription = (props) => {
-  const [showEditionMode, setShowEditionMode] = useState(false)
-
-  const initWysiwyg = () => globalThis.wysiwyg(
-    `#${props.textareaId}`,
-    props.lang,
-    props.onChangeDescription,
-    props.onTinyMceInput,
-    props.onTinyMceKeyDown,
-    props.onTinyMceKeyUp,
-    props.onTinyMceSelectionChange
-  )
+  const [content, setContent] = useState('')
+  const [isModeEdition, setIsModeEdition] = useState(false)
 
   useEffect(() => {
-    if (showEditionMode) initWysiwyg()
-  }, [showEditionMode])
+    setContent(props.description)
+  }, [props.description])
 
   useEffect(() => {
-    if (showEditionMode) {
-      tinymceRemove(`#${props.textareaId}`)
-      initWysiwyg()
+    if (isModeEdition) {
+      const contentWithMention = replaceHTMLElementWithMention(
+        props.memberList,
+        content
+      )
+      setContent(contentWithMention)
     }
-  }, [props.lang])
+  }, [isModeEdition])
 
-  useEffect(() => {
-    return () => {
-      if (!props.isReadOnlyMode) tinymceRemove(`#${props.textareaId}`)
+  /**
+   * Send the description to the backend
+   * @param {string} description The description to send
+   */
+  const handleCtrlEnterEvent = async (description) => {
+    const parsedMentionCommentObject = searchMentionAndReplaceWithTag(
+      props.memberList,
+      description
+    )
+
+    const parsedContentCommentObject = await searchContentAndReplaceWithTag(
+      props.apiUrl,
+      parsedMentionCommentObject.html
+    )
+
+    const submitSuccessfull = await props.onClickSubmit(
+      parsedContentCommentObject.html
+    )
+
+    if (submitSuccessfull) {
+      setContent(parsedContentCommentObject.html)
+      setIsModeEdition(false)
     }
-  }, [props.isReadOnlyMode])
-
-  const handleClickValidateNewDescription = () => {
-    props.onClickValidateNewDescription()
-    setShowEditionMode(false)
   }
 
   return (
@@ -47,28 +57,25 @@ export const SpaceDescription = (props) => {
       <div className='formBlock__title workspace_advanced__description__title'>
         {props.t('Description')}
       </div>
-      {showEditionMode
+      {isModeEdition
         ? (
-          <>
-            <div className='formBlock__field workspace_advanced__description__text'>
-              <textarea
-                className='workspace_advanced__description__text__textarea'
-                hidden
-                id={props.textareaId}
-                onChange={props.onChangeDescription}
-                placeholder={props.t("Space's description")}
-                value={props.description}
-              />
-            </div>
-            {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
-              <AutoComplete
-                apiUrl={props.apiUrl}
-                autoCompleteCursorPosition={props.autoCompleteCursorPosition}
-                autoCompleteItemList={props.autoCompleteItemList}
-                delimiterIndex={props.autoCompleteItemList.filter(item => item.isCommon).length - 1}
-                onClickAutoCompleteItem={props.onClickAutoCompleteItem}
-              />
-            )}
+          <div class='workspace_advanced__description'>
+            <TinyEditor
+              apiUrl={props.apiUrl}
+              setContent={setContent}
+              // End of required props ///////////////////////////////////////////////
+              codeLanguageList={props.codeLanguageList}
+              content={content}
+              onCtrlEnterEvent={handleCtrlEnterEvent}
+              height={200}
+              isAdvancedEdition
+              isStatusBarEnabled
+              language={props.lang}
+              maxHeight={300}
+              minHeight={200}
+              placeholder={props.t('Description of the space')}
+              userList={props.memberList}
+            />
 
             <div className='workspace_advanced__description__bottom'>
               <IconButton
@@ -76,11 +83,11 @@ export const SpaceDescription = (props) => {
                 icon='fas fa-check'
                 intent='primary'
                 mode='light'
-                onClick={handleClickValidateNewDescription}
+                onClick={() => { handleCtrlEnterEvent(content) }}
                 text={props.t('Confirm')}
               />
             </div>
-          </>
+          </div>
         )
         : (
           <div className='workspace_advanced__description'>
@@ -96,7 +103,7 @@ export const SpaceDescription = (props) => {
                 <IconButton
                   customClass='workspace_advanced__description__bottom__btn'
                   icon='fas fa-pen'
-                  onClick={() => setShowEditionMode(true)}
+                  onClick={() => setIsModeEdition(true)}
                   text={props.t('Edit')}
                 />
               </div>
@@ -110,37 +117,21 @@ export const SpaceDescription = (props) => {
 export default translate()(SpaceDescription)
 
 SpaceDescription.propTypes = {
-  apiUrl: PropTypes.string,
-  autoCompleteCursorPosition: PropTypes.number,
-  autoCompleteItemList: PropTypes.array,
+  apiUrl: PropTypes.string.isRequired,
+  onClickSubmit: PropTypes.func.isRequired,
+  // End of required props /////////////////////////////////////////////////////////////////////////
+  codeLanguageList: PropTypes.array,
   description: PropTypes.string,
-  isAutoCompleteActivated: PropTypes.bool,
   isReadOnlyMode: PropTypes.bool,
   lang: PropTypes.string,
-  onChangeDescription: PropTypes.func,
-  onClickAutoCompleteItem: PropTypes.func,
-  onClickValidateNewDescription: PropTypes.func,
-  onTinyMceInput: PropTypes.func,
-  onTinyMceKeyDown: PropTypes.func,
-  onTinyMceKeyUp: PropTypes.func,
-  onTinyMceSelectionChange: PropTypes.func,
-  textareaId: PropTypes.string
+  memberList: PropTypes.array
 }
 
 SpaceDescription.defaultProps = {
-  apiUrl: '/',
-  autoCompleteCursorPosition: 0,
-  autoCompleteItemList: [],
+  codeLanguageList: [],
   description: '',
   isAutoCompleteActivated: false,
   isReadOnlyMode: true,
   lang: 'en',
-  onChangeDescription: () => { },
-  onClickAutoCompleteItem: () => { },
-  onClickValidateNewDescription: () => { },
-  onTinyMceInput: () => { },
-  onTinyMceKeyDown: () => { },
-  onTinyMceKeyUp: () => { },
-  onTinyMceSelectionChange: () => { },
-  textareaId: 'spaceAdvancedTextAreaId'
+  memberList: []
 }

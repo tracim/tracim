@@ -186,9 +186,10 @@ class TagList extends React.Component {
                   apiUrl={props.apiUrl}
                   contentId={props.contentId}
                   contentTagList={state.tagList}
+                  customColor={props.customColor}
                   spaceTagList={state.spaceTagList}
-                  userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                   userProfile={props.userProfile}
+                  userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                   workspaceId={props.workspaceId}
                 />
               )}
@@ -226,6 +227,7 @@ class TagList extends React.Component {
                   confirmIcon='far fa-fw fa-trash-alt'
                   onCancel={() => this.setState({ workspaceTagToDeleteId: 0 })}
                   onConfirm={() => this.handleClickDeleteTag(this.state.workspaceTagToDeleteId)}
+                  customColor={props.customColor}
                 />
               )}
             </div>
@@ -241,12 +243,14 @@ TagList.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   workspaceId: PropTypes.number.isRequired,
   contentId: PropTypes.number,
+  customColor: PropTypes.string,
   userRoleIdInWorkspace: PropTypes.number,
   userProfile: PropTypes.string
 }
 
 TagList.defaultProps = {
   contentId: 0,
+  customColor: '',
   userRoleIdInWorkspace: ROLE.reader.id,
   userProfile: PROFILE.user.slug
 }

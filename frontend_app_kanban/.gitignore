@@ -8,4 +8,5 @@ dist/kanban.app.js.map
 dist/kanban.app.standalone.js
 dist/kanban.app.optimized.js*
 dist/kanban.app.standalone.js.map
+dist/*.LICENSE.txt
 test/fixture/defaultProps.js

@@ -19,23 +19,24 @@ import {
 import {
   CONTENT_NAMESPACE,
   CONTENT_TYPE,
-  getContentPath,
-  GROUP_MENTION_TRANSLATION_LIST,
-  handleFetchResult,
-  Loading,
+  MENTION_CONSTANT,
   NUMBER_RESULTS_BY_PAGE,
   PAGE,
   PROFILE,
+  SORT_BY,
   SUBSCRIPTION_TYPE,
   TLM_CORE_EVENT_TYPE as TLM_EVENT,
   TLM_ENTITY_TYPE as TLM_ENTITY,
   TLM_SUB_TYPE as TLM_SUB,
+  FilterBar,
   IconButton,
   ListItemWrapper,
+  Loading,
   PopinFixedHeader,
-  sortListByMultipleCriteria,
-  SORT_BY,
-  TracimComponent
+  TracimComponent,
+  getContentPath,
+  handleFetchResult,
+  sortListByMultipleCriteria
 } from 'tracim_frontend_lib'
 import { escape as escapeHtml, uniqBy } from 'lodash'
 import NotificationItem from '../component/NotificationItem.jsx'
@@ -44,6 +45,18 @@ import GroupedNotificationItem from './GroupedNotificationItem.jsx'
 const NUMBER_OF_CRITERIA = {
   ONE: 1,
   TWO: 2
+}
+
+export const isPatternIncludedInString = (string, pattern) => {
+  if (string === undefined || string === null) return false
+  if (pattern === '') return true
+
+  // INFO - CH - 2023-12-07 - Implementation to match any words in pattern
+  // const patternList = pattern.trim().split(' ')
+  // return patternList.some(p => string.toLowerCase().includes(p) === true)
+
+  // INFO - CH - 2023-12-07 - Implementation to match the whole pattern
+  return string.toLowerCase().includes(pattern.trim().toLowerCase()) === true
 }
 
 const getMainContentId = (notification) => {
@@ -162,21 +175,21 @@ const createNotificationListWithGroupsFromFlatNotificationList = (notificationLi
   let groupedNotificationList = []
 
   notificationList.forEach((notification, index) => {
-    const listLenght = groupedNotificationList.length
+    const listLength = groupedNotificationList.length
     // INFO - MP - 2022-07-05 - We can't group less than 3 notifications and can't group mention
     if (notification.type.includes(TLM_ENTITY.MENTION) || index < minimumOfNotificationsToGroup - 1) {
       groupedNotificationList.push(notification)
       return
     }
 
-    const previousNotification = groupedNotificationList[listLenght - 1]
+    const previousNotification = groupedNotificationList[listLength - 1]
     // INFO - MP - 2022-07-05 - If there is a group, I check if I can add it to the existing group
-    // overwise I'm trying to create a group with the three or six last notifications
+    // otherwise I'm trying to create a group with the three or six last notifications
     if (previousNotification.group) {
       // INFO - MP - 2022-05-25 - Because it's a group I can check if the first notification is groupable
       // to my current notification
       if (canBeGrouped([previousNotification.group[0], notification])) {
-        groupedNotificationList[listLenght - 1] = {
+        groupedNotificationList[listLength - 1] = {
           ...previousNotification,
           group: [...previousNotification.group, notification]
         }
@@ -197,11 +210,12 @@ const linkToParentContent = (notification) => {
 }
 
 export const NotificationWall = props => {
+  const folderPath = {}
+
   const [notificationList, setNotificationList] = useState([])
-  // INFO - GB -2022-06-05 - The no set below is not used because folderPath is a dictionary and the manipulations are done directly
-  const [folderPath, setFolderPath] = useState({}) // eslint-disable-line no-unused-vars
   const [isFolderPathLoading, setIsFolderPathLoading] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [filterInput, setFilterInput] = useState('')
 
   // INFO - MP - 2022-05-20 - If we change the height, we need to change the
   // height of notification item in the css.
@@ -241,6 +255,17 @@ export const NotificationWall = props => {
       loadNotifications()
     }
   }, [notificationList])
+
+  useEffect(() => {
+    // INFO - CH - 2023-11-08 - Manually give focus to filter input since the component is already mounted
+    // autoFocus props cannot work
+    if (props.isNotificationWallOpen === true) {
+      const inputTextHtml = document.querySelector(
+        '.notification__filterInput .textInputComponent__text'
+      )
+      if (inputTextHtml !== null) inputTextHtml.focus()
+    }
+  }, [props.isNotificationWallOpen])
 
   const handleClickMarkAllAsRead = async () => {
     const fetchAllPutNotificationAsRead = await props.dispatch(putAllNotificationAsRead(props.user.userId))
@@ -425,7 +450,7 @@ export const NotificationWall = props => {
     }
 
     if (entityType === TLM_ENTITY.MENTION && eventType === TLM_EVENT.CREATED) {
-      const groupMention = GROUP_MENTION_TRANSLATION_LIST.includes(notification.mention.recipient)
+      const groupMention = notification.mention.type === MENTION_CONSTANT.TYPE.ROLE
       const mentionEveryone = props.t('{{author}} mentioned everyone in {{content}}', i18nOpts)
       const mentionYou = props.t('{{author}} mentioned you in {{content}}', i18nOpts)
       const isHtmlDocument = notification.content.type === CONTENT_TYPE.HTML_DOCUMENT
@@ -654,6 +679,10 @@ export const NotificationWall = props => {
     }
   }
 
+  const handleChangeFilterInput = newFilter => {
+    setFilterInput(newFilter)
+  }
+
   return (
     isFolderPathLoading
       ? <Loading />
@@ -666,12 +695,20 @@ export const NotificationWall = props => {
             componentTitle={<span className='componentTitle'>{props.t('Notifications')}</span>}
             onClickCloseBtn={props.onCloseNotificationWall}
           >
+            <FilterBar
+              customClass='notification__filterInput'
+              onChange={e => handleChangeFilterInput(e.target.value)}
+              value={filterInput}
+              placeholder={props.t('Filter...')}
+              autoFocus
+            />
+
             <IconButton
               mode='dark'
               onClick={handleClickMarkAllAsRead}
               icon='far fa-envelope-open'
-              text={props.t('Mark all as read')}
               dataCy='markAllAsReadButton'
+              title={props.t('Mark all as read')}
             />
           </PopinFixedHeader>
 
@@ -688,6 +725,7 @@ export const NotificationWall = props => {
                     key={notification.id}
                     onCloseNotificationWall={props.onCloseNotificationWall}
                     read={false}
+                    filterInput={filterInput}
                   />
                 )
               } else {
@@ -702,6 +740,7 @@ export const NotificationWall = props => {
                       onCloseNotificationWall={props.onCloseNotificationWall}
                       getNotificationDetails={getNotificationDetails}
                       notification={notification}
+                      filterInput={filterInput}
                     />
                   </ListItemWrapper>
                 )

@@ -1,8 +1,7 @@
 # coding: utf8
 import enum
-import typing
-
 from pluggy import PluginManager
+import typing
 from wsgidav.dav_provider import DAVProvider
 from wsgidav.dav_provider import _DAVResource
 from wsgidav.lock_manager import LockManager
@@ -85,7 +84,9 @@ class ProcessedWebdavPath(object):
                     workspace = self.workspaces[-1]
                     parent = self.contents[-1] if self.contents else None
                     content = self.content_api.get_one_by_filename(
-                        filename=filemanager_filename, workspace=workspace, parent=parent,
+                        filename=filemanager_filename,
+                        workspace=workspace,
+                        parent=parent,
                     )
                 except ContentNotFound:
                     content = None
@@ -143,7 +144,10 @@ class ProcessedWebdavPath(object):
 
 class WebdavTracimContext(TracimContext):
     def __init__(
-        self, environ: typing.Dict[str, typing.Any], app_config: CFG, plugin_manager: PluginManager,
+        self,
+        environ: typing.Dict[str, typing.Any],
+        app_config: CFG,
+        plugin_manager: PluginManager,
     ):
         super().__init__()
         self.environ = environ
@@ -239,7 +243,9 @@ class TracimDavProvider(DAVProvider):
     """
 
     def __init__(
-        self, app_config: CFG, manage_locks=True,
+        self,
+        app_config: CFG,
+        manage_locks=True,
     ):
         super(TracimDavProvider, self).__init__()
 
