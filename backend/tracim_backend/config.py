@@ -453,6 +453,8 @@ class CFG(object):
         self.SESSION__LOCK_DIR = self.get_raw_config("session.lock_dir", default_session_lock_dir)
         self.SESSION__HTTPONLY = asbool(self.get_raw_config("session.httponly", "True"))
         self.SESSION__SECURE = asbool(self.get_raw_config("session.secure", "False"))
+        self.SESSION__USERNAME = self.get_raw_config("session.username", "")
+        self.SESSION__PASSWORD = self.get_raw_config("session.password", "")
         self.WEBSITE__TITLE = self.get_raw_config("website.title", "Tracim")
         self.WEBSITE__DESCRIPTION = self.get_raw_config("website.description", "")
         self.WEBSITE__USAGE_CONDITIONS = string_to_unique_item_list(
