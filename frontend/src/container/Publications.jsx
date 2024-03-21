@@ -18,7 +18,6 @@ import {
   TLM_SUB_TYPE as TLM_ST,
   TRANSLATION_STATE,
   CommentArea,
-  CardPopupCreateContent,
   ConfirmPopup,
   EditCommentPopup,
   EmptyListMessage,
@@ -64,6 +63,8 @@ import {
 
 import TabBar from '../component/TabBar/TabBar.jsx'
 import FeedItemWithPreview, { LINK_TYPE } from './FeedItemWithPreview.jsx'
+
+import PopupSetPublicationTitle from '../component/Publication/PopupSetPublicationTitle.jsx'
 
 // INFO - G.B. - 2021-10-18 - The value below is used only for local storage, it's a fake id for the
 // publication that is being written but has not been sent yet (i.e. does not have an id)
@@ -210,9 +211,9 @@ export class Publications extends React.Component {
     return false
   }
 
-  handleClickValidatePublicationTitle = async () => {
+  handleClickValidatePublicationTitle = async (newPublicationTitle) => {
     const { state } = this
-    this.handleSaveThreadPublication(state.publication, state.publicationAsFileList)
+    this.handleSaveThreadPublication(state.publication, state.publicationAsFileList, newPublicationTitle)
     state.commentReset()
     this.setState({
       showPublicationTitlePopup: false,
@@ -458,12 +459,12 @@ export class Publications extends React.Component {
     })
   }
 
-  handleSaveThreadPublication = async (publication, publicationAsFileList) => {
-    const { props, state } = this
+  handleSaveThreadPublication = async (publication, publicationAsFileList, newPublicationTitle) => {
+    const { props } = this
 
     const spaceId = props.currentWorkspace.id
-    let title = `${state.newPublicationTitle} - ${this.buildPublicationName(props.user.publicName, props.user.lang)}`
-    if (state.newPublicationTitle === '') {
+    let title = `${newPublicationTitle} - ${this.buildPublicationName(props.user.publicName, props.user.lang)}`
+    if (newPublicationTitle === '') {
       title = this.buildPublicationName(props.user.publicName, props.user.lang)
     }
     const fetchPostPublication = await props.dispatch(postThreadPublication(spaceId, title))
@@ -651,17 +652,9 @@ export class Publications extends React.Component {
           />
         )}
         {state.showPublicationTitlePopup && (
-          <CardPopupCreateContent
+          <PopupSetPublicationTitle
             onClose={this.handleTogglePublicationTitlePopup}
             onValidate={this.handleClickValidatePublicationTitle}
-            label={props.t('Labeling the news')}
-            customColor={COLORS.PUBLICATION}
-            faIcon='fas fa-fw fa-stream'
-            contentName={state.newPublicationTitle !== undefined ? state.newPublicationTitle : ''}
-            onChangeContentName={this.handleChangeNewPublicationTitle}
-            btnValidateLabel={state.newPublicationTitle ? props.t('Publish') : props.t('Publish without title')}
-            inputPlaceholder={props.t('News title')}
-            allowEmptyTitle
           />
         )}
         {state.showChangeContentTypePopup && (
