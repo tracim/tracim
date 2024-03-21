@@ -26,6 +26,7 @@
     &__titleWithBreadcrumbs
       flex auto
       overflow hidden
+      width 100%
     &__titleWrapper
       display flex
       align-items center
@@ -54,12 +55,12 @@
       margin-inline-end standardSpacing
     &__title
       display flex
-      flex 2
       font-size titleFontSize
       font-weight bold
       text-overflow ellipsis
       overflow hidden
       white-space nowrap
+      width 100%
       & > div
         text-overflow ellipsis
         overflow hidden
@@ -82,9 +83,6 @@
       & > i
         font-size titleFontSize
         vertical-align middle
-  &__header__isEditing
-    .wsContentGeneric__header__titleWithBreadcrumbs
-      flex 50
   &__option
     &__menu
       & > div
