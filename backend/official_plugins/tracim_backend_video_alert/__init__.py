@@ -1,3 +1,5 @@
+import time
+
 from pluggy import PluginManager
 from pyramid.config import Configurator
 
@@ -128,16 +130,17 @@ class VideoAlertPlugin:
         Add a comment to the content if it is a video and not a mp4 file.
         """
 
+        # NOTE - M.L. - 2024-03-22 - This delay is required to not trigger the plugin before the
+        #  backend has finished processing the content. Creating errors on the frontend
+        time.sleep(0.1)
+
         if not self.is_content_supported(content):
             return
 
         if self.is_content_whitelisted(content) or not self.is_content_blacklisted(content):
             return
 
-        username = self.config["username"]
-        if username == "":
-            username = content.author.username
-
+        username = self.config.get("username", content.author.username)
         try:
             current_user = UserApi(
                 session=context.dbsession, config=context.app_config, current_user=None
@@ -158,18 +161,17 @@ class VideoAlertPlugin:
         author_id = content.author.user_id
         mention_recipient = content.author.username
         try:
-            content_api = ContentApi(
+            ContentApi(
                 session=context.dbsession,
                 current_user=current_user,
                 config=context.app_config,
-            )
-            content_api.create_comment(
+            ).create_comment(
                 workspace=workspace,
                 parent=content,
                 content=f"<p>{self.wrap_in_mention_node(mention_recipient, str(author_id))} "
                 + f"- {self.config['message']}</p>",
-                do_save=False,
-                do_notify=False,
+                do_save=True,
+                do_notify=True,
             )
         except Exception as e:
             logger.error(self, f"VIDEO_ALERT_PLUGIN w/ ContentApi {e}")
