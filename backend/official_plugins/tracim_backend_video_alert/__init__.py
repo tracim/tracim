@@ -52,7 +52,7 @@ class VideoAlertPlugin:
         return (
             ""
             if recipient == ""
-            else (f'<{MENTION_NODE_NAME} userid="{id_}">' + f"@{recipient}</{MENTION_NODE_NAME}>")
+            else f'<{MENTION_NODE_NAME} userid="{id_}">@{recipient}</{MENTION_NODE_NAME}>'
         )
 
     @staticmethod
