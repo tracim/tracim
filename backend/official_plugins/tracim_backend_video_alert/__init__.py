@@ -48,7 +48,7 @@ class VideoAlertPlugin:
         self.config = None
 
     @staticmethod
-    def wrap_in_mention_node(recipient: str, id_: str):
+    def wrap_in_mention_node(recipient: str, id_: str) -> str:
         return (
             ""
             if recipient == ""
