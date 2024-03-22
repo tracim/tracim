@@ -69,7 +69,7 @@ class VideoAlertPlugin:
                 return True
         return False
 
-    def is_content_blacklisted(self, content: Content):
+    def is_content_blacklisted(self, content: Content) -> bool:
         content_mimetype = content.file_mimetype.lower()
 
         for nok_mimetype in self.config["blacklist"]:
