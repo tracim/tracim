@@ -56,7 +56,7 @@ class VideoAlertPlugin:
         )
 
     @staticmethod
-    def is_content_supported(content: Content):
+    def is_content_supported(content: Content) -> bool:
         return content.type == ContentTypeSlug.FILE.value
 
     def is_content_whitelisted(self, content: Content) -> bool:
