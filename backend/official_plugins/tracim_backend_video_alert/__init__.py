@@ -1,7 +1,6 @@
-import time
-
 from pluggy import PluginManager
 from pyramid.config import Configurator
+import time
 
 from tracim_backend import sliced_dict
 from tracim_backend.app_models.contents import ContentTypeSlug
@@ -21,7 +20,7 @@ MENTION_FIELD = "mention"
 default_config = {
     # Message of the warning. Note that a mention to the file's author will be prepended.
     "message": "Automatic message: the file format used is not compatible with integrated "
-               "playback. Please prefer mp4 or webm format.",
+    "playback. Please prefer mp4 or webm format.",
     # Username of the user that will comment the warning. Leave blank to use the author of the file.
     "username": "",
     # List of mimetypes that should bypass the blacklist.
