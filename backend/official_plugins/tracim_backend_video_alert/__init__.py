@@ -59,7 +59,7 @@ class VideoAlertPlugin:
     def is_content_supported(content: Content):
         return content.type == "file"
 
-    def is_content_whitelisted(self, content: Content):
+    def is_content_whitelisted(self, content: Content) -> bool:
         content_mimetype = content.file_mimetype.lower()
 
         for ok_mimetype in self.config["whitelist"]:
