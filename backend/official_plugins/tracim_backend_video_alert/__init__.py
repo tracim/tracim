@@ -109,6 +109,8 @@ class VideoAlertPlugin:
                 cast_func=str,
                 do_strip=True,
             )
+        else:
+            self.config["whitelist"] = config.get("whitelist")
 
         blacklist = plugin_settings.get(f"{SETTINGS_KEY_PREFIX}blacklist")
         if blacklist:
@@ -118,6 +120,8 @@ class VideoAlertPlugin:
                 cast_func=str,
                 do_strip=True,
             )
+        else:
+            self.config["blacklist"] = config.get("blacklist")
 
         for key, value in self.config.items():
             logger.info(self, f"{key}: {value}")
