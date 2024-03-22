@@ -2,6 +2,7 @@ from pluggy import PluginManager
 from pyramid.config import Configurator
 
 from tracim_backend import sliced_dict
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.plugins import hookimpl
 from tracim_backend.lib.core.user import UserApi
@@ -11,21 +12,20 @@ from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.lib.utils.utils import string_to_unique_item_list
 from tracim_backend.models.data import Content
 
-# Envoi de la mention
-
 # --- CONFIG ---
 
 MENTION_FIELD = "mention"
 
-config = {
+default_config = {
     # Message of the warning. Note that a mention to the file's author will be prepended.
-    "message": "Oops, I sent an unsupported video format. I should've sent a mp4 or webm file.",
+    "message": "Automatic message: the file format used is not compatible with integrated "
+               "playback. Please prefer mp4 or webm format.",
     # Username of the user that will comment the warning. Leave blank to use the author of the file.
     "username": "",
     # List of mimetypes that should bypass the blacklist.
     "whitelist": ["video/mp4", "video/webm"],
     # List of mimetypes that should trigger a warning
-    "blacklist": ["video/", "image/gif", "image/webp"],
+    "blacklist": ["video/", "image/gif"],
 }
 
 # --- UTILS---
@@ -57,7 +57,7 @@ class VideoAlertPlugin:
 
     @staticmethod
     def is_content_supported(content: Content):
-        return content.type == "file"
+        return content.type == ContentTypeSlug.FILE.value
 
     def is_content_whitelisted(self, content: Content) -> bool:
         content_mimetype = content.file_mimetype.lower()
@@ -93,12 +93,12 @@ class VideoAlertPlugin:
         settings = configurator.get_settings()
         plugin_settings = sliced_dict(settings, beginning_key_string=SETTINGS_KEY_PREFIX)
 
-        self.config = config
+        self.config = default_config
         self.config["message"] = plugin_settings.get(
-            f"{SETTINGS_KEY_PREFIX}message", config["message"]
+            f"{SETTINGS_KEY_PREFIX}message", default_config["message"]
         )
         self.config["username"] = plugin_settings.get(
-            f"{SETTINGS_KEY_PREFIX}username", config["username"]
+            f"{SETTINGS_KEY_PREFIX}username", default_config["username"]
         )
 
         whitelist = plugin_settings.get(f"{SETTINGS_KEY_PREFIX}whitelist")
@@ -109,8 +109,6 @@ class VideoAlertPlugin:
                 cast_func=str,
                 do_strip=True,
             )
-        else:
-            self.config["whitelist"] = config.get("whitelist")
 
         blacklist = plugin_settings.get(f"{SETTINGS_KEY_PREFIX}blacklist")
         if blacklist:
@@ -120,8 +118,6 @@ class VideoAlertPlugin:
                 cast_func=str,
                 do_strip=True,
             )
-        else:
-            self.config["blacklist"] = config.get("blacklist")
 
         for key, value in self.config.items():
             logger.info(self, f"{key}: {value}")
