@@ -2,7 +2,7 @@ from pluggy import PluginManager
 from pyramid.config import Configurator
 import time
 
-from tracim_backend import sliced_dict
+from tracim_backend import CFG
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.plugins import hookimpl
@@ -24,15 +24,17 @@ default_config = {
     # Username of the user that will comment the warning. Leave blank to use the author of the file.
     "username": "",
     # List of mimetypes that should bypass the blacklist.
-    "whitelist": ["video/mp4", "video/webm"],
+    "whitelist": "video/mp4,video/webm",
     # List of mimetypes that should trigger a warning
-    "blacklist": ["video/", "image/gif"],
+    "blacklist": "video/,image/gif",
 }
 
-# --- UTILS---
+# --- UTILS ---
+PLUGIN_SETTINGS_NAMESPACE = "plugin"
+VIDEO_ALERT_SETTINGS_NAMESPACE = "video_alert"
 
 MENTION_NODE_NAME = "html-mention"
-SETTINGS_KEY_PREFIX = "video_alert_plugin."
+SETTINGS_KEY_PREFIX = f"{PLUGIN_SETTINGS_NAMESPACE}.{VIDEO_ALERT_SETTINGS_NAMESPACE}."
 
 
 # --- MAIN ---
@@ -91,37 +93,26 @@ class VideoAlertPlugin:
         registry = get_current_registry()
         configurator = Configurator(registry=registry)
 
-        settings = configurator.get_settings()
-        plugin_settings = sliced_dict(settings, beginning_key_string=SETTINGS_KEY_PREFIX)
+        # TODO - M.L. - 2024-03-25 - The plugin loader should load the settings
+        #  and provide them to the plugin instead of the plugin loading them itself.
+        #  Enforcing the plugin namespace for example.
+        settings = configurator.get_settings().get("CFG", None)
 
-        self.config = default_config
-        self.config["message"] = plugin_settings.get(
-            f"{SETTINGS_KEY_PREFIX}message", default_config["message"]
+        self.config = dict()
+        self.config["message"] = settings.get_raw_config(SETTINGS_KEY_PREFIX+"message", default_config["message"])
+        self.config["username"] = settings.get_raw_config(SETTINGS_KEY_PREFIX+"username", default_config["username"])
+        self.config["whitelist"] = string_to_unique_item_list(
+            settings.get_raw_config(SETTINGS_KEY_PREFIX+"whitelist", default_config["whitelist"]),
+            separator=",",
+            cast_func=str,
+            do_strip=True,
         )
-        self.config["username"] = plugin_settings.get(
-            f"{SETTINGS_KEY_PREFIX}username", default_config["username"]
+        self.config["blacklist"] = string_to_unique_item_list(
+            settings.get_raw_config(SETTINGS_KEY_PREFIX+"blacklist", default_config["blacklist"]),
+            separator=",",
+            cast_func=str,
+            do_strip=True,
         )
-
-        whitelist = plugin_settings.get(f"{SETTINGS_KEY_PREFIX}whitelist")
-        if whitelist:
-            self.config["whitelist"] = string_to_unique_item_list(
-                whitelist,
-                separator=",",
-                cast_func=str,
-                do_strip=True,
-            )
-
-        blacklist = plugin_settings.get(f"{SETTINGS_KEY_PREFIX}blacklist")
-        if blacklist:
-            self.config["blacklist"] = string_to_unique_item_list(
-                blacklist,
-                separator=",",
-                cast_func=str,
-                do_strip=True,
-            )
-
-        for key, value in self.config.items():
-            logger.info(self, f"{key}: {value}")
 
     @hookimpl
     def on_content_modified(self, content: Content, context: TracimContext) -> None:
@@ -131,15 +122,15 @@ class VideoAlertPlugin:
 
         # NOTE - M.L. - 2024-03-22 - This delay is required to not trigger the plugin before the
         #  backend has finished processing the content. Creating errors on the frontend
-        time.sleep(0.1)
-
         if not self.is_content_supported(content):
             return
 
         if self.is_content_whitelisted(content) or not self.is_content_blacklisted(content):
             return
 
-        username = self.config.get("username", content.author.username)
+        username = self.config["username"]
+        if username == "":
+            username = content.author.username
         try:
             current_user = UserApi(
                 session=context.dbsession, config=context.app_config, current_user=None
