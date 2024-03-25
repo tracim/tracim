@@ -72,8 +72,8 @@ function KanbanCard (props) {
       className={classnames('kanban__contentpage__wrapper__board__card', {
         readOnly: props.readOnly,
         buttonHidden: props.readOnly && props.hideButtonsWhenReadOnly,
-        kanban__white__text__color : textColorNeededFromBackground(props.card.bgColor || props.customColor),
-        kanban__black__text__color : !textColorNeededFromBackground(props.card.bgColor || props.customColor)
+        kanban__white__text__color: textColorNeededFromBackground(props.card.bgColor || props.customColor),
+        kanban__black__text__color: !textColorNeededFromBackground(props.card.bgColor || props.customColor)
       })}
     >
       <div className='kanban__contentpage__wrapper__board__card__title'>
