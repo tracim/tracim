@@ -39,9 +39,35 @@ function KanbanCard (props) {
     )
   }
 
+  const luminance = (color) => {
+    const rgbHex = color.replace('#', '')
+    const red = parseInt(rgbHex.substr(0, 2), 16)
+    const green = parseInt(rgbHex.substr(2, 2), 16)
+    const blue = parseInt(rgbHex.substr(4, 2), 16)
+    const rgbDec = [red, green, blue]
+    var rgb = rgbDec.map(c => {
+      c /= 255
+      return c < 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
+    })
+    return (0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2])
+  }
+
+  // INFO - FS - 2024-03-25 - Use the contrast ratio to determine witch text color use : https://github.com/tracim/tracim/issues/6356
+  const textColorNeededFromBackground = (backColor) => {
+    const white = '#fdfdfd' // INFO - FS - 2024-03-21 - offWhite color
+    const black = '#252525' // INFO - FS - 2024-03-21 - offBlack color
+    const contrastBackColorWhite = (luminance(white) + 0.05) / (luminance(backColor) + 0.05)
+    const contrastBackColorBlack = (luminance(backColor) + 0.05) / (luminance(black) + 0.05)
+    if (contrastBackColorBlack < contrastBackColorWhite) {
+      return white
+    } else {
+      return black
+    }
+  }
+
   return (
     <div
-      style={{ borderColor: props.card.bgColor || props.customColor }}
+      style={{ backgroundColor: props.card.bgColor || props.customColor, color: textColorNeededFromBackground(props.card.bgColor || props.customColor) }}
       className={classnames('kanban__contentpage__wrapper__board__card', {
         readOnly: props.readOnly,
         buttonHidden: props.readOnly && props.hideButtonsWhenReadOnly
