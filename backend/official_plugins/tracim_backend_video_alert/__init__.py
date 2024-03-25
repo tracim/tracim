@@ -96,6 +96,7 @@ class VideoAlertPlugin:
         # TODO - M.L. - 2024-03-25 - The plugin loader should load the settings
         #  and provide them to the plugin instead of the plugin loading them itself.
         #  Enforcing the plugin namespace for example.
+        #  see https://github.com/tracim/tracim/issues/6416
         settings = configurator.get_settings().get("CFG", None)
 
         self.config = dict()
