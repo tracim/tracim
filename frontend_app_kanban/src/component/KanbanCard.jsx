@@ -53,24 +53,27 @@ function KanbanCard (props) {
   }
 
   // INFO - FS - 2024-03-25 - Use the contrast ratio to determine witch text color use : https://github.com/tracim/tracim/issues/6356
+  // return true if white text color is better than black for this background
   const textColorNeededFromBackground = (backColor) => {
-    const white = '#fdfdfd' // INFO - FS - 2024-03-21 - offWhite color
-    const black = '#252525' // INFO - FS - 2024-03-21 - offBlack color
-    const contrastBackColorWhite = (luminance(white) + 0.05) / (luminance(backColor) + 0.05)
-    const contrastBackColorBlack = (luminance(backColor) + 0.05) / (luminance(black) + 0.05)
+    const whiteLuminance = 1
+    const blackLuminance = 0
+    const contrastBackColorWhite = (whiteLuminance + 0.05) / (luminance(backColor) + 0.05)
+    const contrastBackColorBlack = (luminance(backColor) + 0.05) / (blackLuminance + 0.05)
     if (contrastBackColorBlack < contrastBackColorWhite) {
-      return white
+      return true
     } else {
-      return black
+      return false
     }
   }
 
   return (
     <div
-      style={{ backgroundColor: props.card.bgColor || props.customColor, color: textColorNeededFromBackground(props.card.bgColor || props.customColor) }}
+      style={{ backgroundColor: props.card.bgColor || props.customColor }}
       className={classnames('kanban__contentpage__wrapper__board__card', {
         readOnly: props.readOnly,
-        buttonHidden: props.readOnly && props.hideButtonsWhenReadOnly
+        buttonHidden: props.readOnly && props.hideButtonsWhenReadOnly,
+        kanban__white__text__color : textColorNeededFromBackground(props.card.bgColor || props.customColor),
+        kanban__black__text__color : !textColorNeededFromBackground(props.card.bgColor || props.customColor)
       })}
     >
       <div className='kanban__contentpage__wrapper__board__card__title'>
