@@ -97,11 +97,11 @@ class VideoAlertPlugin:
         #  see https://github.com/tracim/tracim/issues/6416
         settings = configurator.get_settings()
         if settings is None:
-            logger.error(self, f"VIDEO_ALERT_PLUGIN No settings found, skipping.")
+            logger.error(self, "VIDEO_ALERT_PLUGIN No settings found, skipping.")
             return
         cfg = settings.get("CFG", None)
         if cfg is None:
-            logger.error(self, f"VIDEO_ALERT_PLUGIN No CFG found, skipping.")
+            logger.error(self, "VIDEO_ALERT_PLUGIN No CFG found, skipping.")
             return
 
         self.config = dict()
