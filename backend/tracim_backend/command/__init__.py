@@ -109,5 +109,5 @@ class AppContextCommand(Command):
         else:
             try:
                 os.chdir("/etc/tracim")
-            except:
+            except FileNotFoundError:
                 pass
