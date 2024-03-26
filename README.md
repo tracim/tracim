@@ -15,7 +15,13 @@ An easy way to start using Tracim is to use the [Docker image](https://hub.docke
 ```bash
 mkdir -p ~/tracim/etc
 mkdir -p ~/tracim/var
-docker run -e DATABASE_TYPE=sqlite -p 8080:80 -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
+docker run \
+    -e DATABASE_TYPE=sqlite \
+    -e TRACIM_WEBSITE__BASE_URL=http://{ip_address}:{port} \
+    -p 8080:80 \
+    -v ~/tracim/etc:/etc/tracim \
+    -v ~/tracim/var:/var/tracim \
+    algoo/tracim:latest
 ```
 
 Then, you can access the application at <http://localhost:8080>
