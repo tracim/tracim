@@ -1,8 +1,6 @@
 from pluggy import PluginManager
 from pyramid.config import Configurator
-import time
 
-from tracim_backend import CFG
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.plugins import hookimpl
@@ -100,16 +98,20 @@ class VideoAlertPlugin:
         settings = configurator.get_settings().get("CFG", None)
 
         self.config = dict()
-        self.config["message"] = settings.get_raw_config(SETTINGS_KEY_PREFIX+"message", default_config["message"])
-        self.config["username"] = settings.get_raw_config(SETTINGS_KEY_PREFIX+"username", default_config["username"])
+        self.config["message"] = settings.get_raw_config(
+            SETTINGS_KEY_PREFIX + "message", default_config["message"]
+        )
+        self.config["username"] = settings.get_raw_config(
+            SETTINGS_KEY_PREFIX + "username", default_config["username"]
+        )
         self.config["whitelist"] = string_to_unique_item_list(
-            settings.get_raw_config(SETTINGS_KEY_PREFIX+"whitelist", default_config["whitelist"]),
+            settings.get_raw_config(SETTINGS_KEY_PREFIX + "whitelist", default_config["whitelist"]),
             separator=",",
             cast_func=str,
             do_strip=True,
         )
         self.config["blacklist"] = string_to_unique_item_list(
-            settings.get_raw_config(SETTINGS_KEY_PREFIX+"blacklist", default_config["blacklist"]),
+            settings.get_raw_config(SETTINGS_KEY_PREFIX + "blacklist", default_config["blacklist"]),
             separator=",",
             cast_func=str,
             do_strip=True,
