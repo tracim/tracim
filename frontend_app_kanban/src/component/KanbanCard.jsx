@@ -6,7 +6,8 @@ import {
   CardPopup,
   DropdownMenu,
   IconButton,
-  Icon
+  Icon,
+  shouldUseLightTextColor
 } from 'tracim_frontend_lib'
 
 require('./KanbanCard.styl')
@@ -39,41 +40,14 @@ function KanbanCard (props) {
     )
   }
 
-  const luminance = (color) => {
-    const rgbHex = color.replace('#', '')
-    const red = parseInt(rgbHex.substr(0, 2), 16)
-    const green = parseInt(rgbHex.substr(2, 2), 16)
-    const blue = parseInt(rgbHex.substr(4, 2), 16)
-    const rgbDec = [red, green, blue]
-    var rgb = rgbDec.map(c => {
-      c /= 255
-      return c < 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
-    })
-    return (0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2])
-  }
-
-  // INFO - FS - 2024-03-25 - Use the contrast ratio to determine witch text color use : https://github.com/tracim/tracim/issues/6356
-  // return true if white text color is better than black for this background
-  const textColorNeededFromBackground = (backColor) => {
-    const whiteLuminance = 1
-    const blackLuminance = 0
-    const contrastBackColorWhite = (whiteLuminance + 0.05) / (luminance(backColor) + 0.05)
-    const contrastBackColorBlack = (luminance(backColor) + 0.05) / (blackLuminance + 0.05)
-    if (contrastBackColorBlack < contrastBackColorWhite) {
-      return true
-    } else {
-      return false
-    }
-  }
-
   return (
     <div
       style={{ backgroundColor: props.card.bgColor || props.customColor }}
       className={classnames('kanban__contentpage__wrapper__board__card', {
         readOnly: props.readOnly,
         buttonHidden: props.readOnly && props.hideButtonsWhenReadOnly,
-        kanban__white__text__color: textColorNeededFromBackground(props.card.bgColor || props.customColor),
-        kanban__black__text__color: !textColorNeededFromBackground(props.card.bgColor || props.customColor)
+        kanban__white__text__color: shouldUseLightTextColor(props.card.bgColor || props.customColor),
+        kanban__black__text__color: !shouldUseLightTextColor(props.card.bgColor || props.customColor)
       })}
     >
       <div className='kanban__contentpage__wrapper__board__card__title'>
