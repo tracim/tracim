@@ -95,23 +95,30 @@ class VideoAlertPlugin:
         #  and provide them to the plugin instead of the plugin loading them itself.
         #  Enforcing the plugin namespace for example.
         #  see https://github.com/tracim/tracim/issues/6416
-        settings = configurator.get_settings().get("CFG", None)
+        settings = configurator.get_settings()
+        if settings is None:
+            logger.error(self, f"VIDEO_ALERT_PLUGIN No settings found, skipping.")
+            return
+        cfg = settings.get("CFG", None)
+        if cfg is None:
+            logger.error(self, f"VIDEO_ALERT_PLUGIN No CFG found, skipping.")
+            return
 
         self.config = dict()
-        self.config["message"] = settings.get_raw_config(
+        self.config["message"] = cfg.get_raw_config(
             SETTINGS_KEY_PREFIX + "message", default_config["message"]
         )
-        self.config["username"] = settings.get_raw_config(
+        self.config["username"] = cfg.get_raw_config(
             SETTINGS_KEY_PREFIX + "username", default_config["username"]
         )
         self.config["whitelist"] = string_to_unique_item_list(
-            settings.get_raw_config(SETTINGS_KEY_PREFIX + "whitelist", default_config["whitelist"]),
+            cfg.get_raw_config(SETTINGS_KEY_PREFIX + "whitelist", default_config["whitelist"]),
             separator=",",
             cast_func=str,
             do_strip=True,
         )
         self.config["blacklist"] = string_to_unique_item_list(
-            settings.get_raw_config(SETTINGS_KEY_PREFIX + "blacklist", default_config["blacklist"]),
+            cfg.get_raw_config(SETTINGS_KEY_PREFIX + "blacklist", default_config["blacklist"]),
             separator=",",
             cast_func=str,
             do_strip=True,
@@ -134,41 +141,31 @@ class VideoAlertPlugin:
         username = self.config["username"]
         if username == "":
             username = content.author.username
-        try:
-            current_user = UserApi(
-                session=context.dbsession, config=context.app_config, current_user=None
-            ).get_one_by_username(username)
-        except Exception as e:
-            logger.error(self, f"VIDEO_ALERT_PLUGIN w/ UserApi {e}")
-            return
 
-        try:
-            workspace_api = WorkspaceApi(
-                session=context.dbsession, config=context.app_config, current_user=current_user
-            )
-            workspace = workspace_api.get_one(content.workspace_id)
-        except Exception as e:
-            logger.error(self, f"VIDEO_ALERT_PLUGIN w/ WorkspaceApi {e}")
-            return
+        current_user = UserApi(
+            session=context.dbsession, config=context.app_config, current_user=None
+        ).get_one_by_username(username)
+
+        workspace_api = WorkspaceApi(
+            session=context.dbsession, config=context.app_config, current_user=current_user
+        )
+        workspace = workspace_api.get_one(content.workspace_id)
 
         author_id = content.author.user_id
         mention_recipient = content.author.username
-        try:
-            ContentApi(
-                session=context.dbsession,
-                current_user=current_user,
-                config=context.app_config,
-            ).create_comment(
-                workspace=workspace,
-                parent=content,
-                content=f"<p>{self.wrap_in_mention_node(mention_recipient, str(author_id))} "
-                + f"- {self.config['message']}</p>",
-                do_save=True,
-                do_notify=True,
-            )
-        except Exception as e:
-            logger.error(self, f"VIDEO_ALERT_PLUGIN w/ ContentApi {e}")
-            return
+
+        ContentApi(
+            session=context.dbsession,
+            current_user=current_user,
+            config=context.app_config,
+        ).create_comment(
+            workspace=workspace,
+            parent=content,
+            content=f"<p>{self.wrap_in_mention_node(mention_recipient, str(author_id))} "
+            + f"- {self.config['message']}</p>",
+            do_save=False,
+            do_notify=False,
+        )
 
 
 def register_tracim_plugin(plugin_manager: PluginManager):
