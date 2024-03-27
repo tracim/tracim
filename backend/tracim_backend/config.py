@@ -27,7 +27,8 @@ from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.translation import translator_marker as _
-from tracim_backend.lib.utils.utils import CustomPropertiesValidator, DEFAULT_TRACIM_CONFIG_FILE
+from tracim_backend.lib.utils.utils import CustomPropertiesValidator
+from tracim_backend.lib.utils.utils import DEFAULT_TRACIM_CONFIG_FILE
 from tracim_backend.lib.utils.utils import get_build_version
 from tracim_backend.lib.utils.utils import get_cache_token
 from tracim_backend.lib.utils.utils import is_dir_exist
