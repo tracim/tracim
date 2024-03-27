@@ -101,9 +101,8 @@ class AppContextCommand(Command):
         return parser
 
     def changeDirectory(self) -> None:
-        filePath = os.path.dirname(__file__)
-        listDirectory = filePath.split("/")
-        if len(listDirectory) > 3 and listDirectory[-3] == "backend":
+        directoryPath = os.path.dirname(__file__)
+        if len(directoryPath) > 30 and directoryPath[-30:] == "backend/tracim_backend/command":
             os.chdir(os.path.dirname(__file__))
             os.chdir("../..")
         else:
