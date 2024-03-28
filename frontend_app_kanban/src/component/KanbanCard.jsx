@@ -6,7 +6,8 @@ import {
   CardPopup,
   DropdownMenu,
   IconButton,
-  Icon
+  Icon,
+  shouldUseLightTextColor
 } from 'tracim_frontend_lib'
 
 require('./KanbanCard.styl')
@@ -41,10 +42,12 @@ function KanbanCard (props) {
 
   return (
     <div
-      style={{ borderColor: props.card.bgColor || props.customColor }}
+      style={{ backgroundColor: props.card.bgColor || props.customColor }}
       className={classnames('kanban__contentpage__wrapper__board__card', {
         readOnly: props.readOnly,
-        buttonHidden: props.readOnly && props.hideButtonsWhenReadOnly
+        buttonHidden: props.readOnly && props.hideButtonsWhenReadOnly,
+        kanban__white__text__color: shouldUseLightTextColor(props.card.bgColor || props.customColor),
+        kanban__black__text__color: !shouldUseLightTextColor(props.card.bgColor || props.customColor)
       })}
     >
       <div className='kanban__contentpage__wrapper__board__card__title'>

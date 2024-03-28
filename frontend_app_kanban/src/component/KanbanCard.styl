@@ -5,8 +5,6 @@ cardWidth = 280px
 .kanban
   &__contentpage__wrapper__board__card
     width cardWidth
-    background-color offWhite
-    border 1px solid
     border-radius standardBorderRadius
     padding standardSpacing
     text-align start
@@ -76,3 +74,12 @@ cardWidth = 280px
         font-weight bold
         margin-top textSpacing
         color darkGrey1
+    .kanban__KanbanPopup
+      color offBlack
+  &__KanbanPopup__confirm
+    .iconbutton-primary-light:hover
+      background-color var(--primaryDarkColor)
+  &__white__text__color
+    color offWhite
+  &__black__text__color
+    color offBlack
