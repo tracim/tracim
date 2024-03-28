@@ -40,6 +40,7 @@ class PopinFixedContent extends React.Component {
           <div className={classnames('wsContentGeneric__content__left', `${props.customClass}__content__left`)}>
             <PopinFixedHeader
               actionList={props.actionList}
+              customActionList={props.customActionList}
               apiUrl={props.config.apiUrl}
               breadcrumbsList={props.breadcrumbsList}
               componentTitle={props.componentTitle}
@@ -152,6 +153,7 @@ export default translate()(PopinFixedContent)
 PopinFixedContent.propTypes = {
   loading: PropTypes.bool,
   actionList: PropTypes.array,
+  customActionList: PropTypes.array,
   appMode: PropTypes.string,
   availableStatuses: PropTypes.array,
   breadcrumbsList: PropTypes.array,
@@ -194,6 +196,7 @@ PopinFixedContent.propTypes = {
 
 PopinFixedContent.defaultProps = {
   actionList: [],
+  customActionList: [],
   appMode: APP_FEATURE_MODE.VIEW,
   availableStatuses: [],
   breadcrumbsList: [],

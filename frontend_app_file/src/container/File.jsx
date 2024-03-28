@@ -65,6 +65,20 @@ import FileProperties from '../component/FileProperties.jsx'
 
 const ACTION_EDIT = 'edit'
 
+// FIXME - CH - 2023-12-06 - This is hardcoded data for the POC of custom element in app's dropdown action list
+// It will be deleted
+// see https://github.com/tracim/tracim/issues/6315
+const pocCustomActionList = [{
+  icon: '',
+  image: 'https://www.datbim.com/wp-content/uploads/2021/09/connecteur-25.png',
+  label: {
+    fr: 'Ouvrir la maquette dans CiQo',
+    en: 'Open mockup in CiQo'
+  },
+  link: 'https://alliance-batiment.ciqo.eu/link-from-tracim?content_id={content.id}&space_id={content.workspace_id}&user_id={user.user_id}',
+  minimumRole: ROLE.reader.id
+}]
+
 export class File extends React.Component {
   constructor (props) {
     super(props)
@@ -1235,6 +1249,20 @@ export class File extends React.Component {
               dataCy: 'popinListItem__permanentlyDelete'
             }
           ]}
+          customActionList={pocCustomActionList.map(ca => ({
+            icon: ca.icon,
+            image: ca.image,
+            label: ca.label[state.translationTargetLanguageCode],
+            downloadLink: (function buildCustomActionLink (customAction, content, user) {
+              return customAction.link
+                .replace('{content.label}', content.label)
+                .replace('{content.id}', content.content_id)
+                .replace('{content.workspace_id}', content.workspace_id)
+                .replace('{user.user_id}', user.userId)
+            })(ca, state.content, state.loggedUser),
+            showAction: state.loggedUser.userRoleIdInWorkspace >= ca.minimumRole,
+            dataCy: 'popinListItem__customAction'
+          }))}
           appMode={state.mode}
           availableStatuses={state.config.availableStatuses}
           breadcrumbsList={state.breadcrumbsList}
