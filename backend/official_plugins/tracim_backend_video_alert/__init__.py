@@ -24,7 +24,7 @@ default_config = {
     # List of mimetypes that should bypass the blacklist.
     "whitelist": "video/mp4,video/webm",
     # List of mimetypes that should trigger a warning
-    "blacklist": "video/,image/gif",
+    "blacklist": "video/",
 }
 
 # --- UTILS ---
@@ -173,6 +173,7 @@ class VideoAlertPlugin:
         except Exception as e:
             logger.error(self, f"VIDEO_ALERT_PLUGIN w/ ContentApi {e}")
             return
+
 
 def register_tracim_plugin(plugin_manager: PluginManager):
     plugin_manager.register(VideoAlertPlugin())

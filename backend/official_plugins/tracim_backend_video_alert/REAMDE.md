@@ -27,7 +27,7 @@ plugin.video_alert.username =
 # List of mimetypes that should bypass the blacklist.
 plugin.video_alert.whitelist = video/mp4,video/webm
 # List of mimetypes that should trigger a warning
-plugin.video_alert.blacklist = video/,image/gif
+plugin.video_alert.blacklist = video/
 ```
 
 Environment variables follow tracim's configuration system:
@@ -35,5 +35,5 @@ Environment variables follow tracim's configuration system:
 TRACIM_PLUGIN__VIDEO_ALERT__MESSAGE="Automatic message: the file format used is not compatible with integrated playback. Please prefer mp4 or webm format."
 TRACIM_PLUGIN__VIDEO_ALERT__USERNAME=""
 TRACIM_PLUGIN__VIDEO_ALERT__WHITELIST="video/mp4,video/webm"
-TRACIM_PLUGIN__VIDEO_ALERT__BLACKLIST="video/,image/gif"
+TRACIM_PLUGIN__VIDEO_ALERT__BLACKLIST="video/"
 ```
