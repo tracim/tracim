@@ -130,8 +130,6 @@ class VideoAlertPlugin:
         Add a comment to the content if it is a video and not a mp4 file.
         """
 
-        # NOTE - M.L. - 2024-03-22 - This delay is required to not trigger the plugin before the
-        #  backend has finished processing the content. Creating errors on the frontend
         if not self.is_content_supported(content):
             return
 
@@ -154,19 +152,27 @@ class VideoAlertPlugin:
         author_id = content.author.user_id
         mention_recipient = content.author.username
 
-        ContentApi(
-            session=context.dbsession,
-            current_user=current_user,
-            config=context.app_config,
-        ).create_comment(
-            workspace=workspace,
-            parent=content,
-            content=f"<p>{self.wrap_in_mention_node(mention_recipient, str(author_id))} "
-            + f"- {self.config['message']}</p>",
-            do_save=False,
-            do_notify=False,
-        )
-
+        try:
+            ContentApi(
+                session=context.dbsession,
+                current_user=current_user,
+                config=context.app_config,
+            ).create_comment(
+                workspace=workspace,
+                parent=content,
+                content=f"<p>{self.wrap_in_mention_node(mention_recipient, str(author_id))} "
+                + f"- {self.config['message']}</p>",
+                do_save=False,
+                do_notify=False,
+            )
+        # TODO - M.L - 2024-03-28 - Currently, raising / delegating the exception cancels the whole
+        #  content modification. This is not the desired behavior. tracim should be able to
+        #  handle (log) the plugins raised exceptions and resume the content modification.
+        #  Plugins should not be able to cancel the content modification unless desired.
+        #  see: https://github.com/tracim/tracim/issues/6419
+        except Exception as e:
+            logger.error(self, f"VIDEO_ALERT_PLUGIN w/ ContentApi {e}")
+            return
 
 def register_tracim_plugin(plugin_manager: PluginManager):
     plugin_manager.register(VideoAlertPlugin())
