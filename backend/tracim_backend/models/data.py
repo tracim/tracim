@@ -74,7 +74,9 @@ class WorkspaceAccessType(enum.Enum):
 class EmailNotificationType(enum.Enum):
     INDIVIDUAL = "individual"
     NONE = "none"
-    SUMMARY = "summary"
+    HOURLY = "hourly"
+    DAILY = "daily"
+    WEEKLY = "weekly"
 
 
 class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeBase):
@@ -294,7 +296,7 @@ class UserWorkspaceConfig(DeclarativeBase):
     email_notification_type = Column(
         Enum(EmailNotificationType),
         nullable=False,
-        server_default=EmailNotificationType.SUMMARY.name,
+        server_default=EmailNotificationType.DAILY.name,
     )
 
     workspace = relationship(

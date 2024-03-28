@@ -774,7 +774,7 @@ class CFG(object):
         # EMAIL related stuff (notification, reply)
         ##
         self.EMAIL__NOTIFICATION__TYPE_ON_INVITATION = str(
-            self.get_raw_config("email.notification.type_on_invitation", "summary")
+            self.get_raw_config("email.notification.type_on_invitation", "daily")
         )
 
         # TODO - G.M - 2019-04-05 - keep as parameters

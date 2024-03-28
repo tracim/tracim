@@ -155,7 +155,7 @@ class WorkspaceApi(object):
                 self._user,
                 workspace,
                 UserWorkspaceConfig.WORKSPACE_MANAGER,
-                email_notification_type=EmailNotificationType.SUMMARY,
+                email_notification_type=EmailNotificationType.DAILY,
                 flush=False,
             )
         self._session.add(workspace)
@@ -257,7 +257,7 @@ class WorkspaceApi(object):
             self._user,
             workspace,
             workspace.default_user_role.level,
-            email_notification_type=EmailNotificationType.SUMMARY,
+            email_notification_type=EmailNotificationType.DAILY,
         )
         return workspace
 

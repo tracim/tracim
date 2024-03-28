@@ -1,6 +1,7 @@
 import abc
 import contextlib
 from datetime import datetime
+import enum
 from sqlakeyset import Page
 from sqlakeyset import get_page
 from sqlalchemy import and_
@@ -327,8 +328,10 @@ class EventApi:
             include_event_types=[event_type] if event_type is not None else None,
             read_status=read_status,
         )
+
         if created_after:
             query = query.filter(Event.created >= created_after)
+
         if email_notification_type is not None:
             query = (
                 query.filter(UserWorkspaceConfig.workspace_id == Event.workspace_id)
@@ -411,7 +414,10 @@ class EventApi:
         query = query.filter(UserWorkspaceConfig.workspace_id == Event.workspace_id)
         query = query.filter(UserWorkspaceConfig.user_id == user_id)
         query = query.filter(
-            UserWorkspaceConfig.email_notification_type == EmailNotificationType.SUMMARY
+            UserWorkspaceConfig.email_notification_type != EmailNotificationType.NONE
+        )
+        query = query.filter(
+            UserWorkspaceConfig.email_notification_type != EmailNotificationType.INDIVIDUAL
         )
 
         # INFO - MP - 2023-03-14 - Filtering entity type WORKSPACE_MEMBER.MODIFIED because we want

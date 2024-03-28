@@ -586,7 +586,7 @@ website.usage_conditions =
 ## - 'individual': send a mail for every notification received
 ## - 'none': doesn't send any mail
 ## NB: new users will not being notified until they login to Tracim a first time
-; email.notification.type_on_invitation = summary
+; email.notification.type_on_invitation = daily
 # You can enable notification-specific logs using the 'tracim_email_notification' logger.
 
 
