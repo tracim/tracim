@@ -27,9 +27,9 @@ website.base_url = https://mysuperdomainame.ndd
 To be able to use tracimcli from any directory, you can define the path to the configuration file with the environment variable `TRACIM_CONFIG__FILEPATH`.
 Note that despite being present in the configuration spec, this variable is evaluated by the tracimcli before being parsed by the configuration parser.
 
-This means that you can use it in the env to define the path to the configuration file, but you can't use it in the configuration file to define the path to the configuration file itself.
-
 ```bash
+TRACIM_CONFIG__FILEPATH="/path/of/config/file/development.ini
+```
 
 ## Serve Tracim frontend from another URL
 
