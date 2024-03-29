@@ -6,13 +6,6 @@ It works by checking the mimetype of the file and comparing it to a whitelist an
 If the mimetype is in the blacklist, a comment is added to the file. The whitelist is used to bypass the blacklist.
 Both lists are comma-separated lists of mimetypes. They can be used as a prefix system (i.e. `video/` will match all video files).
 
-## Installation
-```bash
-# from backend directory
-mkdir plugins
-cd plugins
-ln -s ../official_plugins/tracim_backend_video_alert .
-```
 
 ## Configuration
 
