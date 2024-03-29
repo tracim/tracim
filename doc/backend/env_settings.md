@@ -27,6 +27,7 @@ To update the list below you will need to:
 | TRACIM_USER__PROFILE__READ_ONLY_FIELDS_INTERNAL                           | user.profile.read_only_fields.internal                         | USER__PROFILE__READ_ONLY_FIELDS__INTERNAL                          |
 | TRACIM_REMOTE_USER_HEADER                                                 | remote_user_header                                             | REMOTE_USER_HEADER                                                 |
 | TRACIM_API__KEY                                                           | api.key                                                        | API__KEY                                                           |
+| TRACIM_CONFIG__FILEPATH                                                   | config.filepath                                                | CONFIG__FILEPATH                                                   |
 | TRACIM_SESSION__TYPE                                                      | session.type                                                   | SESSION__TYPE                                                      |
 | TRACIM_SESSION__URL                                                       | session.url                                                    | SESSION__URL                                                       |
 | TRACIM_SESSION__DATA_DIR                                                  | session.data_dir                                               | SESSION__DATA_DIR                                                  |
