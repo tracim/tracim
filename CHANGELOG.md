@@ -9,10 +9,10 @@
 - Add functionality to transform news into thread
 - The cache of the browser used now saves the states of the navigation sidebar. Hidden sub-spaces will stay hidden.
 - Spaces in sidebar are now sorted without considering emoji
-- Kanban card color is now the background of the card instead of the border and default text color adapt to the background color.
+- Kanban card color is now the background of the card instead of the border. The text color will adapt to the background color in order to stay legible.
 - Tracimcli can now be used in docker container without specifying config file path.
 - New plugins available:
-  - Send an alert message if a video is posted in an unsupported format by frontend's video preview. You need to activate this plugin `tracim_backend_video_alert` (documentation available [here](backend/official_plugins/tracim_backend_video_alert/README.md))
+  - If a video is uploaded in a format not supported by frontend's video preview, tracim will post an alert message in the comments of the file. You need to activate and set the plugin `tracim_backend_video_alert` (documentation available [here](backend/official_plugins/tracim_backend_video_alert/README.md))
 
 ### 🐛 Fixed Issues
 
