@@ -28,7 +28,7 @@ import {
   sendGlobalFlashMessage
 } from 'tracim_frontend_lib'
 
-import { KANBAN_MIME_TYPE, KANBAN_FILE_EXTENSION } from '../helper.js'
+import { KANBAN_MIME_TYPE, KANBAN_FILE_EXTENSION, KANBAN_DEFAULT_BACKGROUND_COLOR } from '../helper.js'
 import KanbanCard from './KanbanCard.jsx'
 import KanbanCardEditor from './KanbanCardEditor.jsx'
 import KanbanColumnEditor from './KanbanColumnEditor.jsx'
@@ -400,6 +400,7 @@ export class Kanban extends React.Component {
                 // End of required props ///////////////////////////////////////
                 codeLanguageList={props.config.system.config.ui__notes__code_sample_languages}
                 customColor={props.config.hexcolor}
+                defaultBackgroundColor={KANBAN_DEFAULT_BACKGROUND_COLOR}
                 focusOnDescription={state.editedCardInfos.focusOnDescription}
                 language={props.language}
                 memberList={props.config.workspace.memberList}
