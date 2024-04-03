@@ -6,7 +6,7 @@ import {
   PAGE,
   ROLE_LIST
 } from 'tracim_frontend_lib'
-import EmailNotificationTypeButton from '../EmailNotificationTypeButton.jsx'
+import EmailNotificationTypeButton from '../EmailNotificationTypeButton/EmailNotificationTypeButton.jsx'
 import { EMAIL_NOTIFICATION_TYPE } from '../../util/helper'
 
 require('./UserStatus.styl')
@@ -19,46 +19,66 @@ export const UserStatus = props => {
 
   return (
     <div className='userstatus'>
-      <div className='userstatus__role'>
-        {props.t('Your role:')}
-        <Icon
-          color={myRole.hexcolor}
-          customClass='userstatus__role__icon'
-          icon={myRole.faIcon}
-          title={props.t('Your role in the space')}
-        />
-        <div className='userstatus__role__text' title={props.t('Your role in the space')}>
-          {props.t(myRole.label)}
+      <div className='userstatus__item role'>
+        <div className='userstatus__item__label'>
+          {props.t('Your role:')}
+        </div>
+
+        <div className='userstatus__item__value'>
+          <Icon
+            color={myRole.hexcolor}
+            customClass='role__icon'
+            icon={myRole.faIcon}
+            title={props.t('Your role in the space')}
+          />
+          <div className='userstatus__role__text' title={props.t('Your role in the space')}>
+            {props.t(myRole.label)}
+          </div>
         </div>
       </div>
 
-      <div className='userstatus__informations'>
-        {props.displayNotifBtn && (
-          <EmailNotificationTypeButton
-            onClickChangeEmailNotificationType={props.onClickChangeEmailNotificationType}
-            currentEmailNotificationType={mySelf.emailNotificationType}
-          />
-        )}
+      <div className='userstatus__item emailNotification'>
+        <div className='userstatus__item__label'>
+          {props.t('Email notification:')}
+        </div>
 
-        {props.displaySubscriptionRequestsInformation && (
-          <Link
-            className='userstatus__informations__requests'
-            to={PAGE.WORKSPACE.ADVANCED_DASHBOARD(props.currentWorkspace.id)}
-          >
-            <Icon
-              icon='fas fa-sign-in-alt'
-              title={props.t('{{newRequests}} new requests', {
-                newRequests: props.newSubscriptionRequestsNumber
-              })}
+        <div className='userstatus__item__value emailNotification__value'>
+          {props.displayNotifBtn && (
+            <EmailNotificationTypeButton
+              onClickChangeEmailNotificationType={props.onClickChangeEmailNotificationType}
+              currentEmailNotificationType={mySelf.emailNotificationType}
             />
-            <div>
-              {props.t('{{newRequests}} new requests', {
-                newRequests: props.newSubscriptionRequestsNumber
-              })}
-            </div>
-          </Link>
-        )}
+          )}
+        </div>
       </div>
+
+      {props.displaySubscriptionRequestsInformation && (
+        <div className='userstatus__item spaceAccessRequest'>
+          <div className='userstatus__item__label'>
+            {props.t('Access request:')}
+          </div>
+
+          <div className='userstatus__item__value'>
+            <Link
+              className='spaceAccessRequest__link'
+              to={PAGE.WORKSPACE.ADVANCED_DASHBOARD(props.currentWorkspace.id)}
+            >
+              <Icon
+                icon='fas fa-sign-in-alt'
+                customClass='spaceAccessRequest__link__icon'
+                title={props.t('{{newRequests}} new requests', {
+                  newRequests: props.newSubscriptionRequestsNumber
+                })}
+              />
+              <div>
+                {props.t('{{newRequests}} new requests', {
+                  newRequests: props.newSubscriptionRequestsNumber
+                })}
+              </div>
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

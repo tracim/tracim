@@ -1,0 +1,28 @@
+@import "~tracim_frontend_lib/src/css/Variable.styl"
+
+.EmailNotificationTypeButton
+  display flex
+  flex-direction row
+  flex-wrap nowrap
+  flex-grow 1
+  justify-content space-between
+  &__label
+    font-size standardFontSize
+    margin-right 5px
+  &__dropdown
+    & > span
+      font-weight bold
+    &__subdropdown
+      &__wrapper
+        padding 0
+      &__item
+        display flex
+        justify-content space-between
+        flex-grow 1
+        padding 10px
+
+// INFO - CH - 2024-04-03 - defining style for less than 412px to avoid having the button to hide the helper
+// popover on small devices
+@media (max-width: 412px)
+  .EmailNotificationTypeButton
+    flex-direction row-reverse
