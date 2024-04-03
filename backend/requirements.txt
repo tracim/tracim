@@ -239,13 +239,13 @@ pytz==2021.1
     # via
     #   babel
     #   pysaml2
-pyyaml==5.4.1
+pyyaml>=6.0.0
     # via
     #   cliff
     #   hapic
     #   tracim-backend (setup.py)
     #   wsgidav
-pyzmq==22.1.0
+pyzmq>=25.1.2
     # via tracim-backend (setup.py)
 radicale==3.1.0
     # via tracim-backend (setup.py)
