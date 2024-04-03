@@ -20,7 +20,7 @@ FROM base_install AS main
     # tested python versions
 
 RUN \
-    ./concourse/scripts/install_backend_python 3.7.11 3.8.11 3.9.6 && \
+    ./concourse/scripts/install_backend_python 3.9.19 3.10.14 3.11.9 && \
     # frontend dependencies
     ./install_frontend_dependencies.sh root && \
     # cypress
