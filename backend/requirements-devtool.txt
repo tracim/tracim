@@ -1,7 +1,7 @@
 # Devtools
 flake8==6.0.0
 isort==v5.10.1
-mypy==0.770
+mypy==1.9.0
 pre-commit==2.18.1
 black==23.3.0
 flake8-black==0.3.6
