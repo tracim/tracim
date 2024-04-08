@@ -18,7 +18,8 @@ const options = {
       ecmaVersion: 11, // defaults to 10
       sourceType: 'module' // defaults to 'module'
       // Check out https://github.com/acornjs/acorn/tree/master/acorn#interface for additional options
-    }
+    },
+    supportBasicHtmlNodes: false
   },
   lngs: ['en', 'fr', 'pt', 'de', 'ar', 'es', 'nb_NO'],
   defaultLng: 'en',
