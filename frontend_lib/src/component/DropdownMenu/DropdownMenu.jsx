@@ -36,7 +36,7 @@ const DropdownMenu = props => {
         className={classnames('dropdownMenu dropdown-menu', props.menuCustomClass)}
         data-cy='dropdownMenu_items'
       >
-        {props.children.length > 1
+        {(props.children.length > 1
           ? props.children.map(child => child && (
             <DropdownMenuItem customClass={props.itemCustomClass} key={child.key}>
               {child}
@@ -47,7 +47,7 @@ const DropdownMenu = props => {
               {props.children}
             </DropdownMenuItem>
           )
-        }
+        )}
       </div>
     </div>
   )
