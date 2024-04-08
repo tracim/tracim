@@ -390,18 +390,29 @@ msgstr "Muchas gracias"
 msgid "{username} (through tracim)"
 msgstr "{username} (a través de Tracim)"
 
-#: tracim_backend/templates/mail/summary_body_html.mak:7
-msgid "Here is the list of your unread mentions in the last 24h:"
-msgstr "Aquí tiene la lista de sus menciones no leídas en las últimas 24h:"
-
 #: tracim_backend/templates/mail/summary_body_html.mak:24
 msgid "{author} mentioned you in"
 msgstr "{autor} le mencionó en"
 
+#: tracim_backend/templates/mail/summary_body_html.mak:7
+msgid "Here is the summary of your unread notifications {email_notification_type_string}:"
+msgstr "Aquí tiene el resumen de sus notificaciones no leídas "
+
 #: tracim_backend/templates/mail/summary_body_html.mak:32
-msgid "Here is the summary of your unread notifications in the last 24h:"
-msgstr ""
-"Aquí tiene el resumen de sus notificaciones no leídas en las últimas 24h:"
+msgid "Here is the list of your unread mentions {email_notification_type_string}:"
+msgstr "Aquí tiene la lista de sus menciones no leídas"
+
+#: tracim_backend/models/data.py:100
+msgid "in the last hour"
+msgstr "en la última hora"
+
+#: tracim_backend/models/data.py:102
+msgid "in the last day"
+msgstr "en el ultimo dia"
+
+#: tracim_backend/models/data.py:104
+msgid "in the last week"
+msgstr "en la ultima semana"
 
 # | msgid "{event_count} events in the space"
 #: tracim_backend/templates/mail/summary_body_html.mak:36
