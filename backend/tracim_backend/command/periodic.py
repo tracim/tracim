@@ -147,8 +147,6 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
                 continue
 
             try:
-                print("email_notification_type_for_template")
-                print(email_notification_type_for_template)
                 context = {
                     "user": user,
                     "mentions": mentions,
@@ -161,14 +159,13 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
                     fallback_lang=config.DEFAULT_LANG,
                 )
                 body = SendMailSummariesCommand._render_template(config, context, translator)
-                print(body)
-                # SendMailSummariesCommand._send_mail(
-                #     config=config,
-                #     translator=translator,
-                #     user_mail=user.email,
-                #     user_lang=user.lang,
-                #     body=body,
-                # )
+                SendMailSummariesCommand._send_mail(
+                    config=config,
+                    translator=translator,
+                    user_mail=user.email,
+                    user_lang=user.lang,
+                    body=body,
+                )
                 mail_sent += 1
             except Exception:
                 mail_not_sent += 1

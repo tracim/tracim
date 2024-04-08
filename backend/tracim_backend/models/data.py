@@ -53,7 +53,6 @@ from tracim_backend.exceptions import WorkspaceFeatureDisabled
 from tracim_backend.lib.utils.app import TracimContentType
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import get_locale
-from tracim_backend.lib.utils.translation import translator_marker as _
 from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.mixins import CreationDateMixin
