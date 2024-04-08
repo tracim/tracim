@@ -117,26 +117,26 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
         event_api = EventApi(current_user=None, session=session, config=config)
         user_api = UserApi(current_user=None, session=session, config=config)
 
-        if parsed_args.email_notification_type == EmailNotificationType.HOURLY:
-            hour_delta = 1
-        elif parsed_args.email_notification_type == EmailNotificationType.DAILY:
-            hour_delta = 24
-        elif parsed_args.email_notification_type == EmailNotificationType.WEEKLY:
-            hour_delta = 168
-        else:
-            hour_delta = 24
+        notification_type = EmailNotificationType(parsed_args.email_notification_type)
+
+        hour_delta = notification_type.get_hours_delta()
         created_after = datetime.utcnow() - timedelta(hours=hour_delta)
+
+        translator = Translator(config)
 
         for user in user_api.get_all():
             if not user.can_receive_summary_mail():
                 continue
+
+            email_notification_type_for_template = notification_type.to_string(
+                user.lang, translator
+            )
 
             mentions = event_api.get_messages_for_user(
                 user.user_id,
                 created_after=created_after,
                 event_type=EventTypeDatabaseParameters.from_event_type("mention.created"),
                 read_status=ReadStatus.UNREAD,
-                email_notification_type=parsed_args.email_notification_type,
             )
             notification_summary = event_api.get_unread_messages_summary(
                 user.user_id,
@@ -147,10 +147,13 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
                 continue
 
             try:
+                print("email_notification_type_for_template")
+                print(email_notification_type_for_template)
                 context = {
                     "user": user,
                     "mentions": mentions,
                     "notification_summary": notification_summary,
+                    "email_notification_type_string": email_notification_type_for_template,
                 }
                 translator = Translator(
                     app_config=config,
@@ -158,13 +161,14 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
                     fallback_lang=config.DEFAULT_LANG,
                 )
                 body = SendMailSummariesCommand._render_template(config, context, translator)
-                SendMailSummariesCommand._send_mail(
-                    config=config,
-                    translator=translator,
-                    user_mail=user.email,
-                    user_lang=user.lang,
-                    body=body,
-                )
+                print(body)
+                # SendMailSummariesCommand._send_mail(
+                #     config=config,
+                #     translator=translator,
+                #     user_mail=user.email,
+                #     user_lang=user.lang,
+                #     body=body,
+                # )
                 mail_sent += 1
             except Exception:
                 mail_not_sent += 1

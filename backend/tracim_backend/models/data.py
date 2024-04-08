@@ -53,6 +53,7 @@ from tracim_backend.exceptions import WorkspaceFeatureDisabled
 from tracim_backend.lib.utils.app import TracimContentType
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import get_locale
+from tracim_backend.lib.utils.translation import translator_marker as _
 from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.mixins import CreationDateMixin
@@ -77,6 +78,30 @@ class EmailNotificationType(enum.Enum):
     HOURLY = "hourly"
     DAILY = "daily"
     WEEKLY = "weekly"
+
+    def get_hours_delta(self) -> Optional[int]:
+        if self == self.INDIVIDUAL:
+            return None
+        if self == self.NONE:
+            return None
+        if self == self.HOURLY:
+            return 1
+        if self == self.DAILY:
+            return 24
+        if self == self.WEEKLY:
+            return 168
+
+    def to_string(self, lang, translator) -> Optional[str]:
+        if self == self.INDIVIDUAL:
+            return None
+        if self == self.NONE:
+            return None
+        if self == self.HOURLY:
+            return translator.get_translation("in the last hour", lang)
+        if self == self.DAILY:
+            return translator.get_translation("in the last day", lang)
+        if self == self.WEEKLY:
+            return translator.get_translation("in the last week", lang)
 
 
 class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeBase):
