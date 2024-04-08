@@ -30,11 +30,13 @@ export const EmailNotificationTypeButton = props => {
         isButton
       >
         {notificationTimingList.map(timing =>
-          <div className='EmailNotificationTypeButton__dropdown__subdropdown__wrapper'>
+          <div
+            className='EmailNotificationTypeButton__dropdown__subdropdown__wrapper'
+            key={timing.value}
+          >
             <div
               className='EmailNotificationTypeButton__dropdown__subdropdown__item'
               onClick={() => props.onClickChangeEmailNotificationType(timing.value)}
-              key={timing.value}
             >
               <button className='transparentButton' key={timing.value}>
                 {timing.label}
@@ -78,10 +80,10 @@ export default translate()(EmailNotificationTypeButton)
 
 EmailNotificationTypeButton.propTypes = {
   currentEmailNotificationType: PropTypes.string,
-  onClickChangeEmailNotificationType: PropTypes.func,
+  onClickChangeEmailNotificationType: PropTypes.func
 }
 
 EmailNotificationTypeButton.defaultProps = {
   currentEmailNotificationType: EMAIL_NOTIFICATION_TYPE.NONE,
-  onClickChangeEmailNotificationType: () => {},
+  onClickChangeEmailNotificationType: () => {}
 }

@@ -1,7 +1,6 @@
 import abc
 import contextlib
 from datetime import datetime
-import enum
 from sqlakeyset import Page
 from sqlakeyset import get_page
 from sqlalchemy import and_

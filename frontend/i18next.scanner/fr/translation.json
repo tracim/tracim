@@ -624,5 +624,14 @@
   "Labeling the news": "Nommer l'actualité",
   "Publish without title": "Publier sans titre",
   "Turn into thread": "Transformer en discussion",
-  "Copy news link": "Copier le lien de l'actualité"
+  "Copy news link": "Copier le lien de l'actualité",
+  "Access request:": "Demande d'accès",
+  "Individual": "Individuelle",
+  "Hourly": "Par heure",
+  "Weekly": "Hebdomadaire",
+  "You will receive an email for each event.<br/>Use this setting when you need to be informed of <i>everything that happens</i>.<br/>Warning: this might result in a lot of e-mails.": "Vous recevrez un e-mail pour chaque événement.<br/>Utilisez cette option pour rester informé de <i>tout ce qui se passe</i>.<br/>Attention : cela peut générer beaucoup d'e-mails.",
+  "You'll <i>receive a hourly e-mail</i> summarizing everything you haven't already read.<br/>There will be a single email for all spaces configured as \"Hourly\".": "Vous <i>recevrez un e-mail par heure</i> résumant tout ce que vous n'avez pas déjà lu.<br/>Il n'y aura qu'un seul e-mail pour tous les espaces configurés en \"Par heure\".",
+  "You'll <i>receive a daily e-mail</i> summarizing everything you haven't already read.<br/>There will be a single email for all spaces configured as \"Daily\".": "Vous <i>recevrez un e-mail par jour</i> résumant tout ce que vous n'avez pas déjà lu.<br/>Il n'y aura qu'un seul e-mail pour tous les espaces configurés en \"Quotidien\".",
+  "You'll <i>receive a weekly e-mail</i> summarizing everything you haven't already read.<br/>There will be a single email for all spaces configured as \"Weekly\".": "Vous <i>recevrez un e-mail par semaine</i> résumant tout ce que vous n'avez pas déjà lu.<br/>Il n'y aura qu'un seul e-mail pour tous les espaces configurés en \"Hebdomadaire\".",
+  "You'll receive no e-mail notifications, even if you are mentioned.<br/>You'll need to rely on recent activities and the notification wall to stay up to date.": "Vous ne recevrez aucun e-mail de notification, même si vous êtes mentionné.<br/>Vous devrez utiliser les activités récentes et le mur de notification pour rester à jour."
 }

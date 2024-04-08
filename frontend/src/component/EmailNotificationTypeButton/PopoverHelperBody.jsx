@@ -1,114 +1,51 @@
 import React from 'react'
-import { translate } from 'react-i18next'
+import { translate, Trans } from 'react-i18next'
 import { EMAIL_NOTIFICATION_TYPE } from '../../util/helper.js'
 import { Popover } from 'tracim_frontend_lib'
 
 require('./PopoverHelperBody.styl')
 
-export const PopoverHelperBodySplit = translate()(props => {
-  return (
-    <>
-      <Popover
-        targetId={`popoverEmailNotificationTypeButtonHelper__${EMAIL_NOTIFICATION_TYPE.INDIVIDUAL}`}
-        placement='auto'
-        trigger='click'
-        popoverBody={
-          <div className='PopoverHelperBody'>
-            <div className='PopoverHelperBody__section'>
-              <div className='PopoverHelperBody__section__label'>
-                {props.t('All')}
-              </div>
-              <div className='PopoverHelperBody__section__description'>
-                {props.t('One mail will be sent for each event of the space.')}<br />
-                {props.t('Use this setting for spaces where you need to be kept informed of everything that happens.')}<br />
-                {props.t('Be careful: this might result in a lot of e-mails. We advise you to pair this feature with filters and/or folders in your mailbox.')}
-              </div>
-            </div>
-          </div>
-        }
-      />
+const PopoverHelperBodyMessageIndividual = translate()(() => (
+  <Trans>
+    You will receive an email for each event.<br />
+    Use this setting when you need to be informed of <i>everything that happens</i>.<br />
+    Warning: this might result in a lot of e-mails.
+  </Trans>
+))
 
-      <Popover
-        targetId={`popoverEmailNotificationTypeButtonHelper__${EMAIL_NOTIFICATION_TYPE.WEEKLY}`}
-        placement='auto'
-        trigger='click'
-        popoverBody={
-          <div className='PopoverHelperBody'>
-            <div className='PopoverHelperBody__section'>
-              <div className='PopoverHelperBody__section__label'>
-                {props.t('Weekly')}
-              </div>
-              <div className='PopoverHelperBody__section__description'>
-                {props.t('TODO')}
-              </div>
-            </div>
-          </div>
-        }
-      />
+const PopoverHelperBodyMessageHourly = translate()(() => (
+  <Trans>
+    You'll <i>receive a hourly e-mail</i> summarizing everything you haven't already read.<br />
+    There will be a single email for all spaces configured as "Hourly".
+  </Trans>
+))
 
-      <Popover
-        targetId={`popoverEmailNotificationTypeButtonHelper__${EMAIL_NOTIFICATION_TYPE.DAILY}`}
-        placement='auto'
-        trigger='click'
-        popoverBody={
-          <div className='PopoverHelperBody'>
-            <div className='PopoverHelperBody__section'>
-              <div className='PopoverHelperBody__section__label'>
-                {props.t('Daily')}
-              </div>
-              <div className='PopoverHelperBody__section__description'>
-                {props.t('One mail will be sent every 24 hours with a daily digest of all actions in this space.')}
-                {props.t("No matter how many spaces are set to 'Daily', only one mail will be sent. This daily mail will include all notifications (including mentions) you haven't read in the last 24h for each space set to 'Daily'.")}
-              </div>
-            </div>
-          </div>
-        }
-      />
+const PopoverHelperBodyMessageDaily = translate()(() => (
+  <Trans>
+    You'll <i>receive a daily e-mail</i> summarizing everything you haven't already read.<br />
+    There will be a single email for all spaces configured as "Daily".
+  </Trans>
+))
 
-      <Popover
-        targetId={`popoverEmailNotificationTypeButtonHelper__${EMAIL_NOTIFICATION_TYPE.HOURLY}`}
-        placement='auto'
-        trigger='click'
-        popoverBody={
-          <div className='PopoverHelperBody'>
-            <div className='PopoverHelperBody__section'>
-              <div className='PopoverHelperBody__section__label'>
-                {props.t('Hourly')}
-              </div>
-              <div className='PopoverHelperBody__section__description'>
-                {props.t('TODO')}
-              </div>
-            </div>
-          </div>
-        }
-      />
+const PopoverHelperBodyMessageWeekly = translate()(() => (
+  <Trans>
+    You'll <i>receive a weekly e-mail</i> summarizing everything you haven't already read.<br />
+    There will be a single email for all spaces configured as "Weekly".
+  </Trans>
+))
 
-      <Popover
-        targetId={`popoverEmailNotificationTypeButtonHelper__${EMAIL_NOTIFICATION_TYPE.NONE}`}
-        placement='auto'
-        trigger='click'
-        popoverBody={
-          <div className='PopoverHelperBody'>
-            <div className='PopoverHelperBody__section'>
-              <div className='PopoverHelperBody__section__label'>
-                {props.t('None')}
-              </div>
-              <div className='PopoverHelperBody__section__description'>
-                {props.t("No notification for this space will be sent by mail. You will have to rely solely on Tracim's notifications wall.")}
-              </div>
-            </div>
-          </div>
-        }
-      />
-    </>
-  )
-})
+const PopoverHelperBodyMessageNone = translate()(() => (
+  <Trans>
+    You'll receive no e-mail notifications, even if you are mentioned.<br />
+    You'll need to rely on recent activities and the notification wall to stay up to date.
+  </Trans>
+))
 
-export const PopoverHelperBodySingle = translate()(props => {
-  return (
+export const PopoverHelperBodySplit = translate()(props => (
+  <>
     <Popover
-      targetId='popoverEmailNotificationTypeButtonHelper__single'
-      placement='left'
+      targetId={`popoverEmailNotificationTypeButtonHelper__${EMAIL_NOTIFICATION_TYPE.INDIVIDUAL}`}
+      placement='auto'
       trigger='click'
       popoverBody={
         <div className='PopoverHelperBody'>
@@ -117,50 +54,139 @@ export const PopoverHelperBodySingle = translate()(props => {
               {props.t('All')}
             </div>
             <div className='PopoverHelperBody__section__description'>
-              {props.t('One mail will be sent for each event of the space.')}<br />
-              {props.t('Use this setting for spaces where you need to be kept informed of everything that happens.')}<br />
-              {props.t('Be careful: this might result in a lot of e-mails. We advise you to pair this feature with filters and/or folders in your mailbox.')}
-            </div>
-          </div>
-
-          <div className='PopoverHelperBody__section'>
-            <div className='PopoverHelperBody__section__label'>
-              {props.t('Hourly')}
-            </div>
-            <div className='PopoverHelperBody__section__description'>
-              {props.t('TODO')}
-            </div>
-          </div>
-
-          <div className='PopoverHelperBody__section'>
-            <div className='PopoverHelperBody__section__label'>
-              {props.t('Daily')}
-            </div>
-            <div className='PopoverHelperBody__section__description'>
-              {props.t('One mail will be sent every 24 hours with a daily digest of all actions in this space.')}
-              {props.t("No matter how many spaces are set to 'Daily', only one mail will be sent. This daily mail will include all notifications (including mentions) you haven't read in the last 24h for each space set to 'Daily'.")}
-            </div>
-          </div>
-
-          <div className='PopoverHelperBody__section'>
-            <div className='PopoverHelperBody__section__label'>
-              {props.t('Weekly')}
-            </div>
-            <div className='PopoverHelperBody__section__description'>
-              {props.t('TODO')}<br />
-            </div>
-          </div>
-
-          <div className='PopoverHelperBody__section'>
-            <div className='PopoverHelperBody__section__label'>
-              {props.t('None')}
-            </div>
-            <div className='PopoverHelperBody__section__description'>
-              {props.t("No notification for this space will be sent by mail. You will have to rely solely on Tracim's notifications wall.")}
+              <PopoverHelperBodyMessageIndividual />
             </div>
           </div>
         </div>
       }
     />
-  )
-})
+
+    <Popover
+      targetId={`popoverEmailNotificationTypeButtonHelper__${EMAIL_NOTIFICATION_TYPE.HOURLY}`}
+      placement='auto'
+      trigger='click'
+      popoverBody={
+        <div className='PopoverHelperBody'>
+          <div className='PopoverHelperBody__section'>
+            <div className='PopoverHelperBody__section__label'>
+              {props.t('Hourly')}
+            </div>
+            <div className='PopoverHelperBody__section__description'>
+              <PopoverHelperBodyMessageHourly />
+            </div>
+          </div>
+        </div>
+      }
+    />
+
+    <Popover
+      targetId={`popoverEmailNotificationTypeButtonHelper__${EMAIL_NOTIFICATION_TYPE.DAILY}`}
+      placement='auto'
+      trigger='click'
+      popoverBody={
+        <div className='PopoverHelperBody'>
+          <div className='PopoverHelperBody__section'>
+            <div className='PopoverHelperBody__section__label'>
+              {props.t('Daily')}
+            </div>
+            <div className='PopoverHelperBody__section__description'>
+              <PopoverHelperBodyMessageDaily />
+            </div>
+          </div>
+        </div>
+      }
+    />
+
+    <Popover
+      targetId={`popoverEmailNotificationTypeButtonHelper__${EMAIL_NOTIFICATION_TYPE.WEEKLY}`}
+      placement='auto'
+      trigger='click'
+      popoverBody={
+        <div className='PopoverHelperBody'>
+          <div className='PopoverHelperBody__section'>
+            <div className='PopoverHelperBody__section__label'>
+              {props.t('Weekly')}
+            </div>
+            <div className='PopoverHelperBody__section__description'>
+              <PopoverHelperBodyMessageWeekly />
+            </div>
+          </div>
+        </div>
+      }
+    />
+
+    <Popover
+      targetId={`popoverEmailNotificationTypeButtonHelper__${EMAIL_NOTIFICATION_TYPE.NONE}`}
+      placement='auto'
+      trigger='click'
+      popoverBody={
+        <div className='PopoverHelperBody'>
+          <div className='PopoverHelperBody__section'>
+            <div className='PopoverHelperBody__section__label'>
+              {props.t('None')}
+            </div>
+            <div className='PopoverHelperBody__section__description'>
+              <PopoverHelperBodyMessageNone />
+            </div>
+          </div>
+        </div>
+      }
+    />
+  </>
+))
+
+export const PopoverHelperBodySingle = translate()(props => (
+  <Popover
+    targetId='popoverEmailNotificationTypeButtonHelper__single'
+    placement='left'
+    trigger='click'
+    popoverBody={
+      <div className='PopoverHelperBody'>
+        <div className='PopoverHelperBody__section'>
+          <div className='PopoverHelperBody__section__label'>
+            {props.t('All')}
+          </div>
+          <div className='PopoverHelperBody__section__description'>
+            <PopoverHelperBodyMessageIndividual />
+          </div>
+        </div>
+
+        <div className='PopoverHelperBody__section'>
+          <div className='PopoverHelperBody__section__label'>
+            {props.t('Hourly')}
+          </div>
+          <div className='PopoverHelperBody__section__description'>
+            <PopoverHelperBodyMessageHourly />
+          </div>
+        </div>
+
+        <div className='PopoverHelperBody__section'>
+          <div className='PopoverHelperBody__section__label'>
+            {props.t('Daily')}
+          </div>
+          <div className='PopoverHelperBody__section__description'>
+            <PopoverHelperBodyMessageDaily />
+          </div>
+        </div>
+
+        <div className='PopoverHelperBody__section'>
+          <div className='PopoverHelperBody__section__label'>
+            {props.t('Weekly')}
+          </div>
+          <div className='PopoverHelperBody__section__description'>
+            <PopoverHelperBodyMessageWeekly />
+          </div>
+        </div>
+
+        <div className='PopoverHelperBody__section'>
+          <div className='PopoverHelperBody__section__label'>
+            {props.t('None')}
+          </div>
+          <div className='PopoverHelperBody__section__description'>
+            <PopoverHelperBodyMessageNone />
+          </div>
+        </div>
+      </div>
+    }
+  />
+))
