@@ -9,15 +9,21 @@
 - Add functionality to transform news into thread
 - The cache of the browser used now saves the states of the navigation sidebar. Hidden sub-spaces will stay hidden.
 - Spaces in sidebar are now sorted without considering emoji
+- Kanban card color is now the background of the card instead of the border. The text color will adapt to the background color in order to stay legible.
+- Tracimcli can now be used in docker container without specifying config file path.
+- New plugins available:
+  - If a video is uploaded in a format not supported by frontend's video preview, tracim will post an alert message in the comments of the file. You need to activate and set the plugin `tracim_backend_video_alert` (documentation available [here](backend/official_plugins/tracim_backend_video_alert/README.md))
 
 ### 🐛 Fixed Issues
 
 - Frontend:
   - Improved responsiveness for workspace creation pop-in on small screen [#6358](https://github.com/tracim/tracim/issues/6358)
+  - Improved design and responsiveness when editing the title of a content [#6364](https://github.com/tracim/tracim/issues/6364)
   - Fixed filter input in notification wall overflow since last version of Firefox [#6375](https://github.com/tracim/tracim/issues/6375)
   - Fixed kanban title with special characters [#5220](https://github.com/tracim/tracim/issues/5220)
   - Renamed label "value" to "open field" in Kanban [#6354](https://github.com/tracim/tracim/issues/6354)
   - Fixed real time issues with kanban [#6363](https://github.com/tracim/tracim/issues/6363)
+  - Fixed performance issues with popup for news title [#6408](https://github.com/tracim/tracim/issues/6408)
 - Backend:
   - Fixed LDAP auth issues [#6355](https://github.com/tracim/tracim/issues/6355)
   - Fixed installation of SAML dependencies [#6365](https://github.com/tracim/tracim/issues/6365)

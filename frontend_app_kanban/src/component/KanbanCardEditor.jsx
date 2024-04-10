@@ -13,7 +13,7 @@ function KanbanCardEditor (props) {
 
   const [title, setTitle] = useState(card.title || '')
   const [description, setDescription] = useState(card.description || '')
-  const [bgColor, setBgColor] = useState(card.bgColor || props.customColor)
+  const [bgColor, setBgColor] = useState(card.bgColor || props.defaultBackgroundColor)
   const [deadline, setDeadline] = useState(card.deadline || '')
   const [freeInput, setFreeInput] = useState(card.freeInput || '')
 
@@ -124,6 +124,7 @@ KanbanCardEditor.propTypes = {
   card: PropTypes.object.isRequired,
   onValidate: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
+  defaultBackgroundColor: PropTypes.string.isRequired,
   // End of required props /////////////////////////////////////////////////////////////////////////
   codeLanguageList: PropTypes.array,
   customColor: PropTypes.string,

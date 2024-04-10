@@ -45,7 +45,9 @@ if TYPE_CHECKING:
     from tracim_backend.config import CFG
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
-DEFAULT_TRACIM_CONFIG_FILE = "development.ini"
+# NOTE - M.L - 2024-03-27 - Not using CFG since this variable used before the config is loaded
+#  This variable is still parsed by CFG to be consistent with other config variables
+DEFAULT_TRACIM_CONFIG_FILE = os.environ.get("TRACIM_CONFIG__FILEPATH", "development.ini")
 CONTENT_FRONTEND_URL_SCHEMA = "workspaces/{workspace_id}/contents/{content_type}/{content_id}"
 WORKSPACE_FRONTEND_URL_SCHEMA = "workspaces/{workspace_id}"
 FRONTEND_UI_SUBPATH = "ui"

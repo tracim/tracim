@@ -28,6 +28,7 @@ from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.translation import translator_marker as _
 from tracim_backend.lib.utils.utils import CustomPropertiesValidator
+from tracim_backend.lib.utils.utils import DEFAULT_TRACIM_CONFIG_FILE
 from tracim_backend.lib.utils.utils import get_build_version
 from tracim_backend.lib.utils.utils import get_cache_token
 from tracim_backend.lib.utils.utils import is_dir_exist
@@ -442,6 +443,9 @@ class CFG(object):
             self.USER__READ_ONLY_FIELDS[auth_type] = readonly_field_list
 
         self.REMOTE_USER_HEADER = self.get_raw_config("remote_user_header", None)
+        # NOTE - M.L - 2024-03-27 -  This variable is parsed by CFG despite not being used elsewhere
+        #  after configuration loading to be consistent with other config variables
+        self.CONFIG__FILEPATH = self.get_raw_config("config.filepath", DEFAULT_TRACIM_CONFIG_FILE)
 
         self.API__KEY = self.get_raw_config("api.key", "", secret=True)
         default_session_data_dir = self.here_macro_replace("%(here)s/sessions_data")
