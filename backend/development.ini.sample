@@ -582,9 +582,9 @@ website.usage_conditions =
 ; email.notification.activated = False
 ## you can change the type of email notification when a user is invited to a space by default.
 ## possible values are:
-## - 'hourly': send a hourly mail containing notification summary
-## - 'daily': send a daily mail containing notification summary
-## - 'weekly': send a weekly mail containing notification summary
+## - 'hourly': send a hourly mail containing unread notification in the last hour
+## - 'daily': send a daily mail containing unread notification in the last day
+## - 'weekly': send a weekly mail containing unread notification in the last week
 ## - 'individual': send a mail for every notification received
 ## - 'none': doesn't send any mail
 ## NB: new users will not being notified until they login to Tracim a first time

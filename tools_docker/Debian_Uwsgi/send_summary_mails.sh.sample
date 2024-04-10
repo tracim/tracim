@@ -8,4 +8,4 @@ if [ $1 != "hourly" ] && [ $1 != "daily" ] && [ $1 != "weekly" ]; then
   exit 0;
 fi
 
-<PATH TO tracimcli> periodic send-summary-mails -c <PATH TO development.ini> --email_notification_type $1
+tracimcli periodic send-summary-mails --email_notification_type $1
