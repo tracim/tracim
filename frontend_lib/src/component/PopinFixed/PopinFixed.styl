@@ -129,21 +129,26 @@
         &__emojiReaction
           order 1
           .EmojiReactions
-            flex-direction row-reverse
+            flex-direction row
         &__version
           order 2
           display flex
           white-space nowrap
-          &::before, &::after
+          &::before
             content '-'
             display block
-            margin 0 4px
+            margin 0 4px 0 0
         &__lastversion
           order 3
           margin-inline-start 5px
           font-weight bold
         &__selectStatus
           order 4
+          display flex
+          &::before
+            content '-'
+            display block
+            margin 0 4px
     &__right
       display flex
       transition width 0.4s ease
