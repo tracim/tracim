@@ -1552,7 +1552,7 @@ class WorkspaceSchema(WorkspaceWithoutDescriptionSchema):
 
 class EmailNotificationTypeSchema(marshmallow.Schema):
     email_notification_type = StrippedString(
-        example=EmailNotificationType.DAILY.name,
+        example=EmailNotificationType.default().name,
         description="Type of email notification for a specific space",
     )
 

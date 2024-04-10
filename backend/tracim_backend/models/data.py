@@ -78,6 +78,10 @@ class EmailNotificationType(enum.Enum):
     DAILY = "daily"
     WEEKLY = "weekly"
 
+    @classmethod
+    def default(cls) -> "EmailNotificationType":
+        return cls.DAILY
+
     def get_hours_delta(self) -> Optional[int]:
         if self == self.INDIVIDUAL:
             return None
@@ -320,7 +324,7 @@ class UserWorkspaceConfig(DeclarativeBase):
     email_notification_type = Column(
         Enum(EmailNotificationType),
         nullable=False,
-        server_default=EmailNotificationType.DAILY.name,
+        server_default=EmailNotificationType.default().name,
     )
 
     workspace = relationship(

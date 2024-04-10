@@ -1924,7 +1924,7 @@ class TestUserChangeEmailNotification(object):
             ("admin@admin.admin", "admin@admin.admin"),
         )
         params = {
-            "email_notification_type": EmailNotificationType.DAILY.value,
+            "email_notification_type": EmailNotificationType.default().value,
         }
         web_testapp.put_json(
             "/api/users/{user_id}/workspaces/{workspace_id}/email_notification_type".format(
@@ -1935,7 +1935,7 @@ class TestUserChangeEmailNotification(object):
         )
         user_workspace_config_api = user_workspace_config_api_factory.get()
         role = user_workspace_config_api.get_one(test_user.user_id, workspace.workspace_id)
-        assert role.email_notification_type == EmailNotificationType.DAILY
+        assert role.email_notification_type == EmailNotificationType.default()
 
     def test_api_change_email_notification__ok__200__user_itself(
         self,
@@ -1975,7 +1975,7 @@ class TestUserChangeEmailNotification(object):
         session.close()
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         params = {
-            "email_notification_type": EmailNotificationType.DAILY.value,
+            "email_notification_type": EmailNotificationType.default().value,
         }
         web_testapp.put_json(
             "/api/users/{user_id}/workspaces/{workspace_id}/email_notification_type".format(
@@ -1986,7 +1986,7 @@ class TestUserChangeEmailNotification(object):
         )
         user_workspace_config_api = user_workspace_config_api_factory.get()
         role = user_workspace_config_api.get_one(test_user.user_id, workspace.workspace_id)
-        assert role.email_notification_type == EmailNotificationType.DAILY
+        assert role.email_notification_type == EmailNotificationType.default()
 
     def test_api_change_email_notification__err__403__other_user(
         self,
@@ -2041,7 +2041,7 @@ class TestUserChangeEmailNotification(object):
         assert role.email_notification_type == EmailNotificationType.NONE
         web_testapp.authorization = ("Basic", ("test2@test2.test2", "password"))
         params = {
-            "email_notification_type": EmailNotificationType.DAILY.value,
+            "email_notification_type": EmailNotificationType.default().value,
         }
         res = web_testapp.put_json(
             "/api/users/{user_id}/workspaces/{workspace_id}/email_notification_type".format(

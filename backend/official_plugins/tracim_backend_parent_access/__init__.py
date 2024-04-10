@@ -43,7 +43,7 @@ class ParentAccessPlugin:
                         user=user,
                         workspace=current_workspace,
                         role_level=current_workspace.default_user_role.level,
-                        email_notification_type=EmailNotificationType.DAILY,
+                        email_notification_type=EmailNotificationType.default(),
                         flush=False,
                     )
                 except RoleAlreadyExistError:

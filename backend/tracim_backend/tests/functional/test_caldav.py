@@ -813,7 +813,7 @@ class TestCaldavRadicaleSync(object):
             user,
             workspace,
             UserWorkspaceConfig.READER,
-            email_notification_type=EmailNotificationType.DAILY,
+            email_notification_type=EmailNotificationType.default(),
         )
         transaction.commit()
         assert os.path.isdir(workspace_agenda_path)

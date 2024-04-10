@@ -94,7 +94,7 @@ class SubscriptionLib(object):
             user=subscription.author,
             workspace=subscription.workspace,
             role_level=user_role.level,
-            email_notification_type=EmailNotificationType.DAILY,
+            email_notification_type=EmailNotificationType.default(),
         )
         self._session.add(subscription)
         self._session.add(user_workspace_config)
