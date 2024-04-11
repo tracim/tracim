@@ -76,7 +76,7 @@ export const PopinFixedHeader = (props) => {
     content,
     favoriteState,
     onClickAddToFavoriteList,
-    onClickRemoveFromFavoriteList,
+    onClickRemoveFromFavoriteList
   } = props
 
   const actionListWithEditTitle = [

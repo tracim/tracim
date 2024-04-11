@@ -111,7 +111,7 @@ class PopinFixedContent extends React.Component {
                           `${props.customClass}__content__left__top__version`
                         )}
                       >
-                        {props.t('Version #{{versionNumber}}', {versionNumber: displayVersionNumber})}
+                        {props.t('Version #{{versionNumber}}', { versionNumber: displayVersionNumber })}
                       </div>
                       {(props.appMode === APP_FEATURE_MODE.REVISION || props.isRefreshNeeded) && (
                         <div
