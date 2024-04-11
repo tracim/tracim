@@ -153,7 +153,7 @@ if [ "$mode" = "cypress" ]; then
     backend_pid=$!
     popd
     pushd "$script_dir/functionnal_tests"
-    yarn run "cypress-$cypress_arg" --spec cypress/integration/dashboard/information_spec.js
+    yarn run "cypress-$cypress_arg"
     teardown
 else
     # disable CSP header for development (tracim dev builds use eval()).

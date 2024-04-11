@@ -38,7 +38,10 @@ describe('Dashboard', () => {
     cy.contains('.workspaceRecentActivities__header', 'Recent activities')
   })
 
-  it.only('should show email notification dropdown', () => {
+  it.skip('should show email notification dropdown', () => {
+    // INFO - CH - 2024-04-11 - Skipping this test because the cypress backend config
+    // in development.ini has email.notification.activated = False which makes this part
+    // of the dashboard to not be displayed
     cy.contains('.userstatus__item.emailNotification .userstatus__item__label', 'Email notification')
     cy.contains('.userstatus__item__value.emailNotification__value', 'Daily')
 

@@ -37,20 +37,20 @@ export const UserStatus = props => {
         </div>
       </div>
 
-      <div className='userstatus__item emailNotification'>
-        <div className='userstatus__item__label'>
-          {props.t('Email notification:')}
-        </div>
+      {props.displayNotifBtn && (
+        <div className='userstatus__item emailNotification'>
+          <div className='userstatus__item__label'>
+            {props.t('Email notification:')}
+          </div>
 
-        <div className='userstatus__item__value emailNotification__value'>
-          {props.displayNotifBtn && (
+          <div className='userstatus__item__value emailNotification__value'>
             <EmailNotificationTypeButton
               onClickChangeEmailNotificationType={props.onClickChangeEmailNotificationType}
               currentEmailNotificationType={mySelf.emailNotificationType}
             />
-          )}
+          </div>
         </div>
-      </div>
+      )}
 
       {props.displaySubscriptionRequestsInformation && (
         <div className='userstatus__item spaceAccessRequest'>
