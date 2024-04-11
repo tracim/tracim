@@ -28,10 +28,10 @@ def upgrade():
       workspace_id INTEGER NOT NULL,
       role INTEGER NOT NULL,
       email_notification_type VARCHAR(10) DEFAULT 'SUMMARY' NOT NULL,
-      CONSTRAINT pk_user_workspace PRIMARY KEY (user_id, workspace_id),
-      CONSTRAINT fk_user_workspace_user_id_users FOREIGN KEY(user_id) REFERENCES users (user_id),
-      CONSTRAINT fk_user_workspace_workspace_id_workspaces FOREIGN KEY(workspace_id) REFERENCES workspaces (workspace_id),
-      CONSTRAINT emailnotificationtype CHECK (email_notification_type IN ('INDIVIDUAL', 'NONE', 'SUMMARY'))
+      CONSTRAINT pk_user_workspace__no_duplicate PRIMARY KEY (user_id, workspace_id),
+      CONSTRAINT fk_user_workspace_user_id_users__no_duplicate FOREIGN KEY(user_id) REFERENCES users (user_id),
+      CONSTRAINT fk_user_workspace_workspace_id_workspaces__no_duplicate FOREIGN KEY(workspace_id) REFERENCES workspaces (workspace_id),
+      CONSTRAINT emailnotificationtype__no_duplicate CHECK (email_notification_type IN ('INDIVIDUAL', 'NONE', 'SUMMARY'))
     );
     """
     )
@@ -79,10 +79,10 @@ def downgrade():
       workspace_id INTEGER NOT NULL,
       role INTEGER NOT NULL,
       email_notification_type VARCHAR(10) DEFAULT 'DAILY' NOT NULL,
-      CONSTRAINT pk_user_workspace PRIMARY KEY (user_id, workspace_id),
-      CONSTRAINT fk_user_workspace_user_id_users FOREIGN KEY(user_id) REFERENCES users (user_id),
-      CONSTRAINT fk_user_workspace_workspace_id_workspaces FOREIGN KEY(workspace_id) REFERENCES workspaces (workspace_id),
-      CONSTRAINT emailnotificationtype CHECK (email_notification_type IN ('INDIVIDUAL', 'WEEKLY', 'DAILY', 'HOURLY', 'NONE'))
+      CONSTRAINT pk_user_workspace__no_duplicate PRIMARY KEY (user_id, workspace_id),
+      CONSTRAINT fk_user_workspace_user_id_users__no_duplicate FOREIGN KEY(user_id) REFERENCES users (user_id),
+      CONSTRAINT fk_user_workspace_workspace_id_workspaces__no_duplicate FOREIGN KEY(workspace_id) REFERENCES workspaces (workspace_id),
+      CONSTRAINT ck_user_workspace_emailnotificationtype__no_duplicate CHECK (email_notification_type IN ('INDIVIDUAL', 'WEEKLY', 'DAILY', 'HOURLY', 'NONE'))
     );
     """
     )
