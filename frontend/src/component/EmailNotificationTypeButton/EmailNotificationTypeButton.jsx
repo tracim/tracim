@@ -19,10 +19,11 @@ export const EmailNotificationTypeButton = props => {
   ]
 
   const displayCurrentEmailNotificationType = notificationTimingList
-    .find(t => t.value === props.currentEmailNotificationType)?.label || ''
+    .find(t => t.value === props.currentEmailNotificationType)?.label || 'unknown'
 
   return (
     <div className='EmailNotificationTypeButton'>
+      props.currentEmailNotificationType:{props.currentEmailNotificationType}
       <DropdownMenu
         buttonIcon='fas fa-envelope'
         buttonLabel={displayCurrentEmailNotificationType}

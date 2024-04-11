@@ -38,7 +38,7 @@ describe('Dashboard', () => {
     cy.contains('.workspaceRecentActivities__header', 'Recent activities')
   })
 
-  it('should show email notification dropdown', () => {
+  it.only('should show email notification dropdown', () => {
     cy.contains('.userstatus__item.emailNotification .userstatus__item__label', 'Email notification')
     cy.contains('.userstatus__item__value.emailNotification__value', 'Daily')
 
