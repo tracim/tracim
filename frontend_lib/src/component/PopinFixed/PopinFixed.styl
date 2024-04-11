@@ -126,12 +126,29 @@
         & .breadcrumbs
           margin-inline-end auto
           overflow auto
+        &__emojiReaction
+          order 1
+          .EmojiReactions
+            flex-direction row
         &__version
-          margin-inline-start auto
+          order 2
           display flex
+          white-space nowrap
+          &::before
+            content '-'
+            display block
+            margin 0 4px 0 0
         &__lastversion
-          margin-inline-start 15px
+          order 3
+          margin-inline-start 5px
           font-weight bold
+        &__selectStatus
+          order 4
+          display flex
+          &::before
+            content '-'
+            display block
+            margin 0 4px
     &__right
       display flex
       transition width 0.4s ease
@@ -298,8 +315,6 @@ responsiveColumnStyle()
     &__header__close
       display inline-block
       height 24px
-    &__header__reactions
-      display inline-block
     &.sidebarVisible
       max-width 100%
     &__option
@@ -313,6 +328,10 @@ responsiveColumnStyle()
         &__textnote
           height auto
           overflow-y hidden
+        &__top
+          flex-wrap wrap
+          &__emojiReaction
+            order 10
       &__right
         width 100%
         height auto

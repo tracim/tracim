@@ -1281,7 +1281,6 @@ export class File extends React.Component {
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onClickChangeMarkedTemplate={this.handleChangeMarkedTemplate}
           onValidateChangeTitle={this.handleSaveEditTitle}
-          showReactions
           showMarkedAsTemplate={COLLABORA_EXTENSIONS.includes(state.content.file_extension)}
           favoriteState={props.isContentInFavoriteList(state.content, state)
             ? FAVORITE_STATE.FAVORITE

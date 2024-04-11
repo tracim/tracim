@@ -10,6 +10,7 @@ import {
 import TranslateButton from '../Button/TranslateButton.jsx'
 import PopinFixedHeader from './PopinFixedHeader.jsx'
 import { TRANSLATION_STATE } from '../../translation.js'
+import EmojiReactions from '../../container/EmojiReactions.jsx'
 import Loading from '../Loading/Loading.jsx'
 
 class PopinFixedContent extends React.Component {
@@ -29,6 +30,12 @@ class PopinFixedContent extends React.Component {
   render () {
     const { props } = this
 
+    const shouldShowVersion = props.lastVersion !== 0 &&
+      (props.appMode === APP_FEATURE_MODE.VIEW || props.appMode === APP_FEATURE_MODE.REVISION)
+    const displayVersionNumber = props.appMode === APP_FEATURE_MODE.VIEW && !props.isRefreshNeeded
+      ? props.lastVersion
+      : props.contentVersionNumber
+
     return props.children.length === 2
       ? (
         <div className={classnames(
@@ -40,7 +47,6 @@ class PopinFixedContent extends React.Component {
           <div className={classnames('wsContentGeneric__content__left', `${props.customClass}__content__left`)}>
             <PopinFixedHeader
               actionList={props.actionList}
-              apiUrl={props.config.apiUrl}
               breadcrumbsList={props.breadcrumbsList}
               componentTitle={props.componentTitle}
               content={props.content}
@@ -58,11 +64,9 @@ class PopinFixedContent extends React.Component {
               onClickRemoveFromFavoriteList={props.onClickRemoveFromFavoriteList}
               onValidateChangeTitle={props.onValidateChangeTitle}
               loading={props.loading}
-              loggedUser={props.loggedUser}
               rawTitle={props.content.label}
               showChangeTitleButton={props.showChangeTitleButton}
               showMarkedAsTemplate={props.showMarkedAsTemplate}
-              showReactions={props.showReactions}
               userRoleIdInWorkspace={props.loggedUser.userRoleIdInWorkspace}
             />
             <div className={classnames('wsContentGeneric__content__left__top', `${props.customClass}__content__left__top`)}>
@@ -85,43 +89,57 @@ class PopinFixedContent extends React.Component {
                     </div>
                   )}
 
-                  {props.lastVersion !== 0 &&
-                   (props.appMode === APP_FEATURE_MODE.VIEW || props.appMode === APP_FEATURE_MODE.REVISION) &&
-                   (
-                     <div
-                       className={classnames(
-                         'wsContentGeneric__content__left__top__version',
-                         `${props.customClass}__content__left__top__version`
-                       )}
-                     >
-                       {props.t(
-                         'Version #{{versionNumber}}', {
-                           versionNumber: props.appMode === APP_FEATURE_MODE.VIEW && !props.isRefreshNeeded
-                             ? props.lastVersion
-                             : props.contentVersionNumber
-                         }
-                       )}
-                       {(props.appMode === APP_FEATURE_MODE.REVISION || props.isRefreshNeeded) && (
-                         <div
-                           className={classnames(
-                             'wsContentGeneric__content__left__top__lastversion',
-                             `${props.customClass}__content__left__top__lastversion`
-                           )}
-                         >
-                           ({props.t('latest version: {{versionNumber}}', { versionNumber: props.lastVersion })})
-                         </div>
-                       )}
-                       &nbsp;-&nbsp;
-                     </div>
-                   )}
+                  <div
+                    className={classnames(
+                      'wsContentGeneric__content__left__top__emojiReaction',
+                      `${props.customClass}__content__left__top__emojiReaction`
+                    )}
+                  >
+                    <EmojiReactions
+                      apiUrl={props.config.apiUrl}
+                      loggedUser={props.loggedUser}
+                      contentId={props.content.content_id}
+                      workspaceId={props.content.workspace_id}
+                    />
+                  </div>
+
+                  {shouldShowVersion && (
+                    <>
+                      <div
+                        className={classnames(
+                          'wsContentGeneric__content__left__top__version',
+                          `${props.customClass}__content__left__top__version`
+                        )}
+                      >
+                        {props.t('Version #{{versionNumber}}', { versionNumber: displayVersionNumber })}
+                      </div>
+                      {(props.appMode === APP_FEATURE_MODE.REVISION || props.isRefreshNeeded) && (
+                        <div
+                          className={classnames(
+                            'wsContentGeneric__content__left__top__lastversion',
+                            `${props.customClass}__content__left__top__lastversion`
+                          )}
+                        >
+                          ({props.t('latest version: {{versionNumber}}', { versionNumber: props.lastVersion })})
+                        </div>
+                      )}
+                    </>
+                  )}
 
                   {props.availableStatuses.length > 0 && props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
-                    <SelectStatus
-                      selectedStatus={props.availableStatuses.find(s => s.slug === props.content.status)}
-                      availableStatus={props.availableStatuses}
-                      onChangeStatus={props.onChangeStatus}
-                      disabled={props.appMode === APP_FEATURE_MODE.REVISION || props.content.is_archived || props.content.is_deleted}
-                    />
+                    <div
+                      className={classnames(
+                        'wsContentGeneric__content__left__top__selectStatus',
+                        `${props.customClass}__content__left__top__version`
+                      )}
+                    >
+                      <SelectStatus
+                        selectedStatus={props.availableStatuses.find(s => s.slug === props.content.status)}
+                        availableStatus={props.availableStatuses}
+                        onChangeStatus={props.onChangeStatus}
+                        disabled={props.appMode === APP_FEATURE_MODE.REVISION || props.content.is_archived || props.content.is_deleted}
+                      />
+                    </div>
                   )}
                 </>
               )}
@@ -184,7 +202,6 @@ PopinFixedContent.propTypes = {
   onValidateChangeTitle: PropTypes.func,
   showChangeTitleButton: PropTypes.bool,
   showMarkedAsTemplate: PropTypes.bool,
-  showReactions: PropTypes.bool,
   showTranslateButton: PropTypes.bool,
   contentVersionNumber: PropTypes.number,
   translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object),
@@ -228,6 +245,5 @@ PopinFixedContent.defaultProps = {
   onValidateChangeTitle: () => {},
   showChangeTitleButton: true,
   showMarkedAsTemplate: false,
-  showReactions: false,
   showTranslateButton: false
 }

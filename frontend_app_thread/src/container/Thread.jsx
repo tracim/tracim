@@ -8,6 +8,7 @@ import {
   buildContentPathBreadcrumbs,
   CONTENT_NAMESPACE,
   CONTENT_TYPE,
+  EmojiReactions,
   handleClickCopyLink,
   handleFetchResult,
   PAGE,
@@ -448,9 +449,6 @@ export class Thread extends React.Component {
               dataCy: 'popinListItem__permanentlyDelete'
             }
           ]}
-          showReactions
-          apiUrl={state.config.apiUrl}
-          loggedUser={state.loggedUser}
           content={state.content}
           favoriteState={props.isContentInFavoriteList(state.content, state)
             ? FAVORITE_STATE.FAVORITE
@@ -480,12 +478,20 @@ export class Thread extends React.Component {
             Breadcrumbs and SelectStatus here directly than to adapt the PopinFixedContent component to cover thread as well. */}
             <div className='thread__contentpage__top'>
               {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && state.config.availableStatuses && (
-                <SelectStatus
-                  selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
-                  availableStatus={state.config.availableStatuses}
-                  onChangeStatus={this.handleChangeStatus}
-                  disabled={state.content.is_archived || state.content.is_deleted}
-                />
+                <>
+                  <EmojiReactions
+                    apiUrl={state.config.apiUrl}
+                    loggedUser={state.loggedUser}
+                    contentId={state.content.content_id}
+                    workspaceId={state.content.workspace_id}
+                  />
+                  <SelectStatus
+                    selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
+                    availableStatus={state.config.availableStatuses}
+                    onChangeStatus={this.handleChangeStatus}
+                    disabled={state.content.is_archived || state.content.is_deleted}
+                  />
+                </>
               )}
             </div>
             {state.showRefreshWarning && (
