@@ -5,6 +5,7 @@ import { isMobile } from 'react-device-detect'
 import { DropdownMenu } from 'tracim_frontend_lib'
 import { EMAIL_NOTIFICATION_TYPE } from '../../util/helper.js'
 import { PopoverHelperBodySplit, PopoverHelperBodySingle } from './PopoverHelperBody.jsx'
+import { classnames } from 'tracim_frontend_vendors/src'
 
 require('./EmailNotificationTypeButton.styl')
 
@@ -31,7 +32,10 @@ export const EmailNotificationTypeButton = props => {
       >
         {notificationTimingList.map(timing =>
           <div
-            className='EmailNotificationTypeButton__dropdown__subdropdown__wrapper'
+            className={classnames(
+              'EmailNotificationTypeButton__dropdown__subdropdown__wrapper',
+              { spacer: timing.value === EMAIL_NOTIFICATION_TYPE.NONE }
+            )}
             key={timing.value}
           >
             <div

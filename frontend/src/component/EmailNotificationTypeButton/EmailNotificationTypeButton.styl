@@ -10,13 +10,15 @@
     font-size standardFontSize
     margin-right 5px
   &__dropdown
-    & > span
-      font-weight bold
     &__subdropdown
       &__wrapper
         padding 0
+        &.spacer
+          border-top borderStyle
       &__item
         display flex
         justify-content space-between
         flex-grow 1
         padding 10px
+  & .dropdownMenuButton.btn
+    padding 0
