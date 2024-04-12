@@ -613,5 +613,14 @@
   "Publish without title": "",
   "News title": "",
   "Turn into thread": "",
-  "Copy news link": "Copiar ligação do conteúdo"
+  "Copy news link": "Copiar ligação do conteúdo",
+  "Access request:": "",
+  "Individual": "",
+  "Hourly": "",
+  "Weekly": "",
+  "You will receive an email for each event.<1></1>Use this setting when you need to be informed of <3>everything that happens</3>.<5></5>Warning: this might result in a lot of e-mails.": "",
+  "You'll <1>receive a hourly e-mail</1> summarizing everything you haven't already read.<3></3>There will be a single email for all spaces configured as \"Hourly\".": "",
+  "You'll <1>receive a daily e-mail</1> summarizing everything you haven't already read.<3></3>There will be a single email for all spaces configured as \"Daily\".": "",
+  "You'll <1>receive a weekly e-mail</1> summarizing everything you haven't already read.<3></3>There will be a single email for all spaces configured as \"Weekly\".": "",
+  "You'll receive no e-mail notifications, even if you are mentioned.<1></1>You'll need to rely on recent activities and the notification wall to stay up to date.": ""
 }

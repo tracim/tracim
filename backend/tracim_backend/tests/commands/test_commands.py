@@ -80,6 +80,8 @@ class TestCommandsList(object):
         assert output.find("content show") > 0
         # revision
         assert output.find("revision delete") > 0
+        # periodic
+        assert output.find("periodic send-summary-mails") > 0
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -2088,3 +2090,19 @@ class TestCommands(object):
             session.query(ContentRevisionRO).filter(
                 ContentRevisionRO.revision_id == revision_id
             ).one()
+
+    def test_func__periodic_send_summary_mails__ok__nominal_case(
+        self,
+    ):
+        app = TracimCLI()
+        result = app.run(
+            [
+                "periodic",
+                "send-summary-mails",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "--email_notification_type",
+                "weekly",
+            ]
+        )
+        assert result == 0

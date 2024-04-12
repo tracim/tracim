@@ -327,8 +327,10 @@ class EventApi:
             include_event_types=[event_type] if event_type is not None else None,
             read_status=read_status,
         )
+
         if created_after:
             query = query.filter(Event.created >= created_after)
+
         if email_notification_type is not None:
             query = (
                 query.filter(UserWorkspaceConfig.workspace_id == Event.workspace_id)
@@ -407,13 +409,17 @@ class EventApi:
         )
         query = query.filter(Message.receiver_id == user_id)
         query = query.filter(Message.read == None)  # noqa: E711
-        query = query.filter(Event.created >= created_after)
         query = query.filter(UserWorkspaceConfig.workspace_id == Event.workspace_id)
         query = query.filter(UserWorkspaceConfig.user_id == user_id)
         query = query.filter(
-            UserWorkspaceConfig.email_notification_type == EmailNotificationType.SUMMARY
+            UserWorkspaceConfig.email_notification_type != EmailNotificationType.NONE
+        )
+        query = query.filter(
+            UserWorkspaceConfig.email_notification_type != EmailNotificationType.INDIVIDUAL
         )
 
+        query = query.filter(Event.created >= created_after)
+        query = query.filter(Event.author_id != user_id)
         # INFO - MP - 2023-03-14 - Filtering entity type WORKSPACE_MEMBER.MODIFIED because we want
         # to display an equivalent result as the notification wall.
         query = query.filter(
@@ -422,7 +428,13 @@ class EventApi:
                 Event.operation != OperationType.MODIFIED,
             )
         )  # noqa: E711
+        # INFO - CH - 2024-04-09 - Filtering MENTION because it is handled separately
+        query = query.filter(Event.entity_type != EntityType.MENTION)
+        # INFO - CH - 2024-04-09 - Filtering WORKSPACE to match notification wall display
+        query = query.filter(Event.entity_type != EntityType.WORKSPACE)
+
         query = query.group_by(Workspace.workspace_id)
+
         return query.all()
 
     def create_event(

@@ -127,7 +127,9 @@ export const unLoggedAllowedPageList = [
 
 export const EMAIL_NOTIFICATION_TYPE = {
   INDIVIDUAL: 'individual',
-  SUMMARY: 'summary',
+  HOURLY: 'hourly',
+  DAILY: 'daily',
+  WEEKLY: 'weekly',
   NONE: 'none'
 }
 

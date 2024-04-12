@@ -78,40 +78,65 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
         parser = super().get_parser(prog_name)
 
         parser.add_argument(
-            "--since",
-            help="how much the summary should going back in time (in hour)",
-            dest="since",
+            "--email_notification_type",
+            help="will send mail to users with unread notification from spaces where they have the same email_notification_type",
+            dest="email_notification_type",
             required=False,
-            default=24,
+            default=None,
         )
+
         return parser
 
     def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         session = app_context["request"].dbsession
         config: CFG = app_context["registry"].settings["CFG"]
 
-        mail_sent = 0
-        mail_not_sent = 0
+        if parsed_args.email_notification_type is None:
+            print("Error: Missing argument email_notification_type")
+            return
+
+        available_email_notification_type = [
+            EmailNotificationType.HOURLY.value,
+            EmailNotificationType.DAILY.value,
+            EmailNotificationType.WEEKLY.value,
+        ]
+
+        if parsed_args.email_notification_type not in available_email_notification_type:
+            print(
+                f"Error: Unknown email_notification_type value. Available values are {', '.join(available_email_notification_type)}"
+            )
+            return
 
         if not config.EMAIL__NOTIFICATION__ACTIVATED:
             print("Email notification are disabled")
             return
 
-        created_after = datetime.utcnow() - timedelta(hours=int(parsed_args.since))
+        mail_sent = 0
+        mail_not_sent = 0
 
         event_api = EventApi(current_user=None, session=session, config=config)
         user_api = UserApi(current_user=None, session=session, config=config)
 
+        notification_type = EmailNotificationType(parsed_args.email_notification_type)
+
+        hour_delta = notification_type.get_hours_delta()
+        created_after = datetime.utcnow() - timedelta(hours=hour_delta)
+
+        translator = Translator(config)
+
         for user in user_api.get_all():
             if not user.can_receive_summary_mail():
                 continue
+
+            email_notification_type_for_template = notification_type.to_string(
+                user.lang, translator
+            )
 
             mentions = event_api.get_messages_for_user(
                 user.user_id,
                 created_after=created_after,
                 event_type=EventTypeDatabaseParameters.from_event_type("mention.created"),
                 read_status=ReadStatus.UNREAD,
-                email_notification_type=EmailNotificationType.SUMMARY,
             )
             notification_summary = event_api.get_unread_messages_summary(
                 user.user_id,
@@ -126,6 +151,7 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
                     "user": user,
                     "mentions": mentions,
                     "notification_summary": notification_summary,
+                    "email_notification_type_string": email_notification_type_for_template,
                 }
                 translator = Translator(
                     app_config=config,

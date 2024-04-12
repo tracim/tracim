@@ -3,4 +3,9 @@ set -a
 . /var/tracim/data/tracim_env_variables_cron
 set +a
 
-<PATH TO tracimcli> periodic send-summary-mails -c <PATH TO development.ini> --since 24
+if [ $1 != "hourly" ] && [ $1 != "daily" ] && [ $1 != "weekly" ]; then
+  echo "Error in send_summary_mails.sh. Argument email_notification_type must be hourly, daily or weekly.";
+  exit 0;
+fi
+
+tracimcli periodic send-summary-mails --email_notification_type $1

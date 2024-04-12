@@ -1571,7 +1571,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user"]["username"] == "TheAdmin"
         assert user_role["user"]["user_id"] == 1
         assert user_role["is_active"] is True
-        assert user_role["email_notification_type"] == "summary"
+        assert user_role["email_notification_type"] == "daily"
         # TODO - G.M - 24-05-2018 - [Avatar] Replace
         # by correct value when avatar feature will be enabled
         assert user_role["user"]["has_avatar"] is True
@@ -1668,7 +1668,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user_id"] == admin_user.user_id
         assert user_role["workspace_id"] == workspace_id
         assert user_role["is_active"] is True
-        assert user_role["email_notification_type"] == "summary"
+        assert user_role["email_notification_type"] == "daily"
 
     def test_api__get_workspace_members__ok_200__as_admin(
         self,
@@ -1769,7 +1769,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user"]["username"] == "TheAdmin"
         assert user_role["user"]["user_id"] == 1
         assert user_role["is_active"] is True
-        assert user_role["email_notification_type"] == "summary"
+        assert user_role["email_notification_type"] == "daily"
         # TODO - G.M - 24-05-2018 - [Avatar] Replace
         # by correct value when avatar feature will be enabled
         assert user_role["user"]["has_avatar"] is True
@@ -1880,7 +1880,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user_id"] == admin_id
         assert user_role["workspace_id"] == workspace_id
         assert user_role["is_active"] is True
-        assert user_role["email_notification_type"] == "summary"
+        assert user_role["email_notification_type"] == "daily"
 
     def test_api__get_workspace_member__err_400__unallowed_user(self, web_testapp):
         """
@@ -2586,7 +2586,7 @@ class TestWorkspaceMembersEndpoint(object):
         )
         user_role = res.json_body
         assert user_role["role"] == "content-manager"
-        assert user_role["email_notification_type"] == "summary"
+        assert user_role["email_notification_type"] == "daily"
         assert user_role["user_id"] == admin2.user_id
         assert user_role["workspace_id"] == workspace.workspace_id
 
