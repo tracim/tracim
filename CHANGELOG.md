@@ -4,30 +4,34 @@
 
 ### ✨ New Features
 
-- New content: Logbook. A logbook is a type of content that features logbook entries. These entries are displayed as a timeline, with an emphasis on the time and the order, most recent at the top.
-- Add possibility to really delete content, accessible to space managers.
-- Add functionality to transform news into thread
-- The cache of the browser used now saves the states of the navigation sidebar. Hidden sub-spaces will stay hidden.
-- Spaces in sidebar are now sorted without considering emoji
-- Kanban card color is now the background of the card instead of the border. The text color will adapt to the background color in order to stay legible.
-- Tracimcli can now be used in docker container without specifying config file path.
-- New plugins available:
-  - If a video is uploaded in a format not supported by frontend's video preview, tracim will post an alert message in the comments of the file. You need to activate and set the plugin `tracim_backend_video_alert` (documentation available [here](backend/official_plugins/tracim_backend_video_alert/README.md))
+- New content type: Logbook. A logbook is a type of content that features logbook entries. These entries are displayed as a timeline, with an emphasis on the time and the order, most recent at the top
+- Allow to permanently delete a content
+- Allow to transform news into thread
+- Mail notification: Summary mail can now be set once every hour, day or week
+- The states of the navigation sidebar is saved in the browser
+- Kanban UI: Kanban card color is now the background of the card instead of the border
+- Kanban UX: The text color will adapt to the background color in order to stay legible
+- Tracimcli can now be used in docker container without specifying config file path
+- New plugins available: `tracim_backend_video_alert` alerts the users when a possibly unsupported video is uploaded
 
 ### 🐛 Fixed Issues
 
-- Frontend:
+- General
+  - Fixed performance issues with popup for news title [#6408](https://github.com/tracim/tracim/issues/6408)
+  - Improved code quality [#6252](https://github.com/tracim/tracim/issues/6252)
+- UI/UX
   - Improved responsiveness for workspace creation pop-in on small screen [#6358](https://github.com/tracim/tracim/issues/6358)
   - Improved design and responsiveness when editing the title of a content [#6364](https://github.com/tracim/tracim/issues/6364)
+  - Spaces in sidebar are now sorted without considering emoji [#6357](https://github.com/tracim/tracim/issues/6357)
   - Fixed filter input in notification wall overflow since last version of Firefox [#6375](https://github.com/tracim/tracim/issues/6375)
+  - Emoji reaction are now more responsive [#6432](https://github.com/tracim/tracim/issues/6432)
+- Kanban
   - Fixed kanban title with special characters [#5220](https://github.com/tracim/tracim/issues/5220)
   - Renamed label "value" to "open field" in Kanban [#6354](https://github.com/tracim/tracim/issues/6354)
   - Fixed real time issues with kanban [#6363](https://github.com/tracim/tracim/issues/6363)
-  - Fixed performance issues with popup for news title [#6408](https://github.com/tracim/tracim/issues/6408)
-- Backend:
-  - Fixed LDAP auth issues [#6355](https://github.com/tracim/tracim/issues/6355)
-  - Fixed installation of SAML dependencies [#6365](https://github.com/tracim/tracim/issues/6365)
-  - Improved code quality [#6252](https://github.com/tracim/tracim/issues/6252)
+- Authentication:
+  - Fixed LDAP auth issues related to auth chaining [#6355](https://github.com/tracim/tracim/issues/6355)
+  - Fixed SAML dependencies for installation [#6365](https://github.com/tracim/tracim/issues/6365)
 
 ## 4.8.0 / 2024-01-24
 
