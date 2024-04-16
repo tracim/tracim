@@ -89,19 +89,21 @@ class PopinFixedContent extends React.Component {
                     </div>
                   )}
 
-                  <div
-                    className={classnames(
-                      'wsContentGeneric__content__left__top__emojiReaction',
-                      `${props.customClass}__content__left__top__emojiReaction`
-                    )}
-                  >
-                    <EmojiReactions
-                      apiUrl={props.config.apiUrl}
-                      loggedUser={props.loggedUser}
-                      contentId={props.content.content_id}
-                      workspaceId={props.content.workspace_id}
-                    />
-                  </div>
+                  {props.showReactions && (
+                    <div
+                      className={classnames(
+                        'wsContentGeneric__content__left__top__emojiReaction',
+                        `${props.customClass}__content__left__top__emojiReaction`
+                      )}
+                    >
+                      <EmojiReactions
+                        apiUrl={props.config.apiUrl}
+                        loggedUser={props.loggedUser}
+                        contentId={props.content.content_id}
+                        workspaceId={props.content.workspace_id}
+                      />
+                    </div>
+                  )}
 
                   {shouldShowVersion && (
                     <>
@@ -202,6 +204,7 @@ PopinFixedContent.propTypes = {
   onValidateChangeTitle: PropTypes.func,
   showChangeTitleButton: PropTypes.bool,
   showMarkedAsTemplate: PropTypes.bool,
+  showReactions: PropTypes.bool,
   showTranslateButton: PropTypes.bool,
   contentVersionNumber: PropTypes.number,
   translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object),
@@ -245,5 +248,6 @@ PopinFixedContent.defaultProps = {
   onValidateChangeTitle: () => {},
   showChangeTitleButton: true,
   showMarkedAsTemplate: false,
+  showReactions: false,
   showTranslateButton: false
 }
