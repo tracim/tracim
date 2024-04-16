@@ -106,6 +106,18 @@ class EmailNotificationType(enum.Enum):
         if self == self.WEEKLY:
             return translator.get_translation("in the last week", lang)
 
+    def get_value(self, lang, translator) -> Optional[str]:
+        if self == self.INDIVIDUAL:
+            return self.value
+        if self == self.NONE:
+            return self.value
+        if self == self.HOURLY:
+            return translator.get_translation("hourly", lang)
+        if self == self.DAILY:
+            return translator.get_translation("daily", lang)
+        if self == self.WEEKLY:
+            return translator.get_translation("weekly", lang)
+
 
 class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeBase):
     MAX_WORKSPACE_LABEL_LENGTH = 1024
