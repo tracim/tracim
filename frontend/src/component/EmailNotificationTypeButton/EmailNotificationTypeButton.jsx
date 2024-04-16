@@ -37,10 +37,10 @@ export const EmailNotificationTypeButton = props => {
               { spacer: timing.value === EMAIL_NOTIFICATION_TYPE.NONE }
             )}
             key={timing.value}
+            onClick={() => props.onClickChangeEmailNotificationType(timing.value)}
           >
             <div
               className='EmailNotificationTypeButton__dropdown__subdropdown__item'
-              onClick={() => props.onClickChangeEmailNotificationType(timing.value)}
             >
               <button className='transparentButton' key={timing.value}>
                 {timing.label}
