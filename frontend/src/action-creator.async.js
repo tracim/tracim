@@ -64,7 +64,8 @@ import {
   FAVORITE_LIST,
   FAVORITE,
   UNREAD_NOTIFICATION_COUNT,
-  USER_WORKSPACE_CONFIG_LIST
+  USER_WORKSPACE_CONFIG_LIST,
+  APP_CUSTOM_ACTION
 } from './action-creator.sync.js'
 import {
   CONTENT_NAMESPACE,
@@ -271,6 +272,19 @@ export const getUserConfiguration = userId => dispatch => {
       method: 'GET'
     },
     actionName: USER_CONFIGURATION,
+    dispatch
+  })
+}
+
+export const getAppCustomActionList = () => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/app-custom-action`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'GET'
+    },
+    actionName: APP_CUSTOM_ACTION,
     dispatch
   })
 }

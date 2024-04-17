@@ -68,7 +68,8 @@ import {
   putSetIncomingUserCallState,
   putSetOutgoingUserCallState,
   postCreateUserCall,
-  getMyselfAllKnownMember
+  getMyselfAllKnownMember,
+  getAppCustomActionList
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -85,7 +86,7 @@ import {
   setUnreadNotificationCount,
   setHeadTitle,
   setAccessibleWorkspaceList,
-  setKnownMemberList
+  setKnownMemberList, setAppCustomActionList
 } from '../action-creator.sync.js'
 import HTMLMention from '../component/Mention/HTMLMention.js'
 import NotificationWall from './NotificationWall.jsx'
@@ -386,6 +387,7 @@ export class Tracim extends React.Component {
         this.loadKnownMemberList()
         this.loadNotificationNotRead(fetchUser.user_id)
         this.loadUserConfiguration(fetchUser.user_id)
+        this.loadAppCustomAction()
 
         this.liveMessageManager.openLiveMessageConnection(fetchUser.user_id, FETCH_CONFIG.apiUrl)
         break
@@ -442,6 +444,16 @@ export class Tracim extends React.Component {
     switch (fetchGetUserConfig.status) {
       case 200: props.dispatch(setUserConfiguration(fetchGetUserConfig.json.parameters)); break
       default: props.dispatch(newFlashMessage(props.t('Error while loading the user configuration')))
+    }
+  }
+
+  loadAppCustomAction = async () => {
+    const { props } = this
+
+    const fetchGetAppCustomActionList = await props.dispatch(getAppCustomActionList())
+    switch (fetchGetAppCustomActionList.status) {
+      case 200: props.dispatch(setAppCustomActionList(fetchGetAppCustomActionList.json)); break
+      default: props.dispatch(newFlashMessage(props.t('Error while loading app custom action')))
     }
   }
 

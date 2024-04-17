@@ -6,7 +6,7 @@ import {
   SET_USER_WORKSPACE_CONFIG_LIST,
   CONFIG,
   LOGIN,
-  HEAD_TITLE
+  HEAD_TITLE, SET_APP_CUSTOM_ACTION_LIST
 } from '../action-creator.sync.js'
 
 export const defaultSystem = {
@@ -16,7 +16,8 @@ export const defaultSystem = {
   contentTypeListLoaded: false,
   config: {},
   titleArgs: [],
-  headTitle: ''
+  headTitle: '',
+  appCustomActionList: []
 }
 
 export function system (state = defaultSystem, action) {
@@ -42,6 +43,9 @@ export function system (state = defaultSystem, action) {
       if (isEqual(titleArgs, state.titleArgs)) return state
       return { ...state, titleArgs, headTitle: action.headTitle }
     }
+
+    case SET_APP_CUSTOM_ACTION_LIST:
+      return { ...state, appCustomActionList: action.appCustomActionList }
 
     default:
       return state

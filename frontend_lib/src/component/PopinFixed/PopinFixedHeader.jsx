@@ -102,15 +102,15 @@ export const PopinFixedHeader = (props) => {
     ...actionList
   ]
   const filteredActionList = actionListWithEditTitle.filter(action => action.showAction)
-  const filteredHeaderButtons = headerButtons ? headerButtons.filter(action => action.showAction) : []
+  const filteredHeaderButtons = headerButtons?.filter(action => action.showAction) || []
 
   const mergedActionList = [
-    ...actionListWithEditTitle
-      .filter(a => a.showAction === true)
-      .map(a => ({ ...a, isCustomAction: false, addSeparator: false })),
     ...props.customActionList
       .filter(a => a.showAction === true)
-      .map((a, i) => ({ ...a, isCustomAction: true, addSeparator: i === 0 }))
+      .map((a, i) => ({ ...a, isCustomAction: true, addSeparator: i === props.customActionList.length })),
+    ...actionListWithEditTitle
+      .filter(a => a.showAction === true)
+      .map(a => ({ ...a, isCustomAction: false, addSeparator: false }))
   ]
 
   return (
@@ -120,8 +120,8 @@ export const PopinFixedHeader = (props) => {
         [`${customClass}__header`]: !editTitle,
         [`${customClass}__header__isEditing`]: editTitle,
         wsContentGeneric__header__isEditing: editTitle
-      })}
-    >
+      }
+    )}>
       <div className='wsContentGeneric__header__titleWithBreadcrumbs'>
         <div className='wsContentGeneric__header__titleWrapper'>
           <div className={classnames('wsContentGeneric__header__icon', `${customClass}__header__icon`)}>
