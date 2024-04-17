@@ -295,3 +295,19 @@ msgstr ""
 #: tracim_backend/models/data.py:104
 msgid "in the last week"
 msgstr ""
+
+#: tracim_backend/command/periodic.py:59
+msgid "[{website_title}] Your {email_notification_type} summary"
+msgstr ""
+
+#: tracim_backend/models/data.py:115
+msgid "hourly"
+msgstr ""
+
+#: tracim_backend/models/data.py:117
+msgid "daily"
+msgstr ""
+
+#: tracim_backend/models/data.py:119
+msgid "weekly"
+msgstr ""

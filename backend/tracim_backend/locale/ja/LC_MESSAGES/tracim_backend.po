@@ -86,7 +86,19 @@ msgid "Uploaded by {username}."
 msgstr ""
 
 #: tracim_backend/command/periodic.py:59
-msgid "[{website_title}] Your daily summary"
+msgid "[{website_title}] Your {email_notification_type} summary"
+msgstr ""
+
+#: tracim_backend/models/data.py:115
+msgid "hourly"
+msgstr ""
+
+#: tracim_backend/models/data.py:117
+msgid "daily"
+msgstr ""
+
+#: tracim_backend/models/data.py:119
+msgid "weekly"
 msgstr ""
 
 #: tracim_backend/lib/core/content.py:753

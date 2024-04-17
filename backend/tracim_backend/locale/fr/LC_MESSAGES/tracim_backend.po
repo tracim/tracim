@@ -103,8 +103,8 @@ msgid "Uploaded by {username}."
 msgstr "Téléversé par {username}."
 
 #: tracim_backend/command/periodic.py:59
-msgid "[{website_title}] Your daily summary"
-msgstr "[{website_title}] Votre récapitulatif quotidien"
+msgid "[{website_title}] Your {email_notification_type} summary"
+msgstr "[{website_title}] Votre récapitulatif {email_notification_type}"
 
 #: tracim_backend/lib/core/content.py:753
 msgid "Space {workspace_name}"
@@ -423,6 +423,18 @@ msgstr "durant le dernier jour"
 #: tracim_backend/models/data.py:104
 msgid "in the last week"
 msgstr "durant la dernière semaine"
+
+#: tracim_backend/models/data.py:115
+msgid "hourly"
+msgstr "par heure"
+
+#: tracim_backend/models/data.py:117
+msgid "daily"
+msgstr "quotidien"
+
+#: tracim_backend/models/data.py:119
+msgid "weekly"
+msgstr "hebdomadaire"
 
 # | msgid "{event_count} events in the space"
 #: tracim_backend/templates/mail/summary_body_html.mak:36
