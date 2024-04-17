@@ -22,8 +22,8 @@ const LogbookEntry = (props) => {
   return (
     <div
       className={classnames('logbook__timeline__entries__entry', {
-        logbook__white__text__color: shouldUseLightTextColor(props.entry.bgColor),
-        logbook__black__text__color: !shouldUseLightTextColor(props.entry.bgColor)
+        logbook__whiteTextColor: shouldUseLightTextColor(props.entry.bgColor),
+        logbook__blackTextColor: !shouldUseLightTextColor(props.entry.bgColor)
       })}
       style={{ backgroundColor: props.entry.bgColor }}
     >
