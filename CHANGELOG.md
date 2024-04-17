@@ -19,6 +19,7 @@
 - General
   - Fixed performance issues with popup for news title [#6408](https://github.com/tracim/tracim/issues/6408)
   - Improved code quality [#6252](https://github.com/tracim/tracim/issues/6252)
+  - Fixed summary mail for spanish users [#6439](https://github.com/tracim/tracim/issues/6439)
 - UI/UX
   - Improved responsiveness for workspace creation pop-in on small screen [#6358](https://github.com/tracim/tracim/issues/6358)
   - Improved design and responsiveness when editing the title of a content [#6364](https://github.com/tracim/tracim/issues/6364)
