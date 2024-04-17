@@ -101,7 +101,6 @@ export const PopinFixedHeader = (props) => {
     },
     ...actionList
   ]
-  const filteredActionList = actionListWithEditTitle.filter(action => action.showAction)
   const filteredHeaderButtons = headerButtons?.filter(action => action.showAction) || []
 
   const mergedActionList = [
@@ -242,7 +241,7 @@ export const PopinFixedHeader = (props) => {
 
       {!props.loading && props.children}
 
-      {!props.loading && filteredActionList.length > 0 && (
+      {!props.loading && mergedActionList.length > 0 && (
         <DropdownMenu
           buttonCustomClass='wsContentGeneric__header__actions'
           buttonIcon='fa-fw fas fa-ellipsis-v'
