@@ -42,7 +42,12 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
 
     @staticmethod
     def _send_mail(
-        config: CFG, translator: Translator, user_mail: str, user_lang: str, body: str
+        config: CFG,
+        translator: Translator,
+        user_mail: str,
+        user_lang: str,
+        body: str,
+        email_notification_type: str,
     ) -> None:
         _ = translator.get_translation
 
@@ -58,9 +63,9 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
         reply_to_address = config.EMAIL__NOTIFICATION__FROM__EMAIL.replace("{user_id}", "0")
 
         msg = EmailNotificationMessage(
-            subject=_("[{website_title}] Your daily summary").replace(
-                EST.WEBSITE_TITLE, config.WEBSITE__TITLE.__str__()
-            ),
+            subject=_("[{website_title}] Your {email_notification_type} summary")
+            .replace(EST.WEBSITE_TITLE, config.WEBSITE__TITLE.__str__())
+            .replace("{email_notification_type}", email_notification_type.__str__()),
             from_header=EmailAddress(config.WEBSITE__TITLE, reply_to_address),
             to_header=EmailAddress("", user_mail),
             reply_to=EmailAddress(config.WEBSITE__TITLE, reply_to_address),
@@ -131,6 +136,7 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
             email_notification_type_for_template = notification_type.to_string(
                 user.lang, translator
             )
+            email_notification_type = notification_type.get_value(user.lang, translator)
 
             mentions = event_api.get_messages_for_user(
                 user.user_id,
@@ -165,6 +171,7 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
                     user_mail=user.email,
                     user_lang=user.lang,
                     body=body,
+                    email_notification_type=email_notification_type,
                 )
                 mail_sent += 1
             except Exception:

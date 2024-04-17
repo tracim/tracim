@@ -121,7 +121,6 @@ if [ ! -f /etc/tracim/send_summary_mails.sh ]; then
     cp /tracim/tools_docker/Debian_Uwsgi/send_summary_mails.sh.sample /etc/tracim/send_summary_mails.sh
     chmod 755 /etc/tracim/send_summary_mails.sh
     sed -i "s|<PATH TO tracimcli>|/usr/local/bin/tracimcli|g" /etc/tracim/send_summary_mails.sh
-    sed -i "s|<PATH TO development.ini>|/etc/tracim/development.ini|g" /etc/tracim/send_summary_mails.sh
 fi
 
 # Create and link branding directory if it does not exist

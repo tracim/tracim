@@ -1022,6 +1022,7 @@ export class HtmlDocument extends React.Component {
           onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
             state.content, state.loggedUser, this.setState.bind(this)
           )}
+          showReactions
           showTranslateButton={state.mode === APP_FEATURE_MODE.VIEW || state.mode === APP_FEATURE_MODE.REVISION}
           translationState={state.translationState}
           translationTargetLanguageList={state.config.system.config.translation_service__target_languages}

@@ -660,6 +660,7 @@ export class Logbook extends React.Component {
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onClickChangeMarkedTemplate={this.handleChangeMarkedTemplate}
           onValidateChangeTitle={this.handleSaveEditTitle}
+          showReactions
           showMarkedAsTemplate
           componentTitle={<FilenameWithBadges file={state.content} isTemplate={state.isTemplate} />}
           favoriteState={props.isContentInFavoriteList(state.content, state)
