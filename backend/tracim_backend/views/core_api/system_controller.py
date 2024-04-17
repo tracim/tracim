@@ -16,6 +16,7 @@ from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import get_timezones_list
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import AboutSchema
+from tracim_backend.views.core_api.schemas import AppCustomActionUiSchema
 from tracim_backend.views.core_api.schemas import ApplicationSchema
 from tracim_backend.views.core_api.schemas import ConfigSchema
 from tracim_backend.views.core_api.schemas import ContentTypeSchema
@@ -129,7 +130,6 @@ class SystemController(Controller):
     def config(self, context, request: TracimRequest, hapic_data=None):
         """
         Returns configuration information required for frontend.
-        At the moment it only returns if email notifications are activated.
         """
         # FIXME - G.M - 2018-12-14 - [config_unauthenticated] #1270
         # do not allow unauthenticated user to
@@ -176,6 +176,12 @@ class SystemController(Controller):
             current_user=request.current_user,
         )
         return {"ui_schema": custom_properties_api.get_ui_schema()}
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
+    @check_right(is_user)
+    @hapic.output_body(AppCustomActionUiSchema())
+    def app_custom_action(self, context, request: TracimRequest, hapic_data=None):
+        return {"custom_actions": ""}
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @hapic.output_body(ErrorCodeSchema(many=True))
@@ -259,3 +265,9 @@ class SystemController(Controller):
             "reserved_usernames", "/system/reserved-usernames", request_method="GET"
         )
         configurator.add_view(self.reserved_usernames, route_name="reserved_usernames")
+
+        # App custom action
+        configurator.add_route(
+            "app_custom_action", "/system/app-custom-action", request_method="GET"
+        )
+        configurator.add_view(self.app_custom_action, route_name="app_custom_action")

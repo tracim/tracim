@@ -410,6 +410,34 @@ class UserDigestSchema(marshmallow.Schema):
     workspace_ids = marshmallow.fields.List(marshmallow.fields.Int(example=3))
 
 
+class AppCustomActionDigestSchema(marshmallow.Schema):
+    content_type = marshmallow.fields.String(
+        required=True,
+        example="file",
+        description="Currently, only 'file' is supported",
+    )
+    icon = marshmallow.fields.String(
+        required=False,
+        example="fas fa-pencil-alt",
+        description="Icon of the custom action. If set, image should not be set.",
+    )
+    image = marshmallow.fields.String(
+        required=False,
+        example="https://www.tracim.fr/static/images/new_tracim/LOGO_TRACIM_RVB_1.png",
+    )
+    label = marshmallow.fields.Dict(
+        required=True,
+        example={"fr": "My action"},
+        description="Dictionary of translations. Key is language (fr, en, es, de, ...), value is translated label",
+    )
+    link = marshmallow.fields.String(
+        required=True,
+        example="https://www.tracim.fr/static/images/new_tracim/LOGO_TRACIM_RVB_1.png",
+        description="The action associated with the button",
+    )
+    minimumRole = marshmallow.fields.Int(required=True)
+
+
 class UserDiskSpaceSchema(UserDigestSchema):
     user_id = marshmallow.fields.Int(dump_only=True, example=3)
     allowed_space = marshmallow.fields.Integer(
@@ -1608,6 +1636,13 @@ class UserCustomPropertiesUiSchema(marshmallow.Schema):
         description="ui schema used for user custom properties",
         required=True,
         allow_none=False,
+    )
+
+
+class AppCustomActionUiSchema(marshmallow.Schema):
+    app_custom_action = marshmallow.fields.List(
+        marshmallow.fields.Dict(AppCustomActionDigestSchema()),
+        description="List of app's custom action. Configurable by branding app_custom_action.json",
     )
 
 
