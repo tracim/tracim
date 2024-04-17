@@ -412,11 +412,11 @@ msgstr "{author} mencionou você em"
 
 #: tracim_backend/templates/mail/summary_body_html.mak:7
 msgid "Here is the summary of your unread notifications {email_notification_type_string}:"
-msgstr "Aqui está o resumo de suas notificações não lidas"
+msgstr "Aqui está o resumo de suas notificações não lidas {email_notification_type_string}:"
 
 #: tracim_backend/templates/mail/summary_body_html.mak:32
 msgid "Here is the list of your unread mentions {email_notification_type_string}:"
-msgstr "Aqui está a lista de suas menções não lidas"
+msgstr "Aqui está a lista de suas menções não lidas {email_notification_type_string}:"
 
 #: tracim_backend/models/data.py:100
 msgid "in the last hour"
