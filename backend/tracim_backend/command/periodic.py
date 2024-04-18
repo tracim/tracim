@@ -122,9 +122,9 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
         event_api = EventApi(current_user=None, session=session, config=config)
         user_api = UserApi(current_user=None, session=session, config=config)
 
-        notification_type = EmailNotificationType(parsed_args.email_notification_type)
+        email_notification_type = EmailNotificationType(parsed_args.email_notification_type)
 
-        hour_delta = notification_type.get_hours_delta()
+        hour_delta = email_notification_type.get_hours_delta()
         created_after = datetime.utcnow() - timedelta(hours=hour_delta)
 
         translator = Translator(config)
@@ -133,20 +133,24 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
             if not user.can_receive_summary_mail():
                 continue
 
-            email_notification_type_for_template = notification_type.to_string(
+            email_notification_type_for_template = email_notification_type.to_string(
                 user.lang, translator
             )
-            email_notification_type = notification_type.get_value(user.lang, translator)
+            email_notification_type_as_string = email_notification_type.get_value(
+                user.lang, translator
+            )
 
             mentions = event_api.get_messages_for_user(
                 user.user_id,
                 created_after=created_after,
                 event_type=EventTypeDatabaseParameters.from_event_type("mention.created"),
                 read_status=ReadStatus.UNREAD,
+                email_notification_type=email_notification_type,
             )
             notification_summary = event_api.get_unread_messages_summary(
                 user.user_id,
                 created_after=created_after,
+                email_notification_type=email_notification_type,
             )
 
             if len(mentions) == 0 and len(notification_summary) == 0:
@@ -171,7 +175,7 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
                     user_mail=user.email,
                     user_lang=user.lang,
                     body=body,
-                    email_notification_type=email_notification_type,
+                    email_notification_type=email_notification_type_as_string,
                 )
                 mail_sent += 1
             except Exception:

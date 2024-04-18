@@ -8,4 +8,5 @@ if [ $1 != "hourly" ] && [ $1 != "daily" ] && [ $1 != "weekly" ]; then
   exit 0;
 fi
 
+echo "Cron task send-summary-email for period: $1"
 <PATH TO tracimcli> periodic send-summary-mails --email_notification_type $1
