@@ -5,7 +5,6 @@ from cliff.app import App
 from cliff.command import Command
 from cliff.commandmanager import CommandManager
 import logging
-import os
 from pyramid.paster import bootstrap
 from pyramid.paster import setup_logging
 import sys
@@ -57,7 +56,6 @@ class AppContextCommand(Command):
     def take_action(self, parsed_args: argparse.Namespace) -> None:
         try:
             super(AppContextCommand, self).take_action(parsed_args)
-            self.changeDirectory()
             self._setup_logging(parsed_args)
             if self.auto_setup_context:
                 with bootstrap(parsed_args.config_file) as app_context:
@@ -99,14 +97,3 @@ class AppContextCommand(Command):
             default=False,
         )
         return parser
-
-    def changeDirectory(self) -> None:
-        directoryPath = os.path.dirname(__file__)
-        if len(directoryPath) > 30 and directoryPath[-30:] == "backend/tracim_backend/command":
-            os.chdir(os.path.dirname(__file__))
-            os.chdir("../..")
-        else:
-            try:
-                os.chdir("/etc/tracim")
-            except FileNotFoundError:
-                pass
