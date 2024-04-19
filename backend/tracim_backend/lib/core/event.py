@@ -334,9 +334,7 @@ class EventApi:
         if email_notification_type is not None:
             query = (
                 query.filter(UserWorkspaceConfig.workspace_id == Event.workspace_id)
-                # INFO - CH - 2024-04-18 - Commenting line bellow because I don't think it works
-                # Keeping it commented because I don't get its purpose
-                # .filter(UserWorkspaceConfig.user_id == user_id)
+                .filter(UserWorkspaceConfig.user_id == user_id)
                 .filter(UserWorkspaceConfig.email_notification_type == email_notification_type)
             )
 
@@ -409,6 +407,7 @@ class EventApi:
             .join(Workspace, Event.workspace_id == Workspace.workspace_id)
         )
         query = query.filter(Message.receiver_id == user_id)
+        query = query.filter(UserWorkspaceConfig.workspace_id == Workspace.workspace_id)
         query = query.filter(Message.read == None)  # noqa: E711
 
         # INFO - CH - 2024-04-18 - Commenting line bellow because I don't think it works
