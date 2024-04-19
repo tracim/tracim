@@ -334,6 +334,7 @@ class EventApi:
         if email_notification_type is not None:
             query = (
                 query.filter(UserWorkspaceConfig.workspace_id == Event.workspace_id)
+                .filter(UserWorkspaceConfig.user_id == Event.author_id)
                 .filter(UserWorkspaceConfig.user_id == user_id)
                 .filter(UserWorkspaceConfig.email_notification_type == email_notification_type)
             )
