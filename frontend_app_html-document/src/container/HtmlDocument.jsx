@@ -747,6 +747,11 @@ export class HtmlDocument extends React.Component {
     sendGlobalFlashMessage(props.t('The link has been copied to clipboard'), 'info')
   }
 
+  handlePermanentlyDeleteComment = async (comment) => {
+    const { state } = this
+    this.props.appContentDeletePermanently(state.content.workspace_id, comment.content_id, () => {})
+  }
+
   shouldDisplayNotifyAllMessage = () => {
     const { state } = this
 
@@ -862,6 +867,8 @@ export class HtmlDocument extends React.Component {
             memberList={state.config.workspace.memberList}
             onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
             onClickDeleteComment={this.handleClickDeleteComment}
+            onClickPermanentlyDeleteComment={this.handlePermanentlyDeleteComment}
+            shouldShowPermanentlyDeleteButton={state.loggedUser.userRoleIdInWorkspace >= ROLE.workspaceManager.id}
             onClickEditComment={this.handleClickEditComment}
             onClickOpenFileComment={this.handleClickOpenFileComment}
             onClickRevisionBtn={this.handleClickShowRevision}

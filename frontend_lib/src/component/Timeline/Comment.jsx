@@ -141,6 +141,20 @@ const Comment = (props) => {
                         textMobile={props.t('Delete comment')}
                       />
                     )}
+
+                    {(props.shouldShowPermanentlyDeleteButton &&
+                      <IconButton
+                        icon='fas fa-exclamation-triangle'
+                        intent='link'
+                        key='deleteComment'
+                        mode='dark'
+                        onClick={props.onClickPermanentlyDeleteComment}
+                        text={props.t('Permanently delete')}
+                        title={props.t('Permanently delete')}
+                        textMobile={props.t('Permanently delete')}
+                        customClass='dropdownMenuSeparatorLine'
+                      />
+                    )}
                   </DropdownMenu>
                 )}
               </div>
@@ -229,6 +243,8 @@ Comment.propTypes = {
   fromMe: PropTypes.bool,
   modificationDate: PropTypes.string,
   onClickDeleteComment: PropTypes.func,
+  onClickPermanentlyDeleteComment: PropTypes.func,
+  shouldShowPermanentlyDeleteButton: PropTypes.bool,
   onClickEditComment: PropTypes.func,
   onClickOpenFileComment: PropTypes.func,
   onClickRestore: PropTypes.func.isRequired,
@@ -247,6 +263,8 @@ Comment.defaultProps = {
   fromMe: false,
   modificationDate: '',
   onClickDeleteComment: () => {},
+  onClickPermanentlyDeleteComment: () => {},
+  shouldShowPermanentlyDeleteButton: false,
   onClickEditComment: () => {},
   onClickOpenFileComment: () => {},
   text: '',
