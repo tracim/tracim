@@ -307,13 +307,22 @@ session.type = file
 # needed for "file" storage config :
 ; session.data_dir = %(here)s/sessions_data
 session.data_dir = %(basic_setup.sessions_data_root_dir)s/sessions_data
-# needed for many session storage type, but not for file (leave as empty for file)
+# needed for many session storage type, but not for file or ext:rediscluster (leave as empty)
 session.url =
+# needed for ext:rediscluster storage type (leave as empty for others)
+session.urls =
 
 ## "Redis" storage config sample:
 # session.type = ext:redis
 # note: redis db name are integer (by default 16 database are available from 0 to 15 db)
 # session.url = redis://localhost:6379/0
+
+## "Redis cluster" storage config sample:
+# session.type = ext:rediscluster
+# note: Even to connect to a single node, if it is in cluster mode, this session type is mandatory
+#  unlike single redis, db name should not be specified and 0 will be used
+#  several urls can be provided as a comma separated list.
+# session.urls = redis://node-1:7001,redis://node-2:7002
 
 ; session.lock_dir = %(here)s/sessions_data
 session.lock_dir = %(basic_setup.sessions_data_root_dir)s/sessions_lock
