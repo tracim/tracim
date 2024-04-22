@@ -404,11 +404,14 @@ class EventApi:
                 func.count(Message.event_id), Workspace.workspace_id, Workspace.label
             )
             .join(Event, Message.event_id == Event.event_id)
-            .join(UserWorkspaceConfig, Message.receiver_id == UserWorkspaceConfig.user_id)
+            .join(
+                UserWorkspaceConfig,
+                (Message.receiver_id == UserWorkspaceConfig.user_id)
+                & (UserWorkspaceConfig.workspace_id == Workspace.workspace_id),
+            )
             .join(Workspace, Event.workspace_id == Workspace.workspace_id)
         )
         query = query.filter(Message.receiver_id == user_id)
-        query = query.filter(UserWorkspaceConfig.workspace_id == Workspace.workspace_id)
         query = query.filter(Message.read == None)  # noqa: E711
 
         # INFO - CH - 2024-04-18 - Commenting line bellow because I don't think it works
