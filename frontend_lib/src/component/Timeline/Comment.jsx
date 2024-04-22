@@ -146,7 +146,7 @@ const Comment = (props) => {
                       <IconButton
                         icon='fas fa-exclamation-triangle'
                         intent='link'
-                        key='deleteComment'
+                        key='deletePermanentlyComment'
                         mode='dark'
                         onClick={props.onClickPermanentlyDeleteComment}
                         text={props.t('Permanently delete')}
