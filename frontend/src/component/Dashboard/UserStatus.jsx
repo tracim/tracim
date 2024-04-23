@@ -27,7 +27,7 @@ export const UserStatus = props => {
         <div className='userstatus__item__value'>
           <Icon
             color={myRole.hexcolor}
-            customClass='role__icon'
+            customClass='userstatus__item__value__icon'
             icon={myRole.faIcon}
             title={props.t('Your role in the space')}
           />
@@ -58,25 +58,23 @@ export const UserStatus = props => {
             {props.t('Access request:')}
           </div>
 
-          <div className='userstatus__item__value'>
-            <Link
-              className='spaceAccessRequest__link'
-              to={PAGE.WORKSPACE.ADVANCED_DASHBOARD(props.currentWorkspace.id)}
-            >
-              <Icon
-                icon='fas fa-sign-in-alt'
-                customClass='spaceAccessRequest__link__icon'
-                title={props.t('{{newRequests}} new requests', {
-                  newRequests: props.newSubscriptionRequestsNumber
-                })}
-              />
-              <div>
-                {props.t('{{newRequests}} new requests', {
-                  newRequests: props.newSubscriptionRequestsNumber
-                })}
-              </div>
-            </Link>
-          </div>
+          <Link
+            className='userstatus__item__value spaceAccessRequest__value'
+            to={PAGE.WORKSPACE.ADVANCED_DASHBOARD(props.currentWorkspace.id)}
+          >
+            <Icon
+              icon='fas fa-sign-in-alt'
+              customClass='userstatus__item__value__icon'
+              title={props.t('{{newRequests}} new requests', {
+                newRequests: props.newSubscriptionRequestsNumber
+              })}
+            />
+            <div>
+              {props.t('{{newRequests}} new requests', {
+                newRequests: props.newSubscriptionRequestsNumber
+              })}
+            </div>
+          </Link>
         </div>
       )}
     </div>

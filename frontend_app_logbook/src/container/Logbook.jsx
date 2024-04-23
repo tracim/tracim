@@ -6,6 +6,7 @@ import {
   APP_FEATURE_MODE,
   BREADCRUMBS_TYPE,
   CONTENT_TYPE,
+  ConfirmPopup,
   CUSTOM_EVENT,
   FAVORITE_STATE,
   PAGE,
@@ -74,6 +75,7 @@ export class Logbook extends React.Component {
       showInvalidMentionPopupInComment: false,
       showProgress: true,
       showRefreshWarning: false,
+      showPermanentlyDeletePopup: false,
       translationTargetLanguageCode: param.loggedUser.lang,
       toDoList: []
     }
@@ -227,6 +229,16 @@ export class Logbook extends React.Component {
   handlePermanentlyDeleteComment = async (comment) => {
     const { state } = this
     this.props.appContentDeletePermanently(state.content.workspace_id, comment.content_id, () => {})
+  }
+
+  handleClickPermanentlyDeleteButton = () => {
+    this.setState(prev => ({ showPermanentlyDeletePopup: !prev.showPermanentlyDeletePopup }))
+  }
+
+  handleClickValidatePermanentlyDeleteButton = () => {
+    const { state } = this
+    this.props.appContentDeletePermanently(state.content.workspace_id, state.content.content_id, this.handleClickBtnCloseApp)
+    this.handleClickPermanentlyDeleteButton()
   }
 
   // TLM Handlers
@@ -640,6 +652,15 @@ export class Logbook extends React.Component {
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
               disabled: readOnly,
               dataCy: 'popinListItem__delete'
+            },
+            {
+              icon: 'fas fa-exclamation-triangle',
+              label: props.t('Permanently delete'),
+              onClick: this.handleClickPermanentlyDeleteButton,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.workspaceManager.id,
+              disabled: false,
+              separatorLine: true,
+              dataCy: 'popinListItem__permanentlyDelete'
             }
           ]}
           headerButtons={[
@@ -702,6 +723,17 @@ export class Logbook extends React.Component {
             menuItemList={this.getMenuItemList()}
           />
         </PopinFixedContent>
+        {state.showPermanentlyDeletePopup && (
+          <ConfirmPopup
+            customColor={props.customColor}
+            confirmLabel={props.t('Yes, delete permanently')}
+            confirmIcon='fas fa-exclamation-triangle'
+            onConfirm={this.handleClickValidatePermanentlyDeleteButton}
+            onCancel={this.handleClickPermanentlyDeleteButton}
+            msg={props.t('Warning: this operation cannot be rolled back')}
+            titleLabel={props.t('Permanently delete')}
+          />
+        )}
       </PopinFixed>
     )
   }

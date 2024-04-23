@@ -5,8 +5,7 @@
     display flex
     align-items center
     flex-wrap wrap
-    &.role, &.emailNotification
-      margin-bottom 8px
+    margin-bottom 8px
     &__label
       width 45%
       margin-right 2%
@@ -14,16 +13,12 @@
     &__value
       display flex
       align-items center
-      & .role__icon
+      &__icon
         margin 0 textSpacing 0 0
-      & .spaceAccessRequest__link
-        display flex
-        align-items center
-        color fontColor
-        &__icon
-          margin 0 textSpacing 0 10px
       &.emailNotification__value
         flex-grow 1
+      &.spaceAccessRequest__value
+        color fontColor
 
 @media (max-width: max-md)
   .userstatus
