@@ -959,7 +959,7 @@ export const stringIncludes = (a) => {
 //  Note that this might exclude some other common characters and does not remove ascii symbol characters
 //  See more at https://www.ling.upenn.edu/courses/Spring_2003/ling538/UnicodeRanges.html
 export const stripEmojis = (str) => {
-  if (!str) return str
+  if (!str) return ''
   return str.replace(/[^\u{0020}-\u{1FFF}\u{3040}-\u{DFFF}]/gu, '')
 }
 
