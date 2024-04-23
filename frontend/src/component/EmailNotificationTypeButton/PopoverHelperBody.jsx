@@ -51,7 +51,7 @@ export const PopoverHelperBodySplit = translate()(props => (
         <div className='PopoverHelperBody'>
           <div className='PopoverHelperBody__section'>
             <div className='PopoverHelperBody__section__label'>
-              {props.t('All')}
+              {props.t('Individual')}
             </div>
             <div className='PopoverHelperBody__section__description'>
               <PopoverHelperBodyMessageIndividual />
@@ -123,7 +123,7 @@ export const PopoverHelperBodySplit = translate()(props => (
         <div className='PopoverHelperBody'>
           <div className='PopoverHelperBody__section'>
             <div className='PopoverHelperBody__section__label'>
-              {props.t('None')}
+              {props.t('None', { context: 'feminine' })}
             </div>
             <div className='PopoverHelperBody__section__description'>
               <PopoverHelperBodyMessageNone />
