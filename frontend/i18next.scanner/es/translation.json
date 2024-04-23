@@ -617,5 +617,6 @@
   "You'll <1>receive a hourly e-mail</1> summarizing everything you haven't already read.<3></3><4></4>There will be a single email for all spaces configured as \"Hourly\".": "",
   "You'll <1>receive a daily e-mail</1> summarizing everything you haven't already read.<3></3><4></4>There will be a single email for all spaces configured as \"Daily\".": "",
   "You'll <1>receive a weekly e-mail</1> summarizing everything you haven't already read.<3></3><4></4>There will be a single email for all spaces configured as \"Weekly\".": "",
+  "You'll receive no e-mail notifications, even if you are mentioned.<1></1><2></2>You'll need to rely on recent activities and the notification wall to stay up to date.": "",
   "logbook_search": "Logbook"
 }
