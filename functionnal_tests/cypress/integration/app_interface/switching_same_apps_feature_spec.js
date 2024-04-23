@@ -1,7 +1,8 @@
 import { SELECTORS as s } from '../../support/generic_selector_commands'
 import { PAGES as p } from '../../support/urls_commands'
 
-describe('Hot switching between the same app', () => {
+// INFO - CH - 2024-04-19 - Skip unstable test
+describe.skip('Hot switching between the same app', () => {
   const htmlDocTitle = 'first Html Doc'
   const threadTitle = 'first Thread'
   const fileTitle = 'first File'

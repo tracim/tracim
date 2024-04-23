@@ -61,7 +61,7 @@ def upgrade():
       role,
       CASE
         WHEN email_notification_type = 'SUMMARY' THEN 'DAILY'
-        ELSE 'NONE'
+        ELSE email_notification_type
       END AS email_notification_type
     FROM user_workspace_temporary_migration_process;
     """
