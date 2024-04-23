@@ -40,7 +40,7 @@ export const UserStatus = props => {
       {props.displayNotifBtn && (
         <div className='userstatus__item emailNotification'>
           <div className='userstatus__item__label'>
-            {props.t('Email notification:')}
+            {props.t('Email notifications:')}
           </div>
 
           <div className='userstatus__item__value emailNotification__value'>
