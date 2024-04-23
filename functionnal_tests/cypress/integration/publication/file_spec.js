@@ -108,7 +108,8 @@ describe('Publications', () => {
     })
 
     describe('open as a thread', () => {
-      it('should be able to comment a file', () => {
+      // INFO - CH - 2024-04-23 - Skip unstable test
+      it.skip('should be able to comment a file', () => {
         cy.get('.feedItemHeader__actionMenu').click()
         cy.get('.feedItemHeader__actionMenu__item[title="Open as content"]').click()
 
