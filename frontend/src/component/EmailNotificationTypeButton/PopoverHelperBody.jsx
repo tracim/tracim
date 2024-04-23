@@ -8,35 +8,35 @@ require('./PopoverHelperBody.styl')
 const PopoverHelperBodyMessageIndividual = translate()(() => (
   <Trans>
     You will receive an email for each event.<br />
-    Use this setting when you need to be informed of <i>everything that happens</i>.<br />
+    Use this setting when you need to be informed of <i>everything that happens</i>.<br /><br />
     Warning: this might result in a lot of e-mails.
   </Trans>
 ))
 
 const PopoverHelperBodyMessageHourly = translate()(() => (
   <Trans>
-    You'll <i>receive a hourly e-mail</i> summarizing everything you haven't already read.<br />
+    You'll <i>receive a hourly e-mail</i> summarizing everything you haven't already read.<br /><br />
     There will be a single email for all spaces configured as "Hourly".
   </Trans>
 ))
 
 const PopoverHelperBodyMessageDaily = translate()(() => (
   <Trans>
-    You'll <i>receive a daily e-mail</i> summarizing everything you haven't already read.<br />
+    You'll <i>receive a daily e-mail</i> summarizing everything you haven't already read.<br /><br />
     There will be a single email for all spaces configured as "Daily".
   </Trans>
 ))
 
 const PopoverHelperBodyMessageWeekly = translate()(() => (
   <Trans>
-    You'll <i>receive a weekly e-mail</i> summarizing everything you haven't already read.<br />
+    You'll <i>receive a weekly e-mail</i> summarizing everything you haven't already read.<br /><br />
     There will be a single email for all spaces configured as "Weekly".
   </Trans>
 ))
 
 const PopoverHelperBodyMessageNone = translate()(() => (
   <Trans>
-    You'll receive no e-mail notifications, even if you are mentioned.<br />
+    You'll receive no e-mail notifications, even if you are mentioned.<br /><br />
     You'll need to rely on recent activities and the notification wall to stay up to date.
   </Trans>
 ))
