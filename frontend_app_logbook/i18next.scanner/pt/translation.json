@@ -37,5 +37,9 @@
   "You must change the status or restore this logbook before any change": "",
   "Create a logbook": "",
   "New logbook": "",
-  "Time of event": ""
+  "Time of event": "",
+  "Turn into content": "",
+  "Permanently delete": "",
+  "Yes, delete permanently": "",
+  "Warning: this operation cannot be rolled back": ""
 }
