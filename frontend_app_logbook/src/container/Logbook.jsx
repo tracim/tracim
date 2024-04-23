@@ -224,6 +224,11 @@ export class Logbook extends React.Component {
     }))
   }
 
+  handlePermanentlyDeleteComment = async (comment) => {
+    const { state } = this
+    this.props.appContentDeletePermanently(state.content.workspace_id, comment.content_id, () => {})
+  }
+
   // TLM Handlers
 
   handleContentChanged = data => {
@@ -296,6 +301,8 @@ export class Logbook extends React.Component {
             memberList={state.config.workspace.memberList}
             onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
             onClickDeleteComment={this.handleClickDeleteComment}
+            onClickPermanentlyDeleteComment={this.handlePermanentlyDeleteComment}
+            shouldShowPermanentlyDeleteButton={state.loggedUser.userRoleIdInWorkspace >= ROLE.workspaceManager.id}
             onClickEditComment={this.handleClickEditComment}
             onClickOpenFileComment={this.handleClickOpenFileComment}
             onClickRevisionBtn={this.handleClickShowRevision}

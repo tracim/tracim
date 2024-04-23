@@ -373,6 +373,11 @@ export class Thread extends React.Component {
     })
   }
 
+  handlePermanentlyDeleteComment = async (comment) => {
+    const { state } = this
+    this.props.appContentDeletePermanently(state.content.workspace_id, comment.content_id, () => {})
+  }
+
   render () {
     const { props, state } = this
     const isPublication = state.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION
@@ -538,6 +543,8 @@ export class Thread extends React.Component {
                 memberList={state.config.workspace && state.config.workspace.memberList}
                 onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
                 onClickDeleteComment={this.handleClickDeleteComment}
+                onClickPermanentlyDeleteComment={this.handlePermanentlyDeleteComment}
+                shouldShowPermanentlyDeleteButton={state.loggedUser.userRoleIdInWorkspace >= ROLE.workspaceManager.id}
                 onClickEditComment={this.handleClickEditComment}
                 onClickOpenFileComment={this.handleClickOpenFileComment}
                 onClickRestoreArchived={this.handleClickRestoreArchive}
