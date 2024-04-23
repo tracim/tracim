@@ -74,6 +74,7 @@ export const SEARCH_CONTENT_FACETS = {
       i18n.t('html-document_search'),
       i18n.t('thread_search'),
       i18n.t('file_search'),
+      i18n.t('logbook_search'),
       i18n.t('kanban_search')
     ]
   },
@@ -185,7 +186,7 @@ const backendTranslationKeyList = [ // eslint-disable-line no-unused-vars
   i18n.t('Deprecated')
 ]
 
-export const ALL_CONTENT_TYPES = 'html-document,file,thread,folder,comment,kanban,todo'
+export const ALL_CONTENT_TYPES = 'html-document,file,thread,folder,comment,kanban,todo,logbook'
 
 export const toggleFavicon = (hasUnreadNotification, hasUnreadMention) => {
   const originalHrefAttribute = 'originalHrefAttribute'
