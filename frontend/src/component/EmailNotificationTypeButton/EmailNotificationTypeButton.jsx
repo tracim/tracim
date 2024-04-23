@@ -15,7 +15,7 @@ export const EmailNotificationTypeButton = props => {
     { label: props.t('Hourly'), value: EMAIL_NOTIFICATION_TYPE.HOURLY },
     { label: props.t('Daily'), value: EMAIL_NOTIFICATION_TYPE.DAILY },
     { label: props.t('Weekly'), value: EMAIL_NOTIFICATION_TYPE.WEEKLY },
-    { label: props.t('None'), value: EMAIL_NOTIFICATION_TYPE.NONE }
+    { label: props.t('None', { context: 'feminine' }), value: EMAIL_NOTIFICATION_TYPE.NONE }
   ]
 
   const displayCurrentEmailNotificationType = notificationTimingList
