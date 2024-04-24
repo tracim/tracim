@@ -17,8 +17,8 @@ MENTION_FIELD = "mention"
 
 default_config = {
     # Message of the warning. Note that a mention to the file's author will be prepended.
-    "message": "Automatic message: the file format used is not compatible with integrated "
-    "playback. Please prefer mp4 or webm format.",
+    "message": "<i>this is an automatic message:</i> the file you uploaded may not be compatible "
+               "with the built-in video player. We suggest you choose an MP4 or WebM video file.",
     # Username of the user that will comment the warning. Leave blank to use the author of the file.
     "username": "",
     # List of mimetypes that should bypass the blacklist.
