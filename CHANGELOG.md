@@ -4,8 +4,9 @@
 
 ### ✨ New Features
 
+- Tracim can now connect to a Redis cluster
 - New content type: Logbook. A logbook is a type of content that features logbook entries. These entries are displayed as a timeline, with an emphasis on the time and the order, most recent at the top
-- Allow to permanently delete a content
+- Allow to permanently delete contents and comments
 - Allow to transform news into thread
 - Mail notification: Summary mail can now be set once every hour, day or week
 - The states of the navigation sidebar is saved in the browser
@@ -33,6 +34,8 @@
 - Authentication:
   - Fixed LDAP auth issues related to auth chaining [#6355](https://github.com/tracim/tracim/issues/6355)
   - Fixed SAML dependencies for installation [#6365](https://github.com/tracim/tracim/issues/6365)
+- Tracimcli
+  - Removed git error messages
 
 ## 4.8.0 / 2024-01-24
 
