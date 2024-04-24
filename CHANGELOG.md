@@ -30,7 +30,7 @@
   - Fixed kanban title with special characters [#5220](https://github.com/tracim/tracim/issues/5220)
   - Renamed label "value" to "open field" in Kanban [#6354](https://github.com/tracim/tracim/issues/6354)
   - Fixed real time issues with kanban [#6363](https://github.com/tracim/tracim/issues/6363)
-- Authentication:
+- Authentication
   - Fixed LDAP auth issues related to auth chaining [#6355](https://github.com/tracim/tracim/issues/6355)
   - Fixed SAML dependencies for installation [#6365](https://github.com/tracim/tracim/issues/6365)
 
