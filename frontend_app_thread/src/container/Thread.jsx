@@ -490,12 +490,14 @@ export class Thread extends React.Component {
                     contentId={state.content.content_id}
                     workspaceId={state.content.workspace_id}
                   />
-                  <SelectStatus
-                    selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
-                    availableStatus={state.config.availableStatuses}
-                    onChangeStatus={this.handleChangeStatus}
-                    disabled={state.content.is_archived || state.content.is_deleted}
-                  />
+                  <div className='wsContentGeneric__content__left__top__selectStatus'>
+                    <SelectStatus
+                      selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
+                      availableStatus={state.config.availableStatuses}
+                      onChangeStatus={this.handleChangeStatus}
+                      disabled={state.content.is_archived || state.content.is_deleted}
+                    />
+                  </div>
                 </>
               )}
             </div>
