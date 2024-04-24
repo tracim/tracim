@@ -58,7 +58,8 @@ function KanbanCard (props) {
           buttonCustomClass='kanban__contentpage__wrapper__board__card__title__actions'
           buttonIcon={classnames('fas fa-ellipsis-v', {
             kanban__white__text__color: shouldUseLightTextColor(props.card.bgColor || props.customColor),
-            kanban__black__text__color: !shouldUseLightTextColor(props.card.bgColor || props.customColor)})}
+            kanban__black__text__color: !shouldUseLightTextColor(props.card.bgColor || props.customColor)
+          })}
           buttonTooltip={props.t('Actions')}
           buttonDataCy='cardActions'
           buttonDisabled={props.readOnly}
