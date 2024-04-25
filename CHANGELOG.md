@@ -1,6 +1,6 @@
 # Changelog
 
-## 4.9.0 / TBA
+## 4.9.0 / 2024-04-25
 
 ### ✨ New Features
 
