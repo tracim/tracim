@@ -53,6 +53,7 @@ from tracim_backend.models.context_models import ContentAndUserPath
 from tracim_backend.models.context_models import ContentCreation
 from tracim_backend.models.context_models import ContentFilter
 from tracim_backend.models.context_models import ContentIdsQuery
+from tracim_backend.models.context_models import ContentNamespaceUpdate
 from tracim_backend.models.context_models import ContentUpdate
 from tracim_backend.models.context_models import FileCreation
 from tracim_backend.models.context_models import FilePath
@@ -1551,7 +1552,7 @@ class WorkspaceSchema(WorkspaceWithoutDescriptionSchema):
 
 class EmailNotificationTypeSchema(marshmallow.Schema):
     email_notification_type = StrippedString(
-        example=EmailNotificationType.SUMMARY.name,
+        example=EmailNotificationType.default().name,
         description="Type of email notification for a specific space",
     )
 
@@ -1560,7 +1561,7 @@ class WorkspaceMemberDigestSchema(EmailNotificationTypeSchema):
     role = StrippedString(example="contributor", validate=user_role_validator)
 
 
-class WorkspaceMemberSchema(WorkspaceMemberDigestSchema):
+class UserWorkspaceConfigSchema(WorkspaceMemberDigestSchema):
     user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
     is_active = marshmallow.fields.Bool()
     user = marshmallow.fields.Nested(UserDigestSchema())
@@ -1573,8 +1574,19 @@ class WorkspaceMemberSchema(WorkspaceMemberDigestSchema):
         description = "Workspace Member information"
 
 
+class WorkspaceRoleDigestSchema(marshmallow.Schema):
+    role = StrippedString(example="contributor", validate=user_role_validator)
+
+
+class UserWorkspaceRoleSchema(WorkspaceRoleDigestSchema):
+    user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
+    is_active = marshmallow.fields.Bool()
+    user = marshmallow.fields.Nested(UserDigestSchema())
+    workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
+
+
 class WorkspaceWithUserMemberSchema(WorkspaceSchema):
-    members = marshmallow.fields.Nested(WorkspaceMemberSchema(many=True))
+    members = marshmallow.fields.Nested(UserWorkspaceConfigSchema(many=True))
 
 
 class UserConfigSchema(marshmallow.Schema):
@@ -1614,7 +1626,7 @@ class WorkspaceDiskSpaceSchema(marshmallow.Schema):
     workspace = marshmallow.fields.Nested(WorkspaceDigestSchema(), attribute="workspace_in_context")
 
 
-class WorkspaceMemberCreationSchema(WorkspaceMemberSchema):
+class WorkspaceMemberCreationSchema(UserWorkspaceConfigSchema):
     newly_created = marshmallow.fields.Bool(
         exemple=False,
         description="Is the user completely new " "(and account was just created) or not ?",
@@ -2085,10 +2097,23 @@ class ContentModifyAbstractSchema(marshmallow.Schema):
     )
 
 
+class ContentModifyNamespaceAbstractSchema(marshmallow.Schema):
+    content_namespace = StrippedString(
+        required=True,
+        description="Content_namespace of the object, raw text",
+    )
+
+
 class ContentModifySchema(ContentModifyAbstractSchema):
     @post_load
     def text_based_content_update(self, data: typing.Dict[str, typing.Any]) -> object:
         return ContentUpdate(**data)
+
+
+class ContentModifyNamespaceSchema(ContentModifyNamespaceAbstractSchema):
+    @post_load
+    def content_namespace_update(self, data: typing.Dict[str, typing.Any]) -> object:
+        return ContentNamespaceUpdate(**data)
 
 
 class FolderContentModifySchema(ContentModifyAbstractSchema):

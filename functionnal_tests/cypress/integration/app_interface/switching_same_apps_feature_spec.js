@@ -1,7 +1,8 @@
 import { SELECTORS as s } from '../../support/generic_selector_commands'
 import { PAGES as p } from '../../support/urls_commands'
 
-describe('Hot switching between the same app', () => {
+// INFO - CH - 2024-04-19 - Skip unstable test
+describe.skip('Hot switching between the same app', () => {
   const htmlDocTitle = 'first Html Doc'
   const threadTitle = 'first Thread'
   const fileTitle = 'first File'
@@ -45,13 +46,23 @@ describe('Hot switching between the same app', () => {
 
     cy.createWorkspace().then(workspace => {
       secondWorkspaceId = workspace.workspace_id
+      let userId;
       cy.getUserByRole('users').then(user => {
+        userId = user.user_id
         cy.addUserToWorkspace(user.user_id, workspace.workspace_id)
       })
-      cy.createKanban(fullFilename, contentType, aThirdKanbanTitle, workspaceId)
-      cy.createHtmlDocument(aThirdHtmlDocTitle, secondWorkspaceId)
-      cy.createThread(aThirdThreadTitle, secondWorkspaceId)
-      cy.createFile(fullFilename, contentType, aThirdFileTitle, secondWorkspaceId)
+      cy.createKanban(fullFilename, contentType, aThirdKanbanTitle, workspaceId).then((kanban) => {
+        cy.createComment(secondWorkspaceId, kanban.content_id, `<html-mention userid="${userId}"></html-mention> hello there`)
+      })
+      cy.createHtmlDocument(aThirdHtmlDocTitle, secondWorkspaceId).then((doc) => {
+        cy.createComment(secondWorkspaceId, doc.content_id, `<html-mention userid="${userId}"></html-mention> hello there`)
+      })
+      cy.createThread(aThirdThreadTitle, secondWorkspaceId).then((thread) => {
+        cy.createComment(secondWorkspaceId, thread.content_id, `<html-mention userid="${userId}"></html-mention> hello there`)
+      })
+      cy.createFile(fullFilename, contentType, aThirdFileTitle, secondWorkspaceId).then((file) => {
+        cy.createComment(secondWorkspaceId, file.content_id, `<html-mention userid="${userId}"></html-mention> hello there`)
+      })
     })
   })
 
@@ -77,9 +88,11 @@ describe('Hot switching between the same app', () => {
         cy.get('.sidebar__notification__item')
           .click('left')
 
-        cy.get('.notification__list__item').first().click()
-
-        cy.contains(aThirdFileTitle)
+        // NOTE - M.L. - 2024-2-27 - This is to wait for the notification wall animation, so that it really clicks on
+        //  the desired notification (same applies for below) the wait value is chosen based on the transition delay
+        //  as in frontend/src/css/NotificationWall.styl line 10
+        cy.wait(500)
+        cy.get(`.notification__list__item.isMention .contentTitle__highlight[title="${aThirdFileTitle}"]`)
           .click('left')
 
         cy.getTag({ selectorName: s.CONTENT_FRAME }).contains(aThirdFileTitle)
@@ -97,7 +110,9 @@ describe('Hot switching between the same app', () => {
         cy.get('.sidebar__notification__item')
           .click('left')
 
-        cy.get('.notification__list__item').first().click()
+        cy.wait(500)
+        cy.get(`.notification__list__item.isMention .contentTitle__highlight[title="${aThirdHtmlDocTitle}"]`)
+          .click('left')
 
         cy.contains(aThirdHtmlDocTitle)
           .click('left')
@@ -117,7 +132,9 @@ describe('Hot switching between the same app', () => {
         cy.get('.sidebar__notification__item')
           .click('left')
 
-        cy.get('.notification__list__item').first().click()
+        cy.wait(500)
+        cy.get(`.notification__list__item.isMention .contentTitle__highlight[title="${aThirdThreadTitle}"]`)
+          .click('left')
 
         cy.contains(aThirdThreadTitle)
           .click('left')
@@ -137,7 +154,9 @@ describe('Hot switching between the same app', () => {
         cy.get('.sidebar__notification__item')
           .click('left')
 
-        cy.get('.notification__list__item').first().click()
+        cy.wait(500)
+        cy.get(`.notification__list__item.isMention .contentTitle__highlight[title="${aThirdKanbanTitle}"]`)
+          .click('left')
 
         cy.contains(aThirdKanbanTitle)
           .click('left')

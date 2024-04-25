@@ -1,6 +1,6 @@
 import { globalManagerFromApi } from './globalManagerFromApi.js'
 import { ROLE } from 'tracim_frontend_lib'
-import { serializeMember } from '../../../src/reducer/currentWorkspace.js'
+import { serializeUserRole } from '../../../src/reducer/currentWorkspace.js'
 
 export const globalManagerAsMemberFromApi = {
   user: {
@@ -11,4 +11,4 @@ export const globalManagerAsMemberFromApi = {
   email_notification_type: 'summary'
 }
 
-export const globalManagerAsMember = serializeMember(globalManagerAsMemberFromApi)
+export const globalManagerAsMember = serializeUserRole(globalManagerAsMemberFromApi)

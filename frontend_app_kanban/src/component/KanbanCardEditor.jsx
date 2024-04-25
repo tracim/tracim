@@ -13,7 +13,7 @@ function KanbanCardEditor (props) {
 
   const [title, setTitle] = useState(card.title || '')
   const [description, setDescription] = useState(card.description || '')
-  const [bgColor, setBgColor] = useState(card.bgColor || props.customColor)
+  const [bgColor, setBgColor] = useState(card.bgColor || props.defaultBackgroundColor)
   const [deadline, setDeadline] = useState(card.deadline || '')
   const [freeInput, setFreeInput] = useState(card.freeInput || '')
 
@@ -59,6 +59,7 @@ function KanbanCardEditor (props) {
             isMentionEnabled={false}
             language={props.language}
             maxHeight={300}
+            userList={props.memberList}
             minHeight={200}
             placeholder={props.t('Description of the card')}
           />
@@ -85,7 +86,7 @@ function KanbanCardEditor (props) {
         </div>
 
         <div className='kanban__KanbanPopup__freeInput'>
-          <label htmlFor='kanban__KanbanPopup__freeInput'>{props.t('Value:')}</label>
+          <label htmlFor='kanban__KanbanPopup__freeInput'>{props.t('Open field:')}</label>
           <TextInput
             id='kanban__KanbanPopup__freeInput'
             onChange={(e) => setFreeInput(e.target.value)}
@@ -123,6 +124,7 @@ KanbanCardEditor.propTypes = {
   card: PropTypes.object.isRequired,
   onValidate: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
+  defaultBackgroundColor: PropTypes.string.isRequired,
   // End of required props /////////////////////////////////////////////////////////////////////////
   codeLanguageList: PropTypes.array,
   customColor: PropTypes.string,
@@ -135,5 +137,6 @@ KanbanCardEditor.defaultProps = {
   codeLanguageList: [],
   customColor: '',
   focusOnDescription: false,
-  language: 'en'
+  language: 'en',
+  memberList: []
 }

@@ -24,10 +24,9 @@ import {
   stringIncludes,
   serialize
 } from 'tracim_frontend_lib'
-import { serializeRole, serializeWorkspaceListProps } from '../../reducer/workspaceList.js'
-import { serializeMember } from '../../reducer/currentWorkspace.js'
+import { serializeUserConfig, serializeUserWorkspaceConfig, serializeWorkspaceListProps } from '../../reducer/workspaceList.js'
 import { newFlashMessage } from '../../action-creator.sync.js'
-import { deleteWorkspaceMember, getUserRoleWorkspaceList } from '../../action-creator.async.js'
+import { deleteUserRole, getUserWorkspaceConfigList } from '../../action-creator.async.js'
 import AdminUserSpacesConfig from '../../container/AdminUserSpacesConfig.jsx'
 import UserSpacesConfigLine from './UserSpacesConfigLine.jsx'
 
@@ -122,7 +121,7 @@ export const UserSpacesConfig = (props) => {
         ? {
           ...space,
           memberList: space.memberList.map(member => member.id === data.fields.user.user_id
-            ? { ...member, ...serializeMember({ user: data.fields.user, ...data.fields.member }) }
+            ? { ...member, ...serializeUserConfig({ user: data.fields.user, ...data.fields.member }) }
             : member
           )
         }
@@ -146,7 +145,7 @@ export const UserSpacesConfig = (props) => {
             {
               ...serialize(data.fields.workspace, serializeWorkspaceListProps),
               memberList: [
-                serializeMember({ user: data.fields.user, ...data.fields.member })
+                serializeUserConfig({ user: data.fields.user, ...data.fields.member })
               ]
             }
           ]
@@ -160,13 +159,13 @@ export const UserSpacesConfig = (props) => {
 
   const getSpaceList = async () => {
     const fetchGetUserWorkspaceList = await props.dispatch(
-      getUserRoleWorkspaceList(props.userToEditId, false)
+      getUserWorkspaceConfigList(props.userToEditId, false)
     )
 
     switch (fetchGetUserWorkspaceList.status) {
       case 200: {
         const userSpaceList = fetchGetUserWorkspaceList.json.map(
-          role => serializeRole(role)
+          config => serializeUserWorkspaceConfig(config)
         )
         setSpaceList(userSpaceList)
         break
@@ -183,7 +182,7 @@ export const UserSpacesConfig = (props) => {
 
     setSpaceBeingDeleted(null)
 
-    const fetchResult = await props.dispatch(deleteWorkspaceMember(spaceId, props.userToEditId))
+    const fetchResult = await props.dispatch(deleteUserRole(spaceId, props.userToEditId))
     if (fetchResult.status !== 204) {
       props.dispatch(newFlashMessage(props.t('Error while leaving the space'), 'warning'))
     }

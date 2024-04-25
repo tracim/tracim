@@ -6,7 +6,7 @@ from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import EmailNotificationType
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
@@ -36,7 +36,7 @@ class TestThread(object):
         assert [folder] == list(workspace.get_valid_children())
 
     def test__unit__get_notifiable_roles__ok__nominal_case(
-        self, admin_user, session, app_config, user_api_factory, role_api_factory
+        self, admin_user, session, app_config, user_api_factory, user_workspace_config_api_factory
     ):
         wapi = WorkspaceApi(session=session, config=app_config, current_user=admin_user)
         workspace = wapi.create_workspace(label="workspace w", save_now=True)
@@ -48,17 +48,17 @@ class TestThread(object):
             email="u.2@u.u", auth_type=AuthType.INTERNAL, do_save=True, do_notify=False
         )
         assert wapi.get_notifiable_roles(workspace=workspace) == []
-        role_api = role_api_factory.get()
-        role_1 = role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        role_1 = user_workspace_config_api.create_one(
             user_1,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.INDIVIDUAL,
         )
-        role_2 = role_api.create_one(
+        role_2 = user_workspace_config_api.create_one(
             user_2,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
 
@@ -68,7 +68,7 @@ class TestThread(object):
         assert role_2 not in roles
 
     def test__unit__get_notifiable_roles__ok__do_not_show_inactive(
-        self, admin_user, session, app_config, user_api_factory, role_api_factory
+        self, admin_user, session, app_config, user_api_factory, user_workspace_config_api_factory
     ):
         wapi = WorkspaceApi(session=session, config=app_config, current_user=admin_user)
         workspace = wapi.create_workspace(label="workspace w", save_now=True)
@@ -81,17 +81,17 @@ class TestThread(object):
         )
         assert wapi.get_notifiable_roles(workspace=workspace) == []
 
-        role_api = role_api_factory.get()
-        role_1 = role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        role_1 = user_workspace_config_api.create_one(
             user_1,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.INDIVIDUAL,
         )
-        role_2 = role_api.create_one(
+        role_2 = user_workspace_config_api.create_one(
             user_2,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.INDIVIDUAL,
         )
 
@@ -107,7 +107,7 @@ class TestThread(object):
         assert role_2 in roles
 
     def test__unit__get_notifiable_roles__ok__do_not_show_deleted(
-        self, admin_user, session, app_config, user_api_factory, role_api_factory
+        self, admin_user, session, app_config, user_api_factory, user_workspace_config_api_factory
     ):
         wapi = WorkspaceApi(session=session, config=app_config, current_user=admin_user)
         workspace = wapi.create_workspace(label="workspace w", save_now=True)
@@ -120,17 +120,17 @@ class TestThread(object):
         )
         assert wapi.get_notifiable_roles(workspace=workspace) == []
 
-        role_api = role_api_factory.get()
-        role_1 = role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        role_1 = user_workspace_config_api.create_one(
             user_1,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.INDIVIDUAL,
         )
-        role_2 = role_api.create_one(
+        role_2 = user_workspace_config_api.create_one(
             user_2,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.INDIVIDUAL,
         )
 
@@ -149,7 +149,7 @@ class TestThread(object):
         "config_section", [{"name": "base_test_optional_email"}], indirect=True
     )
     def test__unit__get_notifiable_roles__ok__do_not_show_without_email(
-        self, admin_user, session, app_config, user_api_factory, role_api_factory
+        self, admin_user, session, app_config, user_api_factory, user_workspace_config_api_factory
     ):
         wapi = WorkspaceApi(session=session, config=app_config, current_user=admin_user)
         workspace = wapi.create_workspace(label="workspace w", save_now=True)
@@ -162,17 +162,17 @@ class TestThread(object):
         )
         assert wapi.get_notifiable_roles(workspace=workspace) == []
 
-        role_api = role_api_factory.get()
-        role_1 = role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        role_1 = user_workspace_config_api.create_one(
             user_1,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.INDIVIDUAL,
         )
-        role_2 = role_api.create_one(
+        role_2 = user_workspace_config_api.create_one(
             user_2,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.INDIVIDUAL,
         )
 
@@ -182,7 +182,7 @@ class TestThread(object):
         assert role_2 not in roles
 
     def test__unit__get_notifiable_roles__ok__do_not_show_unknown_auth(
-        self, admin_user, session, app_config, user_api_factory, role_api_factory
+        self, admin_user, session, app_config, user_api_factory, user_workspace_config_api_factory
     ):
         wapi = WorkspaceApi(session=session, config=app_config, current_user=admin_user)
         workspace = wapi.create_workspace(label="workspace w", save_now=True)
@@ -199,23 +199,23 @@ class TestThread(object):
         )
         assert wapi.get_notifiable_roles(workspace=workspace) == []
 
-        role_api = role_api_factory.get()
-        role_1 = role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        role_1 = user_workspace_config_api.create_one(
             user_1,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.INDIVIDUAL,
         )
-        role_2 = role_api.create_one(
+        role_2 = user_workspace_config_api.create_one(
             user_2,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.INDIVIDUAL,
         )
-        role_3 = role_api.create_one(
+        role_3 = user_workspace_config_api.create_one(
             user_3,
             workspace,
-            UserRoleInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.INDIVIDUAL,
         )
 
@@ -226,7 +226,7 @@ class TestThread(object):
         assert role_3 in roles
 
     def test_unit__get_all_manageable(
-        self, admin_user, session, app_config, user_api_factory, role_api_factory
+        self, admin_user, session, app_config, user_api_factory, user_workspace_config_api_factory
     ):
         uapi = user_api_factory.get()
         # Checks a case without workspaces.
@@ -242,39 +242,39 @@ class TestThread(object):
 
         u = uapi.create_minimal_user("u.s@e.r", profile=Profile.USER, save_now=True)
         wapi = WorkspaceApi(session=session, current_user=u, config=app_config)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user=u,
             workspace=w4,
-            role_level=UserRoleInWorkspace.READER,
+            role_level=UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user=u,
             workspace=w3,
-            role_level=UserRoleInWorkspace.CONTRIBUTOR,
+            role_level=UserWorkspaceConfig.CONTRIBUTOR,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user=u,
             workspace=w2,
-            role_level=UserRoleInWorkspace.CONTENT_MANAGER,
+            role_level=UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user=u,
             workspace=w1,
-            role_level=UserRoleInWorkspace.WORKSPACE_MANAGER,
+            role_level=UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         assert [] == wapi.get_all_manageable()
         # Checks a manager gets only its own workspaces.
         u.profile = Profile.TRUSTED_USER
-        role_api.delete_one(u.user_id, w2.workspace_id)
-        role_api.create_one(
+        user_workspace_config_api.delete_one(u.user_id, w2.workspace_id)
+        user_workspace_config_api.create_one(
             user=u,
             workspace=w2,
-            role_level=UserRoleInWorkspace.WORKSPACE_MANAGER,
+            role_level=UserWorkspaceConfig.WORKSPACE_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         assert [w1, w2] == wapi.get_all_manageable()

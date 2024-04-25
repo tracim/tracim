@@ -24,8 +24,9 @@
     border-bottom 1px solid lightGrey1
     margin 0 pageSpacing
     &__titleWithBreadcrumbs
-      flex 3
+      flex auto
       overflow hidden
+      width 100%
     &__titleWrapper
       display flex
       align-items center
@@ -54,19 +55,20 @@
       margin-inline-end standardSpacing
     &__title
       display flex
-      flex 2
       font-size titleFontSize
       font-weight bold
       text-overflow ellipsis
       overflow hidden
       white-space nowrap
+      width 100%
       & > div
         text-overflow ellipsis
         overflow hidden
       & > input
         padding-inline-start textSpacing
         border-radius standardBorderRadius
-        border none
+        border 1px solid lightGrey1
+        flex auto
     &__reactions
       flex 1
       & > .EmojiReactions
@@ -117,6 +119,7 @@
       &__top
         display flex
         align-items center
+        min-height 38px // INFO - CH - 2024-04-25 - 38 is height of emoji
         color darkGrey2
         font-size metadataFontSize
         padding standardSpacing pageSpacing 0
@@ -124,12 +127,30 @@
         & .breadcrumbs
           margin-inline-end auto
           overflow auto
+        &__emojiReaction
+          order 1
+          .EmojiReactions
+            flex-direction row
         &__version
-          margin-inline-start auto
+          order 2
           display flex
+          white-space nowrap
+          &::before
+            content '-'
+            display block
+            margin 0 4px 0 0
         &__lastversion
-          margin-inline-start 15px
+          order 3
+          margin-inline-start 5px
           font-weight bold
+          white-space nowrap
+        &__selectStatus
+          order 4
+          display flex
+          &::before
+            content '-'
+            display block
+            margin 0 4px
     &__right
       display flex
       transition width 0.4s ease
@@ -284,6 +305,18 @@ responsiveColumnStyle()
     & span
       display none
   .wsContentGeneric
+    &__header__isEditing
+      display list-item
+      height fit-content
+      margin 0
+      .dropdown
+        display inline-block
+        height 24px
+      .wsContentGeneric__header__titleWrapper
+        display inherit
+    &__header__close
+      display inline-block
+      height 24px
     &.sidebarVisible
       max-width 100%
     &__option
@@ -297,6 +330,10 @@ responsiveColumnStyle()
         &__textnote
           height auto
           overflow-y hidden
+        &__top
+          flex-wrap wrap
+          &__emojiReaction
+            order 10
       &__right
         width 100%
         height auto

@@ -5,7 +5,7 @@ from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import User
 from tracim_backend.models.call import UserCall
 from tracim_backend.models.data import Content
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceSubscription
 from tracim_backend.models.reaction import Reaction
@@ -18,7 +18,7 @@ class DatabaseCrudHookSpec:
     - User
     - Content
     - Workspace
-    - UserRoleInWorkspace
+    - UserWorkspaceConfig
     - WorkspaceSubscription
     - Reaction
     - Tag
@@ -51,33 +51,33 @@ class DatabaseCrudHookSpec:
         ...
 
     @hookspec
-    def on_user_role_in_workspace_created(
+    def on_user_config_in_workspace_created(
         self,
-        role: UserRoleInWorkspace,
+        user_workspace_config: UserWorkspaceConfig,
         context: TracimContext,
     ) -> None:
         ...
 
     @hookspec
-    def on_user_role_in_workspaces_created(
+    def on_user_config_in_workspaces_created(
         self,
-        roles: typing.List[UserRoleInWorkspace],
+        user_workspace_configs: typing.List[UserWorkspaceConfig],
         context: TracimContext,
     ) -> None:
         ...
 
     @hookspec
-    def on_user_role_in_workspace_modified(
+    def on_user_config_in_workspace_modified(
         self,
-        role: UserRoleInWorkspace,
+        user_workspace_config: UserWorkspaceConfig,
         context: TracimContext,
     ) -> None:
         ...
 
     @hookspec
-    def on_user_role_in_workspace_deleted(
+    def on_user_config_in_workspace_deleted(
         self,
-        role: UserRoleInWorkspace,
+        user_workspace_config: UserWorkspaceConfig,
         context: TracimContext,
     ) -> None:
         ...

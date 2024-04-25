@@ -17,7 +17,7 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import User
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.reaction import Reaction
 from tracim_backend.models.revision_protection import new_revision
@@ -80,6 +80,8 @@ class TestCommandsList(object):
         assert output.find("content show") > 0
         # revision
         assert output.find("revision delete") > 0
+        # periodic
+        assert output.find("periodic send-summary-mails") > 0
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -861,7 +863,7 @@ class TestCommands(object):
         hapic,
         content_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         admin_user,
     ) -> None:
@@ -883,11 +885,11 @@ class TestCommands(object):
             do_save=True,
             do_notify=False,
         )
-        role_api = role_api_factory.get(current_user=test_user)
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=test_user)
+        user_workspace_config_api.create_one(
             test_user,
             test_workspace,
-            role_level=UserRoleInWorkspace.CONTENT_MANAGER,
+            role_level=UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         content_api = content_api_factory.get(
@@ -971,7 +973,7 @@ class TestCommands(object):
         hapic,
         content_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         admin_user,
     ) -> None:
@@ -996,11 +998,11 @@ class TestCommands(object):
         workspace_api2 = workspace_api_factory.get(current_user=test_user)
         user_workspace = workspace_api2.create_workspace("test_workspace2")
 
-        role_api = role_api_factory.get(current_user=test_user)
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=test_user)
+        user_workspace_config_api.create_one(
             test_user,
             admin_workspace,
-            role_level=UserRoleInWorkspace.CONTENT_MANAGER,
+            role_level=UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         session.add(admin_workspace)
@@ -1100,7 +1102,7 @@ class TestCommands(object):
         hapic,
         content_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         admin_user,
         event_helper,
@@ -1125,11 +1127,11 @@ class TestCommands(object):
         workspace_api2 = workspace_api_factory.get(current_user=test_user)
         user_workspace = workspace_api2.create_workspace("test_workspace2")
 
-        role_api = role_api_factory.get(current_user=test_user)
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=test_user)
+        user_workspace_config_api.create_one(
             test_user,
             admin_workspace,
-            role_level=UserRoleInWorkspace.CONTENT_MANAGER,
+            role_level=UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         session.add(admin_workspace)
@@ -1244,7 +1246,7 @@ class TestCommands(object):
         hapic,
         content_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         admin_user,
     ) -> None:
@@ -1265,11 +1267,11 @@ class TestCommands(object):
             do_save=True,
             do_notify=False,
         )
-        role_api = role_api_factory.get(current_user=test_user)
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=test_user)
+        user_workspace_config_api.create_one(
             test_user,
             test_workspace,
-            role_level=UserRoleInWorkspace.CONTENT_MANAGER,
+            role_level=UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         content_api = content_api_factory.get(
@@ -1371,7 +1373,7 @@ class TestCommands(object):
         hapic,
         content_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         admin_user,
     ) -> None:
@@ -1478,7 +1480,7 @@ class TestCommands(object):
         hapic,
         content_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         admin_user,
         event_helper,
@@ -1546,7 +1548,7 @@ class TestCommands(object):
         hapic,
         content_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         content_type_list,
         admin_user,
         event_helper,
@@ -2088,3 +2090,19 @@ class TestCommands(object):
             session.query(ContentRevisionRO).filter(
                 ContentRevisionRO.revision_id == revision_id
             ).one()
+
+    def test_func__periodic_send_summary_mails__ok__nominal_case(
+        self,
+    ):
+        app = TracimCLI()
+        result = app.run(
+            [
+                "periodic",
+                "send-summary-mails",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "--email_notification_type",
+                "weekly",
+            ]
+        )
+        assert result == 0

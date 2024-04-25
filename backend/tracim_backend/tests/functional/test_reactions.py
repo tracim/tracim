@@ -5,7 +5,7 @@ import transaction
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.core.reaction import ReactionLib
 from tracim_backend.models.data import EmailNotificationType
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 
@@ -338,7 +338,7 @@ class TestReactionsEndpoint(object):
         self,
         workspace_api_factory,
         content_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         session,
         web_testapp,
         admin_user,
@@ -352,11 +352,11 @@ class TestReactionsEndpoint(object):
         workspace_api = workspace_api_factory.get()
         content_api = content_api_factory.get()
         test_workspace = workspace_api.create_workspace(label="test", save_now=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             riyad_user,
             test_workspace,
-            UserRoleInWorkspace.CONTRIBUTOR,
+            UserWorkspaceConfig.CONTRIBUTOR,
             email_notification_type=EmailNotificationType.NONE,
         )
         folder = content_api.create(

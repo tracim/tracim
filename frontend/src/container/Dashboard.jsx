@@ -23,19 +23,19 @@ import {
   buildHeadTitle,
   removeAtInUsername,
   addExternalLinksIcons,
-  getSpaceMemberList
+  getSpaceUserRoleList
 } from 'tracim_frontend_lib'
 import {
   getSubscriptions,
-  postWorkspaceMember,
-  deleteWorkspaceMember,
+  postUserRole,
+  deleteUserRole,
   putMyselfWorkspaceEmailNotificationType
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
   setBreadcrumbs,
   setHeadTitle,
-  setWorkspaceMemberList
+  setUserRoleList
 } from '../action-creator.sync.js'
 import appFactory from '../util/appFactory.js'
 import {
@@ -108,14 +108,14 @@ export class Dashboard extends React.Component {
   async updateWorkspaceList () {
     const { props } = this
 
-    const requestMemberList = await getSpaceMemberList(FETCH_CONFIG.apiUrl, props.currentWorkspace.id)
+    const requestUserRoleList = await getSpaceUserRoleList(FETCH_CONFIG.apiUrl, props.currentWorkspace.id)
 
-    const responseMemberList = await handleFetchResult(requestMemberList)
+    const responseUserRoleList = await handleFetchResult(requestUserRoleList)
 
-    if (responseMemberList.apiResponse.status === 200) {
-      props.dispatch(setWorkspaceMemberList(responseMemberList.body))
+    if (responseUserRoleList.apiResponse.status === 200) {
+      props.dispatch(setUserRoleList(responseUserRoleList.body))
     } else {
-      switch (responseMemberList.apiResponse.status) {
+      switch (responseUserRoleList.apiResponse.status) {
         case 200: break
         case 400: break
         default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('member list')}`, 'warning')); break
@@ -165,7 +165,8 @@ export class Dashboard extends React.Component {
 
   loadNewRequestNumber = async () => {
     const { props } = this
-    const spaceMemberList = (props.workspaceList.find(workspace => workspace.id === props.currentWorkspace.id) || {}).memberList || []
+
+    const spaceMemberList = props.workspaceList.find(ws => ws.id === props.currentWorkspace.id)?.memberList || []
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(
       props.user.userId, spaceMemberList, ROLE_LIST
     )
@@ -315,7 +316,7 @@ export class Dashboard extends React.Component {
       this.setState({ newMember: { ...state.newMember, id: newMemberInKnownMemberList.user_id } })
     }
 
-    const fetchWorkspaceNewMember = await props.dispatch(postWorkspaceMember(props.currentWorkspace.id, {
+    const fetchWorkspaceNewMember = await props.dispatch(postUserRole(props.currentWorkspace.id, {
       id: state.newMember.id || newMemberInKnownMemberList ? newMemberInKnownMemberList.user_id : null,
       email: state.newMember.isEmail ? state.newMember.personalData.trim() : '',
       username: state.newMember.isEmail ? '' : state.newMember.personalData,
@@ -374,7 +375,7 @@ export class Dashboard extends React.Component {
 
     this.setState({ isMemberListLoading: true })
 
-    const fetchWorkspaceRemoveMember = await props.dispatch(deleteWorkspaceMember(props.currentWorkspace.id, memberId))
+    const fetchWorkspaceRemoveMember = await props.dispatch(deleteUserRole(props.currentWorkspace.id, memberId))
     switch (fetchWorkspaceRemoveMember.status) {
       case 204:
         props.dispatch(newFlashMessage(props.t('Member removed'), 'info'))
@@ -532,7 +533,7 @@ export class Dashboard extends React.Component {
                 <div className='dashboard__workspace__rightMenu'>
                   <UserStatus
                     user={props.user}
-                    currentWorkspace={props.currentWorkspace}
+                    currentWorkspace={props.workspaceList.find(ws => ws.id === props.currentWorkspace.id)}
                     displayNotifBtn={props.system.config.email_notification_activated}
                     displaySubscriptionRequestsInformation={
                       userRoleIdInWorkspace >= ROLE.workspaceManager.id &&
@@ -609,7 +610,7 @@ export class Dashboard extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, knownMemberList, contentType, appList, currentWorkspace, system }) => ({
-  breadcrumbs, user, knownMemberList, contentType, appList, currentWorkspace, system
+const mapStateToProps = ({ breadcrumbs, user, knownMemberList, contentType, appList, currentWorkspace, workspaceList, system }) => ({
+  breadcrumbs, user, knownMemberList, contentType, appList, currentWorkspace, workspaceList, system
 })
 export default connect(mapStateToProps)(withRouter(appFactory(translate()(TracimComponent(Dashboard)))))

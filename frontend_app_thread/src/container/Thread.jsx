@@ -8,10 +8,12 @@ import {
   buildContentPathBreadcrumbs,
   CONTENT_NAMESPACE,
   CONTENT_TYPE,
+  EmojiReactions,
   handleClickCopyLink,
   handleFetchResult,
   PAGE,
   PopinFixed,
+  ConfirmPopup,
   PopinFixedHeader,
   PopinFixedContent,
   Timeline,
@@ -59,6 +61,8 @@ export class Thread extends React.Component {
         props.t('Start a topic')
       ],
       showRefreshWarning: false,
+      showChangeTypeContentPopup: false,
+      showPermanentlyDeletePopup: false,
       editionAuthor: '',
       invalidMentionList: [],
       showInvalidMentionPopupInComment: false,
@@ -113,6 +117,18 @@ export class Thread extends React.Component {
     const { props } = this
     console.log('%c<Thread> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
     props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n)
+  }
+
+  handleClickPermanentlyDeleteButton = () => {
+    const { state } = this
+    console.log(state.loggedUser)
+    this.setState(prev => ({ showPermanentlyDeletePopup: !prev.showPermanentlyDeletePopup }))
+  }
+
+  handleClickValidatePermanentlyDeleteButton = () => {
+    const { state } = this
+    this.props.appContentDeletePermanently(state.content.workspace_id, state.content.content_id, this.handleClickBtnCloseApp)
+    this.handleClickPermanentlyDeleteButton()
   }
 
   // TLM Handlers
@@ -341,6 +357,27 @@ export class Thread extends React.Component {
     this.setState({ translationTargetLanguageCode })
   }
 
+  handleToggleContentChangeTypePopup = content => {
+    this.setState(prev => ({
+      showChangeTypeContentPopup: !prev.showChangeTypeContentPopup,
+      contentToChange: prev.showChangeTypeContentPopup ? null : content
+    }))
+  }
+
+  handleClickValidateChangeType = async () => {
+    const { props, state } = this
+    props.appContentChangeType(state.content, this.setState.bind(this))
+    this.setState({
+      showChangeTypeContentPopup: false,
+      contentToChange: null
+    })
+  }
+
+  handlePermanentlyDeleteComment = async (comment) => {
+    const { state } = this
+    this.props.appContentDeletePermanently(state.content.workspace_id, comment.content_id, () => {})
+  }
+
   render () {
     const { props, state } = this
     const isPublication = state.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION
@@ -361,7 +398,38 @@ export class Thread extends React.Component {
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
           disableChangeTitle={!state.content.is_editable}
-          actionList={[
+          actionList={isPublication ? [
+            {
+              icon: 'fas fa-link',
+              label: props.t('Copy news link'),
+              onClick: this.handleClickCopyLink,
+              showAction: true,
+              dataCy: 'popinListItem__copyLink'
+            }, {
+              icon: 'far fa-comments',
+              label: props.t('Turn into thread'),
+              onClick: this.handleToggleContentChangeTypePopup,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              disabled: state.content.is_archived || state.content.is_deleted,
+              dataCy: 'popinListItem__content_type'
+            }, {
+              icon: 'far fa-trash-alt',
+              label: props.t('Delete'),
+              onClick: this.handleClickDelete,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              disabled: state.content.is_archived || state.content.is_deleted,
+              dataCy: 'popinListItem__delete'
+            },
+            {
+              icon: 'fas fa-exclamation-triangle',
+              label: props.t('Permanently delete'),
+              onClick: this.handleClickPermanentlyDeleteButton,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.workspaceManager.id,
+              disabled: false,
+              separatorLine: true,
+              dataCy: 'popinListItem__permanentlyDelete'
+            }
+          ] : [
             {
               icon: 'fas fa-link',
               label: props.t('Copy content link'),
@@ -375,11 +443,17 @@ export class Thread extends React.Component {
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
               disabled: state.content.is_archived || state.content.is_deleted,
               dataCy: 'popinListItem__delete'
+            },
+            {
+              icon: 'fas fa-exclamation-triangle',
+              label: props.t('Permanently delete'),
+              onClick: this.handleClickPermanentlyDeleteButton,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.workspaceManager.id,
+              disabled: false,
+              separatorLine: true,
+              dataCy: 'popinListItem__permanentlyDelete'
             }
           ]}
-          showReactions
-          apiUrl={state.config.apiUrl}
-          loggedUser={state.loggedUser}
           content={state.content}
           favoriteState={props.isContentInFavoriteList(state.content, state)
             ? FAVORITE_STATE.FAVORITE
@@ -393,18 +467,38 @@ export class Thread extends React.Component {
           breadcrumbsList={state.breadcrumbsList}
         />
 
+        {state.showChangeTypeContentPopup && (
+          <ConfirmPopup
+            customColor={props.customColor}
+            confirmLabel={props.t('Turn into thread')}
+            confirmIcon='far fa-comments'
+            onConfirm={this.handleClickValidateChangeType}
+            onCancel={this.handleToggleContentChangeTypePopup}
+          />
+        )}
+
         <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
           <div className='thread__contentpage'>
             {/* INFO - G.B. - 20210616 - Since the thread component behaves a bit differently than the others it was preferable to put
             Breadcrumbs and SelectStatus here directly than to adapt the PopinFixedContent component to cover thread as well. */}
             <div className='thread__contentpage__top'>
               {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && state.config.availableStatuses && (
-                <SelectStatus
-                  selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
-                  availableStatus={state.config.availableStatuses}
-                  onChangeStatus={this.handleChangeStatus}
-                  disabled={state.content.is_archived || state.content.is_deleted}
-                />
+                <>
+                  <EmojiReactions
+                    apiUrl={state.config.apiUrl}
+                    loggedUser={state.loggedUser}
+                    contentId={state.content.content_id}
+                    workspaceId={state.content.workspace_id}
+                  />
+                  <div className='wsContentGeneric__content__left__top__selectStatus'>
+                    <SelectStatus
+                      selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
+                      availableStatus={state.config.availableStatuses}
+                      onChangeStatus={this.handleChangeStatus}
+                      disabled={state.content.is_archived || state.content.is_deleted}
+                    />
+                  </div>
+                </>
               )}
             </div>
             {state.showRefreshWarning && (
@@ -451,6 +545,8 @@ export class Thread extends React.Component {
                 memberList={state.config.workspace && state.config.workspace.memberList}
                 onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
                 onClickDeleteComment={this.handleClickDeleteComment}
+                onClickPermanentlyDeleteComment={this.handlePermanentlyDeleteComment}
+                shouldShowPermanentlyDeleteButton={state.loggedUser.userRoleIdInWorkspace >= ROLE.workspaceManager.id}
                 onClickEditComment={this.handleClickEditComment}
                 onClickOpenFileComment={this.handleClickOpenFileComment}
                 onClickRestoreArchived={this.handleClickRestoreArchive}
@@ -462,6 +558,17 @@ export class Thread extends React.Component {
             ) : null}
           </div>
         </PopinFixedContent>
+        {state.showPermanentlyDeletePopup && (
+          <ConfirmPopup
+            customColor={props.customColor}
+            confirmLabel={props.t('Yes, delete permanently')}
+            confirmIcon='fas fa-exclamation-triangle'
+            onConfirm={this.handleClickValidatePermanentlyDeleteButton}
+            onCancel={this.handleClickPermanentlyDeleteButton}
+            msg={props.t('Warning: this operation cannot be rolled back')}
+            titleLabel={props.t('Permanently delete')}
+          />
+        )}
       </PopinFixed>
     )
   }

@@ -28,11 +28,13 @@ import {
   sendGlobalFlashMessage
 } from 'tracim_frontend_lib'
 
-import { KANBAN_MIME_TYPE, KANBAN_FILE_EXTENSION } from '../helper.js'
+import { KANBAN_MIME_TYPE, KANBAN_FILE_EXTENSION, KANBAN_DEFAULT_BACKGROUND_COLOR } from '../helper.js'
 import KanbanCard from './KanbanCard.jsx'
 import KanbanCardEditor from './KanbanCardEditor.jsx'
 import KanbanColumnEditor from './KanbanColumnEditor.jsx'
 import KanbanColumnHeader from './KanbanColumnHeader.jsx'
+
+const KANBAN_GET_URL_FILENAME = 'kanban' + KANBAN_FILE_EXTENSION
 
 export const BOARD_STATE = {
   INIT: 'init',
@@ -94,24 +96,27 @@ export class Kanban extends React.Component {
     this.setState({ boardState: BOARD_STATE.LOADING })
     const { props } = this
 
-    const fetchRawFileContent = await handleFetchResult(
-      await getRawFileContent(
-        props.config.apiUrl,
-        props.content.workspace_id,
-        props.content.content_id,
-        props.content.current_revision_id,
-        props.content.label + KANBAN_FILE_EXTENSION
-      ),
-      true
-    )
-
-    if (fetchRawFileContent.apiResponse.ok && fetchRawFileContent.body.columns) {
-      this.setState({
-        boardState: BOARD_STATE.LOADED,
-        boardInitiallyLoaded: true,
-        board: fetchRawFileContent.body
-      })
-    } else {
+    try {
+      const fetchRawFileContent = await handleFetchResult(
+        await getRawFileContent(
+          props.config.apiUrl,
+          props.content.workspace_id,
+          props.content.content_id,
+          props.content.current_revision_id,
+          KANBAN_GET_URL_FILENAME
+        ),
+        true
+      )
+      if (fetchRawFileContent.apiResponse.ok && fetchRawFileContent.body.columns) {
+        this.setState({
+          boardState: BOARD_STATE.LOADED,
+          board: fetchRawFileContent.body || {}
+        })
+      } else {
+        this.setState({ boardState: BOARD_STATE.ERROR })
+      }
+    } catch (error) {
+      console.log(`Got an error while fetching the board's contents: ${error}`)
       this.setState({ boardState: BOARD_STATE.ERROR })
     }
   }
@@ -395,8 +400,10 @@ export class Kanban extends React.Component {
                 // End of required props ///////////////////////////////////////
                 codeLanguageList={props.config.system.config.ui__notes__code_sample_languages}
                 customColor={props.config.hexcolor}
+                defaultBackgroundColor={KANBAN_DEFAULT_BACKGROUND_COLOR}
                 focusOnDescription={state.editedCardInfos.focusOnDescription}
                 language={props.language}
+                memberList={props.config.workspace.memberList}
               />
             </CardPopup>
           )}

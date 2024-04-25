@@ -44,6 +44,7 @@ import {
   deleteComment,
   deleteToDo,
   deleteContentFromFavoriteList,
+  deleteContentPermanently,
   getComment,
   getCommentTranslated,
   getContent,
@@ -51,7 +52,7 @@ import {
   getFavoriteContentList,
   getFileChildContent,
   getMyselfKnownContents,
-  getSpaceMemberList,
+  getSpaceUserRoleList,
   getTemplateList,
   getToDoList,
   postContentToFavoriteList,
@@ -65,7 +66,8 @@ import {
   putContentTemplate,
   putEditContent,
   putEditStatus,
-  putToDo
+  putToDo,
+  putChangeContentNamespace
 } from './action.async.js'
 
 import {
@@ -245,6 +247,7 @@ export function appContentFactory (WrappedComponent) {
     handleChildContentDeleted = (tlm) => {
       const { state } = this
       if (!state.content || !permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+      if (!state.wholeTimeline.some(timelineItem => timelineItem.content_id === tlm.fields.content.content_id)) return
       this.setState(prevState => {
         const wholeTimeline = prevState.wholeTimeline.filter(timelineItem => timelineItem.content_id !== tlm.fields.content.content_id)
         const timeline = this.getTimeline(wholeTimeline, prevState.timeline.length - 1)
@@ -452,6 +455,21 @@ export function appContentFactory (WrappedComponent) {
 
       if (response.status !== 204) {
         sendGlobalFlashMessage(i18n.t('Error while deleting the comment'))
+      }
+
+      return response
+    }
+
+    appContentDeletePermanently = async (workspaceId, contentId, toCloseApp) => {
+      this.checkApiUrl()
+
+      const response = await handleFetchResult(await deleteContentPermanently(this.apiUrl, workspaceId, contentId))
+
+      if (response.status !== 204) {
+        sendGlobalFlashMessage(i18n.t('Error while deleting the content'))
+      } else {
+        sendGlobalFlashMessage(i18n.t('The content has been deleted'), '')
+        toCloseApp()
       }
 
       return response
@@ -679,6 +697,54 @@ export function appContentFactory (WrappedComponent) {
           break
       }
 
+      return response
+    }
+
+    appContentChangeType = async (content, setState) => {
+      this.checkApiUrl()
+      // INFO - FS - 2024-02-15 - Depending on if the content comes from Publication or Thread the variable name are different
+      let contentId = content.id
+      let workspaceId = content.workspaceId
+      if (contentId === undefined) {
+        contentId = content.content_id
+        workspaceId = content.workspace_id
+      }
+      const response = await handleFetchResult(
+        await putChangeContentNamespace(this.apiUrl, workspaceId, contentId, 'content')
+      )
+      const status = response.ok ? response.status : response.apiResponse.status
+      switch (status) {
+        case 204:
+          setState({ mode: APP_FEATURE_MODE.VIEW })
+          break
+        case 400:
+          switch (response.body.code) {
+            case 3002:
+              sendGlobalFlashMessage(i18n.t('A content with the same name already exists'))
+              break
+            default:
+              GLOBAL_dispatchEvent({
+                type: CUSTOM_EVENT.ADD_FLASH_MSG,
+                data: {
+                  msg: i18n.t('Error while changing content type'),
+                  type: 'warning',
+                  delay: undefined
+                }
+              })
+              break
+          }
+          break
+        default:
+          GLOBAL_dispatchEvent({
+            type: CUSTOM_EVENT.ADD_FLASH_MSG,
+            data: {
+              msg: i18n.t('Error while changing content type'),
+              type: 'warning',
+              delay: undefined
+            }
+          })
+          break
+      }
       return response
     }
 
@@ -976,7 +1042,7 @@ export function appContentFactory (WrappedComponent) {
       } else {
         autoCompleteItemList = getMatchingGroupMentionList(keyword)
         const fetchSpaceMemberList = await handleFetchResult(
-          await getSpaceMemberList(this.apiUrl, workspaceId)
+          await getSpaceUserRoleList(this.apiUrl, workspaceId)
         )
 
         const includesKeyword = stringIncludes(keyword)
@@ -1110,7 +1176,9 @@ export function appContentFactory (WrappedComponent) {
           appContentCustomEventHandlerAllAppChangeLanguage={this.appContentCustomEventHandlerAllAppChangeLanguage}
           appContentChangeTitle={this.appContentChangeTitle}
           appContentChangeComment={this.appContentChangeComment}
+          appContentChangeType={this.appContentChangeType}
           appContentDeleteComment={this.appContentDeleteComment}
+          appContentDeletePermanently={this.appContentDeletePermanently}
           appContentDeleteToDo={this.appContentDeleteToDo}
           appContentEditComment={this.appContentEditComment}
           appContentMarkAsTemplate={this.appContentMarkAsTemplate}

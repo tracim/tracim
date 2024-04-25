@@ -38,7 +38,6 @@ describe('<PopinFixedContent />', () => {
     onClickCloseBtn: () => { },
     onClickRemoveFromFavoriteList: () => { },
     onValidateChangeTitle: () => { },
-    showReactions: false,
     t: key => key
   }
 

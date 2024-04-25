@@ -12,5 +12,10 @@
   "The content has been modified by {{author}}": "The content has been modified by {{author}}",
   "Delete": "Delete",
   "The link has been copied to clipboard": "Link copied to clipboard",
-  "Copy content link": "Copy content link"
+  "Copy content link": "Copy content link",
+  "Copy news link": "Copy news link",
+  "Turn into thread": "Turn into thread",
+  "Permanently delete": "Permanently delete",
+  "Yes, delete permanently": "Yes, delete permanently",
+  "Warning: this operation cannot be rolled back": "Warning: this operation cannot be rolled back"
 }

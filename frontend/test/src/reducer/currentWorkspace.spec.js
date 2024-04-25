@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import currentWorkspace, {
-  serializeMember,
+  serializeUserRole,
   serializeSidebarEntryProps,
   serializeWorkspace
 } from '../../../src/reducer/currentWorkspace.js'
@@ -11,31 +11,29 @@ import {
   deleteWorkspaceContentList,
   FOLDER_READ,
   REMOVE,
-  removeWorkspaceMember,
+  removeUserRole,
   removeWorkspaceReadStatus,
   SET,
   setWorkspaceAgendaUrl,
   setWorkspaceContentRead,
   setWorkspaceDetail,
-  setWorkspaceMemberList,
+  setUserRoleList,
   setWorkspaceReadStatusList,
   UPDATE,
   updateUser,
-  updateUserWorkspaceEmailNotificationType,
   updateWorkspaceContentList,
   updateWorkspaceDetail,
-  updateWorkspaceMember,
+  updateUserRole,
   addWorkspaceReadStatus,
-  USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
   WORKSPACE_AGENDA_URL,
   WORKSPACE_CONTENT,
   WORKSPACE_DETAIL,
-  WORKSPACE_MEMBER,
-  WORKSPACE_MEMBER_LIST,
+  USER_ROLE,
+  SET_USER_ROLE_LIST,
   WORKSPACE_READ_STATUS,
   WORKSPACE_READ_STATUS_LIST,
   WORKSPACE_CONTENT_SHARE_FOLDER,
-  REMOVE_WORKSPACE_MEMBER,
+  REMOVE_USER_ROLE,
   UPDATE_USER
 } from '../../../src/action-creator.sync.js'
 import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
@@ -65,14 +63,13 @@ describe('reducer currentWorkspace.js', () => {
       })
     })
 
-    describe('serializeMember()', () => {
-      const rez = serializeMember(globalManagerAsMemberFromApi)
+    describe('serializeUserRole()', () => {
+      const rez = serializeUserRole(globalManagerAsMemberFromApi)
       it('should return an object (in camelCase)', () => {
         expect(rez).to.deep.equal({
           id: globalManagerAsMemberFromApi.user.user_id,
           publicName: globalManagerAsMemberFromApi.user.public_name,
           role: globalManagerAsMemberFromApi.role,
-          emailNotificationType: globalManagerAsMemberFromApi.email_notification_type,
           username: globalManagerAsMemberFromApi.user.username,
           hasAvatar: true,
           hasCover: false
@@ -120,18 +117,18 @@ describe('reducer currentWorkspace.js', () => {
       })
     })
 
-    describe(`${SET}/${WORKSPACE_MEMBER_LIST}`, () => {
-      const rez = currentWorkspace(initialState, setWorkspaceMemberList([globalManagerAsMemberFromApi]))
+    describe(SET_USER_ROLE_LIST, () => {
+      const rez = currentWorkspace(initialState, setUserRoleList([globalManagerAsMemberFromApi]))
 
       it('should return a workspace object with a proper members list', () => {
         expect(rez).to.deep.equal({
           ...initialState,
-          memberList: [serializeMember(globalManagerAsMemberFromApi)]
+          memberList: [serializeUserRole(globalManagerAsMemberFromApi)]
         })
       })
     })
 
-    describe(`${ADD}/${WORKSPACE_MEMBER}`, () => {
+    describe(`${ADD}/${USER_ROLE}`, () => {
       const randomMember = {
         id: 15,
         publicName: 'random user',
@@ -154,7 +151,7 @@ describe('reducer currentWorkspace.js', () => {
           ...initialState,
           memberList: [
             randomMember,
-            serializeMember(globalManagerAsMemberFromApi)
+            serializeUserRole(globalManagerAsMemberFromApi)
           ]
         })
       })
@@ -173,11 +170,11 @@ describe('reducer currentWorkspace.js', () => {
       })
     })
 
-    describe(`${UPDATE}/${WORKSPACE_MEMBER}`, () => {
+    describe(`${UPDATE}/${USER_ROLE}`, () => {
       const initialStateWithMember = { ...initialState, memberList: [globalManagerAsMember] }
       const rez = currentWorkspace(
         initialStateWithMember,
-        updateWorkspaceMember(
+        updateUserRole(
           globalManagerFromApi, initialState.id, {
             role: ROLE.contributor.slug, email_notification_type: 'summary'
           }
@@ -194,38 +191,16 @@ describe('reducer currentWorkspace.js', () => {
       })
     })
 
-    describe(REMOVE_WORKSPACE_MEMBER, () => {
+    describe(REMOVE_USER_ROLE, () => {
       const initialStateWithMember = { ...initialState, memberList: [globalManagerAsMember] }
       const rez = currentWorkspace(
         initialStateWithMember,
-        removeWorkspaceMember(globalManagerAsMember.id, initialState.id)
+        removeUserRole(globalManagerAsMember.id, initialState.id)
       )
       it('should return a workspace object with an empty member list', () => {
         expect(rez).to.deep.equal({
           ...initialStateWithMember,
           memberList: []
-        })
-      })
-    })
-
-    describe(`${UPDATE}/${USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE}`, () => {
-      const initialStateWithMember = {
-        ...initialState,
-        memberList: [{
-          ...globalManagerAsMember, emailNotificationType: 'summary'
-        }]
-      }
-      const rez = currentWorkspace(
-        initialStateWithMember,
-        updateUserWorkspaceEmailNotificationType(globalManagerAsMember.id, initialState.id, 'none')
-      )
-      it('should return a workspace object with the member as notification disabled', () => {
-        expect(rez).to.deep.equal({
-          ...initialStateWithMember,
-          memberList: [{
-            ...globalManagerAsMember,
-            emailNotificationType: 'none'
-          }]
         })
       })
     })
@@ -474,8 +449,7 @@ describe('reducer currentWorkspace.js', () => {
       const newInitialState = {
         ...initialState,
         memberList: [{
-          ...serializeMember(globalManagerAsMemberFromApi),
-          emailNotificationType: 'none'
+          ...serializeUserRole(globalManagerAsMemberFromApi)
         }]
       }
       const rez = currentWorkspace(newInitialState, updateUser({ ...globalManagerFromApi, username: 'newUsername' }))
@@ -484,7 +458,6 @@ describe('reducer currentWorkspace.js', () => {
           ...newInitialState,
           memberList: [{
             ...globalManagerAsMember,
-            emailNotificationType: 'none',
             username: 'newUsername'
           }]
         })

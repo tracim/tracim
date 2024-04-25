@@ -92,7 +92,7 @@ describe('Reactions', function () {
   })
 
   describe('In each app', () => {
-    const container = headerClassName
+    const container = '.wsContentGeneric__content'
     for (const contentType of ['file', 'html-document', 'thread']) {
       it('should allow creating and deleting reactions with an existing reaction in a ' + contentType, () => {
         const contentId = contentIdByType[contentType]
@@ -104,12 +104,15 @@ describe('Reactions', function () {
         })
         cy.contains('.wsContentGeneric__header__title', contentName)
 
-        addEmojiReaction(headerClassName, 'grinning', '😀')
-        cy.contains(`${container} ${emojiValueClassName}`, '😀')
-        cy.contains(`${container} ${emojiCounterClassName}`, '1')
+        const containerString = contentType === 'thread'
+          ? `${container} .thread__contentpage__top`
+          : container
+        addEmojiReaction(containerString, 'grinning', '😀')
+        cy.contains(`${containerString} ${emojiValueClassName}`, '😀')
+        cy.contains(`${containerString} ${emojiCounterClassName}`, '1')
 
-        cy.get(`${container} ${emojiButtonClassName}`).click()
-        cy.get(`${container} ${emojiButtonClassName}`)
+        cy.get(`${containerString} ${emojiButtonClassName}`).click()
+        cy.get(`${containerString} ${emojiButtonClassName}`)
           .should('not.exist')
       })
     }
@@ -123,7 +126,7 @@ describe('Reactions', function () {
         params: { contentId: contentIdByType['file'] }
       })
       cy.contains('.wsContentGeneric__header__title', contentName)
-      addEmojiReaction(headerClassName, 'grinning', '😀')
+      addEmojiReaction('.wsContentGeneric__content', 'grinning', '😀')
     })
 
     const container = '.feedItemFooter__right'

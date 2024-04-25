@@ -28,6 +28,7 @@ from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.translation import translator_marker as _
 from tracim_backend.lib.utils.utils import CustomPropertiesValidator
+from tracim_backend.lib.utils.utils import DEFAULT_TRACIM_CONFIG_FILE
 from tracim_backend.lib.utils.utils import get_build_version
 from tracim_backend.lib.utils.utils import get_cache_token
 from tracim_backend.lib.utils.utils import is_dir_exist
@@ -293,6 +294,7 @@ class CFG(object):
             "contents/html-document,"
             "contents/folder,"
             "contents/kanban,"
+            "contents/logbook,"
             "contents/todo,"
             "agenda,"
             "share_content,"
@@ -319,6 +321,7 @@ class CFG(object):
         # FIXME - G.M - 2020-01-27 - force specific order of apps
         # see issue https://github.com/tracim/tracim/issues/2326
         default_app_order = (
+            "contents/logbook",
             "contents/thread",
             "contents/file",
             "contents/html-document",
@@ -440,16 +443,22 @@ class CFG(object):
             self.USER__READ_ONLY_FIELDS[auth_type] = readonly_field_list
 
         self.REMOTE_USER_HEADER = self.get_raw_config("remote_user_header", None)
+        # NOTE - M.L - 2024-03-27 -  This variable is parsed by CFG despite not being used elsewhere
+        #  after configuration loading to be consistent with other config variables
+        self.CONFIG__FILEPATH = self.get_raw_config("config.filepath", DEFAULT_TRACIM_CONFIG_FILE)
 
         self.API__KEY = self.get_raw_config("api.key", "", secret=True)
         default_session_data_dir = self.here_macro_replace("%(here)s/sessions_data")
         default_session_lock_dir = self.here_macro_replace("%(here)s/sessions_lock")
         self.SESSION__TYPE = self.get_raw_config("session.type", "file")
         self.SESSION__URL = self.get_raw_config("session.url")
+        self.SESSION__URLS = self.get_raw_config("session.urls")
         self.SESSION__DATA_DIR = self.get_raw_config("session.data_dir", default_session_data_dir)
         self.SESSION__LOCK_DIR = self.get_raw_config("session.lock_dir", default_session_lock_dir)
         self.SESSION__HTTPONLY = asbool(self.get_raw_config("session.httponly", "True"))
         self.SESSION__SECURE = asbool(self.get_raw_config("session.secure", "False"))
+        self.SESSION__USERNAME = self.get_raw_config("session.username", "")
+        self.SESSION__PASSWORD = self.get_raw_config("session.password", "")
         self.WEBSITE__TITLE = self.get_raw_config("website.title", "Tracim")
         self.WEBSITE__DESCRIPTION = self.get_raw_config("website.description", "")
         self.WEBSITE__USAGE_CONDITIONS = string_to_unique_item_list(
@@ -772,7 +781,7 @@ class CFG(object):
         # EMAIL related stuff (notification, reply)
         ##
         self.EMAIL__NOTIFICATION__TYPE_ON_INVITATION = str(
-            self.get_raw_config("email.notification.type_on_invitation", "summary")
+            self.get_raw_config("email.notification.type_on_invitation", "daily")
         )
 
         # TODO - G.M - 2019-04-05 - keep as parameters
@@ -1153,6 +1162,12 @@ class CFG(object):
             )
             self.check_directory_path_param(
                 "SESSION__DATA_DIR", self.SESSION__DATA_DIR, writable=True
+            )
+        elif self.SESSION__TYPE in ["ext:rediscluster"]:
+            self.check_mandatory_param(
+                "SESSION__URLS",
+                self.SESSION__URLS,
+                when_str="if session type is {}".format(self.SESSION__TYPE),
             )
         elif self.SESSION__TYPE in [
             "ext:database",

@@ -1,7 +1,7 @@
 import {
   SET_KNOWN_MEMBER_LIST,
-  ADD_WORKSPACE_MEMBER,
-  REMOVE_WORKSPACE_MEMBER,
+  ADD_USER_ROLE,
+  REMOVE_USER_ROLE,
   UPDATE_USER,
   REMOVE,
   WORKSPACE_LIST
@@ -27,7 +27,7 @@ export function knownMemberList (state = initialState, action) {
         serialize(apiKnownMember, serializeKnownMemberProps)
       )
 
-    case ADD_WORKSPACE_MEMBER: {
+    case ADD_USER_ROLE: {
       const isNewMemberAlreadyInKnownMemberList = state
         .some(km => km.userId === action.newMember.user.user_id)
 
@@ -47,8 +47,8 @@ export function knownMemberList (state = initialState, action) {
       ]
     }
 
-    case REMOVE_WORKSPACE_MEMBER:
-      knownMemberToRemove = state.find(km => km.userId === action.memberId)
+    case REMOVE_USER_ROLE:
+      knownMemberToRemove = state.find(km => km.userId === action.userId)
       if (knownMemberToRemove.spaceList.length > 1) {
         return state.map(km => km.userId === action.memberId
           ? { ...km, spaceList: km.spaceList.filter(spaceId => spaceId !== action.workspaceId) }

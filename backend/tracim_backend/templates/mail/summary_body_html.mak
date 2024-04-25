@@ -4,7 +4,7 @@
   <p>${_('Hello {username},').format(username=user.display_name)}</p>
 
   % if len(mentions) > 0:
-    <p>${_('Here is the list of your unread mentions in the last 24h:')}</p>
+    <p>${_('Here is the list of your unread mentions {email_notification_type_string}:').format(email_notification_type_string=email_notification_type_string)}</p>
     <ul>
     % for mention in mentions:
       % if mention.event.content["content_type"] == 'comment':
@@ -29,7 +29,7 @@
   % endif
 
   % if len(notification_summary) > 0:
-    <p>${_('Here is the summary of your unread notifications in the last 24h:')}</p>
+    <p>${_('Here is the summary of your unread notifications {email_notification_type_string}:').format(email_notification_type_string=email_notification_type_string)}</p>
     <ul>
     % for notification in notification_summary:
       <li>

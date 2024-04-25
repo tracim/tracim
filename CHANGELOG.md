@@ -1,5 +1,42 @@
 # Changelog
 
+## 4.9.0 / 2024-04-25
+
+### ✨ New Features
+
+- Tracim can now connect to a Redis cluster
+- New content type: Logbook. A logbook is a type of content that features logbook entries. These entries are displayed as a timeline, with an emphasis on the time and the order, most recent at the top
+- Allow to permanently delete contents and comments
+- Allow to transform news into thread
+- Mail notification: Summary mail can now be set once every hour, day or week
+- The states of the navigation sidebar is saved in the browser
+- Kanban UI: Kanban card color is now the background of the card instead of the border
+- Kanban UX: The text color will adapt to the background color in order to stay legible
+- Tracimcli can now be used in docker container without specifying config file path
+- New plugins available: `tracim_backend_video_alert` alerts the users when a possibly unsupported video is uploaded
+
+### 🐛 Fixed Issues
+
+- General
+  - Fixed performance issues with popup for news title [#6408](https://github.com/tracim/tracim/issues/6408)
+  - Improved code quality [#6252](https://github.com/tracim/tracim/issues/6252)
+  - Fixed summary mail for spanish users [#6439](https://github.com/tracim/tracim/issues/6439)
+- UI/UX
+  - Improved responsiveness for workspace creation pop-in on small screen [#6358](https://github.com/tracim/tracim/issues/6358)
+  - Improved design and responsiveness when editing the title of a content [#6364](https://github.com/tracim/tracim/issues/6364)
+  - Spaces in sidebar are now sorted without considering emoji [#6357](https://github.com/tracim/tracim/issues/6357)
+  - Fixed filter input in notification wall overflow since last version of Firefox [#6375](https://github.com/tracim/tracim/issues/6375)
+  - Emoji reaction are now more responsive [#6432](https://github.com/tracim/tracim/issues/6432)
+- Kanban
+  - Fixed kanban title with special characters [#5220](https://github.com/tracim/tracim/issues/5220)
+  - Renamed label "value" to "open field" in Kanban [#6354](https://github.com/tracim/tracim/issues/6354)
+  - Fixed real time issues with kanban [#6363](https://github.com/tracim/tracim/issues/6363)
+- Authentication
+  - Fixed LDAP auth issues related to auth chaining [#6355](https://github.com/tracim/tracim/issues/6355)
+  - Fixed SAML dependencies for installation [#6365](https://github.com/tracim/tracim/issues/6365)
+- Tracimcli
+  - Removed git error messages
+
 ## 4.8.0 / 2024-01-24
 
 ### ✨ New Features

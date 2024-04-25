@@ -51,7 +51,7 @@ from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.core.notifications import NotifierFactory
 from tracim_backend.lib.core.storage import StorageLib
 from tracim_backend.lib.core.tag import TagLib
-from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.rich_text_preview.html_preview import RichTextPreviewLib
 from tracim_backend.lib.utils.app import TracimContentType
@@ -74,7 +74,7 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import RevisionReadStatus
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.favorites import FavoriteContent
@@ -223,9 +223,9 @@ class ContentApi(object):
         # with user workspaces privileges
         if self._user and not self._disable_user_workspaces_filter:
             # Filter according to user workspaces
-            workspace_ids = RoleApi(
+            workspace_ids = UserWorkspaceConfigApi(
                 session=self._session, current_user=self._user, config=self._config
-            ).get_user_workspaces_ids(self._user_id, UserRoleInWorkspace.READER)
+            ).get_user_workspaces_ids(self._user_id, UserWorkspaceConfig.READER)
             result = result.filter(
                 or_(
                     Content.workspace_id.in_(workspace_ids),
@@ -274,7 +274,7 @@ class ContentApi(object):
             user = self._session.query(User).get(self._user_id)
             # Filter according to user workspaces
             workspace_ids = [
-                r.workspace_id for r in user.roles if r.role >= UserRoleInWorkspace.READER
+                r.workspace_id for r in user.roles if r.role >= UserWorkspaceConfig.READER
             ]
             result = result.filter(ContentRevisionRO.workspace_id.in_(workspace_ids))
 
@@ -2378,3 +2378,45 @@ class ContentApi(object):
         self.save(item, ActionDescription.CREATION, do_notify=do_notify)
 
         return item
+
+    def set_content_namespace(
+        self, content_id: int, content_namespace: ContentNamespaces
+    ) -> Content:
+        """Change the content namespace of a content
+
+        Args:
+            content_id: Id of the content
+            content_namespace: content_namespace wanted for the content
+
+        Returns:
+            Content: The modified content.
+        """
+        content = self.get_one(content_id=content_id)
+        is_publication_to_content = (
+            content.content_namespace == ContentNamespaces.PUBLICATION
+            and content_namespace == ContentNamespaces.CONTENT
+        )
+        is_content_to_publication = (
+            content.content_namespace == ContentNamespaces.CONTENT
+            and content_namespace == ContentNamespaces.PUBLICATION
+        )
+        if not any([is_publication_to_content, is_content_to_publication]):
+            raise ContentNamespaceDoNotMatch(
+                "Namespace transision not allowed (allowed are PUBLICATION → CONTENT and CONTENT → PUBLICATION)"
+            )
+
+        with new_revision(session=self._session, tm=transaction.manager, content=content):
+            self.move(
+                content,
+                new_parent=None,
+                new_workspace=content.workspace,
+                new_content_namespace=content_namespace,
+                must_stay_in_same_workspace=False,
+            )
+            self.save(content)
+
+        self._move_children_content_to_new_workspace(
+            item=content, new_workspace=content.workspace, new_content_namespace=content_namespace
+        )
+
+        return content

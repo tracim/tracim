@@ -18,7 +18,7 @@ import {
   TLM_SUB_TYPE as TLM_ST,
   TRANSLATION_STATE,
   CommentArea,
-  CardPopupCreateContent,
+  ConfirmPopup,
   EditCommentPopup,
   EmptyListMessage,
   IconButton,
@@ -64,6 +64,8 @@ import {
 import TabBar from '../component/TabBar/TabBar.jsx'
 import FeedItemWithPreview, { LINK_TYPE } from './FeedItemWithPreview.jsx'
 
+import PopupSetPublicationTitle from '../component/Publication/PopupSetPublicationTitle.jsx'
+
 // INFO - G.B. - 2021-10-18 - The value below is used only for local storage, it's a fake id for the
 // publication that is being written but has not been sent yet (i.e. does not have an id)
 const newPublicationId = -5
@@ -107,6 +109,8 @@ export class Publications extends React.Component {
       commentReset: () => {},
       publicationAsFileList: [],
       showEditPopup: false,
+      contentToChange: null,
+      showChangeContentTypePopup: false,
       showReorderButton: false
     }
   }
@@ -207,9 +211,9 @@ export class Publications extends React.Component {
     return false
   }
 
-  handleClickValidatePublicationTitle = async () => {
+  handleClickValidatePublicationTitle = async (newPublicationTitle) => {
     const { state } = this
-    this.handleSaveThreadPublication(state.publication, state.publicationAsFileList)
+    this.handleSaveThreadPublication(state.publication, state.publicationAsFileList, newPublicationTitle)
     state.commentReset()
     this.setState({
       showPublicationTitlePopup: false,
@@ -227,6 +231,22 @@ export class Publications extends React.Component {
 
     const newTimeline = (parentPublication.commentList || []).filter(it => it.content_id !== data.fields.content.content_id)
     props.dispatch(setCommentListToPublication(parentPublication.id, newTimeline))
+  }
+
+  handleToggleChangeContentTypePopup = (e, content) => {
+    this.setState(prev => ({
+      showChangeContentTypePopup: !prev.showChangeContentTypePopup,
+      contentToChange: prev.showChangeContentTypePopup ? null : content
+    }))
+  }
+
+  handleClickValidateChangeContentType = async () => {
+    const { props, state } = this
+    props.appContentChangeType(state.contentToChange, this.setState.bind(this))
+    this.setState({
+      showChangeContentTypePopup: false,
+      contentToChange: null
+    })
   }
 
   handleContentCreatedOrRestored = (data) => {
@@ -309,7 +329,12 @@ export class Publications extends React.Component {
 
   handleContentModified = (data) => {
     const { props } = this
-    if (data.fields.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION) return
+    if (data.fields.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION) {
+      if (props.publicationPage.list.find((content) => content.id === data.fields.content.content_id) !== undefined) {
+        props.dispatch(removePublication(data.fields.content.content_id))
+      }
+      return
+    }
 
     props.dispatch(updatePublication(data.fields.content))
 
@@ -434,12 +459,12 @@ export class Publications extends React.Component {
     })
   }
 
-  handleSaveThreadPublication = async (publication, publicationAsFileList) => {
-    const { props, state } = this
+  handleSaveThreadPublication = async (publication, publicationAsFileList, newPublicationTitle) => {
+    const { props } = this
 
     const spaceId = props.currentWorkspace.id
-    let title = `${state.newPublicationTitle} - ${this.buildPublicationName(props.user.publicName, props.user.lang)}`
-    if (state.newPublicationTitle === '') {
+    let title = `${newPublicationTitle} - ${this.buildPublicationName(props.user.publicName, props.user.lang)}`
+    if (newPublicationTitle === '') {
       title = this.buildPublicationName(props.user.publicName, props.user.lang)
     }
     const fetchPostPublication = await props.dispatch(postThreadPublication(spaceId, title))
@@ -592,6 +617,8 @@ export class Publications extends React.Component {
             showCommentList
             workspaceId={Number(publication.workspaceId)}
             user={props.user}
+            onClickChangeContentType={(e) => this.handleToggleChangeContentTypePopup(e, publication)}
+            showButtonChangeContentType
             {...this.getPreviewLinkParameters(publication)}
           />
         )}
@@ -625,17 +652,18 @@ export class Publications extends React.Component {
           />
         )}
         {state.showPublicationTitlePopup && (
-          <CardPopupCreateContent
+          <PopupSetPublicationTitle
             onClose={this.handleTogglePublicationTitlePopup}
             onValidate={this.handleClickValidatePublicationTitle}
-            label={props.t('Labeling the news')}
-            customColor={COLORS.PUBLICATION}
-            faIcon='fas fa-fw fa-stream'
-            contentName={state.newPublicationTitle !== undefined ? state.newPublicationTitle : ''}
-            onChangeContentName={this.handleChangeNewPublicationTitle}
-            btnValidateLabel={state.newPublicationTitle ? props.t('Publish') : props.t('Publish without title')}
-            inputPlaceholder={props.t('News title')}
-            allowEmptyTitle
+          />
+        )}
+        {state.showChangeContentTypePopup && (
+          <ConfirmPopup
+            customColor={props.customColor}
+            confirmLabel={props.t('Turn into thread')}
+            confirmIcon='far fa-comments'
+            onConfirm={this.handleClickValidateChangeContentType}
+            onCancel={this.handleToggleChangeContentTypePopup}
           />
         )}
       </ScrollToBottomWrapper>

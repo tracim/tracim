@@ -13,6 +13,7 @@ from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.translate.services.systran import FILE_TRANSLATION_ENDPOINT
 from tracim_backend.models.data import Content
+from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.tests.utils import create_1000px_png_test_image
@@ -5581,6 +5582,205 @@ class TestThreads(object):
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.INVALID_STATUS_CHANGE
+
+
+@pytest.mark.usefixtures("base_fixture")
+@pytest.mark.usefixtures("default_content_fixture")
+@pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+class TestThreadNamespace(object):
+    """
+    Tests for /api/workspaces/{workspace_id}/threads/{content_id}/namespace
+    endpoint
+    """
+
+    def test_api__put_thread_namespace__no__content__204__nominal_case(
+        self, web_testapp, workspace_api_factory, content_api_factory, content_type_list
+    ) -> None:
+        """
+        Get one html document of a content
+        """
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+
+        workspace_api = workspace_api_factory.get()
+        business_workspace = workspace_api.get_one(1)
+        content_api = content_api_factory.get()
+        test_thread = content_api.create(
+            content_type_slug=content_type_list.Thread.slug,
+            workspace=business_workspace,
+            parent=None,
+            label="Test Thread",
+            do_save=True,
+            do_notify=False,
+            content_namespace=ContentNamespaces.PUBLICATION,
+        )
+        test_comment = content_api.create_comment(
+            workspace=business_workspace,
+            parent=test_thread,
+            content="test",
+            do_save=False,
+            do_notify=True,
+        )
+        transaction.commit()
+        params = {"content_namespace": ContentNamespaces.CONTENT}
+
+        web_testapp.put_json(
+            "/api/workspaces/1/threads/{}/namespace".format(test_thread.content_id),
+            params=params,
+            status=204,
+        )
+
+        res = web_testapp.get(
+            "/api/workspaces/1/threads/{}".format(test_thread.content_id), status=200
+        )
+        content = res.json_body
+        res = web_testapp.get(
+            "/api/workspaces/1/contents/{}/comments/{}".format(
+                test_thread.content_id, test_comment.content_id
+            ),
+            status=200,
+        )
+        comment = res.json_body
+
+        assert content["content_namespace"] == ContentNamespaces.CONTENT
+        assert comment["parent_content_namespace"] == ContentNamespaces.CONTENT
+
+    def test_api__put_thread_namespace__no__content__204__content_to_publication(
+        self, web_testapp, workspace_api_factory, content_api_factory, content_type_list
+    ) -> None:
+        """
+        Get one html document of a content
+        """
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+
+        workspace_api = workspace_api_factory.get()
+        business_workspace = workspace_api.get_one(1)
+        content_api = content_api_factory.get()
+        test_thread = content_api.create(
+            content_type_slug=content_type_list.Thread.slug,
+            workspace=business_workspace,
+            parent=None,
+            label="Test Thread",
+            do_save=True,
+            do_notify=False,
+            content_namespace=ContentNamespaces.CONTENT,
+        )
+        test_comment = content_api.create_comment(
+            workspace=business_workspace,
+            parent=test_thread,
+            content="test",
+            do_save=False,
+            do_notify=True,
+        )
+        transaction.commit()
+        params = {"content_namespace": ContentNamespaces.PUBLICATION}
+
+        web_testapp.put_json(
+            "/api/workspaces/1/threads/{}/namespace".format(test_thread.content_id),
+            params=params,
+            status=204,
+        )
+
+        res = web_testapp.get(
+            "/api/workspaces/1/threads/{}".format(test_thread.content_id), status=200
+        )
+        content = res.json_body
+        res = web_testapp.get(
+            "/api/workspaces/1/contents/{}/comments/{}".format(
+                test_thread.content_id, test_comment.content_id
+            ),
+            status=200,
+        )
+        comment = res.json_body
+
+        assert content["content_namespace"] == ContentNamespaces.PUBLICATION
+        assert comment["parent_content_namespace"] == ContentNamespaces.PUBLICATION
+
+    def test_api__put_thread_namespace__err_400__namespace_not_allowed(
+        self, web_testapp, workspace_api_factory, content_api_factory, content_type_list
+    ) -> None:
+        """
+        Get one html document of a content
+        """
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+
+        workspace_api = workspace_api_factory.get()
+        business_workspace = workspace_api.get_one(1)
+        content_api = content_api_factory.get()
+        test_thread = content_api.create(
+            content_type_slug=content_type_list.Thread.slug,
+            workspace=business_workspace,
+            parent=None,
+            label="Test Thread",
+            do_save=True,
+            do_notify=False,
+            content_namespace=ContentNamespaces.CONTENT,
+        )
+        transaction.commit()
+        params = {"content_namespace": ContentNamespaces.CONTENT}
+
+        res = web_testapp.put_json(
+            "/api/workspaces/1/threads/{}/namespace".format(test_thread.content_id),
+            params=params,
+            status=400,
+        )
+
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert res.json_body["code"] == ErrorCode.CONTENT_NAMESPACE_DO_NOT_MATCH
+
+    def test_api__put_thread_namespace__err_400__filename_already_used(
+        self, web_testapp, workspace_api_factory, content_api_factory, content_type_list
+    ) -> None:
+        """
+        Get one html document of a content
+        """
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+
+        workspace_api = workspace_api_factory.get()
+        business_workspace = workspace_api.get_one(1)
+        content_api = content_api_factory.get()
+        test_thread = content_api.create(
+            content_type_slug=content_type_list.Thread.slug,
+            workspace=business_workspace,
+            parent=None,
+            label="Test Thread",
+            do_save=True,
+            do_notify=False,
+            content_namespace=ContentNamespaces.PUBLICATION,
+        )
+        content_api.create(
+            content_type_slug=content_type_list.Thread.slug,
+            workspace=business_workspace,
+            parent=None,
+            label="Test Thread",
+            do_save=True,
+            do_notify=False,
+            content_namespace=ContentNamespaces.CONTENT,
+        )
+        transaction.commit()
+        params = {"content_namespace": ContentNamespaces.CONTENT}
+
+        res = web_testapp.put_json(
+            "/api/workspaces/1/threads/{}/namespace".format(test_thread.content_id),
+            params=params,
+            status=400,
+        )
+
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert res.json_body["code"] == ErrorCode.CONTENT_FILENAME_ALREADY_USED_IN_FOLDER
 
 
 @pytest.mark.usefixtures("base_fixture")

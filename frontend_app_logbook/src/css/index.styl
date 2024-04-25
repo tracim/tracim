@@ -1,0 +1,270 @@
+@import '~tracim_frontend_lib/src/css/Variable.styl'
+
+cardWidth = 280px
+
+.logbook
+  &__new_button
+    margin-inline-start auto
+    margin-bottom standardSpacing
+  &__wrapper
+    height 100%
+    display flex
+    flex-direction column
+    padding standardSpacing
+    margin-inline-start standardSpacing
+  &__timeline
+    width 100%
+    height 100%
+    display flex
+    flex-direction row
+    margin-top standardSpacing
+    position relative
+    &__bar
+      background-color lightGrey1
+      width standardSpacing
+      height 100%
+      margin-inline-start standardSpacing
+      position absolute
+    &__entries
+      $multiple = 4
+      padding-inline-start '%s' % (4 * standardSpacing)
+      width 100%
+      height 100%
+      overflow-y auto
+      padding-inline-end standardSpacing
+      position absolute
+      &__entry
+        border-radius standardBorderRadius
+        display flex
+        flex-direction row
+        margin-bottom standardSpacing
+        &__dot
+          border-radius 100%
+          margin-top standardSpacing
+          margin-inline-start -33px
+          width 16px
+          height 16px
+          border solid 3px darkGrey1
+          background-color darkGrey2
+          z-index 10
+        &__arrow
+          width 8px
+          height 8px
+          margin-top standardSpacing
+          margin-inline-start standardSpacing
+          border-right-width 8px
+          border-right-style solid
+          border-top 8px solid transparent
+          border-bottom 8px solid transparent
+        &__data
+          width 100%
+          padding standardSpacing
+          display flex
+          flex-direction column
+          &__header
+            margin-bottom standardSpacing
+            &__top
+              display flex
+              flex-direction row
+              justify-content space-between
+              &__title
+                margin-bottom 0
+              &__freeInput
+                line-height 1
+                text-align center
+                white-space nowrap
+                border-radius standardBorderRadius
+                padding 5px
+                background-color sidebarActivitiesItem
+                color offWhite
+                height fit-content
+            &__date
+              margin-bottom standardSpacing
+              font-size metadataFontSize
+              color darkGrey
+              &__icon
+                margin-inline-end 4px
+          &__buttons
+            display flex
+            flex-direction row
+            justify-content end
+            &__edit
+              margin-inline-end standardSpacing
+  &__whiteTextColor
+    color offWhite
+  &__blackTextColor
+    color offBlack
+
+@media (max-width: max-sm)
+  .logbook
+    &__timeline
+      &__bar
+        visibility hidden
+      &__entries
+        padding-inline-start standardSpacing
+        padding-inline-end 0
+
+@media (max-width: max-lg)
+  .logbook
+    &__timeline
+      &__entries
+        overflow-y hidden
+        position static
+
+.logbook
+  &__contentpage
+    &__content
+      &__left
+        background-color offWhite
+        display flex
+        flex-direction column
+    &__wrapper
+      display flex
+      flex-direction column
+      // INFO - GB - 2021-12-20 - 28px is the wsContentGeneric__content__left__top height
+      height "calc(100% - %s)" % (headerHeight + 28px)
+      &.fullscreen
+        position fixed
+        width "calc(100% - %s)" % closedSidebarWidth
+        height 100%
+        // INFO - GB - 2022-08-09 - .logbook.fullscreen has z-index 2 to be above TinyMCE (.tox .tox-editor-header)
+        // In case advanced edition is enabled at the moment the user goes into fullscreen mode.
+        z-index 2
+        background offWhite
+
+      &__options
+        display flex
+        justify-content flex-end
+        & button
+          margin-inline-end standardSpacing
+
+      &__toolbar
+        position absolute
+        top standardSpacing
+        z-index 1
+        & .iconbutton
+          background-color offWhite
+          &:hover
+            background-color lightGrey2
+        &:empty
+          display none
+
+  &__LogbookPopup
+    max-height 80%
+    &.hidden
+      display none
+    &__bgColor, &__datetime
+      display flex
+      flex-direction column
+      &__inline
+        flex-direction row
+
+    & .cardPopup__container
+      width 80%
+      display flex
+      flex-direction column
+      overflow auto
+
+    & [type=checkbox]
+      margin textSpacing
+
+    & [type=text], textarea
+      width 100%
+
+    & [type=color]
+      margin-bottom textSpacing
+
+    & label
+      white-space pre
+      font-weight bold
+
+    & input
+      vertical-align middle
+
+    &__description, &__datetime, &__title, &__freeInput
+      margin-bottom standardSpacing
+
+    &__description
+      > div
+        height 200px
+
+    &__form
+      overflow-y auto
+      width 100%
+      height 100%
+      &__fields
+        width calc(100% - 2px) // NOTE - RJ - 19-01-2022 - TinyMCE borders make the form overflow if we don't remove these 2px here
+      label
+        padding-inline-end textSpacing
+
+      & .form-control
+        color unset
+        font-size standardFontSize
+        padding-inline-start textSpacing
+        border none
+
+      &_buttons
+        margin-bottom 0
+        padding-bottom 0
+        text-align end
+        button:last-child, input:last-child
+          margin-inline-start standardSpacing
+
+    &__confirm
+      display flex
+      width 100%
+      justify-content flex-end
+      & > .iconbutton
+        margin-inline-start standardSpacing
+
+[dir=ltr] .logbook
+  &__contentpage
+    &__wrapper
+      &.fullscreen
+        left closedSidebarWidth
+      &__toolbar
+        right standardSpacing
+
+[dir=rtl] .logbook
+  &__contentpage
+    &__wrapper
+      &.fullscreen
+        right closedSidebarWidth
+      &__toolbar
+        left standardSpacing
+
+@media (min-width: max-xs) and (max-width: max-lg)
+  .logbook
+    &__contentpage
+      display block
+      &__content__left
+        min-height 250px
+      &__wrapper
+        width 100%
+        .commentArea
+          &__simpletext
+            display inline-flex
+            width 60%
+          &__submit
+            display inline-flex
+            margin standardSpacing 0
+
+@media (max-width: max-xs)
+  body:not(.tox-fullscreen) .logbook__LogbookPopup
+    transform translate(-50%, 0%) !important
+
+  .logbook__LogbookPopup
+    position absolute
+    top 10%
+    max-height "calc(100% - %s)" % listIconWidth
+
+    & .cardPopup__container
+      min-width 100%
+      max-height 100%
+      overflow auto
+      & .cardPopup__body
+        height 100%
+        & .logbook__LogbookPopup__form
+          height "calc(100% - %s)" % standardSpacing
+  .logbook__contentpage__header__isEditing
+    padding-bottom 40px

@@ -271,5 +271,8 @@
   "moved": "Flyttet",
   "copied": "Kopiert",
   "unknown": "Ukjent",
-  "UnknownRole": "UkjentRolle"
+  "UnknownRole": "UkjentRolle",
+  "Error while deleting the content": "",
+  "The content has been deleted": "",
+  "Error while changing content type": ""
 }

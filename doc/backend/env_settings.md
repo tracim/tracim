@@ -5,6 +5,7 @@ This list is generated using:
 ```bash
 tracimcli dev parameters list --template "| {env_var_name: <74}| {config_file_name: <63}| {config_name: <67}|"
 ```
+⚠️ These are only Tracim environment variables. You can find more environment variables for docker start on the [tracim/tools_docker/README.md](https://github.com/tracim/tracim/blob/master/tools_docker/README.md) page ⚠️
 
 ⚠️ The generated list is based on your `development.ini` file. ⚠️
 
@@ -26,8 +27,10 @@ To update the list below you will need to:
 | TRACIM_USER__PROFILE__READ_ONLY_FIELDS_INTERNAL                           | user.profile.read_only_fields.internal                         | USER__PROFILE__READ_ONLY_FIELDS__INTERNAL                          |
 | TRACIM_REMOTE_USER_HEADER                                                 | remote_user_header                                             | REMOTE_USER_HEADER                                                 |
 | TRACIM_API__KEY                                                           | api.key                                                        | API__KEY                                                           |
+| TRACIM_CONFIG__FILEPATH                                                   | config.filepath                                                | CONFIG__FILEPATH                                                   |
 | TRACIM_SESSION__TYPE                                                      | session.type                                                   | SESSION__TYPE                                                      |
 | TRACIM_SESSION__URL                                                       | session.url                                                    | SESSION__URL                                                       |
+| TRACIM_SESSION__URLS                                                      | session.urls                                                   | SESSION__URLS                                                      |
 | TRACIM_SESSION__DATA_DIR                                                  | session.data_dir                                               | SESSION__DATA_DIR                                                  |
 | TRACIM_SESSION__LOCK_DIR                                                  | session.lock_dir                                               | SESSION__LOCK_DIR                                                  |
 | TRACIM_SESSION__HTTPONLY                                                  | session.httponly                                               | SESSION__HTTPONLY                                                  |

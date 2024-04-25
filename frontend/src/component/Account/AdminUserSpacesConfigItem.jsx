@@ -6,7 +6,7 @@ import {
   ROLE_LIST
 } from 'tracim_frontend_lib'
 import PropTypes from 'prop-types'
-import EmailNotificationTypeButton from '../EmailNotificationTypeButton.jsx'
+import EmailNotificationTypeButton from '../EmailNotificationTypeButton/EmailNotificationTypeButton.jsx'
 
 export const AdminUserSpacesConfigItem = props => {
   let buttonTitle = ''
@@ -49,9 +49,6 @@ export const AdminUserSpacesConfigItem = props => {
           <EmailNotificationTypeButton
             currentEmailNotificationType={props.member.emailNotificationType}
             onClickChangeEmailNotificationType={props.onChangeEmailNotificationType}
-            flexJustifyContent='flex-start'
-            formName={`admin_notificationType_${props.space.id}`}
-            displayLabel={false}
           />
         </td>
       )}

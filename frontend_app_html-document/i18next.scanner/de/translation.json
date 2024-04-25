@@ -35,5 +35,8 @@
   "The link has been copied to clipboard": "Link in die Zwischenablage kopiert",
   "Copy content link": "Link zum Inhalt kopieren",
   "Cancel": "",
-  "Validate": ""
+  "Validate": "",
+  "Permanently delete": "",
+  "Yes, delete permanently": "",
+  "Warning: this operation cannot be rolled back": ""
 }

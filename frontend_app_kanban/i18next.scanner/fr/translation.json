@@ -23,7 +23,6 @@
   "Board's name": "Nom du tableau",
   "This content is deleted": "Ce contenu est supprimé",
   "Restore": "Restaurer",
-  "Value:": "Valeur :",
   "Last version": "Dernière version",
   "The content has been modified by {{author}}": "Le contenu a été modifié par {{author}}",
   "Add new column": "Ajouter une nouvelle colonne",
@@ -45,5 +44,9 @@
   "Tasks": "Tâches",
   "The link has been copied to clipboard": "Lien copié dans le presse-papiers",
   "Copy content link": "Copier le lien du contenu",
-  "Description of the card": "Description de la carte"
+  "Description of the card": "Description de la carte",
+  "Open field:": "Champ libre :",
+  "Permanently delete": "Supprimer définitivement",
+  "Yes, delete permanently": "Oui, supprimer définitivement",
+  "Warning: this operation cannot be rolled back": "Attention : cette opération ne peut pas être annulée"
 }

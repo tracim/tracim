@@ -84,10 +84,11 @@ FROM base
 
 LABEL org.opencontainers.image.authors="contact@tracim.fr"
 
-ENV DEFAULT_APP_LIST="contents/thread,contents/file,contents/html-document,contents/folder,contents/kanban,contents/todo,share_content,upload_permission,gallery"
+ENV DEFAULT_APP_LIST="contents/thread,contents/file,contents/html-document,contents/folder,contents/kanban,contents/todo,contents/logbook,share_content,upload_permission,gallery"
 ENV START_WEBDAV=1
 ENV START_CALDAV=1
 ENV ENABLE_COLLABORATIVE_DOCUMENT_EDITION=0
+ENV TRACIM_CONFIG__FILEPATH="/etc/tracim/development.ini"
 ENV LANG C.UTF-8
 ENV LANGUAGE C.UTF-8
 ENV LC_ALL C.UTF-8

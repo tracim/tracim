@@ -22,7 +22,7 @@ from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
 from tracim_backend.exceptions import UserIsNotContentOwner
 from tracim_backend.exceptions import UserIsNotReactionAuthor
-from tracim_backend.lib.core.userworkspace import RoleApi
+from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import Profile
@@ -419,12 +419,14 @@ class OneCommonWorkspaceUserChecker(AuthorizationChecker):
     """
 
     def check(self, tracim_context: TracimContext) -> bool:
-        role_api = RoleApi(
+        user_workspace_config_api = UserWorkspaceConfigApi(
             tracim_context.dbsession,
             tracim_context.current_user,
             tracim_context.app_config,
         )
-        if not role_api.get_common_workspace_ids(tracim_context.candidate_user.user_id):
+        if not user_workspace_config_api.get_common_workspace_ids(
+            tracim_context.candidate_user.user_id
+        ):
             raise UserDoesNotExist(
                 "User {} not found or not known".format(tracim_context.candidate_user.user_id)
             )

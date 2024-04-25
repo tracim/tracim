@@ -19,7 +19,7 @@ from tracim_backend.lib.search.elasticsearch_search.es_models import get_es_fiel
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
@@ -66,14 +66,14 @@ def content_indexer_with_api_mock() -> typing.Iterator[ContentIndexerWithApiMock
 
 @pytest.fixture
 def user_indexer_with_api_mock() -> typing.Iterator[UserIndexerWithApiMock]:
-    """Create an ESUserIndexer instance with mocked ESSearchApi and RoleApi.
+    """Create an ESUserIndexer instance with mocked ESSearchApi and UserWorkspaceConfigApi.
 
     Return a (ESUserIndexer, ESSearchApi.index_user_mock, RoleApi_mock) tuple.
     """
     with patch(
         "tracim_backend.lib.search.elasticsearch_search.elasticsearch_search.ESSearchApi.index_user"
     ) as index_user_mock, patch(
-        "tracim_backend.lib.search.elasticsearch_search.elasticsearch_search.RoleApi"
+        "tracim_backend.lib.search.elasticsearch_search.elasticsearch_search.UserWorkspaceConfigApi"
     ) as role_api_class_mock:
         role_api_mock = MagicMock()
         role_api_class_mock.return_value = role_api_mock
@@ -82,14 +82,14 @@ def user_indexer_with_api_mock() -> typing.Iterator[UserIndexerWithApiMock]:
 
 @pytest.fixture
 def workspace_indexer_with_api_mock() -> typing.Iterator[WorkspaceIndexerWithApiMock]:
-    """Create an ESUserIndexer instance with mocked ESSearchApi and RoleApi.
+    """Create an ESUserIndexer instance with mocked ESSearchApi and UserWorkspaceConfigApi.
 
     Return a (ESWorkspaceIndexer, ESSearchApi.index_workspace_mock, RoleApi_mock) tuple.
     """
     with patch(
         "tracim_backend.lib.search.elasticsearch_search.elasticsearch_search.ESSearchApi.index_workspace"
     ) as index_workspace_mock, patch(
-        "tracim_backend.lib.search.elasticsearch_search.elasticsearch_search.RoleApi"
+        "tracim_backend.lib.search.elasticsearch_search.elasticsearch_search.UserWorkspaceConfigApi"
     ) as role_api_class_mock:
         role_api_mock = MagicMock()
         role_api_class_mock.return_value = role_api_mock
@@ -282,16 +282,16 @@ class TestElasticSearchUserIndexer:
             (ESUserIndexer.on_content_created, Content(owner=a_user())),
             (ESUserIndexer.on_content_modified, Content(owner=a_user())),
             (
-                ESUserIndexer.on_user_role_in_workspace_created,
-                UserRoleInWorkspace(user=a_user(), workspace=Workspace()),
+                ESUserIndexer.on_user_config_in_workspace_created,
+                UserWorkspaceConfig(user=a_user(), workspace=Workspace()),
             ),
             (
-                ESUserIndexer.on_user_role_in_workspace_modified,
-                UserRoleInWorkspace(user=a_user(), workspace=Workspace()),
+                ESUserIndexer.on_user_config_in_workspace_modified,
+                UserWorkspaceConfig(user=a_user(), workspace=Workspace()),
             ),
             (
-                ESUserIndexer.on_user_role_in_workspace_deleted,
-                UserRoleInWorkspace(user=a_user(), workspace=Workspace()),
+                ESUserIndexer.on_user_config_in_workspace_deleted,
+                UserWorkspaceConfig(user=a_user(), workspace=Workspace()),
             ),
         ],
     )
@@ -344,16 +344,16 @@ class TestElasticSearchWorkspaceIndexer:
             (ESWorkspaceIndexer.on_workspace_created, a_workspace()),
             (ESWorkspaceIndexer.on_workspace_modified, a_workspace()),
             (
-                ESWorkspaceIndexer.on_user_role_in_workspace_created,
-                UserRoleInWorkspace(user=a_user(), workspace=a_workspace()),
+                ESWorkspaceIndexer.on_user_config_in_workspace_created,
+                UserWorkspaceConfig(user=a_user(), workspace=a_workspace()),
             ),
             (
-                ESWorkspaceIndexer.on_user_role_in_workspace_modified,
-                UserRoleInWorkspace(user=a_user(), workspace=a_workspace()),
+                ESWorkspaceIndexer.on_user_config_in_workspace_modified,
+                UserWorkspaceConfig(user=a_user(), workspace=a_workspace()),
             ),
             (
-                ESWorkspaceIndexer.on_user_role_in_workspace_deleted,
-                UserRoleInWorkspace(user=a_user(), workspace=a_workspace()),
+                ESWorkspaceIndexer.on_user_config_in_workspace_deleted,
+                UserWorkspaceConfig(user=a_user(), workspace=a_workspace()),
             ),
         ],
     )

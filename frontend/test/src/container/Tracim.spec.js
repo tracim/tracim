@@ -23,7 +23,7 @@ import {
   SET,
   USER,
   USER_CONFIGURATION,
-  ROLE_WORKSPACE_LIST
+  SET_USER_WORKSPACE_CONFIG_LIST
 } from '../../../src/action-creator.sync'
 import { withRouterMock } from '../../hocMock/withRouter'
 import { FETCH_CONFIG } from '../../../src/util/helper.js'
@@ -68,7 +68,7 @@ describe('<Tracim />', () => {
       case `${SET}/${USER_CONFIGURATION}`:
         setUserConfigurationCallBack()
         break
-      case `${SET}/${ROLE_WORKSPACE_LIST}`:
+      case SET_USER_WORKSPACE_CONFIG_LIST:
         setWorkspaceListCallBack()
         break
       case `${SET}/${BREADCRUMBS}`:

@@ -74,7 +74,49 @@ class WorkspaceAccessType(enum.Enum):
 class EmailNotificationType(enum.Enum):
     INDIVIDUAL = "individual"
     NONE = "none"
-    SUMMARY = "summary"
+    HOURLY = "hourly"
+    DAILY = "daily"
+    WEEKLY = "weekly"
+
+    @classmethod
+    def default(cls) -> "EmailNotificationType":
+        return cls.DAILY
+
+    def get_hours_delta(self) -> Optional[int]:
+        if self == self.INDIVIDUAL:
+            return None
+        if self == self.NONE:
+            return None
+        if self == self.HOURLY:
+            return 1
+        if self == self.DAILY:
+            return 24
+        if self == self.WEEKLY:
+            return 168
+
+    def to_string(self, lang, translator) -> Optional[str]:
+        if self == self.INDIVIDUAL:
+            return None
+        if self == self.NONE:
+            return None
+        if self == self.HOURLY:
+            return translator.get_translation("in the last hour", lang)
+        if self == self.DAILY:
+            return translator.get_translation("in the last day", lang)
+        if self == self.WEEKLY:
+            return translator.get_translation("in the last week", lang)
+
+    def get_value(self, lang, translator) -> Optional[str]:
+        if self == self.INDIVIDUAL:
+            return self.value
+        if self == self.NONE:
+            return self.value
+        if self == self.HOURLY:
+            return translator.get_translation("hourly", lang)
+        if self == self.DAILY:
+            return translator.get_translation("daily", lang)
+        if self == self.WEEKLY:
+            return translator.get_translation("weekly", lang)
 
 
 class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeBase):
@@ -273,7 +315,7 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
 Index("idx__workspaces__parent_id", Workspace.parent_id)
 
 
-class UserRoleInWorkspace(DeclarativeBase):
+class UserWorkspaceConfig(DeclarativeBase):
     __tablename__ = "user_workspace"
 
     user_id = Column(
@@ -294,7 +336,7 @@ class UserRoleInWorkspace(DeclarativeBase):
     email_notification_type = Column(
         Enum(EmailNotificationType),
         nullable=False,
-        server_default=EmailNotificationType.SUMMARY.name,
+        server_default=EmailNotificationType.default().name,
     )
 
     workspace = relationship(

@@ -37,7 +37,6 @@
   "Description:": "وصف:",
   "Color:": "اللون:",
   "Deadline:": "الموعد النهائي:",
-  "Value:": "القيمة:",
   "Validate": "اعتماد",
   "Add a card": "إضافة بطاقة",
   "Edit this column": "تعديل هذا العمود",
@@ -45,5 +44,9 @@
   "Tasks": "",
   "The link has been copied to clipboard": "تم نسخ الرابط إلى الحافظة",
   "Copy content link": "نسخ رابط المحتوى",
-  "Description of the card": ""
+  "Description of the card": "",
+  "Open field:": "",
+  "Permanently delete": "",
+  "Yes, delete permanently": "",
+  "Warning: this operation cannot be rolled back": ""
 }

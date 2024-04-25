@@ -10,7 +10,7 @@ from tracim_backend.applications.agenda.models import AgendaResourceType
 from tracim_backend.lib.cleanup.cleanup import CleanupLib
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import EmailNotificationType
-from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 VALID_CALDAV_BODY_PUT_EVENT = """
@@ -128,7 +128,7 @@ class TestCaldavRadicaleProxyEndpoints(object):
         user_api_factory,
         web_testapp,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         test_context,
     ) -> None:
         test_context.plugin_manager.register(AgendaHooks())
@@ -145,12 +145,12 @@ class TestCaldavRadicaleProxyEndpoints(object):
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         workspace.agenda_enabled = True
-        role_api = role_api_factory.get()
+        user_workspace_config_api = user_workspace_config_api_factory.get()
 
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user,
             workspace,
-            UserRoleInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -289,7 +289,7 @@ class TestCaldavRadicaleProxyEndpoints(object):
         user_api_factory,
         web_testapp,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         test_context,
     ) -> None:
         test_context.plugin_manager.register(AgendaHooks())
@@ -306,11 +306,11 @@ class TestCaldavRadicaleProxyEndpoints(object):
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         workspace.agenda_enabled = True
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
-            UserRoleInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -470,7 +470,7 @@ class TestCaldavRadicaleProxyEndpoints(object):
         user_api_factory,
         web_testapp,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         test_context,
     ) -> None:
         test_context.plugin_manager.register(AgendaHooks())
@@ -487,11 +487,11 @@ class TestCaldavRadicaleProxyEndpoints(object):
         workspace_api = workspace_api_factory.get(show_deleted=True)
         workspace = workspace_api.create_workspace("test", save_now=True)
         workspace.agenda_enabled = True
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
-            UserRoleInWorkspace.CONTENT_MANAGER,
+            UserWorkspaceConfig.CONTENT_MANAGER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -553,7 +553,7 @@ class TestCaldavRadicaleSync(object):
         session,
         test_context,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ) -> None:
         test_context.plugin_manager.register(AgendaHooks())
         uapi = user_api_factory.get()
@@ -568,11 +568,11 @@ class TestCaldavRadicaleSync(object):
         session.add(user)
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("wp1", save_now=True, agenda_enabled=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
-            UserRoleInWorkspace.CONTRIBUTOR,
+            UserWorkspaceConfig.CONTRIBUTOR,
             email_notification_type=EmailNotificationType.NONE,
         )
         session.flush()
@@ -647,7 +647,7 @@ class TestCaldavRadicaleSync(object):
         session,
         test_context,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
     ) -> None:
         test_context.plugin_manager.register(AgendaHooks())
         uapi = user_api_factory.get()
@@ -662,11 +662,11 @@ class TestCaldavRadicaleSync(object):
         session.add(user)
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("wp1", save_now=True, agenda_enabled=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
-            UserRoleInWorkspace.CONTRIBUTOR,
+            UserWorkspaceConfig.CONTRIBUTOR,
             email_notification_type=EmailNotificationType.NONE,
         )
         session.flush()
@@ -741,7 +741,7 @@ class TestCaldavRadicaleSync(object):
         radicale_server,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         web_testapp,
         app_config,
         session,
@@ -761,11 +761,11 @@ class TestCaldavRadicaleSync(object):
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("wp1", save_now=True)
         workspace.agenda_enabled = True
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
-            UserRoleInWorkspace.CONTRIBUTOR,
+            UserWorkspaceConfig.CONTRIBUTOR,
             email_notification_type=EmailNotificationType.NONE,
         )
         session.flush()
@@ -799,7 +799,9 @@ class TestCaldavRadicaleSync(object):
         # Links are created
         assert os.path.islink(workspace_addressbook_symlink_path)
         assert os.path.islink(workspace_calendar_symlink_path)
-        role_api.delete_one(user_id=user.user_id, workspace_id=workspace.workspace_id, flush=True)
+        user_workspace_config_api.delete_one(
+            user_id=user.user_id, workspace_id=workspace.workspace_id, flush=True
+        )
         transaction.commit()
         assert os.path.isdir(workspace_agenda_path)
         assert os.path.isdir(workspace_addressbook_path)
@@ -807,11 +809,11 @@ class TestCaldavRadicaleSync(object):
         assert not os.path.islink(workspace_addressbook_symlink_path)
         assert not os.path.islink(workspace_calendar_symlink_path)
 
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user,
             workspace,
-            UserRoleInWorkspace.READER,
-            email_notification_type=EmailNotificationType.SUMMARY,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.default(),
         )
         transaction.commit()
         assert os.path.isdir(workspace_agenda_path)
@@ -825,7 +827,7 @@ class TestCaldavRadicaleSync(object):
         radicale_server,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         web_testapp,
         app_config,
         session,
@@ -845,11 +847,11 @@ class TestCaldavRadicaleSync(object):
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("wp1", save_now=True)
         workspace.agenda_enabled = True
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
-            UserRoleInWorkspace.CONTRIBUTOR,
+            UserWorkspaceConfig.CONTRIBUTOR,
             email_notification_type=EmailNotificationType.NONE,
         )
         session.flush()
@@ -903,7 +905,7 @@ class TestCaldavRadicaleSync(object):
         radicale_server,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         web_testapp,
         app_config,
         session,
@@ -923,11 +925,11 @@ class TestCaldavRadicaleSync(object):
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("wp1", save_now=True)
         workspace.agenda_enabled = True
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
-            UserRoleInWorkspace.CONTRIBUTOR,
+            UserWorkspaceConfig.CONTRIBUTOR,
             email_notification_type=EmailNotificationType.NONE,
         )
         session.flush()
@@ -982,7 +984,7 @@ class TestCaldavRadicaleSync(object):
         radicale_server,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         web_testapp,
         app_config,
         session,
@@ -1001,11 +1003,11 @@ class TestCaldavRadicaleSync(object):
         session.add(user)
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("wp1", save_now=True, agenda_enabled=False)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
-            UserRoleInWorkspace.CONTRIBUTOR,
+            UserWorkspaceConfig.CONTRIBUTOR,
             email_notification_type=EmailNotificationType.NONE,
         )
         session.flush()
@@ -1061,7 +1063,7 @@ class TestCaldavRadicaleSync(object):
         radicale_server,
         user_api_factory,
         workspace_api_factory,
-        role_api_factory,
+        user_workspace_config_api_factory,
         web_testapp,
         app_config,
         session,
@@ -1080,11 +1082,11 @@ class TestCaldavRadicaleSync(object):
         session.add(user)
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.create_workspace("wp1", save_now=True, agenda_enabled=True)
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
-            UserRoleInWorkspace.CONTRIBUTOR,
+            UserWorkspaceConfig.CONTRIBUTOR,
             email_notification_type=EmailNotificationType.NONE,
         )
         session.flush()
@@ -1209,7 +1211,11 @@ class TestCaldavRadicaleSync(object):
 )
 class TestAgendaApi(object):
     def test_proxy_user_agenda__ok__nominal_case(
-        self, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
+        web_testapp,
     ) -> None:
         uapi = user_api_factory.get()
 
@@ -1230,23 +1236,23 @@ class TestAgendaApi(object):
         workspace3.agenda_enabled = False
         secret_workspace = workspace_api.create_workspace("secret", save_now=True)
         secret_workspace.agenda_enabled = True
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
-            UserRoleInWorkspace.CONTRIBUTOR,
+            UserWorkspaceConfig.CONTRIBUTOR,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user,
             workspace2,
-            UserRoleInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user,
             workspace3,
-            UserRoleInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()
@@ -1271,7 +1277,11 @@ class TestAgendaApi(object):
         assert agenda["with_credentials"] is True
 
     def test_proxy_user_agenda__ok__workspace_filter(
-        self, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
+        web_testapp,
     ) -> None:
         uapi = user_api_factory.get()
 
@@ -1290,23 +1300,23 @@ class TestAgendaApi(object):
         workspace2.agenda_enabled = True
         workspace3 = workspace_api.create_workspace("wp3", save_now=True)
         workspace3.agenda_enabled = True
-        role_api = role_api_factory.get()
-        role_api.create_one(
+        user_workspace_config_api = user_workspace_config_api_factory.get()
+        user_workspace_config_api.create_one(
             user,
             workspace,
-            UserRoleInWorkspace.CONTRIBUTOR,
+            UserWorkspaceConfig.CONTRIBUTOR,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user,
             workspace2,
-            UserRoleInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
-        role_api.create_one(
+        user_workspace_config_api.create_one(
             user,
             workspace3,
-            UserRoleInWorkspace.READER,
+            UserWorkspaceConfig.READER,
             email_notification_type=EmailNotificationType.NONE,
         )
         transaction.commit()

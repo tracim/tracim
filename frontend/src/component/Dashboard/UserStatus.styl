@@ -1,23 +1,23 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
 .userstatus
-  &__role
+  &__item
     display flex
     align-items center
-    justify-content center
-    &__icon
-      margin 0 textSpacing
-    &__text
-      font-weight bold
-  &__informations
-    padding-top 10px
-    text-align center
-    font-size metadataFontSize
-    width 100%
-    &__requests
-      margin auto
-      color fontColor
-      &:hover
+    flex-wrap wrap
+    margin-bottom 8px
+    &__label
+      width 45%
+      margin-right 2%
+      text-align right
+    &__value
+      display flex
+      align-items center
+      &__icon
+        margin 0 textSpacing 0 0
+      &.emailNotification__value
+        flex-grow 1
+      &.spaceAccessRequest__value
         color fontColor
 
 @media (max-width: max-md)

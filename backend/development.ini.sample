@@ -83,6 +83,7 @@ basic_setup.session_secret = change_this_value_please!
 # - contents/folder -> allow to put content into folder.
 # - contents/kanban -> allow to work with kanban-styled boards. It requires content/file to be enabled.
 # - contents/todo -> allow to use todos on contents
+# - contents/logbook -> allow to create a logbook with time specific entries. It requires content/file to be enabled.
 # - agenda -> add caldav agenda feature (specific process need to be started)
 # - collaborative_document_edition -> add support for collaborative document edition,
 #   add support for collaborative edition server like collabora/LibreOfficeOnline.
@@ -90,9 +91,9 @@ basic_setup.session_secret = change_this_value_please!
 # - upload_permission -> allow external with permission to upload some file in a space.
 # - gallery -> add gallery app in Tracim
 # default app.enabled config explicit list config:
-; app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,contents/kanban,contents/todo,agenda,share_content,upload_permission,gallery
+; app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,contents/kanban,contents/todo,contents/logbook,agenda,share_content,upload_permission,gallery
 # With all apps (add collaborative document edition):
-# app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,contents/kanban,contents/todo,agenda,collaborative_document_edition,share_content,upload_permission,gallery
+# app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,contents/kanban,contents/todo,contents/logbook,agenda,collaborative_document_edition,share_content,upload_permission,gallery
 
 ### Live Messages ###
 # control_uri for GRIP protocol reverse-proxy (PushPin) as a comma separated list
@@ -306,13 +307,22 @@ session.type = file
 # needed for "file" storage config :
 ; session.data_dir = %(here)s/sessions_data
 session.data_dir = %(basic_setup.sessions_data_root_dir)s/sessions_data
-# needed for many session storage type, but not for file (leave as empty for file)
+# needed for many session storage type, but not for file or ext:rediscluster (leave as empty)
 session.url =
+# needed for ext:rediscluster storage type (leave as empty for others)
+session.urls =
 
 ## "Redis" storage config sample:
 # session.type = ext:redis
 # note: redis db name are integer (by default 16 database are available from 0 to 15 db)
 # session.url = redis://localhost:6379/0
+
+## "Redis cluster" storage config sample:
+# session.type = ext:rediscluster
+# note: Even to connect to a single node, if it is in cluster mode, this session type is mandatory
+#  unlike single redis, db name should not be specified and 0 will be used
+#  several urls can be provided as a comma separated list.
+# session.urls = redis://node-1:7001,redis://node-2:7002
 
 ; session.lock_dir = %(here)s/sessions_data
 session.lock_dir = %(basic_setup.sessions_data_root_dir)s/sessions_lock
@@ -531,7 +541,7 @@ website.usage_conditions =
 # Possible events are in the form ENTITY_TYPE.EVENT_TYPE or ENTITY_TYPE.EVENT_TYPE.CONTENT_TYPE where:
 # ENTITY_TYPE  = user_call | user | workspace | content | mention | workspace_member
 # EVENT_TYPE   = created | modified | deleted | undeleted
-# CONTENT_TYPE = html-document | file | thread | folder | comment
+# CONTENT_TYPE = html-document | file | thread | folder | comment | logbook
 # To include all notifications, use web.notifications.excluded = ""
 # To exclude all notification of an entity, you can use wildcard syntax: for example "user.*" for user,
 # will exclude those events: user.deleted, user.created, user.modified, user.undeleted...
@@ -581,11 +591,13 @@ website.usage_conditions =
 ; email.notification.activated = False
 ## you can change the type of email notification when a user is invited to a space by default.
 ## possible values are:
-## - 'summary': send a daily mail containing notification summary
+## - 'hourly': send a hourly mail containing unread notification in the last hour
+## - 'daily': send a daily mail containing unread notification in the last day
+## - 'weekly': send a weekly mail containing unread notification in the last week
 ## - 'individual': send a mail for every notification received
 ## - 'none': doesn't send any mail
 ## NB: new users will not being notified until they login to Tracim a first time
-; email.notification.type_on_invitation = summary
+; email.notification.type_on_invitation = daily
 # You can enable notification-specific logs using the 'tracim_email_notification' logger.
 
 
