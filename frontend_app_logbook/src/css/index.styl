@@ -111,6 +111,14 @@ cardWidth = 280px
         overflow-y hidden
         position static
 
+.fullscreen
+  // INFO - ML - 2024-04-26 - 40px is the size of the fullscreen button
+  & .logbook__contentpage__wrapper
+    &__options
+      margin-inline-end "calc(40px + %s)" % standardSpacing
+    &__logbook
+      margin-inline-end "calc(40px + %s)" % standardSpacing
+
 .logbook
   &__contentpage
     &__content
