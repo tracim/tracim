@@ -186,6 +186,78 @@ class ESSearchApi(SearchApi):
                 # Ignore error when no matching alias exists
                 pass
 
+    def delete_indice(self, content: Content) -> None:
+        """
+        Delete a content from elastic_search engine
+        """
+        content_in_context = ContentInContext(content, config=self._config, dbsession=self._session)
+        logger.info(self, "Delete content {} index".format(content_in_context.content_id))
+        author = self._create_digest_user_from_user(content_in_context.author)
+        last_modifier = self._create_digest_user_from_user(content_in_context.last_modifier)
+        workspace = DigestWorkspace(
+            workspace_id=content_in_context.workspace.workspace_id,
+            label=content_in_context.workspace.label,
+        )
+        path = [
+            DigestContent(
+                content_id=component.content_id,
+                label=component.label,
+                slug=component.slug,
+                content_type=component.content_type,
+            )
+            for component in content_in_context.content_path
+        ]
+        indexed_subcontent = self._index_subcontents(content_in_context)
+        comments = indexed_subcontent["comments"]
+        todos = indexed_subcontent["todos"]
+        tags = [content_tag.tag.tag_name for content_tag in content.tags]
+        indexed_content = IndexedContent(
+            content_namespace=content_in_context.content_namespace,
+            content_id=content_in_context.content_id,
+            current_revision_id=content_in_context.current_revision_id,
+            current_revision_type=content_in_context.current_revision_type,
+            slug=content_in_context.slug,
+            parent_id=content_in_context.parent_id,
+            workspace_id=content_in_context.workspace_id,
+            workspace=workspace,
+            label=content_in_context.label,
+            content_type=content_in_context.content_type,
+            sub_content_types=content_in_context.sub_content_types,
+            status=content_in_context.status,
+            is_archived=content_in_context.is_archived,
+            is_deleted=content_in_context.is_deleted,
+            is_editable=content_in_context.is_editable,
+            is_active=content_in_context.is_active,
+            show_in_ui=content_in_context.show_in_ui,
+            file_extension=content_in_context.file_extension,
+            filename=content_in_context.filename,
+            modified=content_in_context.modified,
+            created=content_in_context.created,
+            active_shares=content_in_context.actives_shares,
+            description=content_in_context.description,
+            path=path,
+            comments=comments,
+            comment_count=len(comments),
+            todos=todos,
+            todo_count=len(todos),
+            tags=tags,
+            tag_count=len(tags),
+            author=author,
+            last_modifier=last_modifier,
+            archived_through_parent_id=content_in_context.archived_through_parent_id,
+            deleted_through_parent_id=content_in_context.deleted_through_parent_id,
+            raw_content=content_in_context.raw_content,
+            content_size=content_in_context.size,
+        )
+        indexed_content.meta.id = content_in_context.content_id
+        content_index_alias = self._get_index_parameters(IndexedContent).alias
+        if self._should_index_depot_file(content_in_context):
+            indexed_content.b64_file = content_in_context.get_b64_file()
+        indexed_content.delete(
+            using=self.es,
+            index=content_index_alias,
+        )
+
     def migrate_indices(self) -> None:
         """
         Upgrade function that creates new indices for the data and re-index
@@ -987,6 +1059,20 @@ class ESContentIndexer:
             )
 
     @hookimpl
+    def on_content_deleted(self, content: Content, context: TracimContext) -> None:
+        """Delete the given content index and its children index."""
+        content = self._get_main_content(content)
+        try:
+            self.delete_contents_index([content], context)
+            # if self._should_reindex_children(content.current_revision): #a changer
+            self.delete_contents_index(content.recursive_children, context)
+        except Exception:
+            logger.exception(
+                self,
+                "Exception while deleting the index of content {}".format(content.content_id),
+            )
+
+    @hookimpl
     def on_workspace_modified(self, workspace: Workspace, context: TracimContext) -> None:
         """Index the contents of the given workspace
 
@@ -1073,6 +1159,38 @@ class ESContentIndexer:
         for content in self._filter_excluded_content_types(contents):
             try:
                 search_api.index_content(content)
+            except Exception:
+                logger.exception(
+                    self,
+                    "Exception while indexing content {}".format(content.content_id),
+                )
+                indexing_error_count += 1
+        return indexing_error_count
+
+    def delete_contents_index(self, contents: typing.List[Content], context: TracimContext) -> None:
+        if context.app_config.JOBS__PROCESSING_MODE == CFG.CST.ASYNC:
+            queue = get_rq_queue2(context.app_config, RqQueueName.ELASTICSEARCH_INDEXER)
+            content_ids = [content.content_id for content in contents]
+
+            def index_via_rq_worker(session: Session, flush_context=None) -> None:
+                queue.enqueue(self._index_contents_from_ids, content_ids)
+
+            listen(context.dbsession, "after_commit", index_via_rq_worker, once=True)
+        else:
+            indexing_error_count = self.sync_delete_contents_index(contents, context)
+            if indexing_error_count:
+                raise IndexingError()
+
+    def sync_delete_contents_index(
+        self, contents: typing.List[Content], context: TracimContext
+    ) -> int:
+        search_api = ESSearchApi(
+            session=context.dbsession, config=context.app_config, current_user=None
+        )
+        indexing_error_count = 0
+        for content in contents:
+            try:
+                search_api.delete_indice(content)
             except Exception:
                 logger.exception(
                     self,
