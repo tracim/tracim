@@ -55,6 +55,7 @@ export class Logbook extends React.Component {
       logbook: { entries: [] },
       logbookState: justCreated ? LOGBOOK_STATE.LOADED : LOGBOOK_STATE.INIT,
       entryToEdit: {},
+      showConfirmPopup: false,
       saveRequired: false,
       showEditPopIn: false
     }
@@ -150,14 +151,30 @@ export class Logbook extends React.Component {
     })
   }
 
-  handleRemoveEntry = (entry) => {
+  handleConfirmRemoveEntry = (entry) => {
     this.setState(prevState => {
       const newLogbook = removeEntryFromLogbook(prevState.logbook, entry)
       return {
+        entryToRemove: null,
+        showConfirmPopup: false,
         logbookState: LOGBOOK_STATE.SAVING,
         saveRequired: true,
         logbook: newLogbook
       }
+    })
+  }
+
+  handleCloseConfirmPopup = () => {
+    this.setState({
+      entryToRemove: null,
+      showConfirmPopup: false
+    })
+  }
+
+  handleRemoveEntry = (entry) => {
+    this.setState({
+      entryToRemove: entry,
+      showConfirmPopup: true
     })
   }
 
@@ -294,6 +311,35 @@ export class Logbook extends React.Component {
             </CardPopup>
           )}
         </>
+        {state.showConfirmPopup && (
+          <CardPopup
+            customClass='logbook__LogbookPopup'
+            customColor={props.config.hexcolor}
+            faIcon='far fa-trash-alt'
+            label={props.t('Are you sure?')}
+            onClose={this.handleCloseConfirmPopup}
+          >
+            <div className='logbook__LogbookPopup__confirm'>
+              <IconButton
+                color={props.config.hexcolor}
+                icon='fas fa-times'
+                onClick={this.handleCloseConfirmPopup}
+                text={props.t('Cancel')}
+                dataCy='cancelDeleteCard'
+              />
+
+              <IconButton
+                color={props.config.hexcolor}
+                icon='far fa-trash-alt'
+                intent='primary'
+                mode='light'
+                onClick={() => this.handleConfirmRemoveEntry(state.entryToRemove)}
+                text={props.t('Delete')}
+                dataCy='confirmDeleteCard'
+              />
+            </div>
+          </CardPopup>
+        )}
       </div>
     )
   }
