@@ -799,7 +799,7 @@ export const shouldUseLightTextColor = (backColor, frontColors = {}) => {
   const blackLuminance = frontColors.dark ? luminance(frontColors.dark) : 0
   const contrastBackColorWhite = (whiteLuminance + 0.05) / (luminance(backColor) + 0.05)
   const contrastBackColorBlack = (luminance(backColor) + 0.05) / (blackLuminance + 0.05)
-  return contrastBackColorBlack < contrastBackColorWhite;
+  return contrastBackColorBlack < contrastBackColorWhite
 }
 
 export const darkenColor = (c) => color(c).darken(0.15).hex()
