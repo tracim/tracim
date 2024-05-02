@@ -769,205 +769,204 @@ export class WorkspaceContent extends React.Component {
 
     return (
       <div className='tracim__content-scrollview fullWidthFullHeight' id='scrollableElement'>
-        <div className='workspace__content'>
-          {state.contentLoaded && (
-            <OpenContentApp
-              // automatically open the app for the contentId in url
-              workspaceId={props.currentWorkspace.id}
-              appOpenedType={state.appOpenedType}
-              onUpdateAppOpenedType={this.handleUpdateAppOpenedType}
-            />
-          )}
+        {state.contentLoaded
+          ? (
+            <div className='workspace__content'>
+              <OpenContentApp
+                // automatically open the app for the contentId in url
+                workspaceId={props.currentWorkspace.id}
+                appOpenedType={state.appOpenedType}
+                onUpdateAppOpenedType={this.handleUpdateAppOpenedType}
+              />
 
-          {state.contentLoaded && (
-            <Route
-              path={PAGE.WORKSPACE.SHARE_FOLDER(':idws')}
-              component={() => (
-                <OpenShareFolderApp
-                  // automatically open the share folder advanced
-                  workspaceId={props.currentWorkspace.id}
-                  appOpenedType={state.appOpenedType}
-                  onUpdateAppOpenedType={this.handleUpdateAppOpenedType}
-                />
-              )}
-            />
-          )}
-
-          {state.contentLoaded && (
-            <Route
-              path={PAGE.WORKSPACE.NEW(':idws', ':type')}
-              component={() => (
-                <OpenCreateContentApp
-                  // automatically open the popup create content of the app in url
-                  workspaceId={props.currentWorkspace.id}
-                  appOpenedType={state.appOpenedType}
-                />
-              )}
-            />
-          )}
-
-          <PageWrapper customClass='workspace'>
-            <TabBar
-              currentSpace={props.currentWorkspace}
-              breadcrumbs={breadcrumbs}
-              isEmailNotifActivated={props.system.config.email_notification_activated}
-            />
-            <PageContent parentClass='workspace__content'>
-              <div className='workspace__content__buttons'>
-                {props.appList.some(app => app.slug === 'gallery') && (
-                  <IconButton
-                    onClick={() => props.history.push(PAGE.WORKSPACE.GALLERY(props.currentWorkspace.id))}
-                    text={props.t('Open the gallery')}
-                    icon='far fa-image'
-                    dataCy='IconButton_gallery'
-                  />
-                )}
-                {userRoleIdInWorkspace >= ROLE.contributor.id && (
-                  <DropdownCreateButton
-                    folderId={null} // null because it is workspace root content
-                    onClickCreateContent={this.handleClickCreateContent}
-                    availableApp={createContentAvailableApp}
-                  />
-                )}
-              </div>
-
-              <div className='workspace__content__file_and_folder folder__content active'>
-                <FilterBar
-                  onChange={e => {
-                    const newFilter = e.target.value
-                    this.setState({ userFilter: newFilter })
-                  }}
-                  value={state.userFilter}
-                  placeholder={props.t('Filter visible contents')}
-                />
-
-                <ContentItemHeader
-                  isOrderAscending={state.sortOrder === SORT_ORDER.ASCENDING}
-                  onClickTitle={this.handleClickTitleToSort}
-                  selectedSortCriterion={state.selectedSortCriterion}
-                  showLastModification
-                />
-
-                {currentWorkspace.uploadEnabled && appList.some(a => a.slug === 'upload_permission') && (
-                  <ShareFolder
-                    loading={state.loadingShareFolder}
+              <Route
+                path={PAGE.WORKSPACE.SHARE_FOLDER(':idws')}
+                component={() => (
+                  <OpenShareFolderApp
+                    // automatically open the share folder advanced
                     workspaceId={props.currentWorkspace.id}
-                    availableApp={createContentAvailableApp}
-                    isOpen={state.shareFolder.isOpen}
-                    lang={props.user.lang}
-                    getContentParentList={this.getContentParentList}
-                    onDropMoveContentItem={this.handleDropMoveContent}
-                    onClickFolder={this.handleClickFolder}
-                    onClickCreateContent={this.handleClickCreateContent}
-                    onSetFolderRead={this.handleSetFolderRead}
-                    userRoleIdInWorkspace={userRoleIdInWorkspace}
-                    shareFolderContentList={workspaceShareFolderContentList.contentList}
-                    onClickExtendedAction={{
-                      edit: this.handleClickEditContentItem,
-                      download: this.handleClickDownloadContentItem,
-                      archive: this.handleClickArchiveShareFolderContentItem,
-                      delete: this.handleClickDeleteShareFolderContentItem
-                    }}
-                    onClickShareFolder={this.handleClickShareFolder}
-                    contentType={contentType}
-                    readStatusList={currentWorkspace.contentReadStatusList}
-                    rootContentList={filteredWorkspaceList}
-                    isLast={!state.contentLoaded || isWorkspaceEmpty || isFilteredWorkspaceEmpty}
-                    sortOrder={state.sortOrder}
-                    selectedSortCriterion={state.selectedSortCriterion}
-                    t={t}
+                    appOpenedType={state.appOpenedType}
+                    onUpdateAppOpenedType={this.handleUpdateAppOpenedType}
                   />
                 )}
+              />
 
-                {state.contentLoaded && ((isWorkspaceEmpty || isFilteredWorkspaceEmpty)
-                  ? this.displayWorkspaceEmptyMessage(userRoleIdInWorkspace, isWorkspaceEmpty, isFilteredWorkspaceEmpty)
-                  : filteredWorkspaceList.map((content, i) => content.type === CONTENT_TYPE.FOLDER
-                    ? (
-                      <Folder
-                        loading={state[this.getLoadingFolderKey(content.id)]}
+              <Route
+                path={PAGE.WORKSPACE.NEW(':idws', ':type')}
+                component={() => (
+                  <OpenCreateContentApp
+                    // automatically open the popup create content of the app in url
+                    workspaceId={props.currentWorkspace.id}
+                    appOpenedType={state.appOpenedType}
+                  />
+                )}
+              />
+
+              <PageWrapper customClass='workspace'>
+                <TabBar
+                  currentSpace={props.currentWorkspace}
+                  breadcrumbs={breadcrumbs}
+                  isEmailNotifActivated={props.system.config.email_notification_activated}
+                />
+                <PageContent parentClass='workspace__content'>
+                  <div className='workspace__content__buttons'>
+                    {props.appList.some(app => app.slug === 'gallery') && (
+                      <IconButton
+                        onClick={() => props.history.push(PAGE.WORKSPACE.GALLERY(props.currentWorkspace.id))}
+                        text={props.t('Open the gallery')}
+                        icon='far fa-image'
+                        dataCy='IconButton_gallery'
+                      />
+                    )}
+                    {userRoleIdInWorkspace >= ROLE.contributor.id && (
+                      <DropdownCreateButton
+                        folderId={null} // null because it is workspace root content
+                        onClickCreateContent={this.handleClickCreateContent}
                         availableApp={createContentAvailableApp}
-                        folderData={content}
+                      />
+                    )}
+                  </div>
+
+                  <div className='workspace__content__file_and_folder folder__content active'>
+                    <FilterBar
+                      onChange={e => {
+                        const newFilter = e.target.value
+                        this.setState({ userFilter: newFilter })
+                      }}
+                      value={state.userFilter}
+                      placeholder={props.t('Filter visible contents')}
+                    />
+
+                    <ContentItemHeader
+                      isOrderAscending={state.sortOrder === SORT_ORDER.ASCENDING}
+                      onClickTitle={this.handleClickTitleToSort}
+                      selectedSortCriterion={state.selectedSortCriterion}
+                      showLastModification
+                    />
+
+                    {currentWorkspace.uploadEnabled && appList.some(a => a.slug === 'upload_permission') && (
+                      <ShareFolder
+                        loading={state.loadingShareFolder}
+                        workspaceId={props.currentWorkspace.id}
+                        availableApp={createContentAvailableApp}
+                        isOpen={state.shareFolder.isOpen}
                         lang={props.user.lang}
-                        workspaceContentList={state.displayedContentList}
                         getContentParentList={this.getContentParentList}
-                        userRoleIdInWorkspace={userRoleIdInWorkspace}
-                        onClickExtendedAction={{
-                          edit: this.handleClickEditContentItem,
-                          download: this.handleClickDownloadContentItem,
-                          archive: this.handleClickArchiveContentItem,
-                          delete: this.handleClickDeleteContentItem
-                        }}
                         onDropMoveContentItem={this.handleDropMoveContent}
                         onClickFolder={this.handleClickFolder}
                         onClickCreateContent={this.handleClickCreateContent}
+                        onSetFolderRead={this.handleSetFolderRead}
+                        userRoleIdInWorkspace={userRoleIdInWorkspace}
+                        shareFolderContentList={workspaceShareFolderContentList.contentList}
+                        onClickExtendedAction={{
+                          edit: this.handleClickEditContentItem,
+                          download: this.handleClickDownloadContentItem,
+                          archive: this.handleClickArchiveShareFolderContentItem,
+                          delete: this.handleClickDeleteShareFolderContentItem
+                        }}
+                        onClickShareFolder={this.handleClickShareFolder}
                         contentType={contentType}
                         readStatusList={currentWorkspace.contentReadStatusList}
-                        onSetFolderRead={this.handleSetFolderRead}
-                        isLast={i === filteredWorkspaceList.length - 1}
-                        key={content.id}
-                        selectedSortCriterion={state.selectedSortCriterion}
+                        rootContentList={filteredWorkspaceList}
+                        isLast={isWorkspaceEmpty || isFilteredWorkspaceEmpty}
                         sortOrder={state.sortOrder}
+                        selectedSortCriterion={state.selectedSortCriterion}
                         t={t}
                       />
-                    )
-                    : (
-                      <ContentItem
-                        contentId={content.id}
-                        workspaceId={content.workspaceId}
-                        parentId={content.parentId}
-                        label={content.label}
-                        fileName={content.fileName}
-                        modified={content.modified}
-                        lang={props.user.lang}
-                        currentRevisionType={content.currentRevisionType}
-                        lastModifier={content.lastModifier}
-                        fileExtension={content.fileExtension}
-                        faIcon={contentType.length ? contentType.find(a => a.slug === content.type).faIcon : ''}
-                        isShared={content.activedShares !== 0 && currentWorkspace.downloadEnabled}
-                        isTemplate={content.isTemplate}
-                        statusSlug={content.statusSlug}
-                        contentType={contentType.length ? contentType.find(ct => ct.slug === content.type) : null}
-                        isLast={i === filteredWorkspaceList.length - 1}
-                        urlContent={`${PAGE.WORKSPACE.CONTENT(content.workspaceId, content.type, content.id)}${location.search}`}
-                        userRoleIdInWorkspace={userRoleIdInWorkspace}
-                        read={currentWorkspace.contentReadStatusList.includes(content.id)}
-                        onClickExtendedAction={{
-                          edit: {
-                            callback: e => this.handleClickEditContentItem(e, content),
-                            label: props.t('Edit')
-                          },
-                          download: {
-                            callback: e => this.handleClickDownloadContentItem(e, content),
-                            label: props.t('Download')
-                          },
-                          archive: {
-                            callback: e => this.handleClickArchiveContentItem(e, content),
-                            label: props.t('Archive')
-                          },
-                          delete: {
-                            callback: e => this.handleClickDeleteContentItem(e, content),
-                            label: props.t('Delete')
-                          }
-                        }}
-                        onDropMoveContentItem={this.handleDropMoveContent}
-                        key={content.id}
-                      />
-                    )
-                  )
-                )}
+                    )}
 
-                {state.contentLoaded && userRoleIdInWorkspace >= ROLE.contributor.id && workspaceContentList.length >= 10 && (
-                  <DropdownCreateButton
-                    folderId={null}
-                    onClickCreateContent={this.handleClickCreateContent}
-                    availableApp={createContentAvailableApp}
-                  />
-                )}
-              </div>
-            </PageContent>
-          </PageWrapper>
-        </div>
-        {!state.contentLoaded && <Loading />}
+                    {((isWorkspaceEmpty || isFilteredWorkspaceEmpty)
+                      ? this.displayWorkspaceEmptyMessage(userRoleIdInWorkspace, isWorkspaceEmpty, isFilteredWorkspaceEmpty)
+                      : filteredWorkspaceList.map((content, i) => content.type === CONTENT_TYPE.FOLDER
+                        ? (
+                          <Folder
+                            loading={state[this.getLoadingFolderKey(content.id)]}
+                            availableApp={createContentAvailableApp}
+                            folderData={content}
+                            lang={props.user.lang}
+                            workspaceContentList={state.displayedContentList}
+                            getContentParentList={this.getContentParentList}
+                            userRoleIdInWorkspace={userRoleIdInWorkspace}
+                            onClickExtendedAction={{
+                              edit: this.handleClickEditContentItem,
+                              download: this.handleClickDownloadContentItem,
+                              archive: this.handleClickArchiveContentItem,
+                              delete: this.handleClickDeleteContentItem
+                            }}
+                            onDropMoveContentItem={this.handleDropMoveContent}
+                            onClickFolder={this.handleClickFolder}
+                            onClickCreateContent={this.handleClickCreateContent}
+                            contentType={contentType}
+                            readStatusList={currentWorkspace.contentReadStatusList}
+                            onSetFolderRead={this.handleSetFolderRead}
+                            isLast={i === filteredWorkspaceList.length - 1}
+                            key={content.id}
+                            selectedSortCriterion={state.selectedSortCriterion}
+                            sortOrder={state.sortOrder}
+                            t={t}
+                          />
+                        )
+                        : (
+                          <ContentItem
+                            contentId={content.id}
+                            workspaceId={content.workspaceId}
+                            parentId={content.parentId}
+                            label={content.label}
+                            fileName={content.fileName}
+                            modified={content.modified}
+                            lang={props.user.lang}
+                            currentRevisionType={content.currentRevisionType}
+                            lastModifier={content.lastModifier}
+                            fileExtension={content.fileExtension}
+                            faIcon={contentType.length ? contentType.find(a => a.slug === content.type).faIcon : ''}
+                            isShared={content.activedShares !== 0 && currentWorkspace.downloadEnabled}
+                            isTemplate={content.isTemplate}
+                            statusSlug={content.statusSlug}
+                            contentType={contentType.length ? contentType.find(ct => ct.slug === content.type) : null}
+                            isLast={i === filteredWorkspaceList.length - 1}
+                            urlContent={`${PAGE.WORKSPACE.CONTENT(content.workspaceId, content.type, content.id)}${location.search}`}
+                            userRoleIdInWorkspace={userRoleIdInWorkspace}
+                            read={currentWorkspace.contentReadStatusList.includes(content.id)}
+                            onClickExtendedAction={{
+                              edit: {
+                                callback: e => this.handleClickEditContentItem(e, content),
+                                label: props.t('Edit')
+                              },
+                              download: {
+                                callback: e => this.handleClickDownloadContentItem(e, content),
+                                label: props.t('Download')
+                              },
+                              archive: {
+                                callback: e => this.handleClickArchiveContentItem(e, content),
+                                label: props.t('Archive')
+                              },
+                              delete: {
+                                callback: e => this.handleClickDeleteContentItem(e, content),
+                                label: props.t('Delete')
+                              }
+                            }}
+                            onDropMoveContentItem={this.handleDropMoveContent}
+                            key={content.id}
+                          />
+                        )
+                      )
+                    )}
+
+                    {userRoleIdInWorkspace >= ROLE.contributor.id && workspaceContentList.length >= 10 && (
+                      <DropdownCreateButton
+                        folderId={null}
+                        onClickCreateContent={this.handleClickCreateContent}
+                        availableApp={createContentAvailableApp}
+                      />
+                    )}
+                  </div>
+                </PageContent>
+              </PageWrapper>
+            </div>
+          )
+          : (
+            <Loading />
+          )}
       </div>
     )
   }
