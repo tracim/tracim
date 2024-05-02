@@ -13,11 +13,11 @@ import {
 // NOTE - M.L. - 2024-02-28 - This function is required due to the very specific format requested
 //  by the 'datetime-local' input type
 function toDatetimeLocal (date) {
-  return format(new Date(date), "yyyy-MM-dd'T'hh:mm:ss")
+  return format(new Date(date), "yyyy-MM-dd'T'HH:mm:ss")
 }
 
 function getCurrentDateTime () {
-  return format(new Date(), "yyyy-MM-dd'T'hh:mm:ss")
+  return format(new Date(), "yyyy-MM-dd'T'HH:mm:ss")
 }
 
 function LogbookEntryEditor (props) {
