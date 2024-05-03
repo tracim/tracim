@@ -40,6 +40,5 @@
   "Time of event": "Time of event",
   "Permanently delete": "Permanently delete",
   "Yes, delete permanently": "Yes, delete permanently",
-  "Warning: this operation cannot be rolled back": "Warning: this operation cannot be rolled back",
-  "Are you sure?": "Are you sure?"
+  "Warning: this operation cannot be rolled back": "Warning: this operation cannot be rolled back"
 }

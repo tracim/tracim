@@ -40,6 +40,5 @@
   "You must change the status or restore this logbook before any change": "Vous devez changer le status de ce journal ou le restorer avant tout changement",
   "Permanently delete": "Supprimer définitivement",
   "Yes, delete permanently": "Oui, supprimer définitivement",
-  "Warning: this operation cannot be rolled back": "Attention : cette opération ne peut pas être annulée",
-  "Are you sure?": "Êtes-vous sûr ?"
+  "Warning: this operation cannot be rolled back": "Attention : cette opération ne peut pas être annulée"
 }

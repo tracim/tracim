@@ -14,7 +14,8 @@ import {
   Loading,
   PromptMessage,
   RefreshWarningMessage,
-  sendGlobalFlashMessage
+  sendGlobalFlashMessage,
+  ConfirmPopup
 } from 'tracim_frontend_lib'
 
 import { LOGBOOK_MIME_TYPE, LOGBOOK_FILE_EXTENSION } from '../helper.js'
@@ -312,33 +313,14 @@ export class Logbook extends React.Component {
           )}
         </>
         {state.showConfirmPopup && (
-          <CardPopup
+          <ConfirmPopup
+            onCancel={this.handleCloseConfirmPopup}
+            onConfirm={() => this.handleConfirmRemoveEntry(state.entryToRemove)}
+            confirmLabel={props.t('Delete')}
             customClass='logbook__LogbookPopup'
             customColor={props.config.hexcolor}
-            faIcon='far fa-trash-alt'
-            label={props.t('Are you sure?')}
-            onClose={this.handleCloseConfirmPopup}
-          >
-            <div className='logbook__LogbookPopup__confirm'>
-              <IconButton
-                color={props.config.hexcolor}
-                icon='fas fa-times'
-                onClick={this.handleCloseConfirmPopup}
-                text={props.t('Cancel')}
-                dataCy='cancelDeleteCard'
-              />
-
-              <IconButton
-                color={props.config.hexcolor}
-                icon='far fa-trash-alt'
-                intent='primary'
-                mode='light'
-                onClick={() => this.handleConfirmRemoveEntry(state.entryToRemove)}
-                text={props.t('Delete')}
-                dataCy='confirmDeleteCard'
-              />
-            </div>
-          </CardPopup>
+            confirmIcon='far fa-fw fa-trash-alt'
+          />
         )}
       </div>
     )
