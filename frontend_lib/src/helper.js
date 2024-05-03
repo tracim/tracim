@@ -791,10 +791,15 @@ const luminance = (color) => {
 }
 
 // INFO - FS - 2024-03-25 - Use the contrast ratio to determine witch text color use : https://github.com/tracim/tracim/issues/6356
-// return true if white text color is better than black for this background
+// return true if light text color is better than dark for this background
 // INFO - ML - 2024-04-26 - Second argument is an optional object containing
 //  `.light` color and `.dark` color. Each property is optional
-export const shouldUseLightTextColor = (backColor, frontColors = {}) => {
+// INFO - ML - 2024-05-03 - This function will return a boolean set to true
+//  if the light color is more contrasted than the dark one
+//  this doesn't guarantee that the color will be contrasted, it only
+//  guarantees that the given light color is more or less contrasted than the dark one
+// USAGE - shouldUseLightTextColor('#aabbcc', { light: '#eeeeee', dark: '#666666' })
+export const shouldUseLightTextColor = (backColor , frontColors = {}) => {
   const whiteLuminance = frontColors.light ? luminance(frontColors.light) : 1
   const blackLuminance = frontColors.dark ? luminance(frontColors.dark) : 0
   const contrastBackColorWhite = (whiteLuminance + 0.05) / (luminance(backColor) + 0.05)
