@@ -51,6 +51,7 @@ PromptMessage.defaultProps = {
   msg: '',
   icon: '',
   btnLabel: '',
+  btnIcon: '',
   onClickBtn: () => {},
   tooltip: ''
 }
