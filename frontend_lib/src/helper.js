@@ -799,7 +799,7 @@ const luminance = (color) => {
 //  this doesn't guarantee that the color will be contrasted, it only
 //  guarantees that the given light color is more or less contrasted than the dark one
 // USAGE - shouldUseLightTextColor('#aabbcc', { light: '#eeeeee', dark: '#666666' })
-export const shouldUseLightTextColor = (backColor , frontColors = {}) => {
+export const shouldUseLightTextColor = (backColor, frontColors = {}) => {
   const whiteLuminance = frontColors.light ? luminance(frontColors.light) : 1
   const blackLuminance = frontColors.dark ? luminance(frontColors.dark) : 0
   const contrastBackColorWhite = (whiteLuminance + 0.05) / (luminance(backColor) + 0.05)
