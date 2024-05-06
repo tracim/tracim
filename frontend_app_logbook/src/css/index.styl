@@ -95,6 +95,16 @@ cardWidth = 280px
   &__blackTextColor
     color offBlack
 
+.fullscreen
+  // INFO - ML - 2024-04-26 - 40px is the size of the fullscreen button
+  & .logbook__contentpage__wrapper
+    &__options
+      position relative
+      top 10px
+      margin-inline-end "calc(40px + %s)" % standardSpacing
+    &__logbook
+      margin-inline-end "calc(40px + %s)" % standardSpacing
+
 @media (max-width: max-sm)
   .logbook
     &__timeline
