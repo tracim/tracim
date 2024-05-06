@@ -14,7 +14,8 @@ import {
   Loading,
   PromptMessage,
   RefreshWarningMessage,
-  sendGlobalFlashMessage
+  sendGlobalFlashMessage,
+  ConfirmPopup
 } from 'tracim_frontend_lib'
 
 import { LOGBOOK_MIME_TYPE, LOGBOOK_FILE_EXTENSION } from '../helper.js'
@@ -55,6 +56,7 @@ export class Logbook extends React.Component {
       logbook: { entries: [] },
       logbookState: justCreated ? LOGBOOK_STATE.LOADED : LOGBOOK_STATE.INIT,
       entryToEdit: {},
+      showConfirmPopup: false,
       saveRequired: false,
       showEditPopIn: false
     }
@@ -150,14 +152,30 @@ export class Logbook extends React.Component {
     })
   }
 
-  handleRemoveEntry = (entry) => {
+  handleConfirmRemoveEntry = (entry) => {
     this.setState(prevState => {
       const newLogbook = removeEntryFromLogbook(prevState.logbook, entry)
       return {
+        entryToRemove: null,
+        showConfirmPopup: false,
         logbookState: LOGBOOK_STATE.SAVING,
         saveRequired: true,
         logbook: newLogbook
       }
+    })
+  }
+
+  handleCloseConfirmPopup = () => {
+    this.setState({
+      entryToRemove: null,
+      showConfirmPopup: false
+    })
+  }
+
+  handleRemoveEntry = (entry) => {
+    this.setState({
+      entryToRemove: entry,
+      showConfirmPopup: true
     })
   }
 
@@ -295,6 +313,16 @@ export class Logbook extends React.Component {
             </CardPopup>
           )}
         </>
+        {state.showConfirmPopup && (
+          <ConfirmPopup
+            onCancel={this.handleCloseConfirmPopup}
+            onConfirm={() => this.handleConfirmRemoveEntry(state.entryToRemove)}
+            confirmLabel={props.t('Delete')}
+            customClass='logbook__LogbookPopup'
+            customColor={props.config.hexcolor}
+            confirmIcon='far fa-fw fa-trash-alt'
+          />
+        )}
       </div>
     )
   }
