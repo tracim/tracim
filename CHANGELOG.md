@@ -1,6 +1,6 @@
 # Changelog
 
-## 4.9.1 / TBD
+## 4.9.1 / 2024-05-06
 
 ### 🐛 Fixed Issues
 
