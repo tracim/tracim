@@ -184,7 +184,7 @@ export const revisionTypeList = [{
   label: 'Item unarchived'
 }, {
   id: 'undeletion',
-  faIcon: 'far fa-trash-alt',
+  faIcon: 'fas fa-trash-restore',
   tradKey: i18n.t('Item restored'),
   label: 'Item restored'
 }, {

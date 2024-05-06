@@ -17,7 +17,7 @@ const PromptMessage = props => (
         onClick={props.onClickBtn}
         title={props.tooltip}
       >
-        <i className={`fa-fw ${props.icon}`} />
+        <i className={`fa-fw ${props.btnIcon || props.icon}`} />
         {props.btnLabel}
       </button>
     )}
@@ -41,6 +41,7 @@ PromptMessage.propTypes = {
     'button', 'link'
   ]),
   icon: PropTypes.string,
+  btnIcon: PropTypes.string,
   btnLabel: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
   onClickBtn: PropTypes.func,
   tooltip: PropTypes.string
@@ -50,6 +51,7 @@ PromptMessage.defaultProps = {
   msg: '',
   icon: '',
   btnLabel: '',
+  btnIcon: '',
   onClickBtn: () => {},
   tooltip: ''
 }
