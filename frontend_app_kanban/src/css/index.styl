@@ -202,6 +202,16 @@ cardWidth = 280px
     & > *
       margin auto
 
+.fullscreen
+  // INFO - ML - 2024-04-26 - 40px is the size of the fullscreen button
+  & .kanban__contentpage__wrapper
+    &__options
+      position relative
+      top 10px
+      margin-inline-end "calc(40px + %s)" % standardSpacing
+    &__board
+      margin-inline-end "calc(40px + %s)" % standardSpacing
+
 [dir=ltr] .kanban
   &__contentpage
     &__wrapper
@@ -253,11 +263,3 @@ cardWidth = 280px
           height "calc(100% - %s)" % standardSpacing
   .kanban__contentpage__header__isEditing
     padding-bottom 60px
-
-.fullscreen
-  // INFO - ML - 2024-04-26 - 40px is the size of the fullscreen button
-  & .kanban__contentpage__wrapper
-    &__options
-      margin-inline-end "calc(40px + %s)" % standardSpacing
-    &__board
-      margin-inline-end "calc(40px + %s)" % standardSpacing
