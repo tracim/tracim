@@ -1,5 +1,20 @@
 # Changelog
 
+## 4.9.1 / 2024-05-06
+
+### 🐛 Fixed Issues
+
+- Workspace
+  - Fixed position of the loader on workspace content list [#6480](https://github.com/tracim/tracim/issues/6480)
+- Kanban
+  - Added dynamic font color for timestamps [#6469](https://github.com/tracim/tracim/issues/6469)
+- Logbook
+  - Added confirm pop-in when deleting an entry [#6467](https://github.com/tracim/tracim/issues/6467)
+  - Fixed error in the date format for date field in the entries [#6477](https://github.com/tracim/tracim/issues/6477)
+- App contents
+  - Fixed button position when in fullscreen [#6471](https://github.com/tracim/tracim/issues/6471)
+  - Added specific icon for restore content button [#6475](https://github.com/tracim/tracim/issues/6475)
+
 ## 4.9.0 / 2024-04-25
 
 ### ✨ New Features
