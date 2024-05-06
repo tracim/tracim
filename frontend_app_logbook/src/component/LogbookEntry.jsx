@@ -44,8 +44,8 @@ const LogbookEntry = (props) => {
           </div>
           <span className={classnames('logbook__timeline__entries__entry__data__header__date', {
             // INFO - M.L - light is lightgrey1, dark is darkgrey2
-            logbook__alt__lightTextColor: shouldUseLightTextColor(props.entry.bgColor, { light: '#e8e8e8', dark: '#595959' }),
-            logbook__alt__darkTextColor: !shouldUseLightTextColor(props.entry.bgColor, { light: '#e8e8e8', dark: '#595959' })
+            logbook__lightTextColor: shouldUseLightTextColor(props.entry.bgColor, { light: '#e8e8e8', dark: '#595959' }),
+            logbook__darkTextColor: !shouldUseLightTextColor(props.entry.bgColor, { light: '#e8e8e8', dark: '#595959' })
           })}
           >
             <Icon
