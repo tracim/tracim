@@ -178,12 +178,6 @@ class SystemController(Controller):
         return {"ui_schema": custom_properties_api.get_ui_schema()}
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
-    @check_right(is_user)
-    @hapic.output_body(AppCustomActionUiSchema())
-    def app_custom_action(self, context, request: TracimRequest, hapic_data=None):
-        return {"custom_actions": ""}
-
-    @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @hapic.output_body(ErrorCodeSchema(many=True))
     def error_codes(self, context, request: TracimRequest, hapic_data=None):
         app_config = request.registry.settings["CFG"]  # type: CFG
@@ -265,9 +259,3 @@ class SystemController(Controller):
             "reserved_usernames", "/system/reserved-usernames", request_method="GET"
         )
         configurator.add_view(self.reserved_usernames, route_name="reserved_usernames")
-
-        # App custom action
-        configurator.add_route(
-            "app_custom_action", "/system/app-custom-action", request_method="GET"
-        )
-        configurator.add_view(self.app_custom_action, route_name="app_custom_action")

@@ -425,11 +425,7 @@ class AppCustomActionDigestSchema(marshmallow.Schema):
         required=False,
         example="https://www.tracim.fr/static/images/new_tracim/LOGO_TRACIM_RVB_1.png",
     )
-    label = marshmallow.fields.Dict(
-        required=True,
-        example={"fr": "My action"},
-        description="Dictionary of translations. Key is language (fr, en, es, de, ...), value is translated label",
-    )
+    label = marshmallow.fields.Dict(required=False, example='{"fr": "My string"}')
     link = marshmallow.fields.String(
         required=True,
         example="https://www.tracim.fr/static/images/new_tracim/LOGO_TRACIM_RVB_1.png",
@@ -1641,7 +1637,7 @@ class UserCustomPropertiesUiSchema(marshmallow.Schema):
 
 class AppCustomActionUiSchema(marshmallow.Schema):
     app_custom_action = marshmallow.fields.List(
-        marshmallow.fields.Dict(AppCustomActionDigestSchema()),
+        marshmallow.fields.Nested(AppCustomActionDigestSchema()),
         description="List of app's custom action. Configurable by branding app_custom_action.json",
     )
 
@@ -2246,6 +2242,9 @@ class ConfigSchema(marshmallow.Schema):
         values=marshmallow.fields.List(marshmallow.fields.String()),
     )
     saml_idp_list = marshmallow.fields.Nested(SamLIdPConfigSchema, many=True)
+    app_custom_actions = marshmallow.fields.List(
+        marshmallow.fields.Nested(AppCustomActionDigestSchema())
+    )
 
 
 class ConditionFileSchema(marshmallow.Schema):

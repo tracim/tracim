@@ -520,6 +520,12 @@ website.usage_conditions =
 # example:
 # color.config_file_path = /home/user/tracim/color.json
 
+### App Custom Action ###
+# Parametrable custom action in content app dropdown meaningful
+; app_custom_action.config_file_path = app_custom_action.json
+# example:
+# app_custom_action.config_file_path = /home/user/tracim/app_custom_action.json
+
 ### Rich Text Preview ###
 # Template and css used for preview of notes files, by default use files from
 # the branding dir (frontend/dist/assets/branding/)
