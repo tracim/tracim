@@ -73,13 +73,10 @@ export const PopinFixedHeader = (props) => {
     showChangeTitleButton,
     t,
     actionList,
-    apiUrl,
     content,
     favoriteState,
-    loggedUser,
     onClickAddToFavoriteList,
-    onClickRemoveFromFavoriteList,
-    showReactions
+    onClickRemoveFromFavoriteList
   } = props
 
   const actionListWithEditTitle = [
@@ -276,7 +273,9 @@ export const PopinFixedHeader = (props) => {
                     )
                     : <i className={`fa-fw ${action.icon}`} />
                   )}
-                  {action.label}
+                  <span className='wsContentGeneric__header__actions__item__text'>
+                    {action.label}
+                  </span>
                 </a>
               )
             })
@@ -301,7 +300,6 @@ export default translate()(PopinFixedHeader)
 PopinFixedHeader.propTypes = {
   actionList: PropTypes.array,
   customActionList: PropTypes.array,
-  apiUrl: PropTypes.string,
   breadcrumbsList: PropTypes.array,
   componentTitle: PropTypes.element,
   content: PropTypes.object,
@@ -314,7 +312,6 @@ PopinFixedHeader.propTypes = {
   headerButtons: PropTypes.array,
   isTemplate: PropTypes.bool,
   loading: PropTypes.bool,
-  loggedUser: PropTypes.object,
   onClickAddToFavoriteList: PropTypes.func,
   onClickChangeMarkedTemplate: PropTypes.func,
   onClickCloseBtn: PropTypes.func.isRequired,
@@ -329,7 +326,6 @@ PopinFixedHeader.propTypes = {
 PopinFixedHeader.defaultProps = {
   actionList: [],
   customActionList: [],
-  apiUrl: '',
   breadcrumbsList: [],
   componentTitle: <div />,
   content: {
@@ -344,7 +340,6 @@ PopinFixedHeader.defaultProps = {
   headerButtons: [],
   isTemplate: false,
   loading: false,
-  loggedUser: {},
   onChangeTitle: () => { },
   onClickAddToFavoriteList: () => { },
   onClickChangeMarkedTemplate: () => { },

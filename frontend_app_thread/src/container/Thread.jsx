@@ -29,7 +29,8 @@ import {
   FAVORITE_STATE,
   ROLE,
   COLORS,
-  SelectStatus
+  SelectStatus,
+  buildAppCustomActionLinkList
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -454,6 +455,10 @@ export class Thread extends React.Component {
               dataCy: 'popinListItem__permanentlyDelete'
             }
           ]}
+          customActionList={buildAppCustomActionLinkList(
+            state.config.appCustomActionList, state.content, state.loggedUser, CONTENT_TYPE.THREAD,
+            state.translationTargetLanguageCode
+          )}
           content={state.content}
           favoriteState={props.isContentInFavoriteList(state.content, state)
             ? FAVORITE_STATE.FAVORITE

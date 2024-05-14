@@ -48,7 +48,8 @@ import {
   searchContentAndReplaceWithTag,
   searchMentionAndReplaceWithTag,
   sendGlobalFlashMessage,
-  sortListByMultipleCriteria
+  sortListByMultipleCriteria,
+  buildAppCustomActionLinkList
 } from 'tracim_frontend_lib'
 import {
   getHtmlDocContent,
@@ -987,6 +988,10 @@ export class HtmlDocument extends React.Component {
               dataCy: 'popinListItem__permanentlyDelete'
             }
           ]}
+          customActionList={buildAppCustomActionLinkList(
+            state.config.appCustomActionList, state.content, state.loggedUser, CONTENT_TYPE.HTML_DOCUMENT,
+            state.translationTargetLanguageCode
+          )}
           appMode={state.mode}
           availableStatuses={state.config.availableStatuses}
           breadcrumbsList={state.breadcrumbsList}
