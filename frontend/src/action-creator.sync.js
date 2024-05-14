@@ -167,10 +167,6 @@ export const APP_FEATURE = `${APP}Feature`
 export const APP_LIST = `${APP}/List`
 export const setAppList = appList => ({ type: `${SET}/${APP_LIST}`, appList })
 
-export const APP_CUSTOM_ACTION = `${APP}CustomAction`
-export const SET_APP_CUSTOM_ACTION_LIST = `${SET}/${APP_CUSTOM_ACTION}/List`
-export const setAppCustomActionList = customActionList => ({ type: SET_APP_CUSTOM_ACTION_LIST, customActionList })
-
 export const CONTENT_TYPE = 'ContentType'
 export const CONTENT_TYPE_LIST = `${CONTENT_TYPE}/List`
 export const setContentTypeList = contentTypeList => ({ type: `${SET}/${CONTENT_TYPE_LIST}`, contentTypeList })

@@ -12,7 +12,6 @@ import Breadcrumbs from '../Breadcrumbs/Breadcrumbs.jsx'
 import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import Icon from '../Icon/Icon.jsx'
-import EmojiReactions from '../../container/EmojiReactions.jsx'
 import FavoriteButton from '../Button/FavoriteButton.jsx'
 import Popover from '../Popover/Popover.jsx'
 
@@ -101,17 +100,14 @@ export const PopinFixedHeader = (props) => {
     },
     ...actionList
   ]
-  const filteredActionList = actionListWithEditTitle.filter(action => action.showAction)
   const filteredHeaderButtons = headerButtons?.filter(action => action.showAction) || []
 
-  const mergedActionList = [
-    ...props.customActionList
-      .filter(a => a.showAction === true)
-      .map((a, i) => ({ ...a, isCustomAction: true, addSeparator: i === props.customActionList.length })),
-    ...actionListWithEditTitle
-      .filter(a => a.showAction === true)
-      .map(a => ({ ...a, isCustomAction: false, addSeparator: false }))
-  ]
+  const actionLinkList = actionListWithEditTitle
+    .filter(a => a.showAction === true)
+    .map(a => ({ ...a, isCustomAction: false, addSeparator: false }))
+  const customActionLinkList = props.customActionList
+    .filter(a => a.showAction === true)
+    .map((a, i) => ({ ...a, isCustomAction: true, addSeparator: i === 0 }))
 
   return (
     <div className={classnames(
@@ -186,17 +182,6 @@ export const PopinFixedHeader = (props) => {
         />
       </div>
 
-      {!props.loading && showReactions && (
-        <div className='wsContentGeneric__header__reactions'>
-          <EmojiReactions
-            apiUrl={apiUrl}
-            loggedUser={loggedUser}
-            contentId={content.content_id}
-            workspaceId={content.workspace_id}
-          />
-        </div>
-      )}
-
       {!props.loading && favoriteState && (
         <FavoriteButton
           favoriteState={favoriteState}
@@ -242,22 +227,37 @@ export const PopinFixedHeader = (props) => {
 
       {!props.loading && props.children}
 
-      {!props.loading && filteredActionList.length > 0 && (
+      {!props.loading && (customActionLinkList.length > 0 || actionLinkList.length > 0) && (
         <DropdownMenu
           buttonCustomClass='wsContentGeneric__header__actions'
           buttonIcon='fa-fw fas fa-ellipsis-v'
           buttonTooltip={t('Actions')}
           buttonDataCy='dropdownContentButton'
         >
-          {mergedActionList.map(action => {
-            if (action.downloadLink && action.downloadLink !== '') {
+          {[
+            ...actionLinkList.map(action => (
+              <IconButton
+                disabled={action.disabled}
+                icon={action.icon}
+                text={action.label}
+                textMobile={action.label}
+                label={action.label}
+                key={action.label}
+                onClick={action.onClick} // eslint-disable-line react/jsx-handler-names
+                customClass={classnames('transparentButton', { dropdownMenuSeparatorLine: action.separatorLine })}
+                showAction={action.showAction}
+                dataCy={action.dataCy}
+              />
+            )),
+            ...customActionLinkList.map(action => {
+              if (!action.actionLink) return null
               const isImage = action.icon === '' && action.image !== ''
               return (
                 <a
-                  href={action.downloadLink}
+                  href={action.actionLink}
                   className={classnames(
                     'wsContentGeneric__header__actions__item',
-                    { addSeparator: action.addSeparator === true, isImage: isImage }
+                    { dropdownMenuSeparatorLine: action.addSeparator === true, isImage: isImage }
                   )}
                   target='_blank'
                   rel='noopener noreferrer'
@@ -279,23 +279,8 @@ export const PopinFixedHeader = (props) => {
                   {action.label}
                 </a>
               )
-            }
-
-            return (
-              <IconButton
-                disabled={action.disabled}
-                icon={action.icon}
-                text={action.label}
-                textMobile={action.label}
-                label={action.label}
-                key={action.label}
-                onClick={action.onClick} // eslint-disable-line react/jsx-handler-names
-                customClass={classnames('transparentButton', { dropdownMenuSeparatorLine: action.separatorLine })}
-                showAction={action.showAction}
-                dataCy={action.dataCy}
-              />
-            )
-          })}
+            })
+          ]}
         </DropdownMenu>
       )}
 
@@ -338,7 +323,6 @@ PopinFixedHeader.propTypes = {
   rawTitle: PropTypes.string,
   showChangeTitleButton: PropTypes.bool,
   showMarkedAsTemplate: PropTypes.bool,
-  showReactions: PropTypes.bool,
   userRoleIdInWorkspace: PropTypes.number
 }
 
@@ -368,6 +352,5 @@ PopinFixedHeader.defaultProps = {
   rawTitle: '',
   showChangeTitleButton: true,
   showMarkedAsTemplate: false,
-  showReactions: false,
   userRoleIdInWorkspace: ROLE.reader.id
 }

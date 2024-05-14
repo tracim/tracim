@@ -1,4 +1,3 @@
-import i18n, { getBrowserLang } from './i18n.js'
 import {
   ACCESSIBLE_SPACE_TYPE_LIST,
   ALLOWED_CHARACTERS_USERNAME,
@@ -30,6 +29,7 @@ import {
   addAllResourceI18n,
   addExternalLinksIcons,
   addRevisionFromTLM,
+  buildAppCustomActionLinkList,
   buildContentPathBreadcrumbs,
   buildFilePreviewUrl,
   buildHeadTitle,
@@ -69,6 +69,7 @@ import {
   stripEmojis,
   updateTLMUser
 } from './helper.js'
+import i18n, { getBrowserLang } from './i18n.js'
 
 import {
   SORT_BY,
@@ -417,6 +418,7 @@ export {
   addRevisionFromTLM,
   appContentFactory,
   baseFetch,
+  buildAppCustomActionLinkList,
   buildContentPathBreadcrumbs,
   buildFilePreviewUrl,
   buildHeadTitle,
