@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 
-export const DropdownMenuItemCustomAction = props => {
+export const DropdownMenuItemAppCustomAction = props => {
   if (!props.action.actionLink) return null
   const isImage = props.action.icon === '' && props.action.image !== ''
   return (
@@ -36,10 +36,10 @@ export const DropdownMenuItemCustomAction = props => {
   )
 }
 
-export default DropdownMenuItemCustomAction
+export default DropdownMenuItemAppCustomAction
 
 // INFO - CH - 2024-05-16 - action must be an element of redux system.config.app_custom_actions that went through
 // buildAppCustomActionLinkList from frontend_lib
-DropdownMenuItemCustomAction.propTypes = {
+DropdownMenuItemAppCustomAction.propTypes = {
   action: PropTypes.object.isRequired
 }

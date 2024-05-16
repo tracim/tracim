@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import {
   DropdownMenu,
-  DropdownMenuItemCustomAction,
+  DropdownMenuItemAppCustomAction,
   PAGE,
   ROLE
 } from 'tracim_frontend_lib'
@@ -78,7 +78,7 @@ export const ExtendedAction = props => {
       )}
 
       {props.appCustomActionList.map((action, i) => (
-        <DropdownMenuItemCustomAction action={action} key={`appCustomAction_${i}`} />
+        <DropdownMenuItemAppCustomAction action={action} key={`appCustomAction_${i}`} />
       ))}
     </DropdownMenu>
   )

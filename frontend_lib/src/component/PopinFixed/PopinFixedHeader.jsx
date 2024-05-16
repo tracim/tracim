@@ -10,7 +10,7 @@ import {
 } from '../../helper.js'
 import Breadcrumbs from '../Breadcrumbs/Breadcrumbs.jsx'
 import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
-import DropdownMenuItemCustomAction from '../DropdownMenu/DropdownMenuItemCustomAction.jsx'
+import DropdownMenuItemAppCustomAction from '../DropdownMenu/DropdownMenuItemAppCustomAction.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import Icon from '../Icon/Icon.jsx'
 import FavoriteButton from '../Button/FavoriteButton.jsx'
@@ -250,7 +250,7 @@ export const PopinFixedHeader = (props) => {
               />
             )),
             ...customActionLinkList.map((action, i) => (
-              <DropdownMenuItemCustomAction action={action} key={`customAction_${i}`} />
+              <DropdownMenuItemAppCustomAction action={action} key={`customAction_${i}`} />
             ))
           ]}
         </DropdownMenu>

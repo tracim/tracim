@@ -157,7 +157,7 @@ import CardPopup from './component/CardPopup/CardPopup.jsx'
 import CardPopupCreateContent from './component/CardPopup/CardPopupCreateContent.jsx'
 
 import DropdownMenu from './component/DropdownMenu/DropdownMenu.jsx'
-import DropdownMenuItemCustomAction from './component/DropdownMenu/DropdownMenuItemCustomAction.jsx'
+import DropdownMenuItemAppCustomAction from './component/DropdownMenu/DropdownMenuItemAppCustomAction.jsx'
 
 import NewVersionBtn from './component/OptionComponent/NewVersionBtn.jsx'
 import ArchiveDeleteContent from './component/OptionComponent/ArchiveDeleteContent.jsx'
@@ -368,7 +368,7 @@ export {
   DisplayFileToUpload,
   DistanceDate,
   DropdownMenu,
-  DropdownMenuItemCustomAction,
+  DropdownMenuItemAppCustomAction,
   EditCommentPopup,
   EmptyListMessage,
   ErrorFlashMessageTemplateHtml,
