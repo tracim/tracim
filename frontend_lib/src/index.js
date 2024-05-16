@@ -29,7 +29,6 @@ import {
   addAllResourceI18n,
   addExternalLinksIcons,
   addRevisionFromTLM,
-  buildAppCustomActionLinkList,
   buildContentPathBreadcrumbs,
   buildFilePreviewUrl,
   buildHeadTitle,
@@ -113,6 +112,8 @@ import {
   isFileUploadInErrorState
 } from './fileUpload.js'
 
+import { buildAppCustomActionLinkList } from './appCustomAction.js'
+
 import { defaultDebug } from './debug.js'
 
 import AgendaInfo from './component/AgendaInfo/AgendaInfo.jsx'
@@ -156,6 +157,7 @@ import CardPopup from './component/CardPopup/CardPopup.jsx'
 import CardPopupCreateContent from './component/CardPopup/CardPopupCreateContent.jsx'
 
 import DropdownMenu from './component/DropdownMenu/DropdownMenu.jsx'
+import DropdownMenuItemCustomAction from './component/DropdownMenu/DropdownMenuItemCustomAction.jsx'
 
 import NewVersionBtn from './component/OptionComponent/NewVersionBtn.jsx'
 import ArchiveDeleteContent from './component/OptionComponent/ArchiveDeleteContent.jsx'
@@ -366,6 +368,7 @@ export {
   DisplayFileToUpload,
   DistanceDate,
   DropdownMenu,
+  DropdownMenuItemCustomAction,
   EditCommentPopup,
   EmptyListMessage,
   ErrorFlashMessageTemplateHtml,

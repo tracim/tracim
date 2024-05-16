@@ -10,6 +10,7 @@ import {
 } from '../../helper.js'
 import Breadcrumbs from '../Breadcrumbs/Breadcrumbs.jsx'
 import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
+import DropdownMenuItemCustomAction from '../DropdownMenu/DropdownMenuItemCustomAction.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import Icon from '../Icon/Icon.jsx'
 import FavoriteButton from '../Button/FavoriteButton.jsx'
@@ -107,14 +108,16 @@ export const PopinFixedHeader = (props) => {
     .map((a, i) => ({ ...a, isCustomAction: true, addSeparator: i === 0 }))
 
   return (
-    <div className={classnames(
-      'wsContentGeneric__header',
-      {
-        [`${customClass}__header`]: !editTitle,
-        [`${customClass}__header__isEditing`]: editTitle,
-        wsContentGeneric__header__isEditing: editTitle
-      }
-    )}>
+    <div
+      className={classnames(
+        'wsContentGeneric__header',
+        {
+          [`${customClass}__header`]: !editTitle,
+          [`${customClass}__header__isEditing`]: editTitle,
+          wsContentGeneric__header__isEditing: editTitle
+        }
+      )}
+    >
       <div className='wsContentGeneric__header__titleWithBreadcrumbs'>
         <div className='wsContentGeneric__header__titleWrapper'>
           <div className={classnames('wsContentGeneric__header__icon', `${customClass}__header__icon`)}>
@@ -246,39 +249,9 @@ export const PopinFixedHeader = (props) => {
                 dataCy={action.dataCy}
               />
             )),
-            ...customActionLinkList.map(action => {
-              if (!action.actionLink) return null
-              const isImage = action.icon === '' && action.image !== ''
-              return (
-                <a
-                  href={action.actionLink}
-                  className={classnames(
-                    'wsContentGeneric__header__actions__item',
-                    { dropdownMenuSeparatorLine: action.addSeparator === true, isImage: isImage }
-                  )}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  download
-                  title={action.label}
-                  key={action.label}
-                  data-cy={action.dataCy}
-                >
-                  {(isImage
-                    ? (
-                      <img
-                        src={action.image}
-                        className='wsContentGeneric__header__actions__item__image'
-                        alt=''
-                      />
-                    )
-                    : <i className={`fa-fw ${action.icon}`} />
-                  )}
-                  <span className='wsContentGeneric__header__actions__item__text'>
-                    {action.label}
-                  </span>
-                </a>
-              )
-            })
+            ...customActionLinkList.map((action, i) => (
+              <DropdownMenuItemCustomAction action={action} key={`customAction_${i}`} />
+            ))
           ]}
         </DropdownMenu>
       )}

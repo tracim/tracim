@@ -1,13 +1,18 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import { DropdownMenu, PAGE, ROLE } from 'tracim_frontend_lib'
+import {
+  DropdownMenu,
+  DropdownMenuItemCustomAction,
+  PAGE,
+  ROLE
+} from 'tracim_frontend_lib'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-require('./BtnExtandedAction.styl')
+require('./BtnExtendedAction.styl')
 
-export const ExtandedAction = props => {
+export const ExtendedAction = props => {
   return (
     <DropdownMenu
       buttonIcon='fas fa-ellipsis-h'
@@ -71,21 +76,24 @@ export const ExtandedAction = props => {
           {props.t('Gallery')}
         </Link>
       )}
+
+      {props.appCustomActionList.map((action, i) => (
+        <DropdownMenuItemCustomAction action={action} key={`appCustomAction_${i}`} />
+      ))}
     </DropdownMenu>
   )
 }
 
-const mapStateToProps = ({ appList }) => ({
-  appList
-})
+const mapStateToProps = ({ appList }) => ({ appList })
+export default connect(mapStateToProps)(translate()(ExtendedAction))
 
-export default connect(mapStateToProps)(translate()(ExtandedAction))
-
-ExtandedAction.propTypes = {
+ExtendedAction.propTypes = {
   onClickExtendedAction: PropTypes.object.isRequired,
-  userRoleIdInWorkspace: PropTypes.number
+  userRoleIdInWorkspace: PropTypes.number,
+  appCustomActionList: PropTypes.array
 }
 
-ExtandedAction.defaultProps = {
-  userRoleIdInWorkspace: ROLE.reader.id
+ExtendedAction.defaultProps = {
+  userRoleIdInWorkspace: ROLE.reader.id,
+  appCustomActionList: []
 }

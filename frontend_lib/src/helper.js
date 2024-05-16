@@ -994,26 +994,3 @@ export const getRevisionTypeLabel = (revisionType, t) => {
 
   return revisionType
 }
-
-const replaceCustomActionLinkVariable = (customAction, content, user) => {
-  return customAction.link
-    .replace('{content.label}', content.label)
-    .replace('{content.id}', content.content_id)
-    .replace('{content.workspace_id}', content.workspace_id)
-    .replace('{user.user_id}', user.userId)
-}
-
-export const buildAppCustomActionLinkList = (
-  appCustomActionConfig, content, loggedUser, appContentType, appLanguage
-) => {
-  return appCustomActionConfig
-    .filter(ca => ca.content_type === appContentType)
-    .map(ca => ({
-      icon: ca.icon,
-      image: ca.image,
-      label: ca.label[appLanguage],
-      actionLink: replaceCustomActionLinkVariable(ca, content, loggedUser),
-      showAction: loggedUser.userRoleIdInWorkspace >= ca.minimumRole,
-      dataCy: 'popinListItem__customAction'
-    }))
-}

@@ -1244,7 +1244,8 @@ export class File extends React.Component {
             }
           ]}
           customActionList={buildAppCustomActionLinkList(
-            state.config.appCustomActionList, state.content, state.loggedUser, CONTENT_TYPE.FILE, state.translationTargetLanguageCode
+            state.config.appCustomActionList, state.content, state.loggedUser, CONTENT_TYPE.FILE,
+            state.translationTargetLanguageCode
           )}
           appMode={state.mode}
           availableStatuses={state.config.availableStatuses}
