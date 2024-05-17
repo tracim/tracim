@@ -444,8 +444,7 @@ export class Thread extends React.Component {
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
               disabled: state.content.is_archived || state.content.is_deleted,
               dataCy: 'popinListItem__delete'
-            },
-            {
+            }, {
               icon: 'fas fa-exclamation-triangle',
               label: props.t('Permanently delete'),
               onClick: this.handleClickPermanentlyDeleteButton,

@@ -1204,20 +1204,23 @@ export class File extends React.Component {
             }, {
               icon: 'far fa-file',
               label: props.t('Download current page as PDF'),
-              downloadLink: this.getDownloadPdfPageUrl(state),
+              onClick: () => window.open(this.getDownloadPdfPageUrl(state), '_blank'),
               showAction: state.previewInfo.has_pdf_preview,
+              disabled: false,
               dataCy: 'popinListItem__downloadPageAsPdf'
             }, {
               icon: 'far fa-file-pdf',
               label: props.t('Download as PDF'),
-              downloadLink: this.getDownloadPdfFullUrl(state),
+              onClick: () => window.open(this.getDownloadPdfFullUrl(state), '_blank'),
               showAction: state.previewInfo.has_pdf_preview,
+              disabled: false,
               dataCy: 'popinListItem__downloadAsPdf'
             }, {
               icon: 'fas fa-download',
               label: props.t('Download file'),
-              downloadLink: this.getDownloadRawUrl(state),
+              onClick: () => window.open(this.getDownloadRawUrl(state), '_blank'),
               showAction: true,
+              disabled: false,
               dataCy: 'popinListItem__downloadFile'
             }, {
               icon: 'fas fa-link',
@@ -1232,8 +1235,7 @@ export class File extends React.Component {
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
               disabled: state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted,
               dataCy: 'popinListItem__delete'
-            },
-            {
+            }, {
               icon: 'fas fa-exclamation-triangle',
               label: props.t('Permanently delete'),
               onClick: this.handleClickPermanentlyDeleteButton,

@@ -961,8 +961,9 @@ export class HtmlDocument extends React.Component {
             {
               icon: 'far fa-file-pdf',
               label: props.t('Download as PDF'),
-              downloadLink: this.getDownloadPDFUrl(state),
+              onClick: () => window.open(this.getDownloadPDFUrl(state), '_blank'),
               showAction: true,
+              disabled: false,
               dataCy: 'popinListItem__downloadAsPdf'
             }, {
               icon: 'fas fa-link',

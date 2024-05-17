@@ -6,6 +6,9 @@ import {
 export const buildAppCustomActionLinkList = (
   appCustomActionConfig, content, loggedUser, appContentType, appLanguage
 ) => {
+  // INFO - CH - 2024-05-17 - The function can be called before api has returned content data.
+  if (!content.content_id && !content.id) return []
+
   const contentSafe = { ...content }
   // INFO - CH - 2024-05-16 - Due to a design flaw, content and user objects keys are in camelCase in frontend
   // and in snake_case in apps. So, functions that might be executed in frontend and in apps might have
@@ -75,7 +78,7 @@ const filterContentLabelRegex = (customAction, content) => {
 
 const filterWorkspaceId = (customAction, content) => {
   if (!customAction.workspace_filter) return true
-  return customAction.workspace_filter.split(',').includes(content.workspace_id.toString())
+  return customAction.workspace_filter.split(',').includes(content.workspace_id?.toString())
 }
 
 const filterUserRole = (customAction, userRoleIdInWorkspace) => {

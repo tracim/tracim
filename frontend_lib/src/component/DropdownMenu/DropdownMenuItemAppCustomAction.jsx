@@ -8,6 +8,7 @@ export const DropdownMenuItemAppCustomAction = props => {
   return (
     <a
       href={props.action.actionLink}
+      onClick={e => e.stopPropagation()}
       className={classnames(
         'wsContentGeneric__header__actions__item',
         { dropdownMenuSeparatorLine: props.action.addSeparator === true, isImage: isImage }
