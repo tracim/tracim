@@ -1664,13 +1664,6 @@ class UserCustomPropertiesUiSchema(marshmallow.Schema):
     )
 
 
-class AppCustomActionUiSchema(marshmallow.Schema):
-    app_custom_action = marshmallow.fields.List(
-        marshmallow.fields.Nested(AppCustomActionDigestSchema()),
-        description="List of app's custom action. Configurable by branding app_custom_action.json",
-    )
-
-
 class WorkspaceDiskSpaceSchema(marshmallow.Schema):
     workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
     used_space = marshmallow.fields.Int(

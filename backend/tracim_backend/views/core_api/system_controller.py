@@ -16,7 +16,6 @@ from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import get_timezones_list
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import AboutSchema
-from tracim_backend.views.core_api.schemas import AppCustomActionUiSchema
 from tracim_backend.views.core_api.schemas import ApplicationSchema
 from tracim_backend.views.core_api.schemas import ConfigSchema
 from tracim_backend.views.core_api.schemas import ContentTypeSchema
