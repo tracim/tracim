@@ -94,7 +94,7 @@ describe('buildAppCustomActionLinkList()', () => {
     expect(appCustomActionListResult).to.deep.equal(expected)
   })
 
-  it('should not display any custom action if the content type mismatch', () => {
+  it('should filter custom action if the content type mismatch', () => {
     const newAppContentType = CONTENT_TYPE.LOGBOOK
 
     const appCustomActionListResult = buildAppCustomActionLinkList(
@@ -104,7 +104,7 @@ describe('buildAppCustomActionLinkList()', () => {
     expect(appCustomActionListResult).to.deep.equal(expected)
   })
 
-  it('should not display any custom action if the content label regex mismatch', () => {
+  it('should filter custom action if the content label regex mismatch', () => {
     const newContent = {
       ...content,
       label: 'not matching regex'
@@ -121,7 +121,7 @@ describe('buildAppCustomActionLinkList()', () => {
     expect(appCustomActionListResult).to.deep.equal(expected)
   })
 
-  it("should not display any custom actions user doesn't have enough role in workspace", () => {
+  it("should filter custom actions if user doesn't have enough role in workspace", () => {
     const newLoggedUser = {
       ...loggedUser,
       userRoleIdInWorkspace: 1
@@ -134,7 +134,7 @@ describe('buildAppCustomActionLinkList()', () => {
     expect(appCustomActionListResult).to.deep.equal(expected)
   })
 
-  it("should not display any custom actions user doesn't have enough profile", () => {
+  it("should filter custom actions if user doesn't have enough profile", () => {
     const newLoggedUser = {
       ...loggedUser,
       profile: 1
@@ -147,7 +147,7 @@ describe('buildAppCustomActionLinkList()', () => {
     expect(appCustomActionListResult).to.deep.equal(expected)
   })
 
-  it('should not display any custom action if the file extension mismatch', () => {
+  it('should filter custom action if the file extension mismatch', () => {
     const newContent = {
       ...content,
       file_extension: '.avi'
@@ -160,7 +160,7 @@ describe('buildAppCustomActionLinkList()', () => {
     expect(appCustomActionListResult).to.deep.equal(expected)
   })
 
-  it('should not display any custom action if the workspace id mismatch', () => {
+  it('should filter custom action if the workspace id mismatch', () => {
     const newContent = {
       ...content,
       workspace_id: 11
@@ -206,7 +206,7 @@ describe('buildAppCustomActionLinkList()', () => {
   it('should work with the strict minimal properties in config (the required=True ones by backend)', () => {
     const newAppCustomActionConfig = [{
       icon_text: 'someIcon',
-      icon_image: '',
+      icon_image: 'someImage',
       label: {
         en: 'some english label'
       },
@@ -216,15 +216,7 @@ describe('buildAppCustomActionLinkList()', () => {
     const appCustomActionListResult = buildAppCustomActionLinkList(
       newAppCustomActionConfig, content, loggedUser, appContentType, appLanguage
     )
-    const expected = [{
-      icon: 'someIcon',
-      image: '',
-      label: 'some english label',
-      actionLink: 'some link',
-      showAction: true,
-      dataCy: 'popinListItem__customAction'
-    }]
-    expect(appCustomActionListResult).to.deep.equal(expected)
+    expect(appCustomActionListResult).to.deep.equal(expectedRightResult)
   })
 
   it('should return an empty list if given an empty appCustomActionConfig', () => {
