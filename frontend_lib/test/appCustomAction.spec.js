@@ -35,20 +35,20 @@ describe('buildAppCustomActionLinkList()', () => {
   }
   const appContentType = CONTENT_TYPE.FILE
   const appLanguage = 'en'
+  const expectedRightResult = [{
+    icon: 'someIcon',
+    image: 'someImage',
+    label: 'some english label',
+    actionLink: 'some link',
+    showAction: true,
+    dataCy: 'popinListItem__customAction'
+  }]
 
   it('should create an object for the DropdownMenu of PopinFixedHeader', () => {
     const appCustomActionListResult = buildAppCustomActionLinkList(
       appCustomActionConfig, content, loggedUser, appContentType, appLanguage
     )
-    const expected = [{
-      icon: 'someIcon',
-      image: 'someImage',
-      label: 'some english label',
-      actionLink: 'some link',
-      showAction: true,
-      dataCy: 'popinListItem__customAction'
-    }]
-    expect(appCustomActionListResult).to.deep.equal(expected)
+    expect(appCustomActionListResult).to.deep.equal(expectedRightResult)
   })
 
   it('should replace the variables in the link with values', () => {
@@ -224,6 +224,110 @@ describe('buildAppCustomActionLinkList()', () => {
       showAction: true,
       dataCy: 'popinListItem__customAction'
     }]
+    expect(appCustomActionListResult).to.deep.equal(expected)
+  })
+
+  it('should return an empty list if given an empty appCustomActionConfig', () => {
+    const newAppCustomActionConfig = []
+    const appCustomActionListResult = buildAppCustomActionLinkList(
+      newAppCustomActionConfig, content, loggedUser, appContentType, appLanguage
+    )
+    const expected = []
+    expect(appCustomActionListResult).to.deep.equal(expected)
+  })
+
+  it('should not crash if given a wrong user_role_filter and filter the element', () => {
+    const newAppCustomActionConfig = [
+      ...appCustomActionConfig,
+      {
+        icon_text: 'someOtherIcon',
+        icon_image: '',
+        content_type_filter: 'kanban',
+        label: {
+          fr: 'some other french label',
+          en: 'some other english label'
+        },
+        link: 'some other link',
+        user_role_filter: 'workstributor'
+      }]
+    const appCustomActionListResult = buildAppCustomActionLinkList(
+      newAppCustomActionConfig, content, loggedUser, appContentType, appLanguage
+    )
+    expect(appCustomActionListResult).to.deep.equal(expectedRightResult)
+  })
+
+  it('should not crash if given a wrong user_profile_filter and filter the element', () => {
+    const newAppCustomActionConfig = [
+      ...appCustomActionConfig,
+      {
+        icon_text: 'someOtherIcon',
+        icon_image: '',
+        content_type_filter: 'kanban',
+        label: {
+          fr: 'some other french label',
+          en: 'some other english label'
+        },
+        link: 'some other link',
+        user_profile_filter: 'adminited-users'
+      }]
+    const appCustomActionListResult = buildAppCustomActionLinkList(
+      newAppCustomActionConfig, content, loggedUser, appContentType, appLanguage
+    )
+    expect(appCustomActionListResult).to.deep.equal(expectedRightResult)
+  })
+
+  it('should not crash if given a user_role_filter or user_profile_filter that are not string and filter' +
+    ' the element', () => {
+    const newAppCustomActionConfig = [{
+      ...appCustomActionConfig,
+      user_role_filter: { something: 1 },
+      user_profile_filter: 1337
+    }]
+    const appCustomActionListResult = buildAppCustomActionLinkList(
+      newAppCustomActionConfig, content, loggedUser, appContentType, appLanguage
+    )
+    const expected = []
+    expect(appCustomActionListResult).to.deep.equal(expected)
+  })
+
+  it('should not crash if given a content_type_filter or content_extension_filter or content_label_filter or ' +
+    'workspace_filter that are not a string and filter the element', () => {
+    const newAppCustomActionConfig = [{
+      ...appCustomActionConfig,
+      content_type_filter: [],
+      content_extension_filter: 1337,
+      content_label_filter: () => {},
+      workspace_filter: false
+    }]
+    const appCustomActionListResult = buildAppCustomActionLinkList(
+      newAppCustomActionConfig, content, loggedUser, appContentType, appLanguage
+    )
+    const expected = []
+    expect(appCustomActionListResult).to.deep.equal(expected)
+  })
+
+  it('should not crash if given an unloaded content and return an empty list', () => {
+    const newContent = {
+      content_id: undefined,
+      workspace_id: undefined
+    }
+    const appCustomActionListResult = buildAppCustomActionLinkList(
+      appCustomActionConfig, newContent, loggedUser, appContentType, appLanguage
+    )
+    const expected = []
+    expect(appCustomActionListResult).to.deep.equal(expected)
+  })
+
+  it('should not crash if given an unloaded loggedUser and return an empty list', () => {
+    const newLoggedUser = {
+      userId: undefined,
+      userRoleIdInWorkspace: undefined,
+      profile: undefined
+    }
+    const appCustomActionListResult = buildAppCustomActionLinkList(
+      appCustomActionConfig, content, newLoggedUser, appContentType, appLanguage
+    )
+    const expected = []
     expect(appCustomActionListResult).to.deep.equal(expected)
   })
 })

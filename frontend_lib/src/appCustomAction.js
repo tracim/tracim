@@ -3,6 +3,10 @@ import {
   ROLE_LIST
 } from './helper.js'
 
+// INFO - 2024-05-20 - Improvement idea:
+// param appContentType might not be mandatory and be deduced from content.content_type
+// param appLanguage might not be mandatory and be deduced from loggedUser.lang
+// Improvement not done yet to ensure compatibility for frontend/ and apps
 export const buildAppCustomActionLinkList = (
   appCustomActionConfig, content, loggedUser, appContentType, appLanguage
 ) => {
@@ -10,8 +14,8 @@ export const buildAppCustomActionLinkList = (
   if (!content.content_id && !content.id) return []
 
   const contentSafe = { ...content }
-  // INFO - CH - 2024-05-16 - Due to a design flaw, content and user objects keys are in camelCase in frontend
-  // and in snake_case in apps. So, functions that might be executed in frontend and in apps might have
+  // INFO - CH - 2024-05-16 - Due to a design flaw, content and user objects keys are in camelCase in frontend/
+  // and in snake_case in apps. So, functions that might be executed in frontend/ and in apps might have
   // issues managing both notation types
   if (
     content.content_id === undefined ||
@@ -55,15 +59,27 @@ const replaceCustomActionLinkVariable = (customAction, content, user) => {
 }
 
 const filterContentType = (customAction, appContentType) => {
-  if (!customAction.content_type_filter) return true
-  return customAction.content_type_filter.split(',').includes(appContentType)
+  try {
+    if (!customAction.content_type_filter) return true
+    return customAction.content_type_filter.split(',').includes(appContentType)
+  } catch (e) {
+    console.error('Error in filterContentType during buildAppCustomActionLinkList', e, customAction, appContentType)
+    return false
+  }
 }
 
 const filterContentExtension = (customAction, content, appContentType) => {
-  if (appContentType !== CONTENT_TYPE.FILE) return true
+  try {
+    if (appContentType !== CONTENT_TYPE.FILE) return true
 
-  if (!customAction.content_extension_filter) return true
-  return customAction.content_extension_filter.split(',').includes(content.file_extension)
+    if (!customAction.content_extension_filter) return true
+    return customAction.content_extension_filter.split(',').includes(content.file_extension)
+  } catch (e) {
+    console.error(
+      'Error in filterContentExtension during buildAppCustomActionLinkList', e, customAction, content, appContentType
+    )
+    return false
+  }
 }
 
 const filterContentLabelRegex = (customAction, content) => {
@@ -72,13 +88,19 @@ const filterContentLabelRegex = (customAction, content) => {
     const regex = new RegExp(customAction.content_label_filter, 'gi')
     return regex.test(content.label)
   } catch (e) {
+    console.error('Error in filterContentLabelRegex during buildAppCustomActionLinkList', e, customAction, content)
     return false
   }
 }
 
 const filterWorkspaceId = (customAction, content) => {
-  if (!customAction.workspace_filter) return true
-  return customAction.workspace_filter.split(',').includes(content.workspace_id?.toString())
+  try {
+    if (!customAction.workspace_filter) return true
+    return customAction.workspace_filter.split(',').includes(content.workspace_id?.toString())
+  } catch (e) {
+    console.error('Error in filterWorkspaceId during buildAppCustomActionLinkList', e, customAction, content)
+    return false
+  }
 }
 
 const filterUserRole = (customAction, userRoleIdInWorkspace) => {
@@ -87,9 +109,9 @@ const filterUserRole = (customAction, userRoleIdInWorkspace) => {
     const userRoleFilterIdList = customAction.user_role_filter
       .split(',')
       .map(ur => ROLE_LIST.find(r => r.slug === ur).id)
-
     return userRoleFilterIdList.includes(userRoleIdInWorkspace)
   } catch (e) {
+    console.error('Error in filterUserRole during buildAppCustomActionLinkList', e, customAction, userRoleIdInWorkspace)
     return false
   }
 }
@@ -99,6 +121,7 @@ const filterUserProfile = (customAction, userProfileId) => {
     if (!customAction.user_profile_filter) return true
     return customAction.user_profile_filter.includes(userProfileId)
   } catch (e) {
+    console.error('Error in filterUserProfile during buildAppCustomActionLinkList', e, customAction, userProfileId)
     return false
   }
 }
