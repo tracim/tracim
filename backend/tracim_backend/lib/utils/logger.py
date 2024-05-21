@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from colorlog import colorlog
+import colorlog
 import logging
 import time
 import typing
