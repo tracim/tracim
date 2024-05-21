@@ -65,7 +65,7 @@ requires = [
     "radicale>=3.0.6",
     "caldav",
     # search support
-    "elasticsearch",
+    "elasticsearch==7.13.1",
     "elasticsearch-dsl",
     # text-formatting
     "humanize",
