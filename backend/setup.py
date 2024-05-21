@@ -45,7 +45,7 @@ requires = [
     # mail-fetcher
     "markdown",
     "email_reply_parser",
-    "filelock",
+    "filelock<4,>=3.12.2",
     "imapclient",
     "beautifulsoup4",
     # beaker 1.11 is broken: fix does exist but no new release since:

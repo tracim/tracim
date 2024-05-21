@@ -89,7 +89,7 @@ email-reply-parser==0.5.12
     # via tracim-backend (setup.py)
 filedepot==0.8.0
     # via tracim-backend (setup.py)
-filelock==3.0.12
+filelock==3.14.0
     # via
     #   preview-generator
     #   tracim-backend (setup.py)
