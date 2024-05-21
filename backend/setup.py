@@ -106,10 +106,12 @@ tests_require = [
 
 devtools_require = [
     "flake8==6.0.0",
+    "flake8-black==0.3.6",
+    "flake8-isort==6.0.0",
     "isort==v5.10.1",
     "mypy==1.9.0",
     "pre-commit==2.18.1",
-    "black==19.10b0",
+    "black==23.3.0",
 ]
 
 mysql_require = ["PyMySQL[rsa]"]
