@@ -322,4 +322,20 @@ describe('buildAppCustomActionLinkList()', () => {
     const expected = []
     expect(appCustomActionListResult).to.deep.equal(expected)
   })
+
+  it('should be case insensitive with every string filters', () => {
+    const newAppCustomActionConfig = [{
+      ...appCustomActionConfig[0],
+      content_type_filter: 'FILE,THREAD',
+      content_extension_filter: '.JPG,.PNG',
+      content_label_filter: 'SOME',
+      workspace_filter: '1,2,3',
+      user_role_filter: 'WORKSPACE-MANAGER,CONTENT-MANAGER,CONTRIBUTOR',
+      user_profile_filter: 'ADMINISTRATORS,TRUSTED-USERS'
+    }]
+    const appCustomActionListResult = buildAppCustomActionLinkList(
+      newAppCustomActionConfig, content, loggedUser, appContentType, appLanguage
+    )
+    expect(appCustomActionListResult).to.deep.equal(expectedRightResult)
+  })
 })

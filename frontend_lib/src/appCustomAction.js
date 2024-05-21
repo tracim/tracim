@@ -61,7 +61,7 @@ const replaceCustomActionLinkVariable = (customAction, content, user) => {
 const filterContentType = (customAction, appContentType) => {
   try {
     if (!customAction.content_type_filter) return true
-    return customAction.content_type_filter.split(',').includes(appContentType)
+    return customAction.content_type_filter.toLowerCase().split(',').includes(appContentType)
   } catch (e) {
     console.error('Error in filterContentType during buildAppCustomActionLinkList', e, customAction, appContentType)
     return false
@@ -73,7 +73,7 @@ const filterContentExtension = (customAction, content, appContentType) => {
     if (appContentType !== CONTENT_TYPE.FILE) return true
 
     if (!customAction.content_extension_filter) return true
-    return customAction.content_extension_filter.split(',').includes(content.file_extension)
+    return customAction.content_extension_filter.toLowerCase().split(',').includes(content.file_extension)
   } catch (e) {
     console.error(
       'Error in filterContentExtension during buildAppCustomActionLinkList', e, customAction, content, appContentType
@@ -96,7 +96,7 @@ const filterContentLabelRegex = (customAction, content) => {
 const filterWorkspaceId = (customAction, content) => {
   try {
     if (!customAction.workspace_filter) return true
-    return customAction.workspace_filter.split(',').includes(content.workspace_id?.toString())
+    return customAction.workspace_filter.toLowerCase().split(',').includes(content.workspace_id?.toString())
   } catch (e) {
     console.error('Error in filterWorkspaceId during buildAppCustomActionLinkList', e, customAction, content)
     return false
@@ -107,6 +107,7 @@ const filterUserRole = (customAction, userRoleIdInWorkspace) => {
   try {
     if (!customAction.user_role_filter) return true
     const userRoleFilterIdList = customAction.user_role_filter
+      .toLowerCase()
       .split(',')
       .map(ur => ROLE_LIST.find(r => r.slug === ur).id)
     return userRoleFilterIdList.includes(userRoleIdInWorkspace)
@@ -119,7 +120,7 @@ const filterUserRole = (customAction, userRoleIdInWorkspace) => {
 const filterUserProfile = (customAction, userProfileId) => {
   try {
     if (!customAction.user_profile_filter) return true
-    return customAction.user_profile_filter.includes(userProfileId)
+    return customAction.user_profile_filter.toLowerCase().split(',').includes(userProfileId)
   } catch (e) {
     console.error('Error in filterUserProfile during buildAppCustomActionLinkList', e, customAction, userProfileId)
     return false
