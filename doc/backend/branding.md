@@ -144,11 +144,11 @@ In content apps (File, Thread, Note, Kanban, Logbook), there is a kebab menu acc
 
 App Custom Action allows to add submenu options with custom link.
 
-### Create an App Custom Action
+### Create an App Custom Actions
 
-Update the file `frontend/dist/assets/branding/app_custom_action.json`.  
+Update the file `frontend/dist/assets/branding/app_custom_actions.json`.
 
-It is a json file containing a list objects. Each objects is the definition of an App Custom Actions.
+It is a json file containing a list of objects. Each objects are the definition of an App Custom Actions.
 
 **Available parameters:**
 - `icon_text`:
@@ -204,7 +204,7 @@ It is a json file containing a list objects. Each objects is the definition of a
   - Available key values are: en, fr, ar, de, eo, es, it, pt
   - Example: `"label": { "en": "my english label", "fr": "mon label français" }`
 
-Complete example of `frontend/dist/asset/branding/app_custom_action.json`:
+Complete example of `frontend/dist/asset/branding/app_custom_actions.json`:
 ```json
 [{
   "icon-text": "fas fa-chess-queen",
@@ -220,19 +220,5 @@ Complete example of `frontend/dist/asset/branding/app_custom_action.json`:
     "en": "Open mockup in SomeSoftware"
   },
   "link": "https://some.software.com/open?content={content.content_id}&label={content.label}&space_id={content.workspace_id}&user_id={user.user_id}"
-}, {
-  "icon-text": "",
-  "icon-image": "https://some.domain.com/image/app_logo.png",
-  "content_type_filter": "kanban",
-  "content_extension_filter": "",
-  "content_label_filter": "project",
-  "workspace_filter": "1,2,3",
-  "user_role_filter": "workspace-manager,content-manager",
-  "user_profile_filter":"administrators,truster-users",
-  "label": {
-    "fr": "Supprimer la source",
-    "en": "Delete the source"
-  },
-  "link": "https://some.software.com/remove?content={content.content_id}&label={content.label}&space_id={content.workspace_id}&user_id={user.user_id}",
 }]
 ```

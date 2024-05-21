@@ -410,7 +410,7 @@ class UserDigestSchema(marshmallow.Schema):
     workspace_ids = marshmallow.fields.List(marshmallow.fields.Int(example=3))
 
 
-class AppCustomActionDigestSchema(marshmallow.Schema):
+class AppCustomActionsDigestSchema(marshmallow.Schema):
     icon_text = marshmallow.fields.String(
         required=True,
         description="Icon of the custom action. If set, icon_image must be set to empty string.",
@@ -2265,7 +2265,7 @@ class ConfigSchema(marshmallow.Schema):
     )
     saml_idp_list = marshmallow.fields.Nested(SamLIdPConfigSchema, many=True)
     app_custom_actions = marshmallow.fields.List(
-        marshmallow.fields.Nested(AppCustomActionDigestSchema())
+        marshmallow.fields.Nested(AppCustomActionsDigestSchema())
     )
 
 
