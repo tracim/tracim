@@ -296,7 +296,7 @@ smmap==5.0.1
     # via gitdb
 soupsieve==2.5
     # via beautifulsoup4
-sqlakeyset==2.0.1708907391
+sqlakeyset==1.0.1616300210
     # via tracim_backend (setup.py)
 sqlalchemy==1.3.24
     # via
@@ -323,9 +323,7 @@ transaction==4.0
 translationstring==1.4
     # via pyramid
 typing-extensions==4.11.0
-    # via
-    #   alembic
-    #   sqlakeyset
+    # via alembic
 tzlocal==5.2
     # via caldav
 urllib3==1.26.18
