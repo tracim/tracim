@@ -31,7 +31,7 @@ autopage==0.5.2
     # via cliff
 babel==2.15.0
     # via tracim_backend (setup.py)
-beaker==1.10.1
+beaker @ git+https://github.com/algoo/beaker.git
     # via
     #   pyramid-beaker
     #   tracim_backend (setup.py)
@@ -301,7 +301,7 @@ radicale==3.2.0
     # via tracim_backend (setup.py)
 recurring-ical-events==2.2.1
     # via caldav
-redis==5.0.4
+redis==4.6.0
     # via
     #   rq
     #   tracim_backend (setup.py)

@@ -28,7 +28,7 @@ autopage==0.5.2
     # via cliff
 babel==2.15.0
     # via tracim_backend (setup.py)
-beaker==1.10.1
+beaker @ git+https://github.com/algoo/beaker.git
     # via
     #   pyramid-beaker
     #   tracim_backend (setup.py)
@@ -36,9 +36,9 @@ beautifulsoup4==4.12.3
     # via
     #   tracim_backend (setup.py)
     #   webpreview
-boto3==1.17.103
+boto3==1.34.109
     # via tracim_backend (setup.py)
-botocore==1.20.103
+botocore==1.34.109
     # via
     #   boto3
     #   s3transfer
@@ -135,7 +135,7 @@ importlib-metadata==4.6.0
     #   cliff
     #   markdown
     #   tracim_backend (setup.py)
-jmespath==0.10.0
+jmespath==1.0.1
     # via
     #   boto3
     #   botocore
@@ -275,7 +275,7 @@ radicale==3.2.0
     # via tracim_backend (setup.py)
 recurring-ical-events==2.2.1
     # via caldav
-redis==5.0.4
+redis==4.6.0
     # via
     #   rq
     #   tracim_backend (setup.py)
@@ -296,7 +296,7 @@ rpds-py==0.18.1
     #   referencing
 rq==1.16.2
     # via tracim_backend (setup.py)
-s3transfer==0.4.2
+s3transfer==0.10.1
     # via boto3
 six==1.16.0
     # via
