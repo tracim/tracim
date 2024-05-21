@@ -582,7 +582,7 @@ class CFG(object):
         self.APP_CUSTOM_ACTIONS__CONFIG_FILE = self.get_raw_config(
             "app_custom_actions.config_file", default_app_custom_actions_file
         )
-        self.app_custom_actions__config_file_path = os.path.join(
+        self.APP_CUSTOM_ACTIONS__CONFIG_FILE_PATH = os.path.join(
             self.branding_folder_path, self.APP_CUSTOM_ACTIONS__CONFIG_FILE
         )
 

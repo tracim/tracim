@@ -65,7 +65,7 @@ class SystemApi(object):
             collaborative_document_edition_config = collaborative_document_edition_api.get_config()
 
         try:
-            app_custom_actions = validate_json(self._config.app_custom_actions__config_file_path)
+            app_custom_actions = validate_json(self._config.APP_CUSTOM_ACTIONS__CONFIG_FILE_PATH)
         except (json.JSONDecodeError, FileNotFoundError):
             app_custom_actions = []
 
