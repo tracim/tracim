@@ -350,3 +350,5 @@ zope-sqlalchemy==1.6
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
+# postgres specific dependencies
+psycopg2==2.9.9
