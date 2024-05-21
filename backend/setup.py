@@ -96,6 +96,7 @@ tests_require = [
     "pytest-timeout",
     "responses",
     "mock",
+    "psycopg2",
     "Pillow",
     # INFO - G.M - 2020-01-14 - static version of freezeguh due to regression
     # with webtest, see https://github.com/spulec/freezegun/issues/326
@@ -103,7 +104,13 @@ tests_require = [
     "sseclient-py",
 ]
 
-devtools_require = ["flake8", "isort", "mypy", "pre-commit", "black==19.10b0"]
+devtools_require = [
+    "flake8==6.0.0",
+    "isort==v5.10.1",
+    "mypy==1.9.0",
+    "pre-commit==2.18.1",
+    "black==19.10b0",
+]
 
 mysql_require = ["PyMySQL[rsa]"]
 
@@ -124,6 +131,7 @@ setup(
     zip_safe=False,
     extras_require={
         "testing": tests_require,
+        "devtool": devtools_require,
         "dev": tests_require + devtools_require,
         "mysql": mysql_require,
         "postgresql": postgresql_require,
