@@ -33,8 +33,7 @@ describe('<PopinFixed />', () => {
       userRoleIdInWorkspace: 0
     },
     onClickCloseBtn: () => { },
-    onValidateChangeTitle: () => { },
-    showReactions: false
+    onValidateChangeTitle: () => { }
   }
 
   const PopinFixedWithHOC = withRouterMock(PopinFixed)

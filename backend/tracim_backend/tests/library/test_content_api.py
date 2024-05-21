@@ -2518,7 +2518,7 @@ class TestContentApi(object):
             user2,
             workspace,
             UserWorkspaceConfig.CONTENT_MANAGER,
-            email_notification_type=EmailNotificationType.SUMMARY,
+            email_notification_type=EmailNotificationType.default(),
             flush=True,
         )
 
@@ -2599,7 +2599,7 @@ class TestContentApi(object):
             user2,
             workspace,
             UserWorkspaceConfig.CONTENT_MANAGER,
-            email_notification_type=EmailNotificationType.SUMMARY,
+            email_notification_type=EmailNotificationType.default(),
             flush=True,
         )
 
@@ -2672,7 +2672,7 @@ class TestContentApi(object):
             user2,
             workspace,
             UserWorkspaceConfig.CONTENT_MANAGER,
-            email_notification_type=EmailNotificationType.SUMMARY,
+            email_notification_type=EmailNotificationType.default(),
             flush=True,
         )
 
@@ -2744,7 +2744,7 @@ class TestContentApi(object):
             user2,
             workspace,
             UserWorkspaceConfig.CONTENT_MANAGER,
-            email_notification_type=EmailNotificationType.SUMMARY,
+            email_notification_type=EmailNotificationType.default(),
             flush=True,
         )
 
@@ -2873,7 +2873,7 @@ class TestContentApi(object):
             user2,
             workspace,
             UserWorkspaceConfig.CONTENT_MANAGER,
-            email_notification_type=EmailNotificationType.SUMMARY,
+            email_notification_type=EmailNotificationType.default(),
             flush=True,
         )
 
@@ -2966,7 +2966,7 @@ class TestContentApi(object):
             user2,
             workspace,
             UserWorkspaceConfig.CONTENT_MANAGER,
-            email_notification_type=EmailNotificationType.SUMMARY,
+            email_notification_type=EmailNotificationType.default(),
             flush=True,
         )
 

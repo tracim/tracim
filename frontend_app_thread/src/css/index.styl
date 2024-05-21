@@ -18,7 +18,7 @@
   .thread
     &__contentpage
       width 100%
-      height calc(100% - 25px) // INFO - 2021-08-08 - GB - 25px is the thread__contentpage__top height
+      height calc(100% - 37px) // INFO - 2021-08-08 - GB - 37px is the .thread__contentpage__top height
       & .timeline__texteditor
         margin 0
       & .commentArea
@@ -28,6 +28,7 @@
         display flex
         justify-content flex-end
         padding standardSpacing pageSpacing 0
+        max-height 37px // INFO - CH - 2024-04-23 - max height will allow scroll in emoji list to avoid breaking layout
       &__messagelist
         padding-inline-start pageSpacing
         padding-inline-end pageSpacing
@@ -46,3 +47,7 @@
     height "calc(100vh - %s)" % (headerHeight + 25px) // INFO - 2021-08-08 - GB - 25px is the thread__contentpage__top height
   .thread .thread__contentpage .timeline__texteditor
     padding-bottom 60px // INFO - 2022-02-10 - MB - This is a workaround, not a fix
+  .thread .thread__contentpage__top
+    flex-direction column-reverse
+    align-items flex-end
+    max-height 85px

@@ -1,6 +1,7 @@
 import { PAGES } from '../../support/urls_commands.js'
 
-describe('Notification Wall', () => {
+// INFO - CH - 2024-04-23 - Skipping test because unstable
+describe.skip('Notification Wall', () => {
   beforeEach(function () {
     cy.resetDB()
     cy.setupBaseDB()

@@ -4,7 +4,7 @@ import {
   IconButton,
   ROLE_LIST
 } from 'tracim_frontend_lib'
-import EmailNotificationTypeButton from '../EmailNotificationTypeButton.jsx'
+import EmailNotificationTypeButton from '../EmailNotificationTypeButton/EmailNotificationTypeButton.jsx'
 
 require('./UserSpacesConfigLine.styl')
 
@@ -33,9 +33,6 @@ class UserSpacesConfigLine extends React.Component {
           <td>
             <EmailNotificationTypeButton
               currentEmailNotificationType={props.space.member.emailNotificationType}
-              displayLabel={false}
-              flexJustifyRadio='flex-start'
-              formName={`notificationType_${props.space.id}`}
               onClickChangeEmailNotificationType={props.onChangeEmailNotificationType}
             />
           </td>

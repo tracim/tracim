@@ -145,6 +145,8 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     tracim_setting_for_beaker_session["session.lock_dir"] = app_config.SESSION__LOCK_DIR
     tracim_setting_for_beaker_session["session.httponly"] = app_config.SESSION__HTTPONLY
     tracim_setting_for_beaker_session["session.secure"] = app_config.SESSION__SECURE
+    tracim_setting_for_beaker_session["session.user"] = app_config.SESSION__USERNAME
+    tracim_setting_for_beaker_session["session.password"] = app_config.SESSION__PASSWORD
     session_factory = pyramid_beaker.session_factory_from_settings(
         tracim_setting_for_beaker_session
     )

@@ -35,7 +35,7 @@ class AutoInvitePlugin:
                     user=user,
                     workspace=workspace,
                     role_level=workspace.default_user_role.level,
-                    email_notification_type=EmailNotificationType.SUMMARY,
+                    email_notification_type=EmailNotificationType.default(),
                     flush=False,
                 )
             except RoleAlreadyExistError:
@@ -60,7 +60,7 @@ class AutoInvitePlugin:
                             user=user,
                             workspace=workspace,
                             role_level=workspace.default_user_role.level,
-                            email_notification_type=EmailNotificationType.SUMMARY,
+                            email_notification_type=EmailNotificationType.default(),
                             flush=False,
                         )
                     except RoleAlreadyExistError:

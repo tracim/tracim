@@ -8,6 +8,7 @@ import {
   buildContentPathBreadcrumbs,
   CONTENT_NAMESPACE,
   CONTENT_TYPE,
+  EmojiReactions,
   handleClickCopyLink,
   handleFetchResult,
   PAGE,
@@ -372,6 +373,11 @@ export class Thread extends React.Component {
     })
   }
 
+  handlePermanentlyDeleteComment = async (comment) => {
+    const { state } = this
+    this.props.appContentDeletePermanently(state.content.workspace_id, comment.content_id, () => {})
+  }
+
   render () {
     const { props, state } = this
     const isPublication = state.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION
@@ -448,9 +454,6 @@ export class Thread extends React.Component {
               dataCy: 'popinListItem__permanentlyDelete'
             }
           ]}
-          showReactions
-          apiUrl={state.config.apiUrl}
-          loggedUser={state.loggedUser}
           content={state.content}
           favoriteState={props.isContentInFavoriteList(state.content, state)
             ? FAVORITE_STATE.FAVORITE
@@ -480,12 +483,22 @@ export class Thread extends React.Component {
             Breadcrumbs and SelectStatus here directly than to adapt the PopinFixedContent component to cover thread as well. */}
             <div className='thread__contentpage__top'>
               {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && state.config.availableStatuses && (
-                <SelectStatus
-                  selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
-                  availableStatus={state.config.availableStatuses}
-                  onChangeStatus={this.handleChangeStatus}
-                  disabled={state.content.is_archived || state.content.is_deleted}
-                />
+                <>
+                  <EmojiReactions
+                    apiUrl={state.config.apiUrl}
+                    loggedUser={state.loggedUser}
+                    contentId={state.content.content_id}
+                    workspaceId={state.content.workspace_id}
+                  />
+                  <div className='wsContentGeneric__content__left__top__selectStatus'>
+                    <SelectStatus
+                      selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
+                      availableStatus={state.config.availableStatuses}
+                      onChangeStatus={this.handleChangeStatus}
+                      disabled={state.content.is_archived || state.content.is_deleted}
+                    />
+                  </div>
+                </>
               )}
             </div>
             {state.showRefreshWarning && (
@@ -532,6 +545,8 @@ export class Thread extends React.Component {
                 memberList={state.config.workspace && state.config.workspace.memberList}
                 onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
                 onClickDeleteComment={this.handleClickDeleteComment}
+                onClickPermanentlyDeleteComment={this.handlePermanentlyDeleteComment}
+                shouldShowPermanentlyDeleteButton={state.loggedUser.userRoleIdInWorkspace >= ROLE.workspaceManager.id}
                 onClickEditComment={this.handleClickEditComment}
                 onClickOpenFileComment={this.handleClickOpenFileComment}
                 onClickRestoreArchived={this.handleClickRestoreArchive}

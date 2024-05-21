@@ -327,11 +327,14 @@ class EventApi:
             include_event_types=[event_type] if event_type is not None else None,
             read_status=read_status,
         )
+
         if created_after:
             query = query.filter(Event.created >= created_after)
+
         if email_notification_type is not None:
             query = (
                 query.filter(UserWorkspaceConfig.workspace_id == Event.workspace_id)
+                .filter(UserWorkspaceConfig.user_id != Event.author_id)
                 .filter(UserWorkspaceConfig.user_id == user_id)
                 .filter(UserWorkspaceConfig.email_notification_type == email_notification_type)
             )
@@ -394,26 +397,29 @@ class EventApi:
         ).count()
 
     def get_unread_messages_summary(
-        self,
-        user_id: int,
-        created_after: datetime,
+        self, user_id: int, created_after: datetime, email_notification_type: EmailNotificationType
     ) -> List[typing.Tuple[int, str]]:
         query = (
             self._session.query(
                 func.count(Message.event_id), Workspace.workspace_id, Workspace.label
             )
-            .join(Event)
+            .join(Event, Message.event_id == Event.event_id)
             .join(Workspace, Event.workspace_id == Workspace.workspace_id)
+            .join(
+                UserWorkspaceConfig,
+                (Message.receiver_id == UserWorkspaceConfig.user_id)
+                & (UserWorkspaceConfig.workspace_id == Workspace.workspace_id),
+            )
         )
         query = query.filter(Message.receiver_id == user_id)
         query = query.filter(Message.read == None)  # noqa: E711
-        query = query.filter(Event.created >= created_after)
-        query = query.filter(UserWorkspaceConfig.workspace_id == Event.workspace_id)
-        query = query.filter(UserWorkspaceConfig.user_id == user_id)
-        query = query.filter(
-            UserWorkspaceConfig.email_notification_type == EmailNotificationType.SUMMARY
-        )
 
+        # INFO - CH - 2024-04-18 - Commenting line bellow because I don't think it works
+        # Keeping it commented because I don't get its purpose
+        # query = query.filter(UserWorkspaceConfig.user_id == user_id)
+
+        query = query.filter(Event.created >= created_after)
+        query = query.filter(Event.author_id != user_id)
         # INFO - MP - 2023-03-14 - Filtering entity type WORKSPACE_MEMBER.MODIFIED because we want
         # to display an equivalent result as the notification wall.
         query = query.filter(
@@ -422,7 +428,15 @@ class EventApi:
                 Event.operation != OperationType.MODIFIED,
             )
         )  # noqa: E711
+        # INFO - CH - 2024-04-09 - Filtering MENTION because it is handled separately
+        query = query.filter(Event.entity_type != EntityType.MENTION)
+        # INFO - CH - 2024-04-09 - Filtering WORKSPACE to match notification wall display
+        query = query.filter(Event.entity_type != EntityType.WORKSPACE)
+
+        query = query.filter(UserWorkspaceConfig.email_notification_type == email_notification_type)
+
         query = query.group_by(Workspace.workspace_id)
+
         return query.all()
 
     def create_event(

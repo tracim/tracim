@@ -247,6 +247,7 @@ export function appContentFactory (WrappedComponent) {
     handleChildContentDeleted = (tlm) => {
       const { state } = this
       if (!state.content || !permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+      if (!state.wholeTimeline.some(timelineItem => timelineItem.content_id === tlm.fields.content.content_id)) return
       this.setState(prevState => {
         const wholeTimeline = prevState.wholeTimeline.filter(timelineItem => timelineItem.content_id !== tlm.fields.content.content_id)
         const timeline = this.getTimeline(wholeTimeline, prevState.timeline.length - 1)

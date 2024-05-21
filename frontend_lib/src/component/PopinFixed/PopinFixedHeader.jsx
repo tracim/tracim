@@ -12,7 +12,6 @@ import Breadcrumbs from '../Breadcrumbs/Breadcrumbs.jsx'
 import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import Icon from '../Icon/Icon.jsx'
-import EmojiReactions from '../../container/EmojiReactions.jsx'
 import FavoriteButton from '../Button/FavoriteButton.jsx'
 import Popover from '../Popover/Popover.jsx'
 
@@ -74,13 +73,10 @@ export const PopinFixedHeader = (props) => {
     showChangeTitleButton,
     t,
     actionList,
-    apiUrl,
     content,
     favoriteState,
-    loggedUser,
     onClickAddToFavoriteList,
-    onClickRemoveFromFavoriteList,
-    showReactions
+    onClickRemoveFromFavoriteList
   } = props
 
   const actionListWithEditTitle = [
@@ -176,17 +172,6 @@ export const PopinFixedHeader = (props) => {
           breadcrumbsList={props.breadcrumbsList}
         />
       </div>
-
-      {!props.loading && showReactions && (
-        <div className='wsContentGeneric__header__reactions'>
-          <EmojiReactions
-            apiUrl={apiUrl}
-            loggedUser={loggedUser}
-            contentId={content.content_id}
-            workspaceId={content.workspace_id}
-          />
-        </div>
-      )}
 
       {!props.loading && favoriteState && (
         <FavoriteButton
@@ -287,7 +272,6 @@ export default translate()(PopinFixedHeader)
 
 PopinFixedHeader.propTypes = {
   actionList: PropTypes.array,
-  apiUrl: PropTypes.string,
   breadcrumbsList: PropTypes.array,
   componentTitle: PropTypes.element,
   content: PropTypes.object,
@@ -300,7 +284,6 @@ PopinFixedHeader.propTypes = {
   headerButtons: PropTypes.array,
   isTemplate: PropTypes.bool,
   loading: PropTypes.bool,
-  loggedUser: PropTypes.object,
   onClickAddToFavoriteList: PropTypes.func,
   onClickChangeMarkedTemplate: PropTypes.func,
   onClickCloseBtn: PropTypes.func.isRequired,
@@ -309,13 +292,11 @@ PopinFixedHeader.propTypes = {
   rawTitle: PropTypes.string,
   showChangeTitleButton: PropTypes.bool,
   showMarkedAsTemplate: PropTypes.bool,
-  showReactions: PropTypes.bool,
   userRoleIdInWorkspace: PropTypes.number
 }
 
 PopinFixedHeader.defaultProps = {
   actionList: [],
-  apiUrl: '',
   breadcrumbsList: [],
   componentTitle: <div />,
   content: {
@@ -330,7 +311,6 @@ PopinFixedHeader.defaultProps = {
   headerButtons: [],
   isTemplate: false,
   loading: false,
-  loggedUser: {},
   onChangeTitle: () => { },
   onClickAddToFavoriteList: () => { },
   onClickChangeMarkedTemplate: () => { },
@@ -338,6 +318,5 @@ PopinFixedHeader.defaultProps = {
   rawTitle: '',
   showChangeTitleButton: true,
   showMarkedAsTemplate: false,
-  showReactions: false,
   userRoleIdInWorkspace: ROLE.reader.id
 }

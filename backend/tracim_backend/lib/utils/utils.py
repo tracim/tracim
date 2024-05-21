@@ -468,7 +468,7 @@ def get_current_git_hash() -> Optional[str]:
     Get git hash of current code if available else return ""
     :return: commit short hash or ""
     """
-    token = os.popen("git rev-parse HEAD").read()
+    token = os.popen("git rev-parse HEAD 2> /dev/null").read()
     return token[:7]
 
 
@@ -477,15 +477,15 @@ def get_build_version() -> str:
     Get either tag or commit hash linked to current commit
     :return: tag or commit hash
     """
-    last_commit = os.popen("git rev-parse HEAD").read()
-    return_value = os.system(f"git describe --exact-match {last_commit}")
+    last_commit = os.popen("git rev-parse HEAD 2> /dev/null").read()
+    return_value = os.system(f"git describe --exact-match {last_commit} 2> /dev/null")
 
     if return_value:
         hash = get_current_git_hash()
         if hash == "":
             return UNKNOWN_BUILD_VERSION
         return hash
-    return os.popen(f"git describe --exact-match {last_commit}").read()
+    return os.popen(f"git describe --exact-match {last_commit} 2> /dev/null").read()
 
 
 def validate_page_token(page_token: str) -> None:

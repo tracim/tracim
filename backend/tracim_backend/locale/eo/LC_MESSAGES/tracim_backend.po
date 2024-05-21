@@ -275,3 +275,39 @@ msgid ""
 msgstr ""
 "Vi invitis {nb_receivers} homojn pri alŝuti dosierojn en ĉi tiu spaco <a "
 "href={sharedspace_url}>{sharedspace_name}</a>:"
+
+#: tracim_backend/templates/mail/summary_body_html.mak:7
+msgid "Here is the summary of your unread notifications {email_notification_type_string}:"
+msgstr ""
+
+#: tracim_backend/templates/mail/summary_body_html.mak:32
+msgid "Here is the list of your unread mentions {email_notification_type_string}:"
+msgstr ""
+
+#: tracim_backend/models/data.py:100
+msgid "in the last hour"
+msgstr ""
+
+#: tracim_backend/models/data.py:102
+msgid "in the last day"
+msgstr ""
+
+#: tracim_backend/models/data.py:104
+msgid "in the last week"
+msgstr ""
+
+#: tracim_backend/command/periodic.py:59
+msgid "[{website_title}] Your {email_notification_type} summary"
+msgstr ""
+
+#: tracim_backend/models/data.py:115
+msgid "hourly"
+msgstr ""
+
+#: tracim_backend/models/data.py:117
+msgid "daily"
+msgstr ""
+
+#: tracim_backend/models/data.py:119
+msgid "weekly"
+msgstr ""

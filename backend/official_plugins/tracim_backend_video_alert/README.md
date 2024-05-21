@@ -14,7 +14,7 @@ This plugin is configured using the `.ini` file. or the environment variables.
 Default configuration:
 ```ini
 # Message of the warning. Note that a mention to the file's author will be prepended.
-plugin.video_alert.message = Automatic message: the file format used is not compatible with integrated playback. Please prefer mp4 or webm format.
+plugin.video_alert.message = "<i>this is an automatic message:</i> the file you uploaded may not be compatible with the built-in video player. We suggest you choose an MP4 or WebM video file."
 # Username of the user that will comment the warning. Leave blank to use the author of the file.
 plugin.video_alert.username =
 # List of mimetypes that should bypass the blacklist.

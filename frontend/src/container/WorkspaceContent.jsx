@@ -964,10 +964,10 @@ export class WorkspaceContent extends React.Component {
                   />
                 )}
               </div>
+              {!state.contentLoaded && (<Loading />)}
             </PageContent>
           </PageWrapper>
         </div>
-        {!state.contentLoaded && <Loading />}
       </div>
     )
   }

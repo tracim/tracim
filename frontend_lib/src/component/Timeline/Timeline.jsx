@@ -44,6 +44,7 @@ export class Timeline extends React.Component {
       newComment: {},
       showDeleteCommentPopup: false,
       showEditCommentPopup: false,
+      showPermanentlyDeletePopup: false,
       showInvalidMentionPopupInComment: false
     }
   }
@@ -82,6 +83,19 @@ export class Timeline extends React.Component {
     props.onClickEditComment(comment, commentId, parentId)
   }
 
+  handleClickPermanentlyDeleteButton = content => {
+    this.setState(prev => ({
+      showPermanentlyDeletePopup: !prev.showPermanentlyDeletePopup,
+      commentToDelete: prev.showDeleteCommentPopup ? null : content
+    }))
+  }
+
+  handleClickValidatePermanentlyDeleteButton = () => {
+    const { state } = this
+    this.props.onClickPermanentlyDeleteComment(state.commentToDelete)
+    this.handleClickPermanentlyDeleteButton()
+  }
+
   render () {
     const { props, state } = this
 
@@ -114,6 +128,7 @@ export class Timeline extends React.Component {
             <PromptMessage
               msg={props.t('This content is deleted')}
               btnType='button'
+              btnIcon='fas fa-trash-restore'
               icon='far fa-trash-alt'
               btnLabel={props.t('Restore')}
               onClickBtn={props.onClickRestoreDeleted}
@@ -166,6 +181,8 @@ export class Timeline extends React.Component {
                     translationTargetLanguageList={props.translationTargetLanguageList}
                     onClickEditComment={() => this.handleClickEditComment(content)}
                     onClickDeleteComment={() => this.handleToggleDeleteCommentPopup(content)}
+                    onClickPermanentlyDeleteComment={() => this.handleClickPermanentlyDeleteButton(content)}
+                    shouldShowPermanentlyDeleteButton={props.shouldShowPermanentlyDeleteButton}
                     onClickOpenFileComment={() => props.onClickOpenFileComment(content)}
                   />
                 )
@@ -255,6 +272,17 @@ export class Timeline extends React.Component {
             {props.t('Participate')}
           </Link>
         )}
+        {state.showPermanentlyDeletePopup && (
+          <ConfirmPopup
+            customColor={props.customColor}
+            confirmLabel={props.t('Yes, delete permanently')}
+            confirmIcon='fas fa-exclamation-triangle'
+            onConfirm={this.handleClickValidatePermanentlyDeleteButton}
+            onCancel={this.handleClickPermanentlyDeleteButton}
+            msg={props.t('Warning: this operation cannot be rolled back')}
+            titleLabel={props.t('Permanently delete')}
+          />
+        )}
       </div>
     )
   }
@@ -294,6 +322,8 @@ Timeline.propTypes = {
   memberList: PropTypes.array,
   onChangeTranslationTargetLanguageCode: PropTypes.func,
   onClickDeleteComment: PropTypes.func,
+  onClickPermanentlyDeleteComment: PropTypes.func,
+  shouldShowPermanentlyDeleteButton: PropTypes.bool,
   onClickEditComment: PropTypes.func,
   onClickOpenFileComment: PropTypes.func,
   onClickRestoreArchived: PropTypes.func,
@@ -326,6 +356,8 @@ Timeline.defaultProps = {
   memberList: [],
   onChangeTranslationTargetLanguageCode: () => { },
   onClickDeleteComment: () => { },
+  onClickPermanentlyDeleteComment: () => {},
+  shouldShowPermanentlyDeleteButton: false,
   onClickEditComment: () => { },
   onClickOpenFileComment: () => { },
   onClickRestoreComment: content => { },

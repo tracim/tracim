@@ -102,8 +102,20 @@ msgid "Uploaded by {username}."
 msgstr "Subido por {username}."
 
 #: tracim_backend/command/periodic.py:59
-msgid "[{website_title}] Your daily summary"
-msgstr "[{website_title}] Seu resumo diário"
+msgid "[{website_title}] Your {email_notification_type} summary"
+msgstr ""
+
+#: tracim_backend/models/data.py:115
+msgid "hourly"
+msgstr ""
+
+#: tracim_backend/models/data.py:117
+msgid "daily"
+msgstr ""
+
+#: tracim_backend/models/data.py:119
+msgid "weekly"
+msgstr ""
 
 #: tracim_backend/lib/core/content.py:753
 msgid "Space {workspace_name}"
@@ -394,17 +406,29 @@ msgstr "Muito obrigado"
 msgid "{username} (through tracim)"
 msgstr "{username} (através de Tracim)"
 
-#: tracim_backend/templates/mail/summary_body_html.mak:7
-msgid "Here is the list of your unread mentions in the last 24h:"
-msgstr "Aqui está a lista de suas menções não lidas nas últimas 24h:"
-
 #: tracim_backend/templates/mail/summary_body_html.mak:24
 msgid "{author} mentioned you in"
 msgstr "{author} mencionou você em"
 
+#: tracim_backend/templates/mail/summary_body_html.mak:7
+msgid "Here is the summary of your unread notifications {email_notification_type_string}:"
+msgstr "Aqui está o resumo de suas notificações não lidas {email_notification_type_string}:"
+
 #: tracim_backend/templates/mail/summary_body_html.mak:32
-msgid "Here is the summary of your unread notifications in the last 24h:"
-msgstr "Aqui está o resumo de suas notificações não lidas nas últimas 24h:"
+msgid "Here is the list of your unread mentions {email_notification_type_string}:"
+msgstr "Aqui está a lista de suas menções não lidas {email_notification_type_string}:"
+
+#: tracim_backend/models/data.py:100
+msgid "in the last hour"
+msgstr "na última hora"
+
+#: tracim_backend/models/data.py:102
+msgid "in the last day"
+msgstr "no último dia"
+
+#: tracim_backend/models/data.py:104
+msgid "in the last week"
+msgstr "na última semana"
 
 #: tracim_backend/templates/mail/summary_body_html.mak:36
 msgid "{event_count} activity in the space"

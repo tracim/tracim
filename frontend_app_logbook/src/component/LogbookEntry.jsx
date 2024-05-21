@@ -1,10 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import {
   formatAbsoluteDate,
   Icon,
-  IconButton
+  IconButton,
+  shouldUseLightTextColor
 } from 'tracim_frontend_lib'
 
 const LogbookEntry = (props) => {
@@ -19,7 +21,10 @@ const LogbookEntry = (props) => {
 
   return (
     <div
-      className='logbook__timeline__entries__entry'
+      className={classnames('logbook__timeline__entries__entry', {
+        logbook__whiteTextColor: shouldUseLightTextColor(props.entry.bgColor),
+        logbook__blackTextColor: !shouldUseLightTextColor(props.entry.bgColor)
+      })}
       style={{ backgroundColor: props.entry.bgColor }}
     >
       <div className='logbook__timeline__entries__entry__dot' />
@@ -37,7 +42,12 @@ const LogbookEntry = (props) => {
               </span>
             )}
           </div>
-          <span className='logbook__timeline__entries__entry__data__header__date'>
+          <span className={classnames('logbook__timeline__entries__entry__data__header__date', {
+            // INFO - M.L - light is lightgrey1, dark is darkgrey2
+            logbook__lightTextColor: shouldUseLightTextColor(props.entry.bgColor, { light: '#e8e8e8', dark: '#595959' }),
+            logbook__darkTextColor: !shouldUseLightTextColor(props.entry.bgColor, { light: '#e8e8e8', dark: '#595959' })
+          })}
+          >
             <Icon
               title={props.t('Time of event')}
               customClass='logbook__timeline__entries__entry__data__header__date__icon'
