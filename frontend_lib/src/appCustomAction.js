@@ -56,6 +56,7 @@ const replaceCustomActionLinkVariable = (customAction, content, user) => {
     .replace('{content.author_name}', encodeURIComponent(content.author?.public_name || ''))
     .replace('{content.url}', encodeURIComponent(`${window.location.origin}/contents/${content.content_id}`))
     .replace('{user.user_id}', user.userId)
+    .replace('{user.public_name}', encodeURIComponent(user.publicName))
 }
 
 const filterContentType = (customAction, appContentType) => {
@@ -84,8 +85,8 @@ const filterContentExtension = (customAction, content, appContentType) => {
 
 const filterContentLabelRegex = (customAction, content) => {
   try {
-    if (!customAction.content_label_filter) return true
-    const regex = new RegExp(customAction.content_label_filter, 'gi')
+    if (!customAction.content_label_regex_filter) return true
+    const regex = new RegExp(customAction.content_label_regex_filter, 'gi')
     return regex.test(content.label)
   } catch (e) {
     console.error('Error in filterContentLabelRegex during buildAppCustomActionLinkList', e, customAction, content)
@@ -95,8 +96,8 @@ const filterContentLabelRegex = (customAction, content) => {
 
 const filterWorkspaceId = (customAction, content) => {
   try {
-    if (!customAction.workspace_filter) return true
-    return customAction.workspace_filter.toLowerCase().split(',').includes(content.workspace_id?.toString())
+    if (!customAction.workspace_id_filter) return true
+    return customAction.workspace_id_filter.toLowerCase().split(',').includes(content.workspace_id?.toString())
   } catch (e) {
     console.error('Error in filterWorkspaceId during buildAppCustomActionLinkList', e, customAction, content)
     return false

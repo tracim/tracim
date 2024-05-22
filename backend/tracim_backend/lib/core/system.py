@@ -66,7 +66,11 @@ class SystemApi(object):
 
         try:
             app_custom_actions = validate_json(self._config.APP_CUSTOM_ACTIONS__CONFIG_FILE_PATH)
-        except (json.JSONDecodeError, FileNotFoundError):
+        except json.JSONDecodeError:
+            logger.error(self, "Error, unable to decode app_custom_actions.json")
+            app_custom_actions = []
+        except FileNotFoundError:
+            logger.warning(self, "Warning, file app_custom_actions.json not found")
             app_custom_actions = []
 
         return ConfigModel(

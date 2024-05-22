@@ -8,8 +8,8 @@ describe('buildAppCustomActionLinkList()', () => {
     icon_image: 'someImage',
     content_type_filter: 'file,thread',
     content_extension_filter: '.jpg,.png',
-    content_label_filter: '',
-    workspace_filter: '1,2,3',
+    content_label_regex_filter: '',
+    workspace_id_filter: '1,2,3',
     user_role_filter: 'workspace-manager,content-manager,contributor',
     user_profile_filter: 'administrators,trusted-users',
     label: {
@@ -30,6 +30,7 @@ describe('buildAppCustomActionLinkList()', () => {
   }
   const loggedUser = {
     userId: 1,
+    publicName: 'John Doe',
     userRoleIdInWorkspace: 4,
     profile: 'trusted-users'
   }
@@ -63,7 +64,8 @@ describe('buildAppCustomActionLinkList()', () => {
         '&author_id={content.author_id}',
         '&author_name={content.author_name}',
         '&url={content.url}',
-        '&user_id={user.user_id}'
+        '&user_id={user.user_id}',
+        '&user_public_name={user.public_name}'
       ].join('')
     }]
 
@@ -80,7 +82,8 @@ describe('buildAppCustomActionLinkList()', () => {
       '&author_id=5',
       '&author_name=John%20Doe',
       '&url=http%3A%2F%2Flocalhost%2Fcontents%2F10',
-      '&user_id=1'
+      '&user_id=1',
+      '&user_public_name=John%20Doe'
     ].join('')
 
     const expected = [{
@@ -111,7 +114,7 @@ describe('buildAppCustomActionLinkList()', () => {
     }
     const newAppCustomActionConfig = [{
       ...appCustomActionConfig[0],
-      content_label_filter: 'some'
+      content_label_regex_filter: 'some'
     }]
 
     const appCustomActionListResult = buildAppCustomActionLinkList(
@@ -282,14 +285,14 @@ describe('buildAppCustomActionLinkList()', () => {
     expect(appCustomActionListResult).to.deep.equal(expected)
   })
 
-  it('should not crash if given a content_type_filter or content_extension_filter or content_label_filter or ' +
-    'workspace_filter that are not a string and filter the element', () => {
+  it('should not crash if given a content_type_filter or content_extension_filter or content_label_regex_filter or ' +
+    'workspace_id_filter that are not a string and filter the element', () => {
     const newAppCustomActionConfig = [{
       ...appCustomActionConfig,
       content_type_filter: [],
       content_extension_filter: 1337,
-      content_label_filter: () => {},
-      workspace_filter: false
+      content_label_regex_filter: () => {},
+      workspace_id_filter: false
     }]
     const appCustomActionListResult = buildAppCustomActionLinkList(
       newAppCustomActionConfig, content, loggedUser, appContentType, appLanguage
@@ -328,8 +331,8 @@ describe('buildAppCustomActionLinkList()', () => {
       ...appCustomActionConfig[0],
       content_type_filter: 'FILE,THREAD',
       content_extension_filter: '.JPG,.PNG',
-      content_label_filter: 'SOME',
-      workspace_filter: '1,2,3',
+      content_label_regex_filter: 'SOME',
+      workspace_id_filter: '1,2,3',
       user_role_filter: 'WORKSPACE-MANAGER,CONTENT-MANAGER,CONTRIBUTOR',
       user_profile_filter: 'ADMINISTRATORS,TRUSTED-USERS'
     }]

@@ -441,9 +441,9 @@ class AppCustomActionsDigestSchema(marshmallow.Schema):
         description="A list comma separated of content extensions on which the custom action will apply",
         example=".jpg,.png,.gif",
     )
-    content_label_filter = marshmallow.fields.String(
+    content_label_regex_filter = marshmallow.fields.String(
         required=False,
-        description="A string for content label patern matching on which the custom action will apply",
+        description="A regex string for content label pattern matching on which the custom action will apply",
         example="my_pattern",
     )
     user_role_filter = marshmallow.fields.String(
@@ -456,7 +456,7 @@ class AppCustomActionsDigestSchema(marshmallow.Schema):
         description="A list comma separated of user's profiles for whom the custom action will apply",
         example="administrators,trusted-users,users",
     )
-    workspace_filter = marshmallow.fields.String(
+    workspace_id_filter = marshmallow.fields.String(
         required=False,
         description="A list comma separated of workspace id on which the custom action will apply",
         example="1,10,222",

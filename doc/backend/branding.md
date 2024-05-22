@@ -162,8 +162,8 @@ Complete example of `frontend/dist/asset/branding/app_custom_actions.json`:
   "icon-image": "",
   "content_type_filter": "file",
   "content_extension_filter": ".jpg,.png",
-  "content_label_filter": "field report",
-  "workspace_filter": "1,2,3",
+  "content_label_regex_filter": "field report",
+  "workspace_id_filter": "1,2,3",
   "user_role_filter": "workspace-manager,content-manager",
   "user_profile_filter":"administrators,truster-users",
   "label": {
@@ -192,15 +192,15 @@ Complete example of `frontend/dist/asset/branding/app_custom_actions.json`:
   - The content extension on which the App Custom Action will be available.
   - Must be a list of comma separated extension containing the dot '.'
   - Example: `"content_extension_filter": '.jpg,.png,.gif'`
-- `content_label_filter`:
+- `content_label_regex_filter`:
   - The content label pattern on which the App Custom Action will be available.
   - Must be string that will be matched as a regex. Case-insensitive.
-  - Example: `"content_label_filter": "some"`
+  - Example: `"content_label_regex_filter": "some"`
     - will match "some label", "another some label" but not "last label"
-- `workspace_filter`:
+- `workspace_id_filter`:
   - The workspace id on which the App Custom Action will be available.
   - Must be a list of comma separated ids
-  - Example: `"workspace_filter": "2,10,42"`
+  - Example: `"workspace_id_filter": "2,10,42"`
 - `user_role_filter`:
   - The user's roles on whom the App Custom Action will be available.
   - Must be a list of comma separated roles
@@ -223,6 +223,7 @@ Complete example of `frontend/dist/asset/branding/app_custom_actions.json`:
     - "content.author_name": The author name of the current content. Url encoded.
     - "content.url": The url to open the content in tracim. Url encoded.
     - "user.user_id": The id of the currently connected user. The one that will click on the App Custom Action.
+    - "user.public_name": The public name of the currently connected user. The one that will click on the App Custom Action. Url encoded
   - Example: `"link": "https://some.domaine.com/open?content_label={content.label}&content={content.content_id}&space_id={content.workspace_id}`
 - `label`:
   - An object containing the translation keys of the submenu option. The keys are the language id and the
