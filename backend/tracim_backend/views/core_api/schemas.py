@@ -444,7 +444,7 @@ class AppCustomActionsDigestSchema(marshmallow.Schema):
     content_label_filter = marshmallow.fields.String(
         required=False,
         description="A string for content label patern matching on which the custom action will apply",
-        example="my_patern",
+        example="my_pattern",
     )
     user_role_filter = marshmallow.fields.String(
         required=False,

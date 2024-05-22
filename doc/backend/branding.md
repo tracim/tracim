@@ -146,18 +146,43 @@ App Custom Action allows to add submenu options with custom link.
 
 ### Create an App Custom Actions
 
-Update the file `frontend/dist/assets/branding/app_custom_actions.json`.
+Create the configuration file `frontend/dist/assets/branding/app_custom_actions.json` from its sample source:
+```bash
+cp frontend/dist/assets/branding.sample/app_custom_actions.json frontend/dist/assets/branding/app_custom_actions.json
+```
+
+Edit the file `frontend/dist/assets/branding/app_custom_actions.json`.
 
 It is a json file containing a list of objects. Each objects are the definition of an App Custom Actions.
+
+Complete example of `frontend/dist/asset/branding/app_custom_actions.json`:
+```json
+[{
+  "icon-text": "fas fa-chess-queen",
+  "icon-image": "",
+  "content_type_filter": "file",
+  "content_extension_filter": ".jpg,.png",
+  "content_label_filter": "field report",
+  "workspace_filter": "1,2,3",
+  "user_role_filter": "workspace-manager,content-manager",
+  "user_profile_filter":"administrators,truster-users",
+  "label": {
+    "fr": "Ouvrir la maquette dans SomeSoftware",
+    "en": "Open mockup in SomeSoftware"
+  },
+  "link": "https://some.software.com/open?content={content.content_id}&label={content.label}&space_id={content.workspace_id}&user_id={user.user_id}"
+}]
+```
 
 **Available parameters:**
 - `icon_text`:
   - The icon preceding the submenu option. Use it for icon from css library.
+  - Tracim uses font awesome for css icon library.
   - Example: `"icon_text": "fas fa-wine-bottle"`
 - `icon_image`:
   - The image preceding the submenu option. Use it for images from an online source.
-  - If icon_text and icon_image are set, only image will be displayed.
-  - Example: `"icon_image": "https://www.tracim.fr/static/images/new_tracim/LOGO_TRACIM_RVB_1.png"`
+  - If icon_text and icon_image are set, only icon_image will be displayed.
+  - Example: `"icon_image": "https://raw.githubusercontent.com/tracim/tracim/develop/doc/logos/logo_tracim.png"`
 - `content_type_filter`:
   - The content type on which the App Custom Action will be available.
   - Must be a list of comma separated content type
@@ -187,7 +212,8 @@ It is a json file containing a list of objects. Each objects are the definition 
   - Available values are: administrators, trusted-users, users
   - Example: `"user_profile_filter": "administrators,trusted-users"`
 - `link`:
-  - The on click https link the submenu option will redirect to.
+  - The on click http(s) link the submenu option will redirect to.
+  - Example: `"link": "https://some.software.com/open/some_tool"`
   - You can use variables to transfert data to the link destination. Place each of them inside braces.
   - Available variables are:
     - "content.label": The label of the current content. Url encoded.
@@ -202,23 +228,10 @@ It is a json file containing a list of objects. Each objects are the definition 
   - An object containing the translation keys of the submenu option. The keys are the language id and the
   values are the translated string.
   - Available key values are: en, fr, ar, de, eo, es, it, pt
-  - Example: `"label": { "en": "my english label", "fr": "mon label français" }`
-
-Complete example of `frontend/dist/asset/branding/app_custom_actions.json`:
-```json
-[{
-  "icon-text": "fas fa-chess-queen",
-  "icon-image": "",
-  "content_type_filter": "file",
-  "content_extension_filter": ".jpg,.png",
-  "content_label_filter": "field report",
-  "workspace_filter": "1,2,3",
-  "user_role_filter": "workspace-manager,content-manager",
-  "user_profile_filter":"administrators,truster-users",
-  "label": {
-    "fr": "Ouvrir la maquette dans SomeSoftware",
-    "en": "Open mockup in SomeSoftware"
-  },
-  "link": "https://some.software.com/open?content={content.content_id}&label={content.label}&space_id={content.workspace_id}&user_id={user.user_id}"
-}]
-```
+  - Example:
+  - ```json
+    "label": {
+      "en": "my english label",
+      "fr": "mon label français"
+    }
+    ```
