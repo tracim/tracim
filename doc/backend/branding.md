@@ -158,14 +158,14 @@ It is a json file containing a list of objects. Each objects are the definition 
 Complete example of `frontend/dist/asset/branding/app_custom_actions.json`:
 ```json
 [{
-  "icon-text": "fas fa-chess-queen",
-  "icon-image": "",
+  "icon_text": "fas fa-chess-queen",
+  "icon_image": "",
   "content_type_filter": "file",
   "content_extension_filter": ".jpg,.png",
   "content_label_regex_filter": "field report",
   "workspace_id_filter": "1,2,3",
   "user_role_filter": "workspace-manager,content-manager",
-  "user_profile_filter":"administrators,truster-users",
+  "user_profile_filter":"administrators,trusted-users",
   "label": {
     "fr": "Ouvrir la maquette dans SomeSoftware",
     "en": "Open mockup in SomeSoftware"
