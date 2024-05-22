@@ -961,7 +961,7 @@ export class HtmlDocument extends React.Component {
             {
               icon: 'far fa-file-pdf',
               label: props.t('Download as PDF'),
-              onClick: () => window.open(this.getDownloadPDFUrl(state), '_blank'),
+              href: this.getDownloadPDFUrl(state),
               showAction: true,
               disabled: false,
               dataCy: 'popinListItem__downloadAsPdf'
@@ -978,8 +978,7 @@ export class HtmlDocument extends React.Component {
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
               disabled: state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted,
               dataCy: 'popinListItem__delete'
-            },
-            {
+            }, {
               icon: 'fas fa-exclamation-triangle',
               label: props.t('Permanently delete'),
               onClick: this.handleClickPermanentlyDeleteButton,
@@ -990,7 +989,10 @@ export class HtmlDocument extends React.Component {
             }
           ]}
           customActionList={buildAppCustomActionLinkList(
-            state.config.appCustomActionList, state.content, state.loggedUser, CONTENT_TYPE.HTML_DOCUMENT,
+            state.config.appCustomActionList,
+            state.content,
+            state.loggedUser,
+            CONTENT_TYPE.HTML_DOCUMENT,
             state.translationTargetLanguageCode
           )}
           appMode={state.mode}

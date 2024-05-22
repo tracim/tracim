@@ -653,8 +653,7 @@ export class Logbook extends React.Component {
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
               disabled: readOnly,
               dataCy: 'popinListItem__delete'
-            },
-            {
+            }, {
               icon: 'fas fa-exclamation-triangle',
               label: props.t('Permanently delete'),
               onClick: this.handleClickPermanentlyDeleteButton,
@@ -665,7 +664,10 @@ export class Logbook extends React.Component {
             }
           ]}
           customActionList={buildAppCustomActionLinkList(
-            state.config.appCustomActionList, state.content, state.loggedUser, CONTENT_TYPE.LOGBOOK,
+            state.config.appCustomActionList,
+            state.content,
+            state.loggedUser,
+            CONTENT_TYPE.LOGBOOK,
             state.translationTargetLanguageCode
           )}
           headerButtons={[

@@ -235,20 +235,38 @@ export const PopinFixedHeader = (props) => {
           buttonDataCy='dropdownContentButton'
         >
           {[
-            ...actionLinkList.map(action => (
-              <IconButton
-                disabled={action.disabled}
-                icon={action.icon}
-                text={action.label}
-                textMobile={action.label}
-                label={action.label}
-                key={action.label}
-                onClick={action.onClick} // eslint-disable-line react/jsx-handler-names
-                customClass={classnames('transparentButton', { dropdownMenuSeparatorLine: action.separatorLine })}
-                showAction={action.showAction}
-                dataCy={action.dataCy}
-              />
-            )),
+            ...actionLinkList.map(action => {
+              if (action.href) {
+                return (
+                  <a
+                    href={action.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download
+                    title={action.label}
+                    key={action.label}
+                    data-cy={action.dataCy}
+                  >
+                    <i className={`fa-fw ${action.icon}`} />
+                    {action.label}
+                  </a>
+                )
+              }
+              return (
+                <IconButton
+                  disabled={action.disabled}
+                  icon={action.icon}
+                  text={action.label}
+                  textMobile={action.label}
+                  label={action.label}
+                  key={action.label}
+                  onClick={action.onClick} // eslint-disable-line react/jsx-handler-names
+                  customClass={classnames('transparentButton', { dropdownMenuSeparatorLine: action.separatorLine })}
+                  showAction={action.showAction}
+                  dataCy={action.dataCy}
+                />
+              )
+            }),
             ...customActionLinkList.map((action, i) => (
               <DropdownMenuItemAppCustomAction action={action} key={`customAction_${i}`} />
             ))

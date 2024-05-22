@@ -1204,21 +1204,21 @@ export class File extends React.Component {
             }, {
               icon: 'far fa-file',
               label: props.t('Download current page as PDF'),
-              onClick: () => window.open(this.getDownloadPdfPageUrl(state), '_blank'),
+              href: this.getDownloadPdfPageUrl(state),
               showAction: state.previewInfo.has_pdf_preview,
               disabled: false,
               dataCy: 'popinListItem__downloadPageAsPdf'
             }, {
               icon: 'far fa-file-pdf',
               label: props.t('Download as PDF'),
-              onClick: () => window.open(this.getDownloadPdfFullUrl(state), '_blank'),
+              href: this.getDownloadPdfFullUrl(state),
               showAction: state.previewInfo.has_pdf_preview,
               disabled: false,
               dataCy: 'popinListItem__downloadAsPdf'
             }, {
               icon: 'fas fa-download',
               label: props.t('Download file'),
-              onClick: () => window.open(this.getDownloadRawUrl(state), '_blank'),
+              href: this.getDownloadRawUrl(state),
               showAction: true,
               disabled: false,
               dataCy: 'popinListItem__downloadFile'
@@ -1246,7 +1246,10 @@ export class File extends React.Component {
             }
           ]}
           customActionList={buildAppCustomActionLinkList(
-            state.config.appCustomActionList, state.content, state.loggedUser, CONTENT_TYPE.FILE,
+            state.config.appCustomActionList,
+            state.content,
+            state.loggedUser,
+            CONTENT_TYPE.FILE,
             state.translationTargetLanguageCode
           )}
           appMode={state.mode}

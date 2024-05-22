@@ -455,7 +455,10 @@ export class Thread extends React.Component {
             }
           ]}
           customActionList={buildAppCustomActionLinkList(
-            state.config.appCustomActionList, state.content, state.loggedUser, CONTENT_TYPE.THREAD,
+            state.config.appCustomActionList,
+            state.content,
+            state.loggedUser,
+            CONTENT_TYPE.THREAD,
             state.translationTargetLanguageCode
           )}
           content={state.content}
