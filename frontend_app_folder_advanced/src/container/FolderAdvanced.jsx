@@ -4,6 +4,8 @@ import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
 import {
   buildContentPathBreadcrumbs,
+  buildAppCustomActionLinkList,
+  CONTENT_TYPE,
   getContentTypeList,
   appContentFactory,
   handleClickCopyLink,
@@ -305,6 +307,13 @@ export class FolderAdvanced extends React.Component {
               dataCy: 'popinListItem__delete'
             }
           ]}
+          customActionList={buildAppCustomActionLinkList(
+            state.config.appCustomActionList,
+            state.content,
+            state.loggedUser,
+            CONTENT_TYPE.FOLDER,
+            state.loggedUser.lang
+          )}
           favoriteState={(
             props.isContentInFavoriteList(state.content, state)
               ? FAVORITE_STATE.FAVORITE

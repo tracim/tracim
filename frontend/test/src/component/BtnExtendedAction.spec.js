@@ -1,13 +1,13 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import { ExtandedAction as ExtandedActionWithoutHOC } from '../../../src/component/Workspace/BtnExtandedAction.jsx'
+import { ExtendedAction as ExtendedActionWithoutHOC } from '../../../src/component/Workspace/BtnExtendedAction.jsx'
 import { ROLE } from 'tracim_frontend_lib'
 import sinon from 'sinon'
 import { Link } from 'react-router-dom'
 import { appList } from '../../hocMock/redux/appList/appList'
 
-describe('<BtnExtandedAction />', () => {
+describe('<BtnExtendedAction />', () => {
   const archiveCallBack = sinon.spy()
   const deleteCallBack = sinon.spy()
   const editCallBack = sinon.spy()
@@ -35,7 +35,7 @@ describe('<BtnExtandedAction />', () => {
     appList
   }
 
-  const wrapper = shallow(<ExtandedActionWithoutHOC {...props} t={key => key} />)
+  const wrapper = shallow(<ExtendedActionWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
     it(`should hide all dropdown button when userRoleIdInWorkspace = ${ROLE.contributor.id}`, () => {

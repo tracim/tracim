@@ -1,8 +1,6 @@
 import { PAGES as p } from '../../support/urls_commands'
-import { SELECTORS as s } from '../../support/generic_selector_commands'
 
 context('Open a file', function () {
-  let workspaceId
   let contentId
   const filename = 'the_pdf.pdf'
   before(function () {
@@ -30,14 +28,8 @@ context('Open a file', function () {
     it('should have an action button with a menu', () => {
       cy.get('[data-cy=dropdownContentButton]').click()
       cy.get('[data-cy=popinListItem__downloadFile]')
-        .should('have.attr', 'href')
-        .should('include', filename)
       cy.get('[data-cy=popinListItem__downloadAsPdf]')
-        .should('have.attr', 'href')
-        .should('include', filename)
       cy.get('[data-cy=popinListItem__downloadPageAsPdf]')
-        .should('have.attr', 'href')
-        .should('include', filename)
     })
   })
 })

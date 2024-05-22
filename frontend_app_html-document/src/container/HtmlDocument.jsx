@@ -48,7 +48,8 @@ import {
   searchContentAndReplaceWithTag,
   searchMentionAndReplaceWithTag,
   sendGlobalFlashMessage,
-  sortListByMultipleCriteria
+  sortListByMultipleCriteria,
+  buildAppCustomActionLinkList
 } from 'tracim_frontend_lib'
 import {
   getHtmlDocContent,
@@ -960,8 +961,9 @@ export class HtmlDocument extends React.Component {
             {
               icon: 'far fa-file-pdf',
               label: props.t('Download as PDF'),
-              downloadLink: this.getDownloadPDFUrl(state),
+              href: this.getDownloadPDFUrl(state),
               showAction: true,
+              disabled: false,
               dataCy: 'popinListItem__downloadAsPdf'
             }, {
               icon: 'fas fa-link',
@@ -976,8 +978,7 @@ export class HtmlDocument extends React.Component {
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
               disabled: state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted,
               dataCy: 'popinListItem__delete'
-            },
-            {
+            }, {
               icon: 'fas fa-exclamation-triangle',
               label: props.t('Permanently delete'),
               onClick: this.handleClickPermanentlyDeleteButton,
@@ -987,6 +988,13 @@ export class HtmlDocument extends React.Component {
               dataCy: 'popinListItem__permanentlyDelete'
             }
           ]}
+          customActionList={buildAppCustomActionLinkList(
+            state.config.appCustomActionList,
+            state.content,
+            state.loggedUser,
+            CONTENT_TYPE.HTML_DOCUMENT,
+            state.translationTargetLanguageCode
+          )}
           appMode={state.mode}
           availableStatuses={state.config.availableStatuses}
           breadcrumbsList={state.breadcrumbsList}
