@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import argparse
 from depot.manager import DepotManager
 import os
 from os.path import dirname
