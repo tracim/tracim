@@ -82,7 +82,7 @@ export const ExtendedAction = props => {
         ),
 
         ...props.appCustomActionList.map((action, i) => {
-          const actionWithSeparator = {...action, addSeparator: i === 0 }
+          const actionWithSeparator = { ...action, addSeparator: i === 0 }
           return (
             <DropdownMenuItemAppCustomAction
               action={actionWithSeparator}
