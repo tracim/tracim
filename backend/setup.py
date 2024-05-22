@@ -40,7 +40,7 @@ requires = [
     "mako",
     "lxml>=4.8.0",
     "redis==4.6.0",
-    "rq>=1.9.0",
+    "rq==1.9.0",
     "html2text",
     # mail-fetcher
     "markdown",

@@ -293,7 +293,7 @@ rpds-py==0.18.1
     # via
     #   jsonschema
     #   referencing
-rq==1.16.2
+rq==1.9.0
     # via tracim_backend (setup.py)
 s3transfer==0.10.1
     # via boto3
