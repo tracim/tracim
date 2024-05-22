@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import argparse
 from depot.manager import DepotManager
 import os
 from os.path import dirname
@@ -166,21 +167,21 @@ class TestCommands(object):
         # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
-        res = app.run(
-            [
-                "user",
-                "create",
-                "-c",
-                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
-                "-e",
-                "command_test@user",
-                "-p",
-                "new_password",
-                "--profile",
-                "unknown",
-            ]
-        )
-        assert res == 1
+        with pytest.raises(SystemExit):
+            app.run(
+                [
+                    "user",
+                    "create",
+                    "-c",
+                    "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                    "-e",
+                    "command_test@user",
+                    "-p",
+                    "new_password",
+                    "--profile",
+                    "unknown",
+                ]
+            )
 
     def test_func__user_create_command__err_user_already_exist(self, hapic, session) -> None:
         """
@@ -1643,13 +1644,19 @@ class TestCommands(object):
             )
 
         with new_revision(
-            session=session, tm=transaction.manager, content=content, force_create_new_revision=True
+            session=session,
+            tm=transaction.manager,
+            content=content,
+            force_create_new_revision=True,
         ):
             content = content_api.update_file_data(
                 content, "fo.png", "image/png", create_1000px_png_test_image()
             )
         with new_revision(
-            session=session, tm=transaction.manager, content=content, force_create_new_revision=True
+            session=session,
+            tm=transaction.manager,
+            content=content,
+            force_create_new_revision=True,
         ):
             content = content_api.update_file_data(
                 content, "f.png", "image/png", create_1000px_png_test_image()
@@ -2049,13 +2056,19 @@ class TestCommands(object):
                 content, "foo.png", "image/png", create_1000px_png_test_image()
             )
         with new_revision(
-            session=session, tm=transaction.manager, content=content, force_create_new_revision=True
+            session=session,
+            tm=transaction.manager,
+            content=content,
+            force_create_new_revision=True,
         ):
             content = content_api.update_file_data(
                 content, "fo.png", "image/png", create_1000px_png_test_image()
             )
         with new_revision(
-            session=session, tm=transaction.manager, content=content, force_create_new_revision=True
+            session=session,
+            tm=transaction.manager,
+            content=content,
+            force_create_new_revision=True,
         ):
             content = content_api.update_file_data(
                 content, "f.png", "image/png", create_1000px_png_test_image()
