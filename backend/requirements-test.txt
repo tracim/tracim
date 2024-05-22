@@ -4,7 +4,7 @@
 #
 #    pip-compile --extra=testing --output-file=requirements-test.txt
 #
-alembic==1.13.1
+alembic==1.6.5
     # via tracim_backend (setup.py)
 anyascii==0.3.2
     # via filedepot
@@ -178,7 +178,6 @@ packaging==24.0
     # via
     #   pytest
     #   sqlakeyset
-    #   zope-sqlalchemy
 passlib==1.7.4
     # via radicale
 pastedeploy==3.1.0
@@ -291,6 +290,7 @@ pytest-timeout==2.3.1
     # via tracim_backend (setup.py)
 python-dateutil==2.9.0.post0
     # via
+    #   alembic
     #   elasticsearch-dsl
     #   freezegun
     #   icalendar
@@ -302,6 +302,8 @@ python-dateutil==2.9.0.post0
     #   vobject
 python-dotenv==1.0.1
     # via pytest-dotenv
+python-editor==1.0.4
+    # via alembic
 python-magic==0.4.27
     # via preview-generator
 python-slugify==8.0.4
@@ -334,7 +336,7 @@ referencing==0.35.1
     # via
     #   jsonschema
     #   jsonschema-specifications
-requests==2.32.1
+requests==2.32.2
     # via
     #   caldav
     #   pubcontrol
@@ -400,8 +402,6 @@ transaction==4.0
     #   zope-sqlalchemy
 translationstring==1.4
     # via pyramid
-typing-extensions==4.11.0
-    # via alembic
 tzlocal==5.2
     # via caldav
 urllib3==1.26.18
@@ -453,12 +453,12 @@ zipp==3.18.2
     # via importlib-metadata
 zope-deprecation==5.0
     # via pyramid
-zope-interface==6.4
+zope-interface==6.4.post0
     # via
     #   pyramid
     #   transaction
     #   zope-sqlalchemy
-zope-sqlalchemy==3.1
+zope-sqlalchemy==1.6
     # via tracim_backend (setup.py)
 
 # The following packages are considered to be unsafe in a requirements file:

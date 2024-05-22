@@ -12,8 +12,8 @@ requires = [
     "pyramid_tm",
     "SQLAlchemy<1.4.0",
     "transaction",
-    "zope.sqlalchemy",
-    "alembic",
+    "zope.sqlalchemy==1.6",
+    "alembic==1.6.5",
     "sqlakeyset==1.0.1616300210",
     # API
     "hapic[marshmallow]>=0.83",

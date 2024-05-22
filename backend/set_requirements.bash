@@ -3,7 +3,6 @@
 extras=(
   "testing:requirements-test.txt"
   "devtool:requirements-devtool.txt"
-  "mysql:requirements-db-mysql.txt"
   "postgresql:requirements-db-postgres.txt"
   "s3:requirements-storage-s3.txt"
 )
