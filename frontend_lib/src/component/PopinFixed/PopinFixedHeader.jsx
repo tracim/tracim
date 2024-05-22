@@ -240,8 +240,8 @@ export const PopinFixedHeader = (props) => {
                 return (
                   <a
                     href={action.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    target='_blank'
+                    rel='noopener noreferrer'
                     download
                     title={action.label}
                     key={action.label}
