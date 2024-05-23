@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.10.0 / TBD
+
+### ✨ New Features
+
+- App Custom Action: Add customizable links to apps [#6250](https://github.com/tracim/tracim/issues/6250)
+- Support for python version 3.9, 3.10 an 3.11
+
 ## 4.9.1 / 2024-05-06
 
 ### 🐛 Fixed Issues
