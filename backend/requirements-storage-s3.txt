@@ -375,7 +375,7 @@ zipp==3.18.2
     # via importlib-metadata
 zope-deprecation==5.0
     # via pyramid
-zope-interface==6.4.post1
+zope-interface==6.4.post0
     # via
     #   pyramid
     #   transaction
