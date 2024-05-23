@@ -1,4 +1,3 @@
-import i18n, { getBrowserLang } from './i18n.js'
 import {
   ACCESSIBLE_SPACE_TYPE_LIST,
   ALLOWED_CHARACTERS_USERNAME,
@@ -69,6 +68,7 @@ import {
   stripEmojis,
   updateTLMUser
 } from './helper.js'
+import i18n, { getBrowserLang } from './i18n.js'
 
 import {
   SORT_BY,
@@ -111,6 +111,8 @@ import {
   isFileUploadInList,
   isFileUploadInErrorState
 } from './fileUpload.js'
+
+import { buildAppCustomActionLinkList } from './appCustomAction.js'
 
 import { defaultDebug } from './debug.js'
 
@@ -155,6 +157,7 @@ import CardPopup from './component/CardPopup/CardPopup.jsx'
 import CardPopupCreateContent from './component/CardPopup/CardPopupCreateContent.jsx'
 
 import DropdownMenu from './component/DropdownMenu/DropdownMenu.jsx'
+import DropdownMenuItemAppCustomAction from './component/DropdownMenu/DropdownMenuItemAppCustomAction.jsx'
 
 import NewVersionBtn from './component/OptionComponent/NewVersionBtn.jsx'
 import ArchiveDeleteContent from './component/OptionComponent/ArchiveDeleteContent.jsx'
@@ -365,6 +368,7 @@ export {
   DisplayFileToUpload,
   DistanceDate,
   DropdownMenu,
+  DropdownMenuItemAppCustomAction,
   EditCommentPopup,
   EmptyListMessage,
   ErrorFlashMessageTemplateHtml,
@@ -417,6 +421,7 @@ export {
   addRevisionFromTLM,
   appContentFactory,
   baseFetch,
+  buildAppCustomActionLinkList,
   buildContentPathBreadcrumbs,
   buildFilePreviewUrl,
   buildHeadTitle,

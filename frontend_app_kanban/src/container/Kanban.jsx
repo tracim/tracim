@@ -37,7 +37,8 @@ import {
   handleFetchResult,
   putMyselfFileRead,
   sendGlobalFlashMessage,
-  sortListByMultipleCriteria
+  sortListByMultipleCriteria,
+  buildAppCustomActionLinkList
 } from 'tracim_frontend_lib'
 
 import KanbanComponent from '../component/Kanban.jsx'
@@ -652,8 +653,7 @@ export class Kanban extends React.Component {
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
               disabled: readOnly,
               dataCy: 'popinListItem__delete'
-            },
-            {
+            }, {
               icon: 'fas fa-exclamation-triangle',
               label: props.t('Permanently delete'),
               onClick: this.handleClickPermanentlyDeleteButton,
@@ -663,6 +663,13 @@ export class Kanban extends React.Component {
               dataCy: 'popinListItem__permanentlyDelete'
             }
           ]}
+          customActionList={buildAppCustomActionLinkList(
+            state.config.appCustomActionList,
+            state.content,
+            state.loggedUser,
+            CONTENT_TYPE.KANBAN,
+            state.translationTargetLanguageCode
+          )}
           headerButtons={[
             {
               icon: 'fas fa-expand-arrows-alt',

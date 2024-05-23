@@ -27,6 +27,7 @@ import {
   TracimComponent,
   addAllResourceI18n,
   appContentFactory,
+  buildAppCustomActionLinkList,
   buildContentPathBreadcrumbs,
   buildHeadTitle,
   getFileContent,
@@ -652,8 +653,7 @@ export class Logbook extends React.Component {
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
               disabled: readOnly,
               dataCy: 'popinListItem__delete'
-            },
-            {
+            }, {
               icon: 'fas fa-exclamation-triangle',
               label: props.t('Permanently delete'),
               onClick: this.handleClickPermanentlyDeleteButton,
@@ -663,6 +663,13 @@ export class Logbook extends React.Component {
               dataCy: 'popinListItem__permanentlyDelete'
             }
           ]}
+          customActionList={buildAppCustomActionLinkList(
+            state.config.appCustomActionList,
+            state.content,
+            state.loggedUser,
+            CONTENT_TYPE.LOGBOOK,
+            state.translationTargetLanguageCode
+          )}
           headerButtons={[
             {
               icon: 'fas fa-expand-arrows-alt',

@@ -4,7 +4,7 @@ import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import classnames from 'classnames'
 import { DragSource, DropTarget } from 'react-dnd'
-import BtnExtandedAction from './BtnExtandedAction.jsx'
+import BtnExtendedAction from './BtnExtendedAction.jsx'
 import ContentItem from './ContentItem.jsx'
 import {
   DropdownMenu,
@@ -148,7 +148,7 @@ class Folder extends React.Component {
                 )}
 
                 <div className='d-none d-md-flex' title={props.t('Actions')}>
-                  <BtnExtandedAction
+                  <BtnExtendedAction
                     userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                     onClickExtendedAction={{
                       edit: {
@@ -213,21 +213,9 @@ class Folder extends React.Component {
               )
               : (
                 <ContentItem
-                  contentId={content.id}
-                  workspaceId={content.workspaceId}
-                  parentId={content.parentId}
-                  label={content.label}
-                  type={content.type}
-                  fileName={content.fileName}
-                  fileExtension={content.fileExtension}
-                  modified={content.modified}
-                  lang={props.lang}
-                  currentRevisionType={content.currentRevisionType}
-                  lastModifier={content.lastModifier}
+                  content={content}
                   faIcon={props.contentType.length ? props.contentType.find(a => a.slug === content.type).faIcon : ''}
                   isShared={content.activedShares !== 0}
-                  isTemplate={content.isTemplate}
-                  statusSlug={content.statusSlug}
                   read={props.readStatusList.includes(content.id)}
                   contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === content.type) : null}
                   urlContent={`${PAGE.WORKSPACE.CONTENT(content.workspaceId, content.type, content.id)}${props.location.search}`}
