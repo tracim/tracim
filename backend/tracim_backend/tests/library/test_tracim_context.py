@@ -1,4 +1,11 @@
-from collections import Callable
+# NOTE: ML - 2024/05/21 - This is to support multiple versions of python since the Callable API
+#  changes between the two versions (3.9 to 3.10)
+try:
+    # For Python 3.10 and later
+    from collections.abc import Callable
+except ImportError:
+    # For Python 3.9 and earlier
+    from collections import Callable
 import pytest
 
 from tracim_backend.lib.utils.request import TracimContext

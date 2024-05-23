@@ -12,9 +12,9 @@ requires = [
     "pyramid_tm",
     "SQLAlchemy<1.4.0",
     "transaction",
-    "zope.sqlalchemy",
-    "alembic",
-    "sqlakeyset",
+    "zope.sqlalchemy==1.6",
+    "alembic==1.6.5",
+    "sqlakeyset==1.0.1616300210",
     # API
     "hapic[marshmallow]>=0.83",
     # INFO - G.M - 2019-03-21 - this is needed as there is a requirement issue
@@ -27,7 +27,7 @@ requires = [
     "cliff",
     # Webdav
     "wsgidav<3.0.0",
-    "PyYAML",
+    "Pyyaml>=6.0.1",
     # others
     "filedepot>=0.8.0",
     "babel",
@@ -40,12 +40,12 @@ requires = [
     "mako",
     "lxml>=4.8.0",
     "redis==4.6.0",
-    "rq>=1.9.0",
+    "rq==1.9.0",
     "html2text",
     # mail-fetcher
     "markdown",
     "email_reply_parser",
-    "filelock",
+    "filelock<4,>=3.12.2",
     "imapclient",
     "beautifulsoup4",
     # beaker 1.11 is broken: fix does exist but no new release since:
@@ -65,7 +65,7 @@ requires = [
     "radicale>=3.0.6",
     "caldav",
     # search support
-    "elasticsearch",
+    "elasticsearch==7.13.1",
     "elasticsearch-dsl",
     # text-formatting
     "humanize",
@@ -76,7 +76,7 @@ requires = [
     # live message
     "gripcontrol",
     "tnetstring3",
-    "pyzmq",
+    "pyzmq>=25.1.2",
     "jsonschema",
     # INFO - G.M - 2022-02-28 - Use algoo fork of webpreview for now:
     "webpreview @ git+https://github.com/algoo/webpreview@v1.6.0+algoo",
@@ -96,6 +96,7 @@ tests_require = [
     "pytest-timeout",
     "responses",
     "mock",
+    "psycopg2",
     "Pillow",
     # INFO - G.M - 2020-01-14 - static version of freezeguh due to regression
     # with webtest, see https://github.com/spulec/freezegun/issues/326
@@ -103,7 +104,15 @@ tests_require = [
     "sseclient-py",
 ]
 
-devtools_require = ["flake8", "isort", "mypy", "pre-commit", "black==19.10b0"]
+devtools_require = [
+    "flake8==6.0.0",
+    "flake8-black==0.3.6",
+    "flake8-isort==6.0.0",
+    "isort==v5.10.1",
+    "mypy==1.9.0",
+    "pre-commit==2.18.1",
+    "black==23.3.0",
+]
 
 mysql_require = ["PyMySQL[rsa]"]
 
@@ -124,6 +133,7 @@ setup(
     zip_safe=False,
     extras_require={
         "testing": tests_require,
+        "devtool": devtools_require,
         "dev": tests_require + devtools_require,
         "mysql": mysql_require,
         "postgresql": postgresql_require,
