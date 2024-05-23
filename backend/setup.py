@@ -120,7 +120,7 @@ postgresql_require = [
     "psycopg2",
 ]
 s3_require = [
-    "boto3==1.17.103",
+    "boto3",
 ]
 # Python version adaptations
 if sys.version_info < (3, 5):
