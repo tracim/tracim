@@ -220,50 +220,47 @@ const createNotificationListWithMergedFromFlatNotificationList = (notificationLi
   // This has no direct impact on translation and live filtering, since this is dependant of how
   //  the notification is rendered, not how it is filtered, grouped and merged beforehand.
 
-  const newList = notificationList.map((notification) => ({ ...notification }))
-  console.log("🤔 here is the list", newList)
+  console.log("🤔 here is the list", notificationList)
 
-  for (let i = 0; i < newList.length - 1; i++) {
-    const notification = newList[i]
+  notificationList.forEach((notification, index) => {
     console.log("🤔 Got a notification", notification)
-    const nextNotification = newList[i + 1]
-
-    if (notification.toDelete || notification.type.includes("merged")) {
+    if (notification.toDelete || notification.isMerged) {
       console.log("😡 Notification is already merged, skipping...", notification)
-      continue
+      return
     }
 
     // This can be made generic, with a list of mergeable types
     //  (like a dict of lists, each type has its list...)
     if (notification.type !== `${TLM_ENTITY.CONTENT}.${TLM_EVENT.CREATED}.${TLM_SUB.COMMENT}`) {
       console.log("😡 Notification is not a comment, skipping...", notification)
-      continue
+      return
     }
 
+    const nextNotification = notificationList[index + 1]
     if (!nextNotification) {
       console.log("😡 No next, skipping...", notification, nextNotification)
-      continue
+      return
     }
 
     // Same as above comment
     if (!nextNotification.type.includes(`${TLM_ENTITY.CONTENT}.${TLM_EVENT.CREATED}`)) {
       console.log("😡 Next is not a creation, skipping...", notification, nextNotification)
-      continue
+      return
     }
 
     // This could also be linked to a function per pair ?
     if (nextNotification.content.id !== notification.content.parentId
       || nextNotification.author.userId !== notification.author.userId) {
       console.log("😡 Next is unrelated, skipping...", notification, nextNotification)
-      continue
+      return
     }
 
     nextNotification.toDelete = true
-    notification.type += ".merged"
+    notification.isMerged = true
     console.log("😄 Merged the two !", notification, nextNotification)
-  }
+  })
 
-  return newList.filter(notification => !notification.toDelete)
+  return notificationList.filter(notification => !notification.toDelete)
 }
 
 const linkToParentContent = (notification) => {
@@ -442,6 +439,7 @@ export const NotificationWall = props => {
             if (notification.type.includes("merged")) return {
               title: "Merged comment and created",
               text: "This is a merged comment and created",
+            if (notification.isMerged) return {
               url: linkToParentContent(notification)
             }
 
