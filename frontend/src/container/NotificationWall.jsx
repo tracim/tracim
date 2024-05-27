@@ -436,10 +436,9 @@ export const NotificationWall = props => {
           }
 
           if (contentType === TLM_SUB.COMMENT) {
-            if (notification.type.includes("merged")) return {
-              title: "Merged comment and created",
-              text: "This is a merged comment and created",
             if (notification.isMerged) return {
+              title: props.t('Commented and created'),
+              text: props.t('{{author}} created and commented on {{content}}{{workspaceInfo}}', i18nOpts),
               url: linkToParentContent(notification)
             }
 
