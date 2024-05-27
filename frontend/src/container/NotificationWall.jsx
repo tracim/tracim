@@ -205,6 +205,67 @@ const createNotificationListWithGroupsFromFlatNotificationList = (notificationLi
   return groupedNotificationList
 }
 
+const createNotificationListWithMergedFromFlatNotificationList = (notificationList) => {
+  // This should have no impact on the grouping algorithm since none of the core
+  //  elements of the TLM are modified. Only new contextual elements are added
+  //  and some notifications are removed.
+  //  Grouping occurs on 4 criteria:
+  //    - Content
+  //    - Author
+  //    - Workspace
+  //    - Mention
+  //  Since none of these elements are altered in any way and the TLM with the most
+  //  context is kept. In the case of comment/creation, the comment holds both its own context
+  //  and its parent content description, only thing lost are parent's creation time.
+  // This has no direct impact on translation and live filtering, since this is dependant of how
+  //  the notification is rendered, not how it is filtered, grouped and merged beforehand.
+
+  const newList = notificationList.map((notification) => ({ ...notification }))
+  console.log("🤔 here is the list", newList)
+
+  for (let i = 0; i < newList.length - 1; i++) {
+    const notification = newList[i]
+    console.log("🤔 Got a notification", notification)
+    const nextNotification = newList[i + 1]
+
+    if (notification.toDelete || notification.type.includes("merged")) {
+      console.log("😡 Notification is already merged, skipping...", notification)
+      continue
+    }
+
+    // This can be made generic, with a list of mergeable types
+    //  (like a dict of lists, each type has its list...)
+    if (notification.type !== `${TLM_ENTITY.CONTENT}.${TLM_EVENT.CREATED}.${TLM_SUB.COMMENT}`) {
+      console.log("😡 Notification is not a comment, skipping...", notification)
+      continue
+    }
+
+    if (!nextNotification) {
+      console.log("😡 No next, skipping...", notification, nextNotification)
+      continue
+    }
+
+    // Same as above comment
+    if (!nextNotification.type.includes(`${TLM_ENTITY.CONTENT}.${TLM_EVENT.CREATED}`)) {
+      console.log("😡 Next is not a creation, skipping...", notification, nextNotification)
+      continue
+    }
+
+    // This could also be linked to a function per pair ?
+    if (nextNotification.content.id !== notification.content.parentId
+      || nextNotification.author.userId !== notification.author.userId) {
+      console.log("😡 Next is unrelated, skipping...", notification, nextNotification)
+      continue
+    }
+
+    nextNotification.toDelete = true
+    notification.type += ".merged"
+    console.log("😄 Merged the two !", notification, nextNotification)
+  }
+
+  return newList.filter(notification => !notification.toDelete)
+}
+
 const linkToParentContent = (notification) => {
   return PAGE.CONTENT(notification.content.parentId)
 }
@@ -232,7 +293,8 @@ export const NotificationWall = props => {
   useEffect(() => {
     setIsFolderPathLoading(true)
 
-    const newNotificationList = createNotificationListWithGroupsFromFlatNotificationList(props.notificationPage.list)
+    const prefiltered = createNotificationListWithMergedFromFlatNotificationList(props.notificationPage.list)
+    const newNotificationList = createNotificationListWithGroupsFromFlatNotificationList(prefiltered)
 
     props.notificationPage.list.forEach(async notification => {
       if (notification.type === `${TLM_ENTITY.CONTENT}.${TLM_EVENT.CREATED}.${TLM_SUB.FOLDER}`) {
@@ -377,6 +439,12 @@ export const NotificationWall = props => {
           }
 
           if (contentType === TLM_SUB.COMMENT) {
+            if (notification.type.includes("merged")) return {
+              title: "Merged comment and created",
+              text: "This is a merged comment and created",
+              url: linkToParentContent(notification)
+            }
+
             return {
               title: props.t('Comment_noun'),
               text: props.t('{{author}} commented on {{content}}{{workspaceInfo}}', i18nOpts),
