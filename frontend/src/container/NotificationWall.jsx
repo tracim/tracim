@@ -255,8 +255,8 @@ const createNotificationListWithMergedFromFlatNotificationList = (notificationLi
       return
     }
 
-    nextNotification.toDelete = true
-    notification.isMerged = true
+    notification.toDelete = true
+    nextNotification.isMerged = true
     console.log("😄 Merged the two !", notification, nextNotification)
   })
 
@@ -436,12 +436,6 @@ export const NotificationWall = props => {
           }
 
           if (contentType === TLM_SUB.COMMENT) {
-            if (notification.isMerged) return {
-              title: props.t('Commented and created'),
-              text: props.t('{{author}} created and commented on {{content}}{{workspaceInfo}}', i18nOpts),
-              url: linkToParentContent(notification)
-            }
-
             return {
               title: props.t('Comment_noun'),
               text: props.t('{{author}} commented on {{content}}{{workspaceInfo}}', i18nOpts),
@@ -456,6 +450,12 @@ export const NotificationWall = props => {
               url: linkToParentContent(notification),
               isToDo: true
             }
+          }
+
+          if (notification.isMerged) return {
+            title: props.t('Commented and created'),
+            text: props.t('{{author}} created and commented on {{content}}{{workspaceInfo}}', i18nOpts),
+            url: contentUrl
           }
 
           return {
