@@ -252,7 +252,7 @@ export const TinyEditor = props => {
                 fetch: async function (pattern) {
                   const insensitivePattern = pattern.toLowerCase()
                   const matchedMemberList = props.userList.filter((user) => {
-                    if (!user.username) {
+                    if (!user.username || user.isActive === false) {
                       return false
                     }
                     const insensitiveUsername = user.username.toLowerCase()

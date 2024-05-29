@@ -15,6 +15,7 @@ export const serializeKnownMemberProps = {
   user_id: 'userId',
   public_name: 'publicName',
   has_avatar: 'hasAvatar',
+  is_active: 'isActive',
   workspace_ids: 'spaceList'
 }
 

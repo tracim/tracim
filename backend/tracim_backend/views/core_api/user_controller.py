@@ -82,6 +82,7 @@ from tracim_backend.views.core_api.schemas import GetLiveMessageQuerySchema
 from tracim_backend.views.core_api.schemas import GetUserFollowQuerySchema
 from tracim_backend.views.core_api.schemas import KnownContentsQuerySchema
 from tracim_backend.views.core_api.schemas import KnownMembersQuerySchema
+from tracim_backend.views.core_api.schemas import KnownMembersUserDigestSchema
 from tracim_backend.views.core_api.schemas import LiveMessageSchemaPage
 from tracim_backend.views.core_api.schemas import MessageIdsPathSchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
@@ -99,7 +100,6 @@ from tracim_backend.views.core_api.schemas import TracimLiveEventHeaderSchema
 from tracim_backend.views.core_api.schemas import TracimLiveEventQuerySchema
 from tracim_backend.views.core_api.schemas import UserConfigSchema
 from tracim_backend.views.core_api.schemas import UserCreationSchema
-from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import UserDiskSpaceSchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
 from tracim_backend.views.core_api.schemas import UserIdSchema
@@ -297,7 +297,7 @@ class UserController(Controller):
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(KnownMembersQuerySchema())
-    @hapic.output_body(UserDigestSchema(many=True))
+    @hapic.output_body(KnownMembersUserDigestSchema(many=True))
     @hapic.handle_exception(CannotUseBothIncludeAndExcludeWorkspaceUsers, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(TooShortAutocompleteString, HTTPStatus.BAD_REQUEST)
     def known_members(self, context, request: TracimRequest, hapic_data=None):
