@@ -408,13 +408,6 @@ class UserDigestSchema(marshmallow.Schema):
         example="My-Power_User99", required=False, default=None, allow_none=True
     )
     workspace_ids = marshmallow.fields.List(marshmallow.fields.Int(example=3))
-
-
-class KnownMembersUserDigestSchema(UserDigestSchema):
-    """
-    UserDigestSchema with an "is_active" boolean added
-    """
-
     is_active = marshmallow.fields.Bool()
 
 
