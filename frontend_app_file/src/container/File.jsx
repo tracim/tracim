@@ -53,7 +53,8 @@ import {
   getFileRevisionPreviewInfo,
   sortListByMultipleCriteria,
   SORT_BY,
-  ToDoManagement
+  ToDoManagement,
+  buildAppCustomActionLinkList
 } from 'tracim_frontend_lib'
 import { isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import {
@@ -1203,20 +1204,23 @@ export class File extends React.Component {
             }, {
               icon: 'far fa-file',
               label: props.t('Download current page as PDF'),
-              downloadLink: this.getDownloadPdfPageUrl(state),
+              href: this.getDownloadPdfPageUrl(state),
               showAction: state.previewInfo.has_pdf_preview,
+              disabled: false,
               dataCy: 'popinListItem__downloadPageAsPdf'
             }, {
               icon: 'far fa-file-pdf',
               label: props.t('Download as PDF'),
-              downloadLink: this.getDownloadPdfFullUrl(state),
+              href: this.getDownloadPdfFullUrl(state),
               showAction: state.previewInfo.has_pdf_preview,
+              disabled: false,
               dataCy: 'popinListItem__downloadAsPdf'
             }, {
               icon: 'fas fa-download',
               label: props.t('Download file'),
-              downloadLink: this.getDownloadRawUrl(state),
+              href: this.getDownloadRawUrl(state),
               showAction: true,
+              disabled: false,
               dataCy: 'popinListItem__downloadFile'
             }, {
               icon: 'fas fa-link',
@@ -1231,8 +1235,7 @@ export class File extends React.Component {
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
               disabled: state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted,
               dataCy: 'popinListItem__delete'
-            },
-            {
+            }, {
               icon: 'fas fa-exclamation-triangle',
               label: props.t('Permanently delete'),
               onClick: this.handleClickPermanentlyDeleteButton,
@@ -1242,6 +1245,13 @@ export class File extends React.Component {
               dataCy: 'popinListItem__permanentlyDelete'
             }
           ]}
+          customActionList={buildAppCustomActionLinkList(
+            state.config.appCustomActionList,
+            state.content,
+            state.loggedUser,
+            CONTENT_TYPE.FILE,
+            state.translationTargetLanguageCode
+          )}
           appMode={state.mode}
           availableStatuses={state.config.availableStatuses}
           breadcrumbsList={state.breadcrumbsList}

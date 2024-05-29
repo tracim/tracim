@@ -128,6 +128,7 @@ export class Timeline extends React.Component {
             <PromptMessage
               msg={props.t('This content is deleted')}
               btnType='button'
+              btnIcon='fas fa-trash-restore'
               icon='far fa-trash-alt'
               btnLabel={props.t('Restore')}
               onClickBtn={props.onClickRestoreDeleted}

@@ -121,16 +121,9 @@ class ShareFolder extends React.Component {
             )
             : (
               <ContentItem
-                contentId={content.id}
-                workspaceId={content.workspaceId}
-                parentId={content.parentId}
-                label={content.label}
-                type={content.type}
-                fileName={content.fileName}
-                fileExtension={content.fileExtension}
-                faIcon={props.contentType.length ? props.contentType.find(a => a.slug === content.type).faIcon : ''}
+                content={content}
                 isShared={content.activedShares !== 0}
-                statusSlug={content.statusSlug}
+                faIcon={props.contentType.length ? props.contentType.find(a => a.slug === content.type).faIcon : ''}
                 read={props.readStatusList.includes(content.id)}
                 contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === content.type) : null}
                 urlContent={`${PAGE.WORKSPACE.CONTENT(content.workspaceId, content.type, content.id)}${props.location.search}`}

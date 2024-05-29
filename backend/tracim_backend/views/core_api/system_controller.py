@@ -129,7 +129,6 @@ class SystemController(Controller):
     def config(self, context, request: TracimRequest, hapic_data=None):
         """
         Returns configuration information required for frontend.
-        At the moment it only returns if email notifications are activated.
         """
         # FIXME - G.M - 2018-12-14 - [config_unauthenticated] #1270
         # do not allow unauthenticated user to

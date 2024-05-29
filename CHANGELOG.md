@@ -1,11 +1,34 @@
 # Changelog
 
-## 4.9.0 / TBA
+## 4.10.0 / TBD
 
 ### ✨ New Features
 
+- App Custom Action: Add customizable links to apps [#6250](https://github.com/tracim/tracim/issues/6250)
+- Support for python version 3.9, 3.10 an 3.11
+
+## 4.9.1 / 2024-05-06
+
+### 🐛 Fixed Issues
+
+- Workspace
+  - Fixed position of the loader on workspace content list [#6480](https://github.com/tracim/tracim/issues/6480)
+- Kanban
+  - Added dynamic font color for timestamps [#6469](https://github.com/tracim/tracim/issues/6469)
+- Logbook
+  - Added confirm pop-in when deleting an entry [#6467](https://github.com/tracim/tracim/issues/6467)
+  - Fixed error in the date format for date field in the entries [#6477](https://github.com/tracim/tracim/issues/6477)
+- App contents
+  - Fixed button position when in fullscreen [#6471](https://github.com/tracim/tracim/issues/6471)
+  - Added specific icon for restore content button [#6475](https://github.com/tracim/tracim/issues/6475)
+
+## 4.9.0 / 2024-04-25
+
+### ✨ New Features
+
+- Tracim can now connect to a Redis cluster
 - New content type: Logbook. A logbook is a type of content that features logbook entries. These entries are displayed as a timeline, with an emphasis on the time and the order, most recent at the top
-- Allow to permanently delete a content
+- Allow to permanently delete contents and comments
 - Allow to transform news into thread
 - Mail notification: Summary mail can now be set once every hour, day or week
 - The states of the navigation sidebar is saved in the browser
@@ -30,9 +53,11 @@
   - Fixed kanban title with special characters [#5220](https://github.com/tracim/tracim/issues/5220)
   - Renamed label "value" to "open field" in Kanban [#6354](https://github.com/tracim/tracim/issues/6354)
   - Fixed real time issues with kanban [#6363](https://github.com/tracim/tracim/issues/6363)
-- Authentication:
+- Authentication
   - Fixed LDAP auth issues related to auth chaining [#6355](https://github.com/tracim/tracim/issues/6355)
   - Fixed SAML dependencies for installation [#6365](https://github.com/tracim/tracim/issues/6365)
+- Tracimcli
+  - Removed git error messages
 
 ## 4.8.0 / 2024-01-24
 

@@ -7,16 +7,15 @@ const ListItemWrapper = props => {
 
   return (
     <div
-      className={
-        classnames(
-          'contentItem',
-          {
-            'item-last': props.isLast,
-            'item-first': props.isFirst,
-            read: props.read
-          },
-          props.customClass)
-      }
+      className={classnames(
+        'contentItem',
+        {
+          'item-last': props.isLast,
+          'item-first': props.isFirst,
+          read: props.read
+        },
+        props.customClass
+      )}
       title={props.label}
       id={props.id}
       ref={props.connectDragSource}

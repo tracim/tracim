@@ -578,6 +578,14 @@ class CFG(object):
             "color.config_file_path", default_color_config_file_path
         )
 
+        default_app_custom_actions_file = "app_custom_actions.json"
+        self.APP_CUSTOM_ACTIONS__CONFIG_FILE = self.get_raw_config(
+            "app_custom_actions.config_file", default_app_custom_actions_file
+        )
+        self.APP_CUSTOM_ACTIONS__CONFIG_FILE_PATH = os.path.join(
+            self.branding_folder_path, self.APP_CUSTOM_ACTIONS__CONFIG_FILE
+        )
+
         default_rich_text_preview_css_file_path = os.path.join(
             self.branding_folder_path, "rich_text_preview.css"
         )

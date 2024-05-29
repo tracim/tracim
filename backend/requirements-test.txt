@@ -1,6 +1,6 @@
 # Test requirements
 WebTest==2.0.35
-pytest==5.3.5
+pytest==7.2.2
 pytest-dotenv==0.4.0
 pytest-services==2.0.1
 pytest-testinfra==6.8.0

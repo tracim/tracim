@@ -29,7 +29,8 @@ import {
   FAVORITE_STATE,
   ROLE,
   COLORS,
-  SelectStatus
+  SelectStatus,
+  buildAppCustomActionLinkList
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -443,8 +444,7 @@ export class Thread extends React.Component {
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
               disabled: state.content.is_archived || state.content.is_deleted,
               dataCy: 'popinListItem__delete'
-            },
-            {
+            }, {
               icon: 'fas fa-exclamation-triangle',
               label: props.t('Permanently delete'),
               onClick: this.handleClickPermanentlyDeleteButton,
@@ -454,6 +454,13 @@ export class Thread extends React.Component {
               dataCy: 'popinListItem__permanentlyDelete'
             }
           ]}
+          customActionList={buildAppCustomActionLinkList(
+            state.config.appCustomActionList,
+            state.content,
+            state.loggedUser,
+            CONTENT_TYPE.THREAD,
+            state.translationTargetLanguageCode
+          )}
           content={state.content}
           favoriteState={props.isContentInFavoriteList(state.content, state)
             ? FAVORITE_STATE.FAVORITE
@@ -490,12 +497,14 @@ export class Thread extends React.Component {
                     contentId={state.content.content_id}
                     workspaceId={state.content.workspace_id}
                   />
-                  <SelectStatus
-                    selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
-                    availableStatus={state.config.availableStatuses}
-                    onChangeStatus={this.handleChangeStatus}
-                    disabled={state.content.is_archived || state.content.is_deleted}
-                  />
+                  <div className='wsContentGeneric__content__left__top__selectStatus'>
+                    <SelectStatus
+                      selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
+                      availableStatus={state.config.availableStatuses}
+                      onChangeStatus={this.handleChangeStatus}
+                      disabled={state.content.is_archived || state.content.is_deleted}
+                    />
+                  </div>
                 </>
               )}
             </div>

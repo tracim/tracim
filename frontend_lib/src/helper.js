@@ -184,7 +184,7 @@ export const revisionTypeList = [{
   label: 'Item unarchived'
 }, {
   id: 'undeletion',
-  faIcon: 'far fa-trash-alt',
+  faIcon: 'fas fa-trash-restore',
   tradKey: i18n.t('Item restored'),
   label: 'Item restored'
 }, {
@@ -791,17 +791,20 @@ const luminance = (color) => {
 }
 
 // INFO - FS - 2024-03-25 - Use the contrast ratio to determine witch text color use : https://github.com/tracim/tracim/issues/6356
-// return true if white text color is better than black for this background
-export const shouldUseLightTextColor = (backColor) => {
-  const whiteLuminance = 1
-  const blackLuminance = 0
+// return true if light text color is better than dark for this background
+// INFO - ML - 2024-04-26 - Second argument is an optional object containing
+//  `.light` color and `.dark` color. Each property is optional
+// INFO - ML - 2024-05-03 - This function will return a boolean set to true
+//  if the light color is more contrasted than the dark one
+//  this doesn't guarantee that the color will be contrasted, it only
+//  guarantees that the given light color is more or less contrasted than the dark one
+// USAGE - shouldUseLightTextColor('#aabbcc', { light: '#eeeeee', dark: '#666666' })
+export const shouldUseLightTextColor = (backColor, frontColors = {}) => {
+  const whiteLuminance = frontColors.light ? luminance(frontColors.light) : 1
+  const blackLuminance = frontColors.dark ? luminance(frontColors.dark) : 0
   const contrastBackColorWhite = (whiteLuminance + 0.05) / (luminance(backColor) + 0.05)
   const contrastBackColorBlack = (luminance(backColor) + 0.05) / (blackLuminance + 0.05)
-  if (contrastBackColorBlack < contrastBackColorWhite) {
-    return true
-  } else {
-    return false
-  }
+  return contrastBackColorBlack < contrastBackColorWhite
 }
 
 export const darkenColor = (c) => color(c).darken(0.15).hex()

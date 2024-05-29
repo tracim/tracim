@@ -8,36 +8,46 @@ require('./PopoverHelperBody.styl')
 const PopoverHelperBodyMessageIndividual = translate()(() => (
   <Trans>
     You will receive an email for each event.<br />
-    Use this setting when you need to be informed of <i>everything that happens</i>.<br /><br />
-    Warning: this might result in a lot of e-mails.
+    Use this setting when you need to be informed of <i>everything that happens</i>.
+    <div className='PopoverHelperBody__section__description__details'>
+       Warning: this might result in a lot of e-mails.
+    </div>
   </Trans>
 ))
 
 const PopoverHelperBodyMessageHourly = translate()(() => (
   <Trans>
-    You'll <i>receive a hourly e-mail</i> summarizing everything you haven't already read.<br /><br />
-    There will be a single email for all spaces configured as "Hourly".
+    You'll <i>receive a hourly e-mail</i> summarizing everything you haven't already read.
+    <div className='PopoverHelperBody__section__description__details'>
+       There will be a single email for all spaces configured as "Hourly".
+    </div>
   </Trans>
 ))
 
 const PopoverHelperBodyMessageDaily = translate()(() => (
   <Trans>
-    You'll <i>receive a daily e-mail</i> summarizing everything you haven't already read.<br /><br />
-    There will be a single email for all spaces configured as "Daily".
+    You'll <i>receive a daily e-mail</i> summarizing everything you haven't already read.
+    <div className='PopoverHelperBody__section__description__details'>
+       There will be a single email for all spaces configured as "Daily".
+    </div>
   </Trans>
 ))
 
 const PopoverHelperBodyMessageWeekly = translate()(() => (
   <Trans>
-    You'll <i>receive a weekly e-mail</i> summarizing everything you haven't already read.<br /><br />
-    There will be a single email for all spaces configured as "Weekly".
+    You'll <i>receive a weekly e-mail</i> summarizing everything you haven't already read.
+    <div className='PopoverHelperBody__section__description__details'>
+       There will be a single email for all spaces configured as "Weekly".
+    </div>
   </Trans>
 ))
 
 const PopoverHelperBodyMessageNone = translate()(() => (
   <Trans>
-    You'll receive no e-mail notifications, even if you are mentioned.<br /><br />
-    You'll need to rely on recent activities and the notification wall to stay up to date.
+    You'll receive no e-mail notifications, even if you are mentioned.
+    <div className='PopoverHelperBody__section__description__details'>
+      You'll need to rely on recent activities and the notification wall to stay up to date.
+    </div>
   </Trans>
 ))
 
@@ -144,7 +154,7 @@ export const PopoverHelperBodySingle = translate()(props => (
       <div className='PopoverHelperBody'>
         <div className='PopoverHelperBody__section'>
           <div className='PopoverHelperBody__section__label'>
-            {props.t('All')}
+            {props.t('Individual')}
           </div>
           <div className='PopoverHelperBody__section__description'>
             <PopoverHelperBodyMessageIndividual />
@@ -180,7 +190,7 @@ export const PopoverHelperBodySingle = translate()(props => (
 
         <div className='PopoverHelperBody__section'>
           <div className='PopoverHelperBody__section__label'>
-            {props.t('None')}
+            {props.t('None', { context: 'feminine' })}
           </div>
           <div className='PopoverHelperBody__section__description'>
             <PopoverHelperBodyMessageNone />

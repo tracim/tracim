@@ -91,7 +91,7 @@ email-reply-parser==0.5.12
     # via tracim-backend (setup.py)
 filedepot==0.8.0
     # via tracim-backend (setup.py)
-filelock==3.0.12
+filelock==3.14.0
     # via
     #   preview-generator
     #   tracim-backend (setup.py)
@@ -241,13 +241,13 @@ pytz==2021.1
     # via
     #   babel
     #   pysaml2
-pyyaml==5.4.1
+pyyaml>=6.0.0
     # via
     #   cliff
     #   hapic
     #   tracim-backend (setup.py)
     #   wsgidav
-pyzmq==22.1.0
+pyzmq>=25.1.2
     # via tracim-backend (setup.py)
 radicale==3.1.0
     # via tracim-backend (setup.py)
@@ -352,3 +352,5 @@ zope-sqlalchemy==1.6
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
+# postgres specific dependencies
+psycopg2==2.9.9

@@ -50,6 +50,18 @@
           margin 0
       &::after
         display none
+      &__item
+        &.isImage
+          display flex
+          align-items center
+        &.addSeparator
+          border-top borderStyle
+        &__image
+          width 20px
+          height 20px
+          margin-inline-end 5px
+        &__text
+          margin-inline-start 5px
     &__icon
       font-size titleFontSize
       margin-inline-end standardSpacing
@@ -67,7 +79,7 @@
       & > input
         padding-inline-start textSpacing
         border-radius standardBorderRadius
-        border none
+        border 1px solid lightGrey1
         flex auto
     &__reactions
       flex 1
@@ -119,6 +131,7 @@
       &__top
         display flex
         align-items center
+        min-height 38px // INFO - CH - 2024-04-25 - 38 is height of emoji
         color darkGrey2
         font-size metadataFontSize
         padding standardSpacing pageSpacing 0
@@ -142,6 +155,7 @@
           order 3
           margin-inline-start 5px
           font-weight bold
+          white-space nowrap
         &__selectStatus
           order 4
           display flex
