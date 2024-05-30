@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.9.2 / TBD
+
+### 🐛 Fixed Issue
+
+- Kanban and Logbook
+  - Fixed invisible horizontal scrollbar [#6502](https://github.com/tracim/tracim/issues/6502)
+
 ## 4.9.1 / 2024-05-06
 
 ### 🐛 Fixed Issues
