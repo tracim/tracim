@@ -3,6 +3,7 @@ import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
 import { uniqBy } from 'lodash'
 import {
+  APP_CUSTOM_ACTION_LOCATION_OBJECT,
   APP_FEATURE_MODE,
   BREADCRUMBS_TYPE,
   CONTENT_TYPE,
@@ -27,6 +28,7 @@ import {
   TracimComponent,
   addAllResourceI18n,
   appContentFactory,
+  buildAppCustomActionLinkList,
   buildContentPathBreadcrumbs,
   buildHeadTitle,
   getFileContent,
@@ -37,8 +39,7 @@ import {
   handleFetchResult,
   putMyselfFileRead,
   sendGlobalFlashMessage,
-  sortListByMultipleCriteria,
-  buildAppCustomActionLinkList
+  sortListByMultipleCriteria
 } from 'tracim_frontend_lib'
 
 import KanbanComponent from '../component/Kanban.jsx'
@@ -665,6 +666,7 @@ export class Kanban extends React.Component {
           ]}
           customActionList={buildAppCustomActionLinkList(
             state.config.appCustomActionList,
+            APP_CUSTOM_ACTION_LOCATION_OBJECT.CONTENT_APP_DROPDOWN,
             state.content,
             state.loggedUser,
             CONTENT_TYPE.KANBAN,

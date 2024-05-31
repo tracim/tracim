@@ -87,7 +87,7 @@ class ConfigModel(object):
         auth_types: List[str],
         saml_idp_list: List[Dict[str, str]],
         user__read_only_fields: Dict[str, List[str]],
-        app_custom_actions: List[Dict[str, str]],
+        app_custom_actions: Dict[str, str],
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify

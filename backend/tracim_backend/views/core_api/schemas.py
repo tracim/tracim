@@ -410,7 +410,7 @@ class UserDigestSchema(marshmallow.Schema):
     workspace_ids = marshmallow.fields.List(marshmallow.fields.Int(example=3))
 
 
-class AppCustomActionsDigestSchema(marshmallow.Schema):
+class AppCustomActionsSchema(marshmallow.Schema):
     icon_text = marshmallow.fields.String(
         required=True,
         description="Icon of the custom action. If set, icon_image must be set to empty string.",
@@ -460,6 +460,26 @@ class AppCustomActionsDigestSchema(marshmallow.Schema):
         required=False,
         description="A list comma separated of workspace id on which the custom action will apply",
         example="1,10,222",
+    )
+
+
+class AppCustomActionLocationSchema(marshmallow.Schema):
+    user_sidebar_dropdown = marshmallow.fields.List(
+        marshmallow.fields.Nested(AppCustomActionsSchema), description="NYI"
+    )
+    user_sidebar_shortcuts = marshmallow.fields.List(
+        marshmallow.fields.Nested(AppCustomActionsSchema), description="NYI"
+    )
+    content_in_list_dropdown = marshmallow.fields.List(
+        marshmallow.fields.Nested(AppCustomActionsSchema),
+        description="Custom action placed in the dropdown on content in the workspace content list",
+    )
+    content_app_dropdown = marshmallow.fields.List(
+        marshmallow.fields.Nested(AppCustomActionsSchema),
+        description="Custom action placed in the header dropdown of content apps",
+    )
+    space_dashboard_action_list = marshmallow.fields.List(
+        marshmallow.fields.Nested(AppCustomActionsSchema), description="NYI"
     )
 
 
@@ -2264,9 +2284,7 @@ class ConfigSchema(marshmallow.Schema):
         values=marshmallow.fields.List(marshmallow.fields.String()),
     )
     saml_idp_list = marshmallow.fields.Nested(SamLIdPConfigSchema, many=True)
-    app_custom_actions = marshmallow.fields.List(
-        marshmallow.fields.Nested(AppCustomActionsDigestSchema())
-    )
+    app_custom_actions = marshmallow.fields.Nested(AppCustomActionLocationSchema())
 
 
 class ConditionFileSchema(marshmallow.Schema):
