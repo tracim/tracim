@@ -248,7 +248,7 @@ class UserApi(object):
 
     def get_users_in_common_with_user_workspace(
         self, user_id: int
-    ) -> List[Tuple[int, str, str, int]]:
+    ) -> List[Tuple[int, str, str, int, bool]]:
         """
         Returns a list of found user data in common with the provided user as a tuple
         :param user_id: id of the user to get data from
@@ -259,6 +259,7 @@ class UserApi(object):
                 1 -> username
                 2 -> display_name
                 3 -> workspace_id
+                4 -> is_active
             )
         """
         from sqlalchemy.orm import aliased
@@ -267,7 +268,9 @@ class UserApi(object):
         s2 = aliased(UserWorkspaceConfig)
 
         return (
-            self._session.query(s2.user_id, User.username, User.display_name, s2.workspace_id)
+            self._session.query(
+                s2.user_id, User.username, User.display_name, s2.workspace_id, User.is_active
+            )
             .join(s1, and_(s1.workspace_id == s2.workspace_id, s1.user_id == user_id))
             .join(User, User.user_id == s2.user_id)
             .join(
@@ -311,6 +314,7 @@ class UserApi(object):
                 user.username = user_workspace_setting[1]
                 user.display_name = user_workspace_setting[2]
                 user.workspace_ids = [user_workspace_setting[3]]
+                user.is_active = user_workspace_setting[4]
                 users.append(user)
                 prev_user_id = user.user_id
                 continue
