@@ -455,6 +455,7 @@
   "w": "sem",
   "mth": "m",
   "y": "a",
+  "{{author}} created and commented on {{content}}{{workspaceInfo}}": "{{author}} a créé et commenté {{content}}{{workspaceInfo}}",
   "{{author}} commented on {{content}}{{workspaceInfo}}": "{{author}} a commenté {{content}}{{workspaceInfo}}",
   "{{author}} created {{content}}{{workspaceInfo}}": "{{author}} a créé {{content}}{{workspaceInfo}}",
   "{{author}} changed the status of {{content}}{{workspaceInfo}}": "{{author}} a changé le statut de {{content}}{{workspaceInfo}}",

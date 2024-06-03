@@ -22,7 +22,8 @@ export function appFactory (WrappedComponent) {
         system: this.props.system,
         roleList: ROLE_LIST,
         profileObject: PROFILE,
-        history: this.props.history
+        history: this.props.history,
+        appCustomActionList: this.props.system.config?.app_custom_actions || []
       },
       content
     })

@@ -408,6 +408,60 @@ class UserDigestSchema(marshmallow.Schema):
         example="My-Power_User99", required=False, default=None, allow_none=True
     )
     workspace_ids = marshmallow.fields.List(marshmallow.fields.Int(example=3))
+    is_active = marshmallow.fields.Bool()
+
+
+class AppCustomActionsDigestSchema(marshmallow.Schema):
+    icon_text = marshmallow.fields.String(
+        required=True,
+        description="Icon of the custom action. If set, icon_image must be set to empty string.",
+        example="fas fa-pencil-alt",
+    )
+    icon_image = marshmallow.fields.String(
+        required=True,
+        description="Image of the custom action. If set, icon_text must be set to empty string.",
+        example="https://www.tracim.fr/static/images/new_tracim/LOGO_TRACIM_RVB_1.png",
+    )
+    label = marshmallow.fields.Dict(
+        required=True,
+        description="The visible text displayed in the custom action. Set each labels related to its language key",
+        example='{"fr": "My string"}',
+    )
+    link = marshmallow.fields.String(
+        required=True,
+        description="The action associated with the button",
+        example="https://www.tracim.fr/static/images/new_tracim/LOGO_TRACIM_RVB_1.png",
+    )
+    content_type_filter = marshmallow.fields.String(
+        required=False,
+        description="A list comma separated of content types on which the custom action will apply",
+        example="file,thread,kanban",
+    )
+    content_extension_filter = marshmallow.fields.String(
+        required=False,
+        description="A list comma separated of content extensions on which the custom action will apply",
+        example=".jpg,.png,.gif",
+    )
+    content_label_regex_filter = marshmallow.fields.String(
+        required=False,
+        description="A regex string for content label pattern matching on which the custom action will apply",
+        example="my_pattern",
+    )
+    user_role_filter = marshmallow.fields.String(
+        required=False,
+        description="A list comma separated of user's role for whom the custom action will apply",
+        example="workspace-manager,content-manager,contributor",
+    )
+    user_profile_filter = marshmallow.fields.String(
+        required=False,
+        description="A list comma separated of user's profiles for whom the custom action will apply",
+        example="administrators,trusted-users,users",
+    )
+    workspace_id_filter = marshmallow.fields.String(
+        required=False,
+        description="A list comma separated of workspace id on which the custom action will apply",
+        example="1,10,222",
+    )
 
 
 class UserDiskSpaceSchema(UserDigestSchema):
@@ -2211,6 +2265,9 @@ class ConfigSchema(marshmallow.Schema):
         values=marshmallow.fields.List(marshmallow.fields.String()),
     )
     saml_idp_list = marshmallow.fields.Nested(SamLIdPConfigSchema, many=True)
+    app_custom_actions = marshmallow.fields.List(
+        marshmallow.fields.Nested(AppCustomActionsDigestSchema())
+    )
 
 
 class ConditionFileSchema(marshmallow.Schema):

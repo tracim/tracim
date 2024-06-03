@@ -12,8 +12,8 @@ cardWidth = 280px
     &__wrapper
       display flex
       flex-direction column
-      // INFO - GB - 2021-12-20 - 28px is the wsContentGeneric__content__left__top height
-      height "calc(100% - %s)" % (headerHeight + 28px)
+      // INFO - GB - 2021-12-20 - 38px is the wsContentGeneric__content__left__top height
+      height "calc(100% - %s)" % (headerHeight + 38px)
       &.fullscreen
         position fixed
         width "calc(100% - %s)" % closedSidebarWidth
@@ -201,6 +201,16 @@ cardWidth = 280px
       background-color lightGrey2
     & > *
       margin auto
+
+.fullscreen
+  // INFO - ML - 2024-04-26 - 40px is the size of the fullscreen button
+  & .kanban__contentpage__wrapper
+    &__options
+      position relative
+      top 10px
+      margin-inline-end "calc(40px + %s)" % standardSpacing
+    &__board
+      margin-inline-end "calc(40px + %s)" % standardSpacing
 
 [dir=ltr] .kanban
   &__contentpage

@@ -1465,6 +1465,7 @@ class TestElasticSearchWorkspaceSearch:
                 {
                     "count": 1,
                     "value": {
+                        "is_active": bob.is_active,
                         "has_avatar": bob.has_avatar,
                         "has_cover": bob.has_cover,
                         "user_id": bob.user_id,
@@ -1477,6 +1478,7 @@ class TestElasticSearchWorkspaceSearch:
                 {
                     "count": 1,
                     "value": {
+                        "is_active": bob.is_active,
                         "has_avatar": bob.has_avatar,
                         "has_cover": bob.has_cover,
                         "user_id": bob.user_id,

@@ -1,5 +1,34 @@
 # Changelog
 
+## 4.10.0 / TBD
+
+### ✨ New Features
+
+- App Custom Action: Add customizable links to apps [#6250](https://github.com/tracim/tracim/issues/6250)
+- Support for python version 3.9, 3.10 an 3.11
+
+## 4.9.2 / 2024-05-30
+
+### 🐛 Fixed Issue
+
+- Kanban and Logbook
+  - Fixed invisible horizontal scrollbar [#6502](https://github.com/tracim/tracim/issues/6502)
+
+## 4.9.1 / 2024-05-06
+
+### 🐛 Fixed Issues
+
+- Workspace
+  - Fixed position of the loader on workspace content list [#6480](https://github.com/tracim/tracim/issues/6480)
+- Kanban
+  - Added dynamic font color for timestamps [#6469](https://github.com/tracim/tracim/issues/6469)
+- Logbook
+  - Added confirm pop-in when deleting an entry [#6467](https://github.com/tracim/tracim/issues/6467)
+  - Fixed error in the date format for date field in the entries [#6477](https://github.com/tracim/tracim/issues/6477)
+- App contents
+  - Fixed button position when in fullscreen [#6471](https://github.com/tracim/tracim/issues/6471)
+  - Added specific icon for restore content button [#6475](https://github.com/tracim/tracim/issues/6475)
+
 ## 4.9.0 / 2024-04-25
 
 ### ✨ New Features

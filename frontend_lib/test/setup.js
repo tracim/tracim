@@ -56,3 +56,4 @@ if (!global.window && !global.document) {
 Enzyme.configure({ adapter: new Adapter() })
 chai.use(chaiEnzyme())
 sinon.stub(console, 'log')
+sinon.stub(console, 'error')

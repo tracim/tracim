@@ -434,6 +434,7 @@
   "mth": "mth",
   "Log in": "Log in",
   "y": "y",
+  "{{author}} created and commented on {{content}}{{workspaceInfo}}": "{{author}} created and commented on {{content}}{{workspaceInfo}}",
   "{{author}} commented on {{content}}{{workspaceInfo}}": "{{author}} commented on {{content}}{{workspaceInfo}}",
   "{{author}} created {{content}}{{workspaceInfo}}": "{{author}} created {{content}}{{workspaceInfo}}",
   "{{author}} changed the status of {{content}}{{workspaceInfo}}": "{{author}} changed the status of {{content}}{{workspaceInfo}}",

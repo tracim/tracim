@@ -71,7 +71,8 @@ export const defaultDebug = {
         }
       }
     },
-    label: ''
+    label: '',
+    appCustomActionList: []
   },
   content: {
     content_id: 0,

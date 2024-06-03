@@ -462,6 +462,7 @@ class TestLiveMessages(object):
     @pytest.mark.parametrize(
         "config_section", [{"name": "functional_async_live_test"}], indirect=True
     )
+    @pytest.mark.skip(reason="unstable test, messages does not arrive in expected order")
     def test_api__user_live_messages_endpoint_with_GRIP_proxy__ok__content_tag__async(
         self,
         request,

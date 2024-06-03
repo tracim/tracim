@@ -27,7 +27,7 @@ requires = [
     "cliff",
     # Webdav
     "wsgidav<3.0.0",
-    "PyYAML",
+    "Pyyaml>=6.0.1",
     # others
     "filedepot>=0.8.0",
     "babel",
@@ -45,7 +45,7 @@ requires = [
     # mail-fetcher
     "markdown",
     "email_reply_parser",
-    "filelock",
+    "filelock<4,>=3.12.2",
     "imapclient",
     "beautifulsoup4",
     # beaker 1.11 is broken: fix does exist but no new release since:
@@ -76,7 +76,7 @@ requires = [
     # live message
     "gripcontrol",
     "tnetstring3",
-    "pyzmq",
+    "pyzmq>=25.1.2",
     "jsonschema",
     # INFO - G.M - 2022-02-28 - Use algoo fork of webpreview for now:
     "webpreview @ git+https://github.com/algoo/webpreview@v1.6.0+algoo",
