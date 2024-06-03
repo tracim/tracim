@@ -44,6 +44,7 @@ def a_workspace() -> Workspace:
 
 
 ContentIndexerWithApiMock = typing.Tuple[ESContentIndexer, MagicMock, MagicMock]
+DeleteIndexWithApiMock = typing.Tuple[ESContentIndexer, MagicMock, MagicMock]
 UserIndexerWithApiMock = typing.Tuple[ESUserIndexer, MagicMock, MagicMock]
 WorkspaceIndexerWithApiMock = typing.Tuple[ESWorkspaceIndexer, MagicMock, MagicMock]
 
@@ -62,6 +63,22 @@ def content_indexer_with_api_mock() -> typing.Iterator[ContentIndexerWithApiMock
         content_api_mock = MagicMock()
         content_api_class_mock.return_value = content_api_mock
         yield (ESContentIndexer(), index_content_mock, content_api_mock)
+
+
+@pytest.fixture
+def delete_index_with_api_mock() -> typing.Iterator[DeleteIndexWithApiMock]:
+    """Create an ESContentIndexer instance with mocked ESSearchApi and ContentApi.
+
+    Return a (ESContentIndexer, ESSearchApi.index_content_mock, ContentApi_mock) tuple.
+    """
+    with patch(
+        "tracim_backend.lib.search.elasticsearch_search.elasticsearch_search.ESSearchApi.delete_index"
+    ) as delete_index_mock, patch(
+        "tracim_backend.lib.search.elasticsearch_search.elasticsearch_search.ContentApi"
+    ) as content_api_class_mock:
+        content_api_mock = MagicMock()
+        content_api_class_mock.return_value = content_api_mock
+        yield (ESContentIndexer(), delete_index_mock, content_api_mock)
 
 
 @pytest.fixture
@@ -268,6 +285,29 @@ class TestElasticSearchContentIndexer:
         worker.work(burst=True, app_config=test_context_without_plugins.app_config)
         assert queue.is_empty()
         assert job.is_failed
+
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "test_elasticsearch_search"}], indirect=True
+    )
+    @pytest.mark.parametrize(
+        "content,indexed_content_is_parent",
+        [
+            (html_document(), False),
+            (content_with_parent("html-document", "folder"), False),
+            (content_with_parent("comment", "html-document"), True),
+        ],
+    )
+    def test_unit__sync_delete_index_contents__ok__nominal_cases(
+        self,
+        test_context: TracimContext,
+        delete_index_with_api_mock: DeleteIndexWithApiMock,
+        content: Content,
+        indexed_content_is_parent: bool,
+    ) -> None:
+        content = html_document()
+        (delete_index, delete_index_content_mock, _) = delete_index_with_api_mock
+        delete_index.on_content_deleted(content, test_context)
+        delete_index_content_mock.assert_called_once_with(content)
 
 
 class TestElasticSearchUserIndexer:
