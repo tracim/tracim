@@ -186,7 +186,7 @@ class ESSearchApi(SearchApi):
                 # Ignore error when no matching alias exists
                 pass
 
-    def delete_indice(self, content: Content) -> None:
+    def delete_index(self, content: Content) -> None:
         """
         Delete a content from elastic_search engine
         """
@@ -1061,11 +1061,10 @@ class ESContentIndexer:
     @hookimpl
     def on_content_deleted(self, content: Content, context: TracimContext) -> None:
         """Delete the given content index and its children index."""
-        content = self._get_main_content(content)
         try:
-            self.delete_contents_index([content], context)
-            # if self._should_reindex_children(content.current_revision): #a changer
-            self.delete_contents_index(content.recursive_children, context)
+            if content == self._get_main_content(content):
+                self.delete_contents_index([content], context)
+                self.delete_contents_index(content.recursive_children, context)
         except Exception:
             logger.exception(
                 self,
@@ -1190,11 +1189,11 @@ class ESContentIndexer:
         indexing_error_count = 0
         for content in contents:
             try:
-                search_api.delete_indice(content)
+                search_api.delete_index(content)
             except Exception:
                 logger.exception(
                     self,
-                    "Exception while indexing content {}".format(content.content_id),
+                    "Exception while deleting the index of content {}".format(content.content_id),
                 )
                 indexing_error_count += 1
         return indexing_error_count
