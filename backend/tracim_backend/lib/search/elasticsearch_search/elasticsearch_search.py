@@ -1167,18 +1167,9 @@ class ESContentIndexer:
         return indexing_error_count
 
     def delete_contents_index(self, contents: typing.List[Content], context: TracimContext) -> None:
-        if context.app_config.JOBS__PROCESSING_MODE == CFG.CST.ASYNC:
-            queue = get_rq_queue2(context.app_config, RqQueueName.ELASTICSEARCH_INDEXER)
-            content_ids = [content.content_id for content in contents]
-
-            def index_via_rq_worker(session: Session, flush_context=None) -> None:
-                queue.enqueue(self._index_contents_from_ids, content_ids)
-
-            listen(context.dbsession, "after_commit", index_via_rq_worker, once=True)
-        else:
-            indexing_error_count = self.sync_delete_contents_index(contents, context)
-            if indexing_error_count:
-                raise IndexingError()
+        indexing_error_count = self.sync_delete_contents_index(contents, context)
+        if indexing_error_count:
+            raise IndexingError()
 
     def sync_delete_contents_index(
         self, contents: typing.List[Content], context: TracimContext

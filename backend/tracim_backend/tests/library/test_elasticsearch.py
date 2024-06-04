@@ -309,6 +309,29 @@ class TestElasticSearchContentIndexer:
         delete_index.on_content_deleted(content, test_context)
         delete_index_content_mock.assert_called_once_with(content)
 
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "test_elasticsearch_search__async"}], indirect=True
+    )
+    @pytest.mark.parametrize(
+        "content,indexed_content_is_parent",
+        [
+            (html_document(), False),
+            (content_with_parent("html-document", "folder"), False),
+            (content_with_parent("comment", "html-document"), True),
+        ],
+    )
+    def test_unit__async_delete_index_contents__ok__nominal_cases(
+        self,
+        test_context: TracimContext,
+        delete_index_with_api_mock: DeleteIndexWithApiMock,
+        content: Content,
+        indexed_content_is_parent: bool,
+    ) -> None:
+        content = html_document()
+        (delete_index, delete_index_content_mock, _) = delete_index_with_api_mock
+        delete_index.on_content_deleted(content, test_context)
+        delete_index_content_mock.assert_called_once_with(content)
+
 
 class TestElasticSearchUserIndexer:
     @pytest.mark.parametrize(
