@@ -162,15 +162,15 @@ Complete example of `frontend/dist/asset/branding/app_custom_actions.json`:
     "icon_image": "",
     "content_type_filter": "file",
     "content_extension_filter": ".jpg,.png",
-    "content_label_regex_filter": "field report",
-    "workspace_id_filter": "1,2,3",
-    "user_role_filter": "workspace-manager,content-manager",
-    "user_profile_filter":"administrators,trusted-users",
+    "content_label_regex_filter": "",
+    "workspace_id_filter": "",
+    "user_role_filter": "workspace-manager,content-manager,contributor,reader",
+    "user_profile_filter":"administrators,trusted-users,users",
     "label": {
-      "fr": "Ouvrir la maquette dans SomeSoftware",
-      "en": "Open mockup in SomeSoftware"
+      "fr": "Ouvrir l'image dans SomeSoftware",
+      "en": "Open image in SomeSoftware"
     },
-    "link": "https://some.software.com/open?content={content.content_id}&label={content.label}&space_id={content.workspace_id}&user_id={user.user_id}"
+    "link": "https://some.software.com/open?content={content.content_id}"
   }],
   "space_dashboard_action_list": []
 }
@@ -191,10 +191,10 @@ Each location are a list of objects containing the definition of an App Custom A
 - `user_sidebar_shortcuts`
   - Not Yet Implemented
 - `content_in_list_dropdown`
+  - In workspace content list, the button "..." on each contents
+- `content_app_dropdown`
   - In the header of content apps, the dropdown on the button "⋮"
   - Works for app Thread, Note, File, Kanban, Logbook, Folder advanced
-- `content_app_dropdown`
-  - In workspace content list, the button "..." on each contents
 - `space_dashboard_action_list`
   - Not Yet Implemented
 
