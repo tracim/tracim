@@ -264,6 +264,7 @@ export const UserSpacesConfig = (props) => {
                         />
                       </th>
                       {props.system.config.email_notification_activated && <th>{props.t('Email notifications')}</th>}
+                      <th>{props.t('Web notifications')}</th>
                       <th />
                     </tr>
                   </thead>

@@ -29,7 +29,7 @@ import {
   getSubscriptions,
   postUserRole,
   deleteUserRole,
-  putMyselfWorkspaceEmailNotificationType
+  putMyselfWorkspaceEmailNotificationType, putUserConfiguration
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -415,6 +415,28 @@ export class Dashboard extends React.Component {
     }
   }
 
+  handleClickChangeWebNotification = async () => {
+    const { props } = this
+
+    const currentStatus = props.user.config[`space.${props.currentWorkspace.id}.web_notification`]
+    props.user.config[`space.${props.currentWorkspace.id}.web_notification`] = currentStatus === undefined
+      ? true
+      : !currentStatus
+
+    let fetchChangeUserConfiguration
+    try {
+      fetchChangeUserConfiguration = await props.dispatch(putUserConfiguration(
+        props.user.userId, props.user.config
+      ))
+    } catch (e) {
+      props.dispatch(newFlashMessage(props.t('Error while changing web notification subscription'), 'warning'))
+      console.error(
+        'Error while changing web notification subscription. handleClickChangeWebNotification.',
+        fetchChangeUserConfiguration
+      )
+    }
+  }
+
   render () {
     const { props, state } = this
 
@@ -497,6 +519,7 @@ export class Dashboard extends React.Component {
 
     const description = addExternalLinksIcons(props.currentWorkspace.description.trim())
 
+    console.log('rerender')
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
@@ -541,6 +564,7 @@ export class Dashboard extends React.Component {
                     }
                     newSubscriptionRequestsNumber={state.newSubscriptionRequestsNumber}
                     onClickChangeEmailNotificationType={this.handleClickChangeEmailNotificationType}
+                    onClickChangeWebNotification={this.handleClickChangeWebNotification}
                     t={props.t}
                   />
 

@@ -335,6 +335,7 @@ export class ReduxTlmDispatcher extends React.Component {
 
     let newData
 
+
     if (data.fields.user.user_id === props.user.userId) {
       const updatedUser = await this.fetchUserDetail(props.user.userId)
       if (updatedUser) {

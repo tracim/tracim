@@ -2,15 +2,27 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import {
   IconButton,
-  ROLE_LIST
+  ROLE_LIST,
+  BtnSwitch
 } from 'tracim_frontend_lib'
 import EmailNotificationTypeButton from '../EmailNotificationTypeButton/EmailNotificationTypeButton.jsx'
 
 require('./UserSpacesConfigLine.styl')
 
 class UserSpacesConfigLine extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      isSubscribed: false
+    }
+  }
+
+  setIsSubscribed = (status) => {
+    this.setState({ isSubscribed: status })
+  }
+
   render () {
-    const { props } = this
+    const { props, state } = this
     const memberRole = ROLE_LIST.find(r => r.slug === props.space.member.role)
     return (
       <tr>
@@ -37,6 +49,17 @@ class UserSpacesConfigLine extends React.Component {
             />
           </td>
         )}
+        <td>
+          <div className='usersstatus__item__value webNotifSubscription__value'>
+            <BtnSwitch
+              smallSize
+              onChange={() => this.setIsSubscribed(!state.isSubscribed)}
+              checked={state.isSubscribed}
+              activeLabel={props.t('Enabled')}
+              inactiveLabel={props.t('Disabled')}
+            />
+          </div>
+        </td>
         <td data-cy='spaceconfig__table__leave_space_cell'>
           <IconButton
             customClass='spaceconfig__table__leave_space_cell'

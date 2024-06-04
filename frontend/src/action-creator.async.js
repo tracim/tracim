@@ -481,6 +481,24 @@ export const putUserLang = (user, newLang) => dispatch => {
   })
 }
 
+export const putUserConfiguration = (userId, userConfig) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/config`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'PUT',
+      body: JSON.stringify({
+        parameters: userConfig
+      })
+    },
+    actionName: USER_CONFIGURATION,
+    dispatch
+  })
+}
+
 export const putMyselfWorkspaceEmailNotificationType = (workspaceId, emailNotificationType) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${workspaceId}/email_notification_type`,
