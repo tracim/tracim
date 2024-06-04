@@ -549,7 +549,7 @@ website.usage_conditions =
 # Possible events are in the form ENTITY_TYPE.EVENT_TYPE or ENTITY_TYPE.EVENT_TYPE.CONTENT_TYPE where:
 # ENTITY_TYPE  = user_call | user | workspace | content | mention | workspace_member
 # EVENT_TYPE   = created | modified | deleted | undeleted
-# CONTENT_TYPE = html-document | file | thread | folder | comment | logbook
+# CONTENT_TYPE = html-document | file | thread | folder | comment | kanban | logbook
 # To include all notifications, use web.notifications.excluded = ""
 # To exclude all notification of an entity, you can use wildcard syntax: for example "user.*" for user,
 # will exclude those events: user.deleted, user.created, user.modified, user.undeleted...
