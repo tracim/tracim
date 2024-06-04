@@ -4,6 +4,7 @@ import { translate } from 'react-i18next'
 import { uniqBy } from 'lodash'
 import i18n from '../i18n.js'
 import {
+  APP_CUSTOM_ACTION_LOCATION_OBJECT,
   APP_FEATURE_MODE,
   BREADCRUMBS_TYPE,
   CONTENT_TYPE,
@@ -31,6 +32,7 @@ import {
   addClassToMentionsOfUser,
   addExternalLinksIcons,
   appContentFactory,
+  buildAppCustomActionLinkList,
   buildContentPathBreadcrumbs,
   buildHeadTitle,
   getContent,
@@ -48,8 +50,7 @@ import {
   searchContentAndReplaceWithTag,
   searchMentionAndReplaceWithTag,
   sendGlobalFlashMessage,
-  sortListByMultipleCriteria,
-  buildAppCustomActionLinkList
+  sortListByMultipleCriteria
 } from 'tracim_frontend_lib'
 import {
   getHtmlDocContent,
@@ -990,6 +991,7 @@ export class HtmlDocument extends React.Component {
           ]}
           customActionList={buildAppCustomActionLinkList(
             state.config.appCustomActionList,
+            APP_CUSTOM_ACTION_LOCATION_OBJECT.CONTENT_APP_DROPDOWN,
             state.content,
             state.loggedUser,
             CONTENT_TYPE.HTML_DOCUMENT,

@@ -3,15 +3,34 @@ import {
   ROLE_LIST
 } from './helper.js'
 
+// INFO - 2024-05-31 - CH - This object values must stay synced with
+// frontend/dist/assets/branding.sample/app_custom_actions.json
+// Currently (2024-05-31), only content_in_list_dropdown and content_app_dropdown
+// are implemented
+export const APP_CUSTOM_ACTION_LOCATION_OBJECT = {
+  USER_SIDEBAR_DROPDOWN: 'user_sidebar_dropdown',
+  USER_SIDEBAR_SHORTCUTS: 'user_sidebar_shortcuts',
+  CONTENT_IN_LIST_DROPDOWN: 'content_in_list_dropdown',
+  CONTENT_APP_DROPDOWN: 'content_app_dropdown',
+  SPACE_DASHBOARD_ACTION_LIST: 'space_dashboard_action_list'
+}
+
 // INFO - 2024-05-20 - Improvement idea:
 // param appContentType might not be mandatory and be deduced from content.content_type
 // param appLanguage might not be mandatory and be deduced from loggedUser.lang
 // Improvement not done yet to ensure compatibility for frontend/ and apps
 export const buildAppCustomActionLinkList = (
-  appCustomActionConfig, content, loggedUser, appContentType, appLanguage
+  appCustomActionConfig, location, content, loggedUser, appContentType, appLanguage
 ) => {
   // INFO - CH - 2024-05-17 - The function can be called before api has returned content data.
   if (!content.content_id && !content.id) return []
+
+  if (!Object.values(APP_CUSTOM_ACTION_LOCATION_OBJECT).includes(location)) {
+    console.error('Error in buildAppCustomActionLinkList: unknown location value. location:', location)
+    return []
+  }
+
+  if (!appCustomActionConfig?.[location]) return []
 
   const contentSafe = { ...content }
   // INFO - CH - 2024-05-16 - Due to a design flaw, content and user objects keys are in camelCase in frontend/
@@ -26,7 +45,7 @@ export const buildAppCustomActionLinkList = (
     contentSafe.workspace_id = content.workspaceId
     contentSafe.file_extension = content.fileExtension
   }
-  return appCustomActionConfig
+  return appCustomActionConfig[location]
     .filter(ca => filterUserRole(ca, loggedUser.userRoleIdInWorkspace))
     .filter(ca => filterUserProfile(ca, loggedUser.profile))
     .filter(ca => filterContentType(ca, appContentType))

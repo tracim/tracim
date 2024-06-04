@@ -4,6 +4,7 @@ import { uniqBy } from 'lodash'
 import i18n from '../i18n.js'
 import FileComponent from '../component/FileComponent.jsx'
 import {
+  APP_CUSTOM_ACTION_LOCATION_OBJECT,
   BREADCRUMBS_TYPE,
   COLLABORA_EXTENSIONS,
   CONTENT_TYPE,
@@ -14,6 +15,7 @@ import {
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent,
   buildContentPathBreadcrumbs,
+  buildAppCustomActionLinkList,
   appContentFactory,
   addAllResourceI18n,
   formatAbsoluteDate,
@@ -53,8 +55,7 @@ import {
   getFileRevisionPreviewInfo,
   sortListByMultipleCriteria,
   SORT_BY,
-  ToDoManagement,
-  buildAppCustomActionLinkList
+  ToDoManagement
 } from 'tracim_frontend_lib'
 import { isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import {
@@ -1247,6 +1248,7 @@ export class File extends React.Component {
           ]}
           customActionList={buildAppCustomActionLinkList(
             state.config.appCustomActionList,
+            APP_CUSTOM_ACTION_LOCATION_OBJECT.CONTENT_APP_DROPDOWN,
             state.content,
             state.loggedUser,
             CONTENT_TYPE.FILE,

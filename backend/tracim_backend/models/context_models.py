@@ -5,6 +5,7 @@ from datetime import datetime
 from slugify import slugify
 from sqlakeyset import Page
 from sqlalchemy.orm import Session
+from typing import Any
 from typing import Dict
 from typing import Generic
 from typing import List
@@ -87,7 +88,7 @@ class ConfigModel(object):
         auth_types: List[str],
         saml_idp_list: List[Dict[str, str]],
         user__read_only_fields: Dict[str, List[str]],
-        app_custom_actions: List[Dict[str, str]],
+        app_custom_actions: Dict[str, List[Dict[str, Any]]],
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
