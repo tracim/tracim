@@ -23,13 +23,14 @@ import {
   buildHeadTitle,
   removeAtInUsername,
   addExternalLinksIcons,
-  getSpaceUserRoleList
+  getSpaceUserRoleList,
+  putUserConfiguration
 } from 'tracim_frontend_lib'
 import {
   getSubscriptions,
   postUserRole,
   deleteUserRole,
-  putMyselfWorkspaceEmailNotificationType, putUserConfiguration
+  putMyselfWorkspaceEmailNotificationType
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -418,21 +419,20 @@ export class Dashboard extends React.Component {
   handleClickChangeWebNotification = async () => {
     const { props } = this
 
-    const currentStatus = props.user.config[`space.${props.currentWorkspace.id}.web_notification`]
-    props.user.config[`space.${props.currentWorkspace.id}.web_notification`] = currentStatus === undefined
+    const userConfig = { ...props.user.config }
+    const currentStatus = userConfig[`space.${props.currentWorkspace.id}.web_notification`]
+    userConfig[`space.${props.currentWorkspace.id}.web_notification`] = currentStatus === undefined
       ? true
       : !currentStatus
 
-    let fetchChangeUserConfiguration
     try {
-      fetchChangeUserConfiguration = await props.dispatch(putUserConfiguration(
-        props.user.userId, props.user.config
-      ))
+      await putUserConfiguration(
+        FETCH_CONFIG.apiUrl, props.user.userId, userConfig
+      )
     } catch (e) {
       props.dispatch(newFlashMessage(props.t('Error while changing web notification subscription'), 'warning'))
       console.error(
-        'Error while changing web notification subscription. handleClickChangeWebNotification.',
-        fetchChangeUserConfiguration
+        'Error while changing web notification subscription. handleClickChangeWebNotification.', e
       )
     }
   }
@@ -519,7 +519,6 @@ export class Dashboard extends React.Component {
 
     const description = addExternalLinksIcons(props.currentWorkspace.description.trim())
 
-    console.log('rerender')
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
