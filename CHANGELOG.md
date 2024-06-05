@@ -4,8 +4,14 @@
 
 ### ✨ New Features
 
-- App Custom Action: Add customizable links to apps [#6250](https://github.com/tracim/tracim/issues/6250)
+- App Custom Action: Add customizable links to apps
 - Support for python version 3.9, 3.10 an 3.11
+- Merge of create and first comment web notification
+- New email template signature
+
+### 🐛 Fixed Issue
+
+- The real deletion now also delete from elasticsearch indexes [#6473](https://github.com/tracim/tracim/issues/6473)
 
 ## 4.9.2 / 2024-05-30
 
