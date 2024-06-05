@@ -11,6 +11,7 @@ from tracim_backend.models.data import WorkspaceSubscription
 from tracim_backend.models.reaction import Reaction
 from tracim_backend.models.tag import Tag
 from tracim_backend.models.tag import TagOnContent
+from tracim_backend.models.userconfig import UserConfig
 
 
 class DatabaseCrudHookSpec:
@@ -158,4 +159,16 @@ class DatabaseCrudHookSpec:
 
     @hookspec
     def on_user_call_deleted(self, user_call: UserCall, context: TracimContext) -> None:
+        ...
+
+    @hookspec
+    def on_user_config_created(self, user_config: UserConfig, context: TracimContext) -> None:
+        ...
+
+    @hookspec
+    def on_user_config_modified(self, user_config: UserConfig, context: TracimContext) -> None:
+        ...
+
+    @hookspec
+    def on_user_config_deleted(self, user_config: UserConfig, context: TracimContext) -> None:
         ...
