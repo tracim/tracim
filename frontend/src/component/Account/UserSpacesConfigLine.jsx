@@ -11,9 +11,8 @@ import PropTypes from 'prop-types'
 require('./UserSpacesConfigLine.styl')
 
 class UserSpacesConfigLine extends React.Component {
-
   render () {
-    const { props, state } = this
+    const { props } = this
     const memberRole = ROLE_LIST.find(r => r.slug === props.space.member.role)
     return (
       <tr>
@@ -42,7 +41,7 @@ class UserSpacesConfigLine extends React.Component {
         )}
         {(!props.admin &&
           <td>
-            <div className="usersstatus__item__value webNotifSubscription__value">
+            <div className='usersstatus__item__value webNotifSubscription__value'>
               <BtnSwitch
                 smallSize
                 onChange={() => props.onChangeWebNotification(props.space.id)}
@@ -53,14 +52,14 @@ class UserSpacesConfigLine extends React.Component {
             </div>
           </td>
         )}
-        <td data-cy="spaceconfig__table__leave_space_cell">
+        <td data-cy='spaceconfig__table__leave_space_cell'>
           <IconButton
-            customClass="spaceconfig__table__leave_space_cell"
-            mode="dark"
-            intent="secondary"
+            customClass='spaceconfig__table__leave_space_cell'
+            mode='dark'
+            intent='secondary'
             disabled={props.onlyManager}
             onClick={(() => props.onLeaveSpace(props.space.id))}
-            icon="fas fa-sign-out-alt"
+            icon='fas fa-sign-out-alt'
             text={props.admin ? props.t('Remove from space') : props.t('Leave space')}
             title={
               props.onlyManager
@@ -86,12 +85,11 @@ UserSpacesConfigLine.propTypes = {
   WebNotificationEnabled: PropTypes.bool,
   onLeaveSpace: PropTypes.func,
   onChangeEmailNotificationType: PropTypes.func,
-  onChangeWebNotification: PropTypes.func.isRequired,
+  onChangeWebNotification: PropTypes.func.isRequired
 }
 
 UserSpacesConfigLine.defaultProps = {
   WebNotificationEnabled: true
 }
-
 
 export default translate()(UserSpacesConfigLine)

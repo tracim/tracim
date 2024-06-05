@@ -116,7 +116,8 @@ export class ReduxTlmDispatcher extends React.Component {
       // User call
       { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserCallNotification },
 
-      { entityType: TLM_ET.USER_CONFIG, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserConfigModified },
+      // User config
+      { entityType: TLM_ET.USER_CONFIG, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserConfigModified }
     ])
   }
 
