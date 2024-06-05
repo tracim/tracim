@@ -114,7 +114,9 @@ export class ReduxTlmDispatcher extends React.Component {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.LOGBOOK, handler: this.handleContentUnDeleted },
 
       // User call
-      { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserCallNotification }
+      { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserCallNotification },
+
+      { entityType: TLM_ET.USER_CONFIG, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserConfigModified },
     ])
   }
 
@@ -335,7 +337,6 @@ export class ReduxTlmDispatcher extends React.Component {
 
     let newData
 
-
     if (data.fields.user.user_id === props.user.userId) {
       const updatedUser = await this.fetchUserDetail(props.user.userId)
       if (updatedUser) {
@@ -388,6 +389,16 @@ export class ReduxTlmDispatcher extends React.Component {
         this.handleNotification(data)
       }
     }
+  }
+
+  handleUserConfigModified = async data => {
+    const { props } = this
+
+    const newUser = data.fields.user
+    newUser.config = data.fields.user_config.parameters
+
+    props.dispatch(updateUser(newUser))
+    this.handleNotification(data)
   }
 
   render () {
