@@ -449,6 +449,8 @@ class FileController(Controller):
             config=app_config,
         )
         content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        if content.file_extension in app_config.PREVIEW__SKIPLIST:
+            raise UnavailablePreview("Preview isn't available for this file extension")
         allowed_dim = api.get_jpg_preview_allowed_dim()
         default_filename = "{label}_page_{page_number}.jpg".format(
             label=content.label, page_number=hapic_data.query.page
@@ -487,6 +489,8 @@ class FileController(Controller):
             config=app_config,
         )
         content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        if content.file_extension in app_config.PREVIEW__SKIPLIST:
+            raise UnavailablePreview("Preview isn't available for this file extension")
         default_filename = "{label}_page_{page_number}_{width}x{height}.jpg".format(
             label=content.label,
             page_number=hapic_data.query.page,
@@ -527,6 +531,8 @@ class FileController(Controller):
             config=app_config,
         )
         content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        if content.file_extension in app_config.PREVIEW__SKIPLIST:
+            raise UnavailablePreview("Preview isn't available for this file extension")
         revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
         default_filename = "{label}_r{revision_id}_page_{page_number}_{width}x{height}.jpg".format(
             revision_id=revision.revision_id,
@@ -725,6 +731,7 @@ class FileController(Controller):
         )
         content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
+
         return api.get_revision_in_context(revision)
 
     def bind(self, configurator: Configurator) -> None:

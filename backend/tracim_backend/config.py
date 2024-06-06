@@ -613,6 +613,13 @@ class CFG(object):
             self.get_raw_config("ui.spaces.creation.parent_space_choice.visible", "True")
         )
 
+        self.PREVIEW__SKIPLIST = string_to_unique_item_list(
+            self.get_raw_config("preview.skiplist", ""),
+            separator=",",
+            cast_func=str,
+            do_strip=True,
+        )
+
         default_code_sample_languages = """
             apacheconf:Apache Configuration,
             arduino:Arduino,

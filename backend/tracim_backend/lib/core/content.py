@@ -1966,6 +1966,8 @@ class ContentApi(object):
     def has_jpeg_preview(self, revision_id: int, file_extension: str) -> bool:
         # TODO: - G.M - 2021-01-20 - Refactor this to use new StorageLib, see #4079
         try:
+            if file_extension in self._config.PREVIEW__SKIPLIST:
+                return False
             with self.get_one_revision_filepath(revision_id) as file_path:
                 return self.preview_manager.has_jpeg_preview(file_path, file_ext=file_extension)
         except UnsupportedMimeType:

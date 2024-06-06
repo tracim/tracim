@@ -295,6 +295,11 @@ preview_cache_dir = %(basic_setup.preview_cache_dir)s
 ## endpoint to get any other preview dimensions than allowed_dims will
 ## return error
 ; preview.jpg.restricted_dims = False
+## Preview skiplist, prevent preview for the content with an extension in the list
+## All item should be separated by a coma.
+; preview.skiplist=
+# examples with multiples values:
+# ; preview.skiplist= .ifc, .iges
 
 ### Session ###
 
