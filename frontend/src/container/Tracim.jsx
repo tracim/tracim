@@ -520,14 +520,14 @@ export class Tracim extends React.Component {
       return keep
     })
 
-    return {unreadNotificationCount, unreadMentionCount, notificationList}
+    return { unreadNotificationCount, unreadMentionCount, notificationList }
   }
 
   handleHeadTitleAndFavicon = (prevHeadTitleArgs, prevUnreadNotificationCount, prevUnreadMentionCount, prevUserConfig) => {
     const { props } = this
 
     // TODO - M.L - 2024-06-07 - Maybe use results as a state so that it is not necessary to sort twice
-    const {unreadNotificationCount, unreadMentionCount} = this.filterAndCountNotifications()
+    const { unreadNotificationCount, unreadMentionCount } = this.filterAndCountNotifications()
     const prevUserConfigHasChanged = !isEqual(prevUserConfig, props.user.config)
     const hasHeadTitleChanged = !isEqual(prevHeadTitleArgs, props.system.titleArgs)
     const hasUnreadMentionCountChanged = unreadMentionCount !== prevUnreadMentionCount || prevUserConfigHasChanged
@@ -598,8 +598,8 @@ export class Tracim extends React.Component {
     }
 
     // TODO - M.L - 2024-06-07 - Maybe pass new notificationList to Sidebar and NotificationWall
-    //  to prevent re-filtering lists further down
-    const {unreadNotificationCount, unreadMentionCount, notificationList} = this.filterAndCountNotifications()
+    //  to prevent re-filtering lists further down (new notification list is the third return value) of the function
+    const { unreadNotificationCount, unreadMentionCount } = this.filterAndCountNotifications()
 
     return (
       <div className='tracim fullWidthFullHeight' dir={i18next.dir()}>
