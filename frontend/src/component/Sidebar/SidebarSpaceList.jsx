@@ -19,8 +19,6 @@ import SidebarSpaceItem from './SidebarSpaceItem.jsx'
 
 const SidebarSpaceList = (props) => {
   const displaySpace = (spaceLevel, spaceList) => {
-    // FIXME - M.L - 2024-06-07 - Notification are not sorted here
-    //  should we connect to the notificationPage reducer here instead of in each SidebarSpaceItem?
     return spaceList.map(space =>
       <React.Fragment key={space.id}>
         <SidebarSpaceItem
@@ -30,6 +28,7 @@ const SidebarSpaceList = (props) => {
           hasChildren={space.children.length > 0}
           id={`sidebar-space-item-${space.id}`}
           isNotificationWallOpen={props.isNotificationWallOpen}
+          notificationList={props.notificationList}
           label={space.label}
           level={spaceLevel}
           onToggleFoldChildren={props.onToggleFoldChildren}
@@ -138,7 +137,8 @@ SidebarSpaceList.propTypes = {
   onClickToggleSpaceList: PropTypes.func,
   onToggleFoldChildren: PropTypes.func,
   showSpaceList: PropTypes.bool,
-  spaceList: PropTypes.array
+  spaceList: PropTypes.array,
+  notificationList: PropTypes.array
 }
 
 SidebarSpaceList.defaultProps = {
@@ -150,5 +150,6 @@ SidebarSpaceList.defaultProps = {
   onClickToggleSpaceList: () => { },
   onToggleFoldChildren: () => { },
   showSpaceList: true,
-  spaceList: []
+  spaceList: [],
+  notificationList: []
 }

@@ -597,9 +597,9 @@ export class Tracim extends React.Component {
       )
     }
 
-    // TODO - M.L - 2024-06-07 - Maybe pass new notificationList to Sidebar and NotificationWall
-    //  to prevent re-filtering lists further down (new notification list is the third return value) of the function
-    const { unreadNotificationCount, unreadMentionCount } = this.filterAndCountNotifications()
+    // TODO - M.L - 2024-06-07 - Maybe pass new notificationList to NotificationWall
+    //  to prevent re-filtering lists further down
+    const { unreadNotificationCount, unreadMentionCount, notificationList } = this.filterAndCountNotifications()
 
     return (
       <div className='tracim fullWidthFullHeight' dir={i18next.dir()}>
@@ -774,6 +774,7 @@ export class Tracim extends React.Component {
               <Sidebar
                 isNotificationWallOpen={state.isNotificationWallOpen}
                 onClickNotification={this.handleClickNotificationButton}
+                notificationList={notificationList}
                 unreadMentionCount={unreadMentionCount}
                 unreadNotificationCount={unreadNotificationCount}
                 isSpaceListLoaded={props.system.workspaceListLoaded}
