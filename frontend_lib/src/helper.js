@@ -994,3 +994,7 @@ export const getRevisionTypeLabel = (revisionType, t) => {
 
   return revisionType
 }
+
+export const buildUserConfigContentNotifyAllKey = contentId => `content.${contentId}.notify_all_members_message`
+export const buildUserConfigSpaceWebNotificationKey = spaceId => `space.${spaceId}.web_notification`
+export const buildUserConfigContentWebNotificationKey = contentId => `content.${contentId}.web_notification`
