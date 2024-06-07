@@ -18,6 +18,7 @@ import {
   getReservedUsernames,
   getUsernameAvailability
 } from './action.async.js'
+import { MENTION_CONSTANT } from './mentionOrLink'
 
 export const PAGE = {
   CONTENT: (idcts = ':idcts') => `/ui/contents/${idcts}`,
@@ -998,3 +999,18 @@ export const getRevisionTypeLabel = (revisionType, t) => {
 export const buildUserConfigContentNotifyAllKey = contentId => `content.${contentId}.notify_all_members_message`
 export const buildUserConfigSpaceWebNotificationKey = spaceId => `space.${spaceId}.web_notification`
 export const buildUserConfigContentWebNotificationKey = contentId => `content.${contentId}.web_notification`
+
+// FIXME - M.L - 2024-06-07 - Use of plain string 'mention.created' since importing TLM related constants
+//  breaks the imports (maybe circular imports ?)
+//  TODO Find a solution or explain why we kept it this way
+export const shouldKeepNotification = (notification, userConfig) => {
+  return (notification.type === 'mention.created' && notification.mention.type !== MENTION_CONSTANT.TYPE.ROLE) ||
+    !notification.workspace ||
+    userConfig[buildUserConfigSpaceWebNotificationKey(notification.workspace.id)] === undefined ||
+    userConfig[buildUserConfigSpaceWebNotificationKey(notification.workspace.id)] === true
+}
+
+export const filterNotificationListFromUserConfig = (notificationList, userConfig) => {
+  if (!userConfig) return notificationList
+  return notificationList.filter(notification => shouldKeepNotification(notification, userConfig))
+}

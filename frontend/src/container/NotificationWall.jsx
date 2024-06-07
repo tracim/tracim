@@ -37,7 +37,7 @@ import {
   getContentPath,
   handleFetchResult,
   sortListByMultipleCriteria,
-  buildUserConfigSpaceWebNotificationKey
+  filterNotificationListFromUserConfig
 } from 'tracim_frontend_lib'
 import { escape as escapeHtml, uniqBy } from 'lodash'
 import NotificationItem from '../component/NotificationItem.jsx'
@@ -235,15 +235,6 @@ const createNotificationListWithMergedFromFlatNotificationList = (notificationLi
   })
 
   return notificationList.filter(notification => !notification.toDelete)
-}
-
-const filterNotificationListFromUserConfig = (notificationList, userConfig) => {
-  if (!userConfig) return notificationList
-  return notificationList.filter(notification =>
-    !notification.workspace
-    || userConfig[buildUserConfigSpaceWebNotificationKey(notification.workspace.id)] === undefined
-    || userConfig[buildUserConfigSpaceWebNotificationKey(notification.workspace.id)] === true
-  )
 }
 
 const linkToParentContent = (notification) => {

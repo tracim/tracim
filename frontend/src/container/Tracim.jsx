@@ -42,7 +42,8 @@ import {
   TracimComponent,
   buildHeadTitle,
   formatAbsoluteDate,
-  serialize
+  serialize,
+  shouldKeepNotification
 } from 'tracim_frontend_lib'
 import {
   COOKIE_FRONTEND,
@@ -505,14 +506,32 @@ export class Tracim extends React.Component {
     }
   }
 
-  handleHeadTitleAndFavicon = (prevHeadTitleArgs, prevUnreadNotificationCount, prevUnreadMentionCount) => {
+  filterAndCountNotifications = () => {
     const { props } = this
 
+    let unreadNotificationCount = props.notificationPage.unreadNotificationCount
+    let unreadMentionCount = props.notificationPage.unreadMentionCount
+    const notificationList = props.notificationPage.list.filter(notification => {
+      const keep = shouldKeepNotification(notification, props.user.config)
+      if (!keep && !notification.read) {
+        if (notification.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}`) unreadMentionCount--
+        unreadNotificationCount--
+      }
+      return keep
+    })
+
+    return {unreadNotificationCount, unreadMentionCount, notificationList}
+  }
+
+  handleHeadTitleAndFavicon = (prevHeadTitleArgs, prevUnreadNotificationCount, prevUnreadMentionCount, prevUserConfig) => {
+    const { props } = this
+
+    // TODO - M.L - 2024-06-07 - Maybe use results as a state so that it is not necessary to sort twice
+    const {unreadNotificationCount, unreadMentionCount} = this.filterAndCountNotifications()
+    const prevUserConfigHasChanged = !isEqual(prevUserConfig, props.user.config)
     const hasHeadTitleChanged = !isEqual(prevHeadTitleArgs, props.system.titleArgs)
-    const unreadMentionCount = props.notificationPage.unreadMentionCount
-    const hasUnreadMentionCountChanged = unreadMentionCount !== prevUnreadMentionCount
-    const unreadNotificationCount = props.notificationPage.unreadNotificationCount
-    const hasUnreadNotificationCountChanged = unreadNotificationCount !== prevUnreadNotificationCount
+    const hasUnreadMentionCountChanged = unreadMentionCount !== prevUnreadMentionCount || prevUserConfigHasChanged
+    const hasUnreadNotificationCountChanged = unreadNotificationCount !== prevUnreadNotificationCount || prevUserConfigHasChanged
 
     if ((hasHeadTitleChanged || hasUnreadMentionCountChanged) && props.system.titleArgs.length > 0) {
       let newHeadTitle = buildHeadTitle(props.system.titleArgs)
@@ -577,6 +596,10 @@ export class Tracim extends React.Component {
         </div>
       )
     }
+
+    // TODO - M.L - 2024-06-07 - Maybe pass new notificationList to Sidebar and NotificationWall
+    //  to prevent re-filtering lists further down
+    const {unreadNotificationCount, unreadMentionCount, notificationList} = this.filterAndCountNotifications()
 
     return (
       <div className='tracim fullWidthFullHeight' dir={i18next.dir()}>
@@ -751,8 +774,8 @@ export class Tracim extends React.Component {
               <Sidebar
                 isNotificationWallOpen={state.isNotificationWallOpen}
                 onClickNotification={this.handleClickNotificationButton}
-                unreadMentionCount={props.notificationPage.unreadMentionCount}
-                unreadNotificationCount={props.notificationPage.unreadNotificationCount}
+                unreadMentionCount={unreadMentionCount}
+                unreadNotificationCount={unreadNotificationCount}
                 isSpaceListLoaded={props.system.workspaceListLoaded}
               />
             )}

@@ -19,6 +19,8 @@ import SidebarSpaceItem from './SidebarSpaceItem.jsx'
 
 const SidebarSpaceList = (props) => {
   const displaySpace = (spaceLevel, spaceList) => {
+    // FIXME - M.L - 2024-06-07 - Notification are not sorted here
+    //  should we connect to the notificationPage reducer here instead of in each SidebarSpaceItem?
     return spaceList.map(space =>
       <React.Fragment key={space.id}>
         <SidebarSpaceItem
