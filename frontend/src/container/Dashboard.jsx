@@ -422,7 +422,7 @@ export class Dashboard extends React.Component {
     const userConfig = { ...props.user.config }
     const currentStatus = userConfig[`space.${props.currentWorkspace.id}.web_notification`]
     userConfig[`space.${props.currentWorkspace.id}.web_notification`] = currentStatus === undefined
-      ? true
+      ? false
       : !currentStatus
 
     try {

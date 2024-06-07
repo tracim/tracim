@@ -123,7 +123,7 @@ export const UserSpacesConfig = (props) => {
     const userConfig = { ...props.user.config }
     const currentStatus = userConfig[`space.${spaceId}.web_notification`]
     userConfig[`space.${spaceId}.web_notification`] = currentStatus === undefined
-      ? true
+      ? false
       : !currentStatus
 
     try {
