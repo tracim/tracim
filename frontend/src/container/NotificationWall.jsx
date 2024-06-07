@@ -36,7 +36,8 @@ import {
   TracimComponent,
   getContentPath,
   handleFetchResult,
-  sortListByMultipleCriteria
+  sortListByMultipleCriteria,
+  buildUserConfigSpaceWebNotificationKey
 } from 'tracim_frontend_lib'
 import { escape as escapeHtml, uniqBy } from 'lodash'
 import NotificationItem from '../component/NotificationItem.jsx'
@@ -240,8 +241,8 @@ const filterNotificationListFromUserConfig = (notificationList, userConfig) => {
   if (!userConfig) return notificationList
   return notificationList.filter(notification =>
     !notification.workspace
-    || userConfig[`space.${notification.workspace.id}.web_notification`] === undefined
-    || userConfig[`space.${notification.workspace.id}.web_notification`] === true
+    || userConfig[buildUserConfigSpaceWebNotificationKey(notification.workspace.id)] === undefined
+    || userConfig[buildUserConfigSpaceWebNotificationKey(notification.workspace.id)] === true
   )
 }
 

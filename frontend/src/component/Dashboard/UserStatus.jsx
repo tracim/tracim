@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom'
 import {
   Icon,
   PAGE,
-  ROLE_LIST
+  ROLE_LIST,
+  buildUserConfigSpaceWebNotificationKey
 } from 'tracim_frontend_lib'
 import EmailNotificationTypeButton from '../EmailNotificationTypeButton/EmailNotificationTypeButton.jsx'
 import WebNotificationWorkspaceSelector from '../WebNotificationSpaceSelector/WebNotificationSpaceSelector.jsx'
@@ -54,7 +55,7 @@ export const UserStatus = props => {
       )}
 
       <WebNotificationWorkspaceSelector
-        value={props.user.config[`space.${props.currentWorkspace.id}.web_notification`]}
+        value={props.user.config[buildUserConfigSpaceWebNotificationKey(props.currentWorkspace.id)]}
         onChange={props.onClickChangeWebNotification}
       />
 

@@ -24,7 +24,8 @@ import {
   removeAtInUsername,
   addExternalLinksIcons,
   getSpaceUserRoleList,
-  putUserConfiguration
+  putUserConfiguration,
+  buildUserConfigSpaceWebNotificationKey
 } from 'tracim_frontend_lib'
 import {
   getSubscriptions,
@@ -420,8 +421,8 @@ export class Dashboard extends React.Component {
     const { props } = this
 
     const userConfig = { ...props.user.config }
-    const currentStatus = userConfig[`space.${props.currentWorkspace.id}.web_notification`]
-    userConfig[`space.${props.currentWorkspace.id}.web_notification`] = currentStatus === undefined
+    const currentStatus = userConfig[buildUserConfigSpaceWebNotificationKey(props.currentWorkspace.id)]
+    userConfig[buildUserConfigSpaceWebNotificationKey(props.currentWorkspace.id)] = currentStatus === undefined
       ? false
       : !currentStatus
 

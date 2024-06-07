@@ -23,7 +23,8 @@ import {
   sortListByMultipleCriteria,
   stringIncludes,
   putUserConfiguration,
-  serialize
+  serialize,
+  buildUserConfigSpaceWebNotificationKey
 } from 'tracim_frontend_lib'
 import { serializeUserConfig, serializeUserWorkspaceConfig, serializeWorkspaceListProps } from '../../reducer/workspaceList.js'
 import { newFlashMessage } from '../../action-creator.sync.js'
@@ -89,7 +90,7 @@ export const UserSpacesConfig = (props) => {
           onChangeEmailNotificationType={
             emailNotificationType => props.onChangeEmailNotificationType(space.id, emailNotificationType)
           }
-          WebNotificationEnabled={!props.admin && props.user.config[`space.${space.id}.web_notification`]}
+          WebNotificationEnabled={!props.admin && props.user.config[buildUserConfigSpaceWebNotificationKey(space.id)]}
           onChangeWebNotification={handleChangeWebNotification}
           onLeaveSpace={handleLeaveSpace}
           admin={props.admin}
@@ -121,8 +122,8 @@ export const UserSpacesConfig = (props) => {
 
   const handleChangeWebNotification = async (spaceId) => {
     const userConfig = { ...props.user.config }
-    const currentStatus = userConfig[`space.${spaceId}.web_notification`]
-    userConfig[`space.${spaceId}.web_notification`] = currentStatus === undefined
+    const currentStatus = userConfig[buildUserConfigSpaceWebNotificationKey(spaceId)]
+    userConfig[buildUserConfigSpaceWebNotificationKey(spaceId)] = currentStatus === undefined
       ? false
       : !currentStatus
 
