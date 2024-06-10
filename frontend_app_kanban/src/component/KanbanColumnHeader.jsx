@@ -29,6 +29,7 @@ function KanbanColumnHeader (props) {
           {props.column.title}
         </strong>
       </div>
+      <span className='kanban__contentpage__wrapper__board__column__card__number'>{props.column.cards.length}</span>
 
       <IconButton
         dataCy='kanban_addCard'
