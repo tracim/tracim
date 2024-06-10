@@ -299,7 +299,7 @@ preview_cache_dir = %(basic_setup.preview_cache_dir)s
 ## All item should be separated by a coma.
 ; preview.skiplist=
 # examples with multiples values:
-# ; preview.skiplist= .ifc, .iges
+# preview.skiplist= .ifc, .iges
 
 ### Session ###
 
