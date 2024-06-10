@@ -48,5 +48,9 @@
   "Open field:": "",
   "Permanently delete": "",
   "Yes, delete permanently": "",
-  "Warning: this operation cannot be rolled back": ""
+  "Warning: this operation cannot be rolled back": "",
+  "0 card": "",
+  "{{numberCard}} card": "",
+  "{{count}} cards": "",
+  "{{count}} cards_plural": ""
 }

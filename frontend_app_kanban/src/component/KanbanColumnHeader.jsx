@@ -11,6 +11,12 @@ import {
 function KanbanColumnHeader (props) {
   const [showConfirmPopup, setShowConfirmPopup] = useState(false)
 
+  const numberCard = (numberCard) => {
+    if (numberCard === 0) return props.t('0 card')
+    if (numberCard === 1) return props.t('{{numberCard}} card', { numberCard: numberCard })
+    else return props.t('{{count}} cards', { count: numberCard })
+  }
+
   return (
     <div
       className={classnames('kanban__contentpage__wrapper__board__column', {
@@ -29,7 +35,7 @@ function KanbanColumnHeader (props) {
           {props.column.title}
         </strong>
       </div>
-      <span className='kanban__contentpage__wrapper__board__column__card__number'>{props.column.cards.length}</span>
+      <span className='kanban__contentpage__wrapper__board__column__card__number' title={numberCard(props.column.cards.length)}>{props.column.cards.length}</span>
 
       <IconButton
         dataCy='kanban_addCard'
