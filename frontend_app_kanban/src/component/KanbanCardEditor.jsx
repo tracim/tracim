@@ -54,13 +54,13 @@ function KanbanCardEditor (props) {
             // End of required props ///////////////////////////////////////////////////////////////
             codeLanguageList={props.codeLanguageList}
             content={description}
-            height={200}
+            height={300}
             isAdvancedEdition
             isMentionEnabled={false}
             language={props.language}
-            maxHeight={300}
+            maxHeight={400}
             userList={props.memberList}
-            minHeight={200}
+            minHeight={300}
             placeholder={props.t('Description of the card')}
           />
         </div>
