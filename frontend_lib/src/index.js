@@ -121,7 +121,10 @@ import {
   isFileUploadInErrorState
 } from './fileUpload.js'
 
-import { buildAppCustomActionLinkList } from './appCustomAction.js'
+import {
+  APP_CUSTOM_ACTION_LOCATION_OBJECT,
+  buildAppCustomActionLinkList
+} from './appCustomAction.js'
 
 import { defaultDebug } from './debug.js'
 
@@ -337,6 +340,7 @@ export {
   IMG_LOAD_STATE,
   LIVE_MESSAGE_ERROR_CODE,
   LIVE_MESSAGE_STATUS,
+  APP_CUSTOM_ACTION_LOCATION_OBJECT,
   MAXIMUM_CHARACTERS_USERNAME,
   MENTION_CONSTANT,
   MINIMUM_CHARACTERS_USERNAME,

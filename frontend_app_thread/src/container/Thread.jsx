@@ -2,6 +2,7 @@ import React from 'react'
 import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
 import {
+  APP_CUSTOM_ACTION_LOCATION_OBJECT,
   appContentFactory,
   addAllResourceI18n,
   BREADCRUMBS_TYPE,
@@ -456,6 +457,7 @@ export class Thread extends React.Component {
           ]}
           customActionList={buildAppCustomActionLinkList(
             state.config.appCustomActionList,
+            APP_CUSTOM_ACTION_LOCATION_OBJECT.CONTENT_APP_DROPDOWN,
             state.content,
             state.loggedUser,
             CONTENT_TYPE.THREAD,

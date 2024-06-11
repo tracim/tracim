@@ -10,6 +10,7 @@ import {
 } from '../../util/helper.js'
 import BtnExtendedAction from './BtnExtendedAction.jsx'
 import {
+  APP_CUSTOM_ACTION_LOCATION_OBJECT,
   ROLE,
   buildAppCustomActionLinkList,
   ComposedIcon,
@@ -40,6 +41,7 @@ class ContentItem extends React.Component {
     const appCustomActionList = props.system.config?.app_custom_actions
       ? buildAppCustomActionLinkList(
         props.system.config.app_custom_actions,
+        APP_CUSTOM_ACTION_LOCATION_OBJECT.CONTENT_IN_LIST_DROPDOWN,
         props.content,
         userWithRoleIdInWorkspace,
         props.content.type,
