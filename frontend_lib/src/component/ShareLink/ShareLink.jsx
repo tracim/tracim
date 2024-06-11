@@ -2,7 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
 import ComposedIcon from '../Icon/ComposedIcon.jsx'
-import { ROLE } from '../../helper.js'
+import { ROLE } from '../../helperConstants.js'
 
 // INFO - CH - 2019-09-16 - READ ME:
 // For this component to behave properly regarding responsive and text-overflow ellispsis, the parent of this component

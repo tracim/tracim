@@ -6,7 +6,7 @@ import SelectStatus from '../Input/SelectStatus/SelectStatus.jsx'
 import {
   APP_FEATURE_MODE,
   ROLE
-} from '../../helper.js'
+} from '../../helperConstants.js'
 import TranslateButton from '../Button/TranslateButton.jsx'
 import PopinFixedHeader from './PopinFixedHeader.jsx'
 import { TRANSLATION_STATE } from '../../translation.js'

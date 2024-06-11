@@ -8,7 +8,7 @@ import {
   buildUserConfigSpaceWebNotificationKey
 } from 'tracim_frontend_lib'
 import EmailNotificationTypeButton from '../EmailNotificationTypeButton/EmailNotificationTypeButton.jsx'
-import WebNotificationWorkspaceSelector from '../WebNotificationSpaceSelector/WebNotificationSpaceSelector.jsx'
+import WebNotificationWorkspaceSelector from './WebNotificationSpaceSelector.jsx'
 import { EMAIL_NOTIFICATION_TYPE } from '../../util/helper.js'
 
 require('./UserStatus.styl')
@@ -96,7 +96,7 @@ UserStatus.propTypes = {
   displayNotifBtn: PropTypes.bool,
   displaySubscriptionRequestsInformation: PropTypes.bool,
   newSubscriptionRequestsNumber: PropTypes.number,
-  WebNotificationEnabled: PropTypes.bool,
+  webNotificationEnabled: PropTypes.bool,
   onClickChangeEmailNotificationType: PropTypes.func,
   onClickChangeWebNotification: PropTypes.func,
   t: PropTypes.func

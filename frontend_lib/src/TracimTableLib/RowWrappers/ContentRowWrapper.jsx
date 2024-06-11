@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 
-import { PAGE } from '../../helper.js'
+import { PAGE } from '../../helperConstants.js'
 import ListItemWrapper from '../../component/Lists/ListItemWrapper/ListItemWrapper.jsx'
 
 const ContentRowWrapper = (props) => {

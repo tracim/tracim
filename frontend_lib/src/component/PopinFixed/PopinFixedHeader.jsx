@@ -7,7 +7,7 @@ import {
   BREADCRUMBS_TYPE,
   PAGE,
   ROLE
-} from '../../helper.js'
+} from '../../helperConstants.js'
 import Breadcrumbs from '../Breadcrumbs/Breadcrumbs.jsx'
 import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
 import DropdownMenuItemAppCustomAction from '../DropdownMenu/DropdownMenuItemAppCustomAction.jsx'

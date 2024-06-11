@@ -1,4 +1,4 @@
-import { CONTENT_TYPE } from './helper.js'
+import { CONTENT_TYPE } from './helperConstants.js'
 
 // TLM Event Type list
 const USER = 'user'

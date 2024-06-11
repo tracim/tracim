@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import EmojiReactionButton from './EmojiReactionButton.jsx'
 import EmojiPickerButton from './EmojiPickerButton.jsx'
 import { isBefore, compareAsc, parseISO } from 'date-fns'
-import { ROLE } from '../../helper.js'
+import { ROLE } from '../../helperConstants.js'
 
 function groupReactionsByValue (reactionList) {
   const reactionListsByValueObject = {}

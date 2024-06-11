@@ -2,7 +2,7 @@ import React from 'react'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
-import { revisionTypeList } from '../../helper.js'
+import { revisionTypeList } from '../../helperConstants.js'
 import PropTypes from 'prop-types'
 
 // require('./Revision.styl') // see https://github.com/tracim/tracim/issues/1156

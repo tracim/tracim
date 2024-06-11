@@ -8,13 +8,17 @@ import { translate } from 'react-i18next'
 import Comment from './Comment.jsx'
 import Revision from './Revision.jsx'
 import {
-  PAGE,
-  ROLE,
-  TIMELINE_TYPE,
   darkenColor,
   displayDistanceDate,
   formatAbsoluteDate
 } from '../../helper.js'
+
+import {
+  PAGE,
+  ROLE,
+  TIMELINE_TYPE
+} from '../../helperConstants.js'
+
 import {
   replaceHTMLElementWithMention
 } from '../../mentionOrLink.js'

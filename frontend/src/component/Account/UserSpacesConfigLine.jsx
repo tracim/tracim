@@ -45,7 +45,7 @@ class UserSpacesConfigLine extends React.Component {
               <BtnSwitch
                 smallSize
                 onChange={() => props.onChangeWebNotification(props.space.id)}
-                checked={props.WebNotificationEnabled}
+                checked={props.webNotificationEnabled}
                 activeLabel={props.t('Enabled')}
                 inactiveLabel={props.t('Disabled')}
               />
@@ -82,14 +82,20 @@ UserSpacesConfigLine.propTypes = {
   system: PropTypes.object,
   onlyManager: PropTypes.bool,
   admin: PropTypes.bool,
-  WebNotificationEnabled: PropTypes.bool,
+  webNotificationEnabled: PropTypes.bool,
   onLeaveSpace: PropTypes.func,
   onChangeEmailNotificationType: PropTypes.func,
   onChangeWebNotification: PropTypes.func.isRequired
 }
 
 UserSpacesConfigLine.defaultProps = {
-  WebNotificationEnabled: true
+  space: {},
+  system: {},
+  onlyManager: false,
+  admin: false,
+  webNotificationEnabled: true,
+  onLeaveSpace: () => {},
+  onChangeEmailNotificationType: () => {}
 }
 
 export default translate()(UserSpacesConfigLine)

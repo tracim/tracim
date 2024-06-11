@@ -1,8 +1,10 @@
+import { stripEmojis } from './helper.js'
+
 import {
   CONTENT_TYPE,
-  STATUSES,
-  stripEmojis
-} from './helper.js'
+  STATUSES
+} from './helperConstants.js'
+
 import { isAfter } from 'date-fns'
 
 export const SORT_BY = {

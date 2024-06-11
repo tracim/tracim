@@ -5,17 +5,20 @@ import { uniqBy } from 'lodash'
 
 import {
   handleFetchResult,
-  APP_FEATURE_MODE,
-  NUMBER_RESULTS_BY_PAGE,
   displayDistanceDate,
   sendGlobalFlashMessage,
-  TIMELINE_TYPE,
-  CONTENT_TYPE,
   permissiveNumberEqual,
   getOrCreateSessionClientToken,
   addRevisionFromTLM,
   stringIncludes
 } from './helper.js'
+
+import {
+  APP_FEATURE_MODE,
+  NUMBER_RESULTS_BY_PAGE,
+  TIMELINE_TYPE,
+  CONTENT_TYPE
+} from './helperConstants.js'
 
 import {
   SORT_BY,

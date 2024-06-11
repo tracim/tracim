@@ -17,12 +17,15 @@ import {
   serialize,
   addRevisionFromTLM,
   checkUsernameValidity,
-  MINIMUM_CHARACTERS_USERNAME,
-  MAXIMUM_CHARACTERS_USERNAME,
   permissiveNumberEqual,
   updateTLMUser,
   stringIncludes
 } from '../src/helper.js'
+
+import {
+  MINIMUM_CHARACTERS_USERNAME,
+  MAXIMUM_CHARACTERS_USERNAME
+} from '../src/helperConstants.js'
 
 import {
   mockGetReservedUsernames200,

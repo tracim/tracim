@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { CONTENT_TYPE } from '../src/helper.js'
+import { CONTENT_TYPE } from '../src/helperConstants.js'
 import { buildAppCustomActionLinkList } from '../src/appCustomAction.js'
 
 describe('buildAppCustomActionLinkList()', () => {

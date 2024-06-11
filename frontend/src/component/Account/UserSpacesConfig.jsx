@@ -31,7 +31,7 @@ import { newFlashMessage } from '../../action-creator.sync.js'
 import { deleteUserRole, getUserWorkspaceConfigList } from '../../action-creator.async.js'
 import AdminUserSpacesConfig from '../../container/AdminUserSpacesConfig.jsx'
 import UserSpacesConfigLine from './UserSpacesConfigLine.jsx'
-import { FETCH_CONFIG } from '../../util/helper'
+import { FETCH_CONFIG } from '../../util/helper.js'
 
 export const onlyManager = (userToEditId, member, memberList) => {
   const manager = ROLE.workspaceManager.slug
@@ -90,7 +90,7 @@ export const UserSpacesConfig = (props) => {
           onChangeEmailNotificationType={
             emailNotificationType => props.onChangeEmailNotificationType(space.id, emailNotificationType)
           }
-          WebNotificationEnabled={!props.admin && props.user.config[buildUserConfigSpaceWebNotificationKey(space.id)]}
+          webNotificationEnabled={!props.admin && props.user.config[buildUserConfigSpaceWebNotificationKey(space.id)]}
           onChangeWebNotification={handleChangeWebNotification}
           onLeaveSpace={handleLeaveSpace}
           admin={props.admin}
@@ -100,7 +100,7 @@ export const UserSpacesConfig = (props) => {
       )
     })
     setEntries(entryList)
-  }, [spaceList, sortOrder, selectedSortCriterion, userFilter, props.user])
+  }, [spaceList, sortOrder, selectedSortCriterion, userFilter, props.user.config])
 
   const filterSpaceList = (list) => {
     if (userFilter === '') return list
@@ -122,10 +122,10 @@ export const UserSpacesConfig = (props) => {
 
   const handleChangeWebNotification = async (spaceId) => {
     const userConfig = { ...props.user.config }
-    const currentStatus = userConfig[buildUserConfigSpaceWebNotificationKey(spaceId)]
-    userConfig[buildUserConfigSpaceWebNotificationKey(spaceId)] = currentStatus === undefined
+    const isSubscribed = userConfig[buildUserConfigSpaceWebNotificationKey(spaceId)]
+    userConfig[buildUserConfigSpaceWebNotificationKey(spaceId)] = isSubscribed === undefined
       ? false
-      : !currentStatus
+      : !isSubscribed
 
     try {
       await putUserConfiguration(
@@ -288,7 +288,7 @@ export const UserSpacesConfig = (props) => {
                         />
                       </th>
                       {props.system.config.email_notification_activated && <th>{props.t('Email notifications')}</th>}
-                      <th>{props.t('Web notifications')}</th>
+                      {!props.admin && <th>{props.t('Web notifications')}</th>}
                       <th />
                     </tr>
                   </thead>

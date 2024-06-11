@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Dropzone from 'react-dropzone' // INFO - GB- 2019-07-31 - react-dropzone is in an older version because of a persistent problem with Hooks
 import { translate } from 'react-i18next'
-import { FILE_PREVIEW_STATE } from '../../helper.js'
+import { FILE_PREVIEW_STATE } from '../../helperConstants.js'
 
 export const FileDropzone = props => {
   const isPreviewObjectUrl = props.preview.startsWith('blob:')

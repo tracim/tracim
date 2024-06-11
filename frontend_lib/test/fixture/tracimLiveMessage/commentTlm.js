@@ -1,5 +1,5 @@
 import { author } from '../author.js'
-import { CONTENT_TYPE } from '../../../src/helper.js'
+import { CONTENT_TYPE } from '../../../src/helperConstants.js'
 
 export const commentTlm = {
   author,

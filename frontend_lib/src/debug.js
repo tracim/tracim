@@ -1,9 +1,10 @@
+import { FETCH_CONFIG } from './helper.js'
+
 import {
-  FETCH_CONFIG,
   ROLE,
   ROLE_LIST,
   PROFILE
-} from './helper.js'
+} from './helperConstants.js'
 
 const STATUSES = [{
   label: 'Opened',

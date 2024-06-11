@@ -279,7 +279,7 @@ export const NotificationWall = props => {
 
     setIsFolderPathLoading(false)
     setNotificationList(newNotificationList)
-  }, [props.notificationPage.list, props.user])
+  }, [props.notificationPage.list, props.user.config])
 
   useEffect(() => {
     const notificationListHeight = notificationList.length * NOTIFICATION_ITEM_HEIGHT

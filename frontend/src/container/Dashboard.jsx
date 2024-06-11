@@ -421,10 +421,10 @@ export class Dashboard extends React.Component {
     const { props } = this
 
     const userConfig = { ...props.user.config }
-    const currentStatus = userConfig[buildUserConfigSpaceWebNotificationKey(props.currentWorkspace.id)]
-    userConfig[buildUserConfigSpaceWebNotificationKey(props.currentWorkspace.id)] = currentStatus === undefined
+    const isSubscribed = userConfig[buildUserConfigSpaceWebNotificationKey(props.currentWorkspace.id)]
+    userConfig[buildUserConfigSpaceWebNotificationKey(props.currentWorkspace.id)] = isSubscribed === undefined
       ? false
-      : !currentStatus
+      : !isSubscribed
 
     try {
       await putUserConfiguration(

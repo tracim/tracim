@@ -512,12 +512,12 @@ export class Tracim extends React.Component {
     let unreadNotificationCount = props.notificationPage.unreadNotificationCount
     let unreadMentionCount = props.notificationPage.unreadMentionCount
     const notificationList = props.notificationPage.list.filter(notification => {
-      const keep = shouldKeepNotification(notification, props.user.config)
-      if (!keep && !notification.read) {
+      const shouldKeep = shouldKeepNotification(notification, props.user.config)
+      if (!shouldKeep && !notification.read) {
         if (notification.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}`) unreadMentionCount--
         unreadNotificationCount--
       }
-      return keep
+      return shouldKeep
     })
 
     return { unreadNotificationCount, unreadMentionCount, notificationList }

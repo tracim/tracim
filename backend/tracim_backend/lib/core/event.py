@@ -1202,14 +1202,9 @@ def _get_user_config_event_receiver_ids(
 ) -> Set[int]:
     """
     User configs are readable by
-    - subscription author
-    - administrators
-    - workspace manager of the workspace the subscription took place
+    - subscription user
     """
-    user_api = UserApi(current_user=None, session=session, config=config)
-    administrators = user_api.get_user_ids_from_profile(Profile.ADMIN)
-    user = event.fields["user"]["user_id"]
-    return set(administrators + [user])
+    return {event.fields["user"]["user_id"]}
 
 
 GetReceiverIdsCallable = Callable[[Event, TracimSession, CFG], Iterable[int]]

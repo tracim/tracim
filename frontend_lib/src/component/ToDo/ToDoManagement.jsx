@@ -14,7 +14,7 @@ import ToDoItem, {
   isEditable
 } from './ToDoItem.jsx'
 import NewToDo from './NewToDo.jsx'
-import { CONTENT_TYPE, ROLE } from '../../helper.js'
+import { CONTENT_TYPE, ROLE } from '../../helperConstants.js'
 import CreateToDoFromTextPopUp from './CreateToDoFromTextPopUp.jsx'
 
 // INFO - MP - 2022-07-18 - Transform a list of a to do in text form to a list of to do

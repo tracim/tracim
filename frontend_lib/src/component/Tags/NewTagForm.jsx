@@ -8,11 +8,13 @@ import {
 } from '../../action.async.js'
 import {
   handleFetchResult,
-  NUMBER_RESULTS_BY_PAGE,
-  PROFILE,
-  ROLE,
   sendGlobalFlashMessage
 } from '../../helper.js'
+import {
+  NUMBER_RESULTS_BY_PAGE,
+  PROFILE,
+  ROLE
+} from '../../helperConstants.js'
 import IconButton from '../Button/IconButton.jsx'
 import { isMobile } from 'react-device-detect'
 import onClickOutside from 'react-onclickoutside'

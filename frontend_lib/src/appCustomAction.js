@@ -1,7 +1,7 @@
 import {
   CONTENT_TYPE,
   ROLE_LIST
-} from './helper.js'
+} from './helperConstants.js'
 
 // INFO - 2024-05-20 - Improvement idea:
 // param appContentType might not be mandatory and be deduced from content.content_type

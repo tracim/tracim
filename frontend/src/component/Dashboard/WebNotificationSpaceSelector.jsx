@@ -4,7 +4,7 @@ import {
   Popover,
   BtnSwitch
 } from 'tracim_frontend_lib'
-import { translate, Trans } from 'react-i18next'
+import { translate } from 'react-i18next'
 
 const WebNotificationSpaceSelector = props => {
   const handleChange = () => {
@@ -46,15 +46,13 @@ const WebNotificationSpaceSelector = props => {
                 {props.t('Web notifications')}
               </div>
               <div className='PopoverHelperBody__section__description'>
-                <Trans>
-                  Enable/Disable web notifications for this workspace.<br />
-
-                  When disabled, notifications from this workspace will be hidden from your
-                  notification wall.<br />
-                  <div className='PopoverHelperBody__section__description__details'>
-                    This parameter affects all web notifications except individual mentions.
-                  </div>
-                </Trans>
+                {props.t('Enable/Disable web notifications for this workspace.')}
+                <br />
+                {props.t('When disabled, notifications from this workspace will be hidden from your notification wall.')}
+                <br />
+                <div className='PopoverHelperBody__section__description__details'>
+                  {props.t('This parameter affects all web notifications except individual mentions.')}
+                </div>
               </div>
             </div>
           </div>
