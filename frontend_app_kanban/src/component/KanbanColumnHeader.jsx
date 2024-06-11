@@ -35,7 +35,7 @@ function KanbanColumnHeader (props) {
           {props.column.title}
         </strong>
       </div>
-      <span className='kanban__contentpage__wrapper__board__column__card__number' title={numberCard(props.column.cards.length)}>{props.column.cards.length}</span>
+      <span className='kanban__contentpage__wrapper__board__column__cardNumber' title={numberCard(props.column.cards.length)}>{props.column.cards.length}</span>
 
       <IconButton
         dataCy='kanban_addCard'
