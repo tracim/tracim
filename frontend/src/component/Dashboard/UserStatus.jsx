@@ -55,7 +55,7 @@ export const UserStatus = props => {
       )}
 
       <WebNotificationWorkspaceSelector
-        value={props.user.config[buildUserConfigSpaceWebNotificationKey(props.currentWorkspace.id)]}
+        value={props.user.config && props.user.config[buildUserConfigSpaceWebNotificationKey(props.currentWorkspace.id)]}
         onChange={props.onClickChangeWebNotification}
       />
 
