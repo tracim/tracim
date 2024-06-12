@@ -635,8 +635,8 @@ export const shouldKeepNotification = (notification, userConfig) => {
   const isIndividualMention = notification.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}` &&
     notification.mention.type !== MENTION_CONSTANT.TYPE.ROLE
   const notificationHasNoWorkspace = !notification.workspace
-  const isSubscriptionUndefined = userConfig[buildUserConfigSpaceWebNotificationKey(notification.workspace.id)] === undefined
-  const isSubscribed = userConfig[buildUserConfigSpaceWebNotificationKey(notification.workspace.id)] === true
+  const isSubscriptionUndefined = userConfig[buildUserConfigSpaceWebNotificationKey(notification.workspace?.id)] === undefined
+  const isSubscribed = userConfig[buildUserConfigSpaceWebNotificationKey(notification.workspace?.id)] === true
 
   return (
     isIndividualMention ||
