@@ -533,7 +533,7 @@ export class Tracim extends React.Component {
     const hasUnreadMentionCountChanged = unreadMentionCount !== prevUnreadMentionCount || prevUserConfigHasChanged
     const hasUnreadNotificationCountChanged = unreadNotificationCount !== prevUnreadNotificationCount || prevUserConfigHasChanged
 
-    if ((hasHeadTitleChanged || hasUnreadMentionCountChanged) && props.system.titleArgs.length > 0) {
+    if ((hasHeadTitleChanged || hasUnreadMentionCountChanged) && props.system.titleArgs?.length > 0) {
       let newHeadTitle = buildHeadTitle(props.system.titleArgs)
       if (unreadMentionCount > 0) {
         newHeadTitle = `(${unreadMentionCount > 99 ? '99+' : unreadMentionCount}) ${newHeadTitle}`
