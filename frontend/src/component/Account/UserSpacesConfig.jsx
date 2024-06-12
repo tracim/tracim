@@ -100,7 +100,7 @@ export const UserSpacesConfig = (props) => {
       )
     })
     setEntries(entryList)
-  }, [spaceList, sortOrder, selectedSortCriterion, userFilter, props.user.config])
+  }, [spaceList, sortOrder, selectedSortCriterion, userFilter, props.user?.config])
 
   const filterSpaceList = (list) => {
     if (userFilter === '') return list
