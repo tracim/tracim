@@ -25,9 +25,10 @@ old_entity_type_enum_values = (
     "CONTENT_TAG",
     "USER_CALL",
 )
+user_config = "USER_CONFIG"
 
 old_entity_type_enum = sa.Enum(*old_entity_type_enum_values, name=enum_name)
-new_entity_type_enum = sa.Enum(*(old_entity_type_enum_values + ("USER_CONFIG",)), name=enum_name)
+new_entity_type_enum = sa.Enum(*(old_entity_type_enum_values + (user_config,)), name=enum_name)
 
 
 def upgrade():
@@ -40,6 +41,7 @@ def upgrade():
 
 
 def downgrade():
+    op.execute('DELETE FROM events WHERE entity_type = "%s"' % user_config)
     op.replace_enum(
         table_name="events",
         column_name="entity_type",
