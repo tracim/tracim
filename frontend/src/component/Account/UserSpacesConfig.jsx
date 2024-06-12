@@ -90,7 +90,7 @@ export const UserSpacesConfig = (props) => {
           onChangeEmailNotificationType={
             emailNotificationType => props.onChangeEmailNotificationType(space.id, emailNotificationType)
           }
-          webNotificationEnabled={!props.admin && props.user.config[buildUserConfigSpaceWebNotificationKey(space.id)]}
+          webNotificationEnabled={!props.admin && props.user?.config[buildUserConfigSpaceWebNotificationKey(space.id)]}
           onChangeWebNotification={handleChangeWebNotification}
           onLeaveSpace={handleLeaveSpace}
           admin={props.admin}
