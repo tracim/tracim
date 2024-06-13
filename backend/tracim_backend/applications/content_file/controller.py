@@ -314,6 +314,8 @@ class FileController(Controller):
             config=app_config,
         )
         content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        if content.file_extension in app_config.PREVIEW__SKIPLIST:
+            raise UnavailablePreview("Preview isn't available for this file extension")
         default_filename = "{label}_page_{page_number}.pdf".format(
             label=content.label, page_number=hapic_data.query.page
         )
@@ -348,6 +350,8 @@ class FileController(Controller):
             config=app_config,
         )
         content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        if content.file_extension in app_config.PREVIEW__SKIPLIST:
+            raise UnavailablePreview("Preview isn't available for this file extension")
         default_filename = "{label}.pdf".format(label=content.label)
         return api.get_full_pdf_preview(
             revision=content.revision,
@@ -379,6 +383,8 @@ class FileController(Controller):
             config=app_config,
         )
         content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        if content.file_extension in app_config.PREVIEW__SKIPLIST:
+            raise UnavailablePreview("Preview isn't available for this file extension")
         revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
         default_filename = "{label}_r{revision_id}.pdf".format(
             revision_id=revision.revision_id, label=revision.label
@@ -413,6 +419,8 @@ class FileController(Controller):
             config=app_config,
         )
         content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        if content.file_extension in app_config.PREVIEW__SKIPLIST:
+            raise UnavailablePreview("Preview isn't available for this file extension")
         revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
         default_filename = "{label}_page_{page_number}.pdf".format(
             label=content.label, page_number=hapic_data.query.page
