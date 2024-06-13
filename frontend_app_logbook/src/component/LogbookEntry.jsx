@@ -30,7 +30,7 @@ const LogbookEntry = (props) => {
     )
   }, [props.entry.description])
 
-  const hancleClickSeeDescriptionButton = () => {
+  const handleClickSeeDescriptionButton = () => {
     setShowDescriptionPreview(showSeeDescriptionButton !== DESCRIPTION_BUTTON.SEE_MORE)
     setShowSeeDescriptionButton(showSeeDescriptionButton === DESCRIPTION_BUTTON.SEE_MORE
       ? DESCRIPTION_BUTTON.SEE_LESS
@@ -95,7 +95,7 @@ const LogbookEntry = (props) => {
             dataCy='logbook_descriptionOverflow'
             intent='link'
             mode='light'
-            onClick={hancleClickSeeDescriptionButton}
+            onClick={handleClickSeeDescriptionButton}
             text={showSeeDescriptionButton === DESCRIPTION_BUTTON.SEE_MORE
               ? props.t('See more')
               : props.t('See less')}
