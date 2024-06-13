@@ -30,9 +30,9 @@ function KanbanCard (props) {
       ? DESCRIPTION_BUTTON.SEE_MORE
       : DESCRIPTION_BUTTON.HIDDEN
     )
-  }, [])
+  }, [props.card.description])
 
-  const hancleClickSeeDescriptionButton = () => {
+  const handleClickSeeDescriptionButton = () => {
     setShowDescriptionPreview(showSeeDescriptionButton !== DESCRIPTION_BUTTON.SEE_MORE)
     setShowSeeDescriptionButton(showSeeDescriptionButton === DESCRIPTION_BUTTON.SEE_MORE
       ? DESCRIPTION_BUTTON.SEE_LESS
@@ -137,7 +137,7 @@ function KanbanCard (props) {
             dataCy='kanban_descriptionOverflow'
             intent='link'
             mode='light'
-            onClick={hancleClickSeeDescriptionButton}
+            onClick={handleClickSeeDescriptionButton}
             text={showSeeDescriptionButton === DESCRIPTION_BUTTON.SEE_MORE
               ? props.t('See more')
               : props.t('See less')}
