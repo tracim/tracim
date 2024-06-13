@@ -48,5 +48,9 @@
   "Open field:": "Champ libre :",
   "Permanently delete": "Supprimer définitivement",
   "Yes, delete permanently": "Oui, supprimer définitivement",
-  "Warning: this operation cannot be rolled back": "Attention : cette opération ne peut pas être annulée"
+  "Warning: this operation cannot be rolled back": "Attention : cette opération ne peut pas être annulée",
+  "0 card": "0 carte",
+  "{{numberCard}} card": "{{numberCard}} carte",
+  "{{count}} cards": "{{count}} cartes",
+  "{{count}} cards_plural": "{{count}} cartes"
 }
