@@ -8,10 +8,14 @@
 - Support for python version 3.9, 3.10 an 3.11
 - Merge of create and first comment web notification
 - New email template signature
+- App kanban now show number of cards in each column
+- App logbook now hides long description behind a "see more" button
 
 ### 🐛 Fixed Issue
 
 - The real deletion now also delete from elasticsearch indexes [#6473](https://github.com/tracim/tracim/issues/6473)
+- Fixed size of app kanban edition popup [#6519](https://github.com/tracim/tracim/issues/6519)
+- Fixed "see more" button in app kanban not updating on description change [#5270](https://github.com/tracim/tracim/issues/5270)
 
 ## 4.9.2 / 2024-05-30
 
