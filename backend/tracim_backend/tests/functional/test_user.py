@@ -3013,7 +3013,7 @@ class TestUserEndpoint(object):
         assert res["lang"] == "fr"
         assert res["allowed_space"] == 0
 
-        before_the_last_event = event_helper.last_events(count=2)[0]
+        before_the_last_event = event_helper.last_event
         assert before_the_last_event.event_type == "user.created"
         assert before_the_last_event.fields["user"] == UserDigestSchema().dump(res).data
         assert before_the_last_event.fields["client_token"] is None
@@ -3039,7 +3039,7 @@ class TestUserEndpoint(object):
         assert res["email"] == "test@test.test"
         assert res["public_name"] == "toto"
 
-        before_the_last_event = event_helper.last_events(count=2)[0]
+        before_the_last_event = event_helper.last_event
         assert before_the_last_event.event_type == "user.created"
         assert before_the_last_event.fields["user"] == UserDigestSchema().dump(res).data
         assert before_the_last_event.fields["client_token"] is None

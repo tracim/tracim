@@ -881,16 +881,8 @@ class EventBuilder:
         self._create_user_call_event(OperationType.DELETED, user_call, context)
 
     @hookimpl
-    def on_user_config_created(self, user_config: UserConfig, context: TracimContext) -> None:
-        self._create_user_config_event(OperationType.CREATED, user_config, context)
-
-    @hookimpl
     def on_user_config_modified(self, user_config: UserConfig, context: TracimContext) -> None:
         self._create_user_config_event(OperationType.MODIFIED, user_config, context)
-
-    @hookimpl
-    def on_user_config_deleted(self, user_config: UserConfig, context: TracimContext) -> None:
-        self._create_user_config_event(OperationType.DELETED, user_config, context)
 
     def _create_subscription_event(
         self,
