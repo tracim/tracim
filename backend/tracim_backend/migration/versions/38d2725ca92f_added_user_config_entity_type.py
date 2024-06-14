@@ -41,7 +41,6 @@ def upgrade():
 
 
 def downgrade():
-    op.execute('DELETE FROM events WHERE entity_type = "%s"' % user_config)
     op.replace_enum(
         table_name="events",
         column_name="entity_type",
