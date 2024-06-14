@@ -3013,12 +3013,12 @@ class TestUserEndpoint(object):
         assert res["lang"] == "fr"
         assert res["allowed_space"] == 0
 
-        last_event = event_helper.last_event
-        assert last_event.event_type == "user.created"
-        assert last_event.fields["user"] == UserDigestSchema().dump(res).data
-        assert last_event.fields["client_token"] is None
+        before_the_last_event = event_helper.last_events(count=2)[0]
+        assert before_the_last_event.event_type == "user.created"
+        assert before_the_last_event.fields["user"] == UserDigestSchema().dump(res).data
+        assert before_the_last_event.fields["client_token"] is None
         author = web_testapp.get("/api/users/1", status=200).json_body
-        assert last_event.fields["author"] == UserDigestSchema().dump(author).data
+        assert before_the_last_event.fields["author"] == UserDigestSchema().dump(author).data
 
     def test_api__create_user__ok_200__minimal_rfc_email(
         self, web_testapp, user_api_factory, event_helper
@@ -3039,12 +3039,12 @@ class TestUserEndpoint(object):
         assert res["email"] == "test@test.test"
         assert res["public_name"] == "toto"
 
-        last_event = event_helper.last_event
-        assert last_event.event_type == "user.created"
-        assert last_event.fields["user"] == UserDigestSchema().dump(res).data
-        assert last_event.fields["client_token"] is None
+        before_the_last_event = event_helper.last_events(count=2)[0]
+        assert before_the_last_event.event_type == "user.created"
+        assert before_the_last_event.fields["user"] == UserDigestSchema().dump(res).data
+        assert before_the_last_event.fields["client_token"] is None
         author = web_testapp.get("/api/users/1", status=200).json_body
-        assert last_event.fields["author"] == UserDigestSchema().dump(author).data
+        assert before_the_last_event.fields["author"] == UserDigestSchema().dump(author).data
 
     @pytest.mark.parametrize("public_name_value", ("🐻‍❄👨‍👨‍👧‍👧️ Emoji Lover",))
     def test_api__create_user__ok_200__with_emoji_as_public_name(
