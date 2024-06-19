@@ -127,7 +127,7 @@ export class ReduxTlmDispatcher extends React.Component {
       props.user.userId !== data.fields.author.user_id &&
       !EXCLUDED_NOTIFICATION_TYPE_PREFIXES.some(type => data.event_type.startsWith(type))
     ) {
-      props.dispatch(addNotification(data, props.workspaceList))
+      props.dispatch(addNotification(data, props.user.config, props.workspaceList))
     }
   }
 
@@ -355,7 +355,7 @@ export class ReduxTlmDispatcher extends React.Component {
   handleUserChanged = data => {
     const { props } = this
 
-    this.props.dispatch(addNotification(data, props.workspaceList))
+    this.props.dispatch(addNotification(data, props.user.config, props.workspaceList))
   }
 
   handleWorkspaceSubscriptionCreated = data => {

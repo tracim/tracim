@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import {
   ADD,
   addNotification,
-  APPEND,
+  APPEND_NOTIFICATION_LIST,
   appendNotificationList,
   CONTENT,
   NEXT_PAGE,
@@ -102,7 +102,7 @@ describe('reducer notificationPage.js', () => {
       unreadMentionCount: DEFAULT_UNREAD_MENTION_COUNT
     }
 
-    describe(`${ADD}/${NOTIFICATION}`, () => {
+    describe(ADD_NOTIFICATION, () => {
       const listOfNotification = notificationPage(initialState, addNotification(TLM, workspaceList.workspaceList))
       const listOfMention = notificationPage(initialState, addNotification(TLMMention, workspaceList.workspaceList))
 
@@ -205,7 +205,7 @@ describe('reducer notificationPage.js', () => {
       })
     })
 
-    describe(`${APPEND}/${NOTIFICATION_LIST}`, () => {
+    describe(APPEND_NOTIFICATION_LIST, () => {
       const listOfNotification = notificationPage(
         { ...initialState, list: [notification] },
         appendNotificationList(-1, [{ ...TLM, event_id: 999 }], workspaceList.workspaceList)

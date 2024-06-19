@@ -330,6 +330,7 @@ export const NotificationWall = props => {
           props.dispatch(
             appendNotificationList(
               props.user.userId,
+              props.user.config,
               fetchGetNotificationWall.json.items,
               props.workspaceList
             )

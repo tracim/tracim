@@ -263,6 +263,7 @@ export function appContentFactory (WrappedComponent) {
 
       if (
         props.data === undefined ||
+        props.data.content === undefined ||
         tlm.fields.content.workspace_id !== props.data.content.workspace_id ||
         tlm.fields.content.parent_id !== props.data.content.content_id
       ) return

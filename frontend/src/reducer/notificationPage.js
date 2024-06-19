@@ -1,7 +1,7 @@
 import { uniqBy } from 'lodash'
 import {
-  ADD,
-  APPEND,
+  ADD_NOTIFICATION,
+  APPEND_NOTIFICATION_LIST,
   CONTENT,
   EVERY_NOTIFICATION,
   NEXT_PAGE,
@@ -22,7 +22,8 @@ import {
   serialize,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
-  TLM_SUB_TYPE as TLM_ST
+  TLM_SUB_TYPE as TLM_ST,
+  shouldKeepNotification
 } from 'tracim_frontend_lib'
 
 const defaultNotificationsObject = {
@@ -87,7 +88,7 @@ function getMainContentId (notification) {
  * in withActivity and ActivityList, and can be refactor
  * See https://github.com/tracim/tracim/issues/4677
  * FIXME - MP - 2022-10-18 - This function allows us to filter when loading more notifications.
- * However there is a similar loginc in ReduxTlmDispatcher.js when we receive a TLM.
+ * However there is a similar logic in ReduxTlmDispatcher.js when we receive a TLM.
  * https://github.com/tracim/tracim/issues/5946
  *
  * Filter the notification list according to theses filters:
@@ -95,6 +96,7 @@ function getMainContentId (notification) {
  * - spaceList for access request notifications
  * @param {int} userId Filter the notification list to not display todos notifications if we are not
  *  assigned to the todo. `userIdIfFiltered` if the list is already filtered
+ * @param {userConfig} userConfig filter notification from spaces user is unsubscribed
  * @param {Object[]} notificationList Notification list to filter
  * @param {Object[]} spaceList Filter the notification to not display access request to spaces that
  *  are not in the list
@@ -103,10 +105,10 @@ function getMainContentId (notification) {
  * notification count
  */
 function notificationListFilter (
-  userId, notificationList, spaceList, unreadNotificationCount
+  userId, userConfig, notificationList, spaceList, unreadNotificationCount
 ) {
   let newUnreadNotificationCount = unreadNotificationCount
-  const newNotificationList = notificationList.map((notification) => {
+  const newNotificationList = notificationList.filter(notification => {
     const [entityType, coreType, subType] = notification.type.split('.') // eslint-disable-line no-unused-vars
 
     // INFO - MP - 2022-10-18 - Since we are filtering twice, the userId verification is if we are
@@ -117,7 +119,7 @@ function notificationListFilter (
       notification.content.assignee.userId !== userId
     ) {
       if (!notification.read) newUnreadNotificationCount--
-      return null
+      return false
     }
 
     if (
@@ -128,23 +130,35 @@ function notificationListFilter (
       !(spaceList.find(space => space.id === notification.workspace.id))
     ) {
       if (!notification.read) newUnreadNotificationCount--
-      return null
+      return false
     }
-    return notification
+
+    // INFO - CH - 2024-06-19 - filter notification from spaces user is not subscribed
+    const shouldKeep = shouldKeepNotification(notification, userConfig)
+    if (shouldKeep === false) {
+      if (!notification.read) newUnreadNotificationCount--
+      return false
+    }
+
+    return true
   })
 
-  return { list: newNotificationList.filter(notification => !!notification), unreadNotificationCount: newUnreadNotificationCount }
+  return {
+    list: newNotificationList,
+    unreadNotificationCount: newUnreadNotificationCount
+  }
 }
 
 export default function notificationPage (state = defaultNotificationsObject, action) {
   switch (action.type) {
-    case `${APPEND}/${NOTIFICATION_LIST}`: {
+    case APPEND_NOTIFICATION_LIST: {
       const notificationList = action.notificationList
         .map(notification => serializeNotification(notification))
       return {
         ...state,
         ...notificationListFilter(
           action.userId,
+          action.userConfig,
           [...state.list, ...notificationList],
           action.spaceList,
           state.unreadNotificationCount
@@ -152,9 +166,16 @@ export default function notificationPage (state = defaultNotificationsObject, ac
       }
     }
 
-    case `${ADD}/${NOTIFICATION}`: {
+    case ADD_NOTIFICATION: {
       const notification = serializeNotification(action.notification)
-      const newUnreadMentionCount = notification.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}` ? state.unreadMentionCount + 1 : state.unreadMentionCount
+
+      const shouldKeep = shouldKeepNotification(notification, action.userConfig)
+      if (shouldKeep === false) return state
+
+      const newUnreadMentionCount = notification.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}`
+        ? state.unreadMentionCount + 1
+        : state.unreadMentionCount
+
       return {
         ...state,
         unreadMentionCount: newUnreadMentionCount,
@@ -163,6 +184,7 @@ export default function notificationPage (state = defaultNotificationsObject, ac
         // https://github.com/tracim/tracim/issues/5946
         ...notificationListFilter(
           userIdIfFiltered,
+          action.userConfig,
           sortByCreatedDate([...state.list, notification]),
           action.spaceList,
           state.unreadNotificationCount + 1
@@ -194,9 +216,9 @@ export default function notificationPage (state = defaultNotificationsObject, ac
         n => action.notificationIdList.includes(n.id) ? { ...n, read: true } : n
       )
 
-      const newUnreadMentionCount = state.unreadMentionCount - notificationList.filter(
-        n => n.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}`
-      ).length
+      const newUnreadMentionCount = state.unreadMentionCount - notificationList
+        .filter(n => n.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}`)
+        .length
 
       const newUnreadNotificationCount = state.unreadNotificationCount - notificationList.length
 

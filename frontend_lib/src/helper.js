@@ -635,6 +635,8 @@ export const buildUserConfigContentNotifyAllKey = contentId => `content.${conten
 export const buildUserConfigSpaceWebNotificationKey = spaceId => `space.${spaceId}.web_notification`
 export const buildUserConfigContentWebNotificationKey = contentId => `content.${contentId}.web_notification`
 
+// INFO - CH - 2024-06-19 - This function returns whether or not a notification should be filtered because the user
+// has unsubscribed the space
 export const shouldKeepNotification = (notification, userConfig) => {
   const isIndividualMention = notification.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}` &&
     notification.mention.type !== MENTION_CONSTANT.TYPE.ROLE

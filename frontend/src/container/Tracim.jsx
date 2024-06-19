@@ -506,28 +506,12 @@ export class Tracim extends React.Component {
     }
   }
 
-  filterAndCountNotifications = () => {
-    const { props } = this
-
-    let unreadNotificationCount = props.notificationPage.unreadNotificationCount
-    let unreadMentionCount = props.notificationPage.unreadMentionCount
-    const notificationList = props.notificationPage.list.filter(notification => {
-      const shouldKeep = shouldKeepNotification(notification, props.user.config)
-      if (!shouldKeep && !notification.read) {
-        if (notification.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}`) unreadMentionCount--
-        unreadNotificationCount--
-      }
-      return shouldKeep
-    })
-
-    return { unreadNotificationCount, unreadMentionCount, notificationList }
-  }
-
   handleHeadTitleAndFavicon = (prevHeadTitleArgs, prevUnreadNotificationCount, prevUnreadMentionCount, prevUserConfig) => {
     const { props } = this
 
-    // TODO - M.L - 2024-06-07 - Maybe use results as a state so that it is not necessary to sort twice
-    const { unreadNotificationCount, unreadMentionCount } = this.filterAndCountNotifications()
+    const unreadNotificationCount = props.notificationPage.unreadNotificationCount
+    const unreadMentionCount = props.notificationPage.unreadMentionCount
+
     const prevUserConfigHasChanged = !isEqual(prevUserConfig, props.user.config)
     const hasHeadTitleChanged = !isEqual(prevHeadTitleArgs, props.system.titleArgs)
     const hasUnreadMentionCountChanged = unreadMentionCount !== prevUnreadMentionCount || prevUserConfigHasChanged
@@ -597,9 +581,8 @@ export class Tracim extends React.Component {
       )
     }
 
-    // TODO - M.L - 2024-06-07 - Maybe pass new notificationList to NotificationWall
-    //  to prevent re-filtering lists further down
-    const { unreadNotificationCount, unreadMentionCount, notificationList } = this.filterAndCountNotifications()
+    const unreadNotificationCount = props.notificationPage.unreadNotificationCount
+    const unreadMentionCount = props.notificationPage.unreadMentionCount
 
     return (
       <div className='tracim fullWidthFullHeight' dir={i18next.dir()}>
@@ -774,7 +757,7 @@ export class Tracim extends React.Component {
               <Sidebar
                 isNotificationWallOpen={state.isNotificationWallOpen}
                 onClickNotification={this.handleClickNotificationButton}
-                notificationList={notificationList}
+                notificationList={props.notificationPage.list}
                 unreadMentionCount={unreadMentionCount}
                 unreadNotificationCount={unreadNotificationCount}
                 isSpaceListLoaded={props.system.workspaceListLoaded}

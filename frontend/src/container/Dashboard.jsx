@@ -427,9 +427,7 @@ export class Dashboard extends React.Component {
       : !isSubscribed
 
     try {
-      await putUserConfiguration(
-        FETCH_CONFIG.apiUrl, props.user.userId, userConfig
-      )
+      await putUserConfiguration(FETCH_CONFIG.apiUrl, props.user.userId, userConfig)
     } catch (e) {
       props.dispatch(newFlashMessage(props.t('Error while changing web notification subscription'), 'warning'))
       console.error(
