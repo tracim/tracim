@@ -72,7 +72,7 @@ export const serializeNotification = notification => {
       ? {
         contentId: notification.fields.mention.content_id,
         recipient: notification.fields.mention.recipient,
-        type: notification.fields.mention.type,
+        type: notification.fields.mention.type
       }
       : null,
     created: notification.created,
