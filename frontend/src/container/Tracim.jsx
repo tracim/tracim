@@ -42,8 +42,7 @@ import {
   TracimComponent,
   buildHeadTitle,
   formatAbsoluteDate,
-  serialize,
-  shouldKeepNotification
+  serialize
 } from 'tracim_frontend_lib'
 import {
   COOKIE_FRONTEND,
