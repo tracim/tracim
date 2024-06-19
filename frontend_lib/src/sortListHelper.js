@@ -3,7 +3,7 @@ import { stripEmojis } from './helper.js'
 import {
   CONTENT_TYPE,
   STATUSES
-} from './helperConstants.js'
+} from './constant.js'
 
 import { isAfter } from 'date-fns'
 

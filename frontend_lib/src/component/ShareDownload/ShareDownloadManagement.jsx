@@ -4,7 +4,7 @@ import i18n from '../../i18n.js'
 import Radium from 'radium'
 import { CUSTOM_EVENT } from '../../customEvent.js'
 import ShareLink from '../ShareLink/ShareLink.jsx'
-import { ROLE } from '../../helperConstants.js'
+import { ROLE } from '../../constant.js'
 import IconButton from '../Button/IconButton.jsx'
 
 class ShareDownloadManagement extends React.Component {

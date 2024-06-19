@@ -25,7 +25,7 @@ import {
 import {
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME
-} from '../src/helperConstants.js'
+} from '../src/constant.js'
 
 import {
   mockGetReservedUsernames200,

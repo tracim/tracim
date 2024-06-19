@@ -14,7 +14,7 @@ import {
   NUMBER_RESULTS_BY_PAGE,
   PROFILE,
   ROLE
-} from '../../helperConstants.js'
+} from '../../constant.js'
 import IconButton from '../Button/IconButton.jsx'
 import { isMobile } from 'react-device-detect'
 import onClickOutside from 'react-onclickoutside'

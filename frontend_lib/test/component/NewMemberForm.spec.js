@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import { mount } from 'enzyme'
 import sinon from 'sinon'
 import NewMemberForm from '../../src/component/NewMemberForm/NewMemberForm.jsx'
-import { ROLE } from '../../src/helperConstants.js'
+import { ROLE } from '../../src/constant.js'
 require('../../src/component/NewMemberForm/NewMemberForm.styl')
 
 describe('<NewMemberForm />', () => {

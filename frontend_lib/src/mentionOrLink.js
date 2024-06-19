@@ -1,7 +1,7 @@
 import i18n from './i18n.js'
 
 import { getDocumentFromHTMLString } from './helper.js'
-import { PAGE } from './helperConstants.js'
+import { PAGE } from './constant.js'
 import { getContent } from './action.async.js'
 
 export const MENTION_CONSTANT = {

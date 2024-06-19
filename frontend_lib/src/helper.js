@@ -14,12 +14,16 @@ import {
 
 import {
   ALLOWED_CHARACTERS_USERNAME,
-  APP_FEATURE_MODE, BREADCRUMBS_TYPE, CONTENT_TYPE,
+  APP_FEATURE_MODE,
+  BREADCRUMBS_TYPE,
+  CONTENT_TYPE,
   DATE_FNS_LOCALE,
   MAXIMUM_CHARACTERS_USERNAME,
-  MINIMUM_CHARACTERS_USERNAME, PAGE, TIMELINE_TYPE, USERNAME_ALLOWED_CHARACTERS_REGEX
-
-} from './helperConstants'
+  MINIMUM_CHARACTERS_USERNAME,
+  PAGE,
+  TIMELINE_TYPE,
+  USERNAME_ALLOWED_CHARACTERS_REGEX
+} from './constant.js'
 
 import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -634,18 +638,20 @@ export const buildUserConfigContentWebNotificationKey = contentId => `content.${
 export const shouldKeepNotification = (notification, userConfig) => {
   const isIndividualMention = notification.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}` &&
     notification.mention.type !== MENTION_CONSTANT.TYPE.ROLE
-  const notificationHasNoWorkspace = !notification.workspace
-  const isSubscriptionUndefined = userConfig[buildUserConfigSpaceWebNotificationKey(notification.workspace?.id)] === undefined
-  const isSubscribed = userConfig[buildUserConfigSpaceWebNotificationKey(notification.workspace?.id)] === true
+  if (isIndividualMention) return true
 
-  return (
-    isIndividualMention ||
-    notificationHasNoWorkspace ||
-    isSubscriptionUndefined ||
-    isSubscribed
-  )
+  const notificationHasNoWorkspace = !notification.workspace || !notification.workspace.id
+  if (notificationHasNoWorkspace) return true
+
+  const isSubscriptionUndefined = userConfig[buildUserConfigSpaceWebNotificationKey(notification.workspace.id)] === undefined
+  if (isSubscriptionUndefined) return true
+
+  const isSubscribed = userConfig[buildUserConfigSpaceWebNotificationKey(notification.workspace.id)] === true
+  return isSubscribed
 }
 
+// INFO - CH - 2024-06-18 - Function filterNotificationListFromUserConfig is used to filter the web notification list
+// from spaces where the user has unsubscribed web notification from
 export const filterNotificationListFromUserConfig = (notificationList, userConfig) => {
   if (!userConfig) return notificationList
   return notificationList.filter(notification => shouldKeepNotification(notification, userConfig))

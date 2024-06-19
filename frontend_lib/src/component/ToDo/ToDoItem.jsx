@@ -7,7 +7,7 @@ import {
   PAGE,
   ROLE,
   STATUSES
-} from '../../helperConstants.js'
+} from '../../constant.js'
 import IconButton from '../Button/IconButton.jsx'
 import TimedEvent from '../TimedEvent/TimedEvent.jsx'
 

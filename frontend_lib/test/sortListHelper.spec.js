@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { CONTENT_TYPE } from '../src/helperConstants.js'
+import { CONTENT_TYPE } from '../src/constant.js'
 import {
   sortWithFoldersAtListBeginning,
   SORT_BY,

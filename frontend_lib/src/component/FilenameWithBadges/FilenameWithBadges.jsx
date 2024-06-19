@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import Badge from '../Badge/Badge.jsx'
-import { CONTENT_TYPE } from '../../helperConstants.js'
+import { CONTENT_TYPE } from '../../constant.js'
 import classnames from 'classnames'
 
 export const FilenameWithBadges = (props) => {

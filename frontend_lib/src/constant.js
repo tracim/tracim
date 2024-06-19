@@ -5,7 +5,7 @@ import dateFnsDe from 'date-fns/locale/de'
 import dateFnsAr from 'date-fns/locale/ar-SA'
 import dateFnsEs from 'date-fns/locale/es'
 import dateFnsNbNO from 'date-fns/locale/nb'
-import i18n from './i18n'
+import i18n from './i18n.js'
 
 export const PAGE = {
   CONTENT: (idcts = ':idcts') => `/ui/contents/${idcts}`,

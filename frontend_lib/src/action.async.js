@@ -1,5 +1,5 @@
 import { COMMON_REQUEST_HEADERS, FETCH_CONFIG } from './helper.js'
-import { CONTENT_NAMESPACE, CONTENT_TYPE } from './helperConstants.js'
+import { CONTENT_NAMESPACE, CONTENT_TYPE } from './constant.js'
 
 export const baseFetch = (method, url, body = undefined) => {
   const isFormData = body instanceof FormData

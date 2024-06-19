@@ -4,7 +4,7 @@ import {
   ROLE,
   ROLE_LIST,
   PROFILE
-} from './helperConstants.js'
+} from './constant.js'
 
 const STATUSES = [{
   label: 'Opened',

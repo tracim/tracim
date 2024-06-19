@@ -18,7 +18,7 @@ import {
   NUMBER_RESULTS_BY_PAGE,
   TIMELINE_TYPE,
   CONTENT_TYPE
-} from './helperConstants.js'
+} from './constant.js'
 
 import {
   SORT_BY,

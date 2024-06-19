@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
-import { STATUSES } from '../../../src/helperConstants.js'
+import { STATUSES } from '../../constant.js'
 
 export const PopinFixedRightPartContent = props => {
   const [progressBarWidth, setProgessBarWidth] = useState('0%')

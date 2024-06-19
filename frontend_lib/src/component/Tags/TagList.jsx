@@ -9,7 +9,7 @@ import {
 import {
   PROFILE,
   ROLE
-} from '../../helperConstants.js'
+} from '../../constant.js'
 import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET

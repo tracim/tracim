@@ -1,7 +1,7 @@
 import {
   CONTENT_TYPE,
   ROLE_LIST
-} from './helperConstants.js'
+} from './constant.js'
 
 // INFO - 2024-05-31 - CH - This object values must stay synced with
 // frontend/dist/assets/branding.sample/app_custom_actions.json

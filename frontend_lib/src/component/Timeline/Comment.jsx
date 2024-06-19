@@ -21,7 +21,7 @@ import {
 import {
   CONTENT_TYPE,
   ROLE
-} from '../../helperConstants.js'
+} from '../../constant.js'
 
 import CommentFilePreview from './CommentFilePreview.jsx'
 

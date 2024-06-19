@@ -75,7 +75,7 @@ import {
   SUBSCRIPTION_TYPE,
   TIMELINE_TYPE,
   USER_CALL_STATE
-} from './helperConstants.js'
+} from './constant.js'
 
 import i18n, { getBrowserLang } from './i18n.js'
 

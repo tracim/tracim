@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { CONTENT_TYPE } from '../src/helperConstants.js'
+import { CONTENT_TYPE } from '../src/constant.js'
 import {
   APP_CUSTOM_ACTION_LOCATION_OBJECT,
   buildAppCustomActionLinkList

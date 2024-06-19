@@ -1,5 +1,5 @@
 import { author } from './author.js'
-import { TIMELINE_TYPE } from '../../src/helperConstants.js'
+import { TIMELINE_TYPE } from '../../src/constant.js'
 
 export const revisionList = [{
   sub_content_types: ['comment'],

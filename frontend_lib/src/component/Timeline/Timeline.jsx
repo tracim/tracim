@@ -17,7 +17,7 @@ import {
   PAGE,
   ROLE,
   TIMELINE_TYPE
-} from '../../helperConstants.js'
+} from '../../constant.js'
 
 import {
   replaceHTMLElementWithMention

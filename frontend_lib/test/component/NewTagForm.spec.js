@@ -2,7 +2,7 @@ import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import { NewTagForm } from '../../src/component/Tags/NewTagForm.jsx'
-import { PROFILE, ROLE } from '../../src/helperConstants.js'
+import { PROFILE, ROLE } from '../../src/constant.js'
 
 require('../../src/component/Tags/NewTagForm.styl')
 

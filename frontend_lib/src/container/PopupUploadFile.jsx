@@ -10,7 +10,7 @@ import {
   computeProgressionPercentage,
   sendGlobalFlashMessage
 } from '../helper.js'
-import { FILE_PREVIEW_STATE } from '../helperConstants.js'
+import { FILE_PREVIEW_STATE } from '../constant.js'
 
 import {
   createFileUpload,

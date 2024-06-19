@@ -3,7 +3,7 @@ import { withRouterMock, RouterMock } from '../hocMock/withRouter'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
 import PopinFixedHeader from '../../src/component/PopinFixed/PopinFixedHeader'
-import { ROLE } from '../../src/helperConstants.js'
+import { ROLE } from '../../src/constant.js'
 import sinon from 'sinon'
 
 // TODO - MP - 2022-06-07 - https://github.com/tracim/tracim/issues/5697

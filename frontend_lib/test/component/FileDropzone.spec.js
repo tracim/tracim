@@ -2,7 +2,7 @@ import React from 'react'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
 import FileDropzone from '../../src/component/FileDropzone/FileDropzone.jsx'
-import { FILE_PREVIEW_STATE } from '../../src/helperConstants.js'
+import { FILE_PREVIEW_STATE } from '../../src/constant.js'
 import sinon from 'sinon'
 require('../../src/component/FileDropzone/FileDropzone.styl')
 
