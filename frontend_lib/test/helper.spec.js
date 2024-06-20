@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+import sinon from 'sinon'
 import {
   buildFilePreviewUrl,
   checkEmailValidity,
@@ -20,14 +21,15 @@ import {
   permissiveNumberEqual,
   updateTLMUser,
   stringIncludes,
-  // shouldKeepNotification,
-  filterNotificationListFromUserConfig, shouldKeepNotification
+  filterNotificationListFromUserConfig,
+  shouldKeepNotification
 } from '../src/helper.js'
 import {
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
   CONTENT_TYPE
 } from '../src/constant.js'
+import { MENTION_CONSTANT } from '../src/mentionOrLink.js'
 import {
   mockGetReservedUsernames200,
   mockGetUsernameAvailability200,
@@ -38,9 +40,6 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET
 } from '../src/tracimLiveMessage.js'
-
-import sinon from 'sinon'
-import { MENTION_CONSTANT } from '../src'
 
 describe('helper.js', () => {
   describe('updateTLMUser()', () => {
