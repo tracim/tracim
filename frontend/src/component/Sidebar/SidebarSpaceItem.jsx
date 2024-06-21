@@ -37,10 +37,10 @@ class SidebarSpaceItem extends React.Component {
   }
 
   componentDidUpdate () {
-    const unreadNotifications = this.props.notificationPage.list.filter(
+    const unreadNotifications = this.props.notificationList.filter(
       n => !n.mention && !n.read && n.workspace && (n.workspace.id === this.props.spaceId)
     )
-    const unreadMentionCount = this.props.notificationPage.list.filter(
+    const unreadMentionCount = this.props.notificationList.filter(
       n => n.mention && !n.read && n.workspace && (n.workspace.id === this.props.spaceId)
     ).length
 
@@ -233,7 +233,7 @@ const dragAndDropTargetCollect = (connect, monitor) => ({
   draggedItem: monitor.getItem()
 })
 
-const mapStateToProps = ({ notificationPage, user }) => ({ notificationPage, user })
+const mapStateToProps = ({ user }) => ({ user })
 export default DropTarget(DRAG_AND_DROP.CONTENT_ITEM, dragAndDropTarget, dragAndDropTargetCollect)(connect(mapStateToProps)(withRouter(translate()(SidebarSpaceItem))))
 
 SidebarSpaceItem.propTypes = {
@@ -248,7 +248,8 @@ SidebarSpaceItem.propTypes = {
   isNotificationWallOpen: PropTypes.bool,
   level: PropTypes.number,
   onToggleFoldChildren: PropTypes.func,
-  userRoleIdInWorkspace: PropTypes.array
+  userRoleIdInWorkspace: PropTypes.array,
+  notificationList: PropTypes.array
 }
 
 SidebarSpaceItem.defaultProps = {
@@ -259,5 +260,6 @@ SidebarSpaceItem.defaultProps = {
   isNotificationWallOpen: false,
   level: 0,
   onToggleFoldChildren: () => { },
-  userRoleIdInWorkspace: ROLE.reader.id
+  userRoleIdInWorkspace: ROLE.reader.id,
+  notificationList: []
 }

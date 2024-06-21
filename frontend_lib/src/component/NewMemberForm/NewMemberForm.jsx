@@ -1,7 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import Avatar, { AVATAR_SIZE } from '../Avatar/Avatar.jsx'
-import { ROLE } from '../../helper.js'
+import { ROLE } from '../../constant.js'
 import ComposedIcon from '../Icon/ComposedIcon.jsx'
 import PropTypes from 'prop-types'
 import SingleChoiceList from '../Input/SingleChoiceList/SingleChoiceList.jsx'

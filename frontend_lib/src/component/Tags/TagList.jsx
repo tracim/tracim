@@ -4,10 +4,12 @@ import PropTypes from 'prop-types'
 import {
   sendGlobalFlashMessage,
   naturalCompare,
-  handleFetchResult,
+  handleFetchResult
+} from '../../helper.js'
+import {
   PROFILE,
   ROLE
-} from '../../helper.js'
+} from '../../constant.js'
 import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET

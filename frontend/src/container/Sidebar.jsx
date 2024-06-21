@@ -306,6 +306,7 @@ export class Sidebar extends React.Component {
           isSidebarClosed={state.isSidebarClosed}
           isUserAdministrator={isUserAdministrator}
           isUserManager={isUserManager}
+          notificationList={props.notificationList}
           onClickJoinWorkspace={this.handleClickJoinWorkspace}
           onClickNewSpace={this.handleClickNewSpace}
           onClickOpenSpaceList={this.handleClickOpenSpaceList}
@@ -357,6 +358,7 @@ Sidebar.propTypes = {
   isNotificationWallOpen: PropTypes.bool,
   isSpaceListLoaded: PropTypes.bool,
   onClickNotification: PropTypes.func,
+  notificationList: PropTypes.array,
   unreadMentionCount: PropTypes.number,
   unreadNotificationCount: PropTypes.number
 }
@@ -365,6 +367,7 @@ Sidebar.defaultProps = {
   isNotificationWallOpen: false,
   isSpaceListLoaded: false,
   onClickNotification: () => { },
+  notificationList: [],
   unreadMentionCount: 0,
   unreadNotificationCount: 0
 }

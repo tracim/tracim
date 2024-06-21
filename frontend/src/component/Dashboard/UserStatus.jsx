@@ -4,10 +4,12 @@ import { Link } from 'react-router-dom'
 import {
   Icon,
   PAGE,
-  ROLE_LIST
+  ROLE_LIST,
+  buildUserConfigSpaceWebNotificationKey
 } from 'tracim_frontend_lib'
 import EmailNotificationTypeButton from '../EmailNotificationTypeButton/EmailNotificationTypeButton.jsx'
-import { EMAIL_NOTIFICATION_TYPE } from '../../util/helper'
+import WebNotificationWorkspaceSelector from './WebNotificationSpaceSelector.jsx'
+import { EMAIL_NOTIFICATION_TYPE } from '../../util/helper.js'
 
 require('./UserStatus.styl')
 
@@ -52,6 +54,11 @@ export const UserStatus = props => {
         </div>
       )}
 
+      <WebNotificationWorkspaceSelector
+        value={props.user?.config && props.user.config[buildUserConfigSpaceWebNotificationKey(props.currentWorkspace.id)]}
+        onChange={props.onClickChangeWebNotification}
+      />
+
       {props.displaySubscriptionRequestsInformation && (
         <div className='userstatus__item spaceAccessRequest'>
           <div className='userstatus__item__label'>
@@ -89,7 +96,9 @@ UserStatus.propTypes = {
   displayNotifBtn: PropTypes.bool,
   displaySubscriptionRequestsInformation: PropTypes.bool,
   newSubscriptionRequestsNumber: PropTypes.number,
+  webNotificationEnabled: PropTypes.bool,
   onClickChangeEmailNotificationType: PropTypes.func,
+  onClickChangeWebNotification: PropTypes.func,
   t: PropTypes.func
 }
 UserStatus.defaultProps = {
@@ -102,5 +111,6 @@ UserStatus.defaultProps = {
   displaySubscriptionRequestsInformation: false,
   newSubscriptionRequestsNumber: 0,
   onClickChangeEmailNotificationType: () => {},
+  onClickChangeWebNotification: () => {},
   t: () => {}
 }

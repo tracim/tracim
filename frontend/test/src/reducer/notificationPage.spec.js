@@ -1,8 +1,8 @@
 import { expect } from 'chai'
 import {
-  ADD,
+  ADD_NOTIFICATION,
   addNotification,
-  APPEND,
+  APPEND_NOTIFICATION_LIST,
   appendNotificationList,
   CONTENT,
   NEXT_PAGE,
@@ -26,6 +26,8 @@ import { serialize } from 'tracim_frontend_lib'
 import { serializeUserProps } from '../../../src/reducer/user.js'
 import { serializeWorkspaceListProps } from '../../../src/reducer/workspaceList.js'
 import { workspaceList } from '../../hocMock/redux/workspaceList/workspaceList.js'
+import { contentFromApi } from '../../fixture/content/content'
+import { serializeContentProps } from '../../../src/reducer/workspaceContentList'
 
 const TLM = {
   created: '2020-07-23T12:44:50Z',
@@ -47,6 +49,7 @@ const notification = {
     hasCover: false
   },
   content: null,
+  mention: null,
   created: '2020-07-23T12:44:50Z',
   id: 583,
   type: 'workspace_member.created',
@@ -62,6 +65,8 @@ const TLMMention = {
   event_type: 'mention.created',
   fields: {
     author: globalManagerFromApi,
+    content: contentFromApi,
+    mention: { type: 1, recipient: 2, content_id: contentFromApi.content_id },
     workspace: firstWorkspaceFromApi,
     user: globalManagerFromApi
   },
@@ -69,21 +74,27 @@ const TLMMention = {
 }
 
 const mention = {
+  created: '2020-07-23T12:44:50Z',
   author: {
     publicName: globalManagerFromApi.public_name,
     userId: globalManagerFromApi.user_id,
     hasAvatar: true,
     hasCover: false
   },
-  content: null,
-  created: '2020-07-23T12:44:50Z',
+  content: {
+    ...serialize(contentFromApi, serializeContentProps),
+    assignee: null // INFO - CH - 2024-06-19 - serializeNotification adds assignee
+  },
   id: 523,
   type: 'mention.created',
+  mention: { type: 1, recipient: 2, contentId: contentFromApi.content_id },
   workspace: serialize(firstWorkspaceFromApi, serializeWorkspaceListProps),
   read: null,
   subscription: null,
   user: serialize(globalManagerFromApi, serializeUserProps)
 }
+
+const userConfig = {}
 
 const DEFAULT_UNREAD_NOTIFICATION_COUNT = 10
 const DEFAULT_UNREAD_MENTION_COUNT = 5
@@ -102,11 +113,11 @@ describe('reducer notificationPage.js', () => {
       unreadMentionCount: DEFAULT_UNREAD_MENTION_COUNT
     }
 
-    describe(`${ADD}/${NOTIFICATION}`, () => {
-      const listOfNotification = notificationPage(initialState, addNotification(TLM, workspaceList.workspaceList))
-      const listOfMention = notificationPage(initialState, addNotification(TLMMention, workspaceList.workspaceList))
-
+    describe(ADD_NOTIFICATION, () => {
       it('should return the list of notification added from the object passed as parameter', () => {
+        const listOfNotification = notificationPage(
+          initialState, addNotification(TLM, userConfig, workspaceList.workspaceList)
+        )
         expect(listOfNotification).to.deep.equal({
           ...initialState,
           list: [notification],
@@ -116,6 +127,9 @@ describe('reducer notificationPage.js', () => {
       })
 
       it('should return the list of mentions', () => {
+        const listOfMention = notificationPage(
+          initialState, addNotification(TLMMention, userConfig, workspaceList.workspaceList)
+        )
         expect(listOfMention).to.deep.equal({
           ...initialState,
           list: [mention],
@@ -205,10 +219,10 @@ describe('reducer notificationPage.js', () => {
       })
     })
 
-    describe(`${APPEND}/${NOTIFICATION_LIST}`, () => {
+    describe(APPEND_NOTIFICATION_LIST, () => {
       const listOfNotification = notificationPage(
         { ...initialState, list: [notification] },
-        appendNotificationList(-1, [{ ...TLM, event_id: 999 }], workspaceList.workspaceList)
+        appendNotificationList(-1, userConfig, [{ ...TLM, event_id: 999 }], workspaceList.workspaceList)
       )
 
       it('should return the list of notifications appended with the list passed as parameter',

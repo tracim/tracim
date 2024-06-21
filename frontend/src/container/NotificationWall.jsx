@@ -36,7 +36,8 @@ import {
   TracimComponent,
   getContentPath,
   handleFetchResult,
-  sortListByMultipleCriteria
+  sortListByMultipleCriteria,
+  filterNotificationListFromUserConfig
 } from 'tracim_frontend_lib'
 import { escape as escapeHtml, uniqBy } from 'lodash'
 import NotificationItem from '../component/NotificationItem.jsx'
@@ -263,8 +264,9 @@ export const NotificationWall = props => {
   useEffect(() => {
     setIsFolderPathLoading(true)
 
-    const prefiltered = createNotificationListWithMergedFromFlatNotificationList(props.notificationPage.list)
-    const newNotificationList = createNotificationListWithGroupsFromFlatNotificationList(prefiltered)
+    const prefiltered = filterNotificationListFromUserConfig(props.notificationPage.list, props.user.config)
+    const merged = createNotificationListWithMergedFromFlatNotificationList(prefiltered)
+    const newNotificationList = createNotificationListWithGroupsFromFlatNotificationList(merged)
 
     props.notificationPage.list.forEach(async notification => {
       if (notification.type === `${TLM_ENTITY.CONTENT}.${TLM_EVENT.CREATED}.${TLM_SUB.FOLDER}`) {
@@ -277,7 +279,7 @@ export const NotificationWall = props => {
 
     setIsFolderPathLoading(false)
     setNotificationList(newNotificationList)
-  }, [props.notificationPage.list])
+  }, [props.notificationPage.list, props.user.config])
 
   useEffect(() => {
     const notificationListHeight = notificationList.length * NOTIFICATION_ITEM_HEIGHT
@@ -328,6 +330,7 @@ export const NotificationWall = props => {
           props.dispatch(
             appendNotificationList(
               props.user.userId,
+              props.user.config,
               fetchGetNotificationWall.json.items,
               props.workspaceList
             )

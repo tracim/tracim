@@ -63,6 +63,7 @@ from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.models.tag import Tag
 from tracim_backend.models.tag import TagOnContent
 from tracim_backend.models.tracim_session import TracimSession
+from tracim_backend.models.userconfig import UserConfig
 from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import EventSchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
@@ -72,6 +73,7 @@ from tracim_backend.views.core_api.schemas import ReactionSchema
 from tracim_backend.views.core_api.schemas import TagSchema
 from tracim_backend.views.core_api.schemas import ToDoSchema
 from tracim_backend.views.core_api.schemas import UserCallSchema
+from tracim_backend.views.core_api.schemas import UserConfigSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
@@ -101,6 +103,7 @@ class EventApi:
     workspace_user_role_schema = WorkspaceMemberDigestSchema()
     workspace_subscription_schema = WorkspaceSubscriptionSchema()
     user_call_schema = UserCallSchema()
+    user_config_schema = UserConfigSchema()
 
     def __init__(self, current_user: Optional[User], session: TracimSession, config: CFG) -> None:
         self._current_user = current_user
@@ -877,6 +880,10 @@ class EventBuilder:
     def on_user_call_deleted(self, user_call: UserCall, context: TracimContext) -> None:
         self._create_user_call_event(OperationType.DELETED, user_call, context)
 
+    @hookimpl
+    def on_user_config_modified(self, user_config: UserConfig, context: TracimContext) -> None:
+        self._create_user_config_event(OperationType.MODIFIED, user_config, context)
+
     def _create_subscription_event(
         self,
         operation: OperationType,
@@ -1023,6 +1030,27 @@ class EventBuilder:
             context=context,
         )
 
+    def _create_user_config_event(
+        self, operation: OperationType, user_config: UserConfig, context: TracimContext
+    ) -> None:
+        """Create an event for a user config operation (create/update/delete)."""
+        current_user = context.safe_current_user()
+        user_api = UserApi(current_user, context.dbsession, self._config, show_deleted=True)
+        user = user_api.get_one(user_config.user_id)
+        config_user_in_context = user_api.get_user_with_context(user)
+        user_config_fields = {"parameters": user_config.fields}
+        fields = {
+            Event.USER_CONFIG_FIELD: EventApi.user_config_schema.dump(user_config_fields).data,
+            Event.USER_FIELD: EventApi.user_schema.dump(config_user_in_context).data,
+        }
+        event_api = EventApi(current_user, context.dbsession, self._config)
+        event_api.create_event(
+            entity_type=EntityType.USER_CONFIG,
+            operation=operation,
+            additional_fields=fields,
+            context=context,
+        )
+
 
 def has_just_been_deleted(obj: Union[User, Workspace, ContentRevisionRO]) -> bool:
     """Check that an object has been deleted since it has been queried from database."""
@@ -1161,6 +1189,16 @@ def _get_user_call_event_receiver_ids(
     return {event.user_call["caller"]["user_id"], event.user_call["callee"]["user_id"]}
 
 
+def _get_user_config_event_receiver_ids(
+    event: Event, session: TracimSession, config: CFG
+) -> Set[int]:
+    """
+    User configs are readable by
+    - subscription user
+    """
+    return {event.fields["user"]["user_id"]}
+
+
 GetReceiverIdsCallable = Callable[[Event, TracimSession, CFG], Iterable[int]]
 
 
@@ -1175,6 +1213,7 @@ class BaseLiveMessageBuilder(abc.ABC):
         EntityType.REACTION: _get_content_event_receiver_ids,
         EntityType.TAG: _get_workspace_event_receiver_ids,
         EntityType.USER_CALL: _get_user_call_event_receiver_ids,
+        EntityType.USER_CONFIG: _get_user_config_event_receiver_ids,
         EntityType.USER: _get_user_event_receiver_ids,
         EntityType.WORKSPACE_MEMBER: _get_members_and_administrators_ids,
         EntityType.WORKSPACE_SUBSCRIPTION: _get_workspace_subscription_event_receiver_ids,

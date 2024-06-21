@@ -12,7 +12,8 @@ describe('<UserStatus />', () => {
   const props = {
     user: {
       publicName: 'randomPublicName',
-      userId: 1
+      userId: 1,
+      config: {}
     },
     displayNotifBtn: true,
     newSubscriptionRequestsNumber: true,

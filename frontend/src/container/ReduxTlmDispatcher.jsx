@@ -114,7 +114,10 @@ export class ReduxTlmDispatcher extends React.Component {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.LOGBOOK, handler: this.handleContentUnDeleted },
 
       // User call
-      { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserCallNotification }
+      { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserCallNotification },
+
+      // User config
+      { entityType: TLM_ET.USER_CONFIG, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserConfigModified }
     ])
   }
 
@@ -124,7 +127,7 @@ export class ReduxTlmDispatcher extends React.Component {
       props.user.userId !== data.fields.author.user_id &&
       !EXCLUDED_NOTIFICATION_TYPE_PREFIXES.some(type => data.event_type.startsWith(type))
     ) {
-      props.dispatch(addNotification(data, props.workspaceList))
+      props.dispatch(addNotification(data, props.user.config, props.workspaceList))
     }
   }
 
@@ -352,7 +355,7 @@ export class ReduxTlmDispatcher extends React.Component {
   handleUserChanged = data => {
     const { props } = this
 
-    this.props.dispatch(addNotification(data, props.workspaceList))
+    this.props.dispatch(addNotification(data, props.user.config, props.workspaceList))
   }
 
   handleWorkspaceSubscriptionCreated = data => {
@@ -387,6 +390,16 @@ export class ReduxTlmDispatcher extends React.Component {
         this.handleNotification(data)
       }
     }
+  }
+
+  handleUserConfigModified = async data => {
+    const { props } = this
+
+    const newUser = data.fields.user
+    newUser.config = data.fields.user_config.parameters
+
+    props.dispatch(updateUser(newUser))
+    this.handleNotification(data)
   }
 
   render () {

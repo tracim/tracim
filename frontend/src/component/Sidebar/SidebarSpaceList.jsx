@@ -28,6 +28,7 @@ const SidebarSpaceList = (props) => {
           hasChildren={space.children.length > 0}
           id={`sidebar-space-item-${space.id}`}
           isNotificationWallOpen={props.isNotificationWallOpen}
+          notificationList={props.notificationList}
           label={space.label}
           level={spaceLevel}
           onToggleFoldChildren={props.onToggleFoldChildren}
@@ -136,7 +137,8 @@ SidebarSpaceList.propTypes = {
   onClickToggleSpaceList: PropTypes.func,
   onToggleFoldChildren: PropTypes.func,
   showSpaceList: PropTypes.bool,
-  spaceList: PropTypes.array
+  spaceList: PropTypes.array,
+  notificationList: PropTypes.array
 }
 
 SidebarSpaceList.defaultProps = {
@@ -148,5 +150,6 @@ SidebarSpaceList.defaultProps = {
   onClickToggleSpaceList: () => { },
   onToggleFoldChildren: () => { },
   showSpaceList: true,
-  spaceList: []
+  spaceList: [],
+  notificationList: []
 }

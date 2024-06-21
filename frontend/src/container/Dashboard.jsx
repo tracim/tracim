@@ -23,7 +23,9 @@ import {
   buildHeadTitle,
   removeAtInUsername,
   addExternalLinksIcons,
-  getSpaceUserRoleList
+  getSpaceUserRoleList,
+  putUserConfiguration,
+  buildUserConfigSpaceWebNotificationKey
 } from 'tracim_frontend_lib'
 import {
   getSubscriptions,
@@ -415,6 +417,25 @@ export class Dashboard extends React.Component {
     }
   }
 
+  handleClickChangeWebNotification = async () => {
+    const { props } = this
+
+    const userConfig = { ...props.user.config }
+    const isSubscribed = userConfig[buildUserConfigSpaceWebNotificationKey(props.currentWorkspace.id)]
+    userConfig[buildUserConfigSpaceWebNotificationKey(props.currentWorkspace.id)] = isSubscribed === undefined
+      ? false
+      : !isSubscribed
+
+    try {
+      await putUserConfiguration(FETCH_CONFIG.apiUrl, props.user.userId, userConfig)
+    } catch (e) {
+      props.dispatch(newFlashMessage(props.t('Error while changing web notification subscription'), 'warning'))
+      console.error(
+        'Error while changing web notification subscription. handleClickChangeWebNotification.', e
+      )
+    }
+  }
+
   render () {
     const { props, state } = this
 
@@ -541,6 +562,7 @@ export class Dashboard extends React.Component {
                     }
                     newSubscriptionRequestsNumber={state.newSubscriptionRequestsNumber}
                     onClickChangeEmailNotificationType={this.handleClickChangeEmailNotificationType}
+                    onClickChangeWebNotification={this.handleClickChangeWebNotification}
                     t={props.t}
                   />
 

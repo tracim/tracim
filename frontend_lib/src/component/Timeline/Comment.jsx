@@ -13,12 +13,15 @@ import IconButton from '../Button/IconButton.jsx'
 import LinkPreview from '../LinkPreview/LinkPreview.jsx'
 import ProfileNavigation from '../../component/ProfileNavigation/ProfileNavigation.jsx'
 import {
-  CONTENT_TYPE,
-  ROLE,
   addExternalLinksIcons,
   displayDistanceDate,
   formatAbsoluteDate
 } from '../../helper.js'
+
+import {
+  CONTENT_TYPE,
+  ROLE
+} from '../../constant.js'
 
 import CommentFilePreview from './CommentFilePreview.jsx'
 
