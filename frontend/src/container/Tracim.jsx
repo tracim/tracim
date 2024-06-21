@@ -23,7 +23,6 @@ import FlashMessage from '../component/FlashMessage.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
 import OpenWorkspaceAdvanced from '../component/Workspace/OpenWorkspaceAdvanced.jsx'
 import Home from './Home.jsx'
-import WIPcomponent from './WIPcomponent.jsx'
 import CardPopupUsername from './CardPopupUsername'
 import {
   CUSTOM_EVENT,
@@ -631,8 +630,6 @@ export class Tracim extends React.Component {
             ]}
             render={() => <AppFullscreenRouter />}
           />
-
-          <Route path='/wip/:cp' component={WIPcomponent} /> {/* for testing purpose only */}
 
           <Route
             path={PAGE.SEARCH_RESULT}
