@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import propTypes from 'prop-types'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { isMobile } from 'react-device-detect'
-import { translate, Trans } from 'react-i18next'
+import { translate } from 'react-i18next'
 import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   USER_CALL_STATE,
-  CardPopup,
-  formatAbsoluteDate,
-  IconButton,
   TracimComponent
 } from 'tracim_frontend_lib'
 import {
@@ -18,9 +15,23 @@ import {
   putSetOutgoingUserCallState
 } from '../../action-creator.async.js'
 import { setHeadTitle } from '../../action-creator.sync.js'
+import {
+  CallPopupReceived,
+  CallPopupDeclined,
+  CallPopupInProgress,
+  CallPopupRejected,
+  CallPopupUnanswered,
+  CallPopupAccepted
+} from './CallPopup.jsx'
+
+require('./Call.styl')
 
 const UNANSWERED_CALL_TIMEOUT = 120000 // 2 minutes
+
 const audioCall = new Audio('/assets/branding/incoming-call.ogg')
+// INFO - CH - 2024-06-21 - Allow to play call ringtone in loop
+audioCall.addEventListener('ended', function () { this.play() }, false)
+
 const defaultUserCall = {
   call_id: '',
   state: '',
@@ -29,24 +40,25 @@ const defaultUserCall = {
   url: ''
 }
 
-// INFO - MP - 2021-11-10 - Helper function - Return the current time HH:mm
-const getHoursAndMinutes = lang => formatAbsoluteDate(new Date(), lang, 'p')
-
 export const Call = props => {
   const [userCall, setUserCall] = useState(defaultUserCall)
-  const [displayedUserId, setDisplayedUserId] = useState(0)
-  const [unansweredCallTimeoutId, setUnansweredCallTimeoutId] = useState(-1)
+  const [isMainTab, setIsMainTab] = useState(false)
+
+  let unansweredCallTimeoutId = -1
 
   useEffect(() => {
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.MODIFIED, handler: handleUserCallModified },
       { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.CREATED, handler: handleUserCallCreated }
     ])
+    setIsMainTab(props.liveMessageManager.eventSource !== null)
   }, [])
 
-  const handleUserCallCreated = async (tlm) => {
-    const isMainTab = props.liveMessageManager.eventSource !== null
+  useEffect(() => {
+    setIsMainTab(props.liveMessageManager.eventSource !== null)
+  }, [props.liveMessageManager.eventSource])
 
+  const handleUserCallCreated = async (tlm) => {
     if (tlm.fields.user_call.callee.user_id === props.user.userId) {
       if (window.Notification) {
         const notificationString = tlm.fields.user_call.caller.public_name + props.t(' is calling you on Tracim')
@@ -67,25 +79,13 @@ export const Call = props => {
       }
 
       setUserCall(tlm.fields.user_call)
-
       props.dispatch(setHeadTitle(props.system.headTitle, '🔔'))
-
-      if (!isMainTab) return
-
-      audioCall.addEventListener('ended', function () {
-        this.play()
-      }, false)
-
-      if (isMobile) return
-      audioCall.play()
     } else if (tlm.fields.user_call.caller.user_id === props.user.userId) {
       setUserCall(tlm.fields.user_call)
     }
   }
 
   const handleUserCallModified = (tlm) => {
-    const isMainTab = props.liveMessageManager.eventSource !== null
-
     if (tlm.fields.user_call.callee.user_id === props.user.userId) {
       setUserCall(defaultUserCall)
 
@@ -106,8 +106,7 @@ export const Call = props => {
       clearTimeout(unansweredCallTimeoutId)
 
       setUserCall(tlm.fields.user_call)
-      setDisplayedUserId(tlm.fields.user_call.callee.user_id)
-      setUnansweredCallTimeoutId(-1)
+      unansweredCallTimeoutId = -1
 
       if (tlm.fields.user_call.state === USER_CALL_STATE.ACCEPTED) {
         if (!isMainTab) return
@@ -139,12 +138,12 @@ export const Call = props => {
   }
 
   const handleClickRetryButton = async () => {
-    await props.dispatch(postCreateUserCall(props.user.userId, displayedUserId))
+    await props.dispatch(postCreateUserCall(props.user.userId, userCall.callee.user_id))
     const setUserCallUnanswered = () => {
       props.dispatch(putSetOutgoingUserCallState(props.user.userId, userCall.call_id, USER_CALL_STATE.UNANSWERED))
     }
     const id = setTimeout(setUserCallUnanswered, UNANSWERED_CALL_TIMEOUT)
-    setUnansweredCallTimeoutId(id)
+    unansweredCallTimeoutId = id
   }
 
   const handleClickCancelButton = async () => {
@@ -152,174 +151,73 @@ export const Call = props => {
     audioCall.pause()
   }
 
-  let callLink = null
+  if (
+    userCall.callee.user_id !== props.user.userId &&
+    userCall.caller.user_id !== props.user.userId
+  ) return null
 
-  if (userCall) {
-    const userCalleeName = userCall.callee.public_name
-    const userCallUrl = userCall.url
-    callLink = (
-      <Trans>
-        <span> {{ userCalleeName }} has accepted your call. If the call has not opened click on this
-          <a href={userCallUrl} target='_blank' rel='noopener noreferrer'> link </a>
-        </span>&nbsp;
-      </Trans>
+  if (userCall.callee.user_id === props.user.userId) {
+    if (isMainTab && !isMobile) audioCall.play()
+    return (
+      <CallPopupReceived
+        onClickRejectCall={handleClickRejectCall}
+        onClickDeclineCall={handleClickDeclineCall}
+        onClickOpenCallWindowCallee={handleClickOpenCallWindowCallee}
+        callerPublicName={userCall.caller.public_name}
+        userCallUrl={userCall.url}
+      />
     )
+  } else if (userCall.caller.user_id === props.user.userId) {
+    switch (userCall.state) {
+      case USER_CALL_STATE.IN_PROGRESS:
+        return (
+          <CallPopupInProgress
+            onClickCancelButton={handleClickCancelButton}
+            calleePublicName={userCall.callee.public_name}
+            userCallUrl={userCall.url}
+          />
+        )
+      case USER_CALL_STATE.REJECTED:
+        return (
+          <CallPopupRejected
+            onClosePopup={handleClosePopup}
+            calleePublicName={userCall.callee.public_name}
+            userLang={props.user.lang}
+          />
+        )
+      case USER_CALL_STATE.DECLINED:
+        return (
+          <CallPopupDeclined
+            onClosePopup={handleClosePopup}
+            calleePublicName={userCall.callee.public_name}
+          />
+        )
+      case USER_CALL_STATE.UNANSWERED:
+        return (
+          <CallPopupUnanswered
+            onClosePopup={handleClosePopup}
+            onClickRetryButton={handleClickRetryButton}
+            calleePublicName={userCall.callee.public_name}
+            userLang={props.user.lang}
+          />
+        )
+      case USER_CALL_STATE.ACCEPTED:
+        return (
+          <CallPopupAccepted
+            onClosePopup={handleClosePopup}
+            calleePublicName={userCall.callee.public_name}
+            userCallUrl={userCall.url}
+          />
+        )
+    }
   }
-
-  return (
-    <>
-      {(userCall.callee.user_id === props.user.userId) && (
-        <CardPopup
-          customClass=''
-          customHeaderClass='primaryColorBg'
-          onClose={handleClickRejectCall}
-          label={props.t('{{username}} is calling you', { username: userCall.caller.public_name })}
-          faIcon='fas fa-phone'
-        >
-          <div className='callpopup__body'>
-            <div className='callpopup__body__btn'>
-              <IconButton
-                onClick={handleClickRejectCall}
-                text={props.t('Decline')}
-                icon='fas fa-phone-slash'
-              />
-              <IconButton
-                onClick={handleClickDeclineCall}
-                text={props.t('I\'ll answer later')}
-                icon='far fa-clock'
-              />
-
-              <a href={userCall.url} target='_blank' rel='noopener noreferrer'>
-                {/* FIXME - MB - 2022-01-05 - a LinkButton should be created with the same style that IconButton
-                  see https://github.com/tracim/tracim/issues/5242 */}
-                <IconButton
-                  intent='primary'
-                  mode='light'
-                  onClick={handleClickOpenCallWindowCallee}
-                  text={props.t('Open call')}
-                  icon='fas fa-phone'
-                  color={GLOBAL_primaryColor} // eslint-disable-line camelcase
-                  customClass='openCallButton'
-                />
-              </a>
-            </div>
-          </div>
-        </CardPopup>
-      )}
-
-      {(userCall.caller.user_id === props.user.userId) && userCall.state === USER_CALL_STATE.IN_PROGRESS && (
-        <CardPopup
-          customClass=''
-          customHeaderClass='primaryColorBg'
-          onClose={handleClickCancelButton}
-          label={props.t('Call in progress...')}
-          faIcon='fas fa-phone'
-        >
-          <div className='gallery__delete__file__popup__body'>
-            <div className='callpopup__text'>
-              {props.t(
-                '{{username}} has received your call. If accepted, the call will open automatically.',
-                { username: userCall.callee.public_name }
-              )}
-            </div>
-
-            <div className='gallery__delete__file__popup__body__btn'>
-              <IconButton
-                onClick={handleClickCancelButton}
-                text={props.t('Cancel the call')}
-                icon='fas fa-phone-slash'
-              />
-              <a href={userCall.url} target='_blank' rel='noopener noreferrer'>
-                {/* FIXME - MB - 2022-01-05 - a LinkButton should be created with the same style that IconButton
-                      see https://github.com/tracim/tracim/issues/5242 */}
-                <IconButton
-                  intent='primary'
-                  mode='light'
-                  text={props.t('Open call')}
-                  icon='fas fa-phone'
-                  color={GLOBAL_primaryColor} // eslint-disable-line camelcase
-                  customClass='openCallButton'
-                />
-              </a>
-            </div>
-          </div>
-        </CardPopup>
-      )}
-
-      {/* INFO - MP - 2021-10-15: Declined popup */}
-      {(userCall.caller.user_id === props.user.userId) && userCall.state === USER_CALL_STATE.REJECTED && (
-        <CardPopup
-          customClass='callpopup__body'
-          customHeaderClass='primaryColorBg'
-          onClose={handleClosePopup}
-          label={props.t(
-            'Call declined by {{username}} at {{time}}',
-            { username: userCall.callee.public_name, time: getHoursAndMinutes(props.user.lang) }
-          )}
-          faIcon='fas fa-phone-slash'
-          displayCloseButton
-        />
-      )}
-
-      {/* INFO - MP - 2021-10-15: Call back later popup */}
-      {(userCall.caller.user_id === props.user.userId) && userCall.state === USER_CALL_STATE.DECLINED && (
-        <CardPopup
-          customClass='callpopup__body'
-          customHeaderClass='primaryColorBg'
-          onClose={handleClosePopup}
-          label={props.t('{{username}} will call you back later', { username: userCall.callee.public_name })}
-          faIcon='fas fa-phone-slash'
-          displayCloseButton
-        />
-      )}
-
-      {/* INFO - MP - 2021-10-15: Call failed popup */}
-      {(userCall.caller.user_id === props.user.userId) && userCall.state === USER_CALL_STATE.UNANSWERED && (
-        <CardPopup
-          customClass='callpopup__body'
-          customHeaderClass='primaryColorBg'
-          onClose={handleClosePopup}
-          label={props.t('Call failed at {{time}}', { time: getHoursAndMinutes(props.user.lang) })}
-          faIcon='fas fa-phone-slash'
-          displayCloseButton
-        >
-          <div className='callpopup__text'>
-            {props.t('The call with {{username}} failed', { username: userCall.callee.public_name })}
-          </div>
-
-          <div className='gallery__delete__file__popup__body__btn'>
-            <IconButton
-              intent='primary'
-              mode='light'
-              onClick={handleClickRetryButton}
-              text={props.t('Try again')}
-              icon='fas fa-phone'
-              color={GLOBAL_primaryColor} // eslint-disable-line camelcase
-            />
-          </div>
-        </CardPopup>
-      )}
-
-      {/* INFO - MB - 2021-10-26: Accepted popup */}
-      {(userCall.caller.user_id === props.user.userId) && userCall.state === USER_CALL_STATE.ACCEPTED && (
-        <CardPopup
-          customClass='callpopup__body'
-          customHeaderClass='primaryColorBg'
-          onClose={handleClosePopup}
-          label={callLink}
-          faIcon='fas fa-phone'
-          displayCloseButton
-        />
-      )}
-    </>
-  )
 }
 
 const mapStateToProps = ({ user, system }) => ({ user, system })
 export default connect(mapStateToProps)(translate()(TracimComponent(Call)))
 
 Call.propTypes = {
-  liveMessageManager: propTypes.object.isRequired
+  liveMessageManager: PropTypes.object.isRequired
 }
 Call.defaultProps = {
 }
