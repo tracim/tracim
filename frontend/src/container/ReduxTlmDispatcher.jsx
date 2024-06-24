@@ -35,7 +35,7 @@ import {
   addWorkspaceSubscription,
   removeWorkspaceSubscription,
   updateWorkspaceSubscription,
-  setKnownMemberList
+  setKnownMemberList, filterNotificationList
 } from '../action-creator.sync.js'
 import { getUser, getMyselfAllKnownMember } from '../action-creator.async.js'
 import { FETCH_CONFIG } from '../util/helper.js'
@@ -399,6 +399,7 @@ export class ReduxTlmDispatcher extends React.Component {
     newUser.config = data.fields.user_config.parameters
 
     props.dispatch(updateUser(newUser))
+    props.dispatch(filterNotificationList(newUser.user_id, newUser.config, props.workspaceList))
     this.handleNotification(data)
   }
 
