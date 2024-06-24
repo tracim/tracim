@@ -103,6 +103,7 @@ describe('reducer notificationPage.js', () => {
   describe('actions', () => {
     const initialState = {
       list: [],
+      rawList: [],
       hasNextPage: false,
       nextPageToken: '',
       // NOTE - MP - 2023-04-17 - Defining unreadNotificationCount and unreadMentionCount as bigger
