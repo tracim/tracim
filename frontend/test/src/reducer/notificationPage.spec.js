@@ -224,7 +224,7 @@ describe('reducer notificationPage.js', () => {
 
     describe(APPEND_NOTIFICATION_LIST, () => {
       const listOfNotification = notificationPage(
-        { ...initialState, list: [notification] },
+        { ...initialState, list: [notification], rawList: [notification] },
         appendNotificationList(-1, userConfig, [{ ...TLM, event_id: 999 }], workspaceList.workspaceList)
       )
 
@@ -234,7 +234,7 @@ describe('reducer notificationPage.js', () => {
             {
               ...initialState,
               rawList: [notification, { ...notification, id: 999 }],
-              list: [notification, { ...notification, id: 999 }]
+              list: [notification, { ...notification, id: 999 }],
             }
           )
         }
