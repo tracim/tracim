@@ -234,7 +234,7 @@ describe('reducer notificationPage.js', () => {
             {
               ...initialState,
               rawList: [notification, { ...notification, id: 999 }],
-              list: [notification, { ...notification, id: 999 }],
+              list: [notification, { ...notification, id: 999 }]
             }
           )
         }

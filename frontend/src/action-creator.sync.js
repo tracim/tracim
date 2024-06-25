@@ -223,9 +223,9 @@ export const NOTIFICATION_LIST = `${NOTIFICATION}/List`
 export const EVERY_NOTIFICATION = `Every${NOTIFICATION}`
 export const UNREAD_MENTION_COUNT = 'UnreadMentionCount'
 export const UNREAD_NOTIFICATION_COUNT = `Unread${NOTIFICATION}Count`
-export const FILTER_NOTIFICATION_LIST = `${SET}/FilterNotificationList`
-export const filterNotificationList = (userId, userConfig, spaceList) => ({
-  type: FILTER_NOTIFICATION_LIST,
+export const UPDATE_NOTIFICATION_LIST = `${UPDATE}/${NOTIFICATION_LIST}`
+export const updateNotificationList = (userId, userConfig, spaceList) => ({
+  type: UPDATE_NOTIFICATION_LIST,
   userId,
   userConfig,
   spaceList
