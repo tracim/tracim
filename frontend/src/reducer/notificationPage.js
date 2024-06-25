@@ -12,6 +12,7 @@ import {
   UNREAD_MENTION_COUNT,
   UNREAD_NOTIFICATION_COUNT,
   UPDATE,
+  UPDATE_NOTIFICATION_LIST,
   USER_DISCONNECTED
 } from '../action-creator.sync.js'
 import { serializeContentProps } from './workspaceContentList.js'
@@ -28,6 +29,7 @@ import {
 
 const defaultNotificationsObject = {
   list: [],
+  rawList: [],
   hasNextPage: false,
   nextPageToken: '',
   unreadMentionCount: 0,
@@ -117,13 +119,15 @@ function getMainContentId (notification) {
  * @param {Object[]} spaceList Filter the notification to not display access request to spaces that
  *  are not in the list
  * @param {int} unreadNotificationCount The current unread notification count
+ * @param {int} unreadMentionCount The current unread mention count
  * @returns {Object} An object that contains the new notification list filtered and the new unread
  * notification count
  */
 function notificationListFilter (
-  userId, userConfig, notificationList, spaceList, unreadNotificationCount
+  userId, userConfig, notificationList, spaceList, unreadNotificationCount, unreadMentionCount
 ) {
   let newUnreadNotificationCount = unreadNotificationCount
+  let newUnreadMentionCount = unreadMentionCount
   const newNotificationList = notificationList.filter(notification => {
     const [entityType, coreType, subType] = notification.type.split('.') // eslint-disable-line no-unused-vars
 
@@ -152,7 +156,10 @@ function notificationListFilter (
     // INFO - CH - 2024-06-19 - filter notification from spaces user is not subscribed
     const shouldKeep = shouldKeepNotification(notification, userConfig)
     if (shouldKeep === false) {
-      if (!notification.read) newUnreadNotificationCount--
+      if (!notification.read) {
+        if (notification.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}`) newUnreadMentionCount--
+        newUnreadNotificationCount--
+      }
       return false
     }
 
@@ -160,8 +167,10 @@ function notificationListFilter (
   })
 
   return {
+    rawList: notificationList,
     list: newNotificationList,
-    unreadNotificationCount: newUnreadNotificationCount
+    unreadNotificationCount: newUnreadNotificationCount,
+    unreadMentionCount: newUnreadMentionCount
   }
 }
 
@@ -175,9 +184,10 @@ export default function notificationPage (state = defaultNotificationsObject, ac
         ...notificationListFilter(
           action.userId,
           action.userConfig,
-          [...state.list, ...notificationList],
+          [...state.rawList, ...notificationList],
           action.spaceList,
-          state.unreadNotificationCount
+          state.unreadNotificationCount,
+          state.unreadMentionCount
         )
       }
     }
@@ -194,16 +204,16 @@ export default function notificationPage (state = defaultNotificationsObject, ac
 
       return {
         ...state,
-        unreadMentionCount: newUnreadMentionCount,
         // FIXME - MP - 2022-10-18 - Remove the function here to keep the logic in
         // ReduxTlmDispatcher.jsx
         // https://github.com/tracim/tracim/issues/5946
         ...notificationListFilter(
           userIdIfFiltered,
           action.userConfig,
-          sortByCreatedDate([...state.list, notification]),
+          sortByCreatedDate([...state.rawList, notification]),
           action.spaceList,
-          state.unreadNotificationCount + 1
+          state.unreadNotificationCount + 1,
+          newUnreadMentionCount
         )
       }
     }
@@ -282,6 +292,19 @@ export default function notificationPage (state = defaultNotificationsObject, ac
         unreadNotificationCount
       }
     }
+
+    case UPDATE_NOTIFICATION_LIST:
+      return {
+        ...state,
+        ...notificationListFilter(
+          action.userId,
+          action.userConfig,
+          [...state.rawList],
+          action.spaceList,
+          state.unreadNotificationCount,
+          state.unreadMentionCount
+        )
+      }
 
     case `${SET}/${NEXT_PAGE}`:
       return { ...state, hasNextPage: action.hasNextPage, nextPageToken: action.nextPageToken }

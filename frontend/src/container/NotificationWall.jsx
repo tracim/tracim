@@ -36,8 +36,7 @@ import {
   TracimComponent,
   getContentPath,
   handleFetchResult,
-  sortListByMultipleCriteria,
-  filterNotificationListFromUserConfig
+  sortListByMultipleCriteria
 } from 'tracim_frontend_lib'
 import { escape as escapeHtml, uniqBy } from 'lodash'
 import NotificationItem from '../component/NotificationItem.jsx'
@@ -264,8 +263,7 @@ export const NotificationWall = props => {
   useEffect(() => {
     setIsFolderPathLoading(true)
 
-    const prefiltered = filterNotificationListFromUserConfig(props.notificationPage.list, props.user.config)
-    const merged = createNotificationListWithMergedFromFlatNotificationList(prefiltered)
+    const merged = createNotificationListWithMergedFromFlatNotificationList(props.notificationPage.list)
     const newNotificationList = createNotificationListWithGroupsFromFlatNotificationList(merged)
 
     props.notificationPage.list.forEach(async notification => {
