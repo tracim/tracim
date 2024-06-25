@@ -3,7 +3,7 @@ import {
   ADD_NOTIFICATION,
   APPEND_NOTIFICATION_LIST,
   CONTENT,
-  EVERY_NOTIFICATION, FILTER_NOTIFICATION_LIST,
+  EVERY_NOTIFICATION,
   NEXT_PAGE,
   NOTIFICATION,
   NOTIFICATION_LIST,
@@ -12,6 +12,7 @@ import {
   UNREAD_MENTION_COUNT,
   UNREAD_NOTIFICATION_COUNT,
   UPDATE,
+  UPDATE_NOTIFICATION_LIST,
   USER_DISCONNECTED
 } from '../action-creator.sync.js'
 import { serializeContentProps } from './workspaceContentList.js'
@@ -292,7 +293,7 @@ export default function notificationPage (state = defaultNotificationsObject, ac
       }
     }
 
-    case FILTER_NOTIFICATION_LIST:
+    case UPDATE_NOTIFICATION_LIST:
       return {
         ...state,
         ...notificationListFilter(
