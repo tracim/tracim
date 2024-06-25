@@ -121,6 +121,7 @@ describe('reducer notificationPage.js', () => {
         )
         expect(listOfNotification).to.deep.equal({
           ...initialState,
+          rawList: [notification],
           list: [notification],
           unreadMentionCount: DEFAULT_UNREAD_MENTION_COUNT,
           unreadNotificationCount: DEFAULT_UNREAD_NOTIFICATION_COUNT + 1
@@ -134,6 +135,7 @@ describe('reducer notificationPage.js', () => {
         expect(listOfMention).to.deep.equal({
           ...initialState,
           list: [mention],
+          rawList: [mention],
           unreadMentionCount: DEFAULT_UNREAD_MENTION_COUNT + 1,
           unreadNotificationCount: DEFAULT_UNREAD_NOTIFICATION_COUNT + 1
         })
@@ -229,7 +231,11 @@ describe('reducer notificationPage.js', () => {
       it('should return the list of notifications appended with the list passed as parameter',
         () => {
           expect(listOfNotification).to.deep.equal(
-            { ...initialState, list: [notification, { ...notification, id: 999 }] }
+            {
+              ...initialState,
+              rawList: [notification, { ...notification, id: 999 }],
+              list: [notification, { ...notification, id: 999 }]
+            }
           )
         }
       )
