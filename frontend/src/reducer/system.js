@@ -37,7 +37,9 @@ export function system (state = defaultSystem, action) {
       return { ...state, config: action.config }
 
     case `${SET}/${HEAD_TITLE}`: {
-      const titleArgs = action.titlePrefix === '' ? [action.headTitle, state.config.instance_name] : [action.titlePrefix, action.headTitle, state.config.instance_name]
+      const titleArgs = action.titlePrefix === ''
+        ? [action.headTitle, state.config.instance_name]
+        : [action.titlePrefix, action.headTitle, state.config.instance_name]
 
       if (isEqual(titleArgs, state.titleArgs)) return state
       return { ...state, titleArgs, headTitle: action.headTitle }
