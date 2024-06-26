@@ -637,7 +637,7 @@
   "Disabled": "Désactivées",
   "Web notifications:": "Notifications web :",
   "Enable/Disable web notifications for this workspace.": "Activer / Désactiver les notifications web pour cet espace.",
-  "When disabled, notifications from this workspace will be hidden from your notification wall.": "Lorsque désactivées, les notifications de cet espace seront cachées de votre mur de notifications.",
+  "When disabled, notifications from this workspace will be hidden from your notification wall.": "Si désactivées, les notifications de cet espace seront cachées de votre mur de notifications.",
   "This parameter affects all web notifications except individual mentions.": "Ce paramètre affecte toutes les notifications web sauf les mentions individuelles.",
   "Created and commented": "Créé et commenté"
 }
