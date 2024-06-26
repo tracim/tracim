@@ -4,7 +4,15 @@
   <p>${_('Hello {username},').format(username=user.display_name)}</p>
 
   % if len(mentions) > 0:
-    <p>${_('Here is the list of your unread mentions {email_notification_type_string}:').format(email_notification_type_string=email_notification_type_string)}</p>
+    <p>
+      % if email_notification_type == hourly_email_notification_type:
+        ${_('Here is the list of your unread mentions in the last hour:')}
+      % elif email_notification_type == daily_email_notification_type:
+        ${_('Here is the list of your unread mentions in the last day:')}
+      % elif email_notification_type == weekly_email_notification_type:
+        ${_('Here is the list of your unread mentions in the last week:')}
+      % endif
+    </p>
     <ul>
     % for mention in mentions:
       % if mention.event.content["content_type"] == 'comment':
@@ -29,7 +37,15 @@
   % endif
 
   % if len(notification_summary) > 0:
-    <p>${_('Here is the summary of your unread notifications {email_notification_type_string}:').format(email_notification_type_string=email_notification_type_string)}</p>
+    <p>
+      % if email_notification_type == hourly_email_notification_type:
+        ${_('Here is the list of your unread notifications in the last hour:')}
+      % elif email_notification_type == daily_email_notification_type:
+        ${_('Here is the list of your unread notifications in the last day:')}
+      % elif email_notification_type == weekly_email_notification_type:
+        ${_('Here is the list of your unread notifications in the last week:')}
+      % endif
+    </p>
     <ul>
     % for notification in notification_summary:
       <li>

@@ -133,9 +133,6 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
             if not user.can_receive_summary_mail():
                 continue
 
-            email_notification_type_for_template = email_notification_type.to_string(
-                user.lang, translator
-            )
             email_notification_type_as_string = email_notification_type.get_value(
                 user.lang, translator
             )
@@ -161,7 +158,10 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
                     "user": user,
                     "mentions": mentions,
                     "notification_summary": notification_summary,
-                    "email_notification_type_string": email_notification_type_for_template,
+                    "email_notification_type": email_notification_type,
+                    "hourly_email_notification_type": EmailNotificationType.HOURLY.value,
+                    "daily_email_notification_type": EmailNotificationType.DAILY.value,
+                    "weekly_email_notification_type": EmailNotificationType.WEEKLY.value,
                 }
                 translator = Translator(
                     app_config=config,
