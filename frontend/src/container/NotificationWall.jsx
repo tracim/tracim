@@ -428,7 +428,7 @@ export const NotificationWall = props => {
 
           if (notification.isMerged) {
             return {
-              title: props.t('Commented and created'),
+              title: props.t('Created and commented'),
               text: props.t('{{author}} created and commented on {{content}}{{workspaceInfo}}', i18nOpts),
               url: contentUrl
             }

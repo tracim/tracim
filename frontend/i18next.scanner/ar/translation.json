@@ -649,5 +649,14 @@
   "You'll <1>receive a weekly e-mail</1> summarizing everything you haven't already read.<3>There will be a single email for all spaces configured as \"Weekly\".</3>": "",
   "You'll receive no e-mail notifications, even if you are mentioned.<1>You'll need to rely on recent activities and the notification wall to stay up to date.</1>": "",
   "logbook_search": "Logbook",
-  "{{author}} created and commented on {{content}}{{workspaceInfo}}": ""
+  "{{author}} created and commented on {{content}}{{workspaceInfo}}": "",
+  "Error while changing web notification subscription": "",
+  "Web notifications": "",
+  "Enabled": "",
+  "Disabled": "",
+  "Web notifications:": "",
+  "Enable/Disable web notifications for this workspace.": "",
+  "When disabled, notifications from this workspace will be hidden from your notification wall.": "",
+  "This parameter affects all web notifications except individual mentions.": "",
+  "Created and commented": ""
 }
