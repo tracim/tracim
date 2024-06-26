@@ -168,6 +168,7 @@ describe('reducer notificationPage.js', () => {
           expectedResult: {
             ...initialState,
             list: [{ ...notification, read: true }],
+            rawList: [{ ...notification, read: true }],
             unreadNotificationCount: DEFAULT_UNREAD_NOTIFICATION_COUNT - 1
           },
           description: 'notification'
@@ -177,6 +178,7 @@ describe('reducer notificationPage.js', () => {
           expectedResult: {
             ...initialState,
             list: [{ ...mention, read: true }],
+            rawList: [{ ...mention, read: true }],
             unreadMentionCount: DEFAULT_UNREAD_MENTION_COUNT - 1,
             unreadNotificationCount: DEFAULT_UNREAD_NOTIFICATION_COUNT - 1
           },
@@ -185,7 +187,7 @@ describe('reducer notificationPage.js', () => {
       ]
       testCases.forEach(testCase => {
         it(`should read a ${testCase.description} in a flat list`, () => {
-          const initState = { ...initialState, list: [testCase.type] }
+          const initState = { ...initialState, list: [testCase.type], rawList: [testCase.type] }
           const resultList = notificationPage(initState, readNotificationList([testCase.type.id]))
           expect(resultList).to.deep.equal(testCase.expectedResult)
         })
