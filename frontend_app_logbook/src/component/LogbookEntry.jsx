@@ -23,8 +23,8 @@ const LogbookEntry = (props) => {
   useEffect(() => {
     const descriptionElement = document.getElementById(`${props.entry.id}_description`)
     const descriptionHeight = (descriptionElement || { scrollHeight: 0 }).scrollHeight
-    setShowDescriptionPreview(descriptionHeight > 75)
-    setShowSeeDescriptionButton(descriptionHeight > 75
+    setShowDescriptionPreview(descriptionHeight > 471)
+    setShowSeeDescriptionButton(descriptionHeight > 471
       ? DESCRIPTION_BUTTON.SEE_MORE
       : DESCRIPTION_BUTTON.HIDDEN
     )
