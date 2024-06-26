@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 1.9.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-06-26 17:56+0200\n"
+"POT-Creation-Date: 2024-06-26 18:28+0200\n"
 "PO-Revision-Date: 2022-06-22 14:36+0000\n"
 "Last-Translator: gbonaspetti <gbonaspetti@hotmail.com>\n"
 "Language: en\n"
@@ -96,8 +96,22 @@ msgid "Uploaded by {username}."
 msgstr "Uploaded by {username}."
 
 #: tracim_backend/command/periodic.py:66
-msgid "[{website_title}] Your {email_notification_type} summary"
-msgstr "[{website_title}] Your {email_notification_type} summary"
+#, fuzzy
+#| msgid "[{website_title}] Your {email_notification_type} summary"
+msgid "[{website_title}] Your hourly summary"
+msgstr "[{website_title}] Your hourly summary"
+
+#: tracim_backend/command/periodic.py:68
+#, fuzzy
+#| msgid "[{website_title}] Your {email_notification_type} summary"
+msgid "[{website_title}] Your daily summary"
+msgstr "[{website_title}] Your daily summary"
+
+#: tracim_backend/command/periodic.py:70
+#, fuzzy
+#| msgid "[{website_title}] Your {email_notification_type} summary"
+msgid "[{website_title}] Your weekly summary"
+msgstr "[{website_title}] Your weekly summary"
 
 #: tracim_backend/lib/core/content.py:785
 msgid "Space {workspace_name}"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 3.7.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-06-26 17:56+0200\n"
+"POT-Creation-Date: 2024-06-26 18:28+0200\n"
 "PO-Revision-Date: 2022-02-17 13:47+0000\n"
 "Last-Translator: Marie Bégué <marie.prandstetter@gmail.com>\n"
 "Language: de\n"
@@ -102,7 +102,15 @@ msgid "Uploaded by {username}."
 msgstr "Hochgeladen von {username}."
 
 #: tracim_backend/command/periodic.py:66
-msgid "[{website_title}] Your {email_notification_type} summary"
+msgid "[{website_title}] Your hourly summary"
+msgstr ""
+
+#: tracim_backend/command/periodic.py:68
+msgid "[{website_title}] Your daily summary"
+msgstr ""
+
+#: tracim_backend/command/periodic.py:70
+msgid "[{website_title}] Your weekly summary"
 msgstr ""
 
 #: tracim_backend/lib/core/content.py:785
@@ -433,7 +441,9 @@ msgstr "{author} hat dich erwähnt in"
 
 #: tracim_backend/templates/mail/summary_body_html.mak:42
 msgid "Here is the list of your unread notifications in the last hour:"
-msgstr "Hier ist die Liste Ihrer ungelesenen Benachrichtigungen in der letzten Stunde:"
+msgstr ""
+"Hier ist die Liste Ihrer ungelesenen Benachrichtigungen in der letzten "
+"Stunde:"
 
 #: tracim_backend/templates/mail/summary_body_html.mak:44
 msgid "Here is the list of your unread notifications in the last day:"
@@ -441,7 +451,9 @@ msgstr "Hier ist die Liste Ihrer ungelesenen Benachrichtigungen des letzten Tage
 
 #: tracim_backend/templates/mail/summary_body_html.mak:46
 msgid "Here is the list of your unread notifications in the last week:"
-msgstr "Hier ist die Liste Ihrer ungelesenen Benachrichtigungen in der letzten Woche:"
+msgstr ""
+"Hier ist die Liste Ihrer ungelesenen Benachrichtigungen in der letzten "
+"Woche:"
 
 #: tracim_backend/templates/mail/summary_body_html.mak:52
 msgid "{event_count} activity in the space"
@@ -546,3 +558,6 @@ msgstr ""
 #~ "Here is the summary of your unread"
 #~ " notifications {email_notification_type_string}:"
 #~ msgstr "Hier ist die Liste deiner ungelesenen Erwähnungen"
+
+#~ msgid "[{website_title}] Your {email_notification_type} summary"
+#~ msgstr ""

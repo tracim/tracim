@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 1.9.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-06-26 17:56+0200\n"
+"POT-Creation-Date: 2024-06-26 18:28+0200\n"
 "PO-Revision-Date: 2023-03-27 09:45+0000\n"
 "Last-Translator: Perrier Mathis <mathis.perrier73@gmail.com>\n"
 "Language: fr\n"
@@ -102,8 +102,22 @@ msgid "Uploaded by {username}."
 msgstr "Téléversé par {username}."
 
 #: tracim_backend/command/periodic.py:66
-msgid "[{website_title}] Your {email_notification_type} summary"
-msgstr "[{website_title}] Votre récapitulatif {email_notification_type}"
+#, fuzzy
+#| msgid "[{website_title}] Your {email_notification_type} summary"
+msgid "[{website_title}] Your hourly summary"
+msgstr "[{website_title}] Votre récapitulatif horaire"
+
+#: tracim_backend/command/periodic.py:68
+#, fuzzy
+#| msgid "[{website_title}] Your {email_notification_type} summary"
+msgid "[{website_title}] Your daily summary"
+msgstr "[{website_title}] Votre récapitulatif quotidien"
+
+#: tracim_backend/command/periodic.py:70
+#, fuzzy
+#| msgid "[{website_title}] Your {email_notification_type} summary"
+msgid "[{website_title}] Your weekly summary"
+msgstr "[{website_title}] Votre récapitulatif hebdomadaire"
 
 #: tracim_backend/lib/core/content.py:785
 msgid "Space {workspace_name}"
@@ -438,25 +452,25 @@ msgstr "{author} vous a mentionné dans"
 
 # | msgid "Here is the list of your unread mentions
 # | {email_notification_type_string}:"
+# | msgid "Here is the list of your unread mentions in the last hour:"
 #: tracim_backend/templates/mail/summary_body_html.mak:42
 #, fuzzy
-#| msgid "Here is the list of your unread mentions in the last hour:"
 msgid "Here is the list of your unread notifications in the last hour:"
 msgstr "Voici la liste de vos notifications non lues durant la dernière heure :"
 
 # | msgid "Here is the list of your unread mentions
 # | {email_notification_type_string}:"
+# | msgid "Here is the list of your unread mentions in the last day:"
 #: tracim_backend/templates/mail/summary_body_html.mak:44
 #, fuzzy
-#| msgid "Here is the list of your unread mentions in the last day:"
 msgid "Here is the list of your unread notifications in the last day:"
 msgstr "Voici la liste de vos notifications non lues durant le dernier jour :"
 
 # | msgid "Here is the list of your unread mentions
 # | {email_notification_type_string}:"
+# | msgid "Here is the list of your unread mentions in the last week:"
 #: tracim_backend/templates/mail/summary_body_html.mak:46
 #, fuzzy
-#| msgid "Here is the list of your unread mentions in the last week:"
 msgid "Here is the list of your unread notifications in the last week:"
 msgstr "Voici la liste de vos notifications non lues durant la dernière semaine :"
 

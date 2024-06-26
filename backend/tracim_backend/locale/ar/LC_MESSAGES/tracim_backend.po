@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 4.1.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-06-26 17:56+0200\n"
+"POT-Creation-Date: 2024-06-26 18:28+0200\n"
 "PO-Revision-Date: 2023-03-13 19:38+0000\n"
 "Last-Translator: gbonaspetti <gbonaspetti@hotmail.com>\n"
 "Language: ar\n"
@@ -149,7 +149,15 @@ msgid "Uploaded by {username}."
 msgstr "تم التحميل بواسطة {username}."
 
 #: tracim_backend/command/periodic.py:66
-msgid "[{website_title}] Your {email_notification_type} summary"
+msgid "[{website_title}] Your hourly summary"
+msgstr ""
+
+#: tracim_backend/command/periodic.py:68
+msgid "[{website_title}] Your daily summary"
+msgstr ""
+
+#: tracim_backend/command/periodic.py:70
+msgid "[{website_title}] Your weekly summary"
 msgstr ""
 
 #: tracim_backend/lib/core/content.py:785
@@ -606,4 +614,7 @@ msgstr ""
 #~ msgid ""
 #~ "Here is the summary of your unread"
 #~ " notifications {email_notification_type_string}:"
+#~ msgstr ""
+
+#~ msgid "[{website_title}] Your {email_notification_type} summary"
 #~ msgstr ""

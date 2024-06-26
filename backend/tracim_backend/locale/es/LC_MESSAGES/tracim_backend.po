@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-06-26 17:56+0200\n"
+"POT-Creation-Date: 2024-06-26 18:28+0200\n"
 "PO-Revision-Date: 2023-03-27 09:45+0000\n"
 "Last-Translator: Quiwy <github@quiwy.ninja>\n"
 "Language: es\n"
@@ -96,7 +96,15 @@ msgid "Uploaded by {username}."
 msgstr "Subido por {username}."
 
 #: tracim_backend/command/periodic.py:66
-msgid "[{website_title}] Your {email_notification_type} summary"
+msgid "[{website_title}] Your hourly summary"
+msgstr ""
+
+#: tracim_backend/command/periodic.py:68
+msgid "[{website_title}] Your daily summary"
+msgstr ""
+
+#: tracim_backend/command/periodic.py:70
+msgid "[{website_title}] Your weekly summary"
 msgstr ""
 
 #: tracim_backend/lib/core/content.py:785
@@ -539,3 +547,6 @@ msgstr ""
 #~ "Aquí tiene el resumen de sus "
 #~ "notificaciones no leídas "
 #~ "{email_notification_type_string}:"
+
+#~ msgid "[{website_title}] Your {email_notification_type} summary"
+#~ msgstr ""
