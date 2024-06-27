@@ -2,9 +2,11 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import {
   IconButton,
-  ROLE_LIST
+  ROLE_LIST,
+  BtnSwitch
 } from 'tracim_frontend_lib'
 import EmailNotificationTypeButton from '../EmailNotificationTypeButton/EmailNotificationTypeButton.jsx'
+import PropTypes from 'prop-types'
 
 require('./UserSpacesConfigLine.styl')
 
@@ -29,6 +31,19 @@ class UserSpacesConfigLine extends React.Component {
             </div>
           </div>
         </td>
+        {(!props.admin &&
+          <td>
+            <div className='usersstatus__item__value webNotifSubscription__value'>
+              <BtnSwitch
+                smallSize
+                onChange={() => props.onChangeWebNotification(props.space.id)}
+                checked={props.webNotificationEnabled}
+                activeLabel={props.t('Enabled')}
+                inactiveLabel={props.t('Disabled')}
+              />
+            </div>
+          </td>
+        )}
         {(props.system.config.email_notification_activated &&
           <td>
             <EmailNotificationTypeButton
@@ -60,6 +75,27 @@ class UserSpacesConfigLine extends React.Component {
       </tr>
     )
   }
+}
+
+UserSpacesConfigLine.propTypes = {
+  space: PropTypes.object,
+  system: PropTypes.object,
+  onlyManager: PropTypes.bool,
+  admin: PropTypes.bool,
+  webNotificationEnabled: PropTypes.bool,
+  onLeaveSpace: PropTypes.func,
+  onChangeEmailNotificationType: PropTypes.func,
+  onChangeWebNotification: PropTypes.func.isRequired
+}
+
+UserSpacesConfigLine.defaultProps = {
+  space: {},
+  system: {},
+  onlyManager: false,
+  admin: false,
+  webNotificationEnabled: true,
+  onLeaveSpace: () => {},
+  onChangeEmailNotificationType: () => {}
 }
 
 export default translate()(UserSpacesConfigLine)

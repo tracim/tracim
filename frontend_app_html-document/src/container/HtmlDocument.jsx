@@ -4,6 +4,7 @@ import { translate } from 'react-i18next'
 import { uniqBy } from 'lodash'
 import i18n from '../i18n.js'
 import {
+  APP_CUSTOM_ACTION_LOCATION_OBJECT,
   APP_FEATURE_MODE,
   BREADCRUMBS_TYPE,
   CONTENT_TYPE,
@@ -31,6 +32,7 @@ import {
   addClassToMentionsOfUser,
   addExternalLinksIcons,
   appContentFactory,
+  buildAppCustomActionLinkList,
   buildContentPathBreadcrumbs,
   buildHeadTitle,
   getContent,
@@ -960,8 +962,9 @@ export class HtmlDocument extends React.Component {
             {
               icon: 'far fa-file-pdf',
               label: props.t('Download as PDF'),
-              downloadLink: this.getDownloadPDFUrl(state),
+              href: this.getDownloadPDFUrl(state),
               showAction: true,
+              disabled: false,
               dataCy: 'popinListItem__downloadAsPdf'
             }, {
               icon: 'fas fa-link',
@@ -976,8 +979,7 @@ export class HtmlDocument extends React.Component {
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
               disabled: state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted,
               dataCy: 'popinListItem__delete'
-            },
-            {
+            }, {
               icon: 'fas fa-exclamation-triangle',
               label: props.t('Permanently delete'),
               onClick: this.handleClickPermanentlyDeleteButton,
@@ -987,6 +989,14 @@ export class HtmlDocument extends React.Component {
               dataCy: 'popinListItem__permanentlyDelete'
             }
           ]}
+          customActionList={buildAppCustomActionLinkList(
+            state.config.appCustomActionList,
+            APP_CUSTOM_ACTION_LOCATION_OBJECT.CONTENT_APP_DROPDOWN,
+            state.content,
+            state.loggedUser,
+            CONTENT_TYPE.HTML_DOCUMENT,
+            state.translationTargetLanguageCode
+          )}
           appMode={state.mode}
           availableStatuses={state.config.availableStatuses}
           breadcrumbsList={state.breadcrumbsList}

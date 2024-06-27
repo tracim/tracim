@@ -22,13 +22,16 @@ import {
   sortListBy,
   sortListByMultipleCriteria,
   stringIncludes,
-  serialize
+  putUserConfiguration,
+  serialize,
+  buildUserConfigSpaceWebNotificationKey
 } from 'tracim_frontend_lib'
 import { serializeUserConfig, serializeUserWorkspaceConfig, serializeWorkspaceListProps } from '../../reducer/workspaceList.js'
 import { newFlashMessage } from '../../action-creator.sync.js'
 import { deleteUserRole, getUserWorkspaceConfigList } from '../../action-creator.async.js'
 import AdminUserSpacesConfig from '../../container/AdminUserSpacesConfig.jsx'
 import UserSpacesConfigLine from './UserSpacesConfigLine.jsx'
+import { FETCH_CONFIG } from '../../util/helper.js'
 
 export const onlyManager = (userToEditId, member, memberList) => {
   const manager = ROLE.workspaceManager.slug
@@ -87,6 +90,8 @@ export const UserSpacesConfig = (props) => {
           onChangeEmailNotificationType={
             emailNotificationType => props.onChangeEmailNotificationType(space.id, emailNotificationType)
           }
+          webNotificationEnabled={!props.admin && props.user?.config[buildUserConfigSpaceWebNotificationKey(space.id)]}
+          onChangeWebNotification={handleChangeWebNotification}
           onLeaveSpace={handleLeaveSpace}
           admin={props.admin}
           system={props.system}
@@ -95,7 +100,7 @@ export const UserSpacesConfig = (props) => {
       )
     })
     setEntries(entryList)
-  }, [spaceList, sortOrder, selectedSortCriterion, userFilter])
+  }, [spaceList, sortOrder, selectedSortCriterion, userFilter, props.user?.config])
 
   const filterSpaceList = (list) => {
     if (userFilter === '') return list
@@ -113,6 +118,25 @@ export const UserSpacesConfig = (props) => {
         hasFilterMatchOnRole
       )
     })
+  }
+
+  const handleChangeWebNotification = async (spaceId) => {
+    const userConfig = { ...props.user.config }
+    const isSubscribed = userConfig[buildUserConfigSpaceWebNotificationKey(spaceId)]
+    userConfig[buildUserConfigSpaceWebNotificationKey(spaceId)] = isSubscribed === undefined
+      ? false
+      : !isSubscribed
+
+    try {
+      await putUserConfiguration(
+        FETCH_CONFIG.apiUrl, props.user.userId, userConfig
+      )
+    } catch (e) {
+      props.dispatch(newFlashMessage(props.t('Error while changing notification subscription'), 'warning'))
+      console.error(
+        'Error while changing notification subscription. handleClickChangeWebNotification.', e
+      )
+    }
   }
 
   const handleMemberModified = (data) => {
@@ -263,7 +287,8 @@ export const UserSpacesConfig = (props) => {
                           tootltip={props.t('Sort by role')}
                         />
                       </th>
-                      {props.system.config.email_notification_activated && <th>{props.t('Email notifications')}</th>}
+                      {!props.admin && <th>{props.t('Notifications')}</th>}
+                      {props.system.config.email_notification_activated && <th>{props.t('Follow-up by e-mail')}</th>}
                       <th />
                     </tr>
                   </thead>

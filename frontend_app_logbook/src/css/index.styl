@@ -81,7 +81,6 @@ cardWidth = 280px
             &__date
               margin-bottom standardSpacing
               font-size metadataFontSize
-              color darkGrey
               &__icon
                 margin-inline-end 4px
           &__buttons
@@ -90,10 +89,24 @@ cardWidth = 280px
             justify-content end
             &__edit
               margin-inline-end standardSpacing
+  &__lightTextColor
+    color lightGrey1
+  &__darkTextColor
+    color darkGrey2
   &__whiteTextColor
     color offWhite
   &__blackTextColor
     color offBlack
+
+.fullscreen
+  // INFO - ML - 2024-04-26 - 40px is the size of the fullscreen button
+  & .logbook__contentpage__wrapper
+    &__options
+      position relative
+      top 10px
+      margin-inline-end "calc(40px + %s)" % standardSpacing
+    &__logbook
+      margin-inline-end "calc(40px + %s)" % standardSpacing
 
 @media (max-width: max-sm)
   .logbook
@@ -121,8 +134,8 @@ cardWidth = 280px
     &__wrapper
       display flex
       flex-direction column
-      // INFO - GB - 2021-12-20 - 28px is the wsContentGeneric__content__left__top height
-      height "calc(100% - %s)" % (headerHeight + 28px)
+      // INFO - GB - 2021-12-20 - 38px is the wsContentGeneric__content__left__top height
+      height "calc(100% - %s)" % (headerHeight + 38px)
       &.fullscreen
         position fixed
         width "calc(100% - %s)" % closedSidebarWidth
@@ -151,6 +164,13 @@ cardWidth = 280px
 
   &__LogbookPopup
     max-height 80%
+    &__confirm
+      display flex
+      width 100%
+      justify-content flex-end
+      & > .iconbutton
+        margin-inline-start standardSpacing
+
     &.hidden
       display none
     &__bgColor, &__datetime

@@ -205,6 +205,37 @@ const createNotificationListWithGroupsFromFlatNotificationList = (notificationLi
   return groupedNotificationList
 }
 
+const createNotificationListWithMergedFromFlatNotificationList = (notificationList) => {
+  notificationList.forEach((notification, index) => {
+    if (notification.toDelete || notification.isMerged) {
+      return
+    }
+
+    const nextNotification = notificationList[index + 1]
+    if (!nextNotification) {
+      return
+    }
+
+    if (notification.type !== `${TLM_ENTITY.CONTENT}.${TLM_EVENT.CREATED}.${TLM_SUB.COMMENT}`) {
+      return
+    }
+
+    if (!nextNotification.type.includes(`${TLM_ENTITY.CONTENT}.${TLM_EVENT.CREATED}`)) {
+      return
+    }
+
+    if (nextNotification.content.id !== notification.content.parentId ||
+      nextNotification.author.userId !== notification.author.userId) {
+      return
+    }
+
+    notification.toDelete = true
+    nextNotification.isMerged = true
+  })
+
+  return notificationList.filter(notification => !notification.toDelete)
+}
+
 const linkToParentContent = (notification) => {
   return PAGE.CONTENT(notification.content.parentId)
 }
@@ -232,7 +263,8 @@ export const NotificationWall = props => {
   useEffect(() => {
     setIsFolderPathLoading(true)
 
-    const newNotificationList = createNotificationListWithGroupsFromFlatNotificationList(props.notificationPage.list)
+    const merged = createNotificationListWithMergedFromFlatNotificationList(props.notificationPage.list)
+    const newNotificationList = createNotificationListWithGroupsFromFlatNotificationList(merged)
 
     props.notificationPage.list.forEach(async notification => {
       if (notification.type === `${TLM_ENTITY.CONTENT}.${TLM_EVENT.CREATED}.${TLM_SUB.FOLDER}`) {
@@ -245,7 +277,7 @@ export const NotificationWall = props => {
 
     setIsFolderPathLoading(false)
     setNotificationList(newNotificationList)
-  }, [props.notificationPage.list])
+  }, [props.notificationPage.list, props.user.config])
 
   useEffect(() => {
     const notificationListHeight = notificationList.length * NOTIFICATION_ITEM_HEIGHT
@@ -296,6 +328,7 @@ export const NotificationWall = props => {
           props.dispatch(
             appendNotificationList(
               props.user.userId,
+              props.user.config,
               fetchGetNotificationWall.json.items,
               props.workspaceList
             )
@@ -390,6 +423,14 @@ export const NotificationWall = props => {
               text: props.t('{{author}} created {{task}} on {{content}}{{workspaceInfo}}', i18nOpts),
               url: linkToParentContent(notification),
               isToDo: true
+            }
+          }
+
+          if (notification.isMerged) {
+            return {
+              title: props.t('Created and commented'),
+              text: props.t('{{author}} created and commented on {{content}}{{workspaceInfo}}', i18nOpts),
+              url: contentUrl
             }
           }
 

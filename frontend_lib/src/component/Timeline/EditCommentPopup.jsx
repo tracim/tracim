@@ -5,7 +5,7 @@ import i18n from '../../i18n.js'
 import { TracimComponent } from '../../tracimComponent.js'
 import { appContentFactory } from '../../appContentFactory.js'
 import { CUSTOM_EVENT } from '../../customEvent.js'
-import { CONTENT_TYPE } from '../../helper.js'
+import { CONTENT_TYPE } from '../../constant.js'
 import CardPopup from '../CardPopup/CardPopup.jsx'
 import CommentArea from './CommentArea.jsx'
 

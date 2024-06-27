@@ -13,6 +13,7 @@ from tracim_backend.models.tag import Tag
 from tracim_backend.models.tag import TagOnContent
 from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.models.user_custom_properties import UserCustomProperties
+from tracim_backend.models.userconfig import UserConfig
 
 
 class DatabaseCrudHookCaller:
@@ -64,6 +65,10 @@ class DatabaseCrudHookCaller:
                 self._plugin_manager.hook.on_user_call_created(
                     user_call=obj, context=session.context
                 )
+            elif isinstance(obj, UserConfig):
+                self._plugin_manager.hook.on_user_config_created(
+                    user_config=obj, context=session.context
+                )
         if user_workspace_configs:
             self._plugin_manager.hook.on_user_config_in_workspaces_created(
                 user_workspace_configs=user_workspace_configs, context=session.context
@@ -107,6 +112,10 @@ class DatabaseCrudHookCaller:
                 self._plugin_manager.hook.on_user_call_modified(
                     user_call=obj, context=session.context
                 )
+            elif isinstance(obj, UserConfig):
+                self._plugin_manager.hook.on_user_config_modified(
+                    user_config=obj, context=session.context
+                )
 
         for obj in session.deleted:
             if isinstance(obj, User):
@@ -136,4 +145,8 @@ class DatabaseCrudHookCaller:
             elif isinstance(obj, UserCall):
                 self._plugin_manager.hook.on_user_call_deleted(
                     user_call=obj, context=session.context
+                )
+            elif isinstance(obj, UserConfig):
+                self._plugin_manager.hook.on_user_config_deleted(
+                    user_config=obj, context=session.context
                 )

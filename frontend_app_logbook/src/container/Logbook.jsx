@@ -3,6 +3,7 @@ import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
 import { uniqBy } from 'lodash'
 import {
+  APP_CUSTOM_ACTION_LOCATION_OBJECT,
   APP_FEATURE_MODE,
   BREADCRUMBS_TYPE,
   CONTENT_TYPE,
@@ -27,6 +28,7 @@ import {
   TracimComponent,
   addAllResourceI18n,
   appContentFactory,
+  buildAppCustomActionLinkList,
   buildContentPathBreadcrumbs,
   buildHeadTitle,
   getFileContent,
@@ -652,8 +654,7 @@ export class Logbook extends React.Component {
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
               disabled: readOnly,
               dataCy: 'popinListItem__delete'
-            },
-            {
+            }, {
               icon: 'fas fa-exclamation-triangle',
               label: props.t('Permanently delete'),
               onClick: this.handleClickPermanentlyDeleteButton,
@@ -663,6 +664,14 @@ export class Logbook extends React.Component {
               dataCy: 'popinListItem__permanentlyDelete'
             }
           ]}
+          customActionList={buildAppCustomActionLinkList(
+            state.config.appCustomActionList,
+            APP_CUSTOM_ACTION_LOCATION_OBJECT.CONTENT_APP_DROPDOWN,
+            state.content,
+            state.loggedUser,
+            CONTENT_TYPE.LOGBOOK,
+            state.translationTargetLanguageCode
+          )}
           headerButtons={[
             {
               icon: 'fas fa-expand-arrows-alt',

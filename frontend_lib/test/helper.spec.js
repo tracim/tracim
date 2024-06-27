@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+import sinon from 'sinon'
 import {
   buildFilePreviewUrl,
   checkEmailValidity,
@@ -17,21 +18,28 @@ import {
   serialize,
   addRevisionFromTLM,
   checkUsernameValidity,
-  MINIMUM_CHARACTERS_USERNAME,
-  MAXIMUM_CHARACTERS_USERNAME,
   permissiveNumberEqual,
   updateTLMUser,
-  stringIncludes
+  stringIncludes,
+  filterNotificationListFromUserConfig,
+  shouldKeepNotification
 } from '../src/helper.js'
-
+import {
+  MINIMUM_CHARACTERS_USERNAME,
+  MAXIMUM_CHARACTERS_USERNAME,
+  CONTENT_TYPE
+} from '../src/constant.js'
+import { MENTION_CONSTANT } from '../src/mentionOrLink.js'
 import {
   mockGetReservedUsernames200,
   mockGetUsernameAvailability200,
   mockGetReservedUsernames500,
   mockGetUsernameAvailability500
 } from './apiMock.js'
-
-import sinon from 'sinon'
+import {
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET
+} from '../src/tracimLiveMessage.js'
 
 describe('helper.js', () => {
   describe('updateTLMUser()', () => {
@@ -687,6 +695,123 @@ describe('helper.js', () => {
       it(test.title, () => {
         expect(stringIncludes(test.token)(test.value)).to.equal(test.expect)
       })
+    })
+  })
+
+  describe('filterNotificationListFromUserConfig()', () => {
+    it('should filter notification base on subscribed space by user', () => {
+      const userConfig = {
+        'space.9.web_notification': true,
+        'space.10.web_notification': true,
+        'space.11.web_notification': false
+      }
+      const notification1 = {
+        workspace: { id: 9 },
+        type: `${TLM_ET.CONTENT}.${TLM_CET.CREATED}.${CONTENT_TYPE.COMMENT}`
+      }
+      const notification2 = {
+        workspace: { id: 10 },
+        type: `${TLM_ET.CONTENT}.${TLM_CET.MODIFIED}.${CONTENT_TYPE.FILE}`
+      }
+      const notification3 = {
+        workspace: { id: 11 },
+        type: `${TLM_ET.USER}.${TLM_CET.MODIFIED}`
+      }
+      const expected = [notification1, notification2]
+      const notificationList = [notification1, notification2, notification3]
+      expect(filterNotificationListFromUserConfig(notificationList, userConfig))
+        .to.deep.equal(expected)
+    })
+  })
+
+  describe('shouldKeepNotification()', () => {
+    it('should return false if notification is for an unsubscribed space', () => {
+      const userConfig = {
+        'space.10.web_notification': true,
+        'space.20.web_notification': true,
+        'space.30.web_notification': false
+      }
+      const notification = {
+        workspace: { id: 30 },
+        type: `${TLM_ET.CONTENT}.${TLM_CET.CREATED}.${CONTENT_TYPE.COMMENT}`
+      }
+      expect(shouldKeepNotification(notification, userConfig)).to.equal(false)
+    })
+    it('should return true if notification is for a subscribed space', () => {
+      const userConfig = {
+        'space.10.web_notification': true,
+        'space.20.web_notification': true,
+        'space.30.web_notification': false
+      }
+      const notification = {
+        workspace: { id: 10 },
+        type: `${TLM_ET.CONTENT}.${TLM_CET.CREATED}.${CONTENT_TYPE.COMMENT}`
+      }
+      expect(shouldKeepNotification(notification, userConfig)).to.equal(true)
+    })
+    it('should return true if notification is a mention even if space is unsubscribed', () => {
+      const userConfig = {
+        'space.20.web_notification': true,
+        'space.30.web_notification': false
+      }
+      const notification1 = {
+        workspace: { id: 20 },
+        type: `${TLM_ET.MENTION}.${TLM_CET.CREATED}`,
+        mention: { type: MENTION_CONSTANT.TYPE.USER }
+      }
+      const notification2 = {
+        workspace: { id: 30 },
+        type: `${TLM_ET.MENTION}.${TLM_CET.CREATED}`,
+        mention: { type: MENTION_CONSTANT.TYPE.USER }
+      }
+      expect(shouldKeepNotification(notification1, userConfig)).to.equal(true)
+      expect(shouldKeepNotification(notification2, userConfig)).to.equal(true)
+    })
+    it('should return true if notification has no workspace', () => {
+      const userConfig = {
+        'space.10.web_notification': true,
+        'space.20.web_notification': true,
+        'space.30.web_notification': false
+      }
+      const notification = {
+        type: `${TLM_ET.USER}.${TLM_CET.CREATED}`
+      }
+      expect(shouldKeepNotification(notification, userConfig)).to.equal(true)
+    })
+    it("should return true if notification's workspace is in unset", () => {
+      const userConfig = {}
+      const notification = {
+        type: `${TLM_ET.CONTENT}.${TLM_CET.MODIFIED}.${CONTENT_TYPE.THREAD}`
+      }
+      expect(shouldKeepNotification(notification, userConfig)).to.equal(true)
+    })
+    it("should return true if notification's workspace status in unset", () => {
+      const userConfig = {}
+      const notification = {
+        workspace: { id: 10 },
+        type: `${TLM_ET.CONTENT}.${TLM_CET.MODIFIED}.${CONTENT_TYPE.THREAD}`
+      }
+      expect(shouldKeepNotification(notification, userConfig)).to.equal(true)
+    })
+    it("should return true if notification's workspace status in subscribed", () => {
+      const userConfig = {
+        'space.10.web_notification': true
+      }
+      const notification = {
+        workspace: { id: 10 },
+        type: `${TLM_ET.CONTENT}.${TLM_CET.MODIFIED}.${CONTENT_TYPE.THREAD}`
+      }
+      expect(shouldKeepNotification(notification, userConfig)).to.equal(true)
+    })
+    it("should return false if notification's workspace status in unsubscribed", () => {
+      const userConfig = {
+        'space.10.web_notification': false
+      }
+      const notification = {
+        workspace: { id: 10 },
+        type: `${TLM_ET.CONTENT}.${TLM_CET.MODIFIED}.${CONTENT_TYPE.THREAD}`
+      }
+      expect(shouldKeepNotification(notification, userConfig)).to.equal(false)
     })
   })
 })

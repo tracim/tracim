@@ -1,5 +1,5 @@
 import { author } from './author.js'
-import { CONTENT_TYPE, TIMELINE_TYPE } from '../../src/helper.js'
+import { CONTENT_TYPE, TIMELINE_TYPE } from '../../src/constant.js'
 
 export const commentList = [{
   author: author,

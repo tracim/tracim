@@ -475,7 +475,7 @@ class CFG(object):
         )
         self.WEB__NOTIFICATIONS__EXCLUDED = self.get_raw_config(
             "web.notifications.excluded",
-            "user_call.created, user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*, tag.*, content_tag.*",
+            "user_call.created, user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*, tag.*, content_tag.*, user_config.*",
         )
 
         # base url of the frontend
@@ -578,6 +578,14 @@ class CFG(object):
             "color.config_file_path", default_color_config_file_path
         )
 
+        default_app_custom_actions_file = "app_custom_actions.json"
+        self.APP_CUSTOM_ACTIONS__CONFIG_FILE = self.get_raw_config(
+            "app_custom_actions.config_file", default_app_custom_actions_file
+        )
+        self.APP_CUSTOM_ACTIONS__CONFIG_FILE_PATH = os.path.join(
+            self.branding_folder_path, self.APP_CUSTOM_ACTIONS__CONFIG_FILE
+        )
+
         default_rich_text_preview_css_file_path = os.path.join(
             self.branding_folder_path, "rich_text_preview.css"
         )
@@ -611,6 +619,13 @@ class CFG(object):
 
         self.UI__SPACES__CREATION__PARENT_SPACE_CHOICE__VISIBLE = asbool(
             self.get_raw_config("ui.spaces.creation.parent_space_choice.visible", "True")
+        )
+
+        self.PREVIEW__SKIPLIST = string_to_unique_item_list(
+            self.get_raw_config("preview.skiplist", ""),
+            separator=",",
+            cast_func=str,
+            do_strip=True,
         )
 
         default_code_sample_languages = """

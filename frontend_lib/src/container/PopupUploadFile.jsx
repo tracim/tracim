@@ -8,9 +8,10 @@ import FileDropzone from '../component/FileDropzone/FileDropzone.jsx'
 import FileUploadList from '../component/FileDropzone/FileUploadList.jsx'
 import {
   computeProgressionPercentage,
-  sendGlobalFlashMessage,
-  FILE_PREVIEW_STATE
+  sendGlobalFlashMessage
 } from '../helper.js'
+import { FILE_PREVIEW_STATE } from '../constant.js'
+
 import {
   createFileUpload,
   uploadFile,

@@ -1,5 +1,45 @@
 # Changelog
 
+## 4.10.0 / 2024-06-27
+
+### ✨ New Features
+
+- Allow to subscribe/unsubscribe from notification per spaces
+- App Custom Action: Add customizable links to apps
+- Support for python version 3.9, 3.10 an 3.11
+- Merge of create and first comment web notification
+- New email template signature
+- App kanban now show number of cards in each column
+- App logbook now hides long description behind a "see more" button
+
+### 🐛 Fixed Issue
+
+- The real deletion now also delete from elasticsearch indexes [#6473](https://github.com/tracim/tracim/issues/6473)
+- Fixed size of app kanban edition popup [#6519](https://github.com/tracim/tracim/issues/6519)
+- Fixed "see more" button in app kanban not updating on description change [#5270](https://github.com/tracim/tracim/issues/5270)
+
+## 4.9.2 / 2024-05-30
+
+### 🐛 Fixed Issue
+
+- Kanban and Logbook
+  - Fixed invisible horizontal scrollbar [#6502](https://github.com/tracim/tracim/issues/6502)
+
+## 4.9.1 / 2024-05-06
+
+### 🐛 Fixed Issues
+
+- Workspace
+  - Fixed position of the loader on workspace content list [#6480](https://github.com/tracim/tracim/issues/6480)
+- Kanban
+  - Added dynamic font color for timestamps [#6469](https://github.com/tracim/tracim/issues/6469)
+- Logbook
+  - Added confirm pop-in when deleting an entry [#6467](https://github.com/tracim/tracim/issues/6467)
+  - Fixed error in the date format for date field in the entries [#6477](https://github.com/tracim/tracim/issues/6477)
+- App contents
+  - Fixed button position when in fullscreen [#6471](https://github.com/tracim/tracim/issues/6471)
+  - Added specific icon for restore content button [#6475](https://github.com/tracim/tracim/issues/6475)
+
 ## 4.9.0 / 2024-04-25
 
 ### ✨ New Features

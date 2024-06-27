@@ -1,9 +1,10 @@
+import { FETCH_CONFIG } from './helper.js'
+
 import {
-  FETCH_CONFIG,
   ROLE,
   ROLE_LIST,
   PROFILE
-} from './helper.js'
+} from './constant.js'
 
 const STATUSES = [{
   label: 'Opened',
@@ -71,7 +72,8 @@ export const defaultDebug = {
         }
       }
     },
-    label: ''
+    label: '',
+    appCustomActionList: []
   },
   content: {
     content_id: 0,

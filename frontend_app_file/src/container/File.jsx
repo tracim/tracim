@@ -4,6 +4,7 @@ import { uniqBy } from 'lodash'
 import i18n from '../i18n.js'
 import FileComponent from '../component/FileComponent.jsx'
 import {
+  APP_CUSTOM_ACTION_LOCATION_OBJECT,
   BREADCRUMBS_TYPE,
   COLLABORA_EXTENSIONS,
   CONTENT_TYPE,
@@ -14,6 +15,7 @@ import {
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent,
   buildContentPathBreadcrumbs,
+  buildAppCustomActionLinkList,
   appContentFactory,
   addAllResourceI18n,
   formatAbsoluteDate,
@@ -1203,20 +1205,23 @@ export class File extends React.Component {
             }, {
               icon: 'far fa-file',
               label: props.t('Download current page as PDF'),
-              downloadLink: this.getDownloadPdfPageUrl(state),
+              href: this.getDownloadPdfPageUrl(state),
               showAction: state.previewInfo.has_pdf_preview,
+              disabled: false,
               dataCy: 'popinListItem__downloadPageAsPdf'
             }, {
               icon: 'far fa-file-pdf',
               label: props.t('Download as PDF'),
-              downloadLink: this.getDownloadPdfFullUrl(state),
+              href: this.getDownloadPdfFullUrl(state),
               showAction: state.previewInfo.has_pdf_preview,
+              disabled: false,
               dataCy: 'popinListItem__downloadAsPdf'
             }, {
               icon: 'fas fa-download',
               label: props.t('Download file'),
-              downloadLink: this.getDownloadRawUrl(state),
+              href: this.getDownloadRawUrl(state),
               showAction: true,
+              disabled: false,
               dataCy: 'popinListItem__downloadFile'
             }, {
               icon: 'fas fa-link',
@@ -1231,8 +1236,7 @@ export class File extends React.Component {
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
               disabled: state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted,
               dataCy: 'popinListItem__delete'
-            },
-            {
+            }, {
               icon: 'fas fa-exclamation-triangle',
               label: props.t('Permanently delete'),
               onClick: this.handleClickPermanentlyDeleteButton,
@@ -1242,6 +1246,14 @@ export class File extends React.Component {
               dataCy: 'popinListItem__permanentlyDelete'
             }
           ]}
+          customActionList={buildAppCustomActionLinkList(
+            state.config.appCustomActionList,
+            APP_CUSTOM_ACTION_LOCATION_OBJECT.CONTENT_APP_DROPDOWN,
+            state.content,
+            state.loggedUser,
+            CONTENT_TYPE.FILE,
+            state.translationTargetLanguageCode
+          )}
           appMode={state.mode}
           availableStatuses={state.config.availableStatuses}
           breadcrumbsList={state.breadcrumbsList}

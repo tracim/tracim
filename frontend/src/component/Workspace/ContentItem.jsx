@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
@@ -7,9 +8,11 @@ import {
   ANCHOR_NAMESPACE,
   DRAG_AND_DROP
 } from '../../util/helper.js'
-import BtnExtandedAction from './BtnExtandedAction.jsx'
+import BtnExtendedAction from './BtnExtendedAction.jsx'
 import {
+  APP_CUSTOM_ACTION_LOCATION_OBJECT,
   ROLE,
+  buildAppCustomActionLinkList,
   ComposedIcon,
   FilenameWithBadges,
   ListItemWrapper,
@@ -21,7 +24,7 @@ class ContentItem extends React.Component {
   render () {
     const { props } = this
 
-    const status = props.contentType.availableStatuses.find(s => s.slug === props.statusSlug) || {
+    const status = props.contentType.availableStatuses.find(s => s.slug === props.content.statusSlug) || {
       hexcolor: '',
       label: '',
       faIcon: ''
@@ -31,18 +34,32 @@ class ContentItem extends React.Component {
       opacity: props.isDragging ? 0.5 : 1
     }
 
+    const userWithRoleIdInWorkspace = {
+      ...props.user,
+      userRoleIdInWorkspace: props.userRoleIdInWorkspace
+    }
+    const appCustomActionList = props.system.config?.app_custom_actions
+      ? buildAppCustomActionLinkList(
+        props.system.config.app_custom_actions,
+        APP_CUSTOM_ACTION_LOCATION_OBJECT.CONTENT_IN_LIST_DROPDOWN,
+        props.content,
+        userWithRoleIdInWorkspace,
+        props.content.type,
+        props.user.lang
+      )
+      : []
+
     return (
       <ListItemWrapper
-        label={props.label}
+        label={props.content.label}
         read={props.read}
         connectDragSource={props.userRoleIdInWorkspace >= ROLE.contentManager.id ? props.connectDragSource : undefined}
         contentType={props.contentType}
         isLast={props.isLast}
         isFirst={props.isFirst}
         key={props.id}
-        id={`${ANCHOR_NAMESPACE.workspaceItem}:${props.contentId}`}
+        id={`${ANCHOR_NAMESPACE.workspaceItem}:${props.content.contentId}`}
       >
-
         <Link
           to={props.urlContent}
           className='content__item'
@@ -74,23 +91,23 @@ class ContentItem extends React.Component {
                 )
               )}
             </div>
-            <FilenameWithBadges file={props} isTemplate={props.isTemplate} customClass='content__name' />
+            <FilenameWithBadges file={props.content} isTemplate={props.isTemplate} customClass='content__name' />
           </div>
 
           <TimedEvent
             customClass='content__lastModification'
-            operation={getRevisionTypeLabel(props.currentRevisionType, props.t)}
-            date={props.modified}
-            lang={props.lang}
+            operation={getRevisionTypeLabel(props.content.currentRevisionType, props.t)}
+            date={props.content.modified}
+            lang={props.user.lang}
             author={{
-              publicName: props.lastModifier.public_name,
-              userId: props.lastModifier.user_id
+              publicName: props.content.lastModifier.public_name,
+              userId: props.content.lastModifier.user_id
             }}
           />
 
           {props.userRoleIdInWorkspace >= ROLE.contributor.id && (
             <div className='d-none d-md-block content__actions' title={props.t('Actions')}>
-              <BtnExtandedAction
+              <BtnExtendedAction
                 userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                 onClickExtendedAction={{
                   edit: {
@@ -114,6 +131,7 @@ class ContentItem extends React.Component {
                     allowedRoleId: ROLE.contentManager.id
                   }
                 }}
+                appCustomActionList={appCustomActionList}
               />
             </div>
           )}
@@ -141,9 +159,9 @@ class ContentItem extends React.Component {
 const contentItemDragAndDropSource = {
   beginDrag: props => {
     return {
-      workspaceId: props.workspaceId,
-      contentId: props.contentId,
-      parentId: props.parentId || 0
+      workspaceId: props.content.workspaceId,
+      contentId: props.content.id,
+      parentId: props.content.parentId || 0
     }
   },
   endDrag (props, monitor) {
@@ -161,32 +179,27 @@ const contentItemDragAndDropSourceCollect = (connect, monitor) => ({
   isDragging: monitor.isDragging()
 })
 
-export default DragSource(DRAG_AND_DROP.CONTENT_ITEM, contentItemDragAndDropSource, contentItemDragAndDropSourceCollect)(translate()(ContentItem))
+const mapStateToProps = ({ system, user }) => ({ system, user })
+
+export default DragSource(DRAG_AND_DROP.CONTENT_ITEM, contentItemDragAndDropSource, contentItemDragAndDropSourceCollect)(
+  connect(mapStateToProps)(translate()(ContentItem))
+)
 
 ContentItem.propTypes = {
+  content: PropTypes.object.isRequired,
   contentType: PropTypes.object,
   customClass: PropTypes.string,
-  label: PropTypes.string,
   faIcon: PropTypes.string,
-  fileName: PropTypes.string,
-  fileExtension: PropTypes.string,
   isShared: PropTypes.bool,
-  isTemplate: PropTypes.bool,
   onClickItem: PropTypes.func,
   read: PropTypes.bool,
-  statusSlug: PropTypes.string.isRequired,
   urlContent: PropTypes.string,
-  userRoleIdInWorkspace: PropTypes.number,
-  modified: PropTypes.string.isRequired,
-  lang: PropTypes.string.isRequired,
-  currentRevisionType: PropTypes.string.isRequired
+  userRoleIdInWorkspace: PropTypes.number
 }
 
 ContentItem.defaultProps = {
   customClass: '',
   isShared: false,
-  isTemplate: false,
-  label: '',
   onClickItem: () => {},
   read: false,
   urlContent: '',

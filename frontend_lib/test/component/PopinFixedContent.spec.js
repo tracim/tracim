@@ -2,7 +2,7 @@ import React from 'react'
 import { withRouterMock, RouterMock } from '../hocMock/withRouter'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
-import { APP_FEATURE_MODE } from '../../src/helper.js'
+import { APP_FEATURE_MODE } from '../../src/constant.js'
 import PopinFixedContent from '../../src/component/PopinFixed/PopinFixedContent.jsx'
 import { reactstrapPopoverHack } from '../testHelper.js'
 

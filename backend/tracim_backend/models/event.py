@@ -51,6 +51,7 @@ class EntityType(enum.Enum):
     TAG = "tag"
     CONTENT_TAG = "content_tag"
     USER_CALL = "user_call"
+    USER_CONFIG = "user_config"
 
     def __str__(self) -> str:
         return self.value
@@ -135,6 +136,7 @@ class Event(CreationDateMixin, DeclarativeBase):
     REACTION_FIELD = "reaction"
     TAG_FIELD = "tag"
     USER_CALL_FIELD = "user_call"
+    USER_CONFIG_FIELD = "user_config"
 
     _ENTITY_SUBTYPE_LENGTH = 100
     __tablename__ = "events"

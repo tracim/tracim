@@ -2,6 +2,7 @@ import React from 'react'
 import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
 import {
+  APP_CUSTOM_ACTION_LOCATION_OBJECT,
   appContentFactory,
   addAllResourceI18n,
   BREADCRUMBS_TYPE,
@@ -29,7 +30,8 @@ import {
   FAVORITE_STATE,
   ROLE,
   COLORS,
-  SelectStatus
+  SelectStatus,
+  buildAppCustomActionLinkList
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -443,8 +445,7 @@ export class Thread extends React.Component {
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
               disabled: state.content.is_archived || state.content.is_deleted,
               dataCy: 'popinListItem__delete'
-            },
-            {
+            }, {
               icon: 'fas fa-exclamation-triangle',
               label: props.t('Permanently delete'),
               onClick: this.handleClickPermanentlyDeleteButton,
@@ -454,6 +455,14 @@ export class Thread extends React.Component {
               dataCy: 'popinListItem__permanentlyDelete'
             }
           ]}
+          customActionList={buildAppCustomActionLinkList(
+            state.config.appCustomActionList,
+            APP_CUSTOM_ACTION_LOCATION_OBJECT.CONTENT_APP_DROPDOWN,
+            state.content,
+            state.loggedUser,
+            CONTENT_TYPE.THREAD,
+            state.translationTargetLanguageCode
+          )}
           content={state.content}
           favoriteState={props.isContentInFavoriteList(state.content, state)
             ? FAVORITE_STATE.FAVORITE

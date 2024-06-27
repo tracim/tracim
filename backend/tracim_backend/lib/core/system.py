@@ -3,6 +3,7 @@ from urllib.parse import urljoin
 
 import datetime
 from importlib_metadata import metadata
+import json
 from pathlib import PurePath
 from sqlalchemy.orm import Session
 import typing
@@ -17,6 +18,7 @@ from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.utils import validate_json
 from tracim_backend.models.context_models import AboutModel
 from tracim_backend.models.context_models import ConfigModel
 from tracim_backend.models.context_models import ErrorCodeModel
@@ -62,6 +64,15 @@ class SystemApi(object):
             )
             collaborative_document_edition_config = collaborative_document_edition_api.get_config()
 
+        try:
+            app_custom_actions = validate_json(self._config.APP_CUSTOM_ACTIONS__CONFIG_FILE_PATH)
+        except json.JSONDecodeError:
+            logger.error(self, "Error, unable to decode app_custom_actions.json")
+            app_custom_actions = {}
+        except FileNotFoundError:
+            logger.warning(self, "Warning, file app_custom_actions.json not found")
+            app_custom_actions = {}
+
         return ConfigModel(
             email_notification_activated=self._config.EMAIL__NOTIFICATION__ACTIVATED,
             new_user_invitation_do_notify=self._config.NEW_USER__INVITATION__DO_NOTIFY,
@@ -88,6 +99,7 @@ class SystemApi(object):
                 auth_type.value: [fields.value for fields in fields_list]
                 for auth_type, fields_list in self._config.USER__READ_ONLY_FIELDS.items()
             },
+            app_custom_actions=app_custom_actions,
         )
 
     def get_usage_conditions_files(self) -> typing.List[UsageConditionModel]:

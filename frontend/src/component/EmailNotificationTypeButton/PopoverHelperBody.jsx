@@ -44,7 +44,7 @@ const PopoverHelperBodyMessageWeekly = translate()(() => (
 
 const PopoverHelperBodyMessageNone = translate()(() => (
   <Trans>
-    You'll receive no e-mail notifications, even if you are mentioned.
+    You'll receive no follow-up by e-mail, even if you are mentioned.
     <div className='PopoverHelperBody__section__description__details'>
       You'll need to rely on recent activities and the notification wall to stay up to date.
     </div>
@@ -133,7 +133,7 @@ export const PopoverHelperBodySplit = translate()(props => (
         <div className='PopoverHelperBody'>
           <div className='PopoverHelperBody__section'>
             <div className='PopoverHelperBody__section__label'>
-              {props.t('None', { context: 'feminine' })}
+              {props.t('None')}
             </div>
             <div className='PopoverHelperBody__section__description'>
               <PopoverHelperBodyMessageNone />
@@ -190,7 +190,7 @@ export const PopoverHelperBodySingle = translate()(props => (
 
         <div className='PopoverHelperBody__section'>
           <div className='PopoverHelperBody__section__label'>
-            {props.t('None', { context: 'feminine' })}
+            {props.t('None')}
           </div>
           <div className='PopoverHelperBody__section__description'>
             <PopoverHelperBodyMessageNone />

@@ -12,8 +12,8 @@ cardWidth = 280px
     &__wrapper
       display flex
       flex-direction column
-      // INFO - GB - 2021-12-20 - 28px is the wsContentGeneric__content__left__top height
-      height "calc(100% - %s)" % (headerHeight + 28px)
+      // INFO - GB - 2021-12-20 - 38px is the wsContentGeneric__content__left__top height
+      height "calc(100% - %s)" % (headerHeight + 38px)
       &.fullscreen
         position fixed
         width "calc(100% - %s)" % closedSidebarWidth
@@ -64,6 +64,19 @@ cardWidth = 280px
               padding 0
               &::after
                 display none
+          &__cardNumber
+            background-color lightBlue
+            color offWhite
+            display inline-block
+            font-family monospace
+            font-size metadataFontSize
+            margin 0 textSpacing
+            padding-top 0
+            padding-bottom 0
+            border-radius 20px
+            box-sizing border-box
+            padding-left 8px
+            padding-right 8px
           & button:hover
             background-color lightGrey1
           &.buttonHidden
@@ -116,7 +129,7 @@ cardWidth = 280px
           &:hover
             overflow-y auto
   &__KanbanPopup
-    max-height 80%
+    max-height 90%
     &.hidden
       display none
     &__bgColor, &__deadline
@@ -126,7 +139,7 @@ cardWidth = 280px
         flex-direction row
 
     & .cardPopup__container
-      width 80%
+      width 100%
       display flex
       flex-direction column
       overflow auto
@@ -201,6 +214,16 @@ cardWidth = 280px
       background-color lightGrey2
     & > *
       margin auto
+
+.fullscreen
+  // INFO - ML - 2024-04-26 - 40px is the size of the fullscreen button
+  & .kanban__contentpage__wrapper
+    &__options
+      position relative
+      top 10px
+      margin-inline-end "calc(40px + %s)" % standardSpacing
+    &__board
+      margin-inline-end "calc(40px + %s)" % standardSpacing
 
 [dir=ltr] .kanban
   &__contentpage

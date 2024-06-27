@@ -1,32 +1,5 @@
-import i18n, { getBrowserLang } from './i18n.js'
 import {
-  ACCESSIBLE_SPACE_TYPE_LIST,
-  ALLOWED_CHARACTERS_USERNAME,
-  APP_FEATURE_MODE,
-  BREADCRUMBS_TYPE,
-  CHECK_USERNAME_DEBOUNCE_WAIT,
-  COLLABORA_EXTENSIONS,
-  CONTENT_NAMESPACE,
-  CONTENT_TYPE,
-  DATE_FNS_LOCALE,
   FETCH_CONFIG,
-  FILE_PREVIEW_STATE,
-  IMG_LOAD_STATE,
-  MAXIMUM_CHARACTERS_USERNAME,
-  MINIMUM_CHARACTERS_USERNAME,
-  NUMBER_RESULTS_BY_PAGE,
-  PAGE,
-  PROFILE_LIST,
-  PROFILE,
-  ROLE_LIST,
-  ROLE,
-  SPACE_TYPE_LIST,
-  SPACE_TYPE,
-  STATUSES,
-  SUBSCRIPTION_TYPE_LIST,
-  SUBSCRIPTION_TYPE,
-  TIMELINE_TYPE,
-  USER_CALL_STATE,
   addAllResourceI18n,
   addExternalLinksIcons,
   addRevisionFromTLM,
@@ -34,6 +7,9 @@ import {
   buildFilePreviewUrl,
   buildHeadTitle,
   buildTracimLiveMessageEventType,
+  buildUserConfigContentNotifyAllKey,
+  buildUserConfigSpaceWebNotificationKey,
+  buildUserConfigContentWebNotificationKey,
   checkEmailValidity,
   checkUsernameValidity,
   computeProgressionPercentage,
@@ -41,6 +17,7 @@ import {
   darkenColor,
   displayDistanceDate,
   displayFileSize,
+  filterNotificationListFromUserConfig,
   formatAbsoluteDate,
   generateRandomPassword,
   getAvatarBaseUrl,
@@ -58,17 +35,49 @@ import {
   permissiveNumberEqual,
   removeAtInUsername,
   removeExtensionOfFilename,
-  revisionTypeList,
   scrollIntoViewIfNeeded,
   sendGlobalFlashMessage,
   serialize,
   setupCommonRequestHeaders,
+  shouldKeepNotification,
   shouldUseLightTextColor,
   splitFilenameExtension,
   stringIncludes,
   stripEmojis,
   updateTLMUser
 } from './helper.js'
+
+import {
+  ACCESSIBLE_SPACE_TYPE_LIST,
+  ALLOWED_CHARACTERS_USERNAME,
+  APP_FEATURE_MODE,
+  BREADCRUMBS_TYPE,
+  CHECK_USERNAME_DEBOUNCE_WAIT,
+  COLLABORA_EXTENSIONS,
+  CONTENT_NAMESPACE,
+  CONTENT_TYPE,
+  DATE_FNS_LOCALE,
+  FILE_PREVIEW_STATE,
+  IMG_LOAD_STATE,
+  MAXIMUM_CHARACTERS_USERNAME,
+  MINIMUM_CHARACTERS_USERNAME,
+  NUMBER_RESULTS_BY_PAGE,
+  PAGE,
+  PROFILE_LIST,
+  PROFILE,
+  revisionTypeList,
+  ROLE_LIST,
+  ROLE,
+  SPACE_TYPE_LIST,
+  SPACE_TYPE,
+  STATUSES,
+  SUBSCRIPTION_TYPE_LIST,
+  SUBSCRIPTION_TYPE,
+  TIMELINE_TYPE,
+  USER_CALL_STATE
+} from './constant.js'
+
+import i18n, { getBrowserLang } from './i18n.js'
 
 import {
   SORT_BY,
@@ -111,6 +120,11 @@ import {
   isFileUploadInList,
   isFileUploadInErrorState
 } from './fileUpload.js'
+
+import {
+  APP_CUSTOM_ACTION_LOCATION_OBJECT,
+  buildAppCustomActionLinkList
+} from './appCustomAction.js'
 
 import { defaultDebug } from './debug.js'
 
@@ -155,6 +169,7 @@ import CardPopup from './component/CardPopup/CardPopup.jsx'
 import CardPopupCreateContent from './component/CardPopup/CardPopupCreateContent.jsx'
 
 import DropdownMenu from './component/DropdownMenu/DropdownMenu.jsx'
+import DropdownMenuItemAppCustomAction from './component/DropdownMenu/DropdownMenuItemAppCustomAction.jsx'
 
 import NewVersionBtn from './component/OptionComponent/NewVersionBtn.jsx'
 import ArchiveDeleteContent from './component/OptionComponent/ArchiveDeleteContent.jsx'
@@ -325,6 +340,7 @@ export {
   IMG_LOAD_STATE,
   LIVE_MESSAGE_ERROR_CODE,
   LIVE_MESSAGE_STATUS,
+  APP_CUSTOM_ACTION_LOCATION_OBJECT,
   MAXIMUM_CHARACTERS_USERNAME,
   MENTION_CONSTANT,
   MINIMUM_CHARACTERS_USERNAME,
@@ -365,6 +381,7 @@ export {
   DisplayFileToUpload,
   DistanceDate,
   DropdownMenu,
+  DropdownMenuItemAppCustomAction,
   EditCommentPopup,
   EmptyListMessage,
   ErrorFlashMessageTemplateHtml,
@@ -417,10 +434,14 @@ export {
   addRevisionFromTLM,
   appContentFactory,
   baseFetch,
+  buildAppCustomActionLinkList,
   buildContentPathBreadcrumbs,
   buildFilePreviewUrl,
   buildHeadTitle,
   buildTracimLiveMessageEventType,
+  buildUserConfigContentNotifyAllKey,
+  buildUserConfigSpaceWebNotificationKey,
+  buildUserConfigContentWebNotificationKey,
   checkEmailValidity,
   checkUsernameValidity,
   computeProgressionPercentage,
@@ -432,6 +453,7 @@ export {
   deleteWorkspace,
   displayDistanceDate,
   displayFileSize,
+  filterNotificationListFromUserConfig,
   formatAbsoluteDate,
   generateRandomPassword,
   getAvatarBaseUrl,
@@ -502,6 +524,7 @@ export {
   sendGlobalFlashMessage,
   serialize,
   setupCommonRequestHeaders,
+  shouldKeepNotification,
   shouldUseLightTextColor,
   sortListBy,
   sortListByMultipleCriteria,

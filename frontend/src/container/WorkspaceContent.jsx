@@ -912,20 +912,9 @@ export class WorkspaceContent extends React.Component {
                     )
                     : (
                       <ContentItem
-                        contentId={content.id}
-                        workspaceId={content.workspaceId}
-                        parentId={content.parentId}
-                        label={content.label}
-                        fileName={content.fileName}
-                        modified={content.modified}
-                        lang={props.user.lang}
-                        currentRevisionType={content.currentRevisionType}
-                        lastModifier={content.lastModifier}
-                        fileExtension={content.fileExtension}
-                        faIcon={contentType.length ? contentType.find(a => a.slug === content.type).faIcon : ''}
+                        content={content}
                         isShared={content.activedShares !== 0 && currentWorkspace.downloadEnabled}
-                        isTemplate={content.isTemplate}
-                        statusSlug={content.statusSlug}
+                        faIcon={contentType.length ? contentType.find(a => a.slug === content.type).faIcon : ''}
                         contentType={contentType.length ? contentType.find(ct => ct.slug === content.type) : null}
                         isLast={i === filteredWorkspaceList.length - 1}
                         urlContent={`${PAGE.WORKSPACE.CONTENT(content.workspaceId, content.type, content.id)}${location.search}`}
@@ -964,10 +953,10 @@ export class WorkspaceContent extends React.Component {
                   />
                 )}
               </div>
+              {!state.contentLoaded && (<Loading />)}
             </PageContent>
           </PageWrapper>
         </div>
-        {!state.contentLoaded && <Loading />}
       </div>
     )
   }

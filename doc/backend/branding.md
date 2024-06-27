@@ -123,7 +123,7 @@ supported by browsers. These files it will be accessible through links.
 The original audio track used here for 'incoming-call.ogg' is 'data_sounds_ringtones_Solarium.ogg', from [Android's repository]( https://android.googlesource.com/platform/frameworks/base.git) which is licensed under Apache 2.0.
 If you want to change it, choose another audio file and change it's name, or change the variable.
 
-## Customize Note as pdf convertion rendering
+## Customize Note as pdf conversion rendering
 
 Tracim convert Note as PDF using both pandoc and weasyprint tool.
 This process is customizable through 2 files in branding:
@@ -136,3 +136,128 @@ like `@page`. Supported css features depending on weasyprint, see [here](https:/
 
 The second one (`rich_text_preview.template`) is a templating file of html for pandoc, see [here](https://pandoc.org/MANUAL.html#template-syntax)
 for specific template syntax.
+
+
+## App Custom Action
+
+App Custom Action allows to add submenu options with custom link on various existing dropdown.
+
+### Create an App Custom Actions
+
+Create the configuration file `frontend/dist/assets/branding/app_custom_actions.json` from its sample source:
+```bash
+cp frontend/dist/assets/branding.sample/app_custom_actions.json frontend/dist/assets/branding/app_custom_actions.json
+```
+
+Edit the file `frontend/dist/assets/branding/app_custom_actions.json`.
+
+Complete example of `frontend/dist/asset/branding/app_custom_actions.json`:
+```json
+{
+  "user_sidebar_dropdown": [],
+  "user_sidebar_shortcuts": [],
+  "content_in_list_dropdown": [],
+  "content_app_dropdown": [{
+    "icon_text": "fas fa-chess-queen",
+    "icon_image": "",
+    "content_type_filter": "file",
+    "content_extension_filter": ".jpg,.png",
+    "content_label_regex_filter": "",
+    "workspace_id_filter": "",
+    "user_role_filter": "workspace-manager,content-manager,contributor,reader",
+    "user_profile_filter":"administrators,trusted-users,users",
+    "label": {
+      "fr": "Ouvrir l'image dans SomeSoftware",
+      "en": "Open image in SomeSoftware"
+    },
+    "link": "https://some.software.com/open?content={content.content_id}"
+  }],
+  "space_dashboard_action_list": []
+}
+```
+
+### Structure of the file
+
+It is a json file containing an object.
+
+Each property of the object correspond to a **location** for the custom actions.
+
+Each location are a list of objects containing the definition of an App Custom Actions.
+
+**Locations:**
+
+- `user_sidebar_dropdown`
+  - Not Yet Implemented
+- `user_sidebar_shortcuts`
+  - Not Yet Implemented
+- `content_in_list_dropdown`
+  - In workspace content list, the button "..." on each contents
+- `content_app_dropdown`
+  - In the header of content apps, the dropdown on the button "⋮"
+  - Works for app Thread, Note, File, Kanban, Logbook, Folder advanced
+- `space_dashboard_action_list`
+  - Not Yet Implemented
+
+**Custom actions:**
+- `icon_text`:
+  - The icon preceding the submenu option. Use it for icon from css library.
+  - Tracim uses font awesome for css icon library.
+  - Example: `"icon_text": "fas fa-wine-bottle"`
+- `icon_image`:
+  - The image preceding the submenu option. Use it for images from an online source.
+  - If icon_text and icon_image are set, only icon_image will be displayed.
+  - Example: `"icon_image": "https://raw.githubusercontent.com/tracim/tracim/develop/doc/logos/logo_tracim.png"`
+- `content_type_filter`:
+  - The content type on which the App Custom Action will be available.
+  - Must be a list of comma separated content type
+  - Available values are: 'html-document', 'file', 'thread', 'kanban', 'logbook'.
+  - Example: `"content_type_filter": "file,thread,kanban"`
+- `content_extension_filter`:
+  - The content extension on which the App Custom Action will be available.
+  - Must be a list of comma separated extension containing the dot '.'
+  - Example: `"content_extension_filter": '.jpg,.png,.gif'`
+- `content_label_regex_filter`:
+  - The content label pattern on which the App Custom Action will be available.
+  - Must be string that will be matched as a regex. Case-insensitive.
+  - Example: `"content_label_regex_filter": "some"`
+    - will match "some label", "another some label" but not "last label"
+- `workspace_id_filter`:
+  - The workspace id on which the App Custom Action will be available.
+  - Must be a list of comma separated ids
+  - Example: `"workspace_id_filter": "2,10,42"`
+- `user_role_filter`:
+  - The user's roles on whom the App Custom Action will be available.
+  - Must be a list of comma separated roles
+  - Available values are: workspace-manager, content-manager, contributor, reader
+  - Example: `"user_role_filter": "workspace-manager,content-manager,contributor"`
+- `user_profile_filter`:
+  - The user's profiles on whom the App Custom Action will be available.
+  - Must be a list of comma separated profiles
+  - Available values are: administrators, trusted-users, users
+  - Example: `"user_profile_filter": "administrators,trusted-users"`
+- `link`:
+  - The on click http(s) link the submenu option will redirect to.
+  - Example: `"link": "https://some.software.com/open/some_tool"`
+  - You can use variables to transfert data to the link destination. Place each of them inside braces.
+  - Available variables are:
+    - `content.label`: The label of the current content. Url encoded.
+    - `content.content_id`: The id of the current content.
+    - `content.workspace_id`: The workspace id of the current content.
+    - `content.author_id`: The author id of the current content.
+    - `content.author_name`: The author name of the current content. Url encoded.
+    - `content.url`: The url to open the content in tracim. Url encoded.
+    - `user.user_id`: The id of the currently connected user. The one that will click on the App Custom Action.
+    - `user.public_name`: The public name of the currently connected user. The one that will click on the App Custom Action. Url encoded
+  - Example:
+    - `"link": "https://some.domaine.com/open?content_label={content.label}&content={content.content_id}&space_id={content.workspace_id}`
+- `label`:
+  - An object containing the translation keys of the submenu option. The keys are the language id and the
+  values are the translated string.
+  - Available key values are: en, fr, ar, de, eo, es, it, pt
+  - Example:
+  - ```json
+    "label": {
+      "en": "my english label",
+      "fr": "mon label français"
+    }
+```

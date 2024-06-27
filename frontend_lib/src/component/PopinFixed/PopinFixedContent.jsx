@@ -6,7 +6,7 @@ import SelectStatus from '../Input/SelectStatus/SelectStatus.jsx'
 import {
   APP_FEATURE_MODE,
   ROLE
-} from '../../helper.js'
+} from '../../constant.js'
 import TranslateButton from '../Button/TranslateButton.jsx'
 import PopinFixedHeader from './PopinFixedHeader.jsx'
 import { TRANSLATION_STATE } from '../../translation.js'
@@ -47,6 +47,8 @@ class PopinFixedContent extends React.Component {
           <div className={classnames('wsContentGeneric__content__left', `${props.customClass}__content__left`)}>
             <PopinFixedHeader
               actionList={props.actionList}
+              customActionList={props.customActionList}
+              apiUrl={props.config.apiUrl}
               breadcrumbsList={props.breadcrumbsList}
               componentTitle={props.componentTitle}
               content={props.content}
@@ -64,9 +66,11 @@ class PopinFixedContent extends React.Component {
               onClickRemoveFromFavoriteList={props.onClickRemoveFromFavoriteList}
               onValidateChangeTitle={props.onValidateChangeTitle}
               loading={props.loading}
+              loggedUser={props.loggedUser}
               rawTitle={props.content.label}
               showChangeTitleButton={props.showChangeTitleButton}
               showMarkedAsTemplate={props.showMarkedAsTemplate}
+              showReactions={props.showReactions}
               userRoleIdInWorkspace={props.loggedUser.userRoleIdInWorkspace}
             />
             <div className={classnames('wsContentGeneric__content__left__top', `${props.customClass}__content__left__top`)}>
@@ -172,6 +176,7 @@ export default translate()(PopinFixedContent)
 PopinFixedContent.propTypes = {
   loading: PropTypes.bool,
   actionList: PropTypes.array,
+  customActionList: PropTypes.array,
   appMode: PropTypes.string,
   availableStatuses: PropTypes.array,
   breadcrumbsList: PropTypes.array,
@@ -214,6 +219,7 @@ PopinFixedContent.propTypes = {
 
 PopinFixedContent.defaultProps = {
   actionList: [],
+  customActionList: [],
   appMode: APP_FEATURE_MODE.VIEW,
   availableStatuses: [],
   breadcrumbsList: [],

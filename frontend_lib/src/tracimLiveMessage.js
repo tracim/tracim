@@ -1,4 +1,4 @@
-import { CONTENT_TYPE } from './helper.js'
+import { CONTENT_TYPE } from './constant.js'
 
 // TLM Event Type list
 const USER = 'user'
@@ -11,6 +11,7 @@ const SHAREDSPACE_MEMBER = 'workspace_member'
 const SHAREDSPACE_SUBSCRIPTION = 'workspace_subscription'
 const TAG = 'tag'
 const USER_CALL = 'user_call'
+const USER_CONFIG = 'user_config'
 
 // TLM Core Event Type List
 const CREATED = 'created'
@@ -32,7 +33,8 @@ export const TLM_ENTITY_TYPE = {
   SHAREDSPACE_MEMBER,
   SHAREDSPACE_SUBSCRIPTION,
   TAG,
-  USER_CALL
+  USER_CALL,
+  USER_CONFIG
 }
 export const TLM_CORE_EVENT_TYPE = {
   CREATED,

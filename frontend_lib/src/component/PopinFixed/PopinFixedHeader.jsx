@@ -7,9 +7,10 @@ import {
   BREADCRUMBS_TYPE,
   PAGE,
   ROLE
-} from '../../helper.js'
+} from '../../constant.js'
 import Breadcrumbs from '../Breadcrumbs/Breadcrumbs.jsx'
 import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
+import DropdownMenuItemAppCustomAction from '../DropdownMenu/DropdownMenuItemAppCustomAction.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import Icon from '../Icon/Icon.jsx'
 import FavoriteButton from '../Button/FavoriteButton.jsx'
@@ -97,17 +98,25 @@ export const PopinFixedHeader = (props) => {
     },
     ...actionList
   ]
-  const filteredActionList = actionListWithEditTitle.filter(action => action.showAction)
-  const filteredHeaderButtons = headerButtons ? headerButtons.filter(action => action.showAction) : []
+  const filteredHeaderButtons = headerButtons?.filter(action => action.showAction) || []
+
+  const actionLinkList = actionListWithEditTitle
+    .filter(a => a.showAction === true)
+    .map(a => ({ ...a, isCustomAction: false, addSeparator: false }))
+  const customActionLinkList = props.customActionList
+    .filter(a => a.showAction === true)
+    .map((a, i) => ({ ...a, isCustomAction: true, addSeparator: i === 0 }))
 
   return (
-    <div className={classnames(
-      'wsContentGeneric__header',
-      {
-        [`${customClass}__header`]: !editTitle,
-        [`${customClass}__header__isEditing`]: editTitle,
-        wsContentGeneric__header__isEditing: editTitle
-      })}
+    <div
+      className={classnames(
+        'wsContentGeneric__header',
+        {
+          [`${customClass}__header`]: !editTitle,
+          [`${customClass}__header__isEditing`]: editTitle,
+          wsContentGeneric__header__isEditing: editTitle
+        }
+      )}
     >
       <div className='wsContentGeneric__header__titleWithBreadcrumbs'>
         <div className='wsContentGeneric__header__titleWrapper'>
@@ -218,41 +227,50 @@ export const PopinFixedHeader = (props) => {
 
       {!props.loading && props.children}
 
-      {!props.loading && filteredActionList.length > 0 && (
+      {!props.loading && (customActionLinkList.length > 0 || actionLinkList.length > 0) && (
         <DropdownMenu
           buttonCustomClass='wsContentGeneric__header__actions'
           buttonIcon='fa-fw fas fa-ellipsis-v'
           buttonTooltip={t('Actions')}
           buttonDataCy='dropdownContentButton'
         >
-          {filteredActionList.map((action) => action.downloadLink
-            ? (
-              <a
-                href={action.downloadLink}
-                target='_blank'
-                rel='noopener noreferrer'
-                download
-                title={action.label}
-                key={action.label}
-                data-cy={action.dataCy}
-              >
-                <i className={`fa-fw fa-fw ${action.icon}`} />
-                {action.label}
-              </a>
-            ) : (
-              <IconButton
-                disabled={action.disabled}
-                icon={action.icon}
-                text={action.label}
-                textMobile={action.label}
-                label={action.label}
-                key={action.label}
-                onClick={action.onClick} // eslint-disable-line react/jsx-handler-names
-                customClass={classnames('transparentButton', { dropdownMenuSeparatorLine: action.separatorLine })}
-                showAction={action.showAction}
-                dataCy={action.dataCy}
-              />
-            ))}
+          {[
+            ...actionLinkList.map(action => {
+              if (action.href) {
+                return (
+                  <a
+                    href={action.href}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    download
+                    title={action.label}
+                    key={action.label}
+                    data-cy={action.dataCy}
+                  >
+                    <i className={`fa-fw ${action.icon}`} />
+                    {action.label}
+                  </a>
+                )
+              }
+              return (
+                <IconButton
+                  disabled={action.disabled}
+                  icon={action.icon}
+                  text={action.label}
+                  textMobile={action.label}
+                  label={action.label}
+                  key={action.label}
+                  onClick={action.onClick} // eslint-disable-line react/jsx-handler-names
+                  customClass={classnames('transparentButton', { dropdownMenuSeparatorLine: action.separatorLine })}
+                  showAction={action.showAction}
+                  dataCy={action.dataCy}
+                />
+              )
+            }),
+            ...customActionLinkList.map((action, i) => (
+              <DropdownMenuItemAppCustomAction action={action} key={`customAction_${i}`} />
+            ))
+          ]}
         </DropdownMenu>
       )}
 
@@ -272,6 +290,7 @@ export default translate()(PopinFixedHeader)
 
 PopinFixedHeader.propTypes = {
   actionList: PropTypes.array,
+  customActionList: PropTypes.array,
   breadcrumbsList: PropTypes.array,
   componentTitle: PropTypes.element,
   content: PropTypes.object,
@@ -297,6 +316,7 @@ PopinFixedHeader.propTypes = {
 
 PopinFixedHeader.defaultProps = {
   actionList: [],
+  customActionList: [],
   breadcrumbsList: [],
   componentTitle: <div />,
   content: {

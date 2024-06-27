@@ -233,7 +233,7 @@ const dragAndDropTargetCollect = (connect, monitor) => ({
   draggedItem: monitor.getItem()
 })
 
-const mapStateToProps = ({ notificationPage, user }) => ({ notificationPage, user })
+const mapStateToProps = ({ user, notificationPage }) => ({ user, notificationPage })
 export default DropTarget(DRAG_AND_DROP.CONTENT_ITEM, dragAndDropTarget, dragAndDropTargetCollect)(connect(mapStateToProps)(withRouter(translate()(SidebarSpaceItem))))
 
 SidebarSpaceItem.propTypes = {

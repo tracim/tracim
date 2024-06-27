@@ -1,0 +1,12 @@
+# Created by .ignore support plugin (hsz.mobi)
+.idea/
+.git/
+node_modules/
+src/debug.js
+test/fixture/defaultProps.js
+dist/logbook.app.js
+dist/logbook.app.js.map
+dist/logbook.app.standalone.js
+dist/logbook.app.optimized.js
+dist/logbook.app.standalone.js.map
+dist/*.LICENSE.txt

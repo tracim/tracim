@@ -505,16 +505,18 @@ export class Tracim extends React.Component {
     }
   }
 
-  handleHeadTitleAndFavicon = (prevHeadTitleArgs, prevUnreadNotificationCount, prevUnreadMentionCount) => {
+  handleHeadTitleAndFavicon = (prevHeadTitleArgs, prevUnreadNotificationCount, prevUnreadMentionCount, prevUserConfig) => {
     const { props } = this
 
-    const hasHeadTitleChanged = !isEqual(prevHeadTitleArgs, props.system.titleArgs)
-    const unreadMentionCount = props.notificationPage.unreadMentionCount
-    const hasUnreadMentionCountChanged = unreadMentionCount !== prevUnreadMentionCount
     const unreadNotificationCount = props.notificationPage.unreadNotificationCount
-    const hasUnreadNotificationCountChanged = unreadNotificationCount !== prevUnreadNotificationCount
+    const unreadMentionCount = props.notificationPage.unreadMentionCount
 
-    if ((hasHeadTitleChanged || hasUnreadMentionCountChanged) && props.system.titleArgs.length > 0) {
+    const prevUserConfigHasChanged = !isEqual(prevUserConfig, props.user.config)
+    const hasHeadTitleChanged = !isEqual(prevHeadTitleArgs, props.system.titleArgs)
+    const hasUnreadMentionCountChanged = unreadMentionCount !== prevUnreadMentionCount || prevUserConfigHasChanged
+    const hasUnreadNotificationCountChanged = unreadNotificationCount !== prevUnreadNotificationCount || prevUserConfigHasChanged
+
+    if ((hasHeadTitleChanged || hasUnreadMentionCountChanged) && props.system.titleArgs?.length > 0) {
       let newHeadTitle = buildHeadTitle(props.system.titleArgs)
       if (unreadMentionCount > 0) {
         newHeadTitle = `(${unreadMentionCount > 99 ? '99+' : unreadMentionCount}) ${newHeadTitle}`

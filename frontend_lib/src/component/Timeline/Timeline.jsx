@@ -8,13 +8,17 @@ import { translate } from 'react-i18next'
 import Comment from './Comment.jsx'
 import Revision from './Revision.jsx'
 import {
-  PAGE,
-  ROLE,
-  TIMELINE_TYPE,
   darkenColor,
   displayDistanceDate,
   formatAbsoluteDate
 } from '../../helper.js'
+
+import {
+  PAGE,
+  ROLE,
+  TIMELINE_TYPE
+} from '../../constant.js'
+
 import {
   replaceHTMLElementWithMention
 } from '../../mentionOrLink.js'
@@ -128,6 +132,7 @@ export class Timeline extends React.Component {
             <PromptMessage
               msg={props.t('This content is deleted')}
               btnType='button'
+              btnIcon='fas fa-trash-restore'
               icon='far fa-trash-alt'
               btnLabel={props.t('Restore')}
               onClickBtn={props.onClickRestoreDeleted}
