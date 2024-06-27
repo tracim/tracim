@@ -14,7 +14,7 @@ const WebNotificationSpaceSelector = props => {
   return (
     <div className='userstatus__item webNotificationSpaceSubscription'>
       <div className='userstatus__item__label'>
-        {props.t('Web notifications:')}
+        {props.t('Notifications:')}
       </div>
 
       <div className='usersstatus__item__value webNotificationSpaceSubscription__value'>
@@ -43,15 +43,15 @@ const WebNotificationSpaceSelector = props => {
           <div className='PopoverHelperBody'>
             <div className='PopoverHelperBody__section'>
               <div className='PopoverHelperBody__section__label'>
-                {props.t('Web notifications')}
+                {props.t('Notifications')}
               </div>
               <div className='PopoverHelperBody__section__description'>
-                {props.t('Enable/Disable web notifications for this workspace.')}
+                {props.t('Enable/Disable notifications for this workspace.')}
                 <br />
                 {props.t('When disabled, notifications from this workspace will be hidden from your notification wall.')}
                 <br />
                 <div className='PopoverHelperBody__section__description__details'>
-                  {props.t('This parameter affects all web notifications except individual mentions.')}
+                  {props.t('This parameter affects all notifications except individual mentions.')}
                 </div>
               </div>
             </div>

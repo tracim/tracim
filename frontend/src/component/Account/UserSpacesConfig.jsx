@@ -132,9 +132,9 @@ export const UserSpacesConfig = (props) => {
         FETCH_CONFIG.apiUrl, props.user.userId, userConfig
       )
     } catch (e) {
-      props.dispatch(newFlashMessage(props.t('Error while changing web notification subscription'), 'warning'))
+      props.dispatch(newFlashMessage(props.t('Error while changing notification subscription'), 'warning'))
       console.error(
-        'Error while changing web notification subscription. handleClickChangeWebNotification.', e
+        'Error while changing notification subscription. handleClickChangeWebNotification.', e
       )
     }
   }
@@ -287,8 +287,8 @@ export const UserSpacesConfig = (props) => {
                           tootltip={props.t('Sort by role')}
                         />
                       </th>
-                      {props.system.config.email_notification_activated && <th>{props.t('Email notifications')}</th>}
-                      {!props.admin && <th>{props.t('Web notifications')}</th>}
+                      {!props.admin && <th>{props.t('Notifications')}</th>}
+                      {props.system.config.email_notification_activated && <th>{props.t('Follow-up by e-mail')}</th>}
                       <th />
                     </tr>
                   </thead>

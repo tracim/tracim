@@ -31,14 +31,6 @@ class UserSpacesConfigLine extends React.Component {
             </div>
           </div>
         </td>
-        {(props.system.config.email_notification_activated &&
-          <td>
-            <EmailNotificationTypeButton
-              currentEmailNotificationType={props.space.member.emailNotificationType}
-              onClickChangeEmailNotificationType={props.onChangeEmailNotificationType}
-            />
-          </td>
-        )}
         {(!props.admin &&
           <td>
             <div className='usersstatus__item__value webNotifSubscription__value'>
@@ -50,6 +42,14 @@ class UserSpacesConfigLine extends React.Component {
                 inactiveLabel={props.t('Disabled')}
               />
             </div>
+          </td>
+        )}
+        {(props.system.config.email_notification_activated &&
+          <td>
+            <EmailNotificationTypeButton
+              currentEmailNotificationType={props.space.member.emailNotificationType}
+              onClickChangeEmailNotificationType={props.onChangeEmailNotificationType}
+            />
           </td>
         )}
         <td data-cy='spaceconfig__table__leave_space_cell'>

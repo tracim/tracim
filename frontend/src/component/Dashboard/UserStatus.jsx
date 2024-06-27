@@ -39,10 +39,15 @@ export const UserStatus = props => {
         </div>
       </div>
 
+      <WebNotificationWorkspaceSelector
+        value={props.user?.config && props.user.config[buildUserConfigSpaceWebNotificationKey(props.currentWorkspace.id)]}
+        onChange={props.onClickChangeWebNotification}
+      />
+
       {props.displayNotifBtn && (
         <div className='userstatus__item emailNotification'>
           <div className='userstatus__item__label'>
-            {props.t('Email notifications:')}
+            {props.t('Follow-up by e-mail:')}
           </div>
 
           <div className='userstatus__item__value emailNotification__value'>
@@ -53,11 +58,6 @@ export const UserStatus = props => {
           </div>
         </div>
       )}
-
-      <WebNotificationWorkspaceSelector
-        value={props.user?.config && props.user.config[buildUserConfigSpaceWebNotificationKey(props.currentWorkspace.id)]}
-        onChange={props.onClickChangeWebNotification}
-      />
 
       {props.displaySubscriptionRequestsInformation && (
         <div className='userstatus__item spaceAccessRequest'>
