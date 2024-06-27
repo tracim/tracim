@@ -4,6 +4,7 @@
 
 ### ✨ New Features
 
+- Allow to subscribe/unsubscribe from notification per spaces
 - App Custom Action: Add customizable links to apps
 - Support for python version 3.9, 3.10 an 3.11
 - Merge of create and first comment web notification
