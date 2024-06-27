@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 1.9.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-06-05 10:11+0200\n"
+"POT-Creation-Date: 2024-06-26 18:28+0200\n"
 "PO-Revision-Date: 2022-06-22 14:36+0000\n"
 "Last-Translator: gbonaspetti <gbonaspetti@hotmail.com>\n"
 "Language: en\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.9.1\n"
 
-#: tracim_backend/config.py:836
+#: tracim_backend/config.py:843
 msgid ""
 "[{website_title}] [{workspace_label}] {content_label} "
 "({content_status_label})"
@@ -23,11 +23,11 @@ msgstr ""
 "[{website_title}] [{workspace_label}] {content_label} "
 "({content_status_label})"
 
-#: tracim_backend/config.py:845
+#: tracim_backend/config.py:852
 msgid "[{website_title}] Someone created an account for you"
 msgstr "[{website_title}] Someone created an account for you"
 
-#: tracim_backend/config.py:855
+#: tracim_backend/config.py:862
 msgid "[{website_title}] A password reset has been requested"
 msgstr "[{website_title}] A password reset has been requested"
 
@@ -96,8 +96,22 @@ msgid "Uploaded by {username}."
 msgstr "Uploaded by {username}."
 
 #: tracim_backend/command/periodic.py:66
-msgid "[{website_title}] Your {email_notification_type} summary"
-msgstr "[{website_title}] Your {email_notification_type} summary"
+#, fuzzy
+#| msgid "[{website_title}] Your {email_notification_type} summary"
+msgid "[{website_title}] Your hourly summary"
+msgstr "[{website_title}] Your hourly summary"
+
+#: tracim_backend/command/periodic.py:68
+#, fuzzy
+#| msgid "[{website_title}] Your {email_notification_type} summary"
+msgid "[{website_title}] Your daily summary"
+msgstr "[{website_title}] Your daily summary"
+
+#: tracim_backend/command/periodic.py:70
+#, fuzzy
+#| msgid "[{website_title}] Your {email_notification_type} summary"
+msgid "[{website_title}] Your weekly summary"
+msgstr "[{website_title}] Your weekly summary"
 
 #: tracim_backend/lib/core/content.py:785
 msgid "Space {workspace_name}"
@@ -115,11 +129,11 @@ msgstr "powered by Tracim software"
 msgid "Summary"
 msgstr "Summary"
 
-#: tracim_backend/lib/core/content.py:2198
+#: tracim_backend/lib/core/content.py:2204
 msgid "New folder"
 msgstr "New folder"
 
-#: tracim_backend/lib/core/content.py:2203
+#: tracim_backend/lib/core/content.py:2209
 msgid "New folder {0}"
 msgstr "New folder {0}"
 
@@ -187,18 +201,18 @@ msgstr ""
 msgid "<a href=\"{call_to_action_url}\">view it on tracim</a>"
 msgstr "<a href=\"{call_to_action_url}\">view it on tracim</a>"
 
+# | msgid "You're receiving this email because of your account on
+# | {website_title}."
 #: tracim_backend/templates/mail/content_update_body_html.mak:67
 #: tracim_backend/templates/mail/created_account_body_html.mak:28
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:20
 #: tracim_backend/templates/mail/reset_password_body_html.mak:23
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:20
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:30
-#: tracim_backend/templates/mail/summary_body_html.mak:46
+#: tracim_backend/templates/mail/summary_body_html.mak:62
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:20
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:23
 #, fuzzy
-#| msgid "You're receiving this email because of your account on
-#| {website_title}."
 msgid ""
 "You are receiving this email because you have an account on "
 "{website_title}."
@@ -210,7 +224,7 @@ msgstr "You're receiving this email because of your account on {website_title}."
 #: tracim_backend/templates/mail/reset_password_body_html.mak:24
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:21
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:31
-#: tracim_backend/templates/mail/summary_body_html.mak:47
+#: tracim_backend/templates/mail/summary_body_html.mak:63
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:21
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:24
 msgid ""
@@ -220,31 +234,31 @@ msgstr ""
 "You can change this setting by going to the \"My Spaces\" menu through "
 "this link:"
 
+# | msgid "This email is automatically created, please do not reply."
 #: tracim_backend/templates/mail/content_update_body_html.mak:70
 #: tracim_backend/templates/mail/created_account_body_html.mak:31
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:23
 #: tracim_backend/templates/mail/reset_password_body_html.mak:26
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:23
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:33
-#: tracim_backend/templates/mail/summary_body_html.mak:49
+#: tracim_backend/templates/mail/summary_body_html.mak:65
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:23
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:26
 #, fuzzy
-#| msgid "This email is automatically created, please do not reply."
 msgid "This e-mail was automatically generated by the"
 msgstr "This e-mail was automatically generated by the"
 
+# | msgid "This email is automatically created, please do not reply."
 #: tracim_backend/templates/mail/content_update_body_html.mak:70
 #: tracim_backend/templates/mail/created_account_body_html.mak:31
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:23
 #: tracim_backend/templates/mail/reset_password_body_html.mak:26
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:23
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:33
-#: tracim_backend/templates/mail/summary_body_html.mak:49
+#: tracim_backend/templates/mail/summary_body_html.mak:65
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:23
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:26
 #, fuzzy
-#| msgid "This email is automatically created, please do not reply."
 msgid "that powers {website_title}, please do not reply."
 msgstr "that powers {website_title}, please do not reply."
 
@@ -405,23 +419,35 @@ msgstr "Thanks a lot"
 msgid "{username} (through tracim)"
 msgstr "{username} (through Tracim)"
 
-#: tracim_backend/templates/mail/summary_body_html.mak:7
-msgid "Here is the list of your unread mentions {email_notification_type_string}:"
-msgstr "Here is the list of your unread mentions {email_notification_type_string}:"
+#: tracim_backend/templates/mail/summary_body_html.mak:9
+msgid "Here is the list of your unread mentions in the last hour:"
+msgstr "Here is the list of your unread mentions in the last hour:"
 
-#: tracim_backend/templates/mail/summary_body_html.mak:24
+#: tracim_backend/templates/mail/summary_body_html.mak:11
+msgid "Here is the list of your unread mentions in the last day:"
+msgstr "Here is the list of your unread mentions in the last day:"
+
+#: tracim_backend/templates/mail/summary_body_html.mak:13
+msgid "Here is the list of your unread mentions in the last week:"
+msgstr "Here is the list of your unread mentions in the last week:"
+
+#: tracim_backend/templates/mail/summary_body_html.mak:32
 msgid "{author} mentioned you in"
 msgstr "{author} mentioned you in"
 
-#: tracim_backend/templates/mail/summary_body_html.mak:32
-msgid ""
-"Here is the summary of your unread notifications "
-"{email_notification_type_string}:"
-msgstr ""
-"Here is the summary of your unread notifications "
-"{email_notification_type_string}:"
+#: tracim_backend/templates/mail/summary_body_html.mak:42
+msgid "Here is the list of your unread notifications in the last hour:"
+msgstr "Here is the list of your unread notifications in the last hour:"
 
-#: tracim_backend/templates/mail/summary_body_html.mak:36
+#: tracim_backend/templates/mail/summary_body_html.mak:44
+msgid "Here is the list of your unread notifications in the last day:"
+msgstr "Here is the list of your unread notifications in the last day:"
+
+#: tracim_backend/templates/mail/summary_body_html.mak:46
+msgid "Here is the list of your unread notifications in the last week:"
+msgstr "Here is the list of your unread notifications in the last week:"
+
+#: tracim_backend/templates/mail/summary_body_html.mak:52
 msgid "{event_count} activity in the space"
 msgstr "{event_count} activity in the space"
 
@@ -521,3 +547,10 @@ msgstr ""
 
 #~ msgid "weekly"
 #~ msgstr "weekly"
+
+#~ msgid ""
+#~ "Here is the summary of your unread"
+#~ " notifications {email_notification_type_string}:"
+#~ msgstr ""
+#~ "Here is the summary of your unread"
+#~ " notifications {email_notification_type_string}:"

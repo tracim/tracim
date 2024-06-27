@@ -62,10 +62,17 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
         sender = EmailSender(config, smtp_config, True)
         reply_to_address = config.EMAIL__NOTIFICATION__FROM__EMAIL.replace("{user_id}", "0")
 
+        if email_notification_type == EmailNotificationType.HOURLY.value:
+            subject_translated = _("[{website_title}] Your hourly summary")
+        elif email_notification_type == EmailNotificationType.DAILY.value:
+            subject_translated = _("[{website_title}] Your daily summary")
+        elif email_notification_type == EmailNotificationType.WEEKLY.value:
+            subject_translated = _("[{website_title}] Your weekly summary")
+
         msg = EmailNotificationMessage(
-            subject=_("[{website_title}] Your {email_notification_type} summary")
-            .replace(EST.WEBSITE_TITLE, config.WEBSITE__TITLE.__str__())
-            .replace("{email_notification_type}", email_notification_type.__str__()),
+            subject=subject_translated.replace(
+                EST.WEBSITE_TITLE, config.WEBSITE__TITLE.__str__()
+            ).replace("{email_notification_type}", email_notification_type.__str__()),
             from_header=EmailAddress(config.WEBSITE__TITLE, reply_to_address),
             to_header=EmailAddress("", user_mail),
             reply_to=EmailAddress(config.WEBSITE__TITLE, reply_to_address),
@@ -133,9 +140,6 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
             if not user.can_receive_summary_mail():
                 continue
 
-            email_notification_type_for_template = email_notification_type.to_string(
-                user.lang, translator
-            )
             email_notification_type_as_string = email_notification_type.get_value(
                 user.lang, translator
             )
@@ -161,7 +165,10 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
                     "user": user,
                     "mentions": mentions,
                     "notification_summary": notification_summary,
-                    "email_notification_type_string": email_notification_type_for_template,
+                    "email_notification_type": email_notification_type.value,
+                    "hourly_email_notification_type": EmailNotificationType.HOURLY.value,
+                    "daily_email_notification_type": EmailNotificationType.DAILY.value,
+                    "weekly_email_notification_type": EmailNotificationType.WEEKLY.value,
                 }
                 translator = Translator(
                     app_config=config,
