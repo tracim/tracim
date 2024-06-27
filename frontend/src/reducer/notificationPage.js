@@ -218,6 +218,8 @@ export default function notificationPage (state = defaultNotificationsObject, ac
       }
     }
 
+    // FIXME - M.L - 2024-06-26 - This is not used anymore (except in tests), must be removed
+    //  https://github.com/tracim/tracim/issues/6537
     case `${UPDATE}/${NOTIFICATION}`: {
       const index = state.list.findIndex(notification => notification.id === action.notificationId)
       const newNotificationList = [
@@ -232,13 +234,17 @@ export default function notificationPage (state = defaultNotificationsObject, ac
     }
 
     case `${READ}/${NOTIFICATION_LIST}`: {
-      const notificationList = state.list.filter(
+      const notificationList = state.rawList.filter(
         n => !n.read && action.notificationIdList.includes(n.id)
       )
 
       if (notificationList.length === 0) return state
 
       const replaceList = state.list.map(
+        n => action.notificationIdList.includes(n.id) ? { ...n, read: true } : n
+      )
+
+      const replaceRawList = state.rawList.map(
         n => action.notificationIdList.includes(n.id) ? { ...n, read: true } : n
       )
 
@@ -251,6 +257,7 @@ export default function notificationPage (state = defaultNotificationsObject, ac
       return {
         ...state,
         list: replaceList,
+        rawList: replaceRawList,
         unreadMentionCount: newUnreadMentionCount,
         unreadNotificationCount: newUnreadNotificationCount
       }
@@ -258,9 +265,11 @@ export default function notificationPage (state = defaultNotificationsObject, ac
 
     case `${READ}/${EVERY_NOTIFICATION}`: {
       const notificationList = state.list.map(notification => ({ ...notification, read: true }))
+      const notificationRawList = state.rawList.map(notification => ({ ...notification, read: true }))
       return {
         ...state,
         list: uniqBy(notificationList, 'id'),
+        rawList: uniqBy(notificationRawList, 'id'),
         unreadMentionCount: 0,
         unreadNotificationCount: 0
       }
@@ -269,10 +278,12 @@ export default function notificationPage (state = defaultNotificationsObject, ac
     case `${READ}/${CONTENT}/${NOTIFICATION}`: {
       let unreadMentionCount = state.unreadMentionCount
       let unreadNotificationCount = state.unreadNotificationCount
-      const markNotificationAsRead = (notification) => {
+      // FIXME - M.L - 2024-06-26 - Decrement is a workaround, better solution will be implemented
+      //  https://github.com/tracim/tracim/issues/6537
+      const markNotificationAsRead = (notification, decrement) => {
         if (!notification.content) return notification
         if (getMainContentId(notification) === action.contentId) {
-          if (!notification.read) {
+          if (!notification.read && decrement) {
             if (notification.type.includes(TLM_ET.MENTION)) unreadMentionCount--
             unreadNotificationCount--
           }
@@ -282,12 +293,17 @@ export default function notificationPage (state = defaultNotificationsObject, ac
       }
 
       const newNotificationList = state.list.map(notification => {
-        return markNotificationAsRead(notification)
+        return markNotificationAsRead(notification, true)
+      })
+
+      const newNotificationRawList = state.rawList.map(notification => {
+        return markNotificationAsRead(notification, false)
       })
 
       return {
         ...state,
         list: uniqBy(newNotificationList, 'id'),
+        rawList: uniqBy(newNotificationRawList, 'id'),
         unreadMentionCount,
         unreadNotificationCount
       }

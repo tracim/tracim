@@ -580,9 +580,6 @@ export class Tracim extends React.Component {
       )
     }
 
-    const unreadNotificationCount = props.notificationPage.unreadNotificationCount
-    const unreadMentionCount = props.notificationPage.unreadMentionCount
-
     return (
       <div className='tracim fullWidthFullHeight' dir={i18next.dir()}>
         <Header />
@@ -756,9 +753,8 @@ export class Tracim extends React.Component {
               <Sidebar
                 isNotificationWallOpen={state.isNotificationWallOpen}
                 onClickNotification={this.handleClickNotificationButton}
-                notificationList={props.notificationPage.list}
-                unreadMentionCount={unreadMentionCount}
-                unreadNotificationCount={unreadNotificationCount}
+                unreadMentionCount={props.notificationPage.unreadMentionCount}
+                unreadNotificationCount={props.notificationPage.unreadNotificationCount}
                 isSpaceListLoaded={props.system.workspaceListLoaded}
               />
             )}
