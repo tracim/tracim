@@ -65,7 +65,7 @@
   "Tasks": "Tareas",
   "The link has been copied to clipboard": "Enlace copiado en el portapapeles",
   "Copy content link": "Copiar enlace al contenido",
-  "Permanently delete": "",
-  "Yes, delete permanently": "",
-  "Warning: this operation cannot be rolled back": ""
+  "Permanently delete": "¿Eliminar permanentemente?",
+  "Yes, delete permanently": "Sí, borrar permanentemente",
+  "Warning: this operation cannot be rolled back": "Advertencia: esta operación no puede cancelarse"
 }

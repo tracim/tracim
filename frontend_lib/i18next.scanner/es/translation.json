@@ -249,7 +249,7 @@
   "of": "de",
   "Download": "Descargar",
   "Every members of the space": "Cada miembro del espacio",
-  "All": "Todos",
+  "All": "Todo",
   "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?": "{{filename}} es más grande que 1 MB, esto puede tardar un poco en cargarse, ¿quieres continuar?",
   "Insert": "Insertar",
   "Image": "Imagen",
@@ -274,7 +274,7 @@
   "{{count}} files selected_0": "{{count}} archivo seleccionado",
   "{{count}} files selected_1": "{{count}} archivos seleccionados",
   "{{count}} files selected_2": "{{count}} archivos seleccionados",
-  "Error while deleting the content": "",
-  "The content has been deleted": "",
-  "Error while changing content type": ""
+  "Error while deleting the content": "Error al borrar el contenido",
+  "The content has been deleted": "El contenido ha sido eliminado",
+  "Error while changing content type": "Error al cambiar el tipo del contenido"
 }

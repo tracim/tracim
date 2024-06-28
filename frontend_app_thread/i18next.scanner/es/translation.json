@@ -14,8 +14,8 @@
   "The link has been copied to clipboard": "Enlace copiado en el portapapeles",
   "Copy content link": "Copiar enlace al contenido",
   "Copy news link": "Copiar enlace al contenido",
-  "Turn into thread": "",
-  "Permanently delete": "",
-  "Yes, delete permanently": "",
-  "Warning: this operation cannot be rolled back": ""
+  "Turn into thread": "Transformar en hilo",
+  "Permanently delete": "¿Eliminar permanentemente?",
+  "Yes, delete permanently": "Sí, borrar permanentemente",
+  "Warning: this operation cannot be rolled back": "Advertencia: esta operación no puede cancelarse"
 }

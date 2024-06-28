@@ -46,11 +46,12 @@
   "Copy content link": "Copiar enlace al contenido",
   "Description of the card": "Descripción de la tarjeta",
   "Open field:": "Campo libre:",
-  "Permanently delete": "Eliminar permanentemente",
-  "Yes, delete permanently": "Sí, eliminar permanentemente",
-  "Warning: this operation cannot be rolled back": "Nota: esta operación no se puede cancelar.",
+  "Permanently delete": "¿Eliminar permanentemente?",
+  "Yes, delete permanently": "Sí, borrar permanentemente",
+  "Warning: this operation cannot be rolled back": "Advertencia: esta operación no puede cancelarse",
   "0 card": "0 tarjeta",
   "{{numberCard}} card": "{{numberCard}} Tarjeta",
-  "{{count}} cards": "",
-  "{{count}} cards_plural": ""
+  "{{count}} cards_0": "{{count}} tarjeta",
+  "{{count}} cards_1": "{{count}} tarjetas",
+  "{{count}} cards_2": "{{count}} tarjetas"
 }

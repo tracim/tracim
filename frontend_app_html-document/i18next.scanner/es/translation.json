@@ -36,7 +36,7 @@
   "Copy content link": "Copiar enlace al contenido",
   "Cancel": "Cancelar",
   "Validate": "Validar",
-  "Permanently delete": "",
-  "Yes, delete permanently": "",
-  "Warning: this operation cannot be rolled back": ""
+  "Permanently delete": "¿Eliminar permanentemente?",
+  "Yes, delete permanently": "Sí, borrar permanentemente",
+  "Warning: this operation cannot be rolled back": "Advertencia: esta operación no puede cancelarse"
 }
