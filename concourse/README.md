@@ -62,3 +62,11 @@ Recuperate the image to the file created from it
     - tracim-status-update
 - <imgae_location>: failed test in concourse will display the location after "(Screenshots)"
 - <local_file_location>: local file to put the screenshot in
+
+### Example
+
+```
+touch /tmp/failed_cypress_test.png
+./fly hijack -t algoo -b 137189888 -s end-to-end-cypress-tests cat /tmp/build/c061bd25/pull-request/functionnal_tests/cypress/screenshots/dashboard/information_spec.js/'Dashboard -- should show email notification dropdown (failed).png' > /tmp/failed_cypress_test.png
+eog /tmp/failed_cypress_test.png
+```
