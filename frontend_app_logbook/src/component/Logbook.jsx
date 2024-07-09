@@ -22,6 +22,8 @@ import { LOGBOOK_MIME_TYPE, LOGBOOK_FILE_EXTENSION } from '../helper.js'
 import LogbookEntry from './LogbookEntry.jsx'
 import LogbookEntryEditor from './LogbookEntryEditor.jsx'
 
+export const heightBeforeSeeMoreButton = 251
+
 export const LOGBOOK_STATE = {
   INIT: 'init',
   LOADING: 'loading',
@@ -56,6 +58,7 @@ export class Logbook extends React.Component {
       logbook: { entries: [] },
       logbookState: justCreated ? LOGBOOK_STATE.LOADED : LOGBOOK_STATE.INIT,
       entryToEdit: {},
+      expandAll: false,
       showConfirmPopup: false,
       saveRequired: false,
       showEditPopIn: false
@@ -179,6 +182,18 @@ export class Logbook extends React.Component {
     })
   }
 
+  handleExpand = () => {
+    this.setState({
+      expandAll: true
+    })
+  }
+
+  handleCollapse = () => {
+    this.setState({
+      expandAll: false
+    })
+  }
+
   async save (newLogbook) {
     const { props } = this
     const sortedLogbook = { entries: newLogbook.entries.toSorted((a, b) => new Date(b.datetime) - new Date(a.datetime)) }
@@ -259,15 +274,37 @@ export class Logbook extends React.Component {
               hidden: state.logbookState === LOGBOOK_STATE.INIT
             })}
           >
-            {changesAllowed && (
-              <IconButton
-                customClass='logbook__new_button'
-                text={props.t('Create an event')}
-                textMobile={props.t('Create an event')}
-                icon='fas fa-plus'
-                onClick={() => this.handleShowPopIn({})}
-              />
-            )}
+            <div>
+              {(state.logbook.entries.filter(e => {
+                const descriptionElement = document.getElementById(`${e.id}_description`)
+                const descriptionHeight = (descriptionElement || { scrollHeight: 0 }).scrollHeight
+                return descriptionHeight > heightBeforeSeeMoreButton
+              }).length >= 1) && (
+                <>
+                  <IconButton
+                    customClass='logbook__expand_button'
+                    text={props.t('Expand all event')}
+                    textMobile={props.t('Expand all event')}
+                    onClick={() => this.handleExpand()}
+                  />
+                  <IconButton
+                    customClass='logbook__expand_button'
+                    text={props.t('Collapse all event')}
+                    textMobile={props.t('Collapse all event')}
+                    onClick={() => this.handleCollapse()}
+                  />
+                </>
+              )}
+              {changesAllowed && (
+                <IconButton
+                  customClass='logbook__new_button'
+                  text={props.t('Create an event')}
+                  textMobile={props.t('Create an event')}
+                  icon='fas fa-plus'
+                  onClick={() => this.handleShowPopIn({})}
+                />
+              )}
+            </div>
             <div className='logbook__timeline'>
               {state.logbook.entries.length >= 1
                 ? (
@@ -284,6 +321,7 @@ export class Logbook extends React.Component {
                           onRemoveEntry={this.handleRemoveEntry}
                           key={id}
                           language={props.language}
+                          expand={state.expandAll}
                         />
                       )}
                     </div>

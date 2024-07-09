@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
+import { heightBeforeSeeMoreButton } from './Logbook.jsx'
 import {
   formatAbsoluteDate,
   Icon,
@@ -23,12 +24,24 @@ const LogbookEntry = (props) => {
   useEffect(() => {
     const descriptionElement = document.getElementById(`${props.entry.id}_description`)
     const descriptionHeight = (descriptionElement || { scrollHeight: 0 }).scrollHeight
-    setShowDescriptionPreview(descriptionHeight > 251)
-    setShowSeeDescriptionButton(descriptionHeight > 251
+    setShowDescriptionPreview(descriptionHeight > heightBeforeSeeMoreButton)
+    setShowSeeDescriptionButton(descriptionHeight > heightBeforeSeeMoreButton
       ? DESCRIPTION_BUTTON.SEE_MORE
       : DESCRIPTION_BUTTON.HIDDEN
     )
   }, [props.entry.description])
+
+  useEffect(() => {
+    const descriptionElement = document.getElementById(`${props.entry.id}_description`)
+    const descriptionHeight = (descriptionElement || { scrollHeight: 0 }).scrollHeight
+    if (descriptionHeight > heightBeforeSeeMoreButton) {
+      setShowDescriptionPreview(!props.expand)
+      setShowSeeDescriptionButton(props.expand
+        ? DESCRIPTION_BUTTON.SEE_LESS
+        : DESCRIPTION_BUTTON.SEE_MORE
+      )
+    }
+  }, [props.expand])
 
   const handleClickSeeDescriptionButton = () => {
     setShowDescriptionPreview(showSeeDescriptionButton !== DESCRIPTION_BUTTON.SEE_MORE)
@@ -132,12 +145,14 @@ LogbookEntry.propTypes = {
   entry: PropTypes.object.isRequired,
   onEditEntry: PropTypes.func.isRequired,
   onRemoveEntry: PropTypes.func.isRequired,
+  expand: PropTypes.bool,
   customColor: PropTypes.string,
   language: PropTypes.string,
   readOnly: PropTypes.bool
 }
 
 LogbookEntry.defaultProps = {
+  expand: false,
   customColor: '',
   language: 'en',
   readOnly: false
