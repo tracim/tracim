@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import {
-  CardPopup,
+  ConfirmPopup,
   DropdownMenu,
   IconButton,
   Icon,
@@ -90,33 +90,14 @@ function KanbanCard (props) {
         </DropdownMenu>
 
         {showConfirmPopup && (
-          <CardPopup
-            customClass='kanban__KanbanPopup'
-            customColor={props.customColor}
-            faIcon='far fa-trash-alt'
-            label={props.t('Are you sure?')}
-            onClose={() => setShowConfirmPopup(false)}
-          >
-            <div className='kanban__KanbanPopup__confirm'>
-              <IconButton
-                color={props.customColor}
-                icon='fas fa-times'
-                onClick={() => setShowConfirmPopup(false)}
-                text={props.t('Cancel')}
-                dataCy='cancelDeleteCard'
-              />
-
-              <IconButton
-                color={props.customColor}
-                icon='far fa-trash-alt'
-                intent='primary'
-                mode='light'
-                onClick={() => props.onRemoveCard(props.card)}
-                text={props.t('Delete')}
-                dataCy='confirmDeleteCard'
-              />
-            </div>
-          </CardPopup>
+          <ConfirmPopup
+          onCancel={() => setShowConfirmPopup(false)}
+          onConfirm={() => props.onRemoveCard(props.card)}
+          confirmLabel={props.t('Delete')}
+          customClass='kanban__KanbanPopup'
+          customColor={props.customColor}
+          confirmIcon='far fa-trash-alt'
+        />
         )}
       </div>
       <div
