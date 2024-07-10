@@ -55,6 +55,6 @@ describe('App Kanban (cards)', () => {
     createKanbanCard(cardTitle)
     cy.get('[data-cy=cardActions]').click()
     cy.get('[data-cy=deleteCard]').click()
-    cy.get('[data-cy=confirmDeleteCard]').click()
+    cy.get('[data-cy=confirm_popup__button_confirm]').click()
   })
 })
