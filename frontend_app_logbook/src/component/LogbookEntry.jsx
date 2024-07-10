@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
-import { heightBeforeSeeMoreButton } from './Logbook.jsx'
+import { heightBeforeSeeMoreButton, DESCRIPTION_BUTTON } from './Logbook.jsx'
 import {
   formatAbsoluteDate,
   Icon,
@@ -13,42 +13,22 @@ import {
 require('./LogbookEntry.styl')
 
 const LogbookEntry = (props) => {
-  const DESCRIPTION_BUTTON = {
-    HIDDEN: 'hidden',
-    SEE_MORE: 'seeMore',
-    SEE_LESS: 'seeLess'
-  }
-  const [showDescriptionPreview, setShowDescriptionPreview] = useState(false)
-  const [showSeeDescriptionButton, setShowSeeDescriptionButton] = useState(DESCRIPTION_BUTTON.HIDDEN)
+  const ref = useRef(null)
 
   useEffect(() => {
-    const descriptionElement = document.getElementById(`${props.entry.id}_description`)
-    const descriptionHeight = (descriptionElement || { scrollHeight: 0 }).scrollHeight
-    setShowDescriptionPreview(descriptionHeight > heightBeforeSeeMoreButton)
-    setShowSeeDescriptionButton(descriptionHeight > heightBeforeSeeMoreButton
-      ? DESCRIPTION_BUTTON.SEE_MORE
-      : DESCRIPTION_BUTTON.HIDDEN
-    )
+    if (ref.current.clientHeight > heightBeforeSeeMoreButton) {
+      props.onCollapse(props.entry)
+    } else {
+      props.onHidden(props.entry)
+    }
   }, [props.entry.description])
 
-  useEffect(() => {
-    const descriptionElement = document.getElementById(`${props.entry.id}_description`)
-    const descriptionHeight = (descriptionElement || { scrollHeight: 0 }).scrollHeight
-    if (descriptionHeight > heightBeforeSeeMoreButton) {
-      setShowDescriptionPreview(!props.expand)
-      setShowSeeDescriptionButton(props.expand
-        ? DESCRIPTION_BUTTON.SEE_LESS
-        : DESCRIPTION_BUTTON.SEE_MORE
-      )
-    }
-  }, [props.expand])
-
   const handleClickSeeDescriptionButton = () => {
-    setShowDescriptionPreview(showSeeDescriptionButton !== DESCRIPTION_BUTTON.SEE_MORE)
-    setShowSeeDescriptionButton(showSeeDescriptionButton === DESCRIPTION_BUTTON.SEE_MORE
-      ? DESCRIPTION_BUTTON.SEE_LESS
-      : DESCRIPTION_BUTTON.SEE_MORE
-    )
+    if (props.entry.expand === DESCRIPTION_BUTTON.SEE_MORE) {
+      props.onExpand(props.entry)
+    } else {
+      props.onCollapse(props.entry)
+    }
   }
 
   function formatDate () {
@@ -98,21 +78,22 @@ const LogbookEntry = (props) => {
           </span>
         </div>
         <div
-          className={classnames('logbook__timeline__entries__entry__data__description', { logbook__timeline__entries__entry__data__description__overflow: showDescriptionPreview })}
+          ref={ref}
+          className={classnames('logbook__timeline__entries__entry__data__description', { logbook__timeline__entries__entry__data__description__overflow: props.entry.expand === DESCRIPTION_BUTTON.SEE_MORE })}
           id={`${props.entry.id}_description`}
           dangerouslySetInnerHTML={{ __html: props.entry.description }}
         />
-        {showSeeDescriptionButton !== DESCRIPTION_BUTTON.HIDDEN && (
+        {props.entry.expand !== DESCRIPTION_BUTTON.HIDDEN && (
           <IconButton
             customClass='logbook__timeline__entries__entry__data__description__overflow__button'
             dataCy='logbook_descriptionOverflow'
             intent='link'
             mode='light'
             onClick={handleClickSeeDescriptionButton}
-            text={showSeeDescriptionButton === DESCRIPTION_BUTTON.SEE_MORE
+            text={props.entry.expand === DESCRIPTION_BUTTON.SEE_MORE
               ? props.t('See more')
               : props.t('See less')}
-            textMobile={showSeeDescriptionButton === DESCRIPTION_BUTTON.SEE_MORE
+            textMobile={props.entry.expand === DESCRIPTION_BUTTON.SEE_MORE
               ? props.t('See more')
               : props.t('See less')}
           />
@@ -145,15 +126,19 @@ LogbookEntry.propTypes = {
   entry: PropTypes.object.isRequired,
   onEditEntry: PropTypes.func.isRequired,
   onRemoveEntry: PropTypes.func.isRequired,
-  expand: PropTypes.bool,
   customColor: PropTypes.string,
   language: PropTypes.string,
-  readOnly: PropTypes.bool
+  readOnly: PropTypes.bool,
+  onCollapse: PropTypes.func,
+  onExpand: PropTypes.func,
+  onHidden: PropTypes.func
 }
 
 LogbookEntry.defaultProps = {
-  expand: false,
   customColor: '',
   language: 'en',
-  readOnly: false
+  readOnly: false,
+  onCollapse: () => { },
+  onExpand: () => { },
+  onHidden: () => { }
 }

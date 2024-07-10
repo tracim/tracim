@@ -24,6 +24,12 @@ import LogbookEntryEditor from './LogbookEntryEditor.jsx'
 
 export const heightBeforeSeeMoreButton = 251
 
+export const DESCRIPTION_BUTTON = {
+  HIDDEN: 'hidden',
+  SEE_MORE: 'seeMore',
+  SEE_LESS: 'seeLess'
+}
+
 export const LOGBOOK_STATE = {
   INIT: 'init',
   LOADING: 'loading',
@@ -58,7 +64,6 @@ export class Logbook extends React.Component {
       logbook: { entries: [] },
       logbookState: justCreated ? LOGBOOK_STATE.LOADED : LOGBOOK_STATE.INIT,
       entryToEdit: {},
-      expandAll: false,
       showConfirmPopup: false,
       saveRequired: false,
       showEditPopIn: false
@@ -95,6 +100,25 @@ export class Logbook extends React.Component {
     }
   }
 
+  mapedEntriesWithOldExpand = (entries) => {
+    const newEntries = []
+    entries.forEach((e) => {
+      const oldEntry = this.state.logbook.entries.filter((entry) => entry.id === e.id)
+      if (oldEntry.length === 0) {
+        newEntries.push({
+          ...e,
+          expand: DESCRIPTION_BUTTON.HIDDEN
+        })
+      } else {
+        newEntries.push({
+          ...e,
+          expand: oldEntry[0].expand
+        })
+      }
+    })
+    return newEntries
+  }
+
   async loadLogbookContent () {
     this.setState({ logbookState: LOGBOOK_STATE.LOADING })
     const { props } = this
@@ -112,10 +136,15 @@ export class Logbook extends React.Component {
       )
 
       if (fetchRawFileContent.apiResponse.ok && fetchRawFileContent.body.entries) {
+        const logbook = fetchRawFileContent.body
+        const newlogbook = {
+          ...logbook,
+          entries: this.mapedEntriesWithOldExpand(logbook.entries)
+        }
         this.setState({
           logbookState: LOGBOOK_STATE.LOADED,
           logbookInitiallyLoaded: true,
-          logbook: fetchRawFileContent.body
+          logbook: newlogbook
         })
       } else {
         console.error(fetchRawFileContent)
@@ -182,15 +211,71 @@ export class Logbook extends React.Component {
     })
   }
 
-  handleExpand = () => {
-    this.setState({
-      expandAll: true
+  handleExpand = (entry) => {
+    if (entry !== undefined) {
+      this.setState(prevState => {
+        const newLogbook = {
+          ...prevState.logbook,
+          entries: prevState.logbook.entries.map(e => e.id === entry.id ? { ...e, expand: DESCRIPTION_BUTTON.SEE_LESS } : e)
+        }
+        return {
+          logbook: newLogbook
+        }
+      })
+    }
+  }
+
+  handleCollapse = (entry) => {
+    if (entry !== undefined) {
+      this.setState(prevState => {
+        const newLogbook = {
+          ...prevState.logbook,
+          entries: prevState.logbook.entries.map(e => e.id === entry.id ? { ...e, expand: DESCRIPTION_BUTTON.SEE_MORE } : e)
+        }
+        return {
+          logbook: newLogbook
+        }
+      })
+    }
+  }
+
+  handleHidden = (entry) => {
+    if (entry !== undefined) {
+      this.setState(prevState => {
+        const newLogbook = {
+          ...prevState.logbook,
+          entries: prevState.logbook.entries.map(e => e.id === entry.id ? { ...e, expand: DESCRIPTION_BUTTON.HIDDEN } : e)
+        }
+        return {
+          logbook: newLogbook
+        }
+      })
+    }
+  }
+
+  handleExpandAll = () => {
+    const newExpand = DESCRIPTION_BUTTON.SEE_LESS
+    this.setState(prevState => {
+      const newLogbook = {
+        ...prevState.logbook,
+        entries: prevState.logbook.entries.map(e => e.expand !== DESCRIPTION_BUTTON.HIDDEN ? { ...e, expand: newExpand } : e)
+      }
+      return {
+        logbook: newLogbook
+      }
     })
   }
 
-  handleCollapse = () => {
-    this.setState({
-      expandAll: false
+  handleCollapseAll = () => {
+    const newExpand = DESCRIPTION_BUTTON.SEE_MORE
+    this.setState(prevState => {
+      const newLogbook = {
+        ...prevState.logbook,
+        entries: prevState.logbook.entries.map(e => e.expand !== DESCRIPTION_BUTTON.HIDDEN ? { ...e, expand: newExpand } : e)
+      }
+      return {
+        logbook: newLogbook
+      }
     })
   }
 
@@ -275,23 +360,19 @@ export class Logbook extends React.Component {
             })}
           >
             <div>
-              {(state.logbook.entries.filter(e => {
-                const descriptionElement = document.getElementById(`${e.id}_description`)
-                const descriptionHeight = (descriptionElement || { scrollHeight: 0 }).scrollHeight
-                return descriptionHeight > heightBeforeSeeMoreButton
-              }).length >= 1) && (
+              {(state.logbook.entries.filter(e => e.expand !== DESCRIPTION_BUTTON.HIDDEN).length >= 1) && (
                 <>
                   <IconButton
-                    customClass='logbook__expand_button'
-                    text={props.t('Expand all event')}
-                    textMobile={props.t('Expand all event')}
-                    onClick={() => this.handleExpand()}
+                    customClass={classnames('btn-link', 'logbook__expand_button')}
+                    text={props.t('Expand all event descriptions')}
+                    textMobile={props.t('Expand all event descriptions')}
+                    onClick={() => this.handleExpandAll()}
                   />
                   <IconButton
-                    customClass='logbook__expand_button'
-                    text={props.t('Collapse all event')}
-                    textMobile={props.t('Collapse all event')}
-                    onClick={() => this.handleCollapse()}
+                    customClass={classnames('btn-link', 'logbook__expand_button')}
+                    text={props.t('Collapse all event descriptions')}
+                    textMobile={props.t('Collapse all event descriptions')}
+                    onClick={() => this.handleCollapseAll()}
                   />
                 </>
               )}
@@ -321,7 +402,9 @@ export class Logbook extends React.Component {
                           onRemoveEntry={this.handleRemoveEntry}
                           key={id}
                           language={props.language}
-                          expand={state.expandAll}
+                          onExpand={this.handleExpand}
+                          onCollapse={this.handleCollapse}
+                          onHidden={this.handleHidden}
                         />
                       )}
                     </div>
