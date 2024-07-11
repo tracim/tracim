@@ -4,7 +4,7 @@
 
 ### 🐛 Fixed Issue
 
-- The confirm delete popup in the kanban app is now the same as the other app [#6542](https://github.com/tracim/tracim/issues/6542)
+- The confirm delete popup in the kanban app is now the same as in the other app [#6542](https://github.com/tracim/tracim/issues/6542)
 - Fixed the breadcrumbs UI when breadcrumbs are long [#6524](https://github.com/tracim/tracim/issues/6524)
 
 ## 4.10.0 / 2024-06-27
