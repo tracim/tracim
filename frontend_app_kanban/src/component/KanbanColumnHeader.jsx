@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import {
-  CardPopup,
+  ConfirmPopup,
   DropdownMenu,
   IconButton
 } from 'tracim_frontend_lib'
@@ -80,33 +80,14 @@ function KanbanColumnHeader (props) {
       </DropdownMenu>
 
       {showConfirmPopup && (
-        <CardPopup
+        <ConfirmPopup
+          onCancel={() => setShowConfirmPopup(false)}
+          onConfirm={() => props.onRemoveColumn(props.column)}
+          confirmLabel={props.t('Delete')}
           customClass='kanban__KanbanPopup'
           customColor={props.customColor}
-          faIcon='far fa-trash-alt'
-          label={props.t('Are you sure?')}
-          onClose={() => setShowConfirmPopup(false)}
-        >
-          <div className='kanban__KanbanPopup__confirm'>
-            <IconButton
-              color={props.customColor}
-              icon='fas fa-times'
-              onClick={() => setShowConfirmPopup(false)}
-              text={props.t('Cancel')}
-              dataCy='cancelDeleteColumn'
-            />
-
-            <IconButton
-              color={props.customColor}
-              icon='far fa-trash-alt'
-              intent='primary'
-              mode='light'
-              onClick={() => props.onRemoveColumn(props.column)}
-              text={props.t('Delete')}
-              dataCy='confirmDeleteColumn'
-            />
-          </div>
-        </CardPopup>
+          confirmIcon='far fa-trash-alt'
+        />
       )}
     </div>
   )
