@@ -22,6 +22,14 @@ import { LOGBOOK_MIME_TYPE, LOGBOOK_FILE_EXTENSION } from '../helper.js'
 import LogbookEntry from './LogbookEntry.jsx'
 import LogbookEntryEditor from './LogbookEntryEditor.jsx'
 
+export const heightBeforeSeeMoreButton = 251
+
+export const DESCRIPTION_BUTTON = {
+  HIDDEN: 'hidden',
+  SEE_MORE: 'seeMore',
+  SEE_LESS: 'seeLess'
+}
+
 export const LOGBOOK_STATE = {
   INIT: 'init',
   LOADING: 'loading',
@@ -92,6 +100,25 @@ export class Logbook extends React.Component {
     }
   }
 
+  mapedEntriesWithOldExpand = (entries) => {
+    const newEntries = []
+    entries.forEach((e) => {
+      const oldEntry = this.state.logbook.entries.filter((entry) => entry.id === e.id)
+      if (oldEntry.length === 0) {
+        newEntries.push({
+          ...e,
+          expand: DESCRIPTION_BUTTON.HIDDEN
+        })
+      } else {
+        newEntries.push({
+          ...e,
+          expand: oldEntry[0].expand
+        })
+      }
+    })
+    return newEntries
+  }
+
   async loadLogbookContent () {
     this.setState({ logbookState: LOGBOOK_STATE.LOADING })
     const { props } = this
@@ -109,10 +136,15 @@ export class Logbook extends React.Component {
       )
 
       if (fetchRawFileContent.apiResponse.ok && fetchRawFileContent.body.entries) {
+        const logbook = fetchRawFileContent.body
+        const newlogbook = {
+          ...logbook,
+          entries: this.mapedEntriesWithOldExpand(logbook.entries)
+        }
         this.setState({
           logbookState: LOGBOOK_STATE.LOADED,
           logbookInitiallyLoaded: true,
-          logbook: fetchRawFileContent.body
+          logbook: newlogbook
         })
       } else {
         console.error(fetchRawFileContent)
@@ -176,6 +208,74 @@ export class Logbook extends React.Component {
     this.setState({
       entryToRemove: entry,
       showConfirmPopup: true
+    })
+  }
+
+  handleExpand = (entry) => {
+    if (entry !== undefined) {
+      this.setState(prevState => {
+        const newLogbook = {
+          ...prevState.logbook,
+          entries: prevState.logbook.entries.map(e => e.id === entry.id ? { ...e, expand: DESCRIPTION_BUTTON.SEE_LESS } : e)
+        }
+        return {
+          logbook: newLogbook
+        }
+      })
+    }
+  }
+
+  handleCollapse = (entry) => {
+    if (entry !== undefined) {
+      this.setState(prevState => {
+        const newLogbook = {
+          ...prevState.logbook,
+          entries: prevState.logbook.entries.map(e => e.id === entry.id ? { ...e, expand: DESCRIPTION_BUTTON.SEE_MORE } : e)
+        }
+        return {
+          logbook: newLogbook
+        }
+      })
+    }
+  }
+
+  handleHidden = (entry) => {
+    if (entry !== undefined) {
+      this.setState(prevState => {
+        const newLogbook = {
+          ...prevState.logbook,
+          entries: prevState.logbook.entries.map(e => e.id === entry.id ? { ...e, expand: DESCRIPTION_BUTTON.HIDDEN } : e)
+        }
+        return {
+          logbook: newLogbook
+        }
+      })
+    }
+  }
+
+  handleExpandAll = () => {
+    const newExpand = DESCRIPTION_BUTTON.SEE_LESS
+    this.setState(prevState => {
+      const newLogbook = {
+        ...prevState.logbook,
+        entries: prevState.logbook.entries.map(e => e.expand !== DESCRIPTION_BUTTON.HIDDEN ? { ...e, expand: newExpand } : e)
+      }
+      return {
+        logbook: newLogbook
+      }
+    })
+  }
+
+  handleCollapseAll = () => {
+    const newExpand = DESCRIPTION_BUTTON.SEE_MORE
+    this.setState(prevState => {
+      const newLogbook = {
+        ...prevState.logbook,
+        entries: prevState.logbook.entries.map(e => e.expand !== DESCRIPTION_BUTTON.HIDDEN ? { ...e, expand: newExpand } : e)
+      }
+      return {
+        logbook: newLogbook
+      }
     })
   }
 
@@ -259,15 +359,35 @@ export class Logbook extends React.Component {
               hidden: state.logbookState === LOGBOOK_STATE.INIT
             })}
           >
-            {changesAllowed && (
-              <IconButton
-                customClass='logbook__new_button'
-                text={props.t('Create an event')}
-                textMobile={props.t('Create an event')}
-                icon='fas fa-plus'
-                onClick={() => this.handleShowPopIn({})}
-              />
-            )}
+            <div>
+              {(state.logbook.entries.filter(e => e.expand !== DESCRIPTION_BUTTON.HIDDEN).length >= 1) && (
+                <>
+                  <IconButton
+                    customClass={classnames('btn-link', 'logbook__expand_button')}
+                    text={props.t('Expand all')}
+                    textMobile={props.t('Expand all')}
+                    title={props.t('Expand all event descriptions')}
+                    onClick={() => this.handleExpandAll()}
+                  />
+                  <IconButton
+                    customClass={classnames('btn-link', 'logbook__expand_button')}
+                    text={props.t('Collapse all')}
+                    textMobile={props.t('Collapse all')}
+                    title={props.t('Collapse all event descriptions')}
+                    onClick={() => this.handleCollapseAll()}
+                  />
+                </>
+              )}
+              {changesAllowed && (
+                <IconButton
+                  customClass='logbook__new_button'
+                  text={props.t('Create an event')}
+                  textMobile={props.t('Create an event')}
+                  icon='fas fa-plus'
+                  onClick={() => this.handleShowPopIn({})}
+                />
+              )}
+            </div>
             <div className='logbook__timeline'>
               {state.logbook.entries.length >= 1
                 ? (
@@ -284,6 +404,9 @@ export class Logbook extends React.Component {
                           onRemoveEntry={this.handleRemoveEntry}
                           key={id}
                           language={props.language}
+                          onExpand={this.handleExpand}
+                          onCollapse={this.handleCollapse}
+                          onHidden={this.handleHidden}
                         />
                       )}
                     </div>
