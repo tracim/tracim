@@ -53,8 +53,8 @@ export const Breadcrumbs = props => {
                 className='root primaryColorFont primaryColorFontDarkenHover'
               >
                 {props.root.icon && <i className={`${props.root.icon}`} />}
-                <span className='breadcrumbs__item__text'>{props.root.label}&nbsp;</span>
-              </Link>&gt;&nbsp;
+                <span className='breadcrumbs__item__text'>{props.root.label}</span>
+              </Link>{props.root.label && <span>&nbsp;</span>}&gt;&nbsp;
             </li>
           )
           : (
