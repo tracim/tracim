@@ -634,9 +634,10 @@
   "Created and commented": "Créé et commenté",
   "Follow-up by e-mail:": "Suivi par e-mail :",
   "Enable/Disable notifications for this workspace.": "Activer / Désactiver les notifications pour cet espace.",
-  "This parameter affects all notifications except individual mentions.": "Ce paramètre affecte toutes les notifications sauf les mentions individuel.",
+  "This parameter affects all notifications except individual mentions.": "Ce paramètre affecte toutes les notifications sauf les mentions individuelles.",
   "You'll receive no follow-up by e-mail, even if you are mentioned.<1>You'll need to rely on recent activities and the notification wall to stay up to date.</1>": "Vous ne recevrez aucun suivi par e-mail, même si vous êtes mentionné.<1>Vous devrez utiliser les activités récentes et le mur de notification pour rester à jour.</1>",
   "Error while changing notification subscription": "Une erreur est survenue durant la modification de l'abonnement aux notifications.",
   "Follow-up by e-mail": "Suivi par e-mail",
-  "Notifications:": "Notifications :"
+  "Notifications:": "Notifications :",
+  "Notifications disabled": "Notifications désactivées"
 }

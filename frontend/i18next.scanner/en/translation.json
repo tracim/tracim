@@ -617,5 +617,6 @@
   "You'll receive no follow-up by e-mail, even if you are mentioned.<1>You'll need to rely on recent activities and the notification wall to stay up to date.</1>": "You'll receive no follow-up by e-mail, even if you are mentioned.<1>You'll need to rely on recent activities and the notification wall to stay up to date.</1>",
   "Error while changing notification subscription": "Error while changing notification subscription",
   "Follow-up by e-mail": "Follow-up by e-mail",
-  "Notifications:": "Notifications:"
+  "Notifications:": "Notifications:",
+  "Notifications disabled": "Notifications disabled"
 }
