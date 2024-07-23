@@ -7,6 +7,7 @@ import { translate } from 'react-i18next'
 import { DropTarget } from 'react-dnd'
 import { isMobile } from 'react-device-detect'
 import {
+  buildUserConfigSpaceWebNotificationKey,
   DropdownMenu,
   Icon,
   IconButton,
@@ -185,14 +186,20 @@ class SidebarSpaceItem extends React.Component {
             {props.label}
           </div>
           {state.unreadMentionCount > 0 && <div className='sidebar__mention'>{state.unreadMentionCount}</div>}
-
-          {props.spaceType === SPACE_TYPE.confidential.slug && (
-            <Icon
-              customClass='sidebar__item__space__type'
-              icon={SPACE_TYPE.confidential.faIcon}
-              title={props.t('Confidential space')}
-            />
-          )}
+          <div className='sidebar__item__space__type'>
+            {props.user.config[buildUserConfigSpaceWebNotificationKey(props.spaceId)] === false && (
+              <Icon
+                icon='fas fa-bell-slash'
+                title={props.t('Notifications disabled')}
+              />
+            )}
+            {props.spaceType === SPACE_TYPE.confidential.slug && (
+              <Icon
+                icon={SPACE_TYPE.confidential.faIcon}
+                title={props.t('Confidential space')}
+              />
+            )}
+          </div>
         </div>
 
         {state.showDropdownMenuButton && (
