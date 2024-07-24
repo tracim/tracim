@@ -2,6 +2,10 @@
 
 ## 4.11.0 / TBD
 
+### ✨ New Features
+
+- Added icon next to spaces that have notification disabled in the space list of the sidebar
+
 ### 🐛 Fixed Issue
 
 - The confirm delete popup in the kanban app is now the same as in the other app [#6542](https://github.com/tracim/tracim/issues/6542)
