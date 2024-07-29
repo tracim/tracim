@@ -32,3 +32,41 @@ Connect to a specific docker image by its id
 ```
 fly -t algoo intercept -b build_id
 ```
+
+## Get the screenshot of failing Cypress test
+
+List the first <number_image> available image from algoo CI
+```
+./fly builds -t algoo -c <number_image>
+```
+
+Create a file where you want to retrieve the image on local
+```
+touch <local_file_location>
+```
+
+Recuperate the image to the file created from it
+```
+./fly hijack -t <team_name> -b <build_id> -s <step_name> cat <image_location> > <local_file_location>
+```
+
+### Where
+
+- <number_image>: number of image wanted, by default is 50
+- <team_name>: `algoo`
+- <build_id>: first column of `./fly builds -t algoo`
+- <step_name>: `end-to-end-cypress-tests`
+  - other available values are
+    - end-to-end-cypress-tests
+    - pull-request
+    - tracim-status-update
+- <imgae_location>: failed test in concourse will display the location after "(Screenshots)"
+- <local_file_location>: local file to put the screenshot in
+
+### Example
+
+```
+touch /tmp/failed_cypress_test.png
+./fly hijack -t algoo -b 137189888 -s end-to-end-cypress-tests cat /tmp/build/c061bd25/pull-request/functionnal_tests/cypress/screenshots/dashboard/information_spec.js/'Dashboard -- should show email notification dropdown (failed).png' > /tmp/failed_cypress_test.png
+eog /tmp/failed_cypress_test.png
+```

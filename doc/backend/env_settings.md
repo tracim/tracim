@@ -28,6 +28,7 @@ To update the list below you will need to:
 | TRACIM_REMOTE_USER_HEADER                                                 | remote_user_header                                             | REMOTE_USER_HEADER                                                 |
 | TRACIM_API__KEY                                                           | api.key                                                        | API__KEY                                                           |
 | TRACIM_CONFIG__FILEPATH                                                   | config.filepath                                                | CONFIG__FILEPATH                                                   |
+| TRACIM__APP_CUSTOM_ACTION__CONFIG_FILE_PATH                               | app_custom_action.config_file_path                             | APP_CUSTOM_ACTION__CONFIG_FILE_PATH                                |
 | TRACIM_SESSION__TYPE                                                      | session.type                                                   | SESSION__TYPE                                                      |
 | TRACIM_SESSION__URL                                                       | session.url                                                    | SESSION__URL                                                       |
 | TRACIM_SESSION__URLS                                                      | session.urls                                                   | SESSION__URLS                                                      |
@@ -60,6 +61,7 @@ To update the list below you will need to:
 | TRACIM_BUILD_VERSION                                                      | build_version                                                  | BUILD_VERSION                                                      |
 | TRACIM_PREVIEW__JPG__RESTRICTED_DIMS                                      | preview.jpg.restricted_dims                                    | PREVIEW__JPG__RESTRICTED_DIMS                                      |
 | TRACIM_PREVIEW__JPG__ALLOWED_DIMS                                         | preview.jpg.allowed_dims                                       | PREVIEW__JPG__ALLOWED_DIMS                                         |
+| TRACIM_PREVIEW__SKIPLIST                                                  | preview.skiplist                                               | PREVIEW__SKIPLIST                                                  |
 | TRACIM_FRONTEND__SERVE                                                    | frontend.serve                                                 | FRONTEND__SERVE                                                    |
 | TRACIM_FRONTEND__CACHE_TOKEN                                              | frontend.cache_token                                           | FRONTEND__CACHE_TOKEN                                              |
 | TRACIM_BACKEND__I18N_FOLDER_PATH                                          | backend.i18n_folder_path                                       | BACKEND__I18N_FOLDER_PATH                                          |
