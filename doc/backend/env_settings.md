@@ -28,7 +28,7 @@ To update the list below you will need to:
 | TRACIM_REMOTE_USER_HEADER                                                 | remote_user_header                                             | REMOTE_USER_HEADER                                                 |
 | TRACIM_API__KEY                                                           | api.key                                                        | API__KEY                                                           |
 | TRACIM_CONFIG__FILEPATH                                                   | config.filepath                                                | CONFIG__FILEPATH                                                   |
-| TRACIM__APP_CUSTOM_ACTION__CONFIG_FILE_PATH                               | app_custom_action.config_file_path                             | APP_CUSTOM_ACTION__CONFIG_FILE_PATH                                |
+| TRACIM_APP_CUSTOM_ACTIONS__CONFIG_FILE                                    | app_custom_actions.config_file                                 | APP_CUSTOM_ACTIONS__CONFIG_FILE                                    |
 | TRACIM_SESSION__TYPE                                                      | session.type                                                   | SESSION__TYPE                                                      |
 | TRACIM_SESSION__URL                                                       | session.url                                                    | SESSION__URL                                                       |
 | TRACIM_SESSION__URLS                                                      | session.urls                                                   | SESSION__URLS                                                      |
@@ -36,6 +36,8 @@ To update the list below you will need to:
 | TRACIM_SESSION__LOCK_DIR                                                  | session.lock_dir                                               | SESSION__LOCK_DIR                                                  |
 | TRACIM_SESSION__HTTPONLY                                                  | session.httponly                                               | SESSION__HTTPONLY                                                  |
 | TRACIM_SESSION__SECURE                                                    | session.secure                                                 | SESSION__SECURE                                                    |
+| TRACIM_SESSION__USERNAME                                                  | session.username                                               | SESSION__USERNAME                                                  |
+| TRACIM_SESSION__PASSWORD                                                  | session.password                                               | SESSION__PASSWORD                                                  |
 | TRACIM_WEBSITE__TITLE                                                     | website.title                                                  | WEBSITE__TITLE                                                     |
 | TRACIM_WEBSITE__DESCRIPTION                                               | website.description                                            | WEBSITE__DESCRIPTION                                               |
 | TRACIM_WEBSITE__USAGE_CONDITIONS                                          | website.usage_conditions                                       | WEBSITE__USAGE_CONDITIONS                                          |
