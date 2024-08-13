@@ -209,6 +209,10 @@ export const Call = props => {
             userCallUrl={userCall.url}
           />
         )
+      case USER_CALL_STATE.CANCELLED:
+        return null
+      default:
+        return null
     }
   }
 }
