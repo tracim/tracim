@@ -121,6 +121,8 @@ export function appContentFactory (WrappedComponent) {
 
       props.registerLiveMessageHandlerList([
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, handler: this.handleContentModified },
+        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, handler: this.handleContentModified },
+        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, handler: this.handleContentModified },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleCommentCreated },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.COMMENT, handler: this.handleChildContentDeleted },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentModified },
@@ -310,6 +312,7 @@ export function appContentFactory (WrappedComponent) {
       })
     }
 
+    // INFO - CH - 2024-08-13 - This function handles TLM for content modified, deleted and restored
     handleContentModified = async (tlm) => {
       const { state } = this
       // Not our content
