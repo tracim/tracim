@@ -117,20 +117,14 @@ export const Call = props => {
 
   const handleClickOpenCallWindowCallee = () => {
     props.dispatch(putSetIncomingUserCallState(props.user.userId, userCall.call_id, USER_CALL_STATE.ACCEPTED))
-    props.dispatch(setHeadTitle(props.system.headTitle))
-    audioCall.pause()
   }
 
   const handleClickRejectCall = () => {
     props.dispatch(putSetIncomingUserCallState(props.user.userId, userCall.call_id, USER_CALL_STATE.REJECTED))
-    props.dispatch(setHeadTitle(props.system.headTitle))
-    audioCall.pause()
   }
 
   const handleClickDeclineCall = () => {
     props.dispatch(putSetIncomingUserCallState(props.user.userId, userCall.call_id, USER_CALL_STATE.DECLINED))
-    props.dispatch(setHeadTitle(props.system.headTitle))
-    audioCall.pause()
   }
 
   const handleClosePopup = () => {
@@ -215,6 +209,7 @@ export const Call = props => {
         return null
     }
   }
+  return null
 }
 
 const mapStateToProps = ({ user, system }) => ({ user, system })
