@@ -17,7 +17,11 @@ const LogbookEntry = (props) => {
 
   useEffect(() => {
     if (ref.current.clientHeight > heightBeforeSeeMoreButton) {
-      props.onCollapse(props.entry)
+      if (props.entry.expand === DESCRIPTION_BUTTON.SEE_LESS) {
+        props.onExpand(props.entry)
+      } else {
+        props.onCollapse(props.entry)
+      }
     } else {
       props.onHidden(props.entry)
     }
