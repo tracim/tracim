@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { isMobile } from 'react-device-detect'
@@ -41,21 +41,26 @@ const defaultUserCall = {
 
 export const Call = props => {
   const [userCall, setUserCall] = useState(defaultUserCall)
-  // INFO - CH - 20240827 - useRef is mandatory because the value is read in an event handler
-  // see https://medium.com/geographit/accessing-react-state-in-event-listeners-with-usestate-and-useref-hooks-8cceee73c559
-  const isMasterTab = useRef(props.liveMessageManager.eventSource !== null)
+  const [isMasterTab, setIsMasterTab] = useState(false)
 
   let unansweredCallTimeoutId = -1
 
   useEffect(() => {
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.MODIFIED, handler: handleUserCallModified },
-      { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.CREATED, handler: handleUserCallCreated }
+      { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.MODIFIED, handler: handleUserCallModified }
     ])
   }, [])
 
+  // INFO - CH - 20240827 - isMasterTab as dependency of useEffect is mandatory because handleUserCallCreated
+  // uses isMasterTab. If not set as dependency, handleUserCallCreated won't have the latest value when executing
   useEffect(() => {
-    isMasterTab.current = props.liveMessageManager.eventSource !== null
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.CREATED, handler: handleUserCallCreated }
+    ])
+  }, [isMasterTab])
+
+  useEffect(() => {
+    setIsMasterTab(props.liveMessageManager.eventSource !== null)
   }, [props.liveMessageManager.eventSource])
 
   const handleUserCallCreated = async (tlm) => {
@@ -80,7 +85,7 @@ export const Call = props => {
 
       setUserCall(tlm.fields.user_call)
       props.dispatch(setHeadTitle(props.system.headTitle, '🔔'))
-      if (isMasterTab.current && !isMobile) audioCall.play()
+      if (isMasterTab && !isMobile) audioCall.play()
     } else if (tlm.fields.user_call.caller.user_id === props.user.userId) {
       setUserCall(tlm.fields.user_call)
     }
@@ -110,7 +115,7 @@ export const Call = props => {
       setUserCall(tlm.fields.user_call)
       unansweredCallTimeoutId = -1
 
-      if (tlm.fields.user_call.state === USER_CALL_STATE.ACCEPTED && isMasterTab.current) {
+      if (tlm.fields.user_call.state === USER_CALL_STATE.ACCEPTED && isMasterTab) {
         window.open(tlm.fields.user_call.url)
       }
     }
