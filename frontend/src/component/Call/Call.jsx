@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { isMobile } from 'react-device-detect'
@@ -29,8 +29,7 @@ require('./Call.styl')
 const UNANSWERED_CALL_TIMEOUT = 120000 // 2 minutes
 
 const audioCall = new Audio('/assets/branding/incoming-call.ogg')
-// INFO - CH - 2024-06-21 - Allow to play call ringtone in loop
-audioCall.addEventListener('ended', function () { this.play() }, false)
+audioCall.loop = true
 
 const defaultUserCall = {
   call_id: '',
@@ -42,7 +41,9 @@ const defaultUserCall = {
 
 export const Call = props => {
   const [userCall, setUserCall] = useState(defaultUserCall)
-  const [isMasterTab, setIsMasterTab] = useState(false)
+  // INFO - CH - 20240827 - useRef is mandatory because the value is read in an event handler
+  // see https://medium.com/geographit/accessing-react-state-in-event-listeners-with-usestate-and-useref-hooks-8cceee73c559
+  const isMasterTab = useRef(props.liveMessageManager.eventSource !== null)
 
   let unansweredCallTimeoutId = -1
 
@@ -51,11 +52,10 @@ export const Call = props => {
       { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.MODIFIED, handler: handleUserCallModified },
       { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.CREATED, handler: handleUserCallCreated }
     ])
-    setIsMasterTab(props.liveMessageManager.eventSource !== null)
   }, [])
 
   useEffect(() => {
-    setIsMasterTab(props.liveMessageManager.eventSource !== null)
+    isMasterTab.current = props.liveMessageManager.eventSource !== null
   }, [props.liveMessageManager.eventSource])
 
   const handleUserCallCreated = async (tlm) => {
@@ -80,6 +80,7 @@ export const Call = props => {
 
       setUserCall(tlm.fields.user_call)
       props.dispatch(setHeadTitle(props.system.headTitle, '🔔'))
+      if (isMasterTab.current && !isMobile) audioCall.play()
     } else if (tlm.fields.user_call.caller.user_id === props.user.userId) {
       setUserCall(tlm.fields.user_call)
     }
@@ -109,8 +110,7 @@ export const Call = props => {
       setUserCall(tlm.fields.user_call)
       unansweredCallTimeoutId = -1
 
-      if (tlm.fields.user_call.state === USER_CALL_STATE.ACCEPTED) {
-        if (!isMasterTab) return
+      if (tlm.fields.user_call.state === USER_CALL_STATE.ACCEPTED && isMasterTab.current) {
         window.open(tlm.fields.user_call.url)
       }
     }
@@ -133,9 +133,11 @@ export const Call = props => {
   }
 
   const handleClickRetryButton = async () => {
-    await props.dispatch(postCreateUserCall(props.user.userId, userCall.callee.user_id))
+    const response = await props.dispatch(postCreateUserCall(props.user.userId, userCall.callee.user_id))
     const setUserCallUnanswered = () => {
-      props.dispatch(putSetOutgoingUserCallState(props.user.userId, userCall.call_id, USER_CALL_STATE.UNANSWERED))
+      props.dispatch(putSetOutgoingUserCallState(
+        props.user.userId, response.json.call_id, USER_CALL_STATE.UNANSWERED
+      ))
     }
     const timeoutDuration = props.system.config?.call__unanswered_timeout || UNANSWERED_CALL_TIMEOUT
     const id = setTimeout(setUserCallUnanswered, timeoutDuration)
@@ -153,7 +155,6 @@ export const Call = props => {
   ) return null
 
   if (userCall.callee.user_id === props.user.userId) {
-    if (isMasterTab && !isMobile) audioCall.play()
     return (
       <CallPopupReceived
         onClickRejectCall={handleClickRejectCall}
@@ -163,7 +164,9 @@ export const Call = props => {
         userCallUrl={userCall.url}
       />
     )
-  } else if (userCall.caller.user_id === props.user.userId) {
+  }
+
+  if (userCall.caller.user_id === props.user.userId) {
     switch (userCall.state) {
       case USER_CALL_STATE.IN_PROGRESS:
         return (
