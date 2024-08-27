@@ -42,7 +42,7 @@ const defaultUserCall = {
 
 export const Call = props => {
   const [userCall, setUserCall] = useState(defaultUserCall)
-  const [isMainTab, setIsMainTab] = useState(false)
+  const [isMasterTab, setIsMasterTab] = useState(false)
 
   let unansweredCallTimeoutId = -1
 
@@ -51,11 +51,11 @@ export const Call = props => {
       { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.MODIFIED, handler: handleUserCallModified },
       { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.CREATED, handler: handleUserCallCreated }
     ])
-    setIsMainTab(props.liveMessageManager.eventSource !== null)
+    setIsMasterTab(props.liveMessageManager.eventSource !== null)
   }, [])
 
   useEffect(() => {
-    setIsMainTab(props.liveMessageManager.eventSource !== null)
+    setIsMasterTab(props.liveMessageManager.eventSource !== null)
   }, [props.liveMessageManager.eventSource])
 
   const handleUserCallCreated = async (tlm) => {
@@ -87,8 +87,6 @@ export const Call = props => {
 
   const handleUserCallModified = (tlm) => {
     if (tlm.fields.user_call.callee.user_id === props.user.userId) {
-      setUserCall(defaultUserCall)
-
       const callStateForPauseAudio = [
         USER_CALL_STATE.ACCEPTED,
         USER_CALL_STATE.CANCELLED,
@@ -96,10 +94,13 @@ export const Call = props => {
         USER_CALL_STATE.UNANSWERED,
         USER_CALL_STATE.DECLINED
       ]
+
       if (callStateForPauseAudio.some(state => state === tlm.fields.user_call.state)) {
         audioCall.pause()
         props.dispatch(setHeadTitle(props.system.headTitle))
       }
+
+      setUserCall(defaultUserCall)
     }
 
     if (tlm.fields.user_call.caller.user_id === props.user.userId) {
@@ -109,7 +110,7 @@ export const Call = props => {
       unansweredCallTimeoutId = -1
 
       if (tlm.fields.user_call.state === USER_CALL_STATE.ACCEPTED) {
-        if (!isMainTab) return
+        if (!isMasterTab) return
         window.open(tlm.fields.user_call.url)
       }
     }
@@ -136,7 +137,8 @@ export const Call = props => {
     const setUserCallUnanswered = () => {
       props.dispatch(putSetOutgoingUserCallState(props.user.userId, userCall.call_id, USER_CALL_STATE.UNANSWERED))
     }
-    const id = setTimeout(setUserCallUnanswered, UNANSWERED_CALL_TIMEOUT)
+    const timeoutDuration = props.system.config?.call__unanswered_timeout || UNANSWERED_CALL_TIMEOUT
+    const id = setTimeout(setUserCallUnanswered, timeoutDuration)
     unansweredCallTimeoutId = id
   }
 
@@ -151,7 +153,7 @@ export const Call = props => {
   ) return null
 
   if (userCall.callee.user_id === props.user.userId) {
-    if (isMainTab && !isMobile) audioCall.play()
+    if (isMasterTab && !isMobile) audioCall.play()
     return (
       <CallPopupReceived
         onClickRejectCall={handleClickRejectCall}
