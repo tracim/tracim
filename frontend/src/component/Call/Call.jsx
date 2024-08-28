@@ -60,8 +60,8 @@ export const Call = props => {
   }, [isMasterTab])
 
   useEffect(() => {
-    setIsMasterTab(props.liveMessageManager.eventSource !== null)
-  }, [props.liveMessageManager.eventSource])
+    setIsMasterTab(props.liveMessageManagerEventSource !== null)
+  }, [props.liveMessageManagerEventSource])
 
   const handleUserCallCreated = async (tlm) => {
     if (tlm.fields.user_call.callee.user_id === props.user.userId) {
@@ -226,7 +226,7 @@ const mapStateToProps = ({ user, system }) => ({ user, system })
 export default connect(mapStateToProps)(translate()(TracimComponent(Call)))
 
 Call.propTypes = {
-  liveMessageManager: PropTypes.object.isRequired
+  liveMessageManagerEventSource: PropTypes.object.isRequired
 }
 Call.defaultProps = {
 }
