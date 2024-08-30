@@ -97,6 +97,9 @@ class SAMLSecurityPolicy:
         #  (currently is in the doc/setting.md file) or upgrade the way swagger generates
         #  documentation to ease the addition of non conventional routes
 
+        # See internal documentation for more information
+        #  https://algoo.tracim.fr/ui/workspaces/630/contents/html-document/158020
+
         self._load_settings(configurator)
         _config = configurator.get_settings().get("pyramid_saml")
         with open(_config.get("saml_path"), "r") as config_file:
@@ -241,7 +244,7 @@ class SAMLSecurityPolicy:
     #  sent by the SAML IdP is processed and consumed
     def _acs(self, request: TracimRequest) -> Response:
         if "RelayState" not in request.POST or "SAMLResponse" not in request.POST:
-            return HTTPBadRequest()
+            return HTTPBadRequest()  # FIXME
         response = request.POST["SAMLResponse"]
         try:
             authn_response = self.saml_client.parse_authn_request_response(
@@ -251,10 +254,10 @@ class SAMLSecurityPolicy:
         except ResponseLifetimeExceed as e:
             return Response(e.__str__())
         if authn_response.not_on_or_after <= int(time.time()):
-            return HTTPBadRequest()
+            return HTTPBadRequest()  # FIXME
         identity = authn_response.get_identity()
         if identity is None:
-            return HTTPBadRequest()
+            return HTTPBadRequest()  # FIXME
         # NOTE - M.L - 2023-10-25 - RelayState is information conveyed through the auth process,
         #  this is here to keep info about at which idp the user authenticated
         idp_name = request.POST.get("RelayState")
@@ -283,7 +286,7 @@ class SAMLSecurityPolicy:
         logging.getLogger().debug(f"User profile level found for '{user_id}': '{user_profile}'")
 
         if "user_id" not in formatted_attributes:
-            return HTTPBadRequest()
+            return HTTPBadRequest()  # FIXME
 
         request.session["saml_user_id"] = user_id
         if "username" in formatted_attributes:

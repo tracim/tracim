@@ -1,4 +1,5 @@
 # Shibboleth IDP test container
+## ML - 2024-08-29 - BETA - This documentation is neither definitive or guaranteed to work properly
 
 This container is a shibboleth SAML IdP designed to test SAML SPs (as tracim).
 
@@ -17,7 +18,7 @@ Then provide the SP's metadata in `shibboleth-idp/metadata/MY_ID.xml`.
 
 ## Usage
 
-Make sure to have port 8080 available, then run the container: 
+Make sure to have port 8080 available, then run the container:
 ```sh
 docker run --rm -d --name="shibboleth-idp-test-container" --network=host shibboleth-idp-test-image
 ```
