@@ -362,14 +362,14 @@ export class Logbook extends React.Component {
                     text={props.t('Expand all')}
                     textMobile={props.t('Expand all')}
                     title={props.t('Expand all event descriptions')}
-                    onClick={() => this.handleExpandAll()}
+                    onClick={this.handleExpandAll}
                   />
                   <IconButton
                     customClass={classnames('btn-link', 'logbook__expand_button')}
                     text={props.t('Collapse all')}
                     textMobile={props.t('Collapse all')}
                     title={props.t('Collapse all event descriptions')}
-                    onClick={() => this.handleCollapseAll()}
+                    onClick={this.handleCollapseAll}
                   />
                 </>
               )}
