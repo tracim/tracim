@@ -65,7 +65,6 @@ export class Logbook extends React.Component {
       logbookState: justCreated ? LOGBOOK_STATE.LOADED : LOGBOOK_STATE.INIT,
       entryToEdit: {},
       showConfirmPopup: false,
-      saveRequired: false,
       showEditPopIn: false
     }
   }
@@ -79,37 +78,33 @@ export class Logbook extends React.Component {
       this.setState({
         logbookState: LOGBOOK_STATE.LOADED,
         logbookInitiallyLoaded: true,
-        saveRequired: true,
         logbook: newLogbook
       })
     }
   }
 
   async componentDidUpdate (prevProps) {
-    const { state, props } = this
+    const { props } = this
     if (
       (props.content.current_revision_id !== prevProps.content.current_revision_id) ||
       (props.isNewContentRevision && prevProps.isNewContentRevision !== props.isNewContentRevision)
     ) {
       this.loadLogbookContent()
     }
-
-    if (state.saveRequired) {
-      this.save(state.logbook)
-      this.setState({ saveRequired: false })
-    }
   }
 
   mapEntriesWithOldExpand = (entries) => {
     return entries.map(e => {
-      if (!this.state.logbook.entries.some((entry) => entry.id === e.id)) {
+      const oldEntry = this.state.logbook.entries.find((entry) => entry.id === e.id)
+      if (oldEntry === undefined) {
         return {
           ...e,
           expand: DESCRIPTION_BUTTON.HIDDEN
         }
       } else {
         return {
-          ...e
+          ...e,
+          expand: oldEntry.expand
         }
       }
     })
@@ -167,31 +162,28 @@ export class Logbook extends React.Component {
   }
 
   handleAddOrEditEntry = (entry) => {
-    // INFO - F.S. - 14/08/2024 - expand all the event so that the ref will calculate the height on the full element and not the reduced one
-    this.handleExpandAll()
     this.setState(prevState => {
       const newLogbook = entry.id
         ? replaceEntryInLogbook(prevState.logbook, entry)
         : addEntryToLogbook(prevState.logbook, entry)
+      const sortedLogbook = { entries: newLogbook.entries.toSorted((a, b) => new Date(b.datetime) - new Date(a.datetime)) }
+      this.save(sortedLogbook)
       return {
         showEditPopIn: false,
         logbookState: LOGBOOK_STATE.SAVING,
-        saveRequired: true,
-        logbook: newLogbook
+        logbook: sortedLogbook
       }
     })
   }
 
   handleConfirmRemoveEntry = (entry) => {
-    // INFO - F.S. - 14/08/2024 - expand all the event so that the ref will calculate the height on the full element and not the reduced one
-    this.handleExpandAll()
     this.setState(prevState => {
       const newLogbook = removeEntryFromLogbook(prevState.logbook, entry)
+      this.save(newLogbook)
       return {
         entryToRemove: null,
         showConfirmPopup: false,
         logbookState: LOGBOOK_STATE.SAVING,
-        saveRequired: true,
         logbook: newLogbook
       }
     })
@@ -254,11 +246,10 @@ export class Logbook extends React.Component {
   }
 
   handleExpandAll = () => {
-    const newExpand = DESCRIPTION_BUTTON.SEE_LESS
     this.setState(prevState => {
       const newLogbook = {
         ...prevState.logbook,
-        entries: prevState.logbook.entries.map(e => e.expand !== DESCRIPTION_BUTTON.HIDDEN ? { ...e, expand: newExpand } : e)
+        entries: prevState.logbook.entries.map(e => e.expand !== DESCRIPTION_BUTTON.HIDDEN ? { ...e, expand: DESCRIPTION_BUTTON.SEE_LESS } : e)
       }
       return {
         logbook: newLogbook
@@ -267,11 +258,10 @@ export class Logbook extends React.Component {
   }
 
   handleCollapseAll = () => {
-    const newExpand = DESCRIPTION_BUTTON.SEE_MORE
     this.setState(prevState => {
       const newLogbook = {
         ...prevState.logbook,
-        entries: prevState.logbook.entries.map(e => e.expand !== DESCRIPTION_BUTTON.HIDDEN ? { ...e, expand: newExpand } : e)
+        entries: prevState.logbook.entries.map(e => e.expand !== DESCRIPTION_BUTTON.HIDDEN ? { ...e, expand: DESCRIPTION_BUTTON.SEE_MORE } : e)
       }
       return {
         logbook: newLogbook
@@ -281,8 +271,12 @@ export class Logbook extends React.Component {
 
   async save (newLogbook) {
     const { props } = this
-    const sortedLogbook = { entries: newLogbook.entries.toSorted((a, b) => new Date(b.datetime) - new Date(a.datetime)) }
-    sortedLogbook.entries.map(e => delete e.expand)
+    const logbookForApi = {
+      entries: newLogbook.entries.map(e => {
+        const { expand, ...rest } = e
+        return rest
+      })
+    }
 
     const fetchResultSaveLogbook = await handleFetchResult(
       await putRawFileContent(
@@ -290,7 +284,7 @@ export class Logbook extends React.Component {
         props.content.workspace_id,
         props.content.content_id,
         props.content.label + LOGBOOK_FILE_EXTENSION,
-        JSON.stringify(sortedLogbook),
+        JSON.stringify(logbookForApi),
         LOGBOOK_MIME_TYPE
       )
     )

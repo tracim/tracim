@@ -16,7 +16,7 @@ const LogbookEntry = (props) => {
   const ref = useRef(null)
 
   useEffect(() => {
-    if (ref.current.clientHeight > heightBeforeSeeMoreButton) {
+    if (ref.current.scrollHeight > heightBeforeSeeMoreButton) {
       if (props.entry.expand === DESCRIPTION_BUTTON.SEE_LESS) {
         props.onExpand(props.entry)
       } else {
