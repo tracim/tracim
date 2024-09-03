@@ -275,7 +275,8 @@ export const updateWorkspaceSubscription = subscription => ({ type: `${UPDATE}/$
 
 export const WORKSPACE_ACTIVITY = `${WORKSPACE}/Activity`
 export const EVENT_LIST = 'EVENT_LIST'
-export const setWorkspaceActivityList = activityList => ({ type: `${SET}/${WORKSPACE_ACTIVITY}/${LIST}`, activityList })
+export const SET_WORKSPACE_ACTIVITY_LIST = `${SET}/${WORKSPACE_ACTIVITY}/${LIST}`
+export const setWorkspaceActivityList = activityList => ({ type: SET_WORKSPACE_ACTIVITY_LIST, activityList })
 export const setWorkspaceActivityNextPage = (hasNextPage, nextPageToken) => ({
   type: `${SET}/${WORKSPACE_ACTIVITY}/${NEXT_PAGE}`,
   hasNextPage,

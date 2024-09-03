@@ -42,13 +42,15 @@ export class WorkspaceRecentActivities extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    if (this.props.system) {
+    const { props } = this
+    if (props.system) {
       if (
-        this.props.system.workspaceListLoaded && this.lastSpaceLoaded !== this.props.workspaceId
+        props.system.workspaceListLoaded &&
+        this.lastSpaceLoaded !== props.workspaceId
       ) {
-        this.props.cancelCurrentLoadActivities()
-        this.props.loadActivities(ACTIVITY_COUNT_PER_PAGE, true, this.props.workspaceId)
-        this.lastSpaceLoaded = this.props.workspaceId
+        props.cancelCurrentLoadActivities()
+        props.loadActivities(ACTIVITY_COUNT_PER_PAGE, true, props.workspaceId)
+        this.lastSpaceLoaded = props.workspaceId
       }
     }
   }

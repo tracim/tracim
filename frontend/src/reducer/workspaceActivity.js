@@ -2,9 +2,9 @@ import {
   SET,
   RESET,
   WORKSPACE_ACTIVITY,
-  LIST,
   NEXT_PAGE,
-  EVENT_LIST
+  EVENT_LIST,
+  SET_WORKSPACE_ACTIVITY_LIST
 } from '../action-creator.sync.js'
 
 import { setActivityEventList } from '../util/activity.js'
@@ -19,7 +19,7 @@ const workspaceActivity = (state = defaultWorkspaceActivityState, action) => {
   switch (action.type) {
     case `${RESET}/${WORKSPACE_ACTIVITY}`:
       return defaultWorkspaceActivityState
-    case `${SET}/${WORKSPACE_ACTIVITY}/${LIST}`:
+    case SET_WORKSPACE_ACTIVITY_LIST:
       return { ...state, list: action.activityList }
     case `${SET}/${WORKSPACE_ACTIVITY}/${NEXT_PAGE}`:
       return { ...state, hasNextPage: action.hasNextPage, nextPageToken: action.nextPageToken }
