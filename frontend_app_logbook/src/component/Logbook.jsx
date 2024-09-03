@@ -162,30 +162,28 @@ export class Logbook extends React.Component {
   }
 
   handleAddOrEditEntry = (entry) => {
-    this.setState(prevState => {
-      const newLogbook = entry.id
-        ? replaceEntryInLogbook(prevState.logbook, entry)
-        : addEntryToLogbook(prevState.logbook, entry)
-      const sortedLogbook = { entries: newLogbook.entries.toSorted((a, b) => new Date(b.datetime) - new Date(a.datetime)) }
-      this.save(sortedLogbook)
-      return {
-        showEditPopIn: false,
-        logbookState: LOGBOOK_STATE.SAVING,
-        logbook: sortedLogbook
-      }
+    const newLogbook = entry.id
+      ? replaceEntryInLogbook(this.state.logbook, entry)
+      : addEntryToLogbook(this.state.logbook, entry)
+    const sortedLogbook = {
+      entries: newLogbook.entries.toSorted((a, b) => new Date(b.datetime) - new Date(a.datetime))
+    }
+    this.save(sortedLogbook)
+    this.setState({
+      showEditPopIn: false,
+      logbookState: LOGBOOK_STATE.SAVING,
+      logbook: sortedLogbook
     })
   }
 
   handleConfirmRemoveEntry = (entry) => {
-    this.setState(prevState => {
-      const newLogbook = removeEntryFromLogbook(prevState.logbook, entry)
-      this.save(newLogbook)
-      return {
-        entryToRemove: null,
-        showConfirmPopup: false,
-        logbookState: LOGBOOK_STATE.SAVING,
-        logbook: newLogbook
-      }
+    const newLogbook = removeEntryFromLogbook(this.state.logbook, entry)
+    this.save(newLogbook)
+    this.setState({
+      entryToRemove: null,
+      showConfirmPopup: false,
+      logbookState: LOGBOOK_STATE.SAVING,
+      logbook: newLogbook
     })
   }
 
@@ -208,7 +206,9 @@ export class Logbook extends React.Component {
       this.setState(prevState => {
         const newLogbook = {
           ...prevState.logbook,
-          entries: prevState.logbook.entries.map(e => e.id === entry.id ? { ...e, expand: DESCRIPTION_BUTTON.SEE_LESS } : e)
+          entries: prevState.logbook.entries.map(e => e.id === entry.id ? {
+            ...e, expand: DESCRIPTION_BUTTON.SEE_LESS
+          } : e)
         }
         return {
           logbook: newLogbook
@@ -222,7 +222,9 @@ export class Logbook extends React.Component {
       this.setState(prevState => {
         const newLogbook = {
           ...prevState.logbook,
-          entries: prevState.logbook.entries.map(e => e.id === entry.id ? { ...e, expand: DESCRIPTION_BUTTON.SEE_MORE } : e)
+          entries: prevState.logbook.entries.map(e => e.id === entry.id ? {
+            ...e, expand: DESCRIPTION_BUTTON.SEE_MORE
+          } : e)
         }
         return {
           logbook: newLogbook
@@ -236,7 +238,9 @@ export class Logbook extends React.Component {
       this.setState(prevState => {
         const newLogbook = {
           ...prevState.logbook,
-          entries: prevState.logbook.entries.map(e => e.id === entry.id ? { ...e, expand: DESCRIPTION_BUTTON.HIDDEN } : e)
+          entries: prevState.logbook.entries.map(e => e.id === entry.id ? {
+            ...e, expand: DESCRIPTION_BUTTON.HIDDEN
+          } : e)
         }
         return {
           logbook: newLogbook
@@ -249,7 +253,9 @@ export class Logbook extends React.Component {
     this.setState(prevState => {
       const newLogbook = {
         ...prevState.logbook,
-        entries: prevState.logbook.entries.map(e => e.expand !== DESCRIPTION_BUTTON.HIDDEN ? { ...e, expand: DESCRIPTION_BUTTON.SEE_LESS } : e)
+        entries: prevState.logbook.entries.map(e => e.expand !== DESCRIPTION_BUTTON.HIDDEN ? {
+          ...e, expand: DESCRIPTION_BUTTON.SEE_LESS
+        } : e)
       }
       return {
         logbook: newLogbook
@@ -261,7 +267,9 @@ export class Logbook extends React.Component {
     this.setState(prevState => {
       const newLogbook = {
         ...prevState.logbook,
-        entries: prevState.logbook.entries.map(e => e.expand !== DESCRIPTION_BUTTON.HIDDEN ? { ...e, expand: DESCRIPTION_BUTTON.SEE_MORE } : e)
+        entries: prevState.logbook.entries.map(e => e.expand !== DESCRIPTION_BUTTON.HIDDEN ? {
+          ...e, expand: DESCRIPTION_BUTTON.SEE_MORE
+        } : e)
       }
       return {
         logbook: newLogbook
