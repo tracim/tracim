@@ -26,3 +26,6 @@ tab_width = 4
 
 [*.md]
 trim_trailing_whitespace = false
+
+[*.{jsx,js}]
+max_line_length = 120
