@@ -5,9 +5,13 @@
 ### ✨ New Features
 
 - Added icon next to spaces that have notification disabled in the space list of the sidebar
+- Added a new button in logbook to expand or reduce all long event description
 
 ### 🐛 Fixed Issue
 
+- Fixed the dashboard recent activities list [#6577](https://github.com/tracim/tracim/issues/6577)
+- Fixed the call popup [#6402](https://github.com/tracim/tracim/issues/6402), [#5265](https://github.com/tracim/tracim/issues/5265), [#5337](https://github.com/tracim/tracim/issues/5337), [#5821](https://github.com/tracim/tracim/issues/5821)
+- Supression and restoration of contents are now updated in real time [#6557](https://github.com/tracim/tracim/issues/6557)
 - The confirm delete popup in the kanban app is now the same as in the other app [#6542](https://github.com/tracim/tracim/issues/6542)
 - Fixed the breadcrumbs UI when breadcrumbs are long [#6524](https://github.com/tracim/tracim/issues/6524)
 
