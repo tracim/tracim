@@ -276,7 +276,11 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
           // Could use neither reducer currentWorkspace nor HOC withRouter
           // See https://github.com/tracim/tracim/issues/6577
           const workspaceIdInUrl = window.location.pathname.match(/ui\/workspaces\/(\d+)\/dashboard/)
-          if (workspaceIdInUrl && workspaceIdInUrl.length > 2 && workspaceIdInUrl[1] !== workspaceId.toString()) {
+          if (
+            workspaceIdInUrl &&
+            workspaceIdInUrl.length >= 2 &&
+            workspaceIdInUrl[1].toString() !== workspaceId.toString()
+          ) {
             return
           }
           activityList = activitiesParams.activityList
