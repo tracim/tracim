@@ -72,11 +72,11 @@ Tracim is distributed under the terms of 4 distinct licenses. See [LICENSE.md](.
 
 ## Support
 
-<img src="doc/logos/logo_weblate.png" alt="logo_weblate" width="200"/>
+<img src="docs/development/logos/logo_weblate.png" alt="logo_weblate" width="200"/>
 
 [Weblate](https://weblate.org) is an open source translation service, they are helping us to translate Tracim by providing a hosting service.
 
-<img src="doc/logos/logo_browserstack.png" alt="logo_browserstack" width="150"/>
+<img src="docs/development/logos/logo_browserstack.png" alt="logo_browserstack" width="150"/>
 
 [BrowserStack](https://www.browserstack.com) supports open source projects, and graciously helps us testing Tracim on every devices.
 
