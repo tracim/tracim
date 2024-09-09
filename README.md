@@ -36,15 +36,19 @@ For advanced docker-based usage, look at the full [Tracim Docker documentation](
 
 ## Build Tracim from source
 
-See [Building Tracim from source](./doc/BUILD.md)
+See [Building Tracim from source](./docs/development/app_building.md)
 
 ## Testing Tracim
 
-See [Testing Tracim](./doc/TESTING.md)
+In order to test in a development context, see [Testing Tracim](./docs/development/test/testing.md)
 
 ## Run Tracim for production
 
-See [Running Tracim for production](./doc/PRODUCTION.md)
+If you are interested in production-ready deployment of tracim, then look at the [Tracim administration documentation](./docs/administration), which includes 3 main parts:
+
+- [Installation](./docs/administration/installation) and an entry point for [production installation](./docs/administration/installation/production.md)
+- A second part dedicated to [Tracim server configuration](./docs/administration/configuration)
+- A third part dedicated to [Exploitation of a Tracim server](./docs/administration/exploitation) (CLI commands, database migrations, etc)
 
 ## Contribute
 
