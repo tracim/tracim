@@ -4,6 +4,8 @@ This is a OpenSearch docker image build to run properly with _Tracim_.
 
 ## Build Image
 
+The Dockerfile is in [/tools_docker/opensearch_ingest/](/tools_docker/opensearch_ingest/)
+
     docker build -t opensearch-ingest .
 
 ## Run Image

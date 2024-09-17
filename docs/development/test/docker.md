@@ -10,6 +10,10 @@ for emails and you need to setup dns resolving using a special Docker image)
 - do manual test easily on docker image using `STOP_CONTAINER_AT_THE_END=False`
 - etc.
 
+## Files necessary to start test
+
+All files are in [/tools_docker/test_docker/](/tools_docker/test_docker/)
+
 ## Prerequisities
 
 - install some python packages:

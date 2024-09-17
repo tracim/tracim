@@ -165,3 +165,16 @@ You can also run cypress with a graphical interface:
 ```
 
 For more advanced usage, refer to the [cypress documentation](https://docs.cypress.io/guides/guides/getting-started-guide.html).
+
+## Backend
+### Load test
+
+Script to test load available [here](../../../backend/load_tests/)
+
+```shell
+pip install locust
+```
+
+```sheel
+locust --headless --users 50 --spawn-rate 1 --host http://localhost:7999 -t 2min --html report.html
+```

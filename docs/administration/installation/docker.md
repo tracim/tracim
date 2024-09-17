@@ -1,5 +1,9 @@
 # Tracim with Docker
 
+## Files and folder
+
+All files and folder are in [/tools_docker/](/tools_docker/)
+
 ## Table of contents
 
 - [Run containers](#run-containers)

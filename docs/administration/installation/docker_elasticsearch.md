@@ -4,6 +4,8 @@ This is a ElasticSearch docker image build to run properly with _Tracim_.
 
 ## Build Image
 
+The Dockerfile is [/tools_docker/elasticsearch_ingest/](/tools_docker/elasticsearch_ingest/)
+
     docker build -t elasticsearch-ingest .
 
 ## Run Image
