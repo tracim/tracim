@@ -1,6 +1,6 @@
 # Tracim
 
-![logo_tracim](./doc/logos/logo_tracim.png)
+![logo_tracim](./docs/development/logos/logo_tracim.png)
 
 [Tracim](https://www.tracim.fr) is a tool designed to help you and your team to a better collaboration.
 It's officially supported in Arabic, English, French, German and Portuguese.

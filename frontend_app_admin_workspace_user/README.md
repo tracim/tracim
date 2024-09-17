@@ -11,19 +11,19 @@ It allows creation, edition and deletion of users and full management of spaces.
 
 #### For production
 
-see [doc/frontend/app_building#Production](../doc/frontend/app_building.md#production)
+see [doc/frontend/app_building#Production](../docs/development/app_building.md#production)
 
 #### For development
 
-see [doc/frontend/app_building#Development](../doc/frontend/app_building.md#development)
+see [doc/frontend/app_building#Development](../docs/development/app_building.md#development)
 
 ##### Specific `debug.js` configuration
 none
 
 ### Other available yarn scripts
 
-see [doc/frontend/yarn_scripts.md](../doc/frontend/yarn_scripts.md)
+see [doc/frontend/yarn_scripts.md](../docs/development/yarn_scripts.md)
 
 ### Before pushing changes to this app, you must
 
-see [doc/frontend/before_push.md](../doc/frontend/before_push.md)
+see [doc/frontend/before_push.md](../docs/development/before_push.md)
