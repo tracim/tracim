@@ -20,7 +20,7 @@ chmod +x kes-linux-amd64
 
 - `openssl` utilities to generate the needed key (`openssl` package in Debian >= 1.1.1).
 
-This guide uses a docker compose and some configuration available in [tools_docker/minio-encryption](../../tools_docker/minio-encryption).
+This guide uses a docker compose and some configuration available in [minio-encryption.md](/docs/administration/configuration/storage/minio-encryption.md).
 
 ## General principle
 

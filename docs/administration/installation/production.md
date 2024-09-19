@@ -16,7 +16,7 @@ Then you need to restart your pushpin service:
 sudo systemctl restart pushpin
 ```
 
-Tracim WSGI apps with pastedeploy (config in [development.ini](../backend/development.ini.sample)):
+Tracim WSGI apps with pastedeploy (config in [development.ini](/backend/development.ini.sample)):
 
 ```bash
 cd backend/
@@ -59,10 +59,10 @@ You can now head to (if pushpin is correctly configured and use default port 799
 
 ⚠️ If this does not work, you can try to access [http://localhost:6543](http://localhost:6543). If it works, the issue is related to the configuration of pushpin.
 
-The full documentation about running the Tracim services with uWSGI and supervisor is available in the [Backend README](../backend/README.md), sections `Running Tracim Backend Daemon`
+The full documentation about running the Tracim services with uWSGI and supervisor is available in the [Backend README](/docs/development/README.md), sections `Running Tracim Backend Daemon`
 and `Running Tracim Backend WSGI APP`.
 
 ## Upkeep
 
 When the default "file" storage is used for session files you need to regularly remove old sessions files as they aren't removed automatically when the session expires (either of old age or when a user logs out). Other session storage (e.g. redis) do not have this behavior.
-Please read the [session documentation](../backend/doc/setting.md#User_sessions_in_Tracim) for more information and recommended ways to remove the unused session files.
+Please read the [session documentation](/docs/administration/installation/setting.md#user-sessions-in-Tracim) for more information and recommended ways to remove the unused session files.

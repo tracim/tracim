@@ -2,13 +2,13 @@
 
 ## Production
 
-Its installation and building are respectively handled by [install_frontend_dependencies.sh](../../install_frontend_dependencies.sh) and [build_full_frontend.sh](../../build_full_frontend.sh).
+Its installation and building are respectively handled by [install_frontend_dependencies.sh](/install_frontend_dependencies.sh) and [build_full_frontend.sh](/build_full_frontend.sh).
 
-See [README.md](../../README.md) at the root of the repository.
+See [README.md](/docs/development/build.md).
 
 ## Development
 
-You must run [install_frontend_dependencies.sh](../../install_frontend_dependencies.sh) before starting any build.
+You must run [install_frontend_dependencies.sh](/install_frontend_dependencies.sh) before starting any build.
 
 ### Basic
 

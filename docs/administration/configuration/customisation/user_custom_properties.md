@@ -3,7 +3,7 @@
 User custom properties allow adding instance-specific properties
 for the users of the instance.
 
-The structure of those user properties should be defined in a json schema file. Specification available [here]('https://json-schema.org/specification-links.html#draft-7')).
+The structure of those user properties should be defined in a json schema file. Specification available [here](https://json-schema.org/specification-links.html#draft-7).
 
 It is possible to fine-tune the display and edition behavior of those properties by
 the Tracim frontend in a separate file (named UI schema). Its syntax can be found [here](https://react-jsonschema-form.readthedocs.io/en/latest/api-reference/uiSchema/).
@@ -30,7 +30,7 @@ user.custom_properties.ui_schema_file_path = %(user.custom_properties.dir)s/ui.j
 user.custom_properties.translations_dir_path = %(user.custom_properties.dir)s/locale
 ```
 
-See the [provided files](../tracim_backend/templates/user_custom_properties) as examples.
+See the [provided files](/backend/tracim_backend/templates/user_custom_properties/) as examples.
 
 ## JSONSchema
 
@@ -66,7 +66,7 @@ To display a property in the `Information` column, use `"tracim:display_group": 
 
 To display a property in the `Personal data` column, use `"tracim:display_group": "public_profile_second"`.
 
-See [ui schema](../examples/user_custom_properties/organization/ui.json) for an example.
+See [ui schema](/backend/tracim_backend/templates/user_custom_properties/default/ui.json) for an example.
 
 ## Validation
 
@@ -83,7 +83,7 @@ The following json schema field values are translated:
 
 - `description`
 - `title`
-- `EnumNames` (not standard JSONSchema but supported, see [here]('https://react-jsonschema-form.readthedocs.io/en/latest/usage/single/#custom-labels-for-enum-fields'))
+- `EnumNames` (not standard JSONSchema but supported, see [here](https://react-jsonschema-form.readthedocs.io/en/latest/usage/single/#custom-labels-for-enum-fields))
 
 The following ui schema field values are translated:
 
@@ -96,7 +96,7 @@ The following ui schema field values are translated:
 Custom properties translation files are stored in `user.custom_properties.translations_dir_path` if provided.
 They should be `json` format with a name of format `<lang>.json` (lang should be ISO 639-1 code).
 The content of the translations should be `{"original value": "translation value"}` key:value style, which
-make them compatible with [i18next-json-v3]('https://www.i18next.com/misc/json-format#i-18-next-json-v3').
+make them compatible with [i18next-json-v3](https://www.i18next.com/misc/json-format#i-18-next-json-v3).
 
 To generate translation for an existing schema, a tool is available, which does a part of the job:
 

@@ -9,11 +9,11 @@ It is meant to handle Tracim html document which are text document that allows t
 
 #### For production
 
-see [doc/frontend/app_building#Production](../doc/frontend/app_building.md#production)
+see [docs/development/app_building.md#Production](/docs/development/app_building.md#production)
 
 #### For development
 
-see [doc/frontend/app_building#Development](../doc/frontend/app_building.md#development)
+see [docs/development/app_building.md#Development](/docs/development/app_building.md#development)
 
 ##### Specific `debug.js` configuration
 
@@ -21,13 +21,13 @@ see [doc/frontend/app_building#Development](../doc/frontend/app_building.md#deve
 - In `src/debug.js`, change:
   - `content.content_id` to the id of the content you just created
   - `content.workspace_id` to the id of the space you just created the content in
-  
+
 ___
 
 ### Other available yarn scripts
 
-see [doc/frontend/yarn_scripts.md](../doc/frontend/yarn_scripts.md)
+see [docs/development/yarn_scripts.md](/docs/development/yarn_scripts.md)
 
 ### Before pushing changes to this app, you must
 
-see [doc/frontend/before_push.md](../doc/frontend/before_push.md)
+see [docs/development/before_push.md](/docs/development/before_push.md)

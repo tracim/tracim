@@ -26,7 +26,7 @@ website.base_url = https://mysuperdomainame.ndd
 
 To be able to use tracimcli from any directory, you can define the path to the configuration file with the environment variable `TRACIM_CONFIG__FILEPATH`.
 
-For example: 
+For example:
 ```bash
 TRACIM_CONFIG__FILEPATH="/path/of/config/file/development.ini
 ```
@@ -219,7 +219,7 @@ to change the metadata.
 
 For more details about the standard routes and the protocol, see ["SAML Explained in Plain English"](https://www.onelogin.com/learn/saml)
 
-See [SSO Glossary](https://help.akana.com/content/current/cm/saml/08_glossary.htm) and 
+See [SSO Glossary](https://help.akana.com/content/current/cm/saml/08_glossary.htm) and
 [SLO Article](https://uit.stanford.edu/service/saml/logout) for more details about the employed terms
 
 ### Configuration Explanation for local test
@@ -448,7 +448,7 @@ docker cp <tracim_container_name>:/tracim/backend/settings_saml2.json.sample ~/t
 ```
 
 ### [beta] create your own shibboleth idp locally
-See [tools_docker/shibboleth_idp/README.md](../../tools_docker/shibboleth_idp/README.md)
+See [docker_shibboleth_idp_test_container.md](/docs/administration/installation/docker_shibboleth_idp_test_container.md)
 
 ## User sessions in Tracim
 
@@ -627,7 +627,7 @@ email.reply.imap.use_ssl = true
 email.reply.imap.use_idle = true
 ```
 
-Don't forget to start mail_fetcher daemon, documentation here `/backend/README.md` and chapter "Run daemons according to your config"
+Don't forget to start mail_fetcher daemon, documentation here [Backend README](/docs/development/README.md) and chapter "Run daemons according to your config"
 
 ## Listening port (for pserve only)
 
@@ -986,7 +986,7 @@ uploaded_files.storage.s3.secret_access_key =
 
 If you want to use your own S3 compatible back-end we recommend [minio](https://min.io) as we have tested its usage with Tracim.
 
-You can find an example docker compose file for storing files in minio [here](../../tools_docker/docker-compose-minio.yml)
+You can find an example docker compose file for storing files in minio [here](/tools_docker/docker-compose-minio.yml)
 
 ## Translation Feature
 

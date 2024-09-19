@@ -1,12 +1,14 @@
 # Tracim
 
-![logo_tracim](./doc/logos/logo_tracim.png)
+![logo_tracim](./docs/development/logos/logo_tracim.png)
 
 [Tracim](https://www.tracim.fr) is a tool designed to help you and your team to a better collaboration.
 It's officially supported in Arabic, English, French, German and Portuguese.
 
 Any questions, remarks? Reach us on [Tracim Community](https://public-community.tracim.fr).  
 More informations on our [website](https://www.tracim.fr).
+
+All documentation is available in [docs/](./docs/) folder.
 
 ## Quick start (using Docker)
 
@@ -32,15 +34,11 @@ The credentials to access the application are:
 - password: `admin@admin.admin`
 
 <!-- We have to update Docker documentation according to this one -->
-For advanced docker-based usage, look at the full [Tracim Docker documentation](./tools_docker/)
-
-## Build Tracim from source
-
-See [Building Tracim from source](./docs/development/app_building.md)
+For advanced docker-based usage, look at the full [Tracim installation's documentation](./docs/administration/installation/)
 
 ## Testing Tracim
 
-In order to test in a development context, see [Testing Tracim](./docs/development/test/testing.md)
+In order to test in a development context, see [Testing Tracim](./docs/development/test/)
 
 ## Run Tracim for production
 

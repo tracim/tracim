@@ -5,6 +5,8 @@ This container is a shibboleth SAML IdP designed to test SAML SPs (as tracim).
 
 ## Configuration
 
+The Dockerfile is in [/tools_docker/shibboleth_idp/](/tools_docker/shibboleth_idp/)
+
 Configuration is set at build time, to apply a new configuration the image must be re-built:
 ```sh
 docker build --no-cache -t shibboleth-idp-test-image .

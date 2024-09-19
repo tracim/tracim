@@ -10,14 +10,18 @@ for emails and you need to setup dns resolving using a special Docker image)
 - do manual test easily on docker image using `STOP_CONTAINER_AT_THE_END=False`
 - etc.
 
+## Files necessary to start test
+
+All files are in [/tools_docker/test_docker/](/tools_docker/test_docker/)
+
 ## Prerequisities
 
 - install some python packages:
 `pip install pytest pytest-testinfra python-dotenv`
-- build tracim docker image `DOCKER_TRACIM_IMAGE` set in `test_config.env` and [build part of tracim docker doc](../README.md), default
+- build tracim docker image `DOCKER_TRACIM_IMAGE` set in `test_config.env` and [build part of tracim docker doc](/docs/administration/installation/docker.md), default
 value is `algoo/tracim:test` which does not exist in dockerhub, adapt `DOCKER_TRACIM_IMAGE` according to the image you decide to test)
 - choose elasticsearch docker image `DOCKER_ELASTICSEARCH_IMAGE` set in`test_config.env`   (we do recommand you to build and use
-`elasticsearch_ingest` docker, see [this doc](../elasticsearch_ingest/README.md))
+`elasticsearch_ingest` docker, see [this doc](/docs/administration/installation/docker_elasticsearch.md))
 - create tracim env config file from sample:`cp tracim.sample.env tracim.env`
 - create docker test config file from sample: `cp test_config.sample.env test_config.env`
 

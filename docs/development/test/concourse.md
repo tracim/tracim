@@ -1,5 +1,7 @@
 # Concourse
 
+Concourse files are in [/concourse/](/concourse/)
+
 ## Tracim's CI
 ```
 https://ci.algoo.fr:4443
