@@ -13,11 +13,11 @@ The list of previewable format handled by Preview Generator is available [here](
 
 #### For production
 
-see [docs/development/app_building#Production](../docs/development/app_building.md#production)
+see [docs/development/app_building.md#Production](../docs/development/app_building.md#production)
 
 #### For development
 
-see [docs/development/app_building#Development](../docs/development/app_building.md#development)
+see [docs/development/app_building.md#Development](../docs/development/app_building.md#development)
 
 ##### Specific `debug.js` configuration
 

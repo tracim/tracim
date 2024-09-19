@@ -8,7 +8,7 @@ It's officially supported in Arabic, English, French, German and Portuguese.
 Any questions, remarks? Reach us on [Tracim Community](https://public-community.tracim.fr).  
 More informations on our [website](https://www.tracim.fr).
 
-All documentations are available directly in [/docs/](/docs/) folder.
+All documentation is available in [docs/](./docs/) folder.
 
 ## Quick start (using Docker)
 
@@ -36,13 +36,9 @@ The credentials to access the application are:
 <!-- We have to update Docker documentation according to this one -->
 For advanced docker-based usage, look at the full [Tracim Docker documentation](./tools_docker/)
 
-## Build Tracim from source
-
-See [Building Tracim from source](./docs/development/app_building.md)
-
 ## Testing Tracim
 
-In order to test in a development context, see [Testing Tracim](./docs/development/test/testing.md)
+In order to test in a development context, see [Testing Tracim](./docs/development/test/)
 
 ## Run Tracim for production
 

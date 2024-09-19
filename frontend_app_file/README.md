@@ -13,11 +13,11 @@ This app also allows opening online collaborative edition documents.
 
 #### For production
 
-see [docs/development/app_building#Production](../docs/development/app_building.md#production)
+see [docs/development/app_building.md#Production](../docs/development/app_building.md#production)
 
 #### For development
 
-see [docs/development/app_building#Development](../docs/development/app_building.md#development)
+see [docs/development/app_building.md#Development](../docs/development/app_building.md#development)
 
 ##### Specific `debug.js` configuration
 
