@@ -19,7 +19,7 @@ Create configuration file for a development environment:
     cp development.ini.sample development.ini
 
 The provided default configuration is suitable for local-test. If you need to run Tracim
-over network, see [configuration file documentation](../docs/administration/installation/setting.md).
+over network, see [configuration file documentation](/docs/administration/installation/setting.md).
 
 You need to create the branding folder containing customizable ui elements. Starting with the provided sample is a good way:
 
@@ -29,7 +29,7 @@ You should also create requested folder for running Tracim:
 
     mkdir sessions_data sessions_lock depot previews radicale_storage
 
-Initialize the database using [tracimcli](../docs/administration/exploitation/cli/cli.md) tool. Be careful, if you use Tracim
+Initialize the database using [tracimcli](/docs/administration/exploitation/cli/cli.md) tool. Be careful, if you use Tracim
 with `Redis`, you want to have the `Redis` service running.
 
     tracimcli db init
@@ -248,12 +248,12 @@ For example, with the default configuration:
 ## Roles, Profile and Access Rights
 
 In Tracim, only some users can access to some information, this is also true in
-the Tracim REST API. you can check the [roles documentation](../docs/overview/roles.md) to check
+the Tracim REST API. you can check the [roles documentation](/docs/overview/roles.md) to check
 what a specific user can do.
 
 ## Other Documentation
 
-Detailed documentation on several topics is available in the [docs/development/](../docs/) directory.
+Detailed documentation on several topics is available in the [docs/development/](/docs/) directory.
 
 Frontend
 ========
@@ -264,9 +264,9 @@ This folder is the frontend part of Tracim.
 
 ### Production
 
-Its installation and building are respectively handled by [install_frontend_dependencies.sh](../install_frontend_dependencies.sh) and [build_full_frontend.sh](../build_full_frontend.sh).
+Its installation and building are respectively handled by [install_frontend_dependencies.sh](/install_frontend_dependencies.sh) and [build_full_frontend.sh](/build_full_frontend.sh).
 
-See [README.md](../README.md) at the root of the repository.
+See [README.md](/docs/development/build.md).
 
 
 ### Development
@@ -288,8 +288,8 @@ It uses a proxy for the api and pushpin so that there is nothing more to configu
 ## Linting and translation
 Before pushing changes to this folder, you must:
 
-see [docs/development/before_push.md](../docs/development/before_push.md)
+see [docs/development/before_push.md](/docs/development/before_push.md)
 
 ## Other available yarn scripts
 
-see [docs/development/yarn_scripts.md](../docs/development/yarn_scripts.md)
+see [docs/development/yarn_scripts.md](/docs/development/yarn_scripts.md)

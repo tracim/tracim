@@ -196,6 +196,6 @@ Server: waitress
 
 A detailed error code in given in field `code`, in addition to the more general HTTP error status for a more fine-grained error handling.
 
-Look at [error.py](../tracim_backend/error.py) for more details.
+Look at [error.py](/backend/tracim_backend/error.py) for more details.
 
 Note: a specific endpoint about error cases code [will be added later](https://github.com/tracim/tracim/issues/1006).

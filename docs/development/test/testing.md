@@ -2,7 +2,7 @@
 
 To test [Tracim](https://www.tracim.fr), you first need to be able to
 build the backend and the frontend.
-See [how to build](./BUILD.md).
+See [how to build](/docs/development/build.md).
 
 ## Table of contents
 
@@ -106,8 +106,8 @@ pytest --forked --database=all
 
 ### Docker compose test file
 
-The [docker-compose.yml](../backend/docker-compose.yml) file lists the services needed for testing the Tracim backend.
-<!-- Default environment variables used by the containers are written in the [.env](../backend/.env) file next to `docker-compose.yml`. -->
+The [docker-compose.yml](/backend/docker-compose.yml) file lists the services needed for testing the Tracim backend.
+<!-- Default environment variables used by the containers are written in the [.env](/backend/.env) file next to `docker-compose.yml`. -->
 
 ## Frontend
 
@@ -169,7 +169,7 @@ For more advanced usage, refer to the [cypress documentation](https://docs.cypre
 ## Backend
 ### Load test
 
-Script to test load available [here](../../../backend/load_tests/)
+Script to test load available [here](/backend/load_tests/)
 
 ```shell
 pip install locust

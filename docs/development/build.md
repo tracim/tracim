@@ -81,12 +81,12 @@ Here is the list of every option:
 - `DONT_GENERATE_PYENV`: don't generate the `.pyenv` directory.
 
 <!-- To check -->
-For more information about configuring the backend, see [Backend README](../backend/README.md).
-For more information about the configuration files, see [development.ini.sample](../backend/develompent.ini.sample) and the [backend setting documentation](../backend/doc/setting.md).
+For more information about configuring the backend, see [Backend README](/docs/development/README.md).
+For more information about the configuration files, see [development.ini.sample](/backend/development.ini.sample) and the [backend setting documentation](/docs/administration/installation/setting.md).
 
 ### Option 2: Manually
 
-See the [Backend README](../backend/README.md).
+See the [Backend README](/docs/development/README.md).
 
 #### Dependencies
 
