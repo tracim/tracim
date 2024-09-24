@@ -45,23 +45,19 @@ export const Call = props => {
 
   let unansweredCallTimeoutId = -1
 
+  // INFO - CH - 20240827 - isMasterTab as dependency of useEffect is mandatory because handleUserCallCreated and
+  // handleUserCallModified uses isMasterTab.
+  // If not set as dependency, they won't have the latest value when executing
   useEffect(() => {
     props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.CREATED, handler: handleUserCallCreated },
       { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.MODIFIED, handler: handleUserCallModified }
-    ])
-  }, [])
-
-  // INFO - CH - 20240827 - isMasterTab as dependency of useEffect is mandatory because handleUserCallCreated
-  // uses isMasterTab. If not set as dependency, handleUserCallCreated won't have the latest value when executing
-  useEffect(() => {
-    props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.CREATED, handler: handleUserCallCreated }
     ])
   }, [isMasterTab])
 
   useEffect(() => {
-    setIsMasterTab(props.liveMessageManagerEventSource !== null)
-  }, [props.liveMessageManagerEventSource])
+    setIsMasterTab(props.liveMessageManager.eventSource !== null)
+  }, [props.liveMessageManager.eventSource])
 
   const handleUserCallCreated = async (tlm) => {
     if (tlm.fields.user_call.callee.user_id === props.user.userId) {
@@ -226,7 +222,7 @@ const mapStateToProps = ({ user, system }) => ({ user, system })
 export default connect(mapStateToProps)(translate()(TracimComponent(Call)))
 
 Call.propTypes = {
-  liveMessageManagerEventSource: PropTypes.object.isRequired
+  liveMessageManager: PropTypes.object.isRequired
 }
 Call.defaultProps = {
 }

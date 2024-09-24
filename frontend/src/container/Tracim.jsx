@@ -444,7 +444,7 @@ export class Tracim extends React.Component {
         />
 
         <Call
-          liveMessageManagerEventSource={this.liveMessageManager.eventSource}
+          liveMessageManager={this.liveMessageManager}
         />
 
         {(!props.user.username &&

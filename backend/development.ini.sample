@@ -633,8 +633,8 @@ website.usage_conditions =
 
 # SMTP encryption method valid values are:
 # - default: use smtp encryption using starttls, and unencrypted connection as fallback.
-# - SMTPS: use encrypted connection directly on port like 465
-# - unsecure: don't use encryption, use it with caution !
+# - smtps: use encrypted connection directly on port like 465
+# - unsecure: doesn't use encryption, use it with caution!
 # default value: default
 ; email.notification.smtp.encryption = default
 
