@@ -13,11 +13,11 @@ The list of previewable format handled by Preview Generator is available [here](
 
 #### For production
 
-see [doc/frontend/app_building#Production](../doc/frontend/app_building.md#production)
+see [docs/development/app_building.md#Production](/docs/development/app_building.md#production)
 
 #### For development
 
-see [doc/frontend/app_building#Development](../doc/frontend/app_building.md#development)
+see [docs/development/app_building.md#Development](/docs/development/app_building.md#development)
 
 ##### Specific `debug.js` configuration
 
@@ -29,8 +29,8 @@ ___
 
 ### Other available yarn scripts
 
-see [doc/frontend/yarn_scripts.md](../doc/frontend/yarn_scripts.md)
+see [docs/development/yarn_scripts.md](/docs/development/yarn_scripts.md)
 
 ### Before pushing changes to this app, you must
 
-see [doc/frontend/before_push.md](../doc/frontend/before_push.md)
+see [docs/development/before_push.md](/docs/development/before_push.md)

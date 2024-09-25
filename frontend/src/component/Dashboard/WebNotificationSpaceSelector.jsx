@@ -2,7 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {
   Popover,
-  BtnSwitch
+  BtnSwitch,
+  Icon
 } from 'tracim_frontend_lib'
 import { translate } from 'react-i18next'
 
@@ -44,6 +45,11 @@ const WebNotificationSpaceSelector = props => {
             <div className='PopoverHelperBody__section'>
               <div className='PopoverHelperBody__section__label'>
                 {props.t('Notifications')}
+                &nbsp;
+                <Icon
+                  icon='fas fa-bell'
+                  title={props.t('Notifications')}
+                />
               </div>
               <div className='PopoverHelperBody__section__description'>
                 {props.t('Enable/Disable notifications for this workspace.')}

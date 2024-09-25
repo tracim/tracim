@@ -33,6 +33,15 @@ export const Breadcrumbs = props => {
     breadcrumbsList[breadcrumbsList.length - 1] = lastBreadcrumb
   }
 
+  const shouldBeShrinked = (crumb) => {
+    const fontSize = 16
+    const charPossibleInBreadcrumbs = window.innerWidth * 0.5 / fontSize
+    if (breadcrumbsList.reduce((numberOfChar, crumb) => numberOfChar + crumb.label.length, 0) < charPossibleInBreadcrumbs) {
+      return false
+    }
+    return crumb.label.length >= charPossibleInBreadcrumbs / breadcrumbsList.length
+  }
+
   return (
     <div>
       <ul className={classnames('breadcrumbs', { hidden: props.hidden })}>
@@ -44,8 +53,8 @@ export const Breadcrumbs = props => {
                 className='root primaryColorFont primaryColorFontDarkenHover'
               >
                 {props.root.icon && <i className={`${props.root.icon}`} />}
-                <span className='breadcrumbs__item__text'>{props.root.label}&nbsp;</span>
-              </Link>&gt;&nbsp;
+                <span className='breadcrumbs__item__text'>{props.root.label}</span>
+              </Link>{props.root.label && <span>&nbsp;</span>}&gt;&nbsp;
             </li>
           )
           : (
@@ -60,7 +69,7 @@ export const Breadcrumbs = props => {
 
         {breadcrumbsList.map((crumb, i) =>
           <li
-            className='breadcrumbs__item'
+            className={classnames('breadcrumbs__item', { shrinkBreadcrumbs: shouldBeShrinked(crumb) })}
             key={`breadcrumbs_${i}`}
             title={crumb.htmlTitle || crumb.label || ''}
           >

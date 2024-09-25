@@ -22,6 +22,14 @@ import { LOGBOOK_MIME_TYPE, LOGBOOK_FILE_EXTENSION } from '../helper.js'
 import LogbookEntry from './LogbookEntry.jsx'
 import LogbookEntryEditor from './LogbookEntryEditor.jsx'
 
+export const heightBeforeSeeMoreButton = 251
+
+export const DESCRIPTION_BUTTON = {
+  HIDDEN: 'hidden',
+  SEE_MORE: 'seeMore',
+  SEE_LESS: 'seeLess'
+}
+
 export const LOGBOOK_STATE = {
   INIT: 'init',
   LOADING: 'loading',
@@ -57,7 +65,6 @@ export class Logbook extends React.Component {
       logbookState: justCreated ? LOGBOOK_STATE.LOADED : LOGBOOK_STATE.INIT,
       entryToEdit: {},
       showConfirmPopup: false,
-      saveRequired: false,
       showEditPopIn: false
     }
   }
@@ -71,25 +78,36 @@ export class Logbook extends React.Component {
       this.setState({
         logbookState: LOGBOOK_STATE.LOADED,
         logbookInitiallyLoaded: true,
-        saveRequired: true,
         logbook: newLogbook
       })
     }
   }
 
   async componentDidUpdate (prevProps) {
-    const { state, props } = this
+    const { props } = this
     if (
       (props.content.current_revision_id !== prevProps.content.current_revision_id) ||
       (props.isNewContentRevision && prevProps.isNewContentRevision !== props.isNewContentRevision)
     ) {
       this.loadLogbookContent()
     }
+  }
 
-    if (state.saveRequired) {
-      this.save(state.logbook)
-      this.setState({ saveRequired: false })
-    }
+  mapEntriesWithOldExpand = (entries) => {
+    return entries.map(e => {
+      const oldEntry = this.state.logbook.entries.find((entry) => entry.id === e.id)
+      if (oldEntry === undefined) {
+        return {
+          ...e,
+          expand: DESCRIPTION_BUTTON.HIDDEN
+        }
+      } else {
+        return {
+          ...e,
+          expand: oldEntry.expand
+        }
+      }
+    })
   }
 
   async loadLogbookContent () {
@@ -109,10 +127,15 @@ export class Logbook extends React.Component {
       )
 
       if (fetchRawFileContent.apiResponse.ok && fetchRawFileContent.body.entries) {
+        const logbook = fetchRawFileContent.body
+        const newlogbook = {
+          ...logbook,
+          entries: this.mapEntriesWithOldExpand(logbook.entries)
+        }
         this.setState({
           logbookState: LOGBOOK_STATE.LOADED,
           logbookInitiallyLoaded: true,
-          logbook: fetchRawFileContent.body
+          logbook: newlogbook
         })
       } else {
         console.error(fetchRawFileContent)
@@ -139,29 +162,28 @@ export class Logbook extends React.Component {
   }
 
   handleAddOrEditEntry = (entry) => {
-    this.setState(prevState => {
-      const newLogbook = entry.id
-        ? replaceEntryInLogbook(prevState.logbook, entry)
-        : addEntryToLogbook(prevState.logbook, entry)
-      return {
-        showEditPopIn: false,
-        logbookState: LOGBOOK_STATE.SAVING,
-        saveRequired: true,
-        logbook: newLogbook
-      }
+    const newLogbook = entry.id
+      ? replaceEntryInLogbook(this.state.logbook, entry)
+      : addEntryToLogbook(this.state.logbook, entry)
+    const sortedLogbook = {
+      entries: newLogbook.entries.toSorted((a, b) => new Date(b.datetime) - new Date(a.datetime))
+    }
+    this.save(sortedLogbook)
+    this.setState({
+      showEditPopIn: false,
+      logbookState: LOGBOOK_STATE.SAVING,
+      logbook: sortedLogbook
     })
   }
 
   handleConfirmRemoveEntry = (entry) => {
-    this.setState(prevState => {
-      const newLogbook = removeEntryFromLogbook(prevState.logbook, entry)
-      return {
-        entryToRemove: null,
-        showConfirmPopup: false,
-        logbookState: LOGBOOK_STATE.SAVING,
-        saveRequired: true,
-        logbook: newLogbook
-      }
+    const newLogbook = removeEntryFromLogbook(this.state.logbook, entry)
+    this.save(newLogbook)
+    this.setState({
+      entryToRemove: null,
+      showConfirmPopup: false,
+      logbookState: LOGBOOK_STATE.SAVING,
+      logbook: newLogbook
     })
   }
 
@@ -179,9 +201,90 @@ export class Logbook extends React.Component {
     })
   }
 
+  handleExpand = (entry) => {
+    if (entry !== undefined) {
+      this.setState(prevState => {
+        const newLogbook = {
+          ...prevState.logbook,
+          entries: prevState.logbook.entries.map(e => e.id === entry.id ? {
+            ...e, expand: DESCRIPTION_BUTTON.SEE_LESS
+          } : e)
+        }
+        return {
+          logbook: newLogbook
+        }
+      })
+    }
+  }
+
+  handleCollapse = (entry) => {
+    if (entry !== undefined) {
+      this.setState(prevState => {
+        const newLogbook = {
+          ...prevState.logbook,
+          entries: prevState.logbook.entries.map(e => e.id === entry.id ? {
+            ...e, expand: DESCRIPTION_BUTTON.SEE_MORE
+          } : e)
+        }
+        return {
+          logbook: newLogbook
+        }
+      })
+    }
+  }
+
+  handleHidden = (entry) => {
+    if (entry !== undefined) {
+      this.setState(prevState => {
+        const newLogbook = {
+          ...prevState.logbook,
+          entries: prevState.logbook.entries.map(e => e.id === entry.id ? {
+            ...e, expand: DESCRIPTION_BUTTON.HIDDEN
+          } : e)
+        }
+        return {
+          logbook: newLogbook
+        }
+      })
+    }
+  }
+
+  handleExpandAll = () => {
+    this.setState(prevState => {
+      const newLogbook = {
+        ...prevState.logbook,
+        entries: prevState.logbook.entries.map(e => e.expand !== DESCRIPTION_BUTTON.HIDDEN ? {
+          ...e, expand: DESCRIPTION_BUTTON.SEE_LESS
+        } : e)
+      }
+      return {
+        logbook: newLogbook
+      }
+    })
+  }
+
+  handleCollapseAll = () => {
+    this.setState(prevState => {
+      const newLogbook = {
+        ...prevState.logbook,
+        entries: prevState.logbook.entries.map(e => e.expand !== DESCRIPTION_BUTTON.HIDDEN ? {
+          ...e, expand: DESCRIPTION_BUTTON.SEE_MORE
+        } : e)
+      }
+      return {
+        logbook: newLogbook
+      }
+    })
+  }
+
   async save (newLogbook) {
     const { props } = this
-    const sortedLogbook = { entries: newLogbook.entries.toSorted((a, b) => new Date(b.datetime) - new Date(a.datetime)) }
+    const logbookForApi = {
+      entries: newLogbook.entries.map(e => {
+        const { expand, ...rest } = e
+        return rest
+      })
+    }
 
     const fetchResultSaveLogbook = await handleFetchResult(
       await putRawFileContent(
@@ -189,7 +292,7 @@ export class Logbook extends React.Component {
         props.content.workspace_id,
         props.content.content_id,
         props.content.label + LOGBOOK_FILE_EXTENSION,
-        JSON.stringify(sortedLogbook),
+        JSON.stringify(logbookForApi),
         LOGBOOK_MIME_TYPE
       )
     )
@@ -259,15 +362,35 @@ export class Logbook extends React.Component {
               hidden: state.logbookState === LOGBOOK_STATE.INIT
             })}
           >
-            {changesAllowed && (
-              <IconButton
-                customClass='logbook__new_button'
-                text={props.t('Create an event')}
-                textMobile={props.t('Create an event')}
-                icon='fas fa-plus'
-                onClick={() => this.handleShowPopIn({})}
-              />
-            )}
+            <div>
+              {(state.logbook.entries.filter(e => e.expand !== DESCRIPTION_BUTTON.HIDDEN).length >= 1) && (
+                <>
+                  <IconButton
+                    customClass={classnames('btn-link', 'logbook__expand_button')}
+                    text={props.t('Expand all')}
+                    textMobile={props.t('Expand all')}
+                    title={props.t('Expand all event descriptions')}
+                    onClick={this.handleExpandAll}
+                  />
+                  <IconButton
+                    customClass={classnames('btn-link', 'logbook__expand_button')}
+                    text={props.t('Collapse all')}
+                    textMobile={props.t('Collapse all')}
+                    title={props.t('Collapse all event descriptions')}
+                    onClick={this.handleCollapseAll}
+                  />
+                </>
+              )}
+              {changesAllowed && (
+                <IconButton
+                  customClass='logbook__new_button'
+                  text={props.t('Create an event')}
+                  textMobile={props.t('Create an event')}
+                  icon='fas fa-plus'
+                  onClick={() => this.handleShowPopIn({})}
+                />
+              )}
+            </div>
             <div className='logbook__timeline'>
               {state.logbook.entries.length >= 1
                 ? (
@@ -284,6 +407,9 @@ export class Logbook extends React.Component {
                           onRemoveEntry={this.handleRemoveEntry}
                           key={id}
                           language={props.language}
+                          onExpand={this.handleExpand}
+                          onCollapse={this.handleCollapse}
+                          onHidden={this.handleHidden}
                         />
                       )}
                     </div>

@@ -40,5 +40,11 @@
   "You must change the status or restore this logbook before any change": "Vous devez changer le status de ce journal ou le restorer avant tout changement",
   "Permanently delete": "Supprimer définitivement",
   "Yes, delete permanently": "Oui, supprimer définitivement",
-  "Warning: this operation cannot be rolled back": "Attention : cette opération ne peut pas être annulée"
+  "Warning: this operation cannot be rolled back": "Attention : cette opération ne peut pas être annulée",
+  "Expand all": "Tout développer",
+  "Expand all event descriptions": "Développer les descriptions de tous les évènements",
+  "Collapse all": "Tout réduire",
+  "Collapse all event descriptions": "Réduire les descriptions de tous les évènements",
+  "See more": "Voir plus",
+  "See less": "Voir moins"
 }

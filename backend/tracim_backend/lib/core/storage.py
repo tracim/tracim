@@ -76,6 +76,9 @@ class StorageLib:
         # "raw", where filename returned will be a custom one.
         if not filename or filename == "raw":
             filename = default_filename
+        # INFO - F.S. - 2024-09-09 - replace content type html by text to prevent security issue
+        if file.content_type == "text/html":
+            file.content_type = "text/plain"
         return HapicFile(
             file_object=file,
             mimetype=file.content_type,

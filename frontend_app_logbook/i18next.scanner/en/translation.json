@@ -40,5 +40,11 @@
   "Time of event": "Time of event",
   "Permanently delete": "Permanently delete",
   "Yes, delete permanently": "Yes, delete permanently",
-  "Warning: this operation cannot be rolled back": "Warning: this operation cannot be rolled back"
+  "Warning: this operation cannot be rolled back": "Warning: this operation cannot be rolled back",
+  "Expand all": "Expand all",
+  "Expand all event descriptions": "Expand all event descriptions",
+  "Collapse all": "Collapse all",
+  "Collapse all event descriptions": "Collapse all event descriptions",
+  "See more": "See more",
+  "See less": "See less"
 }

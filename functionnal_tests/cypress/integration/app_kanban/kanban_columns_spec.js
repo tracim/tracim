@@ -33,6 +33,6 @@ describe('App Kanban (columns)', () => {
     createKanbanColumn(columnTitle)
     cy.get('[data-cy=columnActions]').click()
     cy.get('[data-cy=deleteColumn]').click()
-    cy.get('[data-cy=confirmDeleteColumn]').click()
+    cy.get('[data-cy=confirm_popup__button_confirm]').click()
   })
 })

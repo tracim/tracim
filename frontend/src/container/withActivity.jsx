@@ -182,11 +182,16 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
           }
         }
       }
-      // INFO - FS - 2024-02-15 - This TLM handler is used to fix a special case witch happened when turning a publication into a content,
-      // the content and it's comment will send a TLM each, and sometime the TLM of comment overrides the modification of the content
+      // INFO - FS - 2024-02-15 - This TLM handler is used to fix a special case witch happened when turning a
+      // publication into a content, the content and it's comment will send a TLM each, and sometime the TLM of
+      // comment overrides the modification of the content
       // This code fix the bug by applying the update of the comment to the content if it's not already done
       let activityList = props.activity.list
-      if (data.event_type.includes(TLM_ET.CONTENT) && data.event_type.includes(TLM_SUB.COMMENT) && data.event_type.includes(TLM_CET.MODIFIED)) {
+      if (
+        data.event_type.includes(TLM_ET.CONTENT) &&
+        data.event_type.includes(TLM_SUB.COMMENT) &&
+        data.event_type.includes(TLM_CET.MODIFIED)
+      ) {
         const contentParent = props.activity.list.find(a => a.content.content_id === data.fields.content.parent_id)
         if (contentParent.content.content_namespace !== data.fields.content.parent_content_namespace) {
           activityList = props.activity.list.map(activity => {
@@ -267,6 +272,17 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
         )
         try {
           const activitiesParams = await this.loadActivitiesPromise.promise
+          // INFO - CH - 2024 09 03 - Regex bellow is used to extract the workspace id in the dashboard url.
+          // Could use neither reducer currentWorkspace nor HOC withRouter
+          // See https://github.com/tracim/tracim/issues/6577
+          const workspaceIdInUrl = window.location.pathname.match(/ui\/workspaces\/(\d+)\/dashboard/)
+          if (
+            workspaceIdInUrl &&
+            workspaceIdInUrl.length >= 2 &&
+            workspaceIdInUrl[1].toString() !== workspaceId.toString()
+          ) {
+            return
+          }
           activityList = activitiesParams.activityList
           hasNextPage = activitiesParams.hasNextPage
           nextPageToken = activitiesParams.nextPageToken
