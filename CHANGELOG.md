@@ -1,6 +1,6 @@
 # Changelog
 
-## 4.11.0 / TBD
+## 4.11.0 / 2024-09-25
 
 ### ✨ New Features
 
