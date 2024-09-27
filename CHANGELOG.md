@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.11.1 / 2024-09-27
+
+4.11.1 only updates changelog to mention the security fix that is already present in 4.11.0.
+
+### ⚠️ Vulnerability fixed
+
+- CVE-2022-45144 - XSS vulnerability via HTML file upload
+
 ## 4.11.0 / 2024-09-25
 
 ### ✨ New Features
