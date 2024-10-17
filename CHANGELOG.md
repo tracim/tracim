@@ -8,6 +8,9 @@
 
 - CVE-2022-45144 - XSS vulnerability via HTML file upload
 
+### 🔧 Upgrade documentation
+[See the doc](https://github.com/tracim/tracim/issues/6606)
+
 ## 4.11.0 / 2024-09-25
 
 ### ✨ New Features
@@ -22,6 +25,9 @@
 - Suppression and restoration of contents are now updated in real time [#6557](https://github.com/tracim/tracim/issues/6557)
 - The delete confirmation popup in the kanban app is now the same as in the other app [#6542](https://github.com/tracim/tracim/issues/6542)
 - Fixed the breadcrumbs UI when breadcrumbs are long [#6524](https://github.com/tracim/tracim/issues/6524)
+
+### 🔧 Upgrade documentation
+[See the doc](https://github.com/tracim/tracim/issues/6570)
 
 ## 4.10.0 / 2024-06-27
 
