@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.12.0 / TBD
+
+
 ## 4.11.1 / 2024-09-27
 
 4.11.1 only updates changelog to mention the security fix that is already present in 4.11.0.
