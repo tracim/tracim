@@ -75,6 +75,7 @@ export const SpaceDescription = (props) => {
               minHeight={200}
               placeholder={props.t('Description of the space')}
               userList={props.memberList}
+              showImageBorder={false}
             />
 
             <div className='workspace_advanced__description__bottom'>
