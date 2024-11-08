@@ -59,7 +59,7 @@ export const SpaceDescription = (props) => {
       </div>
       {isModeEdition
         ? (
-          <div class='workspace_advanced__description'>
+          <div className='workspace_advanced__description'>
             <TinyEditor
               apiUrl={props.apiUrl}
               setContent={setContent}

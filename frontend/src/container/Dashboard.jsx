@@ -13,6 +13,7 @@ import {
   SPACE_TYPE,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
+  HTMLContent,
   getMyselfKnownMember,
   handleFetchResult,
   IconButton,
@@ -536,8 +537,11 @@ export class Dashboard extends React.Component {
                       ? (
                         <div
                           className='dashboard__workspace__detail__description'
-                          dangerouslySetInnerHTML={{ __html: description }}
-                        />
+                        >
+                          {/* INFO - CH - 2024-11-08 - don't add border to image to avoid breaking
+                          existing client design */}
+                          <HTMLContent showImageBorder={false}>{description}</HTMLContent>
+                        </div>
                       )
                       : (
                         <div className='dashboard__workspace__detail__description__missing'>

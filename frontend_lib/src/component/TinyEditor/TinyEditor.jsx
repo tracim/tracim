@@ -103,6 +103,12 @@ export const TinyEditor = props => {
     ]
   }))
 
+  const customCssForTinymceEditor = [
+    // INFO - CH - 2024-11-08 - Rule bellow must stay sync with rule box-shadow of
+    // frontend_lib/src/css/Variable.styl variable shadow-image
+    '.mce-content-body img { box-shadow: 0px 0px 10px #999; }',
+  ].join('\n')
+
   const editorRef = useRef(null)
   const inputRef = useRef(null)
 
@@ -134,6 +140,7 @@ export const TinyEditor = props => {
           max_height: props.maxHeight,
           min_height: props.minHeight,
           width: '100%',
+          content_style: customCssForTinymceEditor,
           placeholder: props.placeholder,
           menubar: false,
           resize: false,
