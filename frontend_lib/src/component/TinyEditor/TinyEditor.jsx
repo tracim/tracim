@@ -106,7 +106,7 @@ export const TinyEditor = props => {
   const customCssForTinymceEditor = [
     // INFO - CH - 2024-11-08 - Rule bellow must stay sync with rule box-shadow of
     // frontend_lib/src/css/Variable.styl variable shadow-image
-    props.showImageBorder ? '.mce-content-body img { box-shadow: 0px 0px 10px #999; }' : '',
+    props.showImageBorder ? '.mce-content-body img { box-shadow: 0px 0px 10px #999; }' : ''
   ].join('\n')
 
   const editorRef = useRef(null)
@@ -426,7 +426,7 @@ TinyEditor.propTypes = {
   minHeight: PropTypes.number,
   placeholder: PropTypes.string,
   userList: PropTypes.array,
-  showImageBorder: PropTypes.bool,
+  showImageBorder: PropTypes.bool
 }
 
 TinyEditor.defaultProps = {
@@ -445,5 +445,5 @@ TinyEditor.defaultProps = {
   minHeight: 100,
   placeholder: '',
   userList: [],
-  showImageBorder: true,
+  showImageBorder: true
 }

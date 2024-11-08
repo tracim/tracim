@@ -40,12 +40,12 @@ const HTMLContent = (props) => {
 
 HTMLContent.propTypes = {
   isTranslated: PropTypes.bool,
-  showImageBorder: PropTypes.bool,
+  showImageBorder: PropTypes.bool
 }
 
 HTMLContent.defaultProps = {
   isTranslated: false,
-  showImageBorder: true,
+  showImageBorder: true
 }
 
 export default HTMLContent
