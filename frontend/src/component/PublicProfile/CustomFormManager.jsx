@@ -6,7 +6,8 @@ import Form from 'react-jsonschema-form-bs4'
 import {
   Checkbox,
   IconButton,
-  TinyEditor
+  TinyEditor,
+  HTMLContent
 } from 'tracim_frontend_lib'
 
 require('./CustomFormManager.styl')
@@ -37,8 +38,9 @@ const DisplaySchemaPropertyString = props => {
       <DisplaySchemaPropertyLabel {...props} />
       <span
         className='DisplaySchemaPropertyString__value'
-        dangerouslySetInnerHTML={{ __html: props.value }}
-      />
+      >
+        <HTMLContent>{props.value}</HTMLContent>
+      </span>
     </div>
   )
 }
