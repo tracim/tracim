@@ -741,7 +741,6 @@ export const NotificationWall = props => {
               onChange={e => handleChangeFilterInput(e.target.value)}
               value={filterInput}
               placeholder={props.t('Filter...')}
-              autoFocus
             />
 
             <IconButton
