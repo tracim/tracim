@@ -2,6 +2,14 @@
 
 ## 4.12.0 / TBD
 
+### ✨ New Features
+
+- Images added from Wysiwyg editor now have a box shadow delimitation
+- Added autofocus on search input in sidebar and filter input in space content list page
+
+### 🐛 Fixed Issue
+
+- Fixed undesired automatic scroll when opening space content list page [#6589](https://github.com/tracim/tracim/issues/6589)
 
 ## 4.11.1 / 2024-09-27
 
