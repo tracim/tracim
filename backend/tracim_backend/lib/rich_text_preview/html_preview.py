@@ -40,7 +40,7 @@ class RichTextPreviewLib:
                     to="html",
                     format="html",
                     extra_args=[
-                        "-s",
+                        "--standalone",
                         "--toc",
                         "--template",
                         "{}".format(self.app_config.RICH_TEXT_PREVIEW__TEMPLATE_PATH),

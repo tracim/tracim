@@ -795,9 +795,9 @@ class ContentApi(object):
             default_locale=self._config.DEFAULT_LANG,
         )
 
-        revision_txt = _("version {} (revision {}) on {}").format(
+        # INFO - CH - 2024-11-13 - revision_id = revision_in_context.revision_id,
+        revision_txt = _("version {} on {}").format(
             revision_in_context.version_number,
-            revision_in_context.revision_id,
             date_as_lang(
                 revision_in_context.created,
                 locale=self._user.lang,

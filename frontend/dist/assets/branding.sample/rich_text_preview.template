@@ -1,74 +1,108 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"$if(lang)$ lang="$lang$" xml:lang="$lang$"$endif$$if(dir)$ dir="$dir$"$endif$>
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  $if(lang)$
+    lang="$lang$"
+    xml:lang="$lang$"
+  $endif$
+  $if(dir)$
+    dir="$dir$"
+  $endif$
+>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta http-equiv="Content-Style-Type" content="text/css" />
   <meta name="generator" content="$generator$" />
-$for(author-meta)$
-  <meta name="author" content="$author-meta$" />
-$endfor$
-$if(date-meta)$
-  <meta name="date" content="$date-meta$" />
-$endif$
-$if(keywords)$
-  <meta name="keywords" content="$for(keywords)$$keywords$$sep$, $endfor$" />
-$endif$
+
+  $for(author-meta)$
+    <meta name="author" content="$author-meta$" />
+  $endfor$
+
+  $if(date-meta)$
+    <meta name="date" content="$date-meta$" />
+  $endif$
+
+  $if(keywords)$
+    <meta name="keywords" content="$for(keywords)$$keywords$$sep$, $endfor$" />
+  $endif$
+
   <title>$if(title-prefix)$$title-prefix$ – $endif$$title$</title>
   <style type="text/css">code{white-space: pre;}</style>
-$if(quotes)$
-  <style type="text/css">q { quotes: "“" "”" "‘" "’"; }</style>
-$endif$
-$if(highlighting-css)$
-  <style type="text/css">
-$highlighting-css$
-  </style>
-$endif$
-$for(css)$
-  <link rel="stylesheet" href="$css$" type="text/css" />
-$endfor$
-$if(math)$
-  $math$
-$endif$
-$for(header-includes)$
-  $header-includes$
-$endfor$
-</head>
-<body><div class="logo_block"><a href="$website_url$"><img src="$logo_url$"></img></a></div>
-<header>
-  <a href="$content_url$">$title$</a>
-</header>
-<div class="author_block">$author-meta$</div>
 
-<footer>
-$footer_text$
-</footer>
-<div class="page_block"><span id="pageNumber"></span></div>
-$for(include-before)$
-$include-before$
-$endfor$
-$if(toc)$
-$if(title)$
-<section id="first_page_content">
-  <h1 class="title">$title$</h1>
-  $if(subtitle)$
-  <p class="subtitle">$subtitle$</p>
+  $if(quotes)$
+    <style type="text/css">q { quotes: "“" "”" "‘" "’"; }</style>
   $endif$
-  $for(author)$
-  <p class="author">$author$</p>
+
+  $if(highlighting-css)$
+    <style type="text/css">
+      $highlighting-css$
+    </style>
+  $endif$
+
+  $for(css)$
+    <link rel="stylesheet" href="$css$" type="text/css" />
   $endfor$
-  <p class="revision">$revision_txt$</p>
-</section>
-$endif$
-<section id="toc">
-  <h1>$toctitle$</h1>
-$toc$
-</section>
-$endif$
-<section id="body">
-$body$
-</section>
-$for(include-after)$
-$include-after$
-$endfor$
+
+  $if(math)$
+    $math$
+  $endif$
+
+  $for(header-includes)$
+    $header-includes$
+  $endfor$
+</head>
+
+<body>
+  <div class="logo_block">
+    <a href="$website_url$"><img src="$logo_url$"></img></a>
+  </div>
+
+  <header>
+    <a href="$content_url$">$title$</a>
+  </header>
+
+  <div class="author_block">$author-meta$</div>
+
+  <footer>
+    $footer_text$
+  </footer>
+
+  <div class="page_block"><span id="pageNumber"></span></div>
+
+  $for(include-before)$
+    $include-before$
+  $endfor$
+
+  $if(toc)$
+    $if(title)$
+      <section id="first_page_content">
+        <h1 class="title">$title$</h1>
+
+        $if(subtitle)$
+          <p class="subtitle">$subtitle$</p>
+        $endif$
+
+        $for(author)$
+          <p class="author">$author$</p>
+        $endfor$
+
+        <p class="revision">$revision_txt$</p>
+      </section>
+    $endif$
+
+    <section id="toc">
+      <h1>$toctitle$</h1>
+
+      $toc$
+    </section>
+  $endif$
+
+  <section id="body">
+    $body$
+  </section>
+
+  $for(include-after)$
+    $include-after$
+  $endfor$
 </body>
 </html>
