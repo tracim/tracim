@@ -59,7 +59,7 @@ export const SpaceDescription = (props) => {
       </div>
       {isModeEdition
         ? (
-          <div class='workspace_advanced__description'>
+          <div className='workspace_advanced__description'>
             <TinyEditor
               apiUrl={props.apiUrl}
               setContent={setContent}
@@ -75,6 +75,7 @@ export const SpaceDescription = (props) => {
               minHeight={200}
               placeholder={props.t('Description of the space')}
               userList={props.memberList}
+              showImageBorder={false}
             />
 
             <div className='workspace_advanced__description__bottom'>
