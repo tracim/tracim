@@ -84,7 +84,7 @@ requires = [
     "importlib_metadata==4.6.0",
     # note pdf preview
     "pypandoc",
-    "weasyprint<53",
+    "weasyprint==63",
 ]
 
 tests_require = [
