@@ -7,7 +7,8 @@ import {
   DropdownMenu,
   IconButton,
   Icon,
-  shouldUseLightTextColor
+  shouldUseLightTextColor,
+  HTMLContent
 } from 'tracim_frontend_lib'
 
 require('./KanbanCard.styl')
@@ -100,6 +101,7 @@ function KanbanCard (props) {
           />
         )}
       </div>
+
       <div
         className={classnames(
           'kanban__contentpage__wrapper__board__card__description',
@@ -107,11 +109,13 @@ function KanbanCard (props) {
         )}
       >
         <div
-          dangerouslySetInnerHTML={{ __html: props.card.description }}
           disabled={props.readOnly}
           id={`${props.card.id}_description`}
           onClick={props.readOnly ? undefined : () => props.onEditCardContent(props.card)}
-        />
+        >
+          <HTMLContent>{props.card.description}</HTMLContent>
+        </div>
+
         {showSeeDescriptionButton !== DESCRIPTION_BUTTON.HIDDEN && (
           <IconButton
             customClass='kanban__contentpage__wrapper__board__card__description__overflow__button'
@@ -128,6 +132,7 @@ function KanbanCard (props) {
           />
         )}
       </div>
+
       <div
         className='kanban__contentpage__wrapper__board__card__options'
       >

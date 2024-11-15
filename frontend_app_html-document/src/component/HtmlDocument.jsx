@@ -126,7 +126,6 @@ export const HtmlDocument = props => {
         )}
         {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) && (
           <div>
-            {/* need try to inject html in stateless component () => <span>{props.text}</span> */}
             <div className={noteClassName}>
               <HTMLContent isTranslated={isTranslated}>{props.text}</HTMLContent>
             </div>

@@ -7,7 +7,8 @@ import {
   formatAbsoluteDate,
   Icon,
   IconButton,
-  shouldUseLightTextColor
+  shouldUseLightTextColor,
+  HTMLContent
 } from 'tracim_frontend_lib'
 
 require('./LogbookEntry.styl')
@@ -81,12 +82,18 @@ const LogbookEntry = (props) => {
             {formatDate()}
           </span>
         </div>
+
         <div
           ref={ref}
-          className={classnames('logbook__timeline__entries__entry__data__description', { logbook__timeline__entries__entry__data__description__overflow: props.entry.expand === DESCRIPTION_BUTTON.SEE_MORE })}
+          className={classnames(
+            'logbook__timeline__entries__entry__data__description',
+            { logbook__timeline__entries__entry__data__description__overflow: props.entry.expand === DESCRIPTION_BUTTON.SEE_MORE }
+          )}
           id={`${props.entry.id}_description`}
-          dangerouslySetInnerHTML={{ __html: props.entry.description }}
-        />
+        >
+          <HTMLContent>{props.entry.description}</HTMLContent>
+        </div>
+
         {props.entry.expand !== DESCRIPTION_BUTTON.HIDDEN && (
           <IconButton
             customClass='logbook__timeline__entries__entry__data__description__overflow__button'
