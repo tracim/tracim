@@ -53,15 +53,18 @@
 </head>
 
 <body>
-  <div class="logo_block">
-    <a href="$website_url$"><img src="$logo_url$"></img></a>
-  </div>
-
   <header>
-    <a href="$content_url$">$title$</a>
-  </header>
+    <div class="header_left">
+      <a href="$website_url$"><img src="$logo_url$"></img></a>
+    </div>
 
-  <div class="author_block">$author-meta$</div>
+    <div class="header_center"></div>
+
+    <div class="header_right">
+      <a href="$content_url$">$title$</a>
+      $--$author-meta$--$
+    </div>
+  </header>
 
   <footer>
     $footer_text$

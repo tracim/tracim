@@ -42,6 +42,7 @@ class RichTextPreviewLib:
                     extra_args=[
                         "--standalone",
                         "--toc",
+                        "--toc-depth=3",
                         "--template",
                         "{}".format(self.app_config.RICH_TEXT_PREVIEW__TEMPLATE_PATH),
                         *metadata_args,
@@ -49,7 +50,13 @@ class RichTextPreviewLib:
                 )
                 HTML(html_preview_path).write_pdf(
                     pdf_preview_path,
-                    stylesheets=[CSS(self.app_config.RICH_TEXT_PREVIEW__CSS_PATH)],
+                    stylesheets=[
+                        CSS(self.app_config.RICH_TEXT_PREVIEW__CSS_PATH),
+                    ],
+                    # INFO - CH - 2024-11-14 - presentational_hints=True allow weasyprint to keep
+                    # the html attribute width and height added by TinyMCE when we resize the
+                    # images
+                    presentational_hints=True,
                 )
 
             if not filename or filename == "raw":
