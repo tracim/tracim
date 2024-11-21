@@ -67,7 +67,12 @@
   </header>
 
   <footer>
-    $footer_text$
+    <a
+      href="https://tracim.fr"
+      target="_blank"
+    >
+      $footer_text$
+    </a>
   </footer>
 
   <div class="page_block"><span id="pageNumber"></span></div>
