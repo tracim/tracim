@@ -43,6 +43,7 @@ class RichTextPreviewLib:
                         "--standalone",
                         "--toc",
                         "--toc-depth=3",
+                        "--number-sections",
                         "--template",
                         "{}".format(self.app_config.RICH_TEXT_PREVIEW__TEMPLATE_PATH),
                         *metadata_args,
