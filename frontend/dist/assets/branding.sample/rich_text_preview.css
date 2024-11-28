@@ -1,102 +1,120 @@
 :root {
-  --blue: #3465A4;
-  --red: red;
-  --green: green;
+  --black: #333;
+  --darkGrey: #454545;
+  --grey: #666;
+  --lightGrey: #ccc;
 }
 
-a:link { text-decoration: none;}
-a:visited { text-decoration: none; }
-
-
-
-h1 {
-  color: var(--blue);
+body, h1, h2, h3, h4, h5, h6 {
+  font-family: Nunito, sans-serif;
 }
-h2 {
-  color: var(--red);
+
+a:link {
+  text-decoration: none;
 }
-h3 {
-  color: var(--green);
+
+a:visited {
+  text-decoration: none;
 }
 
 
 #toc h1 {
-    font-weight: 700;
-    text-align: center;
+  font-weight: 700;
+  text-align: center;
 }
 
 #toc ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
-  page-break-after: always;
 }
 
-#toc ul li a {
+#toc ul li a, footer a {
   color: inherit;
   text-decoration: none;
 }
 #toc ul li a::after {
-  content: leader('.') target-counter(attr(href), page);
+  content: ' ' leader(dotted) ' ' target-counter(attr(href), page);
+}
+#toc ul li ul {
+  margin-left: 15px;
 }
 
+
 pre {
-    background-color: rgba(0,0,0,0.05);
-    border: 1px solid rgba(0,0,0,0.1);
-    padding: 1em;
-  }
+  background-color: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 1em;
+}
 
 blockquote {
-    background-color: rgba(0,0,0,0.05);
-    border-left: 5px solid rgba(0,0,0,0.1);
-    padding: 0.1em 0.75em;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-left: 5px solid rgba(0, 0, 0, 0.1);
+  padding: 0.1em 0.75em;
 }
 
 section {
-  break-after: always;
+  break-after: page;
+}
+#body img {
+  border: 1px solid #ccc;
 }
 
 @page {
-        size: A4 portrait; /* can use also 'landscape' for orientation */
-        margin: 100px 1cm 150px 1cm;
-        counter-increment: page;
-        @top-left {
-          content: element(logo_block);
-        }
-        @top-center{
-            content: element(header);
-        }
-        @top-right {
-          content: element(author_block);
-        }
-        @bottom-left{
-            content: element(footer);
-        }
-        @bottom-right{
-          content: element(page_block);
-        }
+  size: A4 portrait; /* can use also 'landscape' for orientation */
+  margin: 2cm;
+  counter-increment: page;
+  @top-left {
+    content: element(header_left);
+  }
+  @top-center {
+    content: element(header_center);
+  }
+  @top-right {
+    content: element(header_right);
+  }
+  @bottom-left {
+    content: element(footer);
+  }
+  @bottom-right {
+    content: element(page_block);
+  }
 }
-#pageNumber { content: counter(page) "/" counter(pages) }
 
-header {
-    position: running(header);
+#pageNumber {
+  content: counter(page) "/" counter(pages)
+}
+
+.header_left {
+  position: running(header_left);
+}
+.header_left img {
+  max-height: 25px;
+}
+.header_center {
+  position: running(header_center);
+  font-size: 12px;
+}
+.header_right {
+  position: running(header_right);
+  color: var(--grey);
+  font-size: 12px;
+}
+.header_right a, .header_right a:link, .header_right a:visited {
+  color: var(--grey);
 }
 
 footer {
-    position: running(footer);
+  position: running(footer);
+  color: var(--grey);
+  font-size: 12px;
 }
 
-.logo_block {
-    position: running(logo_block);
-}
-.author_block {
-    position: running(author_block);
-}
 .page_block {
-    position: running(page_block);
+  position: running(page_block);
 }
 
-#first_page_content{
+#first_page_content {
   width: 100%;
   padding-top: 25%;
   text-align: center;
