@@ -6,6 +6,7 @@
 
 - Images added from Wysiwyg editor now have a box shadow delimitation
 - Added autofocus on search input in sidebar and filter input in space content list page
+- Note export as pdf have a better design
 
 ### 🐛 Fixed Issue
 
