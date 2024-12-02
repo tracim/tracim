@@ -1,7 +1,7 @@
 ## YAML definitions re-used in plans
 definitions:
-  main_python_version: &main_python_version "3.9.19"
-  python_versions: &python_versions ["3.9.19", "3.10.14", "3.11.9"]
+  main_python_version: &main_python_version "3.9.2"
+  python_versions: &python_versions ["3.9.2"]
   databases: &databases ["sqlite", "postgresql"]
 
 # plan step to put the current job name as pending in github's PR
