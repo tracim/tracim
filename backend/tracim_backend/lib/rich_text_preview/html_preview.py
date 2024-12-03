@@ -57,7 +57,7 @@ class RichTextPreviewLib:
                     # INFO - CH - 2024-11-14 - presentational_hints=True allow weasyprint to keep
                     # the html attribute width and height added by TinyMCE when we resize the
                     # images
-                    presentational_hints=True,
+                    # presentational_hints=True,
                 )
 
             if not filename or filename == "raw":
