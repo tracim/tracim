@@ -60,7 +60,7 @@ resources:
   type: registry-image
   source:
     repository: algooci/tracim
-    tag: test_python_3.9.2
+    tag: build_148_python_3.9.2
 # resource used to abort the running builds before starting our test jobs
 - name: abort-running-builds
   type: abort-running-builds
