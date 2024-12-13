@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { CUSTOM_EVENT } from '../../customEvent.js'
@@ -21,12 +21,15 @@ function onClick (e) {
 }
 
 const HTMLContent = (props) => {
+  const refHTMLContent = useRef(null)
+
   useEffect(() => {
-    Prism.highlightAll()
+    Prism.highlightAllUnder(refHTMLContent.current)
   })
 
   return (
     <article
+      ref={refHTMLContent}
       onClick={onClick}
       className={classnames(
         'line-numbers',
