@@ -1,8 +1,5 @@
 :root {
-  --black: #333;
-  --darkGrey: #454545;
   --grey: #666;
-  --lightGrey: #ccc;
 }
 
 body, h1, h2, h3, h4, h5, h6 {
@@ -42,14 +39,14 @@ a:visited {
 
 
 pre {
-  background-color: rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  background-color: #ccc;
+  border: 1px solid #666;
   padding: 1em;
 }
 
 blockquote {
-  background-color: rgba(0, 0, 0, 0.05);
-  border-left: 5px solid rgba(0, 0, 0, 0.1);
+  background-color: #ccc;
+  border-left: 5px solid #666;
   padding: 0.1em 0.75em;
 }
 
@@ -58,6 +55,10 @@ section {
 }
 #body img {
   border: 1px solid #ccc;
+  /* INFO - CH - 2024-12-03 - max width is A4 minus margins */
+  max-width: 170mm;
+  /* INFO - CH - 2024-12-03 - max height is (A4 minus margins) / 2 */
+  max-height: 128mm;
 }
 
 @page {
