@@ -3,7 +3,7 @@ List generated with
 head -6 index.md > /tmp/indextemp && cat /tmp/indextemp > index.md && tree | sed "s|$|  |g" >> index.md
 ```
 
-There are two spaces at the end of each lines to force a linebreak in markdown
+There are two spaces at the end of each lines to force a linebreak in markdown  
 .  
 ├── administration  
 │   ├── configuration  
