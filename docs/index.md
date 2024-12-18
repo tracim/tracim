@@ -1,10 +1,10 @@
 List generated with
 ```bash
-head -6 index.md > /tmp/indextemp && cat /tmp/indextemp > index.md && tree | sed "s|$|  |g" >> index.md
+indextmp="$(head -6 index.md)" && echo "$indextmp" > index.md && echo "" >> index.md && tree --noreport | tail -n +2 | sed "s|$|  |g" >> index.md
 ```
 
-There are two spaces at the end of each lines to force a linebreak in markdown  
-.  
+There are two spaces at the end of each lines to force a linebreak in markdown. 
+
 ├── administration  
 │   ├── configuration  
 │   │   ├── customisation  
@@ -75,5 +75,3 @@ There are two spaces at the end of each lines to force a linebreak in markdown
 └── overview  
     ├── known_issues.md  
     └── roles.md  
-  
-19 directories, 51 files  
