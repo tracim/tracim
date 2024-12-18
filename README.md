@@ -1,6 +1,6 @@
 # Tracim
 
-![logo_tracim](./docs/development/logos/logo_tracim.png)
+![logo_tracim](docs/logos/logo_tracim.png)
 
 [Tracim](https://www.tracim.fr) is a tool designed to help you and your team to a better collaboration.
 It's officially supported in Arabic, English, French, German and Portuguese.
@@ -35,6 +35,10 @@ The credentials to access the application are:
 
 <!-- We have to update Docker documentation according to this one -->
 For advanced docker-based usage, look at the full [Tracim installation's documentation](./docs/administration/installation/)
+
+## Install Tracim for development
+
+[See getting started](/docs/development/getting_started.md)
 
 ## Testing Tracim
 
@@ -74,11 +78,11 @@ Tracim is distributed under the terms of 4 distinct licenses. See [LICENSE.md](.
 
 ## Support
 
-<img src="docs/development/logos/logo_weblate.png" alt="logo_weblate" width="200"/>
+<img src="docs/logos/logo_weblate.png" alt="logo_weblate" width="200"/>
 
 [Weblate](https://weblate.org) is an open source translation service, they are helping us to translate Tracim by providing a hosting service.
 
-<img src="docs/development/logos/logo_browserstack.png" alt="logo_browserstack" width="150"/>
+<img src="docs/logos/logo_browserstack.png" alt="logo_browserstack" width="150"/>
 
 [BrowserStack](https://www.browserstack.com) supports open source projects, and graciously helps us testing Tracim on every devices.
 
