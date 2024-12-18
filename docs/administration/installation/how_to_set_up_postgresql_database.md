@@ -1,8 +1,8 @@
 # Handling the Database
 
-Note: This documentation is potentially deprecated (made for Tracim v1)
+Note: This documentation is potentially deprecated
 
-_Note: This page helps you setting up a **development** environment for `Tracim` and its ORM `SQLAlchemy` with `PostgreSQL` and `MySQL`. To set up a **production** environment, changing default database name, database user name and moreover its password is mandatory._
+_Note: This page helps you setting up a **development** environment for `Tracim` and its ORM `SQLAlchemy` with `PostgreSQL`. To set up a **production** environment, changing default database name, database user name and moreover its password is mandatory._
 
 ## PostgreSQL
 
@@ -86,90 +86,16 @@ sudo --user=postgres psql \
 [//]: # (         --command="GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO tracimuser;")
 ```
 
-## Mariadb 10.3+ or Mysql 8.0.1+
-
-❗: Since [Tracim 4.0.0](https://github.com/tracim/tracim/blob/maintenance/4.4/CHANGELOG.md#400--2021-10-29), mysql is not officialy supported by Tracim team. You are on your own when using it.
-
-⚠️ Newest version of Tracim (3.0+) doesn't support anymore old mariadb and mysql version. You need at least
-mariadb 10.3 or mysql 8.0.1 (We need database that are able to support recursive CTE query).
-
-⚠️ newest version of Debian doesn't provide up to date mysql version, you should add the [official apt repository](https://dev.mysql.com/doc/mysql-apt-repo-quick-guide/en/)
-
-⚠️ Tracim requires proper support for UFT-8 to work properly. On MySQL and MariaDB, this means you should be using `utf8mb4`. For the collation we suggest using `utf8mb4_0900_ai_ci` on MySQL 8.0.1+ and `utf8mb4_unicode_520_ci` on MariaDB 10.3+ as they are the most up-to-date Unicode collation algorithms available.
-
-If you need to upgrade to tracim 3.7+ on mysql/mariadb, please use [utf8mb4 migration command line](cli.md) (section "Migrate Mysql/Mariadb database to utf8mb4").
-
-If you want to use MariaDB as database engine
-
-```bash
-sudo apt install mariadb-server
-```
-
-Or mysql:
-
-```bash
-sudo apt install mysql-server
-```
-
-### Minimalist introduction to MariaDB
-
-#### Driver
-
-Tracim uses the `PyMySQL` driver between the `SQLAlchemy` ORM and the `MariaDB` RDBMS. Run the following command to install the right version:
-
-```bash
-pip install -r install/requirements.mysql.txt
-```
-
-#### Create database
-
-Connect to `MariaDB` with root user (password has been set at "Installation" -> "Dependencies" chapter, when installing package)
-
-```bash
-mysql -u root -p
-```
-
-Create a database with following command:
-
-```bash
-CREATE DATABASE tracimdb CHARACTER SET utf8mb4 COLLATE utf```
-8mb4_unicode_520_ci;
-
-Create a user with following command:
-
-```bash
-CREATE USER 'tracimuser'@'localhost' IDENTIFIED BY 'tracimpassword';
-```
-
-And allow him to manipulate created database with following command:
-
-```bash
-GRANT ALL PRIVILEGES ON tracimdb . * TO 'tracimuser'@'localhost';
-```
-
-Then flush privileges:
-
-```bash
-FLUSH PRIVILEGES;
-```
-
-You can now quit `MariaDB` prompt:
-
-```bash
-\q
-```
-
 ## SQLAlchemy settings
 
 In file `backend/development.ini`, search the lines corresponding to the `SQLAlchemy` database url parameter `sqlalchemy.url`. `SQLite` is the default active database and others should be commented.
 
-If you are willing to choose `PostgreSQL` or `MariaDB`, comment the `sqlalchemy.url` line corresponding to `SQLite` and uncomment the one of your choice.
+If you are willing to choose `PostgreSQL`, comment the `sqlalchemy.url` line corresponding to `SQLite` and uncomment the one of your choice.
 
 For instance, with `PostgreSQL`, this should give you:
 
 ```ini
 sqlalchemy.url = postgresql://tracimuser:tracimpassword@127.0.0.1:5432/tracimdb?client_encoding=utf8
-# sqlalchemy.url = mysql+pymysql://tracimuser:tracimpassword@127.0.0.1/tracimdb
 # sqlalchemy.url = sqlite:///tracimdb.sqlite
 ```
 
@@ -183,7 +109,6 @@ Again with `PostgreSQL`, this should give you:
 
 ```ini
 sqlalchemy.url = postgresql://tracimuser:tracimpassword@127.0.0.1:5432/tracimdb_test?client_encoding=utf8
-# sqlalchemy.url = mysql+pymysql://tracimuser:tracimpassword@127.0.0.1/tracimdb_test
 # sqlalchemy.url = sqlite:///tracimdb_test.sqlite
 ```
 
