@@ -124,7 +124,7 @@ If `api.key` is empty, the API key authentication will be disabled.
 #### Remote Auth Authentification (e.g. apache authentication)
 
 It is possible to connect to Tracim using remote authentification (e.g. the Apache authentication method).
-The idea is that the webserver authenticates the user and then pass the login of the authenticated user through uWSGI environment variables or an HTTP header.
+Configuring Tracim in development.iniThe idea is that the webserver authenticates the user and then pass the login of the authenticated user through uWSGI environment variables or an HTTP header.
 
 ⚠ When logging in Tracim, if a valid remote user doesn't
 exist in Tracim, it will be created as a standard user.
@@ -388,7 +388,7 @@ docker cp <tracim_container_name>:/tracim/backend/settings_saml2.json.sample ~/t
       "name_id_format": "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
       "sp_type_in_metadata": true,
       "sp_type": "private",
-      "encrypt_assertion": true,
+Configuring Tracim in development.ini      "encrypt_assertion": true,
       "allow_unsolicited": true,
       "allow_unknown_attributes": true,
       "authn_requests_signed": true,
@@ -448,7 +448,7 @@ docker cp <tracim_container_name>:/tracim/backend/settings_saml2.json.sample ~/t
 ```
 
 ### [beta] create your own shibboleth idp locally
-See [docker_shibboleth_idp_test_container.md](/docs/administration/installation/docker_shibboleth_idp_test_container.md)
+See [BETA_testing_tracim_with_shibboleth_idp_in_docker.md](/docs/administration/installation/BETA_testing_tracim_with_shibboleth_idp_in_docker.md)
 
 ## User sessions in Tracim
 
@@ -798,7 +798,7 @@ Your data are correctly indexed now, you can go to the Tracim UI and use the sea
 
 ### Collaborative Edition Server
 
-In Tracim v2.4, Collaborative Edition Online does support CollaboraOnline/LibreOfficeOnline.
+Since Tracim v2.4, Collaborative Edition Online does support CollaboraOnline/LibreOfficeOnline.
 
 It is tested with CollaboraOnline (professional version of Collabora), with [Collabora CODE](https://hub.docker.com/r/collabora/code) and with [LibreOfficeOnline](https://hub.docker.com/r/libreoffice/online). More information about CollaboraOnline [here](https://www.collaboraoffice.com/)
 We do not support other collaborative edition online service for now but we do support the WOPI protocol, making support for WOPI-compatible software easy.
@@ -810,8 +810,6 @@ note: you should replace <DOT_ESCAPED_DOMAIN_OF_TRACIM_API> with real value like
 ```bash
 sudo docker run -d -t -p 9980:9980 -e "domain=<DOT_ESCAPED_DOMAIN_OF_TRACIM_API>" -e "SLEEPFORDEBUGGER=0" -e "extra_params=--o:ssl.enable=false" --cap-add MKNOD --restart always collabora/code:4.2.6.2
 ```
-
-⚠ Tracim is tested with version 4.0.5.2. Use the latest version at your own risk.
 
 __To set up a `LibreOfficeOnline` server(rolling release, unstable ⚠️) using docker ([image](https://hub.docker.com/r/libreoffice/online)):__
 
@@ -839,9 +837,9 @@ With a Collabora host, `<collabora_host>` may look like `collaboradomain.ndd` or
 -e "extra_params=--o:ssl.enable=false"
 ```
 
-### Configuring Tracim in `development.ini`
+### Configuring Collabora in `development.ini`
 
-To enable online edition on Tracim and allow communication with your edition software.
+To enable online ediConfiguring Tracim in development.inition on Tracim and allow communication with your edition software.
 
 First you need to enable the edition on the API. To do that you have to add the application to app_enabled. For example:
 
@@ -899,14 +897,14 @@ But you can change the default directory to use your templates files:
 collaborative_document_edition.file_template_dir =  PATH_TO_YOUR_TEMPLATE_DIRECTORY
 ```
 
-Filenames of the templates inside the directory are not relevant. Only their extensions matter and need to match the software's default extensions.
+FileConfiguring Tracim in development.ininames of the templates inside the directory are not relevant. Only their extensions matter and need to match the software's default extensions.
 For instance, `CODE` edits `Libre Office` files, so extensions will be `odt`, `odp`, `ods`.
 
 After all these changes in the configuration, you should restart every process (web, webdav, etc...).
 
 ## Call (Tracim v4.0+)
 
-### Configuring Tracim in `development.ini`
+### Configuring Call in `development.ini`
 
 To enable the call feature on Tracim.
 
