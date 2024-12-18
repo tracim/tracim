@@ -26,7 +26,7 @@ ___
 
 ### Other available yarn scripts
 
-see [docs/development/yarn_scripts.md](/docs/development/yarn_scripts.md)
+see [docs/development/yarn_scripts.md](/docs/development/advanced/yarn_scripts.md)
 
 ### Before pushing changes to this app, you must
 

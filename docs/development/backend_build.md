@@ -1,25 +1,24 @@
-# Build Tracim from Source
+# Working in backend
 
 ## Table of contents
 
-- [Build Tracim from Source](#build-tracim-from-source)
+- [Working in backend](#working-in-backend)
   - [Table of contents](#table-of-contents)
   - [Compatibility](#compatibility)
-  - [Backend](#backend)
+  - [Backend](#backend-build)
     - [Option 1: Automated script](#option-1-automated-script)
       - [Script explanation](#script-explanation)
       - [Script options](#script-options)
     - [Option 2: Manually](#option-2-manually)
       - [Dependencies](#dependencies)
     - [VirtualEnv](#virtualenv)
+    - [CLI](#cli)
     - [Others](#others)
-  - [Frontend](#frontend)
-    - [Development build](#development-build)
   - [Run development server](#run-development-server)
 
 ## Compatibility
 
-OS compatibility (tested with Python >= 3.7.3):
+OS compatibility (tested with Python >= 3.9.2):
 
 - Debian:
   - Buster (10)
@@ -28,9 +27,9 @@ OS compatibility (tested with Python >= 3.7.3):
   - Bionic (18.04)
   - Focal (20.04)
 
-Older versions of Debian (8, 9) and Ubuntu (16.04) should work as long as a python version >= 3.7 is used.
+Older versions of Debian (8, 9) and Ubuntu (16.04) should work as long as a python version >= 3.9 is used.
 
-## Backend
+## Backend build
 
 To install the backend, you have two options:
 
@@ -106,9 +105,8 @@ sudo apt install system_packages/debian/optional_preview_packages.list
 
 ### VirtualEnv
 
-To use TracimCLI, you need to be in a Python virtual environment.  
-To do so, you firstly need to create a Python virtual environment:
-
+The script `setup_default_backend.sh` create a virtual env.
+To create a custom virtual env:
 ```bash
 python3 -m venv env
 ```
@@ -119,7 +117,10 @@ Then activate it in your terminal session:
 source env/bin/activate
 ```
 
-Note: Every Tracim command execution must be executed under this virtual environment.
+### CLI
+
+In development, activate the virtual env (see above) and see dedicated
+documentation [here](/docs/administration/exploitation/cli/cli.md)
 
 ### Others
 
@@ -164,61 +165,6 @@ If you want to store files on s3, you need to install the S3 driver:
 ```bash
 pip install -r requirements-storage-s3.txt
 ```
-
-## Frontend
-
-To install the frontend dependencies, all you have to do is to run the script:
-
-```bash
-./install_frontend_dependencies.sh
-```
-
-This script uses sudo. Make sure it is installed and configured.
-Alternatively, under root:
-
-```bash
-./install_frontend_dependencies.sh root
-```
-
-Then, you can build the frontend:
-
-```bash
-./build_full_frontend.sh
-```
-
-### Development build
-
-You may want to build only an application and not the whole frontend.  
-To do so, you will have to build the application by moving into the application folder.
-
-If you want to build `frontend`:
-
-```bash
-cd frontend
-./build_frontend.sh
-```
-
-If you want to build `frontend_app_<any_app>`
-
-```bash
-cd frontend_app_agenda
-./build_app.sh
-```
-
-If you want to build `frontend_lib`:
-
-```bash
-cd frontend_lib
-./build_frontend_lib.sh
-```
-
-On top of that there is an option `-d` to build the frontend in development mode:
-
-```bash
-./build_full_frontend.sh -d
-```
-
-This allow to faster builds and better debugging.
 
 ## Run development server
 
