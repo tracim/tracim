@@ -1,4 +1,4 @@
-# Running Tracim for production
+# Running Tracim components locally
 
 [Tracim](https://www.tracim.fr) is composed of multiples services, some are web wsgi applications and others are daemons (servers not web-related to do some task like sending email).
 
