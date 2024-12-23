@@ -18,7 +18,7 @@ website.description = For storing files and collaborating with people.
 
 The title is displayed in the browser's page. The title and the description are used by search engines to display their results.
 
-These parameters can also be changed with environment variables as described in [setting.md](/docs/administration/installation/setting.md).
+These parameters can also be changed with environment variables as described in [settings_main_topics.md](/docs/administration/installation/settings_main_topics.md).
 
 ## Main colors used by the user interface
 
@@ -89,7 +89,7 @@ website.welcome_page_style = my-welcome-page.css
 
 The paths of the files in `development.ini` are relative to `<branding_folder>`.
 
-These parameters can also be changed with an environment variable as described in [setting.md](/docs/administration/installation/setting.md).
+These parameters can also be changed with an environment variable as described in [settings_main_topics.md](/docs/administration/installation/settings_main_topics.md).
 
 In case you use CSS styling, we recommend to use the `tracimBrandingWelcomePage` class name prefix to avoid collisions with Tracim's own class names.
 The additional files/images added in `<branding_folder>` are available to the browser in `/assets/branding/`, so setup the source/link references in your HTML accordingly.
@@ -260,4 +260,4 @@ Each location are a list of objects containing the definition of an App Custom A
       "en": "my english label",
       "fr": "mon label français"
     }
-```
+    ```
