@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
+import classnames from 'classnames'
 import { CUSTOM_EVENT } from '../../customEvent.js'
 
 import Prism from 'prismjs'
@@ -20,25 +21,34 @@ function onClick (e) {
 }
 
 const HTMLContent = (props) => {
+  const refHTMLContent = useRef(null)
+
   useEffect(() => {
-    Prism.highlightAll()
+    Prism.highlightAllUnder(refHTMLContent.current)
   })
 
   return (
     <article
+      ref={refHTMLContent}
       onClick={onClick}
-      className={`line-numbers ${props.isTranslated ? 'html-content--translated' : 'html-content'}`}
+      className={classnames(
+        'line-numbers',
+        props.isTranslated ? 'html-content--translated' : 'html-content',
+        props.showImageBorder ? 'showImageBorder' : ''
+      )}
       dangerouslySetInnerHTML={{ __html: props.children }}
     />
   )
 }
 
 HTMLContent.propTypes = {
-  isTranslated: PropTypes.bool
+  isTranslated: PropTypes.bool,
+  showImageBorder: PropTypes.bool
 }
 
-HTMLContent.defaultPropTypes = {
-  isTranslated: false
+HTMLContent.defaultProps = {
+  isTranslated: false,
+  showImageBorder: true
 }
 
 export default HTMLContent

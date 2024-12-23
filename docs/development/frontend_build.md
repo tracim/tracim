@@ -1,14 +1,71 @@
-# App Building
+# Working in frontend
 
-## Production
+To install the frontend dependencies, run the script:
 
-Its installation and building are respectively handled by [install_frontend_dependencies.sh](/install_frontend_dependencies.sh) and [build_full_frontend.sh](/build_full_frontend.sh).
+```bash
+./install_frontend_dependencies.sh
+```
 
-See [README.md](/docs/development/build.md).
+This script uses sudo. Make sure it is installed and configured.
+Alternatively, under root:
 
-## Development
+```bash
+./install_frontend_dependencies.sh root
+```
 
-You must run [install_frontend_dependencies.sh](/install_frontend_dependencies.sh) before starting any build.
+Then, you can build the frontend:
+
+```bash
+./build_full_frontend.sh
+```
+
+## Production build
+
+You may want to build only an application and not the whole frontend.  
+To do so, build the application by moving into the application folder and run the build script.
+
+If you want to build `frontend`:
+
+```bash
+cd frontend
+./build_frontend.sh
+```
+
+If you want to build `frontend_lib`:
+
+```bash
+cd frontend_lib
+./build_frontend_lib.sh
+```
+
+If you want to build any other app `frontend_app_<app_name>`
+```bash
+cd frontend_app_<app_name>
+./build_app.sh
+```
+
+## Development build
+
+### Build dev command
+
+Use same command as production build with option `-d` to build in development mode.
+It removes minifaction and add linting warnings and sourcemaps
+
+```bash
+./build_full_frontend.sh -d
+```
+or, for example, for app file:
+```bash
+cd frontend_app_file
+./build_app.sh -d
+```
+
+This allows for faster builds and better debugging.
+
+To use dev server, see [servdev bellow](#with-development-server-servdev)
+
+
+## Build technical information
 
 ### Basic
 
@@ -89,3 +146,7 @@ export const updatedDebugExample = {
   }
 }
 ```
+
+## More information about available yarn scripts
+
+See [yarn_script](/docs/development/advanced/yarn_scripts.md)

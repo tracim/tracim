@@ -404,8 +404,6 @@ api.key = %(basic_setup.api_key)s
 ; ldap_username_attribute = givenName
 ## Attribute name of user record who contain user mail (email)
 ; ldap_mail_attribute = mail
-## Attribute for default Public Name of new user from ldap
-; ldap_name_attributes = displayName
 ## TLS usage to communicate with your LDAP server
 ; ldap_tls = False
 
@@ -680,6 +678,7 @@ website.usage_conditions =
 # emails subjects:
 ; email.notification.content_update.subject = [{website_title}] [{workspace_label}] {content_label} ({content_status_label})
 ; email.notification.created_account.subject = [{website_title}] Someone created an account for you
+; email.notification.reset_password_request.subject = [{website_title}] A password reset has been requested
 ; email.notification.share_content_to_emitter.subject = [{website_title}] You shared "{content_filename}" with {nb_receivers} people
 ; email.notification.share_content_to_receiver.subject = [{website_title}] {emitter_name} shared the file "{content_filename}" with you
 ; email.notification.upload_permission_to_emitter.subject = [{website_title}] You invited {nb_receivers} people to upload files on "{workspace_name}"

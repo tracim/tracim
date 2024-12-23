@@ -58,7 +58,7 @@ class ContentItem extends React.Component {
         isLast={props.isLast}
         isFirst={props.isFirst}
         key={props.id}
-        id={`${ANCHOR_NAMESPACE.workspaceItem}:${props.content.contentId}`}
+        id={`${ANCHOR_NAMESPACE.workspaceItem}:${props.content.id}`}
       >
         <Link
           to={props.urlContent}

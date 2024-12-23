@@ -839,6 +839,7 @@ export class WorkspaceContent extends React.Component {
                   }}
                   value={state.userFilter}
                   placeholder={props.t('Filter visible contents')}
+                  autoFocus
                 />
 
                 <ContentItemHeader

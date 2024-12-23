@@ -33,6 +33,7 @@ export const SearchInput = (props) => {
         onChange={handleNewSearch}
         onKeyDown={handleKeyDown}
         value={searchString}
+        autoFocus
       />
       <button
         className='search__btn'
