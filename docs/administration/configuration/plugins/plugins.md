@@ -1,4 +1,4 @@
-# Writing and using plugins for tracim
+esn# Writing and using plugins for tracim
 
 tracim's plugin system allows to extend and customize the tracim backend by interacting with the backend library, 
 registering new routes/views, and handling events through hooks.
@@ -18,7 +18,7 @@ Plugins are loaded from the folder specified in the `development.ini`
 Plugins must be Python modules and placed in folders whose names must start with `tracim_backend_`.
 They will then be loaded automatically on tracim's startup.
 
-Official plugins are provided with tracim. For more information, see the [official plugin documentation](https://github.com/tracim/tracim/blob/develop/backend/official_plugins/README.md).
+Official plugins are provided with tracim. For more information, see the [official plugin documentation](https://github.com/tracim/tracim/blob/develop/docs/administration/configuration/plugins/Official_Backend_Plugins.md).
 
 ## Plugin Basics
 
@@ -33,7 +33,7 @@ Official plugins are provided with tracim. For more information, see the [offici
 
 Here is a sample implementation of a "Hello World" plugin:
 
-*NOTE: This code is also available at [tracim/doc/backend/hello_world_plugin.py](https://github.com/tracim/tracim/blob/develop/doc/backend/hello_world_plugin.py).*
+*NOTE: This code is also available at [tracim/doc/backend/hello_world_plugin.py](https://github.com/tracim/tracim/blob/develop/docs/administration/configuration/plugins/hello_world_plugin.py).*
 ```python
 """
 This is just a sample of Tracim backend plugin using pluggy hook
