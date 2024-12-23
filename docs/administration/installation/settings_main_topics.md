@@ -388,7 +388,7 @@ docker cp <tracim_container_name>:/tracim/backend/settings_saml2.json.sample ~/t
       "name_id_format": "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
       "sp_type_in_metadata": true,
       "sp_type": "private",
-Configuring Tracim in development.ini      "encrypt_assertion": true,
+      "encrypt_assertion": true,
       "allow_unsolicited": true,
       "allow_unknown_attributes": true,
       "authn_requests_signed": true,
@@ -943,7 +943,7 @@ The default value is 30 seconds.
 ## User Custom Properties
 
 It's possible to configure custom properties attached to user per instance, [read specific documentation
-to know more about this feature](./user_custom_properties.md).
+to know more about this feature](/docs/administration/configuration/customisation/user_custom_properties.md).
 
 ## Default agenda event description in the Frontend
 
