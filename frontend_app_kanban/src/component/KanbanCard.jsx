@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
@@ -14,6 +14,8 @@ import {
 require('./KanbanCard.styl')
 
 function KanbanCard (props) {
+  const refKanbanCard = useRef(null)
+
   const DESCRIPTION_BUTTON = {
     HIDDEN: 'hidden',
     SEE_MORE: 'seeMore',
@@ -24,7 +26,7 @@ function KanbanCard (props) {
   const [showSeeDescriptionButton, setShowSeeDescriptionButton] = useState(DESCRIPTION_BUTTON.HIDDEN)
 
   useEffect(() => {
-    const descriptionElement = document.getElementById(`${props.card.id}_description`)
+    const descriptionElement = refKanbanCard.current
     const descriptionHeight = (descriptionElement || { scrollHeight: 0 }).scrollHeight
     setShowDescriptionPreview(descriptionHeight > 75)
     setShowSeeDescriptionButton(descriptionHeight > 75
@@ -109,6 +111,7 @@ function KanbanCard (props) {
         )}
       >
         <div
+          ref={refKanbanCard}
           disabled={props.readOnly}
           id={`${props.card.id}_description`}
           onClick={props.readOnly ? undefined : () => props.onEditCardContent(props.card)}
