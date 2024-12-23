@@ -12,6 +12,13 @@
 
 - Fixed undesired automatic scroll when opening space content list page [#6589](https://github.com/tracim/tracim/issues/6589)
 
+### ⚡️ Performance
+
+- Improved performance of Kanban with many cards
+
+### 🔧 Upgrade documentation
+[See the doc](https://github.com/tracim/tracim/issues/6611)
+
 ## 4.11.1 / 2024-09-27
 
 4.11.1 only updates changelog to mention the security fix that is already present in 4.11.0.
