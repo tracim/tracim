@@ -1,4 +1,4 @@
-# Running Tracim for production
+# Running Tracim components locally
 
 [Tracim](https://www.tracim.fr) is composed of multiples services, some are web wsgi applications and others are daemons (servers not web-related to do some task like sending email).
 
@@ -65,4 +65,4 @@ and `Running Tracim Backend WSGI APP`.
 ## Upkeep
 
 When the default "file" storage is used for session files you need to regularly remove old sessions files as they aren't removed automatically when the session expires (either of old age or when a user logs out). Other session storage (e.g. redis) do not have this behavior.
-Please read the [session documentation](/docs/administration/installation/setting.md#user-sessions-in-Tracim) for more information and recommended ways to remove the unused session files.
+Please read the [session documentation](/docs/administration/installation/settings_main_topics.md#user-sessions-in-Tracim) for more information and recommended ways to remove the unused session files.

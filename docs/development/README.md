@@ -1,16 +1,25 @@
 # The Tracim Backend
 
+<!--
+TODO - CH - 2024-12-18 - This file should be refactored.
+It includes info related to administration and development
+-->
+
 Backend source code of Tracim, using Pyramid Framework.
 
 ## Installation
+
+### Quick install
+
+See [getting started](/docs/development/getting_started.md)
 
 ### Supported database engines
 
 <!-- Remove the one that we don't support -->
 - SQLite 3.22(2018-01-22)+ with JSON1 extension
 - PostgreSQL 9.6+
-- MySQL 8.0.1+
-- MariaDB 10.3+
+<!-- - MySQL 8.0.1+  -->
+<!-- - MariaDB 10.3+  -->
 
 ## Configuration
 
@@ -19,7 +28,7 @@ Create configuration file for a development environment:
     cp development.ini.sample development.ini
 
 The provided default configuration is suitable for local-test. If you need to run Tracim
-over network, see [configuration file documentation](/docs/administration/installation/setting.md).
+over network, see [configuration file documentation](/docs/administration/installation/settings_main_topics.md).
 
 You need to create the branding folder containing customizable ui elements. Starting with the provided sample is a good way:
 
@@ -292,4 +301,4 @@ see [docs/development/before_push.md](/docs/development/before_push.md)
 
 ## Other available yarn scripts
 
-see [docs/development/yarn_scripts.md](/docs/development/yarn_scripts.md)
+see [docs/development/yarn_scripts.md](/docs/development/advanced/yarn_scripts.md)

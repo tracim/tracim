@@ -2,7 +2,7 @@
 
 To test [Tracim](https://www.tracim.fr), you first need to be able to
 build the backend and the frontend.
-See [how to build](/docs/development/build.md).
+See [how to build](/docs/development/backend_build.md).
 
 ## Table of contents
 

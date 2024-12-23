@@ -1,21 +1,16 @@
 # Tracim configuration parameters which can be given as an environment variable
 
-This list is generated using:
+Variables, as written in `Variable name in configuration file` column are explained in [tracim/backend/development.ini.sample](https://github.com/tracim/tracim/blob/master/backend/development.ini.sample).
 
-```bash
-tracimcli dev parameters list --template "| {env_var_name: <74}| {config_file_name: <63}| {config_name: <67}|"
-```
-⚠️ These are only Tracim environment variables. You can find more environment variables for docker start on the [tracim/tools_docker/README.md](https://github.com/tracim/tracim/blob/master/tools_docker/README.md) page ⚠️
+⚠️ These are only Tracim environment variables. You can find more environment variables for docker start on the [tracim/docs/administration/installation/tracim_with_docker.md](https://github.com/tracim/tracim/blob/master/docs/administration/installation/tracim_with_docker.md) page ⚠️
 
-⚠️ The generated list is based on your `development.ini` file. ⚠️
 
-To update the list below you will need to:
+The following table contains:
+- `Environment variable name`: variables typically used in `docker-compose.yml`
+- `Variable name in configuration file`: can be set directly in `development.ini`
+- `Displayed configuration name`: visible when tracim starts
 
-- Activate all applications (`app.enabled` setting)
-- Set `collaborative_document_edition.software` to `collabora`
-- Give a value to `collaborative_document_edition.collabora.base_url`
-
-| Environment variable name                                                 | Configuration file name                                        | Displayed configuration name                                       |
+| Environment variable name                                                 | Variable name in configuration file                            | Displayed configuration name                                       |
 |---------------------------------------------------------------------------|----------------------------------------------------------------|--------------------------------------------------------------------|
 | TRACIM_APP__ENABLED                                                       | app.enabled                                                    | APP__ENABLED                                                       |
 | TRACIM_SQLALCHEMY__URL                                                    | sqlalchemy.url                                                 | SQLALCHEMY__URL                                                    |
@@ -197,3 +192,19 @@ To update the list below you will need to:
 | TRACIM_EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__SUBJECT         | email.notification.upload_permission_to_emitter.subject        | EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__SUBJECT         |
 | TRACIM_EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML              | email.notification.new_upload_event.template.html              | EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML              |
 | TRACIM_EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT                     | email.notification.new_upload_event.subject                    | EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT                     |
+
+## How to generate the above table
+
+This table is generated using:
+
+```bash
+tracimcli dev parameters list --template "| {env_var_name: <74}| {config_file_name: <63}| {config_name: <67}|"
+```
+
+⚠️ The generated list is based on your `development.ini` file. ⚠️
+
+To update the list below you will need to:
+
+- Activate all applications (`app.enabled` setting)
+- Set `collaborative_document_edition.software` to `collabora`
+- Give a value to `collaborative_document_edition.collabora.base_url`

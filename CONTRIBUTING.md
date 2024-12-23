@@ -29,11 +29,11 @@ Now you can start coding 😄
 
 ##### Build
 
-See [build](./doc/BUILD.md) to see how to build [Tracim](https://www.tracim.fr). Especially the [development build section](./doc/BUILD.md#development-build).
+See [build](./docs/development/getting_started.md) to see how to build [Tracim](https://www.tracim.fr).
 
 ##### Testing
 
-See [testing](./doc/TESTING.md) to see how to test [Tracim](https://www.tracim.fr) and your developments.
+See [testing](./docs/development/test/testing.md) to see how to test [Tracim](https://www.tracim.fr) and your developments.
 
 ##### Committing to the repository
 
@@ -42,7 +42,6 @@ See [git signature](https://git-scm.com/docs/git-commit#git-commit--s).
 
 This will prove that you are the author of the commit and you have accepted the licenses ([MIT](https://opensource.org/licenses/MIT), [LGPLv3](https://www.gnu.org/licenses/lgpl-3.0.html) and [AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)) and [Developer Certificate of Origin](./doc/DCO).
 
-<!-- To remove -->
 ## Code Formatting and Others Checks
 
 ### Pre-commit
