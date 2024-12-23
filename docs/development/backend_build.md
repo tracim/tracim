@@ -81,7 +81,7 @@ Here is the list of every option:
 
 <!-- To check -->
 For more information about configuring the backend, see [Backend README](/docs/development/README.md).
-For more information about the configuration files, see [development.ini.sample](/backend/development.ini.sample) and the [backend setting documentation](/docs/administration/installation/setting.md).
+For more information about the configuration files, see [development.ini.sample](/backend/development.ini.sample) and the [backend setting documentation](/docs/administration/installation/settings_main_topics.md).
 
 ### Option 2: Manually
 
@@ -120,7 +120,7 @@ source env/bin/activate
 ### CLI
 
 In development, activate the virtual env (see above) and see dedicated
-documentation [here](/docs/administration/exploitation/cli/cli.md)
+documentation [here](/docs/administration/exploitation/cli.md)
 
 ### Others
 

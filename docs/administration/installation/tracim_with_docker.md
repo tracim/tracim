@@ -14,7 +14,7 @@ All files and folder are in [/tools_docker/](/tools_docker/)
   - [With custom repository](#with-custom-repository)
 - [Troubleshooting](#troubleshooting)
 - [Tracimcli inside docker](#tracimcli-inside-docker)
-  - [Updating index of ElasticSearch](#updating_index_of_elasticSearch)
+  - [Updating index of ElasticSearch](#updating-index-of-elasticsearch)
 - [ARM64 build](#arm64-build)
 - [Running with gocryptfs encryption](#running-with-gocryptfs-encryption)
 

@@ -35,7 +35,7 @@ yarn run build:translation
 
 - Build the translation files
 - It will add any new translation keys and remove unused one
-- see [./i18n.md](./i18n.md)
+- see [./i18n.md](/docs/development/i18n/i18n-frontend.md)
 - Must be run before pushing modifications to any text displayed in the app
 
 ## run the linting

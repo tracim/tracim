@@ -28,7 +28,7 @@ Create configuration file for a development environment:
     cp development.ini.sample development.ini
 
 The provided default configuration is suitable for local-test. If you need to run Tracim
-over network, see [configuration file documentation](/docs/administration/installation/setting.md).
+over network, see [configuration file documentation](/docs/administration/installation/settings_main_topics.md).
 
 You need to create the branding folder containing customizable ui elements. Starting with the provided sample is a good way:
 
