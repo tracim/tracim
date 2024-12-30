@@ -128,7 +128,7 @@ export const TinyEditor = props => {
       />
       <Editor
         key={editorKey}
-        tinymceScriptSrc='/assets/tinymce-5.10.3/js/tinymce/tinymce.min.js'
+        tinymceScriptSrc='/assets/tinymce-7.6.0/js/tinymce/tinymce.min.js'
         disabled={props.isDisabled}
         onInit={(evt, editor) => {
           editorRef.current = editor
@@ -148,15 +148,15 @@ export const TinyEditor = props => {
           toolbar: toolbar,
           default_link_target: '_blank',
           plugins: [
-            'advlist autolink lists link image charmap print preview anchor',
-            'searchreplace visualblocks code codesample fullscreen emoticons',
-            'insertdatetime media table paste code help wordcount',
+            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview', 'anchor',
+            'searchreplace', 'visualblocks', 'code', 'codesample', 'fullscreen', 'emoticons',
+            'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount',
             props.isAutoResizeEnabled ? 'autoresize' : ''
           ],
           contextmenu: 'selectall copy paste link customInsertImage table',
           codesample_global_prismjs: true,
           codesample_languages: props.codeLanguageList,
-          paste_data_images: true,
+          paste_data_images: true, // INFO - CH - 2024-12-30 - Since tinymce 6+, it is now the default value
           relative_urls: false,
           setup: (editor) => {
             editor.ui.registry.addMenuButton('insert', {
@@ -251,7 +251,7 @@ export const TinyEditor = props => {
             const maxFetchResults = 15
             if (props.isMentionEnabled) {
               editor.ui.registry.addAutocompleter('mentions', {
-                ch: '@',
+                trigger: '@',
                 columns: 1,
                 highlightOn: ['roleName', 'publicName', 'username'],
                 minChars: 0,
@@ -317,7 +317,7 @@ export const TinyEditor = props => {
             // Handle content link
             if (props.isContentLinkEnabled) {
               editor.ui.registry.addAutocompleter('content', {
-                ch: '#',
+                trigger: '#',
                 columns: 1,
                 highlightOn: ['content_label', 'content_id'],
                 minChars: 0,
@@ -336,7 +336,7 @@ export const TinyEditor = props => {
                       return isLabel || isId
                     })
 
-                    const resultList = matchedContentList.map((content) => {
+                    return matchedContentList.map((content) => {
                       return {
                         type: 'cardmenuitem',
                         value: `#${content.content_id} `,
@@ -365,8 +365,6 @@ export const TinyEditor = props => {
                         ]
                       }
                     })
-
-                    return resultList
                   } catch (e) {
                     console.error(
                       'Error in TinyEditor.jsx, couldn\'t fetch content list properly:\n', e
