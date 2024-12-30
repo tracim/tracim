@@ -12,6 +12,6 @@
   },
   "packageManager": "yarn@3.2.0",
   "dependencies": {
-    "@tinymce/tinymce-react": "^4.2.0"
+    "@tinymce/tinymce-react": "^5.1.1"
   }
 }

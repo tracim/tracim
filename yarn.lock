@@ -1837,16 +1837,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tinymce/tinymce-react@npm:^4.2.0":
-  version: 4.3.2
-  resolution: "@tinymce/tinymce-react@npm:4.3.2"
+"@tinymce/tinymce-react@npm:^5.1.1":
+  version: 5.1.1
+  resolution: "@tinymce/tinymce-react@npm:5.1.1"
   dependencies:
     prop-types: ^15.6.2
-    tinymce: ^6.0.0 || ^5.5.1
+    tinymce: ^7.0.0 || ^6.0.0 || ^5.5.1
   peerDependencies:
     react: ^18.0.0 || ^17.0.1 || ^16.7.0
     react-dom: ^18.0.0 || ^17.0.1 || ^16.7.0
-  checksum: 7c28a8c59296b73070ddb6fefa04ee96d13cf52bdc3b406dc18e339991c8523daa839f11fc11654644e78b9aff689e66aa5eb47c8b852ebb97c40b87a9d3752c
+  checksum: 80cb97203f8dbe2a9c0cedd46aec8cb37f233932567fe4e5e283d6f65b1c0b25e6cbc33a69a3af7554d06875f809740f1e5a1000474702ec24ed69c7e7dcf2d9
   languageName: node
   linkType: hard
 
@@ -11077,7 +11077,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "root-workspace-0b6124@workspace:."
   dependencies:
-    "@tinymce/tinymce-react": ^4.2.0
+    "@tinymce/tinymce-react": ^5.1.1
     eslint: ^6.8.0
   languageName: unknown
   linkType: soft
@@ -12338,10 +12338,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tinymce@npm:^6.0.0 || ^5.5.1":
-  version: 6.8.2
-  resolution: "tinymce@npm:6.8.2"
-  checksum: 57ed21bc0f59fac108a357f0a90d4336319be289f251befa373e06d993a8d6eb794692e39149ac6064e482f4129a02ec8cfcea91a1255800a5c267984ccaefd9
+"tinymce@npm:^7.0.0 || ^6.0.0 || ^5.5.1":
+  version: 7.6.0
+  resolution: "tinymce@npm:7.6.0"
+  checksum: 4d6c8ee17cac6ff7e674ce116fe88615f8ca41a4e479dc9c536d1073d8ec0847265e075463858ba47808c38795e8bb909ebcb3fc48e47f7f321bccbbee854ee7
   languageName: node
   linkType: hard
 
