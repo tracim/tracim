@@ -33,13 +33,14 @@ export const Breadcrumbs = props => {
     breadcrumbsList[breadcrumbsList.length - 1] = lastBreadcrumb
   }
 
-  const shouldBeShrinked = (crumb) => {
+  const shouldBeShrank = (crumb) => {
     const fontSize = 16
     const charPossibleInBreadcrumbs = window.innerWidth * 0.5 / fontSize
-    if (breadcrumbsList.reduce((numberOfChar, crumb) => numberOfChar + crumb.label.length, 0) < charPossibleInBreadcrumbs) {
+    const breadCrumbTotalChar = breadcrumbsList.reduce((totalChar, c) => totalChar + c.label?.length, 0)
+    if (breadCrumbTotalChar < charPossibleInBreadcrumbs) {
       return false
     }
-    return crumb.label.length >= charPossibleInBreadcrumbs / breadcrumbsList.length
+    return crumb.label?.length >= charPossibleInBreadcrumbs / breadcrumbsList.length
   }
 
   return (
@@ -69,7 +70,7 @@ export const Breadcrumbs = props => {
 
         {breadcrumbsList.map((crumb, i) =>
           <li
-            className={classnames('breadcrumbs__item', { shrinkBreadcrumbs: shouldBeShrinked(crumb) })}
+            className={classnames('breadcrumbs__item', { shrinkBreadcrumbs: shouldBeShrank(crumb) })}
             key={`breadcrumbs_${i}`}
             title={crumb.htmlTitle || crumb.label || ''}
           >

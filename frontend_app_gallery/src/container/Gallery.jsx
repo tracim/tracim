@@ -306,7 +306,7 @@ export class Gallery extends React.Component {
     const breadcrumbsList = [{
       link: PAGE.WORKSPACE.DASHBOARD(state.config.appConfig.workspaceId),
       type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
-      label: workspaceLabel,
+      label: workspaceLabel || '',
       isALink: true
     }]
     if (state.folderId) {
