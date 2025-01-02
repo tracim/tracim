@@ -26,6 +26,6 @@ describe('Sidebar', function () {
       .get('.fa-caret-right')
       .should('be.visible')
     cy.get('[data-cy="sidebar__space__item_2"]')
-      .should('not.be.visible')
+      .should('not.exist')
   })
 })

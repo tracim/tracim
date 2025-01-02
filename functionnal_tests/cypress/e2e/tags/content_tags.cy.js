@@ -129,7 +129,7 @@ describe('Create tags', () => {
           cy.get(inputClass).type('Ta')
           cy.get('.autocomplete').should('be.visible')
           cy.get(inputClass).type('{esc}')
-          cy.get('.autocomplete').should('be.not.visible')
+          cy.get('.autocomplete').should('not.exist')
         })
 
         it('should add a tag that exists already in workspace', () => {

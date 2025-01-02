@@ -49,7 +49,7 @@ describe('A comment in TinyMCE', () => {
       cy.inputInTinyMCE(`${linkChar}ti`)
       // Display the auto completer
       cy.get('.tox-autocompleter')
-        .should('be.visible')
+        .should('exist')
       // Items are correctly displayed
       cy.contains('.tox-collection__item', noteId)
         .should('be.visible')

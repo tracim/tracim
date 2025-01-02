@@ -56,7 +56,7 @@ describe('Modify to dos', () => {
         cy.contains('.toDoItem', '+johndoe').within(() => {
           cy.get('.toDoItem__checkbox button').should('not.be.disabled').click()
         })
-        cy.get('.toDoItemChecked').should('not.be.visible')
+        cy.get('.toDoItemChecked').should('not.exist')
       })
 
       it('should be able to check/uncheck the unassigned to do', () => {
@@ -67,7 +67,7 @@ describe('Modify to dos', () => {
         cy.contains('.toDoItem', '+TheAdmin').within(() => {
           cy.get('.toDoItem__checkbox button').should('not.be.disabled').click()
         })
-        cy.get('.toDoItemChecked').should('not.be.visible')
+        cy.get('.toDoItemChecked').should('not.exist')
       })
     })
 
@@ -95,7 +95,7 @@ describe('Modify to dos', () => {
         cy.contains('.toDoItem', '+johndoe').within(() => {
           cy.get('.toDoItem__checkbox button').should('not.be.disabled').click()
         })
-        cy.get('.toDoItemChecked').should('not.be.visible')
+        cy.get('.toDoItemChecked').should('not.exist')
       })
 
       it('should not be able to check/uncheck the unassigned to do', () => {
@@ -117,7 +117,7 @@ describe('Modify to dos', () => {
           cy.contains('.toDoItem', 'customToDo').within(() => {
             cy.get('.toDoItem__checkbox button').should('not.be.disabled').click()
           })
-          cy.get('.toDoItemChecked').should('not.be.visible')
+          cy.get('.toDoItemChecked').should('not.exist')
         })
       })
     })

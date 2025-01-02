@@ -119,7 +119,7 @@ describe('Space settings', function () {
           .click()
       }
 
-      // INFO - MP - 2021-11-05 - Validate the test; not in aftereach since it is
+      // INFO - MP - 2021-11-05 - Validate the test; not in after each since it is
       // not a cleaning method
       const successfullyAdded = (userId) => {
         cy.getTag({ selectorName: s.FLASH_MESSAGE })
@@ -206,7 +206,7 @@ describe('Space settings', function () {
 
         cy.getTag({ selectorName: s.CONTENT_FRAME })
           .get(`[data-cy=workspace_advanced__member-${userId}]`)
-          .should('be.not.visible')
+          .should('not.exist')
       })
     })
 
@@ -268,7 +268,7 @@ describe('Space settings', function () {
 
         cy.getTag({ selectorName: s.CONTENT_FRAME })
           .find(`.workspace_advanced__userlist__list__item[data-cy=workspace_advanced__member-${userId}]`)
-          .should('be.not.visible')
+          .should('not.exist')
 
         cy.enableUser(userId)
       })

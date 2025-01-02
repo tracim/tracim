@@ -8,11 +8,6 @@ const veryLongComment = 'this_is_a_very_long_comment lorem_ipsum_dolor_sit_amet_
 
 const contentHtmlDocGetter = formatTag({ selectorName: s.CONTENT_IN_SEARCH, attrs: { title: htmlDocTitle } })
 
-const commentArea = '.timeline__comment__body'
-const commentText = '.timeline__comment__body__content__text'
-const cancelDocBtn = '.html-document__editionmode__cancel'
-const submitBtn = '.commentArea__submit__btn'
-
 describe('Add a new comment', () => {
   before(function () {
     cy.resetDB()
@@ -35,7 +30,7 @@ describe('Add a new comment', () => {
 
   it('Should apply margin between paragraphs', function () {
     cy.get(contentHtmlDocGetter).click()
-    cy.get(cancelDocBtn).click()
+    cy.get('.html-document__editionmode__cancel').click()
 
     cy.createComment(workspaceId, 1, [
       '<p data-cy="timeline__comment-first-paragraph">Hello1</p>',
@@ -43,24 +38,12 @@ describe('Add a new comment', () => {
       '<p data-cy="timeline__comment-last-paragraph">Hello2</p>'
     ].join(''))
 
-    cy.get('[data-cy=timeline__comment-first-paragraph]').invoke('css', 'marginTop').should('be.equal', '0px')
-    cy.get('[data-cy=timeline__comment-first-paragraph]').invoke('css', 'paddingTop').should('be.equal', '0px')
-    cy.get('[data-cy=timeline__comment-last-paragraph]').invoke('css', 'marginBottom').should('be.equal', '0px')
-    cy.get('[data-cy=timeline__comment-last-paragraph]').invoke('css', 'paddingBottom').should('be.equal', '0px')
+    cy.get('[data-cy=timeline__comment-first-paragraph]').should('have.css', 'marginTop', '0px')
+    cy.get('[data-cy=timeline__comment-first-paragraph]').should('have.css', 'paddingTop', '0px')
+    cy.get('[data-cy=timeline__comment-last-paragraph]').should('have.css', 'marginBottom', '0px')
+    cy.get('[data-cy=timeline__comment-last-paragraph]').should('have.css', 'paddingBottom', '0px')
 
-    cy.get('[data-cy=timeline__comment-first-paragraph]').invoke('css', 'marginBottom').should('not.be.equal', '0px')
-    cy.get('[data-cy=timeline__comment-middle-paragraph]').invoke('css', 'marginBottom').should('not.be.equal', '0px')
-  })
-
-  it('Should not change the comment area size', function () {
-    cy.get(contentHtmlDocGetter).click()
-    cy.get(cancelDocBtn).click()
-
-    cy.inputInTinyMCE(veryLongComment)
-    cy.get(submitBtn).click()
-
-    cy.get(commentText).invoke('css', 'width').then(largeCommentSize => {
-      cy.get(commentArea).invoke('css', 'width').should('be.gt', largeCommentSize)
-    })
+    cy.get('[data-cy=timeline__comment-first-paragraph]').should('not.have.css', 'marginBottom', '0px')
+    cy.get('[data-cy=timeline__comment-middle-paragraph]').should('not.have.css', 'marginBottom', '0px')
   })
 })

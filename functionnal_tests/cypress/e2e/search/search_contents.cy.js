@@ -49,8 +49,8 @@ describe('Searching keywords', () => {
     })
 
     it('Should not display the documents that does not match', () => {
-      cy.get(contentFileGetter).should('be.not.visible')
-      cy.get(contentHtmlDocGetter).should('be.not.visible')
+      cy.get(contentFileGetter).should('not.exist')
+      cy.get(contentHtmlDocGetter).should('not.exist')
     })
 
     // INFO - G.B. - 2019-09-06 - For now, we decide to hide the archive function - https://github.com/tracim/tracim/issues/2347
@@ -66,7 +66,7 @@ describe('Searching keywords', () => {
     //       cy.get(searchInput).type('{enter}')
 
     //       cy.get(contentThreadGetter).should('be.visible')
-    //       cy.get(contentThreadTitleLongGetter).should('be.not.visible')
+    //       cy.get(contentThreadTitleLongGetter).should('not.exist')
     //     })
     //   })
     // })

@@ -6,12 +6,15 @@ describe('Profile', () => {
   before(function () {
     cy.resetDB()
     cy.setupBaseDB()
-    cy.login(defaultAdmin)
-    cy.visitPage({ pageName: PAGES.PROFILE, params: { userId: baseUser.user_id } })
   })
 
   after(() => {
     cy.cancelXHR()
+  })
+
+  beforeEach(() => {
+    cy.login(defaultAdmin)
+    cy.visitPage({ pageName: PAGES.PROFILE, params: { userId: baseUser.user_id } })
   })
 
   it("should have the user's avatar", () => {
@@ -67,6 +70,6 @@ describe('Account settings button', () => {
     cy.visitPage({ pageName: PAGES.PROFILE, params: { userId: defaultAdmin.user_id } })
 
     cy.contains('.profile__mainBar__btnGrp', 'Account settings')
-      .should('not.be.visible')
+      .should('not.exist')
   })
 })

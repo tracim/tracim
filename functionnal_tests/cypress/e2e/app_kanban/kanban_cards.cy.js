@@ -1,4 +1,4 @@
-import { createKanbanBoard, createKanbanColumn, createKanbanCard } from './helper'
+import { createKanbanBoard, createKanbanColumn, createKanbanCard } from './helper.cy.js'
 
 describe('App Kanban (cards)', () => {
   const kanbanTitle = 'Kanban'

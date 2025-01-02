@@ -1,4 +1,4 @@
-import { assertPopupCreateContent } from './index.js'
+import { assertPopupCreateContent } from './index.cy.js'
 
 // INFO - CH - 2019-05-15 - The function below assumes you already is on a workspace's content list page
 // it is better to use commands from support/db_commands.js (write it if not exists)

@@ -22,7 +22,7 @@ describe('navigate :: workspace > create_new > file', function () {
     cy.get('.cardPopup__container .filecontent__form').should('be.visible')
     cy.get('.cardPopup__container .createcontent__form__button').should('be.visible')
     cy.get('.cardPopup__container .cardPopup__header__close button').should('be.visible').click()
-    cy.get('.cardPopup__container .createcontent__contentname').should('not.be.visible')
+    cy.get('.cardPopup__container .createcontent__contentname').should('not.exist')
     cy.get('[data-cy=dropdownCreateBtn]')
       .should('be.visible')
       .click()
@@ -39,7 +39,7 @@ describe('navigate :: workspace > create_new > file', function () {
       .get('.cardPopup__container .cardPopup__header__close button')
       .should('be.visible')
       .click()
-    cy.get('.cardPopup__container .createcontent__contentname').should('not.be.visible')
+    cy.get('.cardPopup__container .createcontent__contentname').should('not.exist')
     // @philippe 05/12/2018 this button is just visible if content list have more than 10 content
     // cy
     //   .get('.workspace__content__button.dropdownCreateBtn .__label')
@@ -58,6 +58,6 @@ describe('navigate :: workspace > create_new > file', function () {
     //   .get('.cardPopup__container .cardPopup__header__close')
     //   .should('be.visible')
     //   .click()
-    // cy.get('.cardPopup__container .createcontent__contentname').should('not.be.visible')
+    // cy.get('.cardPopup__container .createcontent__contentname').should('not.exist')
   })
 })

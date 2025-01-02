@@ -146,7 +146,7 @@ describe('App Folder Advanced', function () {
 
       cy.getTag({ selectorName: s.FOLDER_IN_LIST, params: { folderId: folder2.content_id } })
         .find('[data-cy="extended_action_edit"]')
-        .should('be.not.visible')
+        .should('not.exist')
     })
   })
 })

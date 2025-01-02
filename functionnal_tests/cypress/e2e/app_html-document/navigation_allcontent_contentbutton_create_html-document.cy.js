@@ -28,6 +28,6 @@ describe('navigate :: workspace > create_new > html-document', function () {
       .should('have.attr', 'value', title)
       .should('have.attr', 'placeholder')
     cy.get('.cardPopup__container .cardPopup__header__close button').click()
-    cy.get('.cardPopup__container .cardPopup__header__title').should('not.be.visible')
+    cy.get('.cardPopup__container .cardPopup__header__title').should('not.exist')
   })
 })

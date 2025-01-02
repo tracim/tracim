@@ -87,7 +87,7 @@ describe('Publications page', () => {
       cy.getTag({ selectorName: SELECTORS.CARD_POPUP_BODY })
           .get('[data-cy=confirm_popup__button_cancel]')
           .click()
-      cy.get('.emptyListMessage__text').should('not.be.visible')
+      cy.get('.emptyListMessage__text').should('not.exist')
       cy.get('[datacy=tabBar__content_tab]').click()
       cy.get('.content__item').should('have.length',0)
     })

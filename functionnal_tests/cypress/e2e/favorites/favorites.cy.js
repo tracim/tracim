@@ -81,23 +81,23 @@ describe('Favorites', function () {
     it('should filter contents by type', () => {
       cy.get('.favorites__wrapper [data-cy=textInputComponent__text]').type('note')
       cy.get('[title="TitleNote"][data-cy="favorites__item"] > .favoriteTable__row__link').should('be.visible')
-      cy.get('[title="TitleFile"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.be.visible')
+      cy.get('[title="TitleFile"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.exist')
     })
 
     it('should filter contents by name', () => {
       cy.get('.favorites__wrapper [data-cy=textInputComponent__text]').type('Note2')
       cy.get('[title="TitleNote2"][data-cy="favorites__item"] > .favoriteTable__row__link').should('be.visible')
-      cy.get('[title="TitleNote"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.be.visible')
-      cy.get('[title="TitleFile2"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.be.visible')
-      cy.get('[title="TitleFile"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.be.visible')
+      cy.get('[title="TitleNote"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.exist')
+      cy.get('[title="TitleFile2"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.exist')
+      cy.get('[title="TitleFile"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.exist')
     })
 
     it('should filter contents by path', () => {
       cy.get('.favorites__wrapper [data-cy=textInputComponent__text]').type('my open')
       cy.get('[title="TitleNote2"][data-cy="favorites__item"] > .favoriteTable__row__link').should('be.visible')
-      cy.get('[title="TitleNote"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.be.visible')
+      cy.get('[title="TitleNote"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.exist')
       cy.get('[title="TitleFile2"][data-cy="favorites__item"] > .favoriteTable__row__link').should('be.visible')
-      cy.get('[title="TitleFile"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.be.visible')
+      cy.get('[title="TitleFile"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.exist')
     })
 
     it('should put File at the top when sorting by type (Ascending)', () => {
@@ -116,7 +116,7 @@ describe('Favorites', function () {
       cy.contains('[data-cy=flashmessage]', 'has been removed from your favourites.').should('be.visible')
       cy.get('[data-cy=favorites__item]').should('have.length', numberOfFavorites - 1)
       cy.get('[title="TitleNote"][data-cy="favorites__item"] > .favoriteTable__row__link').should('be.visible')
-      cy.get('[title="TitleFile"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.be.visible')
+      cy.get('[title="TitleFile"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.exist')
     })
 
     it('should redirect to users profile if click at author name', () => {

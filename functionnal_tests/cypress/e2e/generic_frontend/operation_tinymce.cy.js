@@ -24,7 +24,7 @@ describe('TinyMce text editor', function () {
           .find('.mce-i-image')
           .parent()
           .click()
-        cy.get('#hidden_tinymce_fileinput').should('be.not.visible')
+        cy.get('#hidden_tinymce_fileinput').should('not.exist')
       })
     })
   })
@@ -78,7 +78,7 @@ describe('TinyMce text editor', function () {
           cy.inputInTinyMCE('@')
           cy.get('.autocomplete').should('be.visible')
           cy.inputInTinyMCE(' ')
-          cy.get('.autocomplete').should('be.not.visible')
+          cy.get('.autocomplete').should('not.exist')
         })
       })
 
@@ -89,7 +89,7 @@ describe('TinyMce text editor', function () {
           cy.inputInTinyMCE('@jo')
           cy.get('.autocomplete').should('be.visible')
           cy.inputInTinyMCE(' ')
-          cy.get('.autocomplete').should('be.not.visible')
+          cy.get('.autocomplete').should('not.exist')
           cy.inputInTinyMCE(' ')
           cy.inputInTinyMCE('@john')
           cy.contains('.autocomplete', '@johndoe').click()
@@ -102,7 +102,7 @@ describe('TinyMce text editor', function () {
         cy.waitForTinyMCELoaded().then(() => {
           cy.inputInTinyMCE('@johndoe')
           cy.get('.html-document__editionmode__submit').click()
-          cy.get('#autocomplete').should('be.not.visible')
+          cy.get('#autocomplete').should('not.exist')
         })
       })
     })
@@ -125,10 +125,10 @@ describe('TinyMce text editor', function () {
           .then(editor => {
             editor.setContent('Hello')
           })
-        cy.get('[title="More..."]').eq(0).click()
+        cy.get('[aria-label="Reveal or hide additional toolbar items"]').eq(0).click()
         // NOTE - MP - 2023-04-05 - eq(1) corresponds to the second button displayed in the HTML
         // editor toolbar. The first one is the one from the comment area.
-        cy.get(`[title="${buttonTitle}"]`).eq(1).click()
+        cy.get(`[aria-label="${buttonTitle}"]`).eq(1).click()
         cy.get('[data-cy=editionmode__button__submit]').click()
         cy.get(`.html-content > ${domElement}`).invoke('attr', 'dir').should('be.equal', 'auto')
       })

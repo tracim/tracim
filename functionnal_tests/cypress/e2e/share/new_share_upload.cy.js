@@ -37,7 +37,7 @@ describe('Open the share folder advanced', () => {
         // INFO - B.L - 2019.09-13 Adds wait to be sure formatting on the input is loaded otherwise it randomly breaks "type"
         cy.wait(1000)
         cy.get(emailInput).type(`${email1};${email2};${email3}`).type('{enter}')
-        cy.get(emailInput).contains(`${email1}\n${email2}\n${email3}`).should('be.visible')
+        cy.get(emailInput).should('have.value', `${email1}\n${email2}\n${email3}\n`)
       })
     })
 
@@ -46,7 +46,7 @@ describe('Open the share folder advanced', () => {
         // INFO - B.L - 2019.09-13 Adds wait to be sure formatting on the input is loaded otherwise it randomly breaks "type"
         cy.wait(1000)
         cy.get(emailInput).type(`${email1},${email2},${email3}`).type('{enter}')
-        cy.get(emailInput).contains(`${email1}\n${email2}\n${email3}`).should('be.visible')
+        cy.get(emailInput).should('have.value', `${email1}\n${email2}\n${email3}\n`)
       })
     })
 

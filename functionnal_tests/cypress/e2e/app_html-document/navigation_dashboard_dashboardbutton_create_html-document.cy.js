@@ -22,6 +22,6 @@ describe('navigate :: workspace > create_new > html-document_dashboard', functio
     cy.get('.cardPopup__container .createcontent .createcontent__form__input').type(titre1)
     cy.get('.cardPopup__container .createcontent .createcontent__form__input').should('have.attr', 'value', titre1)
     cy.get('.cardPopup__container .cardPopup__header__close button').click()
-    cy.get('.cardPopup__container .cardPopup__header__title').should('not.be.visible')
+    cy.get('.cardPopup__container .cardPopup__header__title').should('not.exist')
   })
 })

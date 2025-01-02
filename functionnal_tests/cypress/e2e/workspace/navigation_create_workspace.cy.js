@@ -57,6 +57,6 @@ describe('navigate :: create_new > workspace', function () {
       .should('be.visible')
       .click()
     cy.get('.cardPopup__container .cardPopup__header__title')
-      .should('not.be.visible')
+      .should('not.exist')
   })
 })

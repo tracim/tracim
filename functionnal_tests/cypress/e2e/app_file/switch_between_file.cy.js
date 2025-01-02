@@ -55,7 +55,7 @@ describe('App File', () => {
         cy.contains('.breadcrumbs__item', 'Contents')
 
         cy.get('[data-cy="popinFixed"]')
-          .should('not.be.visible')
+          .should('not.exist')
 
         const contentFile1Getter = formatTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: fileTitle_1 } })
         cy.get(contentFile1Getter)
@@ -65,7 +65,7 @@ describe('App File', () => {
           .should('be.visible')
 
         cy.get('[data-cy="appFileLastVersionBtn"]')
-          .should('be.not.visible')
+          .should('not.exist')
 
         cy.contains('.FilenameWithBadges__label', fileTitle_1)
 
@@ -74,7 +74,7 @@ describe('App File', () => {
           .click()
 
         cy.get('[data-cy="popinFixed"]')
-          .should('not.be.visible')
+          .should('not.exist')
       })
     })
   })
@@ -97,7 +97,7 @@ describe('App File', () => {
         params: { contentId: secondContentId }
       })
       cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .get('[data-cy=popin_right_part_share]').should('be.not.visible')
+        .get('[data-cy=popin_right_part_share]').should('not.exist')
     })
   })
 })
