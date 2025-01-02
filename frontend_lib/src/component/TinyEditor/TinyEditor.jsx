@@ -104,6 +104,7 @@ export const TinyEditor = props => {
   }))
 
   const customCssForTinymceEditor = [
+    'body { font-family: Nunito, sans-serif; }',
     // INFO - CH - 2024-11-08 - Rule bellow must stay sync with rule box-shadow of
     // frontend_lib/src/css/Variable.styl variable shadow-image
     props.showImageBorder ? '.mce-content-body img { box-shadow: 0px 0px 10px #999; }' : ''
