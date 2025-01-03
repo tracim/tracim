@@ -21,14 +21,14 @@ import {
 // require('./TinyEditor.styl') // see https://github.com/tracim/tracim/issues/1156
 
 const advancedToolBar = [
-  'formatselect alignleft aligncenter alignright alignjustify | ',
+  'blocks formatselect alignleft aligncenter alignright alignjustify | ',
   'bold italic underline strikethrough | forecolor backcolor | ',
   'link customInsertImage emoticons charmap | bullist numlist outdent indent | table | ',
   'code codesample | insert | removeformat | customFullscreen help'
 ].join('')
 
 const simpleToolBar = [
-  'bold italic underline | bullist numlist | link customInsertImage emoticons | ',
+  'blocks bold italic underline | bullist numlist | link customInsertImage emoticons | ',
   'customFullscreen help'
 ].join('')
 
@@ -104,6 +104,17 @@ export const TinyEditor = props => {
   }))
 
   const customCssForTinymceEditor = [
+    // INFO - CH - 2024-01-03 - font-face bellow must stay sync with font-face for
+    // frontend/dist/index.mak
+    `@font-face {
+      font-family: "Nunito";
+      src: url("/assets/font/Nunito/Nunito-Regular.ttf");
+    }
+    @font-face {
+      font-family: "Nunito";
+      src: url("/assets/font/Nunito/Nunito-Bold.ttf");
+      font-weight: bold;
+    }`,
     'body { font-family: Nunito, sans-serif; }',
     // INFO - CH - 2024-11-08 - Rule bellow must stay sync with rule box-shadow of
     // frontend_lib/src/css/Variable.styl variable shadow-image
@@ -135,6 +146,7 @@ export const TinyEditor = props => {
           editorRef.current = editor
         }}
         init={{
+          license_key: 'gpl',
           selector: 'textarea',
           language: getTinyMceLang(props.language),
           height: props.height,
@@ -151,7 +163,7 @@ export const TinyEditor = props => {
           plugins: [
             'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview', 'anchor',
             'searchreplace', 'visualblocks', 'code', 'codesample', 'fullscreen', 'emoticons',
-            'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount',
+            'insertdatetime', 'media', 'table', 'help', 'wordcount',
             props.isAutoResizeEnabled ? 'autoresize' : ''
           ],
           contextmenu: 'selectall copy paste link customInsertImage table',
