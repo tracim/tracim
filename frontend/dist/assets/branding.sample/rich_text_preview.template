@@ -27,7 +27,6 @@
   $endif$
 
   <title>$if(title-prefix)$$title-prefix$ – $endif$$title$</title>
-  <style type="text/css">code{white-space: pre;}</style>
 
   $if(quotes)$
     <style type="text/css">q { quotes: "“" "”" "‘" "’"; }</style>
@@ -105,9 +104,10 @@
     </section>
   $endif$
 
-  <section id="body">
-    $body$
-  </section>
+$-- INFO - CH - 2024-12-30 - don't indent the body. Or the spaces will be displayed in code blocks --$
+<section id="body">
+$body$
+</section>
 
   $for(include-after)$
     $include-after$
