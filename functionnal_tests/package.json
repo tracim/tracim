@@ -7,14 +7,14 @@
   "scripts": {
     "lint": "echo 'Functional tests are not linted yet (see issue #3688)'",
     "cypress-run": "cypress run",
-    "cypress-open": "cypress open",
+    "cypress-open": "cypress open --browser chromium",
     "travis-cypress-run": "npm-scripts/travis-cypress-run"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "cypress": "^3.8.1",
+    "cypress": "^13.17.0",
     "cypress-file-upload": "^3.5.3",
     "cypress-wait-until": "^1.6.1"
   }
