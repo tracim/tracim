@@ -10,27 +10,27 @@ describe('Profile', () => {
   })
 
   it('should have translations', () => {
-    cy.changeLanguage('en')
+    cy.changeLanguageFromApiForAdminUser('en')
     cy.visitPage({ pageName: PAGES.PROFILE, params: { userId: baseUser.user_id } })
     cy.contains('.breadcrumbs', 'profile').should('be.visible')
 
-    cy.changeLanguage('fr')
+    cy.changeLanguageFromApiForAdminUser('fr')
     cy.visitPage({ pageName: PAGES.PROFILE, params: { userId: baseUser.user_id } })
     cy.contains('.breadcrumbs', 'Profil').should('be.visible')
 
-    cy.changeLanguage('pt')
+    cy.changeLanguageFromApiForAdminUser('pt')
     cy.visitPage({ pageName: PAGES.PROFILE, params: { userId: baseUser.user_id } })
     cy.contains('.breadcrumbs', 'Perfil').should('be.visible')
 
-    cy.changeLanguage('de')
+    cy.changeLanguageFromApiForAdminUser('de')
     cy.visitPage({ pageName: PAGES.PROFILE, params: { userId: baseUser.user_id } })
     cy.contains('.breadcrumbs', 'Profil').should('be.visible')
 
-    cy.changeLanguage('ar')
+    cy.changeLanguageFromApiForAdminUser('ar')
     cy.visitPage({ pageName: PAGES.PROFILE, params: { userId: baseUser.user_id } })
     cy.contains('.breadcrumbs', 'الشخصي').should('be.visible')
 
-    cy.changeLanguage('es')
+    cy.changeLanguageFromApiForAdminUser('es')
     cy.visitPage({ pageName: PAGES.PROFILE, params: { userId: baseUser.user_id } })
     cy.contains('.breadcrumbs', 'Perfil').should('be.visible')
   })

@@ -209,6 +209,20 @@ Cypress.Commands.add('changeLanguage', (langCode) => {
   })
 })
 
+// INFO - CH - 2025-01-06 - This command is used to change language of user admin faster
+// than using cy.changeLanguage.
+Cypress.Commands.add('changeLanguageFromApiForAdminUser', (langCode) => {
+  return cy.request({
+    method: 'PUT',
+    url: `api/users/1`,
+    body: {
+      public_name: 'Global Manager',
+      timezone: 'Europe/London',
+      lang: langCode
+    }
+  })
+})
+
 Cypress.Commands.add('changeLanguageUnloggedPages', (langCode) => {
   cy.get('.dropdownlang').then(elements => {
     const dropdown = elements[0]

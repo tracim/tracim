@@ -13,27 +13,27 @@ describe('App Workspace Advanced', function () {
   })
 
   it('should have translations', () => {
-    cy.changeLanguage('en')
+    cy.changeLanguageFromApiForAdminUser('en')
     cy.visitPage({ pageName: PAGES.ADVANCED_DASHBOARD, params: { workspaceId } })
     cy.contains('.workspace_advanced__defaultRole .formBlock__title', 'Default role:')
 
-    cy.changeLanguage('fr')
+    cy.changeLanguageFromApiForAdminUser('fr')
     cy.visitPage({ pageName: PAGES.ADVANCED_DASHBOARD, params: { workspaceId } })
     cy.contains('.workspace_advanced__defaultRole .formBlock__title', 'Rôle par défaut :')
 
-    cy.changeLanguage('pt')
+    cy.changeLanguageFromApiForAdminUser('pt')
     cy.visitPage({ pageName: PAGES.ADVANCED_DASHBOARD, params: { workspaceId } })
     cy.contains('.workspace_advanced__defaultRole .formBlock__title', 'Função predefinida:')
 
-    cy.changeLanguage('de')
+    cy.changeLanguageFromApiForAdminUser('de')
     cy.visitPage({ pageName: PAGES.ADVANCED_DASHBOARD, params: { workspaceId } })
     cy.contains('.workspace_advanced__defaultRole .formBlock__title', 'Standard-Rolle:')
 
-    cy.changeLanguage('ar')
+    cy.changeLanguageFromApiForAdminUser('ar')
     cy.visitPage({ pageName: PAGES.ADVANCED_DASHBOARD, params: { workspaceId } })
     cy.contains('.workspace_advanced__defaultRole .formBlock__title', 'الدور الإفتراضي:')
 
-    cy.changeLanguage('es')
+    cy.changeLanguageFromApiForAdminUser('es')
     cy.visitPage({ pageName: PAGES.ADVANCED_DASHBOARD, params: { workspaceId } })
     cy.contains('.workspace_advanced__defaultRole .formBlock__title', 'Rol por defecto:')
   })

@@ -21,23 +21,23 @@ describe('App HTML Document', function () {
   it('should have translations', () => {
     cy.contains('[data-cy="newVersionButton"]', 'Edit')
 
-    cy.changeLanguage('fr')
+    cy.changeLanguageFromApiForAdminUser('fr')
     cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: noteId } })
     cy.contains('[data-cy="newVersionButton"]', 'Modifier')
 
-    cy.changeLanguage('pt')
+    cy.changeLanguageFromApiForAdminUser('pt')
     cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: noteId } })
     cy.contains('[data-cy="newVersionButton"]', 'Editar')
 
-    cy.changeLanguage('de')
+    cy.changeLanguageFromApiForAdminUser('de')
     cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: noteId } })
     cy.contains('[data-cy="newVersionButton"]', 'Bearbeiten')
 
-    cy.changeLanguage('ar')
+    cy.changeLanguageFromApiForAdminUser('ar')
     cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: noteId } })
     cy.contains('[data-cy="newVersionButton"]', 'تعديل')
 
-    cy.changeLanguage('es')
+    cy.changeLanguageFromApiForAdminUser('es')
     cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: noteId } })
     cy.contains('[data-cy="newVersionButton"]', 'Editar')
   })

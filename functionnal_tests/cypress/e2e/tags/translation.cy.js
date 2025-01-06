@@ -32,68 +32,68 @@ describe('Tags', () => {
 
   describe('in a content', () => {
     it('should have translations', () => {
-      cy.changeLanguage('en')
+      cy.changeLanguageFromApiForAdminUser('en')
       cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId } })
       cy.get('[data-cy=popin_right_part_tag]').click()
       cy.contains('.wsContentGeneric__content__right__content__title', 'Tags')
 
-      cy.changeLanguage('fr')
+      cy.changeLanguageFromApiForAdminUser('fr')
       cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId } })
       cy.get('[data-cy=popin_right_part_tag]').click()
       cy.contains('.wsContentGeneric__content__right__content__title', 'Étiquettes')
 
-      cy.changeLanguage('pt')
+      cy.changeLanguageFromApiForAdminUser('pt')
       cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId } })
       cy.get('[data-cy=popin_right_part_tag]').click()
       cy.contains('.wsContentGeneric__content__right__content__title', 'Etiquetas')
 
-      cy.changeLanguage('de')
+      cy.changeLanguageFromApiForAdminUser('de')
       cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId } })
       cy.get('[data-cy=popin_right_part_tag]').click()
       cy.contains('.wsContentGeneric__content__right__content__title', 'Markierungen')
 
-      cy.changeLanguage('ar')
+      cy.changeLanguageFromApiForAdminUser('ar')
       cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId } })
       cy.get('[data-cy=popin_right_part_tag]').click()
       cy.contains('.wsContentGeneric__content__right__content__title', 'إشارات')
 
-      cy.changeLanguage('es')
+      cy.changeLanguageFromApiForAdminUser('es')
       cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId } })
       cy.get('[data-cy=popin_right_part_tag]').click()
       cy.contains('.wsContentGeneric__content__right__content__title', 'Etiquetas')
 
-      cy.changeLanguage('en')
+      cy.changeLanguageFromApiForAdminUser('en')
     })
   })
 
   describe('in a space', () => {
     it('should have translations', () => {
-      cy.changeLanguage('en')
+      cy.changeLanguageFromApiForAdminUser('en')
       cy.visitPage({ pageName: PAGES.ADVANCED_DASHBOARD, params: { workspaceId } })
       cy.get('[data-cy=popin_right_part_tag').click()
       cy.contains('.wsContentGeneric__content__right__content__title', 'Tags')
 
-      cy.changeLanguage('fr')
+      cy.changeLanguageFromApiForAdminUser('fr')
       cy.visitPage({ pageName: PAGES.ADVANCED_DASHBOARD, params: { workspaceId } })
       cy.get('[data-cy=popin_right_part_tag').click()
       cy.contains('.wsContentGeneric__content__right__content__title', 'Étiquettes')
 
-      cy.changeLanguage('pt')
+      cy.changeLanguageFromApiForAdminUser('pt')
       cy.visitPage({ pageName: PAGES.ADVANCED_DASHBOARD, params: { workspaceId } })
       cy.get('[data-cy=popin_right_part_tag').click()
       cy.contains('.wsContentGeneric__content__right__content__title', 'Etiquetas')
 
-      cy.changeLanguage('de')
+      cy.changeLanguageFromApiForAdminUser('de')
       cy.visitPage({ pageName: PAGES.ADVANCED_DASHBOARD, params: { workspaceId } })
       cy.get('[data-cy=popin_right_part_tag').click()
       cy.contains('.wsContentGeneric__content__right__content__title', 'Markierungen')
 
-      cy.changeLanguage('ar')
+      cy.changeLanguageFromApiForAdminUser('ar')
       cy.visitPage({ pageName: PAGES.ADVANCED_DASHBOARD, params: { workspaceId } })
       cy.get('[data-cy=popin_right_part_tag').click()
       cy.contains('.wsContentGeneric__content__right__content__title', 'إشارات')
 
-      cy.changeLanguage('es')
+      cy.changeLanguageFromApiForAdminUser('es')
       cy.visitPage({ pageName: PAGES.ADVANCED_DASHBOARD, params: { workspaceId } })
       cy.get('[data-cy=popin_right_part_tag').click()
       cy.contains('.wsContentGeneric__content__right__content__title', 'Etiquetas')

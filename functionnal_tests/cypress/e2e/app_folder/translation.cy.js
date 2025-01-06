@@ -25,23 +25,23 @@ describe('App Folder Advanced', function () {
   it('should have translations', () => {
     cy.get('.folder_advanced__content__title').contains('Allowed content type for this folder')
 
-    cy.changeLanguage('fr')
+    cy.changeLanguageFromApiForAdminUser('fr')
     cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: folderId } })
     cy.get('.folder_advanced__content__title').contains('Types de contenus autorisés pour ce dossier')
 
-    cy.changeLanguage('pt')
+    cy.changeLanguageFromApiForAdminUser('pt')
     cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: folderId } })
     cy.get('.folder_advanced__content__title').contains('Tipo de conteúdo permitido para esta pasta')
 
-    cy.changeLanguage('de')
+    cy.changeLanguageFromApiForAdminUser('de')
     cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: folderId } })
     cy.get('.folder_advanced__content__title').contains('Erlaubte Inhaltsarten für diesen Ordner')
 
-    cy.changeLanguage('ar')
+    cy.changeLanguageFromApiForAdminUser('ar')
     cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: folderId } })
     cy.get('.folder_advanced__content__title').contains('نوع المحتوى المسموح به لهذا المجلد')
 
-    cy.changeLanguage('es')
+    cy.changeLanguageFromApiForAdminUser('es')
     cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: folderId } })
     cy.get('.folder_advanced__content__title').contains('Tipo de contenido permitido para esta carpeta')
   })

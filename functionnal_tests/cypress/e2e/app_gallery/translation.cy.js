@@ -15,23 +15,23 @@ describe('App Gallery', function () {
   it('should have translations', () => {
     cy.get('.gallery__action__button').contains('Play')
 
-    cy.changeLanguage('fr')
+    cy.changeLanguageFromApiForAdminUser('fr')
     cy.visitPage({ pageName: PAGES.GALLERY, params: { workspaceId } })
     cy.get('.gallery__action__button').contains('Lecture')
 
-    cy.changeLanguage('pt')
+    cy.changeLanguageFromApiForAdminUser('pt')
     cy.visitPage({ pageName: PAGES.GALLERY, params: { workspaceId } })
     cy.get('.gallery__action__button').contains('Reproduzir')
 
-    cy.changeLanguage('de')
+    cy.changeLanguageFromApiForAdminUser('de')
     cy.visitPage({ pageName: PAGES.GALLERY, params: { workspaceId } })
     cy.get('.gallery__action__button').contains('Abspielen')
 
-    cy.changeLanguage('ar')
+    cy.changeLanguageFromApiForAdminUser('ar')
     cy.visitPage({ pageName: PAGES.GALLERY, params: { workspaceId } })
     cy.get('.gallery__action__button').contains('تشغيل')
 
-    cy.changeLanguage('es')
+    cy.changeLanguageFromApiForAdminUser('es')
     cy.visitPage({ pageName: PAGES.GALLERY, params: { workspaceId } })
     cy.get('.gallery__action__button').contains('Jugar')
   })

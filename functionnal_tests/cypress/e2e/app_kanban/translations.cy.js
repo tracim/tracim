@@ -26,27 +26,27 @@ describe('App Kanban', () => {
   })
 
   it('should have translations', () => {
-    cy.changeLanguage('en')
+    cy.changeLanguageFromApiForAdminUser('en')
     cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: kanbanId } })
     cy.contains(fullscreenButtonSelector, 'Fullscreen')
 
-    cy.changeLanguage('fr')
+    cy.changeLanguageFromApiForAdminUser('fr')
     cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: kanbanId } })
     cy.contains(fullscreenButtonSelector, 'Plein écran')
 
-    cy.changeLanguage('pt')
+    cy.changeLanguageFromApiForAdminUser('pt')
     cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: kanbanId } })
     cy.contains(fullscreenButtonSelector, 'Ecrã inteiro')
 
-    cy.changeLanguage('de')
+    cy.changeLanguageFromApiForAdminUser('de')
     cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: kanbanId } })
     cy.contains(fullscreenButtonSelector, 'Vollbild')
 
-    cy.changeLanguage('ar')
+    cy.changeLanguageFromApiForAdminUser('ar')
     cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: kanbanId } })
     cy.contains(fullscreenButtonSelector, 'ملء الشاشة')
 
-    cy.changeLanguage('es')
+    cy.changeLanguageFromApiForAdminUser('es')
     cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: kanbanId } })
     cy.contains(fullscreenButtonSelector, 'Pantalla completa')
   })
