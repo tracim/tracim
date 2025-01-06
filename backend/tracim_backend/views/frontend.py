@@ -24,7 +24,7 @@ BASE_CSP_DIRECTIVES = (
     # (react-jsonschema-form/ajv dependency)
     (
         "script-src",
-        "'unsafe-eval' 'nonce-{nonce}' {base_url}/assets/tinymce-5.10.3/js/",
+        "'unsafe-eval' 'nonce-{nonce}' {base_url}/assets/tinymce-7.6.0/js/",
     ),
     # NOTE S.G. - 2020-12-14 - unsafe-inline is needed for tinyMce
     ("style-src", "'unsafe-inline' 'self'"),

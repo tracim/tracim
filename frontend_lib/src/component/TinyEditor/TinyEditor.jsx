@@ -21,14 +21,14 @@ import {
 // require('./TinyEditor.styl') // see https://github.com/tracim/tracim/issues/1156
 
 const advancedToolBar = [
-  'formatselect alignleft aligncenter alignright alignjustify | ',
+  'blocks formatselect alignleft aligncenter alignright alignjustify | ',
   'bold italic underline strikethrough | forecolor backcolor | ',
   'link customInsertImage emoticons charmap | bullist numlist outdent indent | table | ',
   'code codesample | insert | removeformat | customFullscreen help'
 ].join('')
 
 const simpleToolBar = [
-  'bold italic underline | bullist numlist | link customInsertImage emoticons | ',
+  'blocks bold italic underline | bullist numlist | link customInsertImage emoticons | ',
   'customFullscreen help'
 ].join('')
 
@@ -104,6 +104,18 @@ export const TinyEditor = props => {
   }))
 
   const customCssForTinymceEditor = [
+    // INFO - CH - 2024-01-03 - font-face bellow must stay sync with font-face for
+    // frontend/dist/index.mak
+    `@font-face {
+      font-family: "Nunito";
+      src: url("/assets/font/Nunito/Nunito-Regular.ttf");
+    }
+    @font-face {
+      font-family: "Nunito";
+      src: url("/assets/font/Nunito/Nunito-Bold.ttf");
+      font-weight: bold;
+    }`,
+    'body { font-family: Nunito, sans-serif; }',
     // INFO - CH - 2024-11-08 - Rule bellow must stay sync with rule box-shadow of
     // frontend_lib/src/css/Variable.styl variable shadow-image
     props.showImageBorder ? '.mce-content-body img { box-shadow: 0px 0px 10px #999; }' : ''
@@ -128,12 +140,13 @@ export const TinyEditor = props => {
       />
       <Editor
         key={editorKey}
-        tinymceScriptSrc='/assets/tinymce-5.10.3/js/tinymce/tinymce.min.js'
+        tinymceScriptSrc='/assets/tinymce-7.6.0/js/tinymce/tinymce.min.js'
         disabled={props.isDisabled}
         onInit={(evt, editor) => {
           editorRef.current = editor
         }}
         init={{
+          license_key: 'gpl',
           selector: 'textarea',
           language: getTinyMceLang(props.language),
           height: props.height,
@@ -148,15 +161,15 @@ export const TinyEditor = props => {
           toolbar: toolbar,
           default_link_target: '_blank',
           plugins: [
-            'advlist autolink lists link image charmap print preview anchor',
-            'searchreplace visualblocks code codesample fullscreen emoticons',
-            'insertdatetime media table paste code help wordcount',
+            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview', 'anchor',
+            'searchreplace', 'visualblocks', 'code', 'codesample', 'fullscreen', 'emoticons',
+            'insertdatetime', 'media', 'table', 'help', 'wordcount',
             props.isAutoResizeEnabled ? 'autoresize' : ''
           ],
           contextmenu: 'selectall copy paste link customInsertImage table',
           codesample_global_prismjs: true,
           codesample_languages: props.codeLanguageList,
-          paste_data_images: true,
+          paste_data_images: true, // INFO - CH - 2024-12-30 - Since tinymce 6+, it is now the default value
           relative_urls: false,
           setup: (editor) => {
             editor.ui.registry.addMenuButton('insert', {
@@ -251,7 +264,7 @@ export const TinyEditor = props => {
             const maxFetchResults = 15
             if (props.isMentionEnabled) {
               editor.ui.registry.addAutocompleter('mentions', {
-                ch: '@',
+                trigger: '@',
                 columns: 1,
                 highlightOn: ['roleName', 'publicName', 'username'],
                 minChars: 0,
@@ -317,7 +330,7 @@ export const TinyEditor = props => {
             // Handle content link
             if (props.isContentLinkEnabled) {
               editor.ui.registry.addAutocompleter('content', {
-                ch: '#',
+                trigger: '#',
                 columns: 1,
                 highlightOn: ['content_label', 'content_id'],
                 minChars: 0,
@@ -336,7 +349,7 @@ export const TinyEditor = props => {
                       return isLabel || isId
                     })
 
-                    const resultList = matchedContentList.map((content) => {
+                    return matchedContentList.map((content) => {
                       return {
                         type: 'cardmenuitem',
                         value: `#${content.content_id} `,
@@ -365,8 +378,6 @@ export const TinyEditor = props => {
                         ]
                       }
                     })
-
-                    return resultList
                   } catch (e) {
                     console.error(
                       'Error in TinyEditor.jsx, couldn\'t fetch content list properly:\n', e
