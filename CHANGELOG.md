@@ -1,5 +1,16 @@
 # Changelog
 
+## 2025-04.00 / TBD
+
+### ✨ New Features
+
+- Upgraded TinyMCE to version 6.8.5
+- Upgraded Cypress to version 13.17.0
+
+### 🐛 Fixed Issue
+
+- fixed line break in code block of pdf export [#6643](https://github.com/tracim/tracim/issues/6643)
+
 ## 4.12.0 / 2024-12-23
 
 ### ✨ New Features
