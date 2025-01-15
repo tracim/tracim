@@ -1,0 +1,13 @@
+.tableOfContent
+  &.show
+    display block
+  &.hide
+    display none
+  & ol
+    counter-reset item
+    padding-inline-start 30px
+  & li
+    display block
+  & li:before
+    content counters(item, ".")" "
+    counter-increment item
