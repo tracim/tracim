@@ -59,6 +59,7 @@ import {
   putHtmlDocRead
 } from '../action.async.js'
 import Radium from 'radium'
+import { addIdToTitle } from '../helper.js'
 
 export class HtmlDocument extends React.Component {
   constructor (props) {
@@ -467,10 +468,13 @@ export class HtmlDocument extends React.Component {
    */
   handleClickSaveDocument = async () => {
     const { state } = this
+
     const content = tinymce.activeEditor.getContent()
+    const contentWithId = addIdToTitle(content)
+
     const parsedContentCommentObject = await searchContentAndReplaceWithTag(
       state.config.apiUrl,
-      content
+      contentWithId
     )
     const parsedMentionCommentObject = searchMentionAndReplaceWithTag(
       state.config.workspace.memberList,

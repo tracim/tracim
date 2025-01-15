@@ -1,6 +1,6 @@
-export const generateTocHtml = text => {
+export const generateTocHtml = htmlContent => {
   const domParser = new window.DOMParser()
-  const textDom = domParser.parseFromString(text, 'text/html')
+  const textDom = domParser.parseFromString(htmlContent, 'text/html')
   const titleList = Array.from(textDom.querySelectorAll('h1, h2, h3, h4, h5, h6')).map(node => ({
     titleRank: node.tagName.substring(node.tagName.length - 1), // INFO - CH - 2025-01-13 - extract number of h1..6
     titleText: node.textContent
@@ -52,4 +52,15 @@ const generateTocHtmlFromList = (titleList) => {
   })
 
   return toc
+}
+
+export const addIdToTitle = (htmlContent) => {
+  const slugify = require('slugify')
+  const domParser = new window.DOMParser()
+  const textDom = domParser.parseFromString(htmlContent, 'text/html')
+  Array.from(textDom.querySelectorAll('h1, h2, h3, h4, h5, h6')).forEach(htmlElement => {
+    htmlElement.id = slugify(htmlElement.textContent)
+  })
+
+  return textDom.body.outerHTML
 }
