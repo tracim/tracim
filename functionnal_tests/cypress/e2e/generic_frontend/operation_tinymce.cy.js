@@ -1,7 +1,7 @@
 import { PAGES as p } from '../../support/urls_commands'
 import { SELECTORS as s } from '../../support/generic_selector_commands'
 
-describe('TinyMce text editor', function () {
+describe('HugeRte text editor', function () {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
@@ -125,7 +125,8 @@ describe('TinyMce text editor', function () {
             editor.setContent('Hello')
           })
         cy.get('[aria-label="Reveal or hide additional toolbar items"]').eq(0).click()
-        cy.get(`.tox-tinymce-aux [aria-label="${buttonTitle}"]`).click()
+        cy.get(`.tox-hugerte-aux [aria-label="${buttonTitle}"]`).click()
+        cy.get(`.tox-tiered-menu [aria-label="Default"]`).click()
         cy.get('[data-cy=editionmode__button__submit]').click()
         cy.get(`.html-content > ${domElement}`).invoke('attr', 'dir').should('be.equal', 'auto')
       })
