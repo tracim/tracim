@@ -32,11 +32,11 @@ describe('In Html Document', () => {
     describe('clicking at "notify all" message', () => {
       it.skip('should send a comment with a @all mention', () => {
         // FIXME - RJ - 2022-02-16 - disabled test (see #5436)
-        cy.waitForTinyMCELoaded()
-          .then(() => cy.typeInTinyMCE(HtmlDocContent))
+        cy.waitForHugeRTELoaded()
+          .then(() => cy.typeInHugeRTE(HtmlDocContent))
           .then(() => {
             cy.get('[data-cy=editionmode__button__submit]').should('not.be.disabled').click()
-            cy.assertTinyMCEContent(HtmlDocContent)
+            cy.assertHugeRTEContent(HtmlDocContent)
             cy.get('.promptMessage').should('be.visible')
             cy.get('.buttonLink').click()
             cy.contains('.mention', '@all').should('be.visible')

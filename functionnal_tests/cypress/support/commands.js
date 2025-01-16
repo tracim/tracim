@@ -44,9 +44,9 @@ Cypress.Commands.add('logout', () => {
   cy.cleanSessionCookies()
 })
 
-Cypress.Commands.add('typeInTinyMCE', (content) => {
+Cypress.Commands.add('typeInHugeRTE', (content) => {
   cy.window()
-    .its('tinyMCE')
+    .its('hugeRTE')
     .its('activeEditor')
     .then(activeEditor => {
       activeEditor.setContent(content)
@@ -54,15 +54,15 @@ Cypress.Commands.add('typeInTinyMCE', (content) => {
     })
 })
 
-Cypress.Commands.add('inputInTinyMCE', (content) => {
-  cy.getActiveTinyMCEEditor().then(activeEditor => {
+Cypress.Commands.add('inputInHugeRTE', (content) => {
+  cy.getActiveHugeRTEEditor().then(activeEditor => {
     cy.wrap(activeEditor.getBody()).type(content)
   })
 })
 
-Cypress.Commands.add('clearTinyMCE', () => {
+Cypress.Commands.add('clearHugeRTE', () => {
   cy.window()
-    .its('tinyMCE')
+    .its('hugeRTE')
     .its('activeEditor')
     .then(activeEditor => {
       activeEditor.focus()
@@ -73,20 +73,20 @@ Cypress.Commands.add('clearTinyMCE', () => {
     })
 })
 
-Cypress.Commands.add('assertTinyMCEContent', (content) => {
+Cypress.Commands.add('assertHugeRTEContent', (content) => {
   cy.window({ timeout: 5000 })
-    .its('tinyMCE')
+    .its('hugeRTE')
     .its('activeEditor')
     .then(activeEditor => {
       expect(activeEditor.getContent()).to.have.string(content)
     })
 })
 
-Cypress.Commands.add('assertTinyMCEIsActive', (isActive = true) => {
-  const message = (isActive ? 'tinyMCE is active' : 'tinyMCE is not active')
+Cypress.Commands.add('assertHugeRTEIsActive', (isActive = true) => {
+  const message = (isActive ? 'hugeRTE is active' : 'hugeRTE is not active')
   cy.window().then(win => isActive
-    ? assert.isNotNull(win.tinyMCE.activeEditor, message)
-    : assert.isNull(win.tinyMCE.activeEditor, message)
+    ? assert.isNotNull(win.hugeRTE.activeEditor, message)
+    : assert.isNull(win.hugeRTE.activeEditor, message)
   )
 })
 
@@ -122,15 +122,15 @@ Cypress.Commands.add('dropFixtureInDropZone', (fixturePath, fixtureMime, dropZon
 // FIXME - GB - 2019-07-02 - These events are hardcoded strings because cypress doesn't have the
 // @babel/polyfill loaded and crash when using something from tracim_frontend_lib
 // https://github.com/tracim/tracim/issues/2041
-Cypress.Commands.add('waitForTinyMCELoaded', () => {
-  let isTinyMCEActive = false
+Cypress.Commands.add('waitForHugeRTELoaded', () => {
+  let isHugeRTEActive = false
 
-  cy.window().its('tinyMCE').its('activeEditor').then(activeEditor => {
-    if (activeEditor) isTinyMCEActive = true
+  cy.window().its('hugeRTE').its('activeEditor').then(activeEditor => {
+    if (activeEditor) isHugeRTEActive = true
   })
 
   cy.document().then($doc => {
-    return isTinyMCEActive
+    return isHugeRTEActive
       ? true
       : new Cypress.Promise(resolve => { // Cypress will wait for this Promise to resolve
         const onTinyMceLoaded = () => {
@@ -142,9 +142,9 @@ Cypress.Commands.add('waitForTinyMCELoaded', () => {
   })
 })
 
-Cypress.Commands.add('getActiveTinyMCEEditor', () => {
-  cy.window().its('tinyMCE.activeEditor.initialized').should('be.true')
-  return cy.window().its('tinyMCE.activeEditor')
+Cypress.Commands.add('getActiveHugeRTEEditor', () => {
+  cy.window().its('hugeRTE.activeEditor.initialized').should('be.true')
+  return cy.window().its('hugeRTE.activeEditor')
 })
 
 Cypress.Commands.add('form_request', (method, url, formData) => {

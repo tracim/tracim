@@ -28,7 +28,7 @@ describe('In a file', function () {
       pageName: PAGES.CONTENT_OPEN,
       params: { contentId: fileId }
     })
-    cy.getActiveTinyMCEEditor()
+    cy.getActiveHugeRTEEditor()
       .then(editor => {
         editor.setContent(commentContent)
         cy.get('.commentArea__submit__btn')
@@ -46,7 +46,7 @@ describe('In a file', function () {
         .should('be.visible')
         .click()
 
-      cy.getActiveTinyMCEEditor()
+      cy.getActiveHugeRTEEditor()
         .then(editor => {
           expect(editor.getContent()).to.include(commentContent)
         })

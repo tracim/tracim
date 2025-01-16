@@ -467,7 +467,7 @@ export class HtmlDocument extends React.Component {
    */
   handleClickSaveDocument = async () => {
     const { state } = this
-    const content = tinymce.activeEditor.getContent()
+    const content = hugerte.activeEditor.getContent()
     const parsedContentCommentObject = await searchContentAndReplaceWithTag(
       state.config.apiUrl,
       content

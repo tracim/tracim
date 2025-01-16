@@ -85,7 +85,7 @@ describe('Publications', () => {
           .get('[data-cy=popup__createcontent__form__button]')
           .click()
         cy.contains('.DisplayFileToUpload__message__text', '1')
-        cy.inputInTinyMCE(exampleText).then(() => {
+        cy.inputInHugeRTE(exampleText).then(() => {
           cy.contains(publishButton, 'Publish').click()
           cy.getTag({ selectorName: SELECTORS.CARD_POPUP_BODY })
           .get('[data-cy=popup__createcontent__form__button]')

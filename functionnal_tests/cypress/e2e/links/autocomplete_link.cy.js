@@ -13,7 +13,7 @@ let workspaceId
 
 const linkChar = '#'
 
-describe('A comment in TinyMCE', () => {
+describe('A comment in HugeRTE', () => {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
@@ -46,7 +46,7 @@ describe('A comment in TinyMCE', () => {
 
   describe(`type ${linkChar}`, () => {
     it('should display the auto completer with data', () => {
-      cy.inputInTinyMCE(`${linkChar}ti`)
+      cy.inputInHugeRTE(`${linkChar}ti`)
       // Display the auto completer
       cy.get('.tox-autocompleter')
         .should('exist')
@@ -60,7 +60,7 @@ describe('A comment in TinyMCE', () => {
       // Click on the first item
       cy.contains('.tox-collection__item', fileTitle)
         .click()
-      cy.assertTinyMCEContent(`${linkChar}${fileId}`)
+      cy.assertHugeRTEContent(`${linkChar}${fileId}`)
     })
   })
 })

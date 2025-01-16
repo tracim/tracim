@@ -2,7 +2,7 @@ import React, { useRef } from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import i18n from '../../i18n.js'
-import { Editor } from '@tinymce/tinymce-react'
+import { Editor } from '@hugerte/hugerte-react'
 
 import {
   getAvatarBaseUrl,
@@ -140,7 +140,7 @@ export const TinyEditor = props => {
       />
       <Editor
         key={editorKey}
-        tinymceScriptSrc='/assets/tinymce-6.8.5/js/tinymce/tinymce.min.js'
+        hugerteScriptSrc='/assets/hugerte-dist-1.0.7/hugerte.min.js'
         disabled={props.isDisabled}
         onInit={(evt, editor) => {
           editorRef.current = editor
