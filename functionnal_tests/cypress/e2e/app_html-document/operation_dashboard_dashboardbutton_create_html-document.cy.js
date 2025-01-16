@@ -30,8 +30,8 @@ describe('operation :: workspace > create_new > html-document', function () {
     cy.get('.html-document.visible .html-document__contentpage__timeline__messagelist__version.revision').should('be.visible')
     cy.get('.html-document.visible .wsContentGeneric__header__title').contains(titre1)
 
-    cy.waitForTinyMCELoaded()
-      .then(() => cy.typeInTinyMCE('example'))
+    cy.waitForHugeRTELoaded()
+      .then(() => cy.typeInHugeRTE('example'))
 
     cy.get('button.html-document__editionmode__submit.editionmode__button__submit').click()
     cy.get('.html-document__contentpage__header__close').should('be.visible').click()

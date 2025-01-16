@@ -56,7 +56,7 @@ describe('Check notification dot', () => {
     describe(`As ${baseUser.username} sending ${defaultAdmin.username} a notifications`, () => {
       it('create a general notification', () => {
         cy.get('.componentTitle').should('be.visible')
-        cy.inputInTinyMCE(comment).then(() => {
+        cy.inputInHugeRTE(comment).then(() => {
           cy.get('.commentArea__submit__btn')
             .should('be.visible')
             .click()
@@ -78,7 +78,7 @@ describe('Check notification dot', () => {
 
       it('create a mention notification', () => {
         cy.get('.componentTitle').should('be.visible')
-        cy.inputInTinyMCE(commentAll).then(() => {
+        cy.inputInHugeRTE(commentAll).then(() => {
           cy.get('.commentArea__submit__btn')
             .should('be.visible')
             .click()

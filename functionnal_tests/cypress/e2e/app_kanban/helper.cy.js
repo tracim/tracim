@@ -37,7 +37,7 @@ export const createKanbanColumn = (title) => {
  */
 export const createKanbanCard = (title) => {
   cy.get('[data-cy=kanban_addCard]').first().should('be.visible').click()
-  cy.waitForTinyMCELoaded()
+  cy.waitForHugeRTELoaded()
   cy.contains('.cardPopup__header', 'New Card')
   cy.get('.kanban__KanbanPopup__title .textInputComponent__text').type(title)
   cy.get('.kanban__KanbanPopup__form_buttons .iconbutton').last().should('be.visible').click()

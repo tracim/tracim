@@ -15,7 +15,7 @@ describe('Publications', () => {
         params: { workspaceId: workspace.workspace_id },
         waitForTlm: true
       })
-      cy.inputInTinyMCE(text)
+      cy.inputInHugeRTE(text)
       cy.contains(publishButton, 'Publish').click()
       cy.getTag({ selectorName: SELECTORS.CARD_POPUP_BODY })
           .get('[data-cy=popup__createcontent__form__button]')

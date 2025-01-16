@@ -19,14 +19,14 @@ describe('Publications page', () => {
   })
 
   it("should change button's label according to its state", () => {
-    cy.inputInTinyMCE(text)
+    cy.inputInHugeRTE(text)
     cy.contains(publishButton, 'Publish').click()
     cy.getTag({ selectorName: SELECTORS.CARD_POPUP_BODY })
           .get('[data-cy=popup__createcontent__form__button]')
           .click()
     cy.contains('[data-cy=timeline__comment__body__content__text]', text)
     cy.contains('.buttonComments', 'Comment').should('be.visible').click()
-    cy.inputInTinyMCE(text)
+    cy.inputInHugeRTE(text)
     cy.contains('.feedItem__timeline__texteditor__submit__btn', 'Send')
       .should('be.visible')
       .click()

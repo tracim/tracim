@@ -31,7 +31,7 @@ describe('In a note', function () {
     })
     cy.get('.html-document__contentpage__timeline__texteditor > .tox-tinymce')
       .click()
-    cy.getActiveTinyMCEEditor()
+    cy.getActiveHugeRTEEditor()
       .then(editor => {
         editor.setContent(commentContent)
         cy.get('.commentArea__submit__btn')
@@ -49,7 +49,7 @@ describe('In a note', function () {
         .should('be.visible')
         .click()
 
-      cy.getActiveTinyMCEEditor()
+      cy.getActiveHugeRTEEditor()
         .then(editor => {
           expect(editor.getContent()).to.include(commentContent)
         })

@@ -47,7 +47,7 @@ describe('App File', () => {
         cy.get('[data-cy="revision_data_1"]').should('be.visible')
         cy.get('[data-cy="revision_data_4"]').should('be.visible')
 
-        cy.getActiveTinyMCEEditor()
+        cy.getActiveHugeRTEEditor()
           .then(editor => {
             editor.setContent(comment)
           })

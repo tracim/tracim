@@ -34,7 +34,7 @@ describe('In a comment', () => {
       params: { contentId: threadId }
     })
     cy.get('.componentTitle').should('be.visible')
-    cy.inputInTinyMCE(commentInputText).then(() => {
+    cy.inputInHugeRTE(commentInputText).then(() => {
       cy.get('.commentArea__submit__btn')
         .click()
     })

@@ -23,7 +23,7 @@ describe('News page', () => {
   })
 
   it('should save the news draft', () => {
-    cy.inputInTinyMCE(text)
+    cy.inputInHugeRTE(text)
     cy.visitPage({ pageName: PAGES.ACCOUNT })
     cy.contains('.account__userpreference__setting', 'Change my account settings')
     cy.visitPage({
@@ -31,7 +31,7 @@ describe('News page', () => {
       params: { workspaceId: spaceId },
       waitForTlm: true
     })
-    cy.getActiveTinyMCEEditor().then((editor) => {
+    cy.getActiveHugeRTEEditor().then((editor) => {
       expect(editor.getContent()).to.contain(text)
     })
   })

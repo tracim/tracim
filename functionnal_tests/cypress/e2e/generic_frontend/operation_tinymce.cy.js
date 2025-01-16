@@ -17,7 +17,7 @@ describe('TinyMce text editor', function () {
 
     it('The input tag should not be visible', function () {
       cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: fileName } }).click()
-      cy.waitForTinyMCELoaded().then(() => {
+      cy.waitForHugeRTELoaded().then(() => {
         cy.getTag({ selectorName: s.CONTENT_FRAME })
           .find('.mce-i-image')
           .parent()
@@ -44,62 +44,62 @@ describe('TinyMce text editor', function () {
       })
 
       it('the autocompletion popup should open when typing "@"', function () {
-        cy.waitForTinyMCELoaded().then(() => {
-          cy.inputInTinyMCE('@')
+        cy.waitForHugeRTELoaded().then(() => {
+          cy.inputInHugeRTE('@')
           cy.get('.tox-menu').should('be.visible')
         })
       })
 
       it('the autocompletion should find @johndoe when typing it', function () {
-        cy.waitForTinyMCELoaded().then(() => {
-          cy.inputInTinyMCE('@john')
+        cy.waitForHugeRTELoaded().then(() => {
+          cy.inputInHugeRTE('@john')
           cy.get('.tox-menu').contains('@johndoe')
         })
       })
 
       it('the autocompletion should find @johndoe when typing it, even with a space', function () {
-        cy.waitForTinyMCELoaded().then(() => {
-          cy.inputInTinyMCE(' ')
-          cy.inputInTinyMCE('@john')
+        cy.waitForHugeRTELoaded().then(() => {
+          cy.inputInHugeRTE(' ')
+          cy.inputInHugeRTE('@john')
           cy.get('.tox-menu').contains('@johndoe')
         })
       })
 
       it('the autocompletion should add the item submitted', function () {
-        cy.waitForTinyMCELoaded().then(() => {
-          cy.inputInTinyMCE('@john')
+        cy.waitForHugeRTELoaded().then(() => {
+          cy.inputInHugeRTE('@john')
           cy.get('.tox-menu').contains('@johndoe').click()
-          cy.assertTinyMCEContent('@johndoe')
+          cy.assertHugeRTEContent('@johndoe')
         })
       })
 
       it('the autocompletion should be cancel after press the space bar', function () {
-        cy.waitForTinyMCELoaded().then(() => {
-          cy.inputInTinyMCE(' ')
-          cy.inputInTinyMCE('@')
+        cy.waitForHugeRTELoaded().then(() => {
+          cy.inputInHugeRTE(' ')
+          cy.inputInHugeRTE('@')
           cy.get('.tox-menu').should('be.visible')
-          cy.inputInTinyMCE(' ')
+          cy.inputInHugeRTE(' ')
           cy.get('.tox-menu').should('not.exist')
         })
       })
 
       it('the autocompletion should handle 2 mentions inserted with the autocomplete popup', function () {
-        cy.waitForTinyMCELoaded().then(() => {
-          cy.inputInTinyMCE(' ')
-          cy.inputInTinyMCE('@jo')
+        cy.waitForHugeRTELoaded().then(() => {
+          cy.inputInHugeRTE(' ')
+          cy.inputInHugeRTE('@jo')
           cy.get('.tox-menu').should('be.visible')
-          cy.inputInTinyMCE(' ')
+          cy.inputInHugeRTE(' ')
           cy.get('.tox-menu').should('not.exist')
-          cy.inputInTinyMCE(' ')
-          cy.inputInTinyMCE('@john')
+          cy.inputInHugeRTE(' ')
+          cy.inputInHugeRTE('@john')
           cy.contains('.autocomplete', '@johndoe').click()
-          cy.assertTinyMCEContent('<p>@jo&nbsp;&nbsp;@johndoe&nbsp;</p>')
+          cy.assertHugeRTEContent('<p>@jo&nbsp;&nbsp;@johndoe&nbsp;</p>')
         })
       })
 
       it('should not leave any span after saving the content', function () {
-        cy.waitForTinyMCELoaded().then(() => {
-          cy.inputInTinyMCE('@johndoe')
+        cy.waitForHugeRTELoaded().then(() => {
+          cy.inputInHugeRTE('@johndoe')
           cy.get('.html-document__editionmode__submit').click()
           cy.get('#autocomplete').should('not.exist')
         })
@@ -120,7 +120,7 @@ describe('TinyMce text editor', function () {
     for (const [buttonTitle, domElement] of [['Bullet list', 'ul'], ["Numbered list", 'ol']]) {
       it(`should setup a dir="auto" attribute on ${buttonTitle}s`, function () {
         cy.get('[data-cy=newVersionButton]').click()
-        cy.getActiveTinyMCEEditor()
+        cy.getActiveHugeRTEEditor()
           .then(editor => {
             editor.setContent('Hello')
           })
