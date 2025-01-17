@@ -15,7 +15,6 @@ import {
   TinyEditor,
   TRANSLATION_STATE
 } from 'tracim_frontend_lib'
-import TableOfContent from './TableOfContent/TableOfContent.jsx'
 
 export const HtmlDocument = props => {
   const [textToEdit, setTextToEdit] = useState('')
@@ -125,11 +124,6 @@ export const HtmlDocument = props => {
             onClickBtn={props.onClickShowDraft}
           />
         )}
-
-        <TableOfContent
-          content={textToEdit}
-          showToc={props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION}
-        />
 
         {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) && (
           <div>

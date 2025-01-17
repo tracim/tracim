@@ -60,6 +60,7 @@ import {
 } from '../action.async.js'
 import Radium from 'radium'
 import { addIdToTitle } from '../helper.js'
+import TableOfContentButton from '../component/TableOfContent/TableOfContentButton.jsx'
 
 export class HtmlDocument extends React.Component {
   constructor (props) {
@@ -1048,6 +1049,12 @@ export class HtmlDocument extends React.Component {
           translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
           translationTargetLanguageCode={state.translationTargetLanguageCode}
           showMarkedAsTemplate
+          genericAction={
+            <TableOfContentButton
+              content={displayTranslatedText ? state.translatedRawContent : state.content.raw_content}
+              shouldShowToc={state.mode === APP_FEATURE_MODE.VIEW || state.mode === APP_FEATURE_MODE.REVISION}
+            />
+          }
         >
           {/*
             FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug

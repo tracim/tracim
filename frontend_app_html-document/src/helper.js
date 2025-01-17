@@ -3,7 +3,8 @@ export const generateTocHtml = htmlContent => {
   const textDom = domParser.parseFromString(htmlContent, 'text/html')
   const titleList = Array.from(textDom.querySelectorAll('h1, h2, h3, h4, h5, h6')).map(node => ({
     titleRank: node.tagName.substring(node.tagName.length - 1), // INFO - CH - 2025-01-13 - extract number of h1..6
-    titleText: node.textContent
+    titleText: node.textContent || '',
+    titleId: node.id || ''
   }))
 
   if (titleList.length <= 1) return ''
@@ -16,9 +17,12 @@ export const generateTocHtml = htmlContent => {
 // https://stackoverflow.com/questions/27583871/dynamically-create-a-summary-based-on-a-document
 // The trick is to use document.createElement and document.appendChild to not have to handle
 // the closing ol and li tags
+// Param titleList: [{ titleLevel: int, titleText: str, titleId: str }, ...]
 const generateTocHtmlFromList = (titleList) => {
   const listStack = []
   const toc = document.createElement('ol')
+
+  console.log('titleList', titleList)
 
   titleList.forEach(title => {
     const currentLevel = Number(title.titleRank)
@@ -33,8 +37,12 @@ const generateTocHtmlFromList = (titleList) => {
       }
     }
 
+    const a = document.createElement('a')
+    // todo: use url builder
+    a.href = `#${title.titleId}`
+    a.innerHTML = title.titleText
     const li = document.createElement('li')
-    li.innerHTML = title.titleText
+    li.appendChild(a)
 
     const ol = document.createElement('ol')
     li.appendChild(ol)

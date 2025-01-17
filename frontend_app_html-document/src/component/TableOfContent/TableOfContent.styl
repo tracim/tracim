@@ -1,8 +1,25 @@
+@import '~tracim_frontend_lib/src/css/Variable.styl'
+
+.tableOfContentButton
+  position relative
+  &__button
+    position relative
+    padding 3px 5px
+    border none
+    &:hover + .tableOfContent
+      display block
 .tableOfContent
-  &.show
+  display none
+  position absolute
+  width auto
+  padding 5px
+  background-color offWhite
+  box-shadow shadow-image
+  white-space nowrap
+  &:hover
     display block
-  &.hide
-    display none
+  &.visible
+    display block
   & ol
     counter-reset item
     padding-inline-start 30px
@@ -11,3 +28,9 @@
   & li:before
     content counters(item, ".")" "
     counter-increment item
+  &__toc
+    & ol
+      padding-left 5px
+      margin-bottom 0
+      & ol
+        padding-left 20px
