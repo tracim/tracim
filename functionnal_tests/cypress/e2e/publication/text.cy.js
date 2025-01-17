@@ -60,7 +60,7 @@ describe('Publications', () => {
     })
 
     it('should show the first message as preview ', function () {
-      cy.inputInTinyMCE(exampleText)
+      cy.inputInHugeRTE(exampleText)
       cy.contains(publishButton, 'Publish').click()
       cy.getTag({ selectorName: SELECTORS.CARD_POPUP_BODY })
           .get('[data-cy=popup__createcontent__form__button]')
@@ -70,7 +70,7 @@ describe('Publications', () => {
     })
 
     it('should preview links', function () {
-      cy.inputInTinyMCE(fakeLink)
+      cy.inputInHugeRTE(fakeLink)
       cy.contains(publishButton, 'Publish').click()
       cy.getTag({ selectorName: SELECTORS.CARD_POPUP_BODY })
           .get('[data-cy=popup__createcontent__form__button]')
@@ -81,19 +81,19 @@ describe('Publications', () => {
     })
 
     it('should filter by username when suggesting mentions', () => {
-      cy.inputInTinyMCE(`@${defaultAdmin.username.slice(0, 4)}`)
+      cy.inputInHugeRTE(`@${defaultAdmin.username.slice(0, 4)}`)
       cy.get(':nth-child(1) > .tox-collection__item')
         .should('contain.text', `@${defaultAdmin.username}`)
     })
 
     it('should filter by public name when suggesting mentions', () => {
-      cy.inputInTinyMCE(`@${defaultAdmin.public_name.slice(0, 4)}`)
+      cy.inputInHugeRTE(`@${defaultAdmin.public_name.slice(0, 4)}`)
       cy.get(':nth-child(1) > .tox-collection__item')
         .should('contain.text', `@${defaultAdmin.username}`)
     })
 
     it('should have the subject at the beginning of the title', function () {
-      cy.inputInTinyMCE(exampleText)
+      cy.inputInHugeRTE(exampleText)
       cy.contains(publishButton, 'Publish').click()
       cy.get('.cardPopup__container .createcontent .createcontent__form__input').type(titleSubject)
       cy.getTag({ selectorName: SELECTORS.CARD_POPUP_BODY })
@@ -104,22 +104,22 @@ describe('Publications', () => {
     })
 
     it('should keep the text after canceling the pop-up', function () {
-      cy.inputInTinyMCE(exampleText)
+      cy.inputInHugeRTE(exampleText)
       cy.contains(publishButton, 'Publish').click()
       cy.get('.cardPopup__header__close > .transparentButton > .fa').click()
-      cy.getActiveTinyMCEEditor().then((editor) => {
+      cy.getActiveHugeRTEEditor().then((editor) => {
         expect(editor.getContent()).to.contain(exampleText)
       })
     })
 
     it('should have an empty text area after publishing', function () {
-      cy.inputInTinyMCE(exampleText)
+      cy.inputInHugeRTE(exampleText)
       cy.contains(publishButton, 'Publish').click()
       cy.get('.cardPopup__container .createcontent .createcontent__form__input').type(titleSubject)
       cy.getTag({ selectorName: SELECTORS.CARD_POPUP_BODY })
           .get('[data-cy=popup__createcontent__form__button]')
           .click()
-      cy.getActiveTinyMCEEditor().then((editor) => {
+      cy.getActiveHugeRTEEditor().then((editor) => {
         expect(editor.getContent()).to.be.empty
       })
     })

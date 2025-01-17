@@ -16,7 +16,7 @@ describe('Publications page', () => {
         params: { workspaceId: workspace.workspace_id },
         waitForTlm: true
       })
-      cy.inputInTinyMCE(text)
+      cy.inputInHugeRTE(text)
       cy.contains(publishButton, 'Publish').click()
       cy.getTag({ selectorName: SELECTORS.CARD_POPUP_BODY })
           .get('[data-cy=popup__createcontent__form__button]')
@@ -37,7 +37,7 @@ describe('Publications page', () => {
 
   it('should be possible to comment a publication', () => {
     cy.contains('.buttonComments', 'Comment').should('be.visible').click()
-    cy.inputInTinyMCE(text)
+    cy.inputInHugeRTE(text)
     cy.contains(sendButton, 'Send')
       .should('be.enabled')
       .click()
@@ -58,7 +58,7 @@ describe('Publications page', () => {
       cy.contains('.feedItem__publication__body__content__text', text)
       cy.get('.feedItemHeader__actionMenu__item[title="Edit"]').click()
       cy.get('.cardPopup__header__title').should('be.visible')
-      cy.inputInTinyMCE(`${text}!`)
+      cy.inputInHugeRTE(`${text}!`)
       cy.contains('.editCommentPopup__texteditor__submit > .commentArea__submit__btn', 'Send')
         .click()
       cy.contains('.feedItem__publication__body__content__text', `${text}!`)

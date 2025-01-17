@@ -21,7 +21,7 @@ export const create_htmldocument = (cy, htmlDocTitle = 'Html document 1') => {
   cy.get('[data-cy="popinFixed"].html-document')
     .should('be.visible')
 
-  cy.waitForTinyMCELoaded().then(() => {
+  cy.waitForHugeRTELoaded().then(() => {
     cy.get(`.workspace__content__file_and_folder > .content[title="${htmlDocTitle}"]`)
       .should('be.visible')
   })

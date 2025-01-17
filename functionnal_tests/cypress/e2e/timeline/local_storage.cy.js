@@ -24,13 +24,13 @@ describe('Timeline', () => {
   it('should save the comment draft', () => {
     cy.contains('[data-cy=FilenameWithBadges__label]', noteTitle).click()
     cy.get('.html-document__editionmode__cancel').click()
-    cy.inputInTinyMCE(text)
+    cy.inputInHugeRTE(text)
     cy.visitPage({ pageName: PAGES.ACCOUNT })
     cy.contains('.account__userpreference__setting', 'Change my account settings')
     cy.visitPage({ pageName: PAGES.CONTENTS, params: { workspaceId: workspaceId } })
     cy.contains('[data-cy=FilenameWithBadges__label]', noteTitle).click()
     cy.get('.html-document__editionmode__cancel').click()
-    cy.getActiveTinyMCEEditor().then((editor) => {
+    cy.getActiveHugeRTEEditor().then((editor) => {
       expect(editor.getContent()).to.contain(text)
     })
   })

@@ -25,7 +25,7 @@ describe('In a thread', function () {
       pageName: PAGES.CONTENT_OPEN,
       params: { contentId: threadId }
     })
-    cy.getActiveTinyMCEEditor()
+    cy.getActiveHugeRTEEditor()
       .then(editor => {
         editor.setContent(commentContent)
         cy.get('.commentArea__submit__btn')
@@ -43,7 +43,7 @@ describe('In a thread', function () {
         .should('be.visible')
         .click()
 
-      cy.getActiveTinyMCEEditor()
+      cy.getActiveHugeRTEEditor()
         .then(editor => {
           expect(editor.getContent()).to.include(commentContent)
         })

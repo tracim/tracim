@@ -13,10 +13,10 @@ describe('Known users as a workspace-manager', function () {
       .fixture('baseWorkspace').as('workspace').then(workspace => {
         cy.visit(`/ui/workspaces/${workspace.workspace_id}/contents`)
       })
-    cy.log('TODO find better way to deal with tinyMCE than using wait')
+    cy.log('TODO find better way to deal with hugeRTE than using wait')
   })
 
-  it.only('Check TinyMCE is active if document is empty when opening', function () {
+  it.only('Check HugeRTE is active if document is empty when opening', function () {
     cy.get('[data-cy=dropdownCreateBtn]').first().click()
     cy.contains('Write a note').click()
     cy.get('[data-cy=createcontent__form__input]').type(DOCUMENT_TITLE)
@@ -24,8 +24,8 @@ describe('Known users as a workspace-manager', function () {
     cy.get('.html-document__contentpage__header__close').click()
     cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: DOCUMENT_TITLE } }).click()
 
-    cy.waitForTinyMCELoaded().then(() => {
-      cy.assertTinyMCEIsActive()
+    cy.waitForHugeRTELoaded().then(() => {
+      cy.assertHugeRTEIsActive()
     })
   })
 
@@ -35,8 +35,8 @@ describe('Known users as a workspace-manager', function () {
     cy.get('[data-cy=createcontent__form__input]').type(DOCUMENT_TITLE)
     cy.get('[data-cy=popup__createcontent__form__button]').click()
 
-    cy.waitForTinyMCELoaded()
-      .then(() => cy.typeInTinyMCE(DOCUMENT_HTML_CONTENT))
+    cy.waitForHugeRTELoaded()
+      .then(() => cy.typeInHugeRTE(DOCUMENT_HTML_CONTENT))
       .then(() => {
         cy.get('[data-cy=editionmode__button__submit]').should('not.be.disabled').click()
         cy.contains(DOCUMENT_RAW_CONTENT).should('exist')
@@ -49,43 +49,43 @@ describe('Known users as a workspace-manager', function () {
     cy.get('[data-cy=createcontent__form__input]').type(DOCUMENT_TITLE)
     cy.get('[data-cy=popup__createcontent__form__button]').click()
 
-    cy.waitForTinyMCELoaded()
-      .then(() => cy.typeInTinyMCE(DOCUMENT_HTML_CONTENT))
+    cy.waitForHugeRTELoaded()
+      .then(() => cy.typeInHugeRTE(DOCUMENT_HTML_CONTENT))
       .then(() => {
         cy.get('[data-cy=editionmode__button__submit]').should('not.be.disabled').click()
         cy.contains(DOCUMENT_RAW_CONTENT).should('exist')
       })
   })
 
-  it('Check if TinyMCE open content of the document', function () {
+  it('Check if HugeRTE open content of the document', function () {
     cy.get('[data-cy=dropdownCreateBtn]').first().click()
     cy.contains('Write a note').click()
     cy.get('[data-cy=createcontent__form__input]').type(DOCUMENT_TITLE)
     cy.get('[data-cy=popup__createcontent__form__button]').click()
 
-    cy.waitForTinyMCELoaded()
-      .then(() => cy.typeInTinyMCE(DOCUMENT_HTML_CONTENT))
+    cy.waitForHugeRTELoaded()
+      .then(() => cy.typeInHugeRTE(DOCUMENT_HTML_CONTENT))
       .then(() => {
         cy.get('[data-cy=editionmode__button__submit]').should('not.be.disabled').click()
         cy.get('[data-cy=wsContentGeneric__option__menu__addversion]').should('not.be.disabled').click()
-        cy.assertTinyMCEContent(DOCUMENT_HTML_CONTENT)
+        cy.assertHugeRTEContent(DOCUMENT_HTML_CONTENT)
       })
   })
 
-  it('Check TinyMCE is not active when opening if document has been modified', function () {
+  it('Check HugeRTE is not active when opening if document has been modified', function () {
     cy.get('[data-cy=dropdownCreateBtn]').first().click()
     cy.contains('Write a note').click()
     cy.get('[data-cy=createcontent__form__input]').type(DOCUMENT_TITLE)
     cy.get('[data-cy=popup__createcontent__form__button]').click()
 
-    cy.waitForTinyMCELoaded().then(() => {
-      cy.typeInTinyMCE(DOCUMENT_HTML_CONTENT)
+    cy.waitForHugeRTELoaded().then(() => {
+      cy.typeInHugeRTE(DOCUMENT_HTML_CONTENT)
       cy.get('[data-cy=editionmode__button__submit]').should('not.be.disabled').click()
       cy.get('.wsContentGeneric__header > .wsContentGeneric__header__close .html-document__contentpage__header__close').click()
       cy.get('[data-cy=popinFixed]').should('not.exist')
 
       cy.contains(DOCUMENT_TITLE).click()
-      cy.assertTinyMCEIsActive(false)
+      cy.assertHugeRTEIsActive(false)
     })
   })
 })

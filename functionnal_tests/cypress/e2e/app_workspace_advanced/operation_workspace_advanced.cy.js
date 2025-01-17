@@ -39,8 +39,8 @@ describe('Space settings', function () {
 
       cy.get('.workspace_advanced__description__bottom__btn').click()
 
-      cy.waitForTinyMCELoaded().then(() => {
-        cy.typeInTinyMCE(newDescription).then(() => {
+      cy.waitForHugeRTELoaded().then(() => {
+        cy.typeInHugeRTE(newDescription).then(() => {
           cy.get('.workspace_advanced__description__bottom__btn').click()
 
           cy.get('.workspace_advanced__contentpage__header__close').click()

@@ -75,6 +75,7 @@
       "history",
       "btoa",
       "tinymce",
+      "hugerte",
       "localStorage",
       "GLOBAL_renderAppFeature",
       "GLOBAL_unmountApp",
