@@ -2,8 +2,10 @@ export const generateTocHtml = htmlContent => {
   const domParser = new window.DOMParser()
   const textDom = domParser.parseFromString(htmlContent, 'text/html')
   const titleList = Array.from(textDom.querySelectorAll('h1, h2, h3, h4, h5, h6')).map(node => ({
-    titleRank: node.tagName.substring(node.tagName.length - 1), // INFO - CH - 2025-01-13 - extract number of h1..6
-    titleText: node.textContent || '',
+    titleLevel: node.tagName.substring(node.tagName.length - 1), // INFO - CH - 2025-01-13 - extract number of h1..6
+    // INFO - CH - 2025-01-20 - Don't use node.textContent because it is then inserted in page using
+    // dangerouslySetInnerHTML (see TableOfContent.jsx), it would run style and script tags
+    titleText: node.innerHTML || '',
     titleId: node.id || ''
   }))
 
@@ -22,10 +24,8 @@ const generateTocHtmlFromList = (titleList) => {
   const listStack = []
   const toc = document.createElement('ol')
 
-  console.log('titleList', titleList)
-
   titleList.forEach(title => {
-    const currentLevel = Number(title.titleRank)
+    const currentLevel = Number(title.titleLevel)
     let lastListItem = listStack[listStack.length - 1]
     let lastListItemLevel = lastListItem ? lastListItem.level : 0
 
@@ -38,9 +38,9 @@ const generateTocHtmlFromList = (titleList) => {
     }
 
     const a = document.createElement('a')
-    // todo: use url builder
     a.href = `#${title.titleId}`
     a.innerHTML = title.titleText
+
     const li = document.createElement('li')
     li.appendChild(a)
 
@@ -66,8 +66,8 @@ export const addIdToTitle = (htmlContent) => {
   const slugify = require('slugify')
   const domParser = new window.DOMParser()
   const textDom = domParser.parseFromString(htmlContent, 'text/html')
-  Array.from(textDom.querySelectorAll('h1, h2, h3, h4, h5, h6')).forEach(htmlElement => {
-    htmlElement.id = slugify(htmlElement.textContent)
+  Array.from(textDom.querySelectorAll('h1, h2, h3, h4, h5, h6')).forEach(node => {
+    node.id = slugify(node.textContent, { lower: true, strict: true })
   })
 
   return textDom.body.outerHTML
