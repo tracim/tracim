@@ -22,6 +22,7 @@ export const TableOfContentButton = props => {
         <Popover
           placement='bottom'
           targetId='tableOfContentButtonPopoverAnchor'
+          trigger='click'
           popoverBody={
             <TableOfContent content={props.content} />
           }

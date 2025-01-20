@@ -21,7 +21,7 @@ describe('App note Table of Content', () => {
   })
 
   it('should display the table of content on mouse over', () => {
-    cy.get('#tableOfContentButtonPopoverAnchor').trigger('mouseover')
+    cy.get('#tableOfContentButtonPopoverAnchor').trigger('click')
     cy.get('.tableOfContent__toc a').should('have.length', 4)
   })
 })

@@ -658,3 +658,21 @@ export const filterNotificationListFromUserConfig = (notificationList, userConfi
   if (!userConfig) return notificationList
   return notificationList.filter(notification => shouldKeepNotification(notification, userConfig))
 }
+
+// INFO - CH - 2025-01-20 - Allows to bind handler for on click outside dom element.
+// See Popover.jsx for usage example.
+// Use this function in place of react-onclickoutside for functional component.
+// react-onclickoutside only works on class component
+export function onClickOutside (listening, setListening, menuRef, setIsOpen) {
+  return () => {
+    if (listening) return;
+    if (!menuRef.current) return;
+    setListening(true);
+    [`click`, `touchstart`].forEach((type) => {
+      document.addEventListener(type, (evt) => {
+        if (menuRef.current?.contains(evt.target)) return;
+        setIsOpen(false);
+      });
+    });
+  }
+}
