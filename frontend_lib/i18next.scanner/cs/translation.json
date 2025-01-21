@@ -61,5 +61,16 @@
   "Undo change in title": "Zrušit změnu názvu",
   "Archive": "Archivovat",
   "Status:": "Stav:",
-  "Choose the role of the member": "Vyberte roli člena"
+  "Choose the role of the member": "Vyberte roli člena",
+  "Comment": "Komentář",
+  "Item created": "Položka vytvořena",
+  "Item unarchived": "Položka nearchivována",
+  "Enter the username, email or full name of the user": "Zadejte uživatelské jméno, e-mail nebo celé jméno uživatele",
+  "Item restored": "Položka obnovena",
+  "Item deleted": "Položka smazána",
+  "New revision": "Nová revize",
+  "Item moved": "Položka přesunuta",
+  "Item copied": "Položka zkopírována",
+  "Item archived": "Položka archivována",
+  "If you type an email that isn't associated to an account, an invitational email will be sent": "Pokud zadáte e-mail, který není přiřazen k účtu, bude odeslán zvací e-mail"
 }
