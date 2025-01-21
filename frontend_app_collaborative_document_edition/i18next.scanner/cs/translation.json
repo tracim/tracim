@@ -1,1 +1,20 @@
-{}
+{
+  "Validate and create": "Ověřit a vytvořit",
+  "A content with the same name already exists": "Obsah se stejným názvem již existuje",
+  "Error while creating document": "Chyba při vytváření dokumentu",
+  "Office Document's title": "Název kancelářského dokumentu",
+  "Draw": "Kreslení",
+  "Create an office document": "Vytvoření kancelářského dokumentu",
+  "Unknown url": "Neznámá URL adresa",
+  "Edit online": "Editace online",
+  "Text": "Text",
+  "Spreadsheet": "Tabulkový procesor",
+  "Presentation": "Prezentace",
+  "New Office Document": "Nový kancelářský dokument",
+  "View online": "Zobrazení online",
+  "New Office document": "Nový kancelářský dokument",
+  "Content not found": "Obsah nenalezen",
+  "Space not found": "Prostor nenalezen",
+  "You cannot edit this type of file online": "Tento typ souboru nelze upravovat online",
+  "Unknown error": "Neznámá chyba"
+}

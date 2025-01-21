@@ -1,1 +1,19 @@
-{}
+{
+  "Copy content link": "Kopírovat odkaz na obsah",
+  "New folder": "Nová složka",
+  "Validate and create": "Ověřit a vytvořit",
+  "Folder's name": "Název složky",
+  "Error while saving new folder": "Chyba při ukládání nové složky",
+  "Allowed content type for this folder": "Povolený typ obsahu pro tuto složku",
+  "Error while loading folder details": "Chyba při načítání detailů složky",
+  "Error while saving new available apps list": "Chyba při ukládání nového seznamu dostupných aplikací",
+  "Create a folder": "Vytvořit složku",
+  "Restore": "Obnovit",
+  "This folder is archived": "Tato složka je archivována",
+  "This folder is deleted": "Tato složka je smazána",
+  "Error while loading Tracim's content type list": "Chyba při načítání seznamu typů obsahu Tracimu",
+  "Folder": "Složka",
+  "The content has been modified by {{author}}": "Obsah byl upraven od {{author}}",
+  "Delete": "Smazat",
+  "The link has been copied to clipboard": "Odkaz zkopírován do schránky"
+}

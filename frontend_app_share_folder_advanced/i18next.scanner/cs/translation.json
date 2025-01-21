@@ -1,1 +1,26 @@
-{}
+{
+  "Error while loading Tracim's content type list": "Chyba při načítání seznamu typů obsahu Tracimu",
+  "Cancel": "Zrušit",
+  "New": "Nový",
+  "No upload link has been created yet": "Zatím nebyl vytvořen žádný odkaz na nahrávání",
+  "The password length must be between 6 and 512 characters and the email(s) must be valid": "Délka hesla musí být 6 až 512 znaků a e-mail(y) musí být platný(é)",
+  "Email notification are disabled, please manually share the link": "E-mailová oznámení jsou vypnuta, odkaz prosím sdílejte ručně",
+  "Show password": "Zobrazit heslo",
+  "Generate random password": "Vygenerovat náhodné heslo",
+  "Error in the URL": "Chyba v URL adrese",
+  "Protect by password": "Chránit heslem",
+  "Cancel protection by password": "Zrušit ochranu heslem",
+  "Received files": "Přijaté soubory",
+  "Public upload link has been created.": "Byl vytvořen veřejný odkaz pro nahrávání.",
+  "Recipient's email addresses": "E-mailové adresy příjemců",
+  "New public upload link": "Nový odkaz pro veřejné nahrávání",
+  "Public upload links": "Veřejné odkazy pro nahrávání",
+  "Public upload link has been created. Don't forget to share the password to the recipients.": "Byl vytvořen veřejný odkaz pro nahrávání. Nezapomeňte příjemcům sdělit heslo.",
+  "Error while loading list of public upload links": "Chyba při načítání seznamu veřejných odkazů pro nahrávání",
+  "Error while deleting public upload link": "Chyba při mazání veřejného odkazu pro nahrávání",
+  "Error while creating new public upload link": "Chyba při vytváření nového veřejného odkazu pro nahrávání",
+  "Error, these emails are invalid: ": "Chyba, tyto e-maily jsou neplatné: ",
+  "To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.": "Chcete-li přidat více příjemců, oddělte e-mailové adresy čárkou, středníkem nebo zalomením řádku.",
+  "Validate": "Ověřit",
+  "Password": "Heslo"
+}

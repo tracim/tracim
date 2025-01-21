@@ -1,1 +1,25 @@
-{}
+{
+  "Delete": "Smazat",
+  "{picture}Next": "Další",
+  "Previous": "Předchozí",
+  "Pause": "Pauza",
+  "Play": "Přehrát",
+  "Disable fullscreen": "Zakázat zobrazení na celé obrazovce",
+  "Enable fullscreen": "Povolit zobrazení na celé obrazovce",
+  "Are you sure?": "Opravdu?",
+  "Error while loading content list": "Chyba při načítání seznamu obsahu",
+  "Error while loading folder detail": "Chyba při načítání detailu složky",
+  "Error while loading file preview": "Chyba při načítání náhledu souboru",
+  "Error while loading space detail": "Chyba při načítání detailu prostoru",
+  "Error while deleting document": "Chyba při mazání dokumentu",
+  "Insufficient permissions": "Nedostatečná oprávnění",
+  "Open raw file": "Otevřít soubor raw",
+  "There isn't any previewable content at that space's root.": "V kořenovém adresáři tohoto prostoru není žádný obsah k náhledu.",
+  "There isn't any previewable content at that folder's root.": "V kořenovém adresáři této složky není žádný obsah k náhledu.",
+  "There isn't any picture to delete.": "Není žádný obrázek, který by bylo možné odstranit.",
+  "Rotate 90° right": "Otočit o 90° doprava",
+  "Rotate 90° left": "Otočit o 90° doleva",
+  "Cancel": "Zrušit",
+  "Gallery": "Galerie",
+  "No preview available": "Náhled není k dispozici"
+}

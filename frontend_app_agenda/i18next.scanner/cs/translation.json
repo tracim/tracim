@@ -1,1 +1,13 @@
-{}
+{
+  "Error while loading space list": "Chyba při načítání seznamu prostorů",
+  "User": "Uživatel",
+  "Spaces": "Prostory",
+  "Space": "Prostor",
+  "All my agendas": "Všechny mé agendy",
+  "Agenda of space {{workspaceLabel}}": "Agenda prostoru {{workspaceLabel}}",
+  "Agenda": "Agenda",
+  "Some agenda could not be loaded": "Některé agendy se nepodařilo načíst",
+  "My agendas": "Moje agendy",
+  "Some information was modified by {{author}}": "Některé informace upravil {{author}}",
+  "Error while loading pre-filled agenda event information": "Chyba při načítání předvyplněných informací o událostech agendy"
+}

@@ -1,1 +1,21 @@
-{}
+{
+  "Copy content link": "Kopírovat odkaz na obsah",
+  "Copy news link": "Kopírovat odkaz na novinky",
+  "Validate and create": "Ověřit a vytvořit",
+  "The content has been modified by {{author}}": "Obsah byl upraven od {{author}}",
+  "Delete": "Smazat",
+  "The link has been copied to clipboard": "Odkaz zkopírován do schránky",
+  "Topic's subject": "Předmět tématu",
+  "New Thread": "Nové vlákno",
+  "Start a topic": "Založit téma",
+  "A content with the same name already exists": "Obsah se stejným názvem již existuje",
+  "Error while creating thread": "Chyba při vytváření vlákna",
+  "Thread": "Vlákno",
+  "thread": "vlákno",
+  "threads": "vlákna",
+  "Threads": "Vlákna",
+  "Turn into thread": "Převést na vlákno",
+  "Permanently delete": "Trvale smazat",
+  "Yes, delete permanently": "Ano, trvale smazat",
+  "Warning: this operation cannot be rolled back": "Varování: tuto operaci nelze vrátit zpět"
+}
