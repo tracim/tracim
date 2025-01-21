@@ -9,15 +9,15 @@ import { onClickOutside } from '../../helper.js'
 
 function Popover (props) {
   const popoverRef = useRef(null)
-  const [listening, setListening] = useState(false);
+  const [listening, setListening] = useState(false)
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
 
   useEffect(onClickOutside(
     listening,
     setListening,
     popoverRef,
-    setIsPopoverOpen,
-  ));
+    setIsPopoverOpen
+  ))
 
   const handleTogglePopover = () => setIsPopoverOpen(!isPopoverOpen)
 

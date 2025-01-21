@@ -665,14 +665,14 @@ export const filterNotificationListFromUserConfig = (notificationList, userConfi
 // react-onclickoutside only works on class component
 export function onClickOutside (listening, setListening, menuRef, setIsOpen) {
   return () => {
-    if (listening) return;
-    if (!menuRef.current) return;
-    setListening(true);
-    [`click`, `touchstart`].forEach((type) => {
+    if (listening) return
+    if (!menuRef.current) return
+    setListening(true)
+    ;['click', 'touchstart'].forEach((type) => {
       document.addEventListener(type, (evt) => {
-        if (menuRef.current?.contains(evt.target)) return;
-        setIsOpen(false);
-      });
-    });
+        if (menuRef.current?.contains(evt.target)) return
+        setIsOpen(false)
+      })
+    })
   }
 }
