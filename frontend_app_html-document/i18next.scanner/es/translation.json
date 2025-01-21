@@ -32,11 +32,11 @@
   "Validate anyway": "Validar de todos modos",
   "Tasks": "Tareas",
   "Download as PDF": "Descargar como PDF",
-  "The link has been copied to clipboard": "Enlace copiado en el portapapeles",
+  "The link has been copied to clipboard": "El enlace ha sido copiado al portapapeles",
   "Copy content link": "Copiar enlace al contenido",
   "Cancel": "Cancelar",
   "Validate": "Validar",
-  "Permanently delete": "¿Eliminar permanentemente?",
+  "Permanently delete": "¿Borrar permanentemente?",
   "Yes, delete permanently": "Sí, borrar permanentemente",
   "Warning: this operation cannot be rolled back": "Advertencia: esta operación no puede cancelarse"
 }
