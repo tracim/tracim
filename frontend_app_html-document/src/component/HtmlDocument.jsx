@@ -4,16 +4,16 @@ import { translate } from 'react-i18next'
 import classnames from 'classnames'
 import {
   APP_FEATURE_MODE,
-  CONTENT_TYPE,
-  LOCAL_STORAGE_FIELD,
-  TRANSLATION_STATE,
   ConfirmPopup,
+  CONTENT_TYPE,
   HTMLContent,
   IconButton,
+  LOCAL_STORAGE_FIELD,
   PromptMessage,
   RefreshWarningMessage,
+  setLocalStorageItem,
   TinyEditor,
-  setLocalStorageItem
+  TRANSLATION_STATE
 } from 'tracim_frontend_lib'
 
 export const HtmlDocument = props => {
@@ -124,6 +124,7 @@ export const HtmlDocument = props => {
             onClickBtn={props.onClickShowDraft}
           />
         )}
+
         {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) && (
           <div>
             <div className={noteClassName}>

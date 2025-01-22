@@ -135,10 +135,13 @@
         color darkGrey2
         font-size metadataFontSize
         padding standardSpacing pageSpacing 0
-        justify-content flex-end
+        justify-content space-between
         & .breadcrumbs
           margin-inline-end auto
           overflow auto
+        &--right
+          display flex
+          align-items center
         &__emojiReaction
           order 1
           .EmojiReactions
