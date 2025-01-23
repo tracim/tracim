@@ -4,12 +4,15 @@
 
 ### ✨ New Features
 
-- Upgraded TinyMCE to version 6.8.5
+- Notes now have a generated table of contents
+- Replaced TinyMCE with HugeRTE 1.0.7
 - Upgraded Cypress to version 13.17.0
 
 ### 🐛 Fixed Issue
 
 - fixed line break in code block of pdf export [#6643](https://github.com/tracim/tracim/issues/6643)
+- fixed autocomplete popin on mobile [#6650](https://github.com/tracim/tracim/issues/6650)
+- fixed nested sublist on mobile [#6653](https://github.com/tracim/tracim/issues/6650)
 
 ## 4.12.0 / 2024-12-23
 
