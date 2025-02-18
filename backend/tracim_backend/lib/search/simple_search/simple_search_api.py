@@ -143,7 +143,7 @@ class SimpleSearchApi(SearchApi):
             .exists()
         )
         content_query = (
-            content_api.get_base_query(None)
+            content_api._base_query(None)
             .filter(
                 or_(
                     *(

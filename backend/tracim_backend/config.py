@@ -979,7 +979,7 @@ class CFG(object):
         # TODO - G.M - 2019-04-05 - keep as parameters
         # or set it as constant,
         # see https://github.com/tracim/tracim/issues/1569
-        self.WEBDAV_MANAGE_LOCK = True
+        self.WEBDAV_MANAGE_LOCK = False  # INFO - D.A. - 2025-02-18 - Do not manage locks (implementation may be broken)
 
     def _load_ldap_config(self) -> None:
         """

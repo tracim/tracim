@@ -272,7 +272,7 @@ class UploadPermissionLib(object):
             )
         except ContentFilenameAlreadyUsedInFolder:
             upload_folder = content_api.get_one_by_filename(
-                filename=folder_label, workspace=upload_permission.workspace
+                folder_label, upload_permission.workspace
             )
 
         created_contents = []

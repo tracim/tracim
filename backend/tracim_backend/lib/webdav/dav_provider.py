@@ -4,7 +4,7 @@ from pluggy import PluginManager
 import typing
 from wsgidav.dav_provider import DAVProvider
 from wsgidav.dav_provider import _DAVResource
-from wsgidav.lock_manager import LockManager
+from wsgidav.lock_man.lock_manager import LockManager
 
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentNotFound
@@ -48,13 +48,13 @@ class ProcessedWebdavPath(object):
         self.content_api = ContentApi(current_user=current_user, session=session, config=app_config)
 
         self.workspaces = []
-        self.contents = []
+        self.path_content_items = []
         path_parts = self._path_splitter(self.path)
         # TODO - G.M - 2020-10-09 - Find a proper way to refactor this code to make easier to
         # understood. This code is a bit confusing because:
         # - distinction between invalid path, proper destination path (for move) and root is not so
         # clear.
-        # - We do add None value into both self.contents and self.workspaces list.
+        # - We do add None value into both self.path_content_items and self.workspaces list.
         path_parts = self._path_splitter(self.path)
         if not path_parts:
             self.workspaces.append(None)
@@ -67,11 +67,10 @@ class ProcessedWebdavPath(object):
                 part = path_parts[current_part_index]
                 filemanager_filename = webdav_convert_file_name_to_bdd(part)
                 parent = self.workspaces[-1] if self.workspaces else None
-                self.workspaces.append(
-                    self.workspace_api.get_one_by_filemanager_filename(
+                workspace = self.workspace_api.get_one_by_filemanager_filename(
                         filemanager_filename, parent=parent
                     )
-                )
+                self.workspaces.append(workspace)
                 current_part_index += 1
             except (IndexError, WorkspaceNotFound):
                 workspace_found = False
@@ -82,15 +81,24 @@ class ProcessedWebdavPath(object):
                 try:
                     filemanager_filename = webdav_convert_file_name_to_bdd(part)
                     workspace = self.workspaces[-1]
-                    parent = self.contents[-1] if self.contents else None
+
+                    parent = None
+                    if self.path_content_items:
+                        parent = self.path_content_items[-1]
+                    else:
+                        # FIXME - D.A. 2025-02618 LOG THIS AS DEBUG
+                        # print(f"WARNING: {part} seems not to have parent while path is {self.path}")
+                        pass
+
+
                     content = self.content_api.get_one_by_filename(
                         filename=filemanager_filename,
                         workspace=workspace,
                         parent=parent,
                     )
-                except ContentNotFound:
+                except ContentNotFound as e:
                     content = None
-                self.contents.append(content)
+                self.path_content_items.append(content)
 
     def _path_splitter(self, path: str) -> typing.List[str]:
         path_parts = path.split("/")
@@ -111,14 +119,14 @@ class ProcessedWebdavPath(object):
     @property
     def current_content(self) -> typing.Optional[Content]:
         try:
-            return self.contents[-1]
+            return self.path_content_items[-1]
         except IndexError:
             return None
 
     @property
     def current_parent_content(self) -> typing.Optional[Content]:
         try:
-            return self.contents[-2]
+            return self.path_content_items[-2]
         except IndexError:
             return None
 
@@ -135,7 +143,7 @@ class ProcessedWebdavPath(object):
         """
         if self.path == "/":
             return ResourceType.ROOT
-        if self.contents == [] and self.current_workspace:
+        if self.path_content_items == [] and self.current_workspace:
             return ResourceType.WORKSPACE
         if self.current_content:
             return ResourceType.CONTENT
@@ -198,9 +206,9 @@ class WebdavTracimContext(TracimContext):
         return uapi.get_one_by_login(login)
 
     def _get_current_webdav_username(self) -> str:
-        if not self.environ.get("http_authenticator.username"):
+        if not self.environ.get("wsgidav.auth.user_name"):
             raise NotAuthenticated("User not found")
-        return self.environ["http_authenticator.username"]
+        return self.environ["wsgidav.auth.user_name"]
 
     @property
     def current_workspace(self) -> typing.Optional[Workspace]:
@@ -256,7 +264,7 @@ class TracimDavProvider(DAVProvider):
 
     #########################################################
     # Everything override from DAVProvider
-    def getResourceInst(self, path: str, environ: dict) -> typing.Optional[_DAVResource]:
+    def get_resource_inst(self, path: str, environ: dict) -> typing.Optional[_DAVResource]:
         """
         Called by wsgidav whenever a request is called to get the _DAVResource corresponding to the path
         """
@@ -290,6 +298,10 @@ class TracimDavProvider(DAVProvider):
     def exists(self, path, environ) -> bool:
         """
         Called by wsgidav to check if a certain path is linked to a _DAVResource
+
+        INFO - DA - 2025-02-03
+        Implemented because it is more efficient than parent class implementation
+        (which calls get_resource_inst() method)
         """
         path = normpath(path)
         tracim_context = environ["tracim_context"]

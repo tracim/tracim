@@ -294,8 +294,6 @@ class ContentApi(object):
 
         return result
 
-    def get_base_query(self, workspaces: typing.Optional[typing.List[Workspace]]) -> Query:
-        return self._base_query(workspaces)
 
     def _is_filename_available(
         self,
@@ -320,7 +318,7 @@ class ContentApi(object):
         assert workspace
         assert content_namespace
         label, file_extension = os.path.splitext(filename)
-        query = self.get_base_query(workspaces=[workspace] if workspace else None)
+        query = self._base_query(workspaces=[workspace] if workspace else None)
         query = query.filter(Content.content_namespace == content_namespace)
 
         if parent:
@@ -388,7 +386,7 @@ class ContentApi(object):
         # INFO - G.M - 2018-10-11 - prepare exception message
         exception_message = (
             "A Content already exist with the same filename "
-            "{filename}  in workspace {workspace_id}"
+            "{filename} in workspace {workspace_id}"
         )
         exception_message = exception_message.format(
             filename=filename, workspace_id=workspace.workspace_id
@@ -733,15 +731,18 @@ class ContentApi(object):
         filename: str,
         workspace: Workspace,
         parent: typing.Optional[Content] = None,
-    ):
+    ) -> Content:
+        # TODO 2025-02-18 D.A. - Verify that query filter based on compound file_name property
+        # is working as expected
+
         query = self._base_query([workspace] if workspace else None)
-        query = query.filter((Content.label + Content.file_extension) == filename)
-        if parent:
-            query = query.filter(Content.parent_id == parent.content_id)
-        else:
-            query = query.filter(Content.parent_id == None)  # noqa: E711
+        query = query.filter(Content.file_name == filename)
+        parent_id = parent.content_id if parent else None
+        query = query.filter(ContentRevisionRO.parent_id == parent_id)
+        query = query.order_by(Content.cached_revision_id.desc())
+
         try:
-            return query.order_by(Content.cached_revision_id.desc()).one()
+            return query.first()
         except NoResultFound as exc:
             if parent:
                 parent_string = "with parent {}".format(parent.content_id)
@@ -1369,6 +1370,7 @@ class ContentApi(object):
         new_content_namespace: ContentNamespaces = ContentNamespaces.CONTENT,
         do_save: bool = True,
         do_notify: bool = True,
+        allow_overwrite: bool = False,
     ) -> Content:
         """
         Copy all content, revision and children included (children are included
@@ -1437,10 +1439,16 @@ class ContentApi(object):
 
         filename = self._prepare_filename(label, file_extension)
         content_type_slug = item.type
+
+        content_with_same_filename = None  # not None means the file already exist and we should add a revision to it instead of create it
         if filename:
-            self._is_filename_available_or_raise(
-                filename, workspace, parent, content_namespace=content_namespace
-            )
+            try:
+                file_already_exists = not self._is_filename_available_or_raise(filename, workspace, parent, content_namespace=content_namespace)
+            except ContentFilenameAlreadyUsedInFolder as exc:
+                if allow_overwrite:
+                    content_with_same_filename = (self.get_one_by_filename(filename, workspace, parent))
+                else:
+                    raise exc
         elif self._allow_empty_label(content_type_slug):
             # INFO - G.M - 2019-04-29 - special content like "Comment"
             # which allow empty filename should not
@@ -1452,11 +1460,16 @@ class ContentApi(object):
                 "content {} of type {} should always have a label "
                 "and a valid filename".format(item.content_id, content_type_slug)
             )
+
         new_content = Content()
         with context.batched_events(
             operation_type=OperationType.COPIED,
             obj=new_content,
         ):
+            # INFO - D.A. 2025-02-18 - Classical behavior here: we overwrite existing file
+            if content_with_same_filename:
+                with new_revision(session=self._session, tm=transaction.manager, content=content_with_same_filename):
+                    self.delete(content_with_same_filename)
             copy_result = self._copy(item, new_content, content_namespace, parent)
             copy_result = self._add_copy_revisions(
                 original_content=item,
@@ -1472,6 +1485,7 @@ class ContentApi(object):
                 do_notify=do_notify,
             )
         return copy_result.new_content
+
 
     def copy_from_template(
         self,
@@ -2163,9 +2177,10 @@ class ContentApi(object):
         Args:
             content (Content): Content that the notification will be about
         """
-        NotifierFactory.create(
-            config=self._config, current_user=self._user, session=self._session
-        ).notify_content_update(content)
+        # FIXME - 2025-01-27 - D.A. - Testing purpose
+        # NotifierFactory.create(
+        #     config=self._config, current_user=self._user, session=self._session
+        # ).notify_content_update(content)
 
     def get_all_types(self) -> typing.List[TracimContentType]:
         labels = content_type_list.endpoint_allowed_types_slug()

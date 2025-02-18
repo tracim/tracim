@@ -1,4 +1,7 @@
 # coding: utf8
+import sqlite3
+import sys
+import traceback
 from abc import ABC
 from abc import abstractmethod
 import functools
@@ -11,7 +14,7 @@ from time import mktime
 import transaction
 import typing
 from typing import List
-from wsgidav import compat
+import io
 from wsgidav.dav_error import DAVError
 from wsgidav.dav_error import HTTP_FORBIDDEN
 from wsgidav.dav_error import HTTP_REQUEST_ENTITY_TOO_LARGE
@@ -124,27 +127,28 @@ class WebdavContainer(ABC):
     """
 
     @abstractmethod
-    def createEmptyResource(self, file_name: str):
+    def create_empty_resource(self, name: str):
         """Create a empty non-collection sub-resource of the current resource, for example a file on a directory"""
         pass
 
     @abstractmethod
-    def createCollection(self, label: str) -> "FolderResource":
+    def create_collection(self, name: str) -> "FolderResource":
         """Create a collection sub-resource of the current resource, for example a dir on a directory or workspace"""
         pass
 
     @abstractmethod
-    def getMemberNames(self) -> typing.List[str]:
+    def get_member_names(self) -> typing.List[str]:
         """Get the list of subresources of the current resource"""
         pass
 
     @abstractmethod
-    def getMember(self, label: str) -> _DAVResource:
+    def get_member(self, name: str) -> _DAVResource:
         """Get one member name subresource according to label (same as filename)"""
         pass
 
+
     @abstractmethod
-    def getMemberList(self) -> typing.List[_DAVResource]:
+    def get_member_list(self) -> typing.List[_DAVResource]:
         """Get list of all sub-resources of the current resource"""
         pass
 
@@ -227,13 +231,13 @@ class WorkspaceOnlyContainer(WebdavContainer):
         )
 
     # Container methods
-    def createEmptyResource(self, name: str):
+    def create_empty_resource(self, name: str):
         raise NotImplementedError()
 
-    def createCollection(self, label: str) -> "FolderResource":
+    def create_collection(self, name: str) -> "FolderResource":
         raise NotImplementedError()
 
-    def getMemberNames(self) -> List[str]:
+    def get_member_names(self) -> List[str]:
         """
         This method returns the names (here workspace's labels) of all its children
         """
@@ -245,16 +249,16 @@ class WorkspaceOnlyContainer(WebdavContainer):
             )
         return members_names
 
-    def getMember(self, label: str) -> typing.Optional[_DAVResource]:
+    def get_member(self, name: str) -> typing.Optional[_DAVResource]:
         """
         Access to a specific members
         """
-        return self.provider.getResourceInst(
-            "%s/%s" % (self.path, webdav_convert_file_name_to_display(label)),
+        return self.provider.get_resource_inst(
+            "%s/%s" % (self.path, webdav_convert_file_name_to_display(name)),
             self.environ,
         )
 
-    def getMemberList(self):
+    def get_member_list(self):
         """
         This method is called by wsgidav when requesting with a depth > 0, it will return a list of _DAVResource
         of all its direct children
@@ -354,14 +358,14 @@ class ContentOnlyContainer(WebdavContainer):
         )
 
     # Container methods
-    def createEmptyResource(self, file_name: str):
+    def create_empty_resource(self, name: str):
         """
         Create a new file on the current workspace/folder.
         """
         content = None
-        fixed_file_name = webdav_convert_file_name_to_display(file_name)
-        path = os.path.join(self.path, file_name)
-        resource = self.provider.getResourceInst(path, self.environ)
+        fixed_file_name = webdav_convert_file_name_to_display(name)
+        path = os.path.join(self.path, name)
+        resource = self.provider.get_resource_inst(path, self.environ)  # FIXME HERE
         if resource:
             content = resource.content
         try:
@@ -383,14 +387,14 @@ class ContentOnlyContainer(WebdavContainer):
             path=self.path + "/" + fixed_file_name,
         )
 
-    def createCollection(self, label: str) -> "FolderResource":
+    def create_collection(self, name: str) -> "FolderResource":
         """
         Create a new folder for the current workspace/folder. As it's not possible for the user to choose
         which types of content are allowed in this folder, we allow allow all of them.
 
         This method return the DAVCollection created.
         """
-        folder_label = webdav_convert_file_name_to_bdd(label)
+        folder_label = webdav_convert_file_name_to_bdd(name)
         try:
             folder = self.content_api.create(
                 content_type_slug=content_type_list.Folder.slug,
@@ -405,7 +409,7 @@ class ContentOnlyContainer(WebdavContainer):
 
         transaction.commit()
         # fixed_path
-        folder_path = "%s/%s" % (self.path, webdav_convert_file_name_to_display(label))
+        folder_path = "%s/%s" % (self.path, webdav_convert_file_name_to_display(name))
         # return item
         return FolderResource(
             folder_path,
@@ -415,7 +419,7 @@ class ContentOnlyContainer(WebdavContainer):
             workspace=self.workspace,
         )
 
-    def getMemberNames(self) -> typing.List[str]:
+    def get_member_names(self) -> typing.List[str]:
         """
         Access to the list of content names for current workspace/folder
         """
@@ -425,16 +429,16 @@ class ContentOnlyContainer(WebdavContainer):
             retlist.append(webdav_convert_file_name_to_display(content.file_name))
         return retlist
 
-    def getMember(self, label: str) -> _DAVResource:
+    def get_member(self, name: str) -> _DAVResource:
         """
         Access to a specific members
         """
-        return self.provider.getResourceInst(
-            "%s/%s" % (self.path, webdav_convert_file_name_to_display(label)),
+        return self.provider.get_resource_inst(
+            "%s/%s" % (self.path, webdav_convert_file_name_to_display(name)),
             self.environ,
         )
 
-    def getMemberList(self) -> typing.List[_DAVResource]:
+    def get_member_list(self) -> typing.List[_DAVResource]:
         """
         Access to the list of content of current workspace/folder
         """
@@ -489,16 +493,16 @@ class WorkspaceAndContentContainer(WebdavContainer):
             provider=self.provider,
         )
 
-    def createEmptyResource(self, file_name: str):
-        return self.content_container.createEmptyResource(file_name=file_name)
+    def create_empty_resource(self, name: str):
+        return self.content_container.create_empty_resource(name)
 
-    def createCollection(self, label: str) -> "FolderResource":
-        return self.content_container.createCollection(label=label)
+    def create_collection(self, name: str) -> "FolderResource":
+        return self.content_container.create_collection(name=name)
 
-    def getMemberNames(self) -> typing.List[str]:
+    def get_member_names(self) -> typing.List[str]:
         # INFO - G.M - 2020-14-10 - Unclear if this method is really used by wsgidav
-        workspace_names = self.workspace_container.getMemberNames()
-        content_names = self.content_container.getMemberNames()
+        workspace_names = self.workspace_container.get_member_names()
+        content_names = self.content_container.get_member_names()
         members_names = list(workspace_names)
         for name in content_names:
             if name in workspace_names:
@@ -507,15 +511,15 @@ class WorkspaceAndContentContainer(WebdavContainer):
                 members_names.append(name)
         return members_names
 
-    def getMember(self, label: str) -> _DAVResource:
-        member = self.workspace_container.getMember(label=label)
+    def get_member(self, label: str) -> _DAVResource:
+        member = self.workspace_container.get_member(label=label)
         if not member:
-            member = self.content_container.getMember(label=label)
+            member = self.content_container.get_member(label=label)
 
-    def getMemberList(self) -> typing.List[_DAVResource]:
-        workspace_names = self.workspace_container.getMemberNames()
-        workspaces = self.workspace_container.getMemberList()
-        content_resources = self.content_container.getMemberList()
+    def get_member_list(self) -> typing.List[_DAVResource]:
+        workspace_names = self.workspace_container.get_member_names()
+        workspaces = self.workspace_container.get_member_list()
+        content_resources = self.content_container.get_member_list()
         members = list(workspaces)
         for content_resource in content_resources:
             if content_resource.content.file_name in workspace_names:
@@ -549,19 +553,19 @@ class RootResource(DAVCollection):
         return "<DAVCollection: RootResource>"
 
     @webdav_check_right(is_user)
-    def getMemberNames(self) -> List[str]:
-        return self.workspace_container.getMemberNames()
+    def get_member_names(self) -> List[str]:
+        return self.workspace_container.get_member_names()
 
     @webdav_check_right(is_user)
-    def getMember(self, label: str) -> typing.Optional[DAVCollection]:
-        return self.workspace_container.getMember(label=label)
+    def get_member(self, name) -> typing.Optional[DAVCollection]:
+        return self.workspace_container.get_member(name=name)
 
     @webdav_check_right(is_user)
-    def getMemberList(self):
-        return self.workspace_container.getMemberList()
+    def get_member_list(self):
+        return self.workspace_container.get_member_list()
 
     @webdav_check_right(is_trusted_user)
-    def createEmptyResource(self, name: str):
+    def create_empty_resource(self, name: str):
         """
         This method is called whenever the user wants to create a DAVNonCollection resource (files in our case).
 
@@ -570,7 +574,7 @@ class RootResource(DAVCollection):
         raise DAVError(HTTP_FORBIDDEN, contextinfo="Not allowed to create new root")
 
     @webdav_check_right(is_trusted_user)
-    def createCollection(self, name: str):
+    def create_collection(self, name: str):
         """
         This method is called whenever the user wants to create a DAVCollection resource as a child (in our case,
         we create workspaces as this is the root).
@@ -615,16 +619,16 @@ class WorkspaceResource(DAVCollection):
     def __repr__(self) -> str:
         return "<DAVCollection: Workspace (%d)>" % self.workspace.workspace_id
 
-    def getCreationDate(self) -> float:
+    def get_creation_date(self) -> float:
         return mktime(self.workspace.created.timetuple())
 
-    def getDisplayName(self) -> str:
+    def get_display_name(self) -> str:
         return webdav_convert_file_name_to_display(self.label)
 
-    def getDisplayInfo(self):
+    def get_display_info(self):
         return {"type": "workspace".capitalize()}
 
-    def getLastModified(self) -> float:
+    def get_last_modified(self) -> float:
         return mktime(self.workspace.updated.timetuple())
 
     def delete(self):
@@ -638,31 +642,31 @@ class WorkspaceResource(DAVCollection):
             raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc))
         raise DAVError(HTTP_FORBIDDEN, "Workspace deletion is not allowed through webdav")
 
-    def supportRecursiveMove(self, destpath):
+    def support_recursive_move(self, dest_path):
         return True
 
-    def moveRecursive(self, destpath):
+    def move_recursive(self, dest_path: str):
         raise DAVError(
             HTTP_FORBIDDEN,
             contextinfo="Not allowed to rename or move workspace through webdav",
         )
 
-    def getMemberNames(self) -> typing.List[str]:
-        return self.container.getMemberNames()
+    def get_member_names(self) -> typing.List[str]:
+        return self.container.get_member_names()
 
-    def getMember(self, label: str) -> _DAVResource:
-        return self.container.getMember(label=label)
+    def get_member(self, label: str) -> _DAVResource:
+        return self.container.get_member(label=label)
 
-    def getMemberList(self) -> typing.List[_DAVResource]:
-        return self.container.getMemberList()
+    def get_member_list(self) -> typing.List[_DAVResource]:
+        return self.container.get_member_list()
 
     @webdav_check_right(is_contributor)
-    def createEmptyResource(self, name: str):
-        return self.container.createEmptyResource(file_name=name)
+    def create_empty_resource(self, name: str):
+        return self.container.create_empty_resource(name=name)
 
     @webdav_check_right(is_content_manager)
-    def createCollection(self, name: str):
-        return self.container.createCollection(label=name)
+    def create_collection(self, name: str):
+        return self.container.create_collection(name=name)
 
 
 class FolderResource(DAVCollection):
@@ -705,18 +709,18 @@ class FolderResource(DAVCollection):
         return "<DAVCollection: Folder (%s)>" % self.content.label
 
     @webdav_check_right(is_reader)
-    def getCreationDate(self) -> float:
+    def get_creation_date(self) -> float:
         return mktime(self.content.created.timetuple())
 
     @webdav_check_right(is_reader)
-    def getDisplayName(self) -> str:
+    def get_display_name(self) -> str:
         return webdav_convert_file_name_to_display(self.content.file_name)
 
     @webdav_check_right(is_reader)
-    def getDisplayInfo(self):
+    def get_display_info(self):
         return {"type": self.content.type.capitalize()}
 
-    def getLastModified(self) -> float:
+    def get_last_modified(self) -> float:
         return mktime(self.content.updated.timetuple())
 
     @webdav_check_right(is_content_manager)
@@ -729,17 +733,17 @@ class FolderResource(DAVCollection):
             raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc)) from exc
         transaction.commit()
 
-    def supportRecursiveMove(self, destpath: str):
+    def support_recursive_move(self, dest_path: str):
         return True
 
-    def moveRecursive(self, destpath: str):
+    def move_recursive(self, dest_path: str):
         """
-        As we support recursive move, copymovesingle won't be called, though with copy it'll be called
+        As we support recursive move, copy_move_single won't be called, though with copy it'll be called
         but i have to check if the client ever call that function...
         """
-        destpath = normpath(destpath)
-        self.tracim_context.set_destpath(destpath)
-        if normpath(dirname(destpath)) == normpath(dirname(self.path)):
+        dest_path = normpath(dest_path)
+        self.tracim_context.set_destpath(dest_path)
+        if normpath(dirname(dest_path)) == normpath(dirname(self.path)):
             # INFO - G.M - 2018-12-12 - renaming case
             checker = is_contributor
         else:
@@ -753,18 +757,18 @@ class FolderResource(DAVCollection):
 
         # we check if the path is good (not at the root path /)
         # and we move the content
-        invalid_path = dirname(destpath) == self.environ["http_authenticator.realm"]
+        invalid_path = dirname(dest_path) == self.environ["wsgidav.auth.realm"]
 
         if not invalid_path:
-            self.move_folder(destpath)
+            self.move_folder(dest_path)
 
         if invalid_path:
             raise DAVError(HTTP_FORBIDDEN)
 
-    def move_folder(self, destpath: str):
-        destpath = normpath(destpath)
-        self.tracim_context.set_destpath(destpath)
-        if normpath(dirname(destpath)) == normpath(dirname(self.path)):
+    def move_folder(self, dest_path: str):
+        dest_path = normpath(dest_path)
+        self.tracim_context.set_destpath(dest_path)
+        if normpath(dirname(dest_path)) == normpath(dirname(self.path)):
             # INFO - G.M - 2018-12-12 - renaming case
             checker = is_contributor
         else:
@@ -784,10 +788,11 @@ class FolderResource(DAVCollection):
         try:
             with new_revision(content=self.content, tm=transaction.manager, session=self.session):
                 # renaming file if needed
-                if basename(destpath) != self.getDisplayName():
+                if basename(dest_path) != self.get_display_name():
                     self.content_api.update_content(
                         self.content,
-                        webdav_convert_file_name_to_bdd(basename(destpath)),
+                        webdav_convert_file_name_to_bdd(basename(dest_path)),
+                        force_update=True
                     )
                     self.content_api.save(self.content)
                 # move file if needed
@@ -807,21 +812,141 @@ class FolderResource(DAVCollection):
         transaction.commit()
 
     @webdav_check_right(is_contributor)
-    def createEmptyResource(self, file_name: str):
-        return self.content_container.createEmptyResource(file_name=file_name)
+    def create_empty_resource(self, name: str):
+        return self.content_container.create_empty_resource(name)
 
     @webdav_check_right(is_content_manager)
-    def createCollection(self, label: str) -> "FolderResource":
-        return self.content_container.createCollection(label=label)
+    def create_collection(self, name: str) -> "FolderResource":
+        return self.content_container.create_collection(name)
 
-    def getMemberNames(self) -> typing.List[str]:
-        return self.content_container.getMemberNames()
+    def get_member_names(self) -> typing.List[str]:
+        return self.content_container.get_member_names()
 
-    def getMember(self, label: str) -> _DAVResource:
-        return self.content_container.getMember(label=label)
+    def get_member(self, name: str) -> _DAVResource:
+        return self.content_container.get_member(name)
 
-    def getMemberList(self) -> typing.List[_DAVResource]:
-        return self.content_container.getMemberList()
+    def get_member_list(self) -> typing.List[_DAVResource]:
+        return self.content_container.get_member_list()
+
+
+    def handle_copy(self, dest_path, *, depth_infinity):
+        # CHECK IF FORCE OVERWRITE is 'T' -> in this case we should overwrite files (which is not trivial in tracim)
+        # if self.environ['']
+        destpath = normpath(dest_path)
+        self.tracim_context.set_destpath(destpath)
+        content_in_context = self.content_api.get_content_in_context(self.content)
+        try:
+            self.content_api.check_upload_size(content_in_context.size or 0, self.content.workspace)
+        except (
+            FileSizeOverMaxLimitation,
+            FileSizeOverWorkspaceEmptySpace,
+            FileSizeOverOwnerEmptySpace,
+        ) as exc:
+            raise DAVError(HTTP_REQUEST_ENTITY_TOO_LARGE, contextinfo=str(exc))
+        new_filename = webdav_convert_file_name_to_bdd(basename(destpath))
+        regex_file_extension = re.compile(
+            "(?P<label>.*){}".format(re.escape(self.content.file_extension))
+        )
+        same_extension = regex_file_extension.match(new_filename)
+        if same_extension:
+            new_label = same_extension.group("label")
+            new_file_extension = self.content.file_extension
+        else:
+            new_label, new_file_extension = os.path.splitext(new_filename)
+
+        self.tracim_context.set_destpath(destpath)
+        destination_workspace = self.tracim_context.candidate_workspace
+        try:
+            destination_parent = self.tracim_context.candidate_parent_content
+        except ContentNotFound:
+            destination_parent = None
+        try:
+            # // OVERRIDE ?
+            force_overwrite = False
+            if self.environ['HTTP_OVERWRITE'] and self.environ['HTTP_OVERWRITE'] == 'T':
+                force_overwrite = True
+
+            self.content_api.copy(
+                item=self.content,
+                context=self.tracim_context,
+                new_parent=destination_parent,
+                new_label=new_label,
+                new_workspace=destination_workspace,
+                new_file_extension=new_file_extension,
+                allow_overwrite=force_overwrite
+            )
+
+            # #if self.environ[""]
+            # res = self.content_api.update_content(self.content, new_label=self.content.label+"-temp")
+            # with unprotected_content_revision(self._session) as session:
+            #     cleanup_lib_unprotected = CleanupLib(
+            #         session, self._app_config, dry_run_mode=parsed_args.dry_run_mode
+            #     )
+            #     cleanup_lib_unprotected.delete_content(content)
+            #     session.flush()
+        except TracimException as exc:
+            print(e)
+            traceback.print_exc(sys.stdout)
+            raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc)) from exc
+        except Exception as e:
+            print(e)
+            traceback.print_exc(sys.stdout)
+            raise e
+
+        transaction.commit()
+        return True
+
+    def copy_move_single(self, dest_path, *, is_move):
+        if is_move:
+            return self.move_folder(dest_path)
+
+        destpath = normpath(dest_path)
+        self.tracim_context.set_destpath(destpath)
+        #try:
+        #    can_move_content.check(self.tracim_context)
+        #except TracimException as exc:
+        #    raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc))
+
+        content_in_context = self.content_api.get_content_in_context(self.content)
+        try:
+            self.content_api.check_upload_size(content_in_context.size or 0, self.content.workspace)
+        except (
+            FileSizeOverMaxLimitation,
+            FileSizeOverWorkspaceEmptySpace,
+            FileSizeOverOwnerEmptySpace,
+        ) as exc:
+            raise DAVError(HTTP_REQUEST_ENTITY_TOO_LARGE, contextinfo=str(exc))
+        new_filename = webdav_convert_file_name_to_bdd(basename(destpath))
+        regex_file_extension = re.compile(
+            "(?P<label>.*){}".format(re.escape(self.content.file_extension))
+        )
+        same_extension = regex_file_extension.match(new_filename)
+        if same_extension:
+            new_label = same_extension.group("label")
+            new_file_extension = self.content.file_extension
+        else:
+            new_label, new_file_extension = os.path.splitext(new_filename)
+
+        self.tracim_context.set_destpath(destpath)
+        destination_workspace = self.tracim_context.candidate_workspace
+        try:
+            destination_parent = self.tracim_context.candidate_parent_content
+        except ContentNotFound:
+            destination_parent = None
+        try:
+            # // OVERRIDE ?
+            self.content_api.copy(
+                item=self.content,
+                context=self.tracim_context,
+                new_parent=destination_parent,
+                new_label=new_label,
+                new_workspace=destination_workspace,
+                new_file_extension=new_file_extension,
+                allow_overwrite=True
+            )
+        except TracimException as exc:
+            raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc)) from exc
+        transaction.commit()
 
 
 class FileResource(DAVNonCollection):
@@ -856,34 +981,42 @@ class FileResource(DAVNonCollection):
         return "<DAVNonCollection: FileResource (%d)>" % self.content.cached_revision_id
 
     @webdav_check_right(is_reader)
-    def getContentLength(self) -> int:
+    def get_content_length(self) -> int:
         return self.content.depot_file.file.content_length
 
     @webdav_check_right(is_reader)
-    def getContentType(self) -> str:
+    def get_content_type(self) -> str:
         return self.content.file_mimetype
 
     @webdav_check_right(is_reader)
-    def getCreationDate(self) -> float:
+    def get_creation_date(self) -> float:
         return mktime(self.content.created.timetuple())
 
     @webdav_check_right(is_reader)
-    def getDisplayName(self) -> str:
+    def get_display_name(self) -> str:
         return webdav_convert_file_name_to_display(self.content.file_name)
 
     @webdav_check_right(is_reader)
-    def getDisplayInfo(self):
+    def get_display_info(self):
         return {"type": self.content.type.capitalize()}
 
-    def getLastModified(self) -> float:
+    def get_last_modified(self) -> float:
         return mktime(self.content.updated.timetuple())
 
     @webdav_check_right(is_reader)
-    def getContent(self) -> typing.BinaryIO:
+    def get_content(self) -> typing.BinaryIO:
         return self.content.depot_file.file
 
+    @webdav_check_right(is_reader)
+    def get_etag(self):
+        return None
+
+    @webdav_check_right(is_reader)
+    def support_etag(self):
+        return self.get_etag() is not None
+
     @webdav_check_right(is_contributor)
-    def beginWrite(self, contentType: str = None) -> FakeFileStream:
+    def begin_write(self, *, content_type: str = None) -> FakeFileStream:
         try:
             self.content_api.check_upload_size(
                 int(self.environ["CONTENT_LENGTH"]), self.content.workspace
@@ -903,10 +1036,10 @@ class FileResource(DAVNonCollection):
             session=self.session,
         )
 
-    def moveRecursive(self, destpath):
+    def move_recursive(self, dest_path):
         """As we support recursive move, copymovesingle won't be called, though with copy it'll be called
         but i have to check if the client ever call that function..."""
-        destpath = normpath(destpath)
+        destpath = normpath(dest_path)
         self.tracim_context.set_destpath(destpath)
         if normpath(dirname(destpath)) == normpath(dirname(self.path)):
             # INFO - G.M - 2018-12-12 - renaming case
@@ -921,7 +1054,7 @@ class FileResource(DAVNonCollection):
             raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc))
 
         invalid_path = False
-        invalid_path = dirname(destpath) == self.environ["http_authenticator.realm"]
+        invalid_path = dirname(destpath) == self.environ["wsgidav.auth.realm"]
 
         if not invalid_path:
             self.move_file(destpath)
@@ -960,21 +1093,15 @@ class FileResource(DAVNonCollection):
             raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc))
 
         try:
-            with new_revision(content=self.content, tm=transaction.manager, session=self.session):
+            with (new_revision(content=self.content, tm=transaction.manager, session=self.session)):
                 # INFO - G.M - 2018-03-09 - First, renaming file if needed
-                if basename(destpath) != self.getDisplayName():
+                if basename(destpath) != self.get_display_name():
+                    # aaa.crt -> label = aaa extension = ".crt"
+                    # aaa.crt.bob -> new_label = aaa.crt new_extention = .bob
                     new_filename = webdav_convert_file_name_to_bdd(basename(destpath))
-                    regex_file_extension = re.compile(
-                        "(?P<label>.*){}".format(re.escape(self.content.file_extension))
-                    )
-                    same_extension = regex_file_extension.match(new_filename)
-                    if same_extension:
-                        new_label = same_extension.group("label")
-                        new_file_extension = self.content.file_extension
-                    else:
-                        new_label, new_file_extension = os.path.splitext(new_filename)
-
-                    self.content_api.update_content(self.content, new_label=new_label)
+                    new_label, new_file_extension = os.path.splitext(new_filename)
+                    if new_label != self.content.label:
+                        self.content_api.update_content(self.content, new_label=new_label, force_update=True)
                     self.content.file_extension = new_file_extension
                     self.content_api.save(self.content)
 
@@ -998,8 +1125,8 @@ class FileResource(DAVNonCollection):
 
         transaction.commit()
 
-    def copyMoveSingle(self, destpath, isMove):
-        if isMove:
+    def copy_move_single(self, dest_path, *, is_move):
+        if is_move:
             # INFO - G.M - 12-03-2018 - This case should not happen
             # As far as moveRecursive method exist, all move should not go
             # through this method. If such case appear, try replace this to :
@@ -1009,7 +1136,7 @@ class FileResource(DAVNonCollection):
             ####
             raise NotImplementedError("Feature not available")
 
-        destpath = normpath(destpath)
+        destpath = normpath(dest_path)
         self.tracim_context.set_destpath(destpath)
         try:
             can_move_content.check(self.tracim_context)
@@ -1050,12 +1177,13 @@ class FileResource(DAVNonCollection):
                 new_file_extension=new_file_extension,
                 new_parent=destination_parent,
                 new_workspace=destination_workspace,
+                allow_overwrite=True
             )
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc)) from exc
         transaction.commit()
 
-    def supportRecursiveMove(self, destpath):
+    def support_recursive_move(self, dest_path):
         return True
 
     @webdav_check_right(is_content_manager)
@@ -1097,22 +1225,22 @@ class OtherFileResource(FileResource):
         return "<DAVNonCollection: OtherFileResource (%s)" % self.content.file_name
 
     @webdav_check_right(is_reader)
-    def getContentLength(self) -> int:
+    def get_content_length(self) -> int:
         return len(self.content_designed)
 
     @webdav_check_right(is_reader)
-    def getContentType(self) -> str:
+    def get_content_type(self) -> str:
         return "text/html; charset=utf-8"
 
     @webdav_check_right(is_reader)
-    def getDisplayInfo(self):
+    def get_display_info(self):
         return {"type": self.content.type.capitalize()}
 
     @webdav_check_right(is_reader)
-    def getContent(self):
+    def get_content(self):
         # TODO - G.M - 2019-06-13 - find solution to handle properly big file here without having
         # big file in memory. see https://github.com/tracim/tracim/issues/1913
-        filestream = compat.BytesIO()
+        filestream = io.BytesIO()
 
         filestream.write(bytes(self.content_designed, "utf-8"))
         filestream.seek(0)

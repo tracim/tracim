@@ -578,7 +578,7 @@ class DeleteSpaceCommand(AppContextCommand):
                 force_delete_retour = "no"
                 if not parsed_args.force_delete:
                     nb_children = space.get_children().__len__()
-                    nb_content = len(space.contents)
+                    nb_content = len(space.path_content_items)
                     print(
                         "space {0} have {1} children and {2} content,".format(
                             space.workspace_id, nb_children, nb_content

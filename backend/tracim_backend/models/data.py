@@ -495,7 +495,7 @@ class ContentChecker(object):
         return True
 
 
-class ContentNamespaces(str, enum.Enum):
+class ContentNamespaces(str, enum.Enum):  # TODO - D.A 2025-02-18 - Rename to ContentNamespace
     CONTENT = "content"
     UPLOAD = "upload"
     PUBLICATION = "publication"
@@ -812,7 +812,7 @@ class Content(DeclarativeBase):
     content.PROPERTY (except for content.id, content.revisions, content.children_revisions) will return
     value of most recent revision of content.
 
-    # UPDATE A CONTENT
+    # UPDATE A CONTENT
 
     To update an existing Content, you must use tracim.model.new_revision context manager:
     content = my_sontent_getter_method()
