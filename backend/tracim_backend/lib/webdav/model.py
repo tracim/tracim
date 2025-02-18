@@ -7,7 +7,6 @@ from sqlalchemy.types import Unicode
 from sqlalchemy.types import UnicodeText
 
 
-
 class Lock(object):
     __tablename__ = "my_locks"
 

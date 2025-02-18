@@ -39,6 +39,7 @@ class TestWebdavFactory(object):
         assert isinstance(config["provider_mapping"]["/"], TracimDavProvider)
         assert config["http_authenticator"]["domain_controller"] == TracimDomainController
 
+
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.usefixtures("default_content_fixture")
 class TestWebDav(object):
@@ -236,7 +237,7 @@ class TestWebDav(object):
 
         print("==============")
         print(result)
-        print('--------------')
+        print("--------------")
         assert result, "Result should not be None"
         eq_(
             b"Greek Salad\n",
@@ -257,7 +258,9 @@ class TestWebDav(object):
         environ = webdav_environ_factory.get(
             user_api_factory.get().get_one_by_email("bob@fsf.local")
         )
-        new_file = webdav_provider.get_resource_inst("/Recipes.space/Salads/greek_salad.txt", environ)
+        new_file = webdav_provider.get_resource_inst(
+            "/Recipes.space/Salads/greek_salad.txt", environ
+        )
 
         eq_(None, new_file, msg="Result should be None instead {0}".format(new_file))
 

@@ -30,6 +30,7 @@ class SpecialFolderExtension(object):
 
 TEMP_FILE_IN_MEMORY_MAX_SIZE_BYTES = 10 * 1024 * 1024  # 10 MB
 
+
 class FakeFileStream(object):
     """
     Fake a FileStream that we're giving to wsgidav to receive data and create files / new revisions
@@ -70,7 +71,9 @@ class FakeFileStream(object):
         # see https://github.com/tracim/tracim/issues/1911
         # INFO - D.A. - 2025-02-18 replaced temporary file with SpooledTemporaryFile in order to
         # allow to save large files on system and to avoid writing small files
-        self.temp_file = tempfile.SpooledTemporaryFile(TEMP_FILE_IN_MEMORY_MAX_SIZE_BYTES, suffix="tracim_webdav_upload_")
+        self.temp_file = tempfile.SpooledTemporaryFile(
+            TEMP_FILE_IN_MEMORY_MAX_SIZE_BYTES, suffix="tracim_webdav_upload_"
+        )
         self._session = session
         self._file_name = file_name if file_name != "" else self._content.file_name
         self._content = content

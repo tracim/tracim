@@ -2,18 +2,20 @@ from waitress import serve
 from wsgidav.dir_browser import WsgiDavDirBrowser
 from wsgidav.error_printer import ErrorPrinter
 from wsgidav.http_authenticator import HTTPAuthenticator
-from wsgidav.mw.cors import Cors
 from wsgidav.request_resolver import RequestResolver
 from wsgidav.wsgidav_app import DEFAULT_CONFIG
 from wsgidav.wsgidav_app import WsgiDAVApp
-from wsgidav.xml_tools import use_lxml
+from wsgidav.xml_tools import useLxml
 
 from tracim_backend.config import CFG
 from tracim_backend.lib.webdav.authentication import TracimDomainController
 from tracim_backend.lib.webdav.dav_provider import TracimDavProvider
-from tracim_backend.lib.webdav.middlewares import TracimEnforceHTTPS
 from tracim_backend.lib.webdav.middlewares import TracimEnv
-from tracim_backend.lib.webdav.middlewares import TracimWsgiDavDebugFilter
+
+# INFO - D.A. 2025-02-18 - Useless import? The Cors middleware is not used anymore
+# from wsgidav.mw.cors import Cors
+# INFO - D.A. 2025-02-18 - Useless import? The TracimWsgiDavDebugFilter middleware is for debug purpose only
+# from tracim_backend.lib.webdav.middlewares import TracimWsgiDavDebugFilter
 
 
 class WebdavAppFactory(object):
@@ -42,7 +44,7 @@ class WebdavAppFactory(object):
         config["dir_browser"]["enable"] = app_config.WEBDAV__DIR_BROWSER__ENABLED
         config["dir_browser"]["response_trailer"] = app_config.WEBDAV__DIR_BROWSER__FOOTER
 
-        if not use_lxml and config["verbose"] >= 1:
+        if not useLxml and config["verbose"] >= 1:
             print(
                 "WARNING: Could not import lxml: using xml instead (slower). "
                 "consider installing lxml from http://codespeak.net/lxml/."
@@ -64,8 +66,7 @@ class WebdavAppFactory(object):
             # - wsgidav.mw.debug_filter.WsgiDavDebugFilter
             ErrorPrinter,  # Builds WebDAV error body
             WsgiDavDirBrowser,
-            # TODO - Remove this as it is useless for years now TracimEnforceHTTPS,
-            RequestResolver  # this must be the last middleware item
+            RequestResolver,  # this must be the last middleware item
         ]
         return config
 

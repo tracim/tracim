@@ -4,7 +4,7 @@ from pluggy import PluginManager
 import typing
 from wsgidav.dav_provider import DAVProvider
 from wsgidav.dav_provider import _DAVResource
-from wsgidav.lock_man.lock_manager import LockManager
+from wsgidav.lock_manager import LockManager
 
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentNotFound
@@ -68,8 +68,8 @@ class ProcessedWebdavPath(object):
                 filemanager_filename = webdav_convert_file_name_to_bdd(part)
                 parent = self.workspaces[-1] if self.workspaces else None
                 workspace = self.workspace_api.get_one_by_filemanager_filename(
-                        filemanager_filename, parent=parent
-                    )
+                    filemanager_filename, parent=parent
+                )
                 self.workspaces.append(workspace)
                 current_part_index += 1
             except (IndexError, WorkspaceNotFound):
@@ -90,13 +90,12 @@ class ProcessedWebdavPath(object):
                         # print(f"WARNING: {part} seems not to have parent while path is {self.path}")
                         pass
 
-
                     content = self.content_api.get_one_by_filename(
                         filename=filemanager_filename,
                         workspace=workspace,
                         parent=parent,
                     )
-                except ContentNotFound as e:
+                except ContentNotFound:
                     content = None
                 self.path_content_items.append(content)
 

@@ -1,20 +1,19 @@
 # coding: utf8
-import sqlite3
-import sys
-import traceback
 from abc import ABC
 from abc import abstractmethod
 import functools
+import io
 import logging
 import os
 from os.path import basename
 from os.path import dirname
 import re
+import sys
 from time import mktime
+import traceback
 import transaction
 import typing
 from typing import List
-import io
 from wsgidav.dav_error import DAVError
 from wsgidav.dav_error import HTTP_FORBIDDEN
 from wsgidav.dav_error import HTTP_REQUEST_ENTITY_TOO_LARGE
@@ -145,7 +144,6 @@ class WebdavContainer(ABC):
     def get_member(self, name: str) -> _DAVResource:
         """Get one member name subresource according to label (same as filename)"""
         pass
-
 
     @abstractmethod
     def get_member_list(self) -> typing.List[_DAVResource]:
@@ -792,7 +790,7 @@ class FolderResource(DAVCollection):
                     self.content_api.update_content(
                         self.content,
                         webdav_convert_file_name_to_bdd(basename(dest_path)),
-                        force_update=True
+                        force_update=True,
                     )
                     self.content_api.save(self.content)
                 # move file if needed
@@ -828,7 +826,6 @@ class FolderResource(DAVCollection):
     def get_member_list(self) -> typing.List[_DAVResource]:
         return self.content_container.get_member_list()
 
-
     def handle_copy(self, dest_path, *, depth_infinity):
         # CHECK IF FORCE OVERWRITE is 'T' -> in this case we should overwrite files (which is not trivial in tracim)
         # if self.environ['']
@@ -863,7 +860,7 @@ class FolderResource(DAVCollection):
         try:
             # // OVERRIDE ?
             force_overwrite = False
-            if self.environ['HTTP_OVERWRITE'] and self.environ['HTTP_OVERWRITE'] == 'T':
+            if self.environ["HTTP_OVERWRITE"] and self.environ["HTTP_OVERWRITE"] == "T":
                 force_overwrite = True
 
             self.content_api.copy(
@@ -873,19 +870,10 @@ class FolderResource(DAVCollection):
                 new_label=new_label,
                 new_workspace=destination_workspace,
                 new_file_extension=new_file_extension,
-                allow_overwrite=force_overwrite
+                allow_overwrite=force_overwrite,
             )
-
-            # #if self.environ[""]
-            # res = self.content_api.update_content(self.content, new_label=self.content.label+"-temp")
-            # with unprotected_content_revision(self._session) as session:
-            #     cleanup_lib_unprotected = CleanupLib(
-            #         session, self._app_config, dry_run_mode=parsed_args.dry_run_mode
-            #     )
-            #     cleanup_lib_unprotected.delete_content(content)
-            #     session.flush()
         except TracimException as exc:
-            print(e)
+            print(exc)
             traceback.print_exc(sys.stdout)
             raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc)) from exc
         except Exception as e:
@@ -902,9 +890,9 @@ class FolderResource(DAVCollection):
 
         destpath = normpath(dest_path)
         self.tracim_context.set_destpath(destpath)
-        #try:
+        # try:
         #    can_move_content.check(self.tracim_context)
-        #except TracimException as exc:
+        # except TracimException as exc:
         #    raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc))
 
         content_in_context = self.content_api.get_content_in_context(self.content)
@@ -942,7 +930,7 @@ class FolderResource(DAVCollection):
                 new_label=new_label,
                 new_workspace=destination_workspace,
                 new_file_extension=new_file_extension,
-                allow_overwrite=True
+                allow_overwrite=True,
             )
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc)) from exc
@@ -1093,7 +1081,7 @@ class FileResource(DAVNonCollection):
             raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc))
 
         try:
-            with (new_revision(content=self.content, tm=transaction.manager, session=self.session)):
+            with new_revision(content=self.content, tm=transaction.manager, session=self.session):
                 # INFO - G.M - 2018-03-09 - First, renaming file if needed
                 if basename(destpath) != self.get_display_name():
                     # aaa.crt -> label = aaa extension = ".crt"
@@ -1101,7 +1089,9 @@ class FileResource(DAVNonCollection):
                     new_filename = webdav_convert_file_name_to_bdd(basename(destpath))
                     new_label, new_file_extension = os.path.splitext(new_filename)
                     if new_label != self.content.label:
-                        self.content_api.update_content(self.content, new_label=new_label, force_update=True)
+                        self.content_api.update_content(
+                            self.content, new_label=new_label, force_update=True
+                        )
                     self.content.file_extension = new_file_extension
                     self.content_api.save(self.content)
 
@@ -1177,7 +1167,7 @@ class FileResource(DAVNonCollection):
                 new_file_extension=new_file_extension,
                 new_parent=destination_parent,
                 new_workspace=destination_workspace,
-                allow_overwrite=True
+                allow_overwrite=True,
             )
         except TracimException as exc:
             raise DAVError(HTTP_FORBIDDEN, contextinfo=str(exc)) from exc

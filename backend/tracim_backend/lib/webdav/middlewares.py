@@ -238,25 +238,7 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
             f.write(yaml.dump(dump_content, default_flow_style=False))
 
 
-class TracimEnforceHTTPS(BaseMiddleware):
-    def __init__(self, application, next_app, config):
-        super().__init__(application, next_app, config)
-        self._config = config
-
-    def __call__(self, environ, start_response):
-        # TODO - G.M - 06-03-2018 - Check protocol from http header first
-        # see http://www.bortzmeyer.org/7239.html
-        # if this params doesn't exist, rely on tracim config
-        # from tracim.config.app_cfg import CFG
-        # cfg = CFG.get_instance()
-        #
-        # if cfg.WEBSITE_BASE_URL.startswith('https'):
-        #     environ['wsgi.url_scheme'] = 'https'
-        return self.wsgidav_app(environ, start_response)
-
-
 class TracimEnv(BaseMiddleware):
-
     def __init__(self, application, next_app, config):
         super().__init__(application, next_app, config)
         self.settings = config["tracim_settings"]
@@ -283,7 +265,7 @@ class TracimEnv(BaseMiddleware):
         environ["tracim_context"] = tracim_context
         try:
             for chunk in self.next_app(environ, start_response):
-               yield chunk
+                yield chunk
             transaction.commit()
         except Exception:
             transaction.abort()

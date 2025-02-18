@@ -294,7 +294,6 @@ class ContentApi(object):
 
         return result
 
-
     def _is_filename_available(
         self,
         filename: str,
@@ -1443,10 +1442,14 @@ class ContentApi(object):
         content_with_same_filename = None  # not None means the file already exist and we should add a revision to it instead of create it
         if filename:
             try:
-                file_already_exists = not self._is_filename_available_or_raise(filename, workspace, parent, content_namespace=content_namespace)
+                self._is_filename_available_or_raise(  # HACK - used only for raising an exception
+                    filename, workspace, parent, content_namespace=content_namespace
+                )
             except ContentFilenameAlreadyUsedInFolder as exc:
                 if allow_overwrite:
-                    content_with_same_filename = (self.get_one_by_filename(filename, workspace, parent))
+                    content_with_same_filename = self.get_one_by_filename(
+                        filename, workspace, parent
+                    )
                 else:
                     raise exc
         elif self._allow_empty_label(content_type_slug):
@@ -1468,7 +1471,11 @@ class ContentApi(object):
         ):
             # INFO - D.A. 2025-02-18 - Classical behavior here: we overwrite existing file
             if content_with_same_filename:
-                with new_revision(session=self._session, tm=transaction.manager, content=content_with_same_filename):
+                with new_revision(
+                    session=self._session,
+                    tm=transaction.manager,
+                    content=content_with_same_filename,
+                ):
                     self.delete(content_with_same_filename)
             copy_result = self._copy(item, new_content, content_namespace, parent)
             copy_result = self._add_copy_revisions(
@@ -1485,7 +1492,6 @@ class ContentApi(object):
                 do_notify=do_notify,
             )
         return copy_result.new_content
-
 
     def copy_from_template(
         self,
@@ -2177,10 +2183,9 @@ class ContentApi(object):
         Args:
             content (Content): Content that the notification will be about
         """
-        # FIXME - 2025-01-27 - D.A. - Testing purpose
-        # NotifierFactory.create(
-        #     config=self._config, current_user=self._user, session=self._session
-        # ).notify_content_update(content)
+        NotifierFactory.create(
+            config=self._config, current_user=self._user, session=self._session
+        ).notify_content_update(content)
 
     def get_all_types(self) -> typing.List[TracimContentType]:
         labels = content_type_list.endpoint_allowed_types_slug()
