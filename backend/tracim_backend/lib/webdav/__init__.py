@@ -5,7 +5,7 @@ from wsgidav.http_authenticator import HTTPAuthenticator
 from wsgidav.request_resolver import RequestResolver
 from wsgidav.wsgidav_app import DEFAULT_CONFIG
 from wsgidav.wsgidav_app import WsgiDAVApp
-from wsgidav.xml_tools import useLxml
+from wsgidav.xml_tools import use_lxml
 
 from tracim_backend.config import CFG
 from tracim_backend.lib.webdav.authentication import TracimDomainController
@@ -44,7 +44,7 @@ class WebdavAppFactory(object):
         config["dir_browser"]["enable"] = app_config.WEBDAV__DIR_BROWSER__ENABLED
         config["dir_browser"]["response_trailer"] = app_config.WEBDAV__DIR_BROWSER__FOOTER
 
-        if not useLxml and config["verbose"] >= 1:
+        if not use_lxml and config["verbose"] >= 1:
             print(
                 "WARNING: Could not import lxml: using xml instead (slower). "
                 "consider installing lxml from http://codespeak.net/lxml/."

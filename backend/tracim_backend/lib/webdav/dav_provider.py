@@ -4,7 +4,7 @@ from pluggy import PluginManager
 import typing
 from wsgidav.dav_provider import DAVProvider
 from wsgidav.dav_provider import _DAVResource
-from wsgidav.lock_manager import LockManager
+from wsgidav.lock_man.lock_manager import LockManager
 
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentNotFound
