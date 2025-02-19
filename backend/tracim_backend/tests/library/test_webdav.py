@@ -235,9 +235,6 @@ class TestWebDav(object):
             b"Greek Salad\n",
         )
 
-        print("==============")
-        print(result)
-        print("--------------")
         assert result, "Result should not be None"
         eq_(
             b"Greek Salad\n",
