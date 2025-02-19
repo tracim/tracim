@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import {
+  HTMLContent,
   IconButton,
   TinyEditor,
   replaceHTMLElementWithMention,
@@ -93,7 +94,7 @@ export const SpaceDescription = (props) => {
         : (
           <div className='workspace_advanced__description'>
             {props.description
-              ? <div dangerouslySetInnerHTML={{ __html: props.description }} />
+              ? <HTMLContent>{ props.description }</HTMLContent>
               : (
                 <div className='dashboard__workspace__detail__description__missing'>
                   {props.t("This space doesn't have a description yet.")}
