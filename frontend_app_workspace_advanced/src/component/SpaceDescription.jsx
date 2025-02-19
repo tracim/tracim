@@ -94,7 +94,9 @@ export const SpaceDescription = (props) => {
         : (
           <div className='workspace_advanced__description'>
             {props.description
-              ? <HTMLContent showImageBorder={false}>{ props.description }</HTMLContent>
+              // INFO - CH - 2025-02-19 - setting image border to "false" to allow users to put images
+              // in space description to set advanced space description design without using html
+              ? <HTMLContent showImageBorder={false}>{props.description}</HTMLContent>
               : (
                 <div className='dashboard__workspace__detail__description__missing'>
                   {props.t("This space doesn't have a description yet.")}
