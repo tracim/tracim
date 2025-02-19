@@ -295,7 +295,21 @@ def webdav_convert_file_name_to_bdd(string: str) -> str:
     """
     Called before sending request to the database to recover the right names
     """
-    # FIXME REMOVE THIS CALL WHICH IS USELESS
+    REPLACE_CHARS = {
+        "⧸": "/",
+        "⧹": "\\",
+        "∶": ":",
+        "∗": "*",
+        "ʔ": "?",
+        "ʺ": '"',
+        "❮": "<",
+        "❯": ">",
+        "∣": "|",
+    }
+
+    for key, value in REPLACE_CHARS.items():
+        string = string.replace(key, value)
+
     return string
 
 
