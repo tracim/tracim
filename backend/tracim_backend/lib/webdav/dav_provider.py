@@ -45,7 +45,7 @@ class ProcessedWebdavPath(object):
         self.workspace_api = WorkspaceApi(
             current_user=current_user, session=session, config=app_config
         )
-        self.content_api = ContentApi(current_user=current_user, session=session, config=app_config)
+        self.content_api = ContentApi(session, current_user, app_config, show_temporary=True)
 
         self.workspaces = []
         self.path_content_items = []

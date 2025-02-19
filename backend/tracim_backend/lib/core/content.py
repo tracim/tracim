@@ -230,6 +230,11 @@ class ContentApi(object):
                 or_(
                     Content.workspace_id.in_(workspace_ids),
                     # And allow access to non workspace document when he is owner
+                    # TODO - D.A - 2025-02-19 - investiguate where this part comes from.
+                    # Normal tracim use case should not allow to access content even if the user
+                    # is the owner. Work required is to find when this code arrived in order to
+                    # decide if it must be kept or if it must be removed.
+                    # Note : it may be related to profile images (avatar, background)
                     and_(
                         Content.workspace_id == None,  # noqa: E711
                         Content.owner_id == self._user_id,  # noqa: E711
@@ -735,10 +740,10 @@ class ContentApi(object):
         # is working as expected
 
         query = self._base_query([workspace] if workspace else None)
-        query = query.filter(Content.file_name == filename)
         parent_id = parent.content_id if parent else None
         query = query.filter(ContentRevisionRO.parent_id == parent_id)
         query = query.order_by(Content.cached_revision_id.desc())
+        query = query.filter(Content.file_name == filename)
 
         try:
             return query.first()
