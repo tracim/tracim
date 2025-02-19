@@ -23,7 +23,7 @@ class TracimDomainController(BaseDomainController):
         assert "tracim_settings" in config.keys()
         self.app_config = CFG(config["tracim_settings"])
 
-    def get_domain_realm(self, inputURL: str, environ: typing.Dict[str, typing.Any]) -> str:
+    def get_domain_realm(self, path_info: str, environ: typing.Dict[str, typing.Any]) -> str:
         return DEFAULT_TRACIM_WEBDAV_REALM
 
     def get_realm_user_password(

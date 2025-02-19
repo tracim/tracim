@@ -276,7 +276,9 @@ def webdav_convert_file_name_to_display(string: str) -> str:
     """
     string = core_convert_file_name_to_display(string)
     REPLACE_CHARS = {
-        ":": "∶",
+        # FIXME - D.A - 2025-02-19 - Windows is sometimes already using this fake char ...
+        # So we can't use it anymore otherwise some files are not found
+        # ":": "∶",
         "*": "∗",
         "?": "ʔ",
         '"': "ʺ",
@@ -298,7 +300,9 @@ def webdav_convert_file_name_to_bdd(string: str) -> str:
     REPLACE_CHARS = {
         "⧸": "/",
         "⧹": "\\",
-        "∶": ":",
+        # FIXME - D.A - 2025-02-19 - Windows is sometimes already using this fake char ...
+        # So we can't use it anymore otherwise some files are not found
+        # "∶": ":",
         "∗": "*",
         "ʔ": "?",
         "ʺ": '"',

@@ -98,6 +98,7 @@ class ProcessedWebdavPath(object):
                 except ContentNotFound:
                     content = None
                 self.path_content_items.append(content)
+        pass  # end of the method
 
     def _path_splitter(self, path: str) -> typing.List[str]:
         path_parts = path.split("/")
@@ -255,9 +256,10 @@ class TracimDavProvider(DAVProvider):
         manage_locks=True,
     ):
         super(TracimDavProvider, self).__init__()
-
         if manage_locks:
-            self.lockManager = LockManager(LockStorage())
+            self.set_lock_manager(LockManager(LockStorage()))
+        else:
+            self.set_lock_manager(None)
 
         self.app_config = app_config
 
