@@ -502,9 +502,6 @@ class WorkspaceApi(object):
                 "download feature disabled".format(workspace.workspace_id)
             )
 
-    def get_base_query(self) -> Query:
-        return self._base_query()
-
     def generate_label(self) -> str:
         """
         :return: Generated workspace label

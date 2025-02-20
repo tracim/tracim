@@ -5,17 +5,16 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.types import Float
 from sqlalchemy.types import Unicode
 from sqlalchemy.types import UnicodeText
-from wsgidav.compat import to_unicode
 
 
 class Lock(object):
     __tablename__ = "my_locks"
 
     token = Column(UnicodeText, primary_key=True, unique=True, nullable=False)
-    depth = Column(Unicode(32), unique=False, nullable=False, default=to_unicode("infinity"))
+    depth = Column(Unicode(32), unique=False, nullable=False, default="infinity")
     root = Column(UnicodeText, unique=False, nullable=False)
-    type = Column(Unicode(32), unique=False, nullable=False, default=to_unicode("write"))
-    scope = Column(Unicode(32), unique=False, nullable=False, default=to_unicode("exclusive"))
+    type = Column(Unicode(32), unique=False, nullable=False, default="write")
+    scope = Column(Unicode(32), unique=False, nullable=False, default="exclusive")
     owner = Column(UnicodeText, unique=False, nullable=False)
     expire = Column(Float, unique=False, nullable=False)
     principal = Column(Unicode(255), ForeignKey("my_users.display_name", ondelete="CASCADE"))

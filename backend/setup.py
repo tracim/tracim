@@ -26,7 +26,7 @@ requires = [
     # CLI
     "cliff",
     # Webdav
-    "wsgidav<3.0.0",
+    "wsgidav==4.2.0",
     "Pyyaml>=6.0.1",
     # others
     "filedepot>=0.8.0",

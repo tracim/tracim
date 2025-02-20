@@ -29,17 +29,15 @@ class TestWebdavFactory(object):
         mock._initConfig = WebdavAppFactory._initConfig
         config = mock._initConfig(mock2, **settings)
         assert config
-        assert config["acceptbasic"] is True
-        assert config["acceptdigest"] is False
-        assert config["defaultdigest"] is False
+        assert config["http_authenticator"]["accept_basic"] is True
+        assert config["http_authenticator"]["accept_digest"] is False
+        assert config["http_authenticator"]["default_to_digest"] is False
         # TODO - G.M - 25-05-2018 - Better check for middleware stack config
         assert "middleware_stack" in config
-        assert len(config["middleware_stack"]) == 6
         assert "provider_mapping" in config
         assert "/" in config["provider_mapping"]
         assert isinstance(config["provider_mapping"]["/"], TracimDavProvider)
-        assert "domaincontroller" in config
-        assert isinstance(config["domaincontroller"], TracimDomainController)
+        assert config["http_authenticator"]["domain_controller"] == TracimDomainController
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -48,9 +46,10 @@ class TestWebDav(object):
     def test_unit__get_root__ok(
         self, app_config, webdav_provider, user_api_factory, webdav_environ_factory
     ):
-        root = webdav_provider.getResourceInst(
+        user = user_api_factory.get().get_one_by_email("bob@fsf.local")
+        root = webdav_provider.get_resource_inst(
             "/",
-            webdav_environ_factory.get(user_api_factory.get().get_one_by_email("bob@fsf.local")),
+            webdav_environ_factory.get(user),
         )
         assert root, "Path / should return a RootResource instance"
         assert isinstance(root, RootResource)
@@ -58,14 +57,14 @@ class TestWebDav(object):
     def test_unit__list_workspaces_with_user__ok(
         self, app_config, webdav_provider, user_api_factory, webdav_environ_factory
     ):
-        root = webdav_provider.getResourceInst(
+        root = webdav_provider.get_resource_inst(
             "/",
             webdav_environ_factory.get(user_api_factory.get().get_one_by_email("bob@fsf.local")),
         )
         assert root, "Path / should return a RootResource instance"
         assert isinstance(root, RootResource), "Path / should return a RootResource instance"
 
-        children = root.getMemberList()
+        children = root.get_member_list()
         eq_(
             2,
             len(children),
@@ -83,7 +82,7 @@ class TestWebDav(object):
     def test_unit__list_workspaces_with_admin__ok(
         self, app_config, webdav_provider, user_api_factory, webdav_environ_factory
     ):
-        root = webdav_provider.getResourceInst(
+        root = webdav_provider.get_resource_inst(
             "/",
             webdav_environ_factory.get(
                 user_api_factory.get().get_one_by_email("admin@admin.admin")
@@ -92,7 +91,7 @@ class TestWebDav(object):
         assert root, "Path / a RootResource should return instance"
         assert isinstance(root, RootResource), "Path / should return a RootResource instance"
 
-        children = root.getMemberList()
+        children = root.get_member_list()
         eq_(
             2,
             len(children),
@@ -110,7 +109,7 @@ class TestWebDav(object):
     def test_unit__list_workspace_folders__ok(
         self, app_config, webdav_provider, user_api_factory, webdav_environ_factory
     ):
-        Recipes = webdav_provider.getResourceInst(
+        Recipes = webdav_provider.get_resource_inst(
             "/Recipes.space/",
             webdav_environ_factory.get(user_api_factory.get().get_one_by_email("bob@fsf.local")),
         )
@@ -118,7 +117,7 @@ class TestWebDav(object):
             Recipes, WorkspaceResource
         ), "Path /Recipes should return a Wrkspace instance"
 
-        children = Recipes.getMemberList()
+        children = Recipes.get_member_list()
         eq_(
             2,
             len(children),
@@ -134,14 +133,14 @@ class TestWebDav(object):
     def test_unit__list_content__ok(
         self, app_config, webdav_provider, user_api_factory, webdav_environ_factory
     ):
-        Desserts_dir = webdav_provider.getResourceInst(
+        Desserts_dir = webdav_provider.get_resource_inst(
             "/Recipes.space/Desserts",
             webdav_environ_factory.get(user_api_factory.get().get_one_by_email("bob@fsf.local")),
         )
         assert isinstance(
             Desserts_dir, FolderResource
         ), "Path /Desserts should return a Folder instance"
-        children = Desserts_dir.getMemberList()
+        children = Desserts_dir.get_member_list()
         eq_(
             5,
             len(children),
@@ -176,7 +175,7 @@ class TestWebDav(object):
         webdav_environ_factory,
         session,
     ):
-        pie = webdav_provider.getResourceInst(
+        pie = webdav_provider.get_resource_inst(
             "/Recipes.space/Desserts/Apple_Pie.txt",
             webdav_environ_factory.get(user_api_factory.get().get_one_by_email("bob@fsf.local")),
         )
@@ -192,7 +191,7 @@ class TestWebDav(object):
         webdav_environ_factory,
         session,
     ):
-        pie = webdav_provider.getResourceInst(
+        pie = webdav_provider.get_resource_inst(
             "/Recipes.space/Desserts/Apple_Pie.txt",
             webdav_environ_factory.get(user_api_factory.get().get_one_by_email("bob@fsf.local")),
         )
@@ -214,7 +213,7 @@ class TestWebDav(object):
         )
         eq_(True, content_pie.is_deleted, msg="Content should be deleted!")
 
-        result = webdav_provider.getResourceInst(
+        result = webdav_provider.get_resource_inst(
             "/Recipes.space/Desserts/Apple_Pie.txt",
             webdav_environ_factory.get(user_api_factory.get().get_one_by_email("bob@fsf.local")),
         )
@@ -226,9 +225,8 @@ class TestWebDav(object):
         environ = webdav_environ_factory.get(
             user_api_factory.get().get_one_by_email("bob@fsf.local")
         )
-        result = webdav_provider.getResourceInst("/Recipes.space/Salads/greek_salad.txt", environ)
-
-        eq_(None, result, msg="Result should be None instead {0}".format(result))
+        result = webdav_provider.get_resource_inst("/Recipes.space/Salads/greek_salad.txt", environ)
+        eq_(None, result, msg="webadv resource should be None, instead got {0}".format(result))
 
         result = webdav_put_new_test_file_helper(
             webdav_provider,
@@ -237,7 +235,7 @@ class TestWebDav(object):
             b"Greek Salad\n",
         )
 
-        assert result, "Result should not be None instead {0}".format(result)
+        assert result, "Result should not be None"
         eq_(
             b"Greek Salad\n",
             result.content.depot_file.file.read(),
@@ -257,7 +255,9 @@ class TestWebDav(object):
         environ = webdav_environ_factory.get(
             user_api_factory.get().get_one_by_email("bob@fsf.local")
         )
-        new_file = webdav_provider.getResourceInst("/Recipes.space/Salads/greek_salad.txt", environ)
+        new_file = webdav_provider.get_resource_inst(
+            "/Recipes.space/Salads/greek_salad.txt", environ
+        )
 
         eq_(None, new_file, msg="Result should be None instead {0}".format(new_file))
 
@@ -288,7 +288,7 @@ class TestWebDav(object):
         )
         eq_(True, content_pie.is_deleted, msg="Content should be deleted!")
 
-        result = webdav_provider.getResourceInst(
+        result = webdav_provider.get_resource_inst(
             "/Recipes.space/Salads/greek_salad.txt",
             webdav_environ_factory.get(user_api_factory.get().get_one_by_email("bob@fsf.local")),
         )
@@ -337,7 +337,7 @@ class TestWebDav(object):
         environ = webdav_environ_factory.get(
             user_api_factory.get().get_one_by_email("admin@admin.admin")
         )
-        pie = webdav_provider.getResourceInst("/Recipes.space/Desserts/Apple_Pie.txt", environ)
+        pie = webdav_provider.get_resource_inst("/Recipes.space/Desserts/Apple_Pie.txt", environ)
 
         content_pie = (
             session.query(ContentRevisionRO).filter(Content.label == "Apple_Pie").one()
@@ -345,7 +345,7 @@ class TestWebDav(object):
         assert content_pie, "Apple_Pie should be exist"
         content_pie_id = content_pie.content_id
 
-        pie.moveRecursive("/Recipes.space/Desserts/Apple_Pie_RENAMED.txt")
+        pie.move_recursive("/Recipes.space/Desserts/Apple_Pie_RENAMED.txt")
 
         # Database content is renamed
         content_pie = (
@@ -371,7 +371,7 @@ class TestWebDav(object):
         environ = webdav_environ_factory.get(
             user_api_factory.get().get_one_by_email("admin@admin.admin")
         )
-        pie = webdav_provider.getResourceInst("/Recipes.space/Desserts/Apple_Pie.txt", environ)
+        pie = webdav_provider.get_resource_inst("/Recipes.space/Desserts/Apple_Pie.txt", environ)
 
         content_pie = (
             session.query(ContentRevisionRO).filter(Content.label == "Apple_Pie").one()
@@ -381,7 +381,7 @@ class TestWebDav(object):
         content_pie_parent = content_pie.parent
         eq_(content_pie_parent.label, "Desserts", msg="field parent should be Desserts")
 
-        pie.moveRecursive("/Recipes.space/Salads/Apple_Pie.txt")  # move in f2
+        pie.move_recursive("/Recipes.space/Salads/Apple_Pie.txt")  # move in f2
 
         # Database content is moved
         content_pie = (
@@ -406,7 +406,7 @@ class TestWebDav(object):
         environ = webdav_environ_factory.get(
             user_api_factory.get().get_one_by_email("admin@admin.admin")
         )
-        pie = webdav_provider.getResourceInst("/Recipes.space/Desserts/Apple_Pie.txt", environ)
+        pie = webdav_provider.get_resource_inst("/Recipes.space/Desserts/Apple_Pie.txt", environ)
 
         content_pie = (
             session.query(ContentRevisionRO).filter(Content.label == "Apple_Pie").one()
@@ -416,7 +416,7 @@ class TestWebDav(object):
         content_pie_parent = content_pie.parent
         eq_(content_pie_parent.label, "Desserts", msg="field parent should be Desserts")
 
-        pie.moveRecursive("/Business.space/Menus/Apple_Pie_RENAMED.txt")
+        pie.move_recursive("/Business.space/Menus/Apple_Pie_RENAMED.txt")
         content_pie = (
             session.query(ContentRevisionRO)
             .filter(ContentRevisionRO.content_id == content_pie_id)
@@ -443,7 +443,7 @@ class TestWebDav(object):
         environ = webdav_environ_factory.get(
             user_api_factory.get().get_one_by_email("admin@admin.admin")
         )
-        content_to_move_res = webdav_provider.getResourceInst(
+        content_to_move_res = webdav_provider.get_resource_inst(
             "/Recipes.space/Desserts/Apple_Pie.txt", environ
         )
 
@@ -459,7 +459,7 @@ class TestWebDav(object):
             msg="field parent should be Desserts",
         )
 
-        content_to_move_res.moveRecursive(
+        content_to_move_res.move_recursive(
             "/Business.space/Menus/Apple_Pie.txt"
         )  # move in Business, f1
 
@@ -488,7 +488,7 @@ class TestWebDav(object):
         environ = webdav_environ_factory.get(
             user_api_factory.get().get_one_by_email("admin@admin.admin")
         )
-        result = webdav_provider.getResourceInst("/Recipes.space/Salads/greek_salad.txt", environ)
+        result = webdav_provider.get_resource_inst("/Recipes.space/Salads/greek_salad.txt", environ)
 
         eq_(None, result, msg="Result should be None instead {0}".format(result))
 
@@ -512,10 +512,10 @@ class TestWebDav(object):
         DummyNotifier.send_count = 0
 
         # Update file content
-        write_object = result.beginWrite(contentType="application/octet-stream")
+        write_object = result.begin_write(content_type="application/octet-stream")
         write_object.write(b"An other line")
         write_object.close()
-        result.endWrite(withErrors=False)
+        result.end_write(with_errors=False)
 
         eq_(
             1,

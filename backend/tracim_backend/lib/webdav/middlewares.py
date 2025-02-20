@@ -10,9 +10,8 @@ import sys
 import threading
 import time
 import transaction
-from wsgidav import compat
 from wsgidav import util
-from wsgidav.middleware import BaseMiddleware
+from wsgidav.mw.base_mw import BaseMiddleware
 from xml.etree import ElementTree
 import yaml
 
@@ -31,8 +30,8 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
     WITH ADD OF DUMP RESPONSE & REQUEST
     """
 
-    def __init__(self, application, config):
-        self._application = application
+    def __init__(self, wsgidav_app, next_app, config):
+        super().__init__(wsgidav_app, next_app, config)
         self._config = config
         #        self.out = sys.stderr
         self.out = sys.stdout
@@ -118,7 +117,7 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
         # Dump request headers
         if dumpRequest:
             print(
-                "<%s> --- %s Request ---" % (threading.currentThread().ident, method),
+                "<%s> --- %s Request ---" % (threading.current_thread().ident, method),
                 file=self.out,
             )
             for k, v in environ.items():
@@ -133,7 +132,7 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
 
         nbytes = 0
         first_yield = True
-        app_iter = self._application(environ, sub_app_start_response)
+        app_iter = self.next_app(environ, sub_app_start_response)
 
         for v in app_iter:
             # Start response (the first time)
@@ -163,11 +162,11 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
 
             # Check, if response is a binary string, otherwise we probably have
             # calculated a wrong content-length
-            assert compat.is_bytes(v), v
+            assert isinstance(v, (bytes, bytearray)), v
 
             # Dump response body
             drb = environ.get("wsgidav.dump_response_body")
-            if compat.is_basestring(drb):
+            if isinstance(drb, (str, bytes, bytearray)):
                 # Middleware provided a formatted body representation
                 print(drb, file=self.out)
             elif drb is True:
@@ -239,28 +238,9 @@ class TracimWsgiDavDebugFilter(BaseMiddleware):
             f.write(yaml.dump(dump_content, default_flow_style=False))
 
 
-class TracimEnforceHTTPS(BaseMiddleware):
-    def __init__(self, application, config):
-        super().__init__(application, config)
-        self._application = application
-        self._config = config
-
-    def __call__(self, environ, start_response):
-        # TODO - G.M - 06-03-2018 - Check protocol from http header first
-        # see http://www.bortzmeyer.org/7239.html
-        # if this params doesn't exist, rely on tracim config
-        # from tracim.config.app_cfg import CFG
-        # cfg = CFG.get_instance()
-        #
-        # if cfg.WEBSITE_BASE_URL.startswith('https'):
-        #     environ['wsgi.url_scheme'] = 'https'
-        return self._application(environ, start_response)
-
-
 class TracimEnv(BaseMiddleware):
-    def __init__(self, application, config):
-        super().__init__(application, config)
-        self._application = application
+    def __init__(self, application, next_app, config):
+        super().__init__(application, next_app, config)
         self.settings = config["tracim_settings"]
         self.app_config = CFG(self.settings)
         self.app_config.configure_filedepot()
@@ -284,7 +264,7 @@ class TracimEnv(BaseMiddleware):
         tracim_context.dbsession = session
         environ["tracim_context"] = tracim_context
         try:
-            for chunk in self._application(environ, start_response):
+            for chunk in self.next_app(environ, start_response):
                 yield chunk
             transaction.commit()
         except Exception:
@@ -293,7 +273,8 @@ class TracimEnv(BaseMiddleware):
         finally:
             # NOTE SGD 2020-06-30: avoid circular reference between environment dict and context.
             # This ensures the context will be deleted as soon as this function is exited
-            del environ["tracim_context"]
+            if tracim_context in environ.keys():
+                del environ["tracim_context"]
             tracim_context.cleanup()
 
     def setup_ldap(self, registry: Registry, app_config: CFG):

@@ -1,15 +1,15 @@
 import time
 from wsgidav import util
-from wsgidav.lock_manager import generateLockToken
-from wsgidav.lock_manager import lockString
-from wsgidav.lock_manager import normalizeLockRoot
-from wsgidav.lock_manager import validateLock
+from wsgidav.lock_man.lock_manager import generate_lock_token
+from wsgidav.lock_man.lock_manager import lock_string
+from wsgidav.lock_man.lock_manager import normalize_lock_root
+from wsgidav.lock_man.lock_manager import validate_lock
 from wsgidav.rw_lock import ReadWriteLock
 
 from tracim_backend.lib.webdav.model import Lock
 from tracim_backend.lib.webdav.model import Url2Token
 
-_logger = util.getModuleLogger(__name__)
+_logger = util.get_module_logger(__name__)
 
 
 def from_dict_to_base(lock):
@@ -104,7 +104,7 @@ class LockStorage(object):
             expire = float(lock_base.expire)
             if 0 <= expire < time.time():
                 _logger.debug(
-                    "Lock timed-out(%s): %s" % (expire, lockString(from_base_to_dict(lock_base)))
+                    "Lock timed-out(%s): %s" % (expire, lock_string(from_base_to_dict(lock_base)))
                 )
                 self.delete(token)
                 return None
@@ -137,7 +137,7 @@ class LockStorage(object):
 
             # Normalize root: /foo/bar
             org_path = path
-            path = normalizeLockRoot(path)
+            path = normalize_lock_root(path)
             lock["root"] = path
 
             # Normalize timeout from ttl to expire-date
@@ -150,9 +150,9 @@ class LockStorage(object):
             lock["timeout"] = timeout
             lock["expire"] = time.time() + timeout
 
-            validateLock(lock)
+            validate_lock(lock)
 
-            token = generateLockToken()
+            token = generate_lock_token()
             lock["token"] = token
 
             # Store lock
@@ -167,8 +167,8 @@ class LockStorage(object):
             self._session.commit()
 
             self._flush()
-            _logger.debug("LockStorageDict.set(%r): %s" % (org_path, lockString(lock)))
-            #            print("LockStorageDict.set(%r): %s" % (org_path, lockString(lock)))
+            _logger.debug("LockStorageDict.set(%r): %s" % (org_path, lock_string(lock)))
+            #            print("LockStorageDict.set(%r): %s" % (org_path, lock_string(lock)))
             return lock
         finally:
             self._lock.release()
@@ -210,7 +210,7 @@ class LockStorage(object):
         self._lock.acquireWrite()
         try:
             lock_db = self._session.query(Lock).filter(Lock.token == token).one_or_none()
-            _logger.debug("delete %s" % lockString(from_base_to_dict(lock_db)))
+            _logger.debug("delete %s" % lock_string(from_base_to_dict(lock_db)))
             if lock_db is None:
                 return False
             # Remove url to lock mapping
@@ -230,7 +230,7 @@ class LockStorage(object):
             self._lock.release()
         return True
 
-    def getLockList(self, path, includeRoot, includeChildren, tokenOnly):
+    def get_lock_list(self, path, includeRoot, includeChildren, tokenOnly):
         """Return a list of direct locks for <path>.
 
         Expired locks are *not* returned (but may be purged).
@@ -262,7 +262,7 @@ class LockStorage(object):
                     else:
                         lockList.append(from_base_to_dict(lock_db))
 
-        path = normalizeLockRoot(path)
+        path = normalize_lock_root(path)
         self._lock.acquireRead()
         try:
             tokList = self._session.query(Url2Token.token).filter(Url2Token.path == path).all()

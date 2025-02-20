@@ -118,6 +118,7 @@ def init_plugin_manager(app_config: CFG) -> pluggy.PluginManager:
     import tracim_backend.lib.core.mention as mention
     from tracim_backend.lib.search.search_factory import SearchFactory
 
+    # TODO - 2025-01-27 - DA make this optionnal for import purpose (no event generated, no search engine indexation
     plugin_manager.register(EventBuilder(app_config))
     plugin_manager.register(EventPublisher(app_config))
     plugin_manager.register(MessageHooks())

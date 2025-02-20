@@ -468,7 +468,7 @@ need to be in every workspace you include."
             config=self._config,
         )
 
-        query = content_api.get_base_query(workspaces=self.get_user_workspaces())
+        query = content_api._base_query(workspaces=self.get_user_workspaces())
         query = query.filter(Content.type != content_type_list.Comment.slug)
 
         if acp:
