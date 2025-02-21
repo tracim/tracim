@@ -339,6 +339,7 @@ zope-sqlalchemy==1.6
     # via tracim_backend (setup.py)
 zopfli==0.2.3.post1
     # via fonttools
-
+gunicorn
+gevent
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
