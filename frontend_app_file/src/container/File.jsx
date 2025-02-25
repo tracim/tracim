@@ -1315,6 +1315,7 @@ export class File extends React.Component {
           {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
             https://github.com/tracim/tracim/issues/1840 */}
           <FileComponent
+            content={state.content}
             editionAuthor={state.editionAuthor}
             isRefreshNeeded={state.showRefreshWarning}
             isVideo={isVideo}

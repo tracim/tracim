@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react'
-import { connect } from 'react-redux'
+// import { connect } from 'react-redux'
 
 import {
   AmbientLight,
@@ -57,9 +57,10 @@ scene.add(axes)
 
 const ifcLoader = new IFCLoader()
 
-// INFO - CH - 2025-02-25 - bellow is relative to /assets/
-// Probably because webpack declares /assets/ as PublicPath
-ifcLoader.ifcManager.setWasmPath('ifc/wasm/')
+// INFO - CH - 2025-02-25 - bellow is relative to /app/
+// Probably because the script of app file is loaded from there.
+// setting /assets/wasm/ resulting in trying to load from /app//assets/wasm/ and fail
+ifcLoader.ifcManager.setWasmPath('wasm/')
 
 // const ifcFileResponse = await fetch('/assets/ifc/Infra-Bridge.ifc')
 // const ifcFile = await ifcFileResponse.blob()
@@ -67,7 +68,6 @@ ifcLoader.ifcManager.setWasmPath('ifc/wasm/')
 // ifcLoader.load(ifcURL, (ifcModel) => scene.add(ifcModel))
 
 const IfcViewer = props => {
-  const canvasRef = useRef(null)
 
   useEffect(() => {
     async function loadIfc () {
@@ -95,7 +95,7 @@ const IfcViewer = props => {
 
       animate()
 
-      const ifcFileResponse = await fetch('/assets/ifc/Infra-Bridge.ifc')
+      const ifcFileResponse = await fetch(props.contentRawUrl)
       const ifcFile = await ifcFileResponse.blob()
       const ifcURL = URL.createObjectURL(ifcFile)
       ifcLoader.load(ifcURL, (ifcModel) => scene.add(ifcModel))
@@ -104,9 +104,10 @@ const IfcViewer = props => {
   }, [])
 
   return (
-    <canvas ref={canvasRef} id='canvasIfcViewer'></canvas>
+    <canvas id='canvasIfcViewer'></canvas>
   )
 }
 
-const mapStateToProps = state => ({})
-export default connect(mapStateToProps)(IfcViewer)
+// const mapStateToProps = state => ({})
+// export default connect(mapStateToProps)(IfcViewer)
+export default IfcViewer

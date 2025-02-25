@@ -12,6 +12,7 @@ import {
   PopupProgressUpload,
   RefreshWarningMessage
 } from 'tracim_frontend_lib'
+import IfcViewer from './IfcViewer/IfcViewer.jsx'
 
 export class FileComponent extends React.Component {
   componentDidUpdate (prevProps) {
@@ -142,23 +143,32 @@ export class FileComponent extends React.Component {
         )}
 
         {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) && (
-          <PreviewComponent
-            color={props.customColor}
-            downloadRawUrl={props.downloadRawUrl}
-            isPdfAvailable={props.isPdfAvailable}
-            isJpegAvailable={props.isJpegAvailable}
-            isVideo={props.isVideo}
-            downloadPdfPageUrl={props.downloadPdfPageUrl}
-            downloadPdfFullUrl={props.downloadPdfFullUrl}
-            previewList={props.previewList}
-            preview={props.preview}
-            filePageNb={props.filePageNb}
-            fileCurrentPage={props.fileCurrentPage}
-            lightboxUrlList={props.lightboxUrlList}
-            onClickPreviousPage={props.onClickPreviousPage}
-            onClickNextPage={props.onClickNextPage}
-            onTogglePreviewVideo={props.onTogglePreviewVideo}
-          />
+          props.content.file_extension === '.ifc'
+            ? (
+              <IfcViewer
+                content={props.content}
+                contentRawUrl={props.downloadRawUrl}
+              />
+            )
+            : (
+              <PreviewComponent
+                color={props.customColor}
+                downloadRawUrl={props.downloadRawUrl}
+                isPdfAvailable={props.isPdfAvailable}
+                isJpegAvailable={props.isJpegAvailable}
+                isVideo={props.isVideo}
+                downloadPdfPageUrl={props.downloadPdfPageUrl}
+                downloadPdfFullUrl={props.downloadPdfFullUrl}
+                previewList={props.previewList}
+                preview={props.preview}
+                filePageNb={props.filePageNb}
+                fileCurrentPage={props.fileCurrentPage}
+                lightboxUrlList={props.lightboxUrlList}
+                onClickPreviousPage={props.onClickPreviousPage}
+                onClickNextPage={props.onClickNextPage}
+                onTogglePreviewVideo={props.onTogglePreviewVideo}
+              />
+            )
         )}
 
         {props.mode === APP_FEATURE_MODE.EDIT && (

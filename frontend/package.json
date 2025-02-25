@@ -18,7 +18,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@react-three/fiber": "^9.0.4",
+    "@react-three/fiber": "7.0.10",
     "@types/three": "^0.173.0",
     "classnames": "^2.2.6",
     "color": "^3.1.2",
