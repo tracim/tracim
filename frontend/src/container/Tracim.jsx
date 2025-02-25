@@ -97,6 +97,7 @@ import Favorites from './Favorites.jsx'
 import ContentRedirection from './ContentRedirection.jsx'
 import WorkspacePage from './WorkspacePage.jsx'
 import ToDo from './ToDo.jsx'
+import IfcViewer from '../component/IfcViewer/IfcViewer.jsx'
 
 const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
 
@@ -482,6 +483,8 @@ export class Tracim extends React.Component {
           />
 
           <Route path={PAGE.LOGIN} component={Login} />
+
+          <Route path={'/ui/ifc_viewer'} component={IfcViewer} />
 
           <Route path={PAGE.RECENT_ACTIVITIES} component={PersonalRecentActivities} />
 
