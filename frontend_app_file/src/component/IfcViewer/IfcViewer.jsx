@@ -67,6 +67,9 @@ const IfcViewer = props => {
     }
 
     loadIfc()
+
+    world.renderer.onResize.add(world.camera.updateAspect)
+    window.requestAnimationFrame(world.camera.updateAspect)
   }, [])
 
   return (
