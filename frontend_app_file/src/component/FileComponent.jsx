@@ -4,6 +4,7 @@ import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
 import PreviewComponent from './PreviewComponent.jsx'
+import IfcViewer from './IfcViewer/IfcViewer.jsx'
 import {
   APP_FEATURE_MODE,
   FileDropzone,
@@ -12,7 +13,6 @@ import {
   PopupProgressUpload,
   RefreshWarningMessage
 } from 'tracim_frontend_lib'
-import IfcViewer from './IfcViewer/IfcViewer.jsx'
 
 export class FileComponent extends React.Component {
   componentDidUpdate (prevProps) {
@@ -145,10 +145,6 @@ export class FileComponent extends React.Component {
         {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) && (
           props.content.file_extension === '.ifc'
             ? (
-              // <IfcViewerOld
-              //   content={props.content}
-              //   contentRawUrl={props.downloadRawUrl}
-              // />
               <IfcViewer
                 contentRawUrl={props.downloadRawUrl}
               />

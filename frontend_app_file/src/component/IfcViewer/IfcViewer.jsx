@@ -1,22 +1,18 @@
 import React, { useEffect, useRef } from 'react'
 
-// import * as THREE from 'three'
 import * as WEBIFC from 'web-ifc'
-// import * as BUI from '@thatopen/ui'
-// import Stats from 'stats.js'
 import * as OBC from '@thatopen/components'
 
 require('./IfcViewer.styl')
 
 const IfcViewer = props => {
-  const ifcViewerDom = useRef(null)
+  const ifcViewerRef = useRef(null)
 
   useEffect(() => {
     // INFO - CH - 2025-02-26 - Documentation at
     // https://docs.thatopen.com/Tutorials/Components/Core/IfcLoader
 
-    // const container = document.getElementById('IfcViewerNew')
-    const container = ifcViewerDom.current
+    const container = ifcViewerRef.current
 
     const components = new OBC.Components()
 
@@ -30,7 +26,13 @@ const IfcViewer = props => {
 
     components.init()
 
-    world.camera.controls.setLookAt(12, 6, 8, 0, 0, -10)
+    // INFO - CH - 2025-02-26 - doc:
+    // https://github.com/yomotsu/camera-controls?tab=readme-ov-file#setlookat-positionx-positiony-positionz-targetx-targety-targetz-enabletransition-
+    world.camera.controls.setLookAt(
+      12, 6, 8, // INFO - CH - 2025-02-26 - position x, y, z
+      0, 0, -10, // INFO - CH - 2025-02-26 - target x, y, z
+      true // // INFO - CH - 2025-02-26 - enableTransition
+    )
 
     world.scene.setup()
 
@@ -43,12 +45,10 @@ const IfcViewer = props => {
       const data = await file.arrayBuffer()
       const buffer = new Uint8Array(data)
 
-      // const fragments = components.get(OBC.FragmentsManager)
       const fragmentIfcLoader = components.get(OBC.IfcLoader)
 
-      // await fragmentIfcLoader.setup()
       fragmentIfcLoader.settings.wasm = {
-        // path: 'https://unpkg.com/web-ifc@0.0.68/',
+        // INFO - CH - 2025-02-26 - Source of wasm/ is from https://unpkg.com/web-ifc@0.0.68/
         path: '/assets/wasm/',
         absolute: true
       }
@@ -57,14 +57,12 @@ const IfcViewer = props => {
         WEBIFC.IFCREINFORCINGBAR,
         WEBIFC.IFCREINFORCINGELEMENT
       ]
-
       for (const cat of excludedCats) {
         fragmentIfcLoader.settings.excludedCategories.add(cat)
       }
       fragmentIfcLoader.settings.webIfc.COORDINATE_TO_ORIGIN = true
 
       const model = await fragmentIfcLoader.load(buffer)
-      // model.name = 'example'
       world.scene.three.add(model)
     }
 
@@ -74,7 +72,7 @@ const IfcViewer = props => {
   return (
     <div
       className='ifcViewer'
-      ref={ifcViewerDom}
+      ref={ifcViewerRef}
     />
   )
 }
