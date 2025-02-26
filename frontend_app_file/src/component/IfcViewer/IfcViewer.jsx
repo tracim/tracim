@@ -1,113 +1,82 @@
-import React, { useRef, useState, useEffect } from 'react'
-// import { connect } from 'react-redux'
+import React, { useEffect, useRef } from 'react'
 
-import {
-  AmbientLight,
-  AxesHelper,
-  DirectionalLight,
-  GridHelper,
-  PerspectiveCamera,
-  Scene,
-  WebGLRenderer
-} from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+// import * as THREE from 'three'
+import * as WEBIFC from 'web-ifc'
+// import * as BUI from '@thatopen/ui'
+// import Stats from 'stats.js'
+import * as OBC from '@thatopen/components'
 
-// import { Canvas, useLoader } from '@react-three/fiber'
-import { IFCLoader } from 'web-ifc-three/IFCLoader'
-
-//Creates the Three.js scene
-const scene = new Scene()
-
-//Object to store the size of the viewport
-const size = {
-  width: window.innerWidth,
-  height: window.innerHeight,
-}
-
-//Creates the camera (point of view of the user)
-const aspect = size.width / size.height
-const camera = new PerspectiveCamera(75, aspect)
-camera.position.z = 15
-camera.position.y = 13
-camera.position.x = 8
-
-//Creates the lights of the scene
-const lightColor = 0xffffff
-
-const ambientLight = new AmbientLight(lightColor, 0.5)
-scene.add(ambientLight)
-
-const directionalLight = new DirectionalLight(lightColor, 1)
-directionalLight.position.set(0, 10, 0)
-directionalLight.target.position.set(-5, 0, 0)
-scene.add(directionalLight)
-scene.add(directionalLight.target)
-
-//Creates grids and axes in the scene
-const grid = new GridHelper(50, 30)
-scene.add(grid)
-
-const axes = new AxesHelper()
-axes.material.depthTest = false
-axes.renderOrder = 1
-scene.add(axes)
-
-
-
-
-const ifcLoader = new IFCLoader()
-
-// INFO - CH - 2025-02-25 - bellow is relative to /app/
-// Probably because the script of app file is loaded from there.
-// setting /assets/wasm/ resulting in trying to load from /app//assets/wasm/ and fail
-ifcLoader.ifcManager.setWasmPath('wasm/')
-
-// const ifcFileResponse = await fetch('/assets/ifc/Infra-Bridge.ifc')
-// const ifcFile = await ifcFileResponse.blob()
-// const ifcURL = URL.createObjectURL(ifcFile)
-// ifcLoader.load(ifcURL, (ifcModel) => scene.add(ifcModel))
+require('./IfcViewer.styl')
 
 const IfcViewer = props => {
+  const ifcViewerDom = useRef(null)
 
   useEffect(() => {
+    // INFO - CH - 2025-02-26 - Documentation at
+    // https://docs.thatopen.com/Tutorials/Components/Core/IfcLoader
+
+    // const container = document.getElementById('IfcViewerNew')
+    const container = ifcViewerDom.current
+
+    const components = new OBC.Components()
+
+    const worlds = components.get(OBC.Worlds)
+
+    const world = worlds.create()
+
+    world.scene = new OBC.SimpleScene(components)
+    world.renderer = new OBC.SimpleRenderer(components, container)
+    world.camera = new OBC.SimpleCamera(components)
+
+    components.init()
+
+    world.camera.controls.setLookAt(12, 6, 8, 0, 0, -10)
+
+    world.scene.setup()
+
+    const grids = components.get(OBC.Grids)
+    grids.create(world)
+    world.scene.three.background = null
+
     async function loadIfc () {
-      // Sets up the renderer, fetching the canvas of the HTML
-      const threeCanvas = document.getElementById('canvasIfcViewer')
-      const renderer = new WebGLRenderer({
-        canvas: threeCanvas,
-        alpha: true,
-      })
+      const file = await fetch(props.contentRawUrl)
+      const data = await file.arrayBuffer()
+      const buffer = new Uint8Array(data)
 
-      renderer.setSize(size.width, size.height)
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+      // const fragments = components.get(OBC.FragmentsManager)
+      const fragmentIfcLoader = components.get(OBC.IfcLoader)
 
-      // Creates the orbit controls (to navigate the scene)
-      const controls = new OrbitControls(camera, threeCanvas)
-      controls.enableDamping = true
-      controls.target.set(-2, 0, 0)
-
-      // Animation loop
-      const animate = () => {
-        controls.update()
-        renderer.render(scene, camera)
-        requestAnimationFrame(animate)
+      // await fragmentIfcLoader.setup()
+      fragmentIfcLoader.settings.wasm = {
+        // path: 'https://unpkg.com/web-ifc@0.0.68/',
+        path: '/assets/wasm/',
+        absolute: true
       }
+      const excludedCats = [
+        WEBIFC.IFCTENDONANCHOR,
+        WEBIFC.IFCREINFORCINGBAR,
+        WEBIFC.IFCREINFORCINGELEMENT
+      ]
 
-      animate()
+      for (const cat of excludedCats) {
+        fragmentIfcLoader.settings.excludedCategories.add(cat)
+      }
+      fragmentIfcLoader.settings.webIfc.COORDINATE_TO_ORIGIN = true
 
-      const ifcFileResponse = await fetch(props.contentRawUrl)
-      const ifcFile = await ifcFileResponse.blob()
-      const ifcURL = URL.createObjectURL(ifcFile)
-      ifcLoader.load(ifcURL, (ifcModel) => scene.add(ifcModel))
+      const model = await fragmentIfcLoader.load(buffer)
+      // model.name = 'example'
+      world.scene.three.add(model)
     }
+
     loadIfc()
   }, [])
 
   return (
-    <canvas id='canvasIfcViewer'></canvas>
+    <div
+      className='ifcViewer'
+      ref={ifcViewerDom}
+    />
   )
 }
 
-// const mapStateToProps = state => ({})
-// export default connect(mapStateToProps)(IfcViewer)
 export default IfcViewer

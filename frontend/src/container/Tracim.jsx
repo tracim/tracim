@@ -484,9 +484,9 @@ export class Tracim extends React.Component {
 
           <Route path={PAGE.LOGIN} component={Login} />
 
-          <Route path={'/ui/ifc_viewer'} render={() => (
-            <IfcViewer />
-          )} />
+          {/*<Route path={'/ui/ifc_viewer'} render={() => (*/}
+          {/*  <IfcViewer />*/}
+          {/*)} />*/}
 
           <Route path={PAGE.RECENT_ACTIVITIES} component={PersonalRecentActivities} />
 

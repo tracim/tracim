@@ -145,8 +145,11 @@ export class FileComponent extends React.Component {
         {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) && (
           props.content.file_extension === '.ifc'
             ? (
+              // <IfcViewerOld
+              //   content={props.content}
+              //   contentRawUrl={props.downloadRawUrl}
+              // />
               <IfcViewer
-                content={props.content}
                 contentRawUrl={props.downloadRawUrl}
               />
             )

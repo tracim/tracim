@@ -17,6 +17,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@thatopen/ui": "^2.4.2",
     "classnames": "^2.2.6",
     "color": "^3.1.2",
     "core-js": "^3.6.4",

@@ -10,5 +10,10 @@
   "devDependencies": {
     "eslint": "^6.8.0"
   },
-  "packageManager": "yarn@3.2.0"
+  "packageManager": "yarn@3.2.0",
+  "dependencies": {
+    "@thatopen/components": "^2.4.4",
+    "@thatopen/fragments": "^2.4.0",
+    "web-ifc": "^0.0.68"
+  }
 }
