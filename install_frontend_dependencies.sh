@@ -36,7 +36,7 @@ if ! [ -z ${1+x} ]; then
         echo "This script installs the dependencies of the frontend."
         echo "It installs node and yarn using the APT debian package manager" \
              "if they are not already installed."
-        echo "It also checks that the installed version of node is version 14."
+        echo "It also checks that the installed version of node is version 18."
         echo "It then configures yarn and run yarn install to install the node modules used by the frontend."
         echo
         echo "Usage: $0 [root]"
@@ -49,10 +49,10 @@ fi
 
 test_node_version() {
     node_version=$(node -v | cut -d. -f1 | sed 's/v//g')
-    if [ "$node_version" -gt 13 ]; then
+    if [ "$node_version" -gt 17 ]; then
         loggood "Node $(node -v) is installed."
     else
-        logerror "Node is installed but the version is $(node -v) instead of version 14. Please install this version."
+        logerror "Node is installed but the version is $(node -v) instead of version 18. Please install this version."
         exit 1
     fi
 }
@@ -88,7 +88,7 @@ debian_install() {
         install_yarn_package=yarn
     fi
 
-    log "Checking whether Node v14+ is installed…"
+    log "Checking whether Node v18+ is installed…"
     if node -v > /dev/null 2>&1; then
         test_node_version
     else
@@ -97,9 +97,9 @@ debian_install() {
         debian_install_curl
 
         log "Installing the node repository…"
-        curl -sL https://deb.nodesource.com/setup_14.x | $SUDOCURL bash - && \
+        curl -sL https://deb.nodesource.com/setup_18.x | $SUDOCURL bash - && \
             loggood "The node repository was successfully installed." || \
-            logerror "Failed to install node repository. Please install Node v14+ manually."
+            logerror "Failed to install node repository. Please install Node v18+ manually."
 
         log "We will install node."
         apt_install=true
@@ -111,7 +111,7 @@ debian_install() {
 
         if [ "$install_node_package" = "" ]; then
             # if install_node_package is not empty,
-            # deb.nodesource.com/setup_14.x already updated the repository
+            # deb.nodesource.com/setup_18.x already updated the repository
 
             $SUDO apt-get update || logerror "Failed updating the repositories."
         fi
