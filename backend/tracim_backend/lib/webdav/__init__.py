@@ -38,7 +38,7 @@ class WebdavAppFactory(object):
         config["http_authenticator"]["default_to_digest"] = False
         # check this for apache authentication mechanism
         if app_config.REMOTE_USER_HEADER:
-            config["trusted_auth_header"] = app_config.REMOTE_USER_HEADER
+            config["http_authenticator"]["trusted_auth_header"] = app_config.REMOTE_USER_HEADER
 
         config[
             "verbose"
