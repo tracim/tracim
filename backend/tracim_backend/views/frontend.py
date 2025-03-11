@@ -19,12 +19,9 @@ APP_FRONTEND_PATH = "app/{minislug}.app.optimized.js"
 # INFO S.G - 2020-12-10 - minimum recommended size is 128bits = 16bytes, doubling this
 CSP_NONCE_SIZE = 32
 BASE_CSP_DIRECTIVES = (
-    # NOTE S.G - 2020-12-14 - unsafe-eval is needed for
-    # custom forms app and user profile page
-    # (react-jsonschema-form/ajv dependency)
     (
         "script-src",
-        "'unsafe-eval' 'nonce-{nonce}' {base_url}/assets/hugerte-dist-1.0.7/",
+        "'nonce-{nonce}' {base_url}/assets/hugerte-dist-1.0.7/",
     ),
     # NOTE S.G. - 2020-12-14 - unsafe-inline is needed for tinyMce
     ("style-src", "'unsafe-inline' 'self'"),
@@ -99,6 +96,15 @@ class FrontendController(Controller):
             )
 
             csp_directives = dict(BASE_CSP_DIRECTIVES)
+
+            if app_config.CONTENT_SECURITY_POLICY__ADDITIONAL_SCRIPT_SRC:
+                csp_directives["script-src"] = "".join(
+                    (
+                        csp_directives["script-src"],
+                        " ",
+                        app_config.CONTENT_SECURITY_POLICY__ADDITIONAL_SCRIPT_SRC,
+                    )
+                )
 
             # add CSP directives needed for applications
             app_lib = ApplicationApi(app_list=app_list)
