@@ -6,7 +6,7 @@ playButtonSize = 40px
   display flex
   flex-direction row-reverse
 
-.previewcomponent
+.jpegAndVideoViewer
   overflow-x hidden
   display flex
   width 100%
@@ -29,7 +29,7 @@ playButtonSize = 40px
       font-size playButtonSize
       opacity 0.7
     &:hover
-      & .previewcomponent__fileimg__play
+      & .jpegAndVideoViewer__fileimg__play
         opacity 1
     &__img
       object-fit contain
@@ -72,5 +72,5 @@ playButtonSize = 40px
     justify-content center
 
 @media (min-width: max-xs) and (max-width: max-lg)
-  .previewcomponent
+  .jpegAndVideoViewer
     height 100%

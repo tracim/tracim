@@ -55,7 +55,8 @@ import {
   getFileRevisionPreviewInfo,
   sortListByMultipleCriteria,
   SORT_BY,
-  ToDoManagement
+  ToDoManagement,
+  defaultApiContent
 } from 'tracim_frontend_lib'
 import { isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import {
@@ -153,7 +154,12 @@ export class File extends React.Component {
     const { props, state } = this
     console.log('%c<File> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP(state.config.slug), data)
 
-    props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
+    props.appContentCustomEventHandlerShowApp(
+      data.content,
+      state.content,
+      this.setState.bind(this),
+      this.buildBreadcrumbs
+    )
     if (data.content.content_id === state.content.content_id) this.setHeadTitle(state.content.label)
   }
 
@@ -166,9 +172,13 @@ export class File extends React.Component {
 
   handleReloadContent = data => {
     const { props, state } = this
-    console.log('%c<File> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug), data)
+    const dataWithPropertyReset = {
+      ...defaultApiContent,
+      ...data
+    }
+    console.log('%c<File> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug), dataWithPropertyReset)
 
-    props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), state.appName)
+    props.appContentCustomEventHandlerReloadContent(dataWithPropertyReset, this.setState.bind(this), state.appName)
   }
 
   handleAllAppChangeLanguage = data => {

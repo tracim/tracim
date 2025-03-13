@@ -50,7 +50,8 @@ import {
   searchContentAndReplaceWithTag,
   searchMentionAndReplaceWithTag,
   sendGlobalFlashMessage,
-  sortListByMultipleCriteria
+  sortListByMultipleCriteria,
+  defaultApiContent
 } from 'tracim_frontend_lib'
 import {
   getHtmlDocContent,
@@ -280,8 +281,11 @@ export class HtmlDocument extends React.Component {
   handleReloadContent = data => {
     const { props, state } = this
     // console.debug('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_CONTENT, data)
-
-    props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), state.appName)
+    const dataWithPropertyReset = {
+      ...defaultApiContent,
+      ...data
+    }
+    props.appContentCustomEventHandlerReloadContent(dataWithPropertyReset, this.setState.bind(this), state.appName)
   }
 
   handleAllAppChangeLanguage = data => {

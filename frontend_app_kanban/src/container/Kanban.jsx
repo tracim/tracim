@@ -39,7 +39,8 @@ import {
   handleFetchResult,
   putMyselfFileRead,
   sendGlobalFlashMessage,
-  sortListByMultipleCriteria
+  sortListByMultipleCriteria,
+  defaultApiContent
 } from 'tracim_frontend_lib'
 
 import KanbanComponent from '../component/Kanban.jsx'
@@ -120,7 +121,11 @@ export class Kanban extends React.Component {
 
   handleReloadContent = data => {
     console.log('%c<Kanban> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_CONTENT(this.state.config.slug), data)
-    this.props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), this.state.appName)
+    const dataWithPropertyReset = {
+      ...defaultApiContent,
+      ...data
+    }
+    this.props.appContentCustomEventHandlerReloadContent(dataWithPropertyReset, this.setState.bind(this), this.state.appName)
   }
 
   handleReloadAppFeatureData = () => {

@@ -676,3 +676,32 @@ export function onClickOutside (listening, setListening, menuRef, setIsOpen) {
     })
   }
 }
+
+export const defaultApiContent = {
+  content_id: 0,
+  workspace_id: 0,
+  label: '',
+  filename: '',
+  slug: '',
+  is_deleted: false,
+  content_type: '',
+  file_extension: '',
+  content_namespace: 'content',
+  created: '',
+  current_revision_id: 0,
+  description: '',
+  raw_content: '',
+  assignee_id: null,
+  actives_shares: 0,
+  version_number: 0,
+  is_archived: false,
+  is_template: false,
+  mimetype: '',
+  size: 0,
+  parent_id: 0,
+  status: 'open',
+  show_in_ui: true,
+  current_revision_type: 'revision',
+  modified: '',
+  is_editable: true
+}
