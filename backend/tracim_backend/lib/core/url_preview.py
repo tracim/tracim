@@ -94,7 +94,6 @@ class URLPreviewLib(object):
             # INFO - GM - 2022-02-22 - Default case: preview from html metadata
             if response.is_html:
                 title, description, image_url = web_preview(url=url, content=response.text_content)
-                image_url = image_url.strip()
             # INFO - GM - 2022-02-22 - Small image case: preview is image itself
             elif response.is_image and response.allowed_content_length:
                 title = response.filename
