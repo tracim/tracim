@@ -30,15 +30,15 @@ describe('A video file', () => {
 
   it('should not display more than one preview page', () => {
     cy.contains('[data-cy=FilenameWithBadges__label]', fileTitle)
-    cy.get('.previewcomponent__fileimg').should('be.visible')
-    cy.get('.previewcomponent__pagecount').should('not.exist')
-    cy.get('.previewcomponent__navigationButton').should('not.exist')
+    cy.get('.jpegAndVideoViewer__fileimg').should('be.visible')
+    cy.get('.jpegAndVideoViewer__pagecount').should('not.exist')
+    cy.get('.jpegAndVideoViewer__navigationButton').should('not.exist')
   })
 
   it('should display the video player when clicking on preview', () => {
     cy.contains('[data-cy=FilenameWithBadges__label]', fileTitle).then(() => {
-      cy.get('.previewcomponent__fileimg__text').should('not.exist')
-      cy.get('.previewcomponent__fileimg').should('be.visible').click()
+      cy.get('.jpegAndVideoViewer__fileimg__text').should('not.exist')
+      cy.get('.jpegAndVideoViewer__fileimg').should('be.visible').click()
       cy.get('#videoWrapperDiv > video').should('be.visible')
     })
   })

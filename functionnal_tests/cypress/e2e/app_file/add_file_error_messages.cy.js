@@ -33,7 +33,7 @@ describe('In a workspace', function () {
       .get('[data-cy=popup__createcontent__form__button]')
       .click()
     cy.getTag({ selectorName: s.CONTENT_FRAME })
-      .get('.previewcomponent').should('have.length', 1)
+      .get('.jpegAndVideoViewer').should('have.length', 1)
     cy.getTag({ selectorName: s.CONTENT_FRAME })
       .get('.selectStatus').contains('Opened')
     cy.url().should('include', URLS[p.FILE]({workspaceId, fileId: '1'}))

@@ -39,7 +39,7 @@ describe('App File', () => {
 
         cy.contains('.breadcrumbs__item', fileTitle_2).should('be.visible')
 
-        cy.get('.previewcomponent__filepreview')
+        cy.get('.jpegAndVideoViewer__filepreview')
           .should('be.visible')
 
         cy.get('[data-cy="revision_data_2"]')
