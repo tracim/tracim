@@ -161,7 +161,7 @@ export const TinyEditor = props => {
           toolbar: toolbar,
           default_link_target: '_blank',
           plugins: [
-            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview', 'anchor',
+            'autolink', 'lists', 'link', 'image', 'charmap', 'preview', 'anchor',
             'searchreplace', 'visualblocks', 'code', 'codesample', 'fullscreen', 'emoticons',
             'insertdatetime', 'media', 'table', 'help', 'wordcount',
             props.isAutoResizeEnabled ? 'autoresize' : ''
