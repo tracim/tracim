@@ -12,6 +12,11 @@ export const TextViewerSyntaxHighlight = (props) => {
 
     async function loadContentAsText (rawUrl) {
       const contentResponse = await fetch(rawUrl)
+
+      if (contentResponse.status !== 200 && contentResponse.status !== 204) {
+        return
+      }
+
       const contentResponseAsText = await contentResponse.text()
 
       // INFO - CH - 2025-03-12 - Don't add line break on the line bellow.
