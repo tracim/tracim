@@ -12,12 +12,17 @@ export const TextViewerSyntaxHighlight = (props) => {
 
     async function loadContentAsText (rawUrl) {
       const contentResponse = await fetch(rawUrl)
-      const contentAsText = await contentResponse.text()
+
+      if (contentResponse.status !== 200 && contentResponse.status !== 204) {
+        return
+      }
+
+      const contentResponseAsText = await contentResponse.text()
 
       // INFO - CH - 2025-03-12 - Don't add line break on the line bellow.
       // They would be interpreted by Prism js which would break the design
       const contentWithPrismJsWrapper = `
-        <pre class='language-${props.language}'><code>${contentAsText}</code></pre>
+        <pre class='language-${props.language}'><code>${contentResponseAsText}</code></pre>
       `
 
       setContentAsText(contentWithPrismJsWrapper)
