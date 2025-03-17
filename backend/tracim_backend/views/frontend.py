@@ -21,6 +21,10 @@ APP_FRONTEND_PATH = "app/{minislug}.app.optimized.js"
 CSP_NONCE_SIZE = 32
 BASE_CSP_DIRECTIVES = (
     (
+        # INFO - CH - 2025-03-07 - 'unsafe-eval' is required by
+        # frontend_app_file/src/component/IfcViewer/IfcViewer.jsx
+        # 'wasm-unsafe-eval' would also be required by IfcViewer.jsx but 'unsafe-eval'
+        # already allows wasm execution
         "script-src",
         "'nonce-{nonce}' {base_url}/assets/hugerte-dist-1.0.7/ 'unsafe-eval' 'wasm-unsafe-eval'",
     ),
