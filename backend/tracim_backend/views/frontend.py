@@ -22,7 +22,7 @@ CSP_NONCE_SIZE = 32
 BASE_CSP_DIRECTIVES = (
     (
         "script-src",
-        "'nonce-{nonce}' {base_url}/assets/hugerte-dist-1.0.7/",
+        "'nonce-{nonce}' {base_url}/assets/hugerte-dist-1.0.7/ 'unsafe-eval' 'wasm-unsafe-eval'",
     ),
     # NOTE S.G. - 2020-12-14 - unsafe-inline is needed for tinyMce
     ("style-src", "'unsafe-inline' 'self'"),
