@@ -6,6 +6,15 @@ import * as OBC from '@thatopen/components'
 
 require('./IfcViewer.styl')
 
+// INFO - CH - 2025-03-17 - Cleanup is important because the viewer declares an infinite loop to redraw the
+// ifc viewer every browser's animation frame.
+// Also, it is important to not try to load a malformed ifc file or another format to the ifc viewer.
+// It makes the browser tab to consume huge amount of memory until the browser kills the js process.
+const cleanupIfcViewer = (components, ifcViewerRef) => {
+  components.dispose()
+  ifcViewerRef.current = null
+}
+
 const IfcViewer = props => {
   const ifcViewerRef = useRef(null)
 
@@ -47,29 +56,40 @@ const IfcViewer = props => {
     world.scene.three.background = null
 
     async function loadIfc () {
-      const file = await fetch(props.contentRawUrl)
-      const data = await file.arrayBuffer()
-      const buffer = new Uint8Array(data)
+      try {
+        const file = await fetch(props.contentRawUrl)
 
-      const fragmentIfcLoader = components.get(OBC.IfcLoader)
+        if (file.status !== 200 && file.status !== 204) {
+          cleanupIfcViewer(components, ifcViewerRef)
+          return
+        }
 
-      fragmentIfcLoader.settings.wasm = {
-        // INFO - CH - 2025-02-26 - Source of wasm/ is from https://unpkg.com/web-ifc@0.0.68/
-        path: '/assets/wasm/',
-        absolute: true
+        const data = await file.arrayBuffer()
+        const buffer = new Uint8Array(data)
+
+        const fragmentIfcLoader = components.get(OBC.IfcLoader)
+
+        fragmentIfcLoader.settings.wasm = {
+          // INFO - CH - 2025-02-26 - Source of wasm/ is from https://unpkg.com/web-ifc@0.0.68/
+          path: '/assets/wasm/',
+          absolute: true
+        }
+        const excludedCats = [
+          WEBIFC.IFCTENDONANCHOR,
+          WEBIFC.IFCREINFORCINGBAR,
+          WEBIFC.IFCREINFORCINGELEMENT
+        ]
+        for (const cat of excludedCats) {
+          fragmentIfcLoader.settings.excludedCategories.add(cat)
+        }
+        fragmentIfcLoader.settings.webIfc.COORDINATE_TO_ORIGIN = true
+
+        const model = await fragmentIfcLoader.load(buffer)
+        world.scene.three.add(model)
+      } catch (e) {
+        console.error('Error during loading of file .ifc', e)
+        cleanupIfcViewer(components, ifcViewerRef)
       }
-      const excludedCats = [
-        WEBIFC.IFCTENDONANCHOR,
-        WEBIFC.IFCREINFORCINGBAR,
-        WEBIFC.IFCREINFORCINGELEMENT
-      ]
-      for (const cat of excludedCats) {
-        fragmentIfcLoader.settings.excludedCategories.add(cat)
-      }
-      fragmentIfcLoader.settings.webIfc.COORDINATE_TO_ORIGIN = true
-
-      const model = await fragmentIfcLoader.load(buffer)
-      world.scene.three.add(model)
     }
 
     loadIfc()
@@ -77,8 +97,7 @@ const IfcViewer = props => {
     world.renderer.onResize.add(world.camera.updateAspect)
 
     return () => {
-      components.dispose()
-      ifcViewerRef.current = null
+      cleanupIfcViewer(components, ifcViewerRef)
     }
   }, [props.contentRawUrl])
 
