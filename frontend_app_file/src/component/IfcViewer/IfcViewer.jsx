@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import PropTypes from 'prop-types'
 
 import * as WEBIFC from 'web-ifc'
 import * as OBC from '@thatopen/components'
@@ -9,6 +10,11 @@ const IfcViewer = props => {
   const ifcViewerRef = useRef(null)
 
   useEffect(() => {
+    if (!props.contentRawUrl) {
+      ifcViewerRef.current = null
+      return
+    }
+
     // INFO - CH - 2025-02-26 - Documentation at
     // https://docs.thatopen.com/Tutorials/Components/Core/IfcLoader
 
@@ -69,8 +75,12 @@ const IfcViewer = props => {
     loadIfc()
 
     world.renderer.onResize.add(world.camera.updateAspect)
-    window.requestAnimationFrame(world.camera.updateAspect)
-  }, [])
+
+    return () => {
+      components.dispose()
+      ifcViewerRef.current = null
+    }
+  }, [props.contentRawUrl])
 
   return (
     <div
@@ -81,3 +91,7 @@ const IfcViewer = props => {
 }
 
 export default IfcViewer
+
+IfcViewer.propTypes = {
+  contentRawUrl: PropTypes.string.isRequired
+}

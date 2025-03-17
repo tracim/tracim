@@ -7,9 +7,9 @@ import Lightbox from 'react-image-lightbox'
 import 'react-image-lightbox/style.css'
 import { Icon, IMG_LOAD_STATE } from 'tracim_frontend_lib'
 
-require('./PreviewComponent.styl')
+require('./JpegAndVideoViewer.styl')
 
-export class PreviewComponent extends React.Component {
+export class JpegAndVideoViewer extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -100,12 +100,12 @@ export class PreviewComponent extends React.Component {
     })
 
     return (
-      <div className='previewcomponent'>
-        <div className='previewcomponent__filepreview'>
+      <div className='jpegAndVideoViewer'>
+        <div className='jpegAndVideoViewer__filepreview'>
           {state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.filePageNb > 1 && !props.isVideo && (
             <button
               type='button'
-              className='previewcomponent__navigationButton btn iconBtn'
+              className='jpegAndVideoViewer__navigationButton btn iconBtn'
               onClick={props.onClickPreviousPage}
               style={{ ':hover': { color: props.color } }}
               title={props.t('Previous page')}
@@ -118,7 +118,7 @@ export class PreviewComponent extends React.Component {
 
           <div
             className={classnames(
-              'previewcomponent__fileimg',
+              'jpegAndVideoViewer__fileimg',
               { previewAvailable: state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.isJpegAvailable }
             )}
             onClick={this.handleClickPreview}
@@ -130,11 +130,11 @@ export class PreviewComponent extends React.Component {
                     src={props.preview.url}
                     srcSet={srcSet}
                     alt={props.preview.name}
-                    className='img-thumbnail previewcomponent__fileimg__img'
+                    className='img-thumbnail jpegAndVideoViewer__fileimg__img'
                   />
 
                   {props.isVideo && (
-                    <div className='previewcomponent__fileimg__play'>
+                    <div className='jpegAndVideoViewer__fileimg__play'>
                       <Icon
                         icon='far fa-play-circle'
                         title={props.t('Play video')}
@@ -144,17 +144,17 @@ export class PreviewComponent extends React.Component {
                 </>
               )
               : (
-                <div className='previewcomponent__fileimg__text'>
+                <div className='jpegAndVideoViewer__fileimg__text'>
                   {props.isJpegAvailable && state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADING
                     ? (
-                      <div className='previewcomponent__fileimg__text-msg'>
+                      <div className='jpegAndVideoViewer__fileimg__text-msg'>
                         {props.t('Preview loading...')}
                       </div>
                     )
                     : (
                       <>
-                        <i className='previewcomponent__fileimg__text-icon far fa-eye-slash' style={{ color: props.color }} />
-                        <div className='previewcomponent__fileimg__text-msg'>
+                        <i className='jpegAndVideoViewer__fileimg__text-icon far fa-eye-slash' style={{ color: props.color }} />
+                        <div className='jpegAndVideoViewer__fileimg__text-msg'>
                           {props.t('No preview available')}
                         </div>
                       </>
@@ -183,7 +183,7 @@ export class PreviewComponent extends React.Component {
           {state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.filePageNb > 1 && !props.isVideo && (
             <button
               type='button'
-              className='previewcomponent__navigationButton btn transparentButton'
+              className='jpegAndVideoViewer__navigationButton btn transparentButton'
               onClick={props.onClickNextPage}
               style={{ ':hover': { color: props.color } }}
               title={props.t('Next page')}
@@ -195,7 +195,7 @@ export class PreviewComponent extends React.Component {
           )}
         </div>
         {state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.filePageNb > 1 && !props.isVideo && (
-          <div className='previewcomponent__pagecount'>
+          <div className='jpegAndVideoViewer__pagecount'>
             {props.fileCurrentPage}{props.t(' of ')}{props.filePageNb}
           </div>
         )}
@@ -204,9 +204,9 @@ export class PreviewComponent extends React.Component {
   }
 }
 
-export default translate()(Radium(PreviewComponent))
+export default translate()(Radium(JpegAndVideoViewer))
 
-PreviewComponent.propTypes = {
+JpegAndVideoViewer.propTypes = {
   filePageNb: PropTypes.number,
   fileCurrentPage: PropTypes.number,
   isJpegAvailable: PropTypes.bool,
@@ -223,7 +223,7 @@ PreviewComponent.propTypes = {
 
 }
 
-PreviewComponent.defaultProps = {
+JpegAndVideoViewer.defaultProps = {
   filePageNb: 0,
   fileCurrentPage: 0,
   isJpegAvailable: false,

@@ -31,7 +31,8 @@ import {
   ROLE,
   COLORS,
   SelectStatus,
-  buildAppCustomActionLinkList
+  buildAppCustomActionLinkList,
+  defaultApiContent
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -107,7 +108,11 @@ export class Thread extends React.Component {
 
   handleReloadContent = data => {
     console.log('%c<Thread> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_CONTENT(this.state.config.slug), data)
-    this.props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), this.state.appName)
+    const dataWithPropertyReset = {
+      ...defaultApiContent,
+      ...data
+    }
+    this.props.appContentCustomEventHandlerReloadContent(dataWithPropertyReset, this.setState.bind(this), this.state.appName)
   }
 
   handleReloadAppFeatureData = () => {

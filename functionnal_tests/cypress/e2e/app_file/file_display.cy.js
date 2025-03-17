@@ -34,11 +34,11 @@ context('Open a file', function () {
     })
 
     it('should should display page number', () => {
-      cy.contains('.previewcomponent__pagecount', '1 of 2')
+      cy.contains('.jpegAndVideoViewer__pagecount', '1 of 2')
     })
 
     it('should should display next page navigation', () => {
-      cy.get('.previewcomponent__navigationButton').should('be.visible')
+      cy.get('.jpegAndVideoViewer__navigationButton').should('be.visible')
     })
   })
 })

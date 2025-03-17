@@ -23,7 +23,8 @@ import {
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent,
   sendGlobalFlashMessage,
-  FAVORITE_STATE
+  FAVORITE_STATE,
+  defaultApiContent
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -103,7 +104,11 @@ export class FolderAdvanced extends React.Component {
   handleReloadContent = data => {
     const { state } = this
     console.log('%c<FolderAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug), data)
-    this.setState(prev => ({ content: { ...prev.content, ...data }, isVisible: true }))
+    const dataWithPropertyReset = {
+      ...defaultApiContent,
+      ...data
+    }
+    this.setState(prev => ({ content: { ...prev.content, ...dataWithPropertyReset }, isVisible: true }))
   }
 
   handleReloadAppFeatureData = data => {
