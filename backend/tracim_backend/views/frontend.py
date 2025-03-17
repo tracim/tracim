@@ -118,6 +118,7 @@ class FrontendController(Controller):
                     values = csp_element_list[1:]
                 except IndexError:
                     logger.error(self, "Error while parsing CSP element {}".format(additional_csp))
+                    continue
                 try:
                     csp_directives[directive] = "{} {}".format(
                         csp_directives[directive], " ".join(values)
