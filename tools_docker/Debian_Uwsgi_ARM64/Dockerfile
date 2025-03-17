@@ -63,7 +63,7 @@ RUN cp -r /tracim/frontend/dist/assets/font/Nunito/ /usr/share/fonts/nunito
 # - setups backend translation
 # - builds frontend
 ####
-FROM node:14-buster AS build_frontend
+FROM node:16-buster AS build_frontend
 COPY --from=base /tracim /tracim
 RUN \
     cd /tracim/backend \
