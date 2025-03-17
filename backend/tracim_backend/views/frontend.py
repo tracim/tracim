@@ -5,6 +5,7 @@ from pyramid.config import Configurator
 from pyramid.renderers import render_to_response
 from pyramid.response import Response
 import typing
+from venv import logger
 
 from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.extensions import app_list
@@ -97,15 +98,6 @@ class FrontendController(Controller):
 
             csp_directives = dict(BASE_CSP_DIRECTIVES)
 
-            if app_config.CONTENT_SECURITY_POLICY__ADDITIONAL_SCRIPT_SRC:
-                csp_directives["script-src"] = "".join(
-                    (
-                        csp_directives["script-src"],
-                        " ",
-                        app_config.CONTENT_SECURITY_POLICY__ADDITIONAL_SCRIPT_SRC,
-                    )
-                )
-
             # add CSP directives needed for applications
             app_lib = ApplicationApi(app_list=app_list)
             for app in app_lib.get_all():
@@ -116,8 +108,24 @@ class FrontendController(Controller):
                     except KeyError:
                         csp_directives[app_key] = app_value
 
+            list_additional_csp = app_config.CONTENT_SECURITY_POLICY__ADDITIONAL_DIRECTIVES.split(
+                ";"
+            )
+            for additional_csp in list_additional_csp:
+                csp_element_list = additional_csp.strip().split(" ")
+                try:
+                    directive = csp_element_list[0]
+                    values = csp_element_list[1:]
+                except IndexError:
+                    logger.error(self, "Error while parsing CSP element {}".format(additional_csp))
+                try:
+                    csp_directives[directive] = "{} {}".format(
+                        csp_directives[directive], " ".join(values)
+                    )
+                except KeyError:
+                    csp_directives[directive] = " ".join(values)
+
             csp = "; ".join("{} {}".format(key, value) for key, value in csp_directives.items())
-            csp = "{}; {}".format(app_config.CONTENT_SECURITY_POLICY__ADDITIONAL_DIRECTIVES, csp)
             csp_header_value = csp.format(nonce=csp_nonce, base_url=app_config.WEBSITE__BASE_URL)
             if app_config.CONTENT_SECURITY_POLICY__REPORT_URI:
                 csp_headers.append(("Report-To", app_config.CONTENT_SECURITY_POLICY__REPORT_URI))
