@@ -17,13 +17,10 @@ The following table contains:
 | TRACIM_DEFAULT_LANG                                                       | default_lang                                                   | DEFAULT_LANG                                                       |
 | TRACIM_PREVIEW_CACHE_DIR                                                  | preview_cache_dir                                              | PREVIEW_CACHE_DIR                                                  |
 | TRACIM_AUTH_TYPES                                                         | auth_types                                                     | AUTH_TYPES                                                         |
-| TRACIM_USER__PROFILE__READ_ONLY_FIELDS_SAML                               | user.profile.read_only_fields.saml                             | USER__PROFILE__READ_ONLY_FIELDS__SAML                              |
-| TRACIM_USER__PROFILE__READ_ONLY_FIELDS_LDAP                               | user.profile.read_only_fields.ldap                             | USER__PROFILE__READ_ONLY_FIELDS__LDAP                              |
-| TRACIM_USER__PROFILE__READ_ONLY_FIELDS_INTERNAL                           | user.profile.read_only_fields.internal                         | USER__PROFILE__READ_ONLY_FIELDS__INTERNAL                          |
+| TRACIM_USER__PROFILE__READ_ONLY_FIELDS__INTERNAL                          | user.profile.read_only_fields.internal                         | USER__PROFILE__READ_ONLY_FIELDS__INTERNAL                          |
 | TRACIM_REMOTE_USER_HEADER                                                 | remote_user_header                                             | REMOTE_USER_HEADER                                                 |
-| TRACIM_API__KEY                                                           | api.key                                                        | API__KEY                                                           |
 | TRACIM_CONFIG__FILEPATH                                                   | config.filepath                                                | CONFIG__FILEPATH                                                   |
-| TRACIM_APP_CUSTOM_ACTIONS__CONFIG_FILE                                    | app_custom_actions.config_file                                 | APP_CUSTOM_ACTIONS__CONFIG_FILE                                    |
+| TRACIM_API__KEY                                                           | api.key                                                        | API__KEY                                                           |
 | TRACIM_SESSION__TYPE                                                      | session.type                                                   | SESSION__TYPE                                                      |
 | TRACIM_SESSION__URL                                                       | session.url                                                    | SESSION__URL                                                       |
 | TRACIM_SESSION__URLS                                                      | session.urls                                                   | SESSION__URLS                                                      |
@@ -58,12 +55,12 @@ The following table contains:
 | TRACIM_BUILD_VERSION                                                      | build_version                                                  | BUILD_VERSION                                                      |
 | TRACIM_PREVIEW__JPG__RESTRICTED_DIMS                                      | preview.jpg.restricted_dims                                    | PREVIEW__JPG__RESTRICTED_DIMS                                      |
 | TRACIM_PREVIEW__JPG__ALLOWED_DIMS                                         | preview.jpg.allowed_dims                                       | PREVIEW__JPG__ALLOWED_DIMS                                         |
-| TRACIM_PREVIEW__SKIPLIST                                                  | preview.skiplist                                               | PREVIEW__SKIPLIST                                                  |
 | TRACIM_FRONTEND__SERVE                                                    | frontend.serve                                                 | FRONTEND__SERVE                                                    |
 | TRACIM_FRONTEND__CACHE_TOKEN                                              | frontend.cache_token                                           | FRONTEND__CACHE_TOKEN                                              |
 | TRACIM_BACKEND__I18N_FOLDER_PATH                                          | backend.i18n_folder_path                                       | BACKEND__I18N_FOLDER_PATH                                          |
 | TRACIM_FRONTEND__DIST_FOLDER_PATH                                         | frontend.dist_folder_path                                      | FRONTEND__DIST_FOLDER_PATH                                         |
 | TRACIM_COLOR__CONFIG_FILE_PATH                                            | color.config_file_path                                         | COLOR__CONFIG_FILE_PATH                                            |
+| TRACIM_APP_CUSTOM_ACTIONS__CONFIG_FILE                                    | app_custom_actions.config_file                                 | APP_CUSTOM_ACTIONS__CONFIG_FILE                                    |
 | TRACIM_RICH_TEXT_PREVIEW__CSS_PATH                                        | rich_text_preview.css_path                                     | RICH_TEXT_PREVIEW__CSS_PATH                                        |
 | TRACIM_RICH_TEXT_PREVIEW__TEMPLATE_PATH                                   | rich_text_preview.template_path                                | RICH_TEXT_PREVIEW__TEMPLATE_PATH                                   |
 | TRACIM_PLUGIN__FOLDER_PATH                                                | plugin.folder_path                                             | PLUGIN__FOLDER_PATH                                                |
@@ -71,6 +68,7 @@ The following table contains:
 | TRACIM_URL_PREVIEW__FETCH_TIMEOUT                                         | url_preview.fetch_timeout                                      | URL_PREVIEW__FETCH_TIMEOUT                                         |
 | TRACIM_URL_PREVIEW__MAX_CONTENT_LENGTH                                    | url_preview.max_content_length                                 | URL_PREVIEW__MAX_CONTENT_LENGTH                                    |
 | TRACIM_UI__SPACES__CREATION__PARENT_SPACE_CHOICE__VISIBLE                 | ui.spaces.creation.parent_space_choice.visible                 | UI__SPACES__CREATION__PARENT_SPACE_CHOICE__VISIBLE                 |
+| TRACIM_PREVIEW__SKIPLIST                                                  | preview.skiplist                                               | PREVIEW__SKIPLIST                                                  |
 | TRACIM_UI__NOTES__CODE_SAMPLE_LANGUAGES                                   | ui.notes.code_sample_languages                                 | UI__NOTES__CODE_SAMPLE_LANGUAGES                                   |
 | TRACIM_DEPOT_STORAGE_DIR                                                  | depot_storage_dir                                              | DEPOT_STORAGE_DIR                                                  |
 | TRACIM_DEPOT_STORAGE_NAME                                                 | depot_storage_name                                             | DEPOT_STORAGE_NAME                                                 |
@@ -164,6 +162,7 @@ The following table contains:
 | TRACIM_CONTENT_SECURITY_POLICY__ENABLED                                   | content_security_policy.enabled                                | CONTENT_SECURITY_POLICY__ENABLED                                   |
 | TRACIM_CONTENT_SECURITY_POLICY__REPORT_URI                                | content_security_policy.report_uri                             | CONTENT_SECURITY_POLICY__REPORT_URI                                |
 | TRACIM_CONTENT_SECURITY_POLICY__REPORT_ONLY                               | content_security_policy.report_only                            | CONTENT_SECURITY_POLICY__REPORT_ONLY                               |
+| TRACIM_CONTENT_SECURITY_POLICY__ADDITIONAL_SCRIPT_SRC                     | content_security_policy.additional_script_src                  | CONTENT_SECURITY_POLICY__ADDITIONAL_SCRIPT_SRC                     |
 | TRACIM_CONTENT_SECURITY_POLICY__ADDITIONAL_DIRECTIVES                     | content_security_policy.additional_directives                  | CONTENT_SECURITY_POLICY__ADDITIONAL_DIRECTIVES                     |
 | TRACIM_TRANSLATION_SERVICE__ENABLED                                       | translation_service.enabled                                    | TRANSLATION_SERVICE__ENABLED                                       |
 | TRACIM_TRANSLATION_SERVICE__TIMEOUT                                       | translation_service.timeout                                    | TRANSLATION_SERVICE__TIMEOUT                                       |
@@ -192,6 +191,7 @@ The following table contains:
 | TRACIM_EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__SUBJECT         | email.notification.upload_permission_to_emitter.subject        | EMAIL__NOTIFICATION__UPLOAD_PERMISSION_TO_EMITTER__SUBJECT         |
 | TRACIM_EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML              | email.notification.new_upload_event.template.html              | EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__TEMPLATE__HTML              |
 | TRACIM_EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT                     | email.notification.new_upload_event.subject                    | EMAIL__NOTIFICATION__NEW_UPLOAD_EVENT__SUBJECT                     |
+
 
 ## How to generate the above table
 

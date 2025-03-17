@@ -190,6 +190,9 @@ workspace.join.max_messages_history_count = -1
 # Useful to test policy changes before enforcing them
 # If set to true, "report_uri" must also have a valid value.
 ; content_security_policy.report_only = False
+# additional urls for directives script-src. Useful to add your own external js script. Separate by space
+# Example: content_security_policy.additional_script_src = https://mydomain.com/myurl https://my-other-domain.com/myurl
+; content_security_policy.additional_script_src =
 # additional directives to tune the CSP header, they are added without any change to the header
 ; content_security_policy.additional_directives =
 

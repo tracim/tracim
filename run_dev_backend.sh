@@ -156,8 +156,11 @@ if [ "$mode" = "cypress" ]; then
     yarn run "cypress-$cypress_arg"
     teardown
 else
-    # disable CSP header for development (tracim dev builds use eval()).
-    export TRACIM_CONTENT_SECURITY_POLICY__ENABLED=False
+    # INFO - CH - 2025-03-11 - Force CSP directive script-src to unsafe-eval in development mode
+    # Reason is the frontend apps built in development mode uses eval()
+    # Note that setting content_security_policy.additional_script_src in development.ini
+    # won't take effect as it will be overwritten by this declaration
+    export TRACIM_CONTENT_SECURITY_POLICY__ADDITIONAL_SCRIPT_SRC="'unsafe-eval'"
     # NOTE: by default the mysql/mariadb do save their database in a tmpfs.
     # disabling this for manual tests/dev in order to retain the database between launches
     export TMPFS_DIR=/tmp
