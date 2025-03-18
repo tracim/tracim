@@ -117,7 +117,7 @@ describe('HugeRte text editor', function () {
       cy.visitPage({ pageName: p.CONTENTS, params: { workspaceId: 1 } })
       cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: 'TestNote3' } }).click()
     })
-    for (const [buttonTitle, domElement] of [['Bullet list', 'ul']]) {
+    for (const [buttonTitle, domElement] of [['Bullet list', 'ul'], ["Numbered list", 'ol']]) {
       it(`should setup a dir="auto" attribute on ${buttonTitle}s`, function () {
         cy.get('[data-cy=newVersionButton]').click()
         cy.getActiveHugeRTEEditor()
