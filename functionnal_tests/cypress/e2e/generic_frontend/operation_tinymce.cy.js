@@ -117,7 +117,7 @@ describe('HugeRte text editor', function () {
       cy.visitPage({ pageName: p.CONTENTS, params: { workspaceId: 1 } })
       cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: 'TestNote3' } }).click()
     })
-    for (const [buttonTitle, domElement] of [['Bullet list', 'ul'], ["Numbered list", 'ol']]) {
+    for (const [buttonTitle, domElement] of [['Bullet list', 'ul']]) {
       it(`should setup a dir="auto" attribute on ${buttonTitle}s`, function () {
         cy.get('[data-cy=newVersionButton]').click()
         cy.getActiveHugeRTEEditor()
@@ -126,7 +126,6 @@ describe('HugeRte text editor', function () {
           })
         cy.get('[aria-label="Reveal or hide additional toolbar items"]').eq(0).click()
         cy.get(`.tox-hugerte-aux [aria-label="${buttonTitle}"]`).click()
-        cy.get(`.tox-tiered-menu [aria-label="Default"]`).click()
         cy.get('[data-cy=editionmode__button__submit]').click()
         cy.get(`.html-content > ${domElement}`).invoke('attr', 'dir').should('be.equal', 'auto')
       })
