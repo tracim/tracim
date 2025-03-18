@@ -126,7 +126,6 @@ describe('HugeRte text editor', function () {
           })
         cy.get('[aria-label="Reveal or hide additional toolbar items"]').eq(0).click()
         cy.get(`.tox-hugerte-aux [aria-label="${buttonTitle}"]`).click()
-        cy.get(`.tox-tiered-menu [aria-label="Default"]`).click()
         cy.get('[data-cy=editionmode__button__submit]').click()
         cy.get(`.html-content > ${domElement}`).invoke('attr', 'dir').should('be.equal', 'auto')
       })

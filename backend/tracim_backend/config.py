@@ -1077,9 +1077,6 @@ class CFG(object):
         self.CONTENT_SECURITY_POLICY__REPORT_ONLY = asbool(
             self.get_raw_config("{}.report_only".format(prefix), "False")
         )
-        self.CONTENT_SECURITY_POLICY__ADDITIONAL_SCRIPT_SRC = self.get_raw_config(
-            "{}.additional_script_src".format(prefix), ""
-        )
         self.CONTENT_SECURITY_POLICY__ADDITIONAL_DIRECTIVES = self.get_raw_config(
             "{}.additional_directives".format(prefix), ""
         )

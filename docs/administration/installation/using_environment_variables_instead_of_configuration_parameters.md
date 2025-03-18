@@ -162,7 +162,6 @@ The following table contains:
 | TRACIM_CONTENT_SECURITY_POLICY__ENABLED                                   | content_security_policy.enabled                                | CONTENT_SECURITY_POLICY__ENABLED                                   |
 | TRACIM_CONTENT_SECURITY_POLICY__REPORT_URI                                | content_security_policy.report_uri                             | CONTENT_SECURITY_POLICY__REPORT_URI                                |
 | TRACIM_CONTENT_SECURITY_POLICY__REPORT_ONLY                               | content_security_policy.report_only                            | CONTENT_SECURITY_POLICY__REPORT_ONLY                               |
-| TRACIM_CONTENT_SECURITY_POLICY__ADDITIONAL_SCRIPT_SRC                     | content_security_policy.additional_script_src                  | CONTENT_SECURITY_POLICY__ADDITIONAL_SCRIPT_SRC                     |
 | TRACIM_CONTENT_SECURITY_POLICY__ADDITIONAL_DIRECTIVES                     | content_security_policy.additional_directives                  | CONTENT_SECURITY_POLICY__ADDITIONAL_DIRECTIVES                     |
 | TRACIM_TRANSLATION_SERVICE__ENABLED                                       | translation_service.enabled                                    | TRANSLATION_SERVICE__ENABLED                                       |
 | TRACIM_TRANSLATION_SERVICE__TIMEOUT                                       | translation_service.timeout                                    | TRANSLATION_SERVICE__TIMEOUT                                       |
