@@ -1337,9 +1337,6 @@ export class File extends React.Component {
             isJpegAvailable={state.previewInfo.has_jpeg_preview}
             filePageNb={state.previewInfo.page_nb}
             fileCurrentPage={state.fileCurrentPage}
-            mimeType={state.content.mimetype}
-            isArchived={state.content.is_archived}
-            isDeleted={state.content.is_deleted}
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
             deprecatedStatus={state.config.availableStatuses[3]}
             onClickRestoreArchived={this.handleClickRestoreArchive}
@@ -1358,7 +1355,6 @@ export class File extends React.Component {
             newFilePreview={state.newFilePreview}
             progressUpload={state.progressUpload}
             previewVideo={state.previewVideo}
-            workspaceId={state.content.workspace_id}
             onTogglePreviewVideo={() => this.setState(prev => ({ previewVideo: !prev.previewVideo }))}
             ref={this.refContentLeftTop}
             displayNotifyAllMessage={this.shouldDisplayNotifyAllMessage()}

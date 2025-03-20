@@ -1,9 +1,8 @@
 import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import { CUSTOM_EVENT } from '../../customEvent.js'
-
 import Prism from 'prismjs'
+import { CUSTOM_EVENT } from '../../customEvent.js'
 
 /*
   INFO - G.B. - 2022-10-10 - To add a plugin, change babel.plugins.prismjs.plugins at frontend_lib/package.json
@@ -12,7 +11,7 @@ import Prism from 'prismjs'
   details, click on the plugin name at https://prismjs.com/#plugins
 */
 
-function onClick (e) {
+function onClickHtmlContentText (e) {
   const t = e.target
   if (t instanceof HTMLAnchorElement && t.href && t.href.startsWith(location.origin + '/')) {
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REDIRECT, data: { url: t.href.substr(location.origin.length) } })
@@ -25,21 +24,23 @@ const HTMLContent = (props) => {
 
   useEffect(() => {
     Prism.highlightAllUnder(refHTMLContent.current)
-  })
+  }, [props.children])
 
   return (
     <article
       ref={refHTMLContent}
-      onClick={onClick}
+      onClick={onClickHtmlContentText}
       className={classnames(
         'line-numbers',
-        props.isTranslated ? 'html-content--translated' : 'html-content',
+        props.isTranslated ? 'HTMLContent--translated' : 'HTMLContent',
         props.showImageBorder ? 'showImageBorder' : ''
       )}
       dangerouslySetInnerHTML={{ __html: props.children }}
     />
   )
 }
+
+export default HTMLContent
 
 HTMLContent.propTypes = {
   isTranslated: PropTypes.bool,
@@ -50,5 +51,3 @@ HTMLContent.defaultProps = {
   isTranslated: false,
   showImageBorder: true
 }
-
-export default HTMLContent

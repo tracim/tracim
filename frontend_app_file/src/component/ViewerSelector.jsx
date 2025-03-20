@@ -6,17 +6,18 @@ import TextViewerSyntaxHighlight from './TextViewerSyntaxHighlight/TextViewerSyn
 import { prismJsLanguageList } from './prismJsLanguageList.js'
 
 export const ViewerSelector = props => {
-  if (props.contentExtension === '.ifc') {
+  if (props.content?.file_extension === '.ifc') {
     return (
       <IfcViewer contentRawUrl={props.contentRawUrl} />
     )
   }
 
-  const fileExtensionForPrismJsLanguage = props.contentExtension.replace('.', '')
+  const fileExtensionForPrismJsLanguage = props.content?.file_extension?.replace('.', '') || ''
   if (prismJsLanguageList.some(extension => extension === fileExtensionForPrismJsLanguage)) {
     return (
       <TextViewerSyntaxHighlight
         contentRawUrl={props.contentRawUrl}
+        contentSize={props.content?.size || 0}
         language={fileExtensionForPrismJsLanguage}
       />
     )
@@ -47,7 +48,7 @@ export const ViewerSelector = props => {
 export default ViewerSelector
 
 ViewerSelector.propTypes = {
-  contentExtension: PropTypes.string,
+  content: PropTypes.object,
   color: PropTypes.string,
   contentRawUrl: PropTypes.string,
   isPdfAvailable: PropTypes.bool,
@@ -66,7 +67,7 @@ ViewerSelector.propTypes = {
 }
 
 ViewerSelector.defaultProps = {
-  contentExtension: '',
+  content: {},
   color: '',
   contentRawUrl: '',
   isPdfAvailable: false,
