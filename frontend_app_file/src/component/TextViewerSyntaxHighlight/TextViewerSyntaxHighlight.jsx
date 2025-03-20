@@ -9,7 +9,7 @@ import {
 
 require('./TextViewerSyntaxHighlight.styl')
 
-const SYNTAX_HIGHLIGHT_MAX_FILE_SIZE_IN_OCTET = 10000
+const SYNTAX_HIGHLIGHT_MAX_FILE_SIZE_IN_OCTET = 100000
 
 export const TextViewerSyntaxHighlight = (props) => {
   const [contentAsText, setContentAsText] = useState('')

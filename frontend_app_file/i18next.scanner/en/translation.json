@@ -67,5 +67,8 @@
   "Copy content link": "Copy content link",
   "Permanently delete": "Permanently delete",
   "Yes, delete permanently": "Yes, delete permanently",
-  "Warning: this operation cannot be rolled back": "Warning: this operation cannot be rolled back"
+  "Warning: this operation cannot be rolled back": "Warning: this operation cannot be rolled back",
+  "The file weight {{ fileSize }}.": "The file weight {{ fileSize }}.",
+  "Viewing it online might slow down the page.": "Viewing it online might slow down the page.",
+  "View anyway": "View anyway"
 }

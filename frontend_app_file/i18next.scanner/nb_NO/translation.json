@@ -67,5 +67,8 @@
   " of ": " av ",
   "Permanently delete": "",
   "Yes, delete permanently": "",
-  "Warning: this operation cannot be rolled back": ""
+  "Warning: this operation cannot be rolled back": "",
+  "The file weight {{ fileSize }}.": "",
+  "Viewing it online might slow down the page.": "",
+  "View anyway": ""
 }
