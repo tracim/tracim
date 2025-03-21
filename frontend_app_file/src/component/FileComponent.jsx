@@ -17,8 +17,11 @@ export class FileComponent extends React.Component {
   componentDidUpdate (prevProps) {
     const { props } = this
 
-    if (prevProps.previewVideo && !props.previewVideo) this.unLoadVideoPlayer()
-    else if (!prevProps.previewVideo && props.previewVideo) this.loadVideoPlayer(props.downloadRawUrl, props.mimeType)
+    if (prevProps.previewVideo && !props.previewVideo) {
+      this.unLoadVideoPlayer()
+    } else if (!prevProps.previewVideo && props.previewVideo) {
+      this.loadVideoPlayer(props.downloadRawUrl, props.content.mimetype)
+    }
   }
 
   loadVideoPlayer (videoUrl, videoMimeType) {
@@ -69,7 +72,7 @@ export class FileComponent extends React.Component {
       <div
         className={classnames(
           'file__contentpage__statewrapper',
-          { promptMessageWrapper: props.isArchived || props.isDeleted || props.isDeprecated }
+          { promptMessageWrapper: props.content.is_archived || props.content.is_deleted || props.isDeprecated }
         )}
       >
         <div style={{ visibility: 'hidden' }} ref={props.myForwardedRef} />
@@ -113,7 +116,7 @@ export class FileComponent extends React.Component {
           />
         )}
 
-        {props.isArchived && (
+        {props.content.is_archived && (
           <PromptMessage
             msg={props.t('This content is archived')}
             btnType='button'
@@ -123,7 +126,7 @@ export class FileComponent extends React.Component {
           />
         )}
 
-        {props.isDeleted && (
+        {props.content.is_deleted && (
           <PromptMessage
             msg={props.t('This content is deleted')}
             btnType='button'
@@ -143,7 +146,7 @@ export class FileComponent extends React.Component {
 
         {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) && (
           <ViewerSelector
-            contentExtension={props.content.file_extension}
+            content={props.content}
             color={props.customColor}
             contentRawUrl={props.downloadRawUrl}
             isPdfAvailable={props.isPdfAvailable}

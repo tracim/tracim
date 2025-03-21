@@ -67,5 +67,8 @@
   "Copy content link": "Copier le lien du contenu",
   "Permanently delete": "Supprimer définitivement",
   "Yes, delete permanently": "Oui, supprimer définitivement",
-  "Warning: this operation cannot be rolled back": "Attention : cette opération ne peut pas être annulée"
+  "Warning: this operation cannot be rolled back": "Attention : cette opération ne peut pas être annulée",
+  "The file weight {{ fileSize }}.": "Le fichier pèse {{ fileSize }}.",
+  "Viewing it online might slow down the page.": "Le voir en ligne peut ralentir la page.",
+  "View anyway": "Voir le fichier"
 }
