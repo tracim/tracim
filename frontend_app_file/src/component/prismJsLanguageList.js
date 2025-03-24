@@ -1,6 +1,6 @@
 export const prismJsLanguageList = [
   'txt',
-  'markup', 'html', 'xml', 'svg', 'mathml', 'ssml', 'atom', 'rss',
+  'markup', 'html', 'xhtml', 'xml', 'svg', 'mathml', 'ssml', 'atom', 'rss',
   'css',
   'clike',
   'javascript', 'js',
@@ -83,7 +83,7 @@ export const prismJsLanguageList = [
   'etlua',
   'erb',
   'erlang',
-  'excel-formula', 'xlsx', 'xls',
+  'excel-formula', // 'xlsx', 'xls',
   'fsharp',
   'factor',
   'false',

@@ -10,19 +10,15 @@ require('./IfcViewer.styl')
 // ifc viewer every browser's animation frame.
 // Also, it is important to not try to load a malformed ifc file or another format to the ifc viewer.
 // It makes the browser tab to consume huge amount of memory until the browser kills the js process.
-const cleanupIfcViewer = (components, ifcViewerRef) => {
+const cleanupIfcViewer = (components) => {
   components.dispose()
-  ifcViewerRef.current = null
 }
 
 const IfcViewer = props => {
   const ifcViewerRef = useRef(null)
 
   useEffect(() => {
-    if (!props.contentRawUrl) {
-      ifcViewerRef.current = null
-      return
-    }
+    if (!props.contentRawUrl) return
 
     // INFO - CH - 2025-02-26 - Documentation at
     // https://docs.thatopen.com/Tutorials/Components/Core/IfcLoader
@@ -60,7 +56,7 @@ const IfcViewer = props => {
         const file = await fetch(props.contentRawUrl)
 
         if (file.status !== 200 && file.status !== 204) {
-          cleanupIfcViewer(components, ifcViewerRef)
+          cleanupIfcViewer(components)
           return
         }
 
@@ -88,7 +84,7 @@ const IfcViewer = props => {
         world.scene.three.add(model)
       } catch (e) {
         console.error('Error during loading of file .ifc', e)
-        cleanupIfcViewer(components, ifcViewerRef)
+        cleanupIfcViewer(components)
       }
     }
 
@@ -97,7 +93,7 @@ const IfcViewer = props => {
     world.renderer.onResize.add(world.camera.updateAspect)
 
     return () => {
-      cleanupIfcViewer(components, ifcViewerRef)
+      cleanupIfcViewer(components)
     }
   }, [props.contentRawUrl])
 
