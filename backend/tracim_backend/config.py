@@ -629,6 +629,7 @@ class CFG(object):
         )
 
         default_code_sample_languages = """
+            none:Text,
             apacheconf:Apache Configuration,
             arduino:Arduino,
             aspnet:ASP.NET,

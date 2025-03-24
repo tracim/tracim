@@ -30,7 +30,14 @@ export const TextViewerSyntaxHighlight = (props) => {
         return
       }
 
-      const contentResponseAsText = await contentResponse.text()
+      let contentResponseAsText = await contentResponse.text()
+      if (props.language === 'html' || props.language === 'xhtml') {
+        const div = document.createElement('div')
+        // INFO - CH - 2025-03-21 - Line bellow makes browser convert contentResponseAsText to html entities
+        // to be able to display unprocessed html
+        div.textContent = contentResponseAsText
+        contentResponseAsText = div.innerHTML
+      }
 
       // INFO - CH - 2025-03-12 - Don't add line break on the line bellow.
       // They would be interpreted by Prism js which would break the design
