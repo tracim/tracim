@@ -60,7 +60,7 @@ fi
 
 
 if [ "$mode" = "cypress" ]; then
-    if ! [ -s "$script_dir/functionnal_tests/cypress.json" ]; then
+    if ! [ -s "$script_dir/functionnal_tests/cypress.config.js" ]; then
         cat <<EOF
 It seems you haven't configured Cypress yet. The following command needs to be run before continuing:
 
@@ -156,8 +156,6 @@ if [ "$mode" = "cypress" ]; then
     yarn run "cypress-$cypress_arg"
     teardown
 else
-    # disable CSP header for development (tracim dev builds use eval()).
-    export TRACIM_CONTENT_SECURITY_POLICY__ENABLED=False
     # NOTE: by default the mysql/mariadb do save their database in a tmpfs.
     # disabling this for manual tests/dev in order to retain the database between launches
     export TMPFS_DIR=/tmp

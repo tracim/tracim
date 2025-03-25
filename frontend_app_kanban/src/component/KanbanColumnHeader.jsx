@@ -27,6 +27,7 @@ function KanbanColumnHeader (props) {
     >
       <div
         className='kanban__contentpage__wrapper__board__column__title'
+        title={props.column.title}
       >
         <strong
           className={classnames({ readOnly: props.readOnly })}

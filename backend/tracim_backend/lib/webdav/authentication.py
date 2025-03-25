@@ -2,6 +2,7 @@
 from sqlalchemy.orm import Session  # noqa: F401
 import transaction
 import typing
+from wsgidav.dc.base_dc import BaseDomainController
 
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AuthenticationFailed
@@ -11,19 +12,21 @@ from tracim_backend.lib.core.user import UserApi
 DEFAULT_TRACIM_WEBDAV_REALM = "/"
 
 
-class TracimDomainController(object):
+class TracimDomainController(BaseDomainController):
     """
     The domain controller is used by http_authenticator to authenticate the user every time a request is
     sent
     """
 
-    def __init__(self, app_config: CFG, presetdomain=None, presetserver=None):
-        self.app_config = app_config
+    def __init__(self, wsgidav_app, config):
+        super().__init__(wsgidav_app, config)
+        assert "tracim_settings" in config.keys()
+        self.app_config = CFG(config["tracim_settings"])
 
-    def getDomainRealm(self, inputURL: str, environ: typing.Dict[str, typing.Any]) -> str:
+    def get_domain_realm(self, path_info: str, environ: typing.Dict[str, typing.Any]) -> str:
         return DEFAULT_TRACIM_WEBDAV_REALM
 
-    def getRealmUserPassword(
+    def get_realm_user_password(
         self, realmname: str, username: str, environ: typing.Dict[str, typing.Any]
     ) -> str:
         """
@@ -33,10 +36,10 @@ class TracimDomainController(object):
         """
         raise DigestAuthNotImplemented
 
-    def requireAuthentication(self, realmname: str, environ: typing.Dict[str, typing.Any]) -> bool:
+    def require_authentication(self, realmname: str, environ: typing.Dict[str, typing.Any]) -> bool:
         return True
 
-    def isRealmUser(
+    def is_realm_user(
         self, realmname: str, username: str, environ: typing.Dict[str, typing.Any]
     ) -> bool:
         """
@@ -53,10 +56,10 @@ class TracimDomainController(object):
         except Exception:
             return False
 
-    def authDomainUser(
+    def basic_auth_user(
         self,
-        realmname: str,
-        username: str,
+        realm: str,
+        user_name: str,
         password: str,
         environ: typing.Dict[str, typing.Any],
     ) -> bool:
@@ -68,7 +71,7 @@ class TracimDomainController(object):
         api = UserApi(None, session, self.app_config)
         try:
             api.authenticate(
-                login=username,
+                login=user_name,
                 password=password,
                 ldap_connector=environ["tracim_registry"].ldap_connector,
             )
@@ -76,3 +79,6 @@ class TracimDomainController(object):
         except AuthenticationFailed:
             return False
         return True
+
+    def supports_http_digest_auth(self):
+        return False

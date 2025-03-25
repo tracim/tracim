@@ -12,5 +12,6 @@ module.exports = {
   ],
   reporter: 'spec',
   colors: true,
-  recursive: true
+  recursive: true,
+  exit: true
 }

@@ -1,0 +1,76 @@
+@import "~tracim_frontend_lib/src/css/Variable.styl"
+
+playButtonSize = 40px
+
+.ril__caption
+  display flex
+  flex-direction row-reverse
+
+.jpegAndVideoViewer
+  overflow-x hidden
+  display flex
+  width 100%
+  align-items center
+  justify-content center
+  flex-direction column
+  flex 1
+  padding standardSpacing
+  &__fileimg
+    display flex
+    flex-direction column
+    justify-content center
+    align-items center
+    margin auto
+    min-height 0
+    max-height 100%
+    &__play
+      position absolute
+      left "calc(50% - %s)" % (playButtonSize / 2)
+      font-size playButtonSize
+      opacity 0.7
+    &:hover
+      & .jpegAndVideoViewer__fileimg__play
+        opacity 1
+    &__img
+      object-fit contain
+      margin auto
+      max-height 100%
+      min-height 0
+      max-width 100%
+    &__text
+      text-align center
+      &-icon
+        font-size bigIconSize
+      &-msg
+        margin-top standardSpacing
+        word-break break-word
+    &.previewAvailable
+      cursor pointer
+  &__navigationButton
+    padding standardSpacing
+    font-size titleFontSize
+    cursor pointer
+    &:first-child
+      margin-inline-start auto
+    &:last-child
+      margin-inline-end auto
+    &:focus
+      box-shadow 0 0 0 0
+      outline 0
+  &__pagecount
+    font-size metadataFontSize
+    align-self end
+    padding-bottom standardSpacing
+    padding-inline-end pageSpacing
+  &__filepreview
+    display flex
+    flex 1
+    flex-direction row
+    max-height 100%
+    min-height 0
+    width 100%
+    justify-content center
+
+@media (min-width: max-xs) and (max-width: max-lg)
+  .jpegAndVideoViewer
+    height 100%

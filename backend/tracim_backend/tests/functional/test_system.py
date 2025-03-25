@@ -381,6 +381,7 @@ class TestConfigEndpoint(object):
         assert res.json_body["user__self_registration__enabled"] is False
         assert res.json_body["ui__spaces__creation__parent_space_choice__visible"] is True
         assert res.json_body["ui__notes__code_sample_languages"] == [
+            {"value": "none", "text": "Text"},
             {"value": "apacheconf", "text": "Apache Configuration"},
             {"value": "arduino", "text": "Arduino"},
             {"value": "aspnet", "text": "ASP.NET"},

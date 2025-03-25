@@ -39,7 +39,8 @@ import {
   handleFetchResult,
   putMyselfFileRead,
   sendGlobalFlashMessage,
-  sortListByMultipleCriteria
+  sortListByMultipleCriteria,
+  defaultApiContent
 } from 'tracim_frontend_lib'
 
 import LogbookComponent from '../component/Logbook.jsx'
@@ -120,7 +121,11 @@ export class Logbook extends React.Component {
 
   handleReloadContent = data => {
     console.log('%c<Logbook> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_CONTENT(this.state.config.slug), data)
-    this.props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), this.state.appName)
+    const dataWithPropertyReset = {
+      ...defaultApiContent,
+      ...data
+    }
+    this.props.appContentCustomEventHandlerReloadContent(dataWithPropertyReset, this.setState.bind(this), this.state.appName)
   }
 
   handleReloadAppFeatureData = () => {

@@ -158,7 +158,17 @@ export const displayFileSize = (bytes, decimals) => {
   if (bytes === 0) return '0 Bytes'
   const k = 1024
   const dm = decimals <= 0 ? 0 : decimals || 2
-  const sizes = [i18n.t('Bytes'), i18n.t('KB'), i18n.t('MB'), i18n.t('GB'), i18n.t('TB'), i18n.t('PB'), i18n.t('EB'), i18n.t('ZB'), i18n.t('YB')]
+  const sizes = [
+    i18n.t('Bytes'),
+    i18n.t('KB'),
+    i18n.t('MB'),
+    i18n.t('GB'),
+    i18n.t('TB'),
+    i18n.t('PB'),
+    i18n.t('EB'),
+    i18n.t('ZB'),
+    i18n.t('YB')
+  ]
   const i = Math.floor(Math.log(bytes) / Math.log(k))
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
@@ -657,4 +667,51 @@ export const shouldKeepNotification = (notification, userConfig) => {
 export const filterNotificationListFromUserConfig = (notificationList, userConfig) => {
   if (!userConfig) return notificationList
   return notificationList.filter(notification => shouldKeepNotification(notification, userConfig))
+}
+
+// INFO - CH - 2025-01-20 - Allows to bind handler for on click outside dom element.
+// See Popover.jsx for usage example.
+// Use this function in place of react-onclickoutside for functional component.
+// react-onclickoutside only works on class component
+export function onClickOutside (listening, setListening, menuRef, setIsOpen) {
+  return () => {
+    if (listening) return
+    if (!menuRef.current) return
+    setListening(true)
+    ;['click', 'touchstart'].forEach((type) => {
+      document.addEventListener(type, (evt) => {
+        if (menuRef.current?.contains(evt.target)) return
+        setIsOpen(false)
+      })
+    })
+  }
+}
+
+export const defaultApiContent = {
+  content_id: 0,
+  workspace_id: 0,
+  label: '',
+  filename: '',
+  slug: '',
+  is_deleted: false,
+  content_type: '',
+  file_extension: '',
+  content_namespace: 'content',
+  created: '',
+  current_revision_id: 0,
+  description: '',
+  raw_content: '',
+  assignee_id: null,
+  actives_shares: 0,
+  version_number: 0,
+  is_archived: false,
+  is_template: false,
+  mimetype: '',
+  size: 0,
+  parent_id: 0,
+  status: 'open',
+  show_in_ui: true,
+  current_revision_type: 'revision',
+  modified: '',
+  is_editable: true
 }

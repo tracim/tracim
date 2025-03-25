@@ -38,5 +38,6 @@
   "Validate": "Validate",
   "Permanently delete": "Permanently delete",
   "Yes, delete permanently": "Yes, delete permanently",
-  "Warning: this operation cannot be rolled back": "Warning: this operation cannot be rolled back"
+  "Warning: this operation cannot be rolled back": "Warning: this operation cannot be rolled back",
+  "Table of content": "Table of content"
 }

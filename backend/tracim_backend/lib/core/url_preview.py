@@ -108,5 +108,5 @@ class URLPreviewLib(object):
                 image_url = None
         except (WebpreviewException, InvalidURL) as exc:
             raise UnavailableURLPreview('Can\'t generate URL preview for "{}"'.format(url)) from exc
-        image_url = urljoin(url, image_url) if image_url else None
+        image_url = urljoin(url, image_url).strip() if image_url else None  # strip() fixes #6691
         return URLPreview(title=title, description=description, image=image_url)

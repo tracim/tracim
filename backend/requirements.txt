@@ -322,7 +322,7 @@ webob==1.8.7
     # via pyramid
 webpreview @ git+https://github.com/algoo/webpreview@v1.6.0+algoo
     # via tracim_backend (setup.py)
-wsgidav==2.4.1
+wsgidav==4.2.0
     # via tracim_backend (setup.py)
 xmlschema==2.5.1
     # via pysaml2

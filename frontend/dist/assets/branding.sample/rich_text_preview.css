@@ -1,5 +1,5 @@
 :root {
-  --grey: #666;
+  --customGrey: #666;
 }
 
 body, h1, h2, h3, h4, h5, h6 {
@@ -39,14 +39,20 @@ a:visited {
 
 
 pre {
-  background-color: #ccc;
-  border: 1px solid #666;
+  background-color: #f5f2f0;
+  border: 1px solid #999;
   padding: 1em;
+  font-size: 12px;
 }
 
+pre code {
+  white-space: pre-wrap;
+}
+
+
 blockquote {
-  background-color: #ccc;
-  border-left: 5px solid #666;
+  background-color: #f5f2f0;
+  border-left: 5px solid #999;
   padding: 0.1em 0.75em;
 }
 
@@ -62,7 +68,7 @@ section {
 }
 
 @page {
-  size: A4 portrait; /* can use also 'landscape' for orientation */
+  size: A4 portrait;
   margin: 2cm;
   counter-increment: page;
   @top-left {
@@ -98,16 +104,16 @@ section {
 }
 .header_right {
   position: running(header_right);
-  color: var(--grey);
+  color: var(--customGrey);
   font-size: 12px;
 }
 .header_right a, .header_right a:link, .header_right a:visited {
-  color: var(--grey);
+  color: var(--customGrey);
 }
 
 footer {
   position: running(footer);
-  color: var(--grey);
+  color: var(--customGrey);
   font-size: 12px;
 }
 

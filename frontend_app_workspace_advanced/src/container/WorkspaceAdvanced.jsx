@@ -28,7 +28,8 @@ import {
   handleFetchResult,
   removeAtInUsername,
   sendGlobalFlashMessage,
-  stringIncludes
+  stringIncludes,
+  defaultApiContent
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -126,7 +127,11 @@ export class WorkspaceAdvanced extends React.Component {
 
   handleReloadContent = data => {
     console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_CONTENT(this.state.config.slug), data)
-    this.setState(prev => ({ content: { ...prev.content, ...data }, isVisible: true }))
+    const dataWithPropertyReset = {
+      ...defaultApiContent,
+      ...data
+    }
+    this.setState(prev => ({ content: { ...prev.content, ...dataWithPropertyReset }, isVisible: true }))
   }
 
   handleAllAppChangeLanguage = data => {

@@ -28,6 +28,9 @@ class SpecialFolderExtension(object):
     History = "/.history"
 
 
+TEMP_FILE_IN_MEMORY_MAX_SIZE_BYTES = 10 * 1024 * 1024  # 10 MB
+
+
 class FakeFileStream(object):
     """
     Fake a FileStream that we're giving to wsgidav to receive data and create files / new revisions
@@ -54,7 +57,6 @@ class FakeFileStream(object):
         parent: Content = None,
     ):
         """
-
         :param content_api:
         :param workspace:
         :param path:
@@ -67,7 +69,11 @@ class FakeFileStream(object):
         # a temporary file to avoid big file in memory without needing to refactor all
         # upload mechanism of WebDAV
         # see https://github.com/tracim/tracim/issues/1911
-        self.temp_file = tempfile.NamedTemporaryFile(suffix="tracim_webdav_upload_")
+        # INFO - D.A. - 2025-02-18 replaced temporary file with SpooledTemporaryFile in order to
+        # allow to save large files on system and to avoid writing small files
+        self.temp_file = tempfile.SpooledTemporaryFile(
+            TEMP_FILE_IN_MEMORY_MAX_SIZE_BYTES, suffix="tracim_webdav_upload_"
+        )
         self._session = session
         self._file_name = file_name if file_name != "" else self._content.file_name
         self._content = content
@@ -76,21 +82,21 @@ class FakeFileStream(object):
         self._parent = parent
         self._path = path
 
-    def getRefUrl(self) -> str:
+    def get_ref_url(self) -> str:
         """
         As wsgidav expect to receive a _DAVResource upon creating a new resource, this method's result is used
         by Windows client to establish both file's path and file's name
         """
         return self._path
 
-    def beginWrite(self, contentType) -> "FakeFileStream":
+    def begin_write(self, content_type) -> "FakeFileStream":
         """
         Called by wsgidav, it expect a filestream which possess both 'write' and 'close' operation to write
         the file content.
         """
         return self
 
-    def endWrite(self, withErrors: bool):
+    def end_write(self, with_errors: bool):
         """
         Called by request_server when finished writing everything.
         As we call operation to create new content or revision in the close operation, called before endWrite, there
@@ -117,8 +123,8 @@ class FakeFileStream(object):
         else:
             self.update_file()
 
-        transaction.commit()
         self.temp_file.close()
+        transaction.commit()
 
     def create_file(self):
         """
@@ -135,11 +141,12 @@ class FakeFileStream(object):
                     parent=self._parent,
                     is_temporary=is_temporary,
                     do_save=False,
+                    do_notify=False,
                 )
                 self._api.update_file_data(
                     file,
                     self._file_name,
-                    util.guessMimeType(self._file_name),
+                    util.guess_mime_type(self._file_name),
                     self.temp_file,
                 )
         except TracimException as exc:
@@ -155,7 +162,7 @@ class FakeFileStream(object):
                 self._api.update_file_data(
                     self._content,
                     self._file_name,
-                    util.guessMimeType(self._content.file_name),
+                    util.guess_mime_type(self._content.file_name),
                     self.temp_file,
                 )
         except TracimException as exc:
@@ -163,5 +170,5 @@ class FakeFileStream(object):
 
         self._api.save(self._content, ActionDescription.REVISION)
 
-    def supportEtag(self):
+    def support_etag(self):
         return False

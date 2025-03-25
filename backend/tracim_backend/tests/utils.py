@@ -174,8 +174,8 @@ class WedavEnvironFactory(object):
 
     def get(self, user: typing.Optional[User] = None) -> typing.Dict[str, typing.Any]:
         environ = {
-            "http_authenticator.username": user.email_address if user else None,
-            "http_authenticator.realm": "/",
+            "wsgidav.auth.user_name": user.email_address if user else None,
+            "wsgidav.auth.realm": "/",
             "wsgidav.provider": self.provider,
             "tracim_user": user,
         }
@@ -210,17 +210,17 @@ def webdav_put_new_test_file_helper(
     environ["CONTENT_LENGTH"] = len(file_content)
 
     # Grab parent folder where create file
-    parentRes = provider.getResourceInst(wsgidav_util.getUriParent(file_path), environ)
+    parentRes = provider.get_resource_inst(wsgidav_util.get_uri_parent(file_path), environ)
     assert parentRes, "we should found folder for {0}".format(file_path)
 
-    new_resource = parentRes.createEmptyResource(wsgidav_util.getUriName(file_path))
-    write_object = new_resource.beginWrite(contentType="application/octet-stream")
+    new_resource = parentRes.create_empty_resource(wsgidav_util.get_uri_name(file_path))
+    write_object = new_resource.begin_write(content_type="application/octet-stream")
     write_object.write(file_content)
     write_object.close()
-    new_resource.endWrite(withErrors=False)
+    new_resource.end_write(with_errors=False)
 
     # Now file should exist
-    return provider.getResourceInst(file_path, environ)
+    return provider.get_resource_inst(file_path, environ)
 
 
 class MailHogHelper(object):

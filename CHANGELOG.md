@@ -1,5 +1,28 @@
 # Changelog
 
+## 2025-04.00 / 2025-03-25
+
+### ✨ New Features
+
+- App File now shows the content of text format files
+- App File now shows preview for .ifc files
+- Notes now have a generated table of contents
+- Better configuration option for CSP headers
+- Replaced TinyMCE with HugeRTE 1.0.7
+- Upgraded Cypress to version 13.17.0
+
+### 🐛 Fixed Issue
+
+- Fixed error 500 from url preview [#6691](https://github.com/tracim/tracim/issues/6691)
+- Fixed line break in code block of pdf export [#6643](https://github.com/tracim/tracim/issues/6643)
+- Fixed autocomplete popin on mobile [#6650](https://github.com/tracim/tracim/issues/6650)
+- Fixed nested sublist on mobile [#6653](https://github.com/tracim/tracim/issues/6650)
+- Fixed html title to Kanban column title [#6692](https://github.com/tracim/tracim/issues/6692)
+- Fixed webdav related errors [#6675](https://github.com/tracim/tracim/issues/6675)
+
+### 🔧 Upgrade documentation
+[See the doc](https://github.com/tracim/tracim/issues/6662)
+
 ## 4.12.0 / 2024-12-23
 
 ### ✨ New Features

@@ -55,7 +55,8 @@ import {
   getFileRevisionPreviewInfo,
   sortListByMultipleCriteria,
   SORT_BY,
-  ToDoManagement
+  ToDoManagement,
+  defaultApiContent
 } from 'tracim_frontend_lib'
 import { isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import {
@@ -153,7 +154,12 @@ export class File extends React.Component {
     const { props, state } = this
     console.log('%c<File> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP(state.config.slug), data)
 
-    props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
+    props.appContentCustomEventHandlerShowApp(
+      data.content,
+      state.content,
+      this.setState.bind(this),
+      this.buildBreadcrumbs
+    )
     if (data.content.content_id === state.content.content_id) this.setHeadTitle(state.content.label)
   }
 
@@ -166,9 +172,13 @@ export class File extends React.Component {
 
   handleReloadContent = data => {
     const { props, state } = this
-    console.log('%c<File> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug), data)
+    const dataWithPropertyReset = {
+      ...defaultApiContent,
+      ...data
+    }
+    console.log('%c<File> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_CONTENT(state.config.slug), dataWithPropertyReset)
 
-    props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), state.appName)
+    props.appContentCustomEventHandlerReloadContent(dataWithPropertyReset, this.setState.bind(this), state.appName)
   }
 
   handleAllAppChangeLanguage = data => {
@@ -1315,6 +1325,7 @@ export class File extends React.Component {
           {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
             https://github.com/tracim/tracim/issues/1840 */}
           <FileComponent
+            content={state.content}
             editionAuthor={state.editionAuthor}
             isRefreshNeeded={state.showRefreshWarning}
             isVideo={isVideo}
@@ -1326,9 +1337,6 @@ export class File extends React.Component {
             isJpegAvailable={state.previewInfo.has_jpeg_preview}
             filePageNb={state.previewInfo.page_nb}
             fileCurrentPage={state.fileCurrentPage}
-            mimeType={state.content.mimetype}
-            isArchived={state.content.is_archived}
-            isDeleted={state.content.is_deleted}
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
             deprecatedStatus={state.config.availableStatuses[3]}
             onClickRestoreArchived={this.handleClickRestoreArchive}
@@ -1347,7 +1355,6 @@ export class File extends React.Component {
             newFilePreview={state.newFilePreview}
             progressUpload={state.progressUpload}
             previewVideo={state.previewVideo}
-            workspaceId={state.content.workspace_id}
             onTogglePreviewVideo={() => this.setState(prev => ({ previewVideo: !prev.previewVideo }))}
             ref={this.refContentLeftTop}
             displayNotifyAllMessage={this.shouldDisplayNotifyAllMessage()}

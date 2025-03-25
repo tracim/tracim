@@ -9,11 +9,11 @@ It is meant to handle Tracim html document which are text document that allows t
 
 #### For production
 
-see [docs/development/app_building.md#Production](/docs/development/app_building.md#production)
+see [/docs/development/frontend_build.md#production-build](/docs/development/frontend_build.md#production-build)
 
 #### For development
 
-see [docs/development/app_building.md#Development](/docs/development/app_building.md#development)
+see [/docs/development/frontend_build.md#with-development-server-servdev](/docs/development/frontend_build.md#with-development-server-servdev)
 
 ##### Specific `debug.js` configuration
 

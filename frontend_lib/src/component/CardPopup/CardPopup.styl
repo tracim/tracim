@@ -44,6 +44,16 @@
 body:not(.tox-fullscreen) .cardPopup
   transform translate(-50%, -50%)
 
+@supports (-moz-appearance:none)
+  body:not(.tox-fullscreen) .cardPopup
+    // INFO - CH - 2025-02-18 - The filter bellow is mandatory since hugerte (or tinymce 7+) because they added
+    // a transform: perspective(1px) on .tox-toolbar__primary which "conflicts" with the transform above.
+    // See https://stackoverflow.com/questions/15464055/css-transition-effect-makes-image-blurry-moves-image-1px-in-chrome
+    // for more details.
+    // Also, see https://github.com/tracim/tracim/issues/6674 comment
+    filter blur(0px)
+
+
 @media (max-width: max-xs)
   .cardPopup
     width 90%
