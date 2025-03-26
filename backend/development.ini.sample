@@ -857,11 +857,19 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 # to connect to a cluster, it is possible to provided multiple hosts/ports as a comma separated list
 ; search.elasticsearch.host = localhost,
 ; search.elasticsearch.port = 9200,
-# elasticsearch security configuration
-; search.elasticsearch.ssl = False
+# elasticsearch ssl configuration
+; search.elasticsearch.ssl.activated = False
 ; search.elasticsearch.ssl.ca_certs =
-; search.elasticsearch.auth.username =
-; search.elasticsearch.auth.password =
+# example:
+# search.elasticsearch.ssl.activated = True
+# search.elasticsearch.ssl.ca_certs = /etc/ssl/cert.crt
+
+# elasticsearch connection configuration
+# connection is enabled if basic_auth.username is set
+# if used in a cluster, every node receives the same basic_auth connection
+; search.elasticsearch.basic_auth.username =
+; search.elasticsearch.basic_auth.password =
+
 # global elasticsearch timeout in seconds
 ; search.elasticsearch.request_timeout = 60
 

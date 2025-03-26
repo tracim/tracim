@@ -106,10 +106,10 @@ class ESSearchApi(SearchApi):
     def __init__(self, session: Session, current_user: typing.Optional[User], config: CFG) -> None:
         super().__init__(session, current_user, config)
         assert config.SEARCH__ENGINE == ELASTICSEARCH__SEARCH_ENGINE_SLUG
-        if self._config.SEARCH__ELASTICSEARCH__AUTH__USERNAME:
+        if self._config.SEARCH__ELASTICSEARCH__BASIC_AUTH__USERNAME:
             http_auth = (
-                self._config.SEARCH__ELASTICSEARCH__AUTH__USERNAME,
-                self._config.SEARCH__ELASTICSEARCH__AUTH__PASSWORD,
+                self._config.SEARCH__ELASTICSEARCH__BASIC_AUTH__USERNAME,
+                self._config.SEARCH__ELASTICSEARCH__BASIC_AUTH__PASSWORD,
             )
         else:
             http_auth = None
@@ -122,8 +122,8 @@ class ESSearchApi(SearchApi):
                 )
             ],
             http_auth=http_auth,
-            use_ssl=self._config.SEARCH__ELASTICSEARCH__SSL,
-            verify_certs=self._config.SEARCH__ELASTICSEARCH__SSL,
+            use_ssl=self._config.SEARCH__ELASTICSEARCH__SSL__ACTIVATED,
+            verify_certs=self._config.SEARCH__ELASTICSEARCH__SSL__ACTIVATED,
             ca_certs=self._config.SEARCH__ELASTICSEARCH__SSL__CA_CERTS,
         )
         self.IndexedUser = create_indexed_user_class(config)

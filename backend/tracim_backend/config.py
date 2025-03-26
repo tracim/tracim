@@ -1060,17 +1060,17 @@ class CFG(object):
         self.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT = int(
             self.get_raw_config("search.elasticsearch.request_timeout", "60")
         )
-        self.SEARCH__ELASTICSEARCH__SSL = asbool(
-            self.get_raw_config("search.elasticsearch.ssl", "False")
+        self.SEARCH__ELASTICSEARCH__SSL__ACTIVATED = asbool(
+            self.get_raw_config("search.elasticsearch.ssl.activated", "False")
         )
         self.SEARCH__ELASTICSEARCH__SSL__CA_CERTS = self.get_raw_config(
             "search.elasticsearch.ssl.ca_certs", ""
         )
-        self.SEARCH__ELASTICSEARCH__AUTH__USERNAME = self.get_raw_config(
-            "search.elasticsearch.auth.username", ""
+        self.SEARCH__ELASTICSEARCH__BASIC_AUTH__USERNAME = self.get_raw_config(
+            "search.elasticsearch.basic_auth.username", ""
         )
-        self.SEARCH__ELASTICSEARCH__AUTH__PASSWORD = self.get_raw_config(
-            "search.elasticsearch.auth.password", ""
+        self.SEARCH__ELASTICSEARCH__BASIC_AUTH__PASSWORD = self.get_raw_config(
+            "search.elasticsearch.basic_auth.password", ""
         )
 
     def _load_jobs_config(self) -> None:
