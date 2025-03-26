@@ -106,6 +106,13 @@ class ESSearchApi(SearchApi):
     def __init__(self, session: Session, current_user: typing.Optional[User], config: CFG) -> None:
         super().__init__(session, current_user, config)
         assert config.SEARCH__ENGINE == ELASTICSEARCH__SEARCH_ENGINE_SLUG
+        if self._config.SEARCH__ELASTICSEARCH__AUTH__USERNAME:
+            http_auth = (
+                self._config.SEARCH__ELASTICSEARCH__AUTH__USERNAME,
+                self._config.SEARCH__ELASTICSEARCH__AUTH__PASSWORD,
+            )
+        else:
+            http_auth = None
         self.es = Elasticsearch(
             hosts=[
                 ({"host": host, "port": port})
@@ -113,7 +120,11 @@ class ESSearchApi(SearchApi):
                     self._config.SEARCH__ELASTICSEARCH__HOST,
                     self._config.SEARCH__ELASTICSEARCH__PORT,
                 )
-            ]
+            ],
+            http_auth=http_auth,
+            use_ssl=self._config.SEARCH__ELASTICSEARCH__SSL,
+            verify_certs=self._config.SEARCH__ELASTICSEARCH__SSL,
+            ca_certs=self._config.SEARCH__ELASTICSEARCH__SSL__CA_CERTS,
         )
         self.IndexedUser = create_indexed_user_class(config)
 
