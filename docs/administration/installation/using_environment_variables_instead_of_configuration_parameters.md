@@ -159,6 +159,10 @@ The following table contains:
 | TRACIM_SEARCH__ELASTICSEARCH__HOST                                        | search.elasticsearch.host                                      | SEARCH__ELASTICSEARCH__HOST                                        |
 | TRACIM_SEARCH__ELASTICSEARCH__PORT                                        | search.elasticsearch.port                                      | SEARCH__ELASTICSEARCH__PORT                                        |
 | TRACIM_SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT                             | search.elasticsearch.request_timeout                           | SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT                             |
+| TRACIM_SEARCH__ELASTICSEARCH__SSL__ACTIVATED                              | search.elasticsearch.ssl.activated                             | SEARCH__ELASTICSEARCH__SSL__ACTIVATED                              |
+| TRACIM_SEARCH__ELASTICSEARCH__SSL__CA_CERTS                               | search.elasticsearch.ssl.ca_certs                              | SEARCH__ELASTICSEARCH__SSL__CA_CERTS                               |
+| TRACIM_SEARCH__ELASTICSEARCH__BASIC_AUTH__USERNAME                        | search.elasticsearch.basic_auth.username                       | SEARCH__ELASTICSEARCH__BASIC_AUTH__USERNAME                        |
+| TRACIM_SEARCH__ELASTICSEARCH__BASIC_AUTH__PASSWORD                        | search.elasticsearch.basic_auth.password                       | SEARCH__ELASTICSEARCH__BASIC_AUTH__PASSWORD                        |
 | TRACIM_CONTENT_SECURITY_POLICY__ENABLED                                   | content_security_policy.enabled                                | CONTENT_SECURITY_POLICY__ENABLED                                   |
 | TRACIM_CONTENT_SECURITY_POLICY__REPORT_URI                                | content_security_policy.report_uri                             | CONTENT_SECURITY_POLICY__REPORT_URI                                |
 | TRACIM_CONTENT_SECURITY_POLICY__REPORT_ONLY                               | content_security_policy.report_only                            | CONTENT_SECURITY_POLICY__REPORT_ONLY                               |
