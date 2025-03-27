@@ -2,7 +2,7 @@
 
 ## Structure
 
-To be detected by the backend, a mention must be under the following:
+To be detected by the backend, a mention must be of following form:
 
 ```html
 <html-mention {DATA}></html-mention>

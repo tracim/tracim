@@ -1,13 +1,15 @@
 # Translating the Frontend
 
-<!-- INFO - CH - 2024-12-18 - To improve whole documentation -->
-
 In each folder related to the frontend (frontend, frontend_app_..., frontend_lib), a folder i18next.scanner holds
 translation files in JSON.
 
 ## I found a translation error, how do I fix it?
 
 __If the error is in the translation key:__
+
+Open an issue on [https://github.com/tracim/tracim/issues](https://github.com/tracim/tracim/issues).
+
+If you are a developer and would like to fix it:
 
 1. You must find the key in the corresponding `.jsx` file of that same repo
 2. Fix the error
@@ -29,7 +31,8 @@ Same as the errors: you can make suggestions or, if you already have an account,
 
 ### The key does not appear in the `.json` file
 
-Rebuild the translation files with:
+Open an issue on [https://github.com/tracim/tracim/issues](https://github.com/tracim/tracim/issues)
+or rebuild the translation files with:
 
 ```bash
 yarn build:translation
@@ -37,12 +40,14 @@ yarn build:translation
 
 If the key still isn't in the `.json` file, it means the text in the `.jsx` file does not implement the translation process.
 
-To resolve this, you must:
+You can open an issue on [https://github.com/tracim/tracim/issues](https://github.com/tracim/tracim/issues).
 
-1. Find the corresponding `.jsx` file containing your untranslated key
-2. Wrap your untranslated key with the translation function `t`  
+If you want to resolve it, you must:
+
+1. Find the corresponding `.jsx` file containing the untranslated key
+2. Wrap the untranslated key with the translation function `t`  
 For instance, `<div>My untranslated key</div>` will become `<div>{props.t('My untranslated key')}</div>`
-3. Make sure that `t` in available in your component by wrapping it with the `translate()` function as follows:
+3. Make sure that `t` in available in your component by wrapping it with the `translate()` HOC function as follows:
 
 ``` javascript
 import React from 'react'
@@ -61,12 +66,14 @@ export default translate()(MyComponent)
 5. Rebuild the translation files with: `yarn build:translation`
 6. Commit/push your changes
 
-### Summary
+### CalDav
 
-If the translation you want to add is a caldav file (named `frontend_lib/caldav_translation/{language code}/translation.json`), in addition to translating on the Weblate platform you will have to modify `frontend_lib/dist/assets/_caldavzap/localization.js`:
+If the translation you want to add is a caldav file
+(named `frontend_lib/caldav_translation/{language code}/translation.json`),
+in addition to translating on the Weblate platform you will have to modify `frontend_lib/dist/assets/_caldavzap/localization.js`.
 
-- If the language and you modified existing translations: update the string in the `.js` file. Don't forget to escape special characters (e.g. `'` => `\'`)
-- If the language exist and you added translations: find the right location in the `.js` file and add the key to all languages + the translation or an empty string. Don't forget to escape special characters (e.g. `'` => `\'`)
+- If the language exists, and you modified an existing translations: update the string in the `.js` file. Don't forget to escape special characters (e.g. `'` => `\'`)
+- If the language exists, and you added translations: find the right location in the `.js` file and add the key to all languages + the translation or an empty string. Don't forget to escape special characters (e.g. `'` => `\'`)
 - If the language does not exist:
   - Add the four objects below (at the end if the file?)
     - localization[`{language code}`]
