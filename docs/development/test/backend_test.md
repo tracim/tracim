@@ -13,10 +13,6 @@ See [how to build](/docs/development/backend_build.md).
     - [Configuration test](#configuration-test)
     - [Tests with pytest](#tests-with-pytest)
     - [Docker compose test file](#docker-compose-test-file)
-  - [Frontend](#frontend)
-    - [Prerequisites](#prerequisites-1)
-    - [Unit tests](#unit-tests)
-    - [Functional tests](#functional-tests)
 
 ## Backend
 
@@ -109,62 +105,6 @@ pytest --forked --database=all
 The [docker-compose.yml](/backend/docker-compose.yml) file lists the services needed for testing the Tracim backend.
 <!-- Default environment variables used by the containers are written in the [.env](/backend/.env) file next to `docker-compose.yml`. -->
 
-## Frontend
-
-### Prerequisites
-
-To do the functional tests, you need to have Cypress installed.  
-To install Cypress and its dependencies, run:
-
-```bash
-./setup_functionnal_tests.sh
-```
-
-This script uses sudo, make sure it is installed and configured.
-Alternatively, under root:
-
-```bash
-./setup_functionnal_tests.sh root
-```
-
-If you need to run Cypress with an external server of Tracim, modify "baseurl" in cypress.json ([more details here](https://docs.cypress.io/guides/references/configuration.html#Options)).
-
-### Unit tests
-
-To run every unit tests:
-
-```bash
-./run_frontend_unit_test.sh
-```
-
-You can also test a specific frontend application by doing:
-
-```bash
-yarn run test
-```
-
-For example, to test the `agenda` frontend application:
-
-```bash
-cd frontend_app_agenda
-yarn run test
-```
-
-### Functional tests
-
-To run every functional tests:
-
-```bash
-./run_dev_backend.sh cypress run
-```
-
-You can also run cypress with a graphical interface:
-
-```bash
-./run_dev_backend.sh cypress open
-```
-
-For more advanced usage, refer to the [cypress documentation](https://docs.cypress.io/guides/guides/getting-started-guide.html).
 
 ## Backend
 ### Load test
