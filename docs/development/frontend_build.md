@@ -32,24 +32,23 @@ Then, you can build the frontend:
 
 ## Build and rebuild a single app
 
-You may want to build only an application and not the whole frontend.  
-To do so, run the build script in the desired app.
+You may want to build only one application and not the whole frontend.  
+To do so, run the build script of the desired app in its folder.
 
-If you want to build `frontend`:
-
+**Example:**
+To build `frontend`:
 ```bash
 cd frontend
 ./build_frontend.sh
 ```
 
-If you want to build `frontend_lib`:
-
+To build `frontend_lib`:
 ```bash
 cd frontend_lib
 ./build_frontend_lib.sh
 ```
 
-If you want to build any other app `frontend_app_<app_name>`
+To build any other app `frontend_app_<app_name>`
 ```bash
 cd frontend_app_<app_name>
 ./build_app.sh

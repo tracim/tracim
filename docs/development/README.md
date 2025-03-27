@@ -3,7 +3,6 @@
 <!--
 TODO - CH - 2024-12-18 - This file should be refactored.
 It includes info related to administration and development
-UPDATE - CH - 2025-03-27 - frontend part has been fixed
 -->
 
 Backend source code of Tracim, using Pyramid Framework.
