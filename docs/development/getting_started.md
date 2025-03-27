@@ -14,6 +14,12 @@ Install basic tracim with default configuration for development purpose.
 Open `localhost:7999`.
 Connect using `admin@admin.admin:admin@admin.admin`.
 
+## Connect to Tracim live event
+
+Connect to the live endpoint to receive every change as they appear on the server.
+
+See: [Tracim Live Message documentation](/docs/api-integration/tlm_event_socket.md)
+
 ## Working in backend
 
 To update the backend, restart the server.

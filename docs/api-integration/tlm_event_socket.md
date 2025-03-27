@@ -1,0 +1,297 @@
+# Tracim Live Message
+
+## Definition of a TLM
+
+Tracim Live Message, or TLM, is the protocol that makes a frontend stay up to date with every latest changes from
+other users.
+
+### Origin of a TLM
+
+Every change in database that comes from a user creates an `event` line in the database table `events`.  
+See class `Event` in [/backend/tracim_backend/models/event.py](/backend/tracim_backend/models/event.py)).
+
+For each `events`, a list of `messages` are generated.  
+A `message` is the link between a `user` and an `event`.  
+A `message` will be created for each `users` to which Tracim should send the `event`.
+
+A `TLM` is the action of sending the `message` to the frontend, to the logged used.
+
+**Example:**  
+When a content is created in a space, 1 `event` is created.  
+If the space contains 10 users, 10 `messages` are created.  
+If 3 users are currently logged in to Tracim, 3 `TLM` are sent.  
+
+TLM are sent through **Server Sent Event (SSE)** and will trigger the update of the frontend's interface.
+
+## Connection
+
+Using **Server Sent Event (SSE)**, connect to:
+```
+/api/users/<user_id>/live_messages
+```
+Where **<user_id>** is the id of the logged user.
+
+**Example:**
+```js
+const TLMConnection = new EventSource(
+  `/api/users/${userId}/live_messages`,
+  { withCredentials: true }
+)
+```
+
+## Protocol
+
+TLM are read only. SSE are one-way connection.
+
+TLM body is in JSON.
+
+TLM object properties are:  
+**event_id**<**int**>: Id of the event in database  
+**event_type**<**string**>: Identification of the event. See [Identification: Event type](#identification-event-type)  
+**created**<**string**>: ISO datetime of the creation of the event  
+**read**<**string** | **null**>: ISO datetime of when is the user read the TLM. Usually null  
+**fields**<**object**>: Data of the TLM. See [Data: Fields](#data-fields)  
+
+**Example:**
+```json
+{
+  "event_id": 99,
+  "event_type": "content.created.thread",
+  "created": "2025-03-27T13:51:25Z",
+  "read": null,
+  "fields": {}
+}
+```
+
+### Identification: Event type
+
+To identify the action that has happened, a TLM has an `Event type`.  
+`Event type` are made from 3 parts each separated by a dot ".":
+- Entity type
+- Core event type
+- Sub type (optional)
+
+**Entity type** is the kind of data object the TLM is about.  
+List of entity type: `user`, `workspace`, `workspace_member`, `content`, `mention`, `reaction`, `workspace_subscription`, `tag`, `content_tag`, `user_call`
+
+**Core event type** is the kind of action the TLM is about.  
+List of core event type: `copied`, `created`, `deleted`, `undeleted`, `modified`, `moved`
+
+**Sub type** is optional and is a sub list of entity type when the entity type groups several data objects  
+List of sub type: only the entity type `content` currently has sub type and they are: `thread`, `html-document`, `folder`, `comment`, `kanban`, `logbook`, `todo`
+
+**Examples**:  
+Event type of TLM sent when a user change his avatar: `user.modified`  
+Event type of TLM sent when a user join a space: `workspace_member.created`  
+Event type of TLM sent when a content thread has been created: `content.created.thread`  
+
+### Data: Fields
+
+Fields are the data related to the TLM. See [Fields table](#fields-table).
+
+Each entry in fields is a subset of the corresponding HTTP API structure.
+
+⚠️ "content" field structure vary depending on the type of content (see below).
+
+#### Field user and author (same as UserSchema in API)
+
+```json
+{
+  "user_id": 23,
+  "username": "jdoe",
+  "public_name": "John Doe",
+  "is_active": true,
+  "is_deleted": false
+}
+```
+
+#### Field workspace (same as WorkspaceSchema in API)
+
+```json
+{
+  "workspace_id":  42,
+  "label": "Tracim",
+  "is_deleted": false
+}
+```
+
+#### Field content/thread, content/html-document, content/folder (same as ContentSchema in API)
+
+```json
+{
+  "content_id": 6,
+  "content_namespace": "",
+  "slug": "helloworld",
+  "label": "Hello world",
+  "parent_id": 5,
+  "sub_content_types": [],
+  "status": "open",
+  "is_archived": false,
+  "is_deleted": false,
+  "is_editable": true,
+  "show_in_ui": true,
+  "file_extension": ".html",
+  "filename": "helloworld.html",
+  "modified": "2012-04-23T18:28:43.511Z",
+  "created": "2012-02-23T10:28:43.511Z",
+  "actives_shares": 0,
+  "workspace_id": 23,
+  "current_revision_id": 12,
+  "current_revision_type": "edition",
+  "content_type": "html-document",
+  "raw_content": "Foobar"
+}
+```
+
+#### Field content/file, content/kanban, content/logbook (same as FileContentSchema in API)
+
+```json
+{
+  "content_id": 6,
+  "content_namespace": "",
+  "slug": "helloworld",
+  "label": "Hello world",
+  "parent_id": 5,
+  "sub_content_types": [],
+  "status": "open",
+  "is_archived": false,
+  "is_deleted": false,
+  "is_editable": true,
+  "show_in_ui": true,
+  "file_extension": ".html",
+  "filename": "helloworld.html",
+  "modified": "2012-04-23T18:28:43.511Z",
+  "created": "2012-02-23T10:28:43.511Z",
+  "actives_shares": 0,
+  "workspace_id": 23,
+  "current_revision_id": 12,
+  "current_revision_type": "edition",
+  "content_type": "html-document",
+  "raw_content": "Hello, world",
+  "mimetype": "text/plain",
+  "size": 120
+}
+```
+
+#### Field content/comment (same as CommentSchema in API)
+
+```json
+{
+  "content_id": 7,
+  "parent_id": 5,
+  "raw_content": "Hello",
+  "author": {
+    "avatar_url": null,
+    "user_id": 1,
+    "public_name": "John Doe"
+  },
+  "created": "2012-02-23T10:28:43.511Z"
+}
+```
+
+#### Field content/todo
+
+```json
+{
+  "assignee_id": "2",
+  "content_id": 7,
+  "parent_id": 5,
+  "parent_label": "New note",
+  "status": "closed-deprecated"
+}
+```
+
+#### Field member
+
+```json
+{
+  "role": "reader",
+  "email_notification_type": "summary"
+}
+```
+
+#### Field mention
+
+```json
+{
+  "recipient": "all"
+}
+```
+
+#### Field subscription (same as WorkspaceSubscriptionSchema API)
+
+```json
+{
+  "state":  "pending",
+  "created_date": "2020-06-15T15:05:50.955Z",  "workspace":  {
+    "workspace_id": 42,
+    "label": "Tracim",
+    "is_deleted": false
+  },
+  "author": {
+    "avatar_url": "/api/asset/avatars/john-doe.jpg",
+    "public_name": "John Doe",
+    "user_id": 3,
+    "username": "My-Power_User99"
+  },
+  "evaluation_date": null,
+  "evaluator": {
+    "avatar_url": "/api/asset/avatars/john-doe.jpg",
+    "public_name": "John Doe",
+    "user_id": 3,
+    "username": "My-Power_User99"
+  }
+}
+```
+
+#### Field tag (same as TagSchema in API)
+
+```json
+{
+  "tag_name": "A tag",
+  "tag_id": 23,
+  "workspace_id": 12
+}
+```
+
+#### Field user_call (same as UserCallSchema in API)
+
+```json
+{
+  "call_id": 12,
+  "caller": {
+    "user_id": 12,
+    "public_name": "A user",
+    "username": "auser",
+    "has_avatar": true,
+    "has_cover": false
+  },
+  "callee": {
+    "user_id": 42,
+    "public_name": "Another user",
+    "username": "another-user",
+    "has_avatar": true,
+    "has_cover":
+    false
+  },
+  "state": "in_progress",
+  "created": "2021-08-18T12:12:02",
+  "modified": "2021-08-18T12:12:02",
+  "url": "https://meet.jit.si"
+}
+```
+
+#### Fields table
+
+|       Entity type      |                     Core event types                      |                                    Sub type                                    |                 Fields                 |                                            Comment                                           |                                     Received by                                     |
+|:----------------------:|:---------------------------------------------------------:|:-------------------------------------------------------------------------------:|:--------------------------------------:|:--------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------:|
+| user |      created<br/>deleted<br/>modified<br/>undeleted       |                                                                                 | author,user | author can be null (tracimcli), user account modification, user creation/disabling/etc | administrators, user itself, user in at least one same space |
+| workspace |      created<br/>deleted<br/>modified<br/>undeleted       |                                                                                 | author,workspace | Space creation/deletion but also description/name update | same as workspace_members if confidential, all users if not (open/on_request space) |
+| workspace_member |             created<br/>deleted<br/>modified              |                                                                                 | author,user,workspace,member | add/remove members in space but also role change | administrators, user themself (if one), space members |
+| content | copied<br/>created<br/>deleted<br/>modified<br/>undeleted | thread<br/>html-document<br/>folder<br/>comment<br/>kanban<br/>logbook<br/>todo | author,workspace,content | any content modification(create/update/deletion,etc) | space members |
+| mention |                          created                          |                                                                                 | author,workspace,content,mention | mention with "@" in note/comment | mentioned users (all space members if @all) |
+| reaction |                    created<br/>deleted                    |                                                                                 | author,workspace,content,reaction,user | emoji reaction on content/comment | space members |
+| workspace_subscription |             created<br/>deleted<br/>modified              |                                                                                 | author, workspace, subscription, user  | subscription for on request space (with validation mecanism) | administrator, subscription author, workspace managers |
+| tag |             created<br/>deleted<br/>modified              |                                                                                 | author,workspace,tag | tag usable in space | same as workspace |
+| content_tag |                    created<br/>deleted                    |                                                                                 | author,workspace,tag,content | tag associated to a content | space members |
+| user_call |             created<br/>deleted<br/>modified              |                                                                                 | author,user_call,user | call feature, user is always the callee | caller and callee users |
