@@ -13,8 +13,7 @@
 │   │       ├── minio-encryption.md  
 │   │       └── webdav.md  
 │   ├── exploitation  
-│   │   ├── cli  
-│   │   │   └── controlling_tracim_with_cli.md  
+│   │   ├── cli.md  
 │   │   └── upgrade  
 │   │       ├── how_to_migrate_database.md  
 │   │       ├── how_to_migrate_file_storage.md  
@@ -31,11 +30,12 @@
 │       └── using_environment_variables_instead_of_configuration_parameters.md  
 ├── api-integration  
 │   ├── api.md  
-│   └── socket.md  
+│   └── tlm_event_socket.md  
 ├── DCO  
 ├── development  
 │   ├── advanced  
 │   │   ├── how_to_create_database_migration.md  
+│   │   ├── live_message_server_setup.md  
 │   │   ├── mentions.md  
 │   │   ├── tables.png  
 │   │   ├── tracim_tables.md  
@@ -50,13 +50,10 @@
 │   ├── README.md  
 │   ├── setup  
 │   │   └── devtools.md  
-│   ├── test  
-│   │   ├── concourse.md  
-│   │   ├── docker.md  
-│   │   └── testing.md  
-│   └── tlm  
-│       ├── live_message_setup.md  
-│       └── live_messages.md  
+│   └── test  
+│       ├── concourse.md  
+│       ├── docker.md  
+│       └── testing.md  
 ├── index.md  
 ├── licences  
 │   ├── LICENSE_AGPLv3  
