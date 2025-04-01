@@ -152,7 +152,7 @@ auth_remote_user_header = HTTP_X_REMOTE_USER
 
 Apache virtual host configuration (Tracim should be listening on port 6543, pushpin on 7999):
 
-```xml
+```apache
 Listen 6544
 <VirtualHost *:6544>
   ServerAdmin webmaster@localhost
@@ -627,7 +627,8 @@ email.reply.imap.use_ssl = true
 email.reply.imap.use_idle = true
 ```
 
-Don't forget to start mail_fetcher daemon, documentation here [Backend README](/docs/development/README.md) and chapter "Run daemons according to your config"
+Don't forget to start mail_fetcher daemon, documentation here [Backend advanced setup](/docs/development/advanced/backend_server_setup.md)
+and chapter "Running the Tracim Backend Daemons"
 
 ## Listening port (for pserve only)
 

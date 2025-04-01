@@ -89,8 +89,7 @@ For more information about the configuration files, see:
 
 ### Option 2: Manually
 
-<!-- fixme -->
-See the [Backend README](/docs/development/README.md).
+See the [Backend advanced server setup](/docs/development/advanced/backend_server_setup.md).
 
 #### Dependencies
 
