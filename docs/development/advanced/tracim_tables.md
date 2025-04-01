@@ -3,14 +3,11 @@
 Table and columns in Tracim are a new way of coding and rendering tables and listings
 for Tracim. It contributes to a more consistent interface in Tracim.
 
-For developers, it provides an easier way to design tables.
-It is designed to reduce development time,
-since columns are designed to be reusable in different tables.
-It also removes the necessity to implement
-per table sorting and filtering, since it is managed by the columns.
+For developers, it provides an way to design tables and data listing.
+It removes the necessity to implement per table sorting, filtering and rendering
+since it is managed by the columns.
 
-It also drastically reduces the code size for pages. Since the rendering, filtering and sorting
-of the data is managed by the tables and columns.
+It is based on @tanstack/react-table
 
 ## Table of contents
 
@@ -319,7 +316,7 @@ It has to return `-1` if `a < b`, `0` if `a === b`, `1` if `a > b`.
 #### Conclusion
 
 Here is a complete column. It's filterable, sortable, has a header and a cell and
-can now be used it in tables!
+can now be used it in tables.
 
 ## Tables
 
@@ -378,10 +375,12 @@ myTable.propsType = {
 Finally, render the `TracimTable` component with the data, columns and user props:
 
 ```javascript
+import { tracimTableLib } from 'tracim_frontend_lib'
+
 const myTable = (props) => {
   const columns = [
-    column1(stuff),
-    column2(otherStuff)
+    tracimTableLib.CustomColumn1(stuff),
+    tracimTableLib.CustomColumn2(otherStuff)
   ]
 
   return (

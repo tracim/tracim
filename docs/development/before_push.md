@@ -22,7 +22,8 @@ Before pushing modifications to the frontend code (any folders starting with "fr
 
 ### Linting and unit tests
 
-Run the script for linting and unit tests without any errors
+Run the script for linting and unit tests without any errors.
+It requires node 16.
 
 ```bash
 yarn run test
@@ -30,11 +31,12 @@ yarn run test
 
 ### Translation
 
-Run the translation generation script and if you want to contribute to the keys not translated, you can use the
-[Weblate](https://hosted.weblate.org/projects/tracim/) platform. Notify your PR if some translations are missing.
-
+If you have added or edited translation keys, run the translation generation script:
 ```bash
 yarn run build:translation
 ```
+
+If you want to contribute to the keys not translated, you can use the [Weblate](https://hosted.weblate.org/projects/tracim/) platform.
+Notify your PR if some translations are missing.
 
 More information in [i18n-frontend](/docs/development/i18n/i18n-frontend.md).
