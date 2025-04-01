@@ -6,13 +6,13 @@
 It's officially supported in Arabic, English, French, German and Portuguese.
 
 Any questions, remarks? Reach us on [Tracim Community](https://public-community.tracim.fr).  
-More informations on our [website](https://www.tracim.fr).
+More information on our [website](https://www.tracim.fr).
 
-All documentation is available in [docs/](./docs/) folder.
+All documentation is available in [docs/](/docs/) folder.
 
 ## Quick start (using Docker)
 
-An easy way to start using Tracim is to use the [Docker image](https://hub.docker.com/r/algoo/tracim/).
+To start using Tracim, use the [Docker image](https://hub.docker.com/r/algoo/tracim/).
 
 ```bash
 mkdir -p ~/tracim/etc
@@ -34,7 +34,7 @@ The credentials to access the application are:
 - password: `admin@admin.admin`
 
 <!-- We have to update Docker documentation according to this one -->
-For advanced docker-based usage, look at the full [Tracim installation's documentation](./docs/administration/installation/)
+For advanced docker-based usage, look at the full [Tracim installation's documentation](/docs/administration/installation/)
 
 ## Install Tracim for development
 
@@ -42,15 +42,15 @@ For advanced docker-based usage, look at the full [Tracim installation's documen
 
 ## Testing Tracim
 
-In order to test in a development context, see [Testing Tracim](./docs/development/test/)
+In order to test in a development context, see [Testing Tracim](/docs/development/test/testing.md)
 
 ## Run Tracim for production
 
-If you are interested in production-ready deployment of tracim, then look at the [Tracim administration documentation](./docs/administration), which includes 3 main parts:
+If you are interested in production-ready deployment of tracim, then look at the [Tracim administration documentation](/docs/administration), which includes 3 main parts:
 
-- [Installation](./docs/administration/installation) and an entry point for [production installation](./docs/administration/installation/production.md)
-- A second part dedicated to [Tracim server configuration](./docs/administration/configuration)
-- A third part dedicated to [Exploitation of a Tracim server](./docs/administration/exploitation) (CLI commands, database migrations, etc)
+- [Installation](/docs/administration/installation) and an entry point for [production installation](/docs/administration/installation/install_backend.md)
+- A second part dedicated to [Tracim server configuration](/docs/administration/configuration)
+- A third part dedicated to [Exploitation of a Tracim server](/docs/administration/exploitation) (CLI commands, database migrations, etc)
 
 ## Contribute
 
@@ -60,21 +60,17 @@ There are several ways to contribute to Tracim, here are some tips:
 - Review the [code and propose changes](https://github.com/tracim/tracim/pulls)
 - Contribute to the [translations](https://hosted.weblate.org/projects/tracim/)
 
-<!-- We should explain in CONTRIBUTING.md how to build from source,   -->
-<!-- how to start tests, the code guidelines we respect how to submit -->
-<!-- a pull request, how to find an issue to work on and how to       -->
-<!-- contribute to the translations.                                  -->
-For more information about contributing to Tracim, see the [Contributing to Tracim](./CONTRIBUTING.md) page.
+For more information about contributing to Tracim, see the [Contributing to Tracim](/CONTRIBUTING.md) page.
 
 ## Translation status
 
-We are adding to Tracim interface every translations that once reached 50%.
+We add every translation to the Tracim interface once it reaches 50%.
 
 ![Translation status](https://hosted.weblate.org/widgets/tracim/en/multi-auto.svg)
 
 ## Licence
 
-Tracim is distributed under the terms of 4 distinct licenses. See [LICENSE.md](./LICENSE.md) for details
+Tracim is distributed under the terms of 4 distinct licenses. See [LICENSE.md](/LICENSE.md) for details
 
 ## Support
 

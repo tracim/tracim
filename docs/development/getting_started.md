@@ -16,7 +16,7 @@ Connect using `admin@admin.admin:admin@admin.admin`.
 
 ## Working in backend
 
-To update the backend, restart the server.
+To update the backend, restart the server: `./run_dev_backend.sh`
 
 See [backend doc](/docs/development/backend_build.md) for more information.
 

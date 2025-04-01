@@ -4,7 +4,17 @@
 
 ### Pre-commit
 
-See pre-commit install in [CONTRIBUTING](/CONTRIBUTING.md#pre-commit)
+To enforce most required guidelines, please use [pre-commit](https://pre-commit.com/).  
+This will perform some automatic checks before committing.  
+This is required to contribute to Tracim.
+
+Install pre-commit:
+```bash
+pip install -r requirements-dev.txt
+pre-commit install
+```
+
+It will run automatically when using `git commit`.
 
 ### Tests
 
