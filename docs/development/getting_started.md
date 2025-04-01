@@ -8,6 +8,10 @@ Install basic tracim with default configuration for development purpose.
 ./setup_default_backend.sh
 ./install_frontend_dependencies.sh
 ./build_full_frontend.sh
+```
+
+Run Tracim for development
+```bash
 ./run_dev_backend.sh
 ```
 

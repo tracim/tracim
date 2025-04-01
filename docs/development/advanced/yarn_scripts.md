@@ -53,7 +53,7 @@ yarn run test
 ```
 
 - Run the linting and run the tests from the `test/` folder
-- This command must be run without any errors before pushing code modifying this app
+- This command must be run without any errors before pushing code modifying an app
 
 ## run only the unit tests
 
@@ -76,7 +76,7 @@ yarn run build:standalone
 - Build the app as standalone app including all its dependencies
 - Uses the local `webpack.standalone.config.js`
 
-### build Tracim the app Standalone for debugging
+### build the app Standalone for debugging
 
 ```bash
 yarn run build:standalone:dev

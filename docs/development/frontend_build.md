@@ -1,6 +1,17 @@
 # Working in frontend
 
-To install the frontend dependencies, run the script:
+## Frontend architecture
+
+Tracim frontend is split in `apps`.
+`Apps` are standalone React apps.
+`frontend/` folder is Tracim core.
+Each apps are folders starting with `frontend_app_*`.
+`frontend_lib` is a library for reusable components in any apps.
+`frontend_vendors` build the common vendor libraries to multiple apps (eg. React, date-fns, ...)
+
+## Install frontend
+
+To install the frontend dependencies, run:
 
 ```bash
 ./install_frontend_dependencies.sh
@@ -19,26 +30,25 @@ Then, you can build the frontend:
 ./build_full_frontend.sh
 ```
 
-## Production build
+## Build and rebuild a single app
 
-You may want to build only an application and not the whole frontend.  
-To do so, build the application by moving into the application folder and run the build script.
+You may want to build only one application and not the whole frontend.  
+To do so, run the build script of the desired app in its folder.
 
-If you want to build `frontend`:
-
+**Example:**
+To build `frontend`:
 ```bash
 cd frontend
 ./build_frontend.sh
 ```
 
-If you want to build `frontend_lib`:
-
+To build `frontend_lib`:
 ```bash
 cd frontend_lib
 ./build_frontend_lib.sh
 ```
 
-If you want to build any other app `frontend_app_<app_name>`
+To build any other app `frontend_app_<app_name>`
 ```bash
 cd frontend_app_<app_name>
 ./build_app.sh
