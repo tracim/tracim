@@ -19,7 +19,7 @@ It will run automatically when using `git commit`.
 ### Tests
 
 Run backend tests.
-See [testing doc](/docs/development/test/testing.md#backend).
+See [testing backend](/docs/development/test/backend_test.md).
 
 ### Translation
 
@@ -30,14 +30,11 @@ See [i18n-backend](/docs/development/i18n/i18n-backend.md).
 
 Before pushing modifications to the frontend code (any folders starting with "frontend"), you must
 
-### Linting and unit tests
+### Lint and unit tests
 
 Run the script for linting and unit tests without any errors.
-It requires node 16.
 
-```bash
-yarn run test
-```
+See [testing frontend](/docs/development/test/frontend_test.md).
 
 ### Translation
 

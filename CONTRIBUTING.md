@@ -27,7 +27,9 @@ See [build](/docs/development/getting_started.md) to see how to build [Tracim](h
 
 ### Testing
 
-See [testing](/docs/development/test/testing.md) to see how to test [Tracim](https://www.tracim.fr) and your developments.
+See [testing backend](/docs/development/test/backend_test.md) and
+[testing frontend](/docs/development/test/frontend_test.md) to see how to test [Tracim](https://www.tracim.fr) and
+your developments.
 
 ### Committing to the repository
 

@@ -42,7 +42,9 @@ For advanced docker-based usage, look at the full [Tracim installation's documen
 
 ## Testing Tracim
 
-In order to test in a development context, see [Testing Tracim](/docs/development/test/testing.md)
+In order to test in a development context, see
+- [Testing Tracim backend](/docs/development/test/backend_test.md)
+- [Testing Tracim frontend](/docs/development/test/frontend_test.md)
 
 ## Run Tracim for production
 
