@@ -13,8 +13,7 @@
 │   │       ├── minio-encryption.md  
 │   │       └── webdav.md  
 │   ├── exploitation  
-│   │   ├── cli  
-│   │   │   └── controlling_tracim_with_cli.md  
+│   │   ├── cli.md  
 │   │   └── upgrade  
 │   │       ├── how_to_migrate_database.md  
 │   │       ├── how_to_migrate_file_storage.md  
@@ -24,6 +23,7 @@
 │       ├── BETA_testing_tracim_with_shibboleth_idp_in_docker.md  
 │       ├── elasticsearch_docker_image_with_ingest_plugin.md  
 │       ├── how_to_set_up_postgresql_database.md  
+│       ├── install_backend.md  
 │       ├── opensearch_docker_image_with_ingest_plugin.md  
 │       ├── running_tracim_components_locally.md  
 │       ├── settings_main_topics.md  
@@ -35,6 +35,7 @@
 ├── DCO  
 ├── development  
 │   ├── advanced  
+│   │   ├── backend_server_setup.md  
 │   │   ├── how_to_create_database_migration.md  
 │   │   ├── mentions.md  
 │   │   ├── tables.png  
@@ -47,7 +48,6 @@
 │   ├── i18n  
 │   │   ├── i18n-backend.md  
 │   │   └── i18n-frontend.md  
-│   ├── README.md  
 │   ├── setup  
 │   │   └── devtools.md  
 │   ├── test  
@@ -67,9 +67,10 @@
 │   ├── logo_browserstack.png  
 │   ├── logo_tracim.png  
 │   └── logo_weblate.png  
-└── overview  
-    ├── known_issues.md  
-    └── roles.md  
+├── overview  
+│   ├── known_issues.md  
+│   └── roles.md  
+└── README.md  
 ```
 
 List generated with
