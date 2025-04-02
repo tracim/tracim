@@ -18,7 +18,7 @@ See [backend development documentation](/docs/administration/installation/instal
 
 ### Manual install
 
-Advanced setup backend server setup: [/docs/development/advanced/backend_server_setup.md](/docs/development/advanced/backend_server_setup.md)
+Advanced backend server setup: [/docs/development/advanced/backend_server_setup.md](/docs/development/advanced/backend_server_setup.md)
 
 
 
