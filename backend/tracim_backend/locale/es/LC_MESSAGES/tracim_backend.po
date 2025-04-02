@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2024-06-26 18:28+0200\n"
-"PO-Revision-Date: 2024-06-28 21:09+0000\n"
-"Last-Translator: gallegonovato <fran-carro@hotmail.es>\n"
+"PO-Revision-Date: 2025-01-21 23:19+0000\n"
+"Last-Translator: Jiří Podhorecký <j.podhorecky@volny.cz>\n"
 "Language-Team: Spanish <https://hosted.weblate.org/projects/tracim/backend/"
 "es/>\n"
 "Language: es\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.7-dev\n"
+"X-Generator: Weblate 5.10-dev\n"
 "Generated-By: Babel 2.9.1\n"
 
 #: tracim_backend/config.py:843
@@ -64,6 +64,7 @@ msgstr ""
 "{nb_receivers} personas"
 
 #: tracim_backend/applications/upload_permissions/application.py:26
+#, fuzzy
 msgid "{emitter_name} invited you to upload files on \"{website_title}\""
 msgstr "{emitter_name} le ha invitado a cargar archivos en \"{website_title}\""
 
@@ -252,7 +253,6 @@ msgstr "Este correo electrónico ha sido generado automáticamente por el"
 #: tracim_backend/templates/mail/summary_body_html.mak:65
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:23
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:26
-#, fuzzy
 msgid "that powers {website_title}, please do not reply."
 msgstr "Este correo electrónico se creó automáticamente, por favor no responda."
 
@@ -416,7 +416,7 @@ msgstr "{username} (a través de Tracim)"
 
 #: tracim_backend/templates/mail/summary_body_html.mak:9
 msgid "Here is the list of your unread mentions in the last hour:"
-msgstr "Aquí tiene la lista de sus menciones no leídas en la última hora"
+msgstr "Aquí tiene la lista de sus menciones no leídas en la última hora:"
 
 #: tracim_backend/templates/mail/summary_body_html.mak:11
 msgid "Here is the list of your unread mentions in the last day:"
@@ -432,7 +432,7 @@ msgstr "{author} le mencionó en"
 
 #: tracim_backend/templates/mail/summary_body_html.mak:42
 msgid "Here is the list of your unread notifications in the last hour:"
-msgstr "Aquí tiene la lista de sus notificaciones no leídas en la última hora"
+msgstr "Aquí tiene la lista de sus notificaciones no leídas en la última hora:"
 
 #: tracim_backend/templates/mail/summary_body_html.mak:44
 msgid "Here is the list of your unread notifications in the last day:"

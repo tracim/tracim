@@ -1,18 +1,18 @@
-
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2024-06-26 18:28+0200\n"
-"PO-Revision-Date: 2023-03-01 11:00+0000\n"
-"Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
+"PO-Revision-Date: 2025-01-21 23:19+0000\n"
+"Last-Translator: Jiří Podhorecký <j.podhorecky@volny.cz>\n"
+"Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/tracim/"
+"backend/nb_NO/>\n"
 "Language: nb_NO\n"
-"Language-Team: Norwegian Bokmål "
-"<https://hosted.weblate.org/projects/tracim/backend/nb_NO/>\n"
-"Plural-Forms: nplurals=2; plural=n != 1\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.10-dev\n"
 "Generated-By: Babel 2.9.1\n"
 
 #: tracim_backend/config.py:843
@@ -60,6 +60,7 @@ msgid ""
 msgstr "[{website_title}] Du delte «{content_filename}» med {nb_receivers} folk"
 
 #: tracim_backend/applications/upload_permissions/application.py:26
+#, fuzzy
 msgid "{emitter_name} invited you to upload files on \"{website_title}\""
 msgstr "{emitter_name} inviterte deg til å laste opp filer på «{website_title}»"
 
