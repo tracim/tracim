@@ -20,13 +20,13 @@ mkdir -p ~/tracim/var
 docker run \
     -e DATABASE_TYPE=sqlite \
     -e TRACIM_WEBSITE__BASE_URL=http://{ip_address}:{port} \
-    -p 8080:80 \
+    -p {port}:80 \
     -v ~/tracim/etc:/etc/tracim \
     -v ~/tracim/var:/var/tracim \
     algoo/tracim:latest
 ```
 
-Then, you can access the application at <http://localhost:8080>
+Then, you can access the application at `http://{ip_address}:{port}`
 
 The credentials to access the application are:
 
@@ -40,7 +40,7 @@ For advanced docker-based usage, look at the full [Tracim installation's documen
 
 [See getting started](/docs/development/getting_started.md)
 
-## Testing Tracim
+## Test Tracim
 
 In order to test in a development context, see
 - [Testing Tracim backend](/docs/development/test/backend_test.md)

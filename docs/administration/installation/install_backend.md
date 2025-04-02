@@ -1,4 +1,4 @@
-# Install Tracim backend
+# Install backend
 
 ## Compatibility
 
@@ -25,7 +25,7 @@ Install backend:
 ```bash
 ./setup_default_backend.sh
 ```
-It uses the default configuration file: `development.ini`.  
+It uses the default configuration file: `/backend/development.ini`.  
 Installation includes: node, system dependencies, python packages, database, required folder, mail templates and
 dev certificates
 
@@ -49,9 +49,9 @@ This script may also be used to update:
 
 ### Script options
 
-- `IGNORE_FULL_PREVIEW_GENERATOR`: skip the installation of preview generator.
-- `IGNORE_APT_INSTALL`: skip the installation of the dependencies with apt-get.
-- `DONT_GENERATE_PYENV`: don't generate the python virtual env directory.
+- `IGNORE_FULL_PREVIEW_GENERATOR`: skip the installation of preview generator
+- `IGNORE_APT_INSTALL`: skip the installation of the dependencies with apt-get
+- `DONT_GENERATE_PYENV`: don't generate the python virtual env directory
 
 Usage:
 ```bash

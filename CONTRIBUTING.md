@@ -2,7 +2,7 @@
 
 Thanks for taking the time to contribute :D
 
-## Opening an issue
+## Open an issue
 
 Before opening an issue, please check that the issue is not already opened.  
 If there is no issue similar to yours, feel free to create an issue and follow the template.
@@ -21,17 +21,17 @@ Let's start by opening an issue with the feature template.
 Then create a branch from develop, which should be named `feat/<your ticket title>`.  
 Now you can start coding 😄
 
-### Building
+### Build
 
 See [build](/docs/development/getting_started.md) to see how to build [Tracim](https://www.tracim.fr).
 
-### Testing
+### Test
 
 See [testing backend](/docs/development/test/backend_test.md) and
 [testing frontend](/docs/development/test/frontend_test.md) to see how to test [Tracim](https://www.tracim.fr) and
 your developments.
 
-### Committing to the repository
+### Commit to the repository
 
 You need to sign every commit you make with the `-s` arg of `git commit` command.  
 See [git signature](https://git-scm.com/docs/git-commit#git-commit--s).

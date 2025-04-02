@@ -628,7 +628,7 @@ email.reply.imap.use_idle = true
 ```
 
 Don't forget to start mail_fetcher daemon, documentation here [Backend advanced setup](/docs/development/advanced/backend_server_setup.md)
-and chapter "Running the Tracim Backend Daemons"
+and chapter "Running the Tracim Backend Daemons".
 
 ## Listening port (for pserve only)
 
