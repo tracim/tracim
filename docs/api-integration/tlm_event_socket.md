@@ -9,7 +9,7 @@ You can connect to socket to listen to tracim activity and trigger actions on an
 
 A few use case examples:
 
-- push a file to a web server when a given user comments "VALID FOR PROD" on the content,
+- push a file to a web server when a given user comments "VALID FOR PROD" on the content
 - trigger an email to security staff when someone is invited on a tracim workspace
 - ...
 
@@ -34,7 +34,7 @@ If 3 users are currently logged in to Tracim, 3 `TLM` are sent.
 
 TLM are sent through **Server Sent Event (SSE)** and will trigger the update of the frontend's interface.
 
-## Connection
+## Connection to the TLM stream
 
 Using **Server Sent Event (SSE)**, connect to:
 ```
@@ -57,11 +57,11 @@ TLM are read only. SSE are one-way connection.
 TLM body is in JSON.
 
 TLM object properties are:  
-**event_id**<**int**>: Id of the event in database  
-**event_type**<**string**>: Identification of the event. See [Identification: Event type](#identification-event-type)  
-**created**<**string**>: ISO datetime of the creation of the event  
-**read**<**string** | **null**>: ISO datetime of when is the user read the TLM. Usually null  
-**fields**<**object**>: Data of the TLM. See [Data: Fields](#data-fields)  
+- **event_id**<**int**>: Id of the event in database
+- **event_type**<**string**>: Identification of the event. See [Identification: Event type](#identification-event-type)
+- **created**<**string**>: ISO datetime of the creation of the event
+- **read**<**string** | **null**>: ISO datetime of when is the user read the TLM. Usually null
+- **fields**<**object**>: Data of the TLM. See [Data: Fields](#data-fields)
 
 **Example:**
 ```json
