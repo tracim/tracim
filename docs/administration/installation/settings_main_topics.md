@@ -124,7 +124,7 @@ If `api.key` is empty, the API key authentication will be disabled.
 #### Remote Auth Authentification (e.g. apache authentication)
 
 It is possible to connect to Tracim using remote authentification (e.g. the Apache authentication method).
-Configuring Tracim in development.iniThe idea is that the webserver authenticates the user and then pass the login of the authenticated user through uWSGI environment variables or an HTTP header.
+The idea is that the webserver authenticates the user and then pass the login of the authenticated user through uWSGI environment variables or an HTTP header.
 
 ⚠ When logging in Tracim, if a valid remote user doesn't
 exist in Tracim, it will be created as a standard user.
@@ -132,9 +132,9 @@ exist in Tracim, it will be created as a standard user.
 To do this, you need to properly configure your webserver in order to do
 authentication and to correctly pass the uWSGI environment variable or the HTTP header.
 
-In Tracim, you just need to change value of `remote_user_header` in the INI configuration
+In Tracim, you need to change the value of `remote_user_header` in the INI configuration
 file. The value should be an CGI-like environment variable name, so the `Remote-User` HTTP header
-becomes `HTTP-REMOTE-USER`.
+becomes `HTTP_REMOTE_USER`.
 
 ⚠ You should be very careful using this feature with the HTTP header, your
 webserver should be properly configured to prevent someone from setting a custom
