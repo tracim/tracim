@@ -1,10 +1,5 @@
 # The Tracim Backend
 
-<!--
-TODO - CH - 2024-12-18 - This file should be refactored.
-It includes info related to administration and development
--->
-
 Backend source code of Tracim, using Pyramid Framework.
 
 ## Installation
@@ -15,11 +10,8 @@ See [getting started](/docs/development/getting_started.md)
 
 ### Supported database engines
 
-<!-- Remove the one that we don't support -->
 - SQLite 3.22(2018-01-22)+ with JSON1 extension
 - PostgreSQL 9.6+
-<!-- - MySQL 8.0.1+  -->
-<!-- - MariaDB 10.3+  -->
 
 ## Configuration
 
@@ -262,4 +254,4 @@ what a specific user can do.
 
 ## Other Documentation
 
-Detailed documentation on several topics is available in the [docs/development/](/docs/) directory.
+Detailed documentation on several topics is available in the [docs/development/](/docs/development/) directory.

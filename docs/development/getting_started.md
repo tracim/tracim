@@ -26,8 +26,7 @@ See [Tracim Live Message documentation](/docs/api-integration/tlm_event_socket.m
 
 ## Working in backend
 
-To update the backend, restart the server.
-
+To update the backend, restart the server: `./run_dev_backend.sh`  
 See [backend doc](/docs/development/backend_build.md) for more information.
 
 ## Working in frontend
