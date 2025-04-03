@@ -127,7 +127,7 @@ export const CallPopupRejectedWithoutHOC = props => {
       onClose={props.onClosePopup}
       label={props.t(
         'Call declined by {{username}} at {{time}}',
-        { username: props.callerPublicName, time: getHoursAndMinutes(props.userLang) }
+        { username: props.calleePublicName, time: getHoursAndMinutes(props.userLang) }
       )}
       faIcon='fas fa-phone-slash'
       displayCloseButton
