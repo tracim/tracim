@@ -2078,25 +2078,64 @@ class ContentApi(object):
 
         # The algorithm is:
         # 1. define the read datetime
-        # 2. update all revisions related to current Content
-        # 3. do the same for all child revisions
-        #    (ie parent_id is content_id of current content)
+        # 2. get all the revision ids that need to be updated
+        # 3. update all read related to the revision of the current Content
+        # 4. insert new read related to the revision of the current Content
 
         if not read_datetime:
             read_datetime = datetime.datetime.now()
 
-        viewed_revisions = (
-            self._session.query(ContentRevisionRO)
-            .filter(ContentRevisionRO.content_id == content.content_id)
+        # Get all revision IDs for this content
+        if recursive:
+            content_ids = [content.content_id]
+            for child in content.recursive_children:
+                content_ids.append(child.content_id)
+
+            revision_ids = (
+                self._session.query(ContentRevisionRO.revision_id)
+                .filter(ContentRevisionRO.content_id.in_(content_ids))
+                .all()
+            )
+        else:
+            revision_ids = (
+                self._session.query(ContentRevisionRO.revision_id)
+                .filter(ContentRevisionRO.content_id == content.content_id)
+                .all()
+            )
+
+        # Convert to flat list
+        revision_ids = [r[0] for r in revision_ids]
+
+        self._session.query(RevisionReadStatus).filter(
+            RevisionReadStatus.user_id == self._user.user_id,
+            RevisionReadStatus.revision_id.in_(revision_ids),
+        ).update({RevisionReadStatus.view_datetime: read_datetime}, synchronize_session=False)
+
+        # For revisions without read status, create new ones
+        existing_read_revision_ids = (
+            self._session.query(RevisionReadStatus.revision_id)
+            .filter(
+                RevisionReadStatus.user_id == self._user.user_id,
+                RevisionReadStatus.revision_id.in_(revision_ids),
+            )
             .all()
         )
+        existing_read_revision_ids = [r[0] for r in existing_read_revision_ids]
 
-        for revision in viewed_revisions:
-            revision.read_by[self._user] = read_datetime
+        # Find revisions that need new read statuses
+        new_read_status_revision_ids = [
+            r_id for r_id in revision_ids if r_id not in existing_read_revision_ids
+        ]
 
-        if recursive:
-            for child in content.recursive_children:
-                self.mark_read(child, read_datetime=read_datetime, do_flush=False, recursive=True)
+        # Bulk insert new read statuses
+        if new_read_status_revision_ids:
+            new_statuses = [
+                RevisionReadStatus(
+                    user_id=self._user.user_id, revision_id=revision_id, view_datetime=read_datetime
+                )
+                for revision_id in new_read_status_revision_ids
+            ]
+            self._session.bulk_save_objects(new_statuses)
 
         if do_flush:
             self.flush()
