@@ -12897,6 +12897,7 @@ __metadata:
     three: ^0.173.0
     tracim_frontend_lib: ^1.1.9
     url-loader: ^2.0.1
+    web-e57: ^1.2.0
     web-ifc: ^0.0.68
     webpack: ^5.72.0
     webpack-cli: ^4.9.2
@@ -14127,6 +14128,13 @@ __metadata:
   dependencies:
     minimalistic-assert: ^1.0.0
   checksum: 2abc306c96930b757972a1c4650eb6b25b5d99f24088714957f88629e137db569368c5de0e57986c89ea70db2f1df9bba11a87cb6d0c8694b6f53a0159fab3bf
+  languageName: node
+  linkType: hard
+
+"web-e57@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "web-e57@npm:1.2.0"
+  checksum: c6cc0830dfd9b40746534b29a163bbaf17dbb7705fcb79cd9efb73b3ede509e557389402f06027b7bc1dd318299779e09045d524091e5bd335c58e57360404f1
   languageName: node
   linkType: hard
 
