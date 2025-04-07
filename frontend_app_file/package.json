@@ -34,6 +34,7 @@
     "regenerator-runtime": "^0.13.2",
     "three": "^0.173.0",
     "tracim_frontend_lib": "^1.1.9",
+    "web-e57": "^1.2.0",
     "web-ifc": "^0.0.68"
   },
   "peerDependencies": {

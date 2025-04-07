@@ -43,6 +43,9 @@ if [ "$only_utils" != "--only-utils" ]; then
     yarn run build:optimized$dev  && loggood "success" || logerror "some error"
     log "copying built file to frontend/"
     cp dist/file.app.optimized.js ../frontend/dist/app/file.app.optimized.js && loggood "success" || logerror "some error"
+
+    # INFO - CH - 2025-04-07 - For line bellow, see experiments.asyncWebAssembly in webpack.standalone.config.js
+    cp dist/*.module.wasm ../frontend/dist/app/
 fi
 
 for lang in $(ls i18next.scanner); do

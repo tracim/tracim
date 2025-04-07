@@ -1,6 +1,7 @@
 import React from 'react'
 import { PropTypes } from 'prop-types'
 import IfcViewer from './IfcViewer/IfcViewer.jsx'
+import PointCloudViewer from './PointCloudViewer/PointCloudViewer.jsx'
 import JpegAndVideoViewer from './JpegAndVideoViewer/JpegAndVideoViewer.jsx'
 import TextViewerSyntaxHighlight from './TextViewerSyntaxHighlight/TextViewerSyntaxHighlight.jsx'
 import { prismJsLanguageList } from './prismJsLanguageList.js'
@@ -9,6 +10,12 @@ export const ViewerSelector = props => {
   if (props.content?.file_extension === '.ifc') {
     return (
       <IfcViewer contentRawUrl={props.contentRawUrl} />
+    )
+  }
+
+  if (props.content?.file_extension === '.e57') {
+    return (
+      <PointCloudViewer contentRawUrl={props.contentRawUrl} />
     )
   }
 
