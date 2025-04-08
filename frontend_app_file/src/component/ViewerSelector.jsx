@@ -1,36 +1,55 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { PropTypes } from 'prop-types'
 import IfcViewer from './IfcViewer/IfcViewer.jsx'
 import PointCloudViewer from './PointCloudViewer/PointCloudViewer.jsx'
 import JpegAndVideoViewer from './JpegAndVideoViewer/JpegAndVideoViewer.jsx'
 import TextViewerSyntaxHighlight from './TextViewerSyntaxHighlight/TextViewerSyntaxHighlight.jsx'
 import { prismJsLanguageList } from './prismJsLanguageList.js'
+import FileTooHeavyWarning from './FileTooHeavyWarning/FileTooHeavyWarning.jsx'
+
+const HANDLED_VIEWER_EXTENSION_LIST = ['ifc', 'e57']
+const RUN_VIEWER_MAX_FILE_SIZE_IN_OCTET = 500000 // 500ko
 
 export const ViewerSelector = props => {
-  if (props.content?.file_extension === '.ifc') {
-    return (
-      <IfcViewer contentRawUrl={props.contentRawUrl} />
-    )
-  }
+  const [showSizeWarning, setShowSizeWarning] = useState(true)
 
-  if (props.content?.file_extension === '.e57') {
-    return (
-      <PointCloudViewer
-        contentRawUrl={props.contentRawUrl}
-        contentSize={props.content?.size || 0}
-      />
-    )
-  }
+  useEffect(() => {
+    setShowSizeWarning(props.content?.size > RUN_VIEWER_MAX_FILE_SIZE_IN_OCTET)
+  }, [props.content])
 
-  const fileExtensionForPrismJsLanguage = props.content?.file_extension?.replace('.', '') || ''
-  if (prismJsLanguageList.some(extension => extension === fileExtensionForPrismJsLanguage)) {
-    return (
-      <TextViewerSyntaxHighlight
-        contentRawUrl={props.contentRawUrl}
-        contentSize={props.content?.size || 0}
-        language={fileExtensionForPrismJsLanguage}
-      />
-    )
+  const fileExtension = props.content?.file_extension?.replace('.', '') || ''
+  const availableViewerExtensionList = [
+    ...prismJsLanguageList,
+    ...HANDLED_VIEWER_EXTENSION_LIST
+  ]
+
+  if (availableViewerExtensionList.includes(fileExtension)) {
+    if (showSizeWarning === true) {
+      return (
+        <FileTooHeavyWarning
+          contentSize={props.content.size}
+          onRunAnyway={() => setShowSizeWarning(false)}
+        />
+      )
+    }
+
+    if (fileExtension === 'ifc') {
+      return <IfcViewer contentRawUrl={props.contentRawUrl} />
+    }
+
+    if (fileExtension === 'e57') {
+      return <PointCloudViewer contentRawUrl={props.contentRawUrl} />
+    }
+
+    const canPrismJsHandleExtension = prismJsLanguageList.some(extension => extension === fileExtension)
+    if (canPrismJsHandleExtension) {
+      return (
+        <TextViewerSyntaxHighlight
+          contentRawUrl={props.contentRawUrl}
+          language={fileExtension}
+        />
+      )
+    }
   }
 
   return (

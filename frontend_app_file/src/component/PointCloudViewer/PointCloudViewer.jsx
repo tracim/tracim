@@ -1,19 +1,19 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useRef, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { convertE57 } from 'web-e57'
 import * as THREE from 'three'
 import { XYZLoader } from './XYZLoader.js'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import FileTooHeavyWarning from '../FileTooHeavyWarning/FileTooHeavyWarning'
 
 require('./PointCloudViewer.styl')
 
-const RUN_VIEWER_MAX_FILE_SIZE_IN_OCTET = 1000000 // 1mo
+// INFO - CH - 2025-04-08 - Dynamic import are mandatory because unit test cannot load wasm
+const webE57LibPromise = import('web-e57')
+const OrbitControlsLibPromise = import('three/examples/jsm/controls/OrbitControls.js')
 
 async function convertE57ToXYZ (fileE57) {
   const data = await fileE57.arrayBuffer()
   const dataArray = new Uint8Array(data)
-  return convertE57(dataArray, 'XYZ')
+  const webE57Lib = await webE57LibPromise
+  return webE57Lib.convertE57(dataArray, 'XYZ')
   // return new Blob([convertedData])
 }
 
@@ -24,11 +24,6 @@ const cleanupPointCloudViewer = (renderer) => {
 
 const PointCloudViewer = props => {
   const pointCloudViewerRef = useRef(null)
-  const [shouldRunViewer, setShouldRunViewer] = useState(false)
-
-  useEffect(() => {
-    setShouldRunViewer(props.contentSize <= RUN_VIEWER_MAX_FILE_SIZE_IN_OCTET)
-  }, [props.contentSize])
 
   useEffect(() => {
     let camera, scene, renderer, points, controls
@@ -38,7 +33,6 @@ const PointCloudViewer = props => {
 
     async function init () {
       if (!props.contentRawUrl) return
-      if (shouldRunViewer === false) return
 
       try {
         camera = new THREE.PerspectiveCamera(
@@ -84,7 +78,8 @@ const PointCloudViewer = props => {
           pointCloudViewerRef.current.offsetHeight
         )
 
-        controls = new OrbitControls(camera, renderer.domElement)
+        const OrbitControlsLib = await OrbitControlsLibPromise
+        controls = new OrbitControlsLib.OrbitControls(camera, renderer.domElement)
 
         renderer.setAnimationLoop(animate)
         controls.update()
@@ -122,23 +117,15 @@ const PointCloudViewer = props => {
     return () => {
       cleanupPointCloudViewer(renderer)
     }
-  }, [props.contentRawUrl, shouldRunViewer])
+  }, [props.contentRawUrl])
 
   return (
-    shouldRunViewer
-      ? <div ref={pointCloudViewerRef} className='PointCloudViewer' />
-      : (
-        <FileTooHeavyWarning
-          contentSize={props.contentSize}
-          onRunAnyway={() => setShouldRunViewer(true)}
-        />
-      )
+    <div ref={pointCloudViewerRef} className='PointCloudViewer' />
   )
 }
 
 export default PointCloudViewer
 
 PointCloudViewer.propTypes = {
-  contentRawUrl: PropTypes.string.isRequired,
-  contentSize: PropTypes.number.isRequired
+  contentRawUrl: PropTypes.string.isRequired
 }

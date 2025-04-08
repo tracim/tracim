@@ -1,22 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { HTMLContent } from 'tracim_frontend_lib'
-import FileTooHeavyWarning from '../FileTooHeavyWarning/FileTooHeavyWarning'
 
 require('./TextViewerSyntaxHighlight.styl')
 
-const SYNTAX_HIGHLIGHT_MAX_FILE_SIZE_IN_OCTET = 100000
-
 export const TextViewerSyntaxHighlight = (props) => {
   const [contentAsText, setContentAsText] = useState('')
-  const [shouldRunSyntaxHighlight, setShouldRunSyntaxHighlight] = useState(false)
 
   useEffect(() => {
-    setShouldRunSyntaxHighlight(props.contentSize <= SYNTAX_HIGHLIGHT_MAX_FILE_SIZE_IN_OCTET)
-  }, [props.contentSize])
-
-  useEffect(() => {
-    if (shouldRunSyntaxHighlight === false) return
     if (!props.contentRawUrl || !props.language) return
 
     async function loadContentAsText (rawUrl) {
@@ -50,19 +41,11 @@ export const TextViewerSyntaxHighlight = (props) => {
       console.error('Error in TextViewerSyntaxHighlight', e)
       setContentAsText('')
     }
-  }, [props.contentRawUrl, shouldRunSyntaxHighlight])
+  }, [props.contentRawUrl])
 
   return (
     <div className='TextViewerSyntaxHighlight'>
-      {(shouldRunSyntaxHighlight
-        ? <HTMLContent>{contentAsText}</HTMLContent>
-        : (
-          <FileTooHeavyWarning
-            contentSize={props.contentSize}
-            onRunAnyway={() => setShouldRunSyntaxHighlight(true)}
-          />
-        )
-      )}
+      <HTMLContent>{contentAsText}</HTMLContent>
     </div>
   )
 }
@@ -71,6 +54,5 @@ export default TextViewerSyntaxHighlight
 
 TextViewerSyntaxHighlight.propTypes = {
   contentRawUrl: PropTypes.string.isRequired,
-  language: PropTypes.string.isRequired,
-  contentSize: PropTypes.number.isRequired
+  language: PropTypes.string.isRequired
 }
