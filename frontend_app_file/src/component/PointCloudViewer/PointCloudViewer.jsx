@@ -1,10 +1,14 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { convertE57 } from 'web-e57'
 import * as THREE from 'three'
 import { XYZLoader } from './XYZLoader.js'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import FileTooHeavyWarning from '../FileTooHeavyWarning/FileTooHeavyWarning'
 
 require('./PointCloudViewer.styl')
+
+const RUN_VIEWER_MAX_FILE_SIZE_IN_OCTET = 1000000 // 1mo
 
 async function convertE57ToXYZ (fileE57) {
   const data = await fileE57.arrayBuffer()
@@ -19,23 +23,27 @@ const cleanupPointCloudViewer = (renderer) => {
 }
 
 const PointCloudViewer = props => {
-  // INFO - CH - 2025-04-07 - Wrapper ref is used to get the width and height of the scene after first rendering
-  const pointCloudViewerWrapperRef = useRef(null)
   const pointCloudViewerRef = useRef(null)
+  const [shouldRunViewer, setShouldRunViewer] = useState(false)
 
   useEffect(() => {
-    let camera, scene, renderer, clock, points
+    setShouldRunViewer(props.contentSize <= RUN_VIEWER_MAX_FILE_SIZE_IN_OCTET)
+  }, [props.contentSize])
+
+  useEffect(() => {
+    let camera, scene, renderer, points, controls
 
     // INFO - CH - 2025-04-07 - File adapted from:
     // https://github.com/mrdoob/three.js/blob/master/examples/webgl_loader_xyz.html
 
     async function init () {
       if (!props.contentRawUrl) return
+      if (shouldRunViewer === false) return
 
       try {
         camera = new THREE.PerspectiveCamera(
           45,
-          pointCloudViewerWrapperRef.current.offsetWidth / pointCloudViewerWrapperRef.current.offsetHeight,
+          pointCloudViewerRef.current.offsetWidth / pointCloudViewerRef.current.offsetHeight,
           0.1,
           100
         )
@@ -44,8 +52,6 @@ const PointCloudViewer = props => {
         scene = new THREE.Scene()
         scene.add(camera)
         camera.lookAt(scene.position)
-
-        clock = new THREE.Clock()
 
         const fileE57Promise = await fetch(props.contentRawUrl)
 
@@ -74,11 +80,14 @@ const PointCloudViewer = props => {
         renderer = new THREE.WebGLRenderer({ antialias: true })
         renderer.setPixelRatio(window.devicePixelRatio)
         renderer.setSize(
-          pointCloudViewerWrapperRef.current.offsetWidth,
-          pointCloudViewerWrapperRef.current.offsetHeight
+          pointCloudViewerRef.current.offsetWidth,
+          pointCloudViewerRef.current.offsetHeight
         )
 
+        controls = new OrbitControls(camera, renderer.domElement)
+
         renderer.setAnimationLoop(animate)
+        controls.update()
 
         pointCloudViewerRef.current.appendChild(renderer.domElement)
 
@@ -90,23 +99,21 @@ const PointCloudViewer = props => {
     }
 
     function onWindowResize () {
-      camera.aspect = pointCloudViewerWrapperRef.current.offsetWidth / pointCloudViewerWrapperRef.current.offsetHeight
+      if (pointCloudViewerRef.current === null) return
+
+      camera.aspect = pointCloudViewerRef.current.offsetWidth / pointCloudViewerRef.current.offsetHeight
       camera.updateProjectionMatrix()
 
       renderer.setSize(
-        pointCloudViewerWrapperRef.current.offsetWidth,
-        pointCloudViewerWrapperRef.current.offsetHeight
+        pointCloudViewerRef.current.offsetWidth,
+        pointCloudViewerRef.current.offsetHeight
       )
+      controls.update()
+      renderer.render(scene, camera)
     }
 
     function animate () {
-      const delta = clock.getDelta()
-
-      if (points) {
-        points.rotation.x += delta * 0.2
-        points.rotation.y += delta * 0.5
-      }
-
+      controls.update()
       renderer.render(scene, camera)
     }
 
@@ -115,17 +122,23 @@ const PointCloudViewer = props => {
     return () => {
       cleanupPointCloudViewer(renderer)
     }
-  }, [props.contentRawUrl])
+  }, [props.contentRawUrl, shouldRunViewer])
 
   return (
-    <div ref={pointCloudViewerWrapperRef} className='PointCloudViewer'>
-      <div ref={pointCloudViewerRef} />
-    </div>
+    shouldRunViewer
+      ? <div ref={pointCloudViewerRef} className='PointCloudViewer' />
+      : (
+        <FileTooHeavyWarning
+          contentSize={props.contentSize}
+          onRunAnyway={() => setShouldRunViewer(true)}
+        />
+      )
   )
 }
 
 export default PointCloudViewer
 
 PointCloudViewer.propTypes = {
-  contentRawUrl: PropTypes.string.isRequired
+  contentRawUrl: PropTypes.string.isRequired,
+  contentSize: PropTypes.number.isRequired
 }

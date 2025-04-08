@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { translate } from 'react-i18next'
-import {
-  HTMLContent,
-  IconButton,
-  displayFileSize
-} from 'tracim_frontend_lib'
+import { HTMLContent } from 'tracim_frontend_lib'
+import FileTooHeavyWarning from '../FileTooHeavyWarning/FileTooHeavyWarning'
 
 require('./TextViewerSyntaxHighlight.styl')
 
@@ -59,33 +55,19 @@ export const TextViewerSyntaxHighlight = (props) => {
   return (
     <div className='TextViewerSyntaxHighlight'>
       {(shouldRunSyntaxHighlight
-        ? (
-          <HTMLContent>{contentAsText}</HTMLContent>
-        )
+        ? <HTMLContent>{contentAsText}</HTMLContent>
         : (
-          <pre className='TextViewerSyntaxHighlight__blocked language-none'>
-            <div className='TextViewerSyntaxHighlight__blocked__msg'>
-              {props.t('The file weight {{ fileSize }}.', { fileSize: displayFileSize(props.contentSize, 2) })}
-              <br />
-              {props.t('Viewing it online might slow down the page.')}
-            </div>
-
-            <div className='TextViewerSyntaxHighlight__blocked__btn'>
-              <IconButton
-                onClick={() => setShouldRunSyntaxHighlight(true)}
-                text={props.t('View anyway')}
-                icon='far fa-eye'
-                customClass='TextViewerSyntaxHighlight__blocked__btn__run'
-              />
-            </div>
-          </pre>
+          <FileTooHeavyWarning
+            contentSize={props.contentSize}
+            onRunAnyway={() => setShouldRunSyntaxHighlight(true)}
+          />
         )
       )}
     </div>
   )
 }
 
-export default translate()(TextViewerSyntaxHighlight)
+export default TextViewerSyntaxHighlight
 
 TextViewerSyntaxHighlight.propTypes = {
   contentRawUrl: PropTypes.string.isRequired,

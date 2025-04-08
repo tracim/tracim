@@ -15,7 +15,10 @@ export const ViewerSelector = props => {
 
   if (props.content?.file_extension === '.e57') {
     return (
-      <PointCloudViewer contentRawUrl={props.contentRawUrl} />
+      <PointCloudViewer
+        contentRawUrl={props.contentRawUrl}
+        contentSize={props.content?.size || 0}
+      />
     )
   }
 
