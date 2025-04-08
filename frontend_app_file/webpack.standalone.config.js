@@ -70,6 +70,6 @@ module.exports = {
     // INFO - CH - 2025-04-07 - Option bellow make webpack to generate a <hash>.module.wasm file in the output path
     // It is required for PointCloudViewer.jsx
     // build_app.sh copy that file to frontend/dist/app/
-    asyncWebAssembly: true
+    asyncWebAssembly: true,
   }
 }
