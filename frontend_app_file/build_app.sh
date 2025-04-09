@@ -39,15 +39,23 @@ log "creating default props file for unit tests"
 cp src/debug.js.sample test/fixture/defaultProps.js
 
 if [ "$only_utils" != "--only-utils" ]; then
+    # INFO - CH - 2025-04-09 - Remove generated files related to wasm libraries for
+    # frontend_app_file/src/component/PointCloudViewer/PointCloudViewer.jsx
+    rm ../frontend/dist/app/*.module.wasm
+    rm ../frontend/dist/app/node_modules_web-e57_e57_js.file.app.optimized.js
+    rm ../frontend/dist/app/vendors-node_modules_three_examples_jsm_controls_OrbitControls_js.file.app.optimized.js
+    rm dist/*.module.wasm
+    rm dist/node_modules_web-e57_e57_js.file.app.optimized.js
+    rm dist/vendors-node_modules_three_examples_jsm_controls_OrbitControls_js.file.app.optimized.js
+
     log "building frontend_app_file"
     yarn run build:optimized$dev  && loggood "success" || logerror "some error"
     log "copying built file to frontend/"
     cp dist/file.app.optimized.js ../frontend/dist/app/file.app.optimized.js && loggood "success" || logerror "some error"
 
-    # INFO - CH - 2025-04-07 - See comment about experiments.asyncWebAssembly in webpack.standalone.config.js
-    # Remove the existing output wasm module and add the newly built one
-    rm ../frontend/dist/app/*.module.wasm
     cp dist/*.module.wasm ../frontend/dist/app/
+    cp dist/node_modules_web-e57_e57_js.file.app.optimized.js ../frontend/dist/app/
+    cp dist/vendors-node_modules_three_examples_jsm_controls_OrbitControls_js.file.app.optimized.js ../frontend/dist/app/
 fi
 
 for lang in $(ls i18next.scanner); do

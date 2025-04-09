@@ -6,6 +6,10 @@ dist/file.app.js
 dist/file.app.standalone.js
 dist/file.app.optimized.js
 dist/*.LICENSE.txt
-dist/*.module.wasm
 src/debug.js
 test/fixture/defaultProps.js
+
+# Files generated related to frontend_app_file/src/component/PointCloudViewer/PointCloudViewer.jsx
+dist/*.module.wasm
+dist/node_modules_web-e57_e57_js.file.app.optimized.js
+dist/vendors-node_modules_three_examples_jsm_controls_OrbitControls_js.file.app.optimized.js
