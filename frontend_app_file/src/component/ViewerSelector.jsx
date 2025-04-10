@@ -5,9 +5,11 @@ import JpegAndVideoViewer from './JpegAndVideoViewer/JpegAndVideoViewer.jsx'
 import TextViewerSyntaxHighlight from './TextViewerSyntaxHighlight/TextViewerSyntaxHighlight.jsx'
 import { prismJsLanguageList } from './prismJsLanguageList.js'
 import FileTooHeavyWarning from './FileTooHeavyWarning/FileTooHeavyWarning.jsx'
-import ThreeDViewer from './ThreedViewer/ThreedViewer.jsx'
+import ThreeDViewer from './ThreeDViewer/ThreeDViewer.jsx'
 
-const HANDLED_VIEWER_EXTENSION_LIST = ['ifc', 'xyz', 'e57', 'obj']
+const HANDLED_VIEWER_EXTENSION_LIST = [
+  'ifc', 'xyz', 'e57', 'obj', '3ds', 'max', 'stl', 'dae', 'gcode', 'svg', 'ttf'
+]
 const RUN_VIEWER_MAX_FILE_SIZE_IN_OCTET = 500000 // 500ko
 
 export const ViewerSelector = props => {
@@ -17,7 +19,7 @@ export const ViewerSelector = props => {
     setShowSizeWarning(props.content?.size > RUN_VIEWER_MAX_FILE_SIZE_IN_OCTET)
   }, [props.content])
 
-  const fileExtension = props.content?.file_extension?.replace('.', '') || ''
+  const fileExtension = props.content?.file_extension?.toLowerCase().replace('.', '') || ''
   const availableViewerExtensionList = [
     ...prismJsLanguageList,
     ...HANDLED_VIEWER_EXTENSION_LIST

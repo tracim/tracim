@@ -1,6 +1,16 @@
 import React, { useRef, useEffect } from 'react'
 import * as THREE from 'three'
-import { loadE57, loadObj, loadXYZ } from './ThreeDFormatLoader.js'
+import {
+  load3DS,
+  loadDAE,
+  loadE57,
+  loadGCODE,
+  loadObj,
+  loadSTL,
+  loadSVG,
+  loadTTF,
+  loadXYZ
+} from './ThreeDFormatLoader.js'
 const OrbitControlsLibPromise = import('three/examples/jsm/controls/OrbitControls.js')
 
 require('./ThreeDViewer.styl')
@@ -25,8 +35,9 @@ export const ThreeDViewer = props => {
           45,
           objViewerRef.current.offsetWidth / objViewerRef.current.offsetHeight,
           0.1,
-          100
+          1000
         )
+        window.cameraDebug = camera
         camera.position.set(10, 7, 10)
 
         scene = new THREE.Scene()
@@ -36,17 +47,37 @@ export const ThreeDViewer = props => {
 
         switch (props.contentExtension) {
           case 'obj':
-            loadObj(props.contentRawUrl, scene, camera, object, render)
+            loadObj(props.contentRawUrl, scene, camera, object, render, renderer)
             break
           case 'e57':
-            loadE57(props.contentRawUrl, scene, camera, object, render)
+            loadE57(props.contentRawUrl, scene, camera, object, render, renderer)
             break
           case 'xyz':
-            loadXYZ(props.contentRawUrl, scene, camera, object, render)
+            loadXYZ(props.contentRawUrl, scene, camera, object, render, renderer)
+            break
+          case '3ds':
+          case 'max':
+            load3DS(props.contentRawUrl, scene, camera, object, render, renderer)
+            break
+          case 'stl':
+            loadSTL(props.contentRawUrl, scene, camera, render, renderer)
+            break
+          case 'dae':
+            loadDAE(props.contentRawUrl, scene, camera, object, render, renderer)
+            break
+          case 'gcode':
+            loadGCODE(props.contentRawUrl, scene, camera, object, render, renderer)
+            break
+          case 'svg':
+            loadSVG(props.contentRawUrl, scene, camera, object, render, renderer)
+            break
+          case 'ttf':
+            loadTTF(props.contentRawUrl, scene, camera, object, render, renderer)
             break
         }
 
         renderer = new THREE.WebGLRenderer({ antialias: true })
+
         renderer.setPixelRatio(window.devicePixelRatio)
         renderer.setSize(
           objViewerRef.current.offsetWidth,
@@ -59,6 +90,7 @@ export const ThreeDViewer = props => {
 
         renderer.setAnimationLoop(animate)
         controls.update()
+        render()
 
         window.addEventListener('resize', onWindowResize)
       } catch (e) {
