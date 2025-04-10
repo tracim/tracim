@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { PropTypes } from 'prop-types'
 import IfcViewer from './IfcViewer/IfcViewer.jsx'
-import PointCloudViewer from './PointCloudViewer/PointCloudViewer.jsx'
 import JpegAndVideoViewer from './JpegAndVideoViewer/JpegAndVideoViewer.jsx'
 import TextViewerSyntaxHighlight from './TextViewerSyntaxHighlight/TextViewerSyntaxHighlight.jsx'
 import { prismJsLanguageList } from './prismJsLanguageList.js'
 import FileTooHeavyWarning from './FileTooHeavyWarning/FileTooHeavyWarning.jsx'
+import ThreeDViewer from './ThreedViewer/ThreedViewer.jsx'
 
-const HANDLED_VIEWER_EXTENSION_LIST = ['ifc', 'e57']
+const HANDLED_VIEWER_EXTENSION_LIST = ['ifc', 'xyz', 'e57', 'obj']
 const RUN_VIEWER_MAX_FILE_SIZE_IN_OCTET = 500000 // 500ko
 
 export const ViewerSelector = props => {
@@ -37,8 +37,13 @@ export const ViewerSelector = props => {
       return <IfcViewer contentRawUrl={props.contentRawUrl} />
     }
 
-    if (fileExtension === 'e57') {
-      return <PointCloudViewer contentRawUrl={props.contentRawUrl} />
+    if (HANDLED_VIEWER_EXTENSION_LIST.includes(fileExtension)) {
+      return (
+        <ThreeDViewer
+          contentRawUrl={props.contentRawUrl}
+          contentExtension={fileExtension}
+        />
+      )
     }
 
     const canPrismJsHandleExtension = prismJsLanguageList.some(extension => extension === fileExtension)
