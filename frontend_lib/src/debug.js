@@ -40,7 +40,8 @@ const SYSTEM_CONFIG = {
     search_enabled: true,
     webdav_enabled: true,
     webdav_url: 'http://localhost:3030/',
-    apiUrl: '/api'
+    apiUrl: '/api',
+    ui__notes__code_sample_languages: []
   },
   contentTypeListLoaded: true,
   redirectLogin: '',

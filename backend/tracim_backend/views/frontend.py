@@ -26,7 +26,7 @@ BASE_CSP_DIRECTIVES = (
         # 'wasm-unsafe-eval' would also be required by IfcViewer.jsx but 'unsafe-eval'
         # already allows wasm execution
         "script-src",
-        "'nonce-{nonce}' {base_url}/assets/hugerte-dist-1.0.7/ 'unsafe-eval' 'wasm-unsafe-eval'",
+        "'nonce-{nonce}' {base_url}/assets/hugerte-dist-1.0.7/ {base_url}/app/ 'unsafe-eval' 'wasm-unsafe-eval'",
     ),
     # NOTE S.G. - 2020-12-14 - unsafe-inline is needed for tinyMce
     ("style-src", "'unsafe-inline' 'self'"),
