@@ -8,7 +8,7 @@ import FileTooHeavyWarning from './FileTooHeavyWarning/FileTooHeavyWarning.jsx'
 import ThreeDViewer from './ThreeDViewer/ThreeDViewer.jsx'
 
 const HANDLED_VIEWER_EXTENSION_LIST = [
-  'ifc', 'xyz', 'e57', 'obj', '3ds', 'max', 'stl', 'dae', 'gcode', 'svg', 'ttf'
+  'ifc', 'xyz', 'e57', 'obj', '3ds', 'max', 'stl', 'dae', 'gcode', 'svg', 'ttf', 'wrl', 'vtk'
 ]
 const RUN_VIEWER_MAX_FILE_SIZE_IN_OCTET = 500000 // 500ko
 

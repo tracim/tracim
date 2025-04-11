@@ -5,13 +5,14 @@ import {
   loadDAE,
   loadE57,
   loadGCODE,
-  loadObj,
+  loadOBJ,
   loadSTL,
   loadSVG,
   loadTTF,
+  loadVTK,
+  loadWRL,
   loadXYZ
 } from './ThreeDFormatLoader.js'
-const OrbitControlsLibPromise = import('three/examples/jsm/controls/OrbitControls.js')
 
 require('./ThreeDViewer.styl')
 
@@ -47,7 +48,7 @@ export const ThreeDViewer = props => {
 
         switch (props.contentExtension) {
           case 'obj':
-            loadObj(props.contentRawUrl, scene, camera, object, render, renderer)
+            loadOBJ(props.contentRawUrl, scene, camera, object, render, renderer)
             break
           case 'e57':
             loadE57(props.contentRawUrl, scene, camera, object, render, renderer)
@@ -60,7 +61,7 @@ export const ThreeDViewer = props => {
             load3DS(props.contentRawUrl, scene, camera, object, render, renderer)
             break
           case 'stl':
-            loadSTL(props.contentRawUrl, scene, camera, render, renderer)
+            loadSTL(props.contentRawUrl, scene, camera, object, render, renderer)
             break
           case 'dae':
             loadDAE(props.contentRawUrl, scene, camera, object, render, renderer)
@@ -74,6 +75,12 @@ export const ThreeDViewer = props => {
           case 'ttf':
             loadTTF(props.contentRawUrl, scene, camera, object, render, renderer)
             break
+          case 'wrl':
+            loadWRL(props.contentRawUrl, scene, camera, object, render, renderer)
+            break
+          case 'vtk':
+            loadVTK(props.contentRawUrl, scene, camera, object, render, renderer)
+            break
         }
 
         renderer = new THREE.WebGLRenderer({ antialias: true })
@@ -85,7 +92,7 @@ export const ThreeDViewer = props => {
         )
         objViewerRef.current.appendChild(renderer.domElement)
 
-        const OrbitControlsLib = await OrbitControlsLibPromise
+        const OrbitControlsLib = await import('three/examples/jsm/controls/OrbitControls.js')
         controls = new OrbitControlsLib.OrbitControls(camera, renderer.domElement)
 
         renderer.setAnimationLoop(animate)

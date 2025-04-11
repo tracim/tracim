@@ -1,19 +1,7 @@
 import * as THREE from 'three'
-import { XYZLoader } from './XYZLoader.js'
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
-import { TDSLoader } from 'three/addons/loaders/TDSLoader.js'
-import { STLLoader } from 'three/addons/loaders/STLLoader.js'
-import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js'
-import { GCodeLoader } from 'three/addons/loaders/GCodeLoader.js'
-import { SVGLoader } from 'three/addons/loaders/SVGLoader.js'
-import { TTFLoader } from 'three/addons/loaders/TTFLoader.js'
-import { Font } from 'three/addons/loaders/FontLoader.js'
-import { TextGeometry } from 'three/addons/geometries/TextGeometry.js'
 
-// INFO - CH - 2025-04-08 - Dynamic import are mandatory because unit test cannot load wasm
-const webE57LibPromise = import('web-e57')
-
-export const loadObj = (contentRawUrl, scene, camera, object, render, renderer) => {
+export const loadOBJ = async (contentRawUrl, scene, camera, object, render, renderer) => {
+  const { OBJLoader } = await import('three/examples/jsm/loaders/OBJLoader.js')
   const loader = new OBJLoader()
   loader.load(
     contentRawUrl,
@@ -36,7 +24,7 @@ export const loadE57 = async (contentRawUrl, scene, camera, object, render, rend
   async function convertE57ToXYZ (fileE57) {
     const data = await fileE57.arrayBuffer()
     const dataArray = new Uint8Array(data)
-    const webE57Lib = await webE57LibPromise
+    const { webE57Lib } = await import('web-e57')
     return webE57Lib.convertE57(dataArray, 'XYZ')
     // return new Blob([convertedData])
   }
@@ -45,6 +33,7 @@ export const loadE57 = async (contentRawUrl, scene, camera, object, render, rend
 
   const fileXYZ = await convertE57ToXYZ(fileE57Promise)
 
+  const { XYZLoader } = await import('./XYZLoader.js')
   const loader = new XYZLoader()
   loader.loadFile(
     fileXYZ,
@@ -62,6 +51,7 @@ export const loadE57 = async (contentRawUrl, scene, camera, object, render, rend
 }
 
 export const loadXYZ = async (contentRawUrl, scene, camera, object, render, renderer) => {
+  const { XYZLoader } = await import('./XYZLoader.js')
   const loader = new XYZLoader()
   loader.loadUrl(
     contentRawUrl,
@@ -85,6 +75,7 @@ export const load3DS = async (contentRawUrl, scene, camera, object, render, rend
   directionalLight.position.set(0, 0, 2)
   scene.add(directionalLight)
 
+  const { TDSLoader } = await import('three/addons/loaders/TDSLoader.js')
   const loader = new TDSLoader()
   loader.load(contentRawUrl, function (object) {
     scene.add(object)
@@ -94,6 +85,7 @@ export const load3DS = async (contentRawUrl, scene, camera, object, render, rend
 export const loadSTL = async (contentRawUrl, scene, camera, object, render, renderer) => {
   camera.position.set(3, 0, 3)
 
+  const { STLLoader } = await import('three/addons/loaders/STLLoader.js')
   const loader = new STLLoader()
 
   const material = new THREE.MeshPhongMaterial(
@@ -159,6 +151,7 @@ export const loadDAE = async (contentRawUrl, scene, camera, object, render, rend
     scene.add(contentObject)
   })
 
+  const { ColladaLoader } = await import('three/addons/loaders/ColladaLoader.js')
   const loader = new ColladaLoader(loadingManager)
   loader.load(contentRawUrl, function (collada) {
     contentObject = collada.scene
@@ -166,11 +159,10 @@ export const loadDAE = async (contentRawUrl, scene, camera, object, render, rend
 }
 
 export const loadGCODE = async (contentRawUrl, scene, camera, object, render, renderer) => {
+  const { GCodeLoader } = await import('three/addons/loaders/GCodeLoader.js')
   const loader = new GCodeLoader()
   loader.load(contentRawUrl, function (object) {
-    // object.position.set( - 100, - 20, 100 )
     scene.add(object)
-    // render()
   })
 }
 
@@ -183,6 +175,7 @@ export const loadSVG = async (contentRawUrl, scene, camera, object, render, rend
     strokesWireframe: false
   }
 
+  const { SVGLoader } = await import('three/addons/loaders/SVGLoader.js')
   const loader = new SVGLoader()
   loader.load(guiData.currentURL, function (data) {
     const group = new THREE.Group()
@@ -273,6 +266,9 @@ export const loadTTF = async (contentRawUrl, scene, camera, object, render, rend
     165.25115988577946
   )
 
+  const { TTFLoader } = await import('three/addons/loaders/TTFLoader.js')
+  const { Font } = await import('three/addons/loaders/FontLoader.js')
+  const { TextGeometry } = await import('three/addons/geometries/TextGeometry.js')
   const loader = new TTFLoader()
   loader.load(contentRawUrl, function (json) {
     const font = new Font(json)
@@ -301,5 +297,45 @@ export const loadTTF = async (contentRawUrl, scene, camera, object, render, rend
     textMesh1.rotation.y = Math.PI / 6
 
     group.add(textMesh1)
+  })
+}
+
+export const loadWRL = async (contentRawUrl, scene, camera, object, render, renderer) => {
+  const ambientLight = new THREE.AmbientLight(0xffffff, 1.2)
+  scene.add(ambientLight)
+
+  const dirLight = new THREE.DirectionalLight(0xffffff, 2.0)
+  dirLight.position.set(200, 200, 200)
+  scene.add(dirLight)
+
+  const { VRMLLoader } = await import('three/addons/loaders/VRMLLoader.js')
+  const loader = new VRMLLoader()
+  loader.load(contentRawUrl, function (object) {
+    scene.add(object)
+  })
+}
+
+export const loadVTK = async (contentRawUrl, scene, camera, object, render, renderer) => {
+  const hemiLight = new THREE.HemisphereLight(0xffffff, 0x000000, 3)
+  scene.add(hemiLight)
+
+  const dirLight = new THREE.DirectionalLight(0xffffff, 1.5)
+  dirLight.position.set(2, 2, 2)
+  scene.add(dirLight)
+
+  const { VTKLoader } = await import('three/addons/loaders/VTKLoader.js')
+  const loader = new VTKLoader()
+  loader.load(contentRawUrl, function (geometry) {
+    geometry.center()
+    geometry.computeVertexNormals()
+
+    const material = new THREE.MeshLambertMaterial({ color: 0xffffff })
+    const mesh = new THREE.Mesh(geometry, material)
+    camera.position.set(
+      -0.40988523694571666,
+      0.026503807967017012,
+      0.5998131450652247
+    )
+    scene.add(mesh)
   })
 }
