@@ -1,11 +1,6 @@
 import * as THREE from 'three'
 
-const CameraControls = await import('camera-controls')
-CameraControls.default.install({ THREE: THREE })
-
 function fitCameraToBox (object, scene, cameraControls) {
-  console.log('fitCameraToBox object', object)
-
   let group
   if (object.isObject3D) group = object
   else if (object.scene) group = object.scene

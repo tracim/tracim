@@ -14,9 +14,6 @@ import {
   loadXYZ
 } from './ThreeDFormatLoader.js'
 
-const CameraControls = await import('camera-controls')
-CameraControls.default.install({ THREE: THREE })
-
 require('./ThreeDViewer.styl')
 
 const cleanupThreeDViewer = (renderer) => {
@@ -31,36 +28,35 @@ export const ThreeDViewer = props => {
     let clock, camera, scene, renderer, cameraControls
 
     async function init () {
+      const CameraControls = await import('camera-controls')
+      CameraControls.default.install({ THREE: THREE })
+
       if (!props.contentRawUrl) return
 
       clock = new THREE.Clock()
 
       try {
+        scene = new THREE.Scene()
         camera = new THREE.PerspectiveCamera(
           45,
           objViewerRef.current.offsetWidth / objViewerRef.current.offsetHeight,
           0.1,
           1000
         )
+        renderer = new THREE.WebGLRenderer({ antialias: true })
+
+        const ambientLight = new THREE.AmbientLight(0xffffff)
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x000000, 3)
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.5)
+        dirLight.position.set(2, 2, 2)
+
         window.cameraDebug = camera
         camera.position.set(0, 0, 5)
 
-        scene = new THREE.Scene()
-
         scene.add(camera)
-        camera.lookAt(scene.position)
-
-        const ambientLight = new THREE.AmbientLight(0xffffff)
         scene.add(ambientLight)
-
-        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x000000, 3)
         scene.add(hemiLight)
-
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1.5)
-        dirLight.position.set(2, 2, 2)
         scene.add(dirLight)
-
-        renderer = new THREE.WebGLRenderer({ antialias: true })
 
         renderer.setPixelRatio(window.devicePixelRatio)
         renderer.setSize(
@@ -68,6 +64,7 @@ export const ThreeDViewer = props => {
           objViewerRef.current.offsetHeight
         )
         objViewerRef.current.appendChild(renderer.domElement)
+        renderer.setAnimationLoop(animate)
 
         // eslint-disable-next-line new-cap
         cameraControls = new CameraControls.default(camera, renderer.domElement)
@@ -109,7 +106,6 @@ export const ThreeDViewer = props => {
             break
         }
 
-        renderer.setAnimationLoop(animate)
         render()
 
         window.addEventListener('resize', onWindowResize)
