@@ -19,6 +19,7 @@
   "dependencies": {
     "@thatopen/components": "^2.4.4",
     "@thatopen/fragments": "^2.4.0",
+    "camera-controls": "^2.10.1",
     "classnames": "^2.2.6",
     "color": "^3.1.2",
     "core-js": "^3.6.4",

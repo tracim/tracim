@@ -3472,6 +3472,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"camera-controls@npm:^2.10.1":
+  version: 2.10.1
+  resolution: "camera-controls@npm:2.10.1"
+  peerDependencies:
+    three: ">=0.126.1"
+  checksum: f5ed5e335327e88e51897cefa70741246b20c5be44e9b463dc21f33dbf2984764aa0d37b34f7361240d67ccef7c77ece8cede1504b7663cfdf4102d04446bb40
+  languageName: node
+  linkType: hard
+
 "caniuse-lite@npm:^1.0.30001565":
   version: 1.0.30001579
   resolution: "caniuse-lite@npm:1.0.30001579"
@@ -12863,6 +12872,7 @@ __metadata:
     "@thatopen/fragments": ^2.4.0
     babel-eslint: ^10.1.0
     babel-loader: ^8.2.2
+    camera-controls: ^2.10.1
     chai: ^4.2.0
     chai-enzyme: ^1.0.0-beta.1
     classnames: ^2.2.6

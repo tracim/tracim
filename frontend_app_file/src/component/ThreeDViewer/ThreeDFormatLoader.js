@@ -1,36 +1,44 @@
 import * as THREE from 'three'
 
-export const loadOBJ = async (contentRawUrl, scene, camera, object, render, renderer) => {
+const CameraControls = await import('camera-controls')
+CameraControls.default.install({ THREE: THREE })
+
+function fitCameraToBox (object, scene, cameraControls) {
+  console.log('fitCameraToBox object', object)
+
+  let group
+  if (object.isObject3D) group = object
+  else if (object.scene) group = object.scene
+  else {
+    console.log('Error in fitCameraToBox, object is not a valid 3D object')
+    return
+  }
+
+  cameraControls.fitToBox(group, true)
+}
+
+export const loadOBJ = async (contentRawUrl, scene, cameraControls) => {
   const { OBJLoader } = await import('three/examples/jsm/loaders/OBJLoader.js')
   const loader = new OBJLoader()
   loader.load(
     contentRawUrl,
-    function (newObject) {
-      const ambientLight = new THREE.AmbientLight(0xffffff)
-      scene.add(ambientLight)
-
-      const pointLight = new THREE.PointLight(0xffffff, 15)
-      camera.add(pointLight)
-
-      object = newObject
+    function (object) {
       scene.add(object)
 
-      render()
+      fitCameraToBox(object, scene, cameraControls)
     }
   )
 }
 
-export const loadE57 = async (contentRawUrl, scene, camera, object, render, renderer) => {
+export const loadE57 = async (contentRawUrl, scene, cameraControls) => {
   async function convertE57ToXYZ (fileE57) {
     const data = await fileE57.arrayBuffer()
     const dataArray = new Uint8Array(data)
-    const { webE57Lib } = await import('web-e57')
+    const webE57Lib = await import('web-e57')
     return webE57Lib.convertE57(dataArray, 'XYZ')
-    // return new Blob([convertedData])
   }
 
   const fileE57Promise = await fetch(contentRawUrl)
-
   const fileXYZ = await convertE57ToXYZ(fileE57Promise)
 
   const { XYZLoader } = await import('./XYZLoader.js')
@@ -46,11 +54,13 @@ export const loadE57 = async (contentRawUrl, scene, camera, object, render, rend
 
       const points = new THREE.Points(geometry, material)
       scene.add(points)
+
+      fitCameraToBox(geometry, scene, cameraControls)
     }
   )
 }
 
-export const loadXYZ = async (contentRawUrl, scene, camera, object, render, renderer) => {
+export const loadXYZ = async (contentRawUrl, scene, cameraControls) => {
   const { XYZLoader } = await import('./XYZLoader.js')
   const loader = new XYZLoader()
   loader.loadUrl(
@@ -64,27 +74,22 @@ export const loadXYZ = async (contentRawUrl, scene, camera, object, render, rend
 
       const points = new THREE.Points(geometry, material)
       scene.add(points)
+
+      fitCameraToBox(geometry, scene, cameraControls)
     }
   )
 }
 
-export const load3DS = async (contentRawUrl, scene, camera, object, render, renderer) => {
-  scene.add(new THREE.AmbientLight(0xffffff, 3))
-
-  const directionalLight = new THREE.DirectionalLight(0xffeedd, 3)
-  directionalLight.position.set(0, 0, 2)
-  scene.add(directionalLight)
-
+export const load3DS = async (contentRawUrl, scene, cameraControls) => {
   const { TDSLoader } = await import('three/addons/loaders/TDSLoader.js')
   const loader = new TDSLoader()
   loader.load(contentRawUrl, function (object) {
     scene.add(object)
+    fitCameraToBox(object, scene, cameraControls)
   })
 }
 
-export const loadSTL = async (contentRawUrl, scene, camera, object, render, renderer) => {
-  camera.position.set(3, 0, 3)
-
+export const loadSTL = async (contentRawUrl, scene, cameraControls) => {
   const { STLLoader } = await import('three/addons/loaders/STLLoader.js')
   const loader = new STLLoader()
 
@@ -101,51 +106,20 @@ export const loadSTL = async (contentRawUrl, scene, camera, object, render, rend
 
     const mesh = new THREE.Mesh(geometry, meshMaterial)
 
-    mesh.position.set(0.5, 0.2, 0)
-    mesh.rotation.set(-Math.PI / 2, Math.PI / 2, 0)
-    mesh.scale.set(0.3, 0.3, 0.3)
+    mesh.rotation.set(-Math.PI / 2, 0, 0)
 
     mesh.castShadow = true
     mesh.receiveShadow = true
 
     scene.add(mesh)
 
-    scene.add(new THREE.HemisphereLight(0x8d7c7c, 0x494966, 3))
-
-    function addShadowedLight (x, y, z, color, intensity) {
-      const directionalLight = new THREE.DirectionalLight(color, intensity)
-      directionalLight.position.set(x, y, z)
-      scene.add(directionalLight)
-
-      directionalLight.castShadow = true
-
-      const d = 1
-      directionalLight.shadow.camera.left = -d
-      directionalLight.shadow.camera.right = d
-      directionalLight.shadow.camera.top = d
-      directionalLight.shadow.camera.bottom = -d
-
-      directionalLight.shadow.camera.near = 1
-      directionalLight.shadow.camera.far = 4
-
-      directionalLight.shadow.bias = -0.002
-    }
-
-    addShadowedLight(1, 1, 1, 0xffffff, 3.5)
-    addShadowedLight(0.5, 1, -1, 0xffd500, 3)
+    fitCameraToBox(mesh, scene, cameraControls)
   }, function (progress) {
     console.log((progress.loaded / progress.total * 100) + '%')
   })
 }
 
-export const loadDAE = async (contentRawUrl, scene, camera, object, render, renderer) => {
-  const ambientLight = new THREE.AmbientLight(0xffffff)
-  scene.add(ambientLight)
-
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 2.5)
-  directionalLight.position.set(1, 1, 0).normalize()
-  scene.add(directionalLight)
-
+export const loadDAE = async (contentRawUrl, scene, cameraControls) => {
   let contentObject
   const loadingManager = new THREE.LoadingManager(function () {
     scene.add(contentObject)
@@ -155,18 +129,20 @@ export const loadDAE = async (contentRawUrl, scene, camera, object, render, rend
   const loader = new ColladaLoader(loadingManager)
   loader.load(contentRawUrl, function (collada) {
     contentObject = collada.scene
+    fitCameraToBox(collada, scene, cameraControls)
   })
 }
 
-export const loadGCODE = async (contentRawUrl, scene, camera, object, render, renderer) => {
+export const loadGCODE = async (contentRawUrl, scene, cameraControls) => {
   const { GCodeLoader } = await import('three/addons/loaders/GCodeLoader.js')
   const loader = new GCodeLoader()
   loader.load(contentRawUrl, function (object) {
     scene.add(object)
+    fitCameraToBox(object, scene, cameraControls)
   })
 }
 
-export const loadSVG = async (contentRawUrl, scene, camera, object, render, renderer) => {
+export const loadSVG = async (contentRawUrl, scene, cameraControls) => {
   const guiData = {
     currentURL: contentRawUrl,
     drawFillShapes: true,
@@ -237,21 +213,12 @@ export const loadSVG = async (contentRawUrl, scene, camera, object, render, rend
 
     scene.add(group)
 
-    render()
+    fitCameraToBox(group, scene, cameraControls)
   })
 }
 
-export const loadTTF = async (contentRawUrl, scene, camera, object, render, renderer) => {
+export const loadTTF = async (contentRawUrl, scene, cameraControls) => {
   const text = 'Pack my box with five dozen liquor jugs.'
-
-  const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.4)
-  dirLight1.position.set(0, 0, 1).normalize()
-  scene.add(dirLight1)
-
-  const dirLight2 = new THREE.DirectionalLight(0xffffff, 2)
-  dirLight2.position.set(0, 30, 10).normalize()
-  dirLight2.color.setHSL(1, 1, 1, THREE.SRGBColorSpace)
-  scene.add(dirLight2)
 
   const material = new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true })
 
@@ -259,12 +226,6 @@ export const loadTTF = async (contentRawUrl, scene, camera, object, render, rend
   group.position.z = -200
 
   scene.add(group)
-
-  camera.position.set(
-    55.151758762830354,
-    3.666478115524944,
-    165.25115988577946
-  )
 
   const { TTFLoader } = await import('three/addons/loaders/TTFLoader.js')
   const { Font } = await import('three/addons/loaders/FontLoader.js')
@@ -297,32 +258,21 @@ export const loadTTF = async (contentRawUrl, scene, camera, object, render, rend
     textMesh1.rotation.y = Math.PI / 6
 
     group.add(textMesh1)
+
+    fitCameraToBox(textMesh1, scene, cameraControls)
   })
 }
 
-export const loadWRL = async (contentRawUrl, scene, camera, object, render, renderer) => {
-  const ambientLight = new THREE.AmbientLight(0xffffff, 1.2)
-  scene.add(ambientLight)
-
-  const dirLight = new THREE.DirectionalLight(0xffffff, 2.0)
-  dirLight.position.set(200, 200, 200)
-  scene.add(dirLight)
-
+export const loadWRL = async (contentRawUrl, scene, cameraControls) => {
   const { VRMLLoader } = await import('three/addons/loaders/VRMLLoader.js')
   const loader = new VRMLLoader()
   loader.load(contentRawUrl, function (object) {
     scene.add(object)
+    // fitCameraToBox(object, scene, cameraControls)
   })
 }
 
-export const loadVTK = async (contentRawUrl, scene, camera, object, render, renderer) => {
-  const hemiLight = new THREE.HemisphereLight(0xffffff, 0x000000, 3)
-  scene.add(hemiLight)
-
-  const dirLight = new THREE.DirectionalLight(0xffffff, 1.5)
-  dirLight.position.set(2, 2, 2)
-  scene.add(dirLight)
-
+export const loadVTK = async (contentRawUrl, scene, cameraControls) => {
   const { VTKLoader } = await import('three/addons/loaders/VTKLoader.js')
   const loader = new VTKLoader()
   loader.load(contentRawUrl, function (geometry) {
@@ -331,11 +281,9 @@ export const loadVTK = async (contentRawUrl, scene, camera, object, render, rend
 
     const material = new THREE.MeshLambertMaterial({ color: 0xffffff })
     const mesh = new THREE.Mesh(geometry, material)
-    camera.position.set(
-      -0.40988523694571666,
-      0.026503807967017012,
-      0.5998131450652247
-    )
+
     scene.add(mesh)
+
+    fitCameraToBox(mesh, scene, cameraControls)
   })
 }
