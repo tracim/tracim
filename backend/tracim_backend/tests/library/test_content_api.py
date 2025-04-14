@@ -2039,38 +2039,35 @@ class TestContentApi(object):
             do_save=True,
         )
 
-        for rev in page_1.revisions:
-            eq_(user_b not in rev.read_by.keys(), True)
-        for rev in page_2.revisions:
-            eq_(user_b not in rev.read_by.keys(), True)
-        for rev in page_3.revisions:
-            eq_(user_b not in rev.read_by.keys(), True)
-        for rev in page_4.revisions:
-            eq_(user_b not in rev.read_by.keys(), True)
+        read_status_list = cont_api_b.get_read_status(
+            user=user_b, content_ids=[page_1.id, page_2.id, page_3.id, page_4.id]
+        )
+        for read_status in read_status_list:
+            eq_(read_status["read_by_user"] == 0, True)
 
         # Set as read the workspace n°1
         cont_api_b.mark_read__workspace(workspace=workspace1)
 
-        for rev in page_1.revisions:
-            eq_(user_b in rev.read_by.keys(), True)
-        for rev in page_2.revisions:
-            eq_(user_b in rev.read_by.keys(), True)
-        for rev in page_3.revisions:
-            eq_(user_b not in rev.read_by.keys(), True)
-        for rev in page_4.revisions:
-            eq_(user_b not in rev.read_by.keys(), True)
+        read_status_list = cont_api_b.get_read_status(
+            user=user_b, content_ids=[page_1.id, page_2.id]
+        )
+        for read_status in read_status_list:
+            eq_(read_status["read_by_user"] == 1, True)
+
+        read_status_list = cont_api_b.get_read_status(
+            user=user_b, content_ids=[page_3.id, page_4.id]
+        )
+        for read_status in read_status_list:
+            eq_(read_status["read_by_user"] == 0, True)
 
         # Set as read the workspace n°2
         cont_api_b.mark_read__workspace(workspace=workspace2)
 
-        for rev in page_1.revisions:
-            eq_(user_b in rev.read_by.keys(), True)
-        for rev in page_2.revisions:
-            eq_(user_b in rev.read_by.keys(), True)
-        for rev in page_3.revisions:
-            eq_(user_b in rev.read_by.keys(), True)
-        for rev in page_4.revisions:
-            eq_(user_b in rev.read_by.keys(), True)
+        read_status_list = cont_api_b.get_read_status(
+            user=user_b, content_ids=[page_1.id, page_2.id, page_3.id, page_4.id]
+        )
+        for read_status in read_status_list:
+            eq_(read_status["read_by_user"] == 1, True)
 
     def test_mark_read(
         self,
@@ -2109,13 +2106,15 @@ class TestContentApi(object):
             label="this is a page",
             do_save=True,
         )
-        for rev in page_1.revisions:
-            eq_(user_b not in rev.read_by.keys(), True)
+        read_status_list = cont_api_b.get_read_status(user=user_b, content_ids=[page_1.id])
+        for read_status in read_status_list:
+            eq_(read_status["read_by_user"] == 0, True)
 
         cont_api_b.mark_read(page_1)
 
-        for rev in page_1.revisions:
-            eq_(user_b in rev.read_by.keys(), True)
+        read_status_list = cont_api_b.get_read_status(user=user_b, content_ids=[page_1.id])
+        for read_status in read_status_list:
+            eq_(read_status["read_by_user"] == 1, True)
 
     def test_mark_read__all(
         self,
@@ -2167,25 +2166,19 @@ class TestContentApi(object):
             do_save=True,
         )
 
-        for rev in page_2.revisions:
-            eq_(user_b not in rev.read_by.keys(), True)
-        for rev in page_3.revisions:
-            eq_(user_b not in rev.read_by.keys(), True)
-        for rev in page_4.revisions:
-            eq_(user_b not in rev.read_by.keys(), True)
-
-        session.refresh(page_2)
-        session.refresh(page_3)
-        session.refresh(page_4)
+        read_status_list = cont_api_b.get_read_status(
+            user=user_b, content_ids=[page_2.id, page_3.id, page_4.id]
+        )
+        for read_status in read_status_list:
+            eq_(read_status["read_by_user"] == 0, True)
 
         cont_api_b.mark_read__all()
 
-        for rev in page_2.revisions:
-            eq_(user_b in rev.read_by.keys(), True)
-        for rev in page_3.revisions:
-            eq_(user_b in rev.read_by.keys(), True)
-        for rev in page_4.revisions:
-            eq_(user_b in rev.read_by.keys(), True)
+        read_status_list = cont_api_b.get_read_status(
+            user=user_b, content_ids=[page_2.id, page_3.id, page_4.id]
+        )
+        for read_status in read_status_list:
+            eq_(read_status["read_by_user"] == 1, True)
 
     def test_unit__update__ok__nominal_case(
         self,
