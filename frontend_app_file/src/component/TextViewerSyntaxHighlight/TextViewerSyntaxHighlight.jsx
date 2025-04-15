@@ -45,7 +45,10 @@ export const TextViewerSyntaxHighlight = (props) => {
 
   return (
     <div className='TextViewerSyntaxHighlight'>
-      <HTMLContent>{contentAsText}</HTMLContent>
+      <HTMLContent
+        iframeWhitelist={props.systemConfig.iframe_whitelist}
+        htmlValue={contentAsText}
+      />
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
+import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { isEqual } from 'lodash'
 import {
@@ -248,7 +249,7 @@ export class Preview extends React.Component {
 
     return (
       <div className='feedItem__preview__html'>
-        <HTMLContent>{this.state.previewHtmlCode}</HTMLContent>
+        <HTMLContent iframeWhitelist={props.system.config.iframe_whitelist} htmlValue={this.state.previewHtmlCode} />
       </div>
     )
   }
@@ -330,5 +331,6 @@ Preview.defaultProps = {
   linkType: LINK_TYPE.OPEN_IN_APP
 }
 
-export default translate()(Preview)
+const mapStateToProps = ({ system }) => ({ system })
+export default connect(mapStateToProps)(translate()(Preview))
 export { LINK_TYPE }

@@ -540,7 +540,11 @@ export class Dashboard extends React.Component {
                         >
                           {/* INFO - CH - 2024-11-08 - don't add border to image to avoid breaking
                           existing client design */}
-                          <HTMLContent showImageBorder={false}>{description}</HTMLContent>
+                          <HTMLContent
+                            iframeWhitelist={props.system.config.iframe_whitelist}
+                            showImageBorder={false}
+                            htmlValue={description}
+                          />
                         </div>
                       )
                       : (

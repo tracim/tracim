@@ -300,3 +300,44 @@ export const searchContentAndReplaceWithTag = async (apiUrl, html) => {
 
   return { html: newHtml, invalidContentList }
 }
+
+export function sanitizeIframe (htmlContent, allowedDomainList) {
+  if (!allowedDomainList || allowedDomainList.includes('*')) {
+    return htmlContent
+  }
+  if (typeof htmlContent !== 'string' && typeof htmlContent !== 'object') return htmlContent
+
+  let tempDiv = document.createElement('div')
+  let isObject = false
+  tempDiv.innerHTML = htmlContent
+
+  if (typeof htmlContent === 'object') {
+    if (htmlContent instanceof HTMLElement) {
+      tempDiv = htmlContent.cloneNode(true)
+      isObject = true
+    } else {
+      return htmlContent
+    }
+  }
+
+  const iframeList = tempDiv.querySelectorAll('iframe')
+
+  Array.from(iframeList).forEach(iframe => {
+    const src = iframe.getAttribute('src')
+    try {
+      const parsedUrl = new URL(src)
+
+      if (!allowedDomainList.some(domain =>
+        parsedUrl.hostname.endsWith(domain)
+      )) {
+        iframe.setAttribute('sandbox', '')
+      }
+    } catch (error) {
+      iframe.setAttribute('sandbox', '')
+    }
+  })
+  if (isObject) {
+    return tempDiv
+  }
+  return tempDiv.innerHTML
+}

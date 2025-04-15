@@ -1,8 +1,9 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import Prism from 'prismjs'
 import { CUSTOM_EVENT } from '../../customEvent.js'
+import { sanitizeIframe } from '../../mentionOrLinkOrSanitize.js'
 
 /*
   INFO - G.B. - 2022-10-10 - To add a plugin, change babel.plugins.prismjs.plugins at frontend_lib/package.json
@@ -21,10 +22,12 @@ function onClickHtmlContentText (e) {
 
 const HTMLContent = (props) => {
   const refHTMLContent = useRef(null)
+  const [sanitizedHTML, setSanitizedHTML] = useState('')
 
   useEffect(() => {
+    setSanitizedHTML(sanitizeIframe(props.htmlValue, props.iframeWhitelist))
     Prism.highlightAllUnder(refHTMLContent.current)
-  }, [props.children])
+  }, [props.htmlValue])
 
   return (
     <article
@@ -35,7 +38,7 @@ const HTMLContent = (props) => {
         props.isTranslated ? 'HTMLContent--translated' : 'HTMLContent',
         props.showImageBorder ? 'showImageBorder' : ''
       )}
-      dangerouslySetInnerHTML={{ __html: props.children }}
+      dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
     />
   )
 }
@@ -43,6 +46,8 @@ const HTMLContent = (props) => {
 export default HTMLContent
 
 HTMLContent.propTypes = {
+  iframeWhitelist: PropTypes.array.isRequired,
+  htmlValue: PropTypes.string.isRequired,
   isTranslated: PropTypes.bool,
   showImageBorder: PropTypes.bool
 }

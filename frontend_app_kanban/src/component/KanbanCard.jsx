@@ -116,7 +116,7 @@ function KanbanCard (props) {
           id={`${props.card.id}_description`}
           onClick={props.readOnly ? undefined : () => props.onEditCardContent(props.card)}
         >
-          <HTMLContent>{props.card.description}</HTMLContent>
+          <HTMLContent iframeWhitelist={props.config.iframe_whitelist} htmlValue={props.card.description} />
         </div>
 
         {showSeeDescriptionButton !== DESCRIPTION_BUTTON.HIDDEN && (
@@ -160,6 +160,7 @@ function KanbanCard (props) {
 export default translate()(KanbanCard)
 
 KanbanCard.propTypes = {
+  config: PropTypes.object.isRequired,
   card: PropTypes.object.isRequired,
   onEditCard: PropTypes.func.isRequired,
   onEditCardContent: PropTypes.func.isRequired,

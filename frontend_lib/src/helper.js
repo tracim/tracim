@@ -30,7 +30,7 @@ import {
   TLM_ENTITY_TYPE as TLM_ET
 } from './tracimLiveMessage.js'
 
-import { MENTION_CONSTANT } from './mentionOrLink.js'
+import { MENTION_CONSTANT } from './mentionOrLinkOrSanitize.js'
 
 export const generateFetchResponse = async fetchResult => {
   const resultJson = await fetchResult.clone().json()

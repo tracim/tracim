@@ -941,12 +941,11 @@ export class File extends React.Component {
             )}
             timelineData={props.timeline}
             translationTargetLanguageCode={state.translationTargetLanguageCode}
-            translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
+            system={state.config.system}
             workspaceId={state.content.workspace_id}
             // End of required props ///////////////////////////////////////////
             availableStatusList={state.config.availableStatuses}
             canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
-            codeLanguageList={state.config.system.config.ui__notes__code_sample_languages}
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}
             disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
@@ -1325,6 +1324,7 @@ export class File extends React.Component {
           {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
             https://github.com/tracim/tracim/issues/1840 */}
           <FileComponent
+            system={state.config.system}
             content={state.content}
             editionAuthor={state.editionAuthor}
             isRefreshNeeded={state.showRefreshWarning}

@@ -52,6 +52,7 @@ export const ViewerSelector = props => {
     if (canPrismJsHandleExtension) {
       return (
         <TextViewerSyntaxHighlight
+          systemConfig={props.system.config}
           contentRawUrl={props.contentRawUrl}
           language={fileExtension}
         />
@@ -84,6 +85,7 @@ export const ViewerSelector = props => {
 export default ViewerSelector
 
 ViewerSelector.propTypes = {
+  system: PropTypes.object.isRequired,
   content: PropTypes.object,
   color: PropTypes.string,
   contentRawUrl: PropTypes.string,

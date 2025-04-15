@@ -538,13 +538,12 @@ export class Thread extends React.Component {
                 )}
                 timelineData={props.timeline}
                 translationTargetLanguageCode={state.translationTargetLanguageCode}
-                translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
+                system={state.config.system}
                 workspaceId={state.content.workspace_id}
                 // End of required props ///////////////////////////////////////
                 allowClickOnRevision={false}
                 availableStatusList={state.config.availableStatuses}
                 canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
-                codeLanguageList={state.config.system.config.ui__notes__code_sample_languages}
                 customClass={`${state.config.slug}__contentpage`}
                 customColor={color}
                 deprecatedStatus={state.config.availableStatuses[3]}

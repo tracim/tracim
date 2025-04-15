@@ -517,6 +517,12 @@ website.usage_conditions =
 # example:
 # frontend.cache_token = QmlnIHN1cmljYXRlIGlzIHdhdGNoaW5nIHlvdSAh
 
+## iframe security
+# List of domain without protection against iframe
+# All domains should be separated by a comma.
+# You can use * to allow everything (be careful that it can pose a security risk)
+; iframe.whitelist = youtube.com, youtu.be, dailymotion.com, vimeo.com, google.com, apple.com, openstreetmap.org, mapbox.com, bing.com
+
 ### Color ###
 # check for color.json file in Tracim, check by default in Tracim parent
 # directory of backend.

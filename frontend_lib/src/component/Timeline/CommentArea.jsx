@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 import {
   searchContentAndReplaceWithTag,
   searchMentionAndReplaceWithTag
-} from '../../mentionOrLink.js'
+} from '../../mentionOrLinkOrSanitize.js'
 import {
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,

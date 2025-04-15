@@ -35,7 +35,7 @@ import {
 import {
   addClassToMentionsOfUser,
   getMatchingGroupMentionList
-} from './mentionOrLink.js'
+} from './mentionOrLinkOrSanitize.js'
 
 import {
   getTranslationApiErrorMessage,

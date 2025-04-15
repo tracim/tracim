@@ -293,13 +293,12 @@ export class Kanban extends React.Component {
               languageCode || state.translationTargetLanguageCode
             )}
             timelineData={props.timeline}
-            translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
             translationTargetLanguageCode={state.translationTargetLanguageCode}
+            system={state.config.system}
             workspaceId={state.content.workspace_id}
             // End of required props ///////////////////////////////////////////
             availableStatusList={state.config.availableStatuses}
             canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
-            codeLanguageList={state.config.system.config.ui__notes__code_sample_languages}
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}
             disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}

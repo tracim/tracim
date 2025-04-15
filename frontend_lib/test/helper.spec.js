@@ -29,7 +29,7 @@ import {
   MAXIMUM_CHARACTERS_USERNAME,
   CONTENT_TYPE
 } from '../src/constant.js'
-import { MENTION_CONSTANT } from '../src/mentionOrLink.js'
+import { MENTION_CONSTANT } from '../src/mentionOrLinkOrSanitize.js'
 import {
   mockGetReservedUsernames200,
   mockGetUsernameAvailability200,

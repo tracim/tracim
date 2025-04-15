@@ -399,6 +399,7 @@ export class Logbook extends React.Component {
                     <div className='logbook__timeline__entries'>
                       {state.logbook.entries.toSorted((a, b) => new Date(b.datetime) - new Date(a.datetime)).map((entry, id) =>
                         <LogbookEntry
+                          config={props.config.system.config}
                           customColor={props.config.hexcolor}
                           readOnly={!changesAllowed}
                           hideButtonsWhenReadOnly={props.readOnly}
