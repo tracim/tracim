@@ -59,6 +59,7 @@ The following table contains:
 | TRACIM_FRONTEND__CACHE_TOKEN                                              | frontend.cache_token                                           | FRONTEND__CACHE_TOKEN                                              |
 | TRACIM_BACKEND__I18N_FOLDER_PATH                                          | backend.i18n_folder_path                                       | BACKEND__I18N_FOLDER_PATH                                          |
 | TRACIM_FRONTEND__DIST_FOLDER_PATH                                         | frontend.dist_folder_path                                      | FRONTEND__DIST_FOLDER_PATH                                         |
+| TRACIM_IFRAME__WHITELIST                                                  | iframe.whitelist                                               | IFRAME__WHITELIST                                                  |
 | TRACIM_COLOR__CONFIG_FILE_PATH                                            | color.config_file_path                                         | COLOR__CONFIG_FILE_PATH                                            |
 | TRACIM_APP_CUSTOM_ACTIONS__CONFIG_FILE                                    | app_custom_actions.config_file                                 | APP_CUSTOM_ACTIONS__CONFIG_FILE                                    |
 | TRACIM_RICH_TEXT_PREVIEW__CSS_PATH                                        | rich_text_preview.css_path                                     | RICH_TEXT_PREVIEW__CSS_PATH                                        |
