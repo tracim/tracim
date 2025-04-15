@@ -1,26 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { translate } from 'react-i18next'
-import {
-  HTMLContent,
-  IconButton,
-  displayFileSize
-} from 'tracim_frontend_lib'
+import { HTMLContent } from 'tracim_frontend_lib'
 
 require('./TextViewerSyntaxHighlight.styl')
 
-const SYNTAX_HIGHLIGHT_MAX_FILE_SIZE_IN_OCTET = 100000
-
 export const TextViewerSyntaxHighlight = (props) => {
   const [contentAsText, setContentAsText] = useState('')
-  const [shouldRunSyntaxHighlight, setShouldRunSyntaxHighlight] = useState(false)
 
   useEffect(() => {
-    setShouldRunSyntaxHighlight(props.contentSize <= SYNTAX_HIGHLIGHT_MAX_FILE_SIZE_IN_OCTET)
-  }, [props.contentSize])
-
-  useEffect(() => {
-    if (shouldRunSyntaxHighlight === false) return
     if (!props.contentRawUrl || !props.language) return
 
     async function loadContentAsText (rawUrl) {
@@ -54,41 +41,18 @@ export const TextViewerSyntaxHighlight = (props) => {
       console.error('Error in TextViewerSyntaxHighlight', e)
       setContentAsText('')
     }
-  }, [props.contentRawUrl, shouldRunSyntaxHighlight])
+  }, [props.contentRawUrl])
 
   return (
     <div className='TextViewerSyntaxHighlight'>
-      {(shouldRunSyntaxHighlight
-        ? (
-          <HTMLContent>{contentAsText}</HTMLContent>
-        )
-        : (
-          <pre className='TextViewerSyntaxHighlight__blocked language-none'>
-            <div className='TextViewerSyntaxHighlight__blocked__msg'>
-              {props.t('The file weight {{ fileSize }}.', { fileSize: displayFileSize(props.contentSize, 2) })}
-              <br />
-              {props.t('Viewing it online might slow down the page.')}
-            </div>
-
-            <div className='TextViewerSyntaxHighlight__blocked__btn'>
-              <IconButton
-                onClick={() => setShouldRunSyntaxHighlight(true)}
-                text={props.t('View anyway')}
-                icon='far fa-eye'
-                customClass='TextViewerSyntaxHighlight__blocked__btn__run'
-              />
-            </div>
-          </pre>
-        )
-      )}
+      <HTMLContent>{contentAsText}</HTMLContent>
     </div>
   )
 }
 
-export default translate()(TextViewerSyntaxHighlight)
+export default TextViewerSyntaxHighlight
 
 TextViewerSyntaxHighlight.propTypes = {
   contentRawUrl: PropTypes.string.isRequired,
-  language: PropTypes.string.isRequired,
-  contentSize: PropTypes.number.isRequired
+  language: PropTypes.string.isRequired
 }

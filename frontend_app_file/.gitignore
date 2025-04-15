@@ -8,3 +8,7 @@ dist/file.app.optimized.js
 dist/*.LICENSE.txt
 src/debug.js
 test/fixture/defaultProps.js
+
+# Files generated related to frontend_app_file/src/component/ThreeDViewer/ThreeDFormatLoader.js
+dist/*.module.wasm
+dist/*.file.app.optimized.js
