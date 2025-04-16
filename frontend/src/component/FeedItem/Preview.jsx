@@ -249,7 +249,10 @@ export class Preview extends React.Component {
 
     return (
       <div className='feedItem__preview__html'>
-        <HTMLContent iframeWhitelist={props.system.config.iframe_whitelist} htmlValue={this.state.previewHtmlCode} />
+        <HTMLContent
+          iframeWhitelist={props.system.config.iframe_whitelist}
+          htmlValue={this.state.previewHtmlCode}
+        />
       </div>
     )
   }

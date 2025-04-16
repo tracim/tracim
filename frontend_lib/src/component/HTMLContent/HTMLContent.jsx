@@ -22,7 +22,12 @@ function onClickHtmlContentText (e) {
 
 const HTMLContent = (props) => {
   const refHTMLContent = useRef(null)
-  const [sanitizedHTML, setSanitizedHTML] = useState('')
+  // INFO - CH - 2025-04-16 - Initialize the value with the sanitized iframe
+  // because some components (Preview.jsx, Logbook.jsx,...) need its real height to
+  // be able to check the rendered height of the html element
+  const [sanitizedHTML, setSanitizedHTML] = useState(
+    sanitizeIframe(props.htmlValue, props.iframeWhitelist)
+  )
 
   useEffect(() => {
     setSanitizedHTML(sanitizeIframe(props.htmlValue, props.iframeWhitelist))
