@@ -1,5 +1,13 @@
 # Changelog
 
+## 2025-07-00 / TBD
+
+### ✨ New Features
+
+- Add viewer for some 3d format file type
+- New config parameter to allow iframe from specific domain
+- Improved performance when updading content
+
 ## 2025-04.00 / 2025-03-25
 
 ### ✨ New Features
@@ -258,7 +266,7 @@ Avatars are now real images.
 
 #### 💄 Interface
 
-We did some work on the interface to make it more consistent and easier to use.  
+We did some work on the interface to make it more consistent and easier to use.
 Here is some changes that are worth your attention:
 
 - Space settings improvements
