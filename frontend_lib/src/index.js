@@ -98,7 +98,7 @@ import {
   replaceHTMLElementWithMention,
   searchContentAndReplaceWithTag,
   searchMentionAndReplaceWithTag
-} from './mentionOrLink.js'
+} from './mentionOrLinkOrSanitize.js'
 
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'

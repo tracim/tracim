@@ -2286,6 +2286,7 @@ class ConfigSchema(marshmallow.Schema):
     )
     saml_idp_list = marshmallow.fields.Nested(SamLIdPConfigSchema, many=True)
     app_custom_actions = marshmallow.fields.Nested(AppCustomActionLocationSchema())
+    iframe_whitelist = marshmallow.fields.List(marshmallow.fields.String())
 
 
 class ConditionFileSchema(marshmallow.Schema):

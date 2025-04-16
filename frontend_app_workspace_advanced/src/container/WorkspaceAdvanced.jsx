@@ -869,6 +869,7 @@ export class WorkspaceAdvanced extends React.Component {
         >
           <SpaceAdvancedConfiguration
             apiUrl={state.config.apiUrl}
+            system={state.config.system}
             onClickSubmit={this.handleClickValidateNewDescription}
             // End of required props ///////////////////////////////////////////////////////////////
             agendaUrl={state.content.agendaUrl}

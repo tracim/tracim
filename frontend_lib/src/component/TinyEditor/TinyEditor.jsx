@@ -16,7 +16,7 @@ import {
 } from '../../customEvent.js'
 import {
   DEFAULT_ROLE_LIST
-} from '../../mentionOrLink.js'
+} from '../../mentionOrLinkOrSanitize.js'
 
 // require('./TinyEditor.styl') // see https://github.com/tracim/tracim/issues/1156
 
@@ -170,6 +170,7 @@ export const TinyEditor = props => {
           codesample_global_prismjs: true,
           codesample_languages: props.codeLanguageList,
           paste_data_images: true, // INFO - CH - 2024-12-30 - Since tinymce 6+, it is now the default value
+          sandbox_iframes: false,
           relative_urls: false,
           setup: (editor) => {
             editor.ui.registry.addMenuButton('insert', {

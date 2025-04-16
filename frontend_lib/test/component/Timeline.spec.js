@@ -28,6 +28,13 @@ describe('<Timeline />', () => {
       name: 'randomNameLogin',
       userRoleIdInWorkspace: ROLE.contentManager.id
     },
+    system: {
+      config: {
+        iframe_whitelist: []
+      },
+      ui__notes__code_sample_languages: [],
+      translation_service__target_languages: [{ code: 'fr', display: 'Français' }]
+    },
     onClickRevisionBtn: onClickRevisionBtnCallBack,
     allowClickOnRevision: true,
     shouldScrollToBottom: true,
@@ -42,7 +49,6 @@ describe('<Timeline />', () => {
     registerCustomEventHandlerList: () => {},
     t: key => key,
     workspaceId: 1,
-    translationTargetLanguageList: [{ code: 'fr', display: 'Français' }],
     translationTargetLanguageCode: 'en',
     onChangeTranslationTargetLanguageCode: () => {},
     fetchMoreTimelineItems: () => {},

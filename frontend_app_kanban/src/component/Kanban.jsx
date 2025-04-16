@@ -372,6 +372,7 @@ export class Kanban extends React.Component {
               )}
               renderCard={card => (
                 <KanbanCard
+                  config={props.config.system.config}
                   customColor={props.config.hexcolor}
                   readOnly={!changesAllowed}
                   hideButtonsWhenReadOnly={props.readOnly}

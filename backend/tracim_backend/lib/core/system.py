@@ -100,6 +100,7 @@ class SystemApi(object):
                 for auth_type, fields_list in self._config.USER__READ_ONLY_FIELDS.items()
             },
             app_custom_actions=app_custom_actions,
+            iframe_whitelist=self._config.IFRAME__WHITELIST,
         )
 
     def get_usage_conditions_files(self) -> typing.List[UsageConditionModel]:

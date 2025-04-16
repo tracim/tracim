@@ -630,6 +630,7 @@ class CustomForm extends React.Component {
               onClickWysiwygBtn={this.handleToggleWysiwyg}
               onClickRevisionBtn={this.handleClickShowRevision}
               shouldScrollToBottom={mode !== MODE.REVISION}
+              system={this.props.system}
             />
           ) : null}
         </PopinFixedContent>

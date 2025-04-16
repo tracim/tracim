@@ -89,6 +89,7 @@ class ConfigModel(object):
         saml_idp_list: List[Dict[str, str]],
         user__read_only_fields: Dict[str, List[str]],
         app_custom_actions: Dict[str, List[Dict[str, Any]]],
+        iframe_whitelist: List[str],
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
@@ -115,6 +116,7 @@ class ConfigModel(object):
         self.saml_idp_list = saml_idp_list
         self.user__read_only_fields = user__read_only_fields
         self.app_custom_actions = app_custom_actions
+        self.iframe_whitelist = iframe_whitelist
 
 
 class ErrorCodeModel(object):

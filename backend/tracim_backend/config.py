@@ -573,6 +573,13 @@ class CFG(object):
             "frontend.dist_folder_path", frontend_dist_folder
         )
 
+        self.IFRAME__WHITELIST = string_to_unique_item_list(
+            self.get_raw_config("iframe.whitelist", ""),
+            separator=",",
+            cast_func=str,
+            do_strip=True,
+        )
+
         default_color_config_file_path = os.path.join(self.branding_folder_path, "color.json")
         self.COLOR__CONFIG_FILE_PATH = self.get_raw_config(
             "color.config_file_path", default_color_config_file_path
@@ -1338,6 +1345,18 @@ class CFG(object):
                     "URL_PREVIEW__MAX_CONTENT_LENGTH",
                     self.URL_PREVIEW__MAX_CONTENT_LENGTH,
                 )
+            )
+
+        if "*" in self.IFRAME__WHITELIST:
+            if len(self.IFRAME__WHITELIST) > 1:
+                raise ConfigurationError(
+                    'ERROR  "{}" should be "*" only or not contain "*" (currently "{}")'.format(
+                        "IFRAME__WHITELIST", self.IFRAME__WHITELIST
+                    )
+                )
+            logger.warning(
+                self,
+                '"*" in IFRAME__WHITELIST is unsafe and can pose a security risk',
             )
 
     def _check_uploaded_files_config_validity(self) -> None:

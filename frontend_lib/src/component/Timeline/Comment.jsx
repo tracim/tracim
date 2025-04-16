@@ -179,9 +179,11 @@ const Comment = (props) => {
                         isPublication={props.isPublication}
                       />
                     ) : (
-                      <HTMLContent isTranslated={props.translationState === TRANSLATION_STATE.TRANSLATED}>
-                        {addExternalLinksIcons(props.text)}
-                      </HTMLContent>
+                      <HTMLContent
+                        iframeWhitelist={props.systemConfig.iframe_whitelist}
+                        isTranslated={props.translationState === TRANSLATION_STATE.TRANSLATED}
+                        htmlValue={addExternalLinksIcons(props.text)}
+                      />
                     )
                   )}
                 </div>
@@ -200,7 +202,7 @@ const Comment = (props) => {
               onClickRestore={props.onClickRestore}
               onChangeTargetLanguageCode={props.onChangeTranslationTargetLanguageCode}
               targetLanguageCode={props.translationTargetLanguageCode}
-              targetLanguageList={props.translationTargetLanguageList}
+              targetLanguageList={props.systemConfig.translation_service__target_languages}
               dataCy='commentTranslateButton'
             />
           )}
@@ -237,7 +239,6 @@ Comment.propTypes = {
   loggedUser: PropTypes.object.isRequired,
   onChangeTranslationTargetLanguageCode: PropTypes.func.isRequired,
   translationTargetLanguageCode: PropTypes.string.isRequired,
-  translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
   workspaceId: PropTypes.number.isRequired,
   creationDate: PropTypes.string,
   customClass: PropTypes.string,
@@ -253,6 +254,7 @@ Comment.propTypes = {
   onClickRestore: PropTypes.func.isRequired,
   onClickToggleCommentList: PropTypes.func,
   onClickTranslate: PropTypes.func.isRequired,
+  systemConfig: PropTypes.object.isRequired,
   text: PropTypes.string,
   threadLength: PropTypes.number,
   translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE))

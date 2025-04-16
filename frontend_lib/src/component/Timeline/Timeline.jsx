@@ -21,7 +21,7 @@ import {
 
 import {
   replaceHTMLElementWithMention
-} from '../../mentionOrLink.js'
+} from '../../mentionOrLinkOrSanitize.js'
 import { TRANSLATION_STATE } from '../../translation.js'
 import PromptMessage from '../PromptMessage/PromptMessage.jsx'
 import { CUSTOM_EVENT } from '../../customEvent.js'
@@ -160,6 +160,7 @@ export class Timeline extends React.Component {
               case TIMELINE_TYPE.COMMENT_AS_FILE:
                 return (
                   <Comment
+                    systemConfig={props.system.config}
                     isPublication={false}
                     customClass={`${props.customClass}__comment`}
                     customColor={props.customColor}
@@ -182,7 +183,6 @@ export class Timeline extends React.Component {
                       props.onChangeTranslationTargetLanguageCode(languageCode)
                     }}
                     translationTargetLanguageCode={props.translationTargetLanguageCode}
-                    translationTargetLanguageList={props.translationTargetLanguageList}
                     onClickEditComment={() => this.handleClickEditComment(content)}
                     onClickDeleteComment={() => this.handleToggleDeleteCommentPopup(content)}
                     onClickPermanentlyDeleteComment={() => this.handleClickPermanentlyDeleteButton(content)}
@@ -213,7 +213,7 @@ export class Timeline extends React.Component {
         {state.showEditCommentPopup && (
           <EditCommentPopup
             apiUrl={props.apiUrl}
-            codeLanguageList={props.codeLanguageList}
+            codeLanguageList={props.system.config.ui__notes__code_sample_languages}
             comment={replaceHTMLElementWithMention(
               props.memberList,
               state.newComment.raw_content
@@ -248,7 +248,7 @@ export class Timeline extends React.Component {
               onClickSubmit={props.onClickSubmit}
               workspaceId={props.workspaceId}
               // End of required props /////////////////////////////////////////
-              codeLanguageList={props.codeLanguageList}
+              codeLanguageList={props.system.config.ui__notes__code_sample_languages}
               customClass={props.customClass}
               customColor={props.customColor}
               disableComment={props.disableComment}
@@ -304,13 +304,11 @@ Timeline.propTypes = {
   onClickTranslateComment: PropTypes.func.isRequired,
   timelineData: PropTypes.array.isRequired,
   translationTargetLanguageCode: PropTypes.string.isRequired,
-  translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
   workspaceId: PropTypes.number.isRequired,
   // End of required props /////////////////////////////////////////////////////
   allowClickOnRevision: PropTypes.bool,
   availableStatusList: PropTypes.array,
   canLoadMoreTimelineItems: PropTypes.func,
-  codeLanguageList: PropTypes.array,
   customClass: PropTypes.string,
   customColor: PropTypes.string,
   deprecatedStatus: PropTypes.object,
@@ -335,14 +333,14 @@ Timeline.propTypes = {
   onClickRevisionBtn: PropTypes.func,
   onClickShowMoreTimelineItems: PropTypes.func,
   shouldScrollToBottom: PropTypes.bool,
-  showParticipateButton: PropTypes.bool
+  showParticipateButton: PropTypes.bool,
+  system: PropTypes.object.isRequired
 }
 
 Timeline.defaultProps = {
   allowClickOnRevision: true,
   availableStatusList: [],
   canLoadMoreTimelineItems: () => false,
-  codeLanguageList: [],
   customClass: '',
   customColor: '',
   deprecatedStatus: {

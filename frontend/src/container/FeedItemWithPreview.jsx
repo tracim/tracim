@@ -355,7 +355,6 @@ export class FeedItemWithPreview extends React.Component {
                   onClickTranslate={this.handleTranslateComment}
                   onClickRestore={this.handleRestoreContentTranslation}
                   translationState={state.contentTranslationState}
-                  translationTargetLanguageList={props.system.config.translation_service__target_languages}
                   translationTargetLanguageCode={state.translationTargetLanguageCode}
                   onChangeTranslationTargetLanguageCode={languageCode => {
                     this.handleChangeTranslationTargetLanguageCode(languageCode)
@@ -365,6 +364,7 @@ export class FeedItemWithPreview extends React.Component {
                   discussionToggleButtonLabel={this.getDiscussionToggleButtonLabel(commentList)}
                   threadLength={commentList.length}
                   showCommentList={props.showCommentList}
+                  systemConfig={props.system.config}
                 />
               )
               : (
@@ -419,10 +419,9 @@ export class FeedItemWithPreview extends React.Component {
                 )}
                 timelineData={commentList}
                 translationTargetLanguageCode={state.translationTargetLanguageCode}
-                translationTargetLanguageList={props.system.config.translation_service__target_languages}
                 workspaceId={props.workspaceId}
+                system={props.system}
                 // End of required props ///////////////////////////////////////
-                codeLanguageList={props.system.config.ui__notes__code_sample_languages}
                 customClass='feedItem__timeline'
                 customColor={contentType.hexcolor}
                 id={props.content.id}
