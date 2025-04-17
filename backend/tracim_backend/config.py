@@ -574,7 +574,10 @@ class CFG(object):
         )
 
         self.IFRAME__WHITELIST = string_to_unique_item_list(
-            self.get_raw_config("iframe.whitelist", ""),
+            self.get_raw_config(
+                "iframe.whitelist",
+                "youtube.com, youtu.be, dailymotion.com, vimeo.com, google.com, apple.com, openstreetmap.org, mapbox.com, bing.com",
+            ),
             separator=",",
             cast_func=str,
             do_strip=True,
