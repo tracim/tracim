@@ -628,8 +628,11 @@ class CFG(object):
             self.get_raw_config("ui.spaces.creation.parent_space_choice.visible", "True")
         )
 
+        default_preview_skiplist = (
+            ".ifc, .xyz, .e57, .obj, .3ds, .stl, .dae, .gcode, .svg, .ttf, .wrl, .vtk"
+        )
         self.PREVIEW__SKIPLIST = string_to_unique_item_list(
-            self.get_raw_config("preview.skiplist", ""),
+            self.get_raw_config("preview.skiplist", default_preview_skiplist),
             separator=",",
             cast_func=str,
             do_strip=True,

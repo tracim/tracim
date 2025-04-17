@@ -299,7 +299,7 @@ preview_cache_dir = %(basic_setup.preview_cache_dir)s
 ; preview.jpg.restricted_dims = False
 ## Preview skiplist, prevent preview for the content with an extension in the list
 ## All item should be separated by a coma.
-; preview.skiplist=
+; preview.skiplist=.ifc, .xyz, .e57, .obj, .3ds, .stl, .dae, .gcode, .svg, .ttf, .wrl, .vtk
 # examples with multiples values:
 # preview.skiplist= .ifc, .iges
 
