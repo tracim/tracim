@@ -27,12 +27,12 @@ See [Tracim Live Message documentation](/docs/api-integration/tlm_event_socket.m
 ## Working in backend
 
 To update the backend, restart the server: `./run_dev_backend.sh`  
-See [backend doc](/docs/development/backend_build.md) for more information.
+See [backend doc](/docs/development/backend/build.md) for more information.
 
 ## Working in frontend
 
-See [frontend doc](/docs/development/frontend_build.md).
+See [frontend doc](/docs/development/frontend/build.md).
 
 ## Submit your modifications to tracim repo
 
-See [before push](/docs/development/before_push.md).
+See [before push](/docs/development/getting_started/before_push.md).

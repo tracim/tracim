@@ -21,7 +21,7 @@ See [backend install documentation](/docs/administration/installation/install_ba
 
 ### Option 2: Setup manually
 
-See [Backend advanced server setup](/docs/development/advanced/backend_server_setup.md).
+See [Backend advanced server setup](/docs/development/backend/setup/server_setup.md).
 
 #### Dependencies
 

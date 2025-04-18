@@ -15,34 +15,36 @@ See [getting started](/docs/development/getting_started.md)
 
 ## Configuration
 
-Create configuration file for a development environment:
+Create a configuration file for a development environment:
 
     cp development.ini.sample development.ini
 
 The provided default configuration is suitable for local-test. If you need to run Tracim
 over network, see [configuration file documentation](/docs/administration/installation/settings_main_topics.md).
 
-You need to create the branding folder containing customizable ui elements. Starting with the provided sample is a good way:
+You need to create the branding folder containing customizable ui elements. Starting with the provided sample
+is a good way:
 
     cp -r ../frontend/dist/assets/branding.sample ../frontend/dist/assets/branding
 
-You should also create requested folder for running Tracim:
+You should also create the requested folder for running Tracim:
 
     mkdir sessions_data sessions_lock depot previews radicale_storage
 
-Initialize the database using [tracimcli](/docs/administration/exploitation/cli/cli.md) tool. Be careful, if you use Tracim
+Initialize the database using the [tracimcli](/docs/administration/exploitation/cli/cli.md) tool. Be careful, if you use Tracim
 with `Redis`, you want to have the `Redis` service running.
 
     tracimcli db init
 
-Optional functionalities are available through official plugins, please [read their documentation](official_plugins/README.md) to discover their functionalities and how to activate them.
+Optional functionalities are available through official plugins, please [read their documentation](official_plugins/README.md) to
+discover their functionalities and how to activate them.
 
 ## Deployment
 
 You can run Tracim WSGI apps with many WSGI servers. We provide examples to run them with:
 
 - uWSGI using wsgi/* script.
-- The pserve command of pyramid which only rely on development.ini pastedeploy config.
+- The pserve command of pyramid which only relies on development.ini pastedeploy config.
 
 ### With uWSGI: great for production
 
@@ -56,7 +58,7 @@ Or with PIP:
 
     sudo pip3 install uwsgi
 
-#### All in terminal way
+#### All in the terminal way
 
 Run all web services with UWSGI:
 
@@ -237,7 +239,7 @@ Then run flake8:
 
 Tracim_backend gives access to a REST API in _/api_.
 This API is auto-documented with [Hapic](https://github.com/algoo/hapic).
-The specification is accessible when you run Tracim, go to _/api/doc_ .
+The specification is accessible when you run Tracim, go to _/api/doc_.
 
 For example, with the default configuration:
 
@@ -248,8 +250,8 @@ For example, with the default configuration:
 
 ## Roles, Profile and Access Rights
 
-In Tracim, only some users can access to some information, this is also true in
-the Tracim REST API. you can check the [roles documentation](/docs/overview/roles.md) to check
+In Tracim, only some users can access to some information.
+This is also true in the Tracim REST API. You can check the [roles documentation](/docs/overview/roles.md) to check
 what a specific user can do.
 
 ## Other Documentation

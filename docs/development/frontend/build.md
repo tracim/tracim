@@ -159,4 +159,4 @@ export const updatedDebugExample = {
 
 ## More information about available yarn scripts
 
-See [yarn_script](/docs/development/advanced/yarn_scripts.md)
+See [yarn_script](/docs/development/frontend/scripts.md)

@@ -34,27 +34,33 @@
 │   └── tlm_event_socket.md  
 ├── DCO  
 ├── development  
-│   ├── advanced  
-│   │   ├── backend_server_setup.md  
-│   │   ├── how_to_create_database_migration.md  
-│   │   ├── live_message_server_setup.md  
-│   │   ├── mentions.md  
-│   │   ├── tables.png  
-│   │   ├── tracim_tables.md  
-│   │   └── yarn_scripts.md  
-│   ├── backend_build.md  
-│   ├── before_push.md  
-│   ├── frontend_build.md  
-│   ├── getting_started.md  
+│   ├── backend  
+│   │   ├── build.md  
+│   │   ├── database  
+│   │   │   ├── migrations.md  
+│   │   │   ├── schema.md  
+│   │   │   └── tables_diagram.png  
+│   │   ├── features  
+│   │   │   └── mentions.md  
+│   │   └── setup  
+│   │       ├── live_message_setup.md  
+│   │       └── server_setup.md  
+│   ├── frontend  
+│   │   ├── build.md  
+│   │   └── scripts.md  
+│   ├── getting_started  
+│   │   ├── before_push.md  
+│   │   └── index.md  
 │   ├── i18n  
 │   │   ├── i18n-backend.md  
 │   │   └── i18n-frontend.md  
-│   ├── setup  
+│   ├── misc  
 │   │   └── devtools.md  
 │   └── test  
+│       ├── backend_test.md  
 │       ├── concourse.md  
 │       ├── docker.md  
-│       └── testing.md  
+│       └── frontend_test.md  
 ├── index.md  
 ├── licences  
 │   ├── LICENSE_AGPLv3  
@@ -76,4 +82,4 @@ List generated with
 indextmp="$(tail -7 index.md)" && echo '```bash' > index.md && tree --noreport | sed "s|$|  |g" >> index.md && echo '```' >> index.md && echo "$indextmp" >> index.md
 ```
 
-There are two spaces at the end of each lines to force a linebreak in markdown.
+There are two spaces at the end of each line to force a linebreak in Markdown.
