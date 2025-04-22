@@ -1,9 +1,9 @@
 # Tables and columns in Tracim
 
-Table and columns in Tracim are a new way of coding and rendering tables and listings
+Table and columns in Tracim are the way of coding and rendering tables and listings
 for Tracim. It contributes to a more consistent interface in Tracim.
 
-For developers, it provides an way to design tables and data listing.
+For developers, it provides a way to design tables and data listing.
 It removes the necessity to implement per table sorting, filtering and rendering
 since it is managed by the columns.
 
@@ -398,8 +398,7 @@ myTable.propsType = {
 }
 ```
 
-(Additional props can be passed to `TracimTable`. We will see these in the
-[table props section](#props))
+(Additional props can be passed to `TracimTable`. We will see these in the [table props section](#props))
 
 Now the `TracimTable` will automatically render the column headers,
 and a row per entry in the data array.
@@ -555,4 +554,4 @@ export default connect(mapStateToProps)(translate()(FavoritesTable))
 
 ### Result
 
-![Last Modification](tables.png)
+![Last Modification](/docs/development/frontend/table.png)

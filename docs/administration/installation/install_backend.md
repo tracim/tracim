@@ -244,11 +244,11 @@ environment=TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
 A complete example of such a configuration is available in
 [tools_docker/Debian_Uwsgi/supervisord_tracim.conf](/tools_docker/Debian_Uwsgi/supervisord_tracim.conf).
 
-Run with (supervisord.conf should be provided, see [supervisord.conf default_paths](http://supervisord.org/configuration.html):
-
+Run:
 ```bash
 supervisord
 ```
+`supervisord.conf` should be provided, see [supervisord.conf default_paths](http://supervisord.org/configuration.html).
 
 ## Troubleshooting
 

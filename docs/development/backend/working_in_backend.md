@@ -1,8 +1,8 @@
-# The Tracim Backend
+# Working in backend
 
-Backend source code of Tracim, using Pyramid Framework.
+## Backend setup
 
-## Installation
+### Setup automatically
 
 ```bash
 ./setup_default_backend.sh
@@ -18,7 +18,7 @@ Alternatively, you can use it under root:
 ./setup_default_backend.sh root
 ```
 
-### Script explanation
+#### Script explanation
 
 For each missing configuration file, this script will generate them from the default configuration.  
 If the default SQLite database is missing, the script will generate it.
@@ -29,7 +29,7 @@ This script may also be used to update:
 - system packages
 - Python dependencies
 
-### Script options
+#### Script options
 
 - `IGNORE_FULL_PREVIEW_GENERATOR`: skip the installation of preview generator
 - `IGNORE_APT_INSTALL`: skip the installation of the dependencies with apt-get
@@ -45,64 +45,29 @@ Example:
 IGNORE_FULL_PREVIEW_GENERATOR=1 ./setup_default_backend.sh
 ```
 
-For more information about the configuration files, see:
-- configuration file template: [development.ini.sample](/backend/development.ini.sample)
-- configuration doc: [backend setting documentation](/docs/administration/installation/settings_main_topics.md)
+### Setup manually
 
-### Deployment or manual installation
+See [manual_setup](/docs/development/backend/setup/manual_setup.md).
 
-See [docs/administration/installation/install_backend.md](/docs/administration/installation/install_backend.md).
+## Run development server
 
-## Configuration
-
-Create a configuration file for a development environment:
 ```bash
-cp development.ini.sample development.ini
+./run_dev_backend.sh
+```
+Server is accessible at [localhost:7999](http://localhost:7999).
+
+### VirtualEnv
+
+The script `setup_default_backend.sh` create a virtual env which is used by `run_dev_backend.sh`.
+
+Manually activate the virtual env:
+```bash
+source env/bin/activate
 ```
 
-The provided default configuration is suitable for local-test. If you need to run Tracim
-over the network, see [configuration file documentation](/docs/administration/installation/settings_main_topics.md).
-
-Create the branding folder containing customizable ui elements from the default branding folder:
+Create a custom virtual env:
 ```bash
-cp -r ../frontend/dist/assets/branding.sample ../frontend/dist/assets/branding
-```
-You can customize it later.
-
-Create the requested folder:
-```bash
-mkdir sessions_data sessions_lock depot previews radicale_storage
-```
-
-Initialize the database using the [tracimcli](/docs/administration/exploitation/cli.md) tool. Be careful, if you use
-Tracim with `Redis`, you need to have the `Redis` service running.
-```bash
-tracimcli db init
-```
-
-Optional functionalities are available through official plugins.
-See [official plugins documentations](/docs/administration/configuration/plugins/Official_Backend_Plugins.md).
-
-### Run Tracim for development
-
-It uses pserve and Waitress.
-
-⚠️ By default, python warnings are disabled. To enable warning please set `PYTHONWARNINGS` env var:
-```bash
-export PYTHONWARNINGS=default
-```
-
-Run Tracim backend web API (doesn't include live messages):
-```bash
-pserve development.ini
-```
-Run WsgiDAV server:
-```bash
-tracimcli webdav start
-```
-Run CalDAV server:
-```bash
-tracimcli caldav start
+python3 -m venv new_env
 ```
 
 ## Lint the code
@@ -116,6 +81,11 @@ Run flake8:
 ```bash
 flake8
 ```
+
+### CLI
+
+Activate the virtual env (see above) and see dedicated
+documentation [here](/docs/administration/exploitation/cli.md)
 
 ## API documentation
 

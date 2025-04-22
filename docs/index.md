@@ -7,7 +7,7 @@
 │   │   │   └── user_custom_properties.md  
 │   │   ├── plugins  
 │   │   │   ├── hello_world_plugin.py  
-│   │   │   ├── Official_Backend_Plugins.md  
+│   │   │   ├── official_backend_plugins.md  
 │   │   │   └── plugins.md  
 │   │   └── storage  
 │   │       ├── minio-encryption.md  
@@ -35,19 +35,19 @@
 ├── DCO  
 ├── development  
 │   ├── backend  
-│   │   ├── build.md  
 │   │   ├── database  
-│   │   │   ├── migrations.md  
-│   │   │   ├── schema.md  
-│   │   │   └── tables_diagram.png  
+│   │   │   └── migrations.md  
 │   │   ├── features  
 │   │   │   └── mentions.md  
-│   │   └── setup  
-│   │       ├── live_message_setup.md  
-│   │       └── server_setup.md  
+│   │   ├── setup  
+│   │   │   ├── live_message_setup.md  
+│   │   │   └── manual_setup.md  
+│   │   └── working_in_backend.md  
 │   ├── frontend  
-│   │   ├── build.md  
-│   │   └── scripts.md  
+│   │   ├── scripts.md  
+│   │   ├── table.png  
+│   │   ├── tracim_table.md  
+│   │   └── working_in_frontend.md  
 │   ├── getting_started  
 │   │   ├── before_push.md  
 │   │   └── index.md  

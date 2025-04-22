@@ -99,7 +99,7 @@ Once the script ends, refresh the browser's page to load your new app version (b
   - This address is available in `webpack.servdev.config.js` in the property `devServer.port`
   - exemple for app File: `http://localhost:8075`
 
-#### Run the server
+#### Run the development server (servdev)
 
 From any app (frontend, frontend_app_file, frontend_lib, ...)
 

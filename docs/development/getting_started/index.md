@@ -18,21 +18,21 @@ Run Tracim for development
 Open `localhost:7999`.
 Connect using `admin@admin.admin:admin@admin.admin`.
 
+## Working on the backend
+
+To update the backend, restart the server: `./run_dev_backend.sh`  
+See [backend doc](/docs/development/backend/working_in_backend.md) for more information.
+
+## Working on the frontend
+
+See [frontend doc](/docs/development/frontend/working_in_frontend.md).
+
+## Submit your modifications to tracim repo
+
+See [before push](/docs/development/getting_started/before_push.md).
+
 ## Connect to Tracim live event
 
 Connect to the live endpoint to receive every change as they appear on the server.
 
 See [Tracim Live Message documentation](/docs/api-integration/tlm_event_socket.md).
-
-## Working on the backend
-
-To update the backend, restart the server: `./run_dev_backend.sh`  
-See [backend doc](/docs/development/backend/build.md) for more information.
-
-## Working on the frontend
-
-See [frontend doc](/docs/development/frontend/build.md).
-
-## Submit your modifications to tracim repo
-
-See [before push](/docs/development/getting_started/before_push.md).
