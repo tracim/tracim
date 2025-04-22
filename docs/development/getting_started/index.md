@@ -2,7 +2,7 @@
 
 ## Development installation
 
-Install basic tracim with default configuration for development purpose.
+Install basic tracim with the default configuration for development purposes.
 
 ```bash
 ./setup_default_backend.sh
@@ -24,12 +24,12 @@ Connect to the live endpoint to receive every change as they appear on the serve
 
 See [Tracim Live Message documentation](/docs/api-integration/tlm_event_socket.md).
 
-## Working in backend
+## Working on the backend
 
 To update the backend, restart the server: `./run_dev_backend.sh`  
 See [backend doc](/docs/development/backend/build.md) for more information.
 
-## Working in frontend
+## Working on the frontend
 
 See [frontend doc](/docs/development/frontend/build.md).
 
