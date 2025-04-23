@@ -28,6 +28,7 @@ You can run Tracim WSGI apps with many WSGI servers. We provide examples to run 
 - The pserve command of pyramid which only relies on development.ini pastedeploy config
 
 We advise using uWSGI for production and pserve for development.
+For pserve usage documentation, see [manual_setup](/docs/development/backend/setup/manual_setup.md).
 
 ### Install uWSGI
 
@@ -198,7 +199,6 @@ Create and edit a configuration file `supervisord.conf`:
 
 ```ini
 [supervisord]
-; You need to replace <PATH> with correct absolute path
 
 ; email notifier (if async jobs processing is enabled)
 [program:tracim_mail_notifier]
@@ -240,6 +240,7 @@ autostart=true
 autorestart=true
 environment=TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
 ```
+Replace <PATH> with the correct absolute path.
 
 A complete example of such a configuration is available in
 [tools_docker/Debian_Uwsgi/supervisord_tracim.conf](/tools_docker/Debian_Uwsgi/supervisord_tracim.conf).

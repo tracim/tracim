@@ -55,6 +55,7 @@ See [manual_setup](/docs/development/backend/setup/manual_setup.md).
 ./run_dev_backend.sh
 ```
 Server is accessible at [localhost:7999](http://localhost:7999).
+To update the backend, restart the server: `./run_dev_backend.sh`
 
 ### VirtualEnv
 

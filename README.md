@@ -48,7 +48,8 @@ To test in a development context, see
 
 ## Run Tracim for production
 
-If you are interested in production-ready deployment of tracim, then look at the [Tracim administration documentation](/docs/administration), which includes 3 main parts:
+If you are interested in production-ready deployment of tracim, then look at the
+[Tracim administration documentation](/docs/administration), which includes 3 main parts:
 
 - [Installation](/docs/administration/installation) and an entry point for [production installation](/docs/administration/installation/install_backend.md)
 - A second part dedicated to [Tracim server configuration](/docs/administration/configuration)
