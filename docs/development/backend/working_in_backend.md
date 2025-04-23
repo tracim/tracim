@@ -110,4 +110,4 @@ check what a specific user can do.
 
 ## Other Documentation
 
-Detailed documentation on several topics is available in the [docs/development/](/docs/development/) directory.
+Detailed documentation on several topics is available in the [docs/development/](/docs/development) directory.

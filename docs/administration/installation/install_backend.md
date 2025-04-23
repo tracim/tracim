@@ -22,25 +22,22 @@ Older versions of Debian (8, 9) and Ubuntu (16.04) should work as long as a pyth
 
 ## Installation
 
+Use the automated script that will install dependencies and generate default configuration files:
+```bash
+./setup_default_backend.sh
+```
+
+For a manual installation, follow the [manual setup documentation](/docs/development/backend/setup/manual_setup.md).
+
+## Running Tracim
+
 You can run Tracim WSGI apps with many WSGI servers. We provide examples to run them with:
 
 - uWSGI using backend/wsgi/* scripts
 - The pserve command of pyramid which only relies on development.ini pastedeploy config
 
 We advise using uWSGI for production and pserve for development.
-For pserve usage documentation, see [manual_setup](/docs/development/backend/setup/manual_setup.md).
-
-### Install uWSGI
-
-On Debian:
-```bash
-sudo apt install uwsgi uwsgi-plugin-python3
-```
-
-Or with PIP:
-```bash
-sudo pip3 install uwsgi
-```
+For pserve usage documentation, see [manual setup documentation](/docs/development/backend/setup/manual_setup.md).
 
 ### Run Tracim with uWSGI command line
 
