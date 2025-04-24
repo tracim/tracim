@@ -33,7 +33,6 @@ import {
   ListItemWrapper,
   Loading,
   PopinFixedHeader,
-  TracimComponent,
   getContentPath,
   handleFetchResult,
   sortListByMultipleCriteria
@@ -794,4 +793,4 @@ export const NotificationWall = props => {
 }
 
 const mapStateToProps = ({ user, notificationPage, workspaceList }) => ({ user, notificationPage, workspaceList })
-export default connect(mapStateToProps)(translate()(TracimComponent(NotificationWall)))
+export default connect(mapStateToProps)(translate()(NotificationWall))
