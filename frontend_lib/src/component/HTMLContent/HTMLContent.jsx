@@ -31,8 +31,11 @@ const HTMLContent = (props) => {
 
   useEffect(() => {
     setSanitizedHTML(sanitizeIframe(props.htmlValue, props.iframeWhitelist))
-    Prism.highlightAllUnder(refHTMLContent.current)
   }, [props.htmlValue])
+
+  useEffect(() => {
+    Prism.highlightAllUnder(refHTMLContent.current)
+  }, [sanitizedHTML])
 
   return (
     <article
