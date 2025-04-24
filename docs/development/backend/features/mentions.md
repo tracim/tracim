@@ -2,13 +2,13 @@
 
 ## Structure
 
-To be detected by the backend, a mention must be of following form:
+To be detected by the backend, a mention must be of the following form:
 
 ```html
 <html-mention {DATA}></html-mention>
 ```
 
-`DATA` can be decomposed either into `roleid="X"` or `userid="Y"` depending if the mention is a role
+`DATA` can be decomposed either into `roleid="X"` or `userid="Y"` depending on if the mention is a role
 mention or a user mention. X and Y are the ID of the role or user respectively.
 
 ### Examples

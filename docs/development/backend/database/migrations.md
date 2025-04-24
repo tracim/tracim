@@ -357,4 +357,3 @@ dialect = op.get_context().dialect
 if dialect.server_version_info >= (8, 0, 0):
    pass
 ```
-

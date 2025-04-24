@@ -7,7 +7,7 @@ Most settings in Tracim are configurable using both the INI configuration file a
 ### Tracim fully supported variables
 
 You can set those parameters in INI configuration file (see `config_file_name`) or
-environnement variable (see `env_var_name`).
+environment variable (see `env_var_name`).
 
 The priority order is (from less to more priority):
 

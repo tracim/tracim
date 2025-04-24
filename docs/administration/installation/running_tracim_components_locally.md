@@ -1,10 +1,12 @@
 # Running Tracim components locally
 
-[Tracim](https://www.tracim.fr) is composed of multiples services, some are web wsgi applications and others are daemons (servers not web-related to do some task like sending email).
+[Tracim](https://www.tracim.fr) is composed of multiple services, some are web wsgi applications, and others are daemons (servers not
+web-related to do some tasks like sending email).
 
-You should install pushpin, see [their installation procedure](https://pushpin.org/docs/install/) for your OS. We recommend to use pushpin version 1.30 as this version has been extensively tested and is in use in our official docker image.
+You should install pushpin, see [their installation procedure](https://pushpin.org/docs/install/) for your OS. We recommend using pushpin version
+1.30 as this version has been extensively tested and is in use in our official docker image.
 
-You need to configure pushpin to proxy tracim (by default tracim web run on port 6543):
+You need to configure pushpin to proxy tracim (by default, tracim web runs on port 6543):
 
 ```bash
 echo "* localhost:6543" | sudo tee /etc/pushpin/routes
@@ -57,12 +59,16 @@ You can now head to (if pushpin is correctly configured and use default port 799
 - user: `admin@admin.admin`
 - password: `admin@admin.admin`
 
-⚠️ If this does not work, you can try to access [http://localhost:6543](http://localhost:6543). If it works, the issue is related to the configuration of pushpin.
+⚠️ If this does not work, you can try to access [http://localhost:6543](http://localhost:6543). If it works, the issue is related to the
+configuration of pushpin.
 
-The full documentation about running the Tracim services with uWSGI and supervisor is available in the [Backend advanced setup](/docs/development/advanced/backend_server_setup.md), sections `Running Tracim Backend Daemon`
-and `Running Tracim Backend WSGI APP`.
+The full documentation about running the Tracim services with uWSGI and supervisor is available in the
+[Backend advanced setup](/docs/development/advanced/backend_server_setup.md), sections `Running Tracim Backend Daemon` and `Running Tracim Backend WSGI APP`.
 
 ## Upkeep
 
-When the default "file" storage is used for session files you need to regularly remove old sessions files as they aren't removed automatically when the session expires (either of old age or when a user logs out). Other session storage (e.g. redis) do not have this behavior.
-Please read the [session documentation](/docs/administration/installation/settings_main_topics.md#user-sessions-in-Tracim) for more information and recommended ways to remove the unused session files.
+When the default "file" storage is used for session files, you need to regularly remove old sessions files as they
+aren't removed automatically when the session expires (either of old age or when a user logs out). Other session
+storage (e.g. redis) does not have this behavior.
+Please read the [session documentation](/docs/administration/installation/settings_main_topics.md#user-sessions-in-Tracim) for more information and recommended ways to remove the unused session
+files.

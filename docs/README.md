@@ -16,11 +16,11 @@ See [backend development documentation](/docs/administration/installation/instal
 
 ### Manual install
 
-For advanced backend server setup, see [/docs/development/advanced/backend_server_setup.md](/docs/development/advanced/backend_server_setup.md).
+For advanced backend server setup, see [/docs/development/backend/setup/server_setup.md](/docs/development/backend/setup/server_setup.md).
 
 ## Development
 
-See development [getting started documentation](/docs/development/getting_started.md).
+See development [getting started documentation](/docs/development/getting_started/index.md).
 
 ## Configuration
 
