@@ -31,7 +31,7 @@ def profiler_tween_factory(handler: Handler, registry: Registry) -> Handler:
 
         Both <method> and <path> are written with a regex, for example:
 
-            profiler_tween.path = (POST|GET):\/api\/workspaces\/\d+\/files  # noqa: W605
+            profiler_tween.path = (POST|GET):\/api\/workspaces\/\d+\/files
 
         would match both POST and GET methods for the given path.
         As the path is a regex, the slashes in the path must be escaped.
