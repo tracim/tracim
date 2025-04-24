@@ -86,7 +86,7 @@ For more information about the configuration files, see:
 
 It uses pserve and Waitress.
 
-⚠️ By default, python warnings are disabled. To enable warning please set `PYTHONWARNINGS` env var:
+⚠️ By default, python warnings are disabled. To enable warning, set `PYTHONWARNINGS` env var:
 ```bash
 export PYTHONWARNINGS=default
 ```

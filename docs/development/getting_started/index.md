@@ -20,7 +20,7 @@ Connect using `admin@admin.admin:admin@admin.admin`.
 
 ## Working on the backend
 
-To update the backend, restart the server: `./run_dev_backend.sh`  
+To update the backend, restart the server: `./run_dev_backend.sh`
 See [backend doc](/docs/development/backend/working_in_backend.md) for more information.
 
 ## Working on the frontend
