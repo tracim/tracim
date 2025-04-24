@@ -95,7 +95,7 @@ uwsgi --stop /tmp/tracim_caldav.pid
 ### Run Tracim with uWSGI configuration file
 
 #### Pyramid webserver
-Create and edit a configuration file `/etc/uwsgi/apps-available/tracim_web.ini`.
+Create and edit a configuration file `/etc/uwsgi/apps-available/tracim_web.ini`.  
 You can use a different path.
 ```ini
 [uwsgi]
@@ -115,7 +115,7 @@ uwsgi --ini /etc/uwsgi/apps-available/tracim_web.ini --http-socket :6543
 ```
 
 #### WebDAV
-Create and edit a configuration file `/etc/uwsgi/apps-available/tracim_webdav.ini`.
+Create and edit a configuration file `/etc/uwsgi/apps-available/tracim_webdav.ini`.  
 You can use a different path.
 ```ini
 [uwsgi]
@@ -134,7 +134,7 @@ uwsgi --ini /etc/uwsgi/apps-available/tracim_webdav.ini.ini --http-socket :3030
 ```
 
 #### CalDAV
-Create and edit a configuration file `/etc/uwsgi/apps-available/tracim_caldav.ini`.
+Create and edit a configuration file `/etc/uwsgi/apps-available/tracim_caldav.ini`.  
 You can use a different path.
 ```ini
 [uwsgi]
