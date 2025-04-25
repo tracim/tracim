@@ -67,7 +67,7 @@ pip install pyinstrument
 ```
 
 - Set pyramid.tweens in development.ini [app:tracim_web] section:
-  pyramid.tweens = tracim_backend.lib.utils.tweens.profiler_tween_factory pyramid_tm.tm_tween_factory pyramid.tweens.excview_tween_factor
+pyramid.tweens = tracim_backend.lib.utils.tweens.profiler_tween_factory pyramid_tm.tm_tween_factory pyramid.tweens.excview_tween_factory
 
 (The order and other tweens are important.)
 
@@ -84,38 +84,62 @@ would specifically target file revisions endpoints.
 
 ### Output
 
-The default output is to print the results in the uwsgi log.
-There are other possible outputs to choose from,
-but for those you will have to change the code of the function `profiler_tween_factory` in `tracim/backend/tracim_backend/lib/utils/tweens.py` file.
+#### Default output
 
-Replace the line :
+The default output is to print the results in the uwsgi log.
+There are other possible outputs to choose from, but you'll need to modify the code.
+
+In the function `profiler_tween_factory` located in `tracim/backend/tracim_backend/lib/utils/tweens.py`,
+find and replace this line:
+
 ```python
 logger.debug(logger, profiler.output_text())
 ```
 
-with one of those exemple depending on the output wanted:
-To print the HTML file in the uwsgi log (the HTML file is more graphical than text, but you will have a lot of code to copy from the log):
+with one of the alternative output methods described below.
+
+#### Output HTML file in the log
+
+To print the HTML output in the uwsgi log
+(the HTML file is more graphical than text, but you will have a lot of code to copy from the log):
 ```python
 logger.debug(logger, profiler.output_html())
 ```
 
-To save the HTML to a specific file
-(but you will only get the last request; you can use "a" instead of "w" to append every request to the same file,
-but you will need to separate the HTML files before reading them):
+#### Output HTML to a file
+
+To save the HTML output to a specific file:
+
 ```python
-file=open("/tmp/test.html","w")
+file = open("/tmp/test.html", "w")
 file.write(profiler.output_html())
 file.close()
 ```
 
-To open in the browser:
+Note: This will only store the most recent request. If you want to append all requests to the same file,
+use "a" mode instead of "w", but you'll need to manually separate the HTML before viewing them:
+
+```python
+file = open("/tmp/test.html", "a")
+file.write(profiler.output_html())
+file.close()
+```
+
+#### Output in a browser
+
+To automatically open results in a web browser:
+
 ```python
 profiler.open_in_browser()
 ```
-One new tab will open for every request matching the regex.
-It will open in the browser of the computer running tracim, so can only be used in local.
 
-To create a new file for every request:
+This will open one new browser tab for each request matching your regex pattern.
+Note: This only works when running Tracim locally, as it opens in the browser of the computer running the application.
+
+#### Output each request to different files
+
+To create separate files for each profiled request with descriptive filenames:
+
 ```python
 import os
 i=0
@@ -127,6 +151,8 @@ file=open(f'/tmp/{file_name}',"w")
 file.write(profiler.output_html())
 file.close()
 ```
+
+This creates filenames based on the HTTP method and path, making it easier to identify which request each profile represents.
 
 ### Usage
 
