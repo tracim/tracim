@@ -136,12 +136,19 @@ class ContentApi(object):
         self._show_all_type_of_contents_in_treeview = all_content_in_treeview
         self._force_show_all_types = force_show_all_types
         self._disable_user_workspaces_filter = disable_user_workspaces_filter
-        self.preview_manager = PreviewManager(self._config.PREVIEW_CACHE_DIR, create_folder=True)
+        self.preview_manager = None
         default_lang = None
         if self._user:
             default_lang = self._user.lang
         self.translator = Translator(app_config=self._config, default_lang=default_lang)
         self.namespaces_filter = namespaces_filter
+
+    def get_preview_manager(self):
+        if self.preview_manager == None:
+            self.preview_manager = PreviewManager(
+                self._config.PREVIEW_CACHE_DIR, create_folder=True
+            )
+        return self.preview_manager
 
     @contextmanager
     def show(
@@ -1957,7 +1964,9 @@ class ContentApi(object):
             if file_extension in self._config.PREVIEW__SKIPLIST:
                 return None
             with self.get_one_revision_filepath(revision_id) as file_path:
-                nb_pages = self.preview_manager.get_page_nb(file_path, file_ext=file_extension)
+                nb_pages = self.get_preview_manager().get_page_nb(
+                    file_path, file_ext=file_extension
+                )
         except UnsupportedMimeType:
             return None
         except CannotGetDepotFileDepotCorrupted:
@@ -1978,7 +1987,9 @@ class ContentApi(object):
             if file_extension in self._config.PREVIEW__SKIPLIST:
                 return False
             with self.get_one_revision_filepath(revision_id) as file_path:
-                return self.preview_manager.has_pdf_preview(file_path, file_ext=file_extension)
+                return self.get_preview_manager().has_pdf_preview(
+                    file_path, file_ext=file_extension
+                )
         except UnsupportedMimeType:
             return False
         except CannotGetDepotFileDepotCorrupted:
@@ -1998,7 +2009,9 @@ class ContentApi(object):
             if file_extension in self._config.PREVIEW__SKIPLIST:
                 return False
             with self.get_one_revision_filepath(revision_id) as file_path:
-                return self.preview_manager.has_jpeg_preview(file_path, file_ext=file_extension)
+                return self.get_preview_manager().has_jpeg_preview(
+                    file_path, file_ext=file_extension
+                )
         except UnsupportedMimeType:
             return False
         except CannotGetDepotFileDepotCorrupted:
