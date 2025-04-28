@@ -71,6 +71,7 @@ describe('App File', () => {
           .click()
 
         cy.contains('.breadcrumbs__item', fullFilename_3)
+        cy.get('[data-cy="revision_group_1234"]').click()
         cy.get('[data-cy="revision_data_1"]').should('be.visible')
         cy.get('[data-cy="revision_data_4"]').should('be.visible')
         cy.get('.timeline__comment__body__content__text').contains(comment)
