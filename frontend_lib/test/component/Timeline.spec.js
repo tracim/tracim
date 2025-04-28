@@ -82,7 +82,9 @@ describe('<Timeline />', () => {
       const timelineData = [
         { content_id: 1, timelineType: TIMELINE_TYPE.REVISION },
         { content_id: 2, timelineType: TIMELINE_TYPE.REVISION },
-        { content_id: 3, timelineType: TIMELINE_TYPE.REVISION }
+        { content_id: 3, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 4, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 5, timelineType: TIMELINE_TYPE.REVISION }
       ]
 
       const expectedResult = [{
@@ -90,7 +92,9 @@ describe('<Timeline />', () => {
         group: [
           { content_id: 1, timelineType: TIMELINE_TYPE.REVISION },
           { content_id: 2, timelineType: TIMELINE_TYPE.REVISION },
-          { content_id: 3, timelineType: TIMELINE_TYPE.REVISION }
+          { content_id: 3, timelineType: TIMELINE_TYPE.REVISION },
+          { content_id: 4, timelineType: TIMELINE_TYPE.REVISION },
+          { content_id: 5, timelineType: TIMELINE_TYPE.REVISION }
         ]
       }]
 
@@ -101,7 +105,9 @@ describe('<Timeline />', () => {
       const timelineData = [
         { content_id: 1, timelineType: TIMELINE_TYPE.REVISION },
         { content_id: 2, timelineType: TIMELINE_TYPE.REVISION },
-        { content_id: 3, timelineType: TIMELINE_TYPE.COMMENT }
+        { content_id: 3, timelineType: TIMELINE_TYPE.COMMENT },
+        { content_id: 4, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 5, timelineType: TIMELINE_TYPE.REVISION }
       ]
 
       const expectedResult = [
@@ -112,7 +118,14 @@ describe('<Timeline />', () => {
             { content_id: 2, timelineType: TIMELINE_TYPE.REVISION }
           ]
         },
-        { content_id: 3, timelineType: TIMELINE_TYPE.COMMENT }
+        { content_id: 3, timelineType: TIMELINE_TYPE.COMMENT },
+        {
+          timelineType: TIMELINE_TYPE.REVISION_GROUP,
+          group: [
+            { content_id: 4, timelineType: TIMELINE_TYPE.REVISION },
+            { content_id: 5, timelineType: TIMELINE_TYPE.REVISION }
+          ]
+        }
       ]
 
       expect(groupTimelineData(timelineData)).to.deep.equal(expectedResult)
@@ -122,13 +135,17 @@ describe('<Timeline />', () => {
       const timelineData = [
         { content_id: 1, timelineType: TIMELINE_TYPE.REVISION },
         { content_id: 2, timelineType: TIMELINE_TYPE.COMMENT },
-        { content_id: 3, timelineType: TIMELINE_TYPE.REVISION }
+        { content_id: 3, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 4, timelineType: TIMELINE_TYPE.COMMENT },
+        { content_id: 5, timelineType: TIMELINE_TYPE.REVISION }
       ]
 
       const expectedResult = [
         { content_id: 1, timelineType: TIMELINE_TYPE.REVISION },
         { content_id: 2, timelineType: TIMELINE_TYPE.COMMENT },
-        { content_id: 3, timelineType: TIMELINE_TYPE.REVISION }
+        { content_id: 3, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 4, timelineType: TIMELINE_TYPE.COMMENT },
+        { content_id: 5, timelineType: TIMELINE_TYPE.REVISION }
       ]
 
       expect(groupTimelineData(timelineData)).to.deep.equal(expectedResult)
@@ -224,6 +241,22 @@ describe('<Timeline />', () => {
       ]
       const expectedResult = [
         { content_id: 1, timelineType: TIMELINE_TYPE.COMMENT }
+      ]
+      expect(groupTimelineData(timelineData)).to.deep.equal(expectedResult)
+    })
+
+    it('should not group revision when timeline has less than 5 items', () => {
+      const timelineData = [
+        { content_id: 1, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 2, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 3, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 4, timelineType: TIMELINE_TYPE.REVISION }
+      ]
+      const expectedResult = [
+        { content_id: 1, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 2, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 3, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 4, timelineType: TIMELINE_TYPE.REVISION }
       ]
       expect(groupTimelineData(timelineData)).to.deep.equal(expectedResult)
     })

@@ -391,6 +391,10 @@ export const groupTimelineData = timelineData => {
     return []
   }
 
+  if (timelineData.length <= 4) {
+    return timelineData
+  }
+
   const timelineDataGrouped = []
   const revisionGroup = []
 

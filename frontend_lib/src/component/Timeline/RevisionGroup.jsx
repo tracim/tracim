@@ -47,6 +47,7 @@ const RevisionGroupHtmlWithoutHOC = props => {
           ? { backgroundColor: color(props.customColor).lighten(0.60).hex() }
           : undefined
       }}
+      data-cy={`revision_group_${props.revisionGroup.map(r => r.version_number).join('')}`}
     >
       <div className='RevisionGroup__icon'>
         <i className='fas fa-history' />
