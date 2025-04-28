@@ -358,7 +358,8 @@ export const CONTENT_NAMESPACE = {
 export const TIMELINE_TYPE = {
   COMMENT: CONTENT_TYPE.COMMENT,
   COMMENT_AS_FILE: `${CONTENT_TYPE.COMMENT}AsFile`,
-  REVISION: 'revision'
+  REVISION: 'revision',
+  REVISION_GROUP: 'revisionGroup'
 }
 
 export const FILE_PREVIEW_STATE = {

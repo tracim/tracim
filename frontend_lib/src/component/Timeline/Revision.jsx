@@ -21,14 +21,9 @@ const Revision = props => {
       onClick={props.allowClickOnRevision ? props.onClickRevision : () => {}}
       style={{
         cursor: props.allowClickOnRevision ? 'pointer' : 'auto',
-        ...(props.allowClickOnRevision
-          ? {
-            ':hover': {
-              backgroundColor: color(props.customColor).lighten(0.60).hex()
-            }
-          }
-          : {}
-        )
+        ':hover': props.allowClickOnRevision
+          ? { backgroundColor: color(props.customColor).lighten(0.60).hex() }
+          : undefined
       }}
     >
       <span className='revision__data' data-cy={`revision_data_${props.versionNumber}`}>
