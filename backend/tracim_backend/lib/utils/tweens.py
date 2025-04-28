@@ -21,7 +21,7 @@ def profiler_tween_factory(handler: Handler, registry: Registry) -> Handler:
       - installing pyinstrument (pip install pyinstrument)
       - setting pyramid.tweens in development.ini [app:tracim_web] section:
 
-            pyramid.tweens = tracim_backend.lib.utils.tweens.profiler_tween_factory pyramid_tm.tm_tween_factory pyramid.tweens.excview_tween_factor
+            pyramid.tweens = tracim_backend.lib.utils.tweens.profiler_tween_factory pyramid_tm.tm_tween_factory pyramid.tweens.excview_tween_factory
 
         The order and other tweens are important.
         (see https://docs.pylonsproject.org/projects/pyramid/en/2.0-branch/narr/hooks.html#explicit-tween-ordering).

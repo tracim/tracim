@@ -39,6 +39,7 @@
 │   │   │   └── migrations.md  
 │   │   ├── features  
 │   │   │   └── mentions.md  
+│   │   ├── profiler.md  
 │   │   ├── setup  
 │   │   │   ├── live_message_setup.md  
 │   │   │   └── manual_setup.md  
