@@ -210,20 +210,20 @@ describe('<Timeline />', () => {
 
     it('should not group a single revision', () => {
       const timelineData = [
-        { content_id: 1, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 1, timelineType: TIMELINE_TYPE.REVISION }
       ]
       const expectedResult = [
-        { content_id: 1, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 1, timelineType: TIMELINE_TYPE.REVISION }
       ]
       expect(groupTimelineData(timelineData)).to.deep.equal(expectedResult)
     })
 
     it('should not group a single comment', () => {
       const timelineData = [
-        { content_id: 1, timelineType: TIMELINE_TYPE.COMMENT },
+        { content_id: 1, timelineType: TIMELINE_TYPE.COMMENT }
       ]
       const expectedResult = [
-        { content_id: 1, timelineType: TIMELINE_TYPE.COMMENT },
+        { content_id: 1, timelineType: TIMELINE_TYPE.COMMENT }
       ]
       expect(groupTimelineData(timelineData)).to.deep.equal(expectedResult)
     })
