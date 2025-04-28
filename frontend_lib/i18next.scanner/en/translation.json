@@ -274,5 +274,13 @@
   "UnknownRole": "Unknown Role",
   "Error while deleting the content": "Error while deleting the content",
   "The content has been deleted": "The content has been deleted",
-  "Error while changing content type": "Error while changing content type"
+  "Error while changing content type": "Error while changing content type",
+  "Permanently delete": "Permanently delete",
+  "From": "From",
+  "to": "to",
+  "See all revisions": "See all revisions",
+  "{{count}} Revisions": "{{count}} Revisions",
+  "{{count}} Revisions_plural": "{{count}} Revisions",
+  "Yes, delete permanently": "Yes, delete permanently",
+  "Warning: this operation cannot be rolled back": "Warning: this operation cannot be rolled back"
 }
