@@ -53,7 +53,7 @@ class StorageLib:
             ) from exc
 
     def get_preview_manager(self):
-        if self.preview_manager == None:
+        if self.preview_manager is None:
             self.preview_manager = PreviewManager(
                 self.app_config.PREVIEW_CACHE_DIR, create_folder=True
             )

@@ -144,7 +144,7 @@ class ContentApi(object):
         self.namespaces_filter = namespaces_filter
 
     def get_preview_manager(self):
-        if self.preview_manager == None:
+        if self.preview_manager is None:
             self.preview_manager = PreviewManager(
                 self._config.PREVIEW_CACHE_DIR, create_folder=True
             )
