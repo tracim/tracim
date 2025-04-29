@@ -276,11 +276,10 @@
   "The content has been deleted": "",
   "Error while changing content type": "",
   "Permanently delete": "",
-  "From": "",
-  "to": "",
   "See all revisions": "",
   "{{count}} Revisions": "",
   "{{count}} Revisions_plural": "",
   "Yes, delete permanently": "",
-  "Warning: this operation cannot be rolled back": ""
+  "Warning: this operation cannot be rolled back": "",
+  "Between": ""
 }

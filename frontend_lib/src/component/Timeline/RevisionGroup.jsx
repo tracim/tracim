@@ -28,13 +28,17 @@ const RevisionGroupHtmlWithoutHOC = props => {
     props.loggedUserLang,
     'P'
   )
-  const firstAndLastRevisionDateString = [
-    props.t('From'),
-    firstRevisionDate,
-    props.t('to'),
-    lastRevisionDate
-  ].join(' ')
-  // const lastRevisionDistance = displayDistanceDate(lastRevisionDateTime, props.loggedUserLang)
+
+  const titleHtml = firstRevisionDate === lastRevisionDate
+    ? lastRevisionDate
+    : [
+      props.t('Between'),
+      firstRevisionDate,
+      props.t('and'),
+      lastRevisionDate
+    ].join(' ')
+
+  const lastRevisionDistance = displayDistanceDate(lastRevisionDateTime, props.loggedUserLang)
 
   return (
     <div
@@ -59,9 +63,9 @@ const RevisionGroupHtmlWithoutHOC = props => {
 
       <div
         className='RevisionGroup__date'
-        title={firstAndLastRevisionDateString}
+        title={titleHtml}
       >
-        {lastRevisionDateTime}
+        {lastRevisionDistance}
       </div>
     </div>
   )

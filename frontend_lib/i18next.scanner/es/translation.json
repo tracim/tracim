@@ -276,11 +276,10 @@
   "Permanently delete": "",
   "{{count}} files selected": "{{count}} archivo seleccionado",
   "{{count}} files selected_plural": "{{count}} archivos seleccionados",
-  "From": "",
-  "to": "",
   "See all revisions": "",
   "{{count}} Revisions": "",
   "{{count}} Revisions_plural": "",
   "Yes, delete permanently": "",
-  "Warning: this operation cannot be rolled back": ""
+  "Warning: this operation cannot be rolled back": "",
+  "Between": ""
 }

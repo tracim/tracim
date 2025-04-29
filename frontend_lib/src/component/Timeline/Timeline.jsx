@@ -202,6 +202,7 @@ export class Timeline extends React.Component {
                     loggedUser={props.loggedUser}
                     availableStatusList={props.availableStatusList}
                     allowClickOnRevision={props.allowClickOnRevision}
+                    onClickRevisionBtn={props.onClickRevisionBtn}
                     key={`revisionGroup_${i}`}
                   />
                 )

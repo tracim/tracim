@@ -284,8 +284,6 @@
   "The content has been deleted": "",
   "Error while changing content type": "",
   "Permanently delete": "",
-  "From": "",
-  "to": "",
   "See all revisions": "",
   "{{count}} Revisions_0": "",
   "{{count}} Revisions_1": "",
@@ -294,5 +292,6 @@
   "{{count}} Revisions_4": "",
   "{{count}} Revisions_5": "",
   "Yes, delete permanently": "",
-  "Warning: this operation cannot be rolled back": ""
+  "Warning: this operation cannot be rolled back": "",
+  "Between": ""
 }

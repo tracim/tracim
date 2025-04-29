@@ -276,11 +276,10 @@
   "{{count}} tasks performed on {{numberOfTasks}}": "{{count}} t<C3><A2>che effectu<C3><A9>e sur {{numberOfTasks}}",
   "{{count}} tasks performed on {{numberOfTasks}}_plural": "{{count}} t<C3><A2>ches effectu<C3><A9>es sur {{numberOfTasks}}",
   "Permanently delete": "Supprimer définitivement",
-  "From": "De",
-  "to": "à",
   "See all revisions": "Voir toutes les révisions",
   "{{count}} Revisions": "{{count}} Révision",
   "{{count}} Revisions_plural": "{{count}} Révisions",
   "Yes, delete permanently": "Oui, supprimer définitivement",
-  "Warning: this operation cannot be rolled back": "Attention: cette opération ne peut être annulée"
+  "Warning: this operation cannot be rolled back": "Attention: cette opération ne peut être annulée",
+  "Between": "Entre"
 }
