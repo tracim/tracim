@@ -332,15 +332,6 @@ export class Thread extends React.Component {
     )
   }
 
-  handleClickOpenFileComment = (comment) => {
-    const { state } = this
-    state.config.history.push(PAGE.WORKSPACE.CONTENT(
-      state.content.workspace_id,
-      CONTENT_TYPE.FILE,
-      comment.content_id
-    ))
-  }
-
   handleClickRefresh = () => {
     const { state } = this
 
@@ -561,7 +552,6 @@ export class Thread extends React.Component {
                 onClickPermanentlyDeleteComment={this.handlePermanentlyDeleteComment}
                 shouldShowPermanentlyDeleteButton={state.loggedUser.userRoleIdInWorkspace >= ROLE.workspaceManager.id}
                 onClickEditComment={this.handleClickEditComment}
-                onClickOpenFileComment={this.handleClickOpenFileComment}
                 onClickRestoreArchived={this.handleClickRestoreArchive}
                 onClickRestoreDeleted={this.handleClickRestoreDelete}
                 onClickRevisionBtn={() => { }}

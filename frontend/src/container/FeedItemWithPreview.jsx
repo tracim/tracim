@@ -103,15 +103,6 @@ export class FeedItemWithPreview extends React.Component {
     )
   }
 
-  handleClickOpenFileComment = (comment) => {
-    const { props } = this
-    props.history.push(PAGE.WORKSPACE.CONTENT(
-      props.content.workspaceId,
-      CONTENT_TYPE.FILE,
-      comment.content_id
-    ))
-  }
-
   handleClickValidateNewComment = async (comment, commentAsFileList) => {
     const { props } = this
     const content = {
@@ -430,7 +421,6 @@ export class FeedItemWithPreview extends React.Component {
                 onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
                 onClickDeleteComment={this.handleClickDeleteComment}
                 onClickEditComment={this.handleClickEditComment}
-                onClickOpenFileComment={this.handleClickOpenFileComment}
                 shouldScrollToBottom={false}
                 showParticipateButton={props.showParticipateButton}
               />

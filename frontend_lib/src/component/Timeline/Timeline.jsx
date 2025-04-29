@@ -172,7 +172,9 @@ export class Timeline extends React.Component {
                     loggedUser={props.loggedUser}
                     creationDate={content.created_raw || content.created}
                     modificationDate={content.modified}
-                    text={content.translationState === TRANSLATION_STATE.TRANSLATED ? content.translatedRawContent : content.raw_content}
+                    text={content.translationState === TRANSLATION_STATE.TRANSLATED
+                      ? content.translatedRawContent
+                      : content.raw_content}
                     fromMe={props.loggedUser.userId === content.author.user_id}
                     key={`comment_${content.content_id}`}
                     onClickTranslate={() => { props.onClickTranslateComment(content) }}
@@ -187,7 +189,6 @@ export class Timeline extends React.Component {
                     onClickDeleteComment={() => this.handleToggleDeleteCommentPopup(content)}
                     onClickPermanentlyDeleteComment={() => this.handleClickPermanentlyDeleteButton(content)}
                     shouldShowPermanentlyDeleteButton={props.shouldShowPermanentlyDeleteButton}
-                    onClickOpenFileComment={() => props.onClickOpenFileComment(content)}
                   />
                 )
               case TIMELINE_TYPE.REVISION:
@@ -327,7 +328,6 @@ Timeline.propTypes = {
   onClickPermanentlyDeleteComment: PropTypes.func,
   shouldShowPermanentlyDeleteButton: PropTypes.bool,
   onClickEditComment: PropTypes.func,
-  onClickOpenFileComment: PropTypes.func,
   onClickRestoreArchived: PropTypes.func,
   onClickRestoreDeleted: PropTypes.func,
   onClickRevisionBtn: PropTypes.func,
@@ -361,7 +361,6 @@ Timeline.defaultProps = {
   onClickPermanentlyDeleteComment: () => {},
   shouldShowPermanentlyDeleteButton: false,
   onClickEditComment: () => { },
-  onClickOpenFileComment: () => { },
   onClickRestoreComment: content => { },
   onClickRevisionBtn: () => { },
   onClickShowMoreTimelineItems: () => { },

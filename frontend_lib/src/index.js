@@ -187,6 +187,7 @@ import NoHoverListItem from './component/Lists/NoHoverListItem/NoHoverListItem.j
 import ComposedIcon from './component/Icon/ComposedIcon.jsx'
 
 import IconButton from './component/Button/IconButton.jsx'
+import LinkHtmlButton from './component/Button/LinkHtmlButton.jsx'
 import GenericButton from './component/Button/GenericButton.jsx'
 import TranslateButton from './component/Button/TranslateButton.jsx'
 
@@ -393,6 +394,7 @@ export {
   GenericButton,
   Icon,
   IconButton,
+  LinkHtmlButton,
   ListItemWrapper,
   LiveMessageManager,
   NewMemberForm,
