@@ -57,6 +57,7 @@ from tracim_backend.models.context_models import PaginatedObject
 from tracim_backend.models.context_models import UserWorkspaceConfigInContext
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
+from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import WorkspaceSubscription
 from tracim_backend.models.revision_protection import new_revision
@@ -690,12 +691,13 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            content_id=hapic_data.path["content_id"],
-            content_type=ContentTypeSlug.ANY.value,
-        )
-        content_type = content_type_list.get_one_by_slug(content.type).slug
 
+        content = api.get_content_property(
+            property_list=[ContentRevisionRO.type, ContentRevisionRO.workspace_id],
+            content_id=hapic_data.path["content_id"],
+        )
+        content_type = content_type_list.get_one_by_slug(content[0]).slug
+        workspace_id = content[1]
         if (
             content_type == ContentTypeSlug.KANBAN.value
             or content_type == ContentTypeSlug.LOGBOOK.value
@@ -706,9 +708,9 @@ class WorkspaceController(Controller):
         raise HTTPFound(
             "{base_url}workspaces/{workspace_id}/{content_type}s/{content_id}".format(
                 base_url=BASE_API,
-                workspace_id=content.workspace_id,
+                workspace_id=workspace_id,
                 content_type=content_type,
-                content_id=content.content_id,
+                content_id=hapic_data.path["content_id"],
             )
         )
 

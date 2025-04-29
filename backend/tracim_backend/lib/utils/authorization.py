@@ -22,10 +22,12 @@ from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
 from tracim_backend.exceptions import UserIsNotContentOwner
 from tracim_backend.exceptions import UserIsNotReactionAuthor
+from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import Profile
+from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.roles import WorkspaceRoles
 
 try:
@@ -258,8 +260,16 @@ class ContentTypeChecker(AuthorizationChecker):
         self.allowed_content_type_list = allowed_content_type_list
 
     def check(self, tracim_context: TracimContext) -> bool:
-        content = tracim_context.current_content
-        current_content_type_slug = content_type_list.get_one_by_slug(content.type).slug
+        content_api = ContentApi(
+            config=tracim_context.app_config,
+            session=tracim_context.dbsession,
+            current_user=tracim_context.safe_current_user(),
+        )
+        content_id = tracim_context._get_content_id_in_request()
+        content_type = content_api.get_content_property(
+            property_list=[ContentRevisionRO.type], content_id=content_id
+        )[0]
+        current_content_type_slug = content_type_list.get_one_by_slug(content_type).slug
         if current_content_type_slug in self.allowed_content_type_list:
             return True
         raise ContentTypeNotAllowed()

@@ -2067,7 +2067,7 @@ class ContentApi(object):
             )
         )
 
-        # INFO - G.M - 2020-03-27 - Mark all content as read
+        # INFO - G.M - 2020-03-27 - Mark all content as read
         for content in resultset:
             if content.has_new_information_for(self._user, recursive=False):
                 self.mark_read(content, read_datetime, do_flush, recursive=False)
@@ -2503,3 +2503,55 @@ class ContentApi(object):
         )
 
         return content
+
+    def get_content_property(
+        self,
+        property_list: typing.List[QueryableAttribute],
+        content_id: int = None,
+        revision_id: int = None,
+    ) -> typing.Tuple:
+        """
+        Return the specified properties of a revision.
+        - If revision_id is provided, return the properties for that revision.
+        - If only content_id is provided, return the properties of the last revision for that content.
+        - If both are provided, ensure the revision belongs to the content.
+
+        Args:
+            property_list (List[QueryableAttribute]): List of SQLAlchemy column attributes to retrieve
+            content_id (int, optional): ID of the content
+            revision_id (int, optional): ID of the specific revision
+
+        Returns:
+            tuple: Values of requested properties in same order as property_list
+
+        Raises:
+            ValueError: If neither content_id nor revision_id is provided
+            ContentRevisionNotFound: If the specified revision is not found
+            ContentNotFound: If the specified content is not found
+        """
+        if revision_id is None and content_id is None:
+            raise ValueError("Either content_id or revision_id must be provided")
+
+        query = self._session.query(*property_list)
+
+        if revision_id is not None:
+            query = query.filter(ContentRevisionRO.revision_id == revision_id)
+        else:
+            query = query.order_by(ContentRevisionRO.revision_id.desc())
+
+        if content_id is not None:
+            query = query.filter(ContentRevisionRO.content_id == content_id)
+
+        result = query.first()
+
+        if not result:
+            if revision_id is not None and content_id is not None:
+                raise ContentRevisionNotFound(
+                    f'Revision "{revision_id}" for content "{content_id}" not found'
+                )
+            elif revision_id is not None:
+                raise ContentRevisionNotFound(f'Revision "{revision_id}" not found')
+            else:
+                raise ContentNotFound(f'Content with id "{content_id}" not found')
+
+        return result
