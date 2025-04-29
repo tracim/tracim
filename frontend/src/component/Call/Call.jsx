@@ -45,15 +45,12 @@ export const Call = props => {
 
   let unansweredCallTimeoutId = -1
 
-  // INFO - CH - 20240827 - isMasterTab as dependency of useEffect is mandatory because handleUserCallCreated and
-  // handleUserCallModified uses isMasterTab.
-  // If not set as dependency, they won't have the latest value when executing
   useEffect(() => {
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.CREATED, handler: handleUserCallCreated },
       { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.MODIFIED, handler: handleUserCallModified }
     ])
-  }, [isMasterTab])
+  }, [isMasterTab, props.system.headTitle, props.user.userId])
 
   useEffect(() => {
     setIsMasterTab(props.liveMessageManager.eventSource !== null)

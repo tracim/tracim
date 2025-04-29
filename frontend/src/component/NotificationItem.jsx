@@ -18,7 +18,6 @@ import {
 import {
   AVATAR_SIZE,
   Avatar,
-  TracimComponent,
   formatAbsoluteDate
 } from 'tracim_frontend_lib'
 import { escape as escapeHtml } from 'lodash'
@@ -119,7 +118,7 @@ export const NotificationItem = props => {
 }
 
 const mapStateToProps = ({ user }) => ({ user })
-export default connect(mapStateToProps)(translate()(TracimComponent(NotificationItem)))
+export default connect(mapStateToProps)(translate()(NotificationItem))
 
 NotificationItem.propTypes = {
   onCloseNotificationWall: PropTypes.func.isRequired,

@@ -5,8 +5,7 @@ import PropTypes from 'prop-types'
 import {
   PAGE,
   TLM_SUB_TYPE as TLM_SUB,
-  ListItemWrapper,
-  TracimComponent
+  ListItemWrapper
 } from 'tracim_frontend_lib'
 import NotificationItem from '../component/NotificationItem.jsx'
 import GroupRender from '../component/GroupedNotificationItem/GroupRender.jsx'
@@ -185,7 +184,7 @@ export const GroupedNotificationItem = props => {
 }
 
 const mapStateToProps = ({ user }) => ({ user })
-export default connect(mapStateToProps)(translate()(TracimComponent(GroupedNotificationItem)))
+export default connect(mapStateToProps)(translate()(GroupedNotificationItem))
 
 GroupedNotificationItem.propTypes = {
   getNotificationDetails: PropTypes.func.isRequired,
