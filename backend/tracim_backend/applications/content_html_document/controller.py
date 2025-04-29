@@ -225,8 +225,9 @@ class HTMLDocumentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
-        revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
+        revision = api.get_one_revision(
+            revision_id=hapic_data.path.revision_id, content_id=hapic_data.path.content_id
+        )
         return api.get_revision_in_context(revision)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_HTML_DOCUMENT_ENDPOINTS])
@@ -339,8 +340,9 @@ class HTMLDocumentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
-        revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
+        revision = api.get_one_revision(
+            revision_id=hapic_data.path.revision_id, content_id=hapic_data.path.content_id
+        )
         default_filename = "{label}_r{revision_id}.pdf".format(
             revision_id=revision.revision_id, label=revision.label
         )

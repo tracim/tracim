@@ -644,12 +644,12 @@ class ContentApi(object):
         return content
 
     def get_one_revision(
-        self, revision_id: int = None, content: Content = None
+        self, revision_id: int = None, content_id: int = None
     ) -> ContentRevisionRO:
         """
         This method allow us to get directly any revision with its id
         :param revision_id: The content's revision's id that we want to return
-        :param content: The content related to the revision, if None do not
+        :param content_id: The id of the content related to the revision, if None do not
         check if revision is related to this content.
         :return: An item Content linked with the correct revision
         """
@@ -665,10 +665,10 @@ class ContentApi(object):
             raise ContentRevisionNotFound(
                 'Content revision "{}" not found'.format(revision_id)
             ) from exc
-        if content and revision.content_id != content.content_id:
+        if content_id and revision.content_id != content_id:
             raise RevisionDoesNotMatchThisContent(
                 "revision {revision_id} is not a revision of content {content_id}".format(
-                    revision_id=revision.revision_id, content_id=content.content_id
+                    revision_id=revision.revision_id, content_id=content_id
                 )
             )
         return revision
