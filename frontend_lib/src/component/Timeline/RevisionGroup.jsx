@@ -31,12 +31,14 @@ const RevisionGroupHtmlWithoutHOC = props => {
 
   const titleHtml = firstRevisionDate === lastRevisionDate
     ? lastRevisionDate
-    : [
-      props.t('Between'),
-      firstRevisionDate,
-      props.t('and'),
-      lastRevisionDate
-    ].join(' ')
+    : props.t(
+      'Between {{firstRevisionDate}} and {{lastRevisionDate}}',
+      {
+        firstRevisionDate: firstRevisionDate,
+        lastRevisionDate: lastRevisionDate,
+        interpolation: { escapeValue: false }
+      }
+    )
 
   const lastRevisionDistance = displayDistanceDate(lastRevisionDateTime, props.loggedUserLang)
 

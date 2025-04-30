@@ -281,5 +281,5 @@
   "{{count}} Revisions_plural": "{{count}} Revisions",
   "Yes, delete permanently": "Yes, delete permanently",
   "Warning: this operation cannot be rolled back": "Warning: this operation cannot be rolled back",
-  "Between": "Between"
+  "Between {{firstRevisionDate}} and {{lastRevisionDate}}": "Between {{firstRevisionDate}} and {{lastRevisionDate}}"
 }

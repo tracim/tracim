@@ -293,5 +293,5 @@
   "{{count}} Revisions_5": "",
   "Yes, delete permanently": "",
   "Warning: this operation cannot be rolled back": "",
-  "Between": ""
+  "Between {{firstRevisionDate}} and {{lastRevisionDate}}": ""
 }
