@@ -24,7 +24,6 @@ from tracim_backend.lib.utils.authorization import ProfileChecker
 from tracim_backend.lib.utils.authorization import RoleChecker
 from tracim_backend.lib.utils.authorization import knows_candidate_user
 from tracim_backend.lib.utils.request import TracimContext
-from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
