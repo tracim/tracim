@@ -588,15 +588,6 @@ export class File extends React.Component {
     )
   }
 
-  handleClickOpenFileComment = (comment) => {
-    const { state } = this
-    state.config.history.push(PAGE.WORKSPACE.CONTENT(
-      state.content.workspace_id,
-      CONTENT_TYPE.FILE,
-      comment.content_id
-    ))
-  }
-
   handleClickRestoreDelete = async () => {
     const { props, state } = this
     props.appContentRestoreDelete(state.content, this.setState.bind(this), state.config.slug)
@@ -959,7 +950,6 @@ export class File extends React.Component {
             onClickPermanentlyDeleteComment={this.handlePermanentlyDeleteComment}
             shouldShowPermanentlyDeleteButton={state.loggedUser.userRoleIdInWorkspace >= ROLE.workspaceManager.id}
             onClickEditComment={this.handleClickEditComment}
-            onClickOpenFileComment={this.handleClickOpenFileComment}
             onClickRevisionBtn={this.handleClickShowRevision}
             onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
             shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
