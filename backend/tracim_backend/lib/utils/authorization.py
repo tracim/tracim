@@ -267,8 +267,8 @@ class ContentTypeChecker(AuthorizationChecker):
         )
         content_id = tracim_context._get_content_id_in_request()
         content_type = content_api.get_content_property(
-            property_list=[ContentRevisionRO.type], content_id=content_id
-        )[0]
+            property_list=["type"], content_id=content_id
+        )["type"]
         current_content_type_slug = content_type_list.get_one_by_slug(content_type).slug
         if current_content_type_slug in self.allowed_content_type_list:
             return True

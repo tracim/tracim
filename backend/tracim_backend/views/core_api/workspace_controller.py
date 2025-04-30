@@ -692,12 +692,12 @@ class WorkspaceController(Controller):
             config=app_config,
         )
 
-        content = api.get_content_property(
-            property_list=[ContentRevisionRO.type, ContentRevisionRO.workspace_id],
+        content_property = api.get_content_property(
+            property_list=["type", "workspace_id"],
             content_id=hapic_data.path["content_id"],
         )
-        content_type = content_type_list.get_one_by_slug(content[0]).slug
-        workspace_id = content[1]
+        content_type = content_type_list.get_one_by_slug(content_property["type"]).slug
+        workspace_id = content_property["workspace_id"]
         if (
             content_type == ContentTypeSlug.KANBAN.value
             or content_type == ContentTypeSlug.LOGBOOK.value

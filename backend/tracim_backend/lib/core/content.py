@@ -2505,6 +2505,50 @@ class ContentApi(object):
         return content
 
     def get_content_property(
+        self, property_list: list[str], content_id: int = None, revision_id: int = None
+    ) -> dict:
+        """
+        Return the specified properties of a content or revision.
+        - If revision_id is provided, return the properties for that revision.
+        - If only content_id is provided, return the properties of the last revision for that content.
+        - If both are provided, ensure the revision belongs to the content.
+
+        Args:
+            property_list (list[str]): List of property names to retrieve
+            content_id (int, optional): ID of the content
+            revision_id (int, optional): ID of the specific revision
+
+        Returns:
+            dict: Dictionary mapping property names to their values
+
+        Raises:
+            ValueError: If neither content_id nor revision_id is provided
+            ContentRevisionNotFound: If the specified revision is not found
+            ContentNotFound: If the specified content is not found
+        """
+        assert content_id or revision_id, "Either content_id or revision_id must be provided"
+
+        list_query_attribute: typing.List[QueryableAttribute] = []
+        for property in property_list:
+            if property == "type":
+                list_query_attribute.append(ContentRevisionRO.type)
+            elif property == "workspace_id":
+                list_query_attribute.append(ContentRevisionRO.workspace_id)
+
+        result = self._get_content_property(
+            property_list=list_query_attribute, content_id=content_id, revision_id=revision_id
+        )
+
+        result_dict = {}
+
+        i = 0
+        for property in property_list:
+            result_dict[property] = result[i]
+            i = i + 1
+
+        return result_dict
+
+    def _get_content_property(
         self,
         property_list: typing.List[QueryableAttribute],
         content_id: int = None,
@@ -2529,8 +2573,7 @@ class ContentApi(object):
             ContentRevisionNotFound: If the specified revision is not found
             ContentNotFound: If the specified content is not found
         """
-        if revision_id is None and content_id is None:
-            raise ValueError("Either content_id or revision_id must be provided")
+        assert content_id or revision_id, "Either content_id or revision_id must be provided"
 
         query = self._session.query(*property_list)
 
