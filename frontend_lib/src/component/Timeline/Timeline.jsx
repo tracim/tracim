@@ -32,6 +32,7 @@ import ScrollToBottomWrapper from '../ScrollToBottomWrapper/ScrollToBottomWrappe
 import EditCommentPopup from './EditCommentPopup.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import Loading from '../Loading/Loading.jsx'
+import RevisionGroup from './RevisionGroup.jsx'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 
@@ -108,6 +109,8 @@ export class Timeline extends React.Component {
       return null
     }
 
+    const timelineDataGrouped = groupTimelineData(props.timelineData)
+
     return (
       <div className={classnames('timeline')}>
         <div className='timeline__warning'>
@@ -154,7 +157,7 @@ export class Timeline extends React.Component {
               customClass='timeline__messagelist__showMoreButton'
             />
           )}
-          {props.loading ? <Loading /> : props.timelineData.map(content => {
+          {props.loading ? <Loading /> : timelineDataGrouped.map((content, i) => {
             switch (content.timelineType) {
               case TIMELINE_TYPE.COMMENT:
               case TIMELINE_TYPE.COMMENT_AS_FILE:
@@ -189,6 +192,19 @@ export class Timeline extends React.Component {
                     onClickDeleteComment={() => this.handleToggleDeleteCommentPopup(content)}
                     onClickPermanentlyDeleteComment={() => this.handleClickPermanentlyDeleteButton(content)}
                     shouldShowPermanentlyDeleteButton={props.shouldShowPermanentlyDeleteButton}
+                  />
+                )
+              case TIMELINE_TYPE.REVISION_GROUP:
+                return (
+                  <RevisionGroup
+                    revisionGroup={content.group}
+                    customClass={props.customClass}
+                    customColor={props.customColor}
+                    loggedUser={props.loggedUser}
+                    availableStatusList={props.availableStatusList}
+                    allowClickOnRevision={props.allowClickOnRevision}
+                    onClickRevisionBtn={props.onClickRevisionBtn}
+                    key={`revisionGroup_${i}`}
                   />
                 )
               case TIMELINE_TYPE.REVISION:
@@ -368,4 +384,55 @@ Timeline.defaultProps = {
   shouldScrollToBottom: true,
   showParticipateButton: false,
   timelineData: []
+}
+
+export const groupTimelineData = timelineData => {
+  if (!Array.isArray(timelineData) || timelineData.length === 0) {
+    return []
+  }
+
+  if (timelineData.length <= 4) {
+    return timelineData
+  }
+
+  const timelineDataGrouped = []
+  const revisionGroup = []
+
+  const copyAndResetRevisionGroup = () => {
+    if (revisionGroup.length === 1) {
+      timelineDataGrouped.push(...revisionGroup)
+    } else if (revisionGroup.length > 1) {
+      timelineDataGrouped.push({
+        timelineType: TIMELINE_TYPE.REVISION_GROUP,
+        group: [...revisionGroup]
+      })
+    }
+    revisionGroup.length = 0 // INFO - CH - 2025-04-24 - reset the const array to []
+  }
+
+  for (let i = 0; i < timelineData.length; i++) {
+    const timelineItem = timelineData[i]
+
+    switch (timelineItem.timelineType) {
+      case TIMELINE_TYPE.COMMENT:
+      case TIMELINE_TYPE.COMMENT_AS_FILE:
+        copyAndResetRevisionGroup()
+        timelineDataGrouped.push(timelineItem)
+        break
+
+      case TIMELINE_TYPE.REVISION:
+        revisionGroup.push(timelineItem)
+        break
+
+      case TIMELINE_TYPE.REVISION_GROUP:
+        break
+    }
+  }
+
+  // INFO - CH - 2025-04-24 - Handle the last element if it is a revision
+  if (timelineData[timelineData.length - 1].timelineType === TIMELINE_TYPE.REVISION) {
+    copyAndResetRevisionGroup()
+  }
+
+  return timelineDataGrouped
 }

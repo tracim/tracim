@@ -2,9 +2,9 @@ import React from 'react'
 import { withRouterMock, RouterMock } from '../hocMock/withRouter'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
-import { Timeline } from '../../src/component/Timeline/Timeline.jsx'
+import { groupTimelineData, Timeline } from '../../src/component/Timeline/Timeline.jsx'
 import sinon from 'sinon'
-import { ROLE } from '../../src/constant.js'
+import { ROLE, TIMELINE_TYPE } from '../../src/constant.js'
 import { commentList } from '../fixture/contentCommentList.js'
 import { revisionList } from '../fixture/contentRevisionList.js'
 import { reactstrapPopoverHack } from '../testHelper.js'
@@ -74,6 +74,191 @@ describe('<Timeline />', () => {
       wrapper.setProps({ disableComment: true })
       expect(wrapper.find('.commentArea__advancedtext__btn').prop('disabled')).to.equal(true)
       wrapper.setProps({ disableComment: false })
+    })
+  })
+
+  describe('function groupTimelineData', () => {
+    it('should group the revision', () => {
+      const timelineData = [
+        { content_id: 1, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 2, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 3, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 4, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 5, timelineType: TIMELINE_TYPE.REVISION }
+      ]
+
+      const expectedResult = [{
+        timelineType: TIMELINE_TYPE.REVISION_GROUP,
+        group: [
+          { content_id: 1, timelineType: TIMELINE_TYPE.REVISION },
+          { content_id: 2, timelineType: TIMELINE_TYPE.REVISION },
+          { content_id: 3, timelineType: TIMELINE_TYPE.REVISION },
+          { content_id: 4, timelineType: TIMELINE_TYPE.REVISION },
+          { content_id: 5, timelineType: TIMELINE_TYPE.REVISION }
+        ]
+      }]
+
+      expect(groupTimelineData(timelineData)).to.deep.equal(expectedResult)
+    })
+
+    it('should group the revision and keep the comment', () => {
+      const timelineData = [
+        { content_id: 1, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 2, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 3, timelineType: TIMELINE_TYPE.COMMENT },
+        { content_id: 4, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 5, timelineType: TIMELINE_TYPE.REVISION }
+      ]
+
+      const expectedResult = [
+        {
+          timelineType: TIMELINE_TYPE.REVISION_GROUP,
+          group: [
+            { content_id: 1, timelineType: TIMELINE_TYPE.REVISION },
+            { content_id: 2, timelineType: TIMELINE_TYPE.REVISION }
+          ]
+        },
+        { content_id: 3, timelineType: TIMELINE_TYPE.COMMENT },
+        {
+          timelineType: TIMELINE_TYPE.REVISION_GROUP,
+          group: [
+            { content_id: 4, timelineType: TIMELINE_TYPE.REVISION },
+            { content_id: 5, timelineType: TIMELINE_TYPE.REVISION }
+          ]
+        }
+      ]
+
+      expect(groupTimelineData(timelineData)).to.deep.equal(expectedResult)
+    })
+
+    it('should not group a single revision', () => {
+      const timelineData = [
+        { content_id: 1, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 2, timelineType: TIMELINE_TYPE.COMMENT },
+        { content_id: 3, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 4, timelineType: TIMELINE_TYPE.COMMENT },
+        { content_id: 5, timelineType: TIMELINE_TYPE.REVISION }
+      ]
+
+      const expectedResult = [
+        { content_id: 1, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 2, timelineType: TIMELINE_TYPE.COMMENT },
+        { content_id: 3, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 4, timelineType: TIMELINE_TYPE.COMMENT },
+        { content_id: 5, timelineType: TIMELINE_TYPE.REVISION }
+      ]
+
+      expect(groupTimelineData(timelineData)).to.deep.equal(expectedResult)
+    })
+
+    it('should group the revision in multiple groups separated by comments', () => {
+      const timelineData = [
+        { content_id: 1, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 2, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 3, timelineType: TIMELINE_TYPE.COMMENT },
+        { content_id: 4, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 5, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 6, timelineType: TIMELINE_TYPE.COMMENT }
+      ]
+
+      const expectedResult = [
+        {
+          timelineType: TIMELINE_TYPE.REVISION_GROUP,
+          group: [
+            { content_id: 1, timelineType: TIMELINE_TYPE.REVISION },
+            { content_id: 2, timelineType: TIMELINE_TYPE.REVISION }
+          ]
+        },
+        { content_id: 3, timelineType: TIMELINE_TYPE.COMMENT },
+        {
+          timelineType: TIMELINE_TYPE.REVISION_GROUP,
+          group: [
+            { content_id: 4, timelineType: TIMELINE_TYPE.REVISION },
+            { content_id: 5, timelineType: TIMELINE_TYPE.REVISION }
+          ]
+        },
+        { content_id: 6, timelineType: TIMELINE_TYPE.COMMENT }
+      ]
+
+      expect(groupTimelineData(timelineData)).to.deep.equal(expectedResult)
+    })
+
+    it('should not group file as comment while still grouping revision', () => {
+      const timelineData = [
+        { content_id: 1, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 2, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 3, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 4, timelineType: TIMELINE_TYPE.COMMENT_AS_FILE },
+        { content_id: 5, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 6, timelineType: TIMELINE_TYPE.REVISION }
+      ]
+      const expectedResult = [
+        {
+          timelineType: TIMELINE_TYPE.REVISION_GROUP,
+          group: [
+            { content_id: 1, timelineType: TIMELINE_TYPE.REVISION },
+            { content_id: 2, timelineType: TIMELINE_TYPE.REVISION },
+            { content_id: 3, timelineType: TIMELINE_TYPE.REVISION }
+          ]
+        },
+        { content_id: 4, timelineType: TIMELINE_TYPE.COMMENT_AS_FILE },
+        {
+          timelineType: TIMELINE_TYPE.REVISION_GROUP,
+          group: [
+            { content_id: 5, timelineType: TIMELINE_TYPE.REVISION },
+            { content_id: 6, timelineType: TIMELINE_TYPE.REVISION }
+          ]
+        }
+      ]
+      expect(groupTimelineData(timelineData)).to.deep.equal(expectedResult)
+    })
+
+    it('should return an empty array when timelineData is empty', () => {
+      const timelineData = []
+      const expectedResult = []
+      expect(groupTimelineData(timelineData)).to.deep.equal(expectedResult)
+    })
+
+    it('should return an empty array when timelineData is null', () => {
+      const timelineData = null
+      const expectedResult = []
+      expect(groupTimelineData(timelineData)).to.deep.equal(expectedResult)
+    })
+
+    it('should not group a single revision', () => {
+      const timelineData = [
+        { content_id: 1, timelineType: TIMELINE_TYPE.REVISION }
+      ]
+      const expectedResult = [
+        { content_id: 1, timelineType: TIMELINE_TYPE.REVISION }
+      ]
+      expect(groupTimelineData(timelineData)).to.deep.equal(expectedResult)
+    })
+
+    it('should not group a single comment', () => {
+      const timelineData = [
+        { content_id: 1, timelineType: TIMELINE_TYPE.COMMENT }
+      ]
+      const expectedResult = [
+        { content_id: 1, timelineType: TIMELINE_TYPE.COMMENT }
+      ]
+      expect(groupTimelineData(timelineData)).to.deep.equal(expectedResult)
+    })
+
+    it('should not group revision when timeline has less than 5 items', () => {
+      const timelineData = [
+        { content_id: 1, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 2, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 3, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 4, timelineType: TIMELINE_TYPE.REVISION }
+      ]
+      const expectedResult = [
+        { content_id: 1, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 2, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 3, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 4, timelineType: TIMELINE_TYPE.REVISION }
+      ]
+      expect(groupTimelineData(timelineData)).to.deep.equal(expectedResult)
     })
   })
 })

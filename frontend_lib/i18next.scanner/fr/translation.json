@@ -268,12 +268,18 @@
   "copied": "copié",
   "unknown": "inconnue",
   "UnknownRole": "RôleInconnu",
-  "{{count}} tasks performed on {{numberOfTasks}}_0": "{{count}} tâche effectuée sur {{numberOfTasks}}",
-  "{{count}} tasks performed on {{numberOfTasks}}_1": "{{count}} tâches effectuées sur {{numberOfTasks}}",
-  "{{count}} tasks performed on {{numberOfTasks}}_2": "{{count}} tâches effectuées sur {{numberOfTasks}}",
   "{{count}} files selected": "{{count}} fichier sélectionné",
   "{{count}} files selected_plural": "{{count}} fichiers sélectionnés",
   "Error while deleting the content": "Erreur lors de la suppression du contenu",
   "The content has been deleted": "Le contenu a été supprimé",
-  "Error while changing content type": "Erreur lors du changement de type de contenu"
+  "Error while changing content type": "Erreur lors du changement de type de contenu",
+  "{{count}} tasks performed on {{numberOfTasks}}": "{{count}} t<C3><A2>che effectu<C3><A9>e sur {{numberOfTasks}}",
+  "{{count}} tasks performed on {{numberOfTasks}}_plural": "{{count}} t<C3><A2>ches effectu<C3><A9>es sur {{numberOfTasks}}",
+  "Permanently delete": "Supprimer définitivement",
+  "See all revisions": "Voir toutes les révisions",
+  "{{count}} Revisions": "{{count}} Révision",
+  "{{count}} Revisions_plural": "{{count}} Révisions",
+  "Yes, delete permanently": "Oui, supprimer définitivement",
+  "Warning: this operation cannot be rolled back": "Attention: cette opération ne peut être annulée",
+  "Between {{firstRevisionDate}} and {{lastRevisionDate}}": "Entre {{firstRevisionDate}} et {{lastRevisionDate}}"
 }
