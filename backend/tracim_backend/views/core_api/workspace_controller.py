@@ -57,7 +57,6 @@ from tracim_backend.models.context_models import PaginatedObject
 from tracim_backend.models.context_models import UserWorkspaceConfigInContext
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
-from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import WorkspaceSubscription
 from tracim_backend.models.revision_protection import new_revision

@@ -27,7 +27,6 @@ from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import Profile
-from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.roles import WorkspaceRoles
 
 try:
