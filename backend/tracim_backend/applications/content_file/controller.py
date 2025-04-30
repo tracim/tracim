@@ -281,7 +281,7 @@ class FileController(Controller):
                         revision_id=hapic_data.path.revision_id,
                     )
                 )
-            except ContentNotFound as ee:
+            except ContentNotFound:
                 raise ContentNotFound(
                     "the content {content_id} doesn't exist".format(
                         content_id=hapic_data.path.content_id
