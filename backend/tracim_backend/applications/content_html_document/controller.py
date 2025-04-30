@@ -8,9 +8,11 @@ import transaction
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
+from tracim_backend.exceptions import ContentRevisionNotFound
 from tracim_backend.exceptions import ContentStatusException
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import InvalidMention
+from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
 from tracim_backend.exceptions import UserNotMemberOfWorkspace
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
@@ -209,6 +211,8 @@ class HTMLDocumentController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_HTML_DOCUMENT_ENDPOINTS])
     @check_right(is_reader)
     @check_right(is_html_document_content)
+    @hapic.handle_exception(RevisionDoesNotMatchThisContent, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ContentRevisionNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndContentRevisionIdPathSchema())
     @hapic.output_body(RevisionSchema())
     def get_html_document_revision(
@@ -323,6 +327,8 @@ class HTMLDocumentController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_HTML_DOCUMENT_ENDPOINTS])
     @check_right(is_reader)
     @check_right(is_html_document_content)
+    @hapic.handle_exception(RevisionDoesNotMatchThisContent, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ContentRevisionNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(FileRevisionPathSchema())
     @hapic.input_query(FileQuerySchema())
     @hapic.output_file([])

@@ -249,6 +249,8 @@ class FileController(Controller):
     @check_right(is_reader)
     @check_right(is_file_content)
     @hapic.handle_exception(TracimFileNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ContentRevisionNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ContentNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_query(FileQuerySchema())
     @hapic.input_path(FileRevisionPathSchema())
     @hapic.output_file([])
@@ -271,11 +273,20 @@ class FileController(Controller):
                 revision_id=hapic_data.path.revision_id, content_id=hapic_data.path.content_id
             )
         except ContentRevisionNotFound:
-            raise TracimFileNotFound(
-                "content {} with revision {} not found.".format(
-                    hapic_data.path.content_id, hapic_data.path.revision_id
+            try:
+                api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+                raise ContentRevisionNotFound(
+                    "the content {content_id} has no revision {revision_id}".format(
+                        content_id=hapic_data.path.content_id,
+                        revision_id=hapic_data.path.revision_id,
+                    )
                 )
-            )
+            except ContentNotFound as ee:
+                raise ContentNotFound(
+                    "the content {content_id} doesn't exist".format(
+                        content_id=hapic_data.path.content_id
+                    )
+                )
 
         default_filename = "{label}_r{revision_id}{file_extension}".format(
             label=revision.file_name,
