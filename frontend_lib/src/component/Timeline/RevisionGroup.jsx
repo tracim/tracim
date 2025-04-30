@@ -18,11 +18,6 @@ const RevisionGroupHtmlWithoutHOC = props => {
     props.loggedUserLang,
     'P'
   )
-  const lastRevisionDateTime = formatAbsoluteDate(
-    props.revisionGroup[props.revisionGroup.length - 1].created_raw,
-    props.loggedUserLang,
-    'Pp'
-  )
   const lastRevisionDate = formatAbsoluteDate(
     props.revisionGroup[props.revisionGroup.length - 1].created_raw,
     props.loggedUserLang,
@@ -40,7 +35,10 @@ const RevisionGroupHtmlWithoutHOC = props => {
       }
     )
 
-  const lastRevisionDistance = displayDistanceDate(lastRevisionDateTime, props.loggedUserLang)
+  const lastRevisionDistance = displayDistanceDate(
+    props.revisionGroup[props.revisionGroup.length - 1].created_raw,
+    props.loggedUserLang
+  )
 
   return (
     <div
