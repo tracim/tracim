@@ -2506,7 +2506,11 @@ class ContentApi(object):
         return content
 
     def get_content_property(
-        self, property_list: list[str], content_id: int = None, revision_id: int = None
+        self,
+        property_list: list[str],
+        content_id: int = None,
+        revision_id: int = None,
+        workspace_id=None,
     ) -> dict:
         """
         Return the specified properties of a content or revision.
@@ -2539,7 +2543,7 @@ class ContentApi(object):
             list_query_attribute.append(properties[property_name])
 
         result = self._get_content_property(
-            property_list=list_query_attribute, content_id=content_id, revision_id=revision_id
+            list_query_attribute, content_id, revision_id, workspace_id
         )
 
         result_dict = {}
@@ -2554,6 +2558,7 @@ class ContentApi(object):
         property_list: typing.List[QueryableAttribute],
         content_id: int = None,
         revision_id: int = None,
+        workspace_id: int = None,
     ) -> typing.Tuple:
         """
         Return the specified properties of a revision.
@@ -2582,6 +2587,9 @@ class ContentApi(object):
             query = query.filter(ContentRevisionRO.revision_id == revision_id)
 
         query = query.order_by(ContentRevisionRO.revision_id.desc())
+
+        if workspace_id is not None:
+            query = query.filter(ContentRevisionRO.workspace_id == workspace_id)
 
         if content_id is not None:
             query = query.filter(ContentRevisionRO.content_id == content_id)
