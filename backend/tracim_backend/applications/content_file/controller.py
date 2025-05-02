@@ -20,6 +20,7 @@ from tracim_backend.exceptions import NoFileValidationError
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
+from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
 from tracim_backend.exceptions import TracimFileNotFound
 from tracim_backend.exceptions import TracimUnavailablePreviewType
 from tracim_backend.exceptions import UnallowedSubContent
@@ -250,7 +251,7 @@ class FileController(Controller):
     @check_right(is_file_content)
     @hapic.handle_exception(TracimFileNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentRevisionNotFound, HTTPStatus.BAD_REQUEST)
-    @hapic.handle_exception(ContentNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(RevisionDoesNotMatchThisContent, HTTPStatus.BAD_REQUEST)
     @hapic.input_query(FileQuerySchema())
     @hapic.input_path(FileRevisionPathSchema())
     @hapic.output_file([])
@@ -268,25 +269,10 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        try:
-            revision = api.get_one_revision(
-                revision_id=hapic_data.path.revision_id, content_id=hapic_data.path.content_id
-            )
-        except ContentRevisionNotFound:
-            try:
-                api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
-                raise ContentRevisionNotFound(
-                    "the content {content_id} has no revision {revision_id}".format(
-                        content_id=hapic_data.path.content_id,
-                        revision_id=hapic_data.path.revision_id,
-                    )
-                )
-            except ContentNotFound:
-                raise ContentNotFound(
-                    "the content {content_id} doesn't exist".format(
-                        content_id=hapic_data.path.content_id
-                    )
-                )
+
+        revision = api.get_one_revision(
+            revision_id=hapic_data.path.revision_id, content_id=hapic_data.path.content_id
+        )
 
         default_filename = "{label}_r{revision_id}{file_extension}".format(
             label=revision.file_name,

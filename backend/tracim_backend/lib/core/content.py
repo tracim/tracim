@@ -44,6 +44,7 @@ from tracim_backend.exceptions import FileSizeOverMaxLimitation
 from tracim_backend.exceptions import FileSizeOverOwnerEmptySpace
 from tracim_backend.exceptions import FileSizeOverWorkspaceEmptySpace
 from tracim_backend.exceptions import PreviewDimNotAllowed
+from tracim_backend.exceptions import PropertyNotFound
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
 from tracim_backend.exceptions import SameValueError
 from tracim_backend.exceptions import UnallowedSubContent
@@ -2529,11 +2530,13 @@ class ContentApi(object):
         assert content_id or revision_id, "Either content_id or revision_id must be provided"
 
         list_query_attribute: typing.List[QueryableAttribute] = []
-        for property in property_list:
-            if property == "type":
-                list_query_attribute.append(ContentRevisionRO.type)
-            elif property == "workspace_id":
-                list_query_attribute.append(ContentRevisionRO.workspace_id)
+
+        properties = {
+            "type": ContentRevisionRO.type,
+            "workspace_id": ContentRevisionRO.workspace_id,
+        }
+        for property_name in property_list:
+            list_query_attribute.append(properties[property_name])
 
         result = self._get_content_property(
             property_list=list_query_attribute, content_id=content_id, revision_id=revision_id
@@ -2541,10 +2544,8 @@ class ContentApi(object):
 
         result_dict = {}
 
-        i = 0
-        for property in property_list:
-            result_dict[property] = result[i]
-            i = i + 1
+        for name, value in zip(property_list, result):
+            result_dict[name] = value
 
         return result_dict
 
@@ -2579,8 +2580,8 @@ class ContentApi(object):
 
         if revision_id is not None:
             query = query.filter(ContentRevisionRO.revision_id == revision_id)
-        else:
-            query = query.order_by(ContentRevisionRO.revision_id.desc())
+
+        query = query.order_by(ContentRevisionRO.revision_id.desc())
 
         if content_id is not None:
             query = query.filter(ContentRevisionRO.content_id == content_id)
@@ -2588,13 +2589,8 @@ class ContentApi(object):
         result = query.first()
 
         if not result:
-            if revision_id is not None and content_id is not None:
-                raise ContentRevisionNotFound(
-                    f'Revision "{revision_id}" for content "{content_id}" not found'
-                )
-            elif revision_id is not None:
-                raise ContentRevisionNotFound(f'Revision "{revision_id}" not found')
-            else:
-                raise ContentNotFound(f'Content with id "{content_id}" not found')
+            raise PropertyNotFound(
+                f"Property not found for revision {revision_id} of content {content_id}"
+            )
 
         return result

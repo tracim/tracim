@@ -694,3 +694,7 @@ class UserCallNotFound(NotFound):
 
 class InvalidMention(TracimException):
     error_code = ErrorCode.INVALID_MENTION
+
+
+class PropertyNotFound(TracimException):
+    error_code = ErrorCode.CONTENT_NOT_FOUND
