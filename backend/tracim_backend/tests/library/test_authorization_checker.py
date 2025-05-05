@@ -250,7 +250,10 @@ class TestAuthorizationChecker(object):
         cfg = app_config
 
         class FakeBaseFakeTracimContext(BaseFakeTracimContext):
-            current_content = Content(content_id=15, type=content_type_list.Thread.slug)
+            current_content = Content(
+                content_id=15, type=content_type_list.Thread.slug, workspace_id=1
+            )
+            current_workspace = Workspace(workspace_id=1)
             app_config = cfg
             dbsession = session
 
@@ -281,7 +284,10 @@ class TestAuthorizationChecker(object):
         cfg = app_config
 
         class FakeBaseFakeTracimContext(BaseFakeTracimContext):
-            current_content = Content(content_id=15, type=content_type_list.Thread.slug)
+            current_content = Content(
+                content_id=15, type=content_type_list.Thread.slug, workspace_id=1
+            )
+            current_workspace = Workspace(workspace_id=1)
             app_config = cfg
             dbsession = session
 
@@ -311,7 +317,8 @@ class TestAuthorizationChecker(object):
         cfg = app_config
 
         class FakeBaseFakeTracimContext(BaseFakeTracimContext):
-            current_content = Content(content_id=15, type="unexistent_type")
+            current_content = Content(content_id=15, type="unexistent_type", workspace_id=1)
+            current_workspace = Workspace(workspace_id=1)
             app_config = cfg
             dbsession = session
 
