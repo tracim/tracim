@@ -254,7 +254,7 @@ class TestAuthorizationChecker(object):
             app_config = cfg
             dbsession = session
 
-            def _get_content_id_in_request(self):
+            def get_content_id_in_request(self):
                 return self.current_content.content_id
 
             def safe_current_user(self):
@@ -285,7 +285,7 @@ class TestAuthorizationChecker(object):
             app_config = cfg
             dbsession = session
 
-            def _get_content_id_in_request(self):
+            def get_content_id_in_request(self):
                 return self.current_content.content_id
 
             def safe_current_user(self):
@@ -315,7 +315,7 @@ class TestAuthorizationChecker(object):
             app_config = cfg
             dbsession = session
 
-            def _get_content_id_in_request(self):
+            def get_content_id_in_request(self):
                 return self.current_content.content_id
 
             def safe_current_user(self):
