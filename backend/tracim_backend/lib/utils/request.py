@@ -264,12 +264,6 @@ class TracimContext(ABC):
             return None
 
     def get_content_id_in_request(self) -> typing.Optional[int]:
-        """
-        Return content_id if exist, return None if content_id doesn't exist
-        This differ from _get_content_reaction_id as it does not raise exception
-        but None in case content_id doesn't exist
-        :return:
-        """
         return self._get_content_id_in_request()
 
     def _get_content(self, content_id_fetcher: typing.Callable[[], int]) -> Content:

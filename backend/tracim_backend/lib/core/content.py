@@ -2519,7 +2519,8 @@ class ContentApi(object):
         - If both are provided, ensure the revision belongs to the content.
 
         Args:
-            property_list (list[str]): List of property names to retrieve
+            property_list (list[str]): List of property names to retrieve,
+                for now only type and workspace_id are supported
             content_id (int, optional): ID of the content
             revision_id (int, optional): ID of the specific revision
 
@@ -2527,9 +2528,8 @@ class ContentApi(object):
             dict: Dictionary mapping property names to their values
 
         Raises:
-            ValueError: If neither content_id nor revision_id is provided
-            ContentRevisionNotFound: If the specified revision is not found
-            ContentNotFound: If the specified content is not found
+            AssertionError: If neither content_id nor revision_id is provided
+            PropertyNotFound: If the content and revision are not found
         """
         assert content_id or revision_id, "Either content_id or revision_id must be provided"
 
@@ -2575,9 +2575,8 @@ class ContentApi(object):
             tuple: Values of requested properties in same order as property_list
 
         Raises:
-            ValueError: If neither content_id nor revision_id is provided
-            ContentRevisionNotFound: If the specified revision is not found
-            ContentNotFound: If the specified content is not found
+            AssertionError: If neither content_id nor revision_id is provided
+            PropertyNotFound: If the content and revision are not found
         """
         assert content_id or revision_id, "Either content_id or revision_id must be provided"
 

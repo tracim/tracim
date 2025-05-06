@@ -697,4 +697,4 @@ class InvalidMention(TracimException):
 
 
 class PropertyNotFound(TracimException):
-    error_code = ErrorCode.CONTENT_NOT_FOUND
+    error_code = ErrorCode.PROPERTY_NOT_FOUND
