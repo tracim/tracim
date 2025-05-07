@@ -263,6 +263,9 @@ class TracimContext(ABC):
         except ContentNotFoundInTracimRequest:
             return None
 
+    def get_content_id_in_request(self) -> typing.Optional[int]:
+        return self._get_content_id_in_request()
+
     def _get_content(self, content_id_fetcher: typing.Callable[[], int]) -> Content:
         content_id = content_id_fetcher()
         api = ContentApi(

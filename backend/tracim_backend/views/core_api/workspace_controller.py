@@ -690,12 +690,13 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(
-            content_id=hapic_data.path["content_id"],
-            content_type=ContentTypeSlug.ANY.value,
-        )
-        content_type = content_type_list.get_one_by_slug(content.type).slug
 
+        content_property = api.get_content_property(
+            property_list=["type", "workspace_id"],
+            content_id=hapic_data.path["content_id"],
+        )
+        content_type = content_type_list.get_one_by_slug(content_property["type"]).slug
+        workspace_id = content_property["workspace_id"]
         if (
             content_type == ContentTypeSlug.KANBAN.value
             or content_type == ContentTypeSlug.LOGBOOK.value
@@ -706,9 +707,9 @@ class WorkspaceController(Controller):
         raise HTTPFound(
             "{base_url}workspaces/{workspace_id}/{content_type}s/{content_id}".format(
                 base_url=BASE_API,
-                workspace_id=content.workspace_id,
+                workspace_id=workspace_id,
                 content_type=content_type,
-                content_id=content.content_id,
+                content_id=hapic_data.path["content_id"],
             )
         )
 

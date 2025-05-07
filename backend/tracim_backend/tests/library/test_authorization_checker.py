@@ -1,5 +1,6 @@
 import pytest
 import transaction
+import unittest.mock
 
 from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import ContentTypeNotExist
@@ -243,50 +244,111 @@ class TestAuthorizationChecker(object):
         with pytest.raises(InsufficientUserRoleInWorkspace):
             CandidateWorkspaceRoleChecker(4).check(FakeBaseFakeTracimContext())
 
-    def test__unit__ContentTypeChecker__ok_nominal_test(self, content_type_list):
+    def test__unit__ContentTypeChecker__ok_nominal_test(
+        self, content_type_list, session, app_config
+    ):
+        cfg = app_config
+
         class FakeBaseFakeTracimContext(BaseFakeTracimContext):
-            current_content = Content(content_id=15, type=content_type_list.Thread.slug)
-
-        assert ContentTypeChecker(
-            [
-                content_type_list.File.slug,
-                content_type_list.Thread.slug,
-                content_type_list.Comment.slug,
-            ]
-        ).check(FakeBaseFakeTracimContext())
-        assert ContentTypeChecker([content_type_list.Thread.slug]).check(
-            FakeBaseFakeTracimContext()
-        )
-
-    def test__unit__ContentTypeChecker__err_content_type_not_allowed(self, content_type_list):
-        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
-            current_content = Content(content_id=15, type=content_type_list.Thread.slug)
-
-        with pytest.raises(ContentTypeNotAllowed):
-            assert ContentTypeChecker(
-                [content_type_list.File.slug, content_type_list.Comment.slug]
-            ).check(FakeBaseFakeTracimContext())
-
-        with pytest.raises(ContentTypeNotAllowed):
-            assert ContentTypeChecker([content_type_list.File.slug]).check(
-                FakeBaseFakeTracimContext()
+            current_content = Content(
+                content_id=15, type=content_type_list.Thread.slug, workspace_id=1
             )
+            current_workspace = Workspace(workspace_id=1)
+            app_config = cfg
+            dbsession = session
 
-    def test__unit__ContentTypeChecker__err_content_type_not_exist(self, content_type_list):
-        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
-            current_content = Content(content_id=15, type="unexistent_type")
+            def get_content_id_in_request(self):
+                return self.current_content.content_id
 
-        with pytest.raises(ContentTypeNotExist):
+            def safe_current_user(self):
+                return self.current_user
+
+        with unittest.mock.patch(
+            "tracim_backend.lib.core.content.ContentApi.get_content_property",
+            return_value={"type": content_type_list.Thread.slug},
+        ):
             assert ContentTypeChecker(
                 [
-                    "unexistent_type",
                     content_type_list.File.slug,
+                    content_type_list.Thread.slug,
                     content_type_list.Comment.slug,
                 ]
             ).check(FakeBaseFakeTracimContext())
+            assert ContentTypeChecker([content_type_list.Thread.slug]).check(
+                FakeBaseFakeTracimContext()
+            )
 
-        with pytest.raises(ContentTypeNotExist):
-            assert ContentTypeChecker(["unexistent_type"]).check(FakeBaseFakeTracimContext())
+    def test__unit__ContentTypeChecker__err_content_type_not_allowed(
+        self, content_type_list, session, app_config
+    ):
+        cfg = app_config
+
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
+            current_content = Content(
+                content_id=15, type=content_type_list.Thread.slug, workspace_id=1
+            )
+            current_workspace = Workspace(workspace_id=1)
+            app_config = cfg
+            dbsession = session
+
+            def get_content_id_in_request(self):
+                return self.current_content.content_id
+
+            def safe_current_user(self):
+                return self.current_user
+
+        with unittest.mock.patch(
+            "tracim_backend.lib.core.content.ContentApi.get_content_property",
+            return_value={"type": content_type_list.Thread.slug},
+        ):
+            with pytest.raises(ContentTypeNotAllowed):
+                assert ContentTypeChecker(
+                    [content_type_list.File.slug, content_type_list.Comment.slug]
+                ).check(FakeBaseFakeTracimContext())
+
+            with pytest.raises(ContentTypeNotAllowed):
+                assert ContentTypeChecker([content_type_list.File.slug]).check(
+                    FakeBaseFakeTracimContext()
+                )
+
+    def test__unit__ContentTypeChecker__err_content_type_not_exist(
+        self, content_type_list, session, app_config
+    ):
+        cfg = app_config
+
+        class FakeBaseFakeTracimContext(BaseFakeTracimContext):
+            current_content = Content(content_id=15, type="unexistent_type", workspace_id=1)
+            current_workspace = Workspace(workspace_id=1)
+            app_config = cfg
+            dbsession = session
+
+            def get_content_id_in_request(self):
+                return self.current_content.content_id
+
+            def safe_current_user(self):
+                return self.current_user
+
+        with unittest.mock.patch(
+            "tracim_backend.lib.core.content.ContentApi.get_content_property",
+            return_value={"type": "unexistent_type"},
+        ):
+            with unittest.mock.patch(
+                "tracim_backend.app_models.contents.content_type_list.get_one_by_slug",
+                side_effect=ContentTypeNotExist("Content type not exist"),
+            ):
+                with pytest.raises(ContentTypeNotExist):
+                    assert ContentTypeChecker(
+                        [
+                            "unexistent_type",
+                            content_type_list.File.slug,
+                            content_type_list.Comment.slug,
+                        ]
+                    ).check(FakeBaseFakeTracimContext())
+
+                with pytest.raises(ContentTypeNotExist):
+                    assert ContentTypeChecker(["unexistent_type"]).check(
+                        FakeBaseFakeTracimContext()
+                    )
 
     def test__unit__CommentOwnerChecker__ok__nominal_case(self, content_type_list):
         class FakeBaseFakeTracimContext(BaseFakeTracimContext):

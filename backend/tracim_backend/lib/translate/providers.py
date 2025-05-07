@@ -75,7 +75,7 @@ class TranslationLib:
         )
         content = api.get_one(content_id)
         if revision_id:
-            revision = api.get_one_revision(revision_id=revision_id, content=content)
+            revision = api.get_one_revision(revision_id=revision_id, content_id=content.content_id)
         else:
             revision = content.current_revision
         if not filename or filename == "raw":

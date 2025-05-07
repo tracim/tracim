@@ -13,15 +13,18 @@ from zope.interface import implementer
 from tracim_backend.app_models.contents import ContentTypeList
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import AllUsersAreNotKnown
+from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import InsufficientUserProfile
 from tracim_backend.exceptions import InsufficientUserRoleInWorkspace
 from tracim_backend.exceptions import PageNotFound
+from tracim_backend.exceptions import PropertyNotFound
 from tracim_backend.exceptions import TracimException
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
 from tracim_backend.exceptions import UserIsNotContentOwner
 from tracim_backend.exceptions import UserIsNotReactionAuthor
+from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimContext
@@ -258,8 +261,23 @@ class ContentTypeChecker(AuthorizationChecker):
         self.allowed_content_type_list = allowed_content_type_list
 
     def check(self, tracim_context: TracimContext) -> bool:
-        content = tracim_context.current_content
-        current_content_type_slug = content_type_list.get_one_by_slug(content.type).slug
+        content_api = ContentApi(
+            config=tracim_context.app_config,
+            session=tracim_context.dbsession,
+            current_user=tracim_context.safe_current_user(),
+        )
+        workspace_id = None
+        workspace = tracim_context.current_workspace
+        if workspace:
+            workspace_id = workspace.workspace_id
+        content_id = tracim_context.get_content_id_in_request()
+        try:
+            content_property = content_api.get_content_property(
+                ["type"], content_id, workspace_id=workspace_id
+            )
+        except PropertyNotFound:
+            raise ContentNotFound(f"Content {content_id} not found")
+        current_content_type_slug = content_type_list.get_one_by_slug(content_property["type"]).slug
         if current_content_type_slug in self.allowed_content_type_list:
             return True
         raise ContentTypeNotAllowed()

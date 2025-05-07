@@ -8,9 +8,11 @@ import transaction
 from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
+from tracim_backend.exceptions import ContentRevisionNotFound
 from tracim_backend.exceptions import ContentStatusException
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import InvalidMention
+from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
 from tracim_backend.exceptions import UserNotMemberOfWorkspace
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
@@ -209,6 +211,8 @@ class HTMLDocumentController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_HTML_DOCUMENT_ENDPOINTS])
     @check_right(is_reader)
     @check_right(is_html_document_content)
+    @hapic.handle_exception(RevisionDoesNotMatchThisContent, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ContentRevisionNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndContentRevisionIdPathSchema())
     @hapic.output_body(RevisionSchema())
     def get_html_document_revision(
@@ -225,8 +229,9 @@ class HTMLDocumentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
-        revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
+        revision = api.get_one_revision(
+            revision_id=hapic_data.path.revision_id, content_id=hapic_data.path.content_id
+        )
         return api.get_revision_in_context(revision)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_HTML_DOCUMENT_ENDPOINTS])
@@ -322,6 +327,8 @@ class HTMLDocumentController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_HTML_DOCUMENT_ENDPOINTS])
     @check_right(is_reader)
     @check_right(is_html_document_content)
+    @hapic.handle_exception(RevisionDoesNotMatchThisContent, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ContentRevisionNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(FileRevisionPathSchema())
     @hapic.input_query(FileQuerySchema())
     @hapic.output_file([])
@@ -339,8 +346,9 @@ class HTMLDocumentController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
-        revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
+        revision = api.get_one_revision(
+            revision_id=hapic_data.path.revision_id, content_id=hapic_data.path.content_id
+        )
         default_filename = "{label}_r{revision_id}.pdf".format(
             revision_id=revision.revision_id, label=revision.label
         )

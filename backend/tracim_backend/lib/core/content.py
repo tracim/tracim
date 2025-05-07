@@ -44,6 +44,7 @@ from tracim_backend.exceptions import FileSizeOverMaxLimitation
 from tracim_backend.exceptions import FileSizeOverOwnerEmptySpace
 from tracim_backend.exceptions import FileSizeOverWorkspaceEmptySpace
 from tracim_backend.exceptions import PreviewDimNotAllowed
+from tracim_backend.exceptions import PropertyNotFound
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
 from tracim_backend.exceptions import SameValueError
 from tracim_backend.exceptions import UnallowedSubContent
@@ -136,12 +137,19 @@ class ContentApi(object):
         self._show_all_type_of_contents_in_treeview = all_content_in_treeview
         self._force_show_all_types = force_show_all_types
         self._disable_user_workspaces_filter = disable_user_workspaces_filter
-        self.preview_manager = PreviewManager(self._config.PREVIEW_CACHE_DIR, create_folder=True)
+        self.preview_manager = None
         default_lang = None
         if self._user:
             default_lang = self._user.lang
         self.translator = Translator(app_config=self._config, default_lang=default_lang)
         self.namespaces_filter = namespaces_filter
+
+    def get_preview_manager(self):
+        if self.preview_manager is None:
+            self.preview_manager = PreviewManager(
+                self._config.PREVIEW_CACHE_DIR, create_folder=True
+            )
+        return self.preview_manager
 
     @contextmanager
     def show(
@@ -637,12 +645,12 @@ class ContentApi(object):
         return content
 
     def get_one_revision(
-        self, revision_id: int = None, content: Content = None
+        self, revision_id: int = None, content_id: int = None
     ) -> ContentRevisionRO:
         """
         This method allow us to get directly any revision with its id
         :param revision_id: The content's revision's id that we want to return
-        :param content: The content related to the revision, if None do not
+        :param content_id: The id of the content related to the revision, if None do not
         check if revision is related to this content.
         :return: An item Content linked with the correct revision
         """
@@ -658,10 +666,10 @@ class ContentApi(object):
             raise ContentRevisionNotFound(
                 'Content revision "{}" not found'.format(revision_id)
             ) from exc
-        if content and revision.content_id != content.content_id:
+        if content_id and revision.content_id != content_id:
             raise RevisionDoesNotMatchThisContent(
                 "revision {revision_id} is not a revision of content {content_id}".format(
-                    revision_id=revision.revision_id, content_id=content.content_id
+                    revision_id=revision.revision_id, content_id=content_id
                 )
             )
         return revision
@@ -1957,7 +1965,9 @@ class ContentApi(object):
             if file_extension in self._config.PREVIEW__SKIPLIST:
                 return None
             with self.get_one_revision_filepath(revision_id) as file_path:
-                nb_pages = self.preview_manager.get_page_nb(file_path, file_ext=file_extension)
+                nb_pages = self.get_preview_manager().get_page_nb(
+                    file_path, file_ext=file_extension
+                )
         except UnsupportedMimeType:
             return None
         except CannotGetDepotFileDepotCorrupted:
@@ -1978,7 +1988,9 @@ class ContentApi(object):
             if file_extension in self._config.PREVIEW__SKIPLIST:
                 return False
             with self.get_one_revision_filepath(revision_id) as file_path:
-                return self.preview_manager.has_pdf_preview(file_path, file_ext=file_extension)
+                return self.get_preview_manager().has_pdf_preview(
+                    file_path, file_ext=file_extension
+                )
         except UnsupportedMimeType:
             return False
         except CannotGetDepotFileDepotCorrupted:
@@ -1998,7 +2010,9 @@ class ContentApi(object):
             if file_extension in self._config.PREVIEW__SKIPLIST:
                 return False
             with self.get_one_revision_filepath(revision_id) as file_path:
-                return self.preview_manager.has_jpeg_preview(file_path, file_ext=file_extension)
+                return self.get_preview_manager().has_jpeg_preview(
+                    file_path, file_ext=file_extension
+                )
         except UnsupportedMimeType:
             return False
         except CannotGetDepotFileDepotCorrupted:
@@ -2054,7 +2068,7 @@ class ContentApi(object):
             )
         )
 
-        # INFO - G.M - 2020-03-27 - Mark all content as read
+        # INFO - G.M - 2020-03-27 - Mark all content as read
         for content in resultset:
             if content.has_new_information_for(self._user, recursive=False):
                 self.mark_read(content, read_datetime, do_flush, recursive=False)
@@ -2490,3 +2504,100 @@ class ContentApi(object):
         )
 
         return content
+
+    def get_content_property(
+        self,
+        property_list: list[str],
+        content_id: int = None,
+        revision_id: int = None,
+        workspace_id=None,
+    ) -> dict:
+        """
+        Return the specified properties of a content or revision.
+        - If revision_id is provided, return the properties for that revision.
+        - If only content_id is provided, return the properties of the last revision for that content.
+        - If both are provided, ensure the revision belongs to the content.
+
+        Args:
+            property_list (list[str]): List of property names to retrieve,
+                for now only type and workspace_id are supported
+            content_id (int, optional): ID of the content
+            revision_id (int, optional): ID of the specific revision
+
+        Returns:
+            dict: Dictionary mapping property names to their values
+
+        Raises:
+            AssertionError: If neither content_id nor revision_id is provided
+            PropertyNotFound: If the content and revision are not found
+        """
+        assert content_id or revision_id, "Either content_id or revision_id must be provided"
+
+        list_query_attribute: typing.List[QueryableAttribute] = []
+
+        properties = {
+            "type": ContentRevisionRO.type,
+            "workspace_id": ContentRevisionRO.workspace_id,
+        }
+        for property_name in property_list:
+            list_query_attribute.append(properties[property_name])
+
+        result = self._get_content_property(
+            list_query_attribute, content_id, revision_id, workspace_id
+        )
+
+        result_dict = {}
+
+        for name, value in zip(property_list, result):
+            result_dict[name] = value
+
+        return result_dict
+
+    def _get_content_property(
+        self,
+        property_list: typing.List[QueryableAttribute],
+        content_id: int = None,
+        revision_id: int = None,
+        workspace_id: int = None,
+    ) -> typing.Tuple:
+        """
+        Return the specified properties of a revision.
+        - If revision_id is provided, return the properties for that revision.
+        - If only content_id is provided, return the properties of the last revision for that content.
+        - If both are provided, ensure the revision belongs to the content.
+
+        Args:
+            property_list (List[QueryableAttribute]): List of SQLAlchemy column attributes to retrieve
+            content_id (int, optional): ID of the content
+            revision_id (int, optional): ID of the specific revision
+
+        Returns:
+            tuple: Values of requested properties in same order as property_list
+
+        Raises:
+            AssertionError: If neither content_id nor revision_id is provided
+            PropertyNotFound: If the content and revision are not found
+        """
+        assert content_id or revision_id, "Either content_id or revision_id must be provided"
+
+        query = self._session.query(*property_list)
+
+        if revision_id is not None:
+            query = query.filter(ContentRevisionRO.revision_id == revision_id)
+
+        query = query.order_by(ContentRevisionRO.revision_id.desc())
+
+        if workspace_id is not None:
+            query = query.filter(ContentRevisionRO.workspace_id == workspace_id)
+
+        if content_id is not None:
+            query = query.filter(ContentRevisionRO.content_id == content_id)
+
+        result = query.first()
+
+        if not result:
+            raise PropertyNotFound(
+                f"Property not found for revision {revision_id} of content {content_id}"
+            )
+
+        return result
