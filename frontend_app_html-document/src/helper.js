@@ -10,7 +10,7 @@ export const generateTocHtml = htmlContent => {
     // The html entity encoding is made by hugerte
     nodeWithHtmlEntityDecoded.innerHTML = node.textContent
 
-    const sanitizedNode = sanitizeHtmlElement(nodeWithHtmlEntityDecoded, 'img', 'audio', 'media', 'svg', 'video')
+    const sanitizedNode = sanitizeHtmlElement(nodeWithHtmlEntityDecoded, ['img', 'audio', 'media', 'svg', 'video'])
 
     return {
       titleLevel: node.tagName.substring(node.tagName.length - 1), // INFO - CH - 2025-01-13 - extract number of h1..6
