@@ -1,13 +1,23 @@
+import { sanitizeHtmlElement } from 'tracim_frontend_lib'
+
 export const generateTocHtml = htmlContent => {
   const domParser = new window.DOMParser()
   const textDom = domParser.parseFromString(htmlContent, 'text/html')
-  const titleList = Array.from(textDom.querySelectorAll('h1, h2, h3, h4, h5, h6')).map(node => ({
-    titleLevel: node.tagName.substring(node.tagName.length - 1), // INFO - CH - 2025-01-13 - extract number of h1..6
-    // INFO - CH - 2025-01-20 - Don't use node.textContent because it is then inserted in page using
-    // dangerouslySetInnerHTML (see TableOfContent.jsx), it would run style and script tags
-    titleText: node.innerHTML || '',
-    titleId: node.id || ''
-  }))
+  const titleList = Array.from(textDom.querySelectorAll('h1, h2, h3, h4, h5, h6')).map(node => {
+    const nodeWithHtmlEntityDecoded = document.createElement('div')
+    // INFO - CH - 2025-01-13 - Line bellow is useful to sanitize from encoded html entities like
+    // <h1 id="example">example &lt;style&gt;body{color:black;}&lt;/style&gt; end</h1>
+    // The html entity encoding is made by hugerte
+    nodeWithHtmlEntityDecoded.innerHTML = node.textContent
+
+    const sanitizedNode = sanitizeHtmlElement(nodeWithHtmlEntityDecoded, 'img', 'audio', 'media', 'svg', 'video')
+
+    return {
+      titleLevel: node.tagName.substring(node.tagName.length - 1), // INFO - CH - 2025-01-13 - extract number of h1..6
+      titleText: sanitizedNode.textContent || '',
+      titleId: node.id || ''
+    }
+  })
 
   if (titleList.length <= 1) return ''
 
