@@ -78,25 +78,28 @@ describe('<Timeline />', () => {
   })
 
   describe('function groupTimelineData', () => {
-    it('should group the revision', () => {
+    it('should not group the revision when there is only revisions', () => {
       const timelineData = [
         { content_id: 1, timelineType: TIMELINE_TYPE.REVISION },
         { content_id: 2, timelineType: TIMELINE_TYPE.REVISION },
         { content_id: 3, timelineType: TIMELINE_TYPE.REVISION },
         { content_id: 4, timelineType: TIMELINE_TYPE.REVISION },
-        { content_id: 5, timelineType: TIMELINE_TYPE.REVISION }
+        { content_id: 5, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 6, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 7, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 8, timelineType: TIMELINE_TYPE.REVISION }
       ]
 
-      const expectedResult = [{
-        timelineType: TIMELINE_TYPE.REVISION_GROUP,
-        group: [
-          { content_id: 1, timelineType: TIMELINE_TYPE.REVISION },
-          { content_id: 2, timelineType: TIMELINE_TYPE.REVISION },
-          { content_id: 3, timelineType: TIMELINE_TYPE.REVISION },
-          { content_id: 4, timelineType: TIMELINE_TYPE.REVISION },
-          { content_id: 5, timelineType: TIMELINE_TYPE.REVISION }
-        ]
-      }]
+      const expectedResult = [
+        { content_id: 1, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 2, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 3, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 4, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 5, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 6, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 7, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 8, timelineType: TIMELINE_TYPE.REVISION }
+      ]
 
       expect(groupTimelineData(timelineData)).to.deep.equal(expectedResult)
     })
@@ -107,7 +110,10 @@ describe('<Timeline />', () => {
         { content_id: 2, timelineType: TIMELINE_TYPE.REVISION },
         { content_id: 3, timelineType: TIMELINE_TYPE.COMMENT },
         { content_id: 4, timelineType: TIMELINE_TYPE.REVISION },
-        { content_id: 5, timelineType: TIMELINE_TYPE.REVISION }
+        { content_id: 5, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 6, timelineType: TIMELINE_TYPE.COMMENT },
+        { content_id: 7, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 8, timelineType: TIMELINE_TYPE.REVISION }
       ]
 
       const expectedResult = [
@@ -124,6 +130,14 @@ describe('<Timeline />', () => {
           group: [
             { content_id: 4, timelineType: TIMELINE_TYPE.REVISION },
             { content_id: 5, timelineType: TIMELINE_TYPE.REVISION }
+          ]
+        },
+        { content_id: 6, timelineType: TIMELINE_TYPE.COMMENT },
+        {
+          timelineType: TIMELINE_TYPE.REVISION_GROUP,
+          group: [
+            { content_id: 7, timelineType: TIMELINE_TYPE.REVISION },
+            { content_id: 8, timelineType: TIMELINE_TYPE.REVISION }
           ]
         }
       ]
@@ -158,7 +172,9 @@ describe('<Timeline />', () => {
         { content_id: 3, timelineType: TIMELINE_TYPE.COMMENT },
         { content_id: 4, timelineType: TIMELINE_TYPE.REVISION },
         { content_id: 5, timelineType: TIMELINE_TYPE.REVISION },
-        { content_id: 6, timelineType: TIMELINE_TYPE.COMMENT }
+        { content_id: 6, timelineType: TIMELINE_TYPE.COMMENT },
+        { content_id: 7, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 8, timelineType: TIMELINE_TYPE.REVISION }
       ]
 
       const expectedResult = [
@@ -177,7 +193,14 @@ describe('<Timeline />', () => {
             { content_id: 5, timelineType: TIMELINE_TYPE.REVISION }
           ]
         },
-        { content_id: 6, timelineType: TIMELINE_TYPE.COMMENT }
+        { content_id: 6, timelineType: TIMELINE_TYPE.COMMENT },
+        {
+          timelineType: TIMELINE_TYPE.REVISION_GROUP,
+          group: [
+            { content_id: 7, timelineType: TIMELINE_TYPE.REVISION },
+            { content_id: 8, timelineType: TIMELINE_TYPE.REVISION }
+          ]
+        }
       ]
 
       expect(groupTimelineData(timelineData)).to.deep.equal(expectedResult)
@@ -190,7 +213,10 @@ describe('<Timeline />', () => {
         { content_id: 3, timelineType: TIMELINE_TYPE.REVISION },
         { content_id: 4, timelineType: TIMELINE_TYPE.COMMENT_AS_FILE },
         { content_id: 5, timelineType: TIMELINE_TYPE.REVISION },
-        { content_id: 6, timelineType: TIMELINE_TYPE.REVISION }
+        { content_id: 6, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 7, timelineType: TIMELINE_TYPE.REVISION },
+        { content_id: 8, timelineType: TIMELINE_TYPE.COMMENT_AS_FILE },
+        { content_id: 9, timelineType: TIMELINE_TYPE.REVISION }
       ]
       const expectedResult = [
         {
@@ -206,9 +232,12 @@ describe('<Timeline />', () => {
           timelineType: TIMELINE_TYPE.REVISION_GROUP,
           group: [
             { content_id: 5, timelineType: TIMELINE_TYPE.REVISION },
-            { content_id: 6, timelineType: TIMELINE_TYPE.REVISION }
+            { content_id: 6, timelineType: TIMELINE_TYPE.REVISION },
+            { content_id: 7, timelineType: TIMELINE_TYPE.REVISION }
           ]
-        }
+        },
+        { content_id: 8, timelineType: TIMELINE_TYPE.COMMENT_AS_FILE },
+        { content_id: 9, timelineType: TIMELINE_TYPE.REVISION }
       ]
       expect(groupTimelineData(timelineData)).to.deep.equal(expectedResult)
     })

@@ -761,7 +761,7 @@ export const NotificationWall = props => {
                     isFirst={i === 0}
                     isLast={i === notificationList.length - 1}
                     isSameContent={notification.type.includes(GROUP_NOTIFICATION_CRITERIA.CONTENT)}
-                    key={notification.id}
+                    key={`group_${notification.id}_${i}`}
                     onCloseNotificationWall={props.onCloseNotificationWall}
                     read={false}
                     filterInput={filterInput}
