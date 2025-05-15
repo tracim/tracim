@@ -391,10 +391,6 @@ export const groupTimelineData = timelineData => {
     return []
   }
 
-  if (timelineData.length <= 4) {
-    return timelineData
-  }
-
   const timelineDataGrouped = []
   const revisionGroup = []
 
@@ -432,6 +428,10 @@ export const groupTimelineData = timelineData => {
   // INFO - CH - 2025-04-24 - Handle the last element if it is a revision
   if (timelineData[timelineData.length - 1].timelineType === TIMELINE_TYPE.REVISION) {
     copyAndResetRevisionGroup()
+  }
+
+  if (timelineDataGrouped.length <= 4) {
+    return timelineData
   }
 
   return timelineDataGrouped
