@@ -6,13 +6,18 @@
 
 - Add viewer for some 3d format file type
 - New config parameter to allow iframe from specific domain
-- Improved performance when updading content
-- Revisions are now grouped in Timeline of contents
+- Revisions are now grouped in the Timeline of contents
 
 ### 🐛 Fixed Issue
 
 - Fixed page title when receiving a call [#6736](https://github.com/tracim/tracim/issues/6736)
 - Fixed missing callee name if declined call popin [#6725](https://github.com/tracim/tracim/issues/6725)
+- Fixed note summary generation [#6750](https://github.com/tracim/tracim/issues/6750)
+- Improved kanban with many cards performance [#6743](https://github.com/tracim/tracim/pull/6743)
+
+### ⚡️ Performance
+
+- Improved performance when updading content
 
 ## 2025-04.00 / 2025-03-25
 
