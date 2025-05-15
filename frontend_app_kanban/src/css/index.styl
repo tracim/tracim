@@ -46,6 +46,16 @@ cardWidth = 280px
           align-items baseline
           justify-content space-evenly
           text-align start
+          &.darkText
+            color fontColor
+            & .btn.kanban_addCard,
+            & .btn.kanban__contentpage__wrapper__board__column__title__actions
+              color fontColor
+          &.lightText
+            color offWhite
+            & .btn.kanban_addCard,
+            & .btn.kanban__contentpage__wrapper__board__column__title__actions
+              color offWhite
           &__title
             width 180px
             text-overflow ellipsis
@@ -61,7 +71,9 @@ cardWidth = 280px
               text-overflow ellipsis
             &__actions.dropdownMenuButton
               color fontColor
-              padding 0
+              padding 3px
+              &.btn i
+                margin-inline-end 0
               &::after
                 display none
           &__cardNumber
