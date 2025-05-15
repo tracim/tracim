@@ -22,7 +22,8 @@ import {
   updateTLMUser,
   stringIncludes,
   filterNotificationListFromUserConfig,
-  shouldKeepNotification
+  shouldKeepNotification,
+  sanitizeHtmlElement
 } from '../src/helper.js'
 import {
   MINIMUM_CHARACTERS_USERNAME,
@@ -812,6 +813,33 @@ describe('helper.js', () => {
         type: `${TLM_ET.CONTENT}.${TLM_CET.MODIFIED}.${CONTENT_TYPE.THREAD}`
       }
       expect(shouldKeepNotification(notification, userConfig)).to.equal(false)
+    })
+  })
+
+  describe('sanitizeHtmlElement()', () => {
+    it('should remove script tags', () => {
+      const html = global.document.createElement('div')
+      html.innerHTML = '<div><script>console.log("error")</script>exist</div><script>alert("hello")</script><script>console.log("error")</script>'
+      const sanitizedHtml = sanitizeHtmlElement(html)
+      expect(sanitizedHtml.textContent).to.equal('exist')
+    })
+    it('should remove style tags', () => {
+      const html = global.document.createElement('div')
+      html.innerHTML = '<style>html{width:10px}</style><div>exist</div><style>body{color:red;}</style>'
+      const sanitizedHtml = sanitizeHtmlElement(html)
+      expect(sanitizedHtml.textContent).to.equal('exist')
+    })
+    it('should remove iframe tags', () => {
+      const html = global.document.createElement('div')
+      html.innerHTML = '<div>exist<iframe src="https://tracim.fr"></iframe></div><iframe src="https://github.com/tracim/tracim"></iframe>'
+      const sanitizedHtml = sanitizeHtmlElement(html)
+      expect(sanitizedHtml.textContent).to.equal('exist')
+    })
+    it('should remove img tags when parameter is set', () => {
+      const html = global.document.createElement('div')
+      html.innerHTML = '<div>exist<img src="/logo/tracim.png" alt="" /></div><img src="/logo/bg.jpg" alt="" />'
+      const sanitizedHtml = sanitizeHtmlElement(html, ['img'])
+      expect(sanitizedHtml.textContent).to.equal('exist')
     })
   })
 })

@@ -687,6 +687,18 @@ export function onClickOutside (listening, setListening, menuRef, setIsOpen) {
   }
 }
 
+export const sanitizeHtmlElement = (element, additionalTagList = []) => {
+  const sanitizedElement = document.createElement('div')
+  sanitizedElement.innerHTML = element.innerHTML
+
+  let tagToSanitizeList = ['style', 'script', 'iframe']
+  if (additionalTagList.length > 0) tagToSanitizeList = tagToSanitizeList.concat(additionalTagList)
+
+  Array.from(sanitizedElement.querySelectorAll(tagToSanitizeList.join(',')))
+    .forEach(toRemove => toRemove.remove())
+  return sanitizedElement
+}
+
 export const defaultApiContent = {
   content_id: 0,
   workspace_id: 0,
