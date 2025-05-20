@@ -72,7 +72,7 @@ export class PopupCreateLogbook extends React.Component {
 
   handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
-  onChangeTemplate = (template, { action }) => {
+  handleChangeTemplate = (template, { action }) => {
     this.props.onChangeTemplate(this.setState.bind(this), template, { action })
   }
 
@@ -157,7 +157,7 @@ export class PopupCreateLogbook extends React.Component {
         inputPlaceholder={this.props.t("Logbook's name")}
         label={this.props.t('New logbook')}
         onChangeContentName={this.handleChangeNewContentName}
-        onChangeTemplate={this.onChangeTemplate}
+        onChangeTemplate={this.handleChangeTemplate}
         onClose={this.handleClose}
         onValidate={this.handleValidate}
         templateList={this.state.templateList}

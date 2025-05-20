@@ -70,7 +70,7 @@ class PopupCreateHtmlDocument extends React.Component {
 
   handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
-  onChangeTemplate = (template, { action }) => {
+  handleChangeTemplate = (template, { action }) => {
     this.props.onChangeTemplate(this.setState.bind(this), template, { action })
   }
 
@@ -126,7 +126,7 @@ class PopupCreateHtmlDocument extends React.Component {
         inputPlaceholder={this.props.t("Note's title")}
         label={this.props.t('New note')}
         onChangeContentName={this.handleChangeNewContentName}
-        onChangeTemplate={this.onChangeTemplate}
+        onChangeTemplate={this.handleChangeTemplate}
         onClose={this.handleClose}
         onValidate={this.handleValidate}
         templateList={this.state.templateList}

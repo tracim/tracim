@@ -105,7 +105,7 @@ export class PopupCreateCollaborativeDocument extends React.Component {
 
   handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
-  onChangeTemplate = (template, { action }) => {
+  handleChangeTemplate = (template, { action }) => {
     this.props.onChangeTemplate(this.setState.bind(this), template, { action })
   }
 
@@ -215,13 +215,13 @@ export class PopupCreateCollaborativeDocument extends React.Component {
           <RadioBtnGroup
             data-cy='popup__office__radiogrp'
             options={this.buildOptions()}
-            handleNewSelectedValue={this.handleChangeSelectedOption}
+            onNewSelectedValue={this.handleChangeSelectedOption}
             customColor={this.state.config.hexcolor}
             onKeyDown={this.handleInputKeyDown}
           />
 
           <TemplateContentSelector
-            onChangeTemplate={this.onChangeTemplate}
+            onChangeTemplate={this.handleChangeTemplate}
             templateList={this.state.templateList}
             templateId={this.state.templateId}
             customColor={this.state.config.hexcolor}
