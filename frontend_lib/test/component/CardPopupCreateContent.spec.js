@@ -38,7 +38,7 @@ describe.skip('<CardPopupCreateContent />', () => {
       expect(onValidateCallBack.called).to.equal(true)
     })
 
-    it('should call props.onClose when handler onClose is called when the Escpae key is pressed', () => {
+    it('should call props.onClose when handler onClose is called when the Escape key is pressed', () => {
       wrapper.find('.createcontent__form__input').simulate('keyDown', { key: 'Escape', preventDefault: () => {} })
       expect(onCloseCallBack.called).to.equal(true)
     })

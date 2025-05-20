@@ -159,25 +159,51 @@ export function appContentFactory (WrappedComponent) {
       }
     }
 
-    getTemplateList = async (setState, templateType) => {
+    getTemplateList = async (setState, templateType, workspaceId) => {
       const result = await getTemplateList(this.apiUrl, templateType)
       const fetchGetTemplates = await handleFetchResult(result)
-      const templateList = []
 
-      switch (fetchGetTemplates.apiResponse.status) {
-        case 200:
-          fetchGetTemplates.body.forEach(template => {
-            templateList.push({
-              ...template,
-              value: template.content_id
-            })
-          })
-          setState({ templateList: templateList })
-          break
-        default:
-          sendGlobalFlashMessage(i18n.t('Something went wrong'))
-          setState({ templateList: templateList })
-          break
+      if (fetchGetTemplates.apiResponse.status === 200) {
+        const templateList = fetchGetTemplates.body.map(template => ({
+          ...template,
+          value: template.content_id
+        }))
+
+        const templateSameSpaceList = templateList
+          .filter(template => template.workspace_id === workspaceId)
+          .toSorted((a, b) => a.label?.localeCompare(b, undefined, { numeric: true }))
+
+        const templateOtherSpaceList = templateList
+          .filter(template => template.workspace_id !== workspaceId)
+          .toSorted((a, b) => a.label?.localeCompare(b, undefined, { numeric: true }))
+
+        setState({
+          templateList: [{
+            label: i18n.t('Space models'),
+            options: templateSameSpaceList
+          }, {
+            label: i18n.t('Other models'),
+            options: templateOtherSpaceList
+          }]
+        })
+      } else {
+        sendGlobalFlashMessage(i18n.t('Something went wrong'))
+        setState({ templateList: [] })
+      }
+    }
+
+    handleChangeTemplate = (setState, template, { action }) => {
+      // NOTE - MP - 2022-06-07 - Clear is an action type of react-select
+      // see https://react-select.com/props#prop-types
+      if (action !== 'clear') {
+        setState(prevState => ({
+          templateId: template.value,
+          newContentName: template.value !== null
+            ? `${template.label} ${prevState.newContentName}`
+            : prevState.newContentName
+        }))
+      } else {
+        setState({ templateId: null })
       }
     }
 
@@ -1200,6 +1226,7 @@ export function appContentFactory (WrappedComponent) {
           appContentSaveNewToDo={this.appContentSaveNewToDo}
           buildTimelineFromCommentAndRevision={this.buildTimelineFromCommentAndRevision}
           getTemplateList={this.getTemplateList}
+          onChangeTemplate={this.handleChangeTemplate}
           getToDoList={this.getToDoList}
           handleTranslateComment={this.onHandleTranslateComment}
           handleRestoreComment={this.onHandleRestoreComment}

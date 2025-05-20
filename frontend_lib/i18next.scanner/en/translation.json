@@ -219,7 +219,6 @@
   "Error while loading timeline": "Error while loading timeline",
   "Agenda": "Agenda",
   "Unknown content": "Unknown content",
-  "From a template:": "From a template:",
   "Template": "Template",
   "Unmark template": "Unmark template",
   "Mark template": "Mark template",
@@ -281,5 +280,9 @@
   "{{count}} Revisions_plural": "{{count}} Revisions",
   "Yes, delete permanently": "Yes, delete permanently",
   "Warning: this operation cannot be rolled back": "Warning: this operation cannot be rolled back",
-  "Between {{firstRevisionDate}} and {{lastRevisionDate}}": "Between {{firstRevisionDate}} and {{lastRevisionDate}}"
+  "Between {{firstRevisionDate}} and {{lastRevisionDate}}": "Between {{firstRevisionDate}} and {{lastRevisionDate}}",
+  "No template": "No template",
+  "Use template:": "Use template:",
+  "Space models": "Space models",
+  "Other models": "Other models"
 }

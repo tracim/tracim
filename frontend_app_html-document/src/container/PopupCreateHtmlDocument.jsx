@@ -27,10 +27,10 @@ class PopupCreateHtmlDocument extends React.Component {
     this.state = {
       appName: 'html-document', // must remain 'html-document' because it is the name of the react built app (which contains HtmlDocument and PopupCreateHtmlDocument)
       config: param.config,
-      templateId: null,
       folderId: param.folderId,
       loggedUser: param.loggedUser,
       newContentName: '',
+      templateId: null,
       templateList: [],
       workspaceId: param.workspaceId
     }
@@ -54,7 +54,7 @@ class PopupCreateHtmlDocument extends React.Component {
 
   componentDidMount () {
     this.setHeadTitle()
-    this.props.getTemplateList(this.setState.bind(this), CONTENT_TYPE.HTML_DOCUMENT)
+    this.props.getTemplateList(this.setState.bind(this), CONTENT_TYPE.HTML_DOCUMENT, this.state.workspaceId)
   }
 
   setHeadTitle = () => {
@@ -70,17 +70,8 @@ class PopupCreateHtmlDocument extends React.Component {
 
   handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
-  handleChangeTemplate = (template, { action }) => {
-    // NOTE - MP - 2022-06-07 - Clear is an action type of react-select
-    // see https://react-select.com/props#prop-types
-    if (action !== 'clear') {
-      if (template.content_id !== -1) {
-        this.setState({ templateId: template.content_id })
-        this.setState({ newContentName: `${template.label} ${this.state.newContentName}` })
-      }
-    } else {
-      this.setState({ templateId: null })
-    }
+  onChangeTemplate = (template, { action }) => {
+    this.props.onChangeTemplate(this.setState.bind(this), template, { action })
   }
 
   handleClose = () => GLOBAL_dispatchEvent({
@@ -135,10 +126,11 @@ class PopupCreateHtmlDocument extends React.Component {
         inputPlaceholder={this.props.t("Note's title")}
         label={this.props.t('New note')}
         onChangeContentName={this.handleChangeNewContentName}
-        onChangeTemplate={this.handleChangeTemplate}
+        onChangeTemplate={this.onChangeTemplate}
         onClose={this.handleClose}
         onValidate={this.handleValidate}
         templateList={this.state.templateList}
+        templateId={this.state.templateId}
       />
     )
   }

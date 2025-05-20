@@ -219,7 +219,6 @@
   "Error while loading timeline": "Fehler beim Laden der Zeitleiste",
   "Agenda": "Kalender",
   "Unknown content": "Unbekannter Inhalt",
-  "From a template:": "Von einer Vorlage:",
   "Template": "Vorlage",
   "Unmark template": "Vorlage entfernen",
   "Mark template": "Vorlage markieren",
@@ -281,5 +280,9 @@
   "{{count}} Revisions_plural": "",
   "Yes, delete permanently": "",
   "Warning: this operation cannot be rolled back": "",
-  "Between {{firstRevisionDate}} and {{lastRevisionDate}}": ""
+  "Between {{firstRevisionDate}} and {{lastRevisionDate}}": "",
+  "No template": "",
+  "Use template:": "",
+  "Space models": "",
+  "Other models": ""
 }

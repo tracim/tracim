@@ -30,12 +30,12 @@ export class PopupCreateKanban extends React.Component {
     this.state = {
       appName: 'kanban', // must remain 'kanban' because it is the name of the react built app (which contains Kanban and PopupCreateKanban)
       config: param.config,
-      templateId: null,
       loggedUser: param.loggedUser,
       workspaceId: param.workspaceId,
       folderId: param.folderId,
       newContentName: '',
-      templateList: []
+      templateList: [],
+      templateId: null
     }
 
     // i18n has been init, add resources from frontend
@@ -49,7 +49,7 @@ export class PopupCreateKanban extends React.Component {
 
   componentDidMount () {
     this.setHeadTitle()
-    this.props.getTemplateList(this.setState.bind(this), CONTENT_TYPE.KANBAN)
+    this.props.getTemplateList(this.setState.bind(this), CONTENT_TYPE.KANBAN, this.state.workspaceId)
   }
 
   handleAllAppChangeLanguage = data => {
@@ -72,17 +72,8 @@ export class PopupCreateKanban extends React.Component {
 
   handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
-  handleChangeTemplate = (template, { action }) => {
-    // NOTE - MP - 2022-06-07 - Clear is an action type of react-select
-    // see https://react-select.com/props#prop-types
-    if (action !== 'clear') {
-      if (template.content_id !== -1) {
-        this.setState({ templateId: template.content_id })
-        this.setState({ newContentName: `${template.label} ${this.state.newContentName}` })
-      }
-    } else {
-      this.setState({ templateId: null })
-    }
+  onChangeTemplate = (template, { action }) => {
+    this.props.onChangeTemplate(this.setState.bind(this), template, { action })
   }
 
   handleClose = () => GLOBAL_dispatchEvent({
@@ -166,10 +157,11 @@ export class PopupCreateKanban extends React.Component {
         inputPlaceholder={this.props.t("Board's name")}
         label={this.props.t('New Kanban board')}
         onChangeContentName={this.handleChangeNewContentName}
-        onChangeTemplate={this.handleChangeTemplate}
+        onChangeTemplate={this.onChangeTemplate}
         onClose={this.handleClose}
         onValidate={this.handleValidate}
         templateList={this.state.templateList}
+        templateId={this.state.templateId}
       />
     )
   }

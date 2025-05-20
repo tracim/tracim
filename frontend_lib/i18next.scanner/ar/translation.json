@@ -227,7 +227,6 @@
   "Error while translating the document: {{details}}": "خطأ أثناء ترجمة الوثيقة:{{details}}",
   "Agenda": "مفكرة",
   "Unknown content": "محتوى غير معروف",
-  "From a template:": "من نموذج:",
   "Template": "نموذج",
   "Unmark template": "ازالة علامة عن نموذج",
   "Mark template": "وضع علامة على نموذج",
@@ -293,5 +292,9 @@
   "{{count}} Revisions_5": "",
   "Yes, delete permanently": "",
   "Warning: this operation cannot be rolled back": "",
-  "Between {{firstRevisionDate}} and {{lastRevisionDate}}": ""
+  "Between {{firstRevisionDate}} and {{lastRevisionDate}}": "",
+  "No template": "",
+  "Use template:": "",
+  "Space models": "",
+  "Other models": ""
 }

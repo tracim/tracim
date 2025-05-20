@@ -173,7 +173,6 @@
   "Animals & Nature": "Animales y naturaleza",
   "Activity": "Actividad",
   "Travel & Places": "Viajes y lugares",
-  "From a template:": "De una plantilla:",
   "Template": "Plantilla",
   "Unmark template": "Desmarcar la plantilla",
   "KB": "KB",
@@ -281,5 +280,9 @@
   "{{count}} Revisions_plural": "",
   "Yes, delete permanently": "",
   "Warning: this operation cannot be rolled back": "",
-  "Between {{firstRevisionDate}} and {{lastRevisionDate}}": ""
+  "Between {{firstRevisionDate}} and {{lastRevisionDate}}": "",
+  "No template": "",
+  "Use template:": "",
+  "Space models": "",
+  "Other models": ""
 }
