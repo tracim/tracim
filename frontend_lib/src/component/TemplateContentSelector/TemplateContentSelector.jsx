@@ -4,7 +4,7 @@ import Select from 'react-select'
 import { translate } from 'react-i18next'
 
 export const TemplateContentSelector = props => {
-  const noTemplateValue = { label: props.t('No template'), value: null }
+  const noTemplateValue = { label: props.t('No model'), value: null }
   const optionList = [
     { label: '', options: [noTemplateValue] },
     ...props.templateList
@@ -15,7 +15,7 @@ export const TemplateContentSelector = props => {
   return (
     <div className='TemplateContentSelector'>
       <div className='TemplateContentSelector__label'>
-        {props.t('Use template:')}
+        {props.t('Use model:')}
       </div>
 
       <Select
@@ -36,5 +36,9 @@ export default translate()(TemplateContentSelector)
 TemplateContentSelector.propTypes = {
   onChangeTemplate: PropTypes.func.isRequired,
   templateList: PropTypes.array.isRequired,
-  templateId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired
+  templateId: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+}
+
+TemplateContentSelector.defaultProps = {
+  templateId: null
 }

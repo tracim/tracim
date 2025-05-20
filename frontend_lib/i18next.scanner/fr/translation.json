@@ -281,8 +281,8 @@
   "Yes, delete permanently": "Oui, supprimer définitivement",
   "Warning: this operation cannot be rolled back": "Attention: cette opération ne peut être annulée",
   "Between {{firstRevisionDate}} and {{lastRevisionDate}}": "Entre {{firstRevisionDate}} et {{lastRevisionDate}}",
-  "No template": "Sans modèle",
-  "Use template:": "Modèle",
   "Space models": "Modèles de l'espace",
-  "Other models": "Autre modèles"
+  "Other models": "Autre modèles",
+  "No model": "Sans modèle",
+  "Use model:": "Modèle :"
 }

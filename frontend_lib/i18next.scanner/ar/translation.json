@@ -293,8 +293,8 @@
   "Yes, delete permanently": "",
   "Warning: this operation cannot be rolled back": "",
   "Between {{firstRevisionDate}} and {{lastRevisionDate}}": "",
-  "No template": "",
-  "Use template:": "",
   "Space models": "",
-  "Other models": ""
+  "Other models": "",
+  "No model": "",
+  "Use model:": ""
 }
