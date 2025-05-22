@@ -30,12 +30,12 @@ export class PopupCreateLogbook extends React.Component {
     this.state = {
       appName: 'logbook', // must remain 'logbook' because it is the name of the react built app (which contains Logbook and PopupCreateLogbook)
       config: param.config,
-      templateId: null,
       loggedUser: param.loggedUser,
       workspaceId: param.workspaceId,
       folderId: param.folderId,
       newContentName: '',
-      templateList: []
+      templateList: [],
+      templateId: null
     }
 
     // i18n has been init, add resources from frontend
@@ -49,7 +49,7 @@ export class PopupCreateLogbook extends React.Component {
 
   componentDidMount () {
     this.setHeadTitle()
-    this.props.getTemplateList(this.setState.bind(this), CONTENT_TYPE.LOGBOOK)
+    this.props.getTemplateList(this.setState.bind(this), CONTENT_TYPE.LOGBOOK, this.state.workspaceId)
   }
 
   handleAllAppChangeLanguage = data => {
@@ -73,16 +73,7 @@ export class PopupCreateLogbook extends React.Component {
   handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
   handleChangeTemplate = (template, { action }) => {
-    // NOTE - MP - 2022-06-07 - Clear is an action type of react-select
-    // see https://react-select.com/props#prop-types
-    if (action !== 'clear') {
-      if (template.content_id !== -1) {
-        this.setState({ templateId: template.content_id })
-        this.setState({ newContentName: `${template.label} ${this.state.newContentName}` })
-      }
-    } else {
-      this.setState({ templateId: null })
-    }
+    this.props.onChangeTemplate(this.setState.bind(this), template, { action })
   }
 
   handleClose = () => GLOBAL_dispatchEvent({
@@ -170,6 +161,7 @@ export class PopupCreateLogbook extends React.Component {
         onClose={this.handleClose}
         onValidate={this.handleValidate}
         templateList={this.state.templateList}
+        templateId={this.state.templateId}
       />
     )
   }

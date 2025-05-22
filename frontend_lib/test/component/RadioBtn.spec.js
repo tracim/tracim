@@ -6,7 +6,7 @@ import RadioBtnGroup from '../../src/component/Input/RadioBtn/RadioBtn.jsx'
 require('../../src/component/Input/RadioBtn/RadioBtn.styl')
 
 describe('<RadioBtn />', () => {
-  const handleNewSelectedValueCallBack = sinon.spy()
+  const onNewSelectedValueCallBack = sinon.spy()
 
   const img = {
     src: 'randomImg',
@@ -26,7 +26,7 @@ describe('<RadioBtn />', () => {
       text: 'randomText2',
       value: 'randomValue2'
     }],
-    handleNewSelectedValue: handleNewSelectedValueCallBack,
+    onNewSelectedValue: onNewSelectedValueCallBack,
     customColor: 'randomColor'
   }
 
@@ -70,20 +70,20 @@ describe('<RadioBtn />', () => {
   })
 
   describe('Handlers', () => {
-    it('handleNewSelectedValueCallBack should be called when the radioBtn is clicked', () => {
+    it('onNewSelectedValueCallBack should be called when the radioBtn is clicked', () => {
       wrapper.find('.radio_btn_group__btn').at(1).simulate('click')
-      expect(handleNewSelectedValueCallBack.called).to.equal(true)
+      expect(onNewSelectedValueCallBack.called).to.equal(true)
       expect(wrapper.state('selectedIndex')).to.equal(1)
       expect(wrapper.state('selectedValue')).to.eql(props.options[1])
-      handleNewSelectedValueCallBack.resetHistory()
+      onNewSelectedValueCallBack.resetHistory()
     })
 
-    it('handleNewSelectedValueCallBack should be called when the radioBtnWithImage is clicked', () => {
+    it('onNewSelectedValueCallBack should be called when the radioBtnWithImage is clicked', () => {
       wrapper.find('.radio_btn_group__btn').at(0).simulate('click')
-      expect(handleNewSelectedValueCallBack.called).to.equal(true)
+      expect(onNewSelectedValueCallBack.called).to.equal(true)
       expect(wrapper.state('selectedIndex')).to.equal(0)
       expect(wrapper.state('selectedValue')).to.eql(props.options[0])
-      handleNewSelectedValueCallBack.resetHistory()
+      onNewSelectedValueCallBack.resetHistory()
     })
   })
 })

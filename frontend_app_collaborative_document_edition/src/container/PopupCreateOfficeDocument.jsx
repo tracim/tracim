@@ -10,7 +10,8 @@ import {
   appContentFactory,
   buildHeadTitle,
   handleFetchResult,
-  sendGlobalFlashMessage
+  sendGlobalFlashMessage,
+  TemplateContentSelector
 } from 'tracim_frontend_lib'
 import {
   postCollaborativeDocumentFromTemplate,
@@ -40,6 +41,8 @@ export class PopupCreateCollaborativeDocument extends React.Component {
       loggedUser: param.loggedUser,
       workspaceId: param.workspaceId,
       folderId: param.folderId,
+      templateList: [],
+      templateId: null,
       newContentName: '',
       availableFileTypes: [],
       availableTemplates: [],
@@ -59,7 +62,7 @@ export class PopupCreateCollaborativeDocument extends React.Component {
 
   componentDidMount () {
     this.setHeadTitle()
-    this.setDocumentOptions()
+    this.loadDocumentOptions()
   }
 
   handleAllAppChangeLanguage = data => {
@@ -103,22 +106,7 @@ export class PopupCreateCollaborativeDocument extends React.Component {
   handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
   handleChangeTemplate = (template, { action }) => {
-    // NOTE - MP - 2022-06-07 - Clear is an action type of react-select
-    // see https://react-select.com/props#prop-types
-    if (action !== 'clear') {
-      if (template.content_id !== -1) {
-        this.setState(prevState => ({
-          templateId: template.content_id,
-          templateName: template.label,
-          newContentName: `${template.label} ${prevState.newContentName}`
-        }))
-      }
-    } else {
-      this.setState({
-        templateId: null,
-        templateName: null
-      })
-    }
+    this.props.onChangeTemplate(this.setState.bind(this), template, { action })
   }
 
   handleValidate = async () => {
@@ -165,29 +153,35 @@ export class PopupCreateCollaborativeDocument extends React.Component {
     }
   }
 
-  setDocumentOptions = async () => {
+  loadDocumentOptions = async () => {
     const availableTemplates = await this.getAvailableTemplates()
     const software = this.state.config.system.config.collaborative_document_edition.software
     const availableFileTypes = getAvaibleFileTypes(software, availableTemplates)
     this.setState({
       availableTemplates: availableTemplates,
       availableFileTypes: availableFileTypes,
-      software: software
+      software: software,
+      templateId: null
     })
   }
 
-  setSelectedOption = (fileType) => {
+  handleChangeSelectedOption = async (fileType) => {
     this.setState({ selectedOption: fileType })
 
-    this.props.getTemplateList(this.setState.bind(this), CONTENT_TYPE.FILE).then(
-      () => {
-        const templateList = this.state.templateList.filter(template => {
-          return template.file_extension === FILE_TYPES.collabora[fileType.value].ext
-        })
+    await this.props.getTemplateList(this.setState.bind(this), CONTENT_TYPE.FILE, this.state.workspaceId)
 
-        this.setState({ templateList: templateList })
-      }
-    )
+    // INFO - CH - 2025-05-16 - templateList is separated in 2 lists, one for the templates of the same space
+    // as the current one and one for every other templates
+    const templateList = this.state.templateList.map(templateBySpace => ({
+      ...templateBySpace,
+      options: templateBySpace.options
+        .filter(template => template.file_extension === FILE_TYPES.collabora[fileType.value].ext)
+    }))
+
+    this.setState({
+      templateList: templateList,
+      templateId: null
+    })
   }
 
   buildOptions () {
@@ -211,31 +205,39 @@ export class PopupCreateCollaborativeDocument extends React.Component {
         btnValidateLabel={this.props.t('Validate and create')}
         contentName={this.state.newContentName}
         customColor={this.state.config.hexcolor}
-        displayTemplateList
+        displayTemplateList={false}
         faIcon={this.state.config.faIcon}
-        onChangeTemplate={this.handleChangeTemplate}
         onClose={this.handleClose}
         onValidate={this.handleValidate}
         label={this.props.t('New Office Document')}
-        templateList={this.state.templateList}
       >
-        <input
-          type='text'
-          className='createcontent__form__input'
-          data-cy='createcontent__form__input'
-          placeholder={this.props.t("Office Document's title")}
-          value={this.state.newContentName}
-          onChange={this.handleChangeNewContentName}
-          onKeyDown={this.handleInputKeyDown}
-          autoFocus
-        />
-        <RadioBtnGroup
-          data-cy='popup__office__radiogrp'
-          options={this.buildOptions()}
-          handleNewSelectedValue={this.setSelectedOption}
-          customColor={this.state.config.hexcolor}
-          onKeyDown={this.handleInputKeyDown}
-        />
+        <>
+          <RadioBtnGroup
+            data-cy='popup__office__radiogrp'
+            options={this.buildOptions()}
+            onNewSelectedValue={this.handleChangeSelectedOption}
+            customColor={this.state.config.hexcolor}
+            onKeyDown={this.handleInputKeyDown}
+          />
+
+          <TemplateContentSelector
+            onChangeTemplate={this.handleChangeTemplate}
+            templateList={this.state.templateList}
+            templateId={this.state.templateId}
+            customColor={this.state.config.hexcolor}
+          />
+
+          <input
+            type='text'
+            className='createcontent__form__input'
+            data-cy='createcontent__form__input'
+            placeholder={this.props.t("Office Document's title")}
+            value={this.state.newContentName}
+            onChange={this.handleChangeNewContentName}
+            onKeyDown={this.handleInputKeyDown}
+            autoFocus
+          />
+        </>
       </CardPopupCreateContent>
     )
   }

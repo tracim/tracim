@@ -17,7 +17,7 @@
 
 ### ⚡️ Performance
 
-- Improved performance when updading content
+- Improved performance when updating content
 
 ## 2025-04.00 / 2025-03-25
 

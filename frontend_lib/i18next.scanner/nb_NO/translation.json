@@ -235,7 +235,6 @@
   "This tag already exists": "Denne etiketten finnes allerede",
   "Version #{{versionNumber}}": "Versjon #{{versionNumber}}",
   "Your tag has been added": "Etiketten din har blitt lagt til",
-  "From a template:": "Fra en mal:",
   "Error while translating the document: {{details}}": "Kunne ikke oversette dokumentet: {{details}}",
   "Participate": "Delta",
   "Trusted user + create users, administration of instance": "Betrodd bruker + opprett brukere, administrasjon av instans",
@@ -281,5 +280,9 @@
   "{{count}} Revisions_plural": "",
   "Yes, delete permanently": "",
   "Warning: this operation cannot be rolled back": "",
-  "Between {{firstRevisionDate}} and {{lastRevisionDate}}": ""
+  "Between {{firstRevisionDate}} and {{lastRevisionDate}}": "",
+  "Space models": "",
+  "Other models": "",
+  "No model": "",
+  "Use model:": ""
 }

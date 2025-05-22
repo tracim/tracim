@@ -215,7 +215,6 @@
   "Error while loading timeline": "Erreur lors du chargement de l'historique",
   "Agenda": "Agenda",
   "Unknown content": "Contenu inconnu",
-  "From a template:": "À partir d'un modèle :",
   "Template": "Modèle",
   "Unmark template": "Retirer des modèles",
   "Mark template": "Ajouter aux modèles",
@@ -281,5 +280,9 @@
   "{{count}} Revisions_plural": "{{count}} Révisions",
   "Yes, delete permanently": "Oui, supprimer définitivement",
   "Warning: this operation cannot be rolled back": "Attention: cette opération ne peut être annulée",
-  "Between {{firstRevisionDate}} and {{lastRevisionDate}}": "Entre {{firstRevisionDate}} et {{lastRevisionDate}}"
+  "Between {{firstRevisionDate}} and {{lastRevisionDate}}": "Entre {{firstRevisionDate}} et {{lastRevisionDate}}",
+  "Space models": "Modèles de l'espace",
+  "Other models": "Autre modèles",
+  "No model": "Sans modèle",
+  "Use model:": "Modèle :"
 }
