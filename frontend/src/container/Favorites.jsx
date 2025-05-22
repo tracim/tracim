@@ -84,7 +84,7 @@ export class Favorites extends React.Component {
 
   addWorkspaceToBreadcrumbsPath () {
     const { props, state } = this
-    if (props.workspaceList.length === 0) return
+    if (props.workspaceList.length === 0 || state.favoriteList.length === 0) return
 
     const favoriteWithFullBreadcrumbsList = state.favoriteList
       .map(favorite => {
