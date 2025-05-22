@@ -14,6 +14,11 @@
 - Fixed missing callee name if declined call popin [#6725](https://github.com/tracim/tracim/issues/6725)
 - Fixed note summary generation [#6750](https://github.com/tracim/tracim/issues/6750)
 - Improved kanban with many cards performance [#6743](https://github.com/tracim/tracim/pull/6743)
+- Button Open as content is now a html link [#6084](https://github.com/tracim/tracim/issues/6084)
+- Improved kanban UI [#6752](https://github.com/tracim/tracim/issues/6752)
+- Improved model selection UX in popup to create content [#6756](https://github.com/tracim/tracim/issues/6756)
+- Fixed download button visibility in file preview overlay [#6759](https://github.com/tracim/tracim/issues/6759)
+- Avoid display 'no favorite' while the favorite list is still loading on favorite page [#6716](https://github.com/tracim/tracim/issues/6716)
 
 ### ⚡️ Performance
 
