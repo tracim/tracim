@@ -1,3 +1,5 @@
+@import '../../css/Variable.styl'
+
 .CommentFilePreview
   display block
   margin 0 auto
@@ -5,3 +7,32 @@
   img
     display block
     margin auto
+
+  &__lightbox__openRawContent
+    margin 2px
+    height 35px
+    width 40px
+    font-size standardFontSize
+    border-radius 0.25rem
+    color #929292
+    background-color rgba(0, 0, 0, 0.5)
+    padding 5px
+    &:hover
+      color #FFFFFF
+
+@media (max-width: max-xs)
+  .CommentFilePreview__lightbox__openRawContent
+    height 30px
+    width 35px
+    padding 3px
+  .ril__toolbarRightSide button
+    height 30px
+    width 35px
+    padding 0
+
+.ril__toolbarRightSide
+  & button
+    margin 2px
+    background-color rgba(0, 0, 0, 0.5)
+.ril__caption, .ril__toolbar
+  background none !important /* INFO - CH - 2025 05 22 - Overrides background of lightbox toolbar */
