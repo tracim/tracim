@@ -3,7 +3,8 @@ import {
   FAVORITE,
   ADD,
   REMOVE,
-  SET
+  SET_FAVORITE_LIST,
+  UPDATE_FAVORITE_LIST
 } from '../action-creator.sync.js'
 import { serializeContentProps } from './workspaceContentList.js'
 import { serializeUserProps } from './user.js'
@@ -32,8 +33,10 @@ const serializeFavorite = (apiFavorite) => {
 
 const favoriteList = (state = [], action) => {
   switch (action.type) {
-    case `${SET}/${FAVORITE_LIST}`:
+    case SET_FAVORITE_LIST:
       return action.favoriteList.map(serializeFavorite)
+    case UPDATE_FAVORITE_LIST:
+      return action.favoriteList
     case `${ADD}/${FAVORITE_LIST}`:
       return [
         ...state,

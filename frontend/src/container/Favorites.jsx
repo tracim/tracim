@@ -20,7 +20,8 @@ import {
   setBreadcrumbs,
   setFavoriteList,
   removeFavorite,
-  setHeadTitle
+  setHeadTitle,
+  updateFavoriteList
 } from '../action-creator.sync.js'
 
 import {
@@ -39,8 +40,7 @@ export class Favorites extends React.Component {
     super(props)
 
     this.state = {
-      isLoading: true,
-      favoriteList: []
+      isLoading: true
     }
 
     props.registerCustomEventHandlerList([
@@ -77,26 +77,28 @@ export class Favorites extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    if (prevProps.workspaceList.length === 0 && this.props.workspaceList.length > 0) {
-      this.addWorkspaceToBreadcrumbsPath()
+    if (
+      (prevProps.workspaceList.length === 0 && this.props.workspaceList.length > 0) ||
+      (prevProps.favoriteList.length === 0 && this.props.favoriteList.length > 0)
+    ) {
+      this.addWorkspaceToBreadcrumbsPath(this.props.favoriteList)
     }
   }
 
-  addWorkspaceToBreadcrumbsPath () {
-    const { props, state } = this
-    if (props.workspaceList.length === 0 || state.favoriteList.length === 0) return
+  addWorkspaceToBreadcrumbsPath (favoriteWithIncompleteBreadcrumbsList) {
+    const { props } = this
+    if (props.workspaceList.length === 0) return
 
-    const favoriteWithFullBreadcrumbsList = state.favoriteList
+    const favoriteWithFullBreadcrumbsList = favoriteWithIncompleteBreadcrumbsList
       .map(favorite => {
-        const workspace = props.workspaceList.find(ws => ws.id === favorite.content.workspace_id)
+        const workspace = props.workspaceList.find(ws => ws.id === favorite.content.workspaceId)
         return {
           ...favorite,
           breadcrumbs: [{ label: workspace.label }].concat(favorite.breadcrumbs)
         }
       })
 
-    this.setState({ isLoading: false })
-    props.dispatch(setFavoriteList(favoriteWithFullBreadcrumbsList))
+    props.dispatch(updateFavoriteList(favoriteWithFullBreadcrumbsList))
   }
 
   loadFavoriteList = async () => {
@@ -126,8 +128,8 @@ export class Favorites extends React.Component {
         }
       }))
 
-    this.setState({ favoriteList: favoriteWithIncompleteBreadcrumbsList })
-    this.addWorkspaceToBreadcrumbsPath()
+    props.dispatch(setFavoriteList(favoriteWithIncompleteBreadcrumbsList))
+    this.setState({ isLoading: false })
   }
 
   handleClickRemoveFromFavoriteList = async (favorite) => {
