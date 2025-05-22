@@ -237,7 +237,7 @@ export class WorkspaceContent extends React.Component {
     if (state.appOpenedType) return
 
     const workspaceId = props.currentWorkspace.id
-    const workspaceLabel = props.t(props.workspaceList.find(ws => ws.id === workspaceId).label)
+    const workspaceLabel = props.workspaceList.find(ws => ws.id === workspaceId)?.label || ''
     const breadcrumbsList = [{
       link: PAGE.WORKSPACE.DASHBOARD(workspaceId),
       type: BREADCRUMBS_TYPE.CORE,
