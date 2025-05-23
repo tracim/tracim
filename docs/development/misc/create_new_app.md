@@ -1,5 +1,8 @@
 # Create a new app in Tracim
 
+This documentation provide details to create a new app called "Example" with its associated content type "contents/example".  
+To create your own app, replace every name "example" by your own name. Respect the case.  
+
 ## Frontend
 
 ### Create the new app
@@ -117,15 +120,101 @@ The file in frontend/dist/app must be named example.app.optimized.js
 cp ./index.js ../frontend/dist/app/example.app.optimized.js
 ```
 
+### Handle the notification for the new content type
+
+Notifications rely on TLMs.  
+See [tlm_event_socket.md](/docs/api-integration/tlm_event_socket.md) for how TLMs work.
+
+The file frontend/src/container/ReduxTlmDispatcher.jsx declares the handlers for the TLMs related to content types.
+Add the following handlers declarations to the parameter of `props.registerLiveMessageHandlerList()` in:
+
+**frontend/src/container/ReduxTlmDispatcher.jsx**
+```js
+{ entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.EXAMPLE, handler: this.handleContentCreated },
+{ entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.EXAMPLE, handler: this.handleContentModified },
+{ entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.EXAMPLE, handler: this.handleContentDeleted },
+{ entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.EXAMPLE, handler: this.handleContentUnDeleted },
+```
+The handlers are generic for every content types.
+
 ### Add the app to the html page of development server
 
-The development server is started with the command `yarn run server` in frontend/.  
+The development server is started with the command `yarn run server` in frontend/.
 
 In frontend/dist/index.html, add the following html line in the `body` tag, after the declaration of /app/tracim_frontend_lib.lib.optimized.js:
 **frontend/dist/index.html,**
 ```html
 <script type='text/javascript' src='/app/example.app.js'></script>
 ```
+
+### Translation
+
+The app can have its own translation process or use the Tracim one.  
+
+Tracim frontend translation rely on i18next-scanner.
+To use it, add the dependency:
+```bash
+npm install --save-dev i18next-scanner@4.4.0
+```
+Copy the i18n file of an existing app and add it to the new app.
+```bash
+cp frontend_app_file/src/i18n.js frontend_app_example/src/i18n.js
+```
+In frontend_app_example/src/i18n.js, replace i18n.tracimId with the app name.  
+**frontend_app_example/src/i18n.js**  
+```js
+i18n.tracimId = 'frontend_app_example'
+```
+
+Create the script in package.json to generate the translation files
+```json
+"scripts": {
+  ...,
+  "build:translation": "node ../i18next.scanner.js"
+}
+```
+Run it once to generate the folder tree.
+```bash
+cd frontend_app_example
+npm run build:translation
+```
+
+Add the translation files generation to the build script:
+**frontend_app_example/build_app.sh**
+```bash
+cp ./index.js ../frontend/dist/app/example.app.optimized.js
+
+for lang in $(ls i18next.scanner); do
+    echo "copying ${lang}/translation.json"
+    cp i18next.scanner/"${lang}"/translation.json ../frontend/dist/app/example_"${lang}"_translation.json
+done
+```
+This script copy the translation file for each language to frontend/dist/app folder.
+
+Update frontend/src/util/i18n.js by requiring each new translation files:
+**frontend/src/util/i18n.js**
+```js
+const exampleEnTranslation = require('../../dist/app/example_en_translation.json')
+const exampleFrTranslation = require('../../dist/app/example_fr_translation.json')
+const examplePtTranslation = require('../../dist/app/example_pt_translation.json')
+const exampleDeTranslation = require('../../dist/app/example_de_translation.json')
+const exampleArTranslation = require('../../dist/app/example_ar_translation.json')
+const exampleEsTranslation = require('../../dist/app/example_es_translation.json')
+const exampleNbNOTranslation = require('../../dist/app/example_nb_NO_translation.json')
+```
+Add the translation object for each language to the appropriate language object in `i18n.init.resource` declaration.
+Example for the lang english:
+```js
+resources: {
+  en: {
+    translation: {
+      // ...,
+      exampleEnTranslation
+    }
+```
+
+See `i18next.scanner.js` `option.func.list` for the available translation functions.
+Optional, add additional file extension if required.
 
 
 ## Backend
@@ -300,28 +389,38 @@ The endpoint to create the content already exists and is generic. See create_gen
 **backend/tracim_backend/config.py**  
 In the function `_load_enabled_apps_config`, add `"contents/example,"`, to the concatenated string default_enabled_app  
 In the function `_load_enabled_app`, add `"contents/example",`, to the tuple default_app_order  
-Carefully check the commas, default_enabled_app in a string while default_app_order is a tuple.
+Carefully check the commas, default_enabled_app in a string while default_app_order is a tuple.  
 
+## Docker
 
-## Todo
+Add the app to the Dockerfile environment variable DEFAULT_APP_LIST  
 
-### Notification
+**tools_docker/Debian_New_Uwsgi/Dockerfile**  
+**tools_docker/Debian_Uwsgi/Dockerfile**  
+**tools_docker/Debian_Uwsgi_ARM64/Dockerfile**  
+```dockerfile
+ENV DEFAULT_APP_LIST="[...],contents/example"
+```
 
-- Add TLMs to frontend/src/container/ReduxTlmDispatcher.jsx.
+## Search
 
-### Translation
+To allow the search to filter the app specifically:  
+Add the app to ALL_CONTENT_TYPES.  
+**frontend/src/util/helper.js**  
+```js
+ALL_CONTENT_TYPES="[...],example"
+```
 
-- Generate translations in all apps
-- Import app translations and load them into frontend/src/util/i18n.js
-
-### Docker build
-
-- Add to dockerfiles
-- tools_docker/Debian_New_Uwsgi/Dockerfile
-- tools_docker/Debian_Uwsgi/Dockerfile
-- tools_docker/Debian_Uwsgi_ARM64/Dockerfile
-
-### Search
-- Search:
-  - Add key to facets in frontend/src/util/helper.js (line 72) as <content_type>_search
-  - Add content type to ALL_CONTENT_TYPES in same file as above
+Add the app to the facets of advanced search:  
+**frontend/src/util/helper.js**  
+```js
+SEARCH_CONTENT_FACETS = {
+  // ...,
+  TYPE: {
+    items: [
+      // ...,
+      i18n.t('example_search')
+    ]
+  }
+}
+```
