@@ -7,13 +7,17 @@ To create your own app, replace every name "example" by your own name. Respect t
 
 ### Create the new app
 
-We will create an app called "example".
+Create a folder frontend_app_example and the app entry point `index.js`.
+```bash
+mkdir frontend_app_example
+cd frontend_app_example
+touch index.js
+```
 
-App entry points: `index.js`.  
-It must create a variable available at document root (here, `appExample`) with the following content:  
+The entry point must create a variable available at document root (here, `appExample`) with the following content:  
 **index.js**  
 ```js
-var appExample = {
+const appExample = {
   name: 'example',
   isRendered: false,
   renderAppPopupCreation: data => {
@@ -50,11 +54,11 @@ var appExample = {
     element.appendChild(button)
   },
   renderAppFeature: data => {
-    var element = document.getElementById(data.config.domContainer)
+    const element = document.getElementById(data.config.domContainer)
     element.innerHTML = 'App renders here'
   },
   unmountApp: domId => {
-    var element = document.getElementById(domId)
+    const element = document.getElementById(domId)
     element.remove()
   }
 }
@@ -74,38 +78,39 @@ Implement the content of the 3 functions renderAppFeature, unmountApp, renderApp
   - Called when closing the app
   - It should remove the node from DOM
 
-If the app relies on a bundling process, it must be configured to create a library that expose a variable `appExample`
+If the app relies on a bundling process, it must be configured to create a library that expose a variable `appExample`.
 
 ### Add the new app to the appInterface.js
 
-In `frontend/src/util/appInterface.js`  
-In the switch case, add a case for the app  
+In `frontend/src/util/appInterface.js`, in the switch case, add a case for the app.  
 **frontend/src/util/appInterface.js**
 ```js
 case 'example' // the name is the one from appExample.name in the app
     return appExample // the name is the root variable in the app
 ```
-In the comment to declare "global", add library name (`appExample`). This is to avoid linting error.
+In the comment to declare "global", add library name (`appExample`).  
+This is to avoid linting error for unknown variable.  
 
-Rebuild frontend app.
+Rebuild frontend app.  
 ```bash
 ./frontend/build_frontend.sh
 ```
 
 ### Add the new content type in frontend_lib
 
-In frontend_lib/src/constant.js
-
-Add the content type to the constant CONTENT_TYPE:  
+In frontend_lib/src/constant.js, add the content type to the constant CONTENT_TYPE:  
 **frontend_lib/src/constant.js**  
 ```js
-EXAMPLE: 'example',
+export const CONTENT_TYPE = {
+  EXAMPLE: 'example',
+  // ...
+}
 ```
 
 ### Add a default color to the app
 
-In frontend/dist/assets/branding.sample/color.json and your frontend/dist/assets/branding/color.json  
-Add to, respectively, default values and your value:  
+In frontend/dist/assets/branding.sample/color.json and your frontend/dist/assets/branding/color.json,  
+add to, respectively, default values and your value:  
 **frontend/dist/assets/branding.sample/color.json** and **frontend/dist/assets/branding/color.json**  
 ```json
 "contents/example": "#123456",
@@ -126,8 +131,8 @@ cp ./index.js ../frontend/dist/app/example.app.optimized.js
 Notifications rely on TLMs.  
 See [tlm_event_socket.md](/docs/api-integration/tlm_event_socket.md) for how TLMs work.
 
-The file frontend/src/container/ReduxTlmDispatcher.jsx declares the handlers for the TLMs related to content types.
-Add the following handlers declarations to the parameter of `props.registerLiveMessageHandlerList()` in:
+The file frontend/src/container/ReduxTlmDispatcher.jsx declares the handlers for the TLMs related to content types.  
+Add the following handlers declarations to the parameter of `props.registerLiveMessageHandlerList()` in:  
 
 **frontend/src/container/ReduxTlmDispatcher.jsx**
 ```js
@@ -142,8 +147,9 @@ The handlers are generic for every content types.
 
 The development server is started with the command `yarn run server` in frontend/.
 
-In frontend/dist/index.html, add the following html line in the `body` tag, after the declaration of /app/tracim_frontend_lib.lib.optimized.js:
-**frontend/dist/index.html,**
+In frontend/dist/index.html, add the following html line in the `body` tag, after the declaration of
+/app/tracim_frontend_lib.lib.optimized.js:  
+**frontend/dist/index.html,**  
 ```html
 <script type='text/javascript' src='/app/example.app.js'></script>
 ```
@@ -152,8 +158,8 @@ In frontend/dist/index.html, add the following html line in the `body` tag, afte
 
 The app can have its own translation process or use the Tracim one.  
 
-Tracim frontend translation rely on i18next-scanner.
-To use it, add the dependency:
+Tracim frontend translation rely on i18next-scanner.  
+To use it, add the dependency:  
 ```bash
 npm install --save-dev i18next-scanner@4.4.0
 ```
@@ -168,7 +174,7 @@ i18n.tracimId = 'frontend_app_example'
 ```
 
 Create the script in package.json to generate the translation files  
-**frontend_app_example/package.json**
+**frontend_app_example/package.json**  
 ```json
 "scripts": {
   ...,
@@ -181,8 +187,8 @@ cd frontend_app_example
 npm run build:translation
 ```
 
-Add the translation files generation to the build script:  
-**frontend_app_example/build_app.sh**
+In the build script, add a script to copy the generated translation files to the frontend/dist/app/ folder.  
+**frontend_app_example/build_app.sh**  
 ```bash
 cp ./index.js ../frontend/dist/app/example.app.optimized.js
 
@@ -191,9 +197,8 @@ for lang in $(ls i18next.scanner); do
     cp i18next.scanner/"${lang}"/translation.json ../frontend/dist/app/example_"${lang}"_translation.json
 done
 ```
-This script copy the translation file for each language to frontend/dist/app folder.
 
-Update frontend/src/util/i18n.js by requiring each new translation files:
+Update frontend/src/util/i18n.js by requiring each new translation files:  
 **frontend/src/util/i18n.js**
 ```js
 const exampleEnTranslation = require('../../dist/app/example_en_translation.json')
@@ -204,8 +209,8 @@ const exampleArTranslation = require('../../dist/app/example_ar_translation.json
 const exampleEsTranslation = require('../../dist/app/example_es_translation.json')
 const exampleNbNOTranslation = require('../../dist/app/example_nb_NO_translation.json')
 ```
-Add the translation object for each language to the appropriate language object in `i18n.init.resource` declaration.
-Example for the lang english:
+Add the translation object for each language to the appropriate language object in `i18n.init.resource` declaration.  
+Example for the lang english:  
 ```js
 resources: {
   en: {
@@ -215,9 +220,8 @@ resources: {
     }
 ```
 
-See `i18next.scanner.js` `option.func.list` for the available translation functions.
+See `i18next.scanner.js` `option.func.list` for the available translation functions.  
 Optional, add additional file extension if required.
-
 
 ## Backend
 
@@ -237,7 +241,9 @@ Add the content type to the class ContentTypeSlug:
 
 **backend/tracim_backend/app_models/contents.py**  
 ```python
-EXAMPLE = "example"
+class ContentTypeSlug(str, Enum):
+  EXAMPLE = "example"
+  # ...
 ```
 
 Add the app to the properties of the class ContentTypeList:  
@@ -251,7 +257,9 @@ def Example(self) -> TracimContentType:
 ### Create the app in backend
 
 Create the folder backend/tracim_backend/applications/content_example/  
-**backend/tracim_backend/applications/content_example/**  
+```bash
+mkdir backend/tracim_backend/applications/content_example
+```
 
 In backend/tracim_backend/applications/content_example  
 Create 3 files:  
@@ -259,7 +267,7 @@ Create 3 files:
 empty file  
 
 **backend/tracim_backend/applications/content_example/application.py**  
-```py
+```python
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
 
@@ -391,7 +399,7 @@ The endpoint to create the content already exists and is generic. See create_gen
 **backend/tracim_backend/config.py**  
 In the function `_load_enabled_apps_config`, add `"contents/example,"`, to the concatenated string default_enabled_app  
 In the function `_load_enabled_app`, add `"contents/example",`, to the tuple default_app_order  
-Carefully check the commas, default_enabled_app in a string while default_app_order is a tuple.  
+Carefully check the commas, default_enabled_app is a string while default_app_order is a tuple.  
 
 ## Docker
 
@@ -406,8 +414,7 @@ ENV DEFAULT_APP_LIST="[...],contents/example"
 
 ## Search
 
-To allow the search to filter the app specifically:  
-Add the app to ALL_CONTENT_TYPES.  
+To allow the search to filter the app specifically, add the app to ALL_CONTENT_TYPES.  
 **frontend/src/util/helper.js**  
 ```js
 ALL_CONTENT_TYPES="[...],example"
@@ -431,20 +438,20 @@ SEARCH_CONTENT_FACETS = {
 
 To check that the app works, try to create a new content of type "example".  
 Open the content list page of a space.  
-Example url: /ui/workspaces/1/contents
+Example url: /ui/workspaces/1/contents  
 Click on the "+ Create" button.  
 
-If the content type is visible in the dropdown, the app and content type are properly declared in backend.
+If the content type is visible in the dropdown, the app and content type are properly declared in backend.  
 
 When clicking on the app in the dropdown, the code from frontend_app_example/index.js::renderPopupCreateContent should
-be executed and render the popin.
+be executed and render the popin.  
 
-If the popin doesn't open, check js console.
+If the popin doesn't open, check js console.  
 
 ### "example does not exist. Maybe it hasn't finished loading yet? Retrying in 500ms"
 
 Check frontend/src/util/appInterface.js.  
-The name of the case or of the app in the switch case might not match the name in the app index.js.  
+The name of the case or of the app in the switch case might not match the name in frontend_app_example/index.js.  
 
 Alternatively, check that the app source `example.app.optimized.js` is in the folder `frontend/dist/app`.  
 If missing, the script `frontend_app_example/build_app.sh` might have an issue.  
