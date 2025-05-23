@@ -7,15 +7,16 @@
 We will create an app called "example".
 
 App entry points: `index.js`.  
-It must create a variable available at document root (here, `appExample`) with the following content:
-**index.js**
+It must create a variable available at document root (here, `appExample`) with the following content:  
+**index.js**  
 ```js
 var appExample = {
   name: 'example',
   isRendered: false,
   renderAppPopupCreation: data => {
-    // INFO - The code bellow calls the Tracim api to create a new content of type example
-    // It is here to help create the first content. The api must be ready to accept this call
+    // INFO - The code bellow calls the Tracim api to create a new content of content type "example"
+    // It is here to help create the first content. The api must be ready to accept this call and the content type
+    // must exist in backend
     // See # Backend part
     const button = document.createElement('button')
     button.innerHTML = 'Create a content example'
@@ -35,7 +36,11 @@ var appExample = {
           label: 'First example'
         })
       })
-      console.log('Example created !', response)
+      if (response.status === 200) {
+        console.log('Example created !', response)
+      } else {
+        console.log('Error in creation', response)
+      }
     }
 
     const element = document.getElementById(data.config.domContainer)
@@ -50,32 +55,33 @@ var appExample = {
     element.remove()
   }
 }
-
 ```
 Implement the content of the 3 functions renderAppFeature, unmountApp, renderAppPopupCreation.
 - **renderAppPopupCreation**
   - Called when creating a new content for this content type by clicking on the dropdown to create a content in a space content list
   - It should create a popin in HTML and insert it in the intended DOM container which id is `data.config.domContainer`
   - It should show a popin asking for the name of the content
+  - The popin should have the style `position: absolute`
 - **renderAppFeature**
   - Called when opening a content of that type by clicking on it in the space content list
   - It should create the app in HTML and insert it in the intended DOM container which id is `data.config.domContainer`
-  - It should show the app details and can show its timeline (frontend_lib/src/component/Timeline/Timeline.jsx)
+  - It should show the app details
+  - If the app is in React, it can include any components from frontend_lib/
 - **unmountApp**
   - Called when closing the app
   - It should remove the node from DOM
 
-Alternatively, you can bundle any app as a library that will expose the variable `appExample`.
+If the app relies on a bundling process, it must be configured to create a library that expose a variable `appExample`
 
 ### Add the new app to the appInterface.js
 
 In `frontend/src/util/appInterface.js`  
-In comment to declare "global", add library name (`appExample`)  
-In switch case, add a case for your app  
+In the switch case, add a case for the app  
 ```js
-case 'example' // the name is the one from appExample.name in your app
-    return appExample // the name is the root variable in your app
+case 'example' // the name is the one from appExample.name in the app
+    return appExample // the name is the root variable in the app
 ```
+In the comment to declare "global", add library name (`appExample`). This is to avoid linting error.
 
 Rebuild frontend app.
 ```bash
@@ -102,9 +108,9 @@ Add to, respectively, default values and your value:
 ```
 Set the color of your choice.
 
-### Create a script to place the app in frontend
+### Create a script to copy the app in frontend
 
-Create a script to copy your entry point (bundled if required) to the folder frontend/dist/app.  
+Create a script to copy the entry point (bundled if required) to the folder frontend/dist/app.  
 The file in frontend/dist/app must be named example.app.optimized.js  
 **frontend_app_example/build_app.sh**  
 ```bash
@@ -115,7 +121,8 @@ cp ./index.js ../frontend/dist/app/example.app.optimized.js
 
 The development server is started with the command `yarn run server` in frontend/.  
 
-In frontend/dist/index.html, add:
+In frontend/dist/index.html, add the following html line in the `body` tag, after the declaration of /app/tracim_frontend_lib.lib.optimized.js:
+**frontend/dist/index.html,**
 ```html
 <script type='text/javascript' src='/app/example.app.js'></script>
 ```
@@ -142,7 +149,7 @@ Add the content type to the class ContentTypeSlug:
 EXAMPLE = "example"
 ```
 
-Add the app to the properties of class ContentTypeList:  
+Add the app to the properties of the class ContentTypeList:  
 **backend/tracim_backend/app_models/contents.py**  
 ```python
 @property
@@ -152,7 +159,7 @@ def Example(self) -> TracimContentType:
 
 ### Create the app in backend
 
-Create folder backend/tracim_backend/applications/content_example/  
+Create the folder backend/tracim_backend/applications/content_example/  
 **backend/tracim_backend/applications/content_example/**  
 
 In backend/tracim_backend/applications/content_example  
@@ -223,6 +230,7 @@ def create_app() -> TracimApplication:
         main_route="",
     )
 ```
+You can customize the 2 labels, creation_label, file_extension and fa_icon
 
 **backend/tracim_backend/applications/content_example/controller.py**  
 ```py
@@ -284,13 +292,15 @@ class ExampleController(Controller):
         )
         configurator.add_view(self.get_example, route_name="example")
 ```
+The endpoint to create the content already exists and is generic. See create_generic_content in
+`backend/tracim_backend/views/core_api/workspace_controller.py`
 
 ### Declare the app as available
 
 **backend/tracim_backend/config.py**  
-Add `"contents/example,"`, in the function `_load_enabled_apps_config`, to the tuple default_enabled_app  
-Add `"contents/example",`, in the function `_load_enabled_app`, to the tuple default_app_order  
-Carefully check the commas  
+In the function `_load_enabled_apps_config`, add `"contents/example,"`, to the concatenated string default_enabled_app  
+In the function `_load_enabled_app`, add `"contents/example",`, to the tuple default_app_order  
+Carefully check the commas, default_enabled_app in a string while default_app_order is a tuple.
 
 
 ## Todo
