@@ -18,8 +18,8 @@ var appExample = {
   isRendered: false,
   renderAppPopupCreation: data => {
     // INFO - The code bellow calls the Tracim api to create a new content of content type "example"
-    // It is here to help create the first content. The api must be ready to accept this call and the content type
-    // must exist in backend
+    // It is here to help create the first content. The api must be ready to accept this call and the
+    // content_type must exist in backend
     // See # Backend part
     const button = document.createElement('button')
     button.innerHTML = 'Create a content example'
@@ -80,6 +80,7 @@ If the app relies on a bundling process, it must be configured to create a libra
 
 In `frontend/src/util/appInterface.js`  
 In the switch case, add a case for the app  
+**frontend/src/util/appInterface.js**
 ```js
 case 'example' // the name is the one from appExample.name in the app
     return appExample // the name is the root variable in the app
@@ -166,7 +167,8 @@ In frontend_app_example/src/i18n.js, replace i18n.tracimId with the app name.
 i18n.tracimId = 'frontend_app_example'
 ```
 
-Create the script in package.json to generate the translation files
+Create the script in package.json to generate the translation files  
+**frontend_app_example/package.json**
 ```json
 "scripts": {
   ...,
@@ -179,7 +181,7 @@ cd frontend_app_example
 npm run build:translation
 ```
 
-Add the translation files generation to the build script:
+Add the translation files generation to the build script:  
 **frontend_app_example/build_app.sh**
 ```bash
 cp ./index.js ../frontend/dist/app/example.app.optimized.js
@@ -424,3 +426,35 @@ SEARCH_CONTENT_FACETS = {
   }
 }
 ```
+
+## Troubleshooting
+
+To check that the app works, try to create a new content of type "example".  
+Open the content list page of a space.  
+Example url: /ui/workspaces/1/contents
+Click on the "+ Create" button.  
+
+If the content type is visible in the dropdown, the app and content type are properly declared in backend.
+
+When clicking on the app in the dropdown, the code from frontend_app_example/index.js::renderPopupCreateContent should
+be executed and render the popin.
+
+If the popin doesn't open, check js console.
+
+### "example does not exist. Maybe it hasn't finished loading yet? Retrying in 500ms"
+
+Check frontend/src/util/appInterface.js.  
+The name of the case or of the app in the switch case might not match the name in the app index.js.  
+
+Alternatively, check that the app source `example.app.optimized.js` is in the folder `frontend/dist/app`.  
+If missing, the script `frontend_app_example/build_app.sh` might have an issue.  
+
+### The app is not visible with no error
+
+Check both endpoint:
+- /api/system/content_types
+- /api/system/applications
+They both should include the app in the response.
+
+The app might be missing from `app.enabled` in `backend/development.ini`.  
+Alternatively, the app might be missing from the string `default_enabled_app` in `backend/tracim_backend/config.py`.
