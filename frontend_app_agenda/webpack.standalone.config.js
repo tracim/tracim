@@ -4,7 +4,7 @@ const isProduction = process.env.NODE_ENV === 'production'
 module.exports = {
   mode: isProduction ? 'production' : 'development',
   entry: {
-    app: './src/index.js'
+    app: './src/index.tsx'
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -23,13 +23,19 @@ module.exports = {
       enforce: 'pre',
       use: 'standard-loader',
       exclude: [/node_modules/, /frontend_lib/]
+    }, isProduction ? {} : {
+      test: /\.tsx?$/,
+      enforce: 'pre',
+      use: 'ts-loader',
+      exclude: [/node_modules/, /frontend_lib/]
     }, {
-      test: [/\.js$/, /\.jsx$/],
+      test: [/\.[tj]s$/, /\.[tj]sx$/],
       exclude: [/node_modules/],
       loader: 'babel-loader',
       options: {
         presets: [
           '@babel/preset-env',
+          '@babel/preset-typescript',
           '@babel/preset-react'
         ],
         plugins: [
@@ -54,7 +60,7 @@ module.exports = {
       // Make ~tracim_frontend_lib work in stylus files
       '~tracim_frontend_lib': path.dirname(path.dirname(require.resolve('tracim_frontend_lib')))
     },
-    extensions: ['.js', '.jsx']
+    extensions: ['.js', '.jsx', '.ts', '.tsx']
   },
   plugins: [
     ...[], // @INFO - CH - 2019/04/01 - generic plugins always present

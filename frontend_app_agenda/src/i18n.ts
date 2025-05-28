@@ -23,5 +23,4 @@ i18n
   })
 
 i18n.tracimId = 'frontend_app_agenda'
-
 export default i18n

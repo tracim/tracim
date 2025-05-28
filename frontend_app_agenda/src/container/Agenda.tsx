@@ -1,6 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
-import i18n from '../i18n.js'
+import i18n from '../i18n'
 import {
   addAllResourceI18n,
   handleFetchResult,
@@ -20,6 +20,7 @@ import {
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import { getAgendaList, getPreFilledAgendaEvent } from '../action.async.js'
+import CalendarDav from './CalendarDav'
 
 export class Agenda extends React.Component {
   constructor (props) {
@@ -295,28 +296,12 @@ export class Agenda extends React.Component {
     }
   }
 
-  render () {
+  render() {
     const { props, state } = this
 
     if (!state.isVisible || !state.userWorkspaceListLoaded || !state.preFilledAgendaEvent) return null
 
-    const config = {
-      globalAccountSettings: {
-        agendaList: state.userWorkspaceList.map(a => ({
-          href: a.agenda_url,
-          hrefLabel: a.agenda_type === 'private'
-            ? props.t('User')
-            : state.userWorkspaceList.length > 1 ? props.t('Spaces') : props.t('Space'),
-          settingsAccount: a.agenda_type === 'private',
-          withCredentials: a.with_credentials,
-          loggedUserRole: a.agenda_type === 'private' ? '' : a.loggedUserRole,
-          workspaceId: a.agenda_type === 'private' ? '' : a.workspace_id
-        }))
-      },
-      userLang: state.loggedUser.lang,
-      preFilledAgendaEvent: state.preFilledAgendaEvent,
-      shouldShowCaldavzapSidebar: state.config.appConfig.forceShowSidebar
-    }
+    const calendarUrls = state.userWorkspaceList.map(i => i.agenda_url)
 
     // INFO - GB - 2019-06-11 - This tag dangerouslySetInnerHTML is needed to i18next be able to handle special characters
     // https://github.com/tracim/tracim/issues/1847
@@ -355,13 +340,11 @@ export class Agenda extends React.Component {
         </div>
 
         <PageContent parentClass='agendaPage'>
-          <iframe
-            id='agendaIframe'
-            src='/assets/_caldavzap/index.tracim.html'
-            allow='fullscreen'
-            allowFullScreen
-            data-config={JSON.stringify(config)}
-            ref={f => { this.agendaIframe = f }}
+          <CalendarDav
+            calendarUrls={calendarUrls}
+            headers={{
+              "withCredentials": '1'
+            }}
           />
         </PageContent>
       </PageWrapper>

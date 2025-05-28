@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Router } from 'react-router-dom'
-import Agenda from './container/Agenda.jsx'
+import Agenda from './container/Agenda'
 
 require('./css/index.styl')
 
@@ -14,8 +14,8 @@ const appInterface = {
     return ReactDOM.render(
       <Router history={data.config.history}>
         <Agenda data={data} />
-      </Router>
-      , document.getElementById(data.config.domContainer)
+      </Router>,
+      document.getElementById(data.config.domContainer)
     )
   },
   unmountApp: domId => {
