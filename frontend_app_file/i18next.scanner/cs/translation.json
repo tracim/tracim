@@ -67,5 +67,8 @@
   "In that case, you can download the video and try opening it manually.": "V takovém případě si můžete video stáhnout a zkusit ho otevřít ručně.",
   "To download the video, leave the fullscreen mode and click on download button {{icon}}.": "Chcete-li video stáhnout, opusťte celoobrazovkový režim a klikněte na tlačítko Stáhnout {{icon}}.",
   "Note: Your browser might not be able to read this file.": "Poznámka: Váš prohlížeč nemusí být schopen tento soubor přečíst.",
-  "The file has been updated, it can't be edited anymore": "Soubor byl aktualizován, již jej nelze upravovat"
+  "The file has been updated, it can't be edited anymore": "Soubor byl aktualizován, již jej nelze upravovat",
+  "View anyway": "Přesto zobrazit",
+  "The file weight {{ fileSize }}.": "Velikost souboru {{ fileSize }}.",
+  "Viewing it online might slow down the page.": "Zobrazení online by mohlo zpomalit stránku."
 }
