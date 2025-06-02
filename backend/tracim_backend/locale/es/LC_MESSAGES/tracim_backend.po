@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2024-06-26 18:28+0200\n"
-"PO-Revision-Date: 2025-01-21 23:19+0000\n"
-"Last-Translator: Jiří Podhorecký <j.podhorecky@volny.cz>\n"
+"PO-Revision-Date: 2025-06-02 12:01+0000\n"
+"Last-Translator: Adolfo Jayme Barrientos <fitojb@ubuntu.com>\n"
 "Language-Team: Spanish <https://hosted.weblate.org/projects/tracim/backend/"
 "es/>\n"
 "Language: es\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.10-dev\n"
+"X-Generator: Weblate 5.12-dev\n"
 "Generated-By: Babel 2.9.1\n"
 
 #: tracim_backend/config.py:843
@@ -53,28 +53,27 @@ msgid ""
 "with you"
 msgstr ""
 "[{website_title}] {emitter_name} ha compartido con usted el archivo "
-"\"{content_filename}\""
+"«{content_filename}»"
 
 #: tracim_backend/applications/share/application.py:39
 msgid ""
 "[{website_title}] You shared \"{content_filename}\" with {nb_receivers} "
 "people"
 msgstr ""
-"[{website_title}] Has compartido \"{content_filename}\" con "
-"{nb_receivers} personas"
+"[{website_title}] Ha compartido «{content_filename}» con {nb_receivers} "
+"personas"
 
 #: tracim_backend/applications/upload_permissions/application.py:26
-#, fuzzy
 msgid "{emitter_name} invited you to upload files on \"{website_title}\""
-msgstr "{emitter_name} le ha invitado a cargar archivos en \"{website_title}\""
+msgstr " {emitter_name} le ha invitado a cargar archivos en «{website_title}» "
 
 #: tracim_backend/applications/upload_permissions/application.py:37
 msgid ""
 "[{website_title}] You invited {nb_receivers} people to upload files on "
 "\"{workspace_name}\""
 msgstr ""
-"[{website_title}] Ha invitado a {nb_receivers} personas a subir archivos "
-"en \"{workspace_name}\""
+"[{website_title}] Ha invitado a {nb_receivers} personas a cargar archivos en "
+"«{workspace_name}»"
 
 #: tracim_backend/applications/upload_permissions/application.py:49
 msgid ""
@@ -82,7 +81,7 @@ msgid ""
 " in \"{workspace_name}\""
 msgstr ""
 "[{website_title}] {uploader_username} compartió archivos "
-"{nb_uploaded_contents} en \"{workspace_name}\""
+"{nb_uploaded_contents} en «{workspace_name}»"
 
 #: tracim_backend/applications/upload_permissions/lib.py:258
 msgid "Files uploaded by {username} on {date} at {time}"
@@ -98,15 +97,15 @@ msgstr "Subido por {username}."
 
 #: tracim_backend/command/periodic.py:66
 msgid "[{website_title}] Your hourly summary"
-msgstr "[{website_title}] tu resumen horario"
+msgstr "[{website_title}] Su resumen por hora"
 
 #: tracim_backend/command/periodic.py:68
 msgid "[{website_title}] Your daily summary"
-msgstr "[{website_title}] tu resumen diario"
+msgstr "[{website_title}] Su resumen diario"
 
 #: tracim_backend/command/periodic.py:70
 msgid "[{website_title}] Your weekly summary"
-msgstr "[{website_title}] tu resumen semanal"
+msgstr "[{website_title}] Su resumen semanal"
 
 #: tracim_backend/lib/core/content.py:785
 msgid "Space {workspace_name}"
@@ -211,7 +210,7 @@ msgid ""
 "You are receiving this email because you have an account on "
 "{website_title}."
 msgstr ""
-"Estas recibiendo este correo electrónico debido a tu cuenta en "
+"Está recibiendo este correo electrónico debido a su cuenta en "
 "{website_title}."
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:68
@@ -227,8 +226,8 @@ msgid ""
 "You can change this setting by going to the \"My Spaces\" menu through "
 "this link:"
 msgstr ""
-"Puede cambiar esta configuración accediendo al menú \"Mis espacios\" a "
-"través de este enlace:"
+"Puede cambiar esta configuración accediendo al menú «Mis espacios» a través "
+"de este enlace:"
 
 # | msgid "This email is automatically created, please do not reply."
 #: tracim_backend/templates/mail/content_update_body_html.mak:70
@@ -367,7 +366,7 @@ msgstr ""
 
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:13
 msgid "This file is protected by this password: \"{share_password}\""
-msgstr "Este archivo está protegido por esta contraseña: \"{share_password}\""
+msgstr "Este archivo está protegido por esta contraseña: «{share_password}»"
 
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:7
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:7
@@ -391,9 +390,9 @@ msgid ""
 "This file is protected by a password, please contact me (<a "
 "href=\"mailto:{emitter_email}\">{username}</a>) to get the password."
 msgstr ""
-"Este archivo está protegido por una contraseña, por favor, póngase en "
-"contacto conmigo (<a href=\"mailto:{emitter_email}\">{username}</a>) para"
-" obtener la contraseña."
+"Este archivo está protegido por una contraseña; póngase en contacto conmigo ("
+"<a href=\"mailto:{emitter_email}\">{username}</a>) para obtener la "
+"contraseña."
 
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:19
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:16
@@ -460,8 +459,7 @@ msgid ""
 "This upload is protected by this password: "
 "\"{upload_permission_password}\""
 msgstr ""
-"Esta carga está protegida por esta contraseña: "
-"\"{upload_permission_password}\""
+"Esta carga está protegida por esta contraseña: «{upload_permission_password}»"
 
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:9
 msgid "I invited you to upload files here:"
@@ -476,9 +474,9 @@ msgid ""
 "This upload is protected by a password, please contact me (<a "
 "href=\"mailto:{emitter_email}\">{username}</a>) to get the password."
 msgstr ""
-"Esta carga está protegida por una contraseña, por favor, póngase en "
-"contacto conmigo (<a href=\"mailto:{emitter_email}\">{username}</a>) para"
-" obtener la contraseña."
+"Esta carga está protegida por una contraseña; póngase en contacto conmigo ("
+"<a href=\"mailto:{emitter_email}\">{username}</a>) para obtener la "
+"contraseña."
 
 #~ msgid "Administrator (through {website_title})"
 #~ msgstr "Administrador (de {website_title})"

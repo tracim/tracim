@@ -1,5 +1,5 @@
 {
-  "Delete": "Suprimir",
+  "Delete": "Eliminar",
   "Folder": "Carpeta",
   "Validate and create": "Validar y crear",
   "New folder": "Carpeta nueva",
@@ -14,6 +14,6 @@
   "Error while loading Tracim's content type list": "Error al cargar la lista de tipos de contenido de Tracim",
   "Restore": "Restaurar",
   "Create a folder": "Crear una carpeta",
-  "The link has been copied to clipboard": "Enlace copiado en el portapapeles",
+  "The link has been copied to clipboard": "Se copió el enlace en el portapapeles",
   "Copy content link": "Copiar enlace al contenido"
 }
