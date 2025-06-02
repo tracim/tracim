@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-04-02 19:19+0000\n"
+"PO-Revision-Date: 2025-04-03 07:55+0000\n"
 "Last-Translator: AnsenLIS <as84419595@gmail.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://hosted.weblate.org/"
 "projects/tracim/backend/zh_Hans/>\n"
@@ -26,3 +26,70 @@ msgstr "[{website_title}] 已申请重设密码"
 #: tracim_backend/app_models/contents.py:55
 msgid "Validated"
 msgstr "已编辑"
+
+#: tracim_backend/applications/upload_permissions/application.py:26
+msgid "{emitter_name} invited you to upload files on \"{website_title}\""
+msgstr " {emitter_name} 邀请您在 \"{website_title}\" 上传文件 "
+
+#: tracim_backend/app_models/contents.py:63
+msgid "Cancelled"
+msgstr "已取消"
+
+#: tracim_backend/applications/share/application.py:39
+msgid ""
+"[{website_title}] You shared \"{content_filename}\" with {nb_receivers} "
+"people"
+msgstr "[{website_title}] 您分享了 \"{content_filename}\" 给 {nb_receivers} 个人"
+
+#: tracim_backend/app_models/contents.py:71
+msgid "Deprecated"
+msgstr "已弃用"
+
+#: tracim_backend/applications/upload_permissions/application.py:49
+msgid ""
+"[{website_title}] {uploader_username} shared {nb_uploaded_contents} files"
+" in \"{workspace_name}\""
+msgstr ""
+"[{website_title}] {uploader_username} 分享了 {nb_uploaded_contents} 个文件在 "
+"\"{workspace_name}\""
+
+#: tracim_backend/applications/upload_permissions/lib.py:280
+msgid "Message from {username}: {message}"
+msgstr "来自 {username} 的信息: {message}"
+
+#: tracim_backend/applications/upload_permissions/lib.py:258
+msgid "Files uploaded by {username} on {date} at {time}"
+msgstr "{username} 于 {date} {time} 上传文件"
+
+#: tracim_backend/applications/upload_permissions/lib.py:284
+msgid "Uploaded by {username}."
+msgstr "{username} 上传了文件."
+
+#: tracim_backend/command/periodic.py:66
+msgid "[{website_title}] Your hourly summary"
+msgstr "[{website_title}] 的每小时摘要"
+
+#: tracim_backend/command/periodic.py:68
+msgid "[{website_title}] Your daily summary"
+msgstr "[{website_title}] 的每日摘要"
+
+#: tracim_backend/command/periodic.py:70
+msgid "[{website_title}] Your weekly summary"
+msgstr "[{website_title}] 的每周摘要"
+
+#: tracim_backend/lib/core/content.py:785
+msgid "Space {workspace_name}"
+msgstr "空间 {workspace_name}"
+
+#: tracim_backend/applications/upload_permissions/application.py:37
+msgid ""
+"[{website_title}] You invited {nb_receivers} people to upload files on "
+"\"{workspace_name}\""
+msgstr "[{website_title}] 您邀请了 {nb_receivers} 个人在 \"{workspace_name}\" "
+"中分享文件"
+
+#: tracim_backend/applications/share/application.py:27
+msgid ""
+"[{website_title}] {emitter_name} shared the file \"{content_filename}\" "
+"with you"
+msgstr "[{website_title}] {emitter_name} 分享了 \"{content_filename}\" 给您"
