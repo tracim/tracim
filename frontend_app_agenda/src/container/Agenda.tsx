@@ -19,10 +19,10 @@ import {
   TracimComponent
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
-import { getAgendaList, getPreFilledAgendaEvent } from '../action.async.js'
+import { getAgendaList, getPreFilledAgendaEvent } from '../action.async'
 import CalendarDav from './CalendarDav'
 
-export class Agenda extends React.Component {
+export class Agenda extends React.Component<any, any> {
   constructor (props) {
     super(props)
 
@@ -82,7 +82,6 @@ export class Agenda extends React.Component {
       ? `${props.t('Agenda')} · ${state.content.workspaceLabel}`
       : props.t('My agendas')
     )
-    this.agendaIframe.contentWindow.location.reload()
   }
 
   // TLM Handlers
@@ -148,16 +147,15 @@ export class Agenda extends React.Component {
       if (state.config.appConfig.workspaceId) await this.loadAgendaList(state.config.appConfig.workspaceId)
       await this.loadWorkspaceData()
       this.buildBreadcrumbs()
-      this.agendaIframe.contentWindow.location.reload()
     }
   }
 
   handleClickRefresh = () => {
     this.setState({ showRefreshWarning: false })
-    this.agendaIframe.contentWindow.location.reload()
   }
 
   setHeadTitle = (title) => {
+    //@ts-ignore
     GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.SET_HEAD_TITLE,
       data: { title: title }
@@ -300,9 +298,9 @@ export class Agenda extends React.Component {
     const { props, state } = this
 
     if (!state.isVisible || !state.userWorkspaceListLoaded || !state.preFilledAgendaEvent) return null
-
-    const calendarUrls = state.userWorkspaceList.map(i => i.agenda_url)
-
+    
+    const serverUrl = `${window.location.origin}/dav`
+    
     // INFO - GB - 2019-06-11 - This tag dangerouslySetInnerHTML is needed to i18next be able to handle special characters
     // https://github.com/tracim/tracim/issues/1847
     const pageTitle = state.config.appConfig.workspaceId === null
@@ -341,7 +339,7 @@ export class Agenda extends React.Component {
 
         <PageContent parentClass='agendaPage'>
           <CalendarDav
-            calendarUrls={calendarUrls}
+            serverUrl={serverUrl}
             headers={{
               "withCredentials": '1'
             }}
