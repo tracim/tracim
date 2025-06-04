@@ -2,6 +2,7 @@ import { IcsEvent, NonStandardValuesGeneric } from "ts-ics"
 import { useForm } from "react-hook-form";
 import { isEventAllDay } from "./types";
 import { DAVCalendar } from "tsdav";
+import { tzlib_get_ical_block } from "timezones-ical-library";
 
 export enum ModalMode {
   View,
@@ -11,6 +12,7 @@ export enum ModalMode {
 
 export interface EventModalProps {
   calendars: DAVCalendar[]
+  timezones: string[]
   event: IcsEvent<NonStandardValuesGeneric>
   mode: ModalMode
   onSubmit: (calendarUrl: string, event: IcsEvent<NonStandardValuesGeneric>) => void
@@ -32,17 +34,10 @@ export interface EventFormFields {
   calendar: string
 }
 
-// https://stackoverflow.com/questions/10830357/javascript-toisostring-ignores-timezone-offset
-// function localISOTime(date: IcsDateObject): { date: string, time: string, tzoffset: string } {
-//   if (date.local) 
-//   var tzoffset = d.getTimezoneOffset() * 60000; //offset in milliseconds
-//   return (new Date(d.getTime() - tzoffset)).toISOString().slice(0, -1);
-// }
-
-export default function EventModal({ calendars, mode, event, onSubmit, onCancel }: EventModalProps) {
-  var localStart = event.start.local ?? { date: event.start.date, timezone: "UTC/GMT", tzoffset: "+0000" }
-  var localEnd = event.end.local ?? { date: event.end.date, timezone: "UTC/GMT", tzoffset: "+0000" }
-  const { register, handleSubmit, watch } = useForm<EventFormFields>({
+export default function EventModal({ calendars, timezones, mode, event, onSubmit, onCancel }: EventModalProps) {
+  var localStart = event.start.local ?? { date: event.start.date, timezone: "UTC", tzoffset: "+0000" }
+  var localEnd = event.end.local ?? { date: event.end.date, timezone: "UTC", tzoffset: "+0000" }
+  const { register, handleSubmit, watch, setValue } = useForm<EventFormFields>({
     defaultValues: {
       summary: event.summary,
       description: event.description,
@@ -57,9 +52,25 @@ export default function EventModal({ calendars, mode, event, onSubmit, onCancel 
   });
 
   const allDay = watch("allDay")
+  // const [startOffset, setStartOffset] = useState(localStart.tzoffset)
+  // const [endOffset, setEndOffset] = useState(localEnd.tzoffset)
+  
+  // const [startTimezone, endTimezone] = watch(["startTimezone", "endTimezone"])
+  // // TODO auto change date when timezone changes
+  // useEffect(() => {
+  //   if (timezones.indexOf(startTimezone) == -1) return
+  //   const offset = tzlib_get_offset(startTimezone, localStart.date.toISOString().split("T")[0], localStart.date.toISOString().split("T")[1].slice(0, 5))
+  //   console.log(offset)
+  // }, [startTimezone])
+  
+  // useEffect(() => {
+  //   // TODO auto change date when timezone changes
+  //   if (timezones.indexOf(endTimezone) == -1) return
+  //   const offset = tzlib_get_offset(endTimezone, localEnd.date.toISOString().split("T")[0], localEnd.date.toISOString().split("T")[1].slice(0, 5))
+  //   console.log(offset)
+  // }, [endTimezone])
 
   const onFormSubmit = (data: EventFormFields) => {
-    console.log(data.startDate)
     //@ts-ignore
     onSubmit(data.calendar, {
       ...event,
@@ -68,9 +79,9 @@ export default function EventModal({ calendars, mode, event, onSubmit, onCancel 
         // Does not matter if local is set
         date: new Date(allDay ? data.startDate : `${data.startDate}T${data.startTime}Z`),
         type: data.allDay ? "DATE" : "DATE-TIME",
-        local: data.startTimezone === "UTC/GMT" ? undefined : {
+        local: data.startTimezone === "UTC" ? undefined : {
           date: new Date(allDay ? data.startDate : `${data.startDate}T${data.startTime}Z`),
-          timezone: data.startTimezone,
+          timezone: tzlib_get_ical_block(data.startTimezone)[1].slice(5),
           tzoffset: ""
         }
       },
@@ -78,9 +89,9 @@ export default function EventModal({ calendars, mode, event, onSubmit, onCancel 
         // Does not matter if local is set
         date: new Date(allDay ? data.endDate : `${data.endDate}T${data.endTime}Z`),
         type: data.allDay ? "DATE" : "DATE-TIME",
-        local: data.endTimezone === "UTC/GMT" ? undefined : {
+        local: data.endTimezone === "UTC" ? undefined : {
           date: new Date(allDay ? data.endDate : `${data.endDate}T${data.endTime}Z`),
-          timezone: data.endTimezone,
+          timezone: tzlib_get_ical_block(data.endTimezone)[1].slice(5),
           tzoffset: ""
         }
       },
@@ -90,6 +101,9 @@ export default function EventModal({ calendars, mode, event, onSubmit, onCancel 
 
   return <>
     <form onSubmit={handleSubmit(onFormSubmit)}>
+      <datalist id="timezones">
+        { timezones.map(tz => <option key={tz} value={tz}/>)}
+      </datalist>
       <table>
         <tr>
           <td><label>Calendar:</label></td>
@@ -114,7 +128,7 @@ export default function EventModal({ calendars, mode, event, onSubmit, onCancel 
             <input type="date" {...register("startDate", { required: true })} />
             {!allDay && <>
               <input type="time" {...register("startTime", { required: true })} />
-              <input type="text" {...register("startTimezone", { required: true })} />
+              <input type="text" list="timezones" {...register("startTimezone", { required: true, validate: v => timezones.indexOf(v) != -1})} />
             </>}
           </td>
         </tr>
@@ -124,7 +138,7 @@ export default function EventModal({ calendars, mode, event, onSubmit, onCancel 
             <input type="date" {...register("endDate", { required: true })} />
             {!allDay && <>
               <input type="time" {...register("endTime", { required: true })} />
-              <input type="text" {...register("endTimezone", { required: true })} />
+              <input type="text" list="timezones" {...register("endTimezone", { required: true, validate: v => timezones.indexOf(v) != -1 })} />
             </>}
           </td>
         </tr>

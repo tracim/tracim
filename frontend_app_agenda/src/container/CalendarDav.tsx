@@ -11,11 +11,12 @@ import parse from 'date-fns/parse'
 import startOfWeek from 'date-fns/startOfWeek'
 import getDay from 'date-fns/getDay'
 import enUS from 'date-fns/locale/en-US'
-import { convertIcsCalendar, generateIcsCalendar, IcsCalendar, IcsDateObject, IcsEvent } from "ts-ics"
+import { convertIcsCalendar, convertIcsTimezone, generateIcsCalendar, IcsCalendar, IcsDateObject, IcsEvent } from "ts-ics"
 import Popup from "./Popup"
 import { CalendarEvent, CalendarObject, isEventAllDay } from "./types"
 import EventModal, { ModalMode } from "./EventModal"
 import { addMilliseconds } from "date-fns"
+import { tzlib_get_ical_block, tzlib_get_timezones } from "timezones-ical-library"
 
 export interface CalendarDavProps {
   serverUrl?: string,
@@ -71,6 +72,8 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
   const [modalOpen, setModalOpen] = useState<boolean>(false)
   const [modalMode, setModalMode] = useState<ModalMode>(ModalMode.View)
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent>(null)
+  //@ts-ignore
+  const timezones: string[] = useMemo(() => tzlib_get_timezones(), [])
 
   useEffect(() => {
     if (!!calendarUrls) {
@@ -137,11 +140,36 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
     updateEvent(event)
   }
 
+  const validateTimezones = (calendar: IcsCalendar) => {
+    console.log(calendar.events)
+    const wantedTzids = new Set(calendar.events.flatMap(e => [e.start.local?.timezone, e.end.local?.timezone]).flat().filter(s => !!s))
+    
+    if (calendar.timezones == undefined) {
+      if (wantedTzids.size === 0) return calendar
+      calendar.timezones = []
+    }
+    // Remove extra timezones
+    calendar.timezones = calendar.timezones.filter(tz => wantedTzids.has(tz.id))
+    
+    // Add missing timezones
+    wantedTzids.forEach(tzid => {
+      console.log(tzlib_get_ical_block(tzid))
+      if (calendar.timezones.findIndex(t => t.id === tzid) === -1) {
+        //@ts-ignore
+        calendar.timezones.push(convertIcsTimezone(undefined, tzlib_get_ical_block(tzid)[0]))
+      }
+    })
+    console.log(wantedTzids)
+    console.log(calendar.timezones)
+    return calendar
+  }
+
   // TODO change event to another calendar
   const updateEvent: (event: CalendarEvent) => void = useCallback(event => {
     const calendarObject = davCalendarsObjects.find(o => o.url === event.objectUrl)
     const icsCalendar = convertIcsCalendar(undefined, calendarObject.data)
     icsCalendar.events[event.index] = { ...event.event }
+    validateTimezones(icsCalendar)
     var newCalendarObject = { ...calendarObject, data: generateIcsCalendar(icsCalendar) }
     console.log(newCalendarObject.data)
     updateCalendarObject({ calendarObject: newCalendarObject, headers, fetchOptions })
@@ -160,6 +188,7 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
       version: '2.0',
       events: [event.event],
     }
+    validateTimezones(icsCalendar)
     const data = generateIcsCalendar(icsCalendar)
     createCalendarObject({
       calendar,
@@ -226,6 +255,7 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
     {selectedEvent && <Popup isOpen={modalOpen} onClosePopup={() => setModalOpen(false)}>
       <EventModal
         calendars={davCalendars}
+        timezones={timezones}
         mode={modalMode}
         event={selectedEvent.event}
         onSubmit={onEventSubmited}
