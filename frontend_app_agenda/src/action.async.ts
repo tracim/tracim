@@ -1,6 +1,6 @@
 import { baseFetch } from 'tracim_frontend_lib'
 
-export const getAgendaList = (apiUrl, workspaceId = null) => {
+export function getAgendaList(apiUrl: string, workspaceId?: number): any {
   const param = workspaceId
     ? `?workspace_ids=${workspaceId}`
     : ''
@@ -8,6 +8,6 @@ export const getAgendaList = (apiUrl, workspaceId = null) => {
   return baseFetch('GET', `${apiUrl}/users/me/agenda${param}`)
 }
 
-export const getPreFilledAgendaEvent = (apiUrl) => {
+export function getPreFilledAgendaEvent(apiUrl?: string): any {
   return baseFetch('GET', `${apiUrl}/system/pre-filled-agenda-event`)
 }

@@ -13,7 +13,10 @@ const appInterface = {
 
     return ReactDOM.render(
       <Router history={data.config.history}>
-        <Agenda data={data} />
+        <Agenda
+          //@ts-ignore
+          data={data}
+        />
       </Router>,
       document.getElementById(data.config.domContainer)
     )

@@ -16,7 +16,10 @@ manager.openLiveMessageConnection(debug.loggedUser.userId, debug.config.apiUrl)
 
 ReactDOM.render(
   <Router history={history}>
-    <Agenda data={undefined} />
+    <Agenda
+      //@ts-ignore
+      data={undefined}
+    />
   </Router>
   , document.getElementById('content')
 )
