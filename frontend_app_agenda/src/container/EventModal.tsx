@@ -1,7 +1,7 @@
-import { IcsDateObject, IcsEvent, NonStandardValuesGeneric } from "ts-ics"
+import { IcsEvent, NonStandardValuesGeneric } from "ts-ics"
 import { useForm } from "react-hook-form";
-import { useEffect, useMemo } from "react";
 import { isEventAllDay } from "./types";
+import { DAVCalendar } from "tsdav";
 
 export enum ModalMode {
   View,
@@ -10,9 +10,10 @@ export enum ModalMode {
 }
 
 export interface EventModalProps {
+  calendars: DAVCalendar[]
   event: IcsEvent<NonStandardValuesGeneric>
   mode: ModalMode
-  onSubmit: (event: IcsEvent<NonStandardValuesGeneric>) => void
+  onSubmit: (calendarUrl: string, event: IcsEvent<NonStandardValuesGeneric>) => void
   onCancel: () => void
 }
 
@@ -28,6 +29,7 @@ export interface EventFormFields {
   endTime: string
   endTimezone: string
   allDay?: boolean
+  calendar: string
 }
 
 // https://stackoverflow.com/questions/10830357/javascript-toisostring-ignores-timezone-offset
@@ -37,9 +39,9 @@ export interface EventFormFields {
 //   return (new Date(d.getTime() - tzoffset)).toISOString().slice(0, -1);
 // }
 
-export default function EventModal({ mode, event, onSubmit, onCancel }: EventModalProps) {
-  var localStart = event.start.local ?? {date: event.start.date, timezone: "UTC/GMT", tzoffset: "+0000" }
-  var localEnd = event.end.local ?? {date: event.end.date, timezone: "UTC/GMT", tzoffset: "+0000" }
+export default function EventModal({ calendars, mode, event, onSubmit, onCancel }: EventModalProps) {
+  var localStart = event.start.local ?? { date: event.start.date, timezone: "UTC/GMT", tzoffset: "+0000" }
+  var localEnd = event.end.local ?? { date: event.end.date, timezone: "UTC/GMT", tzoffset: "+0000" }
   const { register, handleSubmit, watch } = useForm<EventFormFields>({
     defaultValues: {
       summary: event.summary,
@@ -59,7 +61,7 @@ export default function EventModal({ mode, event, onSubmit, onCancel }: EventMod
   const onFormSubmit = (data: EventFormFields) => {
     console.log(data.startDate)
     //@ts-ignore
-    onSubmit({
+    onSubmit(data.calendar, {
       ...event,
       summary: data.summary,
       start: {
@@ -90,6 +92,15 @@ export default function EventModal({ mode, event, onSubmit, onCancel }: EventMod
     <form onSubmit={handleSubmit(onFormSubmit)}>
       <table>
         <tr>
+          <td><label>Calendar:</label></td>
+          <td>
+            <select {...register("calendar", { required: true })}>
+              <option value={""}>-- Choose a calendar--</option>
+              {calendars.map(c => <option value={c.url} key={c.url}>{c.displayName}</option>)}
+            </select>
+          </td>
+        </tr>
+        <tr>
           <td><label>Title:</label></td>
           <td><input type="text" {...register("summary", { required: true })} /></td>
         </tr>
@@ -119,7 +130,7 @@ export default function EventModal({ mode, event, onSubmit, onCancel }: EventMod
         </tr>
         <tr>
           <td><label>Description:</label></td>
-          <td><input type="text" {...register("description", { required: true })} /></td>
+          <td><input type="text" {...register("description")} /></td>
         </tr>
       </table>
       <div>

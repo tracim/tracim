@@ -5,10 +5,11 @@ export interface CalendarObject extends DAVCalendarObject {
   calendarUrl: string
 }
 
-export type CalendarEvent = IcsEvent<NonStandardValuesGeneric> & {
+export type CalendarEvent = {
   objectUrl: string
   index: number
   color: string
+  event: IcsEvent<NonStandardValuesGeneric>
 }
 
 export function isEventAllDay(event: IcsEvent) {

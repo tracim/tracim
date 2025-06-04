@@ -11,7 +11,7 @@ import parse from 'date-fns/parse'
 import startOfWeek from 'date-fns/startOfWeek'
 import getDay from 'date-fns/getDay'
 import enUS from 'date-fns/locale/en-US'
-import { convertIcsCalendar, generateIcsCalendar, IcsCalendar, IcsDateObject, IcsEvent, NonStandardValuesGeneric } from "ts-ics"
+import { convertIcsCalendar, generateIcsCalendar, IcsCalendar, IcsDateObject, IcsEvent } from "ts-ics"
 import Popup from "./Popup"
 import { CalendarEvent, CalendarObject, isEventAllDay } from "./types"
 import EventModal, { ModalMode } from "./EventModal"
@@ -70,7 +70,7 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
 
   const [modalOpen, setModalOpen] = useState<boolean>(false)
   const [modalMode, setModalMode] = useState<ModalMode>(ModalMode.View)
-  const [selectedEvent, setSelectedEvent] = useState<IcsEvent<NonStandardValuesGeneric> | null>(null)
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent>(null)
 
   useEffect(() => {
     if (!!calendarUrls) {
@@ -104,7 +104,7 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
       for (let i = 0; i < icsCalendar.events.length; i++) {
         const event = icsCalendar.events[i]
         allEvents.push({
-          ...event,
+          event,
           color: calendar.calendarColor,
           index: i,
           objectUrl: object.url,
@@ -128,19 +128,20 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
 
   // BUG timezones
   const onChangeDates: NonNullable<withDragAndDropProps<CalendarEvent>['onEventResize']> = ({ event, start, end }) => {
-    var startDelta = new Date(start).getTime() - event.start.date.getTime()
-    event.start.date = addMilliseconds(event.start.date, startDelta)
-    if (event.start.local) event.start.local.date = addMilliseconds(event.start.local.date, startDelta)
-    var endDelta = new Date(end).getTime() - event.end.date.getTime()
-    event.end.date = addMilliseconds(event.end.date, endDelta)
-    if (event.end.local) event.end.local.date = addMilliseconds(event.end.local.date, endDelta)
+    var startDelta = new Date(start).getTime() - event.event.start.date.getTime()
+    event.event.start.date = addMilliseconds(event.event.start.date, startDelta)
+    if (event.event.start.local) event.event.start.local.date = addMilliseconds(event.event.start.local.date, startDelta)
+    var endDelta = new Date(end).getTime() - event.event.end.date.getTime()
+    event.event.end.date = addMilliseconds(event.event.end.date, endDelta)
+    if (event.event.end.local) event.event.end.local.date = addMilliseconds(event.event.end.local.date, endDelta)
     updateEvent(event)
   }
 
+  // TODO change event to another calendar
   const updateEvent: (event: CalendarEvent) => void = useCallback(event => {
     const calendarObject = davCalendarsObjects.find(o => o.url === event.objectUrl)
     const icsCalendar = convertIcsCalendar(undefined, calendarObject.data)
-    icsCalendar.events[event.index] = { ...event }
+    icsCalendar.events[event.index] = { ...event.event }
     var newCalendarObject = { ...calendarObject, data: generateIcsCalendar(icsCalendar) }
     console.log(newCalendarObject.data)
     updateCalendarObject({ calendarObject: newCalendarObject, headers, fetchOptions })
@@ -151,16 +152,15 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
       })
   }, [davCalendarsObjects, headers, fetchOptions])
 
-  const createEvent: (event: CalendarEvent) => void = useCallback(event => {
-    const cIndex = 0 // TODO
+  const createEvent = useCallback((calendarUrl: string, event: CalendarEvent) => {
+    const calendar = davCalendars.find(c => c.url === calendarUrl)
     const uid = crypto.randomUUID()
     const icsCalendar: IcsCalendar = {
       prodId: '-//algoo.fr//NONSGML Tracim//EN',
       version: '2.0',
-      events: [event],
+      events: [event.event],
     }
     const data = generateIcsCalendar(icsCalendar)
-    const calendar = davCalendars[cIndex]
     createCalendarObject({
       calendar,
       iCalString: data,
@@ -185,30 +185,33 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
 
   const onSelectSlot: NonNullable<CalendarProps<CalendarEvent>['onSelectSlot']> = useCallback(({ start, end }) => {
     setSelectedEvent({
-      summary: "",
-      start: {
-        date: start,
-        type: "DATE-TIME"
+      event: {
+        summary: "",
+        start: {
+          date: start,
+          type: "DATE-TIME"
+        },
+        end: {
+          date: end,
+          type: "DATE-TIME"
+        },
+        uid: crypto.randomUUID(),
+        stamp: { date: new Date(), type: "DATE-TIME" },
       },
-      end: {
-        date: end,
-        type: "DATE-TIME"
-      },
-      uid: crypto.randomUUID(),
-      stamp: { date: new Date(), type: "DATE-TIME" },
+      color: "",
+      index: 0,
+      objectUrl: ""
     })
     setModalMode(ModalMode.Create)
     setModalOpen(true)
   }, [davCalendars, davCalendarsObjects, headers, fetchOptions])
 
-  const onEventSubmited = (event: IcsEvent) => {
+  const onEventSubmited = (calendarUrl: string, event: IcsEvent) => {
     if (modalMode === ModalMode.Create) {
-      //@ts-ignore
-      createEvent({ ...selectedEvent, ...event })
+      createEvent(calendarUrl, { ...selectedEvent, event })
       setModalOpen(false)
     } else if (modalMode === ModalMode.Edit) {
-      //@ts-ignore
-      updateEvent({...selectedEvent, ...event})
+      updateEvent({ ...selectedEvent, event })
       setModalOpen(false)
     }
   }
@@ -222,8 +225,9 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
   return (<>
     {selectedEvent && <Popup isOpen={modalOpen} onClosePopup={() => setModalOpen(false)}>
       <EventModal
+        calendars={davCalendars}
         mode={modalMode}
-        event={selectedEvent}
+        event={selectedEvent.event}
         onSubmit={onEventSubmited}
         onCancel={() => setModalOpen(false)}
       />
@@ -248,11 +252,11 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
       dayLayoutAlgorithm={'no-overlap'}
 
       //@ts-ignore
-      titleAccessor={e => (<><h1>{e.summary}</h1><br />{e.description}</>)}
-      allDayAccessor={e => isEventAllDay(e)}
-      startAccessor={e => icsDateToDate(e.start)}
-      endAccessor={e => icsDateToDate(e.end, true)} // BUG extra day with all day and extra time slot if end of day
-      tooltipAccessor={e => e.description}
+      titleAccessor={e => (<><h1>{e.event.summary}</h1><br />{e.event.description}</>)}
+      allDayAccessor={e => isEventAllDay(e.event)}
+      startAccessor={e => icsDateToDate(e.event.start)}
+      endAccessor={e => icsDateToDate(e.event.end, true)} // BUG extra day with all day and extra time slot if end of day
+      tooltipAccessor={e => e.event.description}
     />
   </>)
 }
