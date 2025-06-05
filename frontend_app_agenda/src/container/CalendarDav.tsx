@@ -97,6 +97,13 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
     var promises = davCalendars.map(c => fetchCalendarObjects({ calendar: c, headers, fetchOptions }))
     Promise.all(promises).then(cos => setCalendarsObjects(cos.map((co, i) => co.map(c => ({ ...c, calendarUrl: davCalendars[i].url }))).flat()))
   }, [davCalendars, headers, fetchOptions])
+  
+  const fetchEvents = useCallback(() => {
+    var promises = davCalendars.map(c => fetchCalendarObjects({ calendar: c, headers, fetchOptions }))
+    Promise.all(promises).then(cos => setCalendarsObjects(cos.map((co, i) => co.map(c => ({ ...c, calendarUrl: davCalendars[i].url }))).flat()))
+  }, [davCalendars, headers, fetchOptions])
+
+  useEffect(() => fetchEvents(), [fetchEvents])
 
   const events = useMemo<CalendarEvent[]>(() => {
     let allEvents: CalendarEvent[] = []
@@ -247,6 +254,7 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
     setModalOpen(true)
   }
   return (<>
+    <button onClick={() => fetchEvents()}>Refresh events</button>
     {selectedEvent && <Popup isOpen={modalOpen} onClosePopup={() => setModalOpen(false)}>
       <EventModal
         calendars={davCalendars}
