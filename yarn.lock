@@ -13036,6 +13036,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"timezones-ical-library@npm:^1.10.0":
+  version: 1.10.0
+  resolution: "timezones-ical-library@npm:1.10.0"
+  checksum: 89b208618b315c768adc452ebb427a77e8172006c1aab210ffc1c924117ffc3eb17a617e3652600dff13ebb6b0cb1d96bf1eb4dd97dfd375e0e3ae0c9e87447b
+  languageName: node
+  linkType: hard
+
 "tiny-invariant@npm:^1.0.2, tiny-invariant@npm:^1.0.6":
   version: 1.3.1
   resolution: "tiny-invariant@npm:1.3.1"
@@ -13374,6 +13381,7 @@ __metadata:
     style-loader: ^0.23.1
     stylus: ^0.54.5
     stylus-native-loader: ^1.1.0
+    timezones-ical-library: ^1.10.0
     tracim_frontend_lib: ^1.1.9
     ts-ics: ^2.1.2
     ts-loader: ^9.5.2
@@ -14153,11 +14161,11 @@ __metadata:
   linkType: hard
 
 "ts-ics@npm:^2.1.2":
-  version: 2.1.3
-  resolution: "ts-ics@npm:2.1.3"
+  version: 2.1.6
+  resolution: "ts-ics@npm:2.1.6"
   dependencies:
     "@standard-schema/spec": ^1.0.0
-  checksum: d8d053dd6142789cd0485328638bf92c3df27d73342d8f86dc93b6d0b8621cd5bfa51470c9b54b82b3139b3ec058ca11859f5cacc05217ac547f4e01d9de5aab
+  checksum: 831e9c7605f26ae8ab73b637ef0c67637de7a93f0c4a005249240f09f17156f34fe97e31b9f66e3f487780cf6d1f503e4fcc927609b44a1752bd16517d64daef
   languageName: node
   linkType: hard
 

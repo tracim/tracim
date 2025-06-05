@@ -2,7 +2,7 @@ import { IcsEvent, NonStandardValuesGeneric } from "ts-ics"
 import { useForm } from "react-hook-form";
 import { isEventAllDay } from "./types";
 import { DAVCalendar } from "tsdav";
-import { tzlib_get_ical_block } from "timezones-ical-library";
+import { tzlib_get_ical_block, tzlib_get_offset } from "timezones-ical-library";
 
 export enum ModalMode {
   View,
@@ -69,30 +69,32 @@ export default function EventModal({ calendars, timezones, mode, event, onSubmit
   //   const offset = tzlib_get_offset(endTimezone, localEnd.date.toISOString().split("T")[0], localEnd.date.toISOString().split("T")[1].slice(0, 5))
   //   console.log(offset)
   // }, [endTimezone])
-
+  
   const onFormSubmit = (data: EventFormFields) => {
+    var startOffset = tzlib_get_offset(data.startTimezone, data.startDate, data.startTime) 
+    var endOffset = tzlib_get_offset(data.endTimezone, data.endDate, data.endTime) 
     //@ts-ignore
     onSubmit(data.calendar, {
       ...event,
       summary: data.summary,
       start: {
         // Does not matter if local is set
-        date: new Date(allDay ? data.startDate : `${data.startDate}T${data.startTime}Z`),
+        date: new Date(allDay ? data.startDate : `${data.startDate}T${data.startTime}${startOffset}`),
         type: data.allDay ? "DATE" : "DATE-TIME",
         local: data.startTimezone === "UTC" ? undefined : {
           date: new Date(allDay ? data.startDate : `${data.startDate}T${data.startTime}Z`),
           timezone: tzlib_get_ical_block(data.startTimezone)[1].slice(5),
-          tzoffset: ""
+          tzoffset: startOffset
         }
       },
       end: {
         // Does not matter if local is set
-        date: new Date(allDay ? data.endDate : `${data.endDate}T${data.endTime}Z`),
+        date: new Date(allDay ? data.endDate : `${data.endDate}T${data.endTime}${endOffset}`),
         type: data.allDay ? "DATE" : "DATE-TIME",
         local: data.endTimezone === "UTC" ? undefined : {
           date: new Date(allDay ? data.endDate : `${data.endDate}T${data.endTime}Z`),
           timezone: tzlib_get_ical_block(data.endTimezone)[1].slice(5),
-          tzoffset: ""
+          tzoffset: endOffset
         }
       },
       description: data.description,

@@ -30,6 +30,7 @@
     "react-router-dom": "^5.2.0",
     "regenerator-runtime": "^0.13.2",
     "stream-browserify": "^3.0.0",
+    "timezones-ical-library": "^1.10.0",
     "tracim_frontend_lib": "^1.1.9",
     "ts-ics": "^2.1.2",
     "tsdav": "^2.1.4",
