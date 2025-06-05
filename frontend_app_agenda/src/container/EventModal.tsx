@@ -24,8 +24,7 @@ type IcsAttendeeRoleTypes = typeof attendeeRoleTypes;
 
 export interface EventFormFields {
   summary: string
-  // TODO rich text
-  // TODO event going the the end of the day (->00:00 displaying 00:30 and wholeday displaying day+1)
+  // TODO allow rich text edit
   description: string
   startDate: string
   startTime: string
@@ -45,6 +44,9 @@ export interface EventFormFields {
     name?: string
     role: IcsAttendeeRoleTypes[number] | string
   }[]
+  attachments: {
+    uri: string
+  }[]
 }
 
 export default function EventModal({ calendars, timezones, mode, event, onSubmit, onCancel }: EventModalProps) {
@@ -62,10 +64,12 @@ export default function EventModal({ calendars, timezones, mode, event, onSubmit
       endTime: localEnd.date.toISOString().split("T")[1].slice(0, 5),
       endTimezone: localEnd.timezone,
       organizer: event.organizer,
-      attendees: event.attendees
+      attendees: event.attendees,
+      attachments: [{ uri: event.attach }]
     },
   });
-  const { fields: attendeesFields, append, remove } = useFieldArray({ control, name: "attendees" })
+  const { fields: attendeesFields, append: appendAttendee, remove: removeAttendee } = useFieldArray({ control, name: "attendees" })
+  const { fields: attachmentsFields, append: appendAttachment, remove: removeAttachment } = useFieldArray({ control, name: "attachments" })
 
   const allDay = watch("allDay")
   const attendees = watch("attendees")
@@ -117,7 +121,8 @@ export default function EventModal({ calendars, timezones, mode, event, onSubmit
       },
       description: data.description,
       organizer: data.attendees.length === 0 ? undefined : { ...data.organizer },
-      attendees: data.attendees.length === 0 ? undefined : data.attendees.map(a => ({ ...a }))
+      attendees: data.attendees.length === 0 ? undefined : data.attendees.map(a => ({ ...a })),
+      attach: data.attachments.length === 0 ? undefined : data.attachments[0].uri, // BUG ts-ics currently does not allow multiple attach
     })
   };
 
@@ -181,17 +186,28 @@ export default function EventModal({ calendars, timezones, mode, event, onSubmit
                 <td><select name="role" {...register(`attendees.${index}.role`)}>
                   {attendeeRoleTypes.map(a => <option key={a} value={a}>{a}</option>)}
                 </select></td>
-                <td><button onClick={() => remove(index)}>X</button></td>
+                <td><button onClick={() => removeAttendee(index)}>X</button></td>
                 <td>{f.partstat}</td>
               </tr>)}
-              <tr><td><button onClick={() => append({ email: "", role: "REQ-PARTICIPANT", partstat: "NEEDS-ACTION" })}>Add attendee</button></td></tr>
+              <tr><td><button onClick={() => appendAttendee({ email: "", role: "REQ-PARTICIPANT", partstat: "NEEDS-ACTION" })}>Add attendee</button></td></tr>
             </table>
           </td>
-
+        </tr>
+        <tr>
+          <td><label>Attachments:</label></td>
+          <td>
+            <table>
+              {attachmentsFields.map((f, index) => <tr key={f.id}>
+                <td><input type="text" placeholder="uri" {...register(`attachments.${index}.uri`, { required: true })} /></td>
+                <td><button onClick={() => removeAttachment(index)}>X</button></td>
+              </tr>)}
+              <tr><td><button onClick={() => appendAttachment({ uri: "" })}>Add attachment</button></td></tr>
+            </table>
+          </td>
         </tr>
         <tr>
           <td><label>Description:</label></td>
-          <td><input type="text" {...register("description")} /></td>
+          <td><textarea {...register("description")}></textarea></td>
         </tr>
       </table>
       <div>

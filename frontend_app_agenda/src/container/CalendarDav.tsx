@@ -279,8 +279,12 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
       //@ts-ignore
       titleAccessor={e => <>
         <div>
-          <h1>{e.event.summary}</h1><br />
-          {e.event.description && <>{e.event.description}<br /></>}
+          <h1>{e.event.summary}</h1>
+          {e.event.description && <>{
+            e.event.descriptionAltRep?.startsWith("data:text/html,")?
+              <div dangerouslySetInnerHTML={{__html: decodeURIComponent(e.event.descriptionAltRep.slice(15))}}></div> :
+              e.event.description
+          }<br /></>}
         </div>
         {e.event.organizer && e.event.attendees && <div>
           Organizer: {e.event.organizer.name ?? e.event.organizer.email}<br />
