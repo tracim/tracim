@@ -24,6 +24,7 @@ type IcsAttendeeRoleTypes = typeof attendeeRoleTypes;
 
 export interface EventFormFields {
   summary: string
+  location: string
   // TODO allow rich text edit
   description: string
   startDate: string
@@ -55,6 +56,7 @@ export default function EventModal({ calendars, timezones, mode, event, onSubmit
   const { register, handleSubmit, watch, control } = useForm<EventFormFields>({
     defaultValues: {
       summary: event.summary,
+      location: event.location,
       description: event.description,
       allDay: isEventAllDay(event),
       startDate: localStart.date.toISOString().split("T")[0],
@@ -65,7 +67,7 @@ export default function EventModal({ calendars, timezones, mode, event, onSubmit
       endTimezone: localEnd.timezone,
       organizer: event.organizer,
       attendees: event.attendees,
-      attachments: [{ uri: event.attach }]
+      attachments: event.attach && [{ uri: event.attach }]
     },
   });
   const { fields: attendeesFields, append: appendAttendee, remove: removeAttendee } = useFieldArray({ control, name: "attendees" })
@@ -99,6 +101,7 @@ export default function EventModal({ calendars, timezones, mode, event, onSubmit
     onSubmit(data.calendar, {
       ...event,
       summary: data.summary,
+      location: !data.location ? undefined : data.location,
       start: {
         // Does not matter if local is set
         date: new Date(allDay ? data.startDate : `${data.startDate}T${data.startTime}${startOffset}`),
@@ -144,6 +147,10 @@ export default function EventModal({ calendars, timezones, mode, event, onSubmit
         <tr>
           <td><label>Title:</label></td>
           <td><input type="text" {...register("summary", { required: true })} /></td>
+        </tr>
+        <tr>
+          <td><label>Location:</label></td>
+          <td><input type="text" {...register("location")} /></td>
         </tr>
         <tr>
           <td><label>All day:</label></td>
