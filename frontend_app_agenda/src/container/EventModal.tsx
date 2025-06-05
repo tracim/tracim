@@ -1,5 +1,5 @@
-import { IcsEvent, NonStandardValuesGeneric } from "ts-ics"
-import { useForm } from "react-hook-form";
+import { IcsAttendeePartStatusType, IcsEvent, NonStandardValuesGeneric } from "ts-ics"
+import { useFieldArray, useForm } from "react-hook-form";
 import { isEventAllDay } from "./types";
 import { DAVCalendar } from "tsdav";
 import { tzlib_get_ical_block, tzlib_get_offset } from "timezones-ical-library";
@@ -19,6 +19,9 @@ export interface EventModalProps {
   onCancel: () => void
 }
 
+const attendeeRoleTypes = ["CHAIR", "REQ-PARTICIPANT", "OPT-PARTICIPANT", "NON-PARTICIPANT"];
+type IcsAttendeeRoleTypes = typeof attendeeRoleTypes;
+
 export interface EventFormFields {
   summary: string
   // TODO rich text
@@ -32,12 +35,22 @@ export interface EventFormFields {
   endTimezone: string
   allDay?: boolean
   calendar: string
+  organizer: {
+    name?: string;
+    email: string;
+  }
+  attendees: {
+    partstat: IcsAttendeePartStatusType
+    email: string
+    name?: string
+    role: IcsAttendeeRoleTypes[number] | string
+  }[]
 }
 
 export default function EventModal({ calendars, timezones, mode, event, onSubmit, onCancel }: EventModalProps) {
   var localStart = event.start.local ?? { date: event.start.date, timezone: "UTC", tzoffset: "+0000" }
   var localEnd = event.end.local ?? { date: event.end.date, timezone: "UTC", tzoffset: "+0000" }
-  const { register, handleSubmit, watch, setValue } = useForm<EventFormFields>({
+  const { register, handleSubmit, watch, control } = useForm<EventFormFields>({
     defaultValues: {
       summary: event.summary,
       description: event.description,
@@ -48,13 +61,18 @@ export default function EventModal({ calendars, timezones, mode, event, onSubmit
       endDate: localEnd.date.toISOString().split("T")[0],
       endTime: localEnd.date.toISOString().split("T")[1].slice(0, 5),
       endTimezone: localEnd.timezone,
+      organizer: event.organizer,
+      attendees: event.attendees
     },
   });
+  const { fields: attendeesFields, append, remove } = useFieldArray({ control, name: "attendees" })
 
   const allDay = watch("allDay")
+  const attendees = watch("attendees")
+  const organizerName = watch("organizer.name")
   // const [startOffset, setStartOffset] = useState(localStart.tzoffset)
   // const [endOffset, setEndOffset] = useState(localEnd.tzoffset)
-  
+
   // const [startTimezone, endTimezone] = watch(["startTimezone", "endTimezone"])
   // // TODO auto change date when timezone changes
   // useEffect(() => {
@@ -62,17 +80,17 @@ export default function EventModal({ calendars, timezones, mode, event, onSubmit
   //   const offset = tzlib_get_offset(startTimezone, localStart.date.toISOString().split("T")[0], localStart.date.toISOString().split("T")[1].slice(0, 5))
   //   console.log(offset)
   // }, [startTimezone])
-  
+
   // useEffect(() => {
   //   // TODO auto change date when timezone changes
   //   if (timezones.indexOf(endTimezone) == -1) return
   //   const offset = tzlib_get_offset(endTimezone, localEnd.date.toISOString().split("T")[0], localEnd.date.toISOString().split("T")[1].slice(0, 5))
   //   console.log(offset)
   // }, [endTimezone])
-  
+
   const onFormSubmit = (data: EventFormFields) => {
-    var startOffset = tzlib_get_offset(data.startTimezone, data.startDate, data.startTime) 
-    var endOffset = tzlib_get_offset(data.endTimezone, data.endDate, data.endTime) 
+    var startOffset = tzlib_get_offset(data.startTimezone, data.startDate, data.startTime)
+    var endOffset = tzlib_get_offset(data.endTimezone, data.endDate, data.endTime)
     //@ts-ignore
     onSubmit(data.calendar, {
       ...event,
@@ -98,13 +116,15 @@ export default function EventModal({ calendars, timezones, mode, event, onSubmit
         }
       },
       description: data.description,
+      organizer: data.attendees.length === 0 ? undefined : { ...data.organizer },
+      attendees: data.attendees.length === 0 ? undefined : data.attendees.map(a => ({ ...a }))
     })
   };
 
   return <>
     <form onSubmit={handleSubmit(onFormSubmit)}>
       <datalist id="timezones">
-        { timezones.map(tz => <option key={tz} value={tz}/>)}
+        {timezones.map(tz => <option key={tz} value={tz} />)}
       </datalist>
       <table>
         <tr>
@@ -130,7 +150,7 @@ export default function EventModal({ calendars, timezones, mode, event, onSubmit
             <input type="date" {...register("startDate", { required: true })} />
             {!allDay && <>
               <input type="time" {...register("startTime", { required: true })} />
-              <input type="text" list="timezones" {...register("startTimezone", { required: true, validate: v => timezones.indexOf(v) != -1})} />
+              <input type="text" list="timezones" {...register("startTimezone", { required: true, validate: v => timezones.indexOf(v) != -1 })} />
             </>}
           </td>
         </tr>
@@ -143,6 +163,31 @@ export default function EventModal({ calendars, timezones, mode, event, onSubmit
               <input type="text" list="timezones" {...register("endTimezone", { required: true, validate: v => timezones.indexOf(v) != -1 })} />
             </>}
           </td>
+        </tr>
+        <tr>
+          <td><label>Organizer:</label></td>
+          <td>
+            <input type="text" placeholder="email" {...register(`organizer.email`, { validate: v => attendees.length !== 0 && !v ? "must be set because attendees" : organizerName && !v ? "because name is set" : true })} />
+            <input type="text" placeholder="name" {...register(`organizer.name`, { validate: v => attendees.length === 0 ? true : "must be set because attendees" })} />
+          </td>
+        </tr>
+        <tr>
+          <td><label>Attendees:</label></td>
+          <td>
+            <table>
+              {attendeesFields.map((f, index) => <tr key={f.id}>
+                <td><input type="text" placeholder="email" {...register(`attendees.${index}.email`, { required: true })} /></td>
+                <td><input type="text" placeholder="name" {...register(`attendees.${index}.name`)} /></td>
+                <td><select name="role" {...register(`attendees.${index}.role`)}>
+                  {attendeeRoleTypes.map(a => <option key={a} value={a}>{a}</option>)}
+                </select></td>
+                <td><button onClick={() => remove(index)}>X</button></td>
+                <td>{f.partstat}</td>
+              </tr>)}
+              <tr><td><button onClick={() => append({ email: "", role: "REQ-PARTICIPANT", partstat: "NEEDS-ACTION" })}>Add attendee</button></td></tr>
+            </table>
+          </td>
+
         </tr>
         <tr>
           <td><label>Description:</label></td>

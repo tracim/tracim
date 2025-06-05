@@ -141,26 +141,22 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
   }
 
   const validateTimezones = (calendar: IcsCalendar) => {
-    console.log(calendar.events)
     const wantedTzids = new Set(calendar.events.flatMap(e => [e.start.local?.timezone, e.end.local?.timezone]).flat().filter(s => !!s))
-    
+
     if (calendar.timezones == undefined) {
       if (wantedTzids.size === 0) return calendar
       calendar.timezones = []
     }
     // Remove extra timezones
     calendar.timezones = calendar.timezones.filter(tz => wantedTzids.has(tz.id))
-    
+
     // Add missing timezones
     wantedTzids.forEach(tzid => {
-      console.log(tzlib_get_ical_block(tzid))
       if (calendar.timezones.findIndex(t => t.id === tzid) === -1) {
         //@ts-ignore
         calendar.timezones.push(convertIcsTimezone(undefined, tzlib_get_ical_block(tzid)[0]))
       }
     })
-    console.log(wantedTzids)
-    console.log(calendar.timezones)
     return calendar
   }
 
@@ -171,7 +167,6 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
     icsCalendar.events[event.index] = { ...event.event }
     validateTimezones(icsCalendar)
     var newCalendarObject = { ...calendarObject, data: generateIcsCalendar(icsCalendar) }
-    console.log(newCalendarObject.data)
     updateCalendarObject({ calendarObject: newCalendarObject, headers, fetchOptions })
       .then(r => {
         if (!r.ok) throw "something went wrong"
@@ -282,7 +277,16 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
       dayLayoutAlgorithm={'no-overlap'}
 
       //@ts-ignore
-      titleAccessor={e => (<><h1>{e.event.summary}</h1><br />{e.event.description}</>)}
+      titleAccessor={e => <>
+        <div>
+          <h1>{e.event.summary}</h1><br />
+          {e.event.description && <>{e.event.description}<br /></>}
+        </div>
+        {e.event.organizer && e.event.attendees && <div>
+          Organizer: {e.event.organizer.name ?? e.event.organizer.email}<br />
+          Attendees: {e.event.attendees.map((a, i) => <span key={a.email + i} title={a.partstat}>{a.name ?? a.email}, </span>)}
+        </div>}
+      </>}
       allDayAccessor={e => isEventAllDay(e.event)}
       startAccessor={e => icsDateToDate(e.event.start)}
       endAccessor={e => icsDateToDate(e.event.end, true)} // BUG extra day with all day and extra time slot if end of day
