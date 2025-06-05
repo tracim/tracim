@@ -11,7 +11,7 @@ import parse from 'date-fns/parse'
 import startOfWeek from 'date-fns/startOfWeek'
 import getDay from 'date-fns/getDay'
 import enUS from 'date-fns/locale/en-US'
-import { convertIcsCalendar, convertIcsTimezone, generateIcsCalendar, IcsCalendar, IcsDateObject, IcsEvent } from "ts-ics"
+import { convertIcsCalendar, convertIcsTimezone, DateObjectType, generateIcsCalendar, IcsCalendar, IcsDateObject, IcsEvent } from "ts-ics"
 import Popup from "./Popup"
 import { CalendarEvent, CalendarObject, isEventAllDay } from "./types"
 import EventModal, { ModalMode } from "./EventModal"
@@ -215,19 +215,21 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
   }
 
   const onSelectSlot: NonNullable<CalendarProps<CalendarEvent>['onSelectSlot']> = useCallback(({ start, end }) => {
+    var type: DateObjectType = start.getHours() === 0 && start.getMinutes() === 0 && start.getSeconds() === 0
+      && end.getHours() === 0 && end.getMinutes() === 0 && end.getSeconds() === 0 ? "DATE" : "DATE-TIME"
     setSelectedEvent({
       event: {
         summary: "",
         start: {
           date: start,
-          type: "DATE-TIME"
+          type: type
         },
         end: {
           date: end,
-          type: "DATE-TIME"
+          type: type
         },
         uid: crypto.randomUUID(),
-        stamp: { date: new Date(), type: "DATE-TIME" },
+        stamp: { date: new Date() },
       },
       color: "",
       index: 0,
