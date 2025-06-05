@@ -29,14 +29,12 @@
   "Edit": "تعديل",
   "Edit this card": "تعديل هذه البطاقة",
   "Delete this card": "حذف هذه البطاقة",
-  "Are you sure?": "هل أنت متأكد؟",
   "Cancel": "إلغاء",
   "See more": "عرض المزيد",
   "See less": "عرض عناصر أقل",
   "Title:": "عنوان:",
   "Description:": "وصف:",
   "Color:": "اللون:",
-  "Deadline:": "الموعد النهائي:",
   "Validate": "اعتماد",
   "Add a card": "إضافة بطاقة",
   "Edit this column": "تعديل هذا العمود",
@@ -56,5 +54,7 @@
   "{{count}} cards_2": "",
   "{{count}} cards_3": "",
   "{{count}} cards_4": "",
-  "{{count}} cards_5": ""
+  "{{count}} cards_5": "",
+  "Start date:": "",
+  "Due date:": ""
 }

@@ -13,7 +13,6 @@
   "Title:": "Titre :",
   "Description:": "Description :",
   "Color:": "Couleur :",
-  "Deadline:": "Échéance :",
   "Cancel": "Annuler",
   "Validate": "Valider",
   "Add a card": "Ajouter une carte",
@@ -28,7 +27,6 @@
   "Add new column": "Ajouter une nouvelle colonne",
   "Edit Column": "Modifier la colonne",
   "New Column": "Nouvelle colonne",
-  "Are you sure?": "Êtes-vous sûr ?",
   "Edit this column": "Modifier cette colonne",
   "Actions": "Actions",
   "Edit": "Modifier",
@@ -52,5 +50,7 @@
   "0 card": "0 carte",
   "{{numberCard}} card": "{{numberCard}} carte",
   "{{count}} cards": "{{count}} cartes",
-  "{{count}} cards_plural": "{{count}} cartes"
+  "{{count}} cards_plural": "{{count}} cartes",
+  "Start date:": "Date début",
+  "Due date:": "Date limite"
 }

@@ -12,7 +12,6 @@
   "Title:": "Titel:",
   "Description:": "Beschreibung:",
   "Color:": "Farbe:",
-  "Deadline:": "Abgabetermin:",
   "Cancel": "Abbrechen",
   "Validate": "Validieren",
   "Add a card": "Eine Karte hinzufügen",
@@ -28,7 +27,6 @@
   "Add new column": "Eine neue Spalte erstellen",
   "Edit Column": "Spalte bearbeiten",
   "New Column": "Neue Spalte",
-  "Are you sure?": "Sind Sie sicher?",
   "Edit this column": "Diese Spalte bearbeiten",
   "Actions": "Aktionen",
   "Edit": "Bearbeiten",
@@ -52,5 +50,7 @@
   "0 card": "",
   "{{numberCard}} card": "",
   "{{count}} cards": "",
-  "{{count}} cards_plural": ""
+  "{{count}} cards_plural": "",
+  "Start date:": "",
+  "Due date:": ""
 }
