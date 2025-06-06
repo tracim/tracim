@@ -1,4 +1,4 @@
-import { IcsAttendeePartStatusType, IcsEvent, NonStandardValuesGeneric } from "ts-ics"
+import { convertIcsDuration, generateIcsDuration, IcsAttendeePartStatusType, IcsDuration, IcsEvent, IcsTriggerRelation, NonStandardValuesGeneric, triggerRelations } from "ts-ics"
 import { useFieldArray, useForm } from "react-hook-form";
 import { isEventAllDay } from "./types";
 import { DAVCalendar } from "tsdav";
@@ -18,6 +18,9 @@ export interface EventModalProps {
   onSubmit: (calendarUrl: string, event: IcsEvent<NonStandardValuesGeneric>) => void
   onCancel: () => void
 }
+
+const alarmActionTypes = ["DISPLAY"];
+type IcsAlarmActionTypes = typeof alarmActionTypes;
 
 const attendeeRoleTypes = ["CHAIR", "REQ-PARTICIPANT", "OPT-PARTICIPANT", "NON-PARTICIPANT"];
 type IcsAttendeeRoleTypes = typeof attendeeRoleTypes;
@@ -48,6 +51,14 @@ export interface EventFormFields {
   attachments: {
     uri: string
   }[]
+  alarms: {
+    description: string
+    action: IcsAlarmActionTypes[number]
+    triggerRelation: IcsTriggerRelation
+    triggerValue: string
+    repeat: number
+    duration: string
+  }[]
 }
 
 export default function EventModal({ calendars, timezones, mode, event, onSubmit, onCancel }: EventModalProps) {
@@ -67,11 +78,20 @@ export default function EventModal({ calendars, timezones, mode, event, onSubmit
       endTimezone: localEnd.timezone,
       organizer: event.organizer,
       attendees: event.attendees,
-      attachments: event.attach && [{ uri: event.attach }]
+      attachments: event.attach && [{ uri: event.attach }],
+      alarms: event.alarms && event.alarms.map(a => ({
+        description: a.description,
+        action: a.action as IcsAlarmActionTypes[number],
+        triggerRelation: a.trigger.options?.related ?? "START",
+        duration: a.duration && generateIcsDuration(a.duration),
+        triggerValue: generateIcsDuration(a.trigger.value as IcsDuration),
+        repeat: a.repeat,
+      })),
     },
   });
   const { fields: attendeesFields, append: appendAttendee, remove: removeAttendee } = useFieldArray({ control, name: "attendees" })
   const { fields: attachmentsFields, append: appendAttachment, remove: removeAttachment } = useFieldArray({ control, name: "attachments" })
+  const { fields: alarmsFields, append: appendAlarm, remove: removeAlarm } = useFieldArray({ control, name: "alarms" })
 
   const allDay = watch("allDay")
   const attendees = watch("attendees")
@@ -126,6 +146,13 @@ export default function EventModal({ calendars, timezones, mode, event, onSubmit
       organizer: data.attendees.length === 0 ? undefined : { ...data.organizer },
       attendees: data.attendees.length === 0 ? undefined : data.attendees.map(a => ({ ...a })),
       attach: data.attachments.length === 0 ? undefined : data.attachments[0].uri, // BUG ts-ics currently does not allow multiple attach
+      alarms: data.alarms.length === 0 ? undefined : data.alarms.map(a => ({
+        description: a.description,
+        action: a.action,
+        trigger: { type: "relative", options: { related: a.triggerRelation }, value: convertIcsDuration(undefined, { value: a.triggerValue }) },
+        repeat: a.repeat,
+        duration: !a.duration ? undefined : convertIcsDuration(undefined, { value: a.duration })
+      })),
     })
   };
 
@@ -180,7 +207,7 @@ export default function EventModal({ calendars, timezones, mode, event, onSubmit
           <td><label>Organizer:</label></td>
           <td>
             <input type="text" placeholder="email" {...register(`organizer.email`, { validate: v => attendees.length !== 0 && !v ? "must be set because attendees" : organizerName && !v ? "because name is set" : true })} />
-            <input type="text" placeholder="name" {...register(`organizer.name`, { validate: v => attendees.length === 0 ? true : "must be set because attendees" })} />
+            <input type="text" placeholder="name" {...register(`organizer.name`, { validate: v => v.length == 0 || attendees.length >= 0 })} />
           </td>
         </tr>
         <tr>
@@ -215,6 +242,27 @@ export default function EventModal({ calendars, timezones, mode, event, onSubmit
         <tr>
           <td><label>Description:</label></td>
           <td><textarea {...register("description")}></textarea></td>
+        </tr>
+        <tr>
+          <td><label>Alarms:</label></td>
+          <td>
+            <table>
+              {alarmsFields.map((f, index) => <tr key={f.id}>
+                <td><input type="text" {...register(`alarms.${index}.description`, { required: true })} /></td>
+                <td><select {...register(`alarms.${index}.action`, { required: true })}>
+                  {alarmActionTypes.map(a => <option key={a} value={a}>{a}</option>)}
+                </select></td>
+                <td><select {...register(`alarms.${index}.triggerRelation`, { required: true })}>
+                  {triggerRelations.map(a => <option key={a} value={a}>{a}</option>)}
+                </select></td>
+                <td><input type="text" {...register(`alarms.${index}.triggerValue`, { required: true })} /></td>
+                <td><input type="number" placeholder="0" {...register(`alarms.${index}.repeat`)} /></td>
+                <td><input type="text" {...register(`alarms.${index}.duration`)} /></td>
+                <td><button onClick={() => removeAlarm(index)}>X</button></td>
+              </tr>)}
+              <tr><td><button onClick={() => appendAlarm({ description: "", action: "DISPLAY", triggerRelation: "START", triggerValue: "PT10M", repeat: 0, duration: ""})}>Add alarm</button></td></tr>
+            </table>
+          </td>
         </tr>
       </table>
       <div>

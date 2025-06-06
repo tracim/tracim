@@ -11,7 +11,7 @@ import parse from 'date-fns/parse'
 import startOfWeek from 'date-fns/startOfWeek'
 import getDay from 'date-fns/getDay'
 import enUS from 'date-fns/locale/en-US'
-import { convertIcsCalendar, convertIcsTimezone, DateObjectType, generateIcsCalendar, IcsCalendar, IcsDateObject, IcsEvent } from "ts-ics"
+import { convertIcsCalendar, convertIcsTimezone, DateObjectType, generateIcsCalendar, generateIcsDuration, IcsCalendar, IcsDateObject, IcsDuration, IcsEvent } from "ts-ics"
 import Popup from "./Popup"
 import { CalendarEvent, CalendarObject, isEventAllDay } from "./types"
 import EventModal, { ModalMode } from "./EventModal"
@@ -239,7 +239,7 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
     setModalOpen(true)
   }, [davCalendars, davCalendarsObjects, headers, fetchOptions])
 
-  const onEventSubmited = (calendarUrl: string, event: IcsEvent) => {
+  const onEventSubmited = useCallback((calendarUrl: string, event: IcsEvent) => {
     if (modalMode === ModalMode.Create) {
       createEvent(calendarUrl, { ...selectedEvent, event })
       setModalOpen(false)
@@ -247,7 +247,7 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
       updateEvent({ ...selectedEvent, event })
       setModalOpen(false)
     }
-  }
+  }, [modalOpen])
 
   const onDoubleClickEvent = (event: CalendarEvent) => {
     console.log(event)
@@ -289,7 +289,10 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
       //@ts-ignore
       titleAccessor={e => <>
         <div>
-          <h1>{e.event.summary}</h1>
+          <h1>
+            {e.event.summary}
+            {e.event.alarms && <span title={e.event.alarms.map(a => generateIcsDuration(a.trigger.value as IcsDuration)).join("\n")}>🔔</span>}
+          </h1>
           {e.event.description && <>{
             e.event.descriptionAltRep?.startsWith("data:text/html,")?
               <div dangerouslySetInnerHTML={{__html: decodeURIComponent(e.event.descriptionAltRep.slice(15))}}></div> :
