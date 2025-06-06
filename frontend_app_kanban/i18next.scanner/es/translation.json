@@ -52,5 +52,7 @@
   "Start date:": "",
   "Due date:": "",
   "{{count}} cards": "",
-  "{{count}} cards_plural": ""
+  "{{count}} cards_plural": "",
+  "Start date": "",
+  "Due date": ""
 }

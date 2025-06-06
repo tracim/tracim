@@ -51,6 +51,8 @@
   "{{numberCard}} card": "{{numberCard}} carte",
   "{{count}} cards": "{{count}} cartes",
   "{{count}} cards_plural": "{{count}} cartes",
-  "Start date:": "Date début",
-  "Due date:": "Date limite"
+  "Start date:": "Date début :",
+  "Due date:": "Date limite :",
+  "Start date": "Date début",
+  "Due date": "Date limite"
 }

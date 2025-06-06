@@ -139,7 +139,10 @@ function KanbanCard (props) {
       <div className='kanban__contentpage__wrapper__board__card__options'>
         <div className='kanban__contentpage__wrapper__board__card__options__date'>
           {props.card.kickoff !== '' && (
-            <div className='kanban__contentpage__wrapper__board__card__options__date__kickoff'>
+            <div
+              className='kanban__contentpage__wrapper__board__card__options__date__kickoff'
+              title={props.t('Start date')}
+            >
               <Icon
                 icon='far fa-calendar'
                 title={props.card.kickoff}
@@ -149,7 +152,10 @@ function KanbanCard (props) {
           )}
 
           {props.card.deadline !== '' && (
-            <div className='kanban__contentpage__wrapper__board__card__options__date__deadline'>
+            <div
+              className='kanban__contentpage__wrapper__board__card__options__date__deadline'
+              title={props.t('Due date')}
+            >
               <Icon
                 icon='far fa-calendar'
                 title={props.card.deadline}

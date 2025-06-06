@@ -52,5 +52,7 @@
   "{{count}} cards": "{{count}} cards",
   "{{count}} cards_plural": "{{count}} cards",
   "Start date:": "Start date:",
-  "Due date:": "Due date:"
+  "Due date:": "Due date:",
+  "Start date": "Start date",
+  "Due date": "Due date"
 }
