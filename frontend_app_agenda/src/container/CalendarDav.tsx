@@ -11,7 +11,7 @@ import parse from 'date-fns/parse'
 import startOfWeek from 'date-fns/startOfWeek'
 import getDay from 'date-fns/getDay'
 import enUS from 'date-fns/locale/en-US'
-import { convertIcsCalendar, convertIcsTimezone, DateObjectType, generateIcsCalendar, generateIcsDuration, IcsCalendar, IcsDateObject, IcsDuration, IcsEvent } from "ts-ics"
+import { convertIcsCalendar, convertIcsTimezone, DateObjectType, extendByRecurrenceRule, generateIcsCalendar, generateIcsDuration, IcsCalendar, IcsDateObject, IcsDuration, IcsEvent } from "ts-ics"
 import Popup from "./Popup"
 import { CalendarEvent, CalendarObject, isEventAllDay } from "./types"
 import EventModal, { ModalMode } from "./EventModal"
@@ -26,6 +26,26 @@ export interface CalendarDavProps {
   onEventDatesChanged?: (start: Date, end: Date) => CalendarEvent
   onViewEvent?: (event: CalendarEvent) => CalendarEvent | null
   onCreateEvent?: (start: Date, end: Date) => CalendarEvent | null
+}
+
+export function offsetDate(date: IcsDateObject, offset: number): IcsDateObject {
+  return {
+    type: date.type,
+    date: addMilliseconds(date.date, offset),
+    local: date.local && {
+      date: addMilliseconds(date.local.date, offset),
+      timezone: date.local.timezone,
+      tzoffset: date.local.tzoffset,
+    },
+  }
+}
+
+export function isSameDate(a: IcsDateObject, b: IcsDateObject) {
+  return a.date.getTime() === b.date.getTime() && a.type === b.type && a.local?.timezone === b.local?.timezone
+}
+
+export function isSameEvent(a: IcsEvent, b: IcsEvent) {
+  return a.uid === b.uid && (!!a.recurrenceId === !!b.recurrenceId) && isSameDate(a.recurrenceId.value, b.recurrenceId.value)
 }
 
 const DnDCalendar = withDragAndDrop<CalendarEvent>(Calendar)
@@ -97,7 +117,7 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
     var promises = davCalendars.map(c => fetchCalendarObjects({ calendar: c, headers, fetchOptions }))
     Promise.all(promises).then(cos => setCalendarsObjects(cos.map((co, i) => co.map(c => ({ ...c, calendarUrl: davCalendars[i].url }))).flat()))
   }, [davCalendars, headers, fetchOptions])
-  
+
   const fetchEvents = useCallback(() => {
     var promises = davCalendars.map(c => fetchCalendarObjects({ calendar: c, headers, fetchOptions }))
     Promise.all(promises).then(cos => setCalendarsObjects(cos.map((co, i) => co.map(c => ({ ...c, calendarUrl: davCalendars[i].url }))).flat()))
@@ -105,23 +125,51 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
 
   useEffect(() => fetchEvents(), [fetchEvents])
 
-  const events = useMemo<CalendarEvent[]>(() => {
-    let allEvents: CalendarEvent[] = []
+  const [events, recurringEvents] = useMemo(() => {
+    let events: CalendarEvent[] = []
+    let recurringEvents: CalendarEvent[] = []
     for (const object of davCalendarsObjects) {
       const calendar = davCalendars.find(c => c.url === object.calendarUrl)!
       const icsCalendar = convertIcsCalendar(undefined, object.data)
 
       for (let i = 0; i < icsCalendar.events.length; i++) {
         const event = icsCalendar.events[i]
-        allEvents.push({
-          event,
-          color: calendar.calendarColor,
-          index: i,
-          objectUrl: object.url,
-        })
+        if (!event.recurrenceRule) {
+          if (event.recurrenceId) events = events.filter(e => !isSameEvent(e.event, event))
+          events.push({
+            event,
+            color: calendar.calendarColor,
+            index: i,
+            objectUrl: object.url,
+          })
+        } else {
+          recurringEvents.push({
+            event,
+            color: calendar.calendarColor,
+            index: i,
+            objectUrl: object.url,
+          })
+          const dates = extendByRecurrenceRule(event.recurrenceRule, { start: event.start.date, exceptions: event.exceptionDates?.map(e => e.date) })
+          for (const date of dates) {
+            const recEvent: CalendarEvent = {
+              //@ts-ignore
+              event: {
+                ...event,
+                start: offsetDate(event.start, date.getTime() - event.start.date.getTime()),
+                end: offsetDate(event.end, date.getTime() - event.start.date.getTime()),
+                recurrenceRule: undefined,
+                recurrenceId: { value: offsetDate(event.start, date.getTime() - event.start.date.getTime()) },
+              },
+              color: calendar.calendarColor,
+              index: -1,
+              objectUrl: object.url,
+            }
+            if (!events.find(e => isSameEvent(e.event, recEvent.event))) events.push(recEvent)
+          }
+        }
       }
     }
-    return allEvents
+    return [events, recurringEvents]
   }, [davCalendars, davCalendarsObjects])
 
 
@@ -139,11 +187,9 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
   // BUG timezones
   const onChangeDates: NonNullable<withDragAndDropProps<CalendarEvent>['onEventResize']> = ({ event, start, end }) => {
     var startDelta = new Date(start).getTime() - event.event.start.date.getTime()
-    event.event.start.date = addMilliseconds(event.event.start.date, startDelta)
-    if (event.event.start.local) event.event.start.local.date = addMilliseconds(event.event.start.local.date, startDelta)
+    event.event.start = offsetDate(event.event.start, startDelta)
     var endDelta = new Date(end).getTime() - event.event.end.date.getTime()
-    event.event.end.date = addMilliseconds(event.event.end.date, endDelta)
-    if (event.event.end.local) event.event.end.local.date = addMilliseconds(event.event.end.local.date, endDelta)
+    event.event.end = offsetDate(event.event.end, endDelta)
     updateEvent(event)
   }
 
@@ -171,7 +217,19 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
   const updateEvent: (event: CalendarEvent) => void = useCallback(event => {
     const calendarObject = davCalendarsObjects.find(o => o.url === event.objectUrl)
     const icsCalendar = convertIcsCalendar(undefined, calendarObject.data)
-    icsCalendar.events[event.index] = { ...event.event }
+    if (event.event.recurrenceRule) {
+      for (let i = 0; i < icsCalendar.events.length; i++) {
+        const element = icsCalendar.events[i];
+        if (i == event.index) continue
+        else if (element.uid == event.event.uid) {
+          const reccurenceOffset = element.recurrenceId.value.date.getTime() - icsCalendar.events[event.index].start.date.getTime()
+          element.recurrenceId = { value: offsetDate(event.event.start, reccurenceOffset) }
+        }
+      }
+    }
+    if (event.index == -1) icsCalendar.events.push(event.event)
+    else icsCalendar.events[event.index] = { ...event.event, sequence: (event.event.sequence ?? 0) + 1 }
+
     validateTimezones(icsCalendar)
     var newCalendarObject = { ...calendarObject, data: generateIcsCalendar(icsCalendar) }
     updateCalendarObject({ calendarObject: newCalendarObject, headers, fetchOptions })
@@ -247,14 +305,18 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
       updateEvent({ ...selectedEvent, event })
       setModalOpen(false)
     }
-  }, [modalOpen])
+  }, [modalOpen, selectedEvent])
 
-  const onDoubleClickEvent = (event: CalendarEvent) => {
+  const onDoubleClickEvent = useCallback((event: CalendarEvent) => {
     console.log(event)
-    setSelectedEvent(event)
+    if (event.event.recurrenceId) {
+      var allEvents = !!window.prompt("edit all events ?")
+      if (allEvents) setSelectedEvent(recurringEvents.find(e => e.event.uid === event.event.uid))
+      else setSelectedEvent(event)
+    } else setSelectedEvent(event)
     setModalMode(ModalMode.Edit)
     setModalOpen(true)
-  }
+  }, [recurringEvents])
   return (<>
     <button onClick={() => fetchEvents()}>Refresh events</button>
     {selectedEvent && <Popup isOpen={modalOpen} onClosePopup={() => setModalOpen(false)}>
@@ -294,8 +356,8 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
             {e.event.alarms && <span title={e.event.alarms.map(a => generateIcsDuration(a.trigger.value as IcsDuration)).join("\n")}>🔔</span>}
           </h1>
           {e.event.description && <>{
-            e.event.descriptionAltRep?.startsWith("data:text/html,")?
-              <div dangerouslySetInnerHTML={{__html: decodeURIComponent(e.event.descriptionAltRep.slice(15))}}></div> :
+            e.event.descriptionAltRep?.startsWith("data:text/html,") ?
+              <div dangerouslySetInnerHTML={{ __html: decodeURIComponent(e.event.descriptionAltRep.slice(15)) }}></div> :
               e.event.description
           }<br /></>}
         </div>
