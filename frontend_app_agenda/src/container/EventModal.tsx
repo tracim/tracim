@@ -1,4 +1,4 @@
-import { convertIcsDuration, generateIcsDuration, IcsAttendeePartStatusType, IcsDuration, IcsEvent, IcsTriggerRelation, NonStandardValuesGeneric, triggerRelations } from "ts-ics"
+import { convertIcsDuration, convertIcsRecurrenceRule, generateIcsDuration, generateIcsRecurrenceRule, IcsAttendeePartStatusType, IcsDuration, IcsEvent, IcsTriggerRelation, NonStandardValuesGeneric, triggerRelations } from "ts-ics"
 import { useFieldArray, useForm } from "react-hook-form";
 import { isEventAllDay } from "./types";
 import { DAVCalendar } from "tsdav";
@@ -59,6 +59,7 @@ export interface EventFormFields {
     repeat: number
     duration: string
   }[]
+  recurrence: string
 }
 
 export default function EventModal({ calendars, timezones, mode, event, onSubmit, onCancel }: EventModalProps) {
@@ -87,6 +88,7 @@ export default function EventModal({ calendars, timezones, mode, event, onSubmit
         triggerValue: generateIcsDuration(a.trigger.value as IcsDuration),
         repeat: a.repeat,
       })),
+      recurrence: event.recurrenceRule && generateIcsRecurrenceRule(event.recurrenceRule).slice(6)
     },
   });
   const { fields: attendeesFields, append: appendAttendee, remove: removeAttendee } = useFieldArray({ control, name: "attendees" })
@@ -153,6 +155,7 @@ export default function EventModal({ calendars, timezones, mode, event, onSubmit
         repeat: a.repeat,
         duration: !a.duration ? undefined : convertIcsDuration(undefined, { value: a.duration })
       })),
+      recurrenceRule: !data.recurrence ? undefined : convertIcsRecurrenceRule(undefined, {value : data.recurrence}) 
     })
   };
 
@@ -263,6 +266,10 @@ export default function EventModal({ calendars, timezones, mode, event, onSubmit
               <tr><td><button onClick={() => appendAlarm({ description: "", action: "DISPLAY", triggerRelation: "START", triggerValue: "PT10M", repeat: 0, duration: ""})}>Add alarm</button></td></tr>
             </table>
           </td>
+        </tr>
+        <tr>
+          <td><label>Recurrence:</label></td>
+          <td><input type="text" {...register("recurrence")}></input></td>
         </tr>
       </table>
       <div>
