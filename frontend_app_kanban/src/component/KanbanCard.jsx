@@ -142,7 +142,7 @@ function KanbanCard (props) {
             className='kanban__contentpage__wrapper__board__card__options__date__kickoff'
             title={props.t('Start date')}
           >
-            {props.card.kickoff !== '' && (
+            {props.card.kickoff && props.card.kickoff !== '' && (
               <>
                 <Icon
                   icon='far fa-calendar'
@@ -157,7 +157,7 @@ function KanbanCard (props) {
             className='kanban__contentpage__wrapper__board__card__options__date__deadline'
             title={props.t('Due date')}
           >
-            {props.card.deadline !== '' && (
+            {props.card.deadline && props.card.deadline !== '' && (
               <>
                 <Icon
                   icon='far fa-calendar'
