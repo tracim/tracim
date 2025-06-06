@@ -1,18 +1,44 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
+import Select from 'react-select'
 import {
   DateInput,
   IconButton,
   TextInput,
-  TinyEditor
+  TinyEditor,
+  getAvatarBaseUrl
 } from 'tracim_frontend_lib'
+
+const CustomReactSelectOption = (props) => {
+  return (
+    <div
+      ref={props.innerRef}
+      className='CustomReactSelectOption'
+      key={props.data.id}
+      {...props.innerProps}
+    >
+      <div className='CustomReactSelectOption__avatar'>
+        <img
+          className='CustomReactSelectOption__avatar__img'
+          src={`${props.data.avatarUrl}/preview/jpg/25x25/avatar`}
+          alt=''
+        />
+      </div>
+
+      <div>{props.data.publicName}</div>
+
+      <div className='CustomReactSelectOption__username'>@{props.data.username}</div>
+    </div>
+  )
+}
 
 function KanbanCardEditor (props) {
   const { card } = props
 
   const [title, setTitle] = useState(card.title || '')
   const [description, setDescription] = useState(card.description || '')
+  const [assignmentList, setAssignmentList] = useState(card.assignmentList || [])
   const [bgColor, setBgColor] = useState(card.bgColor || props.defaultBackgroundColor)
   const [deadline, setDeadline] = useState(card.deadline || '')
   const [freeInput, setFreeInput] = useState(card.freeInput || '')
@@ -26,11 +52,26 @@ function KanbanCardEditor (props) {
       ...card,
       title,
       description: descriptionText,
+      assignmentList,
       bgColor,
       deadline,
       freeInput
     })
   }
+
+  function handleChangeSelectAssignment (newAssignmentList) {
+    setAssignmentList(newAssignmentList?.map(a => a.id) || [])
+  }
+
+  const assignmentOptionList = props.memberList.map(m => ({
+    ...m,
+    value: m.id,
+    label: m.publicName,
+    avatarUrl: getAvatarBaseUrl(props.apiUrl, m.id)
+  }))
+
+  const selectedAssignmentOptionList = assignmentOptionList
+    .filter(m => assignmentList.some(a => Number(a) === Number(m.id)))
 
   return (
     <form className='kanban__KanbanPopup__form' onSubmit={handleValidate}>
@@ -62,6 +103,24 @@ function KanbanCardEditor (props) {
             userList={props.memberList}
             minHeight={300}
             placeholder={props.t('Description of the card')}
+          />
+        </div>
+
+        <div className='kanban__KanbanPopup__assignment'>
+          <label htmlFor='kanban__KanbanPopup__assignment'>{props.t('Assignment:')}</label>
+
+          <Select
+            id='kanban__KanbanPopup__assignment'
+            className='kanban__KanbanPopup__assignment__select'
+            isSearchable
+            placeholder='Search member'
+            onChange={handleChangeSelectAssignment}
+            options={assignmentOptionList}
+            noOptionsMessage={() => props.t('No member')}
+            defaultValue={selectedAssignmentOptionList}
+            isMulti
+            components={{ Option: CustomReactSelectOption }}
+            // menuIsOpen={true} // debug
           />
         </div>
 

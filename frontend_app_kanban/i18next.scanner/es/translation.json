@@ -12,7 +12,6 @@
   "Validate and create": "Validar y crear",
   "The content has been modified by {{author}}": "El contenido fue modificado por {{author}}",
   "Restore": "Restaurar",
-  "Are you sure?": "¿Está seguro?",
   "Create a Kanban board": "Crear un tablero Kanban",
   "Error while saving the new version": "Error al guardar la nueva versión",
   "Error while creating kanban": "Error al crear el kanban",
@@ -53,5 +52,7 @@
   "{{numberCard}} card": "{{numberCard}} Tarjeta",
   "{{count}} cards_0": "{{count}} tarjeta",
   "{{count}} cards_1": "{{count}} de tarjetas",
-  "{{count}} cards_2": "{{count}} tarjetas"
+  "{{count}} cards_2": "{{count}} tarjetas",
+  "Assignment:": "",
+  "No member": ""
 }

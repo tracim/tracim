@@ -149,6 +149,8 @@ cardWidth = 280px
       flex-direction column
       &__inline
         flex-direction row
+    &__assignment
+      margin-bottom textSpacing
 
     & .cardPopup__container
       width 100%
@@ -252,6 +254,25 @@ cardWidth = 280px
         right closedSidebarWidth
       &__toolbar
         left standardSpacing
+
+.CustomReactSelectOption
+  display flex
+  flex-direction row
+  gap 5px
+  background-color transparent
+  color inherit
+  cursor default
+  font-size inherit
+  padding 8px 12px
+  width 100%
+  user-select none
+  box-sizing border-box
+  &:hover
+    background-color #deebff
+  &__avatar__img
+    border-radius 50%
+  &__username
+    color darkGrey1
 
 @media (min-width: max-xs) and (max-width: max-lg)
   .kanban

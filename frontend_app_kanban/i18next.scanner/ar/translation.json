@@ -29,7 +29,6 @@
   "Edit": "تعديل",
   "Edit this card": "تعديل هذه البطاقة",
   "Delete this card": "حذف هذه البطاقة",
-  "Are you sure?": "هل أنت متأكد؟",
   "Cancel": "إلغاء",
   "See more": "عرض المزيد",
   "See less": "عرض عناصر أقل",
@@ -56,5 +55,7 @@
   "{{count}} cards_2": "",
   "{{count}} cards_3": "",
   "{{count}} cards_4": "",
-  "{{count}} cards_5": ""
+  "{{count}} cards_5": "",
+  "Assignment:": "",
+  "No member": ""
 }

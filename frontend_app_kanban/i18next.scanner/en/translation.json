@@ -28,7 +28,6 @@
   "Add new column": "Add new column",
   "Edit Column": "Edit Column",
   "New Column": "New Column",
-  "Are you sure?": "Are you sure?",
   "Edit this column": "Edit this column",
   "Actions": "Actions",
   "Edit": "Edit",
@@ -52,5 +51,7 @@
   "0 card": "0 card",
   "{{numberCard}} card": "{{numberCard}} card",
   "{{count}} cards": "{{count}} cards",
-  "{{count}} cards_plural": "{{count}} cards"
+  "{{count}} cards_plural": "{{count}} cards",
+  "Assignment:": "Assignment:",
+  "No member": "No member"
 }
