@@ -68,25 +68,25 @@ function KanbanCardEditor (props) {
         </div>
 
         <div className='kanban__KanbanPopup__inline'>
-          <div className='kanban__KanbanPopup__deadline'>
-            <label htmlFor='kanban__KanbanPopup__deadline'>{props.t('Start date:')}</label>
-
-            <DateInput
-              id='kanban__KanbanPopup__deadline'
-              onChange={(e) => setDeadline(e.target.value)}
-              onValidate={handleValidate}
-              value={deadline}
-            />
-          </div>
-
           <div className='kanban__KanbanPopup__kickoff'>
-            <label htmlFor='kanban__KanbanPopup__kickoff'>{props.t('Due date:')}</label>
+            <label htmlFor='kanban__KanbanPopup__kickoff'>{props.t('Start date:')}</label>
 
             <DateInput
               id='kanban__KanbanPopup__kickoff'
               onChange={(e) => setKickoff(e.target.value)}
               onValidate={handleValidate}
               value={kickoff}
+            />
+          </div>
+
+          <div className='kanban__KanbanPopup__deadline'>
+            <label htmlFor='kanban__KanbanPopup__deadline'>{props.t('Due date:')}</label>
+
+            <DateInput
+              id='kanban__KanbanPopup__deadline'
+              onChange={(e) => setDeadline(e.target.value)}
+              onValidate={handleValidate}
+              value={deadline}
             />
           </div>
         </div>

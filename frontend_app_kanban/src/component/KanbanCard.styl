@@ -44,7 +44,11 @@ cardWidth = 280px
       font-weight bold
       font-size metadataFontSize
 
-      &__deadline
+      &__date
+        display flex
+        flex-direction row
+        justify-content space-between
+        &__kickoff, &__deadline
           display inline
           & i
             margin-inline-end textSpacing

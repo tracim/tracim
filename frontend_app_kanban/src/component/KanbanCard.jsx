@@ -136,20 +136,29 @@ function KanbanCard (props) {
         )}
       </div>
 
-      <div
-        className='kanban__contentpage__wrapper__board__card__options'
-      >
-        {props.card.deadline !== '' && (
-          <div
-            className='kanban__contentpage__wrapper__board__card__options__deadline'
-          >
-            <Icon
-              icon='far fa-calendar'
-              title={props.card.deadline}
-            />
-            {props.card.deadline}
-          </div>
-        )}
+      <div className='kanban__contentpage__wrapper__board__card__options'>
+        <div className='kanban__contentpage__wrapper__board__card__options__date'>
+          {props.card.kickoff !== '' && (
+            <div className='kanban__contentpage__wrapper__board__card__options__date__kickoff'>
+              <Icon
+                icon='far fa-calendar'
+                title={props.card.kickoff}
+              />
+              {props.card.kickoff}
+            </div>
+          )}
+
+          {props.card.deadline !== '' && (
+            <div className='kanban__contentpage__wrapper__board__card__options__date__deadline'>
+              <Icon
+                icon='far fa-calendar'
+                title={props.card.deadline}
+              />
+              {props.card.deadline}
+            </div>
+          )}
+        </div>
+
         <div className='kanban__contentpage__wrapper__board__card__options__freeInput'>
           {props.card.freeInput}
         </div>
