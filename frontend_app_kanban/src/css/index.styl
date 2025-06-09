@@ -146,13 +146,27 @@ cardWidth = 280px
       display none
     &__inline
       display flex
+      flex-wrap wrap
       justify-content flex-start
-      gap 25px
+      gap 5px 25px
+    & .inlineInput
+      display flex
+      flex-direction row
+      align-items baseline
+      & label
+        min-width 100px
+    &__bgColor
+      min-width 75px // INFO - CH - 2025-06-06 - label 100px - 25px row gap
     &__assignment, &__kickoff, &__deadline, &__freeInput
       flex-grow 1
     &__bgColor, &__deadline
       display flex
       flex-direction column
+    & .textInputComponent
+      flex-grow 1
+    & .linebreak
+      flex-basis 100%
+      height 0
 
     & .cardPopup__container
       width 100%
@@ -181,6 +195,9 @@ cardWidth = 280px
         height 200px
 
     &__form
+      display flex
+      flex-direction column
+      gap 15px
       overflow-y auto
       width 100%
       height 100%

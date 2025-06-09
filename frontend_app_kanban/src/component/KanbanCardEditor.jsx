@@ -79,18 +79,17 @@ function KanbanCardEditor (props) {
     <form className='kanban__KanbanPopup__form' onSubmit={handleValidate}>
       <div className='kanban__KanbanPopup__form__fields'>
         <div className='kanban__KanbanPopup__title'>
-          <label htmlFor='kanban__KanbanPopup__title'>{props.t('Title:')}</label>
           <TextInput
             autoFocus={!props.focusOnDescription}
             id='kanban__KanbanPopup__title'
             onChange={(e) => setTitle(e.target.value)}
             onValidate={handleValidate}
             value={title}
+            placeholder={props.t('Title')}
           />
         </div>
 
         <div className='kanban__KanbanPopup__description'>
-          <label>{props.t('Description:')}</label>
           <TinyEditor
             apiUrl={props.apiUrl}
             setContent={setDescription}
@@ -101,21 +100,19 @@ function KanbanCardEditor (props) {
             isAdvancedEdition
             isMentionEnabled={false}
             language={props.language}
-            maxHeight={400}
+            maxHeight={350}
             userList={props.memberList}
-            minHeight={300}
+            minHeight={250}
             placeholder={props.t('Description of the card')}
           />
         </div>
 
         <div className='kanban__KanbanPopup__assignment'>
-          <label htmlFor='kanban__KanbanPopup__assignment'>{props.t('Assignment:')}</label>
-
           <Select
             id='kanban__KanbanPopup__assignment'
             className='kanban__KanbanPopup__assignment__select'
             isSearchable
-            placeholder='Search member'
+            placeholder='Assignment'
             onChange={handleChangeSelectAssignment}
             options={assignmentOptionList}
             noOptionsMessage={() => props.t('No member')}
@@ -126,7 +123,16 @@ function KanbanCardEditor (props) {
         </div>
 
         <div className='kanban__KanbanPopup__inline'>
-          <div className='kanban__KanbanPopup__kickoff'>
+          <div className='kanban__KanbanPopup__bgColor'>
+            <input
+              id='kanban__KanbanPopup__bgColor'
+              type='color'
+              value={bgColor}
+              onChange={(e) => setBgColor(e.target.value)}
+            />
+          </div>
+
+          <div className='kanban__KanbanPopup__kickoff inlineInput'>
             <label htmlFor='kanban__KanbanPopup__kickoff'>{props.t('Start date:')}</label>
 
             <DateInput
@@ -137,7 +143,7 @@ function KanbanCardEditor (props) {
             />
           </div>
 
-          <div className='kanban__KanbanPopup__deadline'>
+          <div className='kanban__KanbanPopup__deadline inlineInput'>
             <label htmlFor='kanban__KanbanPopup__deadline'>{props.t('Due date:')}</label>
 
             <DateInput
@@ -147,28 +153,16 @@ function KanbanCardEditor (props) {
               value={deadline}
             />
           </div>
-        </div>
 
-        <div className='kanban__KanbanPopup__inline'>
-          <div className='kanban__KanbanPopup__bgColor'>
-            <label htmlFor='kanban__KanbanPopup__bgColor'>{props.t('Color:')}</label>
-
-            <input
-              id='kanban__KanbanPopup__bgColor'
-              type='color'
-              value={bgColor}
-              onChange={(e) => setBgColor(e.target.value)}
-            />
-          </div>
+          <div className='linebreak'></div>
 
           <div className='kanban__KanbanPopup__freeInput'>
-            <label htmlFor='kanban__KanbanPopup__freeInput'>{props.t('Open field:')}</label>
-
             <TextInput
               id='kanban__KanbanPopup__freeInput'
               onChange={(e) => setFreeInput(e.target.value)}
               onValidate={handleValidate}
               value={freeInput}
+              placeholder={props.t('Open field')}
             />
           </div>
         </div>
