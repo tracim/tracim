@@ -120,7 +120,6 @@ function KanbanCardEditor (props) {
             defaultValue={selectedAssignmentOptionList}
             isMulti
             components={{ Option: CustomReactSelectOption }}
-            // menuIsOpen={true} // debug
           />
         </div>
 

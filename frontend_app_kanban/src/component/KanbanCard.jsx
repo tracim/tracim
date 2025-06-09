@@ -174,7 +174,7 @@ function KanbanCard (props) {
                   <img
                     className='kanban__contentpage__wrapper__board__card__options__assignment__member__avatar'
                     src={`${getAvatarBaseUrl(props.config.apiUrl, assignmentId)}/preview/jpg/25x25/avatar`}
-                    alt=''
+                    alt={member.publicName}
                   />
                 </div>
               )
