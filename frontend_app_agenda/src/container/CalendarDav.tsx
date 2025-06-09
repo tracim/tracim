@@ -87,6 +87,7 @@ export const fetchCalendar = async (url: string, headers?: Record<string, string
 
 export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOptions }: CalendarDavProps) {
   const [davCalendars, setCalendars] = useState<DAVCalendar[]>([])
+  const [visibleCalendars, setVisibleCalendars] = useState<boolean[]>([])
   const [davCalendarsObjects, setCalendarsObjects] = useState<CalendarObject[]>([])
 
   const [modalOpen, setModalOpen] = useState<boolean>(false)
@@ -98,15 +99,21 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
   useEffect(() => {
     if (!!calendarUrls) {
       Promise.all(calendarUrls.map(url => fetchCalendar(url, headers, fetchOptions)))
-        .then(cs => setCalendars(cs))
-    }
-    else if (!!serverUrl) {
-      createAccount({
-        account: { serverUrl, accountType: "caldav" },
-        headers,
-        fetchOptions,
-      }).then(account => fetchCalendars({ account, headers, fetchOptions }))
-        .then(cs => setCalendars(cs))
+        .then(cs => {
+          setCalendars(cs)
+          setVisibleCalendars(cs.map(cs => true))
+        })
+      }
+      else if (!!serverUrl) {
+        createAccount({
+          account: { serverUrl, accountType: "caldav" },
+          headers,
+          fetchOptions,
+        }).then(account => fetchCalendars({ account, headers, fetchOptions }))
+        .then(cs => {
+          setCalendars(cs)
+          setVisibleCalendars(cs.map(cs => true))
+        })
     } else {
       throw "At least `serverUrl` or `calendarUrls` must be set"
     }
@@ -172,6 +179,12 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
     return [events, recurringEvents]
   }, [davCalendars, davCalendarsObjects])
 
+
+  const displayedEvents = useMemo(() => events.filter(event => {
+    const calendarObject = davCalendarsObjects.find(o => o.url === event.objectUrl)
+    const calendarIndex = davCalendars.findIndex(c => c.url === calendarObject.calendarUrl)
+    return visibleCalendars[calendarIndex]
+  }), [events, visibleCalendars, davCalendars, davCalendarsObjects])
 
   const getEventStyle: EventPropGetter<CalendarEvent> = (event, start, end, isSelected) => {
     var style = {
@@ -265,7 +278,6 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
 
   const icsDateToDate = (date: IcsDateObject, isEnd?: boolean) => {
     var jsDate = date.type == "DATE-TIME" ? new Date(date.date) : new Date(date.date.toDateString())
-    // BUG resize all day events
     // if (isEnd && jsDate.getHours() === 0 && jsDate.getMinutes() === 0) {
     //   jsDate.setMinutes(jsDate.getMinutes() - 1)
     // }
@@ -317,6 +329,13 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
     setModalMode(ModalMode.Edit)
     setModalOpen(true)
   }, [recurringEvents])
+
+
+  const onSetCalendarChecked = useCallback((cUrl: string, checked: boolean) => {
+    const calendarIndex = davCalendars.findIndex(c => c.url === cUrl)
+    setVisibleCalendars(value => value.map((c, i) => i == calendarIndex ? checked :c))
+  }, [davCalendars])
+
   return (<>
     <button onClick={() => fetchEvents()}>Refresh events</button>
     {selectedEvent && <Popup isOpen={modalOpen} onClosePopup={() => setModalOpen(false)}>
@@ -329,9 +348,16 @@ export default function CalendarDav({ serverUrl, calendarUrls, headers, fetchOpt
         onCancel={() => setModalOpen(false)}
       />
     </Popup>}
+    <div>
+      {davCalendars.map((c, i) => <div key={c.url} >
+        <label>{c.displayName}</label>
+        <input type="checkbox" onChange={e => onSetCalendarChecked(c.url, e.target.checked)} defaultChecked={visibleCalendars[i]}/>
+        <br />
+      </div>)}
+    </div>
     <DnDCalendar
       defaultView='week'
-      events={events}
+      events={displayedEvents}
       localizer={localizer}
       onEventDrop={onChangeDates}
       onEventResize={onChangeDates}
