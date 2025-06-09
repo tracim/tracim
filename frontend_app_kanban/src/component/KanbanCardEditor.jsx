@@ -112,7 +112,7 @@ function KanbanCardEditor (props) {
             id='kanban__KanbanPopup__assignment'
             className='kanban__KanbanPopup__assignment__select'
             isSearchable
-            placeholder='Assignment'
+            placeholder={props.t('Assignment')}
             onChange={handleChangeSelectAssignment}
             options={assignmentOptionList}
             noOptionsMessage={() => props.t('No member')}
@@ -154,7 +154,7 @@ function KanbanCardEditor (props) {
             />
           </div>
 
-          <div className='linebreak'></div>
+          <div className='linebreak' />
 
           <div className='kanban__KanbanPopup__freeInput'>
             <TextInput

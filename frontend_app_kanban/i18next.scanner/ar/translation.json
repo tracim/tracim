@@ -33,7 +33,6 @@
   "See more": "عرض المزيد",
   "See less": "عرض عناصر أقل",
   "Title:": "عنوان:",
-  "Description:": "وصف:",
   "Color:": "اللون:",
   "Validate": "اعتماد",
   "Add a card": "إضافة بطاقة",
@@ -43,7 +42,6 @@
   "The link has been copied to clipboard": "تم نسخ الرابط إلى الحافظة",
   "Copy content link": "نسخ رابط المحتوى",
   "Description of the card": "",
-  "Open field:": "",
   "Permanently delete": "",
   "Yes, delete permanently": "",
   "Warning: this operation cannot be rolled back": "",
@@ -55,10 +53,12 @@
   "{{count}} cards_3": "",
   "{{count}} cards_4": "",
   "{{count}} cards_5": "",
-  "Assignment:": "",
   "No member": "",
   "Start date:": "",
   "Due date:": "",
   "Start date": "",
-  "Due date": ""
+  "Due date": "",
+  "Title": "",
+  "Open field": "",
+  "Assignment": ""
 }

@@ -5,7 +5,6 @@
   "Error while saving the new version": "Kunne ikke lagre den nye versjonen",
   "Fullscreen": "Fullskjermsvisning",
   "New Card": "Nytt kort",
-  "Description:": "Beskrivelse:",
   "Color:": "Farge:",
   "Cancel": "Avbryt",
   "Validate": "Bekreft",
@@ -43,7 +42,6 @@
   "Error, the space exceed its maximum size": "Rommet er nå større enn det som tillates",
   "Title:": "Navn:",
   "Description of the card": "",
-  "Open field:": "",
   "Permanently delete": "",
   "Yes, delete permanently": "",
   "Warning: this operation cannot be rolled back": "",
@@ -51,10 +49,12 @@
   "{{numberCard}} card": "",
   "{{count}} cards": "",
   "{{count}} cards_plural": "",
-  "Assignment:": "",
   "No member": "",
   "Start date:": "",
   "Due date:": "",
   "Start date": "",
-  "Due date": ""
+  "Due date": "",
+  "Title": "",
+  "Open field": "",
+  "Assignment": ""
 }
