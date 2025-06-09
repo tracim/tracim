@@ -9,7 +9,6 @@
   "Color:": "Farge:",
   "Cancel": "Avbryt",
   "Validate": "Bekreft",
-  "Deadline:": "Frist:",
   "Add a card": "Legg til et kort",
   "Timeline": "Tidslinje",
   "Tags": "Etiketter",
@@ -53,5 +52,9 @@
   "{{count}} cards": "",
   "{{count}} cards_plural": "",
   "Assignment:": "",
-  "No member": ""
+  "No member": "",
+  "Start date:": "",
+  "Due date:": "",
+  "Start date": "",
+  "Due date": ""
 }

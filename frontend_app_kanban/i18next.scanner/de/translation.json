@@ -12,7 +12,6 @@
   "Title:": "Titel:",
   "Description:": "Beschreibung:",
   "Color:": "Farbe:",
-  "Deadline:": "Abgabetermin:",
   "Cancel": "Abbrechen",
   "Validate": "Validieren",
   "Add a card": "Eine Karte hinzufügen",
@@ -53,5 +52,9 @@
   "{{count}} cards": "",
   "{{count}} cards_plural": "",
   "Assignment:": "",
-  "No member": ""
+  "No member": "",
+  "Start date:": "",
+  "Due date:": "",
+  "Start date": "",
+  "Due date": ""
 }

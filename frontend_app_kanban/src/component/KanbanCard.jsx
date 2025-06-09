@@ -144,18 +144,37 @@ function KanbanCard (props) {
         className='kanban__contentpage__wrapper__board__card__options'
         onClick={props.readOnly ? undefined : () => props.onEditCardContent(props.card)}
       >
-
-        {props.card.deadline !== '' && (
+        <div className='kanban__contentpage__wrapper__board__card__options__date'>
           <div
-            className='kanban__contentpage__wrapper__board__card__options__deadline'
+            className='kanban__contentpage__wrapper__board__card__options__date__kickoff'
+            title={props.t('Start date')}
           >
-            <Icon
-              icon='far fa-calendar'
-              title={props.card.deadline}
-            />
-            {props.card.deadline}
+            {props.card.kickoff && props.card.kickoff !== '' && (
+              <>
+                <Icon
+                  icon='far fa-calendar'
+                  title={props.card.kickoff}
+                />
+                {props.card.kickoff}
+              </>
+            )}
           </div>
-        )}
+
+          <div
+            className='kanban__contentpage__wrapper__board__card__options__date__deadline'
+            title={props.t('Due date')}
+          >
+            {props.card.deadline && props.card.deadline !== '' && (
+              <>
+                <Icon
+                  icon='far fa-calendar'
+                  title={props.card.deadline}
+                />
+                {props.card.deadline}
+              </>
+            )}
+          </div>
+        </div>
 
         <div className='kanban__contentpage__wrapper__board__card__options__freeInput'>
           {props.card.freeInput}

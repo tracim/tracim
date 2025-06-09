@@ -53,7 +53,11 @@ cardWidth = 280px
           &__avatar
             border-radius 50%
 
-      &__deadline
+      &__date
+        display flex
+        flex-direction row
+        justify-content space-between
+        &__kickoff, &__deadline
           display inline
           & i
             margin-inline-end textSpacing

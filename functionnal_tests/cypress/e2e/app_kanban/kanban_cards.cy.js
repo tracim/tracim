@@ -38,7 +38,7 @@ describe('App Kanban (cards)', () => {
     cy.contains('.cardPopup__header', 'Editing Card')
     cy.get('.kanban__KanbanPopup__deadline').type('1111-11-11')
     cy.get('.kanban__KanbanPopup__form_buttons .iconbutton').last().should('be.visible').click()
-    cy.contains('.kanban__contentpage__wrapper__board__card__options__deadline', '1111-11-11')
+    cy.contains('.kanban__contentpage__wrapper__board__card__options__date__deadline', '1111-11-11')
   })
 
   it('should be possible to see the free input', () => {

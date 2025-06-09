@@ -13,7 +13,6 @@
   "Title:": "Title:",
   "Description:": "Description:",
   "Color:": "Colour:",
-  "Deadline:": "Deadline:",
   "Cancel": "Cancel",
   "Validate": "Validate",
   "Add a card": "Add a card",
@@ -53,5 +52,9 @@
   "{{count}} cards": "{{count}} cards",
   "{{count}} cards_plural": "{{count}} cards",
   "Assignment:": "Assignment:",
-  "No member": "No member"
+  "No member": "No member",
+  "Start date:": "Start date:",
+  "Due date:": "Due date:",
+  "Start date": "Start date",
+  "Due date": "Due date"
 }

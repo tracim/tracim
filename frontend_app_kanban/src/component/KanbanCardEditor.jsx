@@ -40,6 +40,7 @@ function KanbanCardEditor (props) {
   const [description, setDescription] = useState(card.description || '')
   const [assignmentList, setAssignmentList] = useState(card.assignmentList || [])
   const [bgColor, setBgColor] = useState(card.bgColor || props.defaultBackgroundColor)
+  const [kickoff, setKickoff] = useState(card.kickoff || '')
   const [deadline, setDeadline] = useState(card.deadline || '')
   const [freeInput, setFreeInput] = useState(card.freeInput || '')
 
@@ -54,6 +55,7 @@ function KanbanCardEditor (props) {
       description: descriptionText,
       assignmentList,
       bgColor,
+      kickoff,
       deadline,
       freeInput
     })
@@ -123,36 +125,55 @@ function KanbanCardEditor (props) {
           />
         </div>
 
-        <div className='kanban__KanbanPopup__bgColor'>
-          <label htmlFor='kanban__KanbanPopup__bgColor'>{props.t('Color:')}</label>
-          <input
-            id='kanban__KanbanPopup__bgColor'
-            type='color'
-            value={bgColor}
-            onChange={(e) => setBgColor(e.target.value)}
-          />
+        <div className='kanban__KanbanPopup__inline'>
+          <div className='kanban__KanbanPopup__kickoff'>
+            <label htmlFor='kanban__KanbanPopup__kickoff'>{props.t('Start date:')}</label>
+
+            <DateInput
+              id='kanban__KanbanPopup__kickoff'
+              onChange={(e) => setKickoff(e.target.value)}
+              onValidate={handleValidate}
+              value={kickoff}
+            />
+          </div>
+
+          <div className='kanban__KanbanPopup__deadline'>
+            <label htmlFor='kanban__KanbanPopup__deadline'>{props.t('Due date:')}</label>
+
+            <DateInput
+              id='kanban__KanbanPopup__deadline'
+              onChange={(e) => setDeadline(e.target.value)}
+              onValidate={handleValidate}
+              value={deadline}
+            />
+          </div>
         </div>
 
-        <div className='kanban__KanbanPopup__deadline'>
-          <label htmlFor='kanban__KanbanPopup__deadline'>{props.t('Deadline:')}</label>
-          <DateInput
-            id='kanban__KanbanPopup__deadline'
-            onChange={(e) => setDeadline(e.target.value)}
-            onValidate={handleValidate}
-            value={deadline}
-          />
-        </div>
+        <div className='kanban__KanbanPopup__inline'>
+          <div className='kanban__KanbanPopup__bgColor'>
+            <label htmlFor='kanban__KanbanPopup__bgColor'>{props.t('Color:')}</label>
 
-        <div className='kanban__KanbanPopup__freeInput'>
-          <label htmlFor='kanban__KanbanPopup__freeInput'>{props.t('Open field:')}</label>
-          <TextInput
-            id='kanban__KanbanPopup__freeInput'
-            onChange={(e) => setFreeInput(e.target.value)}
-            onValidate={handleValidate}
-            value={freeInput}
-          />
+            <input
+              id='kanban__KanbanPopup__bgColor'
+              type='color'
+              value={bgColor}
+              onChange={(e) => setBgColor(e.target.value)}
+            />
+          </div>
+
+          <div className='kanban__KanbanPopup__freeInput'>
+            <label htmlFor='kanban__KanbanPopup__freeInput'>{props.t('Open field:')}</label>
+
+            <TextInput
+              id='kanban__KanbanPopup__freeInput'
+              onChange={(e) => setFreeInput(e.target.value)}
+              onValidate={handleValidate}
+              value={freeInput}
+            />
+          </div>
         </div>
       </div>
+
       <div className='kanban__KanbanPopup__form_buttons'>
         <IconButton
           color={props.customColor}

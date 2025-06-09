@@ -13,7 +13,6 @@
   "Title:": "Titre :",
   "Description:": "Description :",
   "Color:": "Couleur :",
-  "Deadline:": "Échéance :",
   "Cancel": "Annuler",
   "Validate": "Valider",
   "Add a card": "Ajouter une carte",
@@ -53,5 +52,9 @@
   "{{count}} cards": "{{count}} cartes",
   "{{count}} cards_plural": "{{count}} cartes",
   "Assignment:": "Affectation :",
-  "No member": "Pas de membre"
+  "No member": "Pas de membre",
+  "Start date:": "Date début :",
+  "Due date:": "Date limite :",
+  "Start date": "Date début",
+  "Due date": "Date limite"
 }

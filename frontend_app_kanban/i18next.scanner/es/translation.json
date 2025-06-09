@@ -25,7 +25,6 @@
   "Timeline": "Revisiones",
   "Description:": "Descripción:",
   "Color:": "Color:",
-  "Deadline:": "Plazo:",
   "Add a card": "Añadir una tarjeta",
   "New Kanban board": "Nuevo tablero Kanban",
   "Board's name": "Nombre del tablero",
@@ -50,9 +49,15 @@
   "Warning: this operation cannot be rolled back": "Atención: esta operación no puede revertirse",
   "0 card": "0 tarjeta",
   "{{numberCard}} card": "{{numberCard}} Tarjeta",
+  "{{count}} cards": "",
+  "{{count}} cards_plural": "",
   "{{count}} cards_0": "{{count}} tarjeta",
   "{{count}} cards_1": "{{count}} de tarjetas",
   "{{count}} cards_2": "{{count}} tarjetas",
   "Assignment:": "",
-  "No member": ""
+  "No member": "",
+  "Start date:": "",
+  "Due date:": "",
+  "Start date": "",
+  "Due date": ""
 }

@@ -35,7 +35,6 @@
   "Title:": "عنوان:",
   "Description:": "وصف:",
   "Color:": "اللون:",
-  "Deadline:": "الموعد النهائي:",
   "Validate": "اعتماد",
   "Add a card": "إضافة بطاقة",
   "Edit this column": "تعديل هذا العمود",
@@ -57,5 +56,9 @@
   "{{count}} cards_4": "",
   "{{count}} cards_5": "",
   "Assignment:": "",
-  "No member": ""
+  "No member": "",
+  "Start date:": "",
+  "Due date:": "",
+  "Start date": "",
+  "Due date": ""
 }
