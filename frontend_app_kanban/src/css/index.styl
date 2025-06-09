@@ -144,11 +144,15 @@ cardWidth = 280px
     max-height 90%
     &.hidden
       display none
+    &__inline
+      display flex
+      justify-content flex-start
+      gap 25px
+    &__kickoff, &__deadline, &__freeInput
+      flex-grow 1
     &__bgColor, &__deadline
       display flex
       flex-direction column
-      &__inline
-        flex-direction row
 
     & .cardPopup__container
       width 100%
@@ -163,7 +167,7 @@ cardWidth = 280px
       width 100%
 
     & [type=color]
-      margin-bottom textSpacing
+      margin textSpacing 0
 
     & label
       white-space pre

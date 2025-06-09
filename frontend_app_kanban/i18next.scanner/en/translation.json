@@ -13,7 +13,6 @@
   "Title:": "Title:",
   "Description:": "Description:",
   "Color:": "Colour:",
-  "Deadline:": "Deadline:",
   "Cancel": "Cancel",
   "Validate": "Validate",
   "Add a card": "Add a card",
@@ -28,7 +27,6 @@
   "Add new column": "Add new column",
   "Edit Column": "Edit Column",
   "New Column": "New Column",
-  "Are you sure?": "Are you sure?",
   "Edit this column": "Edit this column",
   "Actions": "Actions",
   "Edit": "Edit",
@@ -52,5 +50,9 @@
   "0 card": "0 card",
   "{{numberCard}} card": "{{numberCard}} card",
   "{{count}} cards": "{{count}} cards",
-  "{{count}} cards_plural": "{{count}} cards"
+  "{{count}} cards_plural": "{{count}} cards",
+  "Start date:": "Start date:",
+  "Due date:": "Due date:",
+  "Start date": "Start date",
+  "Due date": "Due date"
 }
