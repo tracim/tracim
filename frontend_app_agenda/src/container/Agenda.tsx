@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { createRef, RefObject, useEffect, useRef, useState } from 'react'
 import { translate } from 'react-i18next'
-import i18n from '../i18n.js'
+import i18n from '../i18n'
 import {
   addAllResourceI18n,
   handleFetchResult,
@@ -19,12 +19,14 @@ import {
   TracimComponent
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
-import { getAgendaList, getPreFilledAgendaEvent } from '../action.async.js'
+import { getAgendaList, getPreFilledAgendaEvent } from '../action.async'
+import createCalendarClient from './calendarClient'
 
-export class Agenda extends React.Component {
-  constructor (props) {
+export class Agenda extends React.Component<any, any> {
+  calendarRef: RefObject<any> = createRef()
+
+  constructor(props) {
     super(props)
-
     const param = props.data || debug
 
     this.state = {
@@ -39,7 +41,8 @@ export class Agenda extends React.Component {
       breadcrumbsList: [],
       appMounted: false,
       editionAuthor: '',
-      showRefreshWarning: false
+      showRefreshWarning: false,
+      calendar: null
     }
 
     // i18n has been init, add resources from frontend
@@ -81,7 +84,6 @@ export class Agenda extends React.Component {
       ? `${props.t('Agenda')} · ${state.content.workspaceLabel}`
       : props.t('My agendas')
     )
-    this.agendaIframe.contentWindow.location.reload()
   }
 
   // TLM Handlers
@@ -125,7 +127,7 @@ export class Agenda extends React.Component {
     if (state.userWorkspaceList.length === 1) this.buildBreadcrumbs()
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     const { state, props } = this
     console.log('%c<Agenda> did mount', `color: ${state.config.hexcolor}`)
 
@@ -138,25 +140,27 @@ export class Agenda extends React.Component {
     }
     this.buildBreadcrumbs()
   }
-
-  async componentDidUpdate (prevProps, prevState) {
+  
+  async componentDidUpdate(prevProps, prevState) {
     const { state } = this
     // console.log('%c<Agenda> did update', `color: ${state.config.hexcolor}`, prevState, state)
-
+    
     if (prevState.config.appConfig.workspaceId !== state.config.appConfig.workspaceId) {
       if (state.config.appConfig.workspaceId) await this.loadAgendaList(state.config.appConfig.workspaceId)
       await this.loadWorkspaceData()
       this.buildBreadcrumbs()
-      this.agendaIframe.contentWindow.location.reload()
+    }
+    if (this.calendarRef.current && state.calendar === null) {
+      this.buildCalendar()
     }
   }
 
   handleClickRefresh = () => {
     this.setState({ showRefreshWarning: false })
-    this.agendaIframe.contentWindow.location.reload()
   }
 
   setHeadTitle = (title) => {
+    //@ts-ignore
     GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.SET_HEAD_TITLE,
       data: { title: title }
@@ -183,7 +187,7 @@ export class Agenda extends React.Component {
     }
   }
 
-  async loadPrefilledAgendaEvent () {
+  async loadPrefilledAgendaEvent() {
     const fetchGetPreFilledAgendaEvent = await handleFetchResult(
       await getPreFilledAgendaEvent(this.state.config.apiUrl)
     )
@@ -277,6 +281,15 @@ export class Agenda extends React.Component {
     this.setState({ breadcrumbsList: breadcrumbsList })
   }
 
+  buildCalendar = () => {
+    
+    const calendar = createCalendarClient(
+      this.calendarRef.current,
+      `${window.location.origin}/dav`
+    )
+    this.setState({ calendar })
+  }
+
   loadWorkspaceData = async () => {
     const { state, props } = this
 
@@ -295,28 +308,12 @@ export class Agenda extends React.Component {
     }
   }
 
-  render () {
+  render() {
     const { props, state } = this
 
     if (!state.isVisible || !state.userWorkspaceListLoaded || !state.preFilledAgendaEvent) return null
 
-    const config = {
-      globalAccountSettings: {
-        agendaList: state.userWorkspaceList.map(a => ({
-          href: a.agenda_url,
-          hrefLabel: a.agenda_type === 'private'
-            ? props.t('User')
-            : state.userWorkspaceList.length > 1 ? props.t('Spaces') : props.t('Space'),
-          settingsAccount: a.agenda_type === 'private',
-          withCredentials: a.with_credentials,
-          loggedUserRole: a.agenda_type === 'private' ? '' : a.loggedUserRole,
-          workspaceId: a.agenda_type === 'private' ? '' : a.workspace_id
-        }))
-      },
-      userLang: state.loggedUser.lang,
-      preFilledAgendaEvent: state.preFilledAgendaEvent,
-      shouldShowCaldavzapSidebar: state.config.appConfig.forceShowSidebar
-    }
+    const serverUrl = `${window.location.origin}/dav`
 
     // INFO - GB - 2019-06-11 - This tag dangerouslySetInnerHTML is needed to i18next be able to handle special characters
     // https://github.com/tracim/tracim/issues/1847
@@ -327,14 +324,14 @@ export class Agenda extends React.Component {
           dangerouslySetInnerHTML={{
             __html: props.t(
               'Agenda of space {{workspaceLabel}}', {
-                workspaceLabel: state.content.workspaceLabel,
-                interpolation: { escapeValue: false }
-              }
+              workspaceLabel: state.content.workspaceLabel,
+              interpolation: { escapeValue: false }
+            }
             )
           }}
         />
       )
-
+    
     return (
       <PageWrapper customClass='agendaPage'>
         <PageTitle
@@ -355,14 +352,7 @@ export class Agenda extends React.Component {
         </div>
 
         <PageContent parentClass='agendaPage'>
-          <iframe
-            id='agendaIframe'
-            src='/assets/_caldavzap/index.tracim.html'
-            allow='fullscreen'
-            allowFullScreen
-            data-config={JSON.stringify(config)}
-            ref={f => { this.agendaIframe = f }}
-          />
+          <div ref={this.calendarRef} style={{ height: "100%"}} ></div>
         </PageContent>
       </PageWrapper>
     )

@@ -2,8 +2,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import 'regenerator-runtime/runtime'
 import { Router } from 'react-router-dom'
-import Agenda from './container/Agenda.jsx'
-import { debug } from './debug.js'
+import Agenda from './container/Agenda'
+import { debug } from './debug'
 import { LiveMessageManager } from 'tracim_frontend_lib'
 
 require('./css/index.styl')
@@ -16,7 +16,10 @@ manager.openLiveMessageConnection(debug.loggedUser.userId, debug.config.apiUrl)
 
 ReactDOM.render(
   <Router history={history}>
-    <Agenda data={undefined} />
+    <Agenda
+      //@ts-ignore
+      data={undefined}
+    />
   </Router>
   , document.getElementById('content')
 )

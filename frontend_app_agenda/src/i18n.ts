@@ -22,6 +22,6 @@ i18n
     resources: {} // init with empty resources, they will come from frontend in app constructor
   })
 
+//@ts-ignore
 i18n.tracimId = 'frontend_app_agenda'
-
 export default i18n

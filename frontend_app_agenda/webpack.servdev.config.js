@@ -1,7 +1,7 @@
 const path = require('path')
 
 module.exports = require('./webpack.optimized.config.js')
-module.exports.entry = './src/index.dev.js'
+module.exports.entry = './src/index.dev.tsx'
 delete module.exports.output.library
 
 module.exports.devServer = {
