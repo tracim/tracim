@@ -2,7 +2,7 @@
     display: grid;
     grid-template-columns: max-content max-content;
     grid-gap: 5px;
-
+    
     label {
         text-align: right;
     }
@@ -10,4 +10,19 @@
     label:after {
         content: ":";
     }
+    
+    input[type=checkbox] {
+        justify-self: left;
+    }
+}
+
+.form-div {
+    display: flex;
+}
+
+.attendees-div {
+    display: grid;
+    grid-template-columns: max-content max-content max-content max-content;
+    grid-gap: 5px;
+
 }

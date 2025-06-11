@@ -7523,7 +7523,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"inherits@npm:2, inherits@npm:2.0.4, inherits@npm:^2.0.1, inherits@npm:^2.0.3, inherits@npm:^2.0.4, inherits@npm:~2.0.3":
+"inherits@npm:2, inherits@npm:2.0.4, inherits@npm:^2.0.1, inherits@npm:^2.0.3, inherits@npm:^2.0.4, inherits@npm:~2.0.3, inherits@npm:~2.0.4":
   version: 2.0.4
   resolution: "inherits@npm:2.0.4"
   checksum: 4a48a733847879d6cf6691860a6b1e3f0f4754176e4d71494c41f3475553768b10f84b5ce1d40fbd0e34e6bfbb864ee35858ad4dd2cf31e02fc4a154b724d7f1
@@ -11189,7 +11189,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"readable-stream@npm:3, readable-stream@npm:^3.0.2, readable-stream@npm:^3.0.6, readable-stream@npm:^3.4.0":
+"readable-stream@npm:3, readable-stream@npm:^3.0.2, readable-stream@npm:^3.0.6, readable-stream@npm:^3.4.0, readable-stream@npm:^3.5.0":
   version: 3.6.2
   resolution: "readable-stream@npm:3.6.2"
   dependencies:
@@ -12558,6 +12558,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"stream-browserify@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "stream-browserify@npm:3.0.0"
+  dependencies:
+    inherits: ~2.0.4
+    readable-stream: ^3.5.0
+  checksum: 4c47ef64d6f03815a9ca3874e2319805e8e8a85f3550776c47ce523b6f4c6cd57f40e46ec6a9ab8ad260fde61863c2718f250d3bedb3fe9052444eb9abfd9921
+  languageName: node
+  linkType: hard
+
 "stream-composer@npm:^1.0.2":
   version: 1.0.2
   resolution: "stream-composer@npm:1.0.2"
@@ -13005,6 +13015,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"timezones-ical-library@npm:^1.10.0":
+  version: 1.10.0
+  resolution: "timezones-ical-library@npm:1.10.0"
+  checksum: 89b208618b315c768adc452ebb427a77e8172006c1aab210ffc1c924117ffc3eb17a617e3652600dff13ebb6b0cb1d96bf1eb4dd97dfd375e0e3ae0c9e87447b
+  languageName: node
+  linkType: hard
+
 "tiny-invariant@npm:^1.0.2, tiny-invariant@npm:^1.0.6":
   version: 1.3.1
   resolution: "tiny-invariant@npm:1.3.1"
@@ -13338,9 +13355,11 @@ __metadata:
     script-loader: ^0.7.2
     standard: ^14
     standard-loader: ^7.0.0
+    stream-browserify: ^3.0.0
     style-loader: ^0.23.1
     stylus: ^0.54.5
     stylus-native-loader: ^1.1.0
+    timezones-ical-library: ^1.10.0
     tracim_frontend_lib: ^1.1.9
     ts-ics: ^2.1.2
     ts-loader: ^9.5.2

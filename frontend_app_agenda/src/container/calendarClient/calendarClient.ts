@@ -5,8 +5,9 @@ import { convertIcsCalendar, generateIcsCalendar, getDurationFromInterval, getEv
 import type { IcsCalendar, IcsEvent } from 'ts-ics';
 import { createAccount, createCalendarObject, fetchCalendarObjects, fetchCalendars, updateCalendarObject, type DAVCalendar, type DAVCalendarObject } from 'tsdav';
 import { EventEditPopup } from './eventEditPopup';
-import { fetchCalendar, isEventAllDay, offsetDate } from './utils';
+import { createElement, createText, fetchCalendar, isEventAllDay, offsetDate, validateTimezones } from './utils';
 import type { CalendarUrls, EventIndex, ServerUrl } from './types';
+import { tzlib_get_timezones } from 'timezones-ical-library';
 
 export class CalendarClient {
 
@@ -18,6 +19,8 @@ export class CalendarClient {
   // TODO store converted data
   private _davObjects: DAVCalendarObject[][] = []
 
+  private _timezones: string[]
+
   constructor(
     target: Element | Document | ShadowRoot,
     url: ServerUrl | CalendarUrls,
@@ -25,11 +28,15 @@ export class CalendarClient {
     fetchOptions?: RequestInit
   ) {
     this._headers = { headers, fetchOptions }
+    this._timezones = tzlib_get_timezones() as string[]
 
-    this._eventPopup = new EventEditPopup(target)
+    this._eventPopup = new EventEditPopup(target, this._timezones)
     this._eventPopup.onSave = this.updateEvent
+    target.appendChild(createElement("button", { type: "button", onclick: this.loadEvents }, [createText("Refresh")]))
+    //@ts-ignore
+    const calendarNode = target.appendChild(createElement("div", { style: { display: "flex" } }))
     this._calendar = createEventCalendar(
-      target,
+      calendarNode,
       [DayGrid, TimeGrid, List, Interaction],
       {
         view: "timeGridWeek",
@@ -51,6 +58,8 @@ export class CalendarClient {
         eventDrop: this.updateEventDates,
       }
     )
+
+
     this.loadCalendars(url).then(this.loadEvents)
   }
 
@@ -61,18 +70,18 @@ export class CalendarClient {
   selectDates = ({ start, end, allDay }: Calendar.SelectInfo) => {
     const type = allDay ? "DATE" : "DATE-TIME"
     this._eventPopup.open({
-        summary: "",
-        start: {
-          date: start,
-          type: type
-        },
-        end: {
-          date: end,
-          type: type
-        },
-        uid: crypto.randomUUID(),
-        stamp: { date: new Date() },
-    }, { calendarIndex: -1, objectIndex: -1, eventIndex: -1})
+      summary: "",
+      start: {
+        date: start,
+        type: type
+      },
+      end: {
+        date: end,
+        type: type
+      },
+      uid: crypto.randomUUID(),
+      stamp: { date: new Date() },
+    }, { calendarIndex: -1, objectIndex: -1, eventIndex: -1 })
   }
 
   updateEventDates = async ({ event, oldEvent, revert }: Calendar.EventDropInfo | Calendar.EventResizeInfo) => {
@@ -106,7 +115,7 @@ export class CalendarClient {
     // else
     icsCalendar.events[index.eventIndex] = { ...event, sequence: (event.sequence ?? 0) + 1 }
 
-    // validateTimezones(icsCalendar)
+    validateTimezones(icsCalendar)
     var newCalendarObject = { ...calendarObject, data: generateIcsCalendar(icsCalendar) }
     const res = await updateCalendarObject({ calendarObject: newCalendarObject, ...this._headers })
     if (!res.ok) return false
@@ -122,7 +131,7 @@ export class CalendarClient {
       version: '2.0',
       events: [event],
     }
-    // validateTimezones(icsCalendar)
+    validateTimezones(icsCalendar)
     const data = generateIcsCalendar(icsCalendar)
     const res = await createCalendarObject({
       calendar,
@@ -174,4 +183,6 @@ export class CalendarClient {
     }).flat()).flat()
     this._calendar.setOption("events", events)
   }
+
+
 }
