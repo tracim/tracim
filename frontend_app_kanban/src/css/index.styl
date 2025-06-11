@@ -146,13 +146,27 @@ cardWidth = 280px
       display none
     &__inline
       display flex
+      flex-wrap wrap
       justify-content flex-start
-      gap 25px
-    &__kickoff, &__deadline, &__freeInput
+      gap 5px 25px
+    & .inlineInput
+      display flex
+      flex-direction row
+      align-items baseline
+      & label
+        min-width 100px
+    &__bgColor
+      min-width 75px // INFO - CH - 2025-06-06 - label 100px - 25px row gap
+    &__assignment, &__kickoff, &__deadline, &__freeInput
       flex-grow 1
     &__bgColor, &__deadline
       display flex
       flex-direction column
+    & .textInputComponent
+      flex-grow 1
+    & .linebreak
+      flex-basis 100%
+      height 0
 
     & .cardPopup__container
       width 100%
@@ -176,19 +190,24 @@ cardWidth = 280px
     & input
       vertical-align middle
 
-    &__description, &__deadline, &__title, &__freeInput
-      margin-bottom standardSpacing
-
     &__description
       > div
         height 200px
 
     &__form
+      display flex
+      flex-direction column
+      gap 15px
       overflow-y auto
       width 100%
       height 100%
       &__fields
-          width calc(100% - 2px) // NOTE - RJ - 19-01-2022 - TinyMCE borders make the form overflow if we don't remove these 2px here
+        display flex
+        flex-direction column
+        gap 8px
+        // NOTE - RJ - 2022-01-19 - TinyMCE borders make the form overflow if we don't remove these 2px here
+        width calc(100% - 2px)
+
         label
           padding-inline-end textSpacing
 
@@ -197,6 +216,9 @@ cardWidth = 280px
           font-size standardFontSize
           padding-inline-start textSpacing
           border none
+          &.dateInput
+            flex-grow 1
+            width auto
 
       &_buttons
         margin-bottom 0
@@ -256,6 +278,25 @@ cardWidth = 280px
         right closedSidebarWidth
       &__toolbar
         left standardSpacing
+
+.CustomReactSelectOption
+  display flex
+  flex-direction row
+  gap 5px
+  background-color transparent
+  color inherit
+  cursor default
+  font-size inherit
+  padding 8px 12px
+  width 100%
+  user-select none
+  box-sizing border-box
+  &:hover
+    background-color #deebff
+  &__avatar__img
+    border-radius 50%
+  &__username
+    color darkGrey1
 
 @media (min-width: max-xs) and (max-width: max-lg)
   .kanban

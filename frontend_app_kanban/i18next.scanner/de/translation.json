@@ -10,7 +10,6 @@
   "Editing Card": "Karte bearbeiten",
   "New Card": "Neue Karte",
   "Title:": "Titel:",
-  "Description:": "Beschreibung:",
   "Color:": "Farbe:",
   "Cancel": "Abbrechen",
   "Validate": "Validieren",
@@ -43,7 +42,6 @@
   "The link has been copied to clipboard": "Link in die Zwischenablage kopiert",
   "Copy content link": "Link zum Inhalt kopieren",
   "Description of the card": "Beschreibung der Karte",
-  "Open field:": "",
   "Permanently delete": "Endgültig löschen",
   "Yes, delete permanently": "Ja, endgültig löschen",
   "Warning: this operation cannot be rolled back": "",
@@ -51,8 +49,12 @@
   "{{numberCard}} card": "",
   "{{count}} cards": "",
   "{{count}} cards_plural": "",
+  "No member": "",
   "Start date:": "",
   "Due date:": "",
   "Start date": "",
-  "Due date": ""
+  "Due date": "",
+  "Title": "",
+  "Open field": "",
+  "Assignment": ""
 }

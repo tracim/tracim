@@ -74,7 +74,26 @@ export const defaultDebug = {
       }
     },
     label: '',
-    appCustomActionList: []
+    appCustomActionList: [],
+    workspace: {
+      downloadEnabled: true,
+      label: 'first space',
+      memberList: [{
+        id: 1,
+        publicName: 'Global manager',
+        username: 'TheAdmin',
+        role: 'workspace-manager',
+        hasAvatar: true,
+        hasCover: false
+      }, {
+        id: 2,
+        publicName: 'User1',
+        username: 'User1',
+        role: 'workspace-manager',
+        hasAvatar: true,
+        hasCover: false
+      }]
+    }
   },
   content: {
     content_id: 0,

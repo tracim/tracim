@@ -11,7 +11,6 @@
   "Editing Card": "Editing Card",
   "New Card": "New Card",
   "Title:": "Title:",
-  "Description:": "Description:",
   "Color:": "Colour:",
   "Cancel": "Cancel",
   "Validate": "Validate",
@@ -43,7 +42,6 @@
   "The link has been copied to clipboard": "Link copied to clipboard",
   "Copy content link": "Copy content link",
   "Description of the card": "Description of the card",
-  "Open field:": "Open field:",
   "Permanently delete": "Permanently delete",
   "Yes, delete permanently": "Yes, delete permanently",
   "Warning: this operation cannot be rolled back": "Warning: this operation cannot be rolled back",
@@ -51,8 +49,12 @@
   "{{numberCard}} card": "{{numberCard}} card",
   "{{count}} cards": "{{count}} cards",
   "{{count}} cards_plural": "{{count}} cards",
+  "No member": "No member",
   "Start date:": "Start date:",
   "Due date:": "Due date:",
   "Start date": "Start date",
-  "Due date": "Due date"
+  "Due date": "Due date",
+  "Title": "Title",
+  "Open field": "Open field",
+  "Assignment": "Assignment"
 }
