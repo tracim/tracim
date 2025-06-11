@@ -123,15 +123,6 @@ function KanbanCardEditor (props) {
         </div>
 
         <div className='kanban__KanbanPopup__inline'>
-          <div className='kanban__KanbanPopup__bgColor'>
-            <input
-              id='kanban__KanbanPopup__bgColor'
-              type='color'
-              value={bgColor}
-              onChange={(e) => setBgColor(e.target.value)}
-            />
-          </div>
-
           <div className='kanban__KanbanPopup__kickoff inlineInput'>
             <label htmlFor='kanban__KanbanPopup__kickoff'>{props.t('Start date:')}</label>
 
@@ -155,6 +146,15 @@ function KanbanCardEditor (props) {
           </div>
 
           <div className='linebreak' />
+
+          <div className='kanban__KanbanPopup__bgColor'>
+            <input
+              id='kanban__KanbanPopup__bgColor'
+              type='color'
+              value={bgColor}
+              onChange={(e) => setBgColor(e.target.value)}
+            />
+          </div>
 
           <div className='kanban__KanbanPopup__freeInput'>
             <TextInput
