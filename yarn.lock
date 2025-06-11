@@ -13383,7 +13383,7 @@ __metadata:
     stylus-native-loader: ^1.1.0
     timezones-ical-library: ^1.10.0
     tracim_frontend_lib: ^1.1.9
-    ts-ics: ^2.1.2
+    ts-ics: ^2.1.5
     ts-loader: ^9.5.2
     tsdav: ^2.1.4
     typescript: ^5.8.3
@@ -14160,12 +14160,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-ics@npm:^2.1.2":
-  version: 2.1.6
-  resolution: "ts-ics@npm:2.1.6"
+"ts-ics@npm:^2.1.5":
+  version: 2.1.7
+  resolution: "ts-ics@npm:2.1.7"
   dependencies:
     "@standard-schema/spec": ^1.0.0
-  checksum: 831e9c7605f26ae8ab73b637ef0c67637de7a93f0c4a005249240f09f17156f34fe97e31b9f66e3f487780cf6d1f503e4fcc927609b44a1752bd16517d64daef
+  checksum: 2924f67682c0a80d5ca71f586b68e3a0603dc5695d23bd32184a22d5e56a0486396e350798dd6e2cfd81bec7d5d52764d3159974c25ce17a7eda560b032838b4
   languageName: node
   linkType: hard
 

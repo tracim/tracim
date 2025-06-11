@@ -1,5 +1,5 @@
-import { IcsEvent, NonStandardValuesGeneric } from "ts-ics"
-import { DAVCalendarObject } from "tsdav"
+import type { IcsEvent, NonStandardValuesGeneric } from "ts-ics"
+import type { DAVCalendarObject } from "tsdav"
 
 export interface CalendarObject extends DAVCalendarObject {
   calendarUrl: string

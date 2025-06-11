@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
-import { createAccount, createCalendarObject, DAVCalendar, DAVNamespaceShort, fetchCalendarObjects, fetchCalendars, propfind, updateCalendarObject } from "tsdav"
-import { Calendar, CalendarProps, dateFnsLocalizer, EventPropGetter } from 'react-big-calendar'
-import withDragAndDrop, { withDragAndDropProps } from 'react-big-calendar/lib/addons/dragAndDrop'
+import { createAccount, createCalendarObject, type DAVCalendar, DAVNamespaceShort, fetchCalendarObjects, fetchCalendars, propfind, updateCalendarObject } from "tsdav"
+import { Calendar, type CalendarProps, dateFnsLocalizer, type EventPropGetter } from 'react-big-calendar'
+import withDragAndDrop, { type withDragAndDropProps } from 'react-big-calendar/lib/addons/dragAndDrop'
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 
@@ -11,9 +11,9 @@ import parse from 'date-fns/parse'
 import startOfWeek from 'date-fns/startOfWeek'
 import getDay from 'date-fns/getDay'
 import enUS from 'date-fns/locale/en-US'
-import { convertIcsCalendar, convertIcsTimezone, DateObjectType, extendByRecurrenceRule, generateIcsCalendar, generateIcsDuration, IcsCalendar, IcsDateObject, IcsDuration, IcsEvent } from "ts-ics"
+import { convertIcsCalendar, convertIcsTimezone, type DateObjectType, extendByRecurrenceRule, generateIcsCalendar, generateIcsDuration, type IcsCalendar, type IcsDateObject, type IcsDuration, type IcsEvent } from "ts-ics"
 import Popup from "./Popup"
-import { CalendarEvent, CalendarObject, isEventAllDay } from "./types"
+import { type CalendarEvent, type CalendarObject, isEventAllDay } from "./types"
 import EventModal, { ModalMode } from "./EventModal"
 import { addMilliseconds } from "date-fns"
 import { tzlib_get_ical_block, tzlib_get_timezones } from "timezones-ical-library"
@@ -21,7 +21,7 @@ import { tzlib_get_ical_block, tzlib_get_timezones } from "timezones-ical-librar
 export interface CalendarDavProps {
   serverUrl?: string,
   calendarUrls?: string[],
-  headers: Record<string, string>
+  headers?: Record<string, string>
   fetchOptions?: RequestInit
   onEventDatesChanged?: (start: Date, end: Date) => CalendarEvent
   onViewEvent?: (event: CalendarEvent) => CalendarEvent | null

@@ -20,7 +20,7 @@ import {
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import { getAgendaList, getPreFilledAgendaEvent } from '../action.async'
-import CalendarDav from './CalendarDav'
+import CalendarDav from './calendardav/CalendarDav'
 
 export class Agenda extends React.Component<any, any> {
   constructor (props) {

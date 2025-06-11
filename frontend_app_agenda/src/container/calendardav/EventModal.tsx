@@ -1,10 +1,10 @@
-import { convertIcsDuration, convertIcsRecurrenceRule, generateIcsDuration, generateIcsRecurrenceRule, IcsAttendeePartStatusType, IcsDuration, IcsEvent, IcsTriggerRelation, NonStandardValuesGeneric, triggerRelations } from "ts-ics"
+import { convertIcsDuration, convertIcsRecurrenceRule, generateIcsDuration, generateIcsRecurrenceRule, type IcsAttendeePartStatusType, type IcsDuration, type IcsEvent, type IcsTriggerRelation, type NonStandardValuesGeneric, triggerRelations } from "ts-ics"
 import { useFieldArray, useForm } from "react-hook-form";
 import { isEventAllDay } from "./types";
-import { DAVCalendar } from "tsdav";
+import type { DAVCalendar } from "tsdav";
 import { tzlib_get_ical_block, tzlib_get_offset } from "timezones-ical-library";
 
-export enum ModalMode {
+export const enum ModalMode {
   View,
   Edit,
   Create,
@@ -220,7 +220,7 @@ export default function EventModal({ calendars, timezones, mode, event, onSubmit
               {attendeesFields.map((f, index) => <tr key={f.id}>
                 <td><input type="text" placeholder="email" {...register(`attendees.${index}.email`, { required: true })} /></td>
                 <td><input type="text" placeholder="name" {...register(`attendees.${index}.name`)} /></td>
-                <td><select name="role" {...register(`attendees.${index}.role`)}>
+                <td><select {...register(`attendees.${index}.role`)}>
                   {attendeeRoleTypes.map(a => <option key={a} value={a}>{a}</option>)}
                 </select></td>
                 <td><button onClick={() => removeAttendee(index)}>X</button></td>

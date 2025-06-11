@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, SyntheticEvent, useCallback, useEffect, useMemo, useState } from "react"
+import React, { type PropsWithChildren, type SyntheticEvent } from "react"
 import { createPortal } from "react-dom"
 import './Popup.css'
 
