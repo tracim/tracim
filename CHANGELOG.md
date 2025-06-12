@@ -7,6 +7,9 @@
 - Add viewer for some 3d format file type
 - New config parameter to allow iframe from specific domain
 - Revisions are now grouped in the Timeline of contents
+- Add due date to kanban cards
+- Add assignment to kanban cards
+- Improve UI of kanban cards
 
 ### 🐛 Fixed Issue
 
