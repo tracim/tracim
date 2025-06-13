@@ -5,12 +5,12 @@ import PropTypes from 'prop-types'
 import {
   PAGE,
   TLM_SUB_TYPE as TLM_SUB,
-  ListItemWrapper
+  ListItemWrapper,
+  isPatternIncludedInString
 } from 'tracim_frontend_lib'
 import NotificationItem from '../component/NotificationItem.jsx'
 import GroupRender from '../component/GroupedNotificationItem/GroupRender.jsx'
 import { escape as escapeHtml, uniqBy } from 'lodash'
-import { isPatternIncludedInString } from './NotificationWall.jsx'
 
 export const GroupedNotificationItem = props => {
   const [isGrouped, setIsGrouped] = useState(true)

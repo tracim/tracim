@@ -699,6 +699,18 @@ export const sanitizeHtmlElement = (element, additionalTagList = []) => {
   return sanitizedElement
 }
 
+export const isPatternIncludedInString = (string, pattern) => {
+  if (string === undefined || string === null) return false
+  if (pattern === '') return true
+
+  // INFO - CH - 2023-12-07 - Implementation to match any words in pattern
+  // const patternList = pattern.trim().split(' ')
+  // return patternList.some(p => string.toLowerCase().includes(p) === true)
+
+  // INFO - CH - 2023-12-07 - Implementation to match the whole pattern
+  return string.toLowerCase().includes(pattern.trim().toLowerCase()) === true
+}
+
 export const defaultApiContent = {
   content_id: 0,
   workspace_id: 0,

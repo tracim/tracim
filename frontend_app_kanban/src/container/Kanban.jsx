@@ -40,7 +40,8 @@ import {
   putMyselfFileRead,
   sendGlobalFlashMessage,
   sortListByMultipleCriteria,
-  defaultApiContent
+  defaultApiContent,
+  FilterBar
 } from 'tracim_frontend_lib'
 
 import KanbanComponent from '../component/Kanban.jsx'
@@ -80,7 +81,8 @@ export class Kanban extends React.Component {
       showRefreshWarning: false,
       showPermanentlyDeletePopup: false,
       translationTargetLanguageCode: param.loggedUser.lang,
-      toDoList: []
+      toDoList: [],
+      filterInput: ''
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
 
@@ -612,6 +614,12 @@ export class Kanban extends React.Component {
     this.setState({ translationTargetLanguageCode })
   }
 
+  handleChangeFilterInput = e => {
+    this.setState({
+      filterInput: e.target.value
+    })
+  }
+
   render () {
     const { props, state } = this
 
@@ -703,6 +711,14 @@ export class Kanban extends React.Component {
           onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
             state.content, state.loggedUser, this.setState.bind(this)
           )}
+          genericAction={
+            <FilterBar
+              customClass=''
+              onChange={this.handleChangeFilterInput}
+              value={state.filterInput}
+              placeholder={props.t('Filter...')}
+            />
+          }
         >
           <KanbanComponent
             config={state.config}
@@ -714,6 +730,7 @@ export class Kanban extends React.Component {
             isRefreshNeeded={state.showRefreshWarning}
             language={state.loggedUser.lang}
             mode={state.mode}
+            filterInput={state.filterInput}
             onClickFullscreen={this.handleClickFullscreen}
             onClickLastVersion={this.handleClickLastVersion}
             onClickRefresh={this.handleClickRefresh}
