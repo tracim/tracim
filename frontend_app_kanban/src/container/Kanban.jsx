@@ -615,9 +615,7 @@ export class Kanban extends React.Component {
   }
 
   handleChangeFilterInput = e => {
-    this.setState({
-      filterInput: e.target.value
-    })
+    this.setState({ filterInput: e.target.value })
   }
 
   render () {

@@ -16,12 +16,13 @@ cardWidth = 280px
       opacity 70%
     &__title
       display flex
+      align-items center
+      margin-bottom textSpacing
 
       & strong
         flex 1
         overflow-wrap anywhere
         hyphens auto
-        margin-bottom textSpacing
         unicode-bidi plaintext
 
       & > button
@@ -57,6 +58,8 @@ cardWidth = 280px
         display flex
         flex-direction row
         justify-content space-between
+        align-items center
+        margin-bottom textSpacing
         &__kickoff, &__deadline
           display inline
           & i

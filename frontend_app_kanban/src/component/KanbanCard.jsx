@@ -44,6 +44,9 @@ function KanbanCard (props) {
     )
   }
 
+  const showKickoff = props.card.kickoff && props.card.kickoff !== ''
+  const showDeadline = props.card.deadline && props.card.deadline !== ''
+
   return (
     <div
       style={{ backgroundColor: props.card.bgColor || props.customColor }}
@@ -149,7 +152,7 @@ function KanbanCard (props) {
             className='kanban__contentpage__wrapper__board__card__options__date__kickoff'
             title={props.t('Start date')}
           >
-            {props.card.kickoff && props.card.kickoff !== '' && (
+            {showKickoff && (
               <>
                 <Icon
                   icon='far fa-calendar'
@@ -160,11 +163,15 @@ function KanbanCard (props) {
             )}
           </div>
 
+          {showKickoff && showDeadline && (
+            <Icon icon='fas fa-chevron-right' />
+          )}
+
           <div
             className='kanban__contentpage__wrapper__board__card__options__date__deadline'
             title={props.t('Due date')}
           >
-            {props.card.deadline && props.card.deadline !== '' && (
+            {showDeadline && (
               <>
                 <Icon
                   icon='far fa-calendar'
