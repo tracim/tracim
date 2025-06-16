@@ -202,7 +202,17 @@ export const AdminUserSpacesConfig = (props) => {
     )
 
     if (fetchPutUserSpaceSubscription.status !== 200) {
-      props.dispatch(newFlashMessage(props.t('Error while adding the member to the space'), 'warning'))
+      switch (fetchPutUserSpaceSubscription.json.code) {
+        case 2075:
+          props.dispatch(newFlashMessage(props.t("Guest users aren't allowed to be more than contributor"), 'warning'))
+          break
+        case 8004:
+          props.dispatch(newFlashMessage(props.t('The maximum number of spaces for a guest user has been reached'), 'warning'))
+          break
+        default:
+          props.dispatch(newFlashMessage(props.t('Error while adding the member to the space'), 'warning'))
+          break
+      }
     }
   }
 
@@ -211,11 +221,21 @@ export const AdminUserSpacesConfig = (props) => {
       updateUserRole(space.id, props.userToEditId, role.slug)
     )
     if (fetchUpdateSpaceMember.status !== 200) {
-      props.dispatch(newFlashMessage(
-        fetchUpdateSpaceMember.json.code === 3011
-          ? props.t('You cannot change this member role because there are no other space managers.')
-          : props.t('Error while saving new role for member')
-        , 'warning'))
+      switch (fetchUpdateSpaceMember.json.code) {
+        case 3011:
+          props.dispatch(
+            newFlashMessage(props.t('You cannot change this member role because there are no other space managers.'), 'warning')
+          )
+          break
+        case 2075:
+          props.dispatch(
+            newFlashMessage(props.t("Guest users aren't allowed to be more than contributor"), 'warning')
+          )
+          break
+        default:
+          props.dispatch(newFlashMessage(props.t('Error while saving new role for member'), 'warning'))
+          break
+      }
     }
   }
 

@@ -800,6 +800,18 @@ class CFG(object):
         self.LIMITATION__MAXIMUM_ONLINE_USERS_MESSAGE = self.get_raw_config(
             "limitation.maximum_online_users_message", ""
         )
+        self.LIMITATION__MAX_NON_GUEST_USERS = int(
+            self.get_raw_config("limitation.max_non_guest_users", "-1")
+        )
+        self.LIMITATION__MAX_GUEST_USERS = int(
+            self.get_raw_config("limitation.max_guest_users", "-1")
+        )
+        self.LIMITATION__MAX_GUEST_USER_NB_SPACE = int(
+            self.get_raw_config("limitation.max_guest_user_nb_space", "-1")
+        )
+        self.LIMITATION__STANDARD_USER_EMAIL_DOMAIN = self.get_raw_config(
+            "limitation.standard_user_email_domain", ""
+        )
 
     def _load_email_config(self) -> None:
         """

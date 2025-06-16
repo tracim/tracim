@@ -61,5 +61,7 @@
   "Filter users": "Filtrer brukere",
   "Description of the space": "Beskrivelse av rommet",
   "This space doesn't have a description yet.": "Dette rommet har ikke en beskrivelse enda.",
-  "Edit": "Rediger"
+  "Edit": "Rediger",
+  "Guest users aren't allowed to be more than contributor": "",
+  "The maximum number of spaces for a guest user has been reached": ""
 }

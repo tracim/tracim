@@ -397,10 +397,18 @@ export class WorkspaceAdvanced extends React.Component {
 
     switch (fetchPutUserRole.apiResponse.status) {
       case 200: sendGlobalFlashMessage(props.t('Save successful'), 'info'); break
-      default: sendGlobalFlashMessage(fetchPutUserRole.body.code === 3011
-        ? props.t('You cannot change this member role because there are no other space managers.')
-        : props.t('Error while saving new role for member')
-      )
+      default:
+        switch (fetchPutUserRole.body.code) {
+          case 3011:
+            sendGlobalFlashMessage(props.t('You cannot change this member role because there are no other space managers.'))
+            break
+          case 2075:
+            sendGlobalFlashMessage(props.t("Guest users aren't allowed to be more than contributor"))
+            break
+          default:
+            sendGlobalFlashMessage(props.t('Error while saving new role for member'))
+            break
+        }
     }
   }
 
@@ -615,6 +623,12 @@ export class WorkspaceAdvanced extends React.Component {
       case 400:
         switch (fetchWorkspaceNewMember.body.code) {
           case 2042: sendGlobalFlashMessage(props.t('This account is deactivated')); break
+          case 2075:
+            sendGlobalFlashMessage(props.t("Guest users aren't allowed to be more than contributor"))
+            break
+          case 8004:
+            sendGlobalFlashMessage(props.t('The maximum number of spaces for a guest user has been reached'))
+            break
           case 1001: {
             const ErrorMsg = () => (
               <div>

@@ -225,8 +225,8 @@ workspace.join.max_messages_history_count = -1
 # example:
 # limitation.workspace_size = 1073741824
 
-## default allowed space for new user if not provided in bytes, 0 mean no space
-## limit. Limit is on the sum of sizes of owned by user space.
+## default allowed space for new user if not provided in bytes, 0 mean no space limit.
+## Limit is on the sum of sizes of owned by user space.
 ; limitation.user_default_allowed_space = 0
 
 # maximum count of simultaneously online users, 0 means unlimited and is the default value.
@@ -237,6 +237,18 @@ workspace.join.max_messages_history_count = -1
 ; limitation.maximum_online_users_message =
 # For instance:
 # limitation.maximum_online_users_message = We suggest you contact your manager to upgrade your offer:<br /><b>Leslie Doe</b>, <a href="tel:+336123456789">+336123456789</a>, <a href="mailto:leslie.doe@example.org">leslie.doe@example.org</a>
+
+# max number of non guest user allowed (admin + trusted_user + user), -1 mean no limit.
+; limitation.max_non_guest_users = -1
+
+# max number of guest user allowed, -1 mean no limit.
+; limitation.max_guest_users = -1
+
+# max number of space a guest user can join, -1 mean no limit.
+; limitation.max_guest_user_nb_space = -1
+
+# the standard domain for all user, a new user with email not from this domain will be guest user
+; limitation.standard_user_email_domain =
 
 ####
 # STORAGE

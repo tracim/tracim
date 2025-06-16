@@ -11,7 +11,7 @@ from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.system import SystemApi
 from tracim_backend.lib.core.user_custom_properties import UserCustomPropertiesApi
 from tracim_backend.lib.utils.authorization import check_right
-from tracim_backend.lib.utils.authorization import is_user
+from tracim_backend.lib.utils.authorization import is_guest
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import get_timezones_list
 from tracim_backend.views.controllers import Controller
@@ -34,7 +34,7 @@ SWAGGER_TAG_SYSTEM_ENDPOINTS = "System"
 
 class SystemController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
-    @check_right(is_user)
+    @check_right(is_guest)
     @hapic.output_body(ApplicationSchema(many=True))
     def applications(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -48,7 +48,7 @@ class SystemController(Controller):
         return applications_in_context
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
-    @check_right(is_user)
+    @check_right(is_guest)
     @hapic.output_body(ContentTypeSchema(many=True))
     def content_types(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -64,7 +64,7 @@ class SystemController(Controller):
         return content_types_in_context
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
-    @check_right(is_user)
+    @check_right(is_guest)
     @hapic.output_body(WorkspaceAccessTypeSchema())
     def workspace_access_types(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -78,7 +78,7 @@ class SystemController(Controller):
         }
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
-    @check_right(is_user)
+    @check_right(is_guest)
     @hapic.output_body(TimezoneSchema(many=True))
     def timezones_list(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -87,7 +87,7 @@ class SystemController(Controller):
         return get_timezones_list()
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
-    @check_right(is_user)
+    @check_right(is_guest)
     @hapic.input_query(GetUsernameAvailability())
     @hapic.output_body(UsernameAvailability())
     def username_availability(self, context, request: TracimRequest, hapic_data: HapicData) -> dict:
@@ -102,7 +102,7 @@ class SystemController(Controller):
         }
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
-    @check_right(is_user)
+    @check_right(is_guest)
     @hapic.output_body(ReservedUsernamesSchema())
     def reserved_usernames(
         self, context, request: TracimRequest, hapic_data=None
@@ -113,7 +113,7 @@ class SystemController(Controller):
         return {"items": system_api.get_reserved_usernames()}
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
-    @check_right(is_user)
+    @check_right(is_guest)
     @hapic.output_body(AboutSchema())
     def about(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -138,7 +138,7 @@ class SystemController(Controller):
         return system_api.get_config()
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
-    @check_right(is_user)
+    @check_right(is_guest)
     @hapic.output_body(UserCustomPropertiesSchema())
     def user_custom_properties_schema(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -152,7 +152,7 @@ class SystemController(Controller):
         return {"json_schema": custom_properties_api.get_json_schema()}
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
-    @check_right(is_user)
+    @check_right(is_guest)
     @hapic.output_body(UsageConditionsSchema())
     def usage_conditions(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -163,7 +163,7 @@ class SystemController(Controller):
         return {"items": system_api.get_usage_conditions_files()}
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
-    @check_right(is_user)
+    @check_right(is_guest)
     @hapic.output_body(UserCustomPropertiesUiSchema())
     def custom_user_properties_ui_schema(self, context, request: TracimRequest, hapic_data=None):
         """

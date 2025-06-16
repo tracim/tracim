@@ -90,6 +90,9 @@ class ConfigModel(object):
         user__read_only_fields: Dict[str, List[str]],
         app_custom_actions: Dict[str, List[Dict[str, Any]]],
         iframe_whitelist: List[str],
+        limitation__max_non_guest_users: int,
+        limitation__max_guest_users: int,
+        limitation__max_guest_user_nb_space: int,
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
@@ -117,6 +120,9 @@ class ConfigModel(object):
         self.user__read_only_fields = user__read_only_fields
         self.app_custom_actions = app_custom_actions
         self.iframe_whitelist = iframe_whitelist
+        self.limitation__max_non_guest_users = limitation__max_non_guest_users
+        self.limitation__max_guest_users = limitation__max_guest_users
+        self.limitation__max_guest_user_nb_space = limitation__max_guest_user_nb_space
 
 
 class ErrorCodeModel(object):

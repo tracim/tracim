@@ -61,5 +61,7 @@
   "Filter users": "Filtrar a los usuarios",
   "Description of the space": "Descripción del espacio",
   "This space doesn't have a description yet.": "Este espacio no tiene una descripción todavía.",
-  "Edit": "Editar"
+  "Edit": "Editar",
+  "Guest users aren't allowed to be more than contributor": "",
+  "The maximum number of spaces for a guest user has been reached": ""
 }

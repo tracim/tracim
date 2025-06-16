@@ -20,8 +20,8 @@ from tracim_backend.lib.utils.authorization import can_delete_todo
 from tracim_backend.lib.utils.authorization import can_edit_todo
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_contributor
+from tracim_backend.lib.utils.authorization import is_guest
 from tracim_backend.lib.utils.authorization import is_reader
-from tracim_backend.lib.utils.authorization import is_user
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.models.context_models import ContentInContext
@@ -42,7 +42,7 @@ SWAGGER_TAG__CONTENT_TODO_ENDPOINTS = generate_documentation_swagger_tag(
 
 class TodoController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_TODO_ENDPOINTS])
-    @check_right(is_user)
+    @check_right(is_guest)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(ToDoSchema(many=True))
     def get_user_todos(

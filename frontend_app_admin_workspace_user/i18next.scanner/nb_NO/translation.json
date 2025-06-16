@@ -62,5 +62,21 @@
   "Sort by type": "Sorter etter type",
   "Sort by title": "Sorter etter navn",
   "Sort by description": "Sorter etter beskrivelse",
-  "Sort by number of members": "Sorter etter antall medlemmer"
+  "Sort by number of members": "Sorter etter antall medlemmer",
+  "Guest": "",
+  "No limit for the number of users": "",
+  "No limit for the number of guests": "",
+  "A guest can join up to {{count}} space": "",
+  "A guest can join up to {{count}} space_plural": "",
+  "No limit to the number space a guest user can join": "",
+  "The number maximum of users has been reached": "",
+  "The number maximum of guests has been reached": "",
+  "The user has a role too high level in some space to become a guest": "",
+  "You can' change your own profile": "",
+  "The user is in more space than the number allowed for guest": "",
+  "View user limitations": "",
+  "Normal users: {{currentGuests}}/{{maxGuests}} ({{count}} slots remaining)": "",
+  "Normal users: {{currentGuests}}/{{maxGuests}} ({{count}} slots remaining)_plural": "",
+  "Guest users: {{currentGuests}}/{{maxGuests}} ({{count}} slots remaining)": "",
+  "Guest users: {{currentGuests}}/{{maxGuests}} ({{count}} slots remaining)_plural": ""
 }

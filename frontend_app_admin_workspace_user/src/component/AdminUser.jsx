@@ -4,6 +4,7 @@ import { translate } from 'react-i18next'
 import { Link, withRouter } from 'react-router-dom'
 import { isMobile } from 'react-device-detect'
 import {
+  CardPopup,
   Delimiter,
   IconButton,
   PageWrapper,
@@ -31,9 +32,14 @@ export class AdminUser extends React.Component {
 
     this.state = {
       displayAddUser: false,
-      userFilter: ''
+      userFilter: '',
+      popupInfos: false
     }
   }
+
+  handleTogglePopupInfo = () => this.setState(prevState => ({
+    popupInfos: !prevState.popupInfos
+  }))
 
   handleToggleAddUser = () => this.setState(prevState => ({
     displayAddUser: !prevState.displayAddUser
@@ -104,6 +110,28 @@ export class AdminUser extends React.Component {
     else this.props.onChangeProfile(userId, 'trusted-users')
   }
 
+  handleToggleProfileGuest = (e, userId, toggle) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const { props } = this
+
+    if (!toggle && props.loggedUserId === userId) {
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.ADD_FLASH_MSG,
+        data: {
+          msg: props.t("You can't remove yourself from Administrator"),
+          type: 'warning',
+          delay: undefined
+        }
+      })
+      return
+    }
+
+    if (toggle) this.props.onChangeProfile(userId, 'guests')
+    else this.props.onChangeProfile(userId, 'users')
+  }
+
   handleClickAddUser = async (publicName, username, newEmailWithoutTrim, profile, password) => {
     const email = newEmailWithoutTrim.trim()
     const resultSuccess = await this.props.onClickAddUser(publicName, username, email, profile, password)
@@ -138,6 +166,22 @@ export class AdminUser extends React.Component {
     })
   }
 
+  getNumberActiveGuests = () => {
+    return this.props.userList.filter(user =>
+      user.profile?.toLowerCase() === 'guests'
+    ).filter(user =>
+      user.is_active === true
+    ).length
+  }
+
+  getNumberActiveUsers = () => {
+    return this.props.userList.filter(user =>
+      user.profile?.toLowerCase() !== 'guests'
+    ).filter(user =>
+      user.is_active === true
+    ).length
+  }
+
   render () {
     const { props, state } = this
     const filteredUserList = this.filterUserList()
@@ -165,6 +209,15 @@ export class AdminUser extends React.Component {
               onClick={this.handleToggleAddUser}
               text={props.t('Create a user')}
               icon='fas fa-user-plus'
+            />
+
+            <IconButton
+              customClass='adminUser__InfoPopup'
+              dataCy='adminUser__adduser__info__button'
+              intent='secondary'
+              onClick={this.handleTogglePopupInfo}
+              text={props.t('View user limitations')}
+              icon='fas fa-info'
             />
 
             <div className='adminUser__adduser__emailstate'>
@@ -250,6 +303,7 @@ export class AdminUser extends React.Component {
                   </th>
                   <th className='adminUser__table__canCreate' scope='col'>{props.t('Can create space')}</th>
                   <th className='adminUser__table__administrator' scope='col'>{props.t('Administrator')}</th>
+                  <th className='adminUser__table__guest' scope='col'>{props.t('Guest')}</th>
                 </tr>
               </thead>
 
@@ -333,7 +387,7 @@ export class AdminUser extends React.Component {
                           onChange={e => this.handleToggleProfileManager(e, u.user_id, !(u.profile === PROFILE.manager.slug || u.profile === PROFILE.administrator.slug))}
                           activeLabel={isMobile ? '' : props.t('Activated')}
                           inactiveLabel={isMobile ? '' : props.t('Deactivated')}
-                          disabled={!u.is_active}
+                          disabled={!u.is_active || u.profile === PROFILE.guest.slug}
                           smallSize={isMobile}
                         />
                       </td>
@@ -344,6 +398,15 @@ export class AdminUser extends React.Component {
                           onChange={e => this.handleToggleProfileAdministrator(e, u.user_id, !(u.profile === PROFILE.administrator.slug))}
                           activeLabel={isMobile ? '' : props.t('Activated')}
                           inactiveLabel={isMobile ? '' : props.t('Deactivated')}
+                          disabled={!u.is_active || u.profile === PROFILE.guest.slug}
+                          smallSize={isMobile}
+                        />
+                      </td>
+
+                      <td>
+                        <BtnSwitch
+                          checked={u.profile === PROFILE.guest.slug}
+                          onChange={e => this.handleToggleProfileGuest(e, u.user_id, !(u.profile === PROFILE.guest.slug))}
                           disabled={!u.is_active}
                           smallSize={isMobile}
                         />
@@ -374,6 +437,66 @@ export class AdminUser extends React.Component {
               </EmptyListMessage>
             )}
           </div>
+
+          {state.popupInfos && (
+            <CardPopup
+              customClass='adminUser___right'
+              customColor={props.config.hexcolor}
+              faIcon='far fa-id-card'
+              label={props.t('View user limitations')}
+              onClose={this.handleTogglePopupInfo}
+            >
+              <div>
+
+                {props.config.limitation__max_non_guest_users !== -1 && (
+                  <p>
+                    {
+                      props.t('Normal users: {{currentGuests}}/{{maxGuests}} ({{count}} slots remaining)',
+                        {
+                          currentGuests: this.getNumberActiveUsers(),
+                          maxGuests: props.config.limitation__max_non_guest_users,
+                          count: props.config.limitation__max_non_guest_users - this.getNumberActiveUsers()
+                        }
+                      )
+                    }
+                  </p>
+                )}
+                {props.config.limitation__max_non_guest_users === -1 && (
+                  <p>{props.t('No limit for the number of users')}</p>
+                )}
+                {props.config.limitation__max_guest_users !== -1 && (
+                  <p>
+                    {
+                      props.t('Guest users: {{currentGuests}}/{{maxGuests}} ({{count}} slots remaining)',
+                        {
+                          currentGuests: this.getNumberActiveGuests(),
+                          maxGuests: props.config.limitation__max_guest_users,
+                          count: props.config.limitation__max_guest_users - this.getNumberActiveGuests()
+                        }
+                      )
+                    }
+                  </p>
+                )}
+                {props.config.limitation__max_guest_users === -1 && (
+                  <p>{props.t('No limit for the number of guests')}</p>
+                )}
+
+                {
+                  props.config.limitation__max_guest_user_nb_space !== -1 && (
+                    <p>
+                      {props.t(
+                        'A guest can join up to {{count}} space',
+                        { count: props.config.limitation__max_guest_user_nb_space })}
+                    </p>
+                  )
+                }
+                {props.config.limitation__max_guest_user_nb_space === -1 && (
+                  <p>{props.t('No limit to the number space a guest user can join')}</p>
+                )}
+              </div>
+
+            </CardPopup>
+          )}
 
         </PageContent>
 
