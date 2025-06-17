@@ -232,7 +232,7 @@ class UserApi(object):
                 "UserApi.get_all_user_ids()",
                 lambda: [
                     r[0]
-                    for r in self._session.query(User.user_id).filter(User.is_active == True).all()
+                    for r in self._session.query(User.user_id).filter(User.is_active is True).all()
                 ],
             )
         return self._session.use_cache(
@@ -250,7 +250,7 @@ class UserApi(object):
                     r[0]
                     for r in self._session.query(User.user_id)
                     .filter(User.profile == profile)
-                    .filter(User.is_active == True)
+                    .filter(User.is_active is True)
                     .all()
                 ],
             )

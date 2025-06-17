@@ -44,7 +44,7 @@ describe("An admin seeing a user's profile", () => {
   })
 
   describe('Set a big username', () => {
-    it('should still show the Administration column', () => {
+    it('should still show the Guest column', () => {
       const veryBigUsername = 'aa'.repeat(100)
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
         .find('[data-cy=menusubcomponent__list__personalData] > .menusubcomponent__list__item__link')
@@ -60,7 +60,7 @@ describe("An admin seeing a user's profile", () => {
         .click()
       cy.get('.sidebar__item__menu').click()
       cy.get('[data-cy=sidebar__users__item]').click()
-      cy.get('th').last().contains('Administrator')
+      cy.get('th').last().contains('Guest')
     })
   })
 
