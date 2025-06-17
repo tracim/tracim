@@ -41,7 +41,10 @@ const SYSTEM_CONFIG = {
     webdav_enabled: true,
     webdav_url: 'http://localhost:3030/',
     apiUrl: '/api',
-    ui__notes__code_sample_languages: []
+    ui__notes__code_sample_languages: [],
+    iframe_whitelist: [],
+    translation_service__enabled: false,
+    translation_service__target_languages: []
   },
   contentTypeListLoaded: true,
   redirectLogin: '',

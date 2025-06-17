@@ -40,7 +40,11 @@ import {
   putMyselfFileRead,
   sendGlobalFlashMessage,
   sortListByMultipleCriteria,
-  defaultApiContent
+  defaultApiContent,
+  AppProperty,
+  displayFileSize,
+  formatAbsoluteDate,
+  displayDistanceDate
 } from 'tracim_frontend_lib'
 
 import KanbanComponent from '../component/Kanban.jsx'
@@ -258,6 +262,10 @@ export class Kanban extends React.Component {
     }
   }
 
+  handleClickValidateNewDescription = async newDescription => {
+    this.props.appContentChangeDescription(newDescription)
+  }
+
   componentDidMount () {
     console.log('%c<Kanban> did Mount', `color: ${this.state.config.hexcolor}`)
     this.updateTimelineAndContent()
@@ -373,6 +381,49 @@ export class Kanban extends React.Component {
       )
     }
     menuItemList.push(tagObject)
+
+    const propertyObject = {
+      id: 'properties',
+      label: props.t('Properties'),
+      icon: 'fa-info-circle',
+      children: (
+        <PopinFixedRightPartContent
+          label={props.t('Properties')}
+        >
+          <AppProperty
+            apiUrl={state.config.apiUrl}
+            color={state.config.hexcolor}
+            readOnlyFieldList={[{
+              title: '',
+              label: props.t('Size:'),
+              value: displayFileSize(state.content.size)
+            }, {
+              title: '',
+              label: props.t('Number of shares:'),
+              value: state.content.actives_shares
+            }, {
+              title: formatAbsoluteDate(state.content.created_raw, props.i18n.language),
+              label: props.t('Creation date:'),
+              value: formatAbsoluteDate(state.content.created_raw, props.i18n.language, 'P')
+            }, {
+              title: formatAbsoluteDate(state.content.modified, props.i18n.language),
+              label: props.t('Last modification:'),
+              value: displayDistanceDate(state.content.modified, state.loggedUser.lang)
+            }]}
+            mentionUserList={state.config.workspace.memberList}
+            description={state.content.description}
+            codeLanguageList={state.config.system.config.ui__notes__code_sample_languages}
+            iframeWhitelist={state.config.system.config.iframe_whitelist}
+            language={state.loggedUser.lang}
+            displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id}
+            disableChangeDescription={!state.content.is_editable}
+            onClickValidateNewDescription={this.handleClickValidateNewDescription}
+            key='FileProperties'
+          />
+        </PopinFixedRightPartContent>
+      )
+    }
+    menuItemList.push(propertyObject)
 
     return menuItemList
   }

@@ -45,7 +45,6 @@ import {
   getFileContent,
   getFileRevision,
   PAGE,
-  putFileDescription,
   putMyselfFileRead,
   putUserConfiguration,
   FAVORITE_STATE,
@@ -56,7 +55,8 @@ import {
   sortListByMultipleCriteria,
   SORT_BY,
   ToDoManagement,
-  defaultApiContent
+  defaultApiContent,
+  AppProperty
 } from 'tracim_frontend_lib'
 import { isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import {
@@ -64,7 +64,6 @@ import {
   getShareLinksList,
   postShareLinksList
 } from '../action.async.js'
-import FileProperties from '../component/FileProperties.jsx'
 
 const ACTION_EDIT = 'edit'
 
@@ -450,31 +449,8 @@ export class File extends React.Component {
     this.setState({ mode: APP_FEATURE_MODE.EDIT })
   }
 
-  handleClickValidateNewDescription = async newDescription => {
-    const { props, state } = this
-
-    const fetchResultSaveFile = await handleFetchResult(
-      await putFileDescription(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDescription)
-    )
-    switch (fetchResultSaveFile.apiResponse.status) {
-      case 200: {
-        const newConfiguration = state.loggedUser.config
-        newConfiguration[`content.${state.content.content_id}.notify_all_members_message`] = true
-
-        this.setState(prev => ({ ...prev, loggedUser: { ...prev.loggedUser, config: newConfiguration } }))
-
-        const fetchPutUserConfiguration = await handleFetchResult(await putUserConfiguration(state.config.apiUrl, state.loggedUser.userId, state.loggedUser.config))
-        if (fetchPutUserConfiguration.status !== 204) { sendGlobalFlashMessage(props.t('Error while saving the user configuration')) }
-        break
-      }
-      case 400:
-        switch (fetchResultSaveFile.body.code) {
-          case 2041: break // same description sent, no need for error msg
-          default: sendGlobalFlashMessage(props.t('Error while saving the new description'))
-        }
-        break
-      default: sendGlobalFlashMessage(props.t('Error while saving the new description'))
-    }
+  handleValidateNewDescription = async newDescription => {
+    this.props.appContentChangeDescription(newDescription)
   }
 
   handleChangeNewComment = e => {
@@ -1020,20 +996,42 @@ export class File extends React.Component {
         <PopinFixedRightPartContent
           label={props.t('Properties')}
         >
-          <FileProperties
+          <AppProperty
+            apiUrl={state.config.apiUrl}
             color={state.config.hexcolor}
-            fileType={state.content.mimetype}
-            fileSize={displayFileSize(state.content.size)}
-            filePageNb={state.previewInfo.page_nb}
-            activesShares={state.content.actives_shares}
-            creationDateFormattedWithTime={formatAbsoluteDate(state.content.created_raw, props.i18n.language, 'P')}
-            creationDateFormatted={formatAbsoluteDate(state.content.created_raw, props.i18n.language)}
-            lastModification={displayDistanceDate(state.content.modified, state.loggedUser.lang)}
-            lastModificationFormatted={formatAbsoluteDate(state.content.modified, props.i18n.language)}
+            readOnlyFieldList={[{
+              title: '',
+              label: props.t('Type:'),
+              value: state.content.mimetype
+            }, {
+              title: '',
+              label: props.t('Size:'),
+              value: displayFileSize(state.content.size)
+            }, {
+              title: '',
+              label: props.t('Page number:'),
+              value: state.previewInfo.page_nb
+            }, {
+              title: '',
+              label: props.t('Number of shares:'),
+              value: state.content.actives_shares
+            }, {
+              title: formatAbsoluteDate(state.content.created_raw, props.i18n.language),
+              label: props.t('Creation date:'),
+              value: formatAbsoluteDate(state.content.created_raw, props.i18n.language, 'P')
+            }, {
+              title: formatAbsoluteDate(state.content.modified, props.i18n.language),
+              label: props.t('Last modification:'),
+              value: displayDistanceDate(state.content.modified, state.loggedUser.lang)
+            }]}
+            mentionUserList={state.config.workspace.memberList}
             description={state.content.description}
+            codeLanguageList={state.config.system.config.ui__notes__code_sample_languages}
+            iframeWhitelist={state.config.system.config.iframe_whitelist}
+            language={state.loggedUser.lang}
             displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id}
             disableChangeDescription={!state.content.is_editable}
-            onClickValidateNewDescription={this.handleClickValidateNewDescription}
+            onClickValidateNewDescription={this.handleValidateNewDescription}
             key='FileProperties'
           />
         </PopinFixedRightPartContent>
