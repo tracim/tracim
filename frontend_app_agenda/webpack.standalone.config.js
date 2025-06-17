@@ -1,4 +1,5 @@
 const path = require('path')
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const isProduction = process.env.NODE_ENV === 'production'
 
 module.exports = {
@@ -63,6 +64,7 @@ module.exports = {
     extensions: ['.js', '.jsx', '.ts', '.tsx']
   },
   plugins: [
+    new NodePolyfillPlugin(),
     ...[], // @INFO - CH - 2019/04/01 - generic plugins always present
     ...(isProduction
       ? [] // @INFO - CH - 2019/04/01 - production specific plugins

@@ -1,0 +1,15 @@
+.dropdown-frame {
+    position: absolute;
+    margin: 0 !important;
+    margin-top: -0.5rem !important;
+    padding: 0.5rem;
+    background-color: white;
+    border: 1px solid var(--ec-button-border-color);
+    z-index: 2000;
+}
+
+.calendar-color {
+    display: inline-block;
+    border-radius: 50%;
+    padding: 0.5em;
+}

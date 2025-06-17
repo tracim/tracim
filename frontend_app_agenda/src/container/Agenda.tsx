@@ -20,8 +20,8 @@ import {
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import { getAgendaList, getPreFilledAgendaEvent } from '../action.async'
-import createCalendarClient from './calendarClient'
-
+import { createCalendarClient } from '@tracim/calendar-client'
+import "@tracim/calendar-client/style.css"
 export class Agenda extends React.Component<any, any> {
   calendarRef: RefObject<any> = createRef()
 
