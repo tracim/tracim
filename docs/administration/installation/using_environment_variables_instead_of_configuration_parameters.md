@@ -89,6 +89,10 @@ The following table contains:
 | TRACIM_LIMITATION__USER_DEFAULT_ALLOWED_SPACE                             | limitation.user_default_allowed_space                          | LIMITATION__USER_DEFAULT_ALLOWED_SPACE                             |
 | TRACIM_LIMITATION__MAXIMUM_ONLINE_USERS                                   | limitation.maximum_online_users                                | LIMITATION__MAXIMUM_ONLINE_USERS                                   |
 | TRACIM_LIMITATION__MAXIMUM_ONLINE_USERS_MESSAGE                           | limitation.maximum_online_users_message                        | LIMITATION__MAXIMUM_ONLINE_USERS_MESSAGE                           |
+| TRACIM_LIMITATION__MAX_NON_GUEST_USERS                                    | limitation.max_non_guest_users                                 | LIMITATION__MAX_NON_GUEST_USERS                                    |
+| TRACIM_LIMITATION__MAX_GUEST_USERS                                        | limitation.max_guest_users                                     | LIMITATION__MAX_GUEST_USERS                                        |
+| TRACIM_LIMITATION__MAX_GUEST_USER_NB_SPACE                                | limitation.max_guest_user_nb_space                             | LIMITATION__MAX_GUEST_USER_NB_SPACE                                |
+| TRACIM_LIMITATION__STANDARD_USER_EMAIL_DOMAIN                             | limitation.standard_user_email_domain                          | LIMITATION__STANDARD_USER_EMAIL_DOMAIN                             |
 | TRACIM_JOBS__PROCESSING_MODE                                              | jobs.processing_mode                                           | JOBS__PROCESSING_MODE                                              |
 | TRACIM_JOBS__ASYNC__REDIS__HOST                                           | jobs.async.redis.host                                          | JOBS__ASYNC__REDIS__HOST                                           |
 | TRACIM_JOBS__ASYNC__REDIS__PORT                                           | jobs.async.redis.port                                          | JOBS__ASYNC__REDIS__PORT                                           |
@@ -181,10 +185,6 @@ The following table contains:
 | TRACIM_CALDAV__RADICALE_PROXY__BASE_URL                                   | caldav.radicale_proxy.base_url                                 | CALDAV__RADICALE_PROXY__BASE_URL                                   |
 | TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER                       | caldav.radicale.storage.filesystem_folder                      | CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER                       |
 | TRACIM_CALDAV__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH                    | caldav.pre_filled_event.description_file_path                  | CALDAV__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH                    |
-| TRACIM_COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE                           | collaborative_document_edition.software                        | COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE                           |
-| TRACIM_COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL                | collaborative_document_edition.collabora.base_url              | COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL                |
-| TRACIM_COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR                  | collaborative_document_edition.file_template_dir               | COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR                  |
-| TRACIM_COLLABORATIVE_DOCUMENT_EDITION__ENABLED_EXTENSIONS                 | collaborative_document_edition.enabled_extensions              | COLLABORATIVE_DOCUMENT_EDITION__ENABLED_EXTENSIONS                 |
 | TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__TEMPLATE__HTML     | email.notification.share_content_to_receiver.template.html     | EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__TEMPLATE__HTML     |
 | TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__SUBJECT            | email.notification.share_content_to_receiver.subject           | EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__SUBJECT            |
 | TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__TEMPLATE__HTML      | email.notification.share_content_to_emitter.template.html      | EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__TEMPLATE__HTML      |
