@@ -168,7 +168,7 @@ export class AdminUser extends React.Component {
 
   getNumberActiveGuests = () => {
     return this.props.userList.filter(user =>
-      user.profile?.toLowerCase() === 'guests'
+      user.profile?.toLowerCase() === PROFILE.guest.slug
     ).filter(user =>
       user.is_active === true
     ).length
@@ -176,7 +176,7 @@ export class AdminUser extends React.Component {
 
   getNumberActiveUsers = () => {
     return this.props.userList.filter(user =>
-      user.profile?.toLowerCase() !== 'guests'
+      user.profile?.toLowerCase() !== PROFILE.guest.slug
     ).filter(user =>
       user.is_active === true
     ).length
@@ -491,7 +491,7 @@ export class AdminUser extends React.Component {
                   )
                 }
                 {props.config.limitation__max_guest_user_nb_space === -1 && (
-                  <p>{props.t('No limit to the number space a guest user can join')}</p>
+                  <p>{props.t('No limit to the number spaces a guest user can join')}</p>
                 )}
               </div>
 

@@ -238,13 +238,13 @@ workspace.join.max_messages_history_count = -1
 # For instance:
 # limitation.maximum_online_users_message = We suggest you contact your manager to upgrade your offer:<br /><b>Leslie Doe</b>, <a href="tel:+336123456789">+336123456789</a>, <a href="mailto:leslie.doe@example.org">leslie.doe@example.org</a>
 
-# max number of non guest user allowed (admin + trusted_user + user), -1 mean no limit.
+# max number of non guest user allowed (admin + trusted_user + user), -1 means no limit.
 ; limitation.max_non_guest_users = -1
 
-# max number of guest user allowed, -1 mean no limit.
+# max number of guest user allowed, -1 means no limit.
 ; limitation.max_guest_users = -1
 
-# max number of space a guest user can join, -1 mean no limit.
+# max number of space a guest user can join, -1 means no limit.
 ; limitation.max_guest_user_nb_space = -1
 
 # the standard domain for all user, a new user with email not from this domain will be guest user

@@ -240,10 +240,10 @@ const GUEST = {
   hexcolor: '#15d948',
   tradKey: [
     i18n.t('Guest'),
-    i18n.t('Access to a limited number of spaces where the guest is a member and can\'t be more than contributor')
+    i18n.t('Access to a limited number of spaces and can\'t be more than contributor')
   ], // trad key allow the parser to generate an entry in the json file
   label: 'Guest', // label must be used in components
-  description: 'Access to a limited number of spaces where the guest is a member and can\'t be more than contributor'
+  description: 'Access to a limited number of spaces and can\'t be more than contributor'
 }
 export const PROFILE = {
   administrator: ADMINISTRATOR,

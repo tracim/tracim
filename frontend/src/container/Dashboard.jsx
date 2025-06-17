@@ -353,9 +353,9 @@ export class Dashboard extends React.Component {
           case 2075:
             props.dispatch(newFlashMessage(props.t("Guest users aren't allowed to be more than contributor"), 'warning'))
             return false
-          case 8002: props.dispatch(newFlashMessage(props.t('The number maximum of users has been reached'), 'warning'))
+          case 8002: props.dispatch(newFlashMessage(props.t('The maximum number of users has been reached'), 'warning'))
             return false
-          case 8003: props.dispatch(newFlashMessage(props.t('The number maximum of guests has been reached'), 'warning'))
+          case 8003: props.dispatch(newFlashMessage(props.t('The maximum number of guests has been reached'), 'warning'))
             return false
           case 8004: props.dispatch(newFlashMessage(props.t('The maximum number of spaces for a guest user has been reached'), 'warning'))
             return false

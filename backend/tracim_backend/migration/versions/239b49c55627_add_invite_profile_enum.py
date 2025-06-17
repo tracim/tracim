@@ -18,6 +18,8 @@ def upgrade():
         op.execute("ALTER TYPE profile ADD VALUE 'GUEST' BEFORE 'USER'")
 
     else:
+        with op.batch_alter_table("users") as batch_op:
+            batch_op.drop_constraint("fk_users_creation_author_id_users", type_="foreignkey")
         op.execute(
             """
             CREATE TABLE "users_temporary_migration_process" (
@@ -52,7 +54,6 @@ def upgrade():
             CONSTRAINT "uq__users__external_id" UNIQUE("external_id"),
             CONSTRAINT "pk_users" PRIMARY KEY("user_id"),
             CONSTRAINT "uq__users__username" UNIQUE("username"),
-            CONSTRAINT "fk_users_creation_author_id_users" FOREIGN KEY("creation_author_id") REFERENCES "users"("user_id") ON DELETE SET NULL,
             CONSTRAINT "ck_users_username_email" CHECK(NOT ("email" IS NULL AND "username" IS NULL)),
             CHECK("is_active" IN (0, 1)),
             CONSTRAINT "authtype" CHECK("auth_type" IN ('INTERNAL', 'LDAP', 'SAML', 'UNKNOWN', 'REMOTE')),
@@ -63,9 +64,35 @@ def upgrade():
             CHECK("is_deleted" IN (0, 1))
         );"""
         )
-        op.execute("INSERT INTO users_temporary_migration_process SELECT * FROM users;")
+        op.execute(
+            """
+            INSERT INTO users_temporary_migration_process (
+                created, user_id, external_id, email, username, display_name, password,
+                is_active, imported_from, timezone, auth_type, lang, auth_token,
+                auth_token_created, reset_password_token_hash, reset_password_token_created,
+                allowed_space, profile, is_avatar_default, avatar, cropped_avatar, cover,
+                cropped_cover, creation_author_id, creation_type, connection_status, is_deleted
+            )
+            SELECT
+                created, user_id, external_id, email, username, display_name, password,
+                is_active, imported_from, COALESCE(timezone, ''), auth_type, lang, auth_token,
+                auth_token_created, reset_password_token_hash, reset_password_token_created,
+                allowed_space, profile, is_avatar_default, avatar, cropped_avatar, cover,
+                cropped_cover, creation_author_id, creation_type, connection_status, is_deleted
+            FROM users;
+        """
+        )
         op.execute("DROP TABLE users;")
         op.execute("ALTER TABLE users_temporary_migration_process RENAME TO users;")
+        op.execute("DROP TABLE IF EXISTS users_temporary_migration_process;")
+        with op.batch_alter_table("users") as batch_op:
+            batch_op.create_foreign_key(
+                batch_op.f("fk_users_creation_author_id_users"),
+                referent_table="users",
+                local_cols=["creation_author_id"],
+                remote_cols=["user_id"],
+                ondelete="SET NULL",
+            )
 
 
 def downgrade():
@@ -84,6 +111,8 @@ def downgrade():
         op.execute("ALTER TABLE users ALTER COLUMN profile SET DEFAULT 'NOBODY'")
 
     else:
+        with op.batch_alter_table("users") as batch_op:
+            batch_op.drop_constraint("fk_users_creation_author_id_users", type_="foreignkey")
         op.execute(
             """
             CREATE TABLE "users_temporary_migration_process" (
@@ -118,7 +147,6 @@ def downgrade():
             CONSTRAINT "uq__users__external_id" UNIQUE("external_id"),
             CONSTRAINT "pk_users" PRIMARY KEY("user_id"),
             CONSTRAINT "uq__users__username" UNIQUE("username"),
-            CONSTRAINT "fk_users_creation_author_id_users" FOREIGN KEY("creation_author_id") REFERENCES "users"("user_id") ON DELETE SET NULL,
             CONSTRAINT "ck_users_username_email" CHECK(NOT ("email" IS NULL AND "username" IS NULL)),
             CHECK("is_active" IN (0, 1)),
             CONSTRAINT "authtype" CHECK("auth_type" IN ('INTERNAL', 'LDAP', 'SAML', 'UNKNOWN', 'REMOTE')),
@@ -133,3 +161,12 @@ def downgrade():
         op.execute("INSERT INTO users_temporary_migration_process SELECT * FROM users;")
         op.execute("DROP TABLE users;")
         op.execute("ALTER TABLE users_temporary_migration_process RENAME TO users;")
+        op.execute("DROP TABLE IF EXISTS users_temporary_migration_process;")
+        with op.batch_alter_table("users") as batch_op:
+            batch_op.create_foreign_key(
+                batch_op.f("fk_users_creation_author_id_users"),
+                referent_table="users",
+                local_cols=["creation_author_id"],
+                remote_cols=["user_id"],
+                ondelete="SET NULL",
+            )
