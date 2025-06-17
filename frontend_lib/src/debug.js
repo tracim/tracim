@@ -42,6 +42,9 @@ const SYSTEM_CONFIG = {
     webdav_url: 'http://localhost:3030/',
     apiUrl: '/api',
     ui__notes__code_sample_languages: [],
+    iframe_whitelist: [],
+    translation_service__enabled: false,
+    translation_service__target_languages: [],
     limitation__max_non_guest_users: -1,
     limitation__max_guest_users: -1,
     limitation__max_guest_user_nb_space: -1
@@ -77,7 +80,26 @@ export const defaultDebug = {
       }
     },
     label: '',
-    appCustomActionList: []
+    appCustomActionList: [],
+    workspace: {
+      downloadEnabled: true,
+      label: 'first space',
+      memberList: [{
+        id: 1,
+        publicName: 'Global manager',
+        username: 'TheAdmin',
+        role: 'workspace-manager',
+        hasAvatar: true,
+        hasCover: false
+      }, {
+        id: 2,
+        publicName: 'User1',
+        username: 'User1',
+        role: 'workspace-manager',
+        hasAvatar: true,
+        hasCover: false
+      }]
+    }
   },
   content: {
     content_id: 0,

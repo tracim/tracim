@@ -8,7 +8,8 @@ import {
   IconButton,
   Icon,
   shouldUseLightTextColor,
-  HTMLContent
+  HTMLContent,
+  getAvatarBaseUrl
 } from 'tracim_frontend_lib'
 
 require('./KanbanCard.styl')
@@ -116,7 +117,10 @@ function KanbanCard (props) {
           id={`${props.card.id}_description`}
           onClick={props.readOnly ? undefined : () => props.onEditCardContent(props.card)}
         >
-          <HTMLContent iframeWhitelist={props.config.iframe_whitelist} htmlValue={props.card.description} />
+          <HTMLContent
+            iframeWhitelist={props.config.system.config.iframe_whitelist}
+            htmlValue={props.card.description}
+          />
         </div>
 
         {showSeeDescriptionButton !== DESCRIPTION_BUTTON.HIDDEN && (
@@ -138,21 +142,64 @@ function KanbanCard (props) {
 
       <div
         className='kanban__contentpage__wrapper__board__card__options'
+        onClick={props.readOnly ? undefined : () => props.onEditCardContent(props.card)}
       >
-        {props.card.deadline !== '' && (
+        <div className='kanban__contentpage__wrapper__board__card__options__date'>
           <div
-            className='kanban__contentpage__wrapper__board__card__options__deadline'
+            className='kanban__contentpage__wrapper__board__card__options__date__kickoff'
+            title={props.t('Start date')}
           >
-            <Icon
-              icon='far fa-calendar'
-              title={props.card.deadline}
-            />
-            {props.card.deadline}
+            {props.card.kickoff && props.card.kickoff !== '' && (
+              <>
+                <Icon
+                  icon='far fa-calendar'
+                  title={props.card.kickoff}
+                />
+                {props.card.kickoff}
+              </>
+            )}
           </div>
-        )}
+
+          <div
+            className='kanban__contentpage__wrapper__board__card__options__date__deadline'
+            title={props.t('Due date')}
+          >
+            {props.card.deadline && props.card.deadline !== '' && (
+              <>
+                <Icon
+                  icon='far fa-calendar'
+                  title={props.card.deadline}
+                />
+                {props.card.deadline}
+              </>
+            )}
+          </div>
+        </div>
+
         <div className='kanban__contentpage__wrapper__board__card__options__freeInput'>
           {props.card.freeInput}
         </div>
+
+        {props.card.assignmentList?.length > 0 && (
+          <div className='kanban__contentpage__wrapper__board__card__options__assignment'>
+            {props.card.assignmentList.map(assignmentId => {
+              const member = props.config.workspace.memberList.find(m => m.id === assignmentId) || ''
+              return (
+                <div
+                  className='kanban__contentpage__wrapper__board__card__options__assignment__member'
+                  title={member.publicName}
+                  key={assignmentId}
+                >
+                  <img
+                    className='kanban__contentpage__wrapper__board__card__options__assignment__member__avatar'
+                    src={`${getAvatarBaseUrl(props.config.apiUrl, assignmentId)}/preview/jpg/25x25/avatar`}
+                    alt={member.publicName}
+                  />
+                </div>
+              )
+            })}
+          </div>
+        )}
       </div>
     </div>
   )
