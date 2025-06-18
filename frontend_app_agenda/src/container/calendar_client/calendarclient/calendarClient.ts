@@ -1,7 +1,7 @@
 import { createCalendar as createEventCalendar, DayGrid, TimeGrid, List, Interaction, destroyCalendar as destroyEventCalendar } from '@event-calendar/core'
 import type { Calendar as EventCalendar } from '@event-calendar/core'
 import '@event-calendar/core/index.css';
-import { getEventEnd, type IcsCalendar } from 'ts-ics';
+import { getEventEnd, IcsEvent, type IcsCalendar } from 'ts-ics';
 import { EventEditPopup } from '../eventeditpopup/eventEditPopup';
 import { createCalendarObjects, deleteCalendarObject, fetchCalendarObjects, fetchCalendars, updateCalendarObject } from '../helpers/dav-helper';
 import { hasCalendarHandlers, hasEventHandlers } from '../types';
@@ -25,41 +25,34 @@ export class CalendarClient {
   private _eventHandlers?: EventHandlers
   private _postEventHandlers?: PostEventHandlers
 
-  public constructor(
-    sources: (ServerSource | CalendarSource)[],
-    target: DomNode,
-    options?: CalendarClientOptions,
-  ) {
-    this.loadCalendars(sources).then(() => {
-      this._eventHandlers = options && hasEventHandlers(options) ? {
-        onCreateEvent: options.onCreateEvent,
-        onUpdateEvent: options.onUpdateEvent,
-        onDeleteEvent: options.onDeleteEvent,
-      } : this.createDefaultEventElement(target)
+  public create = async (sources: (ServerSource | CalendarSource)[], target: DomNode, options?: CalendarClientOptions) => {
+    const calendarsPerSource = await Promise.all(sources.map(source => fetchCalendars(source)))
+    this._calendars = calendarsPerSource.flat()
+    this._calendarObjectsPerCalendar = this._calendars.map(_ => [])
 
-      this._calendarHandlers = options && hasCalendarHandlers(options) ? {
-        onSelectCalendars: options.onSelectCalendars,
-      } : this.createDefaultCalendarsElement()
+    this._eventHandlers = options && hasEventHandlers(options) ? {
+      onCreateEvent: options.onCreateEvent,
+      onUpdateEvent: options.onUpdateEvent,
+      onDeleteEvent: options.onDeleteEvent,
+    } : this.createDefaultEventElement(target)
 
-      this._postEventHandlers = {
-        onEventCreated: options?.onEventCreated,
-        onEventUpdated: options?.onEventUpdated,
-        onEventDeleted: options?.onEventDeleted,
-      }
-      this.createCalendar(target, options)
-    })
+    this._calendarHandlers = options && hasCalendarHandlers(options) ? {
+      onSelectCalendars: options.onSelectCalendars,
+    } : this.createDefaultCalendarsElement()
+
+    this._postEventHandlers = {
+      onEventCreated: options?.onEventCreated,
+      onEventUpdated: options?.onEventUpdated,
+      onEventDeleted: options?.onEventDeleted,
+    }
+
+    this.createCalendar(target, options)
   }
 
   public destroy = () => {
     this.destroyCalendar()
-    this.destroyDefaultPopup()
-    this.destroyDefaultVisibilityElement()
-  }
-
-  private loadCalendars = async (sources: (ServerSource | CalendarSource)[]) => {
-    const calendarsPerSource = await Promise.all(sources.map(source => fetchCalendars(source)))
-    this._calendars = calendarsPerSource.flat()
-    this._calendarObjectsPerCalendar = this._calendars.map(_ => [])
+    this.destroyDefaultEventElement()
+    this.destroyDefaultCalendarElement()
   }
 
   private createCalendar = (target: DomNode, options?: CalendarClientOptions) => {
@@ -98,39 +91,23 @@ export class CalendarClient {
         select: this.onSelectTimeRange,
         eventResize: this.onChangeEventDates,
         eventDrop: this.onChangeEventDates,
-        // eventSources: [{ events: this.fetchAndLoadEvents }],
-        eventSources: this._calendars.map((calendar, i) => ({
-          events: async ({ startStr: start, endStr: end }: EventCalendar.FetchInfo): Promise<EventCalendar.EventInput[]> => {
-            const calendarObjects = await fetchCalendarObjects(calendar, { start, end }, true)
-            this._calendarObjectsPerCalendar[i] = calendarObjects
-            return calendarObjects.map(o => o.data.events ?? []).flat().map(event => ({
-              title: event.summary,
-              allDay: isEventAllDay(event),              
-              start: event.start.date,
-              end: getEventEnd(event),
-              backgroundColor: calendar.calendarColor,
-              extendedProps: { uid: event.uid, recurrenceId: event.recurrenceId } as EventUid,
-            }))
-          }
-        })),
+        eventSources: [{ events: this.fetchAndLoadEvents }],
         eventFilter: this.isEventVisible
       }
     )
   }
 
-  // private fetchAndLoadEvents = async ({ startStr: start, endStr: end }: EventCalendar.FetchInfo) => {
-  //   const objectsPerCalendar = await Promise.all(this._calendars.map(calendar => fetchCalendarObjects(calendar, { start, end }, true)))
-  //   this._calendarObjects = objectsPerCalendar.flat()
-  //   console.log(this._calendarObjects)
-  //   return this._calendarObjects.map(co => (co.object.events ?? []).map(event => ({
-  //     title: event.summary,
-  //     allDay: isEventAllDay(event),
-  //     start: event.start.date,
-  //     end: getEventEnd(event),
-  //     backgroundColor: this.getCalendarByUrl(co.calendarUrl)!.calendarColor,
-  //     extendedProps: { uid: event.uid, recurrenceId: event.recurrenceId } as EventUid,
-  //   } as EventCalendar.EventInput)))
-  // }
+  private fetchAndLoadEvents = async ({ startStr: start, endStr: end }: EventCalendar.FetchInfo): Promise<EventCalendar.EventInput[]> => {
+    this._calendarObjectsPerCalendar = await Promise.all(this._calendars.map(calendar => fetchCalendarObjects(calendar, { start, end }, true)))
+    return this._calendarObjectsPerCalendar.flatMap((cos, index) => cos.flatMap(co => co.data.events ?? []).map(event => ({
+      title: event.summary,
+      allDay: isEventAllDay(event),
+      start: event.start.date,
+      end: getEventEnd(event),
+      backgroundColor: this._calendars[index].calendarColor,
+      extendedProps: { uid: event.uid, recurrenceId: event.recurrenceId } as EventUid,
+    })))
+  }
 
   private isEventVisible = ({ event: e }: EventCalendar.EventFilterInfo) => {
     const uidData = this.getEventUidData(e.extendedProps as EventUid)
@@ -146,7 +123,10 @@ export class CalendarClient {
 
   private createDefaultEventElement = (target: DomNode): EventHandlers => {
     // TODO find an other to send calendars the the popup that makes it accessible to any popup
-    this._eventEdit ??= new EventEditPopup(target, this._calendars)
+    if (this._eventEdit === undefined) {
+      this._eventEdit = new EventEditPopup(target)
+      this._eventEdit.setCalendars(this._calendar)
+    }
     return {
       onCreateEvent: this._eventEdit.onCreate,
       onUpdateEvent: this._eventEdit.onUpdate,
@@ -154,7 +134,7 @@ export class CalendarClient {
     }
   }
 
-  private destroyDefaultPopup = () => {
+  private destroyDefaultEventElement = () => {
     this._eventEdit?.destroy()
     this._eventEdit = undefined
   }
@@ -166,38 +146,35 @@ export class CalendarClient {
     }
   }
 
-  private destroyDefaultVisibilityElement = () => {
+  private destroyDefaultCalendarElement = () => {
     this._calendarSelect?.destroy()
     this._calendarSelect = undefined
   }
 
   private onClickCalendars = (event: MouseEvent) => {
-    const button = event.target as Element
-    this._calendarHandlers!.onSelectCalendars(button, this._calendars, this.setCalendarVisibility)
+    this._calendarHandlers!.onSelectCalendars(event, this._calendars, this.setCalendarVisibility)
   }
 
   private getEventContent = ({ event }: EventCalendar.EventContentInfo) => {
     return { html: `${event.title}` }
   }
 
-  private onSelectTimeRange = ({ start, end, allDay }: EventCalendar.SelectInfo) => {
+  private onSelectTimeRange = ({ start, end, allDay, jsEvent }: EventCalendar.SelectInfo) => {
     const type = allDay ? "DATE" : "DATE-TIME"
-    this._eventHandlers!.onCreateEvent({
-      calendarUrl: "", event: {
-        summary: "",
-        start: {
-          date: start,
-          type: type
-        },
-        end: {
-          date: end,
-          type: type
-        },
-        uid: "",
-        stamp: { date: new Date() },
-      }
-    }, this.createEvent
-    )
+    const newEvent: IcsEvent = {
+      summary: "",
+      start: {
+        date: start,
+        type: type
+      },
+      end: {
+        date: end,
+        type: type
+      },
+      uid: "",
+      stamp: { date: new Date() },
+    }
+    this._eventHandlers!.onCreateEvent(jsEvent, { calendarUrl: "", event: newEvent }, this.createEvent)
   }
 
   private onChangeEventDates = async ({ event, oldEvent, revert }: EventCalendar.EventDropInfo | EventCalendar.EventResizeInfo) => {
@@ -216,11 +193,11 @@ export class CalendarClient {
     if (!response.ok) revert()
   }
 
-  private onEventClicked = ({ event: e }: EventCalendar.EventClickInfo) => {
+  private onEventClicked = ({ event: e, jsEvent }: EventCalendar.EventClickInfo) => {
     const uid = e.extendedProps as EventUid
     const uidData = this.getEventUidData(uid)
     if (uidData === undefined) return
-    this._eventHandlers!.onUpdateEvent({ calendarUrl: uidData.calendar.url, event: uidData.event }, this.updateEvent, this.deleteEvent)
+    this._eventHandlers!.onUpdateEvent(jsEvent, { calendarUrl: uidData.calendar.url, event: uidData.event }, this.updateEvent, this.deleteEvent)
   }
 
   // TODO look into expand and timerange (radicale v3.2)

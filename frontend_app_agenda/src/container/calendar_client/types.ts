@@ -3,6 +3,7 @@ import type { DAVCalendar } from "tsdav"
 
 
 // TODO add <TCalendarUid = any>
+// TODO add options to support IcsEvent custom props
 export type Calendar = DAVCalendar & {
   // ctag?: string
   // description?: string;
@@ -62,15 +63,14 @@ export type DomNode = Element | Document | ShadowRoot
 
 export type CalendarHandler = (calendarUrl: string, selected: boolean) => void
 export type CalendarHandlers = {
-  onSelectCalendars: (target: DomNode, calendars: Calendar[], handleSelect: CalendarHandler) => void,
+  onSelectCalendars: (event: Event, calendars: Calendar[], handleSelect: CalendarHandler) => void,
 }
 
-// ? add clicked node to allow positioning relative to the event
 export type EventHandler = (event: CalendarEvent) => Promise<Response>
 export type EventHandlers = {
-  onCreateEvent: (calendarEvent: CalendarEvent, handleCreate: EventHandler) => void,
-  onUpdateEvent: (calendarEvent: CalendarEvent, handleUpdate: EventHandler, handleDelete: EventHandler) => void,
-  onDeleteEvent: (calendarEvent: CalendarEvent, handleDelete: EventHandler) => void,
+  onCreateEvent: (event: Event, calendarEvent: CalendarEvent, handleCreate: EventHandler) => void,
+  onUpdateEvent: (event: Event, calendarEvent: CalendarEvent, handleUpdate: EventHandler, handleDelete: EventHandler) => void,
+  onDeleteEvent: (event: Event, calendarEvent: CalendarEvent, handleDelete: EventHandler) => void,
 }
 
 export type PostEventHandler = (calendarEvent: CalendarEvent, ical: string) => void

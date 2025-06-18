@@ -20,8 +20,13 @@ export class CalendarSelectDropdown {
         this._container = undefined
     }
 
-    public onSelect = (target: DomNode, calendars: Calendar[], handleSelect: CalendarHandler) => {
+    public onSelect = (event: Event, calendars: Calendar[], handleSelect: CalendarHandler) => {
         if (!this._container) return
+
+        // Do not disable if the panel was clicked, as it is a child of the button
+        if (event.target !== event.currentTarget) return
+
+        const target = event.target as DomNode
         if (this._opened) {
             target.removeChild(this._container)
             this._opened = false
