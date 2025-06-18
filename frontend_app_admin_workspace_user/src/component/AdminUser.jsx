@@ -4,7 +4,6 @@ import { translate } from 'react-i18next'
 import { Link, withRouter } from 'react-router-dom'
 import { isMobile } from 'react-device-detect'
 import {
-  CardPopup,
   Delimiter,
   IconButton,
   PageWrapper,
@@ -25,6 +24,7 @@ import {
 } from 'tracim_frontend_lib'
 import AddUserForm from './AddUserForm.jsx'
 import { getUserProfile } from '../helper.js'
+import AdminUserInfoPopup from './AdminUserInfoPopup.jsx'
 
 export class AdminUser extends React.Component {
   constructor (props) {
@@ -166,21 +166,6 @@ export class AdminUser extends React.Component {
     })
   }
 
-  getNumberActiveGuests = () => {
-    return this.props.userList.filter(user =>
-      user.profile?.toLowerCase() === PROFILE.guest.slug
-    ).filter(user =>
-      user.is_active === true
-    ).length
-  }
-
-  getNumberActiveUsers = () => {
-    return this.props.userList.filter(user =>
-      user.profile?.toLowerCase() !== PROFILE.guest.slug
-    ).filter(user =>
-      user.is_active === true
-    ).length
-  }
 
   render () {
     const { props, state } = this
@@ -439,63 +424,11 @@ export class AdminUser extends React.Component {
           </div>
 
           {state.popupInfos && (
-            <CardPopup
-              customClass='adminUser___right'
-              customColor={props.config.hexcolor}
-              faIcon='far fa-id-card'
-              label={props.t('View user limitations')}
+            <AdminUserInfoPopup
+              config={props.config}
               onClose={this.handleTogglePopupInfo}
-            >
-              <div>
-
-                {props.config.limitation__max_non_guest_users !== -1 && (
-                  <p>
-                    {
-                      props.t('Normal users: {{currentGuests}}/{{maxGuests}} ({{count}} slots remaining)',
-                        {
-                          currentGuests: this.getNumberActiveUsers(),
-                          maxGuests: props.config.limitation__max_non_guest_users,
-                          count: props.config.limitation__max_non_guest_users - this.getNumberActiveUsers()
-                        }
-                      )
-                    }
-                  </p>
-                )}
-                {props.config.limitation__max_non_guest_users === -1 && (
-                  <p>{props.t('No limit for the number of users')}</p>
-                )}
-                {props.config.limitation__max_guest_users !== -1 && (
-                  <p>
-                    {
-                      props.t('Guest users: {{currentGuests}}/{{maxGuests}} ({{count}} slots remaining)',
-                        {
-                          currentGuests: this.getNumberActiveGuests(),
-                          maxGuests: props.config.limitation__max_guest_users,
-                          count: props.config.limitation__max_guest_users - this.getNumberActiveGuests()
-                        }
-                      )
-                    }
-                  </p>
-                )}
-                {props.config.limitation__max_guest_users === -1 && (
-                  <p>{props.t('No limit for the number of guests')}</p>
-                )}
-
-                {
-                  props.config.limitation__max_guest_user_nb_space !== -1 && (
-                    <p>
-                      {props.t(
-                        'A guest can join up to {{count}} space',
-                        { count: props.config.limitation__max_guest_user_nb_space })}
-                    </p>
-                  )
-                }
-                {props.config.limitation__max_guest_user_nb_space === -1 && (
-                  <p>{props.t('No limit to the number spaces a guest user can join')}</p>
-                )}
-              </div>
-
-            </CardPopup>
+              userList={props.userList}
+            />
           )}
 
         </PageContent>
