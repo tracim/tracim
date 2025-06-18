@@ -152,7 +152,6 @@ export class AdminUser extends React.Component {
     })
   }
 
-
   render () {
     const { props, state } = this
     const filteredUserList = this.filterUserList()

@@ -3,11 +3,10 @@ import PropTypes from 'prop-types'
 import {
   CardPopup,
   PROFILE
- } from 'tracim_frontend_lib'
+} from 'tracim_frontend_lib'
 import { translate } from 'react-i18next'
 
 const AdminUserInfoPopup = props => {
-
   const getNumberActiveGuests = () => {
     return props.userList.filter(user =>
       user.profile?.toLowerCase() === PROFILE.guest.slug
@@ -23,7 +22,6 @@ const AdminUserInfoPopup = props => {
       user.is_active === true
     ).length
   }
-
 
   return (
     <CardPopup
