@@ -228,40 +228,30 @@ class UserApi(object):
     def get_all_user_ids(self, active_only=False) -> typing.List[int]:
         """When only needing user ids, this is much faster than get_all()."""
         if active_only:
-            return self._session.use_cache(
-                "UserApi.get_all_user_ids()",
-                lambda: [
-                    r[0]
-                    for r in self._session.query(User.user_id).filter(User.is_active is True).all()
-                ],
-            )
+            query = self._session.query(User.user_id).filter(User.is_active).all()
+        else:
+            query = self._session.query(User.user_id).all()
         return self._session.use_cache(
             "UserApi.get_all_user_ids()",
-            lambda: [r[0] for r in self._session.query(User.user_id).all()],
+            lambda: [r[0] for r in query],
         )
 
     def get_user_ids_from_profile(
         self, profile: Profile, active_only=False
     ) -> typing.Iterable[int]:
         if active_only:
-            ids = self._session.use_cache(
-                f"UserApi.get_user_ids_from_profile({profile})",
-                lambda: [
-                    r[0]
-                    for r in self._session.query(User.user_id)
-                    .filter(User.profile == profile)
-                    .filter(User.is_active is True)
-                    .all()
-                ],
+            query = (
+                self._session.query(User.user_id)
+                .filter(User.profile == profile)
+                .filter(User.is_active)
+                .all()
             )
         else:
-            ids = self._session.use_cache(
-                f"UserApi.get_user_ids_from_profile({profile})",
-                lambda: [
-                    r[0]
-                    for r in self._session.query(User.user_id).filter(User.profile == profile).all()
-                ],
-            )
+            query = self._session.query(User.user_id).filter(User.profile == profile).all()
+        ids = self._session.use_cache(
+            f"UserApi.get_user_ids_from_profile({profile})",
+            lambda: [r[0] for r in query],
+        )
         return ids
 
     def get_members_of_workspaces(self, workspace_ids: typing.List[int]) -> typing.List[int]:
