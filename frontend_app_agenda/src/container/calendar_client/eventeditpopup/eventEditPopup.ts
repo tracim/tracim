@@ -1,10 +1,10 @@
-import { type IcsAttendee, type IcsDateObject, type IcsEvent } from "ts-ics"
+import { getEventEndFromDuration, type IcsAttendee, type IcsDateObject, type IcsEvent } from "ts-ics"
 import "../generic.css"
-import { attendeeRoleTypes, type Calendar, type CalendarEvent, type DomNode } from "../types"
+import { attendeeRoleTypes, type Calendar, type CalendarEvent, type DomNode, type EventHandler } from "../types"
 import type { DAVCalendar } from "tsdav"
 import { Popup } from "../popup/popup"
 import { createElement, createText } from "../helpers/dom-helper"
-import { getTimezones, isEventAllDay } from "../helpers/ics-helper"
+import { getTimezones, isEventAllDay, offsetDate } from "../helpers/ics-helper"
 import { tzlib_get_ical_block, tzlib_get_offset } from "timezones-ical-library"
 
 export class EventEditPopup {
@@ -12,7 +12,9 @@ export class EventEditPopup {
   private _popup: Popup
   private _form: HTMLFormElement
   private _submit: HTMLButtonElement
-  private _event?: IcsEvent
+  private _cancel: HTMLButtonElement
+  private _delete: HTMLButtonElement
+  private _calendarEvent?: CalendarEvent
 
   private _startTime: HTMLInputElement
   private _startTimezone: HTMLSelectElement
@@ -22,9 +24,8 @@ export class EventEditPopup {
 
   public _calendarSelect: HTMLSelectElement
 
-  // TODO redo
-  public onSave?: (event: CalendarEvent) => Promise<Response>
-  public onDelete?: (event: CalendarEvent) => Promise<Response>
+  private _handleSave?: EventHandler
+  private _handleDelete?: EventHandler
 
   public constructor(target: DomNode, calendars: Calendar[]) {
     const timezones = getTimezones()
@@ -62,22 +63,15 @@ export class EventEditPopup {
       ]),
       createElement("label", { htmlFor: "event-edit-description" }, [createText("Description")]),
       createElement("textarea", { id: "event-edit-description", name: "description" }),
-      this._submit = createElement("button", { onclick: this.cancel }, [createText("Cancel")]),
+      this._cancel = createElement("button", { onclick: this.cancel }, [createText("Cancel")]),
       this._submit = createElement("button", { type: "submit" }, [createText("Submit")]),
+      this._delete = createElement("button", { onclick: this.delete }, [createText("Delete")]),
     ]))
     this.setCalendars(calendars)
   }
 
   public destroy = () => {
     // TODO
-  }
-
-  private updateDatesDisplay = (allday: boolean) => {
-    const display = allday ? "none" : ""
-    this._startTime.style.display = display
-    this._startTimezone.style.display = display
-    this._endTime.style.display = display
-    this._endTimezone.style.display = display
   }
 
   private setCalendars = (calendars: DAVCalendar[]) => {
@@ -87,6 +81,14 @@ export class EventEditPopup {
     for (const calendar of calendars) {
       this._calendarSelect.appendChild(createElement("option", { value: calendar.url }, [createText(calendar.displayName as string)]))
     }
+  }
+
+  private updateDatesDisplay = (allday: boolean) => {
+    const display = allday ? "none" : ""
+    this._startTime.style.display = display
+    this._startTimezone.style.display = display
+    this._endTime.style.display = display
+    this._endTimezone.style.display = display
   }
 
   private addAttendee = (attendee: IcsAttendee) => {
@@ -103,17 +105,43 @@ export class EventEditPopup {
       { name: "role", required: true },
       attendeeRoleTypes.map(role => createElement("option", { value: role }, [createText(role)]))
     ))
-    role.value = attendee.role ?? "REQ-PARTICIPANT"
+    role.value = attendee.role || "REQ-PARTICIPANT"
     elements.push(createElement("button", { type: "button", onclick: _ => remove() }, [createText("X")]))
 
     for (const e of elements) this._attendees.appendChild(e)
   }
+  
+  public onCreate = (event: CalendarEvent, handleCreate: EventHandler) => {
+    this._handleSave = handleCreate
+    this._handleDelete = undefined
+    this.open(event)
+  }
+  public onUpdate = (event: CalendarEvent, handleUpdate: EventHandler, handleDelete: EventHandler) => {
+    this._handleSave = handleUpdate
+    this._handleDelete = handleDelete
+    this.open(event)
 
-  public open = ({calendarUrl, event}: CalendarEvent) => {
-    var localStart = event.start.local ?? { date: event.start.date, timezone: "UTC", tzoffset: "+0000" }
-    var localEnd = event.end!.local ?? { date: event.end!.date, timezone: "UTC", tzoffset: "+0000" }
+  }
+  public onDelete = (event: CalendarEvent, handleDelete: EventHandler) => {
+    handleDelete(event)
+  }
 
-    this._event = event
+  private updateButtons = () => {
+    // TODO conditional styles
+    this._cancel.style.display = "unset"
+    this._submit.style.display = this._handleSave ? "unset" : "none"
+    this._delete.style.display = this._handleDelete ? "unset" : "none"
+  }
+
+  public open = (calendarEvent: CalendarEvent) => {
+    this._calendarEvent = calendarEvent
+    const { calendarUrl, event } = calendarEvent
+
+    const localStart = event.start.local ?? { date: event.start.date, timezone: "UTC", tzoffset: "+0000" }
+    const end = event.end ??offsetDate(localStart, getEventEndFromDuration(event.start.date, event.duration).getTime() - event.start.date.getTime())
+    const localEnd = end.local ?? { date: end.date, timezone: "UTC", tzoffset: "+0000" }
+
+
     const inputs: { [key: string]: any } = this._form.elements
     inputs["calendar"].value = calendarUrl
     inputs["summary"].value = event.summary ?? ""
@@ -133,13 +161,15 @@ export class EventEditPopup {
     for (const attendee of event.attendees ?? []) this.addAttendee(attendee)
 
     this.updateDatesDisplay(isEventAllDay(event))
+    this.updateButtons()
     this._popup.setVisible(true)
   }
 
   public save = async () => {
-    const data = new FormData(this._form, this._submit)
+    const data = new FormData(this._form)
     const allDay = !!data.get("allday")
 
+    // TODO move to a helper
     const getTimeObject = (name: string): IcsDateObject => {
       const date = data.get(`${name}-date`) as string
       const time = data.get(`${name}-time`) as string
@@ -162,18 +192,25 @@ export class EventEditPopup {
 
     // @ts-ignore
     const event: IcsEvent = {
-      ...this._event,
+      ...this._calendarEvent!.event,
       summary: data.get("summary") as string,
       location: data.get("location") as string || undefined,
       start: getTimeObject("start"),
       end: getTimeObject("end"),
       description: data.get("description") as string || undefined,
-      organizer: data.get("email-organizer") ? { ...this._event?.organizer, email: data.get("email-organizer") as string, name: data.get("name-organizer") as string || undefined } : undefined,
+      organizer: data.get("email-organizer") ? { ...this._calendarEvent!.event!.organizer, email: data.get("email-organizer") as string, name: data.get("name-organizer") as string || undefined } : undefined,
       attendees: emails.map((e, i) => ({ email: e, name: names[i], role: roles[i] })) || undefined
     }
-    const response = await this.onSave?.({ calendarUrl: data.get("calendar") as string, event })
-    if (response?.formData) this._popup.setVisible(false)
+    const response = await this._handleSave!({ calendarUrl: data.get("calendar") as string, event })
+    if (response.ok) this._popup.setVisible(false)
   }
 
-  public cancel = () => this._popup.setVisible(false)
+  public cancel = () => {
+    this._popup.setVisible(false)
+  }
+  
+  public delete = async () => {
+    await this._handleDelete!(this._calendarEvent!)
+    this._popup.setVisible(false)
+  }
 }

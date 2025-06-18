@@ -6,5 +6,5 @@ export function createCalendarClient(
   target: DomNode,
   options?: CalendarClientOptions,
 ): CalendarClient {
-  return new CalendarClient(sources, target, {...options, view: "dayGridMonth" })
+  return new CalendarClient(sources, target, options)
 }

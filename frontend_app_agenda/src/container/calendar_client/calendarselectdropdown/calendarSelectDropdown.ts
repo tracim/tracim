@@ -1,37 +1,36 @@
 import { createElement, createText } from "../helpers/dom-helper"
 import type { Calendar, CalendarHandler, DomNode } from "../types"
 import "./calendarSelectDropdown.css"
-// TODO redo
 import "../generic.css"
 export class CalendarSelectDropdown {
 
     private _opened: boolean = false
-    private _frame?: HTMLDivElement
+    private _container?: HTMLDivElement
 
     public constructor() {
         this.create()
     }
 
     private create = () => {
-        this._frame = createElement("div", { className: "dropdown-frame form" }, [createText("ireunst")])
+        this._container = createElement("div", { className: "dropdown-frame form" })
     }
 
     public destroy = () => {
         // TODO check if opened
-        this._frame = undefined
+        this._container = undefined
     }
 
     public onSelect = (target: DomNode, calendars: Calendar[], handleSelect: CalendarHandler) => {
-        if (!this._frame) return
+        if (!this._container) return
         if (this._opened) {
-            target.parentElement?.removeChild(this._frame)
+            target.removeChild(this._container)
             this._opened = false
             return
         }
-        this._frame.innerHTML = ""
+        this._container.innerHTML = ""
         for (const calendar of calendars) {
             console.log(calendar.calendarColor)
-            this._frame.append(
+            this._container.append(
                 createElement("label", {}, [
                     // @ts-ignore
                     createElement("span", { className: "calendar-color", style: { backgroundColor: calendar.calendarColor ?? "white" } }),
@@ -40,7 +39,7 @@ export class CalendarSelectDropdown {
                 createElement("input", { type: "checkbox", checked: !calendar.hidden, onchange: e => handleSelect(calendar.url, (e.target as HTMLInputElement).checked) }),
             )
         }
-        target.parentElement?.insertBefore(this._frame, (target as Element).nextElementSibling)
+        target.appendChild(this._container)
         this._opened = true
     }
 }

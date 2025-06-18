@@ -16,7 +16,7 @@ export type Calendar = DAVCalendar & {
 }
 
 export type CalendarObject = {
-  object: IcsCalendar
+  data: IcsCalendar
   etag?: string
   url: string
   calendarUrl: string
@@ -68,12 +68,12 @@ export type CalendarHandlers = {
 // ? add clicked node to allow positioning relative to the event
 export type EventHandler = (event: CalendarEvent) => Promise<Response>
 export type EventHandlers = {
-  onCreateEvent: (event: CalendarEvent, handleCreate: EventHandler) => void,
-  onUpdateEvent: (event: CalendarEvent, handleUpdate: EventHandler, handleDelete: EventHandler) => void,
-  onDeleteEvent: (event: CalendarEvent, handleDelete: EventHandler) => void,
+  onCreateEvent: (calendarEvent: CalendarEvent, handleCreate: EventHandler) => void,
+  onUpdateEvent: (calendarEvent: CalendarEvent, handleUpdate: EventHandler, handleDelete: EventHandler) => void,
+  onDeleteEvent: (calendarEvent: CalendarEvent, handleDelete: EventHandler) => void,
 }
 
-export type PostEventHandler = (event: CalendarEvent, ics: string) => void
+export type PostEventHandler = (calendarEvent: CalendarEvent, ical: string) => void
 export type PostEventHandlers = {
   onEventCreated?: PostEventHandler
   onEventUpdated?: PostEventHandler
@@ -89,6 +89,21 @@ export type CalendarOptions = {
 
 export type CalendarClientOptions = CalendarOptions & (CalendarHandlers | {}) & (EventHandlers | {}) & PostEventHandlers
 
-export function hasEventHandlers(source: CalendarClientOptions): source is EventHandlers {
-  return (source as EventHandlers).onCreateEvent !== undefined;
+export function hasEventHandlers(options: CalendarClientOptions): options is EventHandlers {
+  return (options as EventHandlers).onCreateEvent !== undefined;
+}
+
+export function hasCalendarHandlers(options: CalendarClientOptions): options is CalendarHandlers {
+  return (options as CalendarHandlers).onSelectCalendars !== undefined;
+}
+
+export type EventUidData = {
+  event: IcsEvent
+  calendarObject: CalendarObject
+  calendar: Calendar
+}
+
+export type CalendarResponse = {
+  response: Response
+  ical: string
 }

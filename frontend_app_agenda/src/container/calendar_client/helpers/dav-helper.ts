@@ -1,7 +1,7 @@
 import { tzlib_get_ical_block } from "timezones-ical-library";
 import { convertIcsCalendar, convertIcsTimezone, generateIcsCalendar, type IcsCalendar } from "ts-ics";
-import { createAccount, fetchCalendars as davFetchCalendars, fetchCalendarObjects as davFetchCalendarObjects, createCalendarObject as davCreateCalendarObject, updateCalendarObject as davUpdateCalendarObject, deleteCalendarObject as davDeleteCalendarObject, DAVNamespaceShort, propfind, type DAVCalendar } from "tsdav";
-import { type CalendarSource, type ServerSource, type Calendar, type CalendarObject, isServerSource } from "../types";
+import { createAccount, fetchCalendars as davFetchCalendars, fetchCalendarObjects as davFetchCalendarObjects, createCalendarObject as davCreateCalendarObject, updateCalendarObject as davUpdateCalendarObject, deleteCalendarObject as davDeleteCalendarObject, DAVNamespaceShort, propfind, type DAVCalendar, type DAVCalendarObject } from "tsdav";
+import { type CalendarSource, type ServerSource, type Calendar, type CalendarObject, isServerSource, type CalendarResponse } from "../types";
 
 export async function fetchCalendars(source: ServerSource | CalendarSource): Promise<Calendar[]> {
   if (isServerSource(source)) {
@@ -19,71 +19,58 @@ export async function fetchCalendars(source: ServerSource | CalendarSource): Pro
 }
 
 export async function fetchCalendarObjects(calendar: Calendar, timeRange?: { start: string; end: string; }, expand?: boolean): Promise<CalendarObject[]> {
-  const objects = await davFetchCalendarObjects({
+  const davCalendarObjects = await davFetchCalendarObjects({
     calendar: calendar,
     timeRange, expand,
     headers: calendar.headers,
     fetchOptions: calendar.fetchOptions,
   })
-  return objects.map(o => ({ ...o, object: convertIcsCalendar(undefined, o.data), calendarUrl: calendar.url }))
+  return davCalendarObjects.map(o => ({ url: o.url, etag: o.etag, data: convertIcsCalendar(undefined, o.data), calendarUrl: calendar.url }))
 }
 
-export async function createCalendarObjects(calendar: Calendar, object: IcsCalendar): Promise<[Response, string]> {
-  validateTimezones(object)
-  for (const event of object.events ?? []) event.uid = crypto.randomUUID()
-  const uid = object.events?.[0].uid ?? crypto.randomUUID()
-  var iCalString = generateIcsCalendar(object)
+export async function createCalendarObjects(calendar: Calendar, calendarObjectData: IcsCalendar): Promise<CalendarResponse> {
+  validateTimezones(calendarObjectData)
+  for (const event of calendarObjectData.events ?? []) event.uid = crypto.randomUUID()
+  const uid = calendarObjectData.events?.[0].uid ?? crypto.randomUUID()
+  var iCalString = generateIcsCalendar(calendarObjectData)
   const response = await davCreateCalendarObject({ calendar, iCalString, filename: `${uid}.ics`, headers: calendar.headers, fetchOptions: calendar.fetchOptions })
-  return [response, iCalString]
+  return { response, ical: iCalString }
 }
 
-export async function updateCalendarObject(calendar: Calendar, object: CalendarObject): Promise<[Response, string]> {
-  // if (event.recurrenceRule) {
-  //   for (let i = 0; i < icsCalendar.events.length; i++) {
-  //     const element = icsCalendar.events[i];
-  //     if (i == event.index) continue
-  //     else if (element.uid == event.event.uid) {
-  //       const reccurenceOffset = element.recurrenceId.value.date.getTime() - icsCalendar.events[event.index].start.date.getTime()
-  //       element.recurrenceId = { value: offsetDate(event.event.start, reccurenceOffset) }
-  //     }
-  //   }
-  // }
-  // if (event.index == -1) icsCalendar.events.push(event.event)
-  // else
-  // const icsCalendar = generateIcsCalendar(object.data)
-  // icsCalendar.events![index.eventIndex] = { ...event, sequence: (event.sequence ?? 0) + 1 }
-
-  validateTimezones(object.object)
-  var calendarObject = { ...object, data: generateIcsCalendar(object.object) }
-  const response = await davUpdateCalendarObject({ calendarObject: calendarObject, ...calendar })
-  return [response, calendarObject.data]
+export async function updateCalendarObject(calendar: Calendar, calendarObject: CalendarObject): Promise<CalendarResponse> {
+  validateTimezones(calendarObject.data)
+  const davCalendarObject: DAVCalendarObject = { url: calendarObject.url, etag: calendarObject.etag, data: generateIcsCalendar(calendarObject.data) }
+  const response = await davUpdateCalendarObject({ calendarObject: davCalendarObject, headers: calendar.headers, fetchOptions: calendar.fetchOptions })
+  return { response, ical: davCalendarObject.data }
 }
 
-export async function deleteCalendarObject(calendar: Calendar, object: CalendarObject): Promise<[Response, string]> {
-  validateTimezones(object.object)
-  var calendarObject = { ...object, data: generateIcsCalendar(object.object) }
-  const response = await davDeleteCalendarObject({ calendarObject, headers: calendar.headers, fetchOptions: calendar.fetchOptions })
-  return [response, calendarObject.data]
+export async function deleteCalendarObject(calendar: Calendar, calendarObject: CalendarObject): Promise<CalendarResponse> {
+  validateTimezones(calendarObject.data)
+  const davCalendarObject: DAVCalendarObject = { url: calendarObject.url, etag:calendarObject.etag, data: generateIcsCalendar(calendarObject.data) }
+  const response = await davDeleteCalendarObject({ calendarObject: davCalendarObject, headers: calendar.headers, fetchOptions: calendar.fetchOptions })
+  return { response, ical: davCalendarObject.data }
 
 }
 
-function validateTimezones(object: IcsCalendar) {
-  const calendar = object
-  const wantedTzids = new Set(calendar.events!.map(e => [e.start.local?.timezone, e.end!.local?.timezone]).flat().filter(s => s !== undefined))
+function validateTimezones(calendarObjectData: IcsCalendar) {
+  const calendar = calendarObjectData
+  const wantedTzIds = new Set(calendar.events?.flatMap(e => [e.start.local?.timezone, e.end?.local?.timezone]).filter(s => s !== undefined))
   calendar.timezones ??= []
 
   // Remove extra timezones
-  calendar.timezones = calendar.timezones.filter(tz => wantedTzids.has(tz.id))
+  calendar.timezones = calendar.timezones.filter(tz => wantedTzIds.has(tz.id))
 
   // Add missing timezones
-  wantedTzids.forEach(tzid => {
+  wantedTzIds.forEach(tzid => {
     if (calendar.timezones!.findIndex(t => t.id === tzid) === -1) {
       calendar.timezones!.push(convertIcsTimezone(undefined, tzlib_get_ical_block(tzid)[0]))
     }
   })
 }
 
+// Inspired from https://github.com/natelindev/tsdav/blob/master/src/calendar.ts, fetchCalendars
 async function davFetchCalendar(params: { url: string, headers?: Record<string, string>, fetchOptions?: RequestInit }): Promise<DAVCalendar> {
+  const { url, headers, fetchOptions } = params
   const props = {
     [`${DAVNamespaceShort.CALDAV}:calendar-description`]: {},
     [`${DAVNamespaceShort.CALDAV}:calendar-timezone`]: {},
@@ -94,14 +81,14 @@ async function davFetchCalendar(params: { url: string, headers?: Record<string, 
     [`${DAVNamespaceShort.CALDAV}:supported-calendar-component-set`]: {},
     [`${DAVNamespaceShort.DAV}:sync-token`]: {},
   }
-  const res = await propfind({ ...params, props })
-  const calendar = res[0]
+  const response = await propfind({ url, headers, fetchOptions, props })
+  const calendar = response[0]
   if (calendar.error) {
     // TODO
+    throw "Calendar does not exists"
   }
   const description = calendar.props?.calendarDescription;
   const timezone = calendar.props?.calendarTimezone;
-
   return {
     description: typeof description === 'string' ? description : '',
     timezone: typeof timezone === 'string' ? timezone : '',

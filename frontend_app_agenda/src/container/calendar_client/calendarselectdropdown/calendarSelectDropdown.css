@@ -1,11 +1,11 @@
 .dropdown-frame {
     position: absolute;
-    margin: 0 !important;
-    margin-top: -0.5rem !important;
+    margin: 0.375rem 0 0 -0.75rem !important;
     padding: 0.5rem;
     background-color: white;
     border: 1px solid var(--ec-button-border-color);
     z-index: 2000;
+    cursor: pointer;
 }
 
 .calendar-color {
