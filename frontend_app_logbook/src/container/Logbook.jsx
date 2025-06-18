@@ -40,7 +40,12 @@ import {
   putMyselfFileRead,
   sendGlobalFlashMessage,
   sortListByMultipleCriteria,
-  defaultApiContent
+  defaultApiContent,
+  AppProperty,
+  AppDescription,
+  displayFileSize,
+  formatAbsoluteDate,
+  displayDistanceDate
 } from 'tracim_frontend_lib'
 
 import LogbookComponent from '../component/Logbook.jsx'
@@ -248,6 +253,10 @@ export class Logbook extends React.Component {
     this.handleClickPermanentlyDeleteButton()
   }
 
+  handleValidateNewDescription = async newDescription => {
+    this.props.appContentChangeDescription(newDescription)
+  }
+
   // TLM Handlers
 
   handleContentChanged = data => {
@@ -282,7 +291,7 @@ export class Logbook extends React.Component {
 
   getMenuItemList = () => {
     const { props, state } = this
-    const timelineObject = {
+    const timelineComponent = {
       id: 'timeline',
       label: props.t('Timeline'),
       icon: 'fa-history',
@@ -330,10 +339,10 @@ export class Logbook extends React.Component {
       ) : null
     }
 
-    const menuItemList = [timelineObject]
+    const menuItemList = [timelineComponent]
 
     if (state.config.toDoEnabled) {
-      const toDoObject = {
+      const toDoComponent = {
         id: 'todo',
         label: props.t('Tasks'),
         icon: 'fas fa-check-square',
@@ -360,10 +369,10 @@ export class Logbook extends React.Component {
           </PopinFixedRightPartContent>
         )
       }
-      menuItemList.push(toDoObject)
+      menuItemList.push(toDoComponent)
     }
 
-    const tagObject = {
+    const tagComponent = {
       id: 'tag',
       label: props.t('Tags'),
       icon: 'fas fa-tag',
@@ -382,7 +391,56 @@ export class Logbook extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
-    menuItemList.push(tagObject)
+    menuItemList.push(tagComponent)
+
+    const propertyComponent = {
+      id: 'properties',
+      label: props.t('Properties'),
+      icon: 'fa-info-circle',
+      children: (
+        <PopinFixedRightPartContent label={props.t('Properties')}>
+          <AppProperty
+            readOnlyFieldList={[{
+              title: '',
+              label: props.t('Size:'),
+              value: displayFileSize(state.content.size)
+            }, {
+              title: formatAbsoluteDate(state.content.created, props.i18n.language),
+              label: props.t('Creation date:'),
+              value: formatAbsoluteDate(state.content.created, props.i18n.language, 'P')
+            }, {
+              title: formatAbsoluteDate(state.content.modified, props.i18n.language),
+              label: props.t('Last modification:'),
+              value: displayDistanceDate(state.content.modified, state.loggedUser.lang)
+            }]}
+          />
+        </PopinFixedRightPartContent>
+      )
+    }
+    menuItemList.push(propertyComponent)
+
+    const descriptionComponent = {
+      id: 'description',
+      label: props.t('Description'),
+      icon: 'fas fa-list-ul',
+      children: (
+        <PopinFixedRightPartContent label={props.t('Description')}>
+          <AppDescription
+            apiUrl={state.config.apiUrl}
+            color={state.config.hexcolor}
+            mentionUserList={state.config.workspace.memberList}
+            description={state.content.description}
+            codeLanguageList={state.config.system.config.ui__notes__code_sample_languages}
+            iframeWhitelist={state.config.system.config.iframe_whitelist}
+            language={state.loggedUser.lang}
+            displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id}
+            disableChangeDescription={!state.content.is_editable}
+            onClickValidateNewDescription={this.handleValidateNewDescription}
+          />
+        </PopinFixedRightPartContent>
+      )
+    }
+    menuItemList.push(descriptionComponent)
 
     return menuItemList
   }

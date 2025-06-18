@@ -42,6 +42,7 @@ import {
   sortListByMultipleCriteria,
   defaultApiContent,
   AppProperty,
+  AppDescription,
   displayFileSize,
   formatAbsoluteDate,
   displayDistanceDate
@@ -280,7 +281,7 @@ export class Kanban extends React.Component {
 
   getMenuItemList = () => {
     const { props, state } = this
-    const timelineObject = {
+    const timelineComponent = {
       id: 'timeline',
       label: props.t('Timeline'),
       icon: 'fa-history',
@@ -328,10 +329,10 @@ export class Kanban extends React.Component {
       ) : null
     }
 
-    const menuItemList = [timelineObject]
+    const menuItemList = [timelineComponent]
 
     if (state.config.toDoEnabled) {
-      const toDoObject = {
+      const todoComponent = {
         id: 'todo',
         label: props.t('Tasks'),
         icon: 'fas fa-check-square',
@@ -358,10 +359,10 @@ export class Kanban extends React.Component {
           </PopinFixedRightPartContent>
         )
       }
-      menuItemList.push(toDoObject)
+      menuItemList.push(todoComponent)
     }
 
-    const tagObject = {
+    const tagComponent = {
       id: 'tag',
       label: props.t('Tags'),
       icon: 'fas fa-tag',
@@ -380,36 +381,43 @@ export class Kanban extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
-    menuItemList.push(tagObject)
+    menuItemList.push(tagComponent)
 
-    const propertyObject = {
+    const propertyComponent = {
       id: 'properties',
       label: props.t('Properties'),
       icon: 'fa-info-circle',
       children: (
-        <PopinFixedRightPartContent
-          label={props.t('Properties')}
-        >
+        <PopinFixedRightPartContent label={props.t('Properties')}>
           <AppProperty
-            apiUrl={state.config.apiUrl}
-            color={state.config.hexcolor}
             readOnlyFieldList={[{
               title: '',
               label: props.t('Size:'),
               value: displayFileSize(state.content.size)
             }, {
-              title: '',
-              label: props.t('Number of shares:'),
-              value: state.content.actives_shares
-            }, {
-              title: formatAbsoluteDate(state.content.created_raw, props.i18n.language),
+              title: formatAbsoluteDate(state.content.created, props.i18n.language),
               label: props.t('Creation date:'),
-              value: formatAbsoluteDate(state.content.created_raw, props.i18n.language, 'P')
+              value: formatAbsoluteDate(state.content.created, props.i18n.language, 'P')
             }, {
               title: formatAbsoluteDate(state.content.modified, props.i18n.language),
               label: props.t('Last modification:'),
               value: displayDistanceDate(state.content.modified, state.loggedUser.lang)
             }]}
+          />
+        </PopinFixedRightPartContent>
+      )
+    }
+    menuItemList.push(propertyComponent)
+
+    const descriptionComponent = {
+      id: 'description',
+      label: props.t('Description'),
+      icon: 'fas fa-list-ul',
+      children: (
+        <PopinFixedRightPartContent label={props.t('Description')}>
+          <AppDescription
+            apiUrl={state.config.apiUrl}
+            color={state.config.hexcolor}
             mentionUserList={state.config.workspace.memberList}
             description={state.content.description}
             codeLanguageList={state.config.system.config.ui__notes__code_sample_languages}
@@ -418,12 +426,11 @@ export class Kanban extends React.Component {
             displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id}
             disableChangeDescription={!state.content.is_editable}
             onClickValidateNewDescription={this.handleClickValidateNewDescription}
-            key='FileProperties'
           />
         </PopinFixedRightPartContent>
       )
     }
-    menuItemList.push(propertyObject)
+    menuItemList.push(descriptionComponent)
 
     return menuItemList
   }

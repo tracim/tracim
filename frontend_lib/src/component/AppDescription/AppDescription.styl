@@ -1,0 +1,25 @@
+@import '../../css/Variable.styl'
+
+.appDescription
+  padding standardSpacing
+  &__btn
+    display flex
+    justify-content flex-end
+    margin-top standardSpacing
+    &__cancel
+      margin-inline-end standardSpacing
+      &:hover
+        color offWhite
+    &__validate:hover
+      color offWhite
+  &__editBtn
+    display flex
+    flex-direction row
+    justify-content flex-end
+    margin-top standardSpacing
+
+  &__view
+    & .HTMLContent
+      background-color offWhite
+      border-radius standardBorderRadius
+      padding standardSpacing

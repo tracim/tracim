@@ -51,7 +51,11 @@ import {
   searchMentionAndReplaceWithTag,
   sendGlobalFlashMessage,
   sortListByMultipleCriteria,
-  defaultApiContent
+  defaultApiContent,
+  AppProperty,
+  displayFileSize,
+  formatAbsoluteDate,
+  displayDistanceDate
 } from 'tracim_frontend_lib'
 import {
   getHtmlDocContent,
@@ -826,7 +830,7 @@ export class HtmlDocument extends React.Component {
 
   getMenuItemList = () => {
     const { props, state } = this
-    const timelineObject = {
+    const timelineComponent = {
       id: 'timeline',
       label: props.t('Timeline'),
       icon: 'fa-history',
@@ -878,10 +882,10 @@ export class HtmlDocument extends React.Component {
       ) : null
     }
 
-    const menuItemList = [timelineObject]
+    const menuItemList = [timelineComponent]
 
     if (state.config.toDoEnabled) {
-      const toDoObject = {
+      const toDoComponent = {
         id: 'todo',
         label: props.t('Tasks'),
         icon: 'fas fa-check-square',
@@ -908,10 +912,10 @@ export class HtmlDocument extends React.Component {
           </PopinFixedRightPartContent>
         )
       }
-      menuItemList.push(toDoObject)
+      menuItemList.push(toDoComponent)
     }
 
-    const tagObject = {
+    const tagComponent = {
       id: 'tag',
       label: props.t('Tags'),
       icon: 'fas fa-tag',
@@ -930,7 +934,33 @@ export class HtmlDocument extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
-    menuItemList.push(tagObject)
+    menuItemList.push(tagComponent)
+
+    const propertyComponent = {
+      id: 'properties',
+      label: props.t('Properties'),
+      icon: 'fa-info-circle',
+      children: (
+        <PopinFixedRightPartContent label={props.t('Properties')}>
+          <AppProperty
+            readOnlyFieldList={[{
+              title: '',
+              label: props.t('Size:'),
+              value: displayFileSize(new Blob([state.content.raw_content]).size)
+            }, {
+              title: formatAbsoluteDate(state.content.created, props.i18n.language),
+              label: props.t('Creation date:'),
+              value: formatAbsoluteDate(state.content.created, props.i18n.language, 'P')
+            }, {
+              title: formatAbsoluteDate(state.content.modified, props.i18n.language),
+              label: props.t('Last modification:'),
+              value: displayDistanceDate(state.content.modified, state.loggedUser.lang)
+            }]}
+          />
+        </PopinFixedRightPartContent>
+      )
+    }
+    menuItemList.push(propertyComponent)
 
     return menuItemList
   }
