@@ -936,6 +936,11 @@ export class HtmlDocument extends React.Component {
     }
     menuItemList.push(tagComponent)
 
+    // INFO - CH - 2025-06-18 - On content load, .created stores the datetime from api.
+    // When clicking on a revision, the .created get replaced by the formated value and .created_raw is affected
+    // with .created.
+    // See: https://github.com/tracim/tracim/issues/6784
+    const dateCreatedRaw = state.content.created_raw ? state.content.created_raw : state.content.created
     const propertyComponent = {
       id: 'properties',
       label: props.t('Properties'),
@@ -946,11 +951,11 @@ export class HtmlDocument extends React.Component {
             readOnlyFieldList={[{
               title: '',
               label: props.t('Size:'),
-              value: displayFileSize(new Blob([state.content.raw_content]).size)
+              value: displayFileSize(new window.Blob([state.content.raw_content]).size)
             }, {
-              title: formatAbsoluteDate(state.content.created, props.i18n.language),
+              title: formatAbsoluteDate(dateCreatedRaw, props.i18n.language),
               label: props.t('Creation date:'),
-              value: formatAbsoluteDate(state.content.created, props.i18n.language, 'P')
+              value: formatAbsoluteDate(dateCreatedRaw, props.i18n.language, 'P')
             }, {
               title: formatAbsoluteDate(state.content.modified, props.i18n.language),
               label: props.t('Last modification:'),
