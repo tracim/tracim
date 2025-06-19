@@ -1,6 +1,19 @@
 import type { IcsCalendar, IcsEvent, IcsRecurrenceId } from "ts-ics"
 import type { DAVCalendar } from "tsdav"
 
+// TODO move to another file (types-helper.ts ?)
+// ? add the declaration of the "public api class"
+export function isServerSource(source: ServerSource | CalendarSource): source is ServerSource {
+  return (source as ServerSource).serverUrl !== undefined;
+}
+
+export function hasEventHandlers(options: CalendarClientOptions): options is EventHandlers {
+  return (options as EventHandlers).onCreateEvent !== undefined;
+}
+
+export function hasCalendarHandlers(options: CalendarClientOptions): options is CalendarHandlers {
+  return (options as CalendarHandlers).onSelectCalendars !== undefined;
+}
 
 // TODO add <TCalendarUid = any>
 // TODO add options to support IcsEvent custom props
@@ -37,10 +50,6 @@ export type IcsAttendeeRoleTypes = typeof attendeeRoleTypes;
 export const availableViews = ["timeGridDay", "timeGridWeek", "dayGridMonth", "listDay", "listWeek", "listMonth", "listYear"] as const;
 export type View = typeof availableViews[number];
 
-export function isServerSource(source: ServerSource | CalendarSource): source is ServerSource {
-  return (source as ServerSource).serverUrl !== undefined;
-}
-
 export type ServerSource = {
   serverUrl: string
   headers?: Record<string, string>
@@ -58,8 +67,6 @@ export type CalendarEvent = {
   calendarUrl: string
   event: IcsEvent
 }
-
-export type DomNode = Element | Document | ShadowRoot
 
 export type CalendarHandler = (calendarUrl: string, selected: boolean) => void
 export type CalendarHandlers = {
@@ -88,14 +95,6 @@ export type CalendarOptions = {
 }
 
 export type CalendarClientOptions = CalendarOptions & (CalendarHandlers | {}) & (EventHandlers | {}) & PostEventHandlers
-
-export function hasEventHandlers(options: CalendarClientOptions): options is EventHandlers {
-  return (options as EventHandlers).onCreateEvent !== undefined;
-}
-
-export function hasCalendarHandlers(options: CalendarClientOptions): options is CalendarHandlers {
-  return (options as CalendarHandlers).onSelectCalendars !== undefined;
-}
 
 export type EventUidData = {
   event: IcsEvent

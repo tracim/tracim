@@ -28,7 +28,7 @@ export async function fetchCalendarObjects(calendar: Calendar, timeRange?: { sta
   return davCalendarObjects.map(o => ({ url: o.url, etag: o.etag, data: convertIcsCalendar(undefined, o.data), calendarUrl: calendar.url }))
 }
 
-export async function createCalendarObjects(calendar: Calendar, calendarObjectData: IcsCalendar): Promise<CalendarResponse> {
+export async function createCalendarObject(calendar: Calendar, calendarObjectData: IcsCalendar): Promise<CalendarResponse> {
   validateTimezones(calendarObjectData)
   for (const event of calendarObjectData.events ?? []) event.uid = crypto.randomUUID()
   const uid = calendarObjectData.events?.[0].uid ?? crypto.randomUUID()

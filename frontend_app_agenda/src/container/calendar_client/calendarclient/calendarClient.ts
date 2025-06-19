@@ -1,11 +1,11 @@
 import { createCalendar as createEventCalendar, DayGrid, TimeGrid, List, Interaction, destroyCalendar as destroyEventCalendar } from '@event-calendar/core'
 import type { Calendar as EventCalendar } from '@event-calendar/core'
 import '@event-calendar/core/index.css';
-import { getEventEnd, IcsEvent, type IcsCalendar } from 'ts-ics';
+import { getEventEnd, type IcsEvent, type IcsCalendar } from 'ts-ics';
 import { EventEditPopup } from '../eventeditpopup/eventEditPopup';
-import { createCalendarObjects, deleteCalendarObject, fetchCalendarObjects, fetchCalendars, updateCalendarObject } from '../helpers/dav-helper';
+import { createCalendarObject, deleteCalendarObject, fetchCalendarObjects, fetchCalendars, updateCalendarObject } from '../helpers/dav-helper';
 import { hasCalendarHandlers, hasEventHandlers } from '../types';
-import type { CalendarClientOptions, CalendarSource, ServerSource, Calendar, CalendarObject, EventUid, EventHandlers, CalendarEvent, PostEventHandlers, DomNode, CalendarHandlers, EventUidData } from '../types';
+import type { CalendarClientOptions, CalendarSource, ServerSource, Calendar, CalendarObject, EventUid, EventHandlers, CalendarEvent, PostEventHandlers, CalendarHandlers, EventUidData } from '../types';
 import { isEventAllDay, isSameEvent, offsetDate } from '../helpers/ics-helper';
 import "./calendarClient.css"
 import { CalendarSelectDropdown } from '../calendarselectdropdown/calendarSelectDropdown';
@@ -25,7 +25,7 @@ export class CalendarClient {
   private _eventHandlers?: EventHandlers
   private _postEventHandlers?: PostEventHandlers
 
-  public create = async (sources: (ServerSource | CalendarSource)[], target: DomNode, options?: CalendarClientOptions) => {
+  public create = async (sources: (ServerSource | CalendarSource)[], target: Element | Document | ShadowRoot, options?: CalendarClientOptions) => {
     const calendarsPerSource = await Promise.all(sources.map(source => fetchCalendars(source)))
     this._calendars = calendarsPerSource.flat()
     this._calendarObjectsPerCalendar = this._calendars.map(_ => [])
@@ -55,7 +55,7 @@ export class CalendarClient {
     this.destroyDefaultCalendarElement()
   }
 
-  private createCalendar = (target: DomNode, options?: CalendarClientOptions) => {
+  private createCalendar = (target: Element | Document | ShadowRoot, options?: CalendarClientOptions) => {
     if (this._calendar) return
     this._calendar = createEventCalendar(
       target,
@@ -121,11 +121,11 @@ export class CalendarClient {
     this._calendar = undefined
   }
 
-  private createDefaultEventElement = (target: DomNode): EventHandlers => {
-    // TODO find an other to send calendars the the popup that makes it accessible to any popup
+  private createDefaultEventElement = (target: Node): EventHandlers => {
+    // TODO find an other way to send calendars the the popup that makes it accessible to any popup
     if (this._eventEdit === undefined) {
       this._eventEdit = new EventEditPopup(target)
-      this._eventEdit.setCalendars(this._calendar)
+      this._eventEdit.setCalendars(this._calendars)
     }
     return {
       onCreateEvent: this._eventEdit.onCreate,
@@ -183,10 +183,10 @@ export class CalendarClient {
     if (uidData === undefined) return
 
     const newEvent = { ...uidData.event }
-    var startDelta = new Date(event.start).getTime() - oldEvent.start.getTime()
+    var startDelta = event.start.getTime() - oldEvent.start.getTime()
     newEvent.start = offsetDate(newEvent.start, startDelta)
     if (newEvent.end) {
-      var endDelta = new Date(event.end).getTime() - oldEvent.end.getTime()
+      var endDelta = event.end.getTime() - oldEvent.end.getTime()
       newEvent.end = offsetDate(newEvent.end, endDelta)
     }
     const response = await this.updateEvent({ calendarUrl: uidData.calendar.url, event: newEvent })
@@ -232,11 +232,13 @@ export class CalendarClient {
     const calendar = this.getCalendarByUrl(calendarUrl)
     if (calendar === undefined) return new Response(null, { status: 404 })
     const calendarObject: IcsCalendar = {
-      prodId: '-//algoo.fr//NONSGML Tracim//EN',
+      // prodId is a FPI (https://en.wikipedia.org/wiki/Formal_Public_Identifier)
+      prodId: '-//algoo.fr//NONSGML Algoo Calendar Client v0.1//EN',
+      // prodId: '+//IDN algoo.fr//NONSGML Algoo Calendar Client v0.1//EN',
       version: "2.0",
       events: [event],
     }
-    const { response, ical } = await createCalendarObjects(calendar, calendarObject)
+    const { response, ical } = await createCalendarObject(calendar, calendarObject)
     if (response.ok) {
       this._postEventHandlers!.onEventCreated?.({ calendarUrl, event }, ical)
       this.refreshEvents()

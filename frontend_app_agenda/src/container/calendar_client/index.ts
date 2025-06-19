@@ -1,9 +1,9 @@
 import { CalendarClient } from "./calendarclient/calendarClient";
-import type { CalendarClientOptions, CalendarSource, DomNode, ServerSource } from "./types";
+import type { CalendarClientOptions, CalendarSource, ServerSource } from "./types";
 
 export async function createCalendarClient(
   sources: (ServerSource | CalendarSource)[],
-  target: DomNode,
+  target: Element | Document | ShadowRoot,
   options?: CalendarClientOptions,
 ) {
   const calendar = new CalendarClient()

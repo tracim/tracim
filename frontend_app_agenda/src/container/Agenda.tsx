@@ -20,8 +20,7 @@ import {
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import { getAgendaList, getPreFilledAgendaEvent } from '../action.async'
-import { createCalendarClient } from '@tracim/calendar-client'
-import "@tracim/calendar-client/style.css"
+import { createCalendarClient } from '@algoo/calendar-client'
 export class Agenda extends React.Component<any, any> {
   calendarRef: RefObject<any> = createRef()
 
@@ -282,10 +281,9 @@ export class Agenda extends React.Component<any, any> {
   }
 
   buildCalendar = () => {
-    
     const calendar = createCalendarClient(
+      [{ serverUrl: `${window.location.origin}/dav`}],
       this.calendarRef.current,
-      `${window.location.origin}/dav`
     )
     this.setState({ calendar })
   }

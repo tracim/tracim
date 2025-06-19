@@ -1,17 +1,16 @@
 import { getEventEndFromDuration, type IcsAttendee, type IcsDateObject, type IcsEvent } from "ts-ics"
+import "./eventEditPopup.css"
 import "../generic.css"
-import { attendeeRoleTypes, type Calendar, type CalendarEvent, type DomNode, type EventHandler } from "../types"
+import { attendeeRoleTypes, type Calendar, type CalendarEvent, type EventHandler } from "../types"
 import { Popup } from "../popup/popup"
 import { createElement, createText } from "../helpers/dom-helper"
-import { getTimezones, isEventAllDay, offsetDate } from "../helpers/ics-helper"
-import { tzlib_get_ical_block, tzlib_get_offset } from "timezones-ical-library"
+import { isEventAllDay, offsetDate } from "../helpers/ics-helper"
+import { tzlib_get_ical_block, tzlib_get_offset, tzlib_get_timezones } from "timezones-ical-library"
 
 export class EventEditPopup {
 
   private _popup: Popup
   private _form: HTMLFormElement
-  private _submit: HTMLButtonElement
-  private _cancel: HTMLButtonElement
   private _delete: HTMLButtonElement
   private _calendarEvent?: CalendarEvent
 
@@ -26,8 +25,8 @@ export class EventEditPopup {
   private _handleSave?: EventHandler
   private _handleDelete?: EventHandler
 
-  public constructor(target: DomNode) {
-    const timezones = getTimezones()
+  public constructor(target: Node) {
+    const timezones = tzlib_get_timezones() as string[]
     this._popup = new Popup(target)
     this._form = this._popup.content.appendChild(createElement("form", { name: "event", className: "form", onsubmit: async (e) => { e.preventDefault(); await this.save() } }, [
       createElement("label", { htmlFor: "event-edit-calendar" }, [createText("Calendar")]),
@@ -39,13 +38,13 @@ export class EventEditPopup {
       createElement("label", { htmlFor: "event-edit-allday" }, [createText("All day")]),
       createElement("input", { type: "checkbox", id: "event-edit-allday", name: "allday", onchange: e => this.updateDatesDisplay((e.target as HTMLInputElement).checked) }),
       createElement("label", { htmlFor: "event-edit-start" }, [createText("Start")]),
-      createElement("div", { id: "event-edit-start", className: "form-div" }, [
+      createElement("div", { id: "event-edit-start", className: "time-div" }, [
         createElement("input", { type: "date", name: "start-date", required: true }),
         this._startTime = createElement("input", { type: "time", name: "start-time", required: true }),
         this._startTimezone = createElement("select", { name: "start-timezone", required: true }, timezones.map(tz => createElement("option", { value: tz }, [createText(tz)]))),
       ]),
       createElement("label", { htmlFor: "event-edit-end" }, [createText("End")]),
-      createElement("div", { id: "event-edit-end", className: "form-div" }, [
+      createElement("div", { id: "event-edit-end", className: "time-div" }, [
         createElement("input", { type: "date", name: "end-date", required: true }),
         this._endTime = createElement("input", { type: "time", name: "end-time", required: true }),
         this._endTimezone = createElement("select", { name: "end-timezone", required: true }, timezones.map(tz => createElement("option", { value: tz }, [createText(tz)]))),
@@ -53,7 +52,7 @@ export class EventEditPopup {
       createElement("label", { htmlFor: "event-edit-organizer" }, [createText("Organizer")]),
       createElement("div", { id: "event-edit-organizer", className: "attendees-div" }, [
         createElement("input", { type: "email", name: "email-organizer", placeholder: "email" }),
-        this._endTime = createElement("input", { type: "text", name: "name-organizer", placeholder: "name" }),
+        createElement("input", { type: "text", name: "name-organizer", placeholder: "name" }),
       ]),
       createElement("label", { htmlFor: "event-edit-attendees" }, [createText("Attendees")]),
       createElement("div", { id: "event-edit-attendees" }, [
@@ -62,8 +61,8 @@ export class EventEditPopup {
       ]),
       createElement("label", { htmlFor: "event-edit-description" }, [createText("Description")]),
       createElement("textarea", { id: "event-edit-description", name: "description" }),
-      this._cancel = createElement("button", { onclick: this.cancel }, [createText("Cancel")]),
-      this._submit = createElement("button", { type: "submit" }, [createText("Submit")]),
+      createElement("button", { onclick: this.cancel }, [createText("Cancel")]),
+      createElement("button", { type: "submit" }, [createText("Submit")]),
       this._delete = createElement("button", { onclick: this.delete }, [createText("Delete")]),
     ]))
   }
@@ -83,11 +82,10 @@ export class EventEditPopup {
   }
 
   private updateDatesDisplay = (allday: boolean) => {
-    const display = allday ? "none" : ""
-    this._startTime.style.display = display
-    this._startTimezone.style.display = display
-    this._endTime.style.display = display
-    this._endTimezone.style.display = display
+    this._startTime.classList.toggle("hidden", allday)
+    this._startTimezone.classList.toggle("hidden", allday)
+    this._endTime.classList.toggle("hidden", allday)
+    this._endTimezone.classList.toggle("hidden", allday)
   }
 
   private addAttendee = (attendee: IcsAttendee) => {
@@ -126,10 +124,8 @@ export class EventEditPopup {
   }
 
   private updateButtons = () => {
-    // TODO conditional styles
-    this._cancel.style.display = "unset"
-    this._submit.style.display = this._handleSave ? "unset" : "none"
-    this._delete.style.display = this._handleDelete ? "unset" : "none"
+    console.log(this._handleDelete)
+    this._delete.classList.toggle("hidden", this._handleDelete === undefined)
   }
 
   public open = (calendarEvent: CalendarEvent) => {

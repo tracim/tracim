@@ -1,5 +1,5 @@
 import { createElement, createText } from "../helpers/dom-helper"
-import type { Calendar, CalendarHandler, DomNode } from "../types"
+import type { Calendar, CalendarHandler } from "../types"
 import "./calendarSelectDropdown.css"
 import "../generic.css"
 export class CalendarSelectDropdown {
@@ -23,18 +23,19 @@ export class CalendarSelectDropdown {
     public onSelect = (event: Event, calendars: Calendar[], handleSelect: CalendarHandler) => {
         if (!this._container) return
 
-        // Do not disable if the panel was clicked, as it is a child of the button
-        if (event.target !== event.currentTarget) return
 
-        const target = event.target as DomNode
+        const target = event.target as Element
+        const parent = target.parentElement as Element
+        // // Do not disable if the panel was clicked, as it is a child of the button
+        // if (event.target !== event.currentTarget) return
+
         if (this._opened) {
-            target.removeChild(this._container)
+            parent.removeChild(this._container)
             this._opened = false
             return
         }
         this._container.innerHTML = ""
         for (const calendar of calendars) {
-            console.log(calendar.calendarColor)
             this._container.append(
                 createElement("label", {}, [
                     // @ts-ignore
@@ -44,7 +45,13 @@ export class CalendarSelectDropdown {
                 createElement("input", { type: "checkbox", checked: !calendar.hidden, onchange: e => handleSelect(calendar.url, (e.target as HTMLInputElement).checked) }),
             )
         }
-        target.appendChild(this._container)
+
+        const nextSibling = target.nextElementSibling
+        if (nextSibling) parent.insertBefore(this._container, nextSibling)
+        else parent.appendChild(this._container)
+        
+        if (!parent.classList.contains("ec-button-group")) this._container.style.marginTop = "-0.5rem"
+        else this._container.style.translate = `0px calc(${target.clientHeight}px + 1px)`
         this._opened = true
     }
 }
