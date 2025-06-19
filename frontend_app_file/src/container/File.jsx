@@ -989,7 +989,6 @@ export class File extends React.Component {
     }
     menuItemList.push(tagComponent)
 
-
     // INFO - CH - 2025-06-18 - On content load, .created stores the datetime from api.
     // When clicking on a revision, the .created get replaced by the formated value and .created_raw is affected
     // with .created.
