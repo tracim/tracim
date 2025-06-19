@@ -527,6 +527,8 @@ class WorkspaceController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_SUBSCRIPTION_ENDPOINTS])
     @check_right(can_modify_workspace)
     @hapic.handle_exception(RoleAlreadyExistError, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(GuestUserNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TooManyWorkspacesError, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
     @hapic.input_body(RoleUpdateSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)

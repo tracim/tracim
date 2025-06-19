@@ -655,15 +655,13 @@ export class WorkspaceAdvanced extends React.Component {
       userId,
       state.content.default_user_role
     ))
-    switch (fetchPutSubscriptionAccept.status) {
-      case 204: break
-      case 400:
-        switch (fetchPutSubscriptionAccept.body.code) {
-          case 3008: sendGlobalFlashMessage(props.t('This user already is in the space')); break
-          default: sendGlobalFlashMessage(props.t('Error while adding the member to the space'))
-        }
-        break
-      default: sendGlobalFlashMessage(props.t('Error while adding the member to the space'))
+    if (fetchPutSubscriptionAccept.status !== 204) {
+      switch (fetchPutSubscriptionAccept.body.code) {
+        case 2075: sendGlobalFlashMessage(props.t("Guest users aren't allowed to be more than contributor")); break
+        case 3008: sendGlobalFlashMessage(props.t('This user already is in the space')); break
+        case 8004: sendGlobalFlashMessage(props.t('The maximum number of spaces for a guest user has been reached')); break
+        default: sendGlobalFlashMessage(props.t('Error while adding the member to the space'))
+      }
     }
   }
 
