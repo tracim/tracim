@@ -7,7 +7,8 @@ import {
   IconButton,
   TextInput,
   TinyEditor,
-  getAvatarBaseUrl
+  getAvatarBaseUrl,
+  searchContentAndReplaceWithTag
 } from 'tracim_frontend_lib'
 
 const CustomReactSelectOption = (props) => {
@@ -44,15 +45,17 @@ function KanbanCardEditor (props) {
   const [deadline, setDeadline] = useState(card.deadline || '')
   const [freeInput, setFreeInput] = useState(card.freeInput || '')
 
-  function handleValidate (e) {
+  async function handleValidate (e) {
     e.preventDefault()
 
     const descriptionText = description.target ? description.target.value : description
 
+    const descriptionWithContentLink = await searchContentAndReplaceWithTag(props.apiUrl, descriptionText)
+
     props.onValidate({
       ...card,
       title,
-      description: descriptionText,
+      description: descriptionWithContentLink.html,
       assignmentList,
       bgColor,
       kickoff,
