@@ -4,7 +4,7 @@ import '@event-calendar/core/index.css';
 import { getEventEnd, type IcsEvent, type IcsCalendar } from 'ts-ics';
 import { EventEditPopup } from '../eventeditpopup/eventEditPopup';
 import { createCalendarObject, deleteCalendarObject, fetchCalendarObjects, fetchCalendars, updateCalendarObject } from '../helpers/dav-helper';
-import { hasCalendarHandlers, hasEventHandlers } from '../types';
+import { hasCalendarHandlers, hasEventHandlers } from '../helpers/types-helper';
 import type { CalendarClientOptions, CalendarSource, ServerSource, Calendar, CalendarObject, EventUid, EventHandlers, CalendarEvent, PostEventHandlers, CalendarHandlers, EventUidData } from '../types';
 import { isEventAllDay, isSameEvent, offsetDate } from '../helpers/ics-helper';
 import "./calendarClient.css"

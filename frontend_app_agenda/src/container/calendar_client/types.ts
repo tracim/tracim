@@ -1,20 +1,6 @@
 import type { IcsCalendar, IcsEvent, IcsRecurrenceId } from "ts-ics"
 import type { DAVCalendar } from "tsdav"
 
-// TODO move to another file (types-helper.ts ?)
-// ? add the declaration of the "public api class"
-export function isServerSource(source: ServerSource | CalendarSource): source is ServerSource {
-  return (source as ServerSource).serverUrl !== undefined;
-}
-
-export function hasEventHandlers(options: CalendarClientOptions): options is EventHandlers {
-  return (options as EventHandlers).onCreateEvent !== undefined;
-}
-
-export function hasCalendarHandlers(options: CalendarClientOptions): options is CalendarHandlers {
-  return (options as CalendarHandlers).onSelectCalendars !== undefined;
-}
-
 // TODO add <TCalendarUid = any>
 // TODO add options to support IcsEvent custom props
 export type Calendar = DAVCalendar & {
