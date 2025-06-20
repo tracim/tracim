@@ -1,21 +1,43 @@
 .form {
-    display: grid;
-    grid-template-columns: max-content max-content;
-    grid-gap: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
     
-    label {
-        text-align: right;
+    .form-content {
+        display: grid;
+        grid-template-columns: max-content max-content;
+        grid-gap: 5px;
+    
+        label {
+            text-align: right;
+        }
+    
+        label:after {
+            content: ":";
+        }
+    
+        input[type=checkbox] {
+            justify-self: left;
+        }
+    }
+
+    .form-list {
+        display: flex;
+        flex-direction: column;
+        grid-gap: 0.25rem;
+        margin-bottom: 0.25rem;
     }
     
-    label:after {
-        content: ":";
-    }
-    
-    input[type=checkbox] {
-        justify-self: left;
+    .form-buttons {
+        display: flex;
+        flex-direction: row-reverse;
+        gap: 1rem;
+        > * {
+            flex-grow: 1;
+        }
     }
 }
 
 .hidden {
-    display: none !important;
+    visibility: hidden;
 }

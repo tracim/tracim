@@ -9,7 +9,10 @@ import type { CalendarClientOptions, CalendarSource, ServerSource, Calendar, Cal
 import { isEventAllDay, isSameEvent, offsetDate } from '../helpers/ics-helper';
 import "./calendarClient.css"
 import { CalendarSelectDropdown } from '../calendarselectdropdown/calendarSelectDropdown';
+import { icon, library } from '@fortawesome/fontawesome-svg-core';
+import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 
+library.add(faRefresh)
 // TODO recurring events
 export class CalendarClient {
 
@@ -19,13 +22,13 @@ export class CalendarClient {
 
   private _calendars: Calendar[] = []
   private _calendarObjectsPerCalendar: CalendarObject[][] = []
-  // private _calendarObjects: CalendarObject[] = []
 
   private _calendarHandlers?: CalendarHandlers
   private _eventHandlers?: EventHandlers
   private _postEventHandlers?: PostEventHandlers
 
   public create = async (sources: (ServerSource | CalendarSource)[], target: Element | Document | ShadowRoot, options?: CalendarClientOptions) => {
+    if (this._calendar) return
     const calendarsPerSource = await Promise.all(sources.map(source => fetchCalendars(source)))
     this._calendars = calendarsPerSource.flat()
     this._calendarObjectsPerCalendar = this._calendars.map(_ => [])
@@ -65,7 +68,7 @@ export class CalendarClient {
         view: options?.view ?? "timeGridWeek",
         customButtons: {
           refresh: {
-            text: "Refresh",
+            text: { domNodes: Array.from(icon({prefix: "fas", iconName: "refresh"}).node)},
             click: this.refreshEvents
           },
           calendars: {
@@ -92,7 +95,7 @@ export class CalendarClient {
         eventResize: this.onChangeEventDates,
         eventDrop: this.onChangeEventDates,
         eventSources: [{ events: this.fetchAndLoadEvents }],
-        eventFilter: this.isEventVisible
+        eventFilter: this.isEventVisible,
       }
     )
   }
@@ -124,8 +127,7 @@ export class CalendarClient {
   private createDefaultEventElement = (target: Node): EventHandlers => {
     // TODO find an other way to send calendars the the popup that makes it accessible to any popup
     if (this._eventEdit === undefined) {
-      this._eventEdit = new EventEditPopup(target)
-      this._eventEdit.setCalendars(this._calendars)
+      this._eventEdit = new EventEditPopup(target, this._calendars)
     }
     return {
       onCreateEvent: this._eventEdit.onCreate,

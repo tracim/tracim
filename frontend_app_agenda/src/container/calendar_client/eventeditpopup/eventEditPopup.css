@@ -1,8 +1,7 @@
-.attendees-div {
+.form-attendee {
     display: grid;
     grid-template-columns: max-content max-content max-content max-content;
-    grid-gap: 5px;
-
+    grid-gap: 0.25rem;
 }
 
 .time-div {

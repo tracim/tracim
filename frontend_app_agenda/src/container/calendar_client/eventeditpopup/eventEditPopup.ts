@@ -3,82 +3,122 @@ import "./eventEditPopup.css"
 import "../generic.css"
 import { attendeeRoleTypes, type Calendar, type CalendarEvent, type EventHandler } from "../types"
 import { Popup } from "../popup/popup"
-import { createElement, createText } from "../helpers/dom-helper"
+import { parseHtml } from "../helpers/dom-helper"
 import { isEventAllDay, offsetDate } from "../helpers/ics-helper"
 import { tzlib_get_ical_block, tzlib_get_offset, tzlib_get_timezones } from "timezones-ical-library"
+
+const html = `
+<form name="event" class="form">
+  <div class="form-content">
+    <label for="event-edit-calendar">Calendar</label>
+    <select id="event-edit-calendar" name="calendar" required="">
+      <option value="" selected disabled hidden>-- Choose a calendar --</option>
+      {{#calendars}}
+        <option value="{{url}}">{{displayName}}</option>
+      {{/calendars}}
+    </select>
+    <label for="event-edit-summary">Title</label>
+    <input type="text" id="event-edit-summary" name="summary" required="" />
+    <label for="event-edit-location">Location</label>
+    <input type="text" id="event-edit-location" name="location" />
+    <label for="event-edit-allday">All day</label>
+    <input type="checkbox" id="event-edit-allday" name="allday" />
+    <label for="event-edit-start">Start</label>
+    <div id="event-edit-start" class="time-div">
+      <input type="date" name="start-date" required="" />
+      <input type="time" name="start-time" required="" />
+      <select name="start-timezone" required="">
+        {{#timezones}}
+          <option value="{{.}}">{{.}}</option>
+        {{/timezones}}
+        </select>
+    </div>
+    <label for="event-edit-end">End</label>
+    <div id="event-edit-end" class="time-div">
+      <input type="date" name="end-date" required="" />
+      <input type="time" name="end-time" required="" />
+      <select name="end-timezone" required="">
+        {{#timezones}}
+          <option value="{{.}}">{{.}}</option>
+        {{/timezones}}
+      </select>
+    </div>
+    <label for="event-edit-organizer">Organizer</label>
+    <div id="event-edit-organizer" class="form-attendee">
+        <input type="email" name="email-organizer" placeholder="email" />
+        <input type="text" name="name-organizer" placeholder="name" />
+    </div>
+    <label for="event-edit-attendees">Attendees</label>
+    <div id="event-edit-attendees" >
+        <div class="form-list"> </div>
+        <button type="button">Add attendee</button>
+    </div>
+    <label for="event-edit-description">Description</label>
+    <textarea id="event-edit-description" name="description"> </textarea>
+  </div>
+  <div class="form-buttons">
+    <button name="submit" type="submit">Submit</button>
+    <button name="cancel" type="button">Cancel</button>
+    <button name="delete" type="button">Delete</button>
+  </div>
+</form>`
+
+const attendeeHtml = `
+<div class="form-attendee">
+  <input type="email" name="email" placeholder="email" required value="{{email}}"/>
+  <input type="name" name="name" placeholder="name" required value="{{name}}"/>
+  <select name="role" value="{{role}}" required>
+    {{#roles}}
+      <option value="{{.}}">{{.}}</option>
+    {{/roles}}
+  </select>
+  <button type="button" name="remove">X</button>
+</div>`
 
 export class EventEditPopup {
 
   private _popup: Popup
   private _form: HTMLFormElement
-  private _delete: HTMLButtonElement
-  private _calendarEvent?: CalendarEvent
-
   private _startTime: HTMLInputElement
   private _startTimezone: HTMLSelectElement
   private _endTime: HTMLInputElement
   private _endTimezone: HTMLSelectElement
   private _attendees: HTMLDivElement
+  private _delete: HTMLButtonElement
 
-  public _calendarSelect: HTMLSelectElement
-
+  private _calendarEvent?: CalendarEvent
   private _handleSave?: EventHandler
   private _handleDelete?: EventHandler
 
-  public constructor(target: Node) {
+  // TODO find a proper way to allow the client to set / give the calendars the the popup/dropdown
+  public constructor(target: Node, calendars: Calendar[]) {
     const timezones = tzlib_get_timezones() as string[]
+
     this._popup = new Popup(target)
-    this._form = this._popup.content.appendChild(createElement("form", { name: "event", className: "form", onsubmit: async (e) => { e.preventDefault(); await this.save() } }, [
-      createElement("label", { htmlFor: "event-edit-calendar" }, [createText("Calendar")]),
-      this._calendarSelect = createElement("select", { id: "event-edit-calendar", name: "calendar", required: true }),
-      createElement("label", { htmlFor: "event-edit-summary" }, [createText("Title")]),
-      createElement("input", { type: "text", id: "event-edit-summary", name: "summary", required: true }),
-      createElement("label", { htmlFor: "event-edit-location" }, [createText("Location")]),
-      createElement("input", { type: "text", id: "event-edit-location", name: "location" }),
-      createElement("label", { htmlFor: "event-edit-allday" }, [createText("All day")]),
-      createElement("input", { type: "checkbox", id: "event-edit-allday", name: "allday", onchange: e => this.updateDatesDisplay((e.target as HTMLInputElement).checked) }),
-      createElement("label", { htmlFor: "event-edit-start" }, [createText("Start")]),
-      createElement("div", { id: "event-edit-start", className: "time-div" }, [
-        createElement("input", { type: "date", name: "start-date", required: true }),
-        this._startTime = createElement("input", { type: "time", name: "start-time", required: true }),
-        this._startTimezone = createElement("select", { name: "start-timezone", required: true }, timezones.map(tz => createElement("option", { value: tz }, [createText(tz)]))),
-      ]),
-      createElement("label", { htmlFor: "event-edit-end" }, [createText("End")]),
-      createElement("div", { id: "event-edit-end", className: "time-div" }, [
-        createElement("input", { type: "date", name: "end-date", required: true }),
-        this._endTime = createElement("input", { type: "time", name: "end-time", required: true }),
-        this._endTimezone = createElement("select", { name: "end-timezone", required: true }, timezones.map(tz => createElement("option", { value: tz }, [createText(tz)]))),
-      ]),
-      createElement("label", { htmlFor: "event-edit-organizer" }, [createText("Organizer")]),
-      createElement("div", { id: "event-edit-organizer", className: "attendees-div" }, [
-        createElement("input", { type: "email", name: "email-organizer", placeholder: "email" }),
-        createElement("input", { type: "text", name: "name-organizer", placeholder: "name" }),
-      ]),
-      createElement("label", { htmlFor: "event-edit-attendees" }, [createText("Attendees")]),
-      createElement("div", { id: "event-edit-attendees" }, [
-        this._attendees = createElement("div", { className: "attendees-div" }),
-        createElement("button", { type: "button", onclick: () => this.addAttendee({ email: "" }) }, [createText("Add attendee")]),
-      ]),
-      createElement("label", { htmlFor: "event-edit-description" }, [createText("Description")]),
-      createElement("textarea", { id: "event-edit-description", name: "description" }),
-      createElement("button", { onclick: this.cancel }, [createText("Cancel")]),
-      createElement("button", { type: "submit" }, [createText("Submit")]),
-      this._delete = createElement("button", { onclick: this.delete }, [createText("Delete")]),
-    ]))
+    this._form = parseHtml<HTMLFormElement>(html, {
+      timezones: timezones,
+      calendars: calendars,
+    })
+    this._popup.content.appendChild(this._form)
+
+    this._form.addEventListener('submit', async (e) => { e.preventDefault(); await this.save() })
+    this._form.querySelector<HTMLInputElement>("#event-edit-allday")!.addEventListener('change', e => this.updateDatesDisplay((e.target as HTMLInputElement).checked))
+    this._startTime = this._form.querySelector<HTMLInputElement>('#event-edit-start [name="start-time"]')!
+    this._startTimezone = this._form.querySelector<HTMLSelectElement>('#event-edit-start [name="start-timezone"]')!
+    this._endTime = this._form.querySelector<HTMLInputElement>('#event-edit-end [name="end-time"]')!
+    this._endTimezone = this._form.querySelector<HTMLSelectElement>('#event-edit-end [name="end-timezone"]')!
+    this._attendees = this._form.querySelector<HTMLDivElement>('#event-edit-attendees > div')!
+    const addAttendee = this._form.querySelector<HTMLDivElement>('#event-edit-attendees > button')!
+    const cancel = this._form.querySelector<HTMLButtonElement>('.form-buttons [name="cancel"]')!
+    this._delete = this._form.querySelector<HTMLButtonElement>('.form-buttons [name="delete"]')!
+
+    addAttendee.addEventListener("click", () => this.addAttendee({ email: "" }))
+    cancel.addEventListener("click", this.cancel)
+    this._delete.addEventListener("click", this.delete)
   }
 
   public destroy = () => {
     // TODO
-  }
-
-  // TODO find a proper way to allow the client to set / give the calendars the the popup/dropdown
-  public setCalendars = (calendars: Calendar[]) => {
-    this._calendarSelect.innerHTML = ""
-    this._calendarSelect.appendChild(createElement("option", { value: "" }, [createText("-- Choose a calendar --")]))
-
-    for (const calendar of calendars) {
-      this._calendarSelect.appendChild(createElement("option", { value: calendar.url }, [createText(calendar.displayName as string)]))
-    }
   }
 
   private updateDatesDisplay = (allday: boolean) => {
@@ -89,23 +129,14 @@ export class EventEditPopup {
   }
 
   private addAttendee = (attendee: IcsAttendee) => {
-    const elements: HTMLElement[] = []
-    const remove = () => {
-      for (const e of elements) this._attendees.removeChild(e)
-    }
+    const element = parseHtml(attendeeHtml, { ...attendee, role: attendee.role || "REQ-PARTICIPANT", roles: attendeeRoleTypes })
+    this._attendees.appendChild(element)
 
-    elements.push(createElement("input", { type: "email", name: "email", placeholder: "email", required: true, value: attendee.email }))
-    elements.push(createElement("input", { type: "text", name: "name", placeholder: "text", value: attendee.name ?? "" }))
-    var role
-    elements.push(role = createElement(
-      "select",
-      { name: "role", required: true },
-      attendeeRoleTypes.map(role => createElement("option", { value: role }, [createText(role)]))
-    ))
+    const remove = element.querySelector<HTMLButtonElement>("button")!
+    const role = element.querySelector<HTMLSelectElement>('select[name="role"]')!
+
+    remove.addEventListener("click", () => element.remove())
     role.value = attendee.role || "REQ-PARTICIPANT"
-    elements.push(createElement("button", { type: "button", onclick: _ => remove() }, [createText("X")]))
-
-    for (const e of elements) this._attendees.appendChild(e)
   }
 
   public onCreate = (_: Event, event: CalendarEvent, handleCreate: EventHandler) => {
@@ -124,7 +155,6 @@ export class EventEditPopup {
   }
 
   private updateButtons = () => {
-    console.log(this._handleDelete)
     this._delete.classList.toggle("hidden", this._handleDelete === undefined)
   }
 

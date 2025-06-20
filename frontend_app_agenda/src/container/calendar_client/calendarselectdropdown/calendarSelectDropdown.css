@@ -13,3 +13,10 @@
     border-radius: 50%;
     padding: 0.5em;
 }
+
+/* prevents the addition of the popup to affect the style of the button (as it is not the first child anymore */
+.ec-calendars {
+    margin-left: 0 !important;
+    border-top-left-radius: 0.25rem !important;
+    border-bottom-left-radius: 0.25rem !important;
+}
