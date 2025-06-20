@@ -38,6 +38,8 @@ export const AppDescription = props => {
               userList={props.mentionUserList}
               codeLanguageList={props.codeLanguageList}
               isAdvancedEdition
+              isMentionEnabled={false}
+              isContentLinkEnabled={false}
             />
 
             {props.disableChangeDescription && (

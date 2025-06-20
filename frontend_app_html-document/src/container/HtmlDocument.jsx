@@ -944,7 +944,7 @@ export class HtmlDocument extends React.Component {
     const propertyComponent = {
       id: 'properties',
       label: props.t('Properties'),
-      icon: 'fa-info-circle',
+      icon: 'fas fa-list-ul',
       children: (
         <PopinFixedRightPartContent label={props.t('Properties')}>
           <AppProperty

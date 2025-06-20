@@ -391,7 +391,7 @@ export class Kanban extends React.Component {
     const propertyComponent = {
       id: 'properties',
       label: props.t('Properties'),
-      icon: 'fa-info-circle',
+      icon: 'fas fa-list-ul',
       children: (
         <PopinFixedRightPartContent label={props.t('Properties')}>
           <AppProperty
@@ -417,7 +417,7 @@ export class Kanban extends React.Component {
     const descriptionComponent = {
       id: 'description',
       label: props.t('Description'),
-      icon: 'fas fa-list-ul',
+      icon: 'fa-info-circle',
       children: (
         <PopinFixedRightPartContent label={props.t('Description')}>
           <AppDescription
