@@ -423,7 +423,8 @@ export class Kanban extends React.Component {
       content: response.body,
       isTemplate: response.body.is_template,
       currentContentRevisionId: response.body.current_revision_id,
-      loadingContent: false
+      loadingContent: false,
+      filterInput: ''
     })
     this.setHeadTitle(response.body.label)
     this.buildBreadcrumbs(response.body)

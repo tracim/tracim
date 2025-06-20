@@ -379,7 +379,9 @@ export class Kanban extends React.Component {
                 const shouldDisplayCard = isCardMatchFilter(
                   card, props.filterInput, props.config.workspace.memberList
                 )
-                if (shouldDisplayCard === false) return null
+                if (shouldDisplayCard === false) {
+                  return <div className='kanban__card--hidden' />
+                }
 
                 return (
                   <KanbanCard
