@@ -7,3 +7,11 @@
 .time-div {
     display: flex;
 }
+
+.form[name="event"]:has(#event-edit-allday:checked) .event-edit-not-allday {
+    visibility: hidden;
+}
+
+.form[name="event"]:is(.event-edit-create) button[name="delete"] {
+    visibility: hidden;
+}

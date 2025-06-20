@@ -11,6 +11,10 @@
     z-index: 2000;
 }
 
+.popup-overlay:is(.popup-hidden) {
+    display: none;
+}
+
 .popup-frame {
     width: fit-content;
     height: fit-content;

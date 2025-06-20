@@ -19,7 +19,7 @@ const html = `
 export class CalendarSelectDropdown {
   private _container?: HTMLElement
 
-  public constructor() {}
+  public constructor() { }
 
   public destroy = () => {
     // TODO
@@ -28,7 +28,7 @@ export class CalendarSelectDropdown {
   public onSelect = (event: Event, calendars: Calendar[], handleSelect: CalendarHandler) => {
     const target = event.target as Element
     const parent = target.parentElement as Element
-    
+
     if (this._container) {
       parent.removeChild(this._container)
       this._container = undefined
@@ -36,9 +36,6 @@ export class CalendarSelectDropdown {
     }
     this._container = parseHtml(html, { calendars })
     parent.insertBefore(this._container, target)
-    // TODO find a way to move it all to css
-    if (!parent.classList.contains("ec-button-group")) this._container.style.marginTop = "-0.5rem"
-    else this._container.style.translate = `0px calc(${target.clientHeight}px + 1px)`
 
     const inputs = this._container.querySelectorAll("input")
     for (let i = 0; i < inputs.length; i++) {

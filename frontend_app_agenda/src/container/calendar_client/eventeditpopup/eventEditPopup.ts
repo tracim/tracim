@@ -26,8 +26,8 @@ const html = `
     <label for="event-edit-start">Start</label>
     <div id="event-edit-start" class="time-div">
       <input type="date" name="start-date" required="" />
-      <input type="time" name="start-time" required="" />
-      <select name="start-timezone" required="">
+      <input type="time" name="start-time" class="event-edit-not-allday" required="" />
+      <select name="start-timezone" class="event-edit-not-allday" required="">
         {{#timezones}}
           <option value="{{.}}">{{.}}</option>
         {{/timezones}}
@@ -36,8 +36,8 @@ const html = `
     <label for="event-edit-end">End</label>
     <div id="event-edit-end" class="time-div">
       <input type="date" name="end-date" required="" />
-      <input type="time" name="end-time" required="" />
-      <select name="end-timezone" required="">
+      <input type="time" name="end-time" class="event-edit-not-allday" required="" />
+      <select name="end-timezone" class="event-edit-not-allday" required="">
         {{#timezones}}
           <option value="{{.}}">{{.}}</option>
         {{/timezones}}
@@ -79,10 +79,6 @@ export class EventEditPopup {
 
   private _popup: Popup
   private _form: HTMLFormElement
-  private _startTime: HTMLInputElement
-  private _startTimezone: HTMLSelectElement
-  private _endTime: HTMLInputElement
-  private _endTimezone: HTMLSelectElement
   private _attendees: HTMLDivElement
   private _delete: HTMLButtonElement
 
@@ -102,11 +98,6 @@ export class EventEditPopup {
     this._popup.content.appendChild(this._form)
 
     this._form.addEventListener('submit', async (e) => { e.preventDefault(); await this.save() })
-    this._form.querySelector<HTMLInputElement>("#event-edit-allday")!.addEventListener('change', e => this.updateDatesDisplay((e.target as HTMLInputElement).checked))
-    this._startTime = this._form.querySelector<HTMLInputElement>('#event-edit-start [name="start-time"]')!
-    this._startTimezone = this._form.querySelector<HTMLSelectElement>('#event-edit-start [name="start-timezone"]')!
-    this._endTime = this._form.querySelector<HTMLInputElement>('#event-edit-end [name="end-time"]')!
-    this._endTimezone = this._form.querySelector<HTMLSelectElement>('#event-edit-end [name="end-timezone"]')!
     this._attendees = this._form.querySelector<HTMLDivElement>('#event-edit-attendees > div')!
     const addAttendee = this._form.querySelector<HTMLDivElement>('#event-edit-attendees > button')!
     const cancel = this._form.querySelector<HTMLButtonElement>('.form-buttons [name="cancel"]')!
@@ -121,13 +112,6 @@ export class EventEditPopup {
     // TODO
   }
 
-  private updateDatesDisplay = (allday: boolean) => {
-    this._startTime.classList.toggle("hidden", allday)
-    this._startTimezone.classList.toggle("hidden", allday)
-    this._endTime.classList.toggle("hidden", allday)
-    this._endTimezone.classList.toggle("hidden", allday)
-  }
-
   private addAttendee = (attendee: IcsAttendee) => {
     const element = parseHtml(attendeeHtml, { ...attendee, role: attendee.role || "REQ-PARTICIPANT", roles: attendeeRoleTypes })
     this._attendees.appendChild(element)
@@ -140,11 +124,13 @@ export class EventEditPopup {
   }
 
   public onCreate = (_: Event, event: CalendarEvent, handleCreate: EventHandler) => {
+    this._form.classList.toggle("event-edit-create", true)
     this._handleSave = handleCreate
     this._handleDelete = undefined
     this.open(event)
   }
   public onUpdate = (_: Event, event: CalendarEvent, handleUpdate: EventHandler, handleDelete: EventHandler) => {
+    this._form.classList.toggle("event-edit-create", false)
     this._handleSave = handleUpdate
     this._handleDelete = handleDelete
     this.open(event)
@@ -152,10 +138,6 @@ export class EventEditPopup {
   }
   public onDelete = (_: Event, event: CalendarEvent, handleDelete: EventHandler) => {
     handleDelete(event)
-  }
-
-  private updateButtons = () => {
-    this._delete.classList.toggle("hidden", this._handleDelete === undefined)
   }
 
   public open = (calendarEvent: CalendarEvent) => {
@@ -185,8 +167,6 @@ export class EventEditPopup {
     this._attendees.innerHTML = ""
     for (const attendee of event.attendees ?? []) this.addAttendee(attendee)
 
-    this.updateDatesDisplay(isEventAllDay(event))
-    this.updateButtons()
     this._popup.setVisible(true)
   }
 

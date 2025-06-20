@@ -14,6 +14,7 @@ import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 
 library.add(faRefresh)
 // TODO recurring events
+// TODO localize
 export class CalendarClient {
 
   private _calendar?: EventCalendar

@@ -1,17 +1,19 @@
 .dropdown-frame {
     position: absolute;
-    padding: 0.375rem 0.75rem;
+    top: 100%;
+    width: max-content;
+    z-index: 1500;
+    
     background-color: white;
     border: 1px solid var(--ec-button-border-color);
-    z-index: 2000;
+    padding: 0.375rem 0.75rem;
     font-size: 1rem;
     border-radius: 0.25rem;
 }
 
-.calendar-color {
-    display: inline-block;
-    border-radius: 50%;
-    padding: 0.5em;
+/* Added in order to make the `top: 100%` use the heigh of the parent and not of the window */
+.ec-button-group:has(.dropdown-frame) {
+    position: relative;
 }
 
 /* prevents the addition of the popup to affect the style of the button (as it is not the first child anymore */
@@ -19,4 +21,10 @@
     margin-left: 0 !important;
     border-top-left-radius: 0.25rem !important;
     border-bottom-left-radius: 0.25rem !important;
+}
+
+.calendar-color {
+    display: inline-block;
+    border-radius: 50%;
+    padding: 0.5em;
 }

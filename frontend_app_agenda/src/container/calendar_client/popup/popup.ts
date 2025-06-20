@@ -3,7 +3,7 @@ import "../generic.css"
 import { parseHtml } from "../helpers/dom-helper"
 
 const html = `
-<div class="popup-overlay hidden">
+<div class="popup-overlay popup-hidden">
   <div class="popup-frame"/>
 </div>`
 
@@ -26,6 +26,6 @@ export class Popup {
   }
 
   setVisible = (visible: boolean) => {
-    this._node.classList.toggle("hidden", !visible)
+    this._node.classList.toggle("popup-hidden", !visible)
   }
 }
