@@ -1,5 +1,4 @@
 import { isPatternIncludedInString } from 'tracim_frontend_lib'
-import { removeCard } from '@asseinfo/react-kanban'
 
 export const KANBAN_MIME_TYPE = 'application/json'
 export const KANBAN_FILE_EXTENSION = '.kanban'
@@ -26,23 +25,4 @@ export const isCardMatchFilter = (card, filter, memberList) => {
   if (isPatternIncludedInString(descriptionHaystack.body.textContent, filter)) return true
 
   return false
-}
-
-export const filterKanbanBoard = (newFilterInput, currentBoard, memberList) => {
-  if (newFilterInput === '') return currentBoard
-  if (currentBoard?.columns.length === 0) return currentBoard
-
-  let boardFiltered = currentBoard || { column: [] }
-
-  for (const col of currentBoard.columns) {
-    for (const card of col.cards) {
-      const shouldDisplayCard = isCardMatchFilter(card, newFilterInput, memberList)
-
-      if (shouldDisplayCard === false) {
-        boardFiltered = removeCard(boardFiltered, col, card)
-      }
-    }
-  }
-
-  return boardFiltered
 }

@@ -32,7 +32,7 @@ import {
   KANBAN_MIME_TYPE,
   KANBAN_FILE_EXTENSION,
   KANBAN_DEFAULT_BACKGROUND_COLOR,
-  filterKanbanBoard
+  isCardMatchFilter
 } from '../helper.js'
 import KanbanCard from './KanbanCard.jsx'
 import KanbanCardEditor from './KanbanCardEditor.jsx'
@@ -58,15 +58,7 @@ export class Kanban extends React.Component {
     this.state = {
       autoCompleteCursorPosition: 0,
       autoCompleteItemList: [],
-      // INFO - CH - 2025-06-19 - Handlers should only interact with state.board, not state.boardFiltered
       board: { columns: [] },
-      // INFO - CH - 2025-06-19 - State boardFiltered is used to render a copy of state board with the
-      // props.filterInput applied to the cards.
-      // boardFiltered is the displayed state, board is not.
-      // A better solution would be to call isCardMatchFilter in the renderCard props of <Board />
-      // But if renderCard return null, it leaves the dragHandle which has a height and creates spaces
-      // in the column that I couldn't remove using css.
-      boardFiltered: { columns: [] },
       boardState: justCreated ? BOARD_STATE.LOADED : BOARD_STATE.INIT,
       editedCardInfos: null,
       editedColumnInfos: null,
@@ -85,37 +77,23 @@ export class Kanban extends React.Component {
         boardState: BOARD_STATE.LOADED,
         boardInitiallyLoaded: true,
         saveRequired: true,
-        board: newBoard,
-        boardFiltered: newBoard
+        board: newBoard
       })
     }
   }
 
-  async componentDidUpdate (prevProps, prevState) {
+  async componentDidUpdate (prevProps) {
     const { state, props } = this
-
     if (
       (props.content.current_revision_id !== prevProps.content.current_revision_id) ||
       (props.isNewContentRevision && prevProps.isNewContentRevision !== props.isNewContentRevision)
     ) {
       this.loadBoardContent()
-      return
     }
 
     if (state.saveRequired) {
       this.save(state.board)
       this.setState({ saveRequired: false })
-      return
-    }
-
-    if (
-      (prevProps.filterInput !== props.filterInput) ||
-      (prevState.board !== state.board)
-    ) {
-      const boardFiltered = filterKanbanBoard(
-        props.filterInput, state.board, props.config.workspace.memberList
-      )
-      this.setState({ boardFiltered: boardFiltered })
     }
   }
 
@@ -398,6 +376,11 @@ export class Kanban extends React.Component {
                 />
               )}
               renderCard={card => {
+                const shouldDisplayCard = isCardMatchFilter(
+                  card, props.filterInput, props.config.workspace.memberList
+                )
+                if (shouldDisplayCard === false) return null
+
                 return (
                   <KanbanCard
                     config={props.config}
@@ -412,10 +395,9 @@ export class Kanban extends React.Component {
                 )
               }}
             >
-              {state.boardFiltered}
+              {state.board}
             </Board>
           </div>
-
           {state.editedCardInfos && (
             <CardPopup
               customClass={classnames('kanban__KanbanPopup', { hidden: state.boardState !== BOARD_STATE.LOADED })}
