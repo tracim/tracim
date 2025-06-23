@@ -103,7 +103,7 @@ class SystemApi(object):
             iframe_whitelist=self._config.IFRAME__WHITELIST,
             limitation__max_non_guest_users=self._config.LIMITATION__MAX_NON_GUEST_USERS,
             limitation__max_guest_users=self._config.LIMITATION__MAX_GUEST_USERS,
-            limitation__max_guest_user_nb_space=self._config.LIMITATION__MAX_GUEST_USER_NB_SPACE,
+            limitation__max_guest_user_space_nb=self._config.LIMITATION__MAX_GUEST_USER_SPACE_NB,
         )
 
     def get_usage_conditions_files(self) -> typing.List[UsageConditionModel]:

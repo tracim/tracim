@@ -403,7 +403,7 @@ export class WorkspaceAdvanced extends React.Component {
             sendGlobalFlashMessage(props.t('You cannot change this member role because there are no other space managers.'))
             break
           case 2075:
-            sendGlobalFlashMessage(props.t("Guest users aren't allowed to be more than contributor"))
+            sendGlobalFlashMessage(props.t('Guest users are not allowed to be more than contributor. In order to upgrade the role of this guest user, ask your administrator to make it a standard user'))
             break
           default:
             sendGlobalFlashMessage(props.t('Error while saving new role for member'))
@@ -624,10 +624,10 @@ export class WorkspaceAdvanced extends React.Component {
         switch (fetchWorkspaceNewMember.body.code) {
           case 2042: sendGlobalFlashMessage(props.t('This account is deactivated')); break
           case 2075:
-            sendGlobalFlashMessage(props.t("Guest users aren't allowed to be more than contributor"))
+            sendGlobalFlashMessage(props.t('Guest users are not allowed to be more than contributor. In order to upgrade the role of this guest user, ask your administrator to make it a standard user'))
             break
           case 8004:
-            sendGlobalFlashMessage(props.t('The maximum number of spaces for a guest user has been reached'))
+            sendGlobalFlashMessage(props.t('The maximum number of spaces for a guest user has been reached. In order to add this guest user into a new space, ask your administrator to make it a standard user'))
             break
           case 1001: {
             const ErrorMsg = () => (
@@ -657,9 +657,9 @@ export class WorkspaceAdvanced extends React.Component {
     ))
     if (fetchPutSubscriptionAccept.status !== 204) {
       switch (fetchPutSubscriptionAccept.body.code) {
-        case 2075: sendGlobalFlashMessage(props.t("Guest users aren't allowed to be more than contributor")); break
+        case 2075: sendGlobalFlashMessage(props.t('Guest users are not allowed to be more than contributor. In order to upgrade the role of this guest user, ask your administrator to make it a standard user')); break
         case 3008: sendGlobalFlashMessage(props.t('This user already is in the space')); break
-        case 8004: sendGlobalFlashMessage(props.t('The maximum number of spaces for a guest user has been reached')); break
+        case 8004: sendGlobalFlashMessage(props.t('The maximum number of spaces for a guest user has been reached. In order to add this guest user into a new space, ask your administrator to make it a standard user')); break
         default: sendGlobalFlashMessage(props.t('Error while adding the member to the space'))
       }
     }

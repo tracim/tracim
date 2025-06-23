@@ -171,12 +171,12 @@ class UserWorkspaceConfigApi(object):
             )
             nb_user_workspace = len(user_workspace_config_api.get_user_workspaces_ids(user.user_id))
             if (
-                self._config.LIMITATION__MAX_GUEST_USER_NB_SPACE != -1
-                and nb_user_workspace >= self._config.LIMITATION__MAX_GUEST_USER_NB_SPACE
+                self._config.LIMITATION__MAX_GUEST_USER_SPACE_NB != -1
+                and nb_user_workspace >= self._config.LIMITATION__MAX_GUEST_USER_SPACE_NB
             ):
                 raise TooManyWorkspacesError(
                     "The guest user {} has already reached the maximum of {} workspace for guest user".format(
-                        user.user_id, self._config.LIMITATION__MAX_GUEST_USER_NB_SPACE
+                        user.user_id, self._config.LIMITATION__MAX_GUEST_USER_SPACE_NB
                     )
                 )
         user_workspace_config = UserWorkspaceConfig()

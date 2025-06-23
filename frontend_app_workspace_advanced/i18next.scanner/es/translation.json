@@ -62,6 +62,6 @@
   "Description of the space": "Descripción del espacio",
   "This space doesn't have a description yet.": "Este espacio no tiene una descripción todavía.",
   "Edit": "Editar",
-  "Guest users aren't allowed to be more than contributor": "",
-  "The maximum number of spaces for a guest user has been reached": ""
+  "Guest users are not allowed to be more than contributor. In order to upgrade the role of this guest user, ask your administrator to make it a standard user": "",
+  "The maximum number of spaces for a guest user has been reached. In order to add this guest user into a new space, ask your administrator to make it a standard user": ""
 }

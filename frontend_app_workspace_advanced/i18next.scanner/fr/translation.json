@@ -62,6 +62,6 @@
   "Description of the space": "Description de l'espace",
   "This space doesn't have a description yet.": "Cet espace n'a pas encore de description.",
   "Edit": "Modifier",
-  "Guest users aren't allowed to be more than contributor": "Les utilisateurs invités ne peuvent pas être plus que contributeur",
-  "The maximum number of spaces for a guest user has been reached": "Le nombre maximum d'espace pour un invité a été atteint"
+  "Guest users are not allowed to be more than contributor. In order to upgrade the role of this guest user, ask your administrator to make it a standard user": "Les utilisateurs invités ne peuvent pas être plus que contributeur. Pour pouvoir améliorer le rôle de cet utilisateur, demandez à votre administrateur de le faire passer utilisateur",
+  "The maximum number of spaces for a guest user has been reached. In order to add this guest user into a new space, ask your administrator to make it a standard user": "Le nombre maximum d'espace pour un invité a été atteint. Pour ajouter cet invitée dans l'espace, demandez à votre administrateur de faire passer cet invité en utilisateur."
 }

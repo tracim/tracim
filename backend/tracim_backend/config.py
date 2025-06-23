@@ -806,8 +806,8 @@ class CFG(object):
         self.LIMITATION__MAX_GUEST_USERS = int(
             self.get_raw_config("limitation.max_guest_users", "-1")
         )
-        self.LIMITATION__MAX_GUEST_USER_NB_SPACE = int(
-            self.get_raw_config("limitation.max_guest_user_nb_space", "-1")
+        self.LIMITATION__MAX_GUEST_USER_SPACE_NB = int(
+            self.get_raw_config("limitation.max_guest_user_space_nb", "-1")
         )
         self.LIMITATION__STANDARD_USER_EMAIL_DOMAIN = self.get_raw_config(
             "limitation.standard_user_email_domain", ""

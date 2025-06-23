@@ -351,13 +351,13 @@ export class Dashboard extends React.Component {
             props.dispatch(newFlashMessage(props.t('This account is deactivated'), 'warning'))
             return false
           case 2075:
-            props.dispatch(newFlashMessage(props.t("Guest users aren't allowed to be more than contributor"), 'warning'))
+            props.dispatch(newFlashMessage(props.t('Guest users are not allowed to be more than contributor. In order to upgrade the role of this guest user, ask your administrator to make it a standard user'), 'warning'))
             return false
           case 8002: props.dispatch(newFlashMessage(props.t('The maximum number of users has been reached'), 'warning'))
             return false
           case 8003: props.dispatch(newFlashMessage(props.t('The maximum number of guests has been reached'), 'warning'))
             return false
-          case 8004: props.dispatch(newFlashMessage(props.t('The maximum number of spaces for a guest user has been reached'), 'warning'))
+          case 8004: props.dispatch(newFlashMessage(props.t('The maximum number of spaces for a guest user has been reached. In order to add this guest user into a new space, ask your administrator to make it a standard user'), 'warning'))
             return false
           case 1001: {
             const ErrorMsg = () => (

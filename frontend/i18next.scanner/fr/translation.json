@@ -601,7 +601,9 @@
   "Notifications:": "Notifications :",
   "Notifications disabled": "Notifications désactivées",
   "Guest users aren't allowed to be more than contributor": "Les utilisateurs invités ne peuvent pas être plus que contributeur",
+  "Guest users are not allowed to be more than contributor. In order to upgrade the role of this guest user, ask your administrator to make it a standard user": "Les utilisateurs invités ne peuvent pas être plus que contributeur. Pour pouvoir améliorer le rôle de cet utilisateur, demandez à votre administrateur de le faire passer utilisateur",
   "The maximum number of spaces for a guest user has been reached": "Le nombre maximum d'espace pour un invité a été atteint",
+  "The maximum number of spaces for a guest user has been reached. In order to add this guest user into a new space, ask your administrator to make it a standard user": "Le nombre maximum d'espace pour un invité a été atteint. Pour ajouter cet utilisateur dans plus d'espace, demandez à votre administrateur de le faire passer utilisateur",
   "Showing {{displayedResults}} of {{count}} results": "",
   "The maximum number of users has been reached": "Le nombre maximum d'utilisateurs est atteint",
   "The maximum number of guests has been reached": "Le nombre maximum d'invités est atteint",
@@ -620,5 +622,6 @@
   "{{ count }} intervention ": "{{ count }} intervention",
   "in {{ count }} space": " dans {{count}} espace",
   "{{count}} comments": "{{count}} commentaire",
-  "{{count}} members": "{{count}} membre"
+  "{{count}} members": "{{count}} membre",
+  "You have reached the maximum number of spaces allowed as a guest user. In order to join this space, ask your administrator to make you a standard user or leave another space": "Vous avez atteint le nombre maximal d'espaces que vous pouvez rejoindre en tant qu'invité. Pour pouvoir rejoindre cet espace, demandez à votre administrateur de vous mettre utilisateur ou de quitter un autre espace"
 }

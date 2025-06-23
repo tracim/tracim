@@ -1774,8 +1774,8 @@ need to be in every workspace you include."
             .all()
         )
         if (
-            self._config.LIMITATION__MAX_GUEST_USER_NB_SPACE != -1
-            and len(user_workspaces) > self._config.LIMITATION__MAX_GUEST_USER_NB_SPACE
+            self._config.LIMITATION__MAX_GUEST_USER_SPACE_NB != -1
+            and len(user_workspaces) > self._config.LIMITATION__MAX_GUEST_USER_SPACE_NB
         ):
             raise TooManyWorkspacesError(
                 "The user {} is in more space than the number allowed for guest".format(

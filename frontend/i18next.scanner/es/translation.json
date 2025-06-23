@@ -590,8 +590,8 @@
   "Follow-up by e-mail": "Seguir por correo electrónico",
   "Notifications:": "Notificaciones:",
   "Notifications disabled": "Notificaciones desactivadas",
-  "Guest users aren't allowed to be more than contributor": "",
-  "The maximum number of spaces for a guest user has been reached": "",
+  "Guest users are not allowed to be more than contributor. In order to upgrade the role of this guest user, ask your administrator to make it a standard user": "",
+  "The maximum number of spaces for a guest user has been reached. In order to add this guest user into a new space, ask your administrator to make it a standard user": "",
   "Showing {{displayedResults}} of {{count}} results": "",
   "Showing {{displayedResults}} of {{count}} results_plural": "",
   "The maximum number of users has been reached": "",
@@ -620,5 +620,8 @@
   "{{count}} comments": "",
   "{{count}} comments_plural": "",
   "{{count}} members": "",
-  "{{count}} members_plural": ""
+  "{{count}} members_plural": "",
+  "Guest users aren't allowed to be more than contributor": "",
+  "The maximum number of spaces for a guest user has been reached": "",
+  "You have reached the maximum number of spaces allowed as a guest user. In order to join this space, ask your administrator to make you a standard user or leave another space": ""
 }

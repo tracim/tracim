@@ -47,7 +47,7 @@ const SYSTEM_CONFIG = {
     translation_service__target_languages: [],
     limitation__max_non_guest_users: -1,
     limitation__max_guest_users: -1,
-    limitation__max_guest_user_nb_space: -1
+    limitation__max_guest_user_space_nb: -1
   },
   contentTypeListLoaded: true,
   redirectLogin: '',

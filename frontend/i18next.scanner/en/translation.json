@@ -610,8 +610,8 @@
   "Follow-up by e-mail": "Follow-up by e-mail",
   "Notifications:": "Notifications:",
   "Notifications disabled": "Notifications disabled",
-  "Guest users aren't allowed to be more than contributor": "Guest users aren't allowed to be more than contributor",
-  "The maximum number of spaces for a guest user has been reached": "The maximum number of spaces for a guest user has been reached",
+  "Guest users are not allowed to be more than contributor. In order to upgrade the role of this guest user, ask your administrator to make it a standard user": "Guest users are not allowed to be more than contributor. In order to upgrade the role of this guest user, ask your administrator to make it a standard user",
+  "The maximum number of spaces for a guest user has been reached. In order to add this guest user into a new space, ask your administrator to make it a standard user": "The maximum number of spaces for a guest user has been reached. In order to add this guest user into a new space, ask your administrator to make it a standard user",
   "The maximum number of users has been reached": "The maximum number of users has been reached",
   "The maximum number of guests has been reached": "The maximum number of guests has been reached",
   "<0>{{userPublicName}}</0>  joined the space <2><0>{{workspaceLabel}}</0></2>": "<0>{{userPublicName}}</0>  joined the space <2><0>{{workspaceLabel}}</0></2>",
@@ -620,5 +620,8 @@
   "<0>{{userPublicName}}</0>'s  request to join the space has been {{state}}": "<0>{{userPublicName}}</0>'s  request to join the space has been {{state}}",
   "<0>{{userPublicName}}</0>  created the space <2><0>{{workspaceLabel}}</0></2>": "<0>{{userPublicName}}</0>  created the space <2><0>{{workspaceLabel}}</0></2>",
   "<0>{{userPublicName}}</0>  deleted the space <2><0>{{workspaceLabel}}</0></2>": "<0>{{userPublicName}}</0>  deleted the space <2><0>{{workspaceLabel}}</0></2>",
-  "<0> {{userCalleeName}} has accepted your call. If the call has not opened click on this<3> link </3></0> ": "<0> {{userCalleeName}} has accepted your call. If the call has not opened click on this<3> link </3></0> "
+  "<0> {{userCalleeName}} has accepted your call. If the call has not opened click on this<3> link </3></0> ": "<0> {{userCalleeName}} has accepted your call. If the call has not opened click on this<3> link </3></0> ",
+  "Guest users aren't allowed to be more than contributor": "Guest users aren't allowed to be more than contributor",
+  "The maximum number of spaces for a guest user has been reached": "The maximum number of spaces for a guest user has been reached",
+  "You have reached the maximum number of spaces allowed as a guest user. In order to join this space, ask your administrator to make you a standard user or leave another space": "You have reached the maximum number of spaces allowed as a guest user. In order to join this space, ask your administrator to make you a standard user or leave another space"
 }

@@ -650,16 +650,18 @@
   "Follow-up by e-mail": "",
   "Notifications:": "",
   "Notifications disabled": "",
-  "Guest users aren't allowed to be more than contributor": "",
-  "The maximum number of spaces for a guest user has been reached": "",
+  "Guest users are not allowed to be more than contributor. In order to upgrade the role of this guest user, ask your administrator to make it a standard user": "",
+  "The maximum number of spaces for a guest user has been reached. In order to add this guest user into a new space, ask your administrator to make it a standard user": "",
   "The maximum number of users has been reached": "",
   "The maximum number of guests has been reached": "",
-  "<0><0>{{userPublicName}}</0></0>  joined the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> انضم إلى فضاء <2><0><0>{{workspaceLabel}}</0></0></2>",
-  "<0><0>{{userPublicName}}</0></0>'s  role has been changed to <2>{{role}}</2>": "تم تغيير دور <0><0>{{userPublicName}}</0></0> إلى <2>{{role}}</2>",
-  "<0><0>{{userPublicName}}</0></0>  wants to join the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> يريد الانضمام إلى الفضاء <2><0><0>{{workspaceLabel}}</0></0></2>",
-  "<0><0>{{userPublicName}}</0></0>'s  request to join the space has been <2>{{state}}</2>": "طلب <0><0>{{userPublicName}}</0></0> بالانضمام إلى الفضاء قد تم <2>{{state}}</2>",
-  "<0><0>{{userPublicName}}</0></0>  created the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> انشاء فضاء <2><0><0>{{workspaceLabel}}</0></0></2>",
-  "<0><0>{{userPublicName}}</0></0>  deleted the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> حذف الفضاء <2><0><0>{{workspaceLabel}}</0></0></2>",
-  "<0> <1>{{userCalleeName}}</1> has accepted your call. If the call has not opened click on this<3> link </3></0> ": "<0> <1>{{userCalleeName}}</1> قبل الاتصال بك. إذا لم تُفْتَح المكالمة، انقر هنا <3>link</3></0> "
-
+  "Guest users aren't allowed to be more than contributor": "",
+  "The maximum number of spaces for a guest user has been reached": "",
+  "You have reached the maximum number of spaces allowed as a guest user. In order to join this space, ask your administrator to make you a standard user or leave another space": "",
+  "<0>{{userPublicName}}</0>  joined the space <2><0>{{workspaceLabel}}</0></2>": "",
+  "<0>{{userPublicName}}</0>'s  role has been changed to {{role}}": "",
+  "<0>{{userPublicName}}</0>  wants to join the space <2><0>{{workspaceLabel}}</0></2>": "",
+  "<0>{{userPublicName}}</0>'s  request to join the space has been {{state}}": "",
+  "<0>{{userPublicName}}</0>  created the space <2><0>{{workspaceLabel}}</0></2>": "",
+  "<0>{{userPublicName}}</0>  deleted the space <2><0>{{workspaceLabel}}</0></2>": "",
+  "<0> {{userCalleeName}} has accepted your call. If the call has not opened click on this<3> link </3></0> ": ""
 }

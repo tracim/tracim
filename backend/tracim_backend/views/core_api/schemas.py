@@ -2289,7 +2289,7 @@ class ConfigSchema(marshmallow.Schema):
     iframe_whitelist = marshmallow.fields.List(marshmallow.fields.String())
     limitation__max_non_guest_users = marshmallow.fields.Int()
     limitation__max_guest_users = marshmallow.fields.Int()
-    limitation__max_guest_user_nb_space = marshmallow.fields.Int()
+    limitation__max_guest_user_space_nb = marshmallow.fields.Int()
 
 
 class ConditionFileSchema(marshmallow.Schema):

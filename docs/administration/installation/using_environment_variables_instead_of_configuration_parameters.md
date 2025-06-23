@@ -91,7 +91,7 @@ The following table contains:
 | TRACIM_LIMITATION__MAXIMUM_ONLINE_USERS_MESSAGE                           | limitation.maximum_online_users_message                        | LIMITATION__MAXIMUM_ONLINE_USERS_MESSAGE                           |
 | TRACIM_LIMITATION__MAX_NON_GUEST_USERS                                    | limitation.max_non_guest_users                                 | LIMITATION__MAX_NON_GUEST_USERS                                    |
 | TRACIM_LIMITATION__MAX_GUEST_USERS                                        | limitation.max_guest_users                                     | LIMITATION__MAX_GUEST_USERS                                        |
-| TRACIM_LIMITATION__MAX_GUEST_USER_NB_SPACE                                | limitation.max_guest_user_nb_space                             | LIMITATION__MAX_GUEST_USER_NB_SPACE                                |
+| TRACIM_LIMITATION__MAX_GUEST_USER_SPACE_NB                                | limitation.max_guest_user_space_nb                             | LIMITATION__MAX_GUEST_USER_SPACE_NB                                |
 | TRACIM_LIMITATION__STANDARD_USER_EMAIL_DOMAIN                             | limitation.standard_user_email_domain                          | LIMITATION__STANDARD_USER_EMAIL_DOMAIN                             |
 | TRACIM_JOBS__PROCESSING_MODE                                              | jobs.processing_mode                                           | JOBS__PROCESSING_MODE                                              |
 | TRACIM_JOBS__ASYNC__REDIS__HOST                                           | jobs.async.redis.host                                          | JOBS__ASYNC__REDIS__HOST                                           |

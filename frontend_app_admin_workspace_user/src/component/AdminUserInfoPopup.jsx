@@ -66,15 +66,15 @@ const AdminUserInfoPopup = props => {
         )}
 
         {
-          props.config.limitation__max_guest_user_nb_space !== -1 && (
+          props.config.limitation__max_guest_user_space_nb !== -1 && (
             <p>
               {props.t(
                 'A guest can join up to {{count}} space',
-                { count: props.config.limitation__max_guest_user_nb_space })}
+                { count: props.config.limitation__max_guest_user_space_nb })}
             </p>
           )
         }
-        {props.config.limitation__max_guest_user_nb_space === -1 && (
+        {props.config.limitation__max_guest_user_space_nb === -1 && (
           <p>{props.t('No limit to the number spaces a guest user can join')}</p>
         )}
       </div>

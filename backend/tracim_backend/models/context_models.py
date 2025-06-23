@@ -92,7 +92,7 @@ class ConfigModel(object):
         iframe_whitelist: List[str],
         limitation__max_non_guest_users: int,
         limitation__max_guest_users: int,
-        limitation__max_guest_user_nb_space: int,
+        limitation__max_guest_user_space_nb: int,
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
@@ -122,7 +122,7 @@ class ConfigModel(object):
         self.iframe_whitelist = iframe_whitelist
         self.limitation__max_non_guest_users = limitation__max_non_guest_users
         self.limitation__max_guest_users = limitation__max_guest_users
-        self.limitation__max_guest_user_nb_space = limitation__max_guest_user_nb_space
+        self.limitation__max_guest_user_space_nb = limitation__max_guest_user_space_nb
 
 
 class ErrorCodeModel(object):
