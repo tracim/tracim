@@ -1,17 +1,19 @@
-.form-attendee {
-    display: grid;
-    grid-template-columns: max-content max-content max-content max-content;
-    grid-gap: 0.25rem;
-}
-
-.time-div {
+.event-edit-attendee {
     display: flex;
+    gap: 0.25rem;
 }
 
-.form[name="event"]:has(#event-edit-allday:checked) .event-edit-not-allday {
+.event-edit-datetime {
+    display: flex;
+    gap: 0.25rem;
+}
+
+/* Hide the time and timezone inputs if `All day` is checked */
+.event-edit:has(#event-edit-allday:checked) .event-edit-not-allday {
     visibility: hidden;
 }
 
-.form[name="event"]:is(.event-edit-create) button[name="delete"] {
+/* Hide the `Delete` button we are creating an event */
+.event-edit:is(.event-edit-create) button[name="delete"] {
     visibility: hidden;
 }

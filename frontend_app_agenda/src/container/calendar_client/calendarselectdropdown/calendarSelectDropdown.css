@@ -1,4 +1,4 @@
-.dropdown-frame {
+.calendar-select-container {
     position: absolute;
     top: 100%;
     width: max-content;
@@ -11,8 +11,20 @@
     border-radius: 0.25rem;
 }
 
+.calendar-select-label {
+    display: flex;
+    align-items: baseline;
+    gap: 5px
+}
+
+.calendar-select-color {
+    border-radius: 50%;
+    height: 0.75rem;
+    width: 0.75rem;
+}
+
 /* Added in order to make the `top: 100%` use the heigh of the parent and not of the window */
-.ec-button-group:has(.dropdown-frame) {
+.ec-button-group:has(.calendar-select-container) {
     position: relative;
 }
 
@@ -23,8 +35,3 @@
     border-bottom-left-radius: 0.25rem !important;
 }
 
-.calendar-color {
-    display: inline-block;
-    border-radius: 50%;
-    padding: 0.5em;
-}

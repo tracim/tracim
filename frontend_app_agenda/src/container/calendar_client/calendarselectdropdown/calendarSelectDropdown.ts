@@ -1,23 +1,22 @@
 import { parseHtml } from "../helpers/dom-helper"
-import type { Calendar, CalendarHandler } from "../types"
+import type { Calendar, SelectCalendarCallback } from "../types"
 import "./calendarSelectDropdown.css"
-import "../generic.css"
 
-const html = `
-<div class="dropdown-frame">
-  <div class"form">
-  {{#calendars}}
-  <label>
-    <span class="calendar-color" style="background-color:{{calendarColor}}"> </span>
-    {{displayName}}
-  </label>
-  <input type="checkbox"/>
-  {{/calendars}}
+const html = /*html*/`
+<div class="calendar-select-container form">
+  <div class="form-content" >
+    {{#calendars}}
+    <label class="calendar-select-label">
+      <span class="calendar-select-color" style="background-color:{{calendarColor}}"> </span>
+      {{displayName}}
+    </label>
+    <input type="checkbox"/>
+    {{/calendars}}
   </div>
 </div>`
 
 export class CalendarSelectDropdown {
-  private _container?: HTMLElement
+  private _container: Element | null = null
 
   public constructor() { }
 
@@ -25,24 +24,24 @@ export class CalendarSelectDropdown {
     // TODO
   }
 
-  public onSelect = (event: Event, calendars: Calendar[], handleSelect: CalendarHandler) => {
+  public onSelect = (event: Event, calendars: Calendar[], handleSelect: SelectCalendarCallback) => {
     const target = event.target as Element
     const parent = target.parentElement as Element
 
     if (this._container) {
       parent.removeChild(this._container)
-      this._container = undefined
+      this._container = null
       return
     }
-    this._container = parseHtml(html, { calendars })
+    this._container = parseHtml(html, { calendars })[0]
     parent.insertBefore(this._container, target)
 
-    const inputs = this._container.querySelectorAll("input")
+    const inputs = this._container.querySelectorAll<HTMLInputElement>("input")
     for (let i = 0; i < inputs.length; i++) {
-      const element = inputs[i];
+      const input = inputs[i];
       const calendar = calendars[i]
-      element.checked = !calendar.hidden
-      element.addEventListener("change", e => handleSelect(calendar.url, (e.target as HTMLInputElement).checked))
+      input.checked = !calendar.hidden
+      input.addEventListener("change", e => handleSelect(calendar.url, (e.target as HTMLInputElement).checked))
     }
 
   }

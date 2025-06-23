@@ -1,12 +1,14 @@
-import { CalendarClient } from "./calendarclient/calendarClient";
-import type { CalendarClientOptions, CalendarSource, ServerSource } from "./types";
+import { CalendarElement } from "./calendarelement/calendarElement";
+import type { CalendarOptions, CalendarSource, ServerSource } from "./types";
+import "./index.css"
 
-export async function createCalendarClient(
+export async function createCalendar(
   sources: (ServerSource | CalendarSource)[],
   target: Element | Document | ShadowRoot,
-  options?: CalendarClientOptions,
+  options?: CalendarOptions,
 ) {
-  const calendar = new CalendarClient()
+  // return CalendarClient.create(sources, target, options)
+  const calendar = new CalendarElement()
   await calendar.create(sources, target, options)
   return calendar
 }
