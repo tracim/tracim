@@ -3451,6 +3451,66 @@ class TestUserWithNotificationEndpoint(object):
         assert headers["To"][0] == "test <test@test.test>"
         assert headers["Subject"][0] == "[Tracim] Created account"
 
+    def test_api__create_user__ok_200__guest_nominal_case(self, web_testapp, user_api_factory):
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        params = {
+            "email": "test@test.test",
+            "email_notification": False,
+            "password": None,
+            "profile": "guests",
+        }
+        res = web_testapp.post_json("/api/users", status=200, params=params)
+        res = res.json_body
+        assert res["user_id"]
+        user_id = res["user_id"]
+        assert res["created"]
+        assert res["is_active"] is True
+        assert res["profile"] == "guests"
+        assert res["email"] == "test@test.test"
+        assert res["public_name"] == "test"
+        assert res["timezone"] == ""
+        assert res["lang"] is None
+        assert res["auth_type"] == "unknown"
+
+        uapi = user_api_factory.get()
+        user = uapi.get_one(user_id)
+        assert user.email == "test@test.test"
+        assert user.password is None
+
+    def test_api__create_user__err_400__too_many_guest(self, web_testapp, user_api_factory):
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        params = {
+            "email": "test@test.test",
+            "email_notification": False,
+            "password": None,
+            "profile": "guests",
+        }
+        web_testapp.authorization = (
+            "Basic",
+            ("admin@admin.admin", "admin@admin.admin"),
+        )
+        res = web_testapp.post_json("/api/users", status=200, params=params)
+        params = {
+            "email": "test2@test.test",
+            "email_notification": False,
+            "password": None,
+            "profile": "guests",
+        }
+        res = res.json_body
+        user_id = res["user_id"]
+        uapi = user_api_factory.get()
+        user = uapi.get_one(user_id)
+        assert user.email == "test@test.test"
+        assert user.password is None
+        res = web_testapp.post_json("/api/users", status=400, params=params)
+        assert res.json_body["code"] == ErrorCode.TOO_MANY_GUEST
+
     def test_api_delete_user__ok_200__admin(sel, web_testapp, user_api_factory, event_helper):
         uapi = user_api_factory.get()
         profile = Profile.USER
@@ -5501,6 +5561,167 @@ class TestSetUserProfileEndpoint(object):
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.INSUFFICIENT_USER_PROFILE
+
+    def test_api__update_guest__ok_200__guest_to_user(self, user_api_factory, web_testapp):
+        uapi = user_api_factory.get()
+
+        profile = Profile.GUEST
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        # Set params
+        params = {"profile": "users"}
+        res = web_testapp.put_json(
+            "/api/users/{}/profile".format(user_id), params=params, status=204
+        )
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert res["user_id"] == user_id
+        assert res["profile"] == "users"
+
+    def test_api__update_user__ok_200__user_to_guest(self, user_api_factory, web_testapp):
+        uapi = user_api_factory.get()
+
+        profile = Profile.USER
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        # Set params
+        params = {"profile": "guests"}
+        res = web_testapp.put_json(
+            "/api/users/{}/profile".format(user_id), params=params, status=204
+        )
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200)
+        res = res.json_body
+        assert res["user_id"] == user_id
+        assert res["profile"] == "guests"
+
+    def test_api__update_user_to_guest__err_400__too_many_space(
+        self,
+        user_api_factory,
+        user_workspace_config_api_factory,
+        workspace_api_factory,
+        web_testapp,
+    ):
+        uapi = user_api_factory.get()
+
+        profile = Profile.USER
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        workspace_api = workspace_api_factory.get(show_deleted=True)
+        workspace1 = workspace_api.create_workspace("test1", save_now=True)
+        workspace2 = workspace_api.create_workspace("test2", save_now=True)
+
+        profile_admin = Profile.ADMIN
+        admin2 = uapi.create_user(
+            email="admin2@admin2.admin2", profile=profile_admin, do_notify=False
+        )
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=admin2)
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace1,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace2,
+            UserWorkspaceConfig.CONTRIBUTOR,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        # Set params
+        params = {"profile": "guests"}
+        res = web_testapp.put_json(
+            "/api/users/{}/profile".format(user_id), params=params, status=400
+        )
+        assert res.json_body
+        assert "code" in res.json_body
+        assert res.json_body["code"] == ErrorCode.TOO_MANY_WORKSPACE
+
+    def test_api__update_user_to_guest__err_400__role_too_high(
+        self,
+        user_api_factory,
+        user_workspace_config_api_factory,
+        workspace_api_factory,
+        web_testapp,
+    ):
+        uapi = user_api_factory.get()
+
+        profile = Profile.USER
+        test_user = uapi.create_user(
+            email="test@test.test",
+            password="password",
+            name="bob",
+            profile=profile,
+            timezone="Europe/Paris",
+            lang="fr",
+            do_save=True,
+            do_notify=False,
+        )
+        uapi.save(test_user)
+        workspace_api = workspace_api_factory.get(show_deleted=True)
+        workspace1 = workspace_api.create_workspace("test1", save_now=True)
+
+        profile_admin = Profile.ADMIN
+        admin2 = uapi.create_user(
+            email="admin2@admin2.admin2", profile=profile_admin, do_notify=False
+        )
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=admin2)
+        user_workspace_config_api.create_one(
+            test_user,
+            workspace1,
+            UserWorkspaceConfig.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        transaction.commit()
+        user_id = int(test_user.user_id)
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        # Set params
+        params = {"profile": "guests"}
+        res = web_testapp.put_json(
+            "/api/users/{}/profile".format(user_id), params=params, status=400
+        )
+        assert res.json_body
+        assert "code" in res.json_body
+        assert res.json_body["code"] == ErrorCode.GUEST_USER_NOT_ALLOWED
 
 
 @pytest.mark.usefixtures("base_fixture")
