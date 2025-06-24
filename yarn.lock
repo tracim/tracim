@@ -5,18 +5,21 @@ __metadata:
   version: 6
   cacheKey: 8
 
-"@algoo/calendar-client@file:../../calendar-client/::locator=tracim_app_agenda%40workspace%3Afrontend_app_agenda":
+"@algoo/calendar-client@file:./lib/::locator=tracim_app_agenda%40workspace%3Afrontend_app_agenda":
   version: 1.0.0
-  resolution: "@algoo/calendar-client@file:../../calendar-client/#../../calendar-client/::hash=b00737&locator=tracim_app_agenda%40workspace%3Afrontend_app_agenda"
+  resolution: "@algoo/calendar-client@file:./lib/#./lib/::hash=53529a&locator=tracim_app_agenda%40workspace%3Afrontend_app_agenda"
   dependencies:
     "@event-calendar/core": ^4.4.0
     "@fortawesome/fontawesome-svg-core": ^6.7.2
     "@fortawesome/free-solid-svg-icons": ^6.7.2
+    i18next: ^25.2.1
+    i18next-browser-languagedetector: ^8.2.0
+    i18next-resources-to-backend: ^1.2.1
     mustache: ^4.2.0
     timezones-ical-library: ^1.10.0
     ts-ics: ^2.1.7
     tsdav: ^2.1.4
-  checksum: 724d31573d3c95a01e1db6310fb286dc6cbae48b93a5c8d2f400cad84c89c4b1a5e33bc803be8c79913c1f8dd443aac0831c1833f5d04c01a98ea0c0a2863706
+  checksum: cef509258957a756e7fe370c53357e168c14dc89c7af3fd7fb45373e65e6e1538384e461a04b9c459929b42ca0f4919e57614283c850b55a5ca27c8f2a0089b8
   languageName: node
   linkType: hard
 
@@ -1697,6 +1700,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.27.1":
+  version: 7.27.6
+  resolution: "@babel/runtime@npm:7.27.6"
+  checksum: 3f7b879df1823c0926bd5dbc941c62f5d60faa790c1aab9758c04799e1f04ee8d93553be9ec059d4e5882f19fe03cbe8933ee4f46212dced0f6d8205992c9c9a
+  languageName: node
+  linkType: hard
+
 "@babel/template@npm:^7.22.15":
   version: 7.22.15
   resolution: "@babel/template@npm:7.22.15"
@@ -2336,15 +2346,6 @@ __metadata:
   version: 1.0.8
   resolution: "@types/estree@npm:1.0.8"
   checksum: bd93e2e415b6f182ec4da1074e1f36c480f1d26add3e696d54fb30c09bc470897e41361c8fd957bf0985024f8fbf1e6e2aff977d79352ef7eb93a5c6dcff6c11
-  languageName: node
-  linkType: hard
-
-"@types/event-calendar__core@npm:^4.4.0":
-  version: 4.4.0
-  resolution: "@types/event-calendar__core@npm:4.4.0"
-  dependencies:
-    svelte: ^5
-  checksum: 8e746f48abeb8d93988613904a41a7e63b3e2d8c8d7d56dc4d496d2c83ee05ea6f77ad30f668ee00185898a6e1d16f77b7549ac12aba22bc73f55d731fb045ef
   languageName: node
   linkType: hard
 
@@ -7853,6 +7854,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"i18next-browser-languagedetector@npm:^8.2.0":
+  version: 8.2.0
+  resolution: "i18next-browser-languagedetector@npm:8.2.0"
+  dependencies:
+    "@babel/runtime": ^7.23.2
+  checksum: 02fda84fdfd443d7a888c3eaf99550e4f75692453392dffecc1b6f4b8df112672bdc9675f84347d8b9e23ee488aa4e17691abf1ef5847191c3f6ddd4d833524d
+  languageName: node
+  linkType: hard
+
+"i18next-resources-to-backend@npm:^1.2.1":
+  version: 1.2.1
+  resolution: "i18next-resources-to-backend@npm:1.2.1"
+  dependencies:
+    "@babel/runtime": ^7.23.2
+  checksum: a2f338c4eec8d5ba09846ae1abdd23afb72086f6395d6160c748d010c82f5c28c30133f6487f0fd3a65e710231d7750b324785f15cac4baf6d24b33227840341
+  languageName: node
+  linkType: hard
+
 "i18next-scanner@npm:4.4.0":
   version: 4.4.0
   resolution: "i18next-scanner@npm:4.4.0"
@@ -7902,6 +7921,20 @@ __metadata:
   version: 10.6.0
   resolution: "i18next@npm:10.6.0"
   checksum: 7d6209506d95c48c0e4cfb029f66965f787cf183e84a0ae89744015930fd9623e8d7742c6f4f868c5831510020ace3489e3db830e29996c649ea5fce3f6ae8e5
+  languageName: node
+  linkType: hard
+
+"i18next@npm:^25.2.1":
+  version: 25.2.1
+  resolution: "i18next@npm:25.2.1"
+  dependencies:
+    "@babel/runtime": ^7.27.1
+  peerDependencies:
+    typescript: ^5
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 41e4b187ea96f9817b6bf54f2e400045f71d92d5dde1fb63731aa95f2117afe92b40298bb833a604266e0903b28715040556f2202cb32c180f48222d0679fa47
   languageName: node
   linkType: hard
 
@@ -12452,10 +12485,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "root-workspace-0b6124@workspace:."
   dependencies:
-    "@fortawesome/fontawesome-svg-core": ^6.7.2
-    "@fortawesome/free-solid-svg-icons": ^6.7.2
     eslint: ^6.8.0
-    mustache: ^4.2.0
   languageName: unknown
   linkType: soft
 
@@ -13665,28 +13695,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"svelte@npm:^5":
-  version: 5.34.6
-  resolution: "svelte@npm:5.34.6"
-  dependencies:
-    "@ampproject/remapping": ^2.3.0
-    "@jridgewell/sourcemap-codec": ^1.5.0
-    "@sveltejs/acorn-typescript": ^1.0.5
-    "@types/estree": ^1.0.5
-    acorn: ^8.12.1
-    aria-query: ^5.3.1
-    axobject-query: ^4.1.0
-    clsx: ^2.1.1
-    esm-env: ^1.2.1
-    esrap: ^1.4.8
-    is-reference: ^3.0.3
-    locate-character: ^3.0.0
-    magic-string: ^0.30.11
-    zimmerframe: ^1.1.2
-  checksum: d5c7a80276143f9b4fc900c8509c2f64490ddb041189e917edad904bcaf4e072f0a7a144ef1844836e3f153a29ad8b4ab27556648937691cee99698afb7a6a64
-  languageName: node
-  linkType: hard
-
 "svelte@npm:^5.33.14":
   version: 5.34.1
   resolution: "svelte@npm:5.34.1"
@@ -14182,7 +14190,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "tracim_app_agenda@workspace:frontend_app_agenda"
   dependencies:
-    "@algoo/calendar-client": "file:../../calendar-client/"
+    "@algoo/calendar-client": "file:./lib/"
     "@babel/core": ^7.12.10
     "@babel/plugin-proposal-class-properties": ^7.12.1
     "@babel/plugin-proposal-object-rest-spread": ^7.12.1
@@ -14191,8 +14199,6 @@ __metadata:
     "@babel/preset-react": ^7.12.10
     "@babel/preset-typescript": ^7.27.1
     "@babel/register": ^7.12.10
-    "@event-calendar/core": ^4.4.0
-    "@types/event-calendar__core": ^4.4.0
     "@types/react": ^16.13.1
     "@types/react-dom": ^16.9.1
     "@types/react-i18next": 7.8.3
@@ -14228,11 +14234,8 @@ __metadata:
     style-loader: ^0.23.1
     stylus: ^0.54.5
     stylus-native-loader: ^1.1.0
-    timezones-ical-library: ^1.10.0
     tracim_frontend_lib: ^1.1.9
-    ts-ics: ^2.1.7
     ts-loader: ^9.5.2
-    tsdav: ^2.1.4
     typescript: ^5.8.3
     url-loader: ^2.0.1
     webpack: ^5.72.0
