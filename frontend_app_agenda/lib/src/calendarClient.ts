@@ -1,7 +1,7 @@
-import { type IcsCalendar } from 'ts-ics';
-import { createCalendarObject, deleteCalendarObject, fetchCalendarObjects, fetchCalendars, updateCalendarObject } from './helpers/dav-helper';
-import type { CalendarSource, ServerSource, Calendar, CalendarObject, EventUid, CalendarEvent, EventData } from './types';
-import { isSameEvent } from './helpers/ics-helper';
+import { type IcsCalendar } from 'ts-ics'
+import { createCalendarObject, deleteCalendarObject, fetchCalendarObjects, fetchCalendars, updateCalendarObject } from './helpers/dav-helper'
+import type { CalendarSource, ServerSource, Calendar, CalendarObject, EventUid, CalendarEvent, EventData } from './types'
+import { isSameEvent } from './helpers/ics-helper'
 
 // TODO recurring events
 export class CalendarClient {
@@ -12,7 +12,7 @@ export class CalendarClient {
   public loadCalendars = async (sources: (ServerSource | CalendarSource)[]) => {
     const calendarsPerSource = await Promise.all(sources.map(source => fetchCalendars(source)))
     this._calendars = calendarsPerSource.flat()
-    this._calendarObjectsPerCalendar = this._calendars.map(_ => [])
+    this._calendarObjectsPerCalendar = this._calendars.map(() => [])
   }
 
   public destroy = () => {
@@ -21,7 +21,9 @@ export class CalendarClient {
 
   // TODO needs radicale 3.2
   public fetchAndLoadEvents = async (start: string, end: string): Promise<CalendarObject[][]> => {
-    this._calendarObjectsPerCalendar = await Promise.all(this._calendars.map(calendar => fetchCalendarObjects(calendar, { start, end }, true)))
+    this._calendarObjectsPerCalendar = await Promise.all(
+      this._calendars.map(calendar => fetchCalendarObjects(calendar, { start, end }, true)),
+    )
     return this._calendarObjectsPerCalendar
   }
 
@@ -46,12 +48,12 @@ export class CalendarClient {
 
   public createEvent = async ({ calendarUrl, event }: CalendarEvent) => {
     const calendar = this.getCalendarByUrl(calendarUrl)
-    if (!calendar) return { response: new Response(null, { status: 404 }), ical: ""}
+    if (!calendar) return { response: new Response(null, { status: 404 }), ical: '' }
     const calendarObject: IcsCalendar = {
       // prodId is a FPI (https://en.wikipedia.org/wiki/Formal_Public_Identifier)
       prodId: '-//algoo.fr//NONSGML Algoo Calendar Client v0.1//EN',
       // prodId: '+//IDN algoo.fr//NONSGML Algoo Calendar Client v0.1//EN',
-      version: "2.0",
+      version: '2.0',
       events: [event],
     }
     const response = await createCalendarObject(calendar, calendarObject)
@@ -61,7 +63,7 @@ export class CalendarClient {
   // TODO change an event of calendar
   public updateEvent = async ({ event }: CalendarEvent) => {
     const uidData = this.getEventDataByUid(event)
-    if (!uidData) return { response: new Response(null, { status: 404 }), ical: ""}
+    if (!uidData) return { response: new Response(null, { status: 404 }), ical: '' }
     const { event: oldEvent, calendarObject, calendar } = uidData
     // if (event.recurrenceRule) {
     //   for (let i = 0; i < icsCalendar.events.length; i++) {
@@ -79,13 +81,13 @@ export class CalendarClient {
     const oldEvents = calendarObject.data.events
     calendarObject.data.events = calendarObject.data.events!.map(e => isSameEvent(e, oldEvent) ? event : e)
     const response = await updateCalendarObject(calendar, calendarObject)
-    if (!response.response.ok)  calendarObject.data.events = oldEvents
+    if (!response.response.ok) calendarObject.data.events = oldEvents
     return response
   }
 
   public deleteEvent = async ({ event }: CalendarEvent) => {
     const uidData = this.getEventDataByUid(event)
-    if (!uidData) return { response: new Response(null, { status: 404 }), ical: ""}
+    if (!uidData) return { response: new Response(null, { status: 404 }), ical: '' }
     // if (event.recurrenceRule) {
     //   for (let i = 0; i < icsCalendar.events.length; i++) {
     //     const element = icsCalendar.events[i];

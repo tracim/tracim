@@ -1,8 +1,8 @@
-import { parseHtml } from "../helpers/dom-helper"
-import type { Calendar, SelectCalendarCallback } from "../types"
-import "./calendarSelectDropdown.css"
+import { parseHtml } from '../helpers/dom-helper'
+import type { Calendar, SelectCalendarCallback } from '../types'
+import './calendarSelectDropdown.css'
 
-const html = /*html*/`
+const html = /* html */`
 <div class="calendar-select-container form">
   <div class="form-content" >
     {{#calendars}}
@@ -24,7 +24,12 @@ export class CalendarSelectDropdown {
     // TODO
   }
 
-  public onSelect = (event: Event, calendars: Calendar[], selectedCalendars: Set<string>, handleSelect: SelectCalendarCallback) => {
+  public onSelect = (
+    event: Event,
+    calendars: Calendar[],
+    selectedCalendars: Set<string>,
+    handleSelect: SelectCalendarCallback,
+  ) => {
     const target = event.target as Element
     const parent = target.parentElement as Element
 
@@ -36,13 +41,12 @@ export class CalendarSelectDropdown {
     this._container = parseHtml(html, { calendars })[0]
     parent.insertBefore(this._container, target)
 
-    const inputs = this._container.querySelectorAll<HTMLInputElement>("input")
+    const inputs = this._container.querySelectorAll<HTMLInputElement>('input')
     for (let i = 0; i < inputs.length; i++) {
-      const input = inputs[i];
+      const input = inputs[i]
       const calendar = calendars[i]
       input.checked = selectedCalendars.has(calendar.url)
-      input.addEventListener("change", e => handleSelect(calendar.url, (e.target as HTMLInputElement).checked))
+      input.addEventListener('change', e => handleSelect(calendar.url, (e.target as HTMLInputElement).checked))
     }
-
   }
 }

@@ -1,19 +1,19 @@
 .event-edit-attendee {
-    display: flex;
-    gap: 0.25rem;
+  display: flex;
+  gap: 0.25rem;
 }
 
 .event-edit-datetime {
-    display: flex;
-    gap: 0.25rem;
+  display: flex;
+  gap: 0.25rem;
 }
 
 /* Hide the time and timezone inputs if `All day` is checked */
 .event-edit:has(#event-edit-allday:checked) .event-edit-not-allday {
-    visibility: hidden;
+  visibility: hidden;
 }
 
 /* Hide the `Delete` button we are creating an event */
 .event-edit:is(.event-edit-create) button[name="delete"] {
-    visibility: hidden;
+  visibility: hidden;
 }

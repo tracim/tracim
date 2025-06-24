@@ -1,22 +1,22 @@
-import type { IcsDateObject, IcsEvent } from "ts-ics"
-import type { EventUid } from "../types"
+import type { IcsDateObject, IcsEvent } from 'ts-ics'
+import type { EventUid } from '../types'
 
 export function isEventAllDay(event: IcsEvent) {
-    return event.start.type === "DATE" || event.end?.type === "DATE"
-  }
+  return event.start.type === 'DATE' || event.end?.type === 'DATE'
+}
 
 export function offsetDate(date: IcsDateObject, offset: number): IcsDateObject {
-    return {
-        type: date.type,
-        date: new Date(date.date.getTime() + offset),
-        local: date.local && {
-            date: new Date(date.local.date.getTime() + offset),
-            timezone: date.local.timezone,
-            tzoffset: date.local.tzoffset,
-        },
-    }
+  return {
+    type: date.type,
+    date: new Date(date.date.getTime() + offset),
+    local: date.local && {
+      date: new Date(date.local.date.getTime() + offset),
+      timezone: date.local.timezone,
+      tzoffset: date.local.tzoffset,
+    },
+  }
 }
-  
+
 export function isSameEvent(a: EventUid, b: EventUid) {
-    return a.uid === b.uid && a.recurrenceId?.value.date === b.recurrenceId?.value.date
+  return a.uid === b.uid && a.recurrenceId?.value.date === b.recurrenceId?.value.date
 }

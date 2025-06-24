@@ -1,10 +1,10 @@
-import type { IcsCalendar, IcsEvent, IcsRecurrenceId } from "ts-ics"
-import type { DAVCalendar } from "tsdav"
+import type { IcsCalendar, IcsEvent, IcsRecurrenceId } from 'ts-ics'
+import type { DAVCalendar } from 'tsdav'
 
-type DomEvent = GlobalEventHandlersEventMap[keyof GlobalEventHandlersEventMap];
+type DomEvent = GlobalEventHandlersEventMap[keyof GlobalEventHandlersEventMap]
 
 export type CustomTranslation = {
-  [lng: string]: any,
+  [lng: string]: unknown,
 }
 
 // TODO add <TCalendarUid = any>
@@ -17,7 +17,7 @@ export type Calendar = DAVCalendar & {
   // url: string
   // fetchOptions?: RequestInit
   headers?: Record<string, string>
-  uid?: any
+  uid?: unknown
 }
 
 export type CalendarObject = {
@@ -35,11 +35,22 @@ export type EventUid = {
 // export const alarmActionTypes = ["DISPLAY"] as const;
 // export type IcsAlarmActionTypes = typeof alarmActionTypes;
 
-export const attendeeRoleTypes = ["CHAIR", "REQ-PARTICIPANT", "OPT-PARTICIPANT", "NON-PARTICIPANT"] as const;
-export type IcsAttendeeRoleTypes = typeof attendeeRoleTypes;
+export const attendeeRoleTypes = ['CHAIR',
+  'REQ-PARTICIPANT',
+  'OPT-PARTICIPANT',
+  'NON-PARTICIPANT',
+] as const
+export type IcsAttendeeRoleTypes = typeof attendeeRoleTypes
 
-export const availableViews = ["timeGridDay", "timeGridWeek", "dayGridMonth", "listDay", "listWeek", "listMonth", "listYear"] as const;
-export type View = typeof availableViews[number];
+export const availableViews = ['timeGridDay',
+  'timeGridWeek',
+  'dayGridMonth',
+  'listDay',
+  'listWeek',
+  'listMonth',
+  'listYear',
+] as const
+export type View = typeof availableViews[number]
 
 export type ServerSource = {
   serverUrl: string
@@ -49,7 +60,7 @@ export type ServerSource = {
 
 export type CalendarSource = {
   calendarUrl: string
-  calendarUid?: any
+  calendarUid?: unknown
   headers?: Record<string, string>
   fetchOptions?: RequestInit
 }
@@ -61,14 +72,32 @@ export type CalendarEvent = {
 
 export type SelectCalendarCallback = (calendarUrl: string, selected: boolean) => void
 export type SelectCalendarHandlers = {
-  onClickSelectCalendars: (jsEvent: DomEvent, calendars: Calendar[], selectedCalendars: Set<string>, handleSelect: SelectCalendarCallback) => void,
+  onClickSelectCalendars: (
+    jsEvent: DomEvent,
+    calendars: Calendar[],
+    selectedCalendars: Set<string>,
+    handleSelect: SelectCalendarCallback
+  ) => void,
 }
 
 export type EventEditCallback = (event: CalendarEvent) => Promise<Response>
 export type EventEditHandlers = {
-  onCreateEvent: (jsEvent: DomEvent, calendars: Calendar[], event: CalendarEvent, handleCreate: EventEditCallback) => void,
-  onUpdateEvent: (jsEvent: DomEvent, calendars: Calendar[], event: CalendarEvent, handleUpdate: EventEditCallback, handleDelete: EventEditCallback) => void,
-  onDeleteEvent: (jsEvent: DomEvent, calendars: Calendar[], event: CalendarEvent, handleDelete: EventEditCallback) => void,
+  onCreateEvent: (jsEvent: DomEvent,
+    calendars: Calendar[],
+    event: CalendarEvent,
+    handleCreate: EventEditCallback
+  ) => void,
+  onUpdateEvent: (jsEvent: DomEvent,
+    calendars: Calendar[],
+    event: CalendarEvent,
+    handleUpdate: EventEditCallback,
+    handleDelete: EventEditCallback
+  ) => void,
+  onDeleteEvent: (jsEvent: DomEvent,
+    calendars: Calendar[],
+    event: CalendarEvent,
+    handleDelete: EventEditCallback
+  ) => void,
 }
 
 export type PostEventChangeHandlers = {
@@ -85,7 +114,11 @@ export type CalendarElementOptions = {
   editable?: boolean,
 }
 
-export type CalendarOptions = CalendarElementOptions & (SelectCalendarHandlers | {}) & (EventEditHandlers | {}) & PostEventChangeHandlers
+export type CalendarOptions =
+  CalendarElementOptions
+  & (SelectCalendarHandlers | Record<never, never>)
+  & (EventEditHandlers | Record<never, never>)
+  & PostEventChangeHandlers
 
 export type EventData = {
   event: IcsEvent

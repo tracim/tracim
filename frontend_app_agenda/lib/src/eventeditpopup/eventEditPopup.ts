@@ -1,11 +1,11 @@
-import { getEventEndFromDuration, type IcsAttendee, type IcsDateObject, type IcsEvent } from "ts-ics"
-import "./eventEditPopup.css"
-import { attendeeRoleTypes, type Calendar, type CalendarEvent, type EventEditCallback } from "../types"
-import { Popup } from "../popup/popup"
-import { parseHtml } from "../helpers/dom-helper"
-import { isEventAllDay, offsetDate } from "../helpers/ics-helper"
-import { tzlib_get_ical_block, tzlib_get_offset, tzlib_get_timezones } from "timezones-ical-library"
-import i18n from "../i18n"
+import { getEventEndFromDuration, type IcsAttendee, type IcsDateObject, type IcsEvent } from 'ts-ics'
+import './eventEditPopup.css'
+import { attendeeRoleTypes, type Calendar, type CalendarEvent, type EventEditCallback } from '../types'
+import { Popup } from '../popup/popup'
+import { parseHtml } from '../helpers/dom-helper'
+import { isEventAllDay, offsetDate } from '../helpers/ics-helper'
+import { tzlib_get_ical_block, tzlib_get_offset, tzlib_get_timezones } from 'timezones-ical-library'
+import i18n from '../i18n'
 
 const html = /*html*/`
 <form name="event" class="event-edit form">
@@ -93,7 +93,7 @@ export class EventEditPopup {
     const timezones = tzlib_get_timezones() as string[]
 
     this._popup = new Popup(target)
-    const translations = i18n.getResourceBundle(i18n.language, "translation")
+    const translations = i18n.getResourceBundle(i18n.language, 'translation')
     this._form = parseHtml<HTMLFormElement>(html, { t: translations, timezones: timezones })[0]
     this._popup.content.appendChild(this._form)
 
@@ -102,11 +102,11 @@ export class EventEditPopup {
     const addAttendee = this._form.querySelector<HTMLDivElement>('#event-edit-attendees > button')!
     const cancel = this._form.querySelector<HTMLButtonElement>('.form-buttons [name="cancel"]')!
     const remove = this._form.querySelector<HTMLButtonElement>('.form-buttons [name="delete"]')!
-    
+
     this._form.addEventListener('submit', async (e) => { e.preventDefault(); await this.save() })
-    addAttendee.addEventListener("click", () => this.addAttendee({ email: "" }))
-    cancel.addEventListener("click", this.cancel)
-    remove.addEventListener("click", this.delete)
+    addAttendee.addEventListener('click', () => this.addAttendee({ email: '' }))
+    cancel.addEventListener('click', this.cancel)
+    remove.addEventListener('click', this.delete)
   }
 
   public destroy = () => {
@@ -116,36 +116,47 @@ export class EventEditPopup {
   private setCalendars = (calendars: Calendar[]) => {
     const calendarElements = parseHtml<HTMLOptionElement>(calendarsHtml, {
       calendars,
-      t: i18n.getResourceBundle(i18n.language, "translation")
+      t: i18n.getResourceBundle(i18n.language, 'translation'),
     })
-    this._calendar.innerHTML = ""
+    this._calendar.innerHTML = ''
     this._calendar.append(...Array.from(calendarElements))
   }
 
   private addAttendee = (attendee: IcsAttendee) => {
     const element = parseHtml(attendeeHtml, {
       ...attendee,
-      role: attendee.role || "REQ-PARTICIPANT",
+      role: attendee.role || 'REQ-PARTICIPANT',
       roles: attendeeRoleTypes.map(role => ({ key: role, translation: i18n.t(role) })),
-      t: i18n.getResourceBundle(i18n.language, "translation"),
+      t: i18n.getResourceBundle(i18n.language, 'translation'),
     })[0]
     this._attendees.appendChild(element)
 
-    const remove = element.querySelector<HTMLButtonElement>("button")!
+    const remove = element.querySelector<HTMLButtonElement>('button')!
     const role = element.querySelector<HTMLSelectElement>('select[name="role"]')!
 
-    remove.addEventListener("click", () => element.remove())
-    role.value = attendee.role || "REQ-PARTICIPANT"
+    remove.addEventListener('click', () => element.remove())
+    role.value = attendee.role || 'REQ-PARTICIPANT'
   }
 
-  public onCreate = (_: Event, calendars: Calendar[], calendarEvent: CalendarEvent, handleCreate: EventEditCallback) => {
-    this._form.classList.toggle("event-edit-create", true)
+  public onCreate = (
+    _: Event,
+    calendars: Calendar[],
+    calendarEvent: CalendarEvent,
+    handleCreate: EventEditCallback,
+  ) => {
+    this._form.classList.toggle('event-edit-create', true)
     this._handleSave = handleCreate
     this._handleDelete = null
     this.open(calendarEvent, calendars)
   }
-  public onUpdate = (_: Event, calendars: Calendar[], calendarEvent: CalendarEvent, handleUpdate: EventEditCallback, handleDelete: EventEditCallback) => {
-    this._form.classList.toggle("event-edit-create", false)
+  public onUpdate = (
+    _: Event,
+    calendars: Calendar[],
+    calendarEvent: CalendarEvent,
+    handleUpdate: EventEditCallback,
+    handleDelete: EventEditCallback,
+  ) => {
+    this._form.classList.toggle('event-edit-create', false)
     this._handleSave = handleUpdate
     this._handleDelete = handleDelete
     this.open(calendarEvent, calendars)
@@ -161,27 +172,32 @@ export class EventEditPopup {
     this._calendarEvent = calendarEvent
     const { calendarUrl, event } = calendarEvent
 
-    const localStart = event.start.local ?? { date: event.start.date, timezone: "UTC", tzoffset: "+0000" }
-    const end = event.end ?? offsetDate(localStart, getEventEndFromDuration(event.start.date, event.duration).getTime() - event.start.date.getTime())
-    const localEnd = end.local ?? { date: end.date, timezone: "UTC", tzoffset: "+0000" }
+    const localStart = event.start.local ?? { date: event.start.date, timezone: 'UTC', tzoffset: '+0000' }
+    const end = event.end ??
+      offsetDate(
+        localStart,
+        getEventEndFromDuration(event.start.date, event.duration).getTime() - event.start.date.getTime(),
+      )
+    const localEnd = end.local ?? { date: end.date, timezone: 'UTC', tzoffset: '+0000' }
 
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const inputs: { [key: string]: any } = this._form.elements
-    inputs["calendar"].value = calendarUrl
-    inputs["summary"].value = event.summary ?? ""
-    inputs["location"].value = event.location ?? ""
-    inputs["allday"].checked = isEventAllDay(event)
-    inputs["start-date"].value = localStart.date.toISOString().split("T")[0]
-    inputs["start-time"].value = localStart.date.toISOString().split("T")[1].slice(0, 5)
-    inputs["start-timezone"].value = localStart.timezone
-    inputs["end-date"].value = localEnd.date.toISOString().split("T")[0]
-    inputs["end-time"].value = localEnd.date.toISOString().split("T")[1].slice(0, 5)
-    inputs["end-timezone"].value = localEnd.timezone
-    inputs["description"].value = event.description ?? "" // TODO rich text
-    inputs["email-organizer"].value = event.organizer?.email ?? ""
-    inputs["name-organizer"].value = event.organizer?.name ?? ""
+    inputs['calendar'].value = calendarUrl
+    inputs['summary'].value = event.summary ?? ''
+    inputs['location'].value = event.location ?? ''
+    inputs['allday'].checked = isEventAllDay(event)
+    inputs['start-date'].value = localStart.date.toISOString().split('T')[0]
+    inputs['start-time'].value = localStart.date.toISOString().split('T')[1].slice(0, 5)
+    inputs['start-timezone'].value = localStart.timezone
+    inputs['end-date'].value = localEnd.date.toISOString().split('T')[0]
+    inputs['end-time'].value = localEnd.date.toISOString().split('T')[1].slice(0, 5)
+    inputs['end-timezone'].value = localEnd.timezone
+    inputs['description'].value = event.description ?? '' // TODO rich text
+    inputs['email-organizer'].value = event.organizer?.email ?? ''
+    inputs['name-organizer'].value = event.organizer?.name ?? ''
 
-    this._attendees.innerHTML = ""
+    this._attendees.innerHTML = ''
     for (const attendee of event.attendees ?? []) this.addAttendee(attendee)
 
     this._popup.setVisible(true)
@@ -189,7 +205,7 @@ export class EventEditPopup {
 
   public save = async () => {
     const data = new FormData(this._form)
-    const allDay = !!data.get("allday")
+    const allDay = !!data.get('allday')
 
     const getTimeObject = (name: string): IcsDateObject => {
       const date = data.get(`${name}-date`) as string
@@ -197,42 +213,42 @@ export class EventEditPopup {
       const timezone = data.get(`${name}-timezone`) as string
       const offset = tzlib_get_offset(timezone, date, time)
       return {
-        date: new Date(date + (allDay ? "" : `T${time}${offset}`)),
-        type: allDay ? "DATE" : "DATE-TIME",
-        local: timezone === "UTC" ? undefined : {
-          date: new Date(date + (allDay ? "" : `T${time}Z`)),
+        date: new Date(date + (allDay ? '' : `T${time}${offset}`)),
+        type: allDay ? 'DATE' : 'DATE-TIME',
+        local: timezone === 'UTC' ? undefined : {
+          date: new Date(date + (allDay ? '' : `T${time}Z`)),
           timezone: tzlib_get_ical_block(timezone)[1].slice(5),
-          tzoffset: offset
-        }
+          tzoffset: offset,
+        },
       }
     }
 
-    const emails = data.getAll("email") as string[]
-    const names = data.getAll("name") as string[]
-    const roles = data.getAll("role") as string[]
+    const emails = data.getAll('email') as string[]
+    const names = data.getAll('name') as string[]
+    const roles = data.getAll('role') as string[]
 
-    // @ts-ignore
+    // @ts-expect-error either end or duration will be defined
     const event: IcsEvent = {
       ...this._calendarEvent!.event,
-      summary: data.get("summary") as string,
-      location: data.get("location") as string || undefined,
-      start: getTimeObject("start"),
-      end: getTimeObject("end"),
-      description: data.get("description") as string || undefined,
-      organizer: data.get("email-organizer") ?
+      summary: data.get('summary') as string,
+      location: data.get('location') as string || undefined,
+      start: getTimeObject('start'),
+      end: getTimeObject('end'),
+      description: data.get('description') as string || undefined,
+      organizer: data.get('email-organizer') ?
         {
           ...this._calendarEvent!.event!.organizer,
-          email: data.get("email-organizer") as string,
-          name: data.get("name-organizer") as string || undefined
+          email: data.get('email-organizer') as string,
+          name: data.get('name-organizer') as string || undefined,
         } :
         undefined,
       attendees: emails.map((e, i) => ({
         email: e,
         name: names[i],
-        role: roles[i]
-      })) || undefined
+        role: roles[i],
+      })) || undefined,
     }
-    const response = await this._handleSave!({ calendarUrl: data.get("calendar") as string, event })
+    const response = await this._handleSave!({ calendarUrl: data.get('calendar') as string, event })
     if (response.ok) this._popup.setVisible(false)
   }
 
