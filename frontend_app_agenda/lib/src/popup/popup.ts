@@ -19,7 +19,6 @@ export class Popup {
 
     window.addEventListener('click', e => {
       if (this._node.classList.contains('popup-hidden')) return
-      console.log(e, this._node.className)
       if (e.target instanceof Element && (e.target === this.content || e.target.contains(this.content))) {
         this.setVisible(false)
       }
@@ -32,6 +31,5 @@ export class Popup {
 
   setVisible = (visible: boolean) => {
     this._node.classList.toggle('popup-hidden', !visible)
-    console.log(this._node.className)
   }
 }

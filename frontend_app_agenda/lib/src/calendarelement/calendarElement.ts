@@ -153,22 +153,21 @@ export class CalendarElement {
   }
 
   private fetchAndLoadEvents = async (info: EventCalendar.FetchInfo): Promise<EventCalendar.EventInput[]> => {
-    const calendarObjects = await this._client.fetchAndLoadEvents(info.startStr, info.endStr)
-    const calendars = this._client.getCalendars()
-    return calendarObjects.flatMap((cos, index) => cos.flatMap(co => co.data.events ?? []).map(event => ({
+    const calendarEvents = await this._client.fetchAndLoadEvents(info.startStr, info.endStr)
+    return calendarEvents.map(({event, calendarUrl}) => ({
       title: event.summary,
       allDay: isEventAllDay(event),
       start: event.start.date,
       end: getEventEnd(event),
-      backgroundColor: calendars[index].calendarColor,
+      backgroundColor: this._client.getCalendarByUrl(calendarUrl)!.calendarColor,
       extendedProps: { uid: event.uid, recurrenceId: event.recurrenceId } as EventUid,
-    })))
+    }))
   }
 
   private isEventVisible = (info: EventCalendar.EventFilterInfo) => {
-    const eventData = this._client.getEventDataByUid(info.event.extendedProps as EventUid)
+    const eventData = this._client.getCalendarEvent(info.event.extendedProps as EventUid)
     if (!eventData) return false
-    return this._selectedCalendars.has(eventData.calendar.url)
+    return this._selectedCalendars.has(eventData.calendarUrl)
   }
 
   private onClickCalendars = (event: MouseEvent) => {
@@ -207,27 +206,27 @@ export class CalendarElement {
 
   private onChangeEventDates = async (info: EventCalendar.EventDropInfo | EventCalendar.EventResizeInfo) => {
     const uid = info.oldEvent.extendedProps as EventUid
-    const eventData = this._client.getEventDataByUid(uid)
-    if (!eventData) return
+    const calendarEvent = this._client.getCalendarEvent(uid)
+    if (!calendarEvent) return
 
-    const newEvent = { ...eventData.event }
+    const newEvent = { ...calendarEvent.event }
     const startDelta = info.event.start.getTime() - info.oldEvent.start.getTime()
     newEvent.start = offsetDate(newEvent.start, startDelta)
     if (newEvent.end) {
       const endDelta = info.event.end.getTime() - info.oldEvent.end.getTime()
       newEvent.end = offsetDate(newEvent.end, endDelta)
     }
-    const response = await this.handleUpdateEvent({ calendarUrl: eventData.calendar.url, event: newEvent })
+    const response = await this.handleUpdateEvent({ calendarUrl: calendarEvent.calendarUrl, event: newEvent })
     if (!response.ok) info.revert()
   }
 
   private onEventClicked = (info: EventCalendar.EventClickInfo) => {
     const uid = info.event.extendedProps as EventUid
-    const eventData = this._client.getEventDataByUid(uid)
-    if (!eventData) return
+    const calendarEvent = this._client.getCalendarEvent(uid)
+    if (!calendarEvent) return
     this._eventHandlers!.onUpdateEvent(
       info.jsEvent,
-      this._client.getCalendars(), { calendarUrl: eventData.calendar.url, event: eventData.event },
+      this._client.getCalendars(), calendarEvent,
       this.handleUpdateEvent, this.handleDeleteEvent,
     )
   }

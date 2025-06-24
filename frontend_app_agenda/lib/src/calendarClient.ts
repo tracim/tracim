@@ -8,6 +8,7 @@ export class CalendarClient {
 
   private _calendars: Calendar[] = []
   private _calendarObjectsPerCalendar: CalendarObject[][] = []
+  private _recurringObjectsPerCalendar: CalendarObject[][] = []
 
   public loadCalendars = async (sources: (ServerSource | CalendarSource)[]) => {
     const calendarsPerSource = await Promise.all(sources.map(source => fetchCalendars(source)))
@@ -15,22 +16,34 @@ export class CalendarClient {
     this._calendarObjectsPerCalendar = this._calendars.map(() => [])
   }
 
-  public destroy = () => {
-
-  }
-
   // TODO needs radicale 3.2
-  public fetchAndLoadEvents = async (start: string, end: string): Promise<CalendarObject[][]> => {
-    this._calendarObjectsPerCalendar = await Promise.all(
+  public fetchAndLoadEvents = async (start: string, end: string): Promise<CalendarEvent[]> => {
+    const allObjects = await Promise.all(
       this._calendars.map(calendar => fetchCalendarObjects(calendar, { start, end }, true)),
     )
-    return this._calendarObjectsPerCalendar
+    this._calendarObjectsPerCalendar = allObjects.map(objs => objs.calendarObjects)
+    this._recurringObjectsPerCalendar = allObjects.map(objs => objs.calendarObjects)
+    return this._calendarObjectsPerCalendar.flatMap(cos =>
+      cos
+        .flatMap(co => co.data.events ?? [])
+        .map(event => ({ event: event, calendarUrl: cos[0].calendarUrl })))
   }
 
   public getCalendars = () => this._calendars
-  public getCalendarObjects = () => this._calendarObjectsPerCalendar
 
-  public getEventDataByUid = (uid: EventUid): EventData | undefined => {
+  // TODO return another type that includes the "original" event for recurring events
+  public getCalendarEvent = (uid: EventUid): CalendarEvent | undefined => {
+    for (const calendarObject of this._calendarObjectsPerCalendar.flat()) {
+      for (const event of calendarObject.data.events ?? []) {
+        if (!isSameEvent(event, uid)) continue
+        return { event, calendarUrl: calendarObject.calendarUrl }
+      }
+    }
+    return undefined
+  }
+
+  // TODO handle events from _recurringObjectsPerCalendar
+  private getEventDataByUid = (uid: EventUid): EventData | undefined => {
     for (const calendarObject of this._calendarObjectsPerCalendar.flat()) {
       for (const event of calendarObject.data.events ?? []) {
         if (!isSameEvent(event, uid)) continue

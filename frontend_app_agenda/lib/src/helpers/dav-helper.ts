@@ -35,19 +35,40 @@ export async function fetchCalendarObjects(
   calendar: Calendar,
   timeRange?: { start: string; end: string; },
   expand?: boolean,
-): Promise<CalendarObject[]> {
+): Promise<{ calendarObjects: CalendarObject[], recurringObjects: CalendarObject[]}> {
   const davCalendarObjects = await davFetchCalendarObjects({
     calendar: calendar,
     timeRange, expand,
     headers: calendar.headers,
     fetchOptions: calendar.fetchOptions,
   })
-  return davCalendarObjects.map(o => ({
+  const calendarObjects = davCalendarObjects.map(o => ({
     url: o.url,
     etag: o.etag,
     data: convertIcsCalendar(undefined, o.data),
     calendarUrl: calendar.url,
   }))
+  const recurringObjectsUrls = new Set(
+    calendarObjects
+      .filter(c => c.data.events?.find(e => e.recurrenceId))
+      .map(c => c.url),
+  )
+  const davDavRecurringObjects = recurringObjectsUrls.size == 0 ?
+    [] :
+    await davFetchCalendarObjects({
+      calendar: calendar,
+      objectUrls: Array.from(recurringObjectsUrls),
+      timeRange, expand,
+      headers: calendar.headers,
+      fetchOptions: calendar.fetchOptions,
+    })
+  const recurringObjects = davDavRecurringObjects.map(o => ({
+    url: o.url,
+    etag: o.etag,
+    data: convertIcsCalendar(undefined, o.data),
+    calendarUrl: calendar.url,
+  }))
+  return { calendarObjects, recurringObjects}
 }
 
 export async function createCalendarObject(
