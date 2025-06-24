@@ -25,7 +25,6 @@ export class CalendarClient {
     return this._calendarObjectsPerCalendar
   }
 
-  // TODO turn into a getter
   public getCalendars = () => this._calendars
   public getCalendarObjects = () => this._calendarObjectsPerCalendar
 

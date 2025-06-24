@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Algoo - Calendar</title>
+</head>
+
+<body>
+  <div id="calendar-client"></div>
+  <script type="module">
+    import { getBasicAuthHeaders } from "tsdav";
+    import { createCalendar } from "./src";
+
+    const username = window.prompt("username")
+    const password = window.prompt("password")
+    createCalendar(
+      [{ serverUrl: "http://localhost:5232", headers: getBasicAuthHeaders({ username, password }) }],
+      document.getElementById("calendar-client"),
+    )
+  </script>
+</body>
+
+</html>

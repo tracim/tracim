@@ -3,6 +3,10 @@ import type { DAVCalendar } from "tsdav"
 
 type DomEvent = GlobalEventHandlersEventMap[keyof GlobalEventHandlersEventMap];
 
+export type CustomTranslation = {
+  [lng: string]: any,
+}
+
 // TODO add <TCalendarUid = any>
 // TODO add options to support IcsEvent custom props
 export type Calendar = DAVCalendar & {

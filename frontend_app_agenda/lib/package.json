@@ -1,0 +1,49 @@
+{
+  "name": "@algoo/calendar-client",
+  "version": "1.0.0",
+  "title": "Algoo calendar client",
+  "description": "Standalone frontend calendar",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "rimraf build dist && webpack --progress",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@event-calendar/core": "^4.4.0",
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "i18next": "^25.2.1",
+    "i18next-browser-languagedetector": "^8.2.0",
+    "i18next-resources-to-backend": "^1.2.1",
+    "mustache": "^4.2.0",
+    "timezones-ical-library": "^1.10.0",
+    "ts-ics": "^2.1.7",
+    "tsdav": "^2.1.4"
+  },
+  "devDependencies": {
+    "@types/event-calendar__core": "^4.4.0",
+    "@types/mustache": "^4.2.6",
+    "@types/node": "^24.0.3",
+    "css-loader": "^7.1.2",
+    "dts-bundle-webpack": "^1.0.2",
+    "node-polyfill-webpack-plugin": "^4.1.0",
+    "rimraf": "^6.0.1",
+    "style-loader": "^4.0.0",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
+    "vite-plugin-checker": "^0.9.3",
+    "vite-plugin-node-polyfills": "^0.23.0",
+    "webpack": "^5.99.9",
+    "webpack-cli": "^6.0.1"
+  },
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.umd.cjs"
+    },
+    "./style.css": "./dist/index.css"
+  }
+}

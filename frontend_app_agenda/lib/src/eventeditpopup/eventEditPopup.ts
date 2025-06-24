@@ -5,21 +5,22 @@ import { Popup } from "../popup/popup"
 import { parseHtml } from "../helpers/dom-helper"
 import { isEventAllDay, offsetDate } from "../helpers/ics-helper"
 import { tzlib_get_ical_block, tzlib_get_offset, tzlib_get_timezones } from "timezones-ical-library"
+import i18n from "../i18n"
 
 const html = /*html*/`
 <form name="event" class="event-edit form">
   <div class="form-content">
-    <label for="event-edit-calendar">Calendar</label>
+    <label for="event-edit-calendar">{{t.calendar_one}}</label>
     <select id="event-edit-calendar" name="calendar" required="">
 
     </select>
-    <label for="event-edit-summary">Title</label>
+    <label for="event-edit-summary">{{t.title}}</label>
     <input type="text" id="event-edit-summary" name="summary" required="" />
-    <label for="event-edit-location">Location</label>
+    <label for="event-edit-location">{{t.location}}</label>
     <input type="text" id="event-edit-location" name="location" />
-    <label for="event-edit-allday">All day</label>
+    <label for="event-edit-allday">{{t.allDay}}</label>
     <input type="checkbox" id="event-edit-allday" name="allday" />
-    <label for="event-edit-start">Start</label>
+    <label for="event-edit-start">{{t.start}}</label>
     <div id="event-edit-start" class="event-edit-datetime">
       <input type="date" name="start-date" required="" />
       <input type="time" name="start-time" class="event-edit-not-allday" required="" />
@@ -29,7 +30,7 @@ const html = /*html*/`
         {{/timezones}}
         </select>
     </div>
-    <label for="event-edit-end">End</label>
+    <label for="event-edit-end">{{t.end}}</label>
     <div id="event-edit-end" class="event-edit-datetime">
       <input type="date" name="end-date" required="" />
       <input type="time" name="end-time" class="event-edit-not-allday" required="" />
@@ -39,39 +40,39 @@ const html = /*html*/`
         {{/timezones}}
       </select>
     </div>
-    <label for="event-edit-organizer">Organizer</label>
+    <label for="event-edit-organizer">{{t.organizer}}</label>
     <div id="event-edit-organizer" class="form-attendee">
-        <input type="email" name="email-organizer" placeholder="email" />
-        <input type="text" name="name-organizer" placeholder="name" />
+        <input type="email" name="email-organizer" placeholder="{{t.email}}" />
+        <input type="text" name="name-organizer" placeholder="{{t.name}}" />
     </div>
-    <label for="event-edit-attendees">Attendees</label>
+    <label for="event-edit-attendees">{{t.attendee_zero}}</label>
     <div id="event-edit-attendees" >
         <div class="form-list"> </div>
-        <button type="button">Add attendee</button>
+        <button type="button">{{t.addAttendee}}</button>
     </div>
-    <label for="event-edit-description">Description</label>
+    <label for="event-edit-description">{{t.description}}</label>
     <textarea id="event-edit-description" name="description"> </textarea>
   </div>
   <div class="form-buttons">
-    <button name="delete" type="button">Delete</button>
-    <button name="cancel" type="button">Cancel</button>
-    <button name="submit" type="submit">Submit</button>
+    <button name="delete" type="button">{{t.delete}}</button>
+    <button name="cancel" type="button">{{t.cancel}}</button>
+    <button name="submit" type="submit">{{t.save}}</button>
   </div>
 </form>`
 
 const calendarsHtml = /*html*/`
-<option value="" selected disabled hidden>-- Choose a calendar --</option>
+<option value="" selected disabled hidden>{{t.chooseACalendar}}</option>
 {{#calendars}}
   <option value="{{url}}">{{displayName}}</option>
 {{/calendars}}`
 
 const attendeeHtml = /*html*/`
 <div class="event-edit-attendee">
-  <input type="email" name="email" placeholder="email" required value="{{email}}"/>
-  <input type="name" name="name" placeholder="name" required value="{{name}}"/>
+  <input type="email" name="email" placeholder="{{t.email}}" required value="{{email}}"/>
+  <input type="name" name="name" placeholder="{{t.name}}" required value="{{name}}"/>
   <select name="role" value="{{role}}" required>
     {{#roles}}
-      <option value="{{.}}">{{.}}</option>
+      <option value="{{key}}">{{translation}}</option>
     {{/roles}}
   </select>
   <button type="button" name="remove">X</button>
@@ -92,7 +93,8 @@ export class EventEditPopup {
     const timezones = tzlib_get_timezones() as string[]
 
     this._popup = new Popup(target)
-    this._form = parseHtml<HTMLFormElement>(html, { timezones: timezones })[0]
+    const translations = i18n.getResourceBundle(i18n.language, "translation")
+    this._form = parseHtml<HTMLFormElement>(html, { t: translations, timezones: timezones })[0]
     this._popup.content.appendChild(this._form)
 
     this._calendar = this._form.querySelector<HTMLSelectElement>('#event-edit-calendar')!
@@ -111,8 +113,22 @@ export class EventEditPopup {
     // TODO
   }
 
+  private setCalendars = (calendars: Calendar[]) => {
+    const calendarElements = parseHtml<HTMLOptionElement>(calendarsHtml, {
+      calendars,
+      t: i18n.getResourceBundle(i18n.language, "translation")
+    })
+    this._calendar.innerHTML = ""
+    this._calendar.append(...Array.from(calendarElements))
+  }
+
   private addAttendee = (attendee: IcsAttendee) => {
-    const element = parseHtml(attendeeHtml, { ...attendee, role: attendee.role || "REQ-PARTICIPANT", roles: attendeeRoleTypes })[0]
+    const element = parseHtml(attendeeHtml, {
+      ...attendee,
+      role: attendee.role || "REQ-PARTICIPANT",
+      roles: attendeeRoleTypes.map(role => ({ key: role, translation: i18n.t(role) })),
+      t: i18n.getResourceBundle(i18n.language, "translation"),
+    })[0]
     this._attendees.appendChild(element)
 
     const remove = element.querySelector<HTMLButtonElement>("button")!
@@ -140,9 +156,7 @@ export class EventEditPopup {
 
   public open = (calendarEvent: CalendarEvent, calendars: Calendar[]) => {
 
-    this._calendar.innerHTML = ""
-    this._calendar.append(...Array.from(parseHtml<HTMLOptionElement>(calendarsHtml, { calendars })))
-
+    this.setCalendars(calendars)
 
     this._calendarEvent = calendarEvent
     const { calendarUrl, event } = calendarEvent
@@ -177,7 +191,6 @@ export class EventEditPopup {
     const data = new FormData(this._form)
     const allDay = !!data.get("allday")
 
-    // TODO move to a helper
     const getTimeObject = (name: string): IcsDateObject => {
       const date = data.get(`${name}-date`) as string
       const time = data.get(`${name}-time`) as string

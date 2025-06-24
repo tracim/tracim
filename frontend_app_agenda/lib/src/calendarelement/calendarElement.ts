@@ -11,7 +11,7 @@ import { CalendarSelectDropdown } from '../calendarselectdropdown/calendarSelect
 import { icon, library } from '@fortawesome/fontawesome-svg-core';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 import { CalendarClient } from '../calendarClient';
-
+import i18n from "../i18n"
 library.add(faRefresh)
 // TODO localize
 export class CalendarElement {
@@ -78,7 +78,7 @@ export class CalendarElement {
                         click: this.refreshEvents
                     },
                     calendars: {
-                        text: "Calendars",
+                        text: i18n.t("calendar", { count: 0 }),
                         click: this.onClickCalendars,
                     }
                 },
@@ -87,6 +87,8 @@ export class CalendarElement {
                     center: 'title',
                     end: (options?.views ?? ["timeGridDay", "timeGridWeek", "dayGridMonth", "listWeek"]).join(",")
                 },
+                buttonText: i18n.getResourceBundle(i18n.language, "translation"),
+                allDayContent: i18n.t("allDay"),
                 dayMaxEvents: true,
                 nowIndicator: true,
 
@@ -226,7 +228,6 @@ export class CalendarElement {
         return response
     }
 
-    // TODO change an event of calendar
     private handleUpdateEvent = async (calendarEvent: CalendarEvent) => {
         const { response, ical } = await this._client.updateEvent(calendarEvent)
         if (response.ok) {
