@@ -18,10 +18,10 @@ import {
 import {
   AVATAR_SIZE,
   Avatar,
-  formatAbsoluteDate
+  formatAbsoluteDate,
+  isPatternIncludedInString
 } from 'tracim_frontend_lib'
 import { escape as escapeHtml } from 'lodash'
-import { isPatternIncludedInString } from '../container/NotificationWall.jsx'
 
 export const NotificationItem = props => {
   const { notification, user } = props

@@ -16,12 +16,13 @@ cardWidth = 280px
       opacity 70%
     &__title
       display flex
+      align-items center
+      margin-bottom textSpacing
 
       & strong
         flex 1
         overflow-wrap anywhere
         hyphens auto
-        margin-bottom textSpacing
         unicode-bidi plaintext
 
       & > button
@@ -57,6 +58,8 @@ cardWidth = 280px
         display flex
         flex-direction row
         justify-content space-between
+        align-items center
+        margin-bottom textSpacing
         &__kickoff, &__deadline
           display inline
           & i
@@ -96,3 +99,13 @@ cardWidth = 280px
     color offWhite
   &__black__text__color
     color offBlack
+
+// INFO - CH - 2025-06-20 - Css trick to hide the drag handle of a card when the
+// card is hidden by the filter input.
+// Without it, even if the renderCard function return null, the drag handle as a height that is visible
+// inside the columns.
+.react-kanban-board
+  & .kanban__card--hidden
+    display none
+  & [data-rbd-draggable-context-id]:has(> div > .kanban__card--hidden)
+    display none

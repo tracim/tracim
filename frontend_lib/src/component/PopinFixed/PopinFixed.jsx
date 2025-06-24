@@ -1,8 +1,6 @@
 import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
-import PopinFixedHeader from './PopinFixedHeader.jsx'
-import PopinFixedContent from './PopinFixedContent.jsx'
 import { CUSTOM_EVENT } from '../../customEvent.js'
 import { TracimComponent } from '../../tracimComponent.js'
 
@@ -54,18 +52,10 @@ class PopinFixed extends React.Component {
 export default TracimComponent(PopinFixed)
 
 PopinFixed.propTypes = {
-  // from http://www.mattzabriskie.com/blog/react-validating-children
   children: PropTypes.oneOfType([
-    PropTypes.arrayOf((children, key, componentName /* , location, propFullName */) => {
-      if (
-        children.length > 2 ||
-        children[0].type !== PopinFixedHeader ||
-        children[1].type !== PopinFixedContent
-      ) {
-        return new Error(`PropType Error: childrens of ${componentName} must be: 1 PopinFixedHeader and 1 PopinFixedContent.`)
-      }
-    }),
-    PropTypes.element
+    PropTypes.element,
+    PropTypes.array,
+    PropTypes.object
   ]).isRequired,
   customClass: PropTypes.string,
   visible: PropTypes.bool

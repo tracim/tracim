@@ -46,18 +46,6 @@ const NUMBER_OF_CRITERIA = {
   TWO: 2
 }
 
-export const isPatternIncludedInString = (string, pattern) => {
-  if (string === undefined || string === null) return false
-  if (pattern === '') return true
-
-  // INFO - CH - 2023-12-07 - Implementation to match any words in pattern
-  // const patternList = pattern.trim().split(' ')
-  // return patternList.some(p => string.toLowerCase().includes(p) === true)
-
-  // INFO - CH - 2023-12-07 - Implementation to match the whole pattern
-  return string.toLowerCase().includes(pattern.trim().toLowerCase()) === true
-}
-
 const getMainContentId = (notification) => {
   return notification.type.includes(CONTENT_TYPE.COMMENT) ||
     notification.type.includes(CONTENT_TYPE.TODO) ||

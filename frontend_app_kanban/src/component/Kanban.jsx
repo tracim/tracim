@@ -28,7 +28,12 @@ import {
   sendGlobalFlashMessage
 } from 'tracim_frontend_lib'
 
-import { KANBAN_MIME_TYPE, KANBAN_FILE_EXTENSION, KANBAN_DEFAULT_BACKGROUND_COLOR } from '../helper.js'
+import {
+  KANBAN_MIME_TYPE,
+  KANBAN_FILE_EXTENSION,
+  KANBAN_DEFAULT_BACKGROUND_COLOR,
+  isCardMatchFilter
+} from '../helper.js'
 import KanbanCard from './KanbanCard.jsx'
 import KanbanCardEditor from './KanbanCardEditor.jsx'
 import KanbanColumnEditor from './KanbanColumnEditor.jsx'
@@ -370,18 +375,27 @@ export class Kanban extends React.Component {
                   onRemoveColumn={this.handleRemoveColumn}
                 />
               )}
-              renderCard={card => (
-                <KanbanCard
-                  config={props.config}
-                  customColor={props.config.hexcolor}
-                  readOnly={!changesAllowed}
-                  hideButtonsWhenReadOnly={props.readOnly}
-                  card={card}
-                  onEditCard={this.handleEditCard}
-                  onEditCardContent={this.handleEditCardContent}
-                  onRemoveCard={this.handleRemoveCard}
-                />
-              )}
+              renderCard={card => {
+                const shouldDisplayCard = isCardMatchFilter(
+                  card, props.filterInput, props.config.workspace.memberList
+                )
+                if (shouldDisplayCard === false) {
+                  return <div className='kanban__card--hidden' />
+                }
+
+                return (
+                  <KanbanCard
+                    config={props.config}
+                    customColor={props.config.hexcolor}
+                    readOnly={!changesAllowed}
+                    hideButtonsWhenReadOnly={props.readOnly}
+                    card={card}
+                    onEditCard={this.handleEditCard}
+                    onEditCardContent={this.handleEditCardContent}
+                    onRemoveCard={this.handleRemoveCard}
+                  />
+                )
+              }}
             >
               {state.board}
             </Board>
@@ -436,12 +450,14 @@ Kanban.propTypes = {
   content: PropTypes.object.isRequired,
   // End of required props /////////////////////////////////////////////////////
   language: PropTypes.string,
-  readOnly: PropTypes.bool
+  readOnly: PropTypes.bool,
+  filterInput: PropTypes.string
 }
 
 Kanban.defaultProps = {
   language: 'en',
-  readOnly: false
+  readOnly: false,
+  filterInput: ''
 }
 
 export default translate()(Kanban)
