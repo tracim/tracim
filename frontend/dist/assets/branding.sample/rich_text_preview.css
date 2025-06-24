@@ -67,6 +67,8 @@ section {
   max-height: 128mm;
 }
 
+table, td { border: 1px solid #333; border-collapse: collapse; }
+
 @page {
   size: A4 portrait;
   margin: 2cm;
