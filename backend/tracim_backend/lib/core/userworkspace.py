@@ -128,7 +128,7 @@ class UserWorkspaceConfigApi(object):
                 user = UserApi(None, self._session, self._config).get_one(role.user_id)
                 if user.profile == Profile.GUEST:
                     raise GuestUserNotAllowed(
-                        "Guest users aren't allowed to be {}".format(role_level)
+                        "Guest users are not allowed to be {}".format(role_level)
                     )
             if (
                 role.role == WorkspaceRoles.WORKSPACE_MANAGER.level
@@ -175,7 +175,7 @@ class UserWorkspaceConfigApi(object):
                 and nb_user_workspace >= self._config.LIMITATION__MAX_GUEST_USER_SPACE_NB
             ):
                 raise TooManyWorkspacesError(
-                    "The guest user {} has already reached the maximum of {} workspace for guest user".format(
+                    "The user {} has reached {} workspace subscriptions (this is the max subscription nb for guest users)".format(
                         user.user_id, self._config.LIMITATION__MAX_GUEST_USER_SPACE_NB
                     )
                 )

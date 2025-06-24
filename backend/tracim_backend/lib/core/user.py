@@ -1778,15 +1778,15 @@ need to be in every workspace you include."
             and len(user_workspaces) > self._config.LIMITATION__MAX_GUEST_USER_SPACE_NB
         ):
             raise TooManyWorkspacesError(
-                "The user {} is in more space than the number allowed for guest".format(
-                    user.user_id
+                "Space limit reached for user {}. Guest accounts can only access {} spaces".format(
+                    user.user_id, self._config.LIMITATION__MAX_GUEST_USER_SPACE_NB
                 )
             )
         for user_workspace in user_workspaces:
             if user_workspace.role > WorkspaceRoles.CONTRIBUTOR.level:
                 raise GuestUserNotAllowed(
-                    "The user {} has a role too high level in some space to become a guest".format(
-                        user.user_id
+                    "The user {} has a role too high level in space {} to become a guest".format(
+                        user.user_id, user_workspace.workspace_id
                     )
                 )
 
