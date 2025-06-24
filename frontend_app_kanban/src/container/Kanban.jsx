@@ -42,7 +42,6 @@ import {
   sortListByMultipleCriteria,
   defaultApiContent,
   FilterBar,
-  defaultApiContent,
   AppProperty,
   AppDescription,
   displayFileSize,
