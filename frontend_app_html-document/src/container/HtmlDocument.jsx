@@ -599,7 +599,9 @@ export class HtmlDocument extends React.Component {
   // see https://github.com/tracim/tracim/issues/1804
   getDownloadPDFUrl = ({ config: { apiUrl }, content, mode }) => {
     // FIXME - b.l - refactor urls
-    const label = content.label ? encodeURIComponent(content.label + '.pdf') : 'unknown.pdf'
+    const label = content.label
+      ? encodeURIComponent(content.label.replace('/', ' ') + '.pdf')
+      : 'unknown.pdf'
     const urlRevisionPart = mode === APP_FEATURE_MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''
     return `${apiUrl}/workspaces/${content.workspace_id}/html-documents/${content.content_id}/${urlRevisionPart}preview/pdf/full/${label}?force_download=1&revision_id=${content.current_revision_id}`
   }

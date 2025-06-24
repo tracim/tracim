@@ -852,13 +852,21 @@ export class File extends React.Component {
 
   getDownloadPdfPageUrl = ({ config: { apiUrl }, content, mode, fileCurrentPage }) => {
     // FIXME - b.l - refactor urls
-    const filenameNoExtension = content.filename ? encodeURIComponent(removeExtensionOfFilename(content.filename) + '.pdf') : 'unknown.pdf'
+    const filenameNoExtension = content.filename
+      ? encodeURIComponent(
+        removeExtensionOfFilename(content.filename.replace('/', ' ')) + '.pdf'
+      )
+      : 'unknown.pdf'
     return `${this.getDownloadBaseUrl(apiUrl, content, mode)}preview/pdf/${filenameNoExtension}?page=${fileCurrentPage}&force_download=1&revision_id=${content.current_revision_id}`
   }
 
   getDownloadPdfFullUrl = ({ config: { apiUrl }, content, mode }) => {
     // FIXME - b.l - refactor urls
-    const filenameNoExtension = content.filename ? encodeURIComponent(removeExtensionOfFilename(content.filename) + '.pdf') : 'unknown.pdf'
+    const filenameNoExtension = content.filename
+      ? encodeURIComponent(
+        removeExtensionOfFilename(content.filename.replace('/', ' ')) + '.pdf'
+      )
+      : 'unknown.pdf'
     return `${this.getDownloadBaseUrl(apiUrl, content, mode)}preview/pdf/full/${filenameNoExtension}?force_download=1&revision_id=${content.current_revision_id}`
   }
 
