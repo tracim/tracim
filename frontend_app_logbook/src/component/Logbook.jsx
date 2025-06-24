@@ -128,14 +128,14 @@ export class Logbook extends React.Component {
 
       if (fetchRawFileContent.apiResponse.ok && fetchRawFileContent.body.entries) {
         const logbook = fetchRawFileContent.body
-        const newlogbook = {
+        const newLogbook = {
           ...logbook,
           entries: this.mapEntriesWithOldExpand(logbook.entries)
         }
         this.setState({
           logbookState: LOGBOOK_STATE.LOADED,
           logbookInitiallyLoaded: true,
-          logbook: newlogbook
+          logbook: newLogbook
         })
       } else {
         console.error(fetchRawFileContent)

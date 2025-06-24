@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { PropTypes } from 'prop-types'
+import PropTypes from 'prop-types'
 import IfcViewer from './IfcViewer/IfcViewer.jsx'
 import JpegAndVideoViewer from './JpegAndVideoViewer/JpegAndVideoViewer.jsx'
 import TextViewerSyntaxHighlight from './TextViewerSyntaxHighlight/TextViewerSyntaxHighlight.jsx'
