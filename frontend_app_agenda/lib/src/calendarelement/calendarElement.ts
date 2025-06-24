@@ -17,6 +17,8 @@ library.add(faRefresh)
 export class CalendarElement {
 
     private _client: CalendarClient
+    private _selectedCalendars: Set<string>
+
     private _calendar: EventCalendar | null = null
     private _eventEdit: EventEditPopup | null = null
     private _calendarSelect: CalendarSelectDropdown | null = null
@@ -27,6 +29,7 @@ export class CalendarElement {
 
     public constructor() {
         this._client = new CalendarClient()
+        this._selectedCalendars = new Set()
     }
     // public static create = async (sources: (ServerSource | CalendarSource)[], target: Element | Document | ShadowRoot, options?: CalendarElementOptions) => {
     //   const obj = new CalendarElement()
@@ -38,6 +41,7 @@ export class CalendarElement {
     public create = async (sources: (ServerSource | CalendarSource)[], target: Element | Document | ShadowRoot, options?: CalendarOptions) => {
         if (this._calendar) return
         await this._client.loadCalendars(sources)
+        this._selectedCalendars = new Set(this._client.getCalendars().map(c => c.url))
 
         this._eventHandlers = options && hasEventHandlers(options) ? {
             onCreateEvent: options.onCreateEvent,
@@ -156,11 +160,11 @@ export class CalendarElement {
     private isEventVisible = ({ event: e }: EventCalendar.EventFilterInfo) => {
         const eventData = this._client.getEventDataByUid(e.extendedProps as EventUid)
         if (!eventData) return false
-        return !eventData.calendar.hidden
+        return this._selectedCalendars.has(eventData.calendar.url)
     }
 
     private onClickCalendars = (event: MouseEvent) => {
-        this._calendarHandlers!.onClickSelectCalendars(event, this._client.getCalendars(), this.setCalendarVisibility)
+        this._calendarHandlers!.onClickSelectCalendars(event, this._client.getCalendars(), this._selectedCalendars, this.setCalendarVisibility)
     }
 
     private getEventContent = ({ event }: EventCalendar.EventContentInfo) => {
@@ -215,7 +219,8 @@ export class CalendarElement {
     private setCalendarVisibility = (calendarUrl: string, visible: boolean) => {
         const calendar = this._client.getCalendarByUrl(calendarUrl)
         if (!calendar) return
-        calendar.hidden = !visible
+        if (visible) this._selectedCalendars.add(calendarUrl)
+        else this._selectedCalendars.delete(calendarUrl)
         this.refreshEvents()
     }
 

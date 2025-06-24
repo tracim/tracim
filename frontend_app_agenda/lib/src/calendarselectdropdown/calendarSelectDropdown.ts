@@ -24,7 +24,7 @@ export class CalendarSelectDropdown {
     // TODO
   }
 
-  public onSelect = (event: Event, calendars: Calendar[], handleSelect: SelectCalendarCallback) => {
+  public onSelect = (event: Event, calendars: Calendar[], selectedCalendars: Set<string>, handleSelect: SelectCalendarCallback) => {
     const target = event.target as Element
     const parent = target.parentElement as Element
 
@@ -40,7 +40,7 @@ export class CalendarSelectDropdown {
     for (let i = 0; i < inputs.length; i++) {
       const input = inputs[i];
       const calendar = calendars[i]
-      input.checked = !calendar.hidden
+      input.checked = selectedCalendars.has(calendar.url)
       input.addEventListener("change", e => handleSelect(calendar.url, (e.target as HTMLInputElement).checked))
     }
 

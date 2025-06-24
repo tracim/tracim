@@ -18,7 +18,6 @@ export type Calendar = DAVCalendar & {
   // fetchOptions?: RequestInit
   headers?: Record<string, string>
   uid?: any
-  hidden?: boolean // TODO move elsewhere
 }
 
 export type CalendarObject = {
@@ -62,7 +61,7 @@ export type CalendarEvent = {
 
 export type SelectCalendarCallback = (calendarUrl: string, selected: boolean) => void
 export type SelectCalendarHandlers = {
-  onClickSelectCalendars: (jsEvent: DomEvent, calendars: Calendar[], handleSelect: SelectCalendarCallback) => void,
+  onClickSelectCalendars: (jsEvent: DomEvent, calendars: Calendar[], selectedCalendars: Set<string>, handleSelect: SelectCalendarCallback) => void,
 }
 
 export type EventEditCallback = (event: CalendarEvent) => Promise<Response>
