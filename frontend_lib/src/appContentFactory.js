@@ -69,6 +69,8 @@ import {
   putContentTemplate,
   putEditContent,
   putEditStatus,
+  putFileDescription,
+  putUserConfiguration,
   putToDo,
   putChangeContentNamespace
 } from './action.async.js'
@@ -1195,6 +1197,42 @@ export function appContentFactory (WrappedComponent) {
       })
     }
 
+    appContentChangeDescription = async newDescription => {
+      const { state } = this
+
+      const fetchResultSaveFile = await handleFetchResult(
+        await putFileDescription(
+          this.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDescription
+        )
+      )
+      switch (fetchResultSaveFile.apiResponse.status) {
+        case 200: {
+          const newConfiguration = state.loggedUser.config
+          newConfiguration[`content.${state.content.content_id}.notify_all_members_message`] = true
+
+          this.setState(prev => ({
+            ...prev,
+            loggedUser: { ...prev.loggedUser, config: newConfiguration }
+          }))
+
+          const fetchPutUserConfiguration = await handleFetchResult(
+            await putUserConfiguration(this.apiUrl, state.loggedUser.userId, state.loggedUser.config)
+          )
+          if (fetchPutUserConfiguration.status !== 204) {
+            sendGlobalFlashMessage(i18n.t('Error while saving the user configuration'))
+          }
+          break
+        }
+        case 400:
+          switch (fetchResultSaveFile.body.code) {
+            case 2041: break // same description sent, no need for error msg
+            default: sendGlobalFlashMessage(i18n.t('Error while saving the new description'))
+          }
+          break
+        default: sendGlobalFlashMessage(i18n.t('Error while saving the new description'))
+      }
+    }
+
     render () {
       return (
         <WrappedComponent
@@ -1224,6 +1262,7 @@ export function appContentFactory (WrappedComponent) {
           appContentRestoreArchive={this.appContentRestoreArchive}
           appContentRestoreDelete={this.appContentRestoreDelete}
           appContentSaveNewToDo={this.appContentSaveNewToDo}
+          appContentChangeDescription={this.appContentChangeDescription}
           buildTimelineFromCommentAndRevision={this.buildTimelineFromCommentAndRevision}
           getTemplateList={this.getTemplateList}
           onChangeTemplate={this.handleChangeTemplate}

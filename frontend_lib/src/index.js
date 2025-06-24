@@ -133,6 +133,8 @@ import {
 import { defaultDebug } from './debug.js'
 
 import AgendaInfo from './component/AgendaInfo/AgendaInfo.jsx'
+import AppProperty from './component/AppProperty/AppProperty.jsx'
+import AppDescription from './component/AppDescription/AppDescription.jsx'
 import { Breadcrumbs } from './component/Breadcrumbs/Breadcrumbs.jsx'
 import EmptyListMessage from './component/EmptyListMessage/EmptyListMessage.jsx'
 import TitleListHeader from './component/Lists/ListHeader/TitleListHeader.jsx'
@@ -371,6 +373,8 @@ export {
   USER_CALL_STATE,
   AddFileToUploadButton,
   AgendaInfo,
+  AppProperty,
+  AppDescription,
   ArchiveDeleteContent,
   Avatar,
   Badge,

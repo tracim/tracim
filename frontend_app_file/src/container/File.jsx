@@ -45,7 +45,6 @@ import {
   getFileContent,
   getFileRevision,
   PAGE,
-  putFileDescription,
   putMyselfFileRead,
   putUserConfiguration,
   FAVORITE_STATE,
@@ -56,7 +55,9 @@ import {
   sortListByMultipleCriteria,
   SORT_BY,
   ToDoManagement,
-  defaultApiContent
+  defaultApiContent,
+  AppProperty,
+  AppDescription
 } from 'tracim_frontend_lib'
 import { isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import {
@@ -64,7 +65,6 @@ import {
   getShareLinksList,
   postShareLinksList
 } from '../action.async.js'
-import FileProperties from '../component/FileProperties.jsx'
 
 const ACTION_EDIT = 'edit'
 
@@ -450,31 +450,8 @@ export class File extends React.Component {
     this.setState({ mode: APP_FEATURE_MODE.EDIT })
   }
 
-  handleClickValidateNewDescription = async newDescription => {
-    const { props, state } = this
-
-    const fetchResultSaveFile = await handleFetchResult(
-      await putFileDescription(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDescription)
-    )
-    switch (fetchResultSaveFile.apiResponse.status) {
-      case 200: {
-        const newConfiguration = state.loggedUser.config
-        newConfiguration[`content.${state.content.content_id}.notify_all_members_message`] = true
-
-        this.setState(prev => ({ ...prev, loggedUser: { ...prev.loggedUser, config: newConfiguration } }))
-
-        const fetchPutUserConfiguration = await handleFetchResult(await putUserConfiguration(state.config.apiUrl, state.loggedUser.userId, state.loggedUser.config))
-        if (fetchPutUserConfiguration.status !== 204) { sendGlobalFlashMessage(props.t('Error while saving the user configuration')) }
-        break
-      }
-      case 400:
-        switch (fetchResultSaveFile.body.code) {
-          case 2041: break // same description sent, no need for error msg
-          default: sendGlobalFlashMessage(props.t('Error while saving the new description'))
-        }
-        break
-      default: sendGlobalFlashMessage(props.t('Error while saving the new description'))
-    }
+  handleValidateNewDescription = async newDescription => {
+    this.props.appContentChangeDescription(newDescription)
   }
 
   handleChangeNewComment = e => {
@@ -910,7 +887,7 @@ export class File extends React.Component {
   getMenuItemList = () => {
     const { props, state } = this
 
-    const timelineObject = {
+    const timelineComponent = {
       id: 'timeline',
       label: props.t('Timeline'),
       icon: 'fa-history',
@@ -958,10 +935,10 @@ export class File extends React.Component {
       ) : null
     }
 
-    const menuItemList = [timelineObject]
+    const menuItemList = [timelineComponent]
 
     if (state.config.toDoEnabled) {
-      const toDoObject = {
+      const toDoComponent = {
         id: 'todo',
         label: props.t('Tasks'),
         icon: 'fas fa-check-square',
@@ -988,10 +965,10 @@ export class File extends React.Component {
           </PopinFixedRightPartContent>
         )
       }
-      menuItemList.push(toDoObject)
+      menuItemList.push(toDoComponent)
     }
 
-    const tagObject = {
+    const tagComponent = {
       id: 'tag',
       label: props.t('Tags'),
       icon: 'fas fa-tag',
@@ -1010,39 +987,72 @@ export class File extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
-    menuItemList.push(tagObject)
+    menuItemList.push(tagComponent)
 
-    const propertiesObject = {
+    // INFO - CH - 2025-06-18 - On content load, .created stores the datetime from api.
+    // When clicking on a revision, the .created get replaced by the formated value and .created_raw is affected
+    // with .created.
+    // See: https://github.com/tracim/tracim/issues/6784
+    const dateCreatedRaw = state.content.created_raw ? state.content.created_raw : state.content.created
+    const propertyComponent = {
       id: 'properties',
       label: props.t('Properties'),
-      icon: 'fa-info-circle',
+      icon: 'fas fa-list-ul',
       children: (
-        <PopinFixedRightPartContent
-          label={props.t('Properties')}
-        >
-          <FileProperties
-            color={state.config.hexcolor}
-            fileType={state.content.mimetype}
-            fileSize={displayFileSize(state.content.size)}
-            filePageNb={state.previewInfo.page_nb}
-            activesShares={state.content.actives_shares}
-            creationDateFormattedWithTime={formatAbsoluteDate(state.content.created_raw, props.i18n.language, 'P')}
-            creationDateFormatted={formatAbsoluteDate(state.content.created_raw, props.i18n.language)}
-            lastModification={displayDistanceDate(state.content.modified, state.loggedUser.lang)}
-            lastModificationFormatted={formatAbsoluteDate(state.content.modified, props.i18n.language)}
-            description={state.content.description}
-            displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id}
-            disableChangeDescription={!state.content.is_editable}
-            onClickValidateNewDescription={this.handleClickValidateNewDescription}
-            key='FileProperties'
+        <PopinFixedRightPartContent label={props.t('Properties')}>
+          <AppProperty
+            readOnlyFieldList={[{
+              title: '',
+              label: props.t('Type:'),
+              value: state.content.mimetype
+            }, {
+              title: '',
+              label: props.t('Size:'),
+              value: displayFileSize(state.content.size)
+            }, {
+              title: '',
+              label: props.t('Page number:'),
+              value: state.previewInfo.page_nb
+            }, {
+              title: formatAbsoluteDate(dateCreatedRaw, props.i18n.language),
+              label: props.t('Creation date:'),
+              value: formatAbsoluteDate(dateCreatedRaw, props.i18n.language, 'P')
+            }, {
+              title: formatAbsoluteDate(state.content.modified, props.i18n.language),
+              label: props.t('Last modification:'),
+              value: displayDistanceDate(state.content.modified, state.loggedUser.lang)
+            }]}
           />
         </PopinFixedRightPartContent>
       )
     }
-    menuItemList.push(propertiesObject)
+    menuItemList.push(propertyComponent)
+
+    const descriptionComponent = {
+      id: 'description',
+      label: props.t('Description'),
+      icon: 'fa-info-circle',
+      children: (
+        <PopinFixedRightPartContent label={props.t('Description')}>
+          <AppDescription
+            apiUrl={state.config.apiUrl}
+            color={state.config.hexcolor}
+            mentionUserList={state.config.workspace.memberList}
+            description={state.content.description}
+            codeLanguageList={state.config.system.config.ui__notes__code_sample_languages}
+            iframeWhitelist={state.config.system.config.iframe_whitelist}
+            language={state.loggedUser.lang}
+            displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id}
+            disableChangeDescription={!state.content.is_editable}
+            onClickValidateNewDescription={this.handleValidateNewDescription}
+          />
+        </PopinFixedRightPartContent>
+      )
+    }
+    menuItemList.push(descriptionComponent)
 
     if (state.config.workspace.downloadEnabled && state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id) {
-      const shareObject = {
+      const shareComponent = {
         id: 'share',
         label: props.t('Share'),
         icon: 'fa-share-alt',
@@ -1068,7 +1078,7 @@ export class File extends React.Component {
           </PopinFixedRightPartContent>
         )
       }
-      menuItemList.push(shareObject)
+      menuItemList.push(shareComponent)
     }
     return menuItemList
   }

@@ -172,11 +172,19 @@ cardWidth = 280px
       flex-basis 100%
       height 0
 
-    & .cardPopup__container
-      width 100%
-      display flex
-      flex-direction column
-      overflow auto
+    & .cardPopup
+      &__container
+        width 100%
+        display flex
+        flex-direction column
+        overflow auto
+      &__body
+        flex unset
+        align-items unset
+        height unset
+        overflow auto
+        & div[class$="MenuList"] // INFO - 2025-06-24 - .MenuList is part of react-select dom tree
+          max-height 150px
 
     & [type=checkbox]
       margin textSpacing
@@ -202,15 +210,10 @@ cardWidth = 280px
       display flex
       flex-direction column
       gap 15px
-      overflow-y auto
-      width 100%
-      height 100%
       &__fields
         display flex
         flex-direction column
         gap 8px
-        // NOTE - RJ - 2022-01-19 - TinyMCE borders make the form overflow if we don't remove these 2px here
-        width calc(100% - 2px)
 
         label
           padding-inline-end textSpacing
