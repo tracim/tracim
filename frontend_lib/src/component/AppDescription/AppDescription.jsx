@@ -5,6 +5,7 @@ import IconButton from '../Button/IconButton.jsx'
 import PromptMessage from '../PromptMessage/PromptMessage.jsx'
 import TinyEditor from '../TinyEditor/TinyEditor.jsx'
 import HTMLContent from '../HTMLContent/HTMLContent.jsx'
+import { searchContentAndReplaceWithTag } from '../../mentionOrLinkOrSanitize.js'
 
 export const AppDescription = props => {
   const [displayFormNewDescription, setDisplayFormNewDescription] = useState(false)
@@ -19,8 +20,12 @@ export const AppDescription = props => {
     setNewDescription(newValue)
   }
 
-  const handleClickValidateNewDescription = () => {
-    props.onClickValidateNewDescription(newDescription)
+  const handleClickValidateNewDescription = async () => {
+    const descriptionWithContentLink = await searchContentAndReplaceWithTag(
+      props.apiUrl,
+      newDescription
+    )
+    props.onClickValidateNewDescription(descriptionWithContentLink.html)
     setDisplayFormNewDescription(false)
   }
 
@@ -39,7 +44,7 @@ export const AppDescription = props => {
               codeLanguageList={props.codeLanguageList}
               isAdvancedEdition
               isMentionEnabled={false}
-              isContentLinkEnabled={false}
+              isContentLinkEnabled
             />
 
             {props.disableChangeDescription && (
