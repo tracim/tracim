@@ -55,9 +55,9 @@ export async function fetchCalendarObjects(
       .filter(c => c.data.events?.find(e => e.recurrenceId))
       .map(c => c.url),
   )
-  const davDavRecurringObjects = recurringObjectsUrls.size == 0 ?
-    [] :
-    await davFetchCalendarObjects({
+  const davDavRecurringObjects = recurringObjectsUrls.size == 0
+    ? []
+    : await davFetchCalendarObjects({
       calendar: calendar,
       objectUrls: Array.from(recurringObjectsUrls),
       headers: calendar.headers,

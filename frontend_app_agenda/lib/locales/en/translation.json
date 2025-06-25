@@ -27,5 +27,8 @@
     "CHAIR": "Chair",
     "REQ-PARTICIPANT": "Required participant",
     "OPT-PARTICIPANT": "Optional participant",
-    "NON-PARTICIPANT": "Non participant"
+    "NON-PARTICIPANT": "Non participant",
+    "editRecurring": "This is a recurring event",
+    "editAll": "Edit all occurrences",
+    "editSingle": "Edit this occurrence only"
 }

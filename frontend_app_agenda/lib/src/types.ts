@@ -65,53 +65,80 @@ export type CalendarSource = {
   fetchOptions?: RequestInit
 }
 
+export type SelectedCalendar = {
+  url: string
+  selected: boolean
+}
+
+export type SelectCalendarCallback = (calendar: SelectedCalendar) => void
+export type SelectCalendarsClickInfo = {
+  jsEvent: DomEvent
+  calendars: Calendar[]
+  selectedCalendars: Set<string>
+  handleSelect: SelectCalendarCallback
+}
+export type SelectCalendarHandlers = {
+  onClickSelectCalendars: (info: SelectCalendarsClickInfo) => void,
+}
+
 export type CalendarEvent = {
   calendarUrl: string
   event: IcsEvent
 }
-
-export type SelectCalendarCallback = (calendarUrl: string, selected: boolean) => void
-export type SelectCalendarHandlers = {
-  onClickSelectCalendars: (
-    jsEvent: DomEvent,
-    calendars: Calendar[],
-    selectedCalendars: Set<string>,
-    handleSelect: SelectCalendarCallback
-  ) => void,
+export type DisplayedCalendarEvent = {
+  calendarUrl: string
+  event: IcsEvent
+  recurringEvent?: IcsEvent
 }
 
 export type EventEditCallback = (event: CalendarEvent) => Promise<Response>
+export type EventEditCreateInfo = {
+  jsEvent: DomEvent
+  event: IcsEvent
+  calendars: Calendar[]
+  handleCreate: EventEditCallback
+}
+export type EventEditUpdateInfo = {
+  jsEvent: DomEvent
+  calendarUrl: string
+  event: IcsEvent
+  recurringEvent?: IcsEvent
+  calendars: Calendar[]
+  handleUpdate: EventEditCallback
+  handleDelete: EventEditCallback
+}
+export type EventEditDeleteInfo = {
+  jsEvent: DomEvent
+  calendarUrl: string
+  event: IcsEvent
+  recurringEvent?: IcsEvent
+  handleDelete: EventEditCallback
+}
 export type EventEditHandlers = {
-  onCreateEvent: (jsEvent: DomEvent,
-    calendars: Calendar[],
-    event: CalendarEvent,
-    handleCreate: EventEditCallback
-  ) => void,
-  onUpdateEvent: (jsEvent: DomEvent,
-    calendars: Calendar[],
-    event: CalendarEvent,
-    handleUpdate: EventEditCallback,
-    handleDelete: EventEditCallback
-  ) => void,
-  onDeleteEvent: (jsEvent: DomEvent,
-    calendars: Calendar[],
-    event: CalendarEvent,
-    handleDelete: EventEditCallback
-  ) => void,
+  onCreateEvent: (info: EventEditCreateInfo) => void,
+  onUpdateEvent: (info: EventEditUpdateInfo) => void,
+  onDeleteEvent: (info: EventEditDeleteInfo) => void,
 }
 
+export type EventChangeInfo = {
+  calendarUrl: string
+  event: IcsEvent
+
+  // ? Do we keep this as this is for the entire CalendarOBject and not the event itself
+  ical: string
+}
 export type PostEventChangeHandlers = {
-  onEventCreated?: (calendarEvent: CalendarEvent, ical: string) => void
-  onEventUpdated?: (calendarEvent: CalendarEvent, ical: string) => void
-  onEventDeleted?: (calendarEvent: CalendarEvent, ical: string) => void
+  onEventCreated?: (info: EventChangeInfo) => void
+  onEventUpdated?: (info: EventChangeInfo) => void
+  onEventDeleted?: (info: EventChangeInfo) => void
 }
 
 export type CalendarElementOptions = {
   view?: View
-  views?: View[],
-  locale?: string,
-  date?: Date,
-  editable?: boolean,
+  views?: View[]
+  locale?: string
+  date?: Date
+  editable?: boolean
 }
 
 export type CalendarOptions =

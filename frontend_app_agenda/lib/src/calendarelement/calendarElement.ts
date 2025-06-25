@@ -4,16 +4,16 @@ import '@event-calendar/core/index.css'
 import { getEventEnd, type IcsEvent } from 'ts-ics'
 import { EventEditPopup } from '../eventeditpopup/eventEditPopup'
 import { hasCalendarHandlers, hasEventHandlers } from '../helpers/types-helper'
-import type { CalendarOptions, CalendarSource, ServerSource, EventUid, EventEditHandlers, CalendarEvent, PostEventChangeHandlers, SelectCalendarHandlers } from '../types'
+import type { CalendarOptions, CalendarSource, ServerSource, EventUid, EventEditHandlers, CalendarEvent, PostEventChangeHandlers, SelectCalendarHandlers, SelectedCalendar } from '../types'
 import { isEventAllDay, offsetDate } from '../helpers/ics-helper'
 import './calendarElement.css'
 import { CalendarSelectDropdown } from '../calendarselectdropdown/calendarSelectDropdown'
 import { icon, library } from '@fortawesome/fontawesome-svg-core'
-import { faRefresh } from '@fortawesome/free-solid-svg-icons'
+import { faRefresh, faRepeat } from '@fortawesome/free-solid-svg-icons'
 import { CalendarClient } from '../calendarClient'
 import i18n from '../i18n'
 
-library.add(faRefresh)
+library.add(faRefresh, faRepeat)
 
 export class CalendarElement {
   private _client: CalendarClient
@@ -174,38 +174,41 @@ export class CalendarElement {
     return this._selectedCalendars.has(eventData.calendarUrl)
   }
 
-  private onClickCalendars = (event: MouseEvent) => {
-    this._calendarHandlers!.onClickSelectCalendars(
-      event,
-      this._client.getCalendars(), this._selectedCalendars,
-      this.setCalendarVisibility,
-    )
+  private onClickCalendars = (jsEvent: MouseEvent) => {
+    this._calendarHandlers!.onClickSelectCalendars({
+      jsEvent,
+      selectedCalendars: this._selectedCalendars,
+      calendars: this._client.getCalendars(),
+      handleSelect: this.setCalendarVisibility,
+    })
   }
 
+  // TODO mustache
   private getEventContent = (info: EventCalendar.EventContentInfo) => {
-    return { html: `${info.event.title}` }
+    return { html: `${info.event.title}`+icon({ prefix: 'fas', iconName: 'refresh' }).html.join() }
   }
 
-  private onSelectTimeRange = (info: EventCalendar.SelectInfo) => {
-    const type = info.allDay ? 'DATE' : 'DATE-TIME'
+  private onSelectTimeRange = ({ allDay, start, end, jsEvent}: EventCalendar.SelectInfo) => {
+    const type = allDay ? 'DATE' : 'DATE-TIME'
     const newEvent: IcsEvent = {
       summary: '',
       start: {
-        date: info.start,
+        date: start,
         type: type,
       },
       end: {
-        date: info.end,
+        date: end,
         type: type,
       },
       uid: '',
       stamp: { date: new Date() },
     }
-    this._eventHandlers!.onCreateEvent(
-      info.jsEvent,
-      this._client.getCalendars(), { calendarUrl: '', event: newEvent },
-      this.handleCreateEvent,
-    )
+    this._eventHandlers!.onCreateEvent({
+      jsEvent,
+      calendars: this._client.getCalendars(),
+      event: newEvent,
+      handleCreate: this.handleCreateEvent,
+    })
   }
 
   private onChangeEventDates = async (info: EventCalendar.EventDropInfo | EventCalendar.EventResizeInfo) => {
@@ -224,25 +227,27 @@ export class CalendarElement {
     if (!response.ok) info.revert()
   }
 
-  private onEventClicked = (info: EventCalendar.EventClickInfo) => {
-    const uid = info.event.extendedProps as EventUid
+  private onEventClicked = ({ event, jsEvent}: EventCalendar.EventClickInfo) => {
+    const uid = event.extendedProps as EventUid
     const calendarEvent = this._client.getCalendarEvent(uid)
     if (!calendarEvent) return
-    this._eventHandlers!.onUpdateEvent(
-      info.jsEvent,
-      this._client.getCalendars(), calendarEvent,
-      this.handleUpdateEvent, this.handleDeleteEvent,
-    )
+    this._eventHandlers!.onUpdateEvent({
+      jsEvent,
+      calendars: this._client.getCalendars(),
+      ...calendarEvent,
+      handleUpdate: this.handleUpdateEvent,
+      handleDelete: this.handleDeleteEvent,
+    })
   }
 
   private refreshEvents = () => {
     this._calendar!.refetchEvents()
   }
 
-  private setCalendarVisibility = (calendarUrl: string, visible: boolean) => {
+  private setCalendarVisibility = ({url: calendarUrl, selected}: SelectedCalendar) => {
     const calendar = this._client.getCalendarByUrl(calendarUrl)
     if (!calendar) return
-    if (visible) this._selectedCalendars.add(calendarUrl)
+    if (selected) this._selectedCalendars.add(calendarUrl)
     else this._selectedCalendars.delete(calendarUrl)
     this.refreshEvents()
   }
@@ -250,7 +255,7 @@ export class CalendarElement {
   private handleCreateEvent = async (calendarEvent: CalendarEvent) => {
     const { response, ical } = await this._client.createEvent(calendarEvent)
     if (response.ok) {
-      this._postEventHandlers!.onEventCreated?.(calendarEvent, ical)
+      this._postEventHandlers!.onEventCreated?.({...calendarEvent, ical})
       this.refreshEvents()
     }
     return response
@@ -259,7 +264,7 @@ export class CalendarElement {
   private handleUpdateEvent = async (calendarEvent: CalendarEvent) => {
     const { response, ical } = await this._client.updateEvent(calendarEvent)
     if (response.ok) {
-      this._postEventHandlers!.onEventUpdated?.(calendarEvent, ical)
+      this._postEventHandlers!.onEventUpdated?.({...calendarEvent, ical})
       this.refreshEvents()
     }
     return response
@@ -268,7 +273,7 @@ export class CalendarElement {
   private handleDeleteEvent = async (calendarEvent: CalendarEvent) => {
     const { response, ical } = await this._client.deleteEvent(calendarEvent)
     if (response.ok) {
-      this._postEventHandlers!.onEventDeleted?.(calendarEvent, ical)
+      this._postEventHandlers!.onEventDeleted?.({...calendarEvent, ical})
       this.refreshEvents()
     }
     return response

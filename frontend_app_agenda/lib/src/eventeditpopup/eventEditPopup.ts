@@ -1,11 +1,12 @@
 import { getEventEndFromDuration, type IcsAttendee, type IcsDateObject, type IcsEvent } from 'ts-ics'
 import './eventEditPopup.css'
-import { attendeeRoleTypes, type Calendar, type CalendarEvent, type EventEditCallback } from '../types'
+import { attendeeRoleTypes, type Calendar, type EventEditCallback, type EventEditCreateInfo, type EventEditDeleteInfo, type EventEditUpdateInfo } from '../types'
 import { Popup } from '../popup/popup'
 import { parseHtml } from '../helpers/dom-helper'
 import { isEventAllDay, offsetDate } from '../helpers/ics-helper'
 import { tzlib_get_ical_block, tzlib_get_offset, tzlib_get_timezones } from 'timezones-ical-library'
 import i18n from '../i18n'
+import { RecurringEventPopup } from './recurringEventPopup'
 
 const html = /*html*/`
 <form name="event" class="event-edit form">
@@ -80,20 +81,24 @@ const attendeeHtml = /*html*/`
 
 export class EventEditPopup {
 
+  private _recurringPopup: RecurringEventPopup
   private _popup: Popup
   private _form: HTMLFormElement
   private _calendar: HTMLSelectElement
   private _attendees: HTMLDivElement
 
-  private _calendarEvent?: CalendarEvent
+  private _event?: IcsEvent
+  private _calendarUrl?: string
   private _handleSave: EventEditCallback | null = null
   private _handleDelete: EventEditCallback | null = null
 
   public constructor(target: Node) {
     const timezones = tzlib_get_timezones() as string[]
+    const translations = i18n.getResourceBundle(i18n.language, 'translation')
+
+    this._recurringPopup = new RecurringEventPopup(target)
 
     this._popup = new Popup(target)
-    const translations = i18n.getResourceBundle(i18n.language, 'translation')
     this._form = parseHtml<HTMLFormElement>(html, { t: translations, timezones: timezones })[0]
     this._popup.content.appendChild(this._form)
 
@@ -138,39 +143,36 @@ export class EventEditPopup {
     role.value = attendee.role || 'REQ-PARTICIPANT'
   }
 
-  public onCreate = (
-    _: Event,
-    calendars: Calendar[],
-    calendarEvent: CalendarEvent,
-    handleCreate: EventEditCallback,
-  ) => {
+  public onCreate = ({calendars, event, handleCreate}: EventEditCreateInfo) => {
     this._form.classList.toggle('event-edit-create', true)
     this._handleSave = handleCreate
     this._handleDelete = null
-    this.open(calendarEvent, calendars)
+    this.open('', event, calendars)
   }
-  public onUpdate = (
-    _: Event,
-    calendars: Calendar[],
-    calendarEvent: CalendarEvent,
-    handleUpdate: EventEditCallback,
-    handleDelete: EventEditCallback,
-  ) => {
+  public onUpdate = ({
+    calendarUrl,
+    calendars,
+    event,
+    recurringEvent,
+    handleDelete,
+    handleUpdate,
+  }: EventEditUpdateInfo) => {
     this._form.classList.toggle('event-edit-create', false)
     this._handleSave = handleUpdate
     this._handleDelete = handleDelete
-    this.open(calendarEvent, calendars)
+    if (!recurringEvent) this.open(calendarUrl, event, calendars)
+    else this._recurringPopup.open(editAll => this.open(calendarUrl, editAll ? recurringEvent : event, calendars))
   }
-  public onDelete = (_: Event, _2: Calendar[], calendarEvent: CalendarEvent, handleDelete: EventEditCallback) => {
-    handleDelete(calendarEvent)
+  public onDelete = ({calendarUrl, event, handleDelete}: EventEditDeleteInfo) => {
+    handleDelete({calendarUrl, event})
   }
 
-  public open = (calendarEvent: CalendarEvent, calendars: Calendar[]) => {
+  public open = (calendarUrl: string, event: IcsEvent, calendars: Calendar[]) => {
 
     this.setCalendars(calendars)
 
-    this._calendarEvent = calendarEvent
-    const { calendarUrl, event } = calendarEvent
+    this._calendarUrl = calendarUrl
+    this._event = event
 
     const localStart = event.start.local ?? { date: event.start.date, timezone: 'UTC', tzoffset: '+0000' }
     const end = event.end ??
@@ -229,19 +231,19 @@ export class EventEditPopup {
 
     // @ts-expect-error either end or duration will be defined
     const event: IcsEvent = {
-      ...this._calendarEvent!.event,
+      ...this._event!,
       summary: data.get('summary') as string,
       location: data.get('location') as string || undefined,
       start: getTimeObject('start'),
       end: getTimeObject('end'),
       description: data.get('description') as string || undefined,
-      organizer: data.get('email-organizer') ?
-        {
-          ...this._calendarEvent!.event!.organizer,
+      organizer: data.get('email-organizer')
+        ? {
+          ...this._event!.organizer,
           email: data.get('email-organizer') as string,
           name: data.get('name-organizer') as string || undefined,
-        } :
-        undefined,
+        }
+        : undefined,
       attendees: emails.map((e, i) => ({
         email: e,
         name: names[i],
@@ -257,7 +259,7 @@ export class EventEditPopup {
   }
 
   public delete = async () => {
-    await this._handleDelete!(this._calendarEvent!)
+    await this._handleDelete!({ calendarUrl: this._calendarUrl!, event: this._event!})
     this._popup.setVisible(false)
   }
 }
