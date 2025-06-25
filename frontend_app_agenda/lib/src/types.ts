@@ -120,12 +120,6 @@ export type CalendarOptions =
   & (EventEditHandlers | Record<never, never>)
   & PostEventChangeHandlers
 
-export type EventData = {
-  event: IcsEvent
-  calendarObject: CalendarObject
-  calendar: Calendar
-}
-
 export type CalendarResponse = {
   response: Response
   ical: string

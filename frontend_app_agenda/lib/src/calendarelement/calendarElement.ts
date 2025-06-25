@@ -32,12 +32,16 @@ export class CalendarElement {
     this._selectedCalendars = new Set()
   }
 
-  // public static create = async (sources: (ServerSource | CalendarSource)[], target: Element | Document | ShadowRoot, options?: CalendarElementOptions) => {
+  // public static create = async (
+  //   sources: (ServerSource | CalendarSource)[],
+  //   target: Element | Document | ShadowRoot,
+  //   options?: CalendarElementOptions
+  // ) => {
   //   const obj = new CalendarElement()
   //   await obj._create(sources, target, options)
   //   return obj
   // }
-  // private _create = async (sources: (ServerSource | CalendarSource)[], target: Element | Document | ShadowRoot, options?: CalendarOptions) => {
+  // private _create = async (
 
   public create = async (
     sources: (ServerSource | CalendarSource)[],

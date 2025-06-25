@@ -1,9 +1,8 @@
 import { type IcsCalendar } from 'ts-ics'
 import { createCalendarObject, deleteCalendarObject, fetchCalendarObjects, fetchCalendars, updateCalendarObject } from './helpers/dav-helper'
-import type { CalendarSource, ServerSource, Calendar, CalendarObject, EventUid, CalendarEvent, EventData } from './types'
-import { isSameEvent } from './helpers/ics-helper'
+import type { CalendarSource, ServerSource, Calendar, CalendarObject, EventUid, CalendarEvent } from './types'
+import { isRRuleSourceEvent, isSameEvent } from './helpers/ics-helper'
 
-// TODO recurring events
 export class CalendarClient {
 
   private _calendars: Calendar[] = []
@@ -16,13 +15,12 @@ export class CalendarClient {
     this._calendarObjectsPerCalendar = this._calendars.map(() => [])
   }
 
-  // TODO needs radicale 3.2
   public fetchAndLoadEvents = async (start: string, end: string): Promise<CalendarEvent[]> => {
     const allObjects = await Promise.all(
       this._calendars.map(calendar => fetchCalendarObjects(calendar, { start, end }, true)),
     )
     this._calendarObjectsPerCalendar = allObjects.map(objs => objs.calendarObjects)
-    this._recurringObjectsPerCalendar = allObjects.map(objs => objs.calendarObjects)
+    this._recurringObjectsPerCalendar = allObjects.map(objs => objs.recurringObjects)
     return this._calendarObjectsPerCalendar.flatMap(cos =>
       cos
         .flatMap(co => co.data.events ?? [])
@@ -42,14 +40,13 @@ export class CalendarClient {
     return undefined
   }
 
-  // TODO handle events from _recurringObjectsPerCalendar
-  private getEventDataByUid = (uid: EventUid): EventData | undefined => {
-    for (const calendarObject of this._calendarObjectsPerCalendar.flat()) {
+  private getCalendarObject = (uid: EventUid): CalendarObject | undefined => {
+    const searchList = uid.recurrenceId ? this._recurringObjectsPerCalendar : this._calendarObjectsPerCalendar
+    for (const calendarObject of searchList.flat()) {
       for (const event of calendarObject.data.events ?? []) {
-        if (!isSameEvent(event, uid)) continue
-        const calendar = this.getCalendarByUrl(calendarObject.calendarUrl)
-        if (!calendar) return undefined // TODO should not happen
-        return { event, calendarObject, calendar }
+        // Since we look are just looking for the CalendarObject and not the event in particular,
+        // we just need to check the uid
+        if (event.uid === uid.uid) return calendarObject
       }
     }
     return undefined
@@ -75,45 +72,80 @@ export class CalendarClient {
 
   // TODO change an event of calendar
   public updateEvent = async ({ event }: CalendarEvent) => {
-    const uidData = this.getEventDataByUid(event)
-    if (!uidData) return { response: new Response(null, { status: 404 }), ical: '' }
-    const { event: oldEvent, calendarObject, calendar } = uidData
+    const calendarObject = this.getCalendarObject(event)
+    console.log(calendarObject)
+    if (!calendarObject) return { response: new Response(null, { status: 404 }), ical: '' }
+    const calendar = this.getCalendarByUrl(calendarObject.calendarUrl)!
+
+    // Only a shallow copy as we modify the items directly
+    const oldEvents = calendarObject.data.events ? [...calendarObject.data.events] : undefined
+
+    const index = calendarObject.data.events!.findIndex(e => isSameEvent(e, event))
+
+    // Modified an recurring event instance for the 1st time
+    if (event.recurrenceId && index === -1) {
+      calendarObject.data.events!.push(event)
+    } else {
+      event.sequence = (event.sequence ?? 0) + 1
+      calendarObject.data.events![index] = event
+    }
     // if (event.recurrenceRule) {
     //   for (let i = 0; i < icsCalendar.events.length; i++) {
-    //     const element = icsCalendar.events[i];
+    //     const element = icsCalendar.events[i]
     //     if (i == event.index) continue
     //     else if (element.uid == event.event.uid) {
-    //       const recurrenceOffset = element.recurrenceId.value.date.getTime() - icsCalendar.events[event.index].start.date.getTime()
+    //       const recurrenceOffset = element.recurrenceId.value.date.getTime() -
+    //  icsCalendar.events[event.index].start.date.getTime()
     //       element.recurrenceId = { value: offsetDate(event.event.start, recurrenceOffset) }
     //     }
     //   }
     // }
-    // if (event.index == -1) icsCalendar.events.push(event.event)
-    // else
-    event.sequence = (event.sequence ?? 0) + 1
-    const oldEvents = calendarObject.data.events
-    calendarObject.data.events = calendarObject.data.events!.map(e => isSameEvent(e, oldEvent) ? event : e)
     const response = await updateCalendarObject(calendar, calendarObject)
     if (!response.response.ok) calendarObject.data.events = oldEvents
     return response
   }
 
   public deleteEvent = async ({ event }: CalendarEvent) => {
-    const uidData = this.getEventDataByUid(event)
-    if (!uidData) return { response: new Response(null, { status: 404 }), ical: '' }
+    const calendarObject = this.getCalendarObject(event)
+    if (!calendarObject) return { response: new Response(null, { status: 404 }), ical: '' }
+    const calendar = this.getCalendarByUrl(calendarObject.calendarUrl)!
+
+    // Only a shallow copy as we modify the items directly
+    const oldEvents = calendarObject.data.events ? [...calendarObject.data.events] : undefined
+
+
+    // TODO remove all rrule linked events
+    // When removing a recurring event instance, add it to exceptionDates
+    if (event.recurrenceId) {
+      const rruleEvent = calendarObject.data.events!.find(e => isRRuleSourceEvent(event, e))!
+      rruleEvent.exceptionDates ??= []
+      rruleEvent.exceptionDates?.push(event.recurrenceId.value)
+    }
+
+    const index = calendarObject.data.events!.findIndex(e => isSameEvent(e, event))
+    console.log(index, event, oldEvents)
+
+    if (index !== -1) {
+      event.sequence = (event.sequence ?? 0) + 1
+      calendarObject.data.events!.splice(index, 1)
+    }
     // if (event.recurrenceRule) {
     //   for (let i = 0; i < icsCalendar.events.length; i++) {
     //     const element = icsCalendar.events[i];
     //     if (i == event.index) continue
     //     else if (element.uid == event.event.uid) {
-    //       const recurrenceOffset = element.recurrenceId.value.date.getTime() - icsCalendar.events[event.index].start.date.getTime()
+    //       const recurrenceOffset = element.recurrenceId.value.date.getTim
+    // e() - icsCalendar.events[event.index].start.date.getTime()
     //       element.recurrenceId = { value: offsetDate(event.event.start, recurrenceOffset) }
     //     }
     //   }
     // }
     // if (event.index == -1) icsCalendar.events.push(event.event)
     // else
-    const response = await deleteCalendarObject(uidData.calendar, uidData.calendarObject)
+
+    const action = calendarObject.data.events!.length === 0 ? deleteCalendarObject : updateCalendarObject
+    const response = await action(calendar, calendarObject)
+    if (!response.response.ok) calendarObject.data.events = oldEvents
     return response
   }
 }

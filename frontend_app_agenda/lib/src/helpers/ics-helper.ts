@@ -18,5 +18,9 @@ export function offsetDate(date: IcsDateObject, offset: number): IcsDateObject {
 }
 
 export function isSameEvent(a: EventUid, b: EventUid) {
-  return a.uid === b.uid && a.recurrenceId?.value.date === b.recurrenceId?.value.date
+  return a.uid === b.uid && a.recurrenceId?.value.date.getTime() === b.recurrenceId?.value.date.getTime()
+}
+
+export function isRRuleSourceEvent(eventInstance: EventUid, event: EventUid) {
+  return eventInstance.uid === event.uid && event.recurrenceId === undefined
 }

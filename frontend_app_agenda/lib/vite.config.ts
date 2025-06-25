@@ -6,21 +6,21 @@ import pluginChecker from 'vite-plugin-checker'
 // import dts from 'vite-plugin-dts'
 
 export default defineConfig({
-    plugins: [
-        nodePolyfills(),
-        // dts({ rollupTypes: true }),
-        pluginChecker({ typescript: true })
-    ],
-    build: {
-        lib: {
-            entry: "./src/index.ts",
-            name: 'CalendarClient',
-            fileName: 'index',
-        },
+  plugins: [
+    nodePolyfills(),
+    // dts({ rollupTypes: true }),
+    pluginChecker({ typescript: true }),
+  ],
+  build: {
+    lib: {
+      entry: './src/index.ts',
+      name: 'CalendarClient',
+      fileName: 'index',
     },
-    resolve: {
-        alias: {
-            'node-fetch': 'axios',
-        },
-    }
+  },
+  resolve: {
+    alias: {
+      'node-fetch': 'axios',
+    },
+  },
 })

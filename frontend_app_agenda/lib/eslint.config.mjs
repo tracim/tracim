@@ -8,7 +8,7 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
   {
-    files: ['src/**/*.{js,mjs,cjs,ts,mts,cts}'],
+    files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
     plugins: { js, '@stylistic': stylistic },
     rules: {
       '@stylistic/indent': ['error', 2],
@@ -25,7 +25,7 @@ export default defineConfig([
     },
     extends: ['js/recommended'],
   },
-  { files: ['src/**/*.{js,mjs,cjs,ts,mts,cts}'], languageOptions: { globals: globals.browser } },
+  { files: ['**/*.{js,mjs,cjs,ts,mts,cts}'], languageOptions: { globals: globals.browser } },
   // { files: ['src/**/*.css'], plugins: { css }, language: 'css/css', extends: ['css/recommended'] },
   { files: ['locales/*/*.json'], plugins: { json }, language: 'json/json', extends: ['json/recommended'] },
   tseslint.configs.recommended,

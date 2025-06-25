@@ -4,6 +4,8 @@ import { createAccount, fetchCalendars as davFetchCalendars, fetchCalendarObject
 import type { CalendarSource, ServerSource, Calendar, CalendarObject, CalendarResponse } from '../types'
 import { isServerSource } from './types-helper'
 
+// TODO does not work with recurring events
+// BUG ts-ics issue: https://github.com/Neuvernetzung/ts-ics/issues/165
 function generateIcsCalendarTzFix(calendar: IcsCalendar) {
   for (const event of calendar.events ?? []) {
     if (event.start.local) event.start.local.date = event.start.date
@@ -35,10 +37,10 @@ export async function fetchCalendarObjects(
   calendar: Calendar,
   timeRange?: { start: string; end: string; },
   expand?: boolean,
-): Promise<{ calendarObjects: CalendarObject[], recurringObjects: CalendarObject[]}> {
+): Promise<{ calendarObjects: CalendarObject[], recurringObjects: CalendarObject[] }> {
   const davCalendarObjects = await davFetchCalendarObjects({
     calendar: calendar,
-    timeRange, expand,
+    timeRange, expand, // TODO needs radicale 3.2
     headers: calendar.headers,
     fetchOptions: calendar.fetchOptions,
   })
@@ -58,7 +60,6 @@ export async function fetchCalendarObjects(
     await davFetchCalendarObjects({
       calendar: calendar,
       objectUrls: Array.from(recurringObjectsUrls),
-      timeRange, expand,
       headers: calendar.headers,
       fetchOptions: calendar.fetchOptions,
     })
@@ -68,7 +69,7 @@ export async function fetchCalendarObjects(
     data: convertIcsCalendar(undefined, o.data),
     calendarUrl: calendar.url,
   }))
-  return { calendarObjects, recurringObjects}
+  return { calendarObjects, recurringObjects }
 }
 
 export async function createCalendarObject(
