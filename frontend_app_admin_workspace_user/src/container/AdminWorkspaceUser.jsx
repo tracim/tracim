@@ -473,7 +473,17 @@ export class AdminWorkspaceUser extends React.Component {
     const toggleUser = await handleFetchResult(await activateOrDelete(state.config.apiUrl, userId))
 
     if (toggleUser.status !== 204) {
-      sendGlobalFlashMessage(props.t('Error while enabling or disabling user'))
+      switch (toggleUser.body.code) {
+        case 8002:
+          sendGlobalFlashMessage(props.t('The maximum number of users has been reached'))
+          break
+        case 8003:
+          sendGlobalFlashMessage(props.t('The maximum number of guests has been reached'))
+          break
+        default:
+          sendGlobalFlashMessage(props.t('Error while enabling or disabling user'))
+          break
+      }
     }
   }
 
@@ -483,7 +493,26 @@ export class AdminWorkspaceUser extends React.Component {
     const endPoint = userId === state.loggedUser.userId ? putMyselfProfile : putUserProfile
     const toggleManager = await handleFetchResult(await endPoint(state.config.apiUrl, userId, newProfile))
     if (toggleManager.status !== 204) {
-      sendGlobalFlashMessage(props.t('Error while saving new profile'))
+      switch (toggleManager.body.code) {
+        case 2075:
+          sendGlobalFlashMessage(props.t('The user’s role in some space is too high-level to become a guest'))
+          break
+        case 3006:
+          sendGlobalFlashMessage(props.t('You can\' change your own profile'))
+          break
+        case 8002:
+          sendGlobalFlashMessage(props.t('The maximum number of users has been reached'))
+          break
+        case 8003:
+          sendGlobalFlashMessage(props.t('The maximum number of guests has been reached'))
+          break
+        case 8004:
+          sendGlobalFlashMessage(props.t('The user is in more spaces than allowed for a guest'))
+          break
+        default:
+          sendGlobalFlashMessage(props.t('Error while saving new profile'))
+          break
+      }
     }
   }
 
@@ -541,6 +570,8 @@ export class AdminWorkspaceUser extends React.Component {
             )
             break
           case 2036: sendGlobalFlashMessage(props.t('Email already exists')); break
+          case 8002: sendGlobalFlashMessage(props.t('The maximum number of users has been reached')); break
+          case 8003: sendGlobalFlashMessage(props.t('The maximum number of guests has been reached')); break
           default: sendGlobalFlashMessage(props.t('Error while saving new user'))
         }
         return -5
@@ -650,6 +681,7 @@ export class AdminWorkspaceUser extends React.Component {
             onClickTitle={this.handleClickUserTitleToSort}
             isOrderAscending={state.sortOrder === SORT_ORDER.ASCENDING}
             selectedSortCriterion={state.selectedUserSortCriteria}
+            config={state.config.system.config}
           />
         )}
 

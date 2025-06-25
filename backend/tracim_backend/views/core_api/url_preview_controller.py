@@ -7,7 +7,7 @@ from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.url_preview import URLPreview
 from tracim_backend.lib.core.url_preview import URLPreviewLib
 from tracim_backend.lib.utils.authorization import check_right
-from tracim_backend.lib.utils.authorization import is_user
+from tracim_backend.lib.utils.authorization import is_guest
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.views.controllers import Controller
@@ -19,7 +19,7 @@ SWAGGER_TAG_URL_PREVIEW_ENDPOINTS = "URL Preview"
 
 class URLPreviewController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG_URL_PREVIEW_ENDPOINTS])
-    @check_right(is_user)
+    @check_right(is_guest)
     @hapic.handle_exception(UnavailableURLPreview, HTTPStatus.BAD_REQUEST)
     @hapic.input_query(UrlQuerySchema())
     @hapic.output_body(UrlPreviewSchema())

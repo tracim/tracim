@@ -284,5 +284,7 @@
   "Space models": "Space models",
   "Other models": "Other models",
   "No model": "No model",
-  "Use model:": "Use model:"
+  "Use model:": "Use model:",
+  "Guest": "Guest",
+  "Access to a limited number of spaces and can't be more than contributor": "Access to a limited number of spaces and can't be more than contributor"
 }

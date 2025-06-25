@@ -456,6 +456,7 @@ class OneCommonWorkspaceUserChecker(AuthorizationChecker):
 is_administrator = ProfileChecker(Profile.ADMIN)
 is_trusted_user = ProfileChecker(Profile.TRUSTED_USER)
 is_user = ProfileChecker(Profile.USER)
+is_guest = ProfileChecker(Profile.GUEST)
 # role
 is_workspace_manager = RoleChecker(WorkspaceRoles.WORKSPACE_MANAGER.level)
 is_content_manager = RoleChecker(WorkspaceRoles.CONTENT_MANAGER.level)
@@ -482,7 +483,7 @@ knows_candidate_user = OrAuthorizationChecker(
 
 # workspace
 can_see_workspace_information = OrAuthorizationChecker(
-    is_administrator, AndAuthorizationChecker(is_reader, is_user)
+    is_administrator, AndAuthorizationChecker(is_reader, is_guest)
 )
 can_modify_workspace = OrAuthorizationChecker(
     is_administrator, AndAuthorizationChecker(is_workspace_manager, is_user)

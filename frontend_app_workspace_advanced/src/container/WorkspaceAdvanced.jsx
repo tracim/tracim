@@ -397,10 +397,18 @@ export class WorkspaceAdvanced extends React.Component {
 
     switch (fetchPutUserRole.apiResponse.status) {
       case 200: sendGlobalFlashMessage(props.t('Save successful'), 'info'); break
-      default: sendGlobalFlashMessage(fetchPutUserRole.body.code === 3011
-        ? props.t('You cannot change this member role because there are no other space managers.')
-        : props.t('Error while saving new role for member')
-      )
+      default:
+        switch (fetchPutUserRole.body.code) {
+          case 3011:
+            sendGlobalFlashMessage(props.t('You cannot change this member role because there are no other space managers.'))
+            break
+          case 2075:
+            sendGlobalFlashMessage(props.t('Guest users are not allowed to be more than contributor. In order to upgrade the role of this guest user, ask your administrator to make it a standard user'))
+            break
+          default:
+            sendGlobalFlashMessage(props.t('Error while saving new role for member'))
+            break
+        }
     }
   }
 
@@ -615,6 +623,12 @@ export class WorkspaceAdvanced extends React.Component {
       case 400:
         switch (fetchWorkspaceNewMember.body.code) {
           case 2042: sendGlobalFlashMessage(props.t('This account is deactivated')); break
+          case 2075:
+            sendGlobalFlashMessage(props.t('Guest users are not allowed to be more than contributor. In order to upgrade the role of this guest user, ask your administrator to make it a standard user'))
+            break
+          case 8004:
+            sendGlobalFlashMessage(props.t('The maximum number of spaces for a guest user has been reached. In order to add this guest user into a new space, ask your administrator to make it a standard user'))
+            break
           case 1001: {
             const ErrorMsg = () => (
               <div>
@@ -641,15 +655,13 @@ export class WorkspaceAdvanced extends React.Component {
       userId,
       state.content.default_user_role
     ))
-    switch (fetchPutSubscriptionAccept.status) {
-      case 204: break
-      case 400:
-        switch (fetchPutSubscriptionAccept.body.code) {
-          case 3008: sendGlobalFlashMessage(props.t('This user already is in the space')); break
-          default: sendGlobalFlashMessage(props.t('Error while adding the member to the space'))
-        }
-        break
-      default: sendGlobalFlashMessage(props.t('Error while adding the member to the space'))
+    if (fetchPutSubscriptionAccept.status !== 204) {
+      switch (fetchPutSubscriptionAccept.body.code) {
+        case 2075: sendGlobalFlashMessage(props.t('Guest users are not allowed to be more than contributor. In order to upgrade the role of this guest user, ask your administrator to make it a standard user')); break
+        case 3008: sendGlobalFlashMessage(props.t('This user already is in the space')); break
+        case 8004: sendGlobalFlashMessage(props.t('The maximum number of spaces for a guest user has been reached. In order to add this guest user into a new space, ask your administrator to make it a standard user')); break
+        default: sendGlobalFlashMessage(props.t('Error while adding the member to the space'))
+      }
     }
   }
 

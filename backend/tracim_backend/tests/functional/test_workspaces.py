@@ -2393,6 +2393,242 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["user_id"] == user2.user_id
         assert user_role["workspace_id"] == workspace.workspace_id
 
+    def test_api__update_workspace_member_role__ok_200__guest_to_contributor_case(
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
+        admin_user,
+        event_helper,
+    ):
+        """
+        Update worskpace member role
+        """
+
+        uapi = user_api_factory.get()
+        profile = Profile.GUEST
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        workspace_api = workspace_api_factory.get(show_deleted=True)
+        workspace = workspace_api.create_workspace("test", save_now=True)
+        uapi = user_api_factory.get()
+
+        profile = Profile.ADMIN
+        admin2 = uapi.create_user(email="admin2@admin2.admin2", profile=profile, do_notify=False)
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=admin2)
+        user_workspace_config_api.create_one(
+            user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+
+        transaction.commit()
+        # before
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.get(
+            "/api/workspaces/{workspace_id}/members/{user_id}".format(
+                workspace_id=workspace.workspace_id, user_id=user.user_id
+            ),
+            status=200,
+        )
+        # update workspace role
+        params = {"role": "contributor"}
+        res = web_testapp.put_json(
+            "/api/workspaces/{workspace_id}/members/{user_id}".format(
+                workspace_id=workspace.workspace_id, user_id=user.user_id
+            ),
+            status=200,
+            params=params,
+        )
+        user_role = res.json_body
+        assert user_role["role"] == "contributor"
+        assert user_role["user_id"] == user.user_id
+        assert user_role["workspace_id"] == workspace.workspace_id
+
+        # after
+        res = web_testapp.get(
+            "/api/workspaces/{workspace_id}/members/{user_id}".format(
+                workspace_id=workspace.workspace_id, user_id=user.user_id
+            ),
+            status=200,
+        ).json_body
+        user_role = res
+        assert user_role["role"] == "contributor"
+        assert user_role["email_notification_type"] == "none"
+        assert user_role["user_id"] == user.user_id
+        assert user_role["workspace_id"] == workspace.workspace_id
+
+    def test_api__update_workspace_member_role__err_400__guest_to_content_manager_case(
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+        user_workspace_config_api_factory,
+        admin_user,
+        event_helper,
+    ):
+        """
+        Update worskpace member role
+        """
+
+        uapi = user_api_factory.get()
+        profile = Profile.GUEST
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        workspace_api = workspace_api_factory.get(show_deleted=True)
+        workspace = workspace_api.create_workspace("test", save_now=True)
+        uapi = user_api_factory.get()
+
+        profile = Profile.ADMIN
+        admin2 = uapi.create_user(email="admin2@admin2.admin2", profile=profile, do_notify=False)
+        user_workspace_config_api = user_workspace_config_api_factory.get(current_user=admin2)
+        user_workspace_config_api.create_one(
+            user,
+            workspace,
+            UserWorkspaceConfig.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+
+        transaction.commit()
+        # before
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        web_testapp.get(
+            "/api/workspaces/{workspace_id}/members/{user_id}".format(
+                workspace_id=workspace.workspace_id, user_id=user.user_id
+            ),
+            status=200,
+        )
+        # update workspace role
+        params = {"role": "content-manager"}
+        res = web_testapp.put_json(
+            "/api/workspaces/{workspace_id}/members/{user_id}".format(
+                workspace_id=workspace.workspace_id, user_id=user.user_id
+            ),
+            status=400,
+            params=params,
+        )
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert res.json_body["code"] == ErrorCode.GUEST_USER_NOT_ALLOWED
+
+        # after
+        res = web_testapp.get(
+            "/api/workspaces/{workspace_id}/members/{user_id}".format(
+                workspace_id=workspace.workspace_id, user_id=user.user_id
+            ),
+            status=200,
+        ).json_body
+        user_role = res
+        assert user_role["role"] == "reader"
+        assert user_role["email_notification_type"] == "none"
+        assert user_role["user_id"] == user.user_id
+        assert user_role["workspace_id"] == workspace.workspace_id
+
+    def test_api__create_workspace_member_role__err_400__guest_too_hight_level_case(
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+    ):
+        """
+        Update worskpace member role
+        """
+
+        uapi = user_api_factory.get()
+        profile = Profile.GUEST
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        workspace_api = workspace_api_factory.get(show_deleted=True)
+        workspace1 = workspace_api.create_workspace("test", save_now=True)
+        uapi = user_api_factory.get()
+
+        transaction.commit()
+        # before
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
+        params = {
+            "user_id": user.user_id,
+            "user_email": "test@test.test",
+            "role": "content-manager",
+        }
+        res = web_testapp.post_json(
+            "/api/workspaces/{}/members".format(workspace1.workspace_id),
+            status=400,
+            params=params,
+        )
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert res.json_body["code"] == ErrorCode.GUEST_USER_NOT_ALLOWED
+
+    def test_api__update_workspace_member_role__err_400__guest_too_many_space_case(
+        self,
+        web_testapp,
+        user_api_factory,
+        workspace_api_factory,
+    ):
+        """
+        Update worskpace member role
+        """
+
+        uapi = user_api_factory.get()
+        profile = Profile.GUEST
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        workspace_api = workspace_api_factory.get(show_deleted=True)
+        workspace1 = workspace_api.create_workspace("test", save_now=True)
+        workspace2 = workspace_api.create_workspace("test2", save_now=True)
+        uapi = user_api_factory.get()
+
+        transaction.commit()
+        # before
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
+        params = {
+            "user_id": user.user_id,
+            "user_email": "test@test.test",
+            "role": "contributor",
+        }
+        res = web_testapp.post_json(
+            "/api/workspaces/{}/members".format(workspace1.workspace_id),
+            status=200,
+            params=params,
+        )
+        params = {
+            "user_id": user.user_id,
+            "user_email": "test@test.test",
+            "role": "reader",
+        }
+        res = web_testapp.post_json(
+            "/api/workspaces/{}/members".format(workspace2.workspace_id),
+            status=400,
+            params=params,
+        )
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert res.json_body["code"] == ErrorCode.TOO_MANY_WORKSPACE
+
     def test_api__update_workspace_member_role__err_400__role_not_exist(
         self,
         web_testapp,

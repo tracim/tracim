@@ -698,3 +698,19 @@ class InvalidMention(TracimException):
 
 class PropertyNotFound(TracimException):
     error_code = ErrorCode.PROPERTY_NOT_FOUND
+
+
+class GuestUserNotAllowed(TracimException):
+    error_code = ErrorCode.GUEST_USER_NOT_ALLOWED
+
+
+class TooManyUsersError(TracimException):
+    error_code = ErrorCode.TOO_MANY_USERS
+
+
+class TooManyGuestsError(TracimException):
+    error_code = ErrorCode.TOO_MANY_GUEST
+
+
+class TooManyWorkspacesError(TracimException):
+    error_code = ErrorCode.TOO_MANY_WORKSPACE

@@ -198,7 +198,7 @@ export const ROLE = {
 export const ROLE_LIST = [WORKSPACE_MANAGER, CONTENT_MANAGER, CONTRIBUTOR, READER]
 
 const ADMINISTRATOR = {
-  id: 3,
+  id: 4,
   slug: 'administrators',
   faIcon: 'fas fa-shield-alt',
   hexcolor: '#ed0007',
@@ -210,7 +210,7 @@ const ADMINISTRATOR = {
   description: 'Trusted user + create users, administration of instance'
 }
 const MANAGER = {
-  id: 2,
+  id: 3,
   slug: 'trusted-users',
   faIcon: 'fas fa-graduation-cap',
   hexcolor: '#f2af2d',
@@ -222,7 +222,7 @@ const MANAGER = {
   description: 'User + create spaces, add members in spaces'
 }
 const USER = {
-  id: 1,
+  id: 2,
   slug: 'users',
   faIcon: 'fas fa-user',
   hexcolor: '#3145f7',
@@ -233,12 +233,25 @@ const USER = {
   label: 'User', // label must be used in components
   description: 'Access to spaces where user is member'
 }
+const GUEST = {
+  id: 1,
+  slug: 'guests',
+  faIcon: 'fas fa-id-badge',
+  hexcolor: '#15d948',
+  tradKey: [
+    i18n.t('Guest'),
+    i18n.t('Access to a limited number of spaces and can\'t be more than contributor')
+  ], // trad key allow the parser to generate an entry in the json file
+  label: 'Guest', // label must be used in components
+  description: 'Access to a limited number of spaces and can\'t be more than contributor'
+}
 export const PROFILE = {
   administrator: ADMINISTRATOR,
   manager: MANAGER,
-  user: USER
+  user: USER,
+  guest: GUEST
 }
-export const PROFILE_LIST = [ADMINISTRATOR, MANAGER, USER]
+export const PROFILE_LIST = [ADMINISTRATOR, MANAGER, USER, GUEST]
 
 const OPEN = {
   id: 2,

@@ -44,7 +44,10 @@ const SYSTEM_CONFIG = {
     ui__notes__code_sample_languages: [],
     iframe_whitelist: [],
     translation_service__enabled: false,
-    translation_service__target_languages: []
+    translation_service__target_languages: [],
+    limitation__max_non_guest_users: -1,
+    limitation__max_guest_users: -1,
+    limitation__max_guest_user_space_nb: -1
   },
   contentTypeListLoaded: true,
   redirectLogin: '',

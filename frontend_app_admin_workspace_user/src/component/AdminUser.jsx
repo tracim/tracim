@@ -24,6 +24,7 @@ import {
 } from 'tracim_frontend_lib'
 import AddUserForm from './AddUserForm.jsx'
 import { getUserProfile } from '../helper.js'
+import AdminUserInfoPopup from './AdminUserInfoPopup.jsx'
 
 export class AdminUser extends React.Component {
   constructor (props) {
@@ -31,9 +32,14 @@ export class AdminUser extends React.Component {
 
     this.state = {
       displayAddUser: false,
-      userFilter: ''
+      userFilter: '',
+      popupInfos: false
     }
   }
+
+  handleTogglePopupInfo = () => this.setState(prevState => ({
+    popupInfos: !prevState.popupInfos
+  }))
 
   handleToggleAddUser = () => this.setState(prevState => ({
     displayAddUser: !prevState.displayAddUser
@@ -104,6 +110,14 @@ export class AdminUser extends React.Component {
     else this.props.onChangeProfile(userId, 'trusted-users')
   }
 
+  handleToggleProfileGuest = (e, userId, toggle) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (toggle) this.props.onChangeProfile(userId, 'guests')
+    else this.props.onChangeProfile(userId, 'users')
+  }
+
   handleClickAddUser = async (publicName, username, newEmailWithoutTrim, profile, password) => {
     const email = newEmailWithoutTrim.trim()
     const resultSuccess = await this.props.onClickAddUser(publicName, username, email, profile, password)
@@ -165,6 +179,15 @@ export class AdminUser extends React.Component {
               onClick={this.handleToggleAddUser}
               text={props.t('Create a user')}
               icon='fas fa-user-plus'
+            />
+
+            <IconButton
+              customClass='adminUser__InfoPopup'
+              dataCy='adminUser__adduser__info__button'
+              intent='secondary'
+              onClick={this.handleTogglePopupInfo}
+              text={props.t('View user limitations')}
+              icon='fas fa-info'
             />
 
             <div className='adminUser__adduser__emailstate'>
@@ -250,6 +273,7 @@ export class AdminUser extends React.Component {
                   </th>
                   <th className='adminUser__table__canCreate' scope='col'>{props.t('Can create space')}</th>
                   <th className='adminUser__table__administrator' scope='col'>{props.t('Administrator')}</th>
+                  <th className='adminUser__table__guest' scope='col'>{props.t('Guest')}</th>
                 </tr>
               </thead>
 
@@ -333,7 +357,7 @@ export class AdminUser extends React.Component {
                           onChange={e => this.handleToggleProfileManager(e, u.user_id, !(u.profile === PROFILE.manager.slug || u.profile === PROFILE.administrator.slug))}
                           activeLabel={isMobile ? '' : props.t('Activated')}
                           inactiveLabel={isMobile ? '' : props.t('Deactivated')}
-                          disabled={!u.is_active}
+                          disabled={!u.is_active || u.profile === PROFILE.guest.slug}
                           smallSize={isMobile}
                         />
                       </td>
@@ -344,6 +368,15 @@ export class AdminUser extends React.Component {
                           onChange={e => this.handleToggleProfileAdministrator(e, u.user_id, !(u.profile === PROFILE.administrator.slug))}
                           activeLabel={isMobile ? '' : props.t('Activated')}
                           inactiveLabel={isMobile ? '' : props.t('Deactivated')}
+                          disabled={!u.is_active || u.profile === PROFILE.guest.slug}
+                          smallSize={isMobile}
+                        />
+                      </td>
+
+                      <td>
+                        <BtnSwitch
+                          checked={u.profile === PROFILE.guest.slug}
+                          onChange={e => this.handleToggleProfileGuest(e, u.user_id, !(u.profile === PROFILE.guest.slug))}
                           disabled={!u.is_active}
                           smallSize={isMobile}
                         />
@@ -374,6 +407,14 @@ export class AdminUser extends React.Component {
               </EmptyListMessage>
             )}
           </div>
+
+          {state.popupInfos && (
+            <AdminUserInfoPopup
+              config={props.config}
+              onClose={this.handleTogglePopupInfo}
+              userList={props.userList}
+            />
+          )}
 
         </PageContent>
 

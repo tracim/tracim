@@ -14,6 +14,7 @@ from tracim_backend.exceptions import CannotUseBothIncludeAndExcludeWorkspaceUse
 from tracim_backend.exceptions import EmailAlreadyExists
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
+from tracim_backend.exceptions import GuestUserNotAllowed
 from tracim_backend.exceptions import InvalidWorkspaceAccessType
 from tracim_backend.exceptions import MessageDoesNotExist
 from tracim_backend.exceptions import MimetypeNotAllowed
@@ -25,7 +26,10 @@ from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import ReadOnlyFieldException
 from tracim_backend.exceptions import ReservedUsernameError
 from tracim_backend.exceptions import RoleAlreadyExistError
+from tracim_backend.exceptions import TooManyGuestsError
 from tracim_backend.exceptions import TooManyOnlineUsersError
+from tracim_backend.exceptions import TooManyUsersError
+from tracim_backend.exceptions import TooManyWorkspacesError
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import TracimFileNotFound
 from tracim_backend.exceptions import TracimValidationFailed
@@ -230,7 +234,9 @@ class UserController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(GuestUserNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(RoleAlreadyExistError, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TooManyWorkspacesError, HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_body(WorkspaceIdSchema())
@@ -424,6 +430,9 @@ class UserController(Controller):
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.handle_exception(GuestUserNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TooManyUsersError, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TooManyGuestsError, HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_body(SetUserInfoSchema())
     @hapic.input_path(UserIdPathSchema())
@@ -458,6 +467,9 @@ class UserController(Controller):
     @hapic.handle_exception(UsernameAlreadyExists, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ReservedUsernameError, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(TracimValidationFailed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(GuestUserNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TooManyUsersError, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TooManyGuestsError, HTTPStatus.BAD_REQUEST)
     @check_right(is_administrator)
     @hapic.input_body(UserCreationSchema())
     @hapic.output_body(UserSchema())
@@ -505,6 +517,9 @@ class UserController(Controller):
     @hapic.handle_exception(UsernameAlreadyExists, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ReservedUsernameError, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(TracimValidationFailed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(GuestUserNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TooManyUsersError, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TooManyGuestsError, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UserSelfRegistrationDisabledException, HTTPStatus.BAD_REQUEST)
     @hapic.input_body(UserCreationSchema())
     @hapic.output_body(UserSchema())
@@ -544,6 +559,10 @@ class UserController(Controller):
         return uapi.get_user_with_context(user)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENABLE_AND_DISABLE_ENDPOINTS])
+    @hapic.handle_exception(GuestUserNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TooManyUsersError, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TooManyGuestsError, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TooManyWorkspacesError, HTTPStatus.BAD_REQUEST)
     @check_right(is_administrator)
     @hapic.input_path(UserIdPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
@@ -607,6 +626,10 @@ class UserController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @hapic.handle_exception(UserCantChangeIsOwnProfile, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(GuestUserNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TooManyUsersError, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TooManyGuestsError, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TooManyWorkspacesError, HTTPStatus.BAD_REQUEST)
     @check_right(is_administrator)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_body(SetUserProfileSchema())
@@ -629,6 +652,9 @@ class UserController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @hapic.handle_exception(GuestUserNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TooManyUsersError, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TooManyGuestsError, HTTPStatus.BAD_REQUEST)
     @check_right(is_administrator)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_body(SetUserAllowedSpaceSchema())
@@ -734,6 +760,7 @@ class UserController(Controller):
         content_api.mark_read__workspace(request.current_workspace)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_NOTIFICATION_ENDPOINTS])
+    @hapic.handle_exception(GuestUserNotAllowed, HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_path(UserWorkspaceIdPathSchema())
     @hapic.input_body(EmailNotificationTypeSchema())

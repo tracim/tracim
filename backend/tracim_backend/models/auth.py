@@ -72,9 +72,10 @@ class Profile(enum.Enum):
     """This model is the "max" profile associated to a given user."""
 
     NOBODY = (0, "nobody")
-    USER = (1, "users")
-    TRUSTED_USER = (2, "trusted-users")
-    ADMIN = (3, "administrators")
+    GUEST = (1, "guests")
+    USER = (2, "users")
+    TRUSTED_USER = (3, "trusted-users")
+    ADMIN = (4, "administrators")
 
     def __init__(self, profile_id: int, slug: str):
         self.id = profile_id

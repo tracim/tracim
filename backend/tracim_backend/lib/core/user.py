@@ -44,6 +44,7 @@ from tracim_backend.exceptions import EmailTemplateError
 from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
+from tracim_backend.exceptions import GuestUserNotAllowed
 from tracim_backend.exceptions import InvalidUsernameFormat
 from tracim_backend.exceptions import MissingEmailCantResetPassword
 from tracim_backend.exceptions import MissingLDAPConnector
@@ -55,7 +56,10 @@ from tracim_backend.exceptions import NotificationSendingFailed
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import RemoteUserAuthDisabled
 from tracim_backend.exceptions import ReservedUsernameError
+from tracim_backend.exceptions import TooManyGuestsError
 from tracim_backend.exceptions import TooManyOnlineUsersError
+from tracim_backend.exceptions import TooManyUsersError
+from tracim_backend.exceptions import TooManyWorkspacesError
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UnknownAuthType
@@ -92,6 +96,7 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.mention import TRANSLATED_GROUP_MENTIONS
+from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.models.social import UserFollower
 from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.models.user_custom_properties import UserCustomProperties
@@ -220,20 +225,32 @@ class UserApi(object):
     def get_all(self) -> typing.List[User]:
         return self._get_all_query().all()
 
-    def get_all_user_ids(self) -> typing.List[int]:
+    def get_all_user_ids(self, active_only=False) -> typing.List[int]:
         """When only needing user ids, this is much faster than get_all()."""
+        if active_only:
+            query = self._session.query(User.user_id).filter(User.is_active).all()
+        else:
+            query = self._session.query(User.user_id).all()
         return self._session.use_cache(
             "UserApi.get_all_user_ids()",
-            lambda: [r[0] for r in self._session.query(User.user_id).all()],
+            lambda: [r[0] for r in query],
         )
 
-    def get_user_ids_from_profile(self, profile: Profile) -> typing.Iterable[int]:
+    def get_user_ids_from_profile(
+        self, profile: Profile, active_only=False
+    ) -> typing.Iterable[int]:
+        if active_only:
+            query = (
+                self._session.query(User.user_id)
+                .filter(User.profile == profile)
+                .filter(User.is_active)
+                .all()
+            )
+        else:
+            query = self._session.query(User.user_id).filter(User.profile == profile).all()
         ids = self._session.use_cache(
             f"UserApi.get_user_ids_from_profile({profile})",
-            lambda: [
-                r[0]
-                for r in self._session.query(User.user_id).filter(User.profile == profile).all()
-            ],
+            lambda: [r[0] for r in query],
         )
         return ids
 
@@ -1148,6 +1165,10 @@ need to be in every workspace you include."
                 raise UserCantChangeIsOwnProfile(
                     "User {} can't change is own profile".format(user.user_id)
                 )
+            if user.profile == Profile.GUEST and profile != Profile.GUEST:
+                self._check_if_allowed_as_user(user)
+            elif profile == Profile.GUEST and user.profile != Profile.GUEST:
+                self._check_if_allowed_as_guest(user)
             user.profile = profile
 
         if allowed_space is not None:
@@ -1284,7 +1305,16 @@ need to be in every workspace you include."
         user.display_name = email.split("@")[0] if email else username
         user.created = datetime.datetime.utcnow()
         if not profile:
-            profile = Profile.get_profile_from_slug(self._config.USER__DEFAULT_PROFILE)
+            if email and not email.endswith(self._config.LIMITATION__STANDARD_USER_EMAIL_DOMAIN):
+                profile = Profile.GUEST
+            else:
+                profile = Profile.get_profile_from_slug(self._config.USER__DEFAULT_PROFILE)
+
+        if profile == Profile.GUEST:
+            self._check_if_allowed_as_guest(user)
+        if profile != Profile.GUEST:
+            self._check_if_allowed_as_user(user)
+
         user.profile = profile
 
         self.set_avatar(
@@ -1342,6 +1372,10 @@ need to be in every workspace you include."
         )
 
     def enable(self, user: User, do_save=False):
+        if user.profile == Profile.GUEST:
+            self._check_if_allowed_as_guest(user)
+        elif user.profile != Profile.GUEST:
+            self._check_if_allowed_as_user(user)
         user.is_active = True
         if do_save:
             self.save(user)
@@ -1724,3 +1758,46 @@ need to be in every workspace you include."
         <text fill="#fdfdfd" font-family="Nunito" font-weight="bold" font-size="50" x="50" y="65" text-anchor="middle">{avatar_name}</text>
 </svg>"""
         return io.BytesIO(svg_string.encode())
+
+    def _check_if_allowed_as_guest(self, user: User):
+        if self._config.LIMITATION__MAX_GUEST_USERS != -1:
+            nb_guest_user = len(self.get_user_ids_from_profile(Profile.GUEST, True))
+            if nb_guest_user >= self._config.LIMITATION__MAX_GUEST_USERS:
+                raise TooManyGuestsError(
+                    "maximum number of {} guest users reached".format(
+                        self._config.LIMITATION__MAX_GUEST_USERS
+                    )
+                )
+        user_workspaces: List[UserWorkspaceConfig] = (
+            self._session.query(UserWorkspaceConfig)
+            .filter(UserWorkspaceConfig.user_id == user.user_id)
+            .all()
+        )
+        if (
+            self._config.LIMITATION__MAX_GUEST_USER_SPACE_NB != -1
+            and len(user_workspaces) > self._config.LIMITATION__MAX_GUEST_USER_SPACE_NB
+        ):
+            raise TooManyWorkspacesError(
+                "Space limit reached for user {}. Guest accounts can only access {} spaces".format(
+                    user.user_id, self._config.LIMITATION__MAX_GUEST_USER_SPACE_NB
+                )
+            )
+        for user_workspace in user_workspaces:
+            if user_workspace.role > WorkspaceRoles.CONTRIBUTOR.level:
+                raise GuestUserNotAllowed(
+                    "The user {} has a role too high level in space {} to become a guest".format(
+                        user.user_id, user_workspace.workspace_id
+                    )
+                )
+
+    def _check_if_allowed_as_user(self, user: User):
+        if self._config.LIMITATION__MAX_NON_GUEST_USERS == -1:
+            return
+        nb_guest_user = len(self.get_user_ids_from_profile(Profile.GUEST, True))
+        nb_non_guest_user = len(self.get_all_user_ids(True)) - nb_guest_user
+        if nb_non_guest_user >= self._config.LIMITATION__MAX_NON_GUEST_USERS:
+            raise TooManyUsersError(
+                "maximum number of {} users reached".format(
+                    self._config.LIMITATION__MAX_NON_GUEST_USERS
+                )
+            )

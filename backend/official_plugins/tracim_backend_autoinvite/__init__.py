@@ -1,6 +1,8 @@
 from pluggy import PluginManager
 
+from tracim_backend.exceptions import GuestUserNotAllowed
 from tracim_backend.exceptions import RoleAlreadyExistError
+from tracim_backend.exceptions import TooManyWorkspacesError
 from tracim_backend.lib.core.plugins import hookimpl
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
@@ -38,7 +40,7 @@ class AutoInvitePlugin:
                     email_notification_type=EmailNotificationType.default(),
                     flush=False,
                 )
-            except RoleAlreadyExistError:
+            except (RoleAlreadyExistError, GuestUserNotAllowed, TooManyWorkspacesError):
                 pass
 
     @hookimpl
@@ -63,7 +65,7 @@ class AutoInvitePlugin:
                             email_notification_type=EmailNotificationType.default(),
                             flush=False,
                         )
-                    except RoleAlreadyExistError:
+                    except (RoleAlreadyExistError, GuestUserNotAllowed, TooManyWorkspacesError):
                         pass
 
 

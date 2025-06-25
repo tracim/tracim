@@ -14,9 +14,13 @@ from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import DisallowedWorkspaceAccessType
 from tracim_backend.exceptions import EmailValidationFailed
 from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import GuestUserNotAllowed
 from tracim_backend.exceptions import LastWorkspaceManagerRoleCantBeModified
 from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.exceptions import RoleAlreadyExistError
+from tracim_backend.exceptions import TooManyGuestsError
+from tracim_backend.exceptions import TooManyUsersError
+from tracim_backend.exceptions import TooManyWorkspacesError
 from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserIsDeleted
@@ -209,6 +213,7 @@ class WorkspaceController(Controller):
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(DisallowedWorkspaceAccessType, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UserNotAllowedToCreateMoreWorkspace, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(GuestUserNotAllowed, HTTPStatus.BAD_REQUEST)
     @check_right(is_trusted_user)
     @hapic.input_body(WorkspaceCreationSchema())
     @hapic.output_body(WorkspaceSchema())
@@ -359,6 +364,10 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
     @hapic.handle_exception(UserRoleNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(GuestUserNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TooManyWorkspacesError, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TooManyUsersError, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TooManyGuestsError, HTTPStatus.BAD_REQUEST)
     @check_right(can_modify_workspace)
     @hapic.handle_exception(LastWorkspaceManagerRoleCantBeModified, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
@@ -414,6 +423,10 @@ class WorkspaceController(Controller):
     @hapic.handle_exception(UserIsNotActive, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UserIsDeleted, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(RoleAlreadyExistError, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(GuestUserNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TooManyUsersError, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TooManyGuestsError, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TooManyWorkspacesError, HTTPStatus.BAD_REQUEST)
     @check_right(can_modify_workspace)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_body(WorkspaceMemberInviteSchema())
@@ -514,6 +527,8 @@ class WorkspaceController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_SUBSCRIPTION_ENDPOINTS])
     @check_right(can_modify_workspace)
     @hapic.handle_exception(RoleAlreadyExistError, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(GuestUserNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TooManyWorkspacesError, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(WorkspaceAndUserIdPathSchema())
     @hapic.input_body(RoleUpdateSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
