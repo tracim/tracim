@@ -1,6 +1,8 @@
 from pluggy import PluginManager
 
+from tracim_backend.exceptions import GuestUserNotAllowed
 from tracim_backend.exceptions import RoleAlreadyExistError
+from tracim_backend.exceptions import TooManyWorkspacesError
 from tracim_backend.lib.core.plugins import hookimpl
 from tracim_backend.lib.core.userworkspace import UserWorkspaceConfigApi
 from tracim_backend.lib.utils.request import TracimContext
@@ -46,7 +48,7 @@ class ParentAccessPlugin:
                         email_notification_type=EmailNotificationType.default(),
                         flush=False,
                     )
-                except RoleAlreadyExistError:
+                except (RoleAlreadyExistError, GuestUserNotAllowed, TooManyWorkspacesError):
                     pass
             current_workspace = current_workspace.parent
 
