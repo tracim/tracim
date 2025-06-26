@@ -12,6 +12,7 @@
       text-align: right;
     }
 
+    /* TODO replace by something else that supports localization */
     label:after {
       content: ":";
     }

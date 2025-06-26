@@ -42,6 +42,15 @@ export const attendeeRoleTypes = ['CHAIR',
 ] as const
 export type IcsAttendeeRoleTypes = typeof attendeeRoleTypes
 
+export const namedRRules = [
+  'FREQ=DAILY',
+  'FREQ=WEEKLY',
+  'BYDAY=MO,TU,WE,TH,FR;FREQ=DAILY',
+  'INTERVAL=2;FREQ=WEEKLY',
+  'FREQ=MONTHLY',
+  'FREQ=YEARLY',
+] as const
+
 export const availableViews = ['timeGridDay',
   'timeGridWeek',
   'dayGridMonth',
@@ -89,6 +98,15 @@ export type DisplayedCalendarEvent = {
   calendarUrl: string
   event: IcsEvent
   recurringEvent?: IcsEvent
+}
+
+export type EventElementInfo = {
+  calendar: Calendar
+  event: IcsEvent
+  view: View
+}
+export type EventElementHandlers = {
+  getEventElement: (info: EventElementInfo) => Node[]
 }
 
 export type EventEditCallback = (event: CalendarEvent) => Promise<Response>

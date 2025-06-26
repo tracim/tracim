@@ -30,5 +30,16 @@
     "NON-PARTICIPANT": "Non participant",
     "editRecurring": "This is a recurring event",
     "editAll": "Edit all occurrences",
-    "editSingle": "Edit this occurrence only"
+    "editSingle": "Edit this occurrence only",
+    "rrule": "Frequency",
+    "rrules": {
+        "none": "Never",
+        "unchanged": "Keep existing",
+        "FREQ=DAILY": "Daily",
+        "FREQ=WEEKLY": "Weekly",
+        "BYDAY=MO,TU,WE,TH,FR;FREQ=DAILY": "Workdays",
+        "INTERVAL=2;FREQ=WEEKLY": "Every two week",
+        "FREQ=MONTHLY": "Monthly",
+        "FREQ=YEARLY": "Yearly"
+    }
 }

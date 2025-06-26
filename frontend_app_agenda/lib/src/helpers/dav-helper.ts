@@ -4,16 +4,6 @@ import { createAccount, fetchCalendars as davFetchCalendars, fetchCalendarObject
 import type { CalendarSource, ServerSource, Calendar, CalendarObject, CalendarResponse } from '../types'
 import { isServerSource } from './types-helper'
 
-// TODO does not work with recurring events
-// BUG ts-ics issue: https://github.com/Neuvernetzung/ts-ics/issues/165
-function generateIcsCalendarTzFix(calendar: IcsCalendar) {
-  for (const event of calendar.events ?? []) {
-    if (event.start.local) event.start.local.date = event.start.date
-    if (event.end?.local) event.end.local.date = event.end.date
-  }
-  return generateIcsCalendar(calendar)
-}
-
 export async function fetchCalendars(source: ServerSource | CalendarSource): Promise<Calendar[]> {
   if (isServerSource(source)) {
     const account = await createAccount({
@@ -79,7 +69,7 @@ export async function createCalendarObject(
   validateTimezones(calendarObjectData)
   for (const event of calendarObjectData.events ?? []) event.uid = crypto.randomUUID()
   const uid = calendarObjectData.events?.[0].uid ?? crypto.randomUUID()
-  const iCalString = generateIcsCalendarTzFix(calendarObjectData)
+  const iCalString = generateIcsCalendar(calendarObjectData)
   const response = await davCreateCalendarObject({
     calendar,
     iCalString,
@@ -98,7 +88,7 @@ export async function updateCalendarObject(
   const davCalendarObject: DAVCalendarObject = {
     url: calendarObject.url,
     etag: calendarObject.etag,
-    data: generateIcsCalendarTzFix(calendarObject.data),
+    data: generateIcsCalendar(calendarObject.data),
   }
   const response = await davUpdateCalendarObject({
     calendarObject: davCalendarObject,
@@ -116,7 +106,7 @@ export async function deleteCalendarObject(
   const davCalendarObject: DAVCalendarObject = {
     url: calendarObject.url,
     etag: calendarObject.etag,
-    data: generateIcsCalendarTzFix(calendarObject.data),
+    data: generateIcsCalendar(calendarObject.data),
   }
   const response = await davDeleteCalendarObject({
     calendarObject: davCalendarObject,

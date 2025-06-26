@@ -29,7 +29,6 @@ export class CalendarClient {
 
   public getCalendars = () => this._calendars
 
-  // TODO return another type that includes the "original" event for recurring events
   public getCalendarEvent = (uid: EventUid): DisplayedCalendarEvent | undefined => {
     for (const calendarObject of this._calendarObjectsPerCalendar.flat()) {
       for (const event of calendarObject.data.events ?? []) {
@@ -44,14 +43,20 @@ export class CalendarClient {
   }
 
   private getCalendarObject = (uid: IcsEvent): CalendarObject | undefined => {
-    const searchList = (uid.recurrenceId || uid.recurrenceRule)
-      ? this._recurringObjectsPerCalendar
-      : this._calendarObjectsPerCalendar
-    for (const calendarObject of searchList.flat()) {
+    for (const calendarObject of this._calendarObjectsPerCalendar.flat()) {
       for (const event of calendarObject.data.events ?? []) {
         // Since we look are just looking for the CalendarObject and not the event in particular,
         // we just need to check the uid
-        if (event.uid === uid.uid) return calendarObject
+        if (event.uid !== uid.uid) continue
+        if (event.recurrenceId) {
+          for (const recurringObject of this._recurringObjectsPerCalendar.flat()) {
+            for (const event of recurringObject.data.events ?? []) {
+              if (event.uid === uid.uid) return recurringObject
+            }
+          }
+          return undefined
+        }
+        return calendarObject
       }
     }
     return undefined
@@ -94,9 +99,8 @@ export class CalendarClient {
       calendarObject.data.events![index] = event
     }
 
-    // Sync recurrenceIds
     if (event.recurrenceRule) {
-      // Use map to create new events when updating recurrenceId
+      // Sync recurrenceIds
       calendarObject.data.events = calendarObject.data.events!.map(element => {
         if (element === event || !isRRuleSourceEvent(element, event)) return element
         const recurrenceOffset = element.recurrenceId!.value.date.getTime() - oldEvents[index].start.date.getTime()
@@ -104,6 +108,11 @@ export class CalendarClient {
           ...element,
           recurrenceId: { value: offsetDate(event.start, recurrenceOffset) },
         }
+      })
+      // Sync exceptionDates
+      event.exceptionDates = event.exceptionDates?.map(value => {
+        const recurrenceOffset = value.date.getTime() - oldEvents[index].start.date.getTime()
+        return offsetDate(event.start, recurrenceOffset)
       })
     }
     const response = await updateCalendarObject(calendar, calendarObject)

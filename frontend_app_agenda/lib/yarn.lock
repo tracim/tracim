@@ -31,7 +31,7 @@ __metadata:
     rimraf: ^6.0.1
     style-loader: ^4.0.0
     timezones-ical-library: ^1.10.0
-    ts-ics: ^2.1.7
+    ts-ics: ^2.1.8
     ts-loader: ^9.5.2
     tsdav: ^2.1.4
     typescript: ^5.8.3
@@ -4999,12 +4999,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-ics@npm:^2.1.7":
-  version: 2.1.7
-  resolution: "ts-ics@npm:2.1.7"
+"ts-ics@npm:^2.1.8":
+  version: 2.1.8
+  resolution: "ts-ics@npm:2.1.8"
   dependencies:
     "@standard-schema/spec": ^1.0.0
-  checksum: 2924f67682c0a80d5ca71f586b68e3a0603dc5695d23bd32184a22d5e56a0486396e350798dd6e2cfd81bec7d5d52764d3159974c25ce17a7eda560b032838b4
+  checksum: 0fa3821a4a054710ca0b5816f9c519d3c53911524740a8b51edf636a21792d8360889398d9e8297d3c59c8cae1eae6f1f8737ac9a6aafc4a5aa1bc176818e429
   languageName: node
   linkType: hard
 

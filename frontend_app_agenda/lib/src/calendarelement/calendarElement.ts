@@ -4,7 +4,7 @@ import '@event-calendar/core/index.css'
 import { getEventEnd, type IcsEvent } from 'ts-ics'
 import { EventEditPopup } from '../eventeditpopup/eventEditPopup'
 import { hasCalendarHandlers, hasEventHandlers } from '../helpers/types-helper'
-import type { CalendarOptions, CalendarSource, ServerSource, EventUid, EventEditHandlers, CalendarEvent, PostEventChangeHandlers, SelectCalendarHandlers, SelectedCalendar } from '../types'
+import type { CalendarOptions, CalendarSource, ServerSource, EventUid, EventEditHandlers, CalendarEvent, PostEventChangeHandlers, SelectCalendarHandlers, SelectedCalendar, View } from '../types'
 import { isEventAllDay, offsetDate } from '../helpers/ics-helper'
 import './calendarElement.css'
 import { CalendarSelectDropdown } from '../calendarselectdropdown/calendarSelectDropdown'
@@ -12,6 +12,7 @@ import { icon, library } from '@fortawesome/fontawesome-svg-core'
 import { faRefresh, faRepeat } from '@fortawesome/free-solid-svg-icons'
 import { CalendarClient } from '../calendarClient'
 import i18n from '../i18n'
+import { EventElement } from '../eventElement/eventElement'
 
 library.add(faRefresh, faRepeat)
 
@@ -20,6 +21,7 @@ export class CalendarElement {
   private _selectedCalendars: Set<string>
 
   private _calendar: EventCalendar | null = null
+  private _eventElement: EventElement | null = null
   private _eventEdit: EventEditPopup | null = null
   private _calendarSelect: CalendarSelectDropdown | null = null
 
@@ -73,6 +75,8 @@ export class CalendarElement {
     }
 
     this.createCalendar(target, options)
+
+    this._eventElement = new EventElement()
   }
 
   public destroy = () => {
@@ -184,8 +188,16 @@ export class CalendarElement {
   }
 
   // TODO mustache
-  private getEventContent = (info: EventCalendar.EventContentInfo) => {
-    return { html: `${info.event.title}`+icon({ prefix: 'fas', iconName: 'refresh' }).html.join() }
+  private getEventContent = ({ event, view }: EventCalendar.EventContentInfo): EventCalendar.Content => {
+    const calendarEvent = this._client.getCalendarEvent(event.extendedProps as EventUid)!
+    const calendar = this._client.getCalendarByUrl(calendarEvent.calendarUrl)!
+    return {
+      domNodes: this._eventElement!.getElement({
+        event: calendarEvent.event,
+        calendar,
+        view: view.type as View,
+      }),
+    }
   }
 
   private onSelectTimeRange = ({ allDay, start, end, jsEvent}: EventCalendar.SelectInfo) => {

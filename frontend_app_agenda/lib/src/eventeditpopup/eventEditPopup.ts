@@ -1,9 +1,9 @@
-import { getEventEndFromDuration, type IcsAttendee, type IcsDateObject, type IcsEvent } from 'ts-ics'
+import { convertIcsRecurrenceRule, getEventEndFromDuration, type IcsAttendee, type IcsDateObject, type IcsEvent } from 'ts-ics'
 import './eventEditPopup.css'
-import { attendeeRoleTypes, type Calendar, type EventEditCallback, type EventEditCreateInfo, type EventEditDeleteInfo, type EventEditUpdateInfo } from '../types'
+import { attendeeRoleTypes, namedRRules, type Calendar, type EventEditCallback, type EventEditCreateInfo, type EventEditDeleteInfo, type EventEditUpdateInfo } from '../types'
 import { Popup } from '../popup/popup'
 import { parseHtml } from '../helpers/dom-helper'
-import { isEventAllDay, offsetDate } from '../helpers/ics-helper'
+import { getRRuleString, isEventAllDay, offsetDate } from '../helpers/ics-helper'
 import { tzlib_get_ical_block, tzlib_get_offset, tzlib_get_timezones } from 'timezones-ical-library'
 import i18n from '../i18n'
 import { RecurringEventPopup } from './recurringEventPopup'
@@ -51,6 +51,14 @@ const html = /*html*/`
         <div class="form-list"> </div>
         <button type="button">{{t.addAttendee}}</button>
     </div>
+    <label for="event-edit-rrule">{{t.rrule}}</label>
+    <select id="event-edit-rrule" name="rrule">
+      <option value="">{{t.rrules.none}}</option>
+      {{#rrules}}
+      <option value="{{rule}}">{{label}}</option>
+      {{/rrules}}
+      <option id="event-edit-rrule-unchanged" value="">{{t.rrules.unchanged}}</option>
+    </select>
     <label for="event-edit-description">{{t.description}}</label>
     <textarea id="event-edit-description" name="description"> </textarea>
   </div>
@@ -86,6 +94,7 @@ export class EventEditPopup {
   private _form: HTMLFormElement
   private _calendar: HTMLSelectElement
   private _attendees: HTMLDivElement
+  private _rruleUnchanged: HTMLOptionElement
 
   private _event?: IcsEvent
   private _calendarUrl?: string
@@ -99,7 +108,11 @@ export class EventEditPopup {
     this._recurringPopup = new RecurringEventPopup(target)
 
     this._popup = new Popup(target)
-    this._form = parseHtml<HTMLFormElement>(html, { t: translations, timezones: timezones })[0]
+    this._form = parseHtml<HTMLFormElement>(html, {
+      t: translations,
+      timezones: timezones,
+      rrules: namedRRules.map(rule => ({ rule, label: i18n.t(`rrules.${rule}`)})),
+    })[0]
     this._popup.content.appendChild(this._form)
 
     this._calendar = this._form.querySelector<HTMLSelectElement>('#event-edit-calendar')!
@@ -107,6 +120,7 @@ export class EventEditPopup {
     const addAttendee = this._form.querySelector<HTMLDivElement>('#event-edit-attendees > button')!
     const cancel = this._form.querySelector<HTMLButtonElement>('.form-buttons [name="cancel"]')!
     const remove = this._form.querySelector<HTMLButtonElement>('.form-buttons [name="delete"]')!
+    this._rruleUnchanged = this._form.querySelector<HTMLOptionElement>('#event-edit-rrule-unchanged')!
 
     this._form.addEventListener('submit', async (e) => { e.preventDefault(); await this.save() })
     addAttendee.addEventListener('click', () => this.addAttendee({ email: '' }))
@@ -186,6 +200,7 @@ export class EventEditPopup {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const inputs: { [key: string]: any } = this._form.elements
     inputs['calendar'].value = calendarUrl
+    inputs['calendar'].disabled = event.recurrenceId
     inputs['summary'].value = event.summary ?? ''
     inputs['location'].value = event.location ?? ''
     inputs['allday'].checked = isEventAllDay(event)
@@ -198,6 +213,11 @@ export class EventEditPopup {
     inputs['description'].value = event.description ?? '' // TODO rich text
     inputs['email-organizer'].value = event.organizer?.email ?? ''
     inputs['name-organizer'].value = event.organizer?.name ?? ''
+
+    const rrule =  getRRuleString(event.recurrenceRule)
+    this._rruleUnchanged.value = rrule
+    inputs['rrule'].value = rrule
+    inputs['rrule'].disabled = event.recurrenceId
 
     this._attendees.innerHTML = ''
     for (const attendee of event.attendees ?? []) this.addAttendee(attendee)
@@ -228,6 +248,7 @@ export class EventEditPopup {
     const emails = data.getAll('email') as string[]
     const names = data.getAll('name') as string[]
     const roles = data.getAll('role') as string[]
+    const rrule = data.get('rrule') as string
 
     // @ts-expect-error either end or duration will be defined
     const event: IcsEvent = {
@@ -249,6 +270,7 @@ export class EventEditPopup {
         name: names[i],
         role: roles[i],
       })) || undefined,
+      recurrenceRule: rrule ? convertIcsRecurrenceRule(undefined, {value: rrule}) : undefined,
     }
     const response = await this._handleSave!({ calendarUrl: data.get('calendar') as string, event })
     if (response.ok) this._popup.setVisible(false)

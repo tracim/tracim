@@ -30,5 +30,16 @@
     "NON-PARTICIPANT": "Non participant",
     "editRecurring": "Cet évènement est récurrent",
     "editAll": "Modifier toutes les occurrences",
-    "editSingle": "Modifier uniquement cette occurrence"
+    "editSingle": "Modifier uniquement cette occurrence",
+    "rrule": "Répétition",
+    "rrules": {
+        "none": "Never",
+        "unchanged": "Garder la répétition actuelle",
+        "FREQ=DAILY": "Quotidienne",
+        "FREQ=WEEKLY": "Hebdomadaire",
+        "BYDAY=MO,TU,WE,TH,FR;FREQ=DAILY": "Chaque jour ouvrable",
+        "INTERVAL=2;FREQ=WEEKLY": "Toutes les 2 semaines",
+        "FREQ=MONTHLY": "Mensuelle",
+        "FREQ=YEARLY": "Annuelle"
+    }
 }
