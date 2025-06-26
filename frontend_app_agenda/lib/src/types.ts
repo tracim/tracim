@@ -35,12 +35,13 @@ export type EventUid = {
 // export const alarmActionTypes = ["DISPLAY"] as const;
 // export type IcsAlarmActionTypes = typeof alarmActionTypes;
 
-export const attendeeRoleTypes = ['CHAIR',
+export const attendeeRoleTypes = [
+  'CHAIR',
   'REQ-PARTICIPANT',
   'OPT-PARTICIPANT',
   'NON-PARTICIPANT',
 ] as const
-export type IcsAttendeeRoleTypes = typeof attendeeRoleTypes
+export type IcsAttendeeRoleType = typeof attendeeRoleTypes[number]
 
 export const namedRRules = [
   'FREQ=DAILY',
@@ -51,7 +52,8 @@ export const namedRRules = [
   'FREQ=YEARLY',
 ] as const
 
-export const availableViews = ['timeGridDay',
+export const availableViews = [
+  'timeGridDay',
   'timeGridWeek',
   'dayGridMonth',
   'listDay',
@@ -100,13 +102,13 @@ export type DisplayedCalendarEvent = {
   recurringEvent?: IcsEvent
 }
 
-export type EventElementInfo = {
+export type EventBodyInfo = {
   calendar: Calendar
   event: IcsEvent
   view: View
 }
-export type EventElementHandlers = {
-  getEventElement: (info: EventElementInfo) => Node[]
+export type EventBodyHandlers = {
+  getEventBody: (info: EventBodyInfo) => Node[]
 }
 
 export type EventEditCallback = (event: CalendarEvent) => Promise<Response>

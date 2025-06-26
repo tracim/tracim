@@ -78,7 +78,7 @@ const calendarsHtml = /*html*/`
 const attendeeHtml = /*html*/`
 <div class="event-edit-attendee">
   <input type="email" name="email" placeholder="{{t.email}}" required value="{{email}}"/>
-  <input type="name" name="name" placeholder="{{t.name}}" required value="{{name}}"/>
+  <input type="name" name="name" placeholder="{{t.name}}" value="{{name}}"/>
   <select name="role" value="{{role}}" required>
     {{#roles}}
       <option value="{{key}}">{{translation}}</option>
@@ -142,10 +142,10 @@ export class EventEditPopup {
   }
 
   private addAttendee = (attendee: IcsAttendee) => {
-    const element = parseHtml(attendeeHtml, {
+    const element = parseHtml<HTMLDivElement>(attendeeHtml, {
       ...attendee,
       role: attendee.role || 'REQ-PARTICIPANT',
-      roles: attendeeRoleTypes.map(role => ({ key: role, translation: i18n.t(role) })),
+      roles: attendeeRoleTypes.map(role => ({ key: role, translation: i18n.t(`attendeeRoles.${role}`) })),
       t: i18n.getResourceBundle(i18n.language, 'translation'),
     })[0]
     this._attendees.appendChild(element)
@@ -211,6 +211,8 @@ export class EventEditPopup {
     inputs['end-time'].value = localEnd.date.toISOString().split('T')[1].slice(0, 5)
     inputs['end-timezone'].value = localEnd.timezone
     inputs['description'].value = event.description ?? '' // TODO rich text
+
+    // TODO check if ifs needed, as I think thunderbird add them to the attendees list
     inputs['email-organizer'].value = event.organizer?.email ?? ''
     inputs['name-organizer'].value = event.organizer?.name ?? ''
 

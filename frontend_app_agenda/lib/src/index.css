@@ -39,6 +39,11 @@
   }
 }
 
-body {
+#calendar-client {
   font-family: sans-serif;
+  height: 100%;
+}
+
+.ec {
+  height: 100%;
 }

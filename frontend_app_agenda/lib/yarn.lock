@@ -19,6 +19,7 @@ __metadata:
     "@types/event-calendar__core": ^4.4.0
     "@types/mustache": ^4.2.6
     "@types/node": ^24.0.3
+    autolinker: ^4.1.5
     css-loader: ^7.1.2
     dts-bundle-webpack: ^1.0.2
     eslint: ^9.29.0
@@ -1431,6 +1432,15 @@ __metadata:
     object.assign: ^4.1.4
     util: ^0.12.5
   checksum: 1ed1cabba9abe55f4109b3f7292b4e4f3cf2953aad8dc148c0b3c3bd676675c31b1abb32ef563b7d5a19d1715bf90d1e5f09fad2a4ee655199468902da80f7c2
+  languageName: node
+  linkType: hard
+
+"autolinker@npm:^4.1.5":
+  version: 4.1.5
+  resolution: "autolinker@npm:4.1.5"
+  dependencies:
+    tslib: ^2.8.1
+  checksum: 0442ebca65e4160e8aa2a7f2377dac64247058fbc193ac00be3016c1e692db63aff540f205437a9b088d86114bb6a94d8fb0dcd152f214141d45200a023fd124
   languageName: node
   linkType: hard
 
@@ -5033,6 +5043,13 @@ __metadata:
     debug: 4.4.0
     xml-js: 1.6.11
   checksum: 296147ab46546e2e51fa575d392e59c50f95d14e4859db0c722108f506d040466d553f2becad53aad3f370c7a35a8c6a16dda7dba1a26279aabbaf5efd512d7b
+  languageName: node
+  linkType: hard
+
+"tslib@npm:^2.8.1":
+  version: 2.8.1
+  resolution: "tslib@npm:2.8.1"
+  checksum: e4aba30e632b8c8902b47587fd13345e2827fa639e7c3121074d5ee0880723282411a8838f830b55100cbe4517672f84a2472667d355b81e8af165a55dc6203a
   languageName: node
   linkType: hard
 

@@ -1,6 +1,6 @@
 import Mustache from 'mustache'
 
-export function parseHtml<E extends Element = Element>(html: string, format?: unknown): HTMLCollectionOf<E> {
+export function parseHtml<N extends ChildNode = ChildNode>(html: string, format?: unknown): NodeListOf<N> {
   html = Mustache.render(html, format)
-  return Document.parseHTMLUnsafe(html).body.children as HTMLCollectionOf<E>
+  return Document.parseHTMLUnsafe(html).body.childNodes as NodeListOf<N>
 }

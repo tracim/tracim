@@ -24,10 +24,19 @@
     "chooseACalendar": "-- Choisissez un calendrier --",
     "email": "email",
     "name": "nom",
-    "CHAIR": "Organisateur",
-    "REQ-PARTICIPANT": "Participant obligatoire",
-    "OPT-PARTICIPANT": "Participant optionnel",
-    "NON-PARTICIPANT": "Non participant",
+    "partStatus": {
+      "NEEDS-ACTION": "Doit répondre",
+      "ACCEPTED": "Accepté",
+      "DECLINED": "Refusé",
+      "TENTATIVE": "Provisoirement accepté",
+      "DELEGATED": "Délégué"
+    },
+    "attendeeRoles": {
+      "CHAIR": "Organisateur",
+      "REQ-PARTICIPANT": "Participant obligatoire",
+      "OPT-PARTICIPANT": "Participant optionnel",
+      "NON-PARTICIPANT": "Non participant"
+    },
     "editRecurring": "Cet évènement est récurrent",
     "editAll": "Modifier toutes les occurrences",
     "editSingle": "Modifier uniquement cette occurrence",

@@ -8,14 +8,14 @@ const html = /*html*/`
 
 export class Popup {
 
-  private _node: Element
-  public content: Element
+  private _node: HTMLDivElement
+  public content: HTMLDivElement
 
   constructor(target: Node) {
-    this._node = parseHtml(html)[0]
+    this._node = parseHtml<HTMLDivElement>(html)[0]
     target.appendChild(this._node)
 
-    this.content = this._node.firstElementChild!
+    this.content = this._node.firstElementChild as HTMLDivElement
 
     window.addEventListener('click', e => {
       if (this._node.classList.contains('popup-hidden')) return

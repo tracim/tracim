@@ -24,10 +24,19 @@
     "chooseACalendar": "-- Choose a calendar --",
     "email": "email",
     "name": "name",
-    "CHAIR": "Chair",
-    "REQ-PARTICIPANT": "Required participant",
-    "OPT-PARTICIPANT": "Optional participant",
-    "NON-PARTICIPANT": "Non participant",
+    "partStatus": {
+      "NEEDS-ACTION": "Needs to answer",
+      "ACCEPTED": "Accepted",
+      "DECLINED": "Declined",
+      "TENTATIVE": "Tentatively accepted",
+      "DELEGATED": "Delegated"
+    },
+    "attendeeRoles": {
+      "CHAIR": "Chair",
+      "REQ-PARTICIPANT": "Required participant",
+      "OPT-PARTICIPANT": "Optional participant",
+      "NON-PARTICIPANT": "Non participant"
+    },
     "editRecurring": "This is a recurring event",
     "editAll": "Edit all occurrences",
     "editSingle": "Edit this occurrence only",

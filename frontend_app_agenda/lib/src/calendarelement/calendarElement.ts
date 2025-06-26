@@ -9,19 +9,19 @@ import { isEventAllDay, offsetDate } from '../helpers/ics-helper'
 import './calendarElement.css'
 import { CalendarSelectDropdown } from '../calendarselectdropdown/calendarSelectDropdown'
 import { icon, library } from '@fortawesome/fontawesome-svg-core'
-import { faRefresh, faRepeat } from '@fortawesome/free-solid-svg-icons'
+import { faRefresh } from '@fortawesome/free-solid-svg-icons'
 import { CalendarClient } from '../calendarClient'
 import i18n from '../i18n'
-import { EventElement } from '../eventElement/eventElement'
+import { EventBody } from '../eventBody/eventBody'
 
-library.add(faRefresh, faRepeat)
+library.add(faRefresh)
 
 export class CalendarElement {
   private _client: CalendarClient
   private _selectedCalendars: Set<string>
 
   private _calendar: EventCalendar | null = null
-  private _eventElement: EventElement | null = null
+  private _eventBody: EventBody | null = null
   private _eventEdit: EventEditPopup | null = null
   private _calendarSelect: CalendarSelectDropdown | null = null
 
@@ -60,7 +60,7 @@ export class CalendarElement {
         onUpdateEvent: options.onUpdateEvent,
         onDeleteEvent: options.onDeleteEvent,
       }
-      : this.createDefaultEventElement(target)
+      : this.createDefaultEventEdit(target)
 
     this._calendarHandlers = options && hasCalendarHandlers(options)
       ? {
@@ -76,12 +76,12 @@ export class CalendarElement {
 
     this.createCalendar(target, options)
 
-    this._eventElement = new EventElement()
+    this._eventBody = new EventBody()
   }
 
   public destroy = () => {
     this.destroyCalendar()
-    this.destroyDefaultEventElement()
+    this.destroyDefaultEventEdit()
     this.destroyDefaultCalendarElement()
   }
 
@@ -134,7 +134,7 @@ export class CalendarElement {
     this._calendar = null
   }
 
-  private createDefaultEventElement = (target: Node): EventEditHandlers => {
+  private createDefaultEventEdit = (target: Node): EventEditHandlers => {
     this._eventEdit ??= new EventEditPopup(target)
     return {
       onCreateEvent: this._eventEdit.onCreate,
@@ -143,7 +143,7 @@ export class CalendarElement {
     }
   }
 
-  private destroyDefaultEventElement = () => {
+  private destroyDefaultEventEdit = () => {
     this._eventEdit?.destroy()
     this._eventEdit = null
   }
@@ -192,7 +192,7 @@ export class CalendarElement {
     const calendarEvent = this._client.getCalendarEvent(event.extendedProps as EventUid)!
     const calendar = this._client.getCalendarByUrl(calendarEvent.calendarUrl)!
     return {
-      domNodes: this._eventElement!.getElement({
+      domNodes: this._eventBody!.getBody({
         event: calendarEvent.event,
         calendar,
         view: view.type as View,

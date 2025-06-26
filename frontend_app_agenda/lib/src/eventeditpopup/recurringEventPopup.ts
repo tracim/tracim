@@ -16,14 +16,14 @@ export class RecurringEventPopup {
 
   public _handleSelect?: (editAll: boolean) => void
 
-  private _element: Element
+  private _element: HTMLDivElement
   private _popup: Popup
 
   public constructor(target: Node) {
     const translations = i18n.getResourceBundle(i18n.language, 'translation')
 
     this._popup = new Popup(target)
-    this._element = parseHtml(html, { t: translations })[0]
+    this._element = parseHtml<HTMLDivElement>(html, { t: translations })[0]
     this._popup.content.appendChild(this._element)
 
     const editAll = this._element.querySelector<HTMLButtonElement>('.form-buttons [name="edit-all"]')!

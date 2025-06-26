@@ -16,7 +16,7 @@ const html = /* html */`
 </div>`
 
 export class CalendarSelectDropdown {
-  private _container: Element | null = null
+  private _container: HTMLDivElement | null = null
 
   public constructor() { }
 
@@ -33,7 +33,7 @@ export class CalendarSelectDropdown {
       this._container = null
       return
     }
-    this._container = parseHtml(html, { calendars })[0]
+    this._container = parseHtml<HTMLDivElement>(html, { calendars })[0]
     parent.insertBefore(this._container, target)
 
     const inputs = this._container.querySelectorAll<HTMLInputElement>('input')
