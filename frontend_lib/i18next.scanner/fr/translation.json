@@ -286,5 +286,11 @@
   "No model": "Sans modèle",
   "Use model:": "Modèle :",
   "Guest": "Invité",
-  "Access to a limited number of spaces and can't be more than contributor": "Accès à un nombre limité d'espace et ne peut pas dépasser le rôle de contributeur"
+  "Access to a limited number of spaces and can't be more than contributor": "Accès à un nombre limité d'espace et ne peut pas dépasser le rôle de contributeur",
+  "Description": "Description",
+  "The file has been updated, it can't be edited anymore": "",
+  "No description": "Pas de description",
+  "Change description": "Changer la description",
+  "Error while saving the user configuration": "Erreur lors de la sauvegarde de la configuration utilisateur",
+  "Error while saving the new description": "Erreur lors de la sauvegarde de la description"
 }

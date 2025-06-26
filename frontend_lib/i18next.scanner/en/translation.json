@@ -286,5 +286,11 @@
   "No model": "No model",
   "Use model:": "Use model:",
   "Guest": "Guest",
-  "Access to a limited number of spaces and can't be more than contributor": "Access to a limited number of spaces and can't be more than contributor"
+  "Access to a limited number of spaces and can't be more than contributor": "Access to a limited number of spaces and can't be more than contributor",
+  "Description": "Description",
+  "The file has been updated, it can't be edited anymore": "The file has been updated, it can't be edited anymore",
+  "No description": "No description",
+  "Change description": "Change description",
+  "Error while saving the user configuration": "Error while saving the user configuration",
+  "Error while saving the new description": "Error while saving the new description"
 }

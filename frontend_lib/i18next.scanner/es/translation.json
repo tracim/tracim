@@ -286,5 +286,11 @@
   "{{count}} Revisions": "",
   "{{count}} Revisions_plural": "",
   "Guest": "",
-  "Access to a limited number of spaces and can't be more than contributor": ""
+  "Access to a limited number of spaces and can't be more than contributor": "",
+  "Description": "",
+  "The file has been updated, it can't be edited anymore": "",
+  "No description": "",
+  "Change description": "",
+  "Error while saving the user configuration": "",
+  "Error while saving the new description": ""
 }
