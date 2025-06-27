@@ -1,6 +1,6 @@
 # Changelog
 
-## 2025-07-00 / TBD
+## 2025-07-00
 
 ### ✨ New Features
 
