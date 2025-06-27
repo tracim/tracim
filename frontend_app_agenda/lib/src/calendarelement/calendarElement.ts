@@ -1,7 +1,7 @@
 import { createCalendar as createEventCalendar, DayGrid, TimeGrid, List, Interaction, destroyCalendar as destroyEventCalendar } from '@event-calendar/core'
 import type { Calendar as EventCalendar } from '@event-calendar/core'
 import '@event-calendar/core/index.css'
-import { getEventEnd, type IcsEvent } from 'ts-ics'
+import { getEventEnd, getEventEndFromDuration, type IcsDateObject, type IcsEvent } from 'ts-ics'
 import { EventEditPopup } from '../eventeditpopup/eventEditPopup'
 import { hasCalendarHandlers, hasEventHandlers } from '../helpers/types-helper'
 import type { CalendarOptions, CalendarSource, ServerSource, EventUid, EventEditHandlers, CalendarEvent, PostEventChangeHandlers, SelectCalendarHandlers, SelectedCalendar, View } from '../types'
@@ -15,6 +15,20 @@ import i18n from '../i18n'
 import { EventBody } from '../eventBody/eventBody'
 
 library.add(faRefresh)
+
+// When an event is the whole day, the date returned by caldav is in UTC (20250627)
+// but since we display the local date, it's interpreted in our timezone (20250627T000200)
+// and for all day events, EC round up to the nearest day (20250628)
+// In the end the event is displayed for one extra day
+// Those functions correct this by "un-applying" the timezone offset
+function dateToECDate(date: Date, allDay: boolean) {
+  if (!allDay) return date
+  return new Date(date.getTime() + date.getTimezoneOffset()*60*1000)
+}
+function ecDateToDate(date: Date, allDay: boolean) {
+  if (!allDay) return date
+  return new Date(date.getTime() - date.getTimezoneOffset()*60*1000)
+}
 
 export class CalendarElement {
   private _client: CalendarClient
@@ -113,6 +127,8 @@ export class CalendarElement {
         dayMaxEvents: true,
         nowIndicator: true,
 
+        firstDay: 1,
+
         // @ts-expect-error This member is not present in "@types/event-calendar__core"
         eventResizableFromStart: options?.editable ?? true,
         selectable: options?.editable ?? true,
@@ -163,14 +179,17 @@ export class CalendarElement {
 
   private fetchAndLoadEvents = async (info: EventCalendar.FetchInfo): Promise<EventCalendar.EventInput[]> => {
     const calendarEvents = await this._client.fetchAndLoadEvents(info.startStr, info.endStr)
-    return calendarEvents.map(({event, calendarUrl}) => ({
-      title: event.summary,
-      allDay: isEventAllDay(event),
-      start: event.start.date,
-      end: getEventEnd(event),
-      backgroundColor: this._client.getCalendarByUrl(calendarUrl)!.calendarColor,
-      extendedProps: { uid: event.uid, recurrenceId: event.recurrenceId } as EventUid,
-    }))
+    return calendarEvents.map(({ event, calendarUrl }) => {
+      const allDay = isEventAllDay(event)
+      return {
+        title: event.summary,
+        allDay: allDay,
+        start: dateToECDate(event.start.date, allDay),
+        end: dateToECDate(getEventEnd(event), allDay),
+        backgroundColor: this._client.getCalendarByUrl(calendarUrl)!.calendarColor,
+        extendedProps: { uid: event.uid, recurrenceId: event.recurrenceId } as EventUid,
+      }
+    })
   }
 
   private isEventVisible = (info: EventCalendar.EventFilterInfo) => {
@@ -203,14 +222,14 @@ export class CalendarElement {
   private onSelectDate = ({ allDay, date, jsEvent}: EventCalendar.DateClickInfo) => {
     const type = allDay ? 'DATE' : 'DATE-TIME'
     const start: IcsDateObject = {
-      date: date,
+      date: ecDateToDate(date, allDay),
       type: type,
     }
     const newEvent: IcsEvent = {
       summary: '',
       start,
       end: {
-        date: getEventEndFromDuration(date, { minutes: 30 }),
+        date: getEventEndFromDuration(start.date, allDay ? { days: 1 } : { minutes: 30 }),
         type: type,
       },
       uid: '',
@@ -229,11 +248,11 @@ export class CalendarElement {
     const newEvent: IcsEvent = {
       summary: '',
       start: {
-        date: start,
+        date: ecDateToDate(start, allDay),
         type: type,
       },
       end: {
-        date: end,
+        date: ecDateToDate(end, allDay),
         type: type,
       },
       uid: '',
