@@ -125,6 +125,7 @@ export class CalendarElement {
         eventDrop: this.onChangeEventDates,
         eventSources: [{ events: this.fetchAndLoadEvents }],
         eventFilter: this.isEventVisible,
+        dateClick: this.onSelectDate,
       },
     )
   }
@@ -197,6 +198,30 @@ export class CalendarElement {
         view: view.type as View,
       }),
     }
+  }
+
+  private onSelectDate = ({ allDay, date, jsEvent}: EventCalendar.DateClickInfo) => {
+    const type = allDay ? 'DATE' : 'DATE-TIME'
+    const start: IcsDateObject = {
+      date: date,
+      type: type,
+    }
+    const newEvent: IcsEvent = {
+      summary: '',
+      start,
+      end: {
+        date: getEventEndFromDuration(date, { minutes: 30 }),
+        type: type,
+      },
+      uid: '',
+      stamp: { date: new Date() },
+    }
+    this._eventHandlers!.onCreateEvent({
+      jsEvent,
+      calendars: this._client.getCalendars(),
+      event: newEvent,
+      handleCreate: this.handleCreateEvent,
+    })
   }
 
   private onSelectTimeRange = ({ allDay, start, end, jsEvent}: EventCalendar.SelectInfo) => {

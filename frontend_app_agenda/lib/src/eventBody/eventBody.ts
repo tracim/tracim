@@ -36,7 +36,7 @@ const html = /*html*/`
     <span
         title="{{name}} <{{email}}>\n{{tRole}}\n{{tPartstat}}"
         class="event-body-attendee event-body-attendee-{{role}} event-body-attendee-{{partstat}}">
-      {{{email}}}
+      {{{name}}}
     </span>
     {{/attendees}}
   </div>

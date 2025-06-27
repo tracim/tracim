@@ -1,6 +1,7 @@
 .event-body {
   height: 100%;
   width: 100%;
+  overflow: hidden;
   --event-body-gap: 2px;
 }
 
@@ -26,14 +27,13 @@
   gap: 0px 5px;
   flex-wrap: wrap;
 
-  /* TODO handle if it is the same color than the bg */
   .event-body-organizer {
     font-weight: bold;
     color: red;
   }
 
-  .event-body-attendee-chair-participant {
-    font-style: bold;
+  .event-body-attendee-chair {
+    font-weight: bold;
   }
 
   .event-body-attendee-req-participant {
