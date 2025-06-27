@@ -23,7 +23,8 @@
 .event-body-attendees {
   display: flex;
   flex-direction: row;
-  gap: 5px;
+  gap: 0px 5px;
+  flex-wrap: wrap;
 
   /* TODO handle if it is the same color than the bg */
   .event-body-organizer {

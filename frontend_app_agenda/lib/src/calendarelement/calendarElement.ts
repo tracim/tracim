@@ -187,7 +187,6 @@ export class CalendarElement {
     })
   }
 
-  // TODO mustache
   private getEventContent = ({ event, view }: EventCalendar.EventContentInfo): EventCalendar.Content => {
     const calendarEvent = this._client.getCalendarEvent(event.extendedProps as EventUid)!
     const calendar = this._client.getCalendarByUrl(calendarEvent.calendarUrl)!
