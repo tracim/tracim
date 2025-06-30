@@ -50,7 +50,6 @@
     ".": {
       "import": "./dist/index.js",
       "require": "./dist/index.umd.cjs"
-    },
-    "./style.css": "./dist/index.css"
+    }
   }
 }

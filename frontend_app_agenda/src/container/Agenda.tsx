@@ -284,7 +284,7 @@ export class Agenda extends React.Component<any, any> {
   buildCalendar = () => {
     const { state, props } = this
 
-    // TODO does workspace. withCredentials need to be handled ? 
+    // TODO does workspace. withCredentials need to be handled ?
     const sources: CalendarSource[] = state.userWorkspaceList.map(workspace => ({
       calendarUrl: workspace.agenda_url,
     } as CalendarSource))
