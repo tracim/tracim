@@ -8,5 +8,6 @@
     "jsx": "react-jsx",
     "allowJs": true,
     "moduleResolution": "node",
+    "resolveJsonModule": true,
   },
 }

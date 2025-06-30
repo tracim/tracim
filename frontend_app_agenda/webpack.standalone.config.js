@@ -23,15 +23,15 @@ module.exports = {
       test: /\.jsx?$/,
       enforce: 'pre',
       use: 'standard-loader',
-      exclude: [/node_modules/, /frontend_lib/]
+      exclude: [/node_modules/, /.\/lib/, /frontend_lib/]
     }, isProduction ? {} : {
       test: /\.tsx?$/,
       enforce: 'pre',
       use: 'ts-loader',
-      exclude: [/node_modules/, /frontend_lib/]
+      exclude: [/node_modules/, /.\/lib/, /frontend_lib/]
     }, {
       test: [/\.[tj]s$/, /\.[tj]sx$/],
-      exclude: [/node_modules/],
+      exclude: [/node_modules/, /.\/lib/],
       loader: 'babel-loader',
       options: {
         presets: [

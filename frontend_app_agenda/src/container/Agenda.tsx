@@ -21,6 +21,7 @@ import {
 import { debug } from '../debug.js'
 import { getAgendaList, getPreFilledAgendaEvent } from '../action.async'
 import { createCalendar } from '@algoo/calendar-client'
+import { CalendarSource } from '@algoo/calendar-client/types'
 export class Agenda extends React.Component<any, any> {
   calendarRef: RefObject<any> = createRef()
 
@@ -139,17 +140,17 @@ export class Agenda extends React.Component<any, any> {
     }
     this.buildBreadcrumbs()
   }
-  
+
   async componentDidUpdate(prevProps, prevState) {
     const { state } = this
     // console.log('%c<Agenda> did update', `color: ${state.config.hexcolor}`, prevState, state)
-    
+
     if (prevState.config.appConfig.workspaceId !== state.config.appConfig.workspaceId) {
       if (state.config.appConfig.workspaceId) await this.loadAgendaList(state.config.appConfig.workspaceId)
       await this.loadWorkspaceData()
       this.buildBreadcrumbs()
     }
-    if (this.calendarRef.current && state.calendar === null) {
+    if (this.calendarRef.current && state.calendar === null && state.userWorkspaceListLoaded) {
       this.buildCalendar()
     }
   }
@@ -281,8 +282,15 @@ export class Agenda extends React.Component<any, any> {
   }
 
   buildCalendar = () => {
+    const { state, props } = this
+
+    // TODO does workspace. withCredentials need to be handled ? 
+    const sources: CalendarSource[] = state.userWorkspaceList.map(workspace => ({
+      calendarUrl: workspace.agenda_url,
+    } as CalendarSource))
+
     const calendar = createCalendar(
-      [{ serverUrl: `${window.location.origin}/dav`}],
+      sources,
       this.calendarRef.current,
     )
     this.setState({ calendar })
@@ -329,7 +337,7 @@ export class Agenda extends React.Component<any, any> {
           }}
         />
       )
-    
+
     return (
       <PageWrapper customClass='agendaPage'>
         <PageTitle
@@ -350,7 +358,7 @@ export class Agenda extends React.Component<any, any> {
         </div>
 
         <PageContent parentClass='agendaPage'>
-          <div ref={this.calendarRef} style={{ height: "100%"}} ></div>
+          <div ref={this.calendarRef} style={{ height: "100%" }} ></div>
         </PageContent>
       </PageWrapper>
     )

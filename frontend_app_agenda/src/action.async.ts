@@ -1,5 +1,4 @@
 import { baseFetch } from 'tracim_frontend_lib'
-import { DAVCalendar, DAVNamespaceShort, propfind } from 'tsdav'
 
 export function getAgendaList(apiUrl: string, workspaceId?: number): any {
   const param = workspaceId

@@ -26,7 +26,6 @@ __metadata:
     globals: ^16.2.0
     i18next: ^25.2.1
     i18next-browser-languagedetector: ^8.2.0
-    i18next-resources-to-backend: ^1.2.1
     mustache: ^4.2.0
     node-polyfill-webpack-plugin: ^4.1.0
     rimraf: ^6.0.1
@@ -2946,15 +2945,6 @@ __metadata:
   dependencies:
     "@babel/runtime": ^7.23.2
   checksum: 02fda84fdfd443d7a888c3eaf99550e4f75692453392dffecc1b6f4b8df112672bdc9675f84347d8b9e23ee488aa4e17691abf1ef5847191c3f6ddd4d833524d
-  languageName: node
-  linkType: hard
-
-"i18next-resources-to-backend@npm:^1.2.1":
-  version: 1.2.1
-  resolution: "i18next-resources-to-backend@npm:1.2.1"
-  dependencies:
-    "@babel/runtime": ^7.23.2
-  checksum: a2f338c4eec8d5ba09846ae1abdd23afb72086f6395d6160c748d010c82f5c28c30133f6487f0fd3a65e710231d7750b324785f15cac4baf6d24b33227840341
   languageName: node
   linkType: hard
 

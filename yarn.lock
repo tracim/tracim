@@ -7,19 +7,20 @@ __metadata:
 
 "@algoo/calendar-client@file:./lib/::locator=tracim_app_agenda%40workspace%3Afrontend_app_agenda":
   version: 1.0.0
-  resolution: "@algoo/calendar-client@file:./lib/#./lib/::hash=53529a&locator=tracim_app_agenda%40workspace%3Afrontend_app_agenda"
+  resolution: "@algoo/calendar-client@file:./lib/#./lib/::hash=2676e8&locator=tracim_app_agenda%40workspace%3Afrontend_app_agenda"
   dependencies:
     "@event-calendar/core": ^4.4.0
     "@fortawesome/fontawesome-svg-core": ^6.7.2
     "@fortawesome/free-solid-svg-icons": ^6.7.2
+    autolinker: ^4.1.5
     i18next: ^25.2.1
     i18next-browser-languagedetector: ^8.2.0
     i18next-resources-to-backend: ^1.2.1
     mustache: ^4.2.0
     timezones-ical-library: ^1.10.0
-    ts-ics: ^2.1.7
+    ts-ics: ^2.1.8
     tsdav: ^2.1.4
-  checksum: cef509258957a756e7fe370c53357e168c14dc89c7af3fd7fb45373e65e6e1538384e461a04b9c459929b42ca0f4919e57614283c850b55a5ca27c8f2a0089b8
+  checksum: b379877b152a172bb0cc69f4b5c37bb7c9b7c2cffc644cc8552eb54cab4eaeb3ec2b6ceba6aac9f8fe9dfc7fe766c95771ce8b9517932035e48e6840d01d9cb8
   languageName: node
   linkType: hard
 
@@ -3497,6 +3498,15 @@ __metadata:
   dependencies:
     tslib: ^2.3.0
   checksum: d5a1192b321b3527a6cfee777c2714ede05c2a503be1ce223ff8a277152b39dc5c62e663310b57ed69f186c2ba7da52611597a00f215bef268b5b37d7bd38e47
+  languageName: node
+  linkType: hard
+
+"autolinker@npm:^4.1.5":
+  version: 4.1.5
+  resolution: "autolinker@npm:4.1.5"
+  dependencies:
+    tslib: ^2.8.1
+  checksum: 0442ebca65e4160e8aa2a7f2377dac64247058fbc193ac00be3016c1e692db63aff540f205437a9b088d86114bb6a94d8fb0dcd152f214141d45200a023fd124
   languageName: node
   linkType: hard
 
@@ -15010,12 +15020,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-ics@npm:^2.1.7":
-  version: 2.1.7
-  resolution: "ts-ics@npm:2.1.7"
+"ts-ics@npm:^2.1.8":
+  version: 2.1.8
+  resolution: "ts-ics@npm:2.1.8"
   dependencies:
     "@standard-schema/spec": ^1.0.0
-  checksum: 2924f67682c0a80d5ca71f586b68e3a0603dc5695d23bd32184a22d5e56a0486396e350798dd6e2cfd81bec7d5d52764d3159974c25ce17a7eda560b032838b4
+  checksum: 0fa3821a4a054710ca0b5816f9c519d3c53911524740a8b51edf636a21792d8360889398d9e8297d3c59c8cae1eae6f1f8737ac9a6aafc4a5aa1bc176818e429
   languageName: node
   linkType: hard
 
@@ -15076,7 +15086,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.1.0":
+"tslib@npm:^2.1.0, tslib@npm:^2.8.1":
   version: 2.8.1
   resolution: "tslib@npm:2.8.1"
   checksum: e4aba30e632b8c8902b47587fd13345e2827fa639e7c3121074d5ee0880723282411a8838f830b55100cbe4517672f84a2472667d355b81e8af165a55dc6203a
