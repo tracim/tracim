@@ -5,25 +5,6 @@ __metadata:
   version: 6
   cacheKey: 8
 
-"@algoo/calendar-client@file:./lib/::locator=tracim_app_agenda%40workspace%3Afrontend_app_agenda":
-  version: 1.0.0
-  resolution: "@algoo/calendar-client@file:./lib/#./lib/::hash=2676e8&locator=tracim_app_agenda%40workspace%3Afrontend_app_agenda"
-  dependencies:
-    "@event-calendar/core": ^4.4.0
-    "@fortawesome/fontawesome-svg-core": ^6.7.2
-    "@fortawesome/free-solid-svg-icons": ^6.7.2
-    autolinker: ^4.1.5
-    i18next: ^25.2.1
-    i18next-browser-languagedetector: ^8.2.0
-    i18next-resources-to-backend: ^1.2.1
-    mustache: ^4.2.0
-    timezones-ical-library: ^1.10.0
-    ts-ics: ^2.1.8
-    tsdav: ^2.1.4
-  checksum: b379877b152a172bb0cc69f4b5c37bb7c9b7c2cffc644cc8552eb54cab4eaeb3ec2b6ceba6aac9f8fe9dfc7fe766c95771ce8b9517932035e48e6840d01d9cb8
-  languageName: node
-  linkType: hard
-
 "@ampproject/remapping@npm:^2.2.0":
   version: 2.2.1
   resolution: "@ampproject/remapping@npm:2.2.1"
@@ -7873,15 +7854,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next-resources-to-backend@npm:^1.2.1":
-  version: 1.2.1
-  resolution: "i18next-resources-to-backend@npm:1.2.1"
-  dependencies:
-    "@babel/runtime": ^7.23.2
-  checksum: a2f338c4eec8d5ba09846ae1abdd23afb72086f6395d6160c748d010c82f5c28c30133f6487f0fd3a65e710231d7750b324785f15cac4baf6d24b33227840341
-  languageName: node
-  linkType: hard
-
 "i18next-scanner@npm:4.4.0":
   version: 4.4.0
   resolution: "i18next-scanner@npm:4.4.0"
@@ -10495,6 +10467,24 @@ __metadata:
   dependencies:
     mimic-fn: ^2.1.0
   checksum: 2478859ef817fc5d4e9c2f9e5728512ddd1dbc9fb7829ad263765bb6d3b91ce699d6e2332eef6b7dff183c2f490bd3349f1666427eaba4469fba0ac38dfd0d34
+  languageName: node
+  linkType: hard
+
+"open-calendar@file:../../open-calendar/::locator=tracim_app_agenda%40workspace%3Afrontend_app_agenda":
+  version: 1.0.0
+  resolution: "open-calendar@file:../../open-calendar/#../../open-calendar/::hash=d285f4&locator=tracim_app_agenda%40workspace%3Afrontend_app_agenda"
+  dependencies:
+    "@event-calendar/core": ^4.4.0
+    "@fortawesome/fontawesome-svg-core": ^6.7.2
+    "@fortawesome/free-solid-svg-icons": ^6.7.2
+    autolinker: ^4.1.5
+    i18next: ^25.2.1
+    i18next-browser-languagedetector: ^8.2.0
+    mustache: ^4.2.0
+    timezones-ical-library: ^1.10.0
+    ts-ics: ^2.1.8
+    tsdav: ^2.1.4
+  checksum: 3cb5e601fd01dfff0276659a8fea9a3a7d021ce541a590a632d5a32acc2ca14d8bf457b607a2cce6e84f6af286369699c1d8e49319b488df42c3895ca7d5490d
   languageName: node
   linkType: hard
 
@@ -14200,7 +14190,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "tracim_app_agenda@workspace:frontend_app_agenda"
   dependencies:
-    "@algoo/calendar-client": "file:./lib/"
     "@babel/core": ^7.12.10
     "@babel/plugin-proposal-class-properties": ^7.12.1
     "@babel/plugin-proposal-object-rest-spread": ^7.12.1
@@ -14231,6 +14220,7 @@ __metadata:
     jsdom: ^15.1.1
     mocha: ^9.2.2
     node-polyfill-webpack-plugin: ^4.1.0
+    open-calendar: "file:../../open-calendar/"
     pnp-webpack-plugin: ^1.6.4
     prop-types: ^15.7.2
     react: ^16.13.1
