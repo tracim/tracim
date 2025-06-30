@@ -1,3 +1,7 @@
+.ec-event {
+  min-height: 1.5rem !important;
+}
+
 .event-body {
   height: 100%;
   width: 100%;

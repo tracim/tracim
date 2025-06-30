@@ -107,7 +107,7 @@ export type EventBodyInfo = {
   event: IcsEvent
   view: View
 }
-export type EventBodyHandlers = {
+export type BodyHandlers = {
   getEventBody: (info: EventBodyInfo) => Node[]
 }
 
@@ -143,11 +143,11 @@ export type EventEditHandlers = {
 export type EventChangeInfo = {
   calendarUrl: string
   event: IcsEvent
-
   // ? Do we keep this as this is for the entire CalendarOBject and not the event itself
   ical: string
 }
-export type PostEventChangeHandlers = {
+
+export type EventChangeHandlers = {
   onEventCreated?: (info: EventChangeInfo) => void
   onEventUpdated?: (info: EventChangeInfo) => void
   onEventDeleted?: (info: EventChangeInfo) => void
@@ -162,10 +162,11 @@ export type CalendarElementOptions = {
 }
 
 export type CalendarOptions =
-  CalendarElementOptions
-  & (SelectCalendarHandlers | Record<never, never>)
-  & (EventEditHandlers | Record<never, never>)
-  & PostEventChangeHandlers
+  CalendarElementOptions // may define options or not
+  & (SelectCalendarHandlers | Record<never, never>) // must define all handlers or none
+  & (EventEditHandlers | Record<never, never>) // must define all handlers or none
+  & EventChangeHandlers // may define handlers or not
+  & Partial<BodyHandlers> // may define handlers or not, but they will be assigned a default value if they are not
 
 export type CalendarResponse = {
   response: Response

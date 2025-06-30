@@ -4,7 +4,7 @@ import '@event-calendar/core/index.css'
 import { getEventEnd, getEventEndFromDuration, type IcsDateObject, type IcsEvent } from 'ts-ics'
 import { EventEditPopup } from '../eventeditpopup/eventEditPopup'
 import { hasCalendarHandlers, hasEventHandlers } from '../helpers/types-helper'
-import type { CalendarOptions, CalendarSource, ServerSource, EventUid, EventEditHandlers, CalendarEvent, PostEventChangeHandlers, SelectCalendarHandlers, SelectedCalendar, View } from '../types'
+import type { CalendarOptions, CalendarSource, ServerSource, EventUid, EventEditHandlers, CalendarEvent, EventChangeHandlers, SelectCalendarHandlers, SelectedCalendar, View, BodyHandlers, EventBodyInfo } from '../types'
 import { isEventAllDay, offsetDate } from '../helpers/ics-helper'
 import './calendarElement.css'
 import { CalendarSelectDropdown } from '../calendarselectdropdown/calendarSelectDropdown'
@@ -39,9 +39,10 @@ export class CalendarElement {
   private _eventEdit: EventEditPopup | null = null
   private _calendarSelect: CalendarSelectDropdown | null = null
 
-  private _calendarHandlers?: SelectCalendarHandlers
-  private _eventHandlers?: EventEditHandlers
-  private _postEventHandlers?: PostEventChangeHandlers
+  private _calendarSelectHandlers?: SelectCalendarHandlers
+  private _eventEditHandlers?: EventEditHandlers
+  private _eventChangeHandlers?: EventChangeHandlers
+  private _bodyHandlers?: BodyHandlers
 
   public constructor() {
     this._client = new CalendarClient()
@@ -68,7 +69,7 @@ export class CalendarElement {
     await this._client.loadCalendars(sources)
     this._selectedCalendars = new Set(this._client.getCalendars().map(c => c.url))
 
-    this._eventHandlers = options && hasEventHandlers(options)
+    this._eventEditHandlers = options && hasEventHandlers(options)
       ? {
         onCreateEvent: options.onCreateEvent,
         onUpdateEvent: options.onUpdateEvent,
@@ -76,13 +77,13 @@ export class CalendarElement {
       }
       : this.createDefaultEventEdit(target)
 
-    this._calendarHandlers = options && hasCalendarHandlers(options)
+    this._calendarSelectHandlers = options && hasCalendarHandlers(options)
       ? {
         onClickSelectCalendars: options.onClickSelectCalendars,
       }
-      : this.createDefaultCalendarsElement()
+      : this.createDefaultCalendarSelectElement()
 
-    this._postEventHandlers = {
+    this._eventChangeHandlers = {
       onEventCreated: options?.onEventCreated,
       onEventUpdated: options?.onEventUpdated,
       onEventDeleted: options?.onEventDeleted,
@@ -90,13 +91,16 @@ export class CalendarElement {
 
     this.createCalendar(target, options)
 
-    this._eventBody = new EventBody()
+    this._bodyHandlers = {
+      getEventBody: options?.getEventBody ?? this.createDefaultEventBody(),
+    }
   }
 
   public destroy = () => {
     this.destroyCalendar()
     this.destroyDefaultEventEdit()
-    this.destroyDefaultCalendarElement()
+    this.destroyDefaultCalendarSelectElement()
+    this.destroyDefaultEventBody()
   }
 
   private createCalendar = (target: Element | Document | ShadowRoot, options?: CalendarOptions) => {
@@ -117,6 +121,7 @@ export class CalendarElement {
             click: this.onClickCalendars,
           },
         },
+        slotEventOverlap: false,
         headerToolbar: {
           start: 'calendars,refresh prev,today,next',
           center: 'title',
@@ -165,16 +170,25 @@ export class CalendarElement {
     this._eventEdit = null
   }
 
-  private createDefaultCalendarsElement = (): SelectCalendarHandlers => {
+  private createDefaultCalendarSelectElement = (): SelectCalendarHandlers => {
     this._calendarSelect ??= new CalendarSelectDropdown()
     return {
       onClickSelectCalendars: this._calendarSelect.onSelect,
     }
   }
 
-  private destroyDefaultCalendarElement = () => {
+  private destroyDefaultCalendarSelectElement = () => {
     this._calendarSelect?.destroy()
     this._calendarSelect = null
+  }
+
+  private createDefaultEventBody = (): (info: EventBodyInfo) => Node[] => {
+    this._eventBody ??= new EventBody()
+    return this._eventBody.getBody
+  }
+
+  private destroyDefaultEventBody = () => {
+    this._eventBody = null
   }
 
   private fetchAndLoadEvents = async (info: EventCalendar.FetchInfo): Promise<EventCalendar.EventInput[]> => {
@@ -199,7 +213,7 @@ export class CalendarElement {
   }
 
   private onClickCalendars = (jsEvent: MouseEvent) => {
-    this._calendarHandlers!.onClickSelectCalendars({
+    this._calendarSelectHandlers!.onClickSelectCalendars({
       jsEvent,
       selectedCalendars: this._selectedCalendars,
       calendars: this._client.getCalendars(),
@@ -211,7 +225,7 @@ export class CalendarElement {
     const calendarEvent = this._client.getCalendarEvent(event.extendedProps as EventUid)!
     const calendar = this._client.getCalendarByUrl(calendarEvent.calendarUrl)!
     return {
-      domNodes: this._eventBody!.getBody({
+      domNodes: this._bodyHandlers!.getEventBody({
         event: calendarEvent.event,
         calendar,
         view: view.type as View,
@@ -235,7 +249,7 @@ export class CalendarElement {
       uid: '',
       stamp: { date: new Date() },
     }
-    this._eventHandlers!.onCreateEvent({
+    this._eventEditHandlers!.onCreateEvent({
       jsEvent,
       calendars: this._client.getCalendars(),
       event: newEvent,
@@ -258,7 +272,7 @@ export class CalendarElement {
       uid: '',
       stamp: { date: new Date() },
     }
-    this._eventHandlers!.onCreateEvent({
+    this._eventEditHandlers!.onCreateEvent({
       jsEvent,
       calendars: this._client.getCalendars(),
       event: newEvent,
@@ -278,6 +292,9 @@ export class CalendarElement {
       const endDelta = info.event.end.getTime() - info.oldEvent.end.getTime()
       newEvent.end = offsetDate(newEvent.end, endDelta)
     }
+
+    // TODO add and api call onMoveResizeEvent
+    // for ex to allow a popup to open to ask if you want to change a single/all events if a recurrent event
     const response = await this.handleUpdateEvent({ calendarUrl: calendarEvent.calendarUrl, event: newEvent })
     if (!response.ok) info.revert()
   }
@@ -286,7 +303,7 @@ export class CalendarElement {
     const uid = event.extendedProps as EventUid
     const calendarEvent = this._client.getCalendarEvent(uid)
     if (!calendarEvent) return
-    this._eventHandlers!.onUpdateEvent({
+    this._eventEditHandlers!.onUpdateEvent({
       jsEvent,
       calendars: this._client.getCalendars(),
       ...calendarEvent,
@@ -310,7 +327,7 @@ export class CalendarElement {
   private handleCreateEvent = async (calendarEvent: CalendarEvent) => {
     const { response, ical } = await this._client.createEvent(calendarEvent)
     if (response.ok) {
-      this._postEventHandlers!.onEventCreated?.({...calendarEvent, ical})
+      this._eventChangeHandlers!.onEventCreated?.({...calendarEvent, ical})
       this.refreshEvents()
     }
     return response
@@ -319,7 +336,7 @@ export class CalendarElement {
   private handleUpdateEvent = async (calendarEvent: CalendarEvent) => {
     const { response, ical } = await this._client.updateEvent(calendarEvent)
     if (response.ok) {
-      this._postEventHandlers!.onEventUpdated?.({...calendarEvent, ical})
+      this._eventChangeHandlers!.onEventUpdated?.({...calendarEvent, ical})
       this.refreshEvents()
     }
     return response
@@ -328,7 +345,7 @@ export class CalendarElement {
   private handleDeleteEvent = async (calendarEvent: CalendarEvent) => {
     const { response, ical } = await this._client.deleteEvent(calendarEvent)
     if (response.ok) {
-      this._postEventHandlers!.onEventDeleted?.({...calendarEvent, ical})
+      this._eventChangeHandlers!.onEventDeleted?.({...calendarEvent, ical})
       this.refreshEvents()
     }
     return response
