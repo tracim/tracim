@@ -305,10 +305,6 @@ class Login extends React.Component {
     }
 
     props.dispatch(setUserConnected({ ...props.user, logged: true }))
-    if (props.system.redirectLogin !== '') {
-      props.history.push(props.system.redirectLogin)
-      return
-    }
 
     const fetchPutUserConfiguration = await handleFetchResult(await putUserConfiguration(
       FETCH_CONFIG.apiUrl,
@@ -318,6 +314,11 @@ class Login extends React.Component {
 
     if (fetchPutUserConfiguration.status !== 204) {
       props.dispatch(newFlashMessage(props.t('Error while saving the user configuration')))
+    }
+
+    if (props.system.redirectLogin !== '') {
+      props.history.push(props.system.redirectLogin)
+      return
     }
 
     props.history.push(PAGE.HOME)
