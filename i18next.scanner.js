@@ -1,4 +1,5 @@
 const scanner = require('i18next-scanner')
+const typescriptTransform = require('i18next-scanner-typescript');
 const vfs = require('vinyl-fs')
 
 const options = {
@@ -50,7 +51,8 @@ const options = {
     lineEnding: '\n'
   }
 }
+const transform = typescriptTransform()
 
-vfs.src(['./src/**/*.jsx', './src/**/*.js'])
-  .pipe(scanner(options))
+vfs.src(['./src/**/*.jsx', './src/**/*.js', './src/**/*.tsx', './src/**/*.ts'])
+  .pipe(scanner(options, transform))
   .pipe(vfs.dest('./i18next.scanner'))

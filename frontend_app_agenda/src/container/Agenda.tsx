@@ -283,17 +283,82 @@ export class Agenda extends React.Component<any, any> {
     this.setState({ breadcrumbsList })
   }
 
-  buildCalendar = (): void => {
-    const { state } = this
+  buildCalendar = async (): Promise<void> => {
+    const { state, props } = this
+    state.calendar?.destroy()
 
     // TODO does workspace. withCredentials need to be handled ?
     const sources: CalendarSource[] = state.userWorkspaceList.map((workspace: any) => ({
       calendarUrl: workspace.agenda_url
     }))
-
-    const calendar = createCalendar(
+    const calendar = await createCalendar(
       sources,
-      this.calendarRef.current
+      this.calendarRef.current,
+      {},
+      {
+        calendarElement: {
+          timeGridDay: props.t('Day'),
+          timeGridWeek: props.t('Week'),
+          dayGridMonth: props.t('Month'),
+          listDay: props.t('List'),
+          listWeek: props.t('List Week'),
+          listMonth: props.t('List Month'),
+          listYear: props.t('List Year'),
+          today: props.t('Today'),
+          allDay: props.t('Daily'),
+          calendars: props.t('Calendars')
+        },
+        eventForm: {
+          allDay: props.t('Daily'),
+          calendar: props.t('Calendar'),
+          title: props.t('Title'),
+          location: props.t('Location'),
+          start: props.t('Start'),
+          end: props.t('End'),
+          organizer: props.t('Organizer'),
+          attendees: props.t('Attendees'),
+          addAttendee: props.t('Add attendee'),
+          description: props.t('Description'),
+          delete: props.t('Delete'),
+          cancel: props.t('Cancel'),
+          save: props.t('Save'),
+          chooseACalendar: props.t('-- Choose a calendar --'),
+          email: props.t('email'),
+          rrule: props.t('Frequency'),
+          name: props.t('name')
+        },
+        eventBody: {
+          organizer: props.t('Organizer')
+        },
+        recurringForm: {
+          editRecurring: props.t('This is a recurring event'),
+          editAll: props.t('Edit all occurrences'),
+          editSingle: props.t('Edit this occurrence only')
+        },
+        partStatus: {
+          'NEEDS-ACTION': props.t('Needs to answer'),
+          ACCEPTED: props.t('Accepted'),
+          DECLINED: props.t('Declined'),
+          TENTATIVE: props.t('Tentatively accepted'),
+          DELEGATED: props.t('Delegated')
+        },
+        attendeeRoles: {
+          CHAIR: props.t('Chair'),
+          'REQ-PARTICIPANT': props.t('Required participant'),
+          'OPT-PARTICIPANT': props.t('Optional participant'),
+          'NON-PARTICIPANT': props.t('Non participant')
+        },
+        rrules: {
+          none: props.t('Never'),
+          unchanged: props.t('Keep existing'),
+          'FREQ=DAILY': props.t('Daily'),
+          'FREQ=WEEKLY': props.t('Weekly'),
+          'BYDAY=MO,TU,WE,TH,FR;FREQ=DAILY': props.t('Workdays'),
+          'INTERVAL=2;FREQ=WEEKLY': props.t('Every two week'),
+          'FREQ=MONTHLY': props.t('Monthly'),
+          'FREQ=YEARLY': props.t('Yearly')
+        }
+      }
     )
     this.setState({ calendar })
   }
