@@ -1,23 +1,25 @@
-import React from 'react'
 import ReactDOM from 'react-dom'
 import 'regenerator-runtime/runtime'
 import { Router } from 'react-router-dom'
 import Agenda from './container/Agenda'
 import { debug } from './debug'
 import { LiveMessageManager } from 'tracim_frontend_lib'
+import { createBrowserHistory } from 'history'
 
 require('./css/index.styl')
 
 // INFO - CH - 2020-01-12 - Router is required because we have <Link> in <PageTitle> component
-const history = require('history').createBrowserHistory()
+const history = createBrowserHistory()
 
 const manager = new LiveMessageManager()
 manager.openLiveMessageConnection(debug.loggedUser.userId, debug.config.apiUrl)
 
 ReactDOM.render(
+  // @ts-expect-error @types/react uses types from react 19 and not 16 as they require version *
   <Router history={history}>
+    {/* @ts-expect-error Agenda was originally made in js and its props are not declared */}
     <Agenda
-      //@ts-ignore
+      // @ts-expect-error Agenda was originally made in js and its props are not declared
       data={undefined}
     />
   </Router>

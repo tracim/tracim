@@ -9,7 +9,7 @@
     "build:optimized:dev": "NODE_ENV=development webpack-cli --progress --config webpack.optimized.config.js",
     "servdev": "NODE_ENV=development webpack-dev-server --config webpack.servdev.config.js --color",
     "build:translation": "node ../i18next.scanner.js",
-    "lint": "cd src && standard --parser babel-eslint --plugin react && cd ../test && standard --env mocha --parser babel-eslint --plugin react",
+    "lint": "yarn run ts-standard && cd src && standard --parser babel-eslint --plugin react && cd ../test && standard --env mocha --parser babel-eslint --plugin react",
     "test": "yarn run lint && yarn run test:quick",
     "test:quick": "NODE_ENV=test mocha --config test/.mocharc.js"
   },
@@ -21,7 +21,6 @@
     "eslint-import-resolver-node": "^0.3.3",
     "file-loader": "^6.0.0",
     "i18next": "10.5.0",
-    "node-polyfill-webpack-plugin": "^4.1.0",
     "open-calendar": "file:../../open-calendar/",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
@@ -69,10 +68,18 @@
     "stylus": "^0.54.5",
     "stylus-native-loader": "^1.1.0",
     "ts-loader": "^9.5.2",
+    "ts-standard": "^12.0.2",
     "typescript": "^5.8.3",
     "webpack": "^5.72.0",
     "webpack-cli": "^4.9.2",
     "webpack-dev-server": "^4.8.1"
+  },
+  "ts-standard": {
+    "ignore": [
+      "dist",
+      "test",
+      "webpack.*"
+    ]
   },
   "standard": {
     "globals": [

@@ -1,5 +1,4 @@
 const path = require('path')
-const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const isProduction = process.env.NODE_ENV === 'production'
 
 module.exports = {
@@ -23,15 +22,15 @@ module.exports = {
       test: /\.jsx?$/,
       enforce: 'pre',
       use: 'standard-loader',
-      exclude: [/node_modules/, /.\/lib/, /frontend_lib/]
-    }, isProduction ? {} : {
+      exclude: [/node_modules/, /frontend_lib/]
+    }, {
       test: /\.tsx?$/,
       enforce: 'pre',
       use: 'ts-loader',
-      exclude: [/node_modules/, /.\/lib/, /frontend_lib/]
+      exclude: [/node_modules/, /frontend_lib/]
     }, {
       test: [/\.[tj]s$/, /\.[tj]sx$/],
-      exclude: [/node_modules/, /.\/lib/],
+      exclude: [/node_modules/],
       loader: 'babel-loader',
       options: {
         presets: [
@@ -64,7 +63,6 @@ module.exports = {
     extensions: ['.js', '.jsx', '.ts', '.tsx']
   },
   plugins: [
-    new NodePolyfillPlugin(),
     ...[], // @INFO - CH - 2019/04/01 - generic plugins always present
     ...(isProduction
       ? [] // @INFO - CH - 2019/04/01 - production specific plugins

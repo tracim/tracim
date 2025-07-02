@@ -1,4 +1,5 @@
-import React, { createRef, RefObject, useEffect, useRef, useState } from 'react'
+import React, { createRef } from 'react'
+import type { ReactElement, RefObject } from 'react'
 import { translate } from 'react-i18next'
 import i18n from '../i18n'
 import {
@@ -21,11 +22,12 @@ import {
 import { debug } from '../debug.js'
 import { getAgendaList, getPreFilledAgendaEvent } from '../action.async'
 import { createCalendar } from 'open-calendar'
-import { CalendarSource } from 'open-calendar/types'
+import type { CalendarSource } from 'open-calendar/types'
+
 export class Agenda extends React.Component<any, any> {
   calendarRef: RefObject<any> = createRef()
 
-  constructor(props) {
+  constructor (props: any) {
     super(props)
     const param = props.data || debug
 
@@ -61,18 +63,18 @@ export class Agenda extends React.Component<any, any> {
   }
 
   // Custom Event Handlers
-  handleShowApp = data => {
+  handleShowApp = (data: any): void => {
     console.log('%c<Agenda> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP(this.state.config.slug), data)
     if (data.config.appConfig.workspaceId !== this.state.config.appConfig.workspaceId) {
       this.setState({ config: data.config })
     }
   }
 
-  handleAllAppChangeLanguage = data => {
+  handleAllAppChangeLanguage = (data: any): void => {
     const { props, state } = this
     console.log('%c<Agenda> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
 
-    this.setState(prev => ({
+    this.setState((prev: any) => ({
       loggedUser: {
         ...prev.loggedUser,
         lang: data
@@ -87,10 +89,10 @@ export class Agenda extends React.Component<any, any> {
   }
 
   // TLM Handlers
-  handleUserModified = data => {
+  handleUserModified = (data: any): void => {
     if (this.state.loggedUser.userId !== data.fields.user.user_id) return
 
-    this.setState(prev => ({
+    this.setState((prev: any) => ({
       loggedUser: {
         ...prev.loggedUser,
         authType: data.fields.user.auth_type,
@@ -110,9 +112,9 @@ export class Agenda extends React.Component<any, any> {
     }))
   }
 
-  handleSharedspaceModified = data => {
+  handleSharedspaceModified = (data: any): void => {
     const { state } = this
-    if (!state.userWorkspaceList.find(workspace => workspace.workspace_id === data.fields.workspace.workspace_id)) return
+    if (!state.userWorkspaceList.find((workspace: any) => workspace.workspace_id === data.fields.workspace.workspace_id)) return
 
     this.setState({
       content: {
@@ -127,7 +129,7 @@ export class Agenda extends React.Component<any, any> {
     if (state.userWorkspaceList.length === 1) this.buildBreadcrumbs()
   }
 
-  async componentDidMount() {
+  async componentDidMount (): Promise<void> {
     const { state, props } = this
     console.log('%c<Agenda> did mount', `color: ${state.config.hexcolor}`)
 
@@ -141,7 +143,7 @@ export class Agenda extends React.Component<any, any> {
     this.buildBreadcrumbs()
   }
 
-  async componentDidUpdate(prevProps, prevState) {
+  async componentDidUpdate (_: any, prevState: any): Promise<void> {
     const { state } = this
     // console.log('%c<Agenda> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
@@ -155,19 +157,19 @@ export class Agenda extends React.Component<any, any> {
     }
   }
 
-  handleClickRefresh = () => {
+  handleClickRefresh = (): void => {
     this.setState({ showRefreshWarning: false })
   }
 
-  setHeadTitle = (title) => {
-    //@ts-ignore
+  setHeadTitle = (title: string): void => {
+    // @ts-expect-error global variable
     GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.SET_HEAD_TITLE,
-      data: { title: title }
+      data: { title }
     })
   }
 
-  loadAgendaList = async workspaceId => {
+  loadAgendaList = async (workspaceId: number): Promise<void> => {
     const { state, props } = this
 
     const fetchResultUserWorkspace = await handleFetchResult(
@@ -187,7 +189,7 @@ export class Agenda extends React.Component<any, any> {
     }
   }
 
-  async loadPrefilledAgendaEvent() {
+  async loadPrefilledAgendaEvent (): Promise<void> {
     const fetchGetPreFilledAgendaEvent = await handleFetchResult(
       await getPreFilledAgendaEvent(this.state.config.apiUrl)
     )
@@ -203,7 +205,7 @@ export class Agenda extends React.Component<any, any> {
   // INFO - CH - 2019-04-09 - This function is complicated because, right now, the only way to get the user's role
   // on a workspace is to extract it from the members list that workspace
   // see https://github.com/tracim/tracim/issues/1581
-  loadUserRoleInWorkspace = async agendaList => {
+  loadUserRoleInWorkspace = async (agendaList: any[]): Promise<void> => {
     const { state, props } = this
     const fetchResultList = await Promise.all(
       agendaList
@@ -231,9 +233,9 @@ export class Agenda extends React.Component<any, any> {
     const agendaListWithRole = agendaThatCouldGetRoleFrom.map(agenda => ({
       ...agenda,
       loggedUserRole: workspaceListMemberList
-        .find(ws => ws.workspaceId === agenda.workspace_id)
+        .find(ws => ws.workspaceId === agenda.workspace_id)!
         .memberList
-        .find(user => user.user_id === state.loggedUser.userId)
+        .find((user: any) => user.user_id === state.loggedUser.userId)!
         .role
     }))
 
@@ -247,12 +249,12 @@ export class Agenda extends React.Component<any, any> {
     })
   }
 
-  buildBreadcrumbs = () => {
+  buildBreadcrumbs = (): void => {
     const { props, state } = this
 
     const breadcrumbsList = []
 
-    const workspaceId = state.config.appConfig.workspaceId
+    const workspaceId: number = state.config.appConfig.workspaceId
     if (workspaceId) {
       breadcrumbsList.push({
         link: PAGE.WORKSPACE.DASHBOARD(workspaceId),
@@ -278,25 +280,25 @@ export class Agenda extends React.Component<any, any> {
     // app crash telling it cannot render a Link outside a router
     // see https://github.com/tracim/tracim/issues/1637
     // GLOBAL_dispatchEvent({type: 'setBreadcrumbs', data: {breadcrumbs: breadcrumbsList}})
-    this.setState({ breadcrumbsList: breadcrumbsList })
+    this.setState({ breadcrumbsList })
   }
 
-  buildCalendar = () => {
-    const { state, props } = this
+  buildCalendar = (): void => {
+    const { state } = this
 
     // TODO does workspace. withCredentials need to be handled ?
-    const sources: CalendarSource[] = state.userWorkspaceList.map(workspace => ({
-      calendarUrl: workspace.agenda_url,
-    } as CalendarSource))
+    const sources: CalendarSource[] = state.userWorkspaceList.map((workspace: any) => ({
+      calendarUrl: workspace.agenda_url
+    }))
 
     const calendar = createCalendar(
       sources,
-      this.calendarRef.current,
+      this.calendarRef.current
     )
     this.setState({ calendar })
   }
 
-  loadWorkspaceData = async () => {
+  loadWorkspaceData = async (): Promise<void> => {
     const { state, props } = this
 
     const fetchResultWorkspaceDetail = await handleFetchResult(
@@ -314,12 +316,10 @@ export class Agenda extends React.Component<any, any> {
     }
   }
 
-  render() {
+  render (): ReactElement | null {
     const { props, state } = this
 
     if (!state.isVisible || !state.userWorkspaceListLoaded || !state.preFilledAgendaEvent) return null
-
-    const serverUrl = `${window.location.origin}/dav`
 
     // INFO - GB - 2019-06-11 - This tag dangerouslySetInnerHTML is needed to i18next be able to handle special characters
     // https://github.com/tracim/tracim/issues/1847
@@ -330,13 +330,13 @@ export class Agenda extends React.Component<any, any> {
           dangerouslySetInnerHTML={{
             __html: props.t(
               'Agenda of space {{workspaceLabel}}', {
-              workspaceLabel: state.content.workspaceLabel,
-              interpolation: { escapeValue: false }
-            }
+                workspaceLabel: state.content.workspaceLabel,
+                interpolation: { escapeValue: false }
+              }
             )
           }}
         />
-      )
+        )
 
     return (
       <PageWrapper customClass='agendaPage'>
@@ -358,7 +358,7 @@ export class Agenda extends React.Component<any, any> {
         </div>
 
         <PageContent parentClass='agendaPage'>
-          <div ref={this.calendarRef} style={{ height: "100%" }} ></div>
+          <div ref={this.calendarRef} style={{ height: '100%' }} />
         </PageContent>
       </PageWrapper>
     )
