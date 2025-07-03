@@ -307,7 +307,7 @@ export class Agenda extends React.Component<any, any> {
           today: props.t('Today'),
           allDay: props.t('Daily'),
           calendars: props.t('Calendars'),
-          newEvent: props.t("New Event")
+          newEvent: props.t('New Event')
         },
         eventForm: {
           allDay: props.t('Daily'),
