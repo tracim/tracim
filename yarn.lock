@@ -1268,7 +1268,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.0.0, @babel/runtime@npm:^7.0.0-rc.0, @babel/runtime@npm:^7.1.2, @babel/runtime@npm:^7.12.13, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.15.4, @babel/runtime@npm:^7.21.0, @babel/runtime@npm:^7.23.2, @babel/runtime@npm:^7.27.6, @babel/runtime@npm:^7.4.4, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.7.2, @babel/runtime@npm:^7.8.7, @babel/runtime@npm:^7.9.2":
+"@babel/runtime@npm:^7.0.0, @babel/runtime@npm:^7.0.0-rc.0, @babel/runtime@npm:^7.1.2, @babel/runtime@npm:^7.12.13, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.15.4, @babel/runtime@npm:^7.21.0, @babel/runtime@npm:^7.27.6, @babel/runtime@npm:^7.4.4, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.7.2, @babel/runtime@npm:^7.8.7, @babel/runtime@npm:^7.9.2":
   version: 7.27.6
   resolution: "@babel/runtime@npm:7.27.6"
   checksum: 3f7b879df1823c0926bd5dbc941c62f5d60faa790c1aab9758c04799e1f04ee8d93553be9ec059d4e5882f19fe03cbe8933ee4f46212dced0f6d8205992c9c9a
@@ -7562,15 +7562,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next-browser-languagedetector@npm:^8.2.0":
-  version: 8.2.0
-  resolution: "i18next-browser-languagedetector@npm:8.2.0"
-  dependencies:
-    "@babel/runtime": ^7.23.2
-  checksum: 02fda84fdfd443d7a888c3eaf99550e4f75692453392dffecc1b6f4b8df112672bdc9675f84347d8b9e23ee488aa4e17691abf1ef5847191c3f6ddd4d833524d
-  languageName: node
-  linkType: hard
-
 "i18next-scanner-typescript@npm:^1.2.1":
   version: 1.2.1
   resolution: "i18next-scanner-typescript@npm:1.2.1"
@@ -7609,7 +7600,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next@npm:*, i18next@npm:^25.2.1":
+"i18next@npm:*":
   version: 25.3.0
   resolution: "i18next@npm:25.3.0"
   dependencies:
@@ -10211,19 +10202,17 @@ __metadata:
 
 "open-calendar@file:../../open-calendar/::locator=tracim_app_agenda%40workspace%3Afrontend_app_agenda":
   version: 0.9.0
-  resolution: "open-calendar@file:../../open-calendar/#../../open-calendar/::hash=84255e&locator=tracim_app_agenda%40workspace%3Afrontend_app_agenda"
+  resolution: "open-calendar@file:../../open-calendar/#../../open-calendar/::hash=dfd9cb&locator=tracim_app_agenda%40workspace%3Afrontend_app_agenda"
   dependencies:
     "@event-calendar/core": ^4.4.0
     "@fortawesome/fontawesome-svg-core": ^6.7.2
     "@fortawesome/free-solid-svg-icons": ^6.7.2
     autolinker: ^4.1.5
-    i18next: ^25.2.1
-    i18next-browser-languagedetector: ^8.2.0
     mustache: ^4.2.0
     timezones-ical-library: ^1.10.0
     ts-ics: ^2.1.8
     tsdav: ^2.1.4
-  checksum: 75bc27944f5225356a82693f5219887000d303b660fde6be5e05cf590bbad7c04e97899f52d3fe3a6dfaeab5aeefcab0cf2784c91f3272108de1d35f3c31593c
+  checksum: df8fdf919b17a0dca158273b4dad6c6f5198a4a156bb2917afeb8cb760ddaf840bc212db98fefb79d6fa976963298a0d28c99987002cdd6a7cc384b2bbb5a0da
   languageName: node
   linkType: hard
 

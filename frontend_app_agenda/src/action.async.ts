@@ -1,7 +1,7 @@
 import { baseFetch } from 'tracim_frontend_lib'
 
 export const getAgendaList = (apiUrl: string, workspaceId?: number): any => {
-  const param = workspaceId
+  const param = workspaceId != null && workspaceId > 0
     ? `?workspace_ids=${workspaceId}`
     : ''
 

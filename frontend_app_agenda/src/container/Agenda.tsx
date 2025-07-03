@@ -1,5 +1,5 @@
 import React, { createRef } from 'react'
-import type { ReactElement, RefObject } from 'react'
+import type { ReactElement } from 'react'
 import { translate } from 'react-i18next'
 import i18n from '../i18n'
 import {
@@ -25,11 +25,11 @@ import { createCalendar } from 'open-calendar'
 import type { CalendarSource } from 'open-calendar/types'
 
 export class Agenda extends React.Component<any, any> {
-  calendarRef: RefObject<any> = createRef()
+  calendarRef = createRef<HTMLDivElement>()
 
   constructor (props: any) {
     super(props)
-    const param = props.data || debug
+    const param = (props.data != null) ? props.data : debug
 
     this.state = {
       appName: 'agenda',
@@ -83,7 +83,7 @@ export class Agenda extends React.Component<any, any> {
     i18n.changeLanguage(data)
     this.buildBreadcrumbs()
     this.setHeadTitle(state.config.appConfig.workspaceId !== null
-      ? `${props.t('Agenda')} · ${state.content.workspaceLabel}`
+      ? `${props.t('Agenda') as string} · ${state.content.workspaceLabel as string}`
       : props.t('My agendas')
     )
   }
@@ -114,7 +114,7 @@ export class Agenda extends React.Component<any, any> {
 
   handleSharedspaceModified = (data: any): void => {
     const { state } = this
-    if (!state.userWorkspaceList.find((workspace: any) => workspace.workspace_id === data.fields.workspace.workspace_id)) return
+    if (state.userWorkspaceList.find((workspace: any) => workspace.workspace_id === data.fields.workspace.workspace_id) === undefined) return
 
     this.setState({
       content: {
@@ -131,7 +131,7 @@ export class Agenda extends React.Component<any, any> {
 
   async componentDidMount (): Promise<void> {
     const { state, props } = this
-    console.log('%c<Agenda> did mount', `color: ${state.config.hexcolor}`)
+    console.log('%c<Agenda> did mount', `color: ${state.config.hexcolor as string}`)
 
     this.loadAgendaList(state.config.appConfig.workspaceId)
     this.loadPrefilledAgendaEvent()
@@ -148,11 +148,11 @@ export class Agenda extends React.Component<any, any> {
     // console.log('%c<Agenda> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (prevState.config.appConfig.workspaceId !== state.config.appConfig.workspaceId) {
-      if (state.config.appConfig.workspaceId) await this.loadAgendaList(state.config.appConfig.workspaceId)
+      if (state.config.appConfig.workspaceId != null && state.config.appConfig.workspaceId > 0) await this.loadAgendaList(state.config.appConfig.workspaceId)
       await this.loadWorkspaceData()
       this.buildBreadcrumbs()
     }
-    if (this.calendarRef.current && state.calendar === null && state.userWorkspaceListLoaded) {
+    if (this.calendarRef.current != null && state.calendar === null && state.userWorkspaceListLoaded as boolean) {
       this.buildCalendar()
     }
   }
@@ -194,7 +194,7 @@ export class Agenda extends React.Component<any, any> {
       await getPreFilledAgendaEvent(this.state.config.apiUrl)
     )
 
-    if (fetchGetPreFilledAgendaEvent.apiResponse.ok) {
+    if (fetchGetPreFilledAgendaEvent.apiResponse.ok as boolean) {
       this.setState({ preFilledAgendaEvent: fetchGetPreFilledAgendaEvent.body })
     } else {
       sendGlobalFlashMessage(this.props.t('Error while loading pre-filled agenda event information'))
@@ -221,7 +221,7 @@ export class Agenda extends React.Component<any, any> {
 
     const workspaceListMemberList = fetchResultSuccess.map(result => ({
       workspaceId: result.body[0].workspace_id, // INFO - CH - 2019-04-09 - workspaces always have at least one member
-      memberList: result.body || []
+      memberList: result.body
     }))
 
     const agendaThatCouldGetRoleFrom = agendaList
@@ -254,8 +254,8 @@ export class Agenda extends React.Component<any, any> {
 
     const breadcrumbsList = []
 
-    const workspaceId: number = state.config.appConfig.workspaceId
-    if (workspaceId) {
+    const workspaceId: number | null = state.config.appConfig.workspaceId
+    if (workspaceId != null && workspaceId > 0) {
       breadcrumbsList.push({
         link: PAGE.WORKSPACE.DASHBOARD(workspaceId),
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
@@ -287,13 +287,13 @@ export class Agenda extends React.Component<any, any> {
     const { state, props } = this
     state.calendar?.destroy()
 
-    // TODO does workspace. withCredentials need to be handled ?
+    // FIXME - CJ - 2025-07-03 - `workspace.withCredentials` should probably be handle
     const sources: CalendarSource[] = state.userWorkspaceList.map((workspace: any) => ({
       calendarUrl: workspace.agenda_url
     }))
     const calendar = await createCalendar(
       sources,
-      this.calendarRef.current,
+      this.calendarRef.current!,
       {},
       {
         calendarElement: {
@@ -306,7 +306,8 @@ export class Agenda extends React.Component<any, any> {
           listYear: props.t('List Year'),
           today: props.t('Today'),
           allDay: props.t('Daily'),
-          calendars: props.t('Calendars')
+          calendars: props.t('Calendars'),
+          newEvent: props.t("New Event")
         },
         eventForm: {
           allDay: props.t('Daily'),
@@ -377,14 +378,14 @@ export class Agenda extends React.Component<any, any> {
             workspaceLabel: fetchResultWorkspaceDetail.body.label
           }
         })
-        this.setHeadTitle(`${props.t('Agenda')} · ${fetchResultWorkspaceDetail.body.label}`)
+        this.setHeadTitle(`${props.t('Agenda') as string} · ${fetchResultWorkspaceDetail.body.label as string}`)
     }
   }
 
   render (): ReactElement | null {
     const { props, state } = this
 
-    if (!state.isVisible || !state.userWorkspaceListLoaded || !state.preFilledAgendaEvent) return null
+    if (!(state.isVisible as boolean) || !(state.userWorkspaceListLoaded as boolean) || state.preFilledAgendaEvent == null) return null
 
     // INFO - GB - 2019-06-11 - This tag dangerouslySetInnerHTML is needed to i18next be able to handle special characters
     // https://github.com/tracim/tracim/issues/1847
@@ -414,7 +415,7 @@ export class Agenda extends React.Component<any, any> {
         />
 
         <div className='agendaPage__warningMessage'>
-          {state.showRefreshWarning && (
+          {state.showRefreshWarning as boolean && (
             <RefreshWarningMessage
               tooltip={props.t('Some information was modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
               onClickRefresh={this.handleClickRefresh}

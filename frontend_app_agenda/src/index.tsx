@@ -11,11 +11,13 @@ const appInterface = {
     document.getElementById(data.config.domContainer)!.classList.add('fullWidthFullHeight')
 
     ReactDOM.render(
-      // @ts-expect-error @types/react uses types from react 19 and not 16 as they require version *
+      // HACK - CJ - 2025-07-03 - This works but gives an error and I don't know why
+      // @ts-expect-error works
       <Router history={data.config.history}>
-        {/* @ts-expect-error Agenda was originally made in ts and its props are not declared */}
+        {/* HACK - CJ - 2025-07-03 - Agenda was originally made in ts and its props are not declared */}
+        {/* @ts-expect-error Agenda see above HACK comment */}
         <Agenda
-          // @ts-expect-error Agenda was originally made in ts and its props are not declared
+          // @ts-expect-error Agenda see above HACK comment
           data={data}
         />
       </Router>,
