@@ -29,7 +29,7 @@ export class Agenda extends React.Component<any, any> {
 
   constructor (props: any) {
     super(props)
-    const param = (props.data != null) ? props.data : debug
+    const param = (props.data !== undefined) ? props.data : debug
 
     this.state = {
       appName: 'agenda',
@@ -133,8 +133,8 @@ export class Agenda extends React.Component<any, any> {
     const { state, props } = this
     console.log('%c<Agenda> did mount', `color: ${state.config.hexcolor as string}`)
 
-    this.loadAgendaList(state.config.appConfig.workspaceId)
-    this.loadPrefilledAgendaEvent()
+    void this.loadAgendaList(state.config.appConfig.workspaceId)
+    void this.loadPrefilledAgendaEvent()
     if (state.config.appConfig.workspaceId !== null) {
       await this.loadWorkspaceData()
     } else {
@@ -148,12 +148,16 @@ export class Agenda extends React.Component<any, any> {
     // console.log('%c<Agenda> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (prevState.config.appConfig.workspaceId !== state.config.appConfig.workspaceId) {
-      if (state.config.appConfig.workspaceId != null && state.config.appConfig.workspaceId > 0) await this.loadAgendaList(state.config.appConfig.workspaceId)
+      if (state.config.appConfig.workspaceId !== null && Boolean(state.config.appConfig.workspaceId)) await this.loadAgendaList(state.config.appConfig.workspaceId)
       await this.loadWorkspaceData()
       this.buildBreadcrumbs()
     }
-    if (this.calendarRef.current != null && state.calendar === null && state.userWorkspaceListLoaded as boolean) {
-      this.buildCalendar()
+
+    if (this.calendarRef.current !== null &&
+      state.userWorkspaceListLoaded as boolean &&
+      (prevState.loggedUser.lang !== state.loggedUser.lang || state.calendar === null)
+    ) {
+      void this.buildCalendar()
     }
   }
 
@@ -178,7 +182,7 @@ export class Agenda extends React.Component<any, any> {
 
     switch (fetchResultUserWorkspace.apiResponse.status) {
       case 200:
-        this.loadUserRoleInWorkspace(fetchResultUserWorkspace.body)
+        void this.loadUserRoleInWorkspace(fetchResultUserWorkspace.body)
         break
       case 400:
         switch (fetchResultUserWorkspace.body.code) {
@@ -232,10 +236,10 @@ export class Agenda extends React.Component<any, any> {
 
     const agendaListWithRole = agendaThatCouldGetRoleFrom.map(agenda => ({
       ...agenda,
-      loggedUserRole: workspaceListMemberList
-        .find(ws => ws.workspaceId === agenda.workspace_id)!
+      loggedUserRole: (workspaceListMemberList
+        .find(ws => ws.workspaceId === agenda.workspace_id) ?? { memberList: [] })
         .memberList
-        .find((user: any) => user.user_id === state.loggedUser.userId)!
+        .find((user: any) => user.user_id === state.loggedUser.userId)
         .role
     }))
 
@@ -255,7 +259,7 @@ export class Agenda extends React.Component<any, any> {
     const breadcrumbsList = []
 
     const workspaceId: number | null = state.config.appConfig.workspaceId
-    if (workspaceId != null && workspaceId > 0) {
+    if (workspaceId !== null && Boolean(workspaceId)) {
       breadcrumbsList.push({
         link: PAGE.WORKSPACE.DASHBOARD(workspaceId),
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
@@ -284,6 +288,8 @@ export class Agenda extends React.Component<any, any> {
   }
 
   buildCalendar = async (): Promise<void> => {
+    if (this.calendarRef.current === null) return
+
     const { state, props } = this
     state.calendar?.destroy()
 
@@ -293,7 +299,7 @@ export class Agenda extends React.Component<any, any> {
     }))
     const calendar = await createCalendar(
       sources,
-      this.calendarRef.current!,
+      this.calendarRef.current,
       {},
       {
         calendarElement: {
@@ -385,7 +391,7 @@ export class Agenda extends React.Component<any, any> {
   render (): ReactElement | null {
     const { props, state } = this
 
-    if (!(state.isVisible as boolean) || !(state.userWorkspaceListLoaded as boolean) || state.preFilledAgendaEvent == null) return null
+    if (!(state.isVisible as boolean) || !(state.userWorkspaceListLoaded as boolean) || state.preFilledAgendaEvent === null) return null
 
     // INFO - GB - 2019-06-11 - This tag dangerouslySetInnerHTML is needed to i18next be able to handle special characters
     // https://github.com/tracim/tracim/issues/1847

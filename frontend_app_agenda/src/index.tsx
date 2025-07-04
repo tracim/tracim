@@ -8,7 +8,7 @@ const appInterface = {
   name: 'agenda',
   isRendered: false,
   renderAppFullscreen: (data: any): void => {
-    document.getElementById(data.config.domContainer)!.classList.add('fullWidthFullHeight')
+    document.getElementById(data.config.domContainer)?.classList.add('fullWidthFullHeight')
 
     ReactDOM.render(
       // HACK - CJ - 2025-07-03 - This works but gives an error and I don't know why
@@ -25,7 +25,8 @@ const appInterface = {
     )
   },
   unmountApp: (domId: string): boolean => {
-    const element = document.getElementById(domId)!
+    const element = document.getElementById(domId)
+    if (element === null) return false
     element.classList.remove('fullWidthFullHeight')
 
     return ReactDOM.unmountComponentAtNode(element)
