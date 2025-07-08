@@ -145,6 +145,9 @@ export const TinyEditor = props => {
         onInit={(evt, editor) => {
           editorRef.current = editor
         }}
+        value={props.content}
+        onEditorChange={(newValue, editor) => props.setContent(newValue)}
+        onDrop={e => base64EncodeAndTinyMceInsert(editorRef, e.dataTransfer.files)}
         init={{
           license_key: 'gpl',
           selector: 'textarea',
@@ -159,7 +162,7 @@ export const TinyEditor = props => {
           resize: false,
           statusbar: props.isStatusBarEnabled,
           toolbar: toolbar,
-          default_link_target: '_blank',
+          link_default_target: '_blank',
           plugins: [
             'autolink', 'lists', 'link', 'image', 'charmap', 'preview', 'anchor',
             'searchreplace', 'visualblocks', 'code', 'codesample', 'fullscreen', 'emoticons',
@@ -409,9 +412,6 @@ export const TinyEditor = props => {
             })
           }
         }}
-        value={props.content}
-        onEditorChange={(newValue, editor) => props.setContent(newValue)}
-        onDrop={e => base64EncodeAndTinyMceInsert(editorRef, e.dataTransfer.files)}
       />
     </>
   )
