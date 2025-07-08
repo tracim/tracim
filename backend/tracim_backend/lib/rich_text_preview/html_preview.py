@@ -7,11 +7,14 @@ from weasyprint import CSS
 from weasyprint import HTML
 
 from tracim_backend.config import CFG
+from tracim_backend.lib.rich_text_preview.html_parser import HtmlParser
+from tracim_backend.models.tracim_session import TracimSession
 
 
 class RichTextPreviewLib:
-    def __init__(self, app_config: CFG) -> None:
+    def __init__(self, app_config: CFG, session: TracimSession) -> None:
         self.app_config = app_config
+        self.session = session
 
     def get_full_pdf_preview(
         self,
@@ -38,7 +41,8 @@ class RichTextPreviewLib:
                     content,
                     outputfile=html_preview_path.name,
                     to="html",
-                    format="html",
+                    # INFO - CH - 2025-07-07 - raw_html is mandatory to keep the html-mention tags
+                    format="html+raw_html",
                     extra_args=[
                         "--standalone",
                         "--toc",
@@ -49,7 +53,13 @@ class RichTextPreviewLib:
                         *metadata_args,
                     ],
                 )
-                HTML(html_preview_path).write_pdf(
+
+                html_parser = HtmlParser(html_preview_path, self.app_config, self.session)
+                html_parser.add_hostname_to_internal_link()
+                html_parser.add_public_name_to_mention()
+
+                html_str = str(html_parser.soup)
+                HTML(string=html_str).write_pdf(
                     pdf_preview_path,
                     stylesheets=[
                         CSS(self.app_config.RICH_TEXT_PREVIEW__CSS_PATH),
