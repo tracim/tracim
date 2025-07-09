@@ -31,7 +31,10 @@ import { newFlashMessage } from '../../action-creator.sync.js'
 import { deleteUserRole, getUserWorkspaceConfigList } from '../../action-creator.async.js'
 import AdminUserSpacesConfig from '../../container/AdminUserSpacesConfig.jsx'
 import UserSpacesConfigLine from './UserSpacesConfigLine.jsx'
-import { FETCH_CONFIG } from '../../util/helper.js'
+import {
+  FETCH_CONFIG,
+  EMAIL_NOTIFICATION_TYPE
+} from '../../util/helper.js'
 
 export const onlyManager = (userToEditId, member, memberList) => {
   const manager = ROLE.workspaceManager.slug
@@ -113,9 +116,21 @@ export const UserSpacesConfig = (props) => {
       const hasFilterMatchOnLabel = includesFilter(space.label)
       const hasFilterMatchOnRole = userRole && includesFilter(props.t(userRole.label))
 
+      const translationMap = {
+        [EMAIL_NOTIFICATION_TYPE.INDIVIDUAL]: props.t('Individual'),
+        [EMAIL_NOTIFICATION_TYPE.HOURLY]: props.t('Hourly'),
+        [EMAIL_NOTIFICATION_TYPE.DAILY]: props.t('Daily'),
+        [EMAIL_NOTIFICATION_TYPE.WEEKLY]: props.t('Weekly'),
+        [EMAIL_NOTIFICATION_TYPE.NONE]: props.t('None')
+      }
+      const hasFilterMatchNotification = includesFilter(
+        translationMap[space.member.emailNotificationType]
+      )
+
       return (
         hasFilterMatchOnLabel ||
-        hasFilterMatchOnRole
+        hasFilterMatchOnRole ||
+        hasFilterMatchNotification
       )
     })
   }
