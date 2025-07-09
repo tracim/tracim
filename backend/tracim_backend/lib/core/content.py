@@ -843,7 +843,7 @@ class ContentApi(object):
         }
         preview_metadata.update(additional_metadata)
 
-        return RichTextPreviewLib(self._config).get_full_pdf_preview(
+        return RichTextPreviewLib(self._config, self._session).get_full_pdf_preview(
             content=revision.raw_content,
             default_filename=default_filename,
             filename=filename,
