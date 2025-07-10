@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { createRef } from 'react'
+import type { ReactElement } from 'react'
 import { translate } from 'react-i18next'
-import i18n from '../i18n.js'
+import i18n from '../i18n'
 import {
   addAllResourceI18n,
   handleFetchResult,
@@ -19,14 +20,16 @@ import {
   TracimComponent
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
-import { getAgendaList, getPreFilledAgendaEvent } from '../action.async.js'
+import { getAgendaList, getPreFilledAgendaEvent } from '../action.async'
+import { createCalendar } from 'open-dav-calendar'
+import type { CalendarSource } from 'open-dav-calendar/types'
 
-export class Agenda extends React.Component {
-  constructor (props) {
+export class Agenda extends React.Component<any, any> {
+  calendarRef = createRef<HTMLDivElement>()
+
+  constructor (props: any) {
     super(props)
-
-    const param = props.data || debug
-
+    const param = (props.data !== undefined) ? props.data : debug
     this.state = {
       appName: 'agenda',
       isVisible: true,
@@ -39,7 +42,8 @@ export class Agenda extends React.Component {
       breadcrumbsList: [],
       appMounted: false,
       editionAuthor: '',
-      showRefreshWarning: false
+      showRefreshWarning: false,
+      calendar: null
     }
 
     // i18n has been init, add resources from frontend
@@ -58,18 +62,18 @@ export class Agenda extends React.Component {
   }
 
   // Custom Event Handlers
-  handleShowApp = data => {
+  handleShowApp = (data: any): void => {
     console.log('%c<Agenda> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP(this.state.config.slug), data)
     if (data.config.appConfig.workspaceId !== this.state.config.appConfig.workspaceId) {
       this.setState({ config: data.config })
     }
   }
 
-  handleAllAppChangeLanguage = data => {
+  handleAllAppChangeLanguage = (data: any): void => {
     const { props, state } = this
     console.log('%c<Agenda> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
 
-    this.setState(prev => ({
+    this.setState((prev: any) => ({
       loggedUser: {
         ...prev.loggedUser,
         lang: data
@@ -78,17 +82,16 @@ export class Agenda extends React.Component {
     i18n.changeLanguage(data)
     this.buildBreadcrumbs()
     this.setHeadTitle(state.config.appConfig.workspaceId !== null
-      ? `${props.t('Agenda')} · ${state.content.workspaceLabel}`
+      ? `${props.t('Agenda') as string} · ${state.content.workspaceLabel as string}`
       : props.t('My agendas')
     )
-    this.agendaIframe.contentWindow.location.reload()
   }
 
   // TLM Handlers
-  handleUserModified = data => {
+  handleUserModified = (data: any): void => {
     if (this.state.loggedUser.userId !== data.fields.user.user_id) return
 
-    this.setState(prev => ({
+    this.setState((prev: any) => ({
       loggedUser: {
         ...prev.loggedUser,
         authType: data.fields.user.auth_type,
@@ -108,9 +111,9 @@ export class Agenda extends React.Component {
     }))
   }
 
-  handleSharedspaceModified = data => {
+  handleSharedspaceModified = (data: any): void => {
     const { state } = this
-    if (!state.userWorkspaceList.find(workspace => workspace.workspace_id === data.fields.workspace.workspace_id)) return
+    if (state.userWorkspaceList.find((workspace: any) => workspace.workspace_id === data.fields.workspace.workspace_id) === undefined) return
 
     this.setState({
       content: {
@@ -125,12 +128,12 @@ export class Agenda extends React.Component {
     if (state.userWorkspaceList.length === 1) this.buildBreadcrumbs()
   }
 
-  async componentDidMount () {
+  async componentDidMount (): Promise<void> {
     const { state, props } = this
-    console.log('%c<Agenda> did mount', `color: ${state.config.hexcolor}`)
+    console.log('%c<Agenda> did mount', `color: ${state.config.hexcolor as string}`)
 
-    this.loadAgendaList(state.config.appConfig.workspaceId)
-    this.loadPrefilledAgendaEvent()
+    void this.loadAgendaList(state.config.appConfig.workspaceId)
+    void this.loadPrefilledAgendaEvent()
     if (state.config.appConfig.workspaceId !== null) {
       await this.loadWorkspaceData()
     } else {
@@ -139,31 +142,37 @@ export class Agenda extends React.Component {
     this.buildBreadcrumbs()
   }
 
-  async componentDidUpdate (prevProps, prevState) {
+  async componentDidUpdate (_: any, prevState: any): Promise<void> {
     const { state } = this
     // console.log('%c<Agenda> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (prevState.config.appConfig.workspaceId !== state.config.appConfig.workspaceId) {
-      if (state.config.appConfig.workspaceId) await this.loadAgendaList(state.config.appConfig.workspaceId)
+      if (state.config.appConfig.workspaceId !== null && Boolean(state.config.appConfig.workspaceId)) await this.loadAgendaList(state.config.appConfig.workspaceId)
       await this.loadWorkspaceData()
       this.buildBreadcrumbs()
-      this.agendaIframe.contentWindow.location.reload()
+    }
+
+    if (this.calendarRef.current !== null &&
+      state.userWorkspaceListLoaded as boolean &&
+      (prevState.loggedUser.lang !== state.loggedUser.lang || state.calendar === null)
+    ) {
+      void this.buildCalendar()
     }
   }
 
-  handleClickRefresh = () => {
+  handleClickRefresh = (): void => {
     this.setState({ showRefreshWarning: false })
-    this.agendaIframe.contentWindow.location.reload()
   }
 
-  setHeadTitle = (title) => {
+  setHeadTitle = (title: string): void => {
+    // @ts-expect-error global variable
     GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.SET_HEAD_TITLE,
-      data: { title: title }
+      data: { title }
     })
   }
 
-  loadAgendaList = async workspaceId => {
+  loadAgendaList = async (workspaceId: number): Promise<void> => {
     const { state, props } = this
 
     const fetchResultUserWorkspace = await handleFetchResult(
@@ -172,7 +181,7 @@ export class Agenda extends React.Component {
 
     switch (fetchResultUserWorkspace.apiResponse.status) {
       case 200:
-        this.loadUserRoleInWorkspace(fetchResultUserWorkspace.body)
+        void this.loadUserRoleInWorkspace(fetchResultUserWorkspace.body)
         break
       case 400:
         switch (fetchResultUserWorkspace.body.code) {
@@ -183,12 +192,12 @@ export class Agenda extends React.Component {
     }
   }
 
-  async loadPrefilledAgendaEvent () {
+  async loadPrefilledAgendaEvent (): Promise<void> {
     const fetchGetPreFilledAgendaEvent = await handleFetchResult(
       await getPreFilledAgendaEvent(this.state.config.apiUrl)
     )
 
-    if (fetchGetPreFilledAgendaEvent.apiResponse.ok) {
+    if (fetchGetPreFilledAgendaEvent.apiResponse.ok as boolean) {
       this.setState({ preFilledAgendaEvent: fetchGetPreFilledAgendaEvent.body })
     } else {
       sendGlobalFlashMessage(this.props.t('Error while loading pre-filled agenda event information'))
@@ -199,7 +208,7 @@ export class Agenda extends React.Component {
   // INFO - CH - 2019-04-09 - This function is complicated because, right now, the only way to get the user's role
   // on a workspace is to extract it from the members list that workspace
   // see https://github.com/tracim/tracim/issues/1581
-  loadUserRoleInWorkspace = async agendaList => {
+  loadUserRoleInWorkspace = async (agendaList: any[]): Promise<void> => {
     const { state, props } = this
     const fetchResultList = await Promise.all(
       agendaList
@@ -215,7 +224,7 @@ export class Agenda extends React.Component {
 
     const workspaceListMemberList = fetchResultSuccess.map(result => ({
       workspaceId: result.body[0].workspace_id, // INFO - CH - 2019-04-09 - workspaces always have at least one member
-      memberList: result.body || []
+      memberList: result.body
     }))
 
     const agendaThatCouldGetRoleFrom = agendaList
@@ -226,10 +235,10 @@ export class Agenda extends React.Component {
 
     const agendaListWithRole = agendaThatCouldGetRoleFrom.map(agenda => ({
       ...agenda,
-      loggedUserRole: workspaceListMemberList
-        .find(ws => ws.workspaceId === agenda.workspace_id)
+      loggedUserRole: (workspaceListMemberList
+        .find(ws => ws.workspaceId === agenda.workspace_id) ?? { memberList: [] })
         .memberList
-        .find(user => user.user_id === state.loggedUser.userId)
+        .find((user: any) => user.user_id === state.loggedUser.userId)
         .role
     }))
 
@@ -243,13 +252,13 @@ export class Agenda extends React.Component {
     })
   }
 
-  buildBreadcrumbs = () => {
+  buildBreadcrumbs = (): void => {
     const { props, state } = this
 
     const breadcrumbsList = []
 
-    const workspaceId = state.config.appConfig.workspaceId
-    if (workspaceId) {
+    const workspaceId: number | null = state.config.appConfig.workspaceId
+    if (workspaceId !== null && Boolean(workspaceId)) {
       breadcrumbsList.push({
         link: PAGE.WORKSPACE.DASHBOARD(workspaceId),
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
@@ -274,10 +283,93 @@ export class Agenda extends React.Component {
     // app crash telling it cannot render a Link outside a router
     // see https://github.com/tracim/tracim/issues/1637
     // GLOBAL_dispatchEvent({type: 'setBreadcrumbs', data: {breadcrumbs: breadcrumbsList}})
-    this.setState({ breadcrumbsList: breadcrumbsList })
+    this.setState({ breadcrumbsList })
   }
 
-  loadWorkspaceData = async () => {
+  buildCalendar = async (): Promise<void> => {
+    if (this.calendarRef.current === null) return
+
+    const { state, props } = this
+    state.calendar?.destroy()
+
+    // FIXME - CJ - 2025-07-03 - `workspace.withCredentials` should probably be handle
+    const sources: CalendarSource[] = state.userWorkspaceList.map((workspace: any) => ({
+      calendarUrl: workspace.agenda_url
+    }))
+    const calendar = await createCalendar(
+      sources,
+      this.calendarRef.current,
+      {},
+      {
+        calendarElement: {
+          timeGridDay: props.t('Day'),
+          timeGridWeek: props.t('Week'),
+          dayGridMonth: props.t('Month'),
+          listDay: props.t('List'),
+          listWeek: props.t('List Week'),
+          listMonth: props.t('List Month'),
+          listYear: props.t('List Year'),
+          today: props.t('Today'),
+          allDay: props.t('Daily'),
+          calendars: props.t('Calendars'),
+          newEvent: props.t('New Event')
+        },
+        eventForm: {
+          allDay: props.t('Daily'),
+          calendar: props.t('Calendar'),
+          title: props.t('Title'),
+          location: props.t('Location'),
+          start: props.t('Start'),
+          end: props.t('End'),
+          organizer: props.t('Organizer'),
+          attendees: props.t('Attendees'),
+          addAttendee: props.t('Add attendee'),
+          description: props.t('Description'),
+          delete: props.t('Delete'),
+          cancel: props.t('Cancel'),
+          save: props.t('Save'),
+          chooseACalendar: props.t('-- Choose a calendar --'),
+          email: props.t('email'),
+          rrule: props.t('Frequency'),
+          name: props.t('name')
+        },
+        eventBody: {
+          organizer: props.t('Organizer')
+        },
+        recurringForm: {
+          editRecurring: props.t('This is a recurring event'),
+          editAll: props.t('Edit all occurrences'),
+          editSingle: props.t('Edit this occurrence only')
+        },
+        partStatus: {
+          'NEEDS-ACTION': props.t('Needs to answer'),
+          ACCEPTED: props.t('Accepted'),
+          DECLINED: props.t('Declined'),
+          TENTATIVE: props.t('Tentatively accepted'),
+          DELEGATED: props.t('Delegated')
+        },
+        attendeeRoles: {
+          CHAIR: props.t('Chair'),
+          'REQ-PARTICIPANT': props.t('Required participant'),
+          'OPT-PARTICIPANT': props.t('Optional participant'),
+          'NON-PARTICIPANT': props.t('Non participant')
+        },
+        rrules: {
+          none: props.t('Never'),
+          unchanged: props.t('Keep existing'),
+          'FREQ=DAILY': props.t('Daily_f'),
+          'FREQ=WEEKLY': props.t('Weekly'),
+          'BYDAY=MO,TU,WE,TH,FR;FREQ=DAILY': props.t('Workdays'),
+          'INTERVAL=2;FREQ=WEEKLY': props.t('Every two week'),
+          'FREQ=MONTHLY': props.t('Monthly'),
+          'FREQ=YEARLY': props.t('Yearly')
+        }
+      }
+    )
+    this.setState({ calendar })
+  }
+
+  loadWorkspaceData = async (): Promise<void> => {
     const { state, props } = this
 
     const fetchResultWorkspaceDetail = await handleFetchResult(
@@ -291,32 +383,14 @@ export class Agenda extends React.Component {
             workspaceLabel: fetchResultWorkspaceDetail.body.label
           }
         })
-        this.setHeadTitle(`${props.t('Agenda')} · ${fetchResultWorkspaceDetail.body.label}`)
+        this.setHeadTitle(`${props.t('Agenda') as string} · ${fetchResultWorkspaceDetail.body.label as string}`)
     }
   }
 
-  render () {
+  render (): ReactElement | null {
     const { props, state } = this
 
-    if (!state.isVisible || !state.userWorkspaceListLoaded || !state.preFilledAgendaEvent) return null
-
-    const config = {
-      globalAccountSettings: {
-        agendaList: state.userWorkspaceList.map(a => ({
-          href: a.agenda_url,
-          hrefLabel: a.agenda_type === 'private'
-            ? props.t('User')
-            : state.userWorkspaceList.length > 1 ? props.t('Spaces') : props.t('Space'),
-          settingsAccount: a.agenda_type === 'private',
-          withCredentials: a.with_credentials,
-          loggedUserRole: a.agenda_type === 'private' ? '' : a.loggedUserRole,
-          workspaceId: a.agenda_type === 'private' ? '' : a.workspace_id
-        }))
-      },
-      userLang: state.loggedUser.lang,
-      preFilledAgendaEvent: state.preFilledAgendaEvent,
-      shouldShowCaldavzapSidebar: state.config.appConfig.forceShowSidebar
-    }
+    if (!(state.isVisible as boolean) || !(state.userWorkspaceListLoaded as boolean) || state.preFilledAgendaEvent === null) return null
 
     // INFO - GB - 2019-06-11 - This tag dangerouslySetInnerHTML is needed to i18next be able to handle special characters
     // https://github.com/tracim/tracim/issues/1847
@@ -333,7 +407,7 @@ export class Agenda extends React.Component {
             )
           }}
         />
-      )
+        )
 
     return (
       <PageWrapper customClass='agendaPage'>
@@ -346,7 +420,7 @@ export class Agenda extends React.Component {
         />
 
         <div className='agendaPage__warningMessage'>
-          {state.showRefreshWarning && (
+          {state.showRefreshWarning as boolean && (
             <RefreshWarningMessage
               tooltip={props.t('Some information was modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
               onClickRefresh={this.handleClickRefresh}
@@ -355,14 +429,7 @@ export class Agenda extends React.Component {
         </div>
 
         <PageContent parentClass='agendaPage'>
-          <iframe
-            id='agendaIframe'
-            src='/assets/_caldavzap/index.tracim.html'
-            allow='fullscreen'
-            allowFullScreen
-            data-config={JSON.stringify(config)}
-            ref={f => { this.agendaIframe = f }}
-          />
+          <div ref={this.calendarRef} style={{ height: '100%' }} />
         </PageContent>
       </PageWrapper>
     )

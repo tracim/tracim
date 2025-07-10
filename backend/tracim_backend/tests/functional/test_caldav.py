@@ -245,7 +245,7 @@ class TestCaldavRadicaleProxyEndpoints(object):
             "/dav/agenda/user/{}/{}.ics".format(user.user_id, sub_item_label),
             event,
             content_type="text/calendar",
-            status=201,
+            status=204,
         )
         web_testapp.get(
             "/dav/agenda/user/{}/{}.ics".format(user.user_id, sub_item_label),
