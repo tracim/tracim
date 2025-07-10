@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "module": "esnext",
+    "target": "es5",
+    "useDefineForClassFields": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowJs": true,
+
+    "moduleResolution": "node",
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitAny": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "allowSyntheticDefaultImports": true
+  }
+}
