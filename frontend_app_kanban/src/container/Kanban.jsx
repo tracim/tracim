@@ -40,7 +40,13 @@ import {
   putMyselfFileRead,
   sendGlobalFlashMessage,
   sortListByMultipleCriteria,
-  defaultApiContent
+  defaultApiContent,
+  FilterBar,
+  AppProperty,
+  AppDescription,
+  displayFileSize,
+  formatAbsoluteDate,
+  displayDistanceDate
 } from 'tracim_frontend_lib'
 
 import KanbanComponent from '../component/Kanban.jsx'
@@ -80,7 +86,8 @@ export class Kanban extends React.Component {
       showRefreshWarning: false,
       showPermanentlyDeletePopup: false,
       translationTargetLanguageCode: param.loggedUser.lang,
-      toDoList: []
+      toDoList: [],
+      filterInput: ''
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
 
@@ -258,6 +265,10 @@ export class Kanban extends React.Component {
     }
   }
 
+  handleClickValidateNewDescription = async newDescription => {
+    this.props.appContentChangeDescription(newDescription)
+  }
+
   componentDidMount () {
     console.log('%c<Kanban> did Mount', `color: ${this.state.config.hexcolor}`)
     this.updateTimelineAndContent()
@@ -272,7 +283,7 @@ export class Kanban extends React.Component {
 
   getMenuItemList = () => {
     const { props, state } = this
-    const timelineObject = {
+    const timelineComponent = {
       id: 'timeline',
       label: props.t('Timeline'),
       icon: 'fa-history',
@@ -293,13 +304,12 @@ export class Kanban extends React.Component {
               languageCode || state.translationTargetLanguageCode
             )}
             timelineData={props.timeline}
-            translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
             translationTargetLanguageCode={state.translationTargetLanguageCode}
+            system={state.config.system}
             workspaceId={state.content.workspace_id}
             // End of required props ///////////////////////////////////////////
             availableStatusList={state.config.availableStatuses}
             canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
-            codeLanguageList={state.config.system.config.ui__notes__code_sample_languages}
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}
             disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
@@ -313,7 +323,6 @@ export class Kanban extends React.Component {
             onClickPermanentlyDeleteComment={this.handlePermanentlyDeleteComment}
             shouldShowPermanentlyDeleteButton={state.loggedUser.userRoleIdInWorkspace >= ROLE.workspaceManager.id}
             onClickEditComment={this.handleClickEditComment}
-            onClickOpenFileComment={this.handleClickOpenFileComment}
             onClickRevisionBtn={this.handleClickShowRevision}
             onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
             shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
@@ -322,10 +331,10 @@ export class Kanban extends React.Component {
       ) : null
     }
 
-    const menuItemList = [timelineObject]
+    const menuItemList = [timelineComponent]
 
     if (state.config.toDoEnabled) {
-      const toDoObject = {
+      const todoComponent = {
         id: 'todo',
         label: props.t('Tasks'),
         icon: 'fas fa-check-square',
@@ -352,10 +361,10 @@ export class Kanban extends React.Component {
           </PopinFixedRightPartContent>
         )
       }
-      menuItemList.push(toDoObject)
+      menuItemList.push(todoComponent)
     }
 
-    const tagObject = {
+    const tagComponent = {
       id: 'tag',
       label: props.t('Tags'),
       icon: 'fas fa-tag',
@@ -374,7 +383,61 @@ export class Kanban extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
-    menuItemList.push(tagObject)
+    menuItemList.push(tagComponent)
+
+    // INFO - CH - 2025-06-18 - On content load, .created stores the datetime from api.
+    // When clicking on a revision, the .created get replaced by the formated value and .created_raw is affected
+    // with .created.
+    // See: https://github.com/tracim/tracim/issues/6784
+    const dateCreatedRaw = state.content.created_raw ? state.content.created_raw : state.content.created
+    const propertyComponent = {
+      id: 'properties',
+      label: props.t('Properties'),
+      icon: 'fas fa-list-ul',
+      children: (
+        <PopinFixedRightPartContent label={props.t('Properties')}>
+          <AppProperty
+            readOnlyFieldList={[{
+              title: '',
+              label: props.t('Size:'),
+              value: displayFileSize(state.content.size)
+            }, {
+              title: formatAbsoluteDate(dateCreatedRaw, props.i18n.language),
+              label: props.t('Creation date:'),
+              value: formatAbsoluteDate(dateCreatedRaw, props.i18n.language, 'P')
+            }, {
+              title: formatAbsoluteDate(state.content.modified, props.i18n.language),
+              label: props.t('Last modification:'),
+              value: displayDistanceDate(state.content.modified, state.loggedUser.lang)
+            }]}
+          />
+        </PopinFixedRightPartContent>
+      )
+    }
+    menuItemList.push(propertyComponent)
+
+    const descriptionComponent = {
+      id: 'description',
+      label: props.t('Description'),
+      icon: 'fa-info-circle',
+      children: (
+        <PopinFixedRightPartContent label={props.t('Description')}>
+          <AppDescription
+            apiUrl={state.config.apiUrl}
+            color={state.config.hexcolor}
+            mentionUserList={state.config.workspace.memberList}
+            description={state.content.description}
+            codeLanguageList={state.config.system.config.ui__notes__code_sample_languages}
+            iframeWhitelist={state.config.system.config.iframe_whitelist}
+            language={state.loggedUser.lang}
+            displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id}
+            disableChangeDescription={!state.content.is_editable}
+            onClickValidateNewDescription={this.handleClickValidateNewDescription}
+          />
+        </PopinFixedRightPartContent>
+      )
+    }
+    menuItemList.push(descriptionComponent)
 
     return menuItemList
   }
@@ -423,7 +486,8 @@ export class Kanban extends React.Component {
       content: response.body,
       isTemplate: response.body.is_template,
       currentContentRevisionId: response.body.current_revision_id,
-      loadingContent: false
+      loadingContent: false,
+      filterInput: ''
     })
     this.setHeadTitle(response.body.label)
     this.buildBreadcrumbs(response.body)
@@ -590,15 +654,6 @@ export class Kanban extends React.Component {
     )
   }
 
-  handleClickOpenFileComment = (comment) => {
-    const { state } = this
-    state.config.history.push(PAGE.WORKSPACE.CONTENT(
-      state.content.workspace_id,
-      CONTENT_TYPE.FILE,
-      comment.content_id
-    ))
-  }
-
   handleClickRefresh = () => {
     const { state } = this
 
@@ -621,6 +676,10 @@ export class Kanban extends React.Component {
 
   handleChangeTranslationTargetLanguageCode = (translationTargetLanguageCode) => {
     this.setState({ translationTargetLanguageCode })
+  }
+
+  handleChangeFilterInput = e => {
+    this.setState({ filterInput: e.target.value })
   }
 
   render () {
@@ -714,6 +773,14 @@ export class Kanban extends React.Component {
           onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
             state.content, state.loggedUser, this.setState.bind(this)
           )}
+          genericAction={
+            <FilterBar
+              customClass=''
+              onChange={this.handleChangeFilterInput}
+              value={state.filterInput}
+              placeholder={props.t('Filter...')}
+            />
+          }
         >
           <KanbanComponent
             config={state.config}
@@ -725,6 +792,7 @@ export class Kanban extends React.Component {
             isRefreshNeeded={state.showRefreshWarning}
             language={state.loggedUser.lang}
             mode={state.mode}
+            filterInput={state.filterInput}
             onClickFullscreen={this.handleClickFullscreen}
             onClickLastVersion={this.handleClickLastVersion}
             onClickRefresh={this.handleClickRefresh}

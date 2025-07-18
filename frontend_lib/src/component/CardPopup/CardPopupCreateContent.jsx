@@ -1,9 +1,9 @@
 import React from 'react'
 import { translate } from 'react-i18next'
-import Select from 'react-select'
 import PropTypes from 'prop-types'
 import Radium from 'radium'
 import CardPopup from './CardPopup.jsx'
+import TemplateContentSelector from '../TemplateContentSelector/TemplateContentSelector.jsx'
 
 // require('./CardPopupCreateContent.styl') // see https://github.com/tracim/tracim/issues/1156
 const color = require('color')
@@ -33,7 +33,15 @@ export const PopupCreateContent = (props) => {
       >
         <div className='createcontent'>
           <form className='createcontent__form' data-cy='createcontent__form'>
-            {props.children
+            {(props.displayTemplateList && (props.templateList.length > 0)) && (
+              <TemplateContentSelector
+                onChangeTemplate={props.onChangeTemplate}
+                templateList={props.templateList}
+                templateId={props.templateId}
+                customColor={props.customColor}
+              />
+            )}
+            {(props.children
               ? props.children
               : (
                 <input
@@ -46,18 +54,7 @@ export const PopupCreateContent = (props) => {
                   onKeyDown={handleInputKeyDown}
                   autoFocus
                 />
-              )}
-            {(props.displayTemplateList && (props.templateList.length > 0)) && (
-              <div>
-                <div className='createcontent__form__label'>{props.t('From a template:')}</div>
-                <Select
-                  className='createcontent__form__template'
-                  isClearable
-                  isSearchable
-                  onChange={props.onChangeTemplate}
-                  options={props.templateList}
-                />
-              </div>
+              )
             )}
             <div className='createcontent__form__button'>
               <button
@@ -98,7 +95,8 @@ PopupCreateContent.propTypes = {
   onValidate: PropTypes.func.isRequired,
   label: PropTypes.string,
   allowEmptyTitle: PropTypes.bool,
-  templateList: PropTypes.array
+  templateList: PropTypes.array,
+  templateId: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
 }
 
 PopupCreateContent.defaultProps = {
@@ -110,7 +108,8 @@ PopupCreateContent.defaultProps = {
   label: '',
   onChangeTemplate: () => {},
   allowEmptyTitle: false,
-  templateList: []
+  templateList: [],
+  templateId: null
 }
 
 export default translate()(Radium(PopupCreateContent))

@@ -21,7 +21,7 @@ import {
 
 import {
   replaceHTMLElementWithMention
-} from '../../mentionOrLink.js'
+} from '../../mentionOrLinkOrSanitize.js'
 import { TRANSLATION_STATE } from '../../translation.js'
 import PromptMessage from '../PromptMessage/PromptMessage.jsx'
 import { CUSTOM_EVENT } from '../../customEvent.js'
@@ -32,6 +32,7 @@ import ScrollToBottomWrapper from '../ScrollToBottomWrapper/ScrollToBottomWrappe
 import EditCommentPopup from './EditCommentPopup.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import Loading from '../Loading/Loading.jsx'
+import RevisionGroup from './RevisionGroup.jsx'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 
@@ -108,6 +109,8 @@ export class Timeline extends React.Component {
       return null
     }
 
+    const timelineDataGrouped = groupTimelineData(props.timelineData)
+
     return (
       <div className={classnames('timeline')}>
         <div className='timeline__warning'>
@@ -154,12 +157,13 @@ export class Timeline extends React.Component {
               customClass='timeline__messagelist__showMoreButton'
             />
           )}
-          {props.loading ? <Loading /> : props.timelineData.map(content => {
+          {props.loading ? <Loading /> : timelineDataGrouped.map((content, i) => {
             switch (content.timelineType) {
               case TIMELINE_TYPE.COMMENT:
               case TIMELINE_TYPE.COMMENT_AS_FILE:
                 return (
                   <Comment
+                    systemConfig={props.system.config}
                     isPublication={false}
                     customClass={`${props.customClass}__comment`}
                     customColor={props.customColor}
@@ -171,7 +175,9 @@ export class Timeline extends React.Component {
                     loggedUser={props.loggedUser}
                     creationDate={content.created_raw || content.created}
                     modificationDate={content.modified}
-                    text={content.translationState === TRANSLATION_STATE.TRANSLATED ? content.translatedRawContent : content.raw_content}
+                    text={content.translationState === TRANSLATION_STATE.TRANSLATED
+                      ? content.translatedRawContent
+                      : content.raw_content}
                     fromMe={props.loggedUser.userId === content.author.user_id}
                     key={`comment_${content.content_id}`}
                     onClickTranslate={() => { props.onClickTranslateComment(content) }}
@@ -182,12 +188,23 @@ export class Timeline extends React.Component {
                       props.onChangeTranslationTargetLanguageCode(languageCode)
                     }}
                     translationTargetLanguageCode={props.translationTargetLanguageCode}
-                    translationTargetLanguageList={props.translationTargetLanguageList}
                     onClickEditComment={() => this.handleClickEditComment(content)}
                     onClickDeleteComment={() => this.handleToggleDeleteCommentPopup(content)}
                     onClickPermanentlyDeleteComment={() => this.handleClickPermanentlyDeleteButton(content)}
                     shouldShowPermanentlyDeleteButton={props.shouldShowPermanentlyDeleteButton}
-                    onClickOpenFileComment={() => props.onClickOpenFileComment(content)}
+                  />
+                )
+              case TIMELINE_TYPE.REVISION_GROUP:
+                return (
+                  <RevisionGroup
+                    revisionGroup={content.group}
+                    customClass={props.customClass}
+                    customColor={props.customColor}
+                    loggedUser={props.loggedUser}
+                    availableStatusList={props.availableStatusList}
+                    allowClickOnRevision={props.allowClickOnRevision}
+                    onClickRevisionBtn={props.onClickRevisionBtn}
+                    key={`revisionGroup_${i}`}
                   />
                 )
               case TIMELINE_TYPE.REVISION:
@@ -213,7 +230,7 @@ export class Timeline extends React.Component {
         {state.showEditCommentPopup && (
           <EditCommentPopup
             apiUrl={props.apiUrl}
-            codeLanguageList={props.codeLanguageList}
+            codeLanguageList={props.system.config.ui__notes__code_sample_languages}
             comment={replaceHTMLElementWithMention(
               props.memberList,
               state.newComment.raw_content
@@ -248,7 +265,7 @@ export class Timeline extends React.Component {
               onClickSubmit={props.onClickSubmit}
               workspaceId={props.workspaceId}
               // End of required props /////////////////////////////////////////
-              codeLanguageList={props.codeLanguageList}
+              codeLanguageList={props.system.config.ui__notes__code_sample_languages}
               customClass={props.customClass}
               customColor={props.customColor}
               disableComment={props.disableComment}
@@ -304,13 +321,11 @@ Timeline.propTypes = {
   onClickTranslateComment: PropTypes.func.isRequired,
   timelineData: PropTypes.array.isRequired,
   translationTargetLanguageCode: PropTypes.string.isRequired,
-  translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
   workspaceId: PropTypes.number.isRequired,
   // End of required props /////////////////////////////////////////////////////
   allowClickOnRevision: PropTypes.bool,
   availableStatusList: PropTypes.array,
   canLoadMoreTimelineItems: PropTypes.func,
-  codeLanguageList: PropTypes.array,
   customClass: PropTypes.string,
   customColor: PropTypes.string,
   deprecatedStatus: PropTypes.object,
@@ -329,20 +344,19 @@ Timeline.propTypes = {
   onClickPermanentlyDeleteComment: PropTypes.func,
   shouldShowPermanentlyDeleteButton: PropTypes.bool,
   onClickEditComment: PropTypes.func,
-  onClickOpenFileComment: PropTypes.func,
   onClickRestoreArchived: PropTypes.func,
   onClickRestoreDeleted: PropTypes.func,
   onClickRevisionBtn: PropTypes.func,
   onClickShowMoreTimelineItems: PropTypes.func,
   shouldScrollToBottom: PropTypes.bool,
-  showParticipateButton: PropTypes.bool
+  showParticipateButton: PropTypes.bool,
+  system: PropTypes.object.isRequired
 }
 
 Timeline.defaultProps = {
   allowClickOnRevision: true,
   availableStatusList: [],
   canLoadMoreTimelineItems: () => false,
-  codeLanguageList: [],
   customClass: '',
   customColor: '',
   deprecatedStatus: {
@@ -363,7 +377,6 @@ Timeline.defaultProps = {
   onClickPermanentlyDeleteComment: () => {},
   shouldShowPermanentlyDeleteButton: false,
   onClickEditComment: () => { },
-  onClickOpenFileComment: () => { },
   onClickRestoreComment: content => { },
   onClickRevisionBtn: () => { },
   onClickShowMoreTimelineItems: () => { },
@@ -371,4 +384,55 @@ Timeline.defaultProps = {
   shouldScrollToBottom: true,
   showParticipateButton: false,
   timelineData: []
+}
+
+export const groupTimelineData = timelineData => {
+  if (!Array.isArray(timelineData) || timelineData.length === 0) {
+    return []
+  }
+
+  const timelineDataGrouped = []
+  const revisionGroup = []
+
+  const copyAndResetRevisionGroup = () => {
+    if (revisionGroup.length === 1) {
+      timelineDataGrouped.push(...revisionGroup)
+    } else if (revisionGroup.length > 1) {
+      timelineDataGrouped.push({
+        timelineType: TIMELINE_TYPE.REVISION_GROUP,
+        group: [...revisionGroup]
+      })
+    }
+    revisionGroup.length = 0 // INFO - CH - 2025-04-24 - reset the const array to []
+  }
+
+  for (let i = 0; i < timelineData.length; i++) {
+    const timelineItem = timelineData[i]
+
+    switch (timelineItem.timelineType) {
+      case TIMELINE_TYPE.COMMENT:
+      case TIMELINE_TYPE.COMMENT_AS_FILE:
+        copyAndResetRevisionGroup()
+        timelineDataGrouped.push(timelineItem)
+        break
+
+      case TIMELINE_TYPE.REVISION:
+        revisionGroup.push(timelineItem)
+        break
+
+      case TIMELINE_TYPE.REVISION_GROUP:
+        break
+    }
+  }
+
+  // INFO - CH - 2025-04-24 - Handle the last element if it is a revision
+  if (timelineData[timelineData.length - 1].timelineType === TIMELINE_TYPE.REVISION) {
+    copyAndResetRevisionGroup()
+  }
+
+  if (timelineDataGrouped.length <= 4) {
+    return timelineData
+  }
+
+  return timelineDataGrouped
 }

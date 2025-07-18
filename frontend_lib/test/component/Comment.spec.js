@@ -11,6 +11,10 @@ const nock = require('nock')
 describe('<Comment />', () => {
   const props = {
     apiUrl: 'http://fake.url/api',
+    systemConfig: {
+      iframe_whitelist: [],
+      translation_service__target_languages: [{ code: 'fr', display: 'Français' }]
+    },
     created: '0',
     customClass: 'randomCustomClass',
     customColor: '#252525',
@@ -35,7 +39,6 @@ describe('<Comment />', () => {
     onChangeTranslationTargetLanguageCode: () => {},
     translationTargetLanguageCode: 'en',
     targetLanguageList: [{ code: 'fr', display: 'Français' }],
-    translationTargetLanguageList: [{ code: 'fr', display: 'Français' }],
     onChangeTargetLanguageCode: () => {}
   }
 

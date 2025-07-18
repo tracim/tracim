@@ -2,21 +2,17 @@
 
 Thanks for taking the time to contribute :D
 
-## How to
+## Open an issue
 
-### Opening an issue
-
-Before opening an issue, please check that the issue is not already opened.
+Before opening an issue, please check that the issue is not already opened.  
 If there is no issue similar to yours, feel free to create an issue and follow the template.
 
-### Create a pull request
-
-Once you have finished your development and you want to merge it on `develop`, please create a pull request. The pull request must have a title explicit, for example: `feat(frontend): <your feature>`. Once the pull request is created, follow the template.
-
-### Contribute to the translation
+## Contribute to the translation
 
 [Tracim](https://www.tracim.fr) translation is done through [Weblate](https://weblate.org/tracim/tracim/).  
 Head over to [Weblate](https://weblate.org/tracim/tracim/) and contribute to the translation.
+
+## Development
 
 ### Develop a new feature
 
@@ -25,36 +21,29 @@ Let's start by opening an issue with the feature template.
 Then create a branch from develop, which should be named `feat/<your ticket title>`.  
 Now you can start coding 😄
 
-#### Development journey
+### Build
 
-##### Build
+See [build](/docs/development/getting_started.md) to see how to build [Tracim](https://www.tracim.fr).
 
-See [build](./docs/development/getting_started.md) to see how to build [Tracim](https://www.tracim.fr).
+### Test
 
-##### Testing
+See [testing backend](/docs/development/test/backend_test.md) and
+[testing frontend](/docs/development/test/frontend_test.md) to see how to test [Tracim](https://www.tracim.fr) and
+your developments.
 
-See [testing](./docs/development/test/testing.md) to see how to test [Tracim](https://www.tracim.fr) and your developments.
+### Commit to the repository
 
-##### Committing to the repository
-
-First, you need to sign every commit you make with the `-s` arg of `git commit` command.  
+You need to sign every commit you make with the `-s` arg of `git commit` command.  
 See [git signature](https://git-scm.com/docs/git-commit#git-commit--s).
 
-This will prove that you are the author of the commit and you have accepted the licenses ([MIT](https://opensource.org/licenses/MIT), [LGPLv3](https://www.gnu.org/licenses/lgpl-3.0.html) and [AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)) and [Developer Certificate of Origin](./doc/DCO).
+This will prove that you are the author of the commit, and you have accepted the licenses
+([MIT](https://opensource.org/licenses/MIT), [LGPLv3](https://www.gnu.org/licenses/lgpl-3.0.html)
+and [AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)) and [Developer Certificate of Origin](/docs/DCO).
 
-## Code Formatting and Others Checks
+You also have to follow the documentation: [before_push.md](/docs/development/before_push.md).
 
-### Pre-commit
+### Create a pull request
 
-To enforce most required guidelines, please use the precommit mechanism.
-This will perform some automatic checks before committing.
-This is required to contribute to Tracim.
-
-To use it, you need the `pre-commit` Python package (installed with `pip install -r requirements-dev.txt` on the backend)
-you can then install hooks with:
-
-    pre-commit install
-
-Then, you will be able to notice the automatic checks when running `git commit`.
-
-Note: the pre-commit hook requires Python 3.7 or later to work.
+Once you have finished your development, and you want to merge it on `develop`, please create a pull request.  
+The pull request must have an explicit title. For example: `feat(frontend): <your feature>`.  
+Once the pull request is created, follow the template.

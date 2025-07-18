@@ -1,7 +1,7 @@
 {
   "Error while saving the user configuration": "Error al guardar la configuración de usuario",
   "Edit": "Editar",
-  "Delete": "Suprimir",
+  "Delete": "Eliminar",
   "A content with the same name already exists": "Ya existe un contenido con el mismo nombre",
   "Validate and create": "Validar y crear",
   "The content has been modified by {{author}}": "El contenido fue modificado por {{author}}",
@@ -32,12 +32,12 @@
   "Validate anyway": "Validar de todos modos",
   "Tasks": "Tareas",
   "Download as PDF": "Descargar como PDF",
-  "The link has been copied to clipboard": "Enlace copiado en el portapapeles",
+  "The link has been copied to clipboard": "El enlace ha sido copiado al portapapeles",
   "Copy content link": "Copiar enlace al contenido",
   "Cancel": "Cancelar",
   "Validate": "Validar",
-  "Permanently delete": "¿Eliminar permanentemente?",
-  "Yes, delete permanently": "Sí, borrar permanentemente",
-  "Warning: this operation cannot be rolled back": "Advertencia: esta operación no puede cancelarse",
-  "Table of content": ""
+  "Permanently delete": "¿Borrar permanentemente?",
+  "Yes, delete permanently": "Sí, eliminar permanentemente",
+  "Warning: this operation cannot be rolled back": "Atención: esta operación no puede revertirse",
+  "Table of content": "Sumario"
 }

@@ -14,7 +14,6 @@ import {
   COLORS,
   CONTENT_TYPE,
   CUSTOM_EVENT,
-  PAGE,
   ROLE_LIST,
   ROLE,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -101,15 +100,6 @@ export class FeedItemWithPreview extends React.Component {
       comment.content_id,
       comment.content_type
     )
-  }
-
-  handleClickOpenFileComment = (comment) => {
-    const { props } = this
-    props.history.push(PAGE.WORKSPACE.CONTENT(
-      props.content.workspaceId,
-      CONTENT_TYPE.FILE,
-      comment.content_id
-    ))
   }
 
   handleClickValidateNewComment = async (comment, commentAsFileList) => {
@@ -355,7 +345,6 @@ export class FeedItemWithPreview extends React.Component {
                   onClickTranslate={this.handleTranslateComment}
                   onClickRestore={this.handleRestoreContentTranslation}
                   translationState={state.contentTranslationState}
-                  translationTargetLanguageList={props.system.config.translation_service__target_languages}
                   translationTargetLanguageCode={state.translationTargetLanguageCode}
                   onChangeTranslationTargetLanguageCode={languageCode => {
                     this.handleChangeTranslationTargetLanguageCode(languageCode)
@@ -365,6 +354,7 @@ export class FeedItemWithPreview extends React.Component {
                   discussionToggleButtonLabel={this.getDiscussionToggleButtonLabel(commentList)}
                   threadLength={commentList.length}
                   showCommentList={props.showCommentList}
+                  systemConfig={props.system.config}
                 />
               )
               : (
@@ -419,10 +409,9 @@ export class FeedItemWithPreview extends React.Component {
                 )}
                 timelineData={commentList}
                 translationTargetLanguageCode={state.translationTargetLanguageCode}
-                translationTargetLanguageList={props.system.config.translation_service__target_languages}
                 workspaceId={props.workspaceId}
+                system={props.system}
                 // End of required props ///////////////////////////////////////
-                codeLanguageList={props.system.config.ui__notes__code_sample_languages}
                 customClass='feedItem__timeline'
                 customColor={contentType.hexcolor}
                 id={props.content.id}
@@ -431,7 +420,6 @@ export class FeedItemWithPreview extends React.Component {
                 onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
                 onClickDeleteComment={this.handleClickDeleteComment}
                 onClickEditComment={this.handleClickEditComment}
-                onClickOpenFileComment={this.handleClickOpenFileComment}
                 shouldScrollToBottom={false}
                 showParticipateButton={props.showParticipateButton}
               />

@@ -35,7 +35,7 @@ class StorageLib:
         self.uploaded_file_depot = DepotManager.get(
             app_config.UPLOADED_FILES__STORAGE__STORAGE_NAME
         )
-        self.preview_manager = PreviewManager(app_config.PREVIEW_CACHE_DIR, create_folder=True)
+        self.preview_manager = None
 
     def _get_depot_file(self, depot_file) -> StoredFile:
         if depot_file is None:
@@ -51,6 +51,13 @@ class StorageLib:
             raise CannotGetDepotFileDepotCorrupted(
                 "depot file {} is not accessible, depot seems corrupted".format(depot_file.file_id)
             ) from exc
+
+    def get_preview_manager(self):
+        if self.preview_manager is None:
+            self.preview_manager = PreviewManager(
+                self.app_config.PREVIEW_CACHE_DIR, create_folder=True
+            )
+        return self.preview_manager
 
     def get_raw_file(
         self,
@@ -178,7 +185,7 @@ class StorageLib:
                 file_path=file_path,
                 original_file_extension=original_file_extension,
             )
-            jpg_preview_path = self.preview_manager.get_jpeg_preview(
+            jpg_preview_path = self.get_preview_manager().get_jpeg_preview(
                 file_path,
                 page=preview_page_number,
                 width=width,
@@ -218,7 +225,7 @@ class StorageLib:
                 file_path=file_path,
                 original_file_extension=original_file_extension,
             )
-            pdf_preview_path = self.preview_manager.get_pdf_preview(
+            pdf_preview_path = self.get_preview_manager().get_pdf_preview(
                 file_path, page=preview_page_number, file_ext=original_file_extension
             )
         # INFO - G.M - 2019-08-08 - use given filename in all case but none or
@@ -247,7 +254,7 @@ class StorageLib:
         with self.preview_generator_filepath_context(
             depot_file=depot_file, original_file_extension=original_file_extension
         ) as file_path:
-            pdf_preview_path = self.preview_manager.get_pdf_preview(
+            pdf_preview_path = self.get_preview_manager().get_pdf_preview(
                 file_path, file_ext=original_file_extension
             )
         # INFO - G.M - 2019-08-08 - use given filename in all case but none or
@@ -281,7 +288,7 @@ class StorageLib:
         preview_generator_page_number = self._preview_manager_page_format(
             preview_generator_page_number
         )
-        if preview_generator_page_number >= self.preview_manager.get_page_nb(
+        if preview_generator_page_number >= self.get_preview_manager().get_page_nb(
             file_path, file_ext=original_file_extension
         ):
             raise PageOfPreviewNotFound(

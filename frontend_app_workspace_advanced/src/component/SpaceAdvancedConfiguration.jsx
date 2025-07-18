@@ -16,6 +16,7 @@ export const SpaceAdvancedConfiguration = (props) => {
     <div className='workspace_advanced-content'>
       <SpaceDescription
         apiUrl={props.apiUrl}
+        systemConfig={props.system.config}
         onClickSubmit={props.onClickSubmit}
         // End of required props ///////////////////////////////////////////////////////////////////
         codeLanguageList={props.codeLanguageList}
@@ -108,6 +109,7 @@ export default translate()(SpaceAdvancedConfiguration)
 SpaceAdvancedConfiguration.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   onClickSubmit: PropTypes.func.isRequired,
+  system: PropTypes.object.isRequired,
   // End of required props /////////////////////////////////////////////////////////////////////////
   agendaUrl: PropTypes.string,
   codeLanguageList: PropTypes.array,

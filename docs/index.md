@@ -7,14 +7,13 @@
 │   │   │   └── user_custom_properties.md  
 │   │   ├── plugins  
 │   │   │   ├── hello_world_plugin.py  
-│   │   │   ├── Official_Backend_Plugins.md  
+│   │   │   ├── official_backend_plugins.md  
 │   │   │   └── plugins.md  
 │   │   └── storage  
 │   │       ├── minio-encryption.md  
 │   │       └── webdav.md  
 │   ├── exploitation  
-│   │   ├── cli  
-│   │   │   └── controlling_tracim_with_cli.md  
+│   │   ├── cli.md  
 │   │   └── upgrade  
 │   │       ├── how_to_migrate_database.md  
 │   │       ├── how_to_migrate_file_storage.md  
@@ -24,6 +23,7 @@
 │       ├── BETA_testing_tracim_with_shibboleth_idp_in_docker.md  
 │       ├── elasticsearch_docker_image_with_ingest_plugin.md  
 │       ├── how_to_set_up_postgresql_database.md  
+│       ├── install_backend.md  
 │       ├── opensearch_docker_image_with_ingest_plugin.md  
 │       ├── running_tracim_components_locally.md  
 │       ├── settings_main_topics.md  
@@ -31,32 +31,38 @@
 │       └── using_environment_variables_instead_of_configuration_parameters.md  
 ├── api-integration  
 │   ├── api.md  
-│   └── socket.md  
+│   └── tlm_event_socket.md  
 ├── DCO  
 ├── development  
-│   ├── advanced  
-│   │   ├── how_to_create_database_migration.md  
-│   │   ├── mentions.md  
-│   │   ├── tables.png  
-│   │   ├── tracim_tables.md  
-│   │   └── yarn_scripts.md  
-│   ├── backend_build.md  
-│   ├── before_push.md  
-│   ├── frontend_build.md  
-│   ├── getting_started.md  
+│   ├── backend  
+│   │   ├── database  
+│   │   │   └── migrations.md  
+│   │   ├── features  
+│   │   │   └── mentions.md  
+│   │   ├── profiler.md  
+│   │   ├── setup  
+│   │   │   ├── live_message_setup.md  
+│   │   │   └── manual_setup.md  
+│   │   └── working_in_backend.md  
+│   ├── frontend  
+│   │   ├── scripts.md  
+│   │   ├── table.png  
+│   │   ├── tracim_table.md  
+│   │   └── working_in_frontend.md  
+│   ├── getting_started  
+│   │   ├── before_push.md  
+│   │   └── index.md  
 │   ├── i18n  
 │   │   ├── i18n-backend.md  
 │   │   └── i18n-frontend.md  
-│   ├── README.md  
-│   ├── setup  
+│   ├── misc  
+│   │   ├── create_new_app.md  
 │   │   └── devtools.md  
-│   ├── test  
-│   │   ├── concourse.md  
-│   │   ├── docker.md  
-│   │   └── testing.md  
-│   └── tlm  
-│       ├── live_message_setup.md  
-│       └── live_messages.md  
+│   └── test  
+│       ├── backend_test.md  
+│       ├── concourse.md  
+│       ├── docker.md  
+│       └── frontend_test.md  
 ├── index.md  
 ├── licences  
 │   ├── LICENSE_AGPLv3  
@@ -67,9 +73,10 @@
 │   ├── logo_browserstack.png  
 │   ├── logo_tracim.png  
 │   └── logo_weblate.png  
-└── overview  
-    ├── known_issues.md  
-    └── roles.md  
+├── overview  
+│   ├── known_issues.md  
+│   └── roles.md  
+└── README.md  
 ```
 
 List generated with
@@ -77,4 +84,4 @@ List generated with
 indextmp="$(tail -7 index.md)" && echo '```bash' > index.md && tree --noreport | sed "s|$|  |g" >> index.md && echo '```' >> index.md && echo "$indextmp" >> index.md
 ```
 
-There are two spaces at the end of each lines to force a linebreak in markdown.
+There are two spaces at the end of each line to force a linebreak in Markdown.

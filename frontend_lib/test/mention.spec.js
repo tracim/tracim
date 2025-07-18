@@ -1,16 +1,18 @@
 import { expect } from 'chai'
+import React from 'react'
 import {
   MENTION_ID_PREFIX,
   MENTION_ME_CLASS,
   addClassToMentionsOfUser,
   getInvalidMentionList,
   searchMentionAndReplaceWithTag,
-  searchMention
-} from '../src/mentionOrLink.js'
+  searchMention,
+  sanitizeIframe
+} from '../src/mentionOrLinkOrSanitize.js'
 
 const invalidMentionsList = ['@invalid_mention', '@not_a_member']
 
-describe('mentions on mentionOrLink.js', () => {
+describe('mentions on mentionOrLinkOrSanitize.js', () => {
   describe('regex mention', () => {
     const possibleTests = [
       {
@@ -214,5 +216,231 @@ describe('mentions on mentionOrLink.js', () => {
       const content = '<p>This is a content with two @user1 @user1 mentions and a @invalid_mention also two @not_a_member @not_a_member mentions, and also group mentions @all @tous @todos </p>'
       expect(getInvalidMentionList(content, knownMentions)).to.deep.equal(invalidMentionsList)
     })
+  })
+})
+
+describe('function sanitizeIframe', () => {
+  const defaultAllowedDomains = ['youtube.com', 'google.com']
+
+  describe('Parameter htmlContent', () => {
+    it('should return undefined when given undefind', () => {
+      const result = sanitizeIframe(undefined, defaultAllowedDomains)
+      expect(result).to.equal(undefined)
+    })
+
+    it('should return null when given null', () => {
+      const result = sanitizeIframe(null, defaultAllowedDomains)
+      expect(result).to.equal(null)
+    })
+
+    it('should return the boolean when given a boolean', () => {
+      expect(sanitizeIframe(true, defaultAllowedDomains)).to.equal(true)
+      expect(sanitizeIframe(false, defaultAllowedDomains)).to.equal(false)
+    })
+
+    it('should return the number when given a number', () => {
+      expect(sanitizeIframe(42, defaultAllowedDomains)).to.equal(42)
+      expect(sanitizeIframe(0, defaultAllowedDomains)).to.equal(0)
+      expect(sanitizeIframe(-1, defaultAllowedDomains)).to.equal(-1)
+    })
+
+    it('should return the string when given a string without HTML', () => {
+      const result = sanitizeIframe('Simple text content', defaultAllowedDomains)
+      expect(result).to.equal('Simple text content')
+    })
+
+    it('should return the string when given a string with HTML but no iframes', () => {
+      const content = '<div><p>Text</p><span>More text</span></div>'
+      const result = sanitizeIframe(content, defaultAllowedDomains)
+      expect(result).to.equal(content)
+    })
+
+    it('should return React element when given', () => {
+      const element = React.createElement('div', null, 'content')
+      const result = sanitizeIframe(element, defaultAllowedDomains)
+      expect(result).to.equal(element)
+    })
+
+    it('should return React fragment when given', () => {
+      const fragment = React.createElement(React.Fragment, null, 'content')
+      const result = sanitizeIframe(fragment, defaultAllowedDomains)
+      expect(result).to.equal(fragment)
+    })
+
+    it('should return array when given an array', () => {
+      const arrayChild = ['text', 123, '<div key="1">content</div>']
+      const result = sanitizeIframe(arrayChild, defaultAllowedDomains)
+      expect(result).to.equal(arrayChild)
+    })
+
+    it('should return function child', () => {
+      const funcChild = () => <div>content</div>
+      const result = sanitizeIframe(funcChild, defaultAllowedDomains)
+      expect(result).to.equal(funcChild)
+    })
+
+    it('should return React class component child', () => {
+      class TestComponent extends React.Component {
+        render () {
+          return <div>content</div>
+        }
+      }
+      const component = <TestComponent />
+      const result = sanitizeIframe(component, defaultAllowedDomains)
+      expect(result).to.equal(component)
+    })
+
+    it('should return functional component child', () => {
+      const FuncComponent = () => <div>content</div>
+      const component = <FuncComponent />
+      const result = sanitizeIframe(component, defaultAllowedDomains)
+      expect(result).to.equal(component)
+    })
+
+    it('should handle child with nested iframes in string', () => {
+      const content = `
+        <div>
+          <p>Text before</p>
+          <iframe src="https://youtube.com/embed/video123"></iframe>
+          <p>Text between</p>
+          <iframe src="https://untrusted-domain.com/video"></iframe>
+          <p>Text after</p>
+        </div>
+      `
+      const result = sanitizeIframe(content, defaultAllowedDomains)
+      expect(result).to.include('<iframe src="https://youtube.com/embed/video123">')
+      expect(result).to.include('<iframe src="https://untrusted-domain.com/video" sandbox="">')
+      expect(result).to.include('<p>Text before</p>')
+      expect(result).to.include('<p>Text between</p>')
+      expect(result).to.include('<p>Text after</p>')
+    })
+
+    it('should return empty string child', () => {
+      const result = sanitizeIframe('', defaultAllowedDomains)
+      expect(result).to.equal('')
+    })
+
+    it('should return whitespace only string child', () => {
+      const result = sanitizeIframe('   \n\t  ', defaultAllowedDomains)
+      expect(result).to.equal('   \n\t  ')
+    })
+  })
+
+  it('should allow all iframes when allowedDomains includes "*"', () => {
+    const htmlContent = '<iframe src="https://any-domain.com/video"></iframe>'
+    const result = sanitizeIframe(htmlContent, ['*'])
+    expect(result).to.equal(htmlContent)
+  })
+
+  it('should allow iframes from allowed domains', () => {
+    const htmlContent = '<iframe src="https://youtube.com/embed/video123"></iframe>'
+    const result = sanitizeIframe(htmlContent, defaultAllowedDomains)
+    expect(result).to.include('youtube.com')
+    expect(result).to.not.include('sandbox')
+  })
+
+  it('should add sandbox attribute to iframes from non-allowed domains', () => {
+    const htmlContent = '<iframe src="https://untrusted-domain.com/video"></iframe>'
+    const result = sanitizeIframe(htmlContent, defaultAllowedDomains)
+    expect(result).to.include('untrusted-domain.com')
+    expect(result).to.include('sandbox=""')
+  })
+
+  it('should add sandbox to iframes with invalid URLs', () => {
+    const htmlContent = '<div><iframe src="invalid-url"></iframe><p>Some content</p></div>'
+    const result = sanitizeIframe(htmlContent, defaultAllowedDomains)
+    expect(result).to.include('iframe')
+    expect(result).to.include('sandbox=""')
+    expect(result).to.include('<p>Some content</p>')
+  })
+
+  it('should handle multiple iframes correctly', () => {
+    const htmlContent = `
+      <div>
+        <iframe src="https://youtube.com/embed/video123"></iframe>
+        <iframe src="https://untrusted-domain.com/video"></iframe>
+        <iframe src="invalid-url"></iframe>
+        <iframe src="https://google.com/something"></iframe>
+      </div>
+    `
+    const result = sanitizeIframe(htmlContent, defaultAllowedDomains)
+    expect(result).to.include('<iframe src="https://youtube.com/embed/video123"></iframe>')
+    expect(result).to.include('<iframe src="https://google.com/something"></iframe>')
+    expect(result).to.include('<iframe src="https://untrusted-domain.com/video" sandbox=""></iframe>')
+    expect(result).to.include('<iframe src="invalid-url" sandbox=""></iframe>')
+  })
+
+  it('should preserve non-iframe HTML content', () => {
+    const htmlContent = `
+      <div class="container">
+        <h1>Title</h1>
+        <p>Some text</p>
+        <iframe src="https://youtube.com/embed/video123"></iframe>
+        <span>More content</span>
+      </div>
+    `
+    const result = sanitizeIframe(htmlContent, defaultAllowedDomains)
+    expect(result).to.include('<h1>Title</h1>')
+    expect(result).to.include('<p>Some text</p>')
+    expect(result).to.include('<span>More content</span>')
+    expect(result).to.include('youtube.com')
+  })
+
+  it('should sanitize relative URLs in iframe src', () => {
+    const htmlContent = `
+      <div>
+        <iframe src="/relative/path/video"></iframe>
+      </div>
+    `
+    const result = sanitizeIframe(htmlContent, defaultAllowedDomains)
+    expect(result).to.include('iframe')
+    expect(result).to.include('/relative/path/video')
+    expect(result).to.include('sandbox=""')
+  })
+
+  it('should sanitize iframe src with javascript: in URL', () => {
+    const htmlContent = '<iframe src="javascript:alert(1)"></iframe>'
+    const result = sanitizeIframe(htmlContent, defaultAllowedDomains)
+    expect(result).to.include('iframe')
+    expect(result).to.include('sandbox=""')
+  })
+
+  it('should allow HTML node input', () => {
+    const div = document.createElement('div')
+    div.innerHTML = '<iframe src="https://youtube.com/embed/video123"></iframe>'
+    const result = sanitizeIframe(div, defaultAllowedDomains)
+    expect(result.innerHTML).to.include('youtube.com')
+    expect(result.innerHTML).to.not.include('sandbox')
+  })
+
+  it('should sanitize HTML node input with non-allowed domain', () => {
+    const div = document.createElement('div')
+    div.innerHTML = '<iframe src="https://untrusted-domain.com/video"></iframe>'
+    const result = sanitizeIframe(div, defaultAllowedDomains)
+    expect(result).to.not.equal(div)
+    expect(result.innerHTML).to.include('untrusted-domain.com')
+    expect(result.innerHTML).to.include('sandbox=""')
+  })
+
+  it('should allow JSX component input', () => {
+    const JsxComponent = () => (
+      <div>
+        <iframe src='https://untrusted-domain.com/embed/video123' />
+      </div>
+    )
+    const component = <JsxComponent />
+    const result = sanitizeIframe(component, defaultAllowedDomains)
+    expect(result).to.equal(component)
+  })
+
+  it('should allow empty string input', () => {
+    const result = sanitizeIframe('', defaultAllowedDomains)
+    expect(result).to.equal('')
+  })
+
+  it('should allow string without iframes', () => {
+    const htmlContent = '<div><p>Just some text</p></div>'
+    const result = sanitizeIframe(htmlContent, defaultAllowedDomains)
+    expect(result).to.equal(htmlContent)
   })
 })

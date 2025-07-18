@@ -6,20 +6,20 @@ Install Tracim first.
 Install the Apache server and uWSGI:
 
 ```bash
-  sudo apt install apache2 libapache2-mod-proxy-uwsgi uwsgi uwsgi-plugin-python3
+sudo apt install apache2 libapache2-mod-proxy-uwsgi uwsgi uwsgi-plugin-python3
 ```
 
 Activate the proxy_uwsgi module:
 
 ```bash
-  sudo a2enmod proxy_uwsgi
+sudo a2enmod proxy_uwsgi
 ```
 
 ## Configuration
 
 Create a file named `/etc/apache2/sites-available/tracim.conf` containing:
 
-```xml
+```html
 <VirtualHost *:80>
   ServerName [domain_name]
 

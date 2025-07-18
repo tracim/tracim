@@ -165,25 +165,25 @@ Example to use Tracim with ElasticSearch-ingest: (you need to create your elasti
 
 ## Build images
 
-To build image
+To build an image
 
 ```bash
 cd tools_docker/Debian_Uwsgi
 docker build -t algoo/tracim:<version_name> .
 ```
 
-To build encryption-enabled (gocryptfs based) image (experimental):
+To build an encryption-enabled (gocryptfs based) image (experimental):
 
 ```bash
 cd tools_docker/Debian_New_Uwsgi
 docker build -t algoo/tracim:<version_name> .
 ```
 
-### With custom branch or tag
+### With a custom branch or tag
 
 ⚠ **It is not possible to build an image with both ARG `TAG` and ARG `BRANCH` at same time.**
 
-You can build with specific branch
+You can build with a specific branch
 
 ```bash
 cd tools_docker/Debian_Uwsgi
@@ -191,7 +191,7 @@ docker build --build-arg BRANCH="<branch_name>" -t algoo/tracim:<version_name> .
 ```
 Ex: `docker build --build-arg BRANCH="feature/new_app" -t algoo/tracim:test_branch .`
 
-You can also build image with specific tag (This build is make just with necessary files: no other branch available)
+You can also build an image with a specific tag (This build is made just with necessary files: no other branch available)
 
 ```bash
 cd tools_docker/Debian_Uwsgi
@@ -199,15 +199,17 @@ docker build --build-arg TAG="<tag_name>" -t algoo/tracim:<tag_name> .
 ```
 Ex: `docker build --build-arg TAG="release_02.00.00" -t algoo/tracim:release_02.00.00 .`
 
-### With custom repository
+### With a custom repository
 
-By default, the Docker image is built from the main repository of Tracim. To clone Tracim from another repository, use the REPO argument. Don't forget to set a suitable image name.
+By default, the Docker image is built from the main repository of Tracim. To clone Tracim from another repository,
+use the REPO argument. Don't forget to set a suitable image name.
 
 Ex: `docker build --build-arg REPO="https://github.com/<me>/tracim.git" -t algoo/tracim:myrepo .`
 
 ## Troubleshooting
 
-If you encounter problems during the startup of the docker image, you can pass `DEBUG=1` to get additional messages that can help to find the problem cause:
+If you encounter problems during the startup of the docker image, you can pass `DEBUG=1` to get additional messages
+that can help to find the problem cause:
 
 ```bash
     docker run \
@@ -222,13 +224,13 @@ If you encounter problems during the startup of the docker image, you can pass `
 
 ## Tracimcli inside docker
 
-For maintenance purpose you can use tracimcli command line in the docker this way:
+For maintenance purposes you can use tracimcli command line in the docker this way:
 
 ```bash
 docker exec -it -u www-data -w /etc/tracim {CONTAINER ID or NAMES} tracimcli
 ```
 for the interactive mode
-note: /etc/tracim is the folder in container where the configuration file is stored.
+note: /etc/tracim is the folder in the container where the configuration file is stored.
 
 
 or launching command directly:
@@ -239,9 +241,9 @@ docker exec -i -u www-data -w /etc/tracim {CONTAINER ID or NAMES} tracimcli dev 
 
 ### Updating index of ElasticSearch
 
-⚠ Prerequiste: ElasticSearch is running and you have starting Tracim with parameter to communicate with elasticsearch
+⚠ Prerequiste: ElasticSearch is running, and you have starting Tracim with parameter to communicate with elasticsearch
 
-To make an update of ElasticSearch index you need to go inside your running Tracim container:
+To make an update of ElasticSearch index, you need to go inside your running Tracim container:
 
 ```bash
 docker ps
@@ -263,7 +265,7 @@ When is finished, you can quit your container. Index is now updated with all of 
 
 The ARM64 build is an experimental build without VTK enabled.
 
-To build image for ARM64 on a AMD64 machine, you need to:
+To build an image for ARM64 on a AMD64 machine, you need to:
 - install docker buildx: https://docs.docker.com/buildx/working-with-buildx/
 - add `binfmt_misc` multi-arch support (check `tonistiigi/binfmt` docker image in this doc: https://github.com/docker/buildx/#building-multi-platform-images)
 - install `qemu` and `qemu-user-static`.
@@ -286,11 +288,10 @@ the new feature from this docker will maybe be merged to the standard docker or 
 Warning: content should be migratable from gocryptfs-encrypted to plain dir and also in the other side, but
 this was not tested. For previews, there is no need to migrate data, so you can just start with a plain new dir.
 
-This need the new specific Debian_New_Uwsgi docker (see build section).
-Example with basic instance of Tracim (local usage with webdav and caldav) with encrypted storage:
+This needs the new specific Debian_New_Uwsgi docker (see build section).
+Example with a basic instance of Tracim (local usage with webdav and caldav) with encrypted storage:
 
-Note: with this new docker, all tracimcli and alembic command should be runned as
-user www-data, example:
+Note: with this new docker, all tracimcli and alembic commands should be run as user www-data, example:
 
 ```bash
 docker exec -i -u www-data -w /etc/tracim {CONTAINER ID or NAMES} tracimcli dev parameters value -f -d
@@ -305,8 +306,8 @@ mkdir -p ~/tracim/secret
 echo "password" > ~/tracim/secret/password.txt
 ```
 
-Note: this is just an example, we suggest you to write password with a text editor
-instead in order to not store the password in the bash history.
+Note: this is just an example, we suggest you to write password with a text editor instead to not store the
+password in the bash history.
 
 ```bash
     docker run \

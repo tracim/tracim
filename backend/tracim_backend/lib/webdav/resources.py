@@ -35,9 +35,9 @@ from tracim_backend.lib.utils.authorization import can_delete_workspace
 from tracim_backend.lib.utils.authorization import can_move_content
 from tracim_backend.lib.utils.authorization import is_content_manager
 from tracim_backend.lib.utils.authorization import is_contributor
+from tracim_backend.lib.utils.authorization import is_guest
 from tracim_backend.lib.utils.authorization import is_reader
 from tracim_backend.lib.utils.authorization import is_trusted_user
-from tracim_backend.lib.utils.authorization import is_user
 from tracim_backend.lib.utils.utils import add_trailing_slash
 from tracim_backend.lib.utils.utils import normpath
 from tracim_backend.lib.utils.utils import webdav_convert_file_name_to_bdd
@@ -550,15 +550,15 @@ class RootResource(DAVCollection):
     def __repr__(self) -> str:
         return "<DAVCollection: RootResource>"
 
-    @webdav_check_right(is_user)
+    @webdav_check_right(is_guest)
     def get_member_names(self) -> List[str]:
         return self.workspace_container.get_member_names()
 
-    @webdav_check_right(is_user)
+    @webdav_check_right(is_guest)
     def get_member(self, name) -> typing.Optional[DAVCollection]:
         return self.workspace_container.get_member(name=name)
 
-    @webdav_check_right(is_user)
+    @webdav_check_right(is_guest)
     def get_member_list(self):
         return self.workspace_container.get_member_list()
 

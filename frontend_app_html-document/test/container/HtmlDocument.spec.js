@@ -21,6 +21,9 @@ describe('<HtmlDocument />', () => {
   const props = {
     buildTimelineFromCommentAndRevision: (commentList, revisionList) => [...commentList, ...revisionList],
     addCommentToTimeline: sinon.spy((comment, timeline, loggedUser) => timeline),
+    config: {
+      iframe_whitelist: []
+    },
     content: contentHtmlDocument.htmlDocument,
     i18n: {},
     getToDoList: () => { },

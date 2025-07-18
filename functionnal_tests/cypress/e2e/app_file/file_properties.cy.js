@@ -34,15 +34,6 @@ describe('At file properties', () => {
   })
 
   it('should show file properties', () => {
-    cy.get('.fileProperties__content__detail__item').should('have.length', 6)
-  })
-
-  describe('Change the description', () => {
-    it('should show the new description', () => {
-      cy.get('.fileProperties__content__detail__btndesc').click()
-      cy.get('.fileProperties__content__detail__description__editiondesc').click().type(fileDescription)
-      cy.get('.fileProperties__content__detail__description__editiondesc__btn__validate').click()
-      cy.get('.fileProperties__content__detail__description__text').contains(fileDescription)
-    })
+    cy.get('.appProperty__item').should('have.length', 5)
   })
 })

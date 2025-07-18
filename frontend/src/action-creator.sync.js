@@ -316,7 +316,10 @@ export const setFirstComment = (publicationId, comment) => ({ type: `${SET}/${CO
 
 export const FAVORITE = 'Favorite'
 export const FAVORITE_LIST = `${FAVORITE}List`
-export const setFavoriteList = (favoriteList) => ({ type: `${SET}/${FAVORITE_LIST}`, favoriteList })
+export const SET_FAVORITE_LIST = `${SET}/${FAVORITE_LIST}`
+export const setFavoriteList = (favoriteList) => ({ type: SET_FAVORITE_LIST, favoriteList })
+export const UPDATE_FAVORITE_LIST = `${UPDATE}/${FAVORITE_LIST}`
+export const updateFavoriteList = (favoriteList) => ({ type: UPDATE_FAVORITE_LIST, favoriteList })
 export const removeFavorite = (favorite) => ({ type: `${REMOVE}/${FAVORITE}`, favorite })
 export const addFavorite = (favorite) => ({ type: `${ADD}/${FAVORITE}`, favorite })
 

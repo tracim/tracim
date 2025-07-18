@@ -350,6 +350,15 @@ export class Dashboard extends React.Component {
           case 2042:
             props.dispatch(newFlashMessage(props.t('This account is deactivated'), 'warning'))
             return false
+          case 2075:
+            props.dispatch(newFlashMessage(props.t('Guest users are not allowed to be more than contributor. In order to upgrade the role of this guest user, ask your administrator to make it a standard user'), 'warning'))
+            return false
+          case 8002: props.dispatch(newFlashMessage(props.t('The maximum number of users has been reached'), 'warning'))
+            return false
+          case 8003: props.dispatch(newFlashMessage(props.t('The maximum number of guests has been reached'), 'warning'))
+            return false
+          case 8004: props.dispatch(newFlashMessage(props.t('The maximum number of spaces for a guest user has been reached. In order to add this guest user into a new space, ask your administrator to make it a standard user'), 'warning'))
+            return false
           case 1001: {
             const ErrorMsg = () => (
               <div>
@@ -540,7 +549,11 @@ export class Dashboard extends React.Component {
                         >
                           {/* INFO - CH - 2024-11-08 - don't add border to image to avoid breaking
                           existing client design */}
-                          <HTMLContent showImageBorder={false}>{description}</HTMLContent>
+                          <HTMLContent
+                            iframeWhitelist={props.system.config.iframe_whitelist}
+                            showImageBorder={false}
+                            htmlValue={description}
+                          />
                         </div>
                       )
                       : (

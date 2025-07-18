@@ -573,6 +573,16 @@ class CFG(object):
             "frontend.dist_folder_path", frontend_dist_folder
         )
 
+        self.IFRAME__WHITELIST = string_to_unique_item_list(
+            self.get_raw_config(
+                "iframe.whitelist",
+                "youtube.com, youtu.be, dailymotion.com, vimeo.com, google.com, apple.com, openstreetmap.org, mapbox.com, bing.com",
+            ),
+            separator=",",
+            cast_func=str,
+            do_strip=True,
+        )
+
         default_color_config_file_path = os.path.join(self.branding_folder_path, "color.json")
         self.COLOR__CONFIG_FILE_PATH = self.get_raw_config(
             "color.config_file_path", default_color_config_file_path
@@ -621,8 +631,11 @@ class CFG(object):
             self.get_raw_config("ui.spaces.creation.parent_space_choice.visible", "True")
         )
 
+        default_preview_skiplist = (
+            ".ifc, .xyz, .e57, .obj, .3ds, .stl, .dae, .gcode, .svg, .ttf, .wrl, .vtk"
+        )
         self.PREVIEW__SKIPLIST = string_to_unique_item_list(
-            self.get_raw_config("preview.skiplist", ""),
+            self.get_raw_config("preview.skiplist", default_preview_skiplist),
             separator=",",
             cast_func=str,
             do_strip=True,
@@ -786,6 +799,18 @@ class CFG(object):
         )
         self.LIMITATION__MAXIMUM_ONLINE_USERS_MESSAGE = self.get_raw_config(
             "limitation.maximum_online_users_message", ""
+        )
+        self.LIMITATION__MAX_NON_GUEST_USERS = int(
+            self.get_raw_config("limitation.max_non_guest_users", "-1")
+        )
+        self.LIMITATION__MAX_GUEST_USERS = int(
+            self.get_raw_config("limitation.max_guest_users", "-1")
+        )
+        self.LIMITATION__MAX_GUEST_USER_SPACE_NB = int(
+            self.get_raw_config("limitation.max_guest_user_space_nb", "-1")
+        )
+        self.LIMITATION__STANDARD_USER_EMAIL_DOMAIN = self.get_raw_config(
+            "limitation.standard_user_email_domain", ""
         )
 
     def _load_email_config(self) -> None:
@@ -1060,6 +1085,18 @@ class CFG(object):
         self.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT = int(
             self.get_raw_config("search.elasticsearch.request_timeout", "60")
         )
+        self.SEARCH__ELASTICSEARCH__SSL__ACTIVATED = asbool(
+            self.get_raw_config("search.elasticsearch.ssl.activated", "False")
+        )
+        self.SEARCH__ELASTICSEARCH__SSL__CA_CERTS = self.get_raw_config(
+            "search.elasticsearch.ssl.ca_certs", ""
+        )
+        self.SEARCH__ELASTICSEARCH__BASIC_AUTH__USERNAME = self.get_raw_config(
+            "search.elasticsearch.basic_auth.username", ""
+        )
+        self.SEARCH__ELASTICSEARCH__BASIC_AUTH__PASSWORD = self.get_raw_config(
+            "search.elasticsearch.basic_auth.password", ""
+        )
 
     def _load_jobs_config(self) -> None:
         self.JOBS__PROCESSING_MODE = self.get_raw_config("jobs.processing_mode", "sync").upper()
@@ -1326,6 +1363,18 @@ class CFG(object):
                     "URL_PREVIEW__MAX_CONTENT_LENGTH",
                     self.URL_PREVIEW__MAX_CONTENT_LENGTH,
                 )
+            )
+
+        if "*" in self.IFRAME__WHITELIST:
+            if len(self.IFRAME__WHITELIST) > 1:
+                raise ConfigurationError(
+                    'ERROR  "{}" should be "*" only or not contain "*" (currently "{}")'.format(
+                        "IFRAME__WHITELIST", self.IFRAME__WHITELIST
+                    )
+                )
+            logger.warning(
+                self,
+                '"*" in IFRAME__WHITELIST is unsafe and can pose a security risk',
             )
 
     def _check_uploaded_files_config_validity(self) -> None:

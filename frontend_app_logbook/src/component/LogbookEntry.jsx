@@ -91,7 +91,7 @@ const LogbookEntry = (props) => {
           )}
           id={`${props.entry.id}_description`}
         >
-          <HTMLContent>{props.entry.description}</HTMLContent>
+          <HTMLContent iframeWhitelist={props.config.iframe_whitelist} htmlValue={props.entry.description} />
         </div>
 
         {props.entry.expand !== DESCRIPTION_BUTTON.HIDDEN && (
@@ -134,6 +134,7 @@ const LogbookEntry = (props) => {
 export default translate()(LogbookEntry)
 
 LogbookEntry.propTypes = {
+  config: PropTypes.object.isRequired,
   entry: PropTypes.object.isRequired,
   onEditEntry: PropTypes.func.isRequired,
   onRemoveEntry: PropTypes.func.isRequired,

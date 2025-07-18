@@ -38,7 +38,7 @@ from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.utils.authorization import check_right
-from tracim_backend.lib.utils.authorization import is_user
+from tracim_backend.lib.utils.authorization import is_guest
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
@@ -52,7 +52,7 @@ class CollaborativeDocumentEditionController(Controller):
     """
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS])
-    @check_right(is_user)
+    @check_right(is_guest)
     @hapic.output_body(CollaborativeDocumentEditionTokenSchema())
     def collaborative_document_edition_token(
         self,

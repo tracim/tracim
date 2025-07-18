@@ -1,12 +1,12 @@
 import { CUSTOM_EVENT } from 'tracim_frontend_lib'
 
-let previouslySelectedAppFeature = ''
-let previouslySelectedAppFullScreen = ''
+let previouslySelectedAppFeatureSlug = ''
+let previouslySelectedAppFullScreenSlug = ''
 const APP_NOT_LOADED = 'appNotLoaded'
 const TIME_TO_RETRY = 500
 const RETRY_TIMEOUT = 60000
 
-const getSelectedApp = function (appName) {
+const getSelectedApp = async function (appName) {
   // FIXME - CH - 2019-06-18 - The try/catch is a temporary solution to solve the frontend, apps and appInterface.js
   // loading and execution order. If getSelectedApp return APP_NOT_LOADED, GLOBAL_renderAppFeature and GLOBAL_renderAppFullscreen
   // will retry every TIME_TO_RETRY ms for RETRY_TIMEOUT ms
@@ -23,7 +23,8 @@ const getSelectedApp = function (appName) {
       case 'thread':
         return (appThread || { default: {} }).default
       case 'file':
-        return (appFile || { default: {} }).default
+        if (!appFile) return {}
+        return (await appFile).default
       case 'workspace':
         return (appWorkspace || { default: {} }).default
       case 'folder':
@@ -52,16 +53,10 @@ const getSelectedApp = function (appName) {
   }
 }
 
-// FIXME - CH - 2019-06-09 - make a file action.tracimCustomEvent.js that will contains all customEvent that tracim_frontend call
-// => pb with that is that appInterface cant use import since it is not part of the build webpack
-// use module.export and require
-// doesn't work, cant resolve a file outside of the build dir
-// see https://github.com/tracim/tracim/issues/1956
-
-globalThis.GLOBAL_renderAppFeature = function (app, retryCount) {
+globalThis.GLOBAL_renderAppFeature = async function (app, retryCount) {
   console.log('%cGLOBAL_renderAppFeature', 'color: #5cebeb', app)
 
-  const selectedApp = getSelectedApp(app.config.slug)
+  const selectedApp = await getSelectedApp(app.config.slug)
 
   if (selectedApp && selectedApp.content && app && app.content && selectedApp.content.workspace_id !== app.content.workspace_id) {
     unMountApp()
@@ -85,7 +80,7 @@ globalThis.GLOBAL_renderAppFeature = function (app, retryCount) {
   if (selectedApp.isRendered) {
     globalThis.GLOBAL_dispatchEvent({ type: app.config.slug + '_showApp', data: app })
   } else {
-    if (previouslySelectedAppFeature !== selectedApp.name) {
+    if (previouslySelectedAppFeatureSlug !== selectedApp.name) {
       globalThis.GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.UNMOUNT_APP_FEATURE, data: {} })
       unMountAppFeature()
     }
@@ -93,17 +88,18 @@ globalThis.GLOBAL_renderAppFeature = function (app, retryCount) {
     selectedApp.renderAppFeature(app)
     selectedApp.isRendered = true
 
-    if (getSelectedApp(previouslySelectedAppFeature) !== APP_NOT_LOADED) {
-      getSelectedApp(previouslySelectedAppFeature).isRendered = false
+    const previouslySelectedAppFeature = await getSelectedApp(previouslySelectedAppFeatureSlug)
+    if (previouslySelectedAppFeature !== APP_NOT_LOADED) {
+      previouslySelectedAppFeature.isRendered = false
     }
-    previouslySelectedAppFeature = selectedApp.name
+    previouslySelectedAppFeatureSlug = selectedApp.name
   }
 }
 
-globalThis.GLOBAL_renderAppFullscreen = function (app, retryCount) {
+globalThis.GLOBAL_renderAppFullscreen = async function (app, retryCount) {
   console.log('%cGLOBAL_renderAppFullscreen', 'color: #5cebeb', app)
 
-  const selectedApp = getSelectedApp(app.config.slug)
+  const selectedApp = await getSelectedApp(app.config.slug)
 
   if (selectedApp === APP_NOT_LOADED) {
     retryCount = retryCount || 0 // INFO - CH - 2019-06-18 - old school way for default param
@@ -126,17 +122,18 @@ globalThis.GLOBAL_renderAppFullscreen = function (app, retryCount) {
     selectedApp.renderAppFullscreen(app)
     selectedApp.isRendered = true
 
-    if (getSelectedApp(previouslySelectedAppFullScreen) !== APP_NOT_LOADED) {
-      getSelectedApp(previouslySelectedAppFullScreen).isRendered = false
+    const previouslySelectedAppFullScreen = await getSelectedApp(previouslySelectedAppFullScreenSlug)
+    if (previouslySelectedAppFullScreen !== APP_NOT_LOADED) {
+      previouslySelectedAppFullScreen.isRendered = false
     }
-    previouslySelectedAppFullScreen = selectedApp.name
+    previouslySelectedAppFullScreenSlug = selectedApp.name
   }
 }
 
-globalThis.GLOBAL_renderAppPopupCreation = function (app, retryCount) {
+globalThis.GLOBAL_renderAppPopupCreation = async function (app, retryCount) {
   console.log('%cGLOBAL_renderAppPopupCreation', 'color: #5cebeb', app)
 
-  const selectedApp = getSelectedApp(app.config.slug)
+  const selectedApp = await getSelectedApp(app.config.slug)
 
   if (selectedApp === APP_NOT_LOADED) {
     retryCount = retryCount || 0 // INFO - CH - 2019-06-18 - old school way for default param
@@ -153,7 +150,7 @@ globalThis.GLOBAL_renderAppPopupCreation = function (app, retryCount) {
     return
   }
 
-  getSelectedApp(app.config.slug).renderAppPopupCreation(app)
+  selectedApp.renderAppPopupCreation(app)
 }
 
 globalThis.GLOBAL_dispatchEvent = function (event) {
@@ -165,22 +162,22 @@ globalThis.GLOBAL_dispatchEvent = function (event) {
   document.dispatchEvent(customEvent)
 }
 
-function unMountAppFeature () {
-  if (previouslySelectedAppFeature !== '') {
-    const selectedApp = getSelectedApp(previouslySelectedAppFeature)
+async function unMountAppFeature () {
+  if (previouslySelectedAppFeatureSlug !== '') {
+    const selectedApp = await getSelectedApp(previouslySelectedAppFeatureSlug)
     selectedApp.unmountApp('appFeatureContainer')
     selectedApp.unmountApp('popupCreateContentContainer')
     selectedApp.isRendered = false
-    previouslySelectedAppFeature = ''
+    previouslySelectedAppFeatureSlug = ''
   }
 }
 
-function unMountAppFullscreen () {
-  if (previouslySelectedAppFullScreen !== '') {
-    const selectedApp = getSelectedApp(previouslySelectedAppFullScreen)
+async function unMountAppFullscreen () {
+  if (previouslySelectedAppFullScreenSlug !== '') {
+    const selectedApp = await getSelectedApp(previouslySelectedAppFullScreenSlug)
     selectedApp.unmountApp('appFullscreenContainer')
     selectedApp.isRendered = false
-    previouslySelectedAppFullScreen = ''
+    previouslySelectedAppFullScreenSlug = ''
   }
 }
 
@@ -189,7 +186,7 @@ function unMountApp () {
   unMountAppFullscreen()
 }
 
-globalThis.GLOBAL_eventReducer = function (event) {
+const eventReducer = async function (event) {
   const type = event.detail.type
   const data = event.detail.data
 
@@ -197,7 +194,7 @@ globalThis.GLOBAL_eventReducer = function (event) {
     case CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT:
     case CUSTOM_EVENT.HIDE_POPUP_CREATE_WORKSPACE:
       console.log('%cGLOBAL_eventReducer Custom Event', 'color: #28a745', type, data)
-      getSelectedApp(data.name).unmountApp('popupCreateContentContainer')
+      ;(await getSelectedApp(data.name)).unmountApp('popupCreateContentContainer')
       break
     case CUSTOM_EVENT.UNMOUNT_APP:
       console.log('%cGLOBAL_eventReducer Custom Event', 'color: #28a745', type, data)
@@ -209,4 +206,4 @@ globalThis.GLOBAL_eventReducer = function (event) {
   }
 }
 
-document.addEventListener('appCustomEventListener', globalThis.GLOBAL_eventReducer)
+document.addEventListener('appCustomEventListener', eventReducer)

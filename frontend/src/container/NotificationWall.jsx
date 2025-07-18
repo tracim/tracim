@@ -33,7 +33,6 @@ import {
   ListItemWrapper,
   Loading,
   PopinFixedHeader,
-  TracimComponent,
   getContentPath,
   handleFetchResult,
   sortListByMultipleCriteria
@@ -45,18 +44,6 @@ import GroupedNotificationItem from './GroupedNotificationItem.jsx'
 const NUMBER_OF_CRITERIA = {
   ONE: 1,
   TWO: 2
-}
-
-export const isPatternIncludedInString = (string, pattern) => {
-  if (string === undefined || string === null) return false
-  if (pattern === '') return true
-
-  // INFO - CH - 2023-12-07 - Implementation to match any words in pattern
-  // const patternList = pattern.trim().split(' ')
-  // return patternList.some(p => string.toLowerCase().includes(p) === true)
-
-  // INFO - CH - 2023-12-07 - Implementation to match the whole pattern
-  return string.toLowerCase().includes(pattern.trim().toLowerCase()) === true
 }
 
 const getMainContentId = (notification) => {
@@ -762,7 +749,7 @@ export const NotificationWall = props => {
                     isFirst={i === 0}
                     isLast={i === notificationList.length - 1}
                     isSameContent={notification.type.includes(GROUP_NOTIFICATION_CRITERIA.CONTENT)}
-                    key={notification.id}
+                    key={`group_${notification.id}_${i}`}
                     onCloseNotificationWall={props.onCloseNotificationWall}
                     read={false}
                     filterInput={filterInput}
@@ -794,4 +781,4 @@ export const NotificationWall = props => {
 }
 
 const mapStateToProps = ({ user, notificationPage, workspaceList }) => ({ user, notificationPage, workspaceList })
-export default connect(mapStateToProps)(translate()(TracimComponent(NotificationWall)))
+export default connect(mapStateToProps)(translate()(NotificationWall))

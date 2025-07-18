@@ -1,0 +1,19 @@
+{
+  "Back": "Zpět",
+  "Be careful, we do not recommend creating more than two levels of spaces because it makes the information much less accessible.": "Buďte opatrní, nedoporučujeme vytvářet více než dvě úrovně prostorů, protože pak jsou informace mnohem hůře dostupné.",
+  "Create": "Vytvořit",
+  "Default role:": "Výchozí role:",
+  "Error while getting user spaces": "Chyba při získávání uživatelských mezer",
+  "Space's name": "Název prostoru",
+  "Error while saving new space": "Chyba při ukládání nového prostoru",
+  "A space with that name already exists": "Prostor s tímto názvem již existuje",
+  "New space": "Nový prostor",
+  "Parent space:": "Nadřazený prostor:",
+  "Space's name:": "Název prostoru:",
+  "You cannot create anymore space": "Nemůžete vytvořit další prostor",
+  "None": "Žádný",
+  "Next": "Další",
+  "Some input are invalid": "Některé vstupy jsou neplatné",
+  "Space's type:": "Typ prostoru:",
+  "This is the role that members will have by default when they join your space (for open and on request spaces only).": "Tuto roli budou mít členové ve výchozím nastavení, když se připojí k vašemu prostoru (pouze pro otevřené prostory a prostory na vyžádání)."
+}

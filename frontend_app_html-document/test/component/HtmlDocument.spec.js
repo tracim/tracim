@@ -12,6 +12,9 @@ import {
 const props = {
   apiUrl: 'http://localhost/api',
   mode: APP_FEATURE_MODE.VIEW,
+  config: {
+    iframe_whitelist: []
+  },
   customColor: '#654321',
   disableValidateBtn: () => false,
   version: '42',
@@ -50,13 +53,6 @@ const props = {
 
 describe('<HtmlDocument />', () => {
   describe('in VIEW mode', () => {
-    const wrapper = shallow(
-      <HtmlDocument {...props} />
-    )
-    it('should display the content of the document', () =>
-      expect(wrapper.find('.html-document__contentpage__textnote__text').render().text()).to.contains(props.text)
-    )
-
     describe('with the displayNotifyAllMessage is set a true', () => {
       const wrapper = mount(
         <HtmlDocument

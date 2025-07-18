@@ -96,7 +96,7 @@ export const SpaceDescription = (props) => {
             {props.description
               // INFO - CH - 2025-02-19 - setting image border to "false" to allow users to put images
               // in space description to set advanced space description design without using html
-              ? <HTMLContent showImageBorder={false}>{props.description}</HTMLContent>
+              ? <HTMLContent iframeWhitelist={props.systemConfig.iframe_whitelist} showImageBorder={false} htmlValue={props.description} />
               : (
                 <div className='dashboard__workspace__detail__description__missing'>
                   {props.t("This space doesn't have a description yet.")}
@@ -122,6 +122,7 @@ export default translate()(SpaceDescription)
 
 SpaceDescription.propTypes = {
   apiUrl: PropTypes.string.isRequired,
+  systemConfig: PropTypes.object.isRequired,
   onClickSubmit: PropTypes.func.isRequired,
   // End of required props /////////////////////////////////////////////////////////////////////////
   codeLanguageList: PropTypes.array,

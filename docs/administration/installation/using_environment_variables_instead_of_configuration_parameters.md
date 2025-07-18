@@ -59,6 +59,7 @@ The following table contains:
 | TRACIM_FRONTEND__CACHE_TOKEN                                              | frontend.cache_token                                           | FRONTEND__CACHE_TOKEN                                              |
 | TRACIM_BACKEND__I18N_FOLDER_PATH                                          | backend.i18n_folder_path                                       | BACKEND__I18N_FOLDER_PATH                                          |
 | TRACIM_FRONTEND__DIST_FOLDER_PATH                                         | frontend.dist_folder_path                                      | FRONTEND__DIST_FOLDER_PATH                                         |
+| TRACIM_IFRAME__WHITELIST                                                  | iframe.whitelist                                               | IFRAME__WHITELIST                                                  |
 | TRACIM_COLOR__CONFIG_FILE_PATH                                            | color.config_file_path                                         | COLOR__CONFIG_FILE_PATH                                            |
 | TRACIM_APP_CUSTOM_ACTIONS__CONFIG_FILE                                    | app_custom_actions.config_file                                 | APP_CUSTOM_ACTIONS__CONFIG_FILE                                    |
 | TRACIM_RICH_TEXT_PREVIEW__CSS_PATH                                        | rich_text_preview.css_path                                     | RICH_TEXT_PREVIEW__CSS_PATH                                        |
@@ -88,6 +89,10 @@ The following table contains:
 | TRACIM_LIMITATION__USER_DEFAULT_ALLOWED_SPACE                             | limitation.user_default_allowed_space                          | LIMITATION__USER_DEFAULT_ALLOWED_SPACE                             |
 | TRACIM_LIMITATION__MAXIMUM_ONLINE_USERS                                   | limitation.maximum_online_users                                | LIMITATION__MAXIMUM_ONLINE_USERS                                   |
 | TRACIM_LIMITATION__MAXIMUM_ONLINE_USERS_MESSAGE                           | limitation.maximum_online_users_message                        | LIMITATION__MAXIMUM_ONLINE_USERS_MESSAGE                           |
+| TRACIM_LIMITATION__MAX_NON_GUEST_USERS                                    | limitation.max_non_guest_users                                 | LIMITATION__MAX_NON_GUEST_USERS                                    |
+| TRACIM_LIMITATION__MAX_GUEST_USERS                                        | limitation.max_guest_users                                     | LIMITATION__MAX_GUEST_USERS                                        |
+| TRACIM_LIMITATION__MAX_GUEST_USER_SPACE_NB                                | limitation.max_guest_user_space_nb                             | LIMITATION__MAX_GUEST_USER_SPACE_NB                                |
+| TRACIM_LIMITATION__STANDARD_USER_EMAIL_DOMAIN                             | limitation.standard_user_email_domain                          | LIMITATION__STANDARD_USER_EMAIL_DOMAIN                             |
 | TRACIM_JOBS__PROCESSING_MODE                                              | jobs.processing_mode                                           | JOBS__PROCESSING_MODE                                              |
 | TRACIM_JOBS__ASYNC__REDIS__HOST                                           | jobs.async.redis.host                                          | JOBS__ASYNC__REDIS__HOST                                           |
 | TRACIM_JOBS__ASYNC__REDIS__PORT                                           | jobs.async.redis.port                                          | JOBS__ASYNC__REDIS__PORT                                           |
@@ -159,6 +164,10 @@ The following table contains:
 | TRACIM_SEARCH__ELASTICSEARCH__HOST                                        | search.elasticsearch.host                                      | SEARCH__ELASTICSEARCH__HOST                                        |
 | TRACIM_SEARCH__ELASTICSEARCH__PORT                                        | search.elasticsearch.port                                      | SEARCH__ELASTICSEARCH__PORT                                        |
 | TRACIM_SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT                             | search.elasticsearch.request_timeout                           | SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT                             |
+| TRACIM_SEARCH__ELASTICSEARCH__SSL__ACTIVATED                              | search.elasticsearch.ssl.activated                             | SEARCH__ELASTICSEARCH__SSL__ACTIVATED                              |
+| TRACIM_SEARCH__ELASTICSEARCH__SSL__CA_CERTS                               | search.elasticsearch.ssl.ca_certs                              | SEARCH__ELASTICSEARCH__SSL__CA_CERTS                               |
+| TRACIM_SEARCH__ELASTICSEARCH__BASIC_AUTH__USERNAME                        | search.elasticsearch.basic_auth.username                       | SEARCH__ELASTICSEARCH__BASIC_AUTH__USERNAME                        |
+| TRACIM_SEARCH__ELASTICSEARCH__BASIC_AUTH__PASSWORD                        | search.elasticsearch.basic_auth.password                       | SEARCH__ELASTICSEARCH__BASIC_AUTH__PASSWORD                        |
 | TRACIM_CONTENT_SECURITY_POLICY__ENABLED                                   | content_security_policy.enabled                                | CONTENT_SECURITY_POLICY__ENABLED                                   |
 | TRACIM_CONTENT_SECURITY_POLICY__REPORT_URI                                | content_security_policy.report_uri                             | CONTENT_SECURITY_POLICY__REPORT_URI                                |
 | TRACIM_CONTENT_SECURITY_POLICY__REPORT_ONLY                               | content_security_policy.report_only                            | CONTENT_SECURITY_POLICY__REPORT_ONLY                               |

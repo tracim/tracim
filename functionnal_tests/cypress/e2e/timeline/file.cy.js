@@ -41,7 +41,7 @@ describe('Timeline', () => {
 
     it('should be able to open as a content', () => {
       cy.get('.timeline__comment__body__content__header__actions').click()
-      cy.get('.iconbutton[title="Open as content"]').click()
+      cy.get('.LinkHtmlButton[title="Open as content"]').click()
       cy.url().should('include', '/contents/file')
     })
   })

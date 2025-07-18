@@ -1,15 +1,26 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import {
   ConfirmPopup,
   DropdownMenu,
-  IconButton
+  IconButton,
+  shouldUseLightTextColor
 } from 'tracim_frontend_lib'
+import { KANBAN_COLUMN_DEFAULT_COLOR } from '../helper.js'
 
 function KanbanColumnHeader (props) {
   const [showConfirmPopup, setShowConfirmPopup] = useState(false)
+  const columnHeaderRef = useRef(null)
+
+  useEffect(() => {
+    // INFO - CH - 2025-05-15 - Set the background of the column as the custom color.
+    // We have to use DOM manipulation because the kanban library doesn't provide an API to do so.
+    columnHeaderRef.current
+      .closest('.react-kanban-column')
+      .style.backgroundColor = props.column.bgColor || KANBAN_COLUMN_DEFAULT_COLOR
+  }, [props.column.bgColor])
 
   const numberCard = (numberCard) => {
     if (numberCard === 0) return props.t('0 card')
@@ -17,13 +28,19 @@ function KanbanColumnHeader (props) {
     else return props.t('{{count}} cards', { count: numberCard })
   }
 
+  const isLightTextColor = shouldUseLightTextColor(props.column.bgColor || KANBAN_COLUMN_DEFAULT_COLOR)
+
   return (
     <div
-      className={classnames('kanban__contentpage__wrapper__board__column', {
-        readOnly: props.readOnly,
-        buttonHidden: props.readOnly && props.hideButtonsWhenReadOnly
-      })}
-      style={{ borderColor: props.column.bgColor || props.customColor }}
+      className={classnames(
+        'kanban__contentpage__wrapper__board__column',
+        {
+          readOnly: props.readOnly,
+          buttonHidden: props.readOnly && props.hideButtonsWhenReadOnly
+        },
+        isLightTextColor ? 'lightText' : 'darkText'
+      )}
+      ref={columnHeaderRef}
     >
       <div
         className='kanban__contentpage__wrapper__board__column__title'

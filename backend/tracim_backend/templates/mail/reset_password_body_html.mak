@@ -16,7 +16,7 @@
 <pre>${reset_password_url}</pre>
 
 ## the lifetime is converted from seconds to minutes.
-${_('The link is valid for {} minutes.'.format(config.USER__RESET_PASSWORD__TOKEN_LIFETIME // 60))}
+${_('The link is valid for {} minutes.').format(config.USER__RESET_PASSWORD__TOKEN_LIFETIME // 60)}
 
 <p style="font-size: 0.8em; color: #5e5c64">
   --<br/>

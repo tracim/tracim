@@ -332,15 +332,6 @@ export class Thread extends React.Component {
     )
   }
 
-  handleClickOpenFileComment = (comment) => {
-    const { state } = this
-    state.config.history.push(PAGE.WORKSPACE.CONTENT(
-      state.content.workspace_id,
-      CONTENT_TYPE.FILE,
-      comment.content_id
-    ))
-  }
-
   handleClickRefresh = () => {
     const { state } = this
 
@@ -538,13 +529,12 @@ export class Thread extends React.Component {
                 )}
                 timelineData={props.timeline}
                 translationTargetLanguageCode={state.translationTargetLanguageCode}
-                translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
+                system={state.config.system}
                 workspaceId={state.content.workspace_id}
                 // End of required props ///////////////////////////////////////
                 allowClickOnRevision={false}
                 availableStatusList={state.config.availableStatuses}
                 canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
-                codeLanguageList={state.config.system.config.ui__notes__code_sample_languages}
                 customClass={`${state.config.slug}__contentpage`}
                 customColor={color}
                 deprecatedStatus={state.config.availableStatuses[3]}
@@ -562,7 +552,6 @@ export class Thread extends React.Component {
                 onClickPermanentlyDeleteComment={this.handlePermanentlyDeleteComment}
                 shouldShowPermanentlyDeleteButton={state.loggedUser.userRoleIdInWorkspace >= ROLE.workspaceManager.id}
                 onClickEditComment={this.handleClickEditComment}
-                onClickOpenFileComment={this.handleClickOpenFileComment}
                 onClickRestoreArchived={this.handleClickRestoreArchive}
                 onClickRestoreDeleted={this.handleClickRestoreDelete}
                 onClickRevisionBtn={() => { }}

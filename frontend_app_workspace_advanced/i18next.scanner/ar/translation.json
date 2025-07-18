@@ -61,5 +61,7 @@
   "Filter users": "",
   "Description of the space": "",
   "This space doesn't have a description yet.": "",
-  "Edit": ""
+  "Edit": "",
+  "Guest users are not allowed to be more than contributor. In order to upgrade the role of this guest user, ask your administrator to make it a standard user": "",
+  "The maximum number of spaces for a guest user has been reached. In order to add this guest user into a new space, ask your administrator to make it a standard user": ""
 }

@@ -3472,6 +3472,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"camera-controls@npm:^2.10.1":
+  version: 2.10.1
+  resolution: "camera-controls@npm:2.10.1"
+  peerDependencies:
+    three: ">=0.126.1"
+  checksum: f5ed5e335327e88e51897cefa70741246b20c5be44e9b463dc21f33dbf2984764aa0d37b34f7361240d67ccef7c77ece8cede1504b7663cfdf4102d04446bb40
+  languageName: node
+  linkType: hard
+
 "caniuse-lite@npm:^1.0.30001565":
   version: 1.0.30001579
   resolution: "caniuse-lite@npm:1.0.30001579"
@@ -12863,6 +12872,7 @@ __metadata:
     "@thatopen/fragments": ^2.4.0
     babel-eslint: ^10.1.0
     babel-loader: ^8.2.2
+    camera-controls: ^2.10.1
     chai: ^4.2.0
     chai-enzyme: ^1.0.0-beta.1
     classnames: ^2.2.6
@@ -12897,6 +12907,7 @@ __metadata:
     three: ^0.173.0
     tracim_frontend_lib: ^1.1.9
     url-loader: ^2.0.1
+    web-e57: ^1.2.0
     web-ifc: ^0.0.68
     webpack: ^5.72.0
     webpack-cli: ^4.9.2
@@ -14127,6 +14138,13 @@ __metadata:
   dependencies:
     minimalistic-assert: ^1.0.0
   checksum: 2abc306c96930b757972a1c4650eb6b25b5d99f24088714957f88629e137db569368c5de0e57986c89ea70db2f1df9bba11a87cb6d0c8694b6f53a0159fab3bf
+  languageName: node
+  linkType: hard
+
+"web-e57@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "web-e57@npm:1.2.0"
+  checksum: c6cc0830dfd9b40746534b29a163bbaf17dbb7705fcb79cd9efb73b3ede509e557389402f06027b7bc1dd318299779e09045d524091e5bd335c58e57360404f1
   languageName: node
   linkType: hard
 

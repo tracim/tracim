@@ -22,14 +22,16 @@ import {
   updateTLMUser,
   stringIncludes,
   filterNotificationListFromUserConfig,
-  shouldKeepNotification
+  shouldKeepNotification,
+  sanitizeHtmlElement,
+  isPatternIncludedInString
 } from '../src/helper.js'
 import {
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
   CONTENT_TYPE
 } from '../src/constant.js'
-import { MENTION_CONSTANT } from '../src/mentionOrLink.js'
+import { MENTION_CONSTANT } from '../src/mentionOrLinkOrSanitize.js'
 import {
   mockGetReservedUsernames200,
   mockGetUsernameAvailability200,
@@ -812,6 +814,87 @@ describe('helper.js', () => {
         type: `${TLM_ET.CONTENT}.${TLM_CET.MODIFIED}.${CONTENT_TYPE.THREAD}`
       }
       expect(shouldKeepNotification(notification, userConfig)).to.equal(false)
+    })
+  })
+
+  describe('sanitizeHtmlElement()', () => {
+    it('should remove script tags', () => {
+      const html = global.document.createElement('div')
+      html.innerHTML = '<div><script>console.log("error")</script>exist</div><script>alert("hello")</script><script>console.log("error")</script>'
+      const sanitizedHtml = sanitizeHtmlElement(html)
+      expect(sanitizedHtml.textContent).to.equal('exist')
+    })
+    it('should remove style tags', () => {
+      const html = global.document.createElement('div')
+      html.innerHTML = '<style>html{width:10px}</style><div>exist</div><style>body{color:red;}</style>'
+      const sanitizedHtml = sanitizeHtmlElement(html)
+      expect(sanitizedHtml.textContent).to.equal('exist')
+    })
+    it('should remove iframe tags', () => {
+      const html = global.document.createElement('div')
+      html.innerHTML = '<div>exist<iframe src="https://tracim.fr"></iframe></div><iframe src="https://github.com/tracim/tracim"></iframe>'
+      const sanitizedHtml = sanitizeHtmlElement(html)
+      expect(sanitizedHtml.textContent).to.equal('exist')
+    })
+    it('should remove img tags when parameter is set', () => {
+      const html = global.document.createElement('div')
+      html.innerHTML = '<div>exist<img src="/logo/tracim.png" alt="" /></div><img src="/logo/bg.jpg" alt="" />'
+      const sanitizedHtml = sanitizeHtmlElement(html, ['img'])
+      expect(sanitizedHtml.textContent).to.equal('exist')
+    })
+  })
+
+  describe('function isPatternIncludedInString', () => {
+    describe('if pattern is a single word', () => {
+      it('should return true if pattern is in string', () => {
+        expect(isPatternIncludedInString('abcde', 'c')).to.equal(true)
+      })
+      it('should return true if pattern is in string and string contains html', () => {
+        expect(isPatternIncludedInString(
+          "<span title='MrLapin'>User1</span> a modifié son compte", 'modifié'
+        )).to.equal(true)
+      })
+      it('should return false if pattern is not in string', () => {
+        expect(isPatternIncludedInString('abcde', 'z')).to.equal(false)
+      })
+      it('should return true if pattern is an empty string', () => {
+        expect(isPatternIncludedInString('abcde', '')).to.equal(true)
+      })
+      it('should return false if string undefined', () => {
+        expect(isPatternIncludedInString(undefined, '')).to.equal(false)
+      })
+      it('should return false if string null', () => {
+        expect(isPatternIncludedInString(null, '')).to.equal(false)
+      })
+      it('should be case insensitive', () => {
+        expect(isPatternIncludedInString('My First Note', 'My First Note')).to.equal(true)
+        expect(isPatternIncludedInString('My First Note', 'my first note')).to.equal(true)
+        expect(isPatternIncludedInString('my first note', 'my first note')).to.equal(true)
+        expect(isPatternIncludedInString('my first note', 'My First Note')).to.equal(true)
+      })
+    })
+    describe('if pattern has multiple words', () => {
+      it('should return true if pattern is in string', () => {
+        expect(isPatternIncludedInString('abcde fghij', 'de fg')).to.equal(true)
+      })
+      it('should return false if pattern has only one word in string', () => {
+        expect(isPatternIncludedInString('abcde fghij', 'bc zz')).to.equal(false)
+      })
+      it('should return false if pattern has many words in string but not the entire pattern', () => {
+        expect(isPatternIncludedInString('abcde fghij', 'b bc ghij')).to.equal(false)
+      })
+      it('should return false if pattern does not have any words in string', () => {
+        expect(isPatternIncludedInString('abcde fghij', 'x yy zzz')).to.equal(false)
+      })
+      it(
+        'should return false if pattern does not have any words in string and finish with a space',
+        () => {
+          expect(isPatternIncludedInString('abcde fghij', 'x yy zzz ')).to.equal(false)
+        }
+      )
+      it('should return false if pattern has one word in string and finish with a space', () => {
+        expect(isPatternIncludedInString('abcde fghij', 'b zz ')).to.equal(false)
+      })
     })
   })
 })

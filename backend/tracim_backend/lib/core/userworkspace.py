@@ -4,8 +4,10 @@ from sqlalchemy.orm.exc import NoResultFound
 import typing
 
 from tracim_backend.config import CFG
+from tracim_backend.exceptions import GuestUserNotAllowed
 from tracim_backend.exceptions import LastWorkspaceManagerRoleCantBeModified
 from tracim_backend.exceptions import RoleAlreadyExistError
+from tracim_backend.exceptions import TooManyWorkspacesError
 from tracim_backend.exceptions import UserRoleNotFound
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
@@ -44,7 +46,7 @@ class UserWorkspaceConfigApi(object):
         return self._apply_base_filters(self._session.query(UserWorkspaceConfig))
 
     def get_user_workspaces_ids(
-        self, user_id: int, min_role: int = Profile.USER.id
+        self, user_id: int, min_role: int = Profile.GUEST.id
     ) -> typing.List[int]:
         assert (
             not self._user or self._user.profile == Profile.ADMIN or self._user.user_id == user_id
@@ -120,6 +122,14 @@ class UserWorkspaceConfigApi(object):
         :return: updated role
         """
         if role_level is not None:
+            if role_level > WorkspaceRoles.CONTRIBUTOR.level:
+                from tracim_backend.lib.core.user import UserApi
+
+                user = UserApi(None, self._session, self._config).get_one(role.user_id)
+                if user.profile == Profile.GUEST:
+                    raise GuestUserNotAllowed(
+                        "Guest users are not allowed to be {}".format(role_level)
+                    )
             if (
                 role.role == WorkspaceRoles.WORKSPACE_MANAGER.level
                 and self._is_last_workspace_manager(role.user_id, role.workspace_id)
@@ -153,6 +163,22 @@ class UserWorkspaceConfigApi(object):
                     user.user_id, workspace.workspace_id
                 )
             )
+        if user.profile == Profile.GUEST:
+            if role_level > WorkspaceRoles.CONTRIBUTOR.level:
+                raise GuestUserNotAllowed("Guest users aren't allowed to be more than contributor")
+            user_workspace_config_api = UserWorkspaceConfigApi(
+                config=self._config, session=self._session, current_user=None
+            )
+            nb_user_workspace = len(user_workspace_config_api.get_user_workspaces_ids(user.user_id))
+            if (
+                self._config.LIMITATION__MAX_GUEST_USER_SPACE_NB != -1
+                and nb_user_workspace >= self._config.LIMITATION__MAX_GUEST_USER_SPACE_NB
+            ):
+                raise TooManyWorkspacesError(
+                    "The user {} has reached {} workspace subscriptions (this is the max subscription nb for guest users)".format(
+                        user.user_id, self._config.LIMITATION__MAX_GUEST_USER_SPACE_NB
+                    )
+                )
         user_workspace_config = UserWorkspaceConfig()
         user_workspace_config.user = user
         user_workspace_config.workspace = workspace

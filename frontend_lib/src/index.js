@@ -31,12 +31,14 @@ import {
   handleFetchResult,
   hasSpaces,
   htmlToText,
+  isPatternIncludedInString,
   lightenColor,
   onClickOutside,
   parserStringToList,
   permissiveNumberEqual,
   removeAtInUsername,
   removeExtensionOfFilename,
+  sanitizeHtmlElement,
   scrollIntoViewIfNeeded,
   sendGlobalFlashMessage,
   serialize,
@@ -98,7 +100,7 @@ import {
   replaceHTMLElementWithMention,
   searchContentAndReplaceWithTag,
   searchMentionAndReplaceWithTag
-} from './mentionOrLink.js'
+} from './mentionOrLinkOrSanitize.js'
 
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -131,6 +133,8 @@ import {
 import { defaultDebug } from './debug.js'
 
 import AgendaInfo from './component/AgendaInfo/AgendaInfo.jsx'
+import AppProperty from './component/AppProperty/AppProperty.jsx'
+import AppDescription from './component/AppDescription/AppDescription.jsx'
 import { Breadcrumbs } from './component/Breadcrumbs/Breadcrumbs.jsx'
 import EmptyListMessage from './component/EmptyListMessage/EmptyListMessage.jsx'
 import TitleListHeader from './component/Lists/ListHeader/TitleListHeader.jsx'
@@ -187,6 +191,7 @@ import NoHoverListItem from './component/Lists/NoHoverListItem/NoHoverListItem.j
 import ComposedIcon from './component/Icon/ComposedIcon.jsx'
 
 import IconButton from './component/Button/IconButton.jsx'
+import LinkHtmlButton from './component/Button/LinkHtmlButton.jsx'
 import GenericButton from './component/Button/GenericButton.jsx'
 import TranslateButton from './component/Button/TranslateButton.jsx'
 
@@ -311,6 +316,7 @@ export { default as ToolBar } from './component/ToolBar/ToolBar.jsx'
 export { default as LinkPreview } from './component/LinkPreview/LinkPreview.jsx'
 export { default as TagList } from './component/Tags/TagList.jsx'
 export { default as Tag } from './component/Tags/Tag.jsx'
+export { default as TemplateContentSelector } from './component/TemplateContentSelector/TemplateContentSelector.jsx'
 export { default as Loading } from './component/Loading/Loading.jsx'
 export { default as COLORS } from './colors.js'
 
@@ -367,6 +373,8 @@ export {
   USER_CALL_STATE,
   AddFileToUploadButton,
   AgendaInfo,
+  AppProperty,
+  AppDescription,
   ArchiveDeleteContent,
   Avatar,
   Badge,
@@ -393,6 +401,7 @@ export {
   GenericButton,
   Icon,
   IconButton,
+  LinkHtmlButton,
   ListItemWrapper,
   LiveMessageManager,
   NewMemberForm,
@@ -499,6 +508,7 @@ export {
   htmlToText,
   isFileUploadInErrorState,
   isFileUploadInList,
+  isPatternIncludedInString,
   lightenColor,
   onClickOutside,
   parserStringToList,
@@ -522,6 +532,7 @@ export {
   removeExtensionOfFilename,
   replaceHTMLElementWithMention,
   revisionTypeList,
+  sanitizeHtmlElement,
   scrollIntoViewIfNeeded,
   searchContentAndReplaceWithTag,
   searchMentionAndReplaceWithTag,

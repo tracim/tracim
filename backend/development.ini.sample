@@ -225,8 +225,8 @@ workspace.join.max_messages_history_count = -1
 # example:
 # limitation.workspace_size = 1073741824
 
-## default allowed space for new user if not provided in bytes, 0 mean no space
-## limit. Limit is on the sum of sizes of owned by user space.
+## default allowed space for new user if not provided in bytes, 0 mean no space limit.
+## Limit is on the sum of sizes of owned by user space.
 ; limitation.user_default_allowed_space = 0
 
 # maximum count of simultaneously online users, 0 means unlimited and is the default value.
@@ -237,6 +237,18 @@ workspace.join.max_messages_history_count = -1
 ; limitation.maximum_online_users_message =
 # For instance:
 # limitation.maximum_online_users_message = We suggest you contact your manager to upgrade your offer:<br /><b>Leslie Doe</b>, <a href="tel:+336123456789">+336123456789</a>, <a href="mailto:leslie.doe@example.org">leslie.doe@example.org</a>
+
+# max number of non guest user allowed (a non-guest user is either an admin, a trusted_user or a user), -1 means no limit.
+; limitation.max_non_guest_users = -1
+
+# max number of guest user allowed, -1 means no limit.
+; limitation.max_guest_users = -1
+
+# max number of space a guest user can join, a guest user can't be a member of more than x space set here. -1 means no limit.
+; limitation.max_guest_user_space_nb = -1
+
+# the standard domain for all user, a new user with email not from this domain will be guest user
+; limitation.standard_user_email_domain =
 
 ####
 # STORAGE
@@ -299,7 +311,7 @@ preview_cache_dir = %(basic_setup.preview_cache_dir)s
 ; preview.jpg.restricted_dims = False
 ## Preview skiplist, prevent preview for the content with an extension in the list
 ## All item should be separated by a coma.
-; preview.skiplist=
+; preview.skiplist=.ifc, .xyz, .e57, .obj, .3ds, .stl, .dae, .gcode, .svg, .ttf, .wrl, .vtk
 # examples with multiples values:
 # preview.skiplist= .ifc, .iges
 
@@ -516,6 +528,12 @@ website.usage_conditions =
 ; frontend.cache_token =
 # example:
 # frontend.cache_token = QmlnIHN1cmljYXRlIGlzIHdhdGNoaW5nIHlvdSAh
+
+## iframe security
+# List of domain without protection against iframe
+# All domains should be separated by a comma.
+# You can use * to allow everything (be careful that it can pose a security risk)
+; iframe.whitelist = youtube.com, youtu.be, dailymotion.com, vimeo.com, google.com, apple.com, openstreetmap.org, mapbox.com, bing.com
 
 ### Color ###
 # check for color.json file in Tracim, check by default in Tracim parent
@@ -857,6 +875,19 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 # to connect to a cluster, it is possible to provided multiple hosts/ports as a comma separated list
 ; search.elasticsearch.host = localhost,
 ; search.elasticsearch.port = 9200,
+# elasticsearch ssl configuration
+; search.elasticsearch.ssl.activated = False
+; search.elasticsearch.ssl.ca_certs =
+# example:
+# search.elasticsearch.ssl.activated = True
+# search.elasticsearch.ssl.ca_certs = /etc/ssl/cert.crt
+
+# elasticsearch connection configuration
+# connection is enabled if basic_auth.username is set
+# if used in a cluster, every node receives the same basic_auth connection
+; search.elasticsearch.basic_auth.username =
+; search.elasticsearch.basic_auth.password =
+
 # global elasticsearch timeout in seconds
 ; search.elasticsearch.request_timeout = 60
 

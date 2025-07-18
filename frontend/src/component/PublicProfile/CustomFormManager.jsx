@@ -39,7 +39,7 @@ const DisplaySchemaPropertyString = props => {
       <span
         className='DisplaySchemaPropertyString__value'
       >
-        <HTMLContent>{props.value}</HTMLContent>
+        <HTMLContent iframeWhitelist={props.systemConfig.iframe_whitelist} htmlValue={props.value} />
       </span>
     </div>
   )
@@ -68,6 +68,7 @@ const DisplaySchemaArray = props => {
   if (props.valueList.every(value => typeof value === 'string')) {
     return (
       <DisplaySchemaPropertyString
+        systemConfig={props.systemConfig}
         label={props.label}
         value={props.valueList.join(', ')}
       />
@@ -93,6 +94,7 @@ const DisplaySchemaArray = props => {
             key={`object_${props.parentKey}_${value.title}_${i}`}
           >
             <DisplaySchemaObject
+              systemConfig={props.systemConfig}
               schemaObject={props.schemaObject}
               dataSchemaObject={value}
             />
@@ -166,6 +168,7 @@ const DisplaySchemaObject = props => {
         if (Array.isArray(value)) {
           return (
             <DisplaySchemaArray
+              systemConfig={props.systemConfig}
               label={schemaItemProperties.title}
               valueList={value}
               parentKey={key}
@@ -178,6 +181,7 @@ const DisplaySchemaObject = props => {
         if (valueType === 'object') {
           return (
             <DisplaySchemaObject
+              systemConfig={props.systemConfig}
               schemaObject={schemaItemProperties}
               dataSchemaObject={value}
               nestedLevel={props.nestedLevel + 1}
@@ -189,6 +193,7 @@ const DisplaySchemaObject = props => {
         if (valueType === 'string') {
           return (
             <DisplaySchemaPropertyString
+              systemConfig={props.systemConfig}
               label={schemaItemProperties.title}
               value={value}
               key={`property_string_${key}`}
@@ -216,6 +221,7 @@ const SchemaAsView = props => {
   return (
     <div className='SchemaAsView'>
       <DisplaySchemaObject
+        systemConfig={props.systemConfig}
         schemaObject={props.schemaObject}
         uiSchemaObject={props.uiSchemaObject}
         dataSchemaObject={props.dataSchemaObject}
@@ -331,6 +337,7 @@ export class CustomFormManager extends React.Component {
         {(state.mode === MODE.VIEW
           ? (
             <SchemaAsView
+              systemConfig={props.system.config}
               schemaObject={props.schemaObject}
               uiSchemaObject={props.uiSchemaObject}
               dataSchemaObject={props.dataSchemaObject}
@@ -357,7 +364,8 @@ export class CustomFormManager extends React.Component {
   }
 }
 
-export default translate()(CustomFormManager)
+const mapStateToProps = ({ system }) => ({ system })
+export default connect(mapStateToProps)(translate()(CustomFormManager))
 
 CustomFormManager.propTypes = {
   title: PropTypes.string,

@@ -10,6 +10,7 @@ from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentNotFound
+from tracim_backend.exceptions import ContentRevisionNotFound
 from tracim_backend.exceptions import ContentStatusException
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import FileSizeOverMaxLimitation
@@ -19,6 +20,7 @@ from tracim_backend.exceptions import NoFileValidationError
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.exceptions import PreviewDimNotAllowed
+from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
 from tracim_backend.exceptions import TracimFileNotFound
 from tracim_backend.exceptions import TracimUnavailablePreviewType
 from tracim_backend.exceptions import UnallowedSubContent
@@ -248,6 +250,8 @@ class FileController(Controller):
     @check_right(is_reader)
     @check_right(is_file_content)
     @hapic.handle_exception(TracimFileNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ContentRevisionNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(RevisionDoesNotMatchThisContent, HTTPStatus.BAD_REQUEST)
     @hapic.input_query(FileQuerySchema())
     @hapic.input_path(FileRevisionPathSchema())
     @hapic.output_file([])
@@ -265,8 +269,10 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
-        revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
+
+        revision = api.get_one_revision(
+            revision_id=hapic_data.path.revision_id, content_id=hapic_data.path.content_id
+        )
 
         default_filename = "{label}_r{revision_id}{file_extension}".format(
             label=revision.file_name,
@@ -385,7 +391,9 @@ class FileController(Controller):
         content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         if content.file_extension in app_config.PREVIEW__SKIPLIST:
             raise UnavailablePreview("Preview isn't available for this file extension")
-        revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
+        revision = api.get_one_revision(
+            revision_id=hapic_data.path.revision_id, content_id=content.content_id
+        )
         default_filename = "{label}_r{revision_id}.pdf".format(
             revision_id=revision.revision_id, label=revision.label
         )
@@ -421,7 +429,9 @@ class FileController(Controller):
         content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         if content.file_extension in app_config.PREVIEW__SKIPLIST:
             raise UnavailablePreview("Preview isn't available for this file extension")
-        revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
+        revision = api.get_one_revision(
+            revision_id=hapic_data.path.revision_id, content_id=content.content_id
+        )
         default_filename = "{label}_page_{page_number}.pdf".format(
             label=content.label, page_number=hapic_data.query.page
         )
@@ -541,7 +551,9 @@ class FileController(Controller):
         content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         if content.file_extension in app_config.PREVIEW__SKIPLIST:
             raise UnavailablePreview("Preview isn't available for this file extension")
-        revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
+        revision = api.get_one_revision(
+            revision_id=hapic_data.path.revision_id, content_id=content.content_id
+        )
         default_filename = "{label}_r{revision_id}_page_{page_number}_{width}x{height}.jpg".format(
             revision_id=revision.revision_id,
             label=revision.label,
@@ -737,8 +749,9 @@ class FileController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
-        revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
+        revision = api.get_one_revision(
+            revision_id=hapic_data.path.revision_id, content_id=hapic_data.path.content_id
+        )
 
         return api.get_revision_in_context(revision)
 

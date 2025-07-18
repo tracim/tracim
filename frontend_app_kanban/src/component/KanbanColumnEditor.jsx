@@ -2,12 +2,13 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import { IconButton, TextInput } from 'tracim_frontend_lib'
+import { KANBAN_COLUMN_DEFAULT_COLOR } from '../helper.js'
 
 function KanbanColumnEditor (props) {
   const { column } = props
 
   const [title, setTitle] = React.useState(column.title || '')
-  const [bgColor, setBgColor] = React.useState(column.bgColor || props.customColor)
+  const [bgColor, setBgColor] = React.useState(column.bgColor || KANBAN_COLUMN_DEFAULT_COLOR)
 
   function handleValidate (e) {
     e.preventDefault()

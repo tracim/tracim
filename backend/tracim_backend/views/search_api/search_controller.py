@@ -12,7 +12,7 @@ from tracim_backend.lib.search.models import ContentSearchResponse
 from tracim_backend.lib.search.search_factory import ELASTICSEARCH__SEARCH_ENGINE_SLUG
 from tracim_backend.lib.search.simple_search.simple_search_api import SimpleSearchApi
 from tracim_backend.lib.utils.authorization import check_right
-from tracim_backend.lib.utils.authorization import is_user
+from tracim_backend.lib.utils.authorization import is_guest
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.search_api.schemas import AdvancedContentSearchQuery
@@ -32,7 +32,7 @@ SWAGGER_TAG__SEARCH_SECTION = "Search"
 class SearchController(Controller):
     @classmethod
     @hapic.with_api_doc(tags=[SWAGGER_TAG__SEARCH_SECTION])
-    @check_right(is_user)
+    @check_right(is_guest)
     @hapic.input_query(ContentSearchQuerySchema())
     @hapic.output_body(ContentSearchResultSchema())
     def search_content(
@@ -47,7 +47,7 @@ class SearchController(Controller):
         return search
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__SEARCH_SECTION])
-    @check_right(is_user)
+    @check_right(is_guest)
     @hapic.input_query(AdvancedContentSearchQuerySchema())
     @hapic.output_body(AdvancedContentSearchResultSchema())
     @hapic.handle_exception(AdvancedSearchNotEnabled, HTTPStatus.BAD_REQUEST)
@@ -58,7 +58,7 @@ class SearchController(Controller):
         return search_api.search_content(AdvancedContentSearchQuery(**hapic_data.query))
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__SEARCH_SECTION])
-    @check_right(is_user)
+    @check_right(is_guest)
     @hapic.input_query(UserSearchQuerySchema())
     @hapic.output_body(UserSearchResultSchema())
     @hapic.handle_exception(AdvancedSearchNotEnabled, HTTPStatus.BAD_REQUEST)
@@ -70,7 +70,7 @@ class SearchController(Controller):
         return response
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__SEARCH_SECTION])
-    @check_right(is_user)
+    @check_right(is_guest)
     @hapic.input_query(WorkspaceSearchQuerySchema())
     @hapic.output_body(WorkspaceSearchResultSchema())
     @hapic.handle_exception(AdvancedSearchNotEnabled, HTTPStatus.BAD_REQUEST)

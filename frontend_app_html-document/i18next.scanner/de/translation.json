@@ -36,8 +36,8 @@
   "Copy content link": "Link zum Inhalt kopieren",
   "Cancel": "",
   "Validate": "",
-  "Permanently delete": "",
-  "Yes, delete permanently": "",
+  "Permanently delete": "Endgültig löschen",
+  "Yes, delete permanently": "Ja, endgültig löschen",
   "Warning: this operation cannot be rolled back": "",
   "Table of content": ""
 }

@@ -30,7 +30,7 @@ import {
   TLM_ENTITY_TYPE as TLM_ET
 } from './tracimLiveMessage.js'
 
-import { MENTION_CONSTANT } from './mentionOrLink.js'
+import { MENTION_CONSTANT } from './mentionOrLinkOrSanitize.js'
 
 export const generateFetchResponse = async fetchResult => {
   const resultJson = await fetchResult.clone().json()
@@ -685,6 +685,30 @@ export function onClickOutside (listening, setListening, menuRef, setIsOpen) {
       })
     })
   }
+}
+
+export const sanitizeHtmlElement = (element, additionalTagList = []) => {
+  const sanitizedElement = document.createElement('div')
+  sanitizedElement.innerHTML = element.innerHTML
+
+  let tagToSanitizeList = ['style', 'script', 'iframe']
+  if (additionalTagList.length > 0) tagToSanitizeList = tagToSanitizeList.concat(additionalTagList)
+
+  Array.from(sanitizedElement.querySelectorAll(tagToSanitizeList.join(',')))
+    .forEach(toRemove => toRemove.remove())
+  return sanitizedElement
+}
+
+export const isPatternIncludedInString = (string, pattern) => {
+  if (string === undefined || string === null) return false
+  if (pattern === '') return true
+
+  // INFO - CH - 2023-12-07 - Implementation to match any words in pattern
+  // const patternList = pattern.trim().split(' ')
+  // return patternList.some(p => string.toLowerCase().includes(p) === true)
+
+  // INFO - CH - 2023-12-07 - Implementation to match the whole pattern
+  return string.toLowerCase().includes(pattern.trim().toLowerCase()) === true
 }
 
 export const defaultApiContent = {

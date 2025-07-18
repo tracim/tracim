@@ -1,5 +1,32 @@
 # Changelog
 
+## 2025-07-00
+
+### ✨ New Features
+
+- Add viewer for some 3d format file type
+- New config parameter to allow iframe from specific domain
+- Revisions are now grouped in the Timeline of contents
+- Add due date to kanban cards
+- Add assignment to kanban cards
+- Improve UI of kanban cards
+
+### 🐛 Fixed Issue
+
+- Fixed page title when receiving a call [#6736](https://github.com/tracim/tracim/issues/6736)
+- Fixed missing callee name if declined call popin [#6725](https://github.com/tracim/tracim/issues/6725)
+- Fixed note summary generation [#6750](https://github.com/tracim/tracim/issues/6750)
+- Improved kanban with many cards performance [#6743](https://github.com/tracim/tracim/pull/6743)
+- Button Open as content is now a html link [#6084](https://github.com/tracim/tracim/issues/6084)
+- Improved kanban UI [#6752](https://github.com/tracim/tracim/issues/6752)
+- Improved model selection UX in popup to create content [#6756](https://github.com/tracim/tracim/issues/6756)
+- Fixed download button visibility in file preview overlay [#6759](https://github.com/tracim/tracim/issues/6759)
+- Avoid display 'no favorite' while the favorite list is still loading on favorite page [#6716](https://github.com/tracim/tracim/issues/6716)
+
+### ⚡️ Performance
+
+- Improved performance when updating content
+
 ## 2025-04.00 / 2025-03-25
 
 ### ✨ New Features
@@ -258,7 +285,7 @@ Avatars are now real images.
 
 #### 💄 Interface
 
-We did some work on the interface to make it more consistent and easier to use.  
+We did some work on the interface to make it more consistent and easier to use.
 Here is some changes that are worth your attention:
 
 - Space settings improvements

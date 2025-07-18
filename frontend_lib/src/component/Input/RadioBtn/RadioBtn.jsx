@@ -118,7 +118,7 @@ export class RadioBtnGroup extends React.Component {
       selectedIndex: index,
       selectedValue: selectedValue
     })
-    this.props.handleNewSelectedValue(selectedValue)
+    this.props.onNewSelectedValue(selectedValue)
   }
 
   buildButtons () {
@@ -152,7 +152,7 @@ export class RadioBtnGroup extends React.Component {
 RadioBtnGroup.propTypes = {
   selectedIndex: PropTypes.number,
   options: PropTypes.arrayOf(PropTypes.object),
-  handleNewSelectedValue: PropTypes.func,
+  onNewSelectedValue: PropTypes.func,
   customColor: PropTypes.string,
   onKeyDown: PropTypes.func
 }
@@ -160,7 +160,7 @@ RadioBtnGroup.propTypes = {
 RadioBtnGroup.defaultProps = {
   selectedIndex: 0,
   options: [],
-  handleNewSelectedValue: () => {},
+  onNewSelectedValue: () => {},
   customColor: '',
   onKeyDown: () => {}
 }

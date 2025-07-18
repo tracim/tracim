@@ -128,7 +128,11 @@ export const HtmlDocument = props => {
         {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) && (
           <div>
             <div className={noteClassName}>
-              <HTMLContent isTranslated={isTranslated}>{props.text}</HTMLContent>
+              <HTMLContent
+                iframeWhitelist={props.config.iframe_whitelist}
+                isTranslated={isTranslated}
+                htmlValue={props.text}
+              />
             </div>
           </div>
         )}
@@ -210,6 +214,7 @@ export default translate()(HtmlDocument)
 
 HtmlDocument.propTypes = {
   apiUrl: PropTypes.string.isRequired,
+  config: PropTypes.object.isRequired,
   workspaceId: PropTypes.number.isRequired,
   codeLanguageList: PropTypes.array,
   contentId: PropTypes.number,

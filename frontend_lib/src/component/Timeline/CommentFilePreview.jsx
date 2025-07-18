@@ -161,7 +161,7 @@ export class CommentFilePreview extends React.Component {
               imagePadding={55}
               toolbarButtons={[(
                 <a
-                  className='btn gallery__action__button__lightbox__openRawContent'
+                  className='btn CommentFilePreview__lightbox__openRawContent'
                   download
                   href={fileDownloadUrl}
                   key='CommentFilePreview__download'

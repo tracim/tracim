@@ -17,8 +17,8 @@ from tracim_backend.lib.utils.authorization import AuthorizationChecker
 from tracim_backend.lib.utils.authorization import CandidateIsCurrentUserChecker
 from tracim_backend.lib.utils.authorization import is_content_manager
 from tracim_backend.lib.utils.authorization import is_contributor
+from tracim_backend.lib.utils.authorization import is_guest
 from tracim_backend.lib.utils.authorization import is_reader
-from tracim_backend.lib.utils.authorization import is_user
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.lib.utils.request import TracimRequest
 
@@ -166,4 +166,4 @@ can_access_user_agenda_event = CaldavChecker(CandidateIsCurrentUserChecker())
 can_access_user_root_agenda = CaldavChecker(
     AndAuthorizationChecker(CandidateIsCurrentUserChecker(), CanAccessUserRootAgendaChecker())
 )
-can_access_to_agenda_list = CaldavChecker(is_user)
+can_access_to_agenda_list = CaldavChecker(is_guest)

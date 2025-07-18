@@ -146,6 +146,7 @@ export class FileComponent extends React.Component {
 
         {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) && (
           <ViewerSelector
+            system={props.system}
             content={props.content}
             color={props.customColor}
             contentRawUrl={props.downloadRawUrl}
@@ -217,6 +218,7 @@ const FileComponentWithHOC = translate()(Radium(FileComponent))
 export default React.forwardRef((props, ref) => <FileComponentWithHOC {...props} myForwardedRef={ref} />)
 
 FileComponent.propTypes = {
+  system: PropTypes.object.isRequired,
   customColor: PropTypes.string,
   editionAuthor: PropTypes.string,
   isRefreshNeeded: PropTypes.bool,

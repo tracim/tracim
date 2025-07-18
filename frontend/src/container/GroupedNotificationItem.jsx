@@ -6,12 +6,11 @@ import {
   PAGE,
   TLM_SUB_TYPE as TLM_SUB,
   ListItemWrapper,
-  TracimComponent
+  isPatternIncludedInString
 } from 'tracim_frontend_lib'
 import NotificationItem from '../component/NotificationItem.jsx'
 import GroupRender from '../component/GroupedNotificationItem/GroupRender.jsx'
 import { escape as escapeHtml, uniqBy } from 'lodash'
-import { isPatternIncludedInString } from './NotificationWall.jsx'
 
 export const GroupedNotificationItem = props => {
   const [isGrouped, setIsGrouped] = useState(true)
@@ -185,7 +184,7 @@ export const GroupedNotificationItem = props => {
 }
 
 const mapStateToProps = ({ user }) => ({ user })
-export default connect(mapStateToProps)(translate()(TracimComponent(GroupedNotificationItem)))
+export default connect(mapStateToProps)(translate()(GroupedNotificationItem))
 
 GroupedNotificationItem.propTypes = {
   getNotificationDetails: PropTypes.func.isRequired,

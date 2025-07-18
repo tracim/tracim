@@ -131,6 +131,19 @@ export class JoinWorkspace extends React.Component {
         ), 'info'))
         props.history.push(PAGE.WORKSPACE.DASHBOARD(workspace.id))
         break
+      case 400:
+        switch (fetchPutUserSpaceSubscription.json.code) {
+          case 2075:
+            props.dispatch(newFlashMessage(props.t('Guest users are not allowed to be more than contributor. In order to upgrade the role of this guest user, ask your administrator to make it a standard user'), 'warning'))
+            break
+          case 8004:
+            props.dispatch(newFlashMessage(props.t('You have reached the maximum number of spaces allowed as a guest user. In order to join this space, ask your administrator to make you a standard user or leave another space'), 'warning'))
+            break
+          default:
+            props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
+            break
+        }
+        break
       default: props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
     }
   }

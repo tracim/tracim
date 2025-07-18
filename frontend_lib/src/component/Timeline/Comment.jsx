@@ -10,8 +10,10 @@ import EmojiReactions from '../../container/EmojiReactions.jsx'
 import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
 import Popover from '../Popover/Popover.jsx'
 import IconButton from '../Button/IconButton.jsx'
+import LinkHtmlButton from '../Button/LinkHtmlButton.jsx'
 import LinkPreview from '../LinkPreview/LinkPreview.jsx'
 import ProfileNavigation from '../../component/ProfileNavigation/ProfileNavigation.jsx'
+
 import {
   addExternalLinksIcons,
   displayDistanceDate,
@@ -19,10 +21,9 @@ import {
 } from '../../helper.js'
 
 import {
-  CONTENT_TYPE,
+  CONTENT_TYPE, PAGE,
   ROLE
 } from '../../constant.js'
-
 import CommentFilePreview from './CommentFilePreview.jsx'
 
 function areCommentActionsAllowed (loggedUser, commentAuthorId) {
@@ -45,7 +46,9 @@ const Comment = (props) => {
   const isFile = (props.apiContent.content_type || props.apiContent.type) === CONTENT_TYPE.FILE
   const isThread = (props.apiContent.content_type || props.apiContent.type) === CONTENT_TYPE.THREAD
   const isFirstCommentFile = firstComment && (firstComment.content_type || firstComment.type) === CONTENT_TYPE.FILE
-  const readableModificationDate = isModified ? formatAbsoluteDate(props.modificationDate, props.loggedUser.lang, 'PPPPp') : null
+  const readableModificationDate = isModified
+    ? formatAbsoluteDate(props.modificationDate, props.loggedUser.lang, 'PPPPp')
+    : null
 
   return (
     <div className={classnames(`${props.customClass}__messagelist__item`, 'timeline__messagelist__item')}>
@@ -108,14 +111,11 @@ const Comment = (props) => {
                   >
                     {(isFile
                       ? (
-                        <IconButton
-                          icon='fas fa-paperclip'
-                          intent='link'
-                          key='openFileComment'
-                          mode='dark'
-                          onClick={props.onClickOpenFileComment}
+                        <LinkHtmlButton
+                          href={PAGE.WORKSPACE.CONTENT(props.workspaceId, CONTENT_TYPE.FILE, props.contentId)}
+                          target='_blank'
                           text={props.t('Open as content')}
-                          textMobile={props.t('Open as content')}
+                          icon='fas fa-paperclip'
                         />
                       )
                       : (
@@ -179,9 +179,11 @@ const Comment = (props) => {
                         isPublication={props.isPublication}
                       />
                     ) : (
-                      <HTMLContent isTranslated={props.translationState === TRANSLATION_STATE.TRANSLATED}>
-                        {addExternalLinksIcons(props.text)}
-                      </HTMLContent>
+                      <HTMLContent
+                        iframeWhitelist={props.systemConfig.iframe_whitelist}
+                        isTranslated={props.translationState === TRANSLATION_STATE.TRANSLATED}
+                        htmlValue={addExternalLinksIcons(props.text)}
+                      />
                     )
                   )}
                 </div>
@@ -200,7 +202,7 @@ const Comment = (props) => {
               onClickRestore={props.onClickRestore}
               onChangeTargetLanguageCode={props.onChangeTranslationTargetLanguageCode}
               targetLanguageCode={props.translationTargetLanguageCode}
-              targetLanguageList={props.translationTargetLanguageList}
+              targetLanguageList={props.systemConfig.translation_service__target_languages}
               dataCy='commentTranslateButton'
             />
           )}
@@ -237,7 +239,6 @@ Comment.propTypes = {
   loggedUser: PropTypes.object.isRequired,
   onChangeTranslationTargetLanguageCode: PropTypes.func.isRequired,
   translationTargetLanguageCode: PropTypes.string.isRequired,
-  translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
   workspaceId: PropTypes.number.isRequired,
   creationDate: PropTypes.string,
   customClass: PropTypes.string,
@@ -253,6 +254,7 @@ Comment.propTypes = {
   onClickRestore: PropTypes.func.isRequired,
   onClickToggleCommentList: PropTypes.func,
   onClickTranslate: PropTypes.func.isRequired,
+  systemConfig: PropTypes.object.isRequired,
   text: PropTypes.string,
   threadLength: PropTypes.number,
   translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE))

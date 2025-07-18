@@ -8,7 +8,7 @@ from tracim_backend.config import CFG  # noqa F401
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import has_personal_access
-from tracim_backend.lib.utils.authorization import is_user
+from tracim_backend.lib.utils.authorization import is_guest
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.views.controllers import Controller
@@ -42,7 +42,7 @@ class AgendaController(Controller):
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_AGENDA_ENDPOINTS])
-    @check_right(is_user)
+    @check_right(is_guest)
     @hapic.input_query(AgendaFilterQuerySchema())
     @hapic.output_body(AgendaSchema(many=True))
     def account_agendas(self, context, request: TracimRequest, hapic_data=None):
@@ -60,7 +60,7 @@ class AgendaController(Controller):
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__AGENDA_SECTION])
-    @check_right(is_user)
+    @check_right(is_guest)
     @hapic.output_body(PreFilledAgendaEventSchema())
     def pre_filled_agenda_event(self, context, request: TracimRequest, hapic_data=None):
         app_config = request.registry.settings["CFG"]  # type : CFG

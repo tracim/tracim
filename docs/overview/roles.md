@@ -9,31 +9,33 @@ The other is workspace-related and is called `workspace role`.
 
 Available slugs:
 
+- `guests` is for guest users.
 - `users` is for normal users.
-- `trysted-users` is for trusted users.
+- `trusted-users` is for trusted users.
 - `administrators` is for admin.
 
-|                               | Normal User | Trusted User    | Admin   |
-|-------------------------------|-------------|-------------|---------|
-| access to Tracim apps/contents_types/timezones_list         |  yes        | yes         | yes     |
-| participate to workspaces     |  yes        | yes         | yes     |
-|-------------------------------|-------------|-------------|---------|
-| get list of user workspace    | personal-only        | personal_only       | yes     |
-| get know_users of user        | personal-only        | personal-only        | yes     |
-| access to all user data (/users/{user_id} endpoints) |personal-only|personal-only| yes     |
-| set user info                 |personal-only|personal-only| yes     |
-| set content as read/unread for user | personal-only | personal-only | yes |
-| enable/disable user notification for workspace | personal-only | personal-only | yes |
-|-------------------------------|-------------|-------------|---------|
-| create workspace              |  no         | yes         | yes     |
-| invite user to Tracim         |  no         | yes, if manager of a given workspace         | yes     |
-| delete workspace              |  no         | yes, if manager of a given workspace         | yes     |
-|-------------------------------|-------------|-------------|---------|
-| get list of all user          | no          | no          | yes     |
-| get list of all workspace     | no          | no          | yes     |
-| set user global profile rights|  no         | no          | yes     |
-| activate/deactivate user      |  no         | no          | yes     |
-| delete user/ undelete user    |  no         | no          | yes     |
+|                               | Guest User  | Normal User | Trusted User| Admin   |
+|-------------------------------|-------------|-------------|-------------|---------|
+| access to Tracim apps/contents_types/timezones_list         |  yes        |  yes        | yes         | yes     |
+| participate to workspaces     |  yes        | yes         |  yes        | yes     |
+| Maximum workspaces roles      | Contributor |Workspace Manager|Workspace Manager|Workspace Manager|
+|-------------------------------|-------------|-------------|-------------|---------|
+| get list of user workspace    | personal-only | personal-only | personal_only | yes |
+| get know_users of user        | personal-only | personal-only | personal-only | yes |
+| access to all user data (/users/{user_id} endpoints) |personal-only|personal-only|personal-only| yes |
+| set user info                 |personal-only|personal-only|personal-only| yes     |
+| set content as read/unread for user | personal-only | personal-only | personal-only | yes |
+| enable/disable user notification for workspace | personal-only | personal-only | personal-only | yes |
+|-------------------------------|-------------|-------------|-------------|---------|
+| create workspace              |  no         |  no         | yes         | yes     |
+| invite user to Tracim         |  no         |  no         | yes, if manager of a given workspace | yes     |
+| delete workspace              |  no         |  no         | yes, if manager of a given workspace | yes     |
+|-------------------------------|-------------|-------------|-------------|---------|
+| get list of all user          |  no         | no          | no          | yes     |
+| get list of all workspace     |  no         | no          | no          | yes     |
+| set user global profile rights|  no         | no          | no          | yes     |
+| activate/deactivate user      |  no         | no          | no          | yes     |
+| delete user/ undelete user    |  no         | no          | no          | yes     |
 
 ## Workspace Roles
 
