@@ -53,5 +53,10 @@
   "Monthly": "Monthly",
   "Yearly": "Yearly",
   "New Event": "New Event",
-  "Daily_f": "Daily"
+  "Daily_f": "Daily",
+  "You were invited to this event": "You were invited to this event",
+  "Not answered": "Not answered",
+  "Accept": "Accept",
+  "Decline": "Decline",
+  "Accept tentatively": "Accept tentatively"
 }

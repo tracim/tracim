@@ -11291,9 +11291,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"open-dav-calendar@npm:^0.9.1":
+"open-dav-calendar@file:../../open-calendar::locator=tracim_app_agenda%40workspace%3Afrontend_app_agenda":
   version: 0.9.1
-  resolution: "open-dav-calendar@npm:0.9.1"
+  resolution: "open-dav-calendar@file:../../open-calendar#../../open-calendar::hash=33c7d3&locator=tracim_app_agenda%40workspace%3Afrontend_app_agenda"
   dependencies:
     "@event-calendar/core": ^4.4.0
     "@fortawesome/fontawesome-svg-core": ^6.7.2
@@ -11303,7 +11303,7 @@ __metadata:
     timezones-ical-library: ^1.10.0
     ts-ics: ^2.1.8
     tsdav: ^2.1.4
-  checksum: f707e521495548e342c398470c657810ea7f7ffc68397247229ae2babe54dc95d12e8d5d5259233a040419369793785895f6c87a32b2b866e8482254de4bd6cc
+  checksum: f8ceae3312184a19b7b0f3fd6156400c46053b2170ba69399623c7b4e3c33987218e2f839584ec3a85a988c8a16409951c7b4fd95ada65f0aa4178339eb60120
   languageName: node
   linkType: hard
 
@@ -15156,7 +15156,7 @@ __metadata:
     ignore-styles: ^5.0.1
     jsdom: ^15.1.1
     mocha: ^9.2.2
-    open-dav-calendar: ^0.9.1
+    open-dav-calendar: ../../open-calendar
     pnp-webpack-plugin: ^1.6.4
     prop-types: ^15.7.2
     react: ^16.13.1

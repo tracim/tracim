@@ -53,5 +53,10 @@
   "Monthly": "Mensuelle",
   "Yearly": "Annuelle",
   "New Event": "Nouvel évènement",
-  "Daily_f": "Quotidienne"
+  "Daily_f": "Quotidienne",
+  "You were invited to this event": "Vous avez été invité à cet évènement",
+  "Not answered": "Pas encore répondu",
+  "Accept": "Accepter",
+  "Decline": "Décliner",
+  "Accept tentatively": "Accepter provisoirement"
 }

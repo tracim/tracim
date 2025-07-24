@@ -299,7 +299,12 @@ export class Agenda extends React.Component<any, any> {
     const calendar = await createCalendar(
       sources,
       this.calendarRef.current,
-      {},
+      {
+        userContact: {
+          name: state.loggedUser.publicName,
+          email: state.loggedUser.email
+        }
+      },
       {
         calendarElement: {
           timeGridDay: props.t('Day'),
@@ -331,7 +336,8 @@ export class Agenda extends React.Component<any, any> {
           chooseACalendar: props.t('-- Choose a calendar --'),
           email: props.t('email'),
           rrule: props.t('Frequency'),
-          name: props.t('name')
+          name: props.t('name'),
+          userInvite: props.t('You were invited to this event')
         },
         eventBody: {
           organizer: props.t('Organizer')
@@ -341,7 +347,13 @@ export class Agenda extends React.Component<any, any> {
           editAll: props.t('Edit all occurrences'),
           editSingle: props.t('Edit this occurrence only')
         },
-        partStatus: {
+        userParticipationStatus: {
+          'NEEDS-ACTION': props.t('Not answered'),
+          ACCEPTED: props.t('Accept'),
+          DECLINED: props.t('Decline'),
+          TENTATIVE: props.t('Accept tentatively')
+        },
+        participationStatus: {
           'NEEDS-ACTION': props.t('Needs to answer'),
           ACCEPTED: props.t('Accepted'),
           DECLINED: props.t('Declined'),
