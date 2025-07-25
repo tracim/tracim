@@ -20,9 +20,8 @@ import {
   TracimComponent
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
-import { getAgendaList, getPreFilledAgendaEvent } from '../action.async'
+import { getResourceList, getPreFilledAgendaEvent } from '../action.async'
 import { createCalendar } from 'open-dav-calendar'
-import type { CalendarSource } from 'open-dav-calendar/types'
 
 export class Agenda extends React.Component<any, any> {
   calendarRef = createRef<HTMLDivElement>()
@@ -36,7 +35,8 @@ export class Agenda extends React.Component<any, any> {
       config: param.config,
       loggedUser: param.loggedUser,
       content: param.content,
-      userWorkspaceList: [],
+      agendaList: [],
+      addressBookList: [],
       userWorkspaceListLoaded: false,
       preFilledAgendaEvent: null,
       breadcrumbsList: [],
@@ -105,15 +105,15 @@ export class Agenda extends React.Component<any, any> {
       },
       editionAuthor: data.fields.author.public_name,
       // INFO - GB - 2020-06-18 - Just show the warning message if there have been any changes in "My agendas" page and if it's not the language that changes (handled by custom event)
-      // state.userWorkspaceList.length !== 1 represents "My Agendas" page because for the agendas of a specific workspace the state.userWorkspaceList.length is always 1 (there is only the workspace in the list)
+      // state.agendaList.length !== 1 represents "My Agendas" page because for the agendas of a specific workspace the state.agendaList.length is always 1 (there is only the workspace in the list)
       // and there is no need to show the warning in these agendas because there is no data that can be changed visible.
-      showRefreshWarning: prev.userWorkspaceList.length !== 1 && prev.loggedUser.lang === data.fields.user.lang
+      showRefreshWarning: prev.agendaList.length !== 1 && prev.loggedUser.lang === data.fields.user.lang
     }))
   }
 
   handleSharedspaceModified = (data: any): void => {
     const { state } = this
-    if (state.userWorkspaceList.find((workspace: any) => workspace.workspace_id === data.fields.workspace.workspace_id) === undefined) return
+    if (state.agendaList.find((workspace: any) => workspace.workspace_id === data.fields.workspace.workspace_id) === undefined) return
 
     this.setState({
       content: {
@@ -121,11 +121,11 @@ export class Agenda extends React.Component<any, any> {
       },
       editionAuthor: data.fields.author.public_name,
       // INFO - GB - 2020-06-18 - Just show the warning message if there have been any changes in "My agendas" page
-      // state.userWorkspaceList.length !== 1 represents "My Agendas" page because for the agendas of a specific workspace the state.userWorkspaceList.length is always 1 (there is only the workspace in the list)
+      // state.agendaList.length !== 1 represents "My Agendas" page because for the agendas of a specific workspace the state.agendaList.length is always 1 (there is only the workspace in the list)
       // and there is no need to show the warning in these agendas because there is no data that can be changed visible.
-      showRefreshWarning: state.userWorkspaceList.length !== 1
+      showRefreshWarning: state.agendaList.length !== 1
     })
-    if (state.userWorkspaceList.length === 1) this.buildBreadcrumbs()
+    if (state.agendaList.length === 1) this.buildBreadcrumbs()
   }
 
   async componentDidMount (): Promise<void> {
@@ -176,7 +176,7 @@ export class Agenda extends React.Component<any, any> {
     const { state, props } = this
 
     const fetchResultUserWorkspace = await handleFetchResult(
-      await getAgendaList(state.config.apiUrl, workspaceId)
+      await getResourceList(state.config.apiUrl, workspaceId)
     )
 
     switch (fetchResultUserWorkspace.apiResponse.status) {
@@ -208,10 +208,10 @@ export class Agenda extends React.Component<any, any> {
   // INFO - CH - 2019-04-09 - This function is complicated because, right now, the only way to get the user's role
   // on a workspace is to extract it from the members list that workspace
   // see https://github.com/tracim/tracim/issues/1581
-  loadUserRoleInWorkspace = async (agendaList: any[]): Promise<void> => {
+  loadUserRoleInWorkspace = async (resourceList: any[]): Promise<void> => {
     const { state, props } = this
     const fetchResultList = await Promise.all(
-      agendaList
+      resourceList
         .filter(a => a.agenda_type === 'workspace')
         .map(async a => {
           const fetchWorkspaceUserRoleList = await handleFetchResult(await getSpaceUserRoleList(state.config.apiUrl, a.workspace_id))
@@ -220,34 +220,38 @@ export class Agenda extends React.Component<any, any> {
     )
 
     const fetchResultSuccess = fetchResultList.filter(result => result.apiResponse.status === 200)
-    if (fetchResultSuccess.length < fetchResultList.length) sendGlobalFlashMessage(props.t('Some agenda could not be loaded'))
+    if (fetchResultSuccess.length < fetchResultList.length) sendGlobalFlashMessage(props.t('Some agenda or address books could not be loaded'))
 
     const workspaceListMemberList = fetchResultSuccess.map(result => ({
       workspaceId: result.body[0].workspace_id, // INFO - CH - 2019-04-09 - workspaces always have at least one member
       memberList: result.body
     }))
 
-    const agendaThatCouldGetRoleFrom = agendaList
+    const resourceThatCouldGetRoleFrom = resourceList
       // INFO - CH - 2019-04-09 - remove user's agenda
       .filter(a => a.agenda_type === 'workspace')
       // INFO - CH - 2019-04-09 - remove unloaded members list agenda
       .filter(a => workspaceListMemberList.map(ws => ws.workspaceId).includes(a.workspace_id))
 
-    const agendaListWithRole = agendaThatCouldGetRoleFrom.map(agenda => ({
-      ...agenda,
+    const resourceListWithRole = resourceThatCouldGetRoleFrom.map(resource => ({
+      ...resource,
       loggedUserRole: (workspaceListMemberList
-        .find(ws => ws.workspaceId === agenda.workspace_id) ?? { memberList: [] })
+        .find(ws => ws.workspaceId === resource.workspace_id) ?? { memberList: [] })
         .memberList
         .find((user: any) => user.user_id === state.loggedUser.userId)
         .role
     }))
 
     if (state.config.appConfig.workspaceId === null) {
-      agendaListWithRole.push(agendaList.find(a => a.agenda_type === 'private'))
+      resourceListWithRole.push(...resourceList.filter(a => a.agenda_type === 'private'))
     }
 
+    const agendaListWithRole = resourceListWithRole.filter(r => r.resource_type === 'calendar')
+    const addressBookListWithRole = resourceListWithRole.filter(r => r.resource_type === 'addressbook')
+
     this.setState({
-      userWorkspaceList: agendaListWithRole,
+      agendaList: agendaListWithRole,
+      addressBookList: addressBookListWithRole,
       userWorkspaceListLoaded: true
     })
   }
@@ -293,13 +297,12 @@ export class Agenda extends React.Component<any, any> {
     state.calendar?.destroy()
 
     // FIXME - CJ - 2025-07-03 - `workspace.withCredentials` should probably be handle
-    const sources: CalendarSource[] = state.userWorkspaceList.map((workspace: any) => ({
-      calendarUrl: workspace.agenda_url
-    }))
     const calendar = await createCalendar(
-      sources,
+      state.agendaList.map((workspace: any) => ({ calendarUrl: workspace.agenda_url })),
+      state.addressBookList.map((workspace: any) => ({ addressBookUrl: workspace.agenda_url })),
       this.calendarRef.current,
       {
+        hideVCardEmails: true,
         userContact: {
           name: state.loggedUser.publicName,
           email: state.loggedUser.email
@@ -334,9 +337,7 @@ export class Agenda extends React.Component<any, any> {
           cancel: props.t('Cancel'),
           save: props.t('Save'),
           chooseACalendar: props.t('-- Choose a calendar --'),
-          email: props.t('email'),
           rrule: props.t('Frequency'),
-          name: props.t('name'),
           userInvite: props.t('You were invited to this event')
         },
         eventBody: {

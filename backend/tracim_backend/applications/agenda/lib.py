@@ -8,6 +8,7 @@ import os
 import requests
 from sqlalchemy.orm import Session
 import typing
+import vobject
 from xml.sax.saxutils import escape
 
 from tracim_backend import ApplicationApi
@@ -151,6 +152,45 @@ class AgendaApi(object):
             return self._update_addressbook_props(url, name, description)
         else:
             raise ()
+
+    def _ensure_user_vcard(self, user: User):
+        user_addressbook_url = self.get_user_addressbook_url(user, use_proxy=False)
+        vcard = vobject.vCard()
+        vcard.add("uid")
+        vcard.uid.value = str(user.user_id)
+
+        vcard.add("fn")
+        vcard.fn.value = user.display_name
+
+        if user.username:
+            vcard.add("nickname")
+            vcard.nickname.value = user.username
+
+        vcard.add("n")
+        name_parts = user.display_name.split(" ", 1)
+        if len(name_parts) == 2:
+            given_name = name_parts[0]
+            family_name = name_parts[1]
+        else:
+            given_name = user.display_name
+            family_name = ""
+
+        vcard.n.value = vobject.vcard.Name(
+            family=family_name, given=given_name, additional="", prefix="", suffix=""
+        )
+
+        if user.email:
+            vcard.add("email")
+            vcard.email.value = user.email
+            vcard.email.type_param = "INTERNET"
+        vcard_content = vcard.serialize()
+        user_vcard_url = user_addressbook_url + str(user.user_id) + ".vcf"
+        requests.put(
+            user_vcard_url,
+            data=vcard_content.encode("utf-8"),
+            headers={"Content-Type": "text/vcard; charset=utf-8"},
+            auth=("tracim", "tracim"),
+        )
 
     def _update_agenda_props(self, url, name, description):
         try:
@@ -380,6 +420,7 @@ class AgendaApi(object):
                 type=AgendaResourceType.addressbook,
             )
             result = True
+        self._ensure_user_vcard(user)
         return result
 
     def get_resource_type_dir(self, resource_type: AgendaResourceType) -> typing.Optional[str]:
@@ -486,6 +527,11 @@ class AgendaApi(object):
             dest_user_id=user.user_id,
             resource_type=AgendaResourceType.addressbook,
         )
+        self._create_user_workspace_symlinks(
+            workspace=workspace,
+            user=user,
+            resource_type=AgendaResourceType.addressbook,
+        )
 
     def _ensure_workspace_symlinks_missing(self, user: User, workspace: Workspace):
         self._delete_workspace_symlinks(
@@ -496,6 +542,11 @@ class AgendaApi(object):
         self._delete_workspace_symlinks(
             workspace_id=workspace.workspace_id,
             dest_user_id=user.user_id,
+            resource_type=AgendaResourceType.addressbook,
+        )
+        self._delete_user_workspace_symlinks(
+            workspace_id=workspace.workspace_id,
+            user=user,
             resource_type=AgendaResourceType.addressbook,
         )
 
@@ -516,6 +567,24 @@ class AgendaApi(object):
         symlink_path = "{local_path}{user_resource_path}".format(
             local_path=self._config.RADICALE__LOCAL_PATH_STORAGE,
             user_resource_path=user_resource_path,
+        )
+        with contextlib.suppress(FileNotFoundError):
+            os.remove(symlink_path)
+
+    def _delete_user_workspace_symlinks(
+        self, workspace_id: int, user: User, resource_type: AgendaResourceType
+    ):
+        resource_type_dir = self.get_resource_type_dir(resource_type)
+        workspace_agenda_path = self._config.RADICALE__WORKSPACE_AGENDA_PATH_PATTERN.format(
+            resource_type_dir=resource_type_dir,
+            workspace_subdir=self._config.RADICALE__WORKSPACE_SUBDIR,
+            workspace_id=workspace_id,
+        )
+
+        symlink_path = "{local_path}{workspace_agenda_path}/{user_id}.vcf".format(
+            local_path=self._config.RADICALE__LOCAL_PATH_STORAGE,
+            workspace_agenda_path=workspace_agenda_path,
+            user_id=user.user_id,
         )
         with contextlib.suppress(FileNotFoundError):
             os.remove(symlink_path)
@@ -561,6 +630,43 @@ class AgendaApi(object):
                 ),
                 symlink_path,
             )
+
+    def _create_user_workspace_symlinks(
+        self, workspace: Workspace, user: User, resource_type: AgendaResourceType
+    ):
+        resource_type_dir = self.get_resource_type_dir(resource_type)
+        workspace_addressbook_path = self._config.RADICALE__WORKSPACE_AGENDA_PATH_PATTERN.format(
+            resource_type_dir=resource_type_dir,
+            workspace_subdir=self._config.RADICALE__WORKSPACE_SUBDIR,
+            workspace_id=workspace.workspace_id,
+        )
+
+        symlink_path = "{local_path}{workspace_addressbook_path}".format(
+            local_path=self._config.RADICALE__LOCAL_PATH_STORAGE,
+            workspace_addressbook_path=workspace_addressbook_path,
+        )
+
+        symlink_file = "{symlink_path}/{user_id}.vcf".format(
+            symlink_path=symlink_path,
+            user_id=user.user_id,
+        )
+
+        user_agenda_path = self._config.RADICALE__USER_AGENDA_PATH_PATTERN.format(
+            resource_type_dir=self._config.RADICALE__ADDRESSBOOK_DIR,
+            user_subdir=self._config.RADICALE__USER_SUBDIR,
+            user_id=user.user_id,
+        )
+
+        if os.path.isdir(symlink_path):
+            if not os.path.islink(symlink_file):
+                os.symlink(
+                    "{local_path}{user_agenda_path}/{user_id}.vcf".format(
+                        local_path=self._config.RADICALE__LOCAL_PATH_STORAGE,
+                        user_agenda_path=user_agenda_path,
+                        user_id=user.user_id,
+                    ),
+                    symlink_file,
+                )
 
     def get_user_agendas(
         self,
