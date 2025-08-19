@@ -191,10 +191,13 @@ export const ALL_CONTENT_TYPES = 'html-document,file,thread,folder,comment,kanba
 export const toggleFavicon = (hasUnreadNotification, hasUnreadMention) => {
   const originalHrefAttribute = 'originalHrefAttribute'
 
-  Array.from(document.getElementsByClassName('tracim__favicon')).forEach(favicon => {
-    if (!(hasUnreadNotification || hasUnreadMention)) {
-      favicon.href = favicon.getAttribute(originalHrefAttribute)
-      favicon.removeAttribute(originalHrefAttribute)
+  Array.from(document.querySelectorAll('link[rel="icon"]')).forEach(favicon => {
+    if (hasUnreadNotification === false && hasUnreadMention === false) {
+      const currentHref = favicon.getAttribute(originalHrefAttribute)
+      if (currentHref) {
+        favicon.href = currentHref
+        favicon.removeAttribute(originalHrefAttribute)
+      }
       return
     }
 
@@ -227,7 +230,9 @@ export const toggleFavicon = (hasUnreadNotification, hasUnreadMention) => {
       context.fill()
 
       // INFO - GM - 2020/08/18 - Replace the favicon
-      if (!favicon.getAttribute(originalHrefAttribute)) favicon.setAttribute(originalHrefAttribute, favicon.href)
+      if (!favicon.getAttribute(originalHrefAttribute)) {
+        favicon.setAttribute(originalHrefAttribute, favicon.href)
+      }
       favicon.href = canvas.toDataURL('image/png')
     }
   })

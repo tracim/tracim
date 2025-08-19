@@ -363,16 +363,15 @@ export class Tracim extends React.Component {
     }
   }
 
-  handleHeadTitleAndFavicon = (prevHeadTitleArgs, prevUnreadNotificationCount, prevUnreadMentionCount, prevUserConfig) => {
+  handleHeadTitleAndFavicon = (prevHeadTitleArgs, prevUnreadNotificationCount, prevUnreadMentionCount) => {
     const { props } = this
 
     const unreadNotificationCount = props.notificationPage.unreadNotificationCount
     const unreadMentionCount = props.notificationPage.unreadMentionCount
 
-    const prevUserConfigHasChanged = !isEqual(prevUserConfig, props.user.config)
     const hasHeadTitleChanged = !isEqual(prevHeadTitleArgs, props.system.titleArgs)
-    const hasUnreadMentionCountChanged = unreadMentionCount !== prevUnreadMentionCount || prevUserConfigHasChanged
-    const hasUnreadNotificationCountChanged = unreadNotificationCount !== prevUnreadNotificationCount || prevUserConfigHasChanged
+    const hasUnreadMentionCountChanged = unreadMentionCount !== prevUnreadMentionCount
+    const hasUnreadNotificationCountChanged = unreadNotificationCount !== prevUnreadNotificationCount
 
     if ((hasHeadTitleChanged || hasUnreadMentionCountChanged) && props.system.titleArgs?.length > 0) {
       let newHeadTitle = buildHeadTitle(props.system.titleArgs)
