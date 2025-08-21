@@ -22,7 +22,7 @@ module.exports = {
       test: /\.jsx?$/,
       enforce: 'pre',
       use: 'standard-loader',
-      exclude: [/node_modules/, /frontend_lib/]
+      exclude: [/node_modules/, /frontend_lib/, /dist/]
     }, {
       test: /\.tsx?$/,
       enforce: 'pre',
