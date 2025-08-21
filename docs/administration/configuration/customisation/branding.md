@@ -62,12 +62,6 @@ You can also tune the manifest file used by progressive web apps located in `<br
 
 More documentation about this manifest file is available on [W3C website](https://www.w3.org/TR/appmanifest/).
 
-### Safari pinned tab icon
-
-This icon can be changed by copying your image in `<branding_folder>/images/safari-pinned-tab-icon.svg`. Its color will automatically be the primary color setup in `color.json`.
-
-Documentation about this feature in Safari is available on [Apple's website](https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/pinnedTabs/pinnedTabs.html).
-
 ## Customize the login page
 
 The login page can be customized by creating/editing some simple HTML files.
