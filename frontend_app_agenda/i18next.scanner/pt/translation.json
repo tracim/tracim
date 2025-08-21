@@ -3,7 +3,6 @@
   "All my agendas": "Todas as minhas agendas",
   "Agenda of space {{workspaceLabel}}": "Agenda do espaço {{workspaceLabel}}",
   "Agenda": "Agenda",
-  "Some agenda could not be loaded": "Impossível de carregar alguma agenda",
   "My agendas": "Minhas agendas",
   "Some information was modified by {{author}}": "Algumas informações foram modificadas por {{author}}",
   "Error while loading pre-filled agenda event information": "Erro durante o carregamento de informações sobre eventos de agenda pré-preenchidos",
@@ -30,9 +29,7 @@
   "Cancel": "",
   "Save": "",
   "-- Choose a calendar --": "",
-  "email": "",
   "Frequency": "",
-  "name": "",
   "This is a recurring event": "",
   "Edit all occurrences": "",
   "Edit this occurrence only": "",
@@ -58,5 +55,10 @@
   "Not answered": "",
   "Accept": "",
   "Decline": "",
-  "Accept tentatively": ""
+  "Accept tentatively": "",
+  "Some agenda or address books could not be loaded": "",
+  "Participation confirmed": "",
+  "Participation pending": "",
+  "Participation confirmed tentative": "",
+  "Participation declined": ""
 }

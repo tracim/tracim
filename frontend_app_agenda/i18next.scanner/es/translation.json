@@ -5,7 +5,6 @@
   "Error while loading space list": "Error al cargar la lista de espacios",
   "All my agendas": "Todas mis agendas",
   "Agenda of space {{workspaceLabel}}": "Agenda del espacio {{workspaceLabel}}",
-  "Some agenda could not be loaded": "No se ha podido cargar alguna agenda",
   "Some information was modified by {{author}}": "Alguna información fue modificada por {{author}}",
   "Calendars": "",
   "Day": "",
@@ -30,9 +29,7 @@
   "Cancel": "",
   "Save": "",
   "-- Choose a calendar --": "",
-  "email": "",
   "Frequency": "",
-  "name": "",
   "This is a recurring event": "",
   "Edit all occurrences": "",
   "Edit this occurrence only": "",
@@ -58,5 +55,10 @@
   "Not answered": "",
   "Accept": "",
   "Decline": "",
-  "Accept tentatively": ""
+  "Accept tentatively": "",
+  "Some agenda or address books could not be loaded": "",
+  "Participation confirmed": "",
+  "Participation pending": "",
+  "Participation confirmed tentative": "",
+  "Participation declined": ""
 }

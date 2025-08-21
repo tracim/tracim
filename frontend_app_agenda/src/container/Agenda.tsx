@@ -341,7 +341,14 @@ export class Agenda extends React.Component<any, any> {
           userInvite: props.t('You were invited to this event')
         },
         eventBody: {
-          organizer: props.t('Organizer')
+          organizer: props.t('Organizer'),
+          participation_require: props.t('Required participant'),
+          participation_optional: props.t('Optional participant'),
+          non_participant: props.t('Non participant'),
+          participation_confirmed: props.t('Participation confirmed'),
+          participation_pending: props.t('Participation pending'),
+          participation_confirmed_tentative: props.t('Participation confirmed tentative'),
+          participation_declined: props.t('Participation declined')
         },
         recurringForm: {
           editRecurring: props.t('This is a recurring event'),

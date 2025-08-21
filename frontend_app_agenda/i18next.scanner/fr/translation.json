@@ -1,7 +1,6 @@
 {
   "Error while loading space list": "Erreur lors du chargement de la liste des espaces",
   "Agenda": "Agenda",
-  "Some agenda could not be loaded": "Certains agendas n'ont pas pu être chargés",
   "My agendas": "Mes agendas",
   "Some information was modified by {{author}}": "Certaines informations ont été modifiées par {{author}}",
   "All my agendas": "Tous mes agendas",
@@ -30,9 +29,7 @@
   "Cancel": "Annuler",
   "Save": "Enregistrer",
   "-- Choose a calendar --": "-- Choisissez un calendrier --",
-  "email": "email",
   "Frequency": "Fréquence",
-  "name": "nom",
   "This is a recurring event": "Cet évènement est récurent",
   "Edit all occurrences": "Modifier toutes les occurrences",
   "Edit this occurrence only": "Modifier cet évènement uniquement",
@@ -58,5 +55,10 @@
   "Not answered": "Pas encore répondu",
   "Accept": "Accepter",
   "Decline": "Décliner",
-  "Accept tentatively": "Accepter provisoirement"
+  "Accept tentatively": "Accepter provisoirement",
+  "Some agenda or address books could not be loaded": "Certains agendas ou carnets d’adresses n'ont pas pu être chargés",
+  "Participation confirmed": "Participation confirmée",
+  "Participation pending": "En attente de réponse",
+  "Participation confirmed tentative": "Participation confirmée provisoirement",
+  "Participation declined": "Participation refusée"
 }

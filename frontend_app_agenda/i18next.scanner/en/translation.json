@@ -1,7 +1,6 @@
 {
   "Error while loading space list": "Error while loading space list",
   "Agenda": "Agenda",
-  "Some agenda could not be loaded": "Some agenda could not be loaded",
   "My agendas": "My agendas",
   "Some information was modified by {{author}}": "Some information was modified by {{author}}",
   "All my agendas": "All my agendas",
@@ -30,9 +29,7 @@
   "Cancel": "Cancel",
   "Save": "Save",
   "-- Choose a calendar --": "-- Choose a calendar --",
-  "email": "email",
   "Frequency": "Frequency",
-  "name": "name",
   "This is a recurring event": "This is a recurring event",
   "Edit all occurrences": "Edit all occurrences",
   "Edit this occurrence only": "Edit this occurrence only",
@@ -58,5 +55,10 @@
   "Not answered": "Not answered",
   "Accept": "Accept",
   "Decline": "Decline",
-  "Accept tentatively": "Accept tentatively"
+  "Accept tentatively": "Accept tentatively",
+  "Some agenda or address books could not be loaded": "Some agenda or address books could not be loaded",
+  "Participation confirmed": "Participation confirmed",
+  "Participation pending": "Participation pending",
+  "Participation confirmed tentative": "Participation confirmed tentative",
+  "Participation declined": "Participation declined"
 }
