@@ -694,6 +694,11 @@ export class WorkspaceAdvanced extends React.Component {
     }
   }
 
+  handleClickAutoComplete = () => this.setState({
+    autoCompleteFormNewMemberActive: false,
+    autoCompleteClicked: true
+  })
+
   getMenuItemList = () => {
     const { props, state } = this
 
