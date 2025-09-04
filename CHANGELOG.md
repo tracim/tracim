@@ -1,6 +1,22 @@
 # Changelog
 
-## 2025-07-00
+## 2025.10.00
+
+### ✨ New Features
+
+- New agenda library: [Open Calendar](https://github.com/algoo/open-calendar)
+- New branding for Tracim with new logo and new default primary color
+
+### 🐛 Fixed Issue
+
+- Fixed favicon display [#6646](https://github.com/tracim/tracim/issues/6646)
+- Fixed pdf export using mentions and internal links [#6794](https://github.com/tracim/tracim/issues/6794)
+- Fixed app workspace advanced unknown member invitation [#6572](https://github.com/tracim/tracim/issues/6572)
+- Added web notification status filter on space administration page [#6793](https://github.com/tracim/tracim/issues/6793)
+- Fixed usage condition validation popin
+- Fixed some links not able to open in a new tab
+
+## 2025.07.00
 
 ### ✨ New Features
 
