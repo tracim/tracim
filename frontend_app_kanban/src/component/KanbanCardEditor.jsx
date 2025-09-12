@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import Select from 'react-select'
@@ -8,8 +8,11 @@ import {
   TextInput,
   TinyEditor,
   getAvatarBaseUrl,
-  searchContentAndReplaceWithTag
+  searchContentAndReplaceWithTag,
+  getLocalStorageItem,
+  setLocalStorageItem
 } from 'tracim_frontend_lib'
+import { localStorageFieldIdBuilder } from '../helper.js'
 
 const CustomReactSelectOption = (props) => {
   return (
@@ -37,20 +40,52 @@ const CustomReactSelectOption = (props) => {
 function KanbanCardEditor (props) {
   const { card } = props
 
-  const [title, setTitle] = useState(card.title || '')
-  const [description, setDescription] = useState(card.description || '')
-  const [assignmentList, setAssignmentList] = useState(card.assignmentList || [])
-  const [bgColor, setBgColor] = useState(card.bgColor || props.defaultBackgroundColor)
-  const [kickoff, setKickoff] = useState(card.kickoff || '')
-  const [deadline, setDeadline] = useState(card.deadline || '')
-  const [freeInput, setFreeInput] = useState(card.freeInput || '')
+  const cardFromLocalStorage = useMemo(() => {
+    const localStorageCardJson = getLocalStorageItem(
+      props.content.content_type,
+      props.content.content_id,
+      props.content.workspace_id,
+      localStorageFieldIdBuilder(props.card.id)
+    )
+    if (localStorageCardJson) return JSON.parse(localStorageCardJson)
+
+    return {
+      title: null,
+      description: null,
+      assignmentList: null,
+      bgColor: null,
+      kickoff: null,
+      deadline: null,
+      freeInput: null
+    }
+  }, [])
+
+  const [title, setTitle] = useState(cardFromLocalStorage.title || card.title || '')
+  const [description, setDescription] = useState(cardFromLocalStorage.description || card.description || '')
+  const [assignmentList, setAssignmentList] = useState(cardFromLocalStorage.assignmentList || card.assignmentList || [])
+  const [bgColor, setBgColor] = useState(cardFromLocalStorage.bgColor || card.bgColor || props.defaultBackgroundColor)
+  const [kickoff, setKickoff] = useState(cardFromLocalStorage.kickoff || card.kickoff || '')
+  const [deadline, setDeadline] = useState(cardFromLocalStorage.deadline || card.deadline || '')
+  const [freeInput, setFreeInput] = useState(cardFromLocalStorage.freeInput || card.freeInput || '')
+
+  useEffect(() => {
+    const kanbanCardDataJson = JSON.stringify({
+      title, description, assignmentList, bgColor, kickoff, deadline, freeInput
+    })
+
+    setLocalStorageItem(
+      props.content.content_type,
+      props.content.content_id,
+      props.content.workspace_id,
+      localStorageFieldIdBuilder(props.card.id),
+      kanbanCardDataJson
+    )
+  }, [title, description, assignmentList, bgColor, kickoff, deadline, freeInput])
 
   async function handleValidate (e) {
     e.preventDefault()
 
-    const descriptionText = description.target ? description.target.value : description
-
-    const descriptionWithContentLink = await searchContentAndReplaceWithTag(props.apiUrl, descriptionText)
+    const descriptionWithContentLink = await searchContentAndReplaceWithTag(props.apiUrl, description)
 
     props.onValidate({
       ...card,
@@ -83,7 +118,7 @@ function KanbanCardEditor (props) {
       <div className='kanban__KanbanPopup__form__fields'>
         <div className='kanban__KanbanPopup__title'>
           <TextInput
-            autoFocus={!props.focusOnDescription}
+            autoFocus
             id='kanban__KanbanPopup__title'
             onChange={(e) => setTitle(e.target.value)}
             onValidate={handleValidate}
@@ -197,6 +232,7 @@ export default translate()(KanbanCardEditor)
 
 KanbanCardEditor.propTypes = {
   apiUrl: PropTypes.string.isRequired,
+  content: PropTypes.object.isRequired,
   card: PropTypes.object.isRequired,
   onValidate: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
@@ -204,7 +240,6 @@ KanbanCardEditor.propTypes = {
   // End of required props /////////////////////////////////////////////////////////////////////////
   codeLanguageList: PropTypes.array,
   customColor: PropTypes.string,
-  focusOnDescription: PropTypes.bool,
   language: PropTypes.string,
   memberList: PropTypes.array
 }
@@ -212,7 +247,6 @@ KanbanCardEditor.propTypes = {
 KanbanCardEditor.defaultProps = {
   codeLanguageList: [],
   customColor: '',
-  focusOnDescription: false,
   language: 'en',
   memberList: []
 }

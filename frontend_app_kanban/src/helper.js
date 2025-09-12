@@ -1,4 +1,4 @@
-import { isPatternIncludedInString } from 'tracim_frontend_lib'
+import { isPatternIncludedInString, LOCAL_STORAGE_FIELD } from 'tracim_frontend_lib'
 
 export const KANBAN_MIME_TYPE = 'application/json'
 export const KANBAN_FILE_EXTENSION = '.kanban'
@@ -25,4 +25,9 @@ export const isCardMatchFilter = (card, filter, memberList) => {
   if (isPatternIncludedInString(descriptionHaystack.body.textContent, filter)) return true
 
   return false
+}
+
+export const localStorageFieldIdBuilder = (entryId) => {
+  const entryIdSafe = entryId || 'new'
+  return `${entryIdSafe}/${LOCAL_STORAGE_FIELD.RAW_CONTENT}`
 }

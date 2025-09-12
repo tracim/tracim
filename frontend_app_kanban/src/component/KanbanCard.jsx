@@ -116,9 +116,8 @@ function KanbanCard (props) {
       >
         <div
           ref={refKanbanCard}
-          disabled={props.readOnly}
           id={`${props.card.id}_description`}
-          onClick={props.readOnly ? undefined : () => props.onEditCardContent(props.card)}
+          onClick={props.readOnly ? undefined : () => props.onEditCard(props.card)}
         >
           <HTMLContent
             iframeWhitelist={props.config.system.config.iframe_whitelist}
@@ -145,7 +144,7 @@ function KanbanCard (props) {
 
       <div
         className='kanban__contentpage__wrapper__board__card__options'
-        onClick={props.readOnly ? undefined : () => props.onEditCardContent(props.card)}
+        onClick={props.readOnly ? undefined : () => props.onEditCard(props.card)}
       >
         <div className='kanban__contentpage__wrapper__board__card__options__date'>
           <div
@@ -217,7 +216,6 @@ KanbanCard.propTypes = {
   config: PropTypes.object.isRequired,
   card: PropTypes.object.isRequired,
   onEditCard: PropTypes.func.isRequired,
-  onEditCardContent: PropTypes.func.isRequired,
   onRemoveCard: PropTypes.func.isRequired,
   customColor: PropTypes.string,
   readOnly: PropTypes.bool

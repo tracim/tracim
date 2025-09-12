@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import { format } from 'date-fns'
@@ -7,8 +7,11 @@ import {
   IconButton,
   TextInput,
   TinyEditor,
-  sendGlobalFlashMessage
+  sendGlobalFlashMessage,
+  getLocalStorageItem,
+  setLocalStorageItem
 } from 'tracim_frontend_lib'
+import { localStorageFieldIdBuilder } from '../helper.js'
 
 // NOTE - M.L. - 2024-02-28 - This function is required due to the very specific format requested
 //  by the 'datetime-local' input type
@@ -23,11 +26,45 @@ function getCurrentDateTime () {
 function LogbookEntryEditor (props) {
   const { entry } = props
 
-  const [title, setTitle] = useState(entry.title || '')
-  const [description, setDescription] = useState(entry.description || '')
-  const [bgColor, setBgColor] = useState(entry.bgColor || '#e8e8e8')
-  const [datetime, setDatetime] = useState((entry.datetime && toDatetimeLocal(entry.datetime)) || getCurrentDateTime())
-  const [freeInput, setFreeInput] = useState(entry.freeInput || '')
+  const entryFromLocalStorage = useMemo(() => {
+    const entryFromLocalStorageJson = getLocalStorageItem(
+      props.content.content_type,
+      props.content.content_id,
+      props.content.workspace_id,
+      localStorageFieldIdBuilder(props.entry.id)
+    )
+    if (entryFromLocalStorageJson) return JSON.parse(entryFromLocalStorageJson)
+
+    return {
+      title: null,
+      description: null,
+      bgColor: null,
+      datetime: null,
+      freeInput: null
+    }
+  }, [])
+
+  const [title, setTitle] = useState(entryFromLocalStorage.title || entry.title || '')
+  const [description, setDescription] = useState(entryFromLocalStorage.description || entry.description || '')
+  const [bgColor, setBgColor] = useState(entryFromLocalStorage.bgColor || entry.bgColor || '#e8e8e8')
+  const [datetime, setDatetime] = useState(
+    entryFromLocalStorage.datetime || (entry.datetime && toDatetimeLocal(entry.datetime)) || getCurrentDateTime()
+  )
+  const [freeInput, setFreeInput] = useState(entryFromLocalStorage.freeInput || entry.freeInput || '')
+
+  useEffect(() => {
+    const logbookEntryDataJson = JSON.stringify({
+      title, description, bgColor, datetime, freeInput
+    })
+
+    setLocalStorageItem(
+      props.content.content_type,
+      props.content.content_id,
+      props.content.workspace_id,
+      localStorageFieldIdBuilder(props.entry.id),
+      logbookEntryDataJson
+    )
+  }, [title, description, bgColor, datetime, freeInput])
 
   function handleValidate (e) {
     e.preventDefault()
@@ -38,18 +75,21 @@ function LogbookEntryEditor (props) {
       sendGlobalFlashMessage(props.t('Invalid date'))
       return
     }
-    props.onValidate({
+
+    const newEntry = {
       ...entry,
-      title,
+      title: title,
       description: descriptionText,
-      bgColor,
+      bgColor: bgColor,
       datetime: newDate,
-      freeInput
-    })
+      freeInput: freeInput
+    }
+
+    props.onValidate(newEntry)
   }
 
   return (
-    <form className='logbook__LogbookPopup__form' onSubmit={handleValidate}>
+    <form className='logbook__LogbookPopup__form'>
       <div className='logbook__LogbookPopup__form__fields'>
         <div className='logbook__LogbookPopup__title'>
           <label htmlFor='logbook__LogbookPopup__title'>{props.t('Title:')}</label>
@@ -137,6 +177,7 @@ function LogbookEntryEditor (props) {
 export default translate()(LogbookEntryEditor)
 
 LogbookEntryEditor.propTypes = {
+  content: PropTypes.object.isRequired,
   apiUrl: PropTypes.string.isRequired,
   entry: PropTypes.object.isRequired,
   onValidate: PropTypes.func.isRequired,

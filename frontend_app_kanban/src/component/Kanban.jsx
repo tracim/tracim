@@ -25,14 +25,16 @@ import {
   Loading,
   PromptMessage,
   RefreshWarningMessage,
-  sendGlobalFlashMessage
+  sendGlobalFlashMessage,
+  removeLocalStorageItem
 } from 'tracim_frontend_lib'
 
 import {
   KANBAN_MIME_TYPE,
   KANBAN_FILE_EXTENSION,
   KANBAN_DEFAULT_BACKGROUND_COLOR,
-  isCardMatchFilter
+  isCardMatchFilter,
+  localStorageFieldIdBuilder
 } from '../helper.js'
 import KanbanCard from './KanbanCard.jsx'
 import KanbanCardEditor from './KanbanCardEditor.jsx'
@@ -63,6 +65,7 @@ export class Kanban extends React.Component {
       editedCardInfos: null,
       editedColumnInfos: null,
       saveRequired: false,
+      cardIdEdited: null,
       isAutoCompleteActivated: false
     }
   }
@@ -92,7 +95,7 @@ export class Kanban extends React.Component {
     }
 
     if (state.saveRequired) {
-      this.save(state.board)
+      this.save(state.board, state.cardIdEdited)
       this.setState({ saveRequired: false })
     }
   }
@@ -128,13 +131,7 @@ export class Kanban extends React.Component {
 
   handleEditCard = (card) => {
     this.setState({
-      editedCardInfos: { card, focusOnDescription: false }
-    })
-  }
-
-  handleEditCardContent = (card) => {
-    this.setState({
-      editedCardInfos: { card, focusOnDescription: true }
+      editedCardInfos: { card }
     })
   }
 
@@ -177,6 +174,7 @@ export class Kanban extends React.Component {
         editedCardInfos: null,
         board: newBoard,
         saveRequired: true,
+        cardIdEdited: card.id,
         boardState: BOARD_STATE.SAVING
       }
     })
@@ -213,8 +211,9 @@ export class Kanban extends React.Component {
     this.setState({ editedColumnInfos: null })
   }
 
-  async save (newBoard) {
+  async save (newBoard, cardIdEdited) {
     const { props } = this
+
     const fetchResultSaveKanban = await handleFetchResult(
       await putRawFileContent(
         props.config.apiUrl,
@@ -235,7 +234,15 @@ export class Kanban extends React.Component {
           sendGlobalFlashMessage(props.t('Error while saving the new version'))
           break
       }
+      return
     }
+
+    removeLocalStorageItem(
+      props.content.content_type,
+      props.content.content_id,
+      props.content.workspace_id,
+      localStorageFieldIdBuilder(cardIdEdited)
+    )
   }
 
   handleRemoveColumn = (column) => {
@@ -283,8 +290,17 @@ export class Kanban extends React.Component {
     return column
   }
 
-  handleCardEditCancel = () => {
+  handleCardEditCancel = (cardId) => {
+    const { props } = this
+
     this.setState({ editedCardInfos: null })
+
+    removeLocalStorageItem(
+      props.content.content_type,
+      props.content.content_id,
+      props.content.workspace_id,
+      localStorageFieldIdBuilder(cardId)
+    )
   }
 
   render () {
@@ -391,7 +407,6 @@ export class Kanban extends React.Component {
                     hideButtonsWhenReadOnly={props.readOnly}
                     card={card}
                     onEditCard={this.handleEditCard}
-                    onEditCardContent={this.handleEditCardContent}
                     onRemoveCard={this.handleRemoveCard}
                   />
                 )
@@ -406,18 +421,18 @@ export class Kanban extends React.Component {
               customColor={props.config.hexcolor}
               faIcon='far fa-id-card'
               label={state.editedCardInfos.card.id ? props.t('Editing Card') : props.t('New Card')}
-              onClose={this.handleCardEditCancel}
+              onClose={() => this.handleCardEditCancel(state.editedCardInfos.card.id)}
             >
               <KanbanCardEditor
                 apiUrl={props.config.apiUrl}
+                content={props.content}
                 card={state.editedCardInfos.card}
                 onValidate={this.handleCardEdited}
-                onCancel={this.handleCardEditCancel}
+                onCancel={() => this.handleCardEditCancel(state.editedCardInfos.card.id)}
                 // End of required props ///////////////////////////////////////
                 codeLanguageList={props.config.system.config.ui__notes__code_sample_languages}
                 customColor={props.config.hexcolor}
                 defaultBackgroundColor={KANBAN_DEFAULT_BACKGROUND_COLOR}
-                focusOnDescription={state.editedCardInfos.focusOnDescription}
                 language={props.language}
                 memberList={props.config.workspace.memberList}
               />

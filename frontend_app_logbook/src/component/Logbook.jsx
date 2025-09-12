@@ -15,10 +15,15 @@ import {
   PromptMessage,
   RefreshWarningMessage,
   sendGlobalFlashMessage,
-  ConfirmPopup
+  ConfirmPopup,
+  removeLocalStorageItem
 } from 'tracim_frontend_lib'
 
-import { LOGBOOK_MIME_TYPE, LOGBOOK_FILE_EXTENSION } from '../helper.js'
+import {
+  LOGBOOK_MIME_TYPE,
+  LOGBOOK_FILE_EXTENSION,
+  localStorageFieldIdBuilder
+} from '../helper.js'
 import LogbookEntry from './LogbookEntry.jsx'
 import LogbookEntryEditor from './LogbookEntryEditor.jsx'
 
@@ -154,7 +159,16 @@ export class Logbook extends React.Component {
     })
   }
 
-  handleHidePopIn = () => {
+  handleHidePopIn = (entryIdToEdit) => {
+    const { props } = this
+
+    removeLocalStorageItem(
+      props.content.content_type,
+      props.content.content_id,
+      props.content.workspace_id,
+      localStorageFieldIdBuilder(entryIdToEdit)
+    )
+
     this.setState({
       entryToEdit: {},
       showEditPopIn: false
@@ -168,7 +182,9 @@ export class Logbook extends React.Component {
     const sortedLogbook = {
       entries: newLogbook.entries.toSorted((a, b) => new Date(b.datetime) - new Date(a.datetime))
     }
-    this.save(sortedLogbook)
+
+    this.save(sortedLogbook, entry.id)
+
     this.setState({
       showEditPopIn: false,
       logbookState: LOGBOOK_STATE.SAVING,
@@ -177,8 +193,12 @@ export class Logbook extends React.Component {
   }
 
   handleConfirmRemoveEntry = (entry) => {
+    const { props } = this
+
     const newLogbook = removeEntryFromLogbook(this.state.logbook, entry)
-    this.save(newLogbook)
+
+    this.save(newLogbook, entry.id)
+
     this.setState({
       entryToRemove: null,
       showConfirmPopup: false,
@@ -277,7 +297,7 @@ export class Logbook extends React.Component {
     })
   }
 
-  async save (newLogbook) {
+  async save (newLogbook, entryIdEdited) {
     const { props } = this
     const logbookForApi = {
       entries: newLogbook.entries.map(e => {
@@ -306,7 +326,15 @@ export class Logbook extends React.Component {
           sendGlobalFlashMessage(props.t('Error while saving the new version'))
           break
       }
+      return
     }
+
+    removeLocalStorageItem(
+      props.content.content_type,
+      props.content.content_id,
+      props.content.workspace_id,
+      localStorageFieldIdBuilder(entryIdEdited)
+    )
   }
 
   render () {
@@ -425,13 +453,14 @@ export class Logbook extends React.Component {
               customColor={props.config.hexcolor}
               faIcon='far fa-id-card'
               label={state.entryToEdit.id ? props.t('Editing event') : props.t('New event')}
-              onClose={this.handleHidePopIn}
+              onClose={() => this.handleHidePopIn(state.entryToEdit.id)}
             >
               <LogbookEntryEditor
+                content={props.content}
                 apiUrl={props.config.apiUrl}
                 entry={state.entryToEdit}
                 onValidate={this.handleAddOrEditEntry}
-                onCancel={this.handleHidePopIn}
+                onCancel={() => this.handleHidePopIn(state.entryToEdit.id)}
                 // End of required props ///////////////////////////////////////
                 codeLanguageList={props.config.system.config.ui__notes__code_sample_languages}
                 customColor={props.config.hexcolor}
