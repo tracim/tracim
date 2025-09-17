@@ -26,6 +26,12 @@ export function TracimComponent (WrappedComponent) {
       })
     }
 
+    unregisterCustomEventHandlerList = (customEventList) => {
+      customEventList.forEach(customEvent => {
+        delete this.customEventHandlerList[customEvent.name]
+      })
+    }
+
     execCustomEventHandler = ({ detail: { type, data } }) => {
       if (Object.hasOwnProperty.call(this.customEventHandlerList, type)) {
         this.customEventHandlerList[type](data)
@@ -68,6 +74,7 @@ export function TracimComponent (WrappedComponent) {
         <WrappedComponent
           {...this.props}
           registerCustomEventHandlerList={this.registerCustomEventHandlerList}
+          unregisterCustomEventHandlerList={this.unregisterCustomEventHandlerList}
           registerLiveMessageHandlerList={this.registerLiveMessageHandlerList}
           registerGlobalLiveMessageHandler={this.registerGlobalLiveMessageHandler}
         />

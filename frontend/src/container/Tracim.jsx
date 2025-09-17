@@ -97,6 +97,7 @@ import Favorites from './Favorites.jsx'
 import ContentRedirection from './ContentRedirection.jsx'
 import WorkspacePage from './WorkspacePage.jsx'
 import ToDo from './ToDo.jsx'
+import TriggerPageView from '../component/TriggerPageView.jsx'
 
 const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
 
@@ -374,11 +375,18 @@ export class Tracim extends React.Component {
     const hasUnreadNotificationCountChanged = unreadNotificationCount !== prevUnreadNotificationCount
 
     if ((hasHeadTitleChanged || hasUnreadMentionCountChanged) && props.system.titleArgs?.length > 0) {
-      let newHeadTitle = buildHeadTitle(props.system.titleArgs)
+      const newHeadTitle = buildHeadTitle(props.system.titleArgs)
+      let newHeadTitleWithNotifCount = newHeadTitle
+
       if (unreadMentionCount > 0) {
-        newHeadTitle = `(${unreadMentionCount > 99 ? '99+' : unreadMentionCount}) ${newHeadTitle}`
+        newHeadTitleWithNotifCount = `(${unreadMentionCount > 99 ? '99+' : unreadMentionCount}) ${newHeadTitle}`
       }
-      document.title = newHeadTitle
+
+      document.title = newHeadTitleWithNotifCount
+      GLOBAL_dispatchEvent({
+        type: CUSTOM_EVENT.HEAD_TITLE_CHANGED,
+        data: newHeadTitle
+      })
     }
 
     if (hasUnreadMentionCountChanged || hasUnreadNotificationCountChanged) {
@@ -420,6 +428,8 @@ export class Tracim extends React.Component {
 
     return (
       <div className='tracim fullWidthFullHeight' dir={i18next.dir()}>
+        <TriggerPageView />
+
         <Header />
 
         {state.displayConnectionError && (

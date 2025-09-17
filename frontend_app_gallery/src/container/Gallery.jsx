@@ -522,6 +522,8 @@ export class Gallery extends React.Component {
   }
 
   setHeadTitle = (title) => {
+    if (!title) return
+
     GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.SET_HEAD_TITLE,
       data: { title: title }

@@ -68,6 +68,8 @@ export class CollaborativeEditionFrame extends React.Component {
   }
 
   setHeadTitle = async (contentName, workspaceLabel) => {
+    if (!contentName || !workspaceLabel) return
+
     GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.SET_HEAD_TITLE,
       data: { title: buildHeadTitle([contentName, workspaceLabel]) }

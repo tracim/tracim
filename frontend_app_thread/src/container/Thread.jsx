@@ -186,6 +186,8 @@ export class Thread extends React.Component {
   setHeadTitle = (contentName) => {
     const { state } = this
 
+    if (!contentName) return
+
     if (state.config && state.config.workspace && state.isVisible) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.SET_HEAD_TITLE,

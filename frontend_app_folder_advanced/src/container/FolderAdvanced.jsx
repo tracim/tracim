@@ -150,6 +150,8 @@ export class FolderAdvanced extends React.Component {
   setHeadTitle = (folderName) => {
     const { state } = this
 
+    if (!folderName) return
+
     if (state.config && state.config.workspace && state.isVisible) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.SET_HEAD_TITLE,

@@ -6,7 +6,7 @@ import {
   SET_USER_WORKSPACE_CONFIG_LIST,
   CONFIG,
   LOGIN,
-  HEAD_TITLE
+  SET_HEAD_TITLE
 } from '../action-creator.sync.js'
 
 export const defaultSystem = {
@@ -36,7 +36,7 @@ export function system (state = defaultSystem, action) {
     case `${SET}/${CONFIG}`:
       return { ...state, config: action.config }
 
-    case `${SET}/${HEAD_TITLE}`: {
+    case SET_HEAD_TITLE: {
       const titleArgs = action.titlePrefix === ''
         ? [action.headTitle, state.config.instance_name]
         : [action.titlePrefix, action.headTitle, state.config.instance_name]

@@ -16,6 +16,7 @@ from tracim_backend.lib.utils.utils import FRONTEND_UI_SUBPATH
 from tracim_backend.views.controllers import Controller
 
 INDEX_PAGE_NAME = "index.mak"
+ANALYTICS_JS_FILE_NAME = "analytics.js"
 APP_FRONTEND_PATH = "app/{minislug}.app.optimized.js"
 # INFO S.G - 2020-12-10 - minimum recommended size is 128bits = 16bytes, doubling this
 CSP_NONCE_SIZE = 32
@@ -71,6 +72,15 @@ class FrontendController(Controller):
             if entry.name.endswith(".js") and entry.is_file():
                 custom_toolbox_files.append(entry)
         return custom_toolbox_files
+
+    def _get_analytics_file_path(self) -> str:
+        analytics_file_path = os.path.join(
+            self.dist_folder_path, "assets", "branding", ANALYTICS_JS_FILE_NAME
+        )
+        analytics_file_web_path = f"/assets/branding/{ANALYTICS_JS_FILE_NAME}"
+        if not os.path.exists(analytics_file_path):
+            return ""
+        return analytics_file_web_path
 
     def ui(self, context, request: TracimRequest):
         return self.index(context, request)
@@ -139,6 +149,7 @@ class FrontendController(Controller):
                 )
             csp_headers.append((csp_header_key, csp_header_value))
             base_response = Response(headerlist=[("Content-Type", "text/html")] + csp_headers)
+            analytics_file_path = self._get_analytics_file_path()
         return render_to_response(
             self._get_index_file_path(),
             {
@@ -158,6 +169,7 @@ class FrontendController(Controller):
                 "excluded_notifications": app_config.WEB__NOTIFICATIONS__EXCLUDED,
                 "csp_nonce": csp_nonce,
                 "glob": self.glob,
+                "analytics_file_path": analytics_file_path,
             },
             request=request,
             response=base_response,

@@ -25,6 +25,8 @@ export const CUSTOM_EVENT = {
   RELOAD_APP_FEATURE_DATA: type => `${type}_reloadAppFeatureData`,
   SET_BREADCRUMBS: 'setBreadcrumbs',
   SET_HEAD_TITLE: 'setHeadTitle',
+  HEAD_TITLE_CHANGED: 'headTitleChanged',
+  NEW_PAGE_VIEWED: 'newPageViewed',
   SHOW_APP: type => `${type}_showApp`,
   SHOW_CREATE_WORKSPACE_POPUP: 'showCreateWorkspacePopup',
   SHOW_SIDEBAR: 'showSidebar',

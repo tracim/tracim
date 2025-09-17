@@ -223,6 +223,8 @@ export class AdminWorkspaceUser extends React.Component {
   setHeadTitle = (title) => {
     const { state } = this
 
+    if (!title) return
+
     if (state.isVisible) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.SET_HEAD_TITLE,

@@ -108,6 +108,10 @@
       GLOBAL_primaryColor = '${primary_color_str}'
       GLOBAL_excludedNotifications = '${excluded_notifications}'.replace(/\s/g, '').split(',')
     </script>
+
+    % if analytics_file_path:
+      <script src="${analytics_file_path}" nonce="${csp_nonce}"></script>
+    % endif
   </head>
 
   <body>
