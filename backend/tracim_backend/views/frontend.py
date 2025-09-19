@@ -101,6 +101,8 @@ class FrontendController(Controller):
 
         base_response = None
         csp_nonce = ""
+        analytics_file_path = self._get_analytics_file_path()
+
         if app_config.CONTENT_SECURITY_POLICY__ENABLED:
             csp_nonce = os.urandom(CSP_NONCE_SIZE).hex()
             csp_headers = []
@@ -149,7 +151,6 @@ class FrontendController(Controller):
                 )
             csp_headers.append((csp_header_key, csp_header_value))
             base_response = Response(headerlist=[("Content-Type", "text/html")] + csp_headers)
-            analytics_file_path = self._get_analytics_file_path()
         return render_to_response(
             self._get_index_file_path(),
             {
