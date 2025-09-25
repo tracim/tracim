@@ -111,8 +111,12 @@ const GroupRender = props => {
           )}
         </div>
       </div>
-      <div className='notification__list__item__circle__wrapper'>
-        {!readStatus &&
+
+      <div
+        className='notification__list__item__circle__wrapper'
+        title={props.t('Mark as read')}
+      >
+        {!readStatus && (
           <i
             className='notification__list__item__circle fas fa-circle'
             onClick={(e) => {
@@ -120,7 +124,8 @@ const GroupRender = props => {
               e.preventDefault()
               e.stopPropagation()
             }}
-          />}
+          />
+        )}
       </div>
     </Link>
   )

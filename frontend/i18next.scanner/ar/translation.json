@@ -663,5 +663,6 @@
   "<0>{{userPublicName}}</0>'s  request to join the space has been {{state}}": "",
   "<0>{{userPublicName}}</0>  created the space <2><0>{{workspaceLabel}}</0></2>": "",
   "<0>{{userPublicName}}</0>  deleted the space <2><0>{{workspaceLabel}}</0></2>": "",
-  "<0> {{userCalleeName}} has accepted your call. If the call has not opened click on this<3> link </3></0> ": ""
+  "<0> {{userCalleeName}} has accepted your call. If the call has not opened click on this<3> link </3></0> ": "",
+  "Mark as read": ""
 }

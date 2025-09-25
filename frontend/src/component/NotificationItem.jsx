@@ -101,8 +101,11 @@ export const NotificationItem = props => {
           )}
         </div>
       </div>
-      <div className='notification__list__item__circle__wrapper'>
-        {!notification.read &&
+      <div
+        className='notification__list__item__circle__wrapper'
+        title={props.t('Mark as read')}
+      >
+        {!notification.read && (
           <i
             className='notification__list__item__circle fas fa-circle'
             onClick={(event) => {
@@ -110,7 +113,8 @@ export const NotificationItem = props => {
               event.stopPropagation()
               handleReadNotification(notification.id)
             }}
-          />}
+          />
+        )}
       </div>
     </Link>
 

@@ -623,5 +623,6 @@
   "<0> {{userCalleeName}} has accepted your call. If the call has not opened click on this<3> link </3></0> ": "",
   "Guest users aren't allowed to be more than contributor": "",
   "The maximum number of spaces for a guest user has been reached": "",
-  "You have reached the maximum number of spaces allowed as a guest user. In order to join this space, ask your administrator to make you a standard user or leave another space": ""
+  "You have reached the maximum number of spaces allowed as a guest user. In order to join this space, ask your administrator to make you a standard user or leave another space": "",
+  "Mark as read": ""
 }
