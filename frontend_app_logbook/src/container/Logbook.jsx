@@ -393,6 +393,29 @@ export class Logbook extends React.Component {
     }
     menuItemList.push(tagComponent)
 
+    const descriptionComponent = {
+      id: 'description',
+      label: props.t('Description'),
+      icon: 'fa-info-circle',
+      children: (
+        <PopinFixedRightPartContent label={props.t('Description')}>
+          <AppDescription
+            apiUrl={state.config.apiUrl}
+            color={state.config.hexcolor}
+            mentionUserList={state.config.workspace.memberList}
+            description={state.content.description}
+            codeLanguageList={state.config.system.config.ui__notes__code_sample_languages}
+            iframeWhitelist={state.config.system.config.iframe_whitelist}
+            language={state.loggedUser.lang}
+            displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id}
+            disableChangeDescription={!state.content.is_editable}
+            onClickValidateNewDescription={this.handleValidateNewDescription}
+          />
+        </PopinFixedRightPartContent>
+      )
+    }
+    menuItemList.push(descriptionComponent)
+
     // INFO - CH - 2025-06-18 - On content load, .created stores the datetime from api.
     // When clicking on a revision, the .created get replaced by the formated value and .created_raw is affected
     // with .created.
@@ -423,29 +446,6 @@ export class Logbook extends React.Component {
       )
     }
     menuItemList.push(propertyComponent)
-
-    const descriptionComponent = {
-      id: 'description',
-      label: props.t('Description'),
-      icon: 'fa-info-circle',
-      children: (
-        <PopinFixedRightPartContent label={props.t('Description')}>
-          <AppDescription
-            apiUrl={state.config.apiUrl}
-            color={state.config.hexcolor}
-            mentionUserList={state.config.workspace.memberList}
-            description={state.content.description}
-            codeLanguageList={state.config.system.config.ui__notes__code_sample_languages}
-            iframeWhitelist={state.config.system.config.iframe_whitelist}
-            language={state.loggedUser.lang}
-            displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id}
-            disableChangeDescription={!state.content.is_editable}
-            onClickValidateNewDescription={this.handleValidateNewDescription}
-          />
-        </PopinFixedRightPartContent>
-      )
-    }
-    menuItemList.push(descriptionComponent)
 
     return menuItemList
   }
