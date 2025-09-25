@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 import {
   PAGE,
   ROLE,
-  STATUSES
+  TODO_STATUSES
 } from '../../constant.js'
 import IconButton from '../Button/IconButton.jsx'
 import TimedEvent from '../TimedEvent/TimedEvent.jsx'
@@ -32,7 +32,7 @@ const ToDoItem = props => {
   const username = props.username
     ? props.username
     : (props.memberList.find(member => member.id === props.toDo.assignee.user_id) || { username: '' }).username
-  const isToDoChecked = props.toDo.status !== STATUSES.OPEN
+  const isToDoChecked = props.toDo.status !== TODO_STATUSES.OPEN
 
   return (
     <div className={classnames('toDoItem', { toDoItemChecked: isToDoChecked })}>
@@ -43,7 +43,7 @@ const ToDoItem = props => {
           icon={`far ${isToDoChecked ? 'fa-check-square' : 'fa-square'}`}
           intent='link'
           onClick={() => props.onClickChangeStatusToDo(
-            props.toDo, isToDoChecked ? STATUSES.OPEN : STATUSES.VALIDATED
+            props.toDo, isToDoChecked ? TODO_STATUSES.OPEN : TODO_STATUSES.VALIDATED
           )}
           title={props.isEditable ? (isToDoChecked ? props.t('Uncheck') : props.t('Check')) : undefined}
         />

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
-import { STATUSES } from '../../constant.js'
+import { TODO_STATUSES } from '../../constant.js'
 
 export const PopinFixedRightPartContent = props => {
   const [progressBarWidth, setProgessBarWidth] = useState('0%')
@@ -12,7 +12,7 @@ export const PopinFixedRightPartContent = props => {
     let numberOfCheckedToDos = 0
 
     props.toDoList.forEach((toDo) => {
-      if (toDo.status === STATUSES.VALIDATED) {
+      if (toDo.status === TODO_STATUSES.VALIDATED) {
         numberOfCheckedToDos += 1
       }
     })

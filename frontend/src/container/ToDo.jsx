@@ -20,7 +20,7 @@ import {
   ROLE,
   sortListByMultipleCriteria,
   SORT_BY,
-  STATUSES,
+  TODO_STATUSES,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_SUB_TYPE as TLM_ST,
@@ -71,7 +71,7 @@ const ToDo = (props) => {
     let numberOfCheckedToDos = 0
 
     toDoList.forEach((toDo) => {
-      if (toDo.status === STATUSES.VALIDATED) {
+      if (toDo.status === TODO_STATUSES.VALIDATED) {
         numberOfCheckedToDos += 1
       }
     })

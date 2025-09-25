@@ -107,7 +107,8 @@ export class Tracim extends React.Component {
     this.connectionErrorDisplayTimeoutId = 0
     this.state = {
       displayConnectionError: false,
-      isNotificationWallOpen: false
+      isNotificationWallOpen: false,
+      unreadTodoCount: 0
     }
 
     initializeCustomElements('html-mention', HTMLMention)
@@ -474,8 +475,6 @@ export class Tracim extends React.Component {
               <Sidebar
                 isNotificationWallOpen={state.isNotificationWallOpen}
                 onClickNotification={this.handleClickNotificationButton}
-                unreadMentionCount={props.notificationPage.unreadMentionCount}
-                unreadNotificationCount={props.notificationPage.unreadNotificationCount}
                 isSpaceListLoaded={props.system.workspaceListLoaded}
               />
             )}

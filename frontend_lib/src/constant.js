@@ -343,7 +343,7 @@ export const IMG_LOAD_STATE = {
   ERROR: 'error'
 }
 
-export const STATUSES = {
+export const TODO_STATUSES = {
   OPEN: 'open',
   VALIDATED: 'closed-validated',
   CANCELLED: 'closed-unvalidated',

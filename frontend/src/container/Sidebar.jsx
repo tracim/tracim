@@ -6,17 +6,24 @@ import { translate } from 'react-i18next'
 import { isMobile } from 'react-device-detect'
 import {
   CUSTOM_EVENT,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_SUB_TYPE as TLM_ST,
+  getToDoListForUser,
+  handleFetchResult,
   Icon,
   NUMBER_RESULTS_BY_PAGE,
   PAGE,
   PROFILE,
   scrollIntoViewIfNeeded,
   TracimComponent,
-  withUsePublishLifecycle
+  withUsePublishLifecycle,
+  TODO_STATUSES
 } from 'tracim_frontend_lib'
 import {
   ADVANCED_SEARCH_TYPE,
   ALL_CONTENT_TYPES,
+  FETCH_CONFIG,
   NO_ACTIVE_SPACE_ID,
   SEARCH_TYPE,
   TRACIM_APP_VERSION,
@@ -70,7 +77,8 @@ export class Sidebar extends React.Component {
       foldedSpaceList: sidebarState?.[SIDEBAR_STATE_LOCAL_STORAGE_KEY.FOLDED_SPACE_LIST] ?? [],
       isSidebarClosed: isMobile,
       showSpaceList: sidebarState?.[SIDEBAR_STATE_LOCAL_STORAGE_KEY.SHOW_SPACE_LIST] ?? true,
-      showUserItems: sidebarState?.[SIDEBAR_STATE_LOCAL_STORAGE_KEY.SHOW_USER_ITEMS] ?? false
+      showUserItems: sidebarState?.[SIDEBAR_STATE_LOCAL_STORAGE_KEY.SHOW_USER_ITEMS] ?? false,
+      todoList: []
     }
 
     props.registerCustomEventHandlerList([
@@ -79,8 +87,22 @@ export class Sidebar extends React.Component {
       { name: CUSTOM_EVENT.SHOW_SIDEBAR, handler: this.handleOpenSidebar }
     ])
 
-    props.registerLiveMessageHandlerList([
-    ])
+    props.registerLiveMessageHandlerList([{
+      entityType: TLM_ET.CONTENT,
+      coreEntityType: TLM_CET.CREATED,
+      optionalSubType: TLM_ST.TODO,
+      handler: this.handleTodoCreated
+    }, {
+      entityType: TLM_ET.CONTENT,
+      coreEntityType: TLM_CET.MODIFIED,
+      optionalSubType: TLM_ST.TODO,
+      handler: this.handleTodoModified
+    }, {
+      entityType: TLM_ET.CONTENT,
+      coreEntityType: TLM_CET.DELETED,
+      optionalSubType: TLM_ST.TODO,
+      handler: this.handleTodoDeleted
+    }])
   }
 
   handleClickSearch = async (searchString) => {
@@ -131,6 +153,8 @@ export class Sidebar extends React.Component {
         this.setState({ activeSpaceId: spaceIdInUrl })
       }
     }
+
+    this.loadTodo()
   }
 
   componentDidUpdate (prevProps) {
@@ -158,6 +182,50 @@ export class Sidebar extends React.Component {
     const hasStopClass = element.classList.contains('sidebar')
     if (hasStopClass) return false
     else return hasOriginalClass || this.hasClassOnTargetOrItsParents(element.parentNode, className)
+  }
+
+  loadTodo = async () => {
+    const { props } = this
+
+    const fetchGetToDo = await handleFetchResult(
+      await getToDoListForUser(FETCH_CONFIG.apiUrl, props.user.userId)
+    )
+
+    if (fetchGetToDo.apiResponse.status === 200) {
+      this.setState({ todoList: fetchGetToDo.body })
+    } else {
+      console.error('Error loading todo from Sidebar.jsx', fetchGetToDo)
+    }
+  }
+
+  handleTodoCreated = data => {
+    const { props } = this
+    if (
+      data.fields.content.assignee.user_id === props.user.userId &&
+      data.fields.content.status === TODO_STATUSES.OPEN
+    ) {
+      this.loadTodo()
+    }
+  }
+
+  handleTodoModified = data => {
+    const { props, state } = this
+    if (
+      data.fields.content.assignee.user_id === props.user.userId &&
+      state.todoList.some(t => t.content_id === data.fields.content.content_id)
+    ) {
+      this.loadTodo()
+    }
+  }
+
+  handleTodoDeleted = data => {
+    const { props, state } = this
+    if (
+      data.fields.content.assignee.user_id === props.user.userId &&
+      state.todoList.some(t => t.content_id === data.fields.content.content_id)
+    ) {
+      this.loadTodo()
+    }
   }
 
   handleClickToggleSidebar = (e) => {
@@ -232,9 +300,14 @@ export class Sidebar extends React.Component {
     const isAgendaEnabled = props.appList.some(a => a.slug === 'agenda')
     const isUserAdministrator = props.user.profile === PROFILE.administrator.slug
     const isUserManager = props.user.profile === PROFILE.manager.slug
+    const todoOpenList = state.todoList.filter(todo => todo.status === TODO_STATUSES.OPEN)
 
     return (
-      <div ref={this.frameRef} className={classnames('sidebar', { sidebarClose: state.isSidebarClosed })} onClick={this.handleClickToggleSidebar}>
+      <div
+        ref={this.frameRef}
+        className={classnames('sidebar', { sidebarClose: state.isSidebarClosed })}
+        onClick={this.handleClickToggleSidebar}
+      >
         <div className='sidebar__header'>
           <Logo to={PAGE.HOME} />
           <button className='btn transparentButton sidebar__header__expand'>
@@ -280,8 +353,9 @@ export class Sidebar extends React.Component {
           icon='fas fa-bell'
           isCurrentItem={props.isNotificationWallOpen}
           onClickItem={props.onClickNotification}
-          unreadMentionCount={props.unreadMentionCount}
-          unreadNotificationCount={props.unreadNotificationCount}
+          unreadMentionCount={props.notificationPage.unreadMentionCount}
+          unreadNotificationCount={props.notificationPage.unreadNotificationCount}
+          todoOpenCount={todoOpenList.length}
         />
 
         <SidebarUserItemList
@@ -341,14 +415,16 @@ const mapStateToProps = ({
   system,
   simpleSearch,
   user,
-  workspaceList
+  workspaceList,
+  notificationPage
 }) => ({
   accessibleWorkspaceList,
   appList,
   simpleSearch,
   system,
   user,
-  workspaceList
+  workspaceList,
+  notificationPage
 })
 const SidebarWithHooks = withUsePublishLifecycle(Sidebar, 'SIDEBAR')
 export default connect(mapStateToProps)(appFactory(translate()(TracimComponent(SidebarWithHooks))))
@@ -356,15 +432,11 @@ export default connect(mapStateToProps)(appFactory(translate()(TracimComponent(S
 Sidebar.propTypes = {
   isNotificationWallOpen: PropTypes.bool,
   isSpaceListLoaded: PropTypes.bool,
-  onClickNotification: PropTypes.func,
-  unreadMentionCount: PropTypes.number,
-  unreadNotificationCount: PropTypes.number
+  onClickNotification: PropTypes.func
 }
 
 Sidebar.defaultProps = {
   isNotificationWallOpen: false,
   isSpaceListLoaded: false,
-  onClickNotification: () => { },
-  unreadMentionCount: 0,
-  unreadNotificationCount: 0
+  onClickNotification: () => { }
 }

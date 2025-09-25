@@ -2,7 +2,7 @@ import { stripEmojis } from './helper.js'
 
 import {
   CONTENT_TYPE,
-  STATUSES
+  TODO_STATUSES
 } from './constant.js'
 
 import { isAfter } from 'date-fns'
@@ -223,7 +223,7 @@ const sortByStatus = (list, lang) => {
     let bStatus = b.status || b.statusSlug
     if (!bStatus) bStatus = b.content ? b.content.statusSlug : ''
 
-    const statusOrder = [STATUSES.OPEN, STATUSES.VALIDATED, STATUSES.CANCELLED, STATUSES.DEPRECATED]
+    const statusOrder = [TODO_STATUSES.OPEN, TODO_STATUSES.VALIDATED, TODO_STATUSES.CANCELLED, TODO_STATUSES.DEPRECATED]
 
     const aStatusIndex = statusOrder.indexOf(aStatus)
     const bStatusIndex = statusOrder.indexOf(bStatus)
