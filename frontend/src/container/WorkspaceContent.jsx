@@ -661,12 +661,14 @@ export class WorkspaceContent extends React.Component {
       const hasFilterMatchOnLastModifier = content.lastModifier && includesFilter(content.lastModifier.public_name)
       const hasFilterMatchOnType = contentTypeInfo && includesFilter(props.t(contentTypeInfo.label))
       const hasFilterMatchOnStatus = statusInfo && includesFilter(props.t(statusInfo.label))
+      const hasFilterMatchOnExtension = includesFilter(content.fileExtension)
 
       return (
         hasFilterMatchOnLabel ||
         hasFilterMatchOnLastModifier ||
         hasFilterMatchOnType ||
-        hasFilterMatchOnStatus
+        hasFilterMatchOnStatus ||
+        hasFilterMatchOnExtension
       )
     }
 
@@ -686,13 +688,12 @@ export class WorkspaceContent extends React.Component {
     )
   }
 
-  filterWorkspaceContent = (contentList, filter, userFilter) => {
+  filterWorkspaceContent = (contentList, filterList, userFilter) => {
     const userFilteredList = this.filterWorkspaceContentByUserInput(contentList, userFilter)
 
-    return filter.length === 0
+    return filterList.length === 0
       ? userFilteredList
-      : userFilteredList.filter(c => c.type === CONTENT_TYPE.FOLDER ||
-        filter.includes(c.type))
+      : userFilteredList.filter(c => c.type === CONTENT_TYPE.FOLDER || filterList.includes(c.type))
   }
 
   displayWorkspaceEmptyMessage = (userRoleIdInWorkspace, isWorkspaceEmpty, isFilteredWorkspaceEmpty) => {
