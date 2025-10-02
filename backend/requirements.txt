@@ -244,7 +244,7 @@ pyyaml==6.0.2
     #   wsgidav
 pyzmq==26.2.0
     # via tracim_backend (setup.py)
-radicale==3.5.4
+radicale==3.5.7
     # via tracim_backend (setup.py)
 redis==4.6.0
     # via
