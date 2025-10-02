@@ -9,11 +9,7 @@ import {
   computeShortDate
 } from '../util/helper.js'
 import {
-  putNotificationListAsRead
-} from '../action-creator.async.js'
-import {
-  newFlashMessage,
-  readNotificationList
+  newFlashMessage
 } from '../action-creator.sync.js'
 import {
   AVATAR_SIZE,
@@ -36,7 +32,7 @@ export const NotificationItem = props => {
     ) return null
   }
 
-  const handleClickNotification = async (e, notificationId, notificationDetails) => {
+  const handleClickNotification = async (e, notification, notificationDetails) => {
     if (!notificationDetails.url) {
       if (notificationDetails.emptyUrlMsg) {
         props.dispatch(newFlashMessage(notificationDetails.emptyUrlMsg, notificationDetails.msgType || 'warning'))
@@ -44,21 +40,9 @@ export const NotificationItem = props => {
       e.preventDefault()
     }
 
-    handleReadNotification(notificationId)
+    props.onClickMarkNotificationListAsRead([notification])
 
     props.onCloseNotificationWall()
-  }
-
-  const handleReadNotification = async (notificationId) => {
-    const fetchPutNotificationAsRead = await props.dispatch(putNotificationListAsRead(props.user.userId, [notificationId]))
-    switch (fetchPutNotificationAsRead.status) {
-      case 204: {
-        props.dispatch(readNotificationList([notificationId]))
-        break
-      }
-      default:
-        props.dispatch(newFlashMessage(props.t('Error while marking the notification as read'), 'warning'))
-    }
   }
 
   if (Object.keys(notificationDetails).length === 0) return null
@@ -66,7 +50,7 @@ export const NotificationItem = props => {
   return (
     <Link
       to={notificationDetails.url || '#'}
-      onClick={(e) => handleClickNotification(e, notification.id, notificationDetails)}
+      onClick={(e) => handleClickNotification(e, notification, notificationDetails)}
       className={classnames('notification__list__item',
         { itemRead: notification.read, isMention: notificationDetails.isMention, isToDo: notificationDetails.isToDo }
       )}
@@ -111,7 +95,7 @@ export const NotificationItem = props => {
             onClick={(event) => {
               event.preventDefault()
               event.stopPropagation()
-              handleReadNotification(notification.id)
+              props.onClickMarkNotificationListAsRead([notification])
             }}
           />
         )}
@@ -125,9 +109,10 @@ const mapStateToProps = ({ user }) => ({ user })
 export default connect(mapStateToProps)(translate()(NotificationItem))
 
 NotificationItem.propTypes = {
-  onCloseNotificationWall: PropTypes.func.isRequired,
   getNotificationDetails: PropTypes.func.isRequired,
   notification: PropTypes.object.isRequired,
+  onCloseNotificationWall: PropTypes.func.isRequired,
+  onClickMarkNotificationListAsRead: PropTypes.func.isRequired,
   filterInput: PropTypes.string
 }
 

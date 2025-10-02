@@ -777,6 +777,7 @@ export class WorkspaceContent extends React.Component {
               workspaceId={props.currentWorkspace.id}
               appOpenedType={state.appOpenedType}
               onUpdateAppOpenedType={this.handleUpdateAppOpenedType}
+              liveMessageManager={props.liveMessageManager}
             />
           )}
 

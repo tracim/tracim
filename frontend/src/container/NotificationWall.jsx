@@ -4,12 +4,15 @@ import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import {
   getNotificationList,
-  putAllNotificationAsRead
+  putAllNotificationAsRead,
+  putNotificationListAsRead
 } from '../action-creator.async.js'
 import {
   appendNotificationList,
   newFlashMessage,
   readEveryNotification,
+  readNotificationList,
+  readContentNotification,
   setNextPage
 } from '../action-creator.sync.js'
 import {
@@ -35,7 +38,9 @@ import {
   PopinFixedHeader,
   getContentPath,
   handleFetchResult,
-  sortListByMultipleCriteria
+  sortListByMultipleCriteria,
+  CUSTOM_EVENT,
+  TracimComponent
 } from 'tracim_frontend_lib'
 import { escape as escapeHtml, uniqBy } from 'lodash'
 import NotificationItem from '../component/NotificationItem.jsx'
@@ -240,6 +245,31 @@ export const NotificationWall = props => {
   const NOTIFICATION_ITEM_HEIGHT = 60
 
   useEffect(() => {
+    // FIXME - CH - 2025-09-29 - Once the mark as read is a TLM instead of a custom event,
+    // move this declarations to ReduxTlmDispatcher
+    // see: https://github.com/tracim/tracim/issues/3560
+    props.registerCustomEventHandlerList([
+      {
+        name: CUSTOM_EVENT.MARK_ALL_NOTIFICATION_AS_READ,
+        handler: () => {
+          props.dispatch(readEveryNotification())
+        }
+      },
+      {
+        name: CUSTOM_EVENT.MARK_NOTIFICATION_LIST_AS_READ,
+        handler: data => {
+          props.dispatch(readNotificationList(data.notificationIdList))
+          if (data.contentIdList) {
+            for (const contentId of data.contentIdList) {
+              props.dispatch(readContentNotification(contentId))
+            }
+          }
+        }
+      }
+    ])
+  }, [])
+
+  useEffect(() => {
     if (props.user.userId !== -1) {
       loadNotifications()
     }
@@ -290,10 +320,31 @@ export const NotificationWall = props => {
     const fetchAllPutNotificationAsRead = await props.dispatch(putAllNotificationAsRead(props.user.userId))
     switch (fetchAllPutNotificationAsRead.status) {
       case 204:
-        props.dispatch(readEveryNotification())
+        props.liveMessageManager.dispatchBroadcastChannelCustomEvent(
+          CUSTOM_EVENT.MARK_ALL_NOTIFICATION_AS_READ, {}
+        )
         break
       default:
         props.dispatch(newFlashMessage(props.t('An error has happened while setting "mark all as read"'), 'warning'))
+    }
+  }
+
+  const handleClickMarkNotificationListAsRead = async notificationList => {
+    const notificationIdList = notificationList.map(notification => notification.id)
+
+    const fetchOnePutNotificationAsRead = await props.dispatch(
+      putNotificationListAsRead(props.user.userId, notificationIdList)
+    )
+
+    switch (fetchOnePutNotificationAsRead.status) {
+      case 204: {
+        props.liveMessageManager.dispatchBroadcastChannelCustomEvent(
+          CUSTOM_EVENT.MARK_NOTIFICATION_LIST_AS_READ, { notificationIdList: notificationIdList }
+        )
+        break
+      }
+      default:
+        props.dispatch(newFlashMessage(props.t('Error while marking the notification as read'), 'warning'))
     }
   }
 
@@ -751,6 +802,7 @@ export const NotificationWall = props => {
                     isSameContent={notification.type.includes(GROUP_NOTIFICATION_CRITERIA.CONTENT)}
                     key={`group_${notification.id}_${i}`}
                     onCloseNotificationWall={props.onCloseNotificationWall}
+                    onClickMarkNotificationListAsRead={handleClickMarkNotificationListAsRead}
                     read={false}
                     filterInput={filterInput}
                   />
@@ -764,10 +816,11 @@ export const NotificationWall = props => {
                     key={notification.id}
                   >
                     <NotificationItem
-                      onCloseNotificationWall={props.onCloseNotificationWall}
                       getNotificationDetails={getNotificationDetails}
                       notification={notification}
                       filterInput={filterInput}
+                      onCloseNotificationWall={props.onCloseNotificationWall}
+                      onClickMarkNotificationListAsRead={handleClickMarkNotificationListAsRead}
                     />
                   </ListItemWrapper>
                 )
@@ -781,4 +834,4 @@ export const NotificationWall = props => {
 }
 
 const mapStateToProps = ({ user, notificationPage, workspaceList }) => ({ user, notificationPage, workspaceList })
-export default connect(mapStateToProps)(translate()(NotificationWall))
+export default connect(mapStateToProps)(translate()(TracimComponent(NotificationWall)))

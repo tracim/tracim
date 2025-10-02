@@ -485,6 +485,7 @@ export class Tracim extends React.Component {
               <NotificationWall
                 onCloseNotificationWall={this.handleClickNotificationButton}
                 isNotificationWallOpen={state.isNotificationWallOpen}
+                liveMessageManager={this.liveMessageManager}
               />
             )}
           />
@@ -553,7 +554,9 @@ export class Tracim extends React.Component {
                   ]}
                   render={() => (
                     <div className='tracim__content fullWidthFullHeight'>
-                      <WorkspaceContent />
+                      <WorkspaceContent
+                        liveMessageManager={this.liveMessageManager}
+                      />
                     </div>
                   )}
                 />

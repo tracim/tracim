@@ -6,7 +6,7 @@ import appFactory from '../../util/appFactory.js'
 import { findUserRoleIdInWorkspace } from '../../util/helper.js'
 import { ROLE_LIST, CUSTOM_EVENT, CONTENT_TYPE } from 'tracim_frontend_lib'
 import { HACK_COLLABORA_CONTENT_TYPE } from '../../container/WorkspaceContent.jsx'
-import { newFlashMessage, readContentNotification } from '../../action-creator.sync.js'
+import { newFlashMessage } from '../../action-creator.sync.js'
 import { putContentNotificationAsRead } from '../../action-creator.async.js'
 
 // @FIXME Côme - 2018/07/31 - should this be in a component like AppFeatureManager ?
@@ -91,7 +91,9 @@ export class OpenContentApp extends React.Component {
     const fetchPutContentNotificationAsRead = await props.dispatch(putContentNotificationAsRead(userId, contentId, parentId))
     switch (fetchPutContentNotificationAsRead.status) {
       case 204:
-        props.dispatch(readContentNotification(contentId))
+        props.liveMessageManager.dispatchBroadcastChannelCustomEvent(
+          CUSTOM_EVENT.MARK_NOTIFICATION_LIST_AS_READ, { notificationIdList: [], contentIdList: [contentId] }
+        )
         break
       default: props.dispatch(newFlashMessage(props.t('Error while marking the notification as read'), 'warning'))
     }

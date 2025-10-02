@@ -119,6 +119,26 @@ export class ReduxTlmDispatcher extends React.Component {
 
       // User config
       { entityType: TLM_ET.USER_CONFIG, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserConfigModified }
+
+      // FIXME - CH - 2025-09-30 - Once the mark as read is a TLM instead of a custom event,
+      // uncomment the declarations bellow and move the handlers to specific function instead of anonymous function
+      // Note that the TLM's entity type and core event type don't exists yet, add them to
+      // frontend_lib/src/tracimLiveMessage.js once they are specified.
+      // see: https://github.com/tracim/tracim/issues/3560
+      // Mark notification as read
+      // { entityType: TLM_ET.MESSAGE, coreEntityType: TLM_CET.READ_ALL, handler: () => {
+      //   props.dispatch(readEveryNotification())
+      // }},
+      // { entityType: TLM_ET.MESSAGE, coreEntityType: TLM_CET.READ, handler: data => {
+      //   const notificationList = data.fields.notification_list
+      //   props.dispatch(readNotificationList(notificationList))
+      //   const contentList = data.fields.content_list
+      //   if (contentList) {
+      //     for (const content of contentList) {
+      //       props.dispatch(readContentNotification(content.content_id))
+      //     }
+      //   }
+      // }}
     ])
   }
 

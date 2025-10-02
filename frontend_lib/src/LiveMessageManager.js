@@ -54,6 +54,11 @@ export class LiveMessageManager {
   }
 
   broadcastChannelMessageReceived (message) {
+    if (message.customEvent) {
+      globalThis.GLOBAL_dispatchEvent({ type: message.customEvent.type, data: message.customEvent.data })
+      return
+    }
+
     if (message.canIHaveStatus && this.eventSource) {
       this.broadcastChannel.postMessage({ status: this.status })
     }
@@ -271,6 +276,16 @@ export class LiveMessageManager {
     })
     console.log('%cGLOBAL_dispatchLiveMessage', 'color: #ccc', tlm)
     document.dispatchEvent(customEvent)
+  }
+
+  dispatchBroadcastChannelCustomEvent (type, data) {
+    const detail = {
+      type: type,
+      data: data
+    }
+    globalThis.GLOBAL_dispatchEvent(detail)
+    this.broadcastChannel.postMessage({ customEvent: detail })
+    console.log('%cdispatchBroadcastChannelCustomEvent', 'color: #ccc', { customEvent: detail })
   }
 
   startHeartbeatFailureTimer () {

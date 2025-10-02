@@ -161,6 +161,7 @@ export const GroupedNotificationItem = props => {
           groupedNotifications={props.groupedNotifications}
           notificationDetails={notificationDetails}
           handleClickGroupedNotification={handleClickGroupedNotification}
+          onClickMarkNotificationListAsRead={props.onClickMarkNotificationListAsRead}
         />
       </ListItemWrapper>
     )
@@ -178,6 +179,7 @@ export const GroupedNotificationItem = props => {
         getNotificationDetails={props.getNotificationDetails}
         notification={notification}
         filterInput={props.filterInput}
+        onClickMarkNotificationListAsRead={props.onClickMarkNotificationListAsRead}
       />
     </ListItemWrapper>
   ))
@@ -192,6 +194,7 @@ GroupedNotificationItem.propTypes = {
   isFirst: PropTypes.bool,
   isLast: PropTypes.bool,
   onCloseNotificationWall: PropTypes.func.isRequired,
+  onClickMarkNotificationListAsRead: PropTypes.func.isRequired,
   read: PropTypes.bool,
   filterInput: PropTypes.string
 }

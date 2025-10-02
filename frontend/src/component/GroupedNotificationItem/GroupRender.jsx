@@ -14,13 +14,6 @@ import {
   Icon,
   formatAbsoluteDate
 } from 'tracim_frontend_lib'
-import {
-  putNotificationListAsRead
-} from '../../action-creator.async.js'
-import {
-  newFlashMessage,
-  readNotificationList
-} from '../../action-creator.sync.js'
 import { escape as escapeHtml, uniqBy } from 'lodash'
 
 const GroupRender = props => {
@@ -35,23 +28,6 @@ const GroupRender = props => {
   const numberOfAuthors = groupedNotifications.author.length
   const numberOfWorkspaces = uniqBy(groupedNotifications.group.map(notification => notification.workspace), 'id').length
   const readStatus = groupedNotifications.group.map(notification => notification.read).reduce((acc, current) => acc && current)
-
-  const handleReadNotificationGroup = async (groupNotification) => {
-    const notificationIdList = groupNotification.group.map(notification => notification.id)
-    const fetchPutNotificationGroupAsRead = await props.dispatch(
-      putNotificationListAsRead(props.user.userId, notificationIdList)
-    )
-    switch (fetchPutNotificationGroupAsRead.status) {
-      case 204: {
-        props.dispatch(readNotificationList(notificationIdList))
-        break
-      }
-      default:
-        props.dispatch(
-          newFlashMessage(props.t('Error while marking the notification group as read'), 'warning')
-        )
-    }
-  }
 
   return (
     <Link
@@ -120,7 +96,7 @@ const GroupRender = props => {
           <i
             className='notification__list__item__circle fas fa-circle'
             onClick={(e) => {
-              handleReadNotificationGroup(groupedNotifications)
+              props.onClickMarkNotificationListAsRead(groupedNotifications.group)
               e.preventDefault()
               e.stopPropagation()
             }}
@@ -137,5 +113,6 @@ export default connect(mapStateToProps)(translate()(GroupRender))
 GroupRender.propTypes = {
   groupedNotifications: PropTypes.object.isRequired,
   handleClickGroupedNotification: PropTypes.func.isRequired,
-  notificationDetails: PropTypes.object.isRequired
+  notificationDetails: PropTypes.object.isRequired,
+  onClickMarkNotificationListAsRead: PropTypes.func.isRequired
 }

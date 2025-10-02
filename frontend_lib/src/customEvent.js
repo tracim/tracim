@@ -33,5 +33,7 @@ export const CUSTOM_EVENT = {
   UNMOUNT_APP: 'unmount_app',
   UNMOUNT_APP_FEATURE: 'unmount_appFeature',
   USER_CONNECTED: 'userConnected',
-  USER_DISCONNECTED: 'userDisconnected'
+  USER_DISCONNECTED: 'userDisconnected',
+  MARK_ALL_NOTIFICATION_AS_READ: 'markAllNotificationAsRead',
+  MARK_NOTIFICATION_LIST_AS_READ: 'markNotificationListAsRead'
 }
