@@ -6,15 +6,22 @@
 
 - New agenda library: [Open Calendar](https://github.com/algoo/open-calendar)
 - New branding for Tracim with new logo and new default primary color
+- Marking a notification as read is now propagated to every opened Tracim tabs [#3560](https://github.com/tracim/tracim/issues/3560)
+- Added number of opened tasks in the sidebar [#6813](https://github.com/tracim/tracim/issues/6813)
+- New config parameters to fine tune notification wall and recent activities [#6818](https://github.com/tracim/tracim/issues/6818)
 
 ### 🐛 Fixed Issue
 
 - Fixed favicon display [#6646](https://github.com/tracim/tracim/issues/6646)
+- Fixed local storage usage for app Kanban and Logbook [#6797](https://github.com/tracim/tracim/issues/6797)
 - Fixed pdf export using mentions and internal links [#6794](https://github.com/tracim/tracim/issues/6794)
 - Fixed app workspace advanced unknown member invitation [#6572](https://github.com/tracim/tracim/issues/6572)
 - Added web notification status filter on space administration page [#6793](https://github.com/tracim/tracim/issues/6793)
 - Fixed usage condition validation popin
 - Fixed some links not able to open in a new tab
+- Added title to button "mark all as read" [#6814](https://github.com/tracim/tracim/issues/6814)
+- Inverted position of tabs "Description" and "Properties" in apps [#6815](https://github.com/tracim/tracim/issues/6815)
+- Content filter of page space content list now also filters on file extension [#6714](https://github.com/tracim/tracim/issues/6714)
 
 ## 2025.07.00
 
