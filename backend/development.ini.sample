@@ -568,15 +568,22 @@ website.usage_conditions =
 ; webdav.ui.enabled = True
 
 ### Notifications ###
-# Comma-separated events listed in this setting are not displayed in recent activities and notifications to the user.
+# The 4 parameters bellow define the excluded (blacklist) or included (whitelist) events for the notification wall and
+# the recent activity list.
 # Possible events are in the form ENTITY_TYPE.EVENT_TYPE or ENTITY_TYPE.EVENT_TYPE.CONTENT_TYPE where:
-# ENTITY_TYPE  = user_call | user | workspace | content | mention | workspace_member | user_config
-# EVENT_TYPE   = created | modified | deleted | undeleted
-# CONTENT_TYPE = html-document | file | thread | folder | comment | kanban | logbook
-# To include all notifications, use web.notifications.excluded = ""
-# To exclude all notification of an entity, you can use wildcard syntax: for example "user.*" for user,
-# will exclude those events: user.deleted, user.created, user.modified, user.undeleted...
-; web.notifications.excluded = user_call.created, user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*, tag.*, content_tag.*, user_config.*
+# ENTITY_TYPE  = user | content | content_tag | mention | reaction | workspace | workspace_member | workspace_subscription | tag | user_call | user_config
+# EVENT_TYPE   = created | modified | deleted | undeleted | copied | moved |
+# CONTENT_TYPE = html-document | file | thread | folder | comment | kanban | logbook | todo
+# Comma-separated list
+# To include all notifications, use web.notification_wall.excluded = ""
+# To exclude all notification of an entity, you can use wildcard syntax: for example "user.*" for user, will exclude those events: user.deleted, user.created, user.modified, user.undeleted...
+# included list take precedence over excluded list
+# Event filter for notification wall
+; web.notification_wall.excluded = user_call.created, user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*, tag.*, content_tag.*, user_config.*
+; web.notification_wall.included =
+# Event filter for recent activities
+; web.recent_activities.excluded = user_call.created, user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, reaction.*, tag.*, content_tag.*, user_config.*
+; web.recent_activities.included =
 
 ### UI Customization
 # These parameters configure the user interface without affecting the backend proper

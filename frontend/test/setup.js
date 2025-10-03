@@ -36,7 +36,10 @@ if (!global.window && !global.document) {
   global.GLOBAL_dispatchEvent = global.document.dispatchEvent = (e) => { global.lastCustomEventTypes.add(e.type) }
   global.CustomEvent = () => {}
   global.fetch = require('node-fetch')
-  global.GLOBAL_excludedNotifications = []
+  global.GLOBAL_excludedNotificationWall = []
+  global.GLOBAL_includedNotificationWall = []
+  global.GLOBAL_excludedRecentActivities = []
+  global.GLOBAL_includedRecentActivities = []
   global.DOMParser = window.DOMParser
   global.Element = window.Element
   global.Audio = window.Audio

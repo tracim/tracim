@@ -473,9 +473,21 @@ class CFG(object):
         self.WEBSITE__WELCOME_PAGE_STYLE = self.get_raw_config(
             "website.welcome_page_style", "welcome-simple.css"
         )
-        self.WEB__NOTIFICATIONS__EXCLUDED = self.get_raw_config(
-            "web.notifications.excluded",
+        self.WEB__NOTIFICATION_WALL__EXCLUDED = self.get_raw_config(
+            "web.notification_wall.excluded",
             "user_call.created, user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*, tag.*, content_tag.*, user_config.*",
+        )
+        self.WEB__NOTIFICATION_WALL__INCLUDED = self.get_raw_config(
+            "web.notification_wall.included",
+            "",
+        )
+        self.WEB__RECENT_ACTIVITIES__EXCLUDED = self.get_raw_config(
+            "web.recent_activities.excluded",
+            "user_call.created, user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, reaction.*, tag.*, content_tag.*, user_config.*",
+        )
+        self.WEB__RECENT_ACTIVITIES__INCLUDED = self.get_raw_config(
+            "web.recent_activities.included",
+            "",
         )
 
         # base url of the frontend

@@ -106,7 +106,12 @@
 
     <script type="text/javascript" nonce="${csp_nonce}">
       GLOBAL_primaryColor = '${primary_color_str}'
-      GLOBAL_excludedNotifications = '${excluded_notifications}'.replace(/\s/g, '').split(',')
+
+      GLOBAL_excludedNotificationWall = '${excluded_notification_wall}'.replace(/\s/g, '').split(',')
+      GLOBAL_includedNotificationWall = '${included_notification_wall}'.replace(/\s/g, '').split(',')
+
+      GLOBAL_excludedRecentActivities = '${excluded_recent_activities}'.replace(/\s/g, '').split(',')
+      GLOBAL_includedRecentActivities = '${included_recent_activities}'.replace(/\s/g, '').split(',')
     </script>
 
     % if analytics_file_path:

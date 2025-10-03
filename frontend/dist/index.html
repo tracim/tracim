@@ -80,7 +80,13 @@
 
   <script type='text/javascript'>
     GLOBAL_primaryColor = '#2f7d30'
-    GLOBAL_excludedNotifications = []
+
+    // INFO - CH - 2025-10-01 - Default development.ini.sample value:
+    GLOBAL_excludedNotificationWall = 'user_call.created, user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*, tag.*, content_tag.*, user_config.*'.replace(/\s/g, '').split(',')
+    GLOBAL_includedNotificationWall = ''.replace(/\s/g, '').split(',')
+
+    GLOBAL_excludedRecentActivities = 'user_call.created, user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, reaction.*, tag.*, content_tag.*, user_config.*'.replace(/\s/g, '').split(',')
+    GLOBAL_includedRecentActivities = ''.replace(/\s/g, '').split(',')
   </script>
 </head>
 

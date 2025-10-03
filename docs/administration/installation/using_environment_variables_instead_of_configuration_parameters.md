@@ -35,7 +35,10 @@ The following table contains:
 | TRACIM_WEBSITE__USAGE_CONDITIONS                                          | website.usage_conditions                                       | WEBSITE__USAGE_CONDITIONS                                          |
 | TRACIM_WEBSITE__WELCOME_PAGE                                              | website.welcome_page                                           | WEBSITE__WELCOME_PAGE                                              |
 | TRACIM_WEBSITE__WELCOME_PAGE_STYLE                                        | website.welcome_page_style                                     | WEBSITE__WELCOME_PAGE_STYLE                                        |
-| TRACIM_WEB__NOTIFICATIONS__EXCLUDED                                       | web.notifications.excluded                                     | WEB__NOTIFICATIONS__EXCLUDED                                       |
+| TRACIM_WEB__NOTIFICATION_WALL__EXCLUDED                                   | web.notification_wall.excluded                                 | WEB__NOTIFICATION_WALL__EXCLUDED                                   |
+| TRACIM_WEB__NOTIFICATION_WALL__INCLUDED                                   | web.notification_wall.included                                 | WEB__NOTIFICATION_WALL__INCLUDED                                   |
+| TRACIM_WEB__RECENT_ACTIVITIES__EXCLUDED                                   | web.recent_activities.excluded                                 | WEB__RECENT_ACTIVITIES__EXCLUDED                                   |
+| TRACIM_WEB__RECENT_ACTIVITIES__INCLUDED                                   | web.recent_activities.included                                 | WEB__RECENT_ACTIVITIES__INCLUDED                                   |
 | TRACIM_WEBSITE__BASE_URL                                                  | website.base_url                                               | WEBSITE__BASE_URL                                                  |
 | TRACIM_API__BASE_URL                                                      | api.base_url                                                   | API__BASE_URL                                                      |
 | TRACIM_CORS__ACCESS_CONTROL_ALLOWED_ORIGIN                                | cors.access-control-allowed-origin                             | CORS__ACCESS_CONTROL_ALLOWED_ORIGIN                                |

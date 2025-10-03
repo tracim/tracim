@@ -44,7 +44,7 @@ import { cloneDeep } from 'lodash'
 
 // INFO - RJ - 2021-09-08 - we remove the star from the excluded types since we
 // use startsWith on notification types to check whether the type is excluded
-const EXCLUDED_NOTIFICATION_TYPE_PREFIXES = GLOBAL_excludedNotifications.map(type => type.replace(/\*$/, ''))
+const EXCLUDED_NOTIFICATION_TYPE_PREFIXES = GLOBAL_excludedNotificationWall.map(type => type.replace(/\*$/, ''))
 
 // INFO - CH - 2020-06-16 - this file is a component that render null because that way, it can use the TracimComponent
 // HOC like apps would do. It also allow using connect() from redux which adds the props dispatch().

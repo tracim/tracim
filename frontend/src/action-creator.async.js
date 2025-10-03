@@ -71,8 +71,6 @@ import {
   ErrorFlashMessageTemplateHtml,
   NUMBER_RESULTS_BY_PAGE,
   PAGE,
-  TLM_CORE_EVENT_TYPE,
-  TLM_ENTITY_TYPE,
   CONTENT_TYPE,
   CUSTOM_EVENT,
   updateTLMUser,
@@ -905,14 +903,11 @@ export const getGuestUploadInfo = token => dispatch => {
   })
 }
 
-const defaultExcludedEventTypesParam = '&exclude_event_types=' + global.GLOBAL_excludedNotifications.join(',')
+const notificationWallExcludedEventTypesParam = '&exclude_event_types=' + global.GLOBAL_excludedNotificationWall.join(',')
+const notificationWallIncludedEventTypesParam = '&include_event_types=' + global.GLOBAL_includedNotificationWall.join(',')
 
-const activityExcludedEventTypesParam = '&exclude_event_types=' + global.GLOBAL_excludedNotifications.filter(
-  ev => {
-    const [entityType, eventType] = ev.split('.')
-    return (entityType !== TLM_ENTITY_TYPE.CONTENT || eventType !== TLM_CORE_EVENT_TYPE.MODIFIED)
-  }
-).join(',')
+const recentActivityExcludedEventTypesParam = '&exclude_event_types=' + global.GLOBAL_excludedRecentActivities.join(',')
+const recentActivityIncludedEventTypesParam = '&include_event_types=' + global.GLOBAL_includedRecentActivities.join(',')
 
 export const getNotificationList = (
   userId,
@@ -924,18 +919,21 @@ export const getNotificationList = (
     includeNotSent = false,
     recentActivitiesEvents = false,
     relatedContentId = null
-  }) => async dispatch => {
+  }
+) => async dispatch => {
   const queryParameterList = [
     recentActivitiesEvents
-      ? activityExcludedEventTypesParam
-      : defaultExcludedEventTypesParam
+      ? recentActivityExcludedEventTypesParam + recentActivityIncludedEventTypesParam
+      : notificationWallExcludedEventTypesParam + notificationWallIncludedEventTypesParam
   ]
+
   if (excludeAuthorId) queryParameterList.push(`exclude_author_ids=${excludeAuthorId}`)
   if (notificationsPerPage > 0) queryParameterList.push(`count=${notificationsPerPage}`)
   if (nextPageToken) queryParameterList.push(`page_token=${nextPageToken}`)
   if (workspaceId) queryParameterList.push(`workspace_ids=${workspaceId}`)
   if (includeNotSent) queryParameterList.push('include_not_sent=1')
   if (relatedContentId) queryParameterList.push(`related_to_content_ids=${relatedContentId}`)
+
   const fetchGetNotificationWall = await fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages?${queryParameterList.join('&')}`,
     param: {
@@ -1026,7 +1024,7 @@ export const putAllNotificationAsRead = (userId) => dispatch => {
 }
 
 export const getUserMessagesSummary = (userId, includeEventTypeList = []) => dispatch => {
-  const url = `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/summary?exclude_author_ids=${userId}${defaultExcludedEventTypesParam}`
+  const url = `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/summary?exclude_author_ids=${userId}${notificationWallExcludedEventTypesParam}`
   const includeEventTypeListParam = includeEventTypeList.length > 0 ? `&include_event_types=${includeEventTypeList.join(',')}` : ''
   const fetchGetMessages = fetchWrapper({
     url: `${url}${includeEventTypeListParam}`,
