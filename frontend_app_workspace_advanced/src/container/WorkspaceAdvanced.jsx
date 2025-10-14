@@ -573,7 +573,10 @@ export class WorkspaceAdvanced extends React.Component {
       case 204:
         sendGlobalFlashMessage(props.t('Member removed'), 'info')
         break
-      default: sendGlobalFlashMessage(props.t('Error while removing member'))
+      default:
+        // TODO PG - 2025-10-14 - we should handle error case like we did in #6817 but for now we don't have the api response in fetchDeleteMember :(
+        sendGlobalFlashMessage(props.t('Error while removing member'))
+        break
     }
   }
 

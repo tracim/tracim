@@ -671,8 +671,8 @@ export const postUserRole = (workspaceId, newMember) => dispatch => {
   })
 }
 
-export const deleteUserRole = (workspaceId, memberId) => dispatch => {
-  return fetchWrapper({
+export const deleteUserRole = (workspaceId, memberId, isAdmin) => async dispatch => {
+  const fetchResult = await fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/members/${memberId}`,
     param: {
       credentials: 'include',
@@ -682,6 +682,19 @@ export const deleteUserRole = (workspaceId, memberId) => dispatch => {
     actionName: REMOVE_USER_ROLE,
     dispatch
   })
+
+  if (fetchResult.status !== 204) {
+    if (fetchResult.json.code === 3011) {
+      const messageCannotLeaveSpace = (isAdmin)
+        ? 'You cannot remove this member because there are no other space managers.'
+        : 'You cannot leave this space because there are no other space managers.'
+      dispatch(newFlashMessage(i18n.t(messageCannotLeaveSpace), 'danger'))
+    } else {
+      dispatch(newFlashMessage(i18n.t('Error while leaving the space'), 'warning'))
+    }
+  }
+
+  return fetchResult
 }
 
 export const updateUserRole = (workspaceId, memberId, newRole) => dispatch => {

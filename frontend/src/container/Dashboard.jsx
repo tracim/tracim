@@ -387,12 +387,10 @@ export class Dashboard extends React.Component {
 
     this.setState({ isMemberListLoading: true })
 
-    const fetchWorkspaceRemoveMember = await props.dispatch(deleteUserRole(props.currentWorkspace.id, memberId))
-    switch (fetchWorkspaceRemoveMember.status) {
-      case 204:
-        props.dispatch(newFlashMessage(props.t('Member removed'), 'info'))
-        break
-      default: props.dispatch(newFlashMessage(props.t('Error while removing member'), 'warning')); break
+    const fetchWorkspaceRemoveMember = await props.dispatch(deleteUserRole(props.currentWorkspace.id, memberId, false))
+
+    if (fetchWorkspaceRemoveMember.status === 204) {
+      props.dispatch(newFlashMessage(props.t('Member removed'), 'info'))
     }
 
     this.setState({ isMemberListLoading: false })

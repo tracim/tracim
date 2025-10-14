@@ -221,10 +221,7 @@ export const UserSpacesConfig = (props) => {
 
     setSpaceBeingDeleted(null)
 
-    const fetchResult = await props.dispatch(deleteUserRole(spaceId, props.userToEditId))
-    if (fetchResult.status !== 204) {
-      props.dispatch(newFlashMessage(props.t('Error while leaving the space'), 'warning'))
-    }
+    await props.dispatch(deleteUserRole(spaceId, props.userToEditId, props.admin))
   }
 
   const handleLeaveSpace = (spaceBeingDeleted) => {
