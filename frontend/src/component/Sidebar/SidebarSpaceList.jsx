@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import {
@@ -8,7 +8,9 @@ import {
   IconButton,
   Loading,
   createSpaceTree,
-  sortListByMultipleCriteria
+  sortListByMultipleCriteria,
+  ConfirmPopup,
+  PAGE
 } from 'tracim_frontend_lib'
 import {
   findUserRoleIdInWorkspace,
@@ -16,8 +18,20 @@ import {
 } from '../../util/helper.js'
 import { LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE } from '../../container/Sidebar.jsx'
 import SidebarSpaceItem from './SidebarSpaceItem.jsx'
+import { deleteUserRole } from '../../action-creator.async'
+import { newFlashMessage } from '../../action-creator.sync'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 
 const SidebarSpaceList = (props) => {
+  const [showLeaveSpacePopin, setShowLeaveSpacePopin] = useState(false)
+  const [spaceToLeaveId, setSpaceToLeaveId] = useState(null)
+
+  const handleLeaveSpace = (spaceId) => {
+    setSpaceToLeaveId(spaceId)
+    setShowLeaveSpacePopin(true)
+  }
+
   const displaySpace = (spaceLevel, spaceList) => {
     return spaceList.map(space =>
       <React.Fragment key={space.id}>
@@ -30,6 +44,7 @@ const SidebarSpaceList = (props) => {
           isNotificationWallOpen={props.isNotificationWallOpen}
           label={space.label}
           level={spaceLevel}
+          onLeaveSpace={handleLeaveSpace}
           onToggleFoldChildren={props.onToggleFoldChildren}
           spaceId={space.id}
           spaceType={space.accessType}
@@ -60,6 +75,38 @@ const SidebarSpaceList = (props) => {
         }
       } else props.onClickToggleSpaceList()
     }
+  }
+
+  const handleConfirmLeaveSpace = async (spaceId) => {
+    if ((spaceId === null) || (spaceId === undefined)) { return }
+
+    const fetchResult = await props.dispatch(deleteUserRole(spaceId, props.userId))
+
+    if (fetchResult.status !== 204) {
+      if (fetchResult.json.code === 3011) {
+        setSpaceToLeaveId(null)
+        setShowLeaveSpacePopin(false)
+        props.dispatch(newFlashMessage(props.t('You cannot leave this space because there are no other space managers.'), 'danger'))
+      } else {
+        props.dispatch(newFlashMessage(props.t('Error while leaving the space'), 'warning'))
+      }
+      return
+    }
+
+    setSpaceToLeaveId(null)
+    setShowLeaveSpacePopin(false)
+
+    const appCurrentUrlPath = props.location.pathname
+    const spaceToLeaveUrlPath = `${PAGE.WORKSPACE.ROOT}/${spaceId}/`
+    const isCurrentlyDisplayingLeavedSpace = appCurrentUrlPath.includes(spaceToLeaveUrlPath)
+    if (isCurrentlyDisplayingLeavedSpace) {
+      props.history.push(PAGE.RECENT_ACTIVITIES)
+    }
+  }
+
+  const handleCancelLeaveSpace = () => {
+    setSpaceToLeaveId(null)
+    setShowLeaveSpacePopin(false)
   }
 
   return (
@@ -113,6 +160,13 @@ const SidebarSpaceList = (props) => {
               {props.t("You aren't member of any space yet")}
             </div>
           )}
+
+          {showLeaveSpacePopin && (
+            <ConfirmPopup
+              onConfirm={() => handleConfirmLeaveSpace(spaceToLeaveId)}
+              onCancel={handleCancelLeaveSpace}
+            />
+          )}
         </>
       ) : (
         <Loading
@@ -124,7 +178,8 @@ const SidebarSpaceList = (props) => {
     </>
   )
 }
-export default translate()(SidebarSpaceList)
+
+export default connect()(withRouter(translate()(SidebarSpaceList)))
 
 SidebarSpaceList.propTypes = {
   userId: PropTypes.number.isRequired,

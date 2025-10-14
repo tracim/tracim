@@ -218,7 +218,18 @@ class SidebarSpaceItem extends React.Component {
                 <i className={`fa-fw ${allowedApp.faIcon}`} />
                 {props.t(allowedApp.label)}
               </Link>
-            ))}
+            )).concat([
+              <span
+                key='leaveSpaceLink'
+                onClick={((event) => {
+                  props.onLeaveSpace(props.spaceId)
+                  // PG - INFO - 2025-10-06 - we just want the onClick to happen, so disabling navigation of the parent Link tag
+                  event.stopPropagation()
+                  event.preventDefault()
+                })}
+              >
+                <i className='fa-fw fas fa-sign-out-alt' /> {props.t('Leave space')}
+              </span>])}
           </DropdownMenu>
         )}
       </Link>
@@ -248,6 +259,7 @@ SidebarSpaceItem.propTypes = {
   label: PropTypes.string.isRequired,
   spaceId: PropTypes.number.isRequired,
   spaceType: PropTypes.string.isRequired,
+  onLeaveSpace: PropTypes.func.isRequired,
   activeSpaceId: PropTypes.number,
   allowedAppList: PropTypes.array,
   foldChildren: PropTypes.bool,
