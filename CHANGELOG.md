@@ -2,13 +2,15 @@
 
 ## 2025.10.00
 
+💥 This release contains a breaking change related to notifications configuration parameter. Please read it carefully.
+
 ### ✨ New Features
 
 - New agenda library: [Open Calendar](https://github.com/algoo/open-calendar)
 - New branding for Tracim with new logo and new default primary color
-- Marking a notification as read is now propagated to every opened Tracim tabs [#3560](https://github.com/tracim/tracim/issues/3560)
-- Added number of opened tasks in the sidebar [#6813](https://github.com/tracim/tracim/issues/6813)
-- New config parameters to fine tune notification wall and recent activities [#6818](https://github.com/tracim/tracim/issues/6818)
+- Marking a notification as read is now propagated to every opened Tracim tabs
+- Added number of opened tasks in the sidebar
+- New config parameters to fine tune notification wall and recent activities
 
 ### 🐛 Fixed Issue
 
@@ -22,6 +24,13 @@
 - Added title to button "mark all as read" [#6814](https://github.com/tracim/tracim/issues/6814)
 - Inverted position of tabs "Description" and "Properties" in apps [#6815](https://github.com/tracim/tracim/issues/6815)
 - Content filter of page space content list now also filters on file extension [#6714](https://github.com/tracim/tracim/issues/6714)
+
+### 💥 Breaking/Important changes
+
+The `web.notifications.excluded` config parameter is split into 2 new parameters :
+
+- `web.notification_wall.excluded`
+- `web.recent_activities.excluded`
 
 ## 2025.07.00
 
