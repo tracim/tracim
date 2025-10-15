@@ -577,7 +577,7 @@ website.usage_conditions =
 # Comma-separated list
 # To include all notifications, use web.notification_wall.excluded = ""
 # To exclude all notification of an entity, you can use wildcard syntax: for example "user.*" for user, will exclude those events: user.deleted, user.created, user.modified, user.undeleted...
-# included list take precedence over excluded list
+# Set only one included or excluded list. If both are set only the included list will be used.
 # Event filter for notification wall
 ; web.notification_wall.excluded = user_call.created, user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*, tag.*, content_tag.*, user_config.*
 ; web.notification_wall.included =
