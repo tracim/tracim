@@ -1,5 +1,15 @@
 # Changelog
 
+## 2025.12.00
+
+### ✨ New Features
+
+- New "leave space" link in Space contextual drop down menu
+
+### 🐛 Fixed Issue
+
+
+
 ## 2025.10.00
 
 ### ✨ New Features
