@@ -37,6 +37,8 @@ Prepare the favorite icons and copy them in:
 | ICO, 48x48 pixels   | `<branding_folder>/images/favicon/favicon.ico`          |
 | PNG, 180x180 pixels | `<branding_folder>/images/favicon/apple-touch-icon.png` |
 
+You can also tune the index files in `<branding_folder>/index.mak` and `<branding_folder>/index.html`.
+
 ### Main logo displayed in the top-left of the header bar
 
 Copy your image in `<branding_folder>/images/tracim-logo.png`. Its size should be between 150x30 and 150x50 pixels.
