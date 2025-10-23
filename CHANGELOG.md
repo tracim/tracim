@@ -1,5 +1,10 @@
 # Changelog
 
+## 2025-10-01
+
+- Update sidebar notification pills aspect when having more than 9 elements
+- Add breaking change info in the changelog (notifications configuration parameter)
+
 ## 2025.10.00
 
 💥 This release contains a breaking change related to notifications configuration parameter. Please read it carefully.
