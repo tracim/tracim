@@ -28,14 +28,16 @@ You can change the default colors used in Tracim by editing the `color.json` fil
 
 ### Website's favorite icons
 
-Prepare 4 favorite icons and copy them in:
+Prepare the favorite icons and copy them in:
 
-|Icon|Path|
-|----|----|
-|PNG, 16x16 pixels|`<branding_folder>/images/favicon/tracim-16x16.png`|
-|PNG, 32x32 pixels|`<branding_folder>/images/favicon/tracim-32x32.png`|
-|PNG, 64x64 pixels|`<branding_folder>/images/favicon/tracim-64x64.png`|
-|ICO, 16x16 pixels|`<branding_folder>/images/favicon/favicon.ico`|
+| Icon                | Path                                                    |
+|---------------------|---------------------------------------------------------|
+| PNG, 16x16 pixels   | `<branding_folder>/images/favicon/tracim-16x16.png`     |
+| PNG, 32x32 pixels   | `<branding_folder>/images/favicon/tracim-32x32.png`     |
+| ICO, 48x48 pixels   | `<branding_folder>/images/favicon/favicon.ico`          |
+| PNG, 180x180 pixels | `<branding_folder>/images/favicon/apple-touch-icon.png` |
+
+You can also tune the index files in `<branding_folder>/index.mak` and `<branding_folder>/index.html`.
 
 ### Main logo displayed in the top-left of the header bar
 
@@ -43,20 +45,12 @@ Copy your image in `<branding_folder>/images/tracim-logo.png`. Its size should b
 
 ### Progressive webapp icons for Android and iOS devices
 
-Prepare 10 images and copy them in:
+Prepare your images and copy them in:
 
-|Icon|Path|
-|----|----|
-|PNG, 72x72 pixels|`<branding_folder>/images/wa-tracim-logo-72x72.png`|
-|PNG, 96x96 pixels|`<branding_folder>/images/wa-tracim-logo-96x96.png`|
-|PNG, 120x120 pixels|`<branding_folder>/images/wa-tracim-logo-120x120.png`|
-|PNG, 128x128 pixels|`<branding_folder>/images/wa-tracim-logo-128x128.png`|
-|PNG, 144x144 pixels|`<branding_folder>/images/wa-tracim-logo-144x144.png`|
-|PNG, 152x152 pixels|`<branding_folder>/images/wa-tracim-logo-152x152.png`|
-|PNG, 180x180 pixels|`<branding_folder>/images/wa-tracim-logo-180x180.png`|
-|PNG, 192x192 pixels|`<branding_folder>/images/wa-tracim-logo-192x192.png`|
-|PNG, 384x384 pixels|`<branding_folder>/images/wa-tracim-logo-384x384.png`|
-|PNG, 512x512 pixels|`<branding_folder>/images/wa-tracim-logo-512x512.png`|
+| Icon                | Path                                                  |
+|---------------------|-------------------------------------------------------|
+| PNG, 192x192 pixels | `<branding_folder>/images/android-chrome-192x192.png` |
+| PNG, 512x512 pixels | `<branding_folder>/images/android-chrome-512x512.png` |
 
 You can also tune the manifest file used by progressive web apps located in `<branding_folder>/manifest.json`
 

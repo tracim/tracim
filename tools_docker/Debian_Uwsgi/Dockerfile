@@ -2,6 +2,7 @@ ARG PACKAGE_DIR="/tracim/system_packages/debian"
 ARG REPO="https://github.com/tracim/tracim.git"
 ARG BRANCH=""
 ARG TAG=""
+ARG VERSION="0000.00.00"
 
 ###
 # Base install stages:
@@ -14,12 +15,16 @@ ARG REPO
 ARG PACKAGE_DIR
 ARG BRANCH
 ARG TAG
+ARG VERSION
 RUN apt-get update \
    && apt-get upgrade -qy \
    && apt-get install apt-utils git -qy
 COPY ./clone_repo.sh /clone_repo.sh
 RUN /clone_repo.sh "${REPO}" "${BRANCH}" "${TAG}"
 RUN rm /clone_repo.sh
+COPY ./tracim_set_version.sh /tracim_set_version.sh
+RUN /tracim_set_version.sh "${VERSION}"
+RUN rm /tracim_set_version.sh
 RUN apt-get install -qy --no-install-recommends \
     $(cat "${PACKAGE_DIR}/run_backend_packages.list") \
     && apt-get autoremove -qy \
