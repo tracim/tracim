@@ -1,6 +1,6 @@
 # Changelog
 
-## 2025.12.00
+## 2026.01.00
 
 ### ✨ New Features
 
