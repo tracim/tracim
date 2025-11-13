@@ -94,9 +94,9 @@ ENV START_WEBDAV=1
 ENV START_CALDAV=1
 ENV ENABLE_COLLABORATIVE_DOCUMENT_EDITION=0
 ENV TRACIM_CONFIG__FILEPATH="/etc/tracim/development.ini"
-ENV LANG C.UTF-8
-ENV LANGUAGE C.UTF-8
-ENV LC_ALL C.UTF-8
+ENV LANG=C.UTF-8
+ENV LANGUAGE=C.UTF-8
+ENV LC_ALL=C.UTF-8
 ARG PACKAGE_DIR
 # NOTE - 2021-10-21 - S.G. - pin condure (used by pushpin) to a lower priority so that mongrel2 is used instead.
 # This is due to automated tests randomly failing with condure.
