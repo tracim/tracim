@@ -1,18 +1,48 @@
 # Tracim
 
-![logo_tracim](docs/logos/logo_tracim.png)
+<p align="center">![logo_tracim](docs/logos/logo_tracim.png)</p>
 
-[Tracim](https://www.tracim.fr) is a tool designed to help you and your team to a better collaboration.
-It's officially supported in Arabic, English, French, German and Portuguese.
+## Description
 
-Any questions, remarks? Reach us on [Tracim Community](https://public-community.tracim.fr).  
-More information on our [website](https://www.tracim.fr).
+Unified platform for seamless collaboration.   
+No matter when you work!   
+[Tracim](https://www.tracim-teamwork.com/en/index.html) enables optimal team collaboration right from the start.
 
-All documentation is available in [docs/](/docs/) folder.
+### 🧐 Features
+Tracim offers the essential features you need for efficient, intuitive and multi-device team and project collaboration:
 
-## Quick start (using Docker)
+- Share and version files
+- Communicate with your team
+- Manage tasks and projets, organized in spaces
+- Multilingual:  Arabic, English, French, German and Portuguese
 
-To start using Tracim, use the [Docker image](https://hub.docker.com/r/algoo/tracim/).
+No more missed messages. Just one place to plan, create and succeed together.   
+It’s not just chat, drive and visio — it also includes knowledge, documentation, project management, logbooks,
+templates ... all organized.
+
+Learn more at https://www.tracim-teamwork.com/
+
+### Project information:
+
+- 📄 Tracim is distributed under the terms of 4 distinct licenses. See [LICENSE.md](LICENSE.md) for details.
+- 🛠️ Tech stack: Python, React, PostgreSQL
+- [Roadmap](https://github.com/tracim/tracim/projects?query=is%3Aopen)
+- [Changelog](CHANGELOG.md)
+
+## Getting started
+
+### Using our free online service
+
+Try Tracim using the [online demo](https://demo.tracim.fr/ui/login).
+
+### Locally using Docker
+
+If you prefer to test Tracim on your own infrastructure, then you can use Docker with the [Tracim Docker image](https://hub.docker.com/r/algoo/tracim/).
+
+> [!important]
+> Docker images for the latest Tracim versions are only available to our paying customers.
+
+Launch using:
 
 ```bash
 mkdir -p ~/tracim/etc
@@ -26,63 +56,42 @@ docker run \
     algoo/tracim:latest
 ```
 
-Then, you can access the application at `http://{ip_address}:{port}`
+> [!note]
+> Application will be accessible at `http://{ip_address}:{port}`
+> Default credentials will be:
+> - email: `admin@admin.admin`
+> - password: `admin@admin.admin`
 
-The credentials to access the application are:
+## Getting help
 
-- email: `admin@admin.admin`
-- password: `admin@admin.admin`
+Multiple subscriptions plans are available to get professional support, including a free plan for families or individual
+uses, even non-profit organizations.     
+Check our [irresistible packages](https://www.tracim-teamwork.com/en/packages.html) !
 
-<!-- We have to update Docker documentation according to this one -->
-For advanced docker-based usage, look at the full [Tracim installation's documentation](/docs/administration/installation/)
+For non-paying users, community support is available:
 
-## Install Tracim for development
+- [Read the docs](https://public-community.tracim.fr/ui/workspaces/180/contents): Learn how to use Tracim with our quick
+  start guide.
+- [Public Technical documentation](docs/README.md)
+- [Join the community](https://public-community.tracim.fr/ui/workspaces/157/contents): Facing an issue? Reach out to the
+  community for help!
 
-[See getting started](/docs/development/getting_started/index.md)
+## Contributing
 
-## Test Tracim
+Check [the contribution guide](CONTRIBUTING.md).
 
-To test in a development context, see
-- [Testing Tracim backend](/docs/development/test/backend_test.md)
-- [Testing Tracim frontend](/docs/development/test/frontend_test.md)
+## Author
 
-## Run Tracim for production
+Tracim is made by [Algoo](https://www.algoo.fr/).
 
-If you are interested in production-ready deployment of tracim, then look at the
-[Tracim administration documentation](/docs/administration), which includes 3 main parts:
-
-- [Installation](/docs/administration/installation) and an entry point for [production installation](/docs/administration/installation/install_backend.md)
-- A second part dedicated to [Tracim server configuration](/docs/administration/configuration)
-- A third part dedicated to [Exploitation of a Tracim server](/docs/administration/exploitation) (CLI commands, database migrations, etc)
-
-## Contribute
-
-There are several ways to contribute to Tracim, here are some tips:
-
-- Submit [bugs and feature requests](https://github.com/tracim/tracim/issues)
-- Review the [code and propose changes](https://github.com/tracim/tracim/pulls)
-- Contribute to the [translations](https://hosted.weblate.org/projects/tracim/)
-
-For more information about contributing to Tracim, see the [Contributing to Tracim](/CONTRIBUTING.md) page.
-
-## Translation status
-
-We add every translation to the Tracim interface once it reaches 50%.
-
-![Translation status](https://hosted.weblate.org/widgets/tracim/en/multi-auto.svg)
-
-## Licence
-
-Tracim is distributed under the terms of 4 distinct licenses. See [LICENSE.md](/LICENSE.md) for details
-
-## Support
+## ❤️ Project support
 
 <img src="docs/logos/logo_weblate.png" alt="logo_weblate" width="200"/>
 
-[Weblate](https://weblate.org) is an open source translation service, they are helping us to translate Tracim by providing a hosting service.
+[Weblate](https://weblate.org) is an open source translation service, they are helping us to translate Tracim by
+providing a hosting service.
 
 <img src="docs/logos/logo_browserstack.png" alt="logo_browserstack" width="150"/>
 
-[BrowserStack](https://www.browserstack.com) supports open source projects, and graciously helps us testing Tracim on every devices.
-
-<!-- END -->
+[BrowserStack](https://www.browserstack.com) supports open source projects, and graciously helps us to test Tracim on
+every device.
