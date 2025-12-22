@@ -9,7 +9,7 @@ It allows to create events and to connect to it through any tool that implements
 
 ### Build the app
 
-see [/docs/development/frontend/working_in_frontend.md](/docs/development/frontend/working_in_frontend.md)
+see [FrontEnd dev setup doc](/docs/developer/setup_env/setup_frontend.md)
 
 ### Specific `debug.js` configuration
 
@@ -32,7 +32,8 @@ caldav.radicale.headers.Access-Control-Allow-Origin = http://localhost:5173/
 ```bash
 tracimcli caldav start
 ```
-See [/docs/administration/installation/running_tracim_components_locally.md](/docs/administration/installation/running_tracim_components_locally.md)
+
+See [Running Tracim components locally](/docs.legacy/administration/installation/running_tracim_components_locally.md)
 
 #### Update OpenCalendar index.html
 
@@ -85,8 +86,8 @@ yarn run dev
 
 ### Other available yarn scripts
 
-see [docs/development/yarn_scripts.md](/docs/development/frontend/scripts.md)
+see [Yarn scripts doc](/docs.legacy/development/frontend/scripts.md)
 
 ### Before pushing changes to this app, you must
 
-see [docs/development/before_push.md](/docs/development/getting_started/before_push.md)
+see [Before Push doc](/docs/contribution/code/before_push.md)

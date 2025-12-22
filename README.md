@@ -1,6 +1,6 @@
 # Tracim
 
-<p align="center">![logo_tracim](docs/logos/logo_tracim.png)</p>
+<p align="center">![Logo Tracim](docs/_assets/logo_tracim.png)</p>
 
 ## Description
 
@@ -70,28 +70,30 @@ Check our [irresistible packages](https://www.tracim-teamwork.com/en/packages.ht
 
 For non-paying users, community support is available:
 
-- [Read the docs](https://public-community.tracim.fr/ui/workspaces/180/contents): Learn how to use Tracim with our quick
+- [Read the user documentation](https://public-community.tracim.fr/ui/workspaces/180/contents): Learn how to use Tracim with our quick
   start guide.
-- [Public Technical documentation](docs/README.md)
-- [Join the community](https://public-community.tracim.fr/ui/workspaces/157/contents): Facing an issue? Reach out to the
+- [Public Technical documentation](docs/)
+- [Join the community forum](https://public-community.tracim.fr/ui/workspaces/157/contents): Facing an issue? Reach out to the
   community for help!
 
 ## Contributing
 
-Check [the contribution guide](CONTRIBUTING.md).
+Contributions are much welcome, whether to translations, helping others on the forum or code !
+
+Please check the [contribution guide](CONTRIBUTING.md).
 
 ## Author
 
-Tracim is made by [Algoo](https://www.algoo.fr/).
+Tracim is developed with ❤️ by [Algoo](https://www.algoo.fr/), a French company deeply rooted in open source software.
 
 ## ❤️ Project support
 
-<img src="docs/logos/logo_weblate.png" alt="logo_weblate" width="200"/>
+<img src="docs/_assets/logo_weblate.png" alt="logo_weblate" width="200"/>
 
 [Weblate](https://weblate.org) is an open source translation service, they are helping us to translate Tracim by
 providing a hosting service.
 
-<img src="docs/logos/logo_browserstack.png" alt="logo_browserstack" width="150"/>
+<img src="docs/_assets/logo_browserstack.png" alt="logo_browserstack" width="150"/>
 
 [BrowserStack](https://www.browserstack.com) supports open source projects, and graciously helps us to test Tracim on
 every device.

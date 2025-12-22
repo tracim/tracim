@@ -9,11 +9,11 @@ It is meant to handle Tracim html document which are text document that allows t
 
 #### For production
 
-see [/docs/development/frontend_build.md#production-build](/docs/development/frontend_build.md#production-build)
+see [FrontEnd dev doc](/docs/developer/setup_env/setup_frontend.md#production-build)
 
 #### For development
 
-see [/docs/development/frontend_build.md#with-development-server-servdev](/docs/development/frontend_build.md#with-development-server-servdev)
+see [FrontEnd dev doc](/docs/developer/setup_env/setup_frontend.md#with-development-server-servdev)
 
 ##### Specific `debug.js` configuration
 
@@ -26,8 +26,8 @@ ___
 
 ### Other available yarn scripts
 
-see [docs/development/yarn_scripts.md](/docs/development/advanced/yarn_scripts.md)
+see [Yarn Scripts doc](/docs.legacy/development/frontend/scripts.md)
 
 ### Before pushing changes to this app, you must
 
-see [docs/development/before_push.md](/docs/development/before_push.md)
+see [Before Push doc](/docs/contribution/code/before_push.md)
