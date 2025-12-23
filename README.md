@@ -1,6 +1,6 @@
 # Tracim
 
-<p align="center">![Logo Tracim](docs/_assets/logo_tracim.png)</p>
+![Logo Tracim](docs/_assets/logo_tracim.png)
 
 ## Description
 
