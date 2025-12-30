@@ -4,16 +4,22 @@
 
 ### ✨ New Features
 
-- New "leave space" link in Space contextual drop down menu
-- Fix generic error message on removing last space manager
+- Add a "leave space" action in the space contextual dropdown menu [#6817](https://github.com/tracim/tracim/issues/6817)
+
+### 🐛 Fixed Issues
+
+- Improve error message when trying to remove the last manager of a space
+
+### 🔧 Upgrade documentation
+
 - Improve README and CONTRIBUTING files
-- Change documentation organization
+- Change documentation organization ⚠ caution multiple documentation files have their path changed
 
-### 🐛 Fixed Issue
+## 2025.10.01
 
-## 2025-10-01
+### 🐛 Fixed Issues
 
-- Update sidebar notification pills aspect when having more than 9 elements
+- Improve sidebar notification pills design [#6823](https://github.com/tracim/tracim/issues/6823)
 - Add breaking change info in the changelog (notifications configuration parameter)
 
 ## 2025.10.00
@@ -22,19 +28,19 @@
 
 ### ✨ New Features
 
-- New agenda library: [Open Calendar](https://github.com/algoo/open-calendar)
-- New branding for Tracim with new logo and new default primary color
-- Marking a notification as read is now propagated to every opened Tracim tabs
-- Added number of opened tasks in the sidebar
-- New config parameters to fine tune notification wall and recent activities
+- Use the brand new [Open Calendar](https://github.com/algoo/open-calendar) library for Tracim calendars
+- Upgrade the branding with the new Tracim logo and primary color
+- Propagate "notification read" event to all Tracim tabs. Now the notification wall is synchronized between tabs
+- Added the number of assigned tasks in the sidebar
+- Allow to fine tune notification wall and recent activities content through two new config parameters
 
-### 🐛 Fixed Issue
+### 🐛 Fixed Issues
 
 - Fixed favicon display [#6646](https://github.com/tracim/tracim/issues/6646)
 - Fixed local storage usage for app Kanban and Logbook [#6797](https://github.com/tracim/tracim/issues/6797)
-- Fixed pdf export using mentions and internal links [#6794](https://github.com/tracim/tracim/issues/6794)
-- Fixed app workspace advanced unknown member invitation [#6572](https://github.com/tracim/tracim/issues/6572)
-- Added web notification status filter on space administration page [#6793](https://github.com/tracim/tracim/issues/6793)
+- Fixed PDF export using mentions and internal links [#6794](https://github.com/tracim/tracim/issues/6794)
+- Fixed new member invitation from the workspace advance screen [#6572](https://github.com/tracim/tracim/issues/6572)
+- Allow to filter by "web notification status" on space administration screen [#6793](https://github.com/tracim/tracim/issues/6793)
 - Fixed usage condition validation popin
 - Fixed some links not able to open in a new tab
 - Added title to button "mark all as read" [#6814](https://github.com/tracim/tracim/issues/6814)
@@ -54,12 +60,12 @@ The `web.notifications.excluded` config parameter is split into 2 new parameters
 
 - Add viewer for some 3d format file type
 - New config parameter to allow iframe from specific domain
-- Revisions are now grouped in the Timeline of contents
+- Revisions are now grouped in the timeline of contents
 - Add due date to kanban cards
 - Add assignment to kanban cards
 - Improve UI of kanban cards
 
-### 🐛 Fixed Issue
+### 🐛 Fixed Issues
 
 - Fixed page title when receiving a call [#6736](https://github.com/tracim/tracim/issues/6736)
 - Fixed missing callee name if declined call popin [#6725](https://github.com/tracim/tracim/issues/6725)
@@ -86,7 +92,7 @@ The `web.notifications.excluded` config parameter is split into 2 new parameters
 - Replaced TinyMCE with HugeRTE 1.0.7
 - Upgraded Cypress to version 13.17.0
 
-### 🐛 Fixed Issue
+### 🐛 Fixed Issues
 
 - Fixed error 500 from url preview [#6691](https://github.com/tracim/tracim/issues/6691)
 - Fixed line break in code block of pdf export [#6643](https://github.com/tracim/tracim/issues/6643)
@@ -106,7 +112,7 @@ The `web.notifications.excluded` config parameter is split into 2 new parameters
 - Added autofocus on search input in sidebar and filter input in space content list page
 - Note export as pdf have a better design
 
-### 🐛 Fixed Issue
+### 🐛 Fixed Issues
 
 - Fixed undesired automatic scroll when opening space content list page [#6589](https://github.com/tracim/tracim/issues/6589)
 
@@ -135,7 +141,7 @@ The `web.notifications.excluded` config parameter is split into 2 new parameters
 - Added icon next to spaces that have notification disabled in the space list of the sidebar
 - Added a new button in logbook to expand or reduce all long event description
 
-### 🐛 Fixed Issue
+### 🐛 Fixed Issues
 
 - Fixed the dashboard recent activities list [#6577](https://github.com/tracim/tracim/issues/6577)
 - Fixed the call popup [#6402](https://github.com/tracim/tracim/issues/6402), [#5265](https://github.com/tracim/tracim/issues/5265), [#5337](https://github.com/tracim/tracim/issues/5337), [#5821](https://github.com/tracim/tracim/issues/5821)
@@ -158,7 +164,7 @@ The `web.notifications.excluded` config parameter is split into 2 new parameters
 - App kanban now show number of cards in each column
 - App logbook now hides long description behind a "see more" button
 
-### 🐛 Fixed Issue
+### 🐛 Fixed Issues
 
 - The real deletion now also delete from elasticsearch indexes [#6473](https://github.com/tracim/tracim/issues/6473)
 - Fixed size of app kanban edition popup [#6519](https://github.com/tracim/tracim/issues/6519)
@@ -166,7 +172,7 @@ The `web.notifications.excluded` config parameter is split into 2 new parameters
 
 ## 4.9.2 / 2024-05-30
 
-### 🐛 Fixed Issue
+### 🐛 Fixed Issues
 
 - Kanban and Logbook
   - Fixed invisible horizontal scrollbar [#6502](https://github.com/tracim/tracim/issues/6502)
@@ -559,7 +565,7 @@ the localhost.
 
 ## 4.3.2 / 2022-08-09
 
-### Fixed Issue
+### Fixed Issues
 
 - Backend: [#5813](https://github.com/tracim/tracim/issues/5813)
 
