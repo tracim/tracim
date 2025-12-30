@@ -5,6 +5,9 @@
 ### ✨ New Features
 
 - New "leave space" link in Space contextual drop down menu
+- Fix generic error message on removing last space manager
+- Improve README and CONTRIBUTING files
+- Change documentation organization
 
 ### 🐛 Fixed Issue
 
