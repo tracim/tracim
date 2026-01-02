@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026.04.00
+
+### 🐛 Fixed Issues
+
+- Fix Tracim copyright year
+
 ## 2026.01.00
 
 ### ✨ New Features
