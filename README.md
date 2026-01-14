@@ -2,6 +2,8 @@
 
 ![Logo Tracim](docs/_assets/logo_tracim.png)
 
+⚠️ 2026-01-14 - The development and release processes are under active rework. If you are interested in deploying Tracim, do not hesitate to [contact us ](https://www.tracim-teamwork.com/en/contact.html).
+
 ## Description
 
 Unified platform for seamless collaboration.   
