@@ -65,12 +65,11 @@ class EST(object):
 
 
 class EmailAddress(object):
-    def __init__(self, label: str, email: str, force_angle_bracket=False,
-                 force_email_lowercase=False):
+    def __init__(self, label: str, email: str, force_angle_bracket=False):
         self.label = label
 
-        if force_email_lowercase:
-            email = email.lower()
+        # we want email to be always lowercase, see GH#2339 and GH#6830
+        email = email.lower()
         self.email = email
         self.idna_email = self._encode_idna(email)
 
@@ -91,9 +90,9 @@ class EmailAddress(object):
         return username + "@" + domain
 
     @classmethod
-    def from_rfc_email_address(cls, rfc_email: str, force_email_lowercase=False) -> "EmailAddress":
+    def from_rfc_email_address(cls, rfc_email: str) -> "EmailAddress":
         label, email = parseaddr(rfc_email)
-        return EmailAddress(label, email, False, force_email_lowercase)
+        return EmailAddress(label, email, False)
 
     @property
     def address(self):
