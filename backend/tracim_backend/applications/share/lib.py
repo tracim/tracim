@@ -20,6 +20,7 @@ from tracim_backend.exceptions import NotificationSendingFailed
 from tracim_backend.exceptions import WrongSharePassword
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
+from tracim_backend.lib.mail_notifier.utils import EmailAddress
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import core_convert_file_name_to_display
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
@@ -63,10 +64,12 @@ class ShareLib(object):
         created = datetime.now()
         share_group_uuid = str(uuid.uuid4())
         for email in emails:
+            email_address = EmailAddress.from_rfc_email_address(email)
+            # Only lowercase the email part, preserve the label/name casing
             content_share = ContentShare(
                 author=self._user,
                 content_id=content.content_id,
-                email=email.lower(),
+                email=EmailAddress(email_address.label, email_address.email.lower()).address,
                 share_token=str(uuid.uuid4()),
                 password=password,
                 type=ContentShareType.EMAIL,
