@@ -194,6 +194,14 @@ class TestEmailAddress(object):
         assert john_address.force_angle_bracket is False
         assert john_address.address == "john.doe@domainame.ndl"
 
+        john_address_angle_brackets = EmailAddress.from_rfc_email_address(
+            "<john.doe@domainame.ndl>", True)
+        assert john_address_angle_brackets.domain == "domainame.ndl"
+        assert john_address_angle_brackets.label == ""
+        assert john_address_angle_brackets.email == "john.doe@domainame.ndl"
+        assert john_address_angle_brackets.force_angle_bracket is True
+        assert john_address_angle_brackets.address == "<john.doe@domainame.ndl>"
+
     def test_unit__email_address_address__ok__from_rfc_email_address__nominal_case(
         self,
     ):

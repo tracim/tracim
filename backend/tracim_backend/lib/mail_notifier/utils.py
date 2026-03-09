@@ -66,6 +66,11 @@ class EST(object):
 
 class EmailAddress(object):
     def __init__(self, label: str, email: str, force_angle_bracket=False):
+        """
+        See :meth:`from_rfc_email_address` to construct the object from a raw string
+
+        Warning : email will be converted to lowercase, see `🐛 Bug: In a share link, whole field is converted to lowercase even if it consists of a name + email address · Issue #6830 <https://github.com/tracim/tracim/issues/6830>`
+        """
         self.label = label
 
         # we want email to be always lowercase, see GH#2339 and GH#6830
@@ -90,9 +95,16 @@ class EmailAddress(object):
         return username + "@" + domain
 
     @classmethod
-    def from_rfc_email_address(cls, rfc_email: str) -> "EmailAddress":
+    def from_rfc_email_address(cls, rfc_email: str, force_angle_bracket=False) -> "EmailAddress":
+        """
+        RFC 5322 "angle-addr" format like:
+           "John Doe" <john.doe@domainame.ndl>
+        Uses :func:`parseaddr`
+        See `RFC 5322 - Internet Message Format <https://datatracker.ietf.org/doc/html/rfc5322#section-3.4>`
+        See :class:`TestEmailAddress` for use cases
+        """
         label, email = parseaddr(rfc_email)
-        return EmailAddress(label, email, False)
+        return EmailAddress(label, email, force_angle_bracket)
 
     @property
     def address(self):
