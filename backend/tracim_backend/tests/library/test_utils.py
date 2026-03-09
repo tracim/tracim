@@ -214,6 +214,25 @@ class TestEmailAddress(object):
         assert john_address.force_angle_bracket is False
         assert john_address.address == "John Doe <john.doe@domainame.ndl>"
 
+    def test_unit__email_address_address__ok__from_rfc_email_address__force_email_lowercase(
+        self,
+    ):
+        john_address_default = EmailAddress.from_rfc_email_address(
+            '"John Doe" <John.Doe@domainame.ndl>')
+        assert john_address_default.domain == "domainame.ndl"
+        assert john_address_default.label == "John Doe"
+        assert john_address_default.email == "John.Doe@domainame.ndl"
+        assert john_address_default.force_angle_bracket is False
+        assert john_address_default.address == "John Doe <John.Doe@domainame.ndl>"
+
+        john_address_force_lowercase = EmailAddress.from_rfc_email_address(
+            '"John Doe" <John.Doe@domainame.ndl>', True)
+        assert john_address_force_lowercase.domain == "domainame.ndl"
+        assert john_address_force_lowercase.label == "John Doe"
+        assert john_address_force_lowercase.email == "john.doe@domainame.ndl"
+        assert john_address_force_lowercase.force_angle_bracket is False
+        assert john_address_force_lowercase.address == "John Doe <john.doe@domainame.ndl>"
+
 
 class TestCustomPropertiesCheck(object):
     def test_unit__validate_json_schema__ok__nominal_case(self):
