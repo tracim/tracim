@@ -108,6 +108,9 @@ class EmailAddress(object):
 
     @property
     def address(self):
+        """
+        Uses :meth:email.utils.formataddr
+        """
         if self.label:
             return formataddr((self.label, self.idna_email))
         if self.force_angle_bracket and self.email and self.email[0] != "<":
