@@ -66,15 +66,27 @@ class EST(object):
 
 class EmailAddress(object):
     def __init__(self, label: str, email: str, force_angle_bracket=False):
+        """
+        See :meth:`from_rfc_email_address` to construct the object from a raw string
+
+        Warning : email will be converted to lowercase, see `🐛 Bug: In a share link, whole field is converted to lowercase even if it consists of a name + email address · Issue #6830 <https://github.com/tracim/tracim/issues/6830>`
+        """
         self.label = label
+
+        # we want email to be always lowercase, see GH#2339 and GH#6830
+        email = email.lower()
         self.email = email
         self.idna_email = self._encode_idna(email)
+
         self.force_angle_bracket = force_angle_bracket
 
     def _encode_idna_part(self, part: str):
         return ".".join([p.encode("idna").decode("ascii") for p in part.split(".")])
 
     def _encode_idna(self, email: str):
+        """
+        Handles international domain names, see `encodings.idna — Internationalized Domain Names in Applications <https://docs.python.org/3/library/codecs.html#module-encodings.idna>`
+        """
         username, domain = [self._encode_idna_part(part) for part in email.rsplit("@", 1)]
 
         username = self._encode_idna_part(username)
@@ -83,12 +95,22 @@ class EmailAddress(object):
         return username + "@" + domain
 
     @classmethod
-    def from_rfc_email_address(cls, rfc_email: str) -> "EmailAddress":
+    def from_rfc_email_address(cls, rfc_email: str, force_angle_bracket=False) -> "EmailAddress":
+        """
+        RFC 5322 "angle-addr" format like:
+           "John Doe" <john.doe@domainame.ndl>
+        Uses :func:`parseaddr`
+        See `RFC 5322 - Internet Message Format <https://datatracker.ietf.org/doc/html/rfc5322#section-3.4>`
+        See :class:`TestEmailAddress` for use cases
+        """
         label, email = parseaddr(rfc_email)
-        return EmailAddress(label, email)
+        return EmailAddress(label, email, force_angle_bracket)
 
     @property
     def address(self):
+        """
+        Uses :meth:email.utils.formataddr
+        """
         if self.label:
             return formataddr((self.label, self.idna_email))
         if self.force_angle_bracket and self.email and self.email[0] != "<":

@@ -28,7 +28,7 @@ from tracim_backend.exceptions import WrongSharePassword
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
-from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
+from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration, EmailAddress
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
@@ -75,10 +75,11 @@ class UploadPermissionLib(object):
         created = datetime.utcnow()
         upload_permission_group_uuid = str(uuid.uuid4().hex)
         for email in emails:
+            email_object = EmailAddress.from_rfc_email_address(email, True)
             upload_permission = UploadPermission(
                 author=self._user,
                 workspace_id=workspace.workspace_id,
-                email=email.lower(),
+                email=email_object.address,
                 token=str(uuid.uuid4()),
                 password=password,
                 type=UploadPermissionType.EMAIL,
