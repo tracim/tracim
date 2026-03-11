@@ -5,6 +5,7 @@
 ### 🐛 Fixed Issues
 
 - Fix Tracim copyright year
+- Fix RFC5322 addresses converted to lowercase in share file link and folder upload link [#6830](https://github.com/tracim/tracim/issues/6830)
 
 ## 2026.01.00
 
