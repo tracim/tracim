@@ -2,6 +2,10 @@
 
 ## 2026.04.00
 
+### ✨ New Features
+
+- Add "template" badge in space contents list [#6833](https://github.com/tracim/tracim/issues/6833)
+
 ### 🐛 Fixed Issues
 
 - Fix Tracim copyright year
