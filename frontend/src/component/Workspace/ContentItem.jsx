@@ -91,7 +91,7 @@ class ContentItem extends React.Component {
                 )
               )}
             </div>
-            <FilenameWithBadges file={props.content} isTemplate={props.isTemplate} customClass='content__name' />
+            <FilenameWithBadges file={props.content} isTemplate={props.content.isTemplate} customClass='content__name' />
           </div>
 
           <TimedEvent
