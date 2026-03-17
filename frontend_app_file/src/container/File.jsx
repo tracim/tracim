@@ -1276,7 +1276,7 @@ export class File extends React.Component {
           appMode={state.mode}
           availableStatuses={state.config.availableStatuses}
           breadcrumbsList={state.breadcrumbsList}
-          componentTitle={<FilenameWithBadges file={state.content} isTemplate={state.isTemplate} />}
+          componentTitle={<FilenameWithBadges content={state.content} isTemplate={state.isTemplate} />}
           content={state.content}
           config={state.config}
           contentVersionNumber={contentVersionNumber}

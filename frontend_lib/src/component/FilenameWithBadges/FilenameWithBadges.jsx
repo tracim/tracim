@@ -6,20 +6,20 @@ import { CONTENT_TYPE } from '../../constant.js'
 import classnames from 'classnames'
 
 export const FilenameWithBadges = (props) => {
-  const file = props.file
-  const contentType = file.type || file.content_type || file.contentType
+  const content = props.content
+  const contentType = content.type || content.content_type || content.contentType
   const isFile = contentType && ((contentType.slug || contentType) === CONTENT_TYPE.FILE)
 
   return (
     <div
       className={classnames('FilenameWithBadges', props.customClass)}
-      title={file.label}
+      title={content.label}
     >
       <span className='FilenameWithBadges__label' data-cy='FilenameWithBadges__label'>
-        {file.label}
+        {content.label}
       </span>
       {(isFile && (
-        <Badge text={file.fileExtension || file.file_extension} />
+        <Badge text={content.fileExtension || content.file_extension} />
       ))}
       {(props.isTemplate && (
         <Badge text={props.t('Template')} />
@@ -31,11 +31,11 @@ export const FilenameWithBadges = (props) => {
 export default translate()(FilenameWithBadges)
 
 FilenameWithBadges.propTypes = {
-  file: PropTypes.object,
+  content: PropTypes.object,
   isTemplate: PropTypes.bool
 }
 
 FilenameWithBadges.defaultProps = {
-  file: {},
+  content: {},
   isTemplate: false
 }

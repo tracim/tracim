@@ -88,10 +88,10 @@ export class FeedItemHeader extends React.Component {
           {props.titleLink
             ? (
               <Link to={props.titleLink}>
-                <FilenameWithBadges file={props.content} isTemplate={props.content.isTemplate} customClass='content__name' />
+                <FilenameWithBadges content={props.content} isTemplate={props.content.isTemplate} customClass='content__name' />
               </Link>
             )
-            : <FilenameWithBadges file={props.content} isTemplate={props.content.isTemplate} customClass='content__name' />}
+            : <FilenameWithBadges content={props.content} isTemplate={props.content.isTemplate} customClass='content__name' />}
           {props.breadcrumbsList && (
             <Breadcrumbs breadcrumbsList={props.breadcrumbsList} keepLastBreadcrumbAsLink />
           )}
