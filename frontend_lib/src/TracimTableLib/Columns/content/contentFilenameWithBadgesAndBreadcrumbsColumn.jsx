@@ -21,7 +21,7 @@ const contentFilenameWithBadgesAndBreadcrumbsColumn = (settings, t) => {
       if (props.row.original.content) {
         return (
           <div className='contentFilenameColumn__name_path'>
-            <FilenameWithBadges file={props.row.original.content} />
+            <FilenameWithBadges content={props.row.original.content} />
             <Breadcrumbs
               breadcrumbsList={props.row.original.breadcrumbs}
               keepLastBreadcrumbAsLink

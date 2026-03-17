@@ -765,7 +765,7 @@ export class Kanban extends React.Component {
           onValidateChangeTitle={this.handleSaveEditTitle}
           showReactions
           showMarkedAsTemplate
-          componentTitle={<FilenameWithBadges file={state.content} isTemplate={state.isTemplate} />}
+          componentTitle={<FilenameWithBadges content={state.content} isTemplate={state.isTemplate} />}
           favoriteState={props.isContentInFavoriteList(state.content, state)
             ? FAVORITE_STATE.FAVORITE
             : FAVORITE_STATE.NOT_FAVORITE}

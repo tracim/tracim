@@ -86,7 +86,7 @@ export const AdvancedSearchContentList = props => {
                 </div>
 
                 <div className='advancedSearchContent__name_path'>
-                  <FilenameWithBadges file={searchItem} />
+                  <FilenameWithBadges content={searchItem} />
                   <Breadcrumbs
                     breadcrumbsList={searchItem.breadcrumbsList || []}
                     keepLastBreadcrumbAsLink
