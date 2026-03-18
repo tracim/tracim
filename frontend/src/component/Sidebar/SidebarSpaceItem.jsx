@@ -221,7 +221,10 @@ class SidebarSpaceItem extends React.Component {
             ))
               .concat([
                 <span key='SpaceSettingsLink'>
-                  <i className='fas fa-fw fa-cog' /> {props.t('Space settings')}
+                  <i className='fas fa-fw fa-cog' /> {(props.userRoleIdInWorkspace >= ROLE.contentManager.id
+                    ? props.t('Space settings')
+                    : props.t('Space information')
+                  )}
                 </span>
               ])
               .concat([
