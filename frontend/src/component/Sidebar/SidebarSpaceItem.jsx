@@ -19,6 +19,8 @@ import { DRAG_AND_DROP, NO_ACTIVE_SPACE_ID } from '../../util/helper.js'
 import { putNotificationListAsRead } from '../../action-creator.async.js'
 import { newFlashMessage, readNotificationList } from '../../action-creator.sync.js'
 import { LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE } from '../../container/Sidebar.jsx'
+import { CUSTOM_EVENT } from 'tracim_frontend_lib/src/customEvent'
+import appFactory from '../../util/appFactory'
 
 const qs = require('query-string')
 
@@ -95,6 +97,12 @@ class SidebarSpaceItem extends React.Component {
 
   handleClickSpace = () => {
     this.handleReadSpaceNotifications()
+  }
+
+  handleClickOpenAdvancedDashboard = (spaceId) => {
+    const { props, state } = this
+
+    props.history.push(PAGE.WORKSPACE.ADVANCED_DASHBOARD(spaceId))
   }
 
   handleMouseEnterItem = () => this.setState({ showDropdownMenuButton: true })
@@ -220,7 +228,15 @@ class SidebarSpaceItem extends React.Component {
               </Link>
             ))
               .concat([
-                <span key='SpaceSettingsLink'>
+                <span
+                  key='SpaceSettingsLink'
+                  onClick={((event) => {
+                    this.handleClickOpenAdvancedDashboard(props.spaceId)
+                    // PG - INFO - 2025-03-18 - we just want the onClick to happen, so disabling navigation of the parent Link tag
+                    event.stopPropagation()
+                    event.preventDefault()
+                  })}
+                >
                   <i className='fas fa-fw fa-cog' /> {(props.userRoleIdInWorkspace >= ROLE.contentManager.id
                     ? props.t('Space settings')
                     : props.t('Space information')
@@ -262,7 +278,7 @@ const dragAndDropTargetCollect = (connect, monitor) => ({
 })
 
 const mapStateToProps = ({ user, notificationPage }) => ({ user, notificationPage })
-export default DropTarget(DRAG_AND_DROP.CONTENT_ITEM, dragAndDropTarget, dragAndDropTargetCollect)(connect(mapStateToProps)(withRouter(translate()(SidebarSpaceItem))))
+export default DropTarget(DRAG_AND_DROP.CONTENT_ITEM, dragAndDropTarget, dragAndDropTargetCollect)(connect(mapStateToProps)(withRouter(appFactory(translate()(SidebarSpaceItem)))))
 
 SidebarSpaceItem.propTypes = {
   id: PropTypes.string.isRequired,
