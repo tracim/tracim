@@ -218,18 +218,31 @@ class SidebarSpaceItem extends React.Component {
                 <i className={`fa-fw ${allowedApp.faIcon}`} />
                 {props.t(allowedApp.label)}
               </Link>
-            )).concat([
-              <span
-                key='leaveSpaceLink'
-                onClick={((event) => {
-                  props.onLeaveSpace(props.spaceId)
-                  // PG - INFO - 2025-10-06 - we just want the onClick to happen, so disabling navigation of the parent Link tag
-                  event.stopPropagation()
-                  event.preventDefault()
-                })}
-              >
-                <i className='fa-fw fas fa-sign-out-alt' /> {props.t('Leave space')}
-              </span>])}
+            ))
+              .concat([
+                <Link
+                  key='SpaceSettingsLink'
+                  to={PAGE.WORKSPACE.ADVANCED_DASHBOARD(props.spaceId)}
+                >
+                  <i className='fas fa-fw fa-cog' /> {(props.userRoleIdInWorkspace >= ROLE.contentManager.id
+                    ? props.t('Space settings')
+                    : props.t('Space information')
+                  )}
+                </Link>
+              ])
+              .concat([
+                <span
+                  key='leaveSpaceLink'
+                  onClick={((event) => {
+                    props.onLeaveSpace(props.spaceId)
+                    // PG - INFO - 2025-10-06 - we just want the onClick to happen, so disabling navigation of the parent Link tag
+                    event.stopPropagation()
+                    event.preventDefault()
+                  })}
+                >
+                  <i className='fa-fw fas fa-sign-out-alt' /> {props.t('Leave space')}
+                </span>
+              ])}
           </DropdownMenu>
         )}
       </Link>
