@@ -2,8 +2,16 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import appFactory from '../../util/appFactory.js'
-import { findUserRoleIdInWorkspace } from '../../util/helper.js'
+import { FETCH_CONFIG, findUserRoleIdInWorkspace } from '../../util/helper.js'
 import { ROLE_LIST, CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { getLoggedUserCalendar } from '../../action-creator.async'
+import { handleFetchResult } from 'tracim_frontend_lib/src/helper'
+import { getSpaceUserRoleList } from 'tracim_frontend_lib/src/action.async'
+import {
+  setUserRoleList,
+  setWorkspaceAgendaUrl,
+  setWorkspaceLoaded
+} from '../../action-creator.sync'
 
 export class OpenWorkspaceAdvanced extends React.Component {
   openWorkspaceAdvanced = async (prevProps = {}) => {
@@ -14,7 +22,10 @@ export class OpenWorkspaceAdvanced extends React.Component {
       (prevProps.match && props.match.params.idws === prevProps.match.params.idws)
     ) return
 
+    await this.updateWorkspaceData()
+
     if (props.user && props.currentWorkspace && typeof props.currentWorkspace.agendaUrl === 'string') {
+      console.debug('OpenWorkspaceAdvanced before renderApp', props.currentWorkspace.agendaUrl)
       props.renderAppFeature(
         {
           label: 'Advanced dashboard',
@@ -28,6 +39,35 @@ export class OpenWorkspaceAdvanced extends React.Component {
         { ...props.currentWorkspace, workspace_id: props.currentWorkspace.id }
       )
     }
+  }
+
+  /**
+   * INFO - PG - 2026-03-18
+   * Since #6834 we can call this screen directly from the sidebar space contextual menu
+   * In consequence, we need to refresh some data (id and label are already ok)
+   */
+  async updateWorkspaceData () {
+    const { props } = this
+    const currentWorkspaceId = parseInt(props.currentWorkspace.id)
+
+    const requestUserRoleList = await handleFetchResult(await getSpaceUserRoleList(FETCH_CONFIG.apiUrl, currentWorkspaceId))
+    const fetchCalendar = await props.dispatch(getLoggedUserCalendar())
+
+    const [responseUserRoleList] = await Promise.all([
+      requestUserRoleList
+    ])
+
+    console.debug('OpenWorkspaceAdvanced before update', responseUserRoleList, fetchCalendar)
+
+    if (responseUserRoleList.apiResponse.status === 200) {
+      props.dispatch(setUserRoleList(responseUserRoleList.body))
+    }
+    if (fetchCalendar.status === 200) {
+      const currentWorkspaceAgendaUrl = (fetchCalendar.json.find(a => a.workspace_id === currentWorkspaceId) || { agenda_url: '' }).agenda_url
+      this.props.dispatch(setWorkspaceAgendaUrl(currentWorkspaceAgendaUrl))
+      console.debug('OpenWorkspaceAdvanced after update calendar', currentWorkspaceAgendaUrl)
+    }
+    props.dispatch(setWorkspaceLoaded())
   }
 
   componentDidMount () {
