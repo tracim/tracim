@@ -14,6 +14,11 @@ import {
 } from '../../action-creator.sync'
 
 export class OpenWorkspaceAdvanced extends React.Component {
+  constructor (props) {
+    super(props)
+    this.updateWorkspaceData()
+  }
+
   openWorkspaceAdvanced = async (prevProps = {}) => {
     const { props } = this
 
@@ -63,6 +68,7 @@ export class OpenWorkspaceAdvanced extends React.Component {
       props.dispatch(setUserRoleList(responseUserRoleList.body))
     }
     if (fetchCalendar.status === 200) {
+      // FIXME there might not be an agenda in the space !
       const currentWorkspaceAgendaUrl = (fetchCalendar.json.find(a => a.workspace_id === currentWorkspaceId) || { agenda_url: '' }).agenda_url
       this.props.dispatch(setWorkspaceAgendaUrl(currentWorkspaceAgendaUrl))
       console.debug('OpenWorkspaceAdvanced after update calendar', currentWorkspaceAgendaUrl)
