@@ -5,6 +5,7 @@
 ### ✨ New Features
 
 - Add "template" badge in space contents list [#6833](https://github.com/tracim/tracim/issues/6833)
+- Add "space information" / "space settings" link in the sidebar space contextual dropdown menu [#6834](https://github.com/tracim/tracim/issues/6834)
 
 ### 🐛 Fixed Issues
 
