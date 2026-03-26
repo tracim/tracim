@@ -115,6 +115,7 @@ export const updateWorkspaceDetail = workspaceDetail => ({ type: `${UPDATE}/${WO
 
 export const WORKSPACE_LOADED = `${WORKSPACE}/Loaded`
 export const setWorkspaceLoaded = () => ({ type: `${SET}/${WORKSPACE_LOADED}` })
+export const removeWorkspaceLoaded = () => ({ type: `${REMOVE}/${WORKSPACE_LOADED}` })
 
 const ROLE = 'Role'
 export const USER_ROLE = `${USER}/${ROLE}`

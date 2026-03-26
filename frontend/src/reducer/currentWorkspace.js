@@ -211,6 +211,9 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
     case `${SET}/${WORKSPACE_LOADED}`:
       return { ...state, workspaceLoaded: true }
 
+    case `${REMOVE}/${WORKSPACE_LOADED}`:
+      return { ...state, workspaceLoaded: false }
+
     case UPDATE_USER:
       if (!state.memberList.some(member => member.id === action.newUser.user_id)) return state
 

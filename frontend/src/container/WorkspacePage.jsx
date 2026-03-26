@@ -9,6 +9,7 @@ import {
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
+  removeWorkspaceLoaded,
   setWorkspaceAgendaUrl,
   setWorkspaceDetail,
   setWorkspaceLoaded,
@@ -31,6 +32,12 @@ class WorkspacePage extends React.Component {
   async updateCurrentWorkspace () {
     const { props } = this
 
+    const currentWorkspaceId = props.currentWorkspace.id
+    const workspaceToLoadId = props.workspaceId
+    if (currentWorkspaceId !== workspaceToLoadId) {
+      props.dispatch(removeWorkspaceLoaded())
+    }
+
     const requestUserRoleList = handleFetchResult(await getSpaceUserRoleList(FETCH_CONFIG.apiUrl, props.workspaceId))
     const requestWorkspaceDetail = props.dispatch(getWorkspaceDetail(props.workspaceId))
 
@@ -41,11 +48,14 @@ class WorkspacePage extends React.Component {
     if (responseUserRoleList.apiResponse.status === 200 && responseWorkspaceDetail.status === 200) {
       props.dispatch(setWorkspaceDetail(responseWorkspaceDetail.json))
       props.dispatch(setUserRoleList(responseUserRoleList.body))
-      props.dispatch(setWorkspaceLoaded())
 
-      if (props.appList.some(a => a.slug === 'agenda') && responseWorkspaceDetail.json.agenda_enabled) {
-        this.loadCalendarDetail()
-      }
+      // WARNING - PGO - 2026-03-26 - some screens like Workspace settings / information needs the current agenda URL
+      // as loading calendar info is async, we need to wait to be able to call setWorkspaceLoaded()
+      const calendarPromise =
+        (props.appList.some(a => a.slug === 'agenda') && responseWorkspaceDetail.json.agenda_enabled)
+          ? this.loadCalendarDetail()
+          : Promise.resolve()
+      calendarPromise.then(() => { props.dispatch(setWorkspaceLoaded()) })
     } else {
       switch (responseUserRoleList.apiResponse.status) {
         case 200: break
