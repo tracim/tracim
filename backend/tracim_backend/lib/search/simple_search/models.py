@@ -70,6 +70,7 @@ class SimpleContentSearchResponse(ContentSearchResponse):
                 is_archived=content.is_archived,
                 is_deleted=content.is_deleted,
                 is_editable=content.is_editable,
+                is_template=content.is_template,
                 show_in_ui=content.show_in_ui,
                 file_extension=content.file_extension,
                 filename=content.filename,
