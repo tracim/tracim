@@ -9,6 +9,7 @@ export const FilenameWithBadges = (props) => {
   const content = props.content
   const contentType = content.type || content.content_type || content.contentType
   const isFile = contentType && ((contentType.slug || contentType) === CONTENT_TYPE.FILE)
+  const isTemplate = content.isTemplate || content.is_template
 
   return (
     <div
@@ -21,7 +22,7 @@ export const FilenameWithBadges = (props) => {
       {(isFile && (
         <Badge text={content.fileExtension || content.file_extension} />
       ))}
-      {(props.isTemplate && (
+      {(isTemplate && (
         <Badge text={props.t('Template')} />
       ))}
     </div>
@@ -31,11 +32,9 @@ export const FilenameWithBadges = (props) => {
 export default translate()(FilenameWithBadges)
 
 FilenameWithBadges.propTypes = {
-  content: PropTypes.object,
-  isTemplate: PropTypes.bool
+  content: PropTypes.object
 }
 
 FilenameWithBadges.defaultProps = {
-  content: {},
-  isTemplate: false
+  content: {}
 }
