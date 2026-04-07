@@ -42,6 +42,7 @@ export const serializeSearchItemProps = {
   is_archived: 'isArchived',
   is_deleted: 'isDeleted',
   is_editable: 'isEditable',
+  is_template: 'isTemplate',
   label: 'label',
   last_modifier: 'lastModifier',
   member_count: 'memberCount',
