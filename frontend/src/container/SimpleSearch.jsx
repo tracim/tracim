@@ -234,6 +234,7 @@ export class SimpleSearch extends React.Component {
                               <ContentItemSearch
                                 label={searchItem.label}
                                 path={`${searchItem.workspace.label} > ${this.getPath(searchItem.path)}`}
+                                isTemplate={searchItem.isTemplate}
                                 lastModificationAuthor={searchItem.lastModifier}
                                 lastModificationTime={displayDistanceDate(searchItem.modified, props.user.lang)}
                                 lastModificationFormated={formatAbsoluteDate(searchItem.modified, props.user.lang)}

@@ -71,11 +71,13 @@ ContentItemSearch.propTypes = {
   fileExtension: PropTypes.string,
   contentType: PropTypes.object,
   faIcon: PropTypes.string,
-  urlContent: PropTypes.string
+  urlContent: PropTypes.string,
+  isTemplate: PropTypes.bool
 }
 
 ContentItemSearch.defaultProps = {
   label: '',
   customClass: '',
-  urlContent: ''
+  urlContent: '',
+  isTemplate: false
 }
