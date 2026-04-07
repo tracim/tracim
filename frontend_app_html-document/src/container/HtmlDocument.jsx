@@ -1036,7 +1036,7 @@ export class HtmlDocument extends React.Component {
           appMode={state.mode}
           availableStatuses={state.config.availableStatuses}
           breadcrumbsList={state.breadcrumbsList}
-          componentTitle={<FilenameWithBadges content={state.content} isTemplate={state.isTemplate} />}
+          componentTitle={<FilenameWithBadges content={state.content} />}
           content={state.content}
           config={state.config}
           contentVersionNumber={contentVersionNumber}
