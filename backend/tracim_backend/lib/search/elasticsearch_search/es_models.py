@@ -153,6 +153,7 @@ class IndexedContent(Document):
     is_archived = Boolean()
     is_deleted = Boolean()
     is_editable = Boolean()
+    is_template = Boolean()
     show_in_ui = Boolean()
     file_extension = SimpleText()
     filename = SimpleText()

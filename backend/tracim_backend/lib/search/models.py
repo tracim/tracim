@@ -104,6 +104,7 @@ class SearchedContent(object):
         workspace_id: int,
         active_shares: int,
         content_size: int,
+        is_template: bool = False,
         tags: Optional[List[str]] = None,
         tag_count: int = 0,
         parent_id: Optional[int] = None,
@@ -130,6 +131,7 @@ class SearchedContent(object):
         self.is_archived = is_archived
         self.is_deleted = is_deleted
         self.is_editable = is_editable
+        self.is_template = is_template
         self.show_in_ui = show_in_ui
         self.file_extension = file_extension
         self.filename = filename
