@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026.07.00
+
+### ✨ New Features
+
+- Show the template badge in search results [#6840](https://github.com/tracim/tracim/issues/6840)
+
+### 💥 Breaking/Important changes
+
+- Add a new property in advanced search results, so content needs to be re-indexed using `tracimcli search index-populate`
+
+
 ## 2026.04.00
 
 ### ✨ New Features
