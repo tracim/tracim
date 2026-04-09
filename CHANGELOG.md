@@ -10,6 +10,10 @@
 
 - Add a new property in advanced search results, so content needs to be re-indexed using `tracimcli search index-populate`
 
+### Other changes
+
+- FilenameWithBadges React component refactoring [#6838](https://github.com/tracim/tracim/issues/6838)
+
 
 ## 2026.04.00
 
