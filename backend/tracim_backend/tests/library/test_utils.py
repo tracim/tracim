@@ -195,7 +195,8 @@ class TestEmailAddress(object):
         assert john_address.address == "john.doe@domainame.ndl"
 
         john_address_angle_brackets = EmailAddress.from_rfc_email_address(
-            "<john.doe@domainame.ndl>", True)
+            "<john.doe@domainame.ndl>", True
+        )
         assert john_address_angle_brackets.domain == "domainame.ndl"
         assert john_address_angle_brackets.label == ""
         assert john_address_angle_brackets.email == "john.doe@domainame.ndl"
@@ -225,8 +226,7 @@ class TestEmailAddress(object):
     def test_unit__email_address_address__ok__from_rfc_email_address__with_non_lowercase_email(
         self,
     ):
-        john_address = EmailAddress.from_rfc_email_address(
-            '"John Doe" <John.Doe@domainame.ndl>')
+        john_address = EmailAddress.from_rfc_email_address('"John Doe" <John.Doe@domainame.ndl>')
         assert john_address.domain == "domainame.ndl"
         assert john_address.label == "John Doe"
         assert john_address.email == "john.doe@domainame.ndl"
