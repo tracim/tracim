@@ -90,6 +90,22 @@ class TestStringToList(object):
             4,
         ]
 
+    def test_unit__string_to_list__ok__trailing_comma__no_remove_empty_param(self):
+        assert string_to_list("one,two,", separator=",", cast_func=str) == ["one", "two", ""]
+
+    def test_unit__string_to_list__ok__trailing_comma__remove_empty_true(self):
+        assert string_to_list("one,two,", separator=",", cast_func=str, remove_empty=True) == [
+            "one",
+            "two",
+        ]
+
+    def test_unit__string_to_list__ok__trailing_comma__remove_empty_false(self):
+        assert string_to_list("one,two,", separator=",", cast_func=str, remove_empty=False) == [
+            "one",
+            "two",
+            "",
+        ]
+
 
 class TestTranslateDict(object):
     @pytest.mark.parametrize(
