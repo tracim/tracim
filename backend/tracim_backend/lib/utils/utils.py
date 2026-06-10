@@ -195,6 +195,7 @@ def string_to_list(
     separator: str,
     cast_func: Callable[[str], Any],
     do_strip: bool = False,
+    remove_empty: bool = False,
 ) -> List[Any]:
     """
     Convert a string to a list of separated item of one type according
@@ -212,6 +213,7 @@ def string_to_list(
     of separated element before casting.
     if false, do not strip string before casting
     to convert to type like int, str ...
+    :param remove_empty: if true, empty strings (e.g. from a trailing separator) are ignored.
     :return: list of content of type returned by the cast_func.
     """
     if not base_string:
@@ -219,6 +221,8 @@ def string_to_list(
     string_list = base_string.split(separator)
     if do_strip:
         string_list = [item.strip() for item in string_list]
+    if remove_empty:
+        string_list = [item for item in string_list if item]
     return [cast_func(item) for item in string_list]
 
 

@@ -775,11 +775,13 @@ class CFG(object):
             self.get_raw_config("live_messages.control_zmq_uri", "tcp://localhost:5563"),
             cast_func=str,
             separator=",",
+            remove_empty=True,
         )
         self.LIVE_MESSAGES__PUSH_ZMQ_URI = string_to_list(
             self.get_raw_config("live_messages.push_zmq_uri"),
             cast_func=str,
             separator=",",
+            remove_empty=True,
         )
         self.LIVE_MESSAGES__PUB_ZMQ_URI = string_to_list(
             self.get_raw_config("live_messages.pub_zmq_uri"),
@@ -1088,11 +1090,13 @@ class CFG(object):
             self.get_raw_config("search.elasticsearch.host", "localhost"),
             cast_func=str,
             separator=",",
+            remove_empty=True,
         )
         self.SEARCH__ELASTICSEARCH__PORT = string_to_list(
             self.get_raw_config("search.elasticsearch.port", "9200"),
             cast_func=int,
             separator=",",
+            remove_empty=True,
         )
         self.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT = int(
             self.get_raw_config("search.elasticsearch.request_timeout", "60")
