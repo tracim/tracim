@@ -72,7 +72,7 @@ class TestExtendedColor(object):
 
 
 class TestStringToList(object):
-    def test__unit__string_to_list__ok__list_of_string_unstripped(self):
+    def test_unit__string_to_list__ok__list_of_string_unstripped(self):
         assert string_to_list(
             "one , two,three,fo ur", separator=",", cast_func=str, do_strip=False
         ) == ["one ", " two", "three", "fo ur"]
@@ -98,12 +98,119 @@ class TestStringToList(object):
             "one",
             "two",
         ]
+        assert string_to_list("one,,three", separator=",", cast_func=str, remove_empty=True) == [
+            "one",
+            "three",
+        ]
+        assert string_to_list(",two,three", separator=",", cast_func=str, remove_empty=True) == [
+            "two",
+            "three",
+        ]
 
     def test_unit__string_to_list__ok__trailing_comma__remove_empty_false(self):
+        assert string_to_list(",two,three", separator=",", cast_func=str, remove_empty=False) == [
+            "",
+            "two",
+            "three",
+        ]
+        assert string_to_list("one,,three", separator=",", cast_func=str, remove_empty=False) == [
+            "one",
+            "",
+            "three",
+        ]
         assert string_to_list("one,two,", separator=",", cast_func=str, remove_empty=False) == [
             "one",
             "two",
             "",
+        ]
+
+    def test_unit__string_to_list__string_stripped__remove_empty_true(self):
+        assert string_to_list(
+            "   ,two,three", separator=",", cast_func=str, do_strip=True, remove_empty=True
+        ) == [
+            "two",
+            "three",
+        ]
+        assert string_to_list(
+            "one,   ,three", separator=",", cast_func=str, do_strip=True, remove_empty=True
+        ) == [
+            "one",
+            "three",
+        ]
+        assert string_to_list(
+            "one,two,   ", separator=",", cast_func=str, do_strip=True, remove_empty=True
+        ) == [
+            "one",
+            "two",
+        ]
+
+    def test_unit__string_to_list__string_unstripped__remove_empty_true(self):
+        assert string_to_list(
+            "   ,two,three", separator=",", cast_func=str, do_strip=False, remove_empty=True
+        ) == [
+            "   ",
+            "two",
+            "three",
+        ]
+        assert string_to_list(
+            "one,   ,three", separator=",", cast_func=str, do_strip=False, remove_empty=True
+        ) == [
+            "one",
+            "   ",
+            "three",
+        ]
+        assert string_to_list(
+            "one,two,   ", separator=",", cast_func=str, do_strip=False, remove_empty=True
+        ) == [
+            "one",
+            "two",
+            "   ",
+        ]
+
+    def test_unit__string_to_list__string_stripped__remove_empty_false(self):
+        assert string_to_list(
+            "   ,two,three", separator=",", cast_func=str, do_strip=True, remove_empty=False
+        ) == [
+            "",
+            "two",
+            "three",
+        ]
+        assert string_to_list(
+            "one,   ,three", separator=",", cast_func=str, do_strip=True, remove_empty=False
+        ) == [
+            "one",
+            "",
+            "three",
+        ]
+        assert string_to_list(
+            "one,two,   ", separator=",", cast_func=str, do_strip=True, remove_empty=False
+        ) == [
+            "one",
+            "two",
+            "",
+        ]
+
+    def test_unit__string_to_list__string_unstripped__remove_empty_false(self):
+        assert string_to_list(
+            "   ,two,three", separator=",", cast_func=str, do_strip=False, remove_empty=False
+        ) == [
+            "   ",
+            "two",
+            "three",
+        ]
+        assert string_to_list(
+            "one,   ,three", separator=",", cast_func=str, do_strip=False, remove_empty=False
+        ) == [
+            "one",
+            "   ",
+            "three",
+        ]
+        assert string_to_list(
+            "one,two,   ", separator=",", cast_func=str, do_strip=False, remove_empty=False
+        ) == [
+            "one",
+            "two",
+            "   ",
         ]
 
 
