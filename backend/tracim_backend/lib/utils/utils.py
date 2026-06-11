@@ -234,6 +234,7 @@ def string_to_unique_item_list(
     separator: str,
     cast_func: Callable[[str], Any],
     do_strip: bool = False,
+    remove_empty: bool = False,
 ) -> List[Any]:
     """
     Convert a string to a list of separated item of one type according
@@ -251,9 +252,13 @@ def string_to_unique_item_list(
     of separated element before casting.
     if false, do not strip string before casting
     to convert to type like int, str ...
+    :param remove_empty: if true, empty strings (e.g. from a trailing separator) are ignored.
     :return: list of unique content of type returned by the cast_func.
+
+    .. versionadded:: 2026.07.00
+        add new optional `remove_empty` parameter
     """
-    item_list = string_to_list(base_string, separator, cast_func, do_strip)
+    item_list = string_to_list(base_string, separator, cast_func, do_strip, remove_empty)
     return list(OrderedDict.fromkeys(item_list))
 
 
