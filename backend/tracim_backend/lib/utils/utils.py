@@ -215,6 +215,9 @@ def string_to_list(
     to convert to type like int, str ...
     :param remove_empty: if true, empty strings (e.g. from a trailing separator) are ignored.
     :return: list of content of type returned by the cast_func.
+
+    .. versionadded:: 2026.07.00
+        add new optional `remove_empty` parameter
     """
     if not base_string:
         return []
