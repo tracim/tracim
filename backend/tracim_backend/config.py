@@ -308,6 +308,7 @@ class CFG(object):
             separator=",",
             cast_func=str,
             do_strip=True,
+            remove_empty=True,
         )
 
     def _load_enabled_app(
@@ -426,6 +427,7 @@ class CFG(object):
             separator=",",
             cast_func=AuthType,
             do_strip=True,
+            remove_empty=True,
         )
         self.USER__READ_ONLY_FIELDS: typing.Dict[AuthType, typing.List[UserReadOnlyFields]] = {}
         for auth_type in self.AUTH_TYPES:
@@ -434,6 +436,7 @@ class CFG(object):
                 separator=",",
                 cast_func=UserReadOnlyFields,
                 do_strip=True,
+                remove_empty=True,
             )
             # HACK - M.L - 2023-10-30 - This is to satisfy CFG._check_consistency despite being
             #  poorly usable
@@ -466,6 +469,7 @@ class CFG(object):
             separator=",",
             cast_func=str,
             do_strip=True,
+            remove_empty=True,
         )
         self.WEBSITE__WELCOME_PAGE = self.get_raw_config(
             "website.welcome_page", "welcome-simple.html"
@@ -505,6 +509,7 @@ class CFG(object):
             separator=",",
             cast_func=str,
             do_strip=True,
+            remove_empty=True,
         )
         self.DEFAULT_ANONYMIZED_USER_DISPLAY_NAME = self.get_raw_config(
             "default_anonymized_user_display_name", "Deleted user"
@@ -550,6 +555,7 @@ class CFG(object):
             separator=",",
             cast_func=WorkspaceAccessType,
             do_strip=True,
+            remove_empty=True,
         )
         self.WORKSPACE__JOIN__MAX_MESSAGES_HISTORY_COUNT = int(
             self.get_raw_config("workspace.join.max_messages_history_count", "-1")
@@ -564,6 +570,7 @@ class CFG(object):
             self.get_raw_config("preview.jpg.allowed_dims", "256x256"),
             cast_func=PreviewDim.from_string,
             separator=",",
+            remove_empty=True,
         )
 
         self.FRONTEND__SERVE = asbool(self.get_raw_config("frontend.serve", "True"))
@@ -593,6 +600,7 @@ class CFG(object):
             separator=",",
             cast_func=str,
             do_strip=True,
+            remove_empty=True,
         )
 
         default_color_config_file_path = os.path.join(self.branding_folder_path, "color.json")
@@ -651,6 +659,7 @@ class CFG(object):
             separator=",",
             cast_func=str,
             do_strip=True,
+            remove_empty=True,
         )
 
         default_code_sample_languages = """
@@ -721,6 +730,7 @@ class CFG(object):
             separator=",",
             cast_func=create_code_sample_langage,
             do_strip=True,
+            remove_empty=True,
         )
         try:
             self.UI__NOTES__CODE_SAMPLE_LANGUAGES = [
@@ -775,16 +785,19 @@ class CFG(object):
             self.get_raw_config("live_messages.control_zmq_uri", "tcp://localhost:5563"),
             cast_func=str,
             separator=",",
+            remove_empty=True,
         )
         self.LIVE_MESSAGES__PUSH_ZMQ_URI = string_to_list(
             self.get_raw_config("live_messages.push_zmq_uri"),
             cast_func=str,
             separator=",",
+            remove_empty=True,
         )
         self.LIVE_MESSAGES__PUB_ZMQ_URI = string_to_list(
             self.get_raw_config("live_messages.pub_zmq_uri"),
             cast_func=str,
             separator=",",
+            remove_empty=True,
         )
 
         self.LIVE_MESSAGES__STATS_ZMQ_URI = self.get_raw_config(
@@ -1074,12 +1087,14 @@ class CFG(object):
             separator=",",
             cast_func=str,
             do_strip=True,
+            remove_empty=True,
         )
         self.SEARCH__ELASTICSEARCH__INGEST__MIMETYPE_BLACKLIST = string_to_unique_item_list(
             self.get_raw_config("search.elasticsearch.ingest.mimetype_blacklist", ""),
             separator=",",
             cast_func=str,
             do_strip=True,
+            remove_empty=True,
         )
         self.SEARCH__ELASTICSEARCH__INGEST__SIZE_LIMIT = int(
             self.get_raw_config("search.elasticsearch.ingest.size_limit", "52428800")
@@ -1088,11 +1103,13 @@ class CFG(object):
             self.get_raw_config("search.elasticsearch.host", "localhost"),
             cast_func=str,
             separator=",",
+            remove_empty=True,
         )
         self.SEARCH__ELASTICSEARCH__PORT = string_to_list(
             self.get_raw_config("search.elasticsearch.port", "9200"),
             cast_func=int,
             separator=",",
+            remove_empty=True,
         )
         self.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT = int(
             self.get_raw_config("search.elasticsearch.request_timeout", "60")
@@ -1160,6 +1177,7 @@ class CFG(object):
             separator=",",
             cast_func=create_target_langage,
             do_strip=True,
+            remove_empty=True,
         )
         try:
             self.TRANSLATION_SERVICE__TARGET_LANGUAGES = [

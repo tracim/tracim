@@ -14,6 +14,7 @@
 
 - FilenameWithBadges React component refactoring [#6838](https://github.com/tracim/tracim/issues/6838)
 - Fix linter issues introduced in 2026.04.00
+- Fix multivalued configuration variables with trailing commas crashing Tracim on startup [#6850](https://github.com/tracim/tracim/issues/6850)
 
 
 ## 2026.04.00

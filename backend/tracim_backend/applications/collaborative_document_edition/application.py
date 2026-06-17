@@ -40,6 +40,7 @@ class CollaborativeDocumentEditionApp(TracimApplication):
             separator=",",
             cast_func=str,
             do_strip=True,
+            remove_empty=True,
         )
 
     def check_config(self, app_config: CFG) -> None:
