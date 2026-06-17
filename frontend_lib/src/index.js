@@ -226,6 +226,7 @@ import ContentType from './component/ContentType/ContentType.jsx'
 
 import {
   baseFetch,
+  deleteContentFromFavoriteList,
   deleteToDo,
   deleteWorkspace,
   getComment,
@@ -254,6 +255,7 @@ import {
   getUsernameAvailability,
   getWorkspaceContentList,
   getWorkspaceDetail,
+  postContentToFavoriteList,
   postNewComment,
   postNewEmptyContent,
   postRawFileContent,
@@ -461,6 +463,7 @@ export {
   darkenColor,
   defaultApiContent,
   defaultDebug,
+  deleteContentFromFavoriteList,
   deleteToDo,
   deleteWorkspace,
   displayDistanceDate,
@@ -513,6 +516,7 @@ export {
   onClickOutside,
   parserStringToList,
   permissiveNumberEqual,
+  postContentToFavoriteList,
   postNewComment,
   postNewEmptyContent,
   postRawFileContent,

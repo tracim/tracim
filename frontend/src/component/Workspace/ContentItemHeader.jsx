@@ -62,6 +62,12 @@ export const ContentItemHeader = props => {
         isSelected={props.selectedSortCriterion === SORT_BY.STATUS}
         tootltip={props.t('Sort by status')}
       />
+
+      {!props.showSearchDetails && (
+        <div className='content__header__favorite'>
+          {props.t('Favorite')}
+        </div>
+      )}
     </div>
   )
 }

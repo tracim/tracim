@@ -8,6 +8,8 @@ import BtnExtendedAction from './BtnExtendedAction.jsx'
 import ContentItem from './ContentItem.jsx'
 import {
   DropdownMenu,
+  FAVORITE_STATE,
+  FavoriteButton,
   Icon,
   PAGE,
   sortWithFoldersAtListBeginning,
@@ -85,7 +87,6 @@ class Folder extends React.Component {
             className='folder__header align-items-center'
             ref={props.userRoleIdInWorkspace >= ROLE.contentManager.id ? props.connectDragPreview : undefined}
           >
-
             <div className={classnames('folder__header__triangleborder', { open: isActive })}>
               <div className='folder__header__triangleborder__triangle primaryColorFontLighten' />
             </div>
@@ -179,6 +180,19 @@ class Folder extends React.Component {
             </div>
 
             <div className='folder__header__status' />
+
+            {props.onClickAddToFavoriteList && (
+              <div className='folder__header__favorite'>
+                <FavoriteButton
+                  favoriteState={props.favoriteList && props.favoriteList.some(f => f.contentId === props.folderData.id)
+                    ? FAVORITE_STATE.FAVORITE
+                    : FAVORITE_STATE.NOT_FAVORITE}
+                  onClickAddToFavoriteList={e => { e.stopPropagation(); props.onClickAddToFavoriteList(e, props.folderData) }}
+                  onClickRemoveFromFavoriteList={e => { e.stopPropagation(); props.onClickRemoveFromFavoriteList(e, props.folderData) }}
+                  dataCy='folder_favorite'
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -193,6 +207,9 @@ class Folder extends React.Component {
                   getContentParentList={props.getContentParentList}
                   userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                   onClickExtendedAction={props.onClickExtendedAction}
+                  onClickAddToFavoriteList={props.onClickAddToFavoriteList}
+                  onClickRemoveFromFavoriteList={props.onClickRemoveFromFavoriteList}
+                  favoriteList={props.favoriteList}
                   onClickFolder={props.onClickFolder}
                   onClickCreateContent={props.onClickCreateContent}
                   onDropMoveContentItem={props.onDropMoveContentItem}
@@ -236,7 +253,13 @@ class Folder extends React.Component {
                     delete: {
                       callback: e => props.onClickExtendedAction.delete(e, content),
                       label: props.t('Delete')
-                    }
+                    },
+                    ...(props.onClickAddToFavoriteList && {
+                      favorite: {
+                        addCallback: e => props.onClickAddToFavoriteList(e, content),
+                        removeCallback: e => props.onClickRemoveFromFavoriteList(e, content)
+                      }
+                    })
                   }}
                   onDropMoveContentItem={props.onDropMoveContentItem}
                   isLast={props.isLast && i === folderContentList.length - 1}

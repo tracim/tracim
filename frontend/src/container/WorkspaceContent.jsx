@@ -7,6 +7,7 @@ import { translate } from 'react-i18next'
 import { isEqual } from 'lodash'
 import {
   findUserRoleIdInWorkspace,
+  FETCH_CONFIG,
   SHARE_FOLDER_ID,
   ANCHOR_NAMESPACE
 } from '../util/helper.js'
@@ -30,8 +31,11 @@ import {
   CONTENT_TYPE,
   CUSTOM_EVENT,
   buildHeadTitle,
+  deleteContentFromFavoriteList,
+  handleFetchResult,
   IconButton,
   PAGE,
+  postContentToFavoriteList,
   sortWithFoldersAtListBeginning,
   SORT_BY,
   SORT_ORDER,
@@ -50,7 +54,8 @@ import {
   putWorkspaceContentDeleted,
   getMyselfWorkspaceReadStatusList,
   putFolderRead,
-  putContentItemMove
+  putContentItemMove,
+  getFavoriteContentList
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -62,7 +67,10 @@ import {
   setWorkspaceContentRead,
   setBreadcrumbs,
   resetBreadcrumbsAppFeature,
-  setHeadTitle
+  setHeadTitle,
+  addFavorite,
+  removeFavorite,
+  setFavoriteList
 } from '../action-creator.sync.js'
 import uniq from 'lodash/uniq'
 import { isMobile } from 'react-device-detect'
@@ -100,7 +108,9 @@ export class WorkspaceContent extends React.Component {
       { name: CUSTOM_EVENT.OPEN_CONTENT_URL, handler: this.handleOpenContentUrl },
       { name: CUSTOM_EVENT.APP_CLOSED, handler: this.handleCloseApp },
       { name: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT, handler: this.handleHidePopupCreateContent },
-      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage },
+      { name: CUSTOM_EVENT.ADD_CONTENT_TO_FAVORITE_LIST, handler: this.handleExternalAddContentToFavoriteList },
+      { name: CUSTOM_EVENT.REMOVE_CONTENT_FROM_FAVORITE_LIST, handler: this.handleExternalRemoveContentFromFavoriteList }
     ])
   }
 
@@ -149,6 +159,32 @@ export class WorkspaceContent extends React.Component {
     if (!this.state.appOpenedType) this.setHeadTitle(this.getFilterName(qs.parse(this.props.location.search).type))
   }
 
+  handleExternalAddContentToFavoriteList = data => {
+    if (data.source === 'shell') return
+    this.props.dispatch(addFavorite(data))
+  }
+
+  handleExternalRemoveContentFromFavoriteList = data => {
+    if (data.source === 'shell') return
+    const { props } = this
+    const favorite = props.favoriteList.find(f => f.contentId === data.content_id)
+    if (!favorite) return
+    props.dispatch(removeFavorite(favorite))
+  }
+
+  /**
+   * WORKAROUND - PG - 2026-06-11 - Favorite status is not returned by the content list API,
+   * so we need a separate call to load it.
+   * @see {@link getContentPathList} method to load contents list
+   * @since 2026.07.00 GH#6835
+   */
+  loadFavoriteList = async () => {
+    const { props } = this
+    const response = await props.dispatch(getFavoriteContentList(props.user.userId))
+    if (!response.ok) return
+    props.dispatch(setFavoriteList(response.json.items))
+  }
+
   componentDidMount () {
     const { props } = this
 
@@ -165,6 +201,7 @@ export class WorkspaceContent extends React.Component {
 
     this.loadAllWorkspaceContent(spaceToLoad, true, true)
     this.setDisplayedContentList()
+    this.loadFavoriteList()
   }
 
   // CH - 2018-11-26 - refactor idea: do not rebuild folder_open when on direct link of an app
@@ -397,6 +434,34 @@ export class WorkspaceContent extends React.Component {
     if (fetchPutContentDeleted.status !== 204) {
       props.dispatch(newFlashMessage(props.t('Error while deleting content'), 'warning'))
     }
+  }
+
+  handleClickAddToFavoriteList = async (e, content) => {
+    const { props } = this
+    e.preventDefault()
+    e.stopPropagation()
+    const response = await handleFetchResult(await postContentToFavoriteList(FETCH_CONFIG.apiUrl, props.user.userId, content.id))
+    if (!response.ok) {
+      props.dispatch(newFlashMessage(props.t('An error has happened while adding to favorites'), 'warning'))
+      return
+    }
+    props.dispatch(addFavorite(response.body))
+    props.dispatchCustomEvent(CUSTOM_EVENT.ADD_CONTENT_TO_FAVORITE_LIST, { ...response.body, source: 'shell' })
+  }
+
+  handleClickRemoveFromFavoriteList = async (e, content) => {
+    const { props } = this
+    e.preventDefault()
+    e.stopPropagation()
+    const favorite = props.favoriteList.find(f => f.contentId === content.id)
+    if (!favorite) return
+    const response = await handleFetchResult(await deleteContentFromFavoriteList(FETCH_CONFIG.apiUrl, props.user.userId, content.id))
+    if (!response.ok) {
+      props.dispatch(newFlashMessage(props.t('An error has happened while removing from favorites'), 'warning'))
+      return
+    }
+    props.dispatch(removeFavorite(favorite))
+    props.dispatchCustomEvent(CUSTOM_EVENT.REMOVE_CONTENT_FROM_FAVORITE_LIST, { content_id: content.id, source: 'shell' })
   }
 
   handleClickFolder = async (e, folderId) => {
@@ -900,6 +965,9 @@ export class WorkspaceContent extends React.Component {
                           archive: this.handleClickArchiveContentItem,
                           delete: this.handleClickDeleteContentItem
                         }}
+                        onClickAddToFavoriteList={this.handleClickAddToFavoriteList}
+                        onClickRemoveFromFavoriteList={this.handleClickRemoveFromFavoriteList}
+                        favoriteList={props.favoriteList}
                         onDropMoveContentItem={this.handleDropMoveContent}
                         onClickFolder={this.handleClickFolder}
                         onClickCreateContent={this.handleClickCreateContent}
@@ -939,6 +1007,10 @@ export class WorkspaceContent extends React.Component {
                           delete: {
                             callback: e => this.handleClickDeleteContentItem(e, content),
                             label: props.t('Delete')
+                          },
+                          favorite: {
+                            addCallback: e => this.handleClickAddToFavoriteList(e, content),
+                            removeCallback: e => this.handleClickRemoveFromFavoriteList(e, content)
                           }
                         }}
                         onDropMoveContentItem={this.handleDropMoveContent}
@@ -965,7 +1037,7 @@ export class WorkspaceContent extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, system, workspaceList, contentType, appList }) => ({
-  breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, system, workspaceList, contentType, appList
+const mapStateToProps = ({ breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, system, workspaceList, contentType, appList, favoriteList }) => ({
+  breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, system, workspaceList, contentType, appList, favoriteList
 })
 export default withRouter(connect(mapStateToProps)(appFactory(translate()(TracimComponent(WorkspaceContent)))))

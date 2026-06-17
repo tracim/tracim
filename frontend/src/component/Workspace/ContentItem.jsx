@@ -11,6 +11,8 @@ import {
 import BtnExtendedAction from './BtnExtendedAction.jsx'
 import {
   APP_CUSTOM_ACTION_LOCATION_OBJECT,
+  FAVORITE_STATE,
+  FavoriteButton,
   ROLE,
   buildAppCustomActionLinkList,
   ComposedIcon,
@@ -23,6 +25,8 @@ import {
 class ContentItem extends React.Component {
   render () {
     const { props } = this
+
+    const isFavorite = props.favoriteList && props.favoriteList.some(f => f.contentId === props.content.id)
 
     const status = props.contentType.availableStatuses.find(s => s.slug === props.content.statusSlug) || {
       hexcolor: '',
@@ -150,6 +154,16 @@ class ContentItem extends React.Component {
               {props.t(status.label)}
             </div>
           </div>
+          {props.onClickExtendedAction.favorite && (
+            <div className='content__favorite'>
+              <FavoriteButton
+                favoriteState={isFavorite ? FAVORITE_STATE.FAVORITE : FAVORITE_STATE.NOT_FAVORITE}
+                onClickAddToFavoriteList={e => props.onClickExtendedAction.favorite.addCallback(e)}
+                onClickRemoveFromFavoriteList={e => props.onClickExtendedAction.favorite.removeCallback(e)}
+                dataCy='content_item_favorite'
+              />
+            </div>
+          )}
         </Link>
       </ListItemWrapper>
     )
@@ -179,7 +193,7 @@ const contentItemDragAndDropSourceCollect = (connect, monitor) => ({
   isDragging: monitor.isDragging()
 })
 
-const mapStateToProps = ({ system, user }) => ({ system, user })
+const mapStateToProps = ({ system, user, favoriteList }) => ({ system, user, favoriteList })
 
 export default DragSource(DRAG_AND_DROP.CONTENT_ITEM, contentItemDragAndDropSource, contentItemDragAndDropSourceCollect)(
   connect(mapStateToProps)(translate()(ContentItem))

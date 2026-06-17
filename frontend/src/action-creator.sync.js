@@ -323,6 +323,6 @@ export const setFavoriteList = (favoriteList) => ({ type: SET_FAVORITE_LIST, fav
 export const UPDATE_FAVORITE_LIST = `${UPDATE}/${FAVORITE_LIST}`
 export const updateFavoriteList = (favoriteList) => ({ type: UPDATE_FAVORITE_LIST, favoriteList })
 export const removeFavorite = (favorite) => ({ type: `${REMOVE}/${FAVORITE}`, favorite })
-export const addFavorite = (favorite) => ({ type: `${ADD}/${FAVORITE}`, favorite })
+export const addFavorite = (favorite) => ({ type: `${ADD}/${FAVORITE_LIST}`, favorite })
 
 export const USAGE_CONDITIONS = 'UsageConditions'

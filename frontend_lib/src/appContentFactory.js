@@ -117,9 +117,15 @@ export function appContentFactory (WrappedComponent) {
         config: param.config,
         loggedUser: param.loggedUser || props.user,
         content: param.content,
+        favoriteList: [],
         ...DEFAULT_TIMELINE_STATE
       }
       this.sessionClientToken = getOrCreateSessionClientToken()
+
+      props.registerCustomEventHandlerList([
+        { name: CUSTOM_EVENT.ADD_CONTENT_TO_FAVORITE_LIST, handler: this.handleExternalAddContentToFavoriteList },
+        { name: CUSTOM_EVENT.REMOVE_CONTENT_FROM_FAVORITE_LIST, handler: this.handleExternalRemoveContentFromFavoriteList }
+      ])
 
       props.registerLiveMessageHandlerList([
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, handler: this.handleContentModified },
@@ -871,6 +877,20 @@ export function appContentFactory (WrappedComponent) {
       translationState: initialCommentTranslationState
     })
 
+    handleExternalAddContentToFavoriteList = data => {
+      if (data.source === 'app') return
+      this.setState(prev => ({
+        favoriteList: [...prev.favoriteList, data]
+      }))
+    }
+
+    handleExternalRemoveContentFromFavoriteList = data => {
+      if (data.source === 'app') return
+      this.setState(prev => ({
+        favoriteList: prev.favoriteList.filter(f => f.content_id !== data.content_id)
+      }))
+    }
+
     addContentToFavoriteList = async (content, loggedUser, setState) => {
       const response = await handleFetchResult(await postContentToFavoriteList(
         this.apiUrl,
@@ -887,6 +907,8 @@ export function appContentFactory (WrappedComponent) {
           favoriteList: [...previousState.favoriteList, newFavorite]
         }
       })
+      this.setState(prev => ({ favoriteList: [...prev.favoriteList, newFavorite] }))
+      GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.ADD_CONTENT_TO_FAVORITE_LIST, data: { ...newFavorite, source: 'app' } })
     }
 
     removeContentFromFavoriteList = async (content, loggedUser, setState) => {
@@ -906,6 +928,10 @@ export function appContentFactory (WrappedComponent) {
           )
         }
       })
+      this.setState(prev => ({
+        favoriteList: prev.favoriteList.filter(f => f.content_id !== content.content_id)
+      }))
+      GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REMOVE_CONTENT_FROM_FAVORITE_LIST, data: { content_id: content.content_id, source: 'app' } })
     }
 
     loadFavoriteContentList = async (loggedUser, setState) => {
@@ -913,14 +939,16 @@ export function appContentFactory (WrappedComponent) {
       if (!response.ok) {
         sendGlobalFlashMessage(i18n.t('Error while getting favorites'))
         setState({ favoriteList: [] })
+        this.setState({ favoriteList: [] }) // updating also appContentFactory to share state between content list and content details
         return
       }
       const favorites = response.body
       setState({ favoriteList: favorites.items })
+      this.setState({ favoriteList: favorites.items }) // updating also appContentFactory to share state between content list and content details
     }
 
-    isContentInFavoriteList = (content, state) => {
-      return state.favoriteList && state.favoriteList.some(
+    isContentInFavoriteList = (content) => {
+      return this.state.favoriteList && this.state.favoriteList.some(
         favorite => favorite.content_id === content.content_id
       )
     }

@@ -92,6 +92,8 @@ class ShareFolder extends React.Component {
 
           <div className='folder__header__status' />
 
+          <div className='folder__header__favorite' />
+
         </div>
 
         <div className='folder__content'>
