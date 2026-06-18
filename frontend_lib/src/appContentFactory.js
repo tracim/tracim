@@ -137,7 +137,9 @@ export function appContentFactory (WrappedComponent) {
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentCreated },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentDeleted },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentModified },
-        { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
+        { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified },
+        { entityType: TLM_ET.USER_FAVORITE, coreEntityType: TLM_CET.CREATED, handler: this.handleTlmFavoriteCreated },
+        { entityType: TLM_ET.USER_FAVORITE, coreEntityType: TLM_CET.DELETED, handler: this.handleTlmFavoriteDeleted }
       ])
 
       // FIXME - GB - 2021-09-08 - The condition below is needed because appContentFactory is used by
@@ -888,6 +890,21 @@ export function appContentFactory (WrappedComponent) {
       if (data.source === 'app') return
       this.setState(prev => ({
         favoriteList: prev.favoriteList.filter(f => f.content_id !== data.content_id)
+      }))
+    }
+
+    handleTlmFavoriteCreated = tlm => {
+      const newFavorite = tlm.fields.user_favorite
+      this.setState(prev => {
+        if (prev.favoriteList.some(f => f.content_id === newFavorite.content_id)) return null
+        return { favoriteList: [...prev.favoriteList, newFavorite] }
+      })
+    }
+
+    handleTlmFavoriteDeleted = tlm => {
+      const { content_id: contentId } = tlm.fields.user_favorite
+      this.setState(prev => ({
+        favoriteList: prev.favoriteList.filter(f => f.content_id !== contentId)
       }))
     }
 

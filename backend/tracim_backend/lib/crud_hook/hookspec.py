@@ -8,6 +8,7 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceSubscription
+from tracim_backend.models.favorites import FavoriteContent
 from tracim_backend.models.reaction import Reaction
 from tracim_backend.models.tag import Tag
 from tracim_backend.models.tag import TagOnContent
@@ -171,4 +172,16 @@ class DatabaseCrudHookSpec:
 
     @hookspec
     def on_user_config_deleted(self, user_config: UserConfig, context: TracimContext) -> None:
+        ...
+
+    @hookspec
+    def on_favorite_content_created(
+        self, favorite_content: FavoriteContent, context: TracimContext
+    ) -> None:
+        ...
+
+    @hookspec
+    def on_favorite_content_deleted(
+        self, favorite_content: FavoriteContent, context: TracimContext
+    ) -> None:
         ...

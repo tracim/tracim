@@ -58,6 +58,7 @@ from tracim_backend.models.event import EventTypeDatabaseParameters
 from tracim_backend.models.event import Message
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import ReadStatus
+from tracim_backend.models.favorites import FavoriteContent
 from tracim_backend.models.reaction import Reaction
 from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.models.tag import Tag
@@ -75,6 +76,7 @@ from tracim_backend.views.core_api.schemas import ToDoSchema
 from tracim_backend.views.core_api.schemas import UserCallSchema
 from tracim_backend.views.core_api.schemas import UserConfigSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
+from tracim_backend.views.core_api.schemas import UserFavoriteSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSubscriptionSchema
@@ -104,6 +106,7 @@ class EventApi:
     workspace_subscription_schema = WorkspaceSubscriptionSchema()
     user_call_schema = UserCallSchema()
     user_config_schema = UserConfigSchema()
+    user_favorite_schema = UserFavoriteSchema()
 
     def __init__(self, current_user: Optional[User], session: TracimSession, config: CFG) -> None:
         self._current_user = current_user
@@ -884,6 +887,36 @@ class EventBuilder:
     def on_user_config_modified(self, user_config: UserConfig, context: TracimContext) -> None:
         self._create_user_config_event(OperationType.MODIFIED, user_config, context)
 
+    @hookimpl
+    def on_favorite_content_created(
+        self, favorite_content: FavoriteContent, context: TracimContext
+    ) -> None:
+        self._create_user_favorite_event(OperationType.CREATED, favorite_content, context)
+
+    @hookimpl
+    def on_favorite_content_deleted(
+        self, favorite_content: FavoriteContent, context: TracimContext
+    ) -> None:
+        self._create_user_favorite_event(OperationType.DELETED, favorite_content, context)
+
+    def _create_user_favorite_event(
+        self, operation: OperationType, favorite_content: FavoriteContent, context: TracimContext
+    ) -> None:
+        current_user = context.safe_current_user()
+        user_api = UserApi(current_user, context.dbsession, self._config, show_deleted=True)
+        favorite_user_in_context = user_api.get_user_with_context(favorite_content.user)
+        fields = {
+            Event.USER_FAVORITE_FIELD: EventApi.user_favorite_schema.dump(favorite_content).data,
+            Event.USER_FIELD: EventApi.user_schema.dump(favorite_user_in_context).data,
+        }
+        event_api = EventApi(current_user, context.dbsession, self._config)
+        event_api.create_event(
+            entity_type=EntityType.USER_FAVORITE,
+            operation=operation,
+            additional_fields=fields,
+            context=context,
+        )
+
     def _create_subscription_event(
         self,
         operation: OperationType,
@@ -1199,6 +1232,15 @@ def _get_user_config_event_receiver_ids(
     return {event.fields["user"]["user_id"]}
 
 
+def _get_user_favorite_event_receiver_ids(
+    event: Event, session: TracimSession, config: CFG
+) -> Set[int]:
+    """
+    Favorite events are only visible to the user who owns the favorite.
+    """
+    return {event.fields["user"]["user_id"]}
+
+
 GetReceiverIdsCallable = Callable[[Event, TracimSession, CFG], Iterable[int]]
 
 
@@ -1214,6 +1256,7 @@ class BaseLiveMessageBuilder(abc.ABC):
         EntityType.TAG: _get_workspace_event_receiver_ids,
         EntityType.USER_CALL: _get_user_call_event_receiver_ids,
         EntityType.USER_CONFIG: _get_user_config_event_receiver_ids,
+        EntityType.USER_FAVORITE: _get_user_favorite_event_receiver_ids,
         EntityType.USER: _get_user_event_receiver_ids,
         EntityType.WORKSPACE_MEMBER: _get_members_and_administrators_ids,
         EntityType.WORKSPACE_SUBSCRIPTION: _get_workspace_subscription_event_receiver_ids,

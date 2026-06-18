@@ -2427,10 +2427,8 @@ class ContentApi(object):
         return favorite
 
     def remove_favorite(self, content_id: int, do_save: bool = True) -> None:
-        self._session.query(FavoriteContent).filter(
-            FavoriteContent.user_id == self._user.user_id,
-            FavoriteContent.content_id == content_id,
-        ).delete()
+        favorite = self.get_one_user_favorite_content(self._user.user_id, content_id)
+        self._session.delete(favorite)
         if do_save:
             self._session.flush()
 
