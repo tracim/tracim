@@ -117,15 +117,10 @@ export function appContentFactory (WrappedComponent) {
         config: param.config,
         loggedUser: param.loggedUser || props.user,
         content: param.content,
-        favoriteList: [],
+        isCurrentContentFavorite: false,
         ...DEFAULT_TIMELINE_STATE
       }
       this.sessionClientToken = getOrCreateSessionClientToken()
-
-      props.registerCustomEventHandlerList([
-        { name: CUSTOM_EVENT.ADD_CONTENT_TO_FAVORITE_LIST, handler: this.handleExternalAddContentToFavoriteList },
-        { name: CUSTOM_EVENT.REMOVE_CONTENT_FROM_FAVORITE_LIST, handler: this.handleExternalRemoveContentFromFavoriteList }
-      ])
 
       props.registerLiveMessageHandlerList([
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, handler: this.handleContentModified },
@@ -879,33 +874,18 @@ export function appContentFactory (WrappedComponent) {
       translationState: initialCommentTranslationState
     })
 
-    handleExternalAddContentToFavoriteList = data => {
-      if (data.source === 'app') return
-      this.setState(prev => ({
-        favoriteList: [...prev.favoriteList, data]
-      }))
-    }
-
-    handleExternalRemoveContentFromFavoriteList = data => {
-      if (data.source === 'app') return
-      this.setState(prev => ({
-        favoriteList: prev.favoriteList.filter(f => f.content_id !== data.content_id)
-      }))
-    }
-
     handleTlmFavoriteCreated = tlm => {
-      const newFavorite = tlm.fields.user_favorite
-      this.setState(prev => {
-        if (prev.favoriteList.some(f => f.content_id === newFavorite.content_id)) return null
-        return { favoriteList: [...prev.favoriteList, newFavorite] }
-      })
+      const { content_id: contentId } = tlm.fields.user_favorite
+      if (this.state.content && this.state.content.content_id === contentId) {
+        this.setState({ isCurrentContentFavorite: true })
+      }
     }
 
     handleTlmFavoriteDeleted = tlm => {
       const { content_id: contentId } = tlm.fields.user_favorite
-      this.setState(prev => ({
-        favoriteList: prev.favoriteList.filter(f => f.content_id !== contentId)
-      }))
+      if (this.state.content && this.state.content.content_id === contentId) {
+        this.setState({ isCurrentContentFavorite: false })
+      }
     }
 
     addContentToFavoriteList = async (content, loggedUser, setState) => {
@@ -919,12 +899,9 @@ export function appContentFactory (WrappedComponent) {
         return
       }
       const newFavorite = response.body
-      setState(previousState => {
-        return {
-          favoriteList: [...previousState.favoriteList, newFavorite]
-        }
-      })
-      this.setState(prev => ({ favoriteList: [...prev.favoriteList, newFavorite] }))
+      setState(previousState => ({
+        favoriteList: [...previousState.favoriteList, newFavorite]
+      }))
       GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.ADD_CONTENT_TO_FAVORITE_LIST, data: { ...newFavorite, source: 'app' } })
     }
 
@@ -938,15 +915,10 @@ export function appContentFactory (WrappedComponent) {
         sendGlobalFlashMessage(i18n.t('Error while removing content from favorites'))
         return
       }
-      setState(previousState => {
-        return {
-          favoriteList: previousState.favoriteList.filter(
-            favorite => favorite.content_id !== content.content_id
-          )
-        }
-      })
-      this.setState(prev => ({
-        favoriteList: prev.favoriteList.filter(f => f.content_id !== content.content_id)
+      setState(previousState => ({
+        favoriteList: previousState.favoriteList.filter(
+          favorite => favorite.content_id !== content.content_id
+        )
       }))
       GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REMOVE_CONTENT_FROM_FAVORITE_LIST, data: { content_id: content.content_id, source: 'app' } })
     }
@@ -956,18 +928,19 @@ export function appContentFactory (WrappedComponent) {
       if (!response.ok) {
         sendGlobalFlashMessage(i18n.t('Error while getting favorites'))
         setState({ favoriteList: [] })
-        this.setState({ favoriteList: [] }) // updating also appContentFactory to share state between content list and content details
+        this.setState({ isCurrentContentFavorite: false })
         return
       }
       const favorites = response.body
       setState({ favoriteList: favorites.items })
-      this.setState({ favoriteList: favorites.items }) // updating also appContentFactory to share state between content list and content details
+      const currentContentId = this.state.content && this.state.content.content_id
+      this.setState({
+        isCurrentContentFavorite: favorites.items.some(f => f.content_id === currentContentId)
+      })
     }
 
-    isContentInFavoriteList = (content) => {
-      return this.state.favoriteList && this.state.favoriteList.some(
-        favorite => favorite.content_id === content.content_id
-      )
+    isContentInFavoriteList = () => {
+      return this.state.isCurrentContentFavorite
     }
 
     buildTimelineItemCommentAsFile = (content, loggedUser) => ({
