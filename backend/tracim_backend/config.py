@@ -479,7 +479,7 @@ class CFG(object):
         )
         self.WEB__NOTIFICATION_WALL__EXCLUDED = self.get_raw_config(
             "web.notification_wall.excluded",
-            "user_call.created, user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*, tag.*, content_tag.*, user_config.*",
+            "user_call.created, user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*, tag.*, content_tag.*, user_config.*, user_favorite.*",
         )
         self.WEB__NOTIFICATION_WALL__INCLUDED = self.get_raw_config(
             "web.notification_wall.included",
@@ -487,7 +487,7 @@ class CFG(object):
         )
         self.WEB__RECENT_ACTIVITIES__EXCLUDED = self.get_raw_config(
             "web.recent_activities.excluded",
-            "user_call.created, user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, reaction.*, tag.*, content_tag.*, user_config.*",
+            "user_call.created, user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, reaction.*, tag.*, content_tag.*, user_config.*, user_favorite.*",
         )
         self.WEB__RECENT_ACTIVITIES__INCLUDED = self.get_raw_config(
             "web.recent_activities.included",

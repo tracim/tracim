@@ -5,7 +5,7 @@
 ### ✨ New Features
 
 - Show the template badge in search results [#6840](https://github.com/tracim/tracim/issues/6840)
-- Show the favorite icon in the content list [#6835](https://github.com/tracim/tracim/issues/6835)
+- Show the favorite icon in the content list with real-time sync across tabs (new favorite TLM) [#6835](https://github.com/tracim/tracim/issues/6835)
 
 ### 💥 Breaking/Important changes
 
