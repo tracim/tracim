@@ -8,7 +8,13 @@
 
 ### 💥 Breaking/Important changes
 
-- Add a new property in advanced search results, so content needs to be re-indexed using `tracimcli search index-populate`
+- As a new property was added in advanced search results, you will need to rebuild the Elastic search index by running the following commands in the backend folder:
+
+  ```sh
+  tracimcli search index-drop
+  tracimcli search index-create
+  tracimcli search index-populate
+  ```
 
 ### Other changes
 
