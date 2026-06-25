@@ -83,6 +83,41 @@ export class Favorites extends React.Component {
     ) {
       this.addWorkspaceToBreadcrumbsPath(this.props.favoriteList)
     }
+
+    if (prevProps.favoriteList !== this.props.favoriteList) {
+      const newFavorites = this.props.favoriteList.filter(
+        f => !prevProps.favoriteList.some(pf => pf.contentId === f.contentId)
+      )
+      if (newFavorites.length > 0 && this.props.workspaceList.length > 0) {
+        this.fetchBreadcrumbsForNewFavorites(newFavorites)
+      }
+    }
+  }
+
+  fetchBreadcrumbsForNewFavorites = async (newFavorites) => {
+    const { props } = this
+    const updatedFavorites = await Promise.all(
+      newFavorites
+        .filter(f => f.content !== null)
+        .map(async favorite => {
+          try {
+            const response = await handleFetchResult(
+              await getContentPath(FETCH_CONFIG.apiUrl, favorite.contentId)
+            )
+            const workspace = props.workspaceList.find(ws => ws.id === favorite.content.workspaceId)
+            const workspaceBreadcrumb = workspace ? [{ label: workspace.label }] : []
+            return { ...favorite, breadcrumbs: workspaceBreadcrumb.concat(response.body.items) }
+          } catch (e) {
+            console.error('Error fetching breadcrumbs for new favorite', favorite, e)
+            return favorite
+          }
+        })
+    )
+
+    const updatedFavoriteList = props.favoriteList.map(
+      f => updatedFavorites.find(uf => uf.contentId === f.contentId) || f
+    )
+    props.dispatch(updateFavoriteList(updatedFavoriteList))
   }
 
   addWorkspaceToBreadcrumbsPath (favoriteWithIncompleteBreadcrumbsList) {
