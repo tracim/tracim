@@ -5,7 +5,7 @@
 ### ✨ New Features
 
 - Show the template badge in search results [#6840](https://github.com/tracim/tracim/issues/6840)
-- Show the favorite icon in the content list with real-time sync across tabs (new favorite TLM) [#6835](https://github.com/tracim/tracim/issues/6835)
+- Show the favorite icon in the content list [#6835](https://github.com/tracim/tracim/issues/6835)
 
 ### 💥 Breaking/Important changes
 
@@ -22,6 +22,7 @@
 - FilenameWithBadges React component refactoring [#6838](https://github.com/tracim/tracim/issues/6838)
 - Fix linter issues introduced in 2026.04.00
 - Fix multivalued configuration variables with trailing commas crashing Tracim on startup [#6850](https://github.com/tracim/tracim/issues/6850)
+- Add new TLM for favorite creation / deletion [#6835](https://github.com/tracim/tracim/issues/6835)
 
 
 ## 2026.04.00
