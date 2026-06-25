@@ -133,8 +133,8 @@ export function appContentFactory (WrappedComponent) {
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentDeleted },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentModified },
         { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified },
-        { entityType: TLM_ET.USER_FAVORITE, coreEntityType: TLM_CET.CREATED, handler: this.handleTlmFavoriteCreated },
-        { entityType: TLM_ET.USER_FAVORITE, coreEntityType: TLM_CET.DELETED, handler: this.handleTlmFavoriteDeleted }
+        { entityType: TLM_ET.FAVORITE, coreEntityType: TLM_CET.CREATED, handler: this.handleTlmFavoriteCreated },
+        { entityType: TLM_ET.FAVORITE, coreEntityType: TLM_CET.DELETED, handler: this.handleTlmFavoriteDeleted }
       ])
 
       // FIXME - GB - 2021-09-08 - The condition below is needed because appContentFactory is used by
@@ -875,14 +875,14 @@ export function appContentFactory (WrappedComponent) {
     })
 
     handleTlmFavoriteCreated = tlm => {
-      const { content_id: contentId } = tlm.fields.user_favorite
+      const { content_id: contentId } = tlm.fields.favorite
       if (this.state.content && this.state.content.content_id === contentId) {
         this.setState({ isCurrentContentFavorite: true })
       }
     }
 
     handleTlmFavoriteDeleted = tlm => {
-      const { content_id: contentId } = tlm.fields.user_favorite
+      const { content_id: contentId } = tlm.fields.favorite
       if (this.state.content && this.state.content.content_id === contentId) {
         this.setState({ isCurrentContentFavorite: false })
       }

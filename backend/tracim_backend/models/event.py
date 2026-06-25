@@ -52,7 +52,7 @@ class EntityType(enum.Enum):
     CONTENT_TAG = "content_tag"
     USER_CALL = "user_call"
     USER_CONFIG = "user_config"
-    USER_FAVORITE = "user_favorite"
+    FAVORITE = "favorite"
 
     def __str__(self) -> str:
         return self.value
@@ -138,7 +138,7 @@ class Event(CreationDateMixin, DeclarativeBase):
     TAG_FIELD = "tag"
     USER_CALL_FIELD = "user_call"
     USER_CONFIG_FIELD = "user_config"
-    USER_FAVORITE_FIELD = "user_favorite"
+    FAVORITE_FIELD = "favorite"
 
     _ENTITY_SUBTYPE_LENGTH = 100
     __tablename__ = "events"
@@ -162,7 +162,7 @@ class Event(CreationDateMixin, DeclarativeBase):
     reaction = index_property("fields", REACTION_FIELD)
     tag = index_property("fields", TAG_FIELD)
     user_call = index_property("fields", USER_CALL_FIELD)
-    user_favorite = index_property("fields", USER_FAVORITE_FIELD)
+    favorite = index_property("fields", FAVORITE_FIELD)
 
     # INFO - GM - 2021-09-09
     # duplicated  ids from JSON column fields to ease indexing (workspace_id is indexed)

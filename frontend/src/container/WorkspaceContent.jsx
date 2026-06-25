@@ -109,8 +109,8 @@ export class WorkspaceContent extends React.Component {
       { name: CUSTOM_EVENT.APP_CLOSED, handler: this.handleCloseApp },
       { name: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT, handler: this.handleHidePopupCreateContent },
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage },
-      { name: CUSTOM_EVENT.ADD_CONTENT_TO_FAVORITE_LIST, handler: this.handleExternalAddContentToFavoriteList },
-      { name: CUSTOM_EVENT.REMOVE_CONTENT_FROM_FAVORITE_LIST, handler: this.handleExternalRemoveContentFromFavoriteList }
+      { name: CUSTOM_EVENT.ADD_CONTENT_TO_FAVORITE_LIST, handler: this.handleAddContentToFavoriteList },
+      { name: CUSTOM_EVENT.REMOVE_CONTENT_FROM_FAVORITE_LIST, handler: this.handleRemoveContentFromFavoriteList }
     ])
   }
 
@@ -159,12 +159,12 @@ export class WorkspaceContent extends React.Component {
     if (!this.state.appOpenedType) this.setHeadTitle(this.getFilterName(qs.parse(this.props.location.search).type))
   }
 
-  handleExternalAddContentToFavoriteList = data => {
+  handleAddContentToFavoriteList = data => {
     if (data.source === 'shell') return
     this.props.dispatch(addFavorite(data))
   }
 
-  handleExternalRemoveContentFromFavoriteList = data => {
+  handleRemoveContentFromFavoriteList = data => {
     if (data.source === 'shell') return
     const { props } = this
     const favorite = props.favoriteList.find(f => f.contentId === data.content_id)

@@ -532,16 +532,16 @@ class TestLiveMessages(object):
 
         assert favorite_created_event.event == "message"
         result = json.loads(favorite_created_event.data)
-        assert result["event_type"] == "user_favorite.created"
+        assert result["event_type"] == "favorite.created"
         assert result["read"] is None
         assert result["fields"]
         assert result["created"]
         assert result["event_id"]
         assert result["fields"]["user"]
         assert result["fields"]["user"]["user_id"] == 1
-        assert result["fields"]["user_favorite"]
-        assert result["fields"]["user_favorite"]["content_id"] == small_html_document_a.content_id
-        assert result["fields"]["user_favorite"]["user_id"] == 1
+        assert result["fields"]["favorite"]
+        assert result["fields"]["favorite"]["content_id"] == small_html_document_a.content_id
+        assert result["fields"]["favorite"]["user_id"] == 1
 
         with messages_stream_client() as client_events:
             remove_favorite_request = requests.delete(
@@ -555,7 +555,7 @@ class TestLiveMessages(object):
 
         assert favorite_deleted_event.event == "message"
         result = json.loads(favorite_deleted_event.data)
-        assert result["event_type"] == "user_favorite.deleted"
-        assert result["fields"]["user_favorite"]
-        assert result["fields"]["user_favorite"]["content_id"] == small_html_document_a.content_id
-        assert result["fields"]["user_favorite"]["user_id"] == 1
+        assert result["event_type"] == "favorite.deleted"
+        assert result["fields"]["favorite"]
+        assert result["fields"]["favorite"]["content_id"] == small_html_document_a.content_id
+        assert result["fields"]["favorite"]["user_id"] == 1

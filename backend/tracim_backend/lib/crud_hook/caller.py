@@ -67,7 +67,7 @@ class DatabaseCrudHookCaller:
                     user_call=obj, context=session.context
                 )
             elif isinstance(obj, FavoriteContent):
-                self._plugin_manager.hook.on_favorite_content_created(
+                self._plugin_manager.hook.on_favorite_created(
                     favorite_content=obj, context=session.context
                 )
             elif isinstance(obj, UserConfig):
@@ -152,7 +152,7 @@ class DatabaseCrudHookCaller:
                     user_call=obj, context=session.context
                 )
             elif isinstance(obj, FavoriteContent):
-                self._plugin_manager.hook.on_favorite_content_deleted(
+                self._plugin_manager.hook.on_favorite_deleted(
                     favorite_content=obj, context=session.context
                 )
             elif isinstance(obj, UserConfig):

@@ -676,7 +676,7 @@ class TestEventReceiver:
         ) = workspace_and_users
         user_api = user_api_factory.get()
         fields = {
-            Event.USER_FAVORITE_FIELD: {
+            Event.FAVORITE_FIELD: {
                 "user_id": event_initiator.user_id,
                 "content_id": 42,
                 "original_label": "A document",
@@ -687,7 +687,7 @@ class TestEventReceiver:
             .data,
         }
         event = Event(
-            entity_type=EntityType.USER_FAVORITE,
+            entity_type=EntityType.FAVORITE,
             operation=OperationType.CREATED,
             fields=fields,
         )

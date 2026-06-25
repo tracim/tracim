@@ -83,7 +83,7 @@ To identify the action that has happened, a TLM has an `Event type`.
 - Sub type (optional)
 
 **Entity type** is the kind of data object the TLM is about.  
-List of entity type: `user`, `workspace`, `workspace_member`, `content`, `mention`, `reaction`, `workspace_subscription`, `tag`, `content_tag`, `user_call`, `user_favorite`
+List of entity type: `user`, `workspace`, `workspace_member`, `content`, `mention`, `reaction`, `workspace_subscription`, `tag`, `content_tag`, `user_call`, `favorite`
 
 **Core event type** is the kind of action the TLM is about.  
 List of core event type: `copied`, `created`, `deleted`, `undeleted`, `modified`, `moved`
@@ -292,7 +292,7 @@ Each entry in fields is a subset of the corresponding HTTP API structure.
 }
 ```
 
-#### Field user_favorite (same as UserFavoriteSchema in API)
+#### Field favorite (same as FavoriteSchema in API)
 
 ```json
 {
@@ -317,4 +317,4 @@ Each entry in fields is a subset of the corresponding HTTP API structure.
 |          tag           |             created<br/>deleted<br/>modified              |                                                                                 |               author<br />workspace<br />tag               |                                       tag usable in space                                        |                                    same as workspace                                     |
 |      content_tag       |                    created<br/>deleted                    |                                                                                 |        author<br />workspace<br />tag<br />content         |                                   tag associated to a content                                    |                                      space members                                       |
 |       user_call        |             created<br/>deleted<br/>modified              |                                                                                 |              author<br />user_call<br />user               |                           call feature<br /> user is always the callee                           |                                 caller and callee users                                  |
-|     user_favorite      |                    created<br/>deleted                    |                                                                                 |         author<br />user<br />user_favorite                |           user added/removed a content from their favorites<br /> author and user are always the same person           |                              the user who owns the favorite                              |
+|     favorite      |                    created<br/>deleted                    |                                                                                 |         author<br />user<br />favorite                |           user added/removed a content from their favorites<br /> author and user are always the same person           |                              the user who owns the favorite                              |

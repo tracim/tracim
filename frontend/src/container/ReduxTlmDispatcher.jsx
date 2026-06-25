@@ -123,8 +123,8 @@ export class ReduxTlmDispatcher extends React.Component {
       { entityType: TLM_ET.USER_CONFIG, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserConfigModified },
 
       // User favorite
-      { entityType: TLM_ET.USER_FAVORITE, coreEntityType: TLM_CET.CREATED, handler: this.handleUserFavoriteCreated },
-      { entityType: TLM_ET.USER_FAVORITE, coreEntityType: TLM_CET.DELETED, handler: this.handleUserFavoriteDeleted }
+      { entityType: TLM_ET.FAVORITE, coreEntityType: TLM_CET.CREATED, handler: this.handleUserFavoriteCreated },
+      { entityType: TLM_ET.FAVORITE, coreEntityType: TLM_CET.DELETED, handler: this.handleUserFavoriteDeleted }
 
       // FIXME - CH - 2025-09-30 - Once the mark as read is a TLM instead of a custom event,
       // uncomment the declarations bellow and move the handlers to specific function instead of anonymous function
@@ -420,11 +420,11 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleUserFavoriteCreated = data => {
-    this.props.dispatch(addFavorite(data.fields.user_favorite))
+    this.props.dispatch(addFavorite(data.fields.favorite))
   }
 
   handleUserFavoriteDeleted = data => {
-    this.props.dispatch(removeFavorite({ contentId: data.fields.user_favorite.content_id }))
+    this.props.dispatch(removeFavorite({ contentId: data.fields.favorite.content_id }))
   }
 
   handleUserConfigModified = async data => {

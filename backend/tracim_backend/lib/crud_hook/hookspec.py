@@ -26,6 +26,7 @@ class DatabaseCrudHookSpec:
     - Tag
     - TagOnContent
     - UserCall
+    - Favorite
     """
 
     @hookspec
@@ -175,13 +176,13 @@ class DatabaseCrudHookSpec:
         ...
 
     @hookspec
-    def on_favorite_content_created(
+    def on_favorite_created(
         self, favorite_content: FavoriteContent, context: TracimContext
     ) -> None:
         ...
 
     @hookspec
-    def on_favorite_content_deleted(
+    def on_favorite_deleted(
         self, favorite_content: FavoriteContent, context: TracimContext
     ) -> None:
         ...

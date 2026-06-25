@@ -1,4 +1,4 @@
-"""add_user_favorite_entity_type
+"""add_favorite_entity_type
 
 Revision ID: 527a180de9dc
 Revises: 239b49c55627
@@ -26,10 +26,10 @@ old_entity_type_enum_values = (
     "USER_CALL",
     "USER_CONFIG",
 )
-user_favorite = "USER_FAVORITE"
+favorite = "FAVORITE"
 
 old_entity_type_enum = sa.Enum(*old_entity_type_enum_values, name=enum_name)
-new_entity_type_enum = sa.Enum(*(old_entity_type_enum_values + (user_favorite,)), name=enum_name)
+new_entity_type_enum = sa.Enum(*(old_entity_type_enum_values + (favorite,)), name=enum_name)
 
 
 def upgrade():
