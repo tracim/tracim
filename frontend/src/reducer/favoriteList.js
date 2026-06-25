@@ -21,6 +21,7 @@ const serializeFavoriteProps = {
 const serializeFavorite = (apiFavorite) => {
   return {
     ...serialize(apiFavorite, serializeFavoriteProps),
+    breadcrumbs: apiFavorite.breadcrumbs || [],
     content: apiFavorite.content
       ? {
         ...serialize(apiFavorite.content, serializeContentProps),

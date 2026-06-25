@@ -67,7 +67,7 @@ from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.models.userconfig import UserConfig
 from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import EventSchema
-from tracim_backend.views.core_api.schemas import FavoriteSchema
+from tracim_backend.views.core_api.schemas import FavoriteContentSchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
 from tracim_backend.views.core_api.schemas import MessageCommentSchema
 from tracim_backend.views.core_api.schemas import MessageContentSchema
@@ -106,7 +106,7 @@ class EventApi:
     workspace_subscription_schema = WorkspaceSubscriptionSchema()
     user_call_schema = UserCallSchema()
     user_config_schema = UserConfigSchema()
-    favorite_schema = FavoriteSchema()
+    favorite_schema = FavoriteContentSchema()
 
     def __init__(self, current_user: Optional[User], session: TracimSession, config: CFG) -> None:
         self._current_user = current_user
@@ -905,8 +905,12 @@ class EventBuilder:
         current_user = context.safe_current_user()
         user_api = UserApi(current_user, context.dbsession, self._config, show_deleted=True)
         favorite_user_in_context = user_api.get_user_with_context(favorite_content.user)
+        content_api = ContentApi(
+            context.dbsession, current_user, self._config, show_deleted=True, show_archived=True
+        )
+        favorite_in_context = content_api.get_one_user_favorite_content_in_context(favorite_content)
         fields = {
-            Event.FAVORITE_FIELD: EventApi.favorite_schema.dump(favorite_content).data,
+            Event.FAVORITE_FIELD: EventApi.favorite_schema.dump(favorite_in_context).data,
             Event.USER_FIELD: EventApi.user_schema.dump(favorite_user_in_context).data,
         }
         event_api = EventApi(current_user, context.dbsession, self._config)

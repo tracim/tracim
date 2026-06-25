@@ -292,14 +292,36 @@ Each entry in fields is a subset of the corresponding HTTP API structure.
 }
 ```
 
-#### Field favorite (same as FavoriteSchema in API)
+#### Field favorite (same as FavoriteContentSchema in API)
+
+`content` is `null` when the favorited content has been deleted or is no longer accessible.
 
 ```json
 {
   "user_id": 3,
   "content_id": 6,
   "original_label": "Intervention Report 12",
-  "original_type": "html-document"
+  "original_type": "html-document",
+  "content": {
+    "content_id": 6,
+    "label": "Intervention Report 12",
+    "content_type": "html-document",
+    "workspace_id": 23,
+    "status": "open",
+    "modified": "2012-04-23T18:28:43Z",
+    "is_deleted": false,
+    "is_archived": false,
+    "author": {
+      "user_id": 1,
+      "public_name": "John Doe",
+      "username": "jdoe"
+    },
+    "last_modifier": {
+      "user_id": 1,
+      "public_name": "John Doe",
+      "username": "jdoe"
+    }
+  }
 }
 ```
 

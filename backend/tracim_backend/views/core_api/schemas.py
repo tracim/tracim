@@ -1946,15 +1946,6 @@ class PaginatedFavoriteContentSchema(BasePaginatedSchemaPage):
     items = marshmallow.fields.Nested(FavoriteContentSchema, many=True)
 
 
-class FavoriteSchema(marshmallow.Schema):
-    """Lightweight schema used in TLM events (no nested content object)."""
-
-    user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
-    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
-    original_label = StrippedString(example="Intervention Report 12")
-    original_type = StrippedString(example="html-document", validate=all_content_types_validator)
-
-
 class ReadStatusSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     read_by_user = marshmallow.fields.Bool(example=False, default=False)
