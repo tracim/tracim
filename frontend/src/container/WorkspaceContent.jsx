@@ -174,7 +174,11 @@ export class WorkspaceContent extends React.Component {
 
   /**
    * WORKAROUND - PG - 2026-06-11 - Favorite status is not returned by the content list API,
-   * so we need a separate call to load it.
+   * so we need a separate call to load the user favorites list
+   *
+   * WARNING - PG - 2026-06-26 ⚠️⚡️ the user favorites list API returns lots of unneeded information (see
+   * FavoriteContentSchema Python class), so this may become a performance issue one day...
+   *
    * @see {@link getContentPathList} method to load contents list
    * @since 2026.07.00 GH#6835
    */
