@@ -888,27 +888,23 @@ class EventBuilder:
         self._create_user_config_event(OperationType.MODIFIED, user_config, context)
 
     @hookimpl
-    def on_favorite_created(
-        self, favorite_content: FavoriteContent, context: TracimContext
-    ) -> None:
-        self._create_favorite_event(OperationType.CREATED, favorite_content, context)
+    def on_favorite_created(self, favorite: FavoriteContent, context: TracimContext) -> None:
+        self._create_favorite_event(OperationType.CREATED, favorite, context)
 
     @hookimpl
-    def on_favorite_deleted(
-        self, favorite_content: FavoriteContent, context: TracimContext
-    ) -> None:
-        self._create_favorite_event(OperationType.DELETED, favorite_content, context)
+    def on_favorite_deleted(self, favorite: FavoriteContent, context: TracimContext) -> None:
+        self._create_favorite_event(OperationType.DELETED, favorite, context)
 
     def _create_favorite_event(
-        self, operation: OperationType, favorite_content: FavoriteContent, context: TracimContext
+        self, operation: OperationType, favorite: FavoriteContent, context: TracimContext
     ) -> None:
         current_user = context.safe_current_user()
         user_api = UserApi(current_user, context.dbsession, self._config, show_deleted=True)
-        favorite_user_in_context = user_api.get_user_with_context(favorite_content.user)
+        favorite_user_in_context = user_api.get_user_with_context(favorite.user)
         content_api = ContentApi(
             context.dbsession, current_user, self._config, show_deleted=True, show_archived=True
         )
-        favorite_in_context = content_api.get_one_user_favorite_content_in_context(favorite_content)
+        favorite_in_context = content_api.get_one_user_favorite_content_in_context(favorite)
         fields = {
             Event.FAVORITE_FIELD: EventApi.favorite_schema.dump(favorite_in_context).data,
             Event.USER_FIELD: EventApi.user_schema.dump(favorite_user_in_context).data,
