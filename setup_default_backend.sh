@@ -61,7 +61,7 @@ function install_backend_system_dep {
     else
         PACKAGE_LIST=$(cat "${system_package_dir}/build_backend_packages.list" "${system_package_dir}/run_backend_packages.list")
     fi
-    $SUDO apt install -y $PACKAGE_LIST && loggood "$PACKAGE correctly installed" || logerror "failed to install $PACKAGE"
+    $SUDO apt-get install -y $PACKAGE_LIST && loggood "$PACKAGE correctly installed" || logerror "failed to install $PACKAGE"
 }
 
 function setup_pyenv {
