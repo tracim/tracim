@@ -76,7 +76,7 @@ class UploadPermissionLib(object):
         created = datetime.utcnow()
         upload_permission_group_uuid = str(uuid.uuid4().hex)
         for email in emails:
-            email_object = EmailAddress.from_rfc_email_address(email, True)
+            email_object = EmailAddress.from_rfc_email_address(email)
             upload_permission = UploadPermission(
                 author=self._user,
                 workspace_id=workspace.workspace_id,

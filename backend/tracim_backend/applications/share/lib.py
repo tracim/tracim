@@ -64,7 +64,7 @@ class ShareLib(object):
         created = datetime.now()
         share_group_uuid = str(uuid.uuid4())
         for email in emails:
-            email_object = EmailAddress.from_rfc_email_address(email, True)
+            email_object = EmailAddress.from_rfc_email_address(email)
             content_share = ContentShare(
                 author=self._user,
                 content_id=content.content_id,
