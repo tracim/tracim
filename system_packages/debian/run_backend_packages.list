@@ -1,7 +1,7 @@
 ghostscript
 git
 imagemagick
-libmagickcore-6.q16-6-extra
+libmagickcore-?.q16-*-extra
 iproute2
 libfile-mimeinfo-perl
 libimage-exiftool-perl
