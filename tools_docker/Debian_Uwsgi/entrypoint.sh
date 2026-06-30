@@ -218,9 +218,7 @@ fi
 
 # Start tracim
 log "start uwsgi"
-set +e
-service uwsgi restart
-set -e
+uwsgi --emperor /etc/uwsgi/apps-enabled/ --daemonize2 /var/tracim/logs/uwsgi-emperor.log
 if [ "$START_CALDAV" = "1" ]; then
     log "Synchronizing caldav accounts"
     cd /tracim/backend/

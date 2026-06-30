@@ -11,7 +11,7 @@ ARG CONTAINER_TRACIM_DIR="/tracim"
 # Base image for installing some base dependencies
 ####
 
-FROM debian:bullseye AS base
+FROM python:3.11-slim-trixie AS base
 ARG REPO
 ARG PACKAGE_DIR
 ARG BRANCH
@@ -42,7 +42,6 @@ RUN apt-get install -qy --no-install-recommends \
 # - installs optional dependencies
 ####
 FROM base AS build_backend
-ENV SETUPTOOLS_USE_DISTUTILS=stdlib
 ARG PACKAGE_DIR
 # required packages for building the backend dependencies
 RUN apt-get install -qy $(cat "${PACKAGE_DIR}/build_backend_packages.list") \
@@ -56,6 +55,7 @@ RUN apt-get install -qy $(cat "${PACKAGE_DIR}/build_backend_packages.list") \
     -r requirements-db-mysql.txt \
     -r requirements-storage-s3.txt \
     -r requirements-full-preview-generator.txt \
+    uWSGI \
     -e "."
 RUN cp -r /tracim/frontend/dist/assets/font/Nunito/ /usr/share/fonts/nunito
 
@@ -68,7 +68,7 @@ RUN cp -r /tracim/frontend/dist/assets/font/Nunito/ /usr/share/fonts/nunito
 # - setups backend translation
 # - builds frontend
 ####
-FROM node:16-buster AS build_frontend
+FROM node:16-bookworm AS build_frontend
 COPY --from=base /tracim /tracim
 RUN \
     cd /tracim/backend \
@@ -98,12 +98,17 @@ ENV LANG=C.UTF-8
 ENV LANGUAGE=C.UTF-8
 ENV LC_ALL=C.UTF-8
 ARG PACKAGE_DIR
-# NOTE - 2021-10-21 - S.G. - pin condure (used by pushpin) to a lower priority so that mongrel2 is used instead.
-# This is due to automated tests randomly failing with condure.
-RUN printf "Package: condure\nPin: version *\nPin-Priority: -1" > /etc/apt/preferences.d/pushpin \
+# pushpin is not yet packaged for Debian 13 Trixie; install from sid
+RUN echo "deb http://deb.debian.org/debian sid main" > /etc/apt/sources.list.d/sid.list \
+    && printf "Package: *\nPin: release a=sid\nPin-Priority: 100\n\nPackage: pushpin\nPin: release a=sid\nPin-Priority: 600\n" > /etc/apt/preferences.d/sid \
+    && apt-get update -qy \
+    && apt-get install -qy pushpin \
+    && rm /etc/apt/sources.list.d/sid.list /etc/apt/preferences.d/sid \
+    && apt-get update -qy \
     && apt-get install -qy $(cat "${PACKAGE_DIR}/server_packages.list" "${PACKAGE_DIR}/optional_preview_packages.list") vim wget curl \
     && apt-get autoremove -qy \
     && rm -rf /var/lib/{apt,dpkg,cache,log}/ /tmp/* /var/tmp/* \
+    && mkdir -p /etc/uwsgi/apps-available /etc/uwsgi/apps-enabled /var/log/uwsgi/app \
 # Remove default apache2 conf
     && rm /etc/apache2/sites-enabled/000-default.conf \
 # Do not show apache version
