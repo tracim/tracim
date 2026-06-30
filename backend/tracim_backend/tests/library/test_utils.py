@@ -356,6 +356,38 @@ class TestEmailAddress(object):
         assert john_address.force_angle_bracket is False
         assert john_address.address == "John Doe <john.doe@domainame.ndl>"
 
+    def test_unit__email_address_address__ok__from_rfc_email_address__force_angle_bracket_noop_with_label(
+        self,
+    ):
+        # force_angle_bracket with no label always adds angle brackets
+        john_address_no_name = EmailAddress.from_rfc_email_address("john.doe@domainame.ndl", True)
+        assert john_address_no_name.domain == "domainame.ndl"
+        assert john_address_no_name.label == ""
+        assert john_address_no_name.email == "john.doe@domainame.ndl"
+        assert john_address_no_name.force_angle_bracket is True
+        assert john_address_no_name.address == "<john.doe@domainame.ndl>"
+
+        # force_angle_bracket has no effect when a label is present: formataddr always produces "Name <email>"
+        john_address_with_name_force_brackets = EmailAddress.from_rfc_email_address(
+            "John Doe <john.doe@domainame.ndl>", True
+        )
+        assert john_address_with_name_force_brackets.domain == "domainame.ndl"
+        assert john_address_with_name_force_brackets.label == "John Doe"
+        assert john_address_with_name_force_brackets.email == "john.doe@domainame.ndl"
+        assert john_address_with_name_force_brackets.force_angle_bracket is True
+        assert john_address_with_name_force_brackets.address == "John Doe <john.doe@domainame.ndl>"
+
+        john_address_with_name_default_brackets = EmailAddress.from_rfc_email_address(
+            "John Doe <john.doe@domainame.ndl>", False
+        )
+        assert john_address_with_name_default_brackets.domain == "domainame.ndl"
+        assert john_address_with_name_default_brackets.label == "John Doe"
+        assert john_address_with_name_default_brackets.email == "john.doe@domainame.ndl"
+        assert john_address_with_name_default_brackets.force_angle_bracket is False
+        assert (
+            john_address_with_name_default_brackets.address == "John Doe <john.doe@domainame.ndl>"
+        )
+
 
 class TestCustomPropertiesCheck(object):
     def test_unit__validate_json_schema__ok__nominal_case(self):
