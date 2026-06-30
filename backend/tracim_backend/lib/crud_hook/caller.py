@@ -8,6 +8,7 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceSubscription
+from tracim_backend.models.favorites import FavoriteContent
 from tracim_backend.models.reaction import Reaction
 from tracim_backend.models.tag import Tag
 from tracim_backend.models.tag import TagOnContent
@@ -65,6 +66,8 @@ class DatabaseCrudHookCaller:
                 self._plugin_manager.hook.on_user_call_created(
                     user_call=obj, context=session.context
                 )
+            elif isinstance(obj, FavoriteContent):
+                self._plugin_manager.hook.on_favorite_created(favorite=obj, context=session.context)
             elif isinstance(obj, UserConfig):
                 self._plugin_manager.hook.on_user_config_created(
                     user_config=obj, context=session.context
@@ -146,6 +149,8 @@ class DatabaseCrudHookCaller:
                 self._plugin_manager.hook.on_user_call_deleted(
                     user_call=obj, context=session.context
                 )
+            elif isinstance(obj, FavoriteContent):
+                self._plugin_manager.hook.on_favorite_deleted(favorite=obj, context=session.context)
             elif isinstance(obj, UserConfig):
                 self._plugin_manager.hook.on_user_config_deleted(
                     user_config=obj, context=session.context

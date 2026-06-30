@@ -117,6 +117,7 @@ export function appContentFactory (WrappedComponent) {
         config: param.config,
         loggedUser: param.loggedUser || props.user,
         content: param.content,
+        isCurrentContentFavorite: false,
         ...DEFAULT_TIMELINE_STATE
       }
       this.sessionClientToken = getOrCreateSessionClientToken()
@@ -131,7 +132,9 @@ export function appContentFactory (WrappedComponent) {
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentCreated },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentDeleted },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentModified },
-        { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
+        { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified },
+        { entityType: TLM_ET.FAVORITE, coreEntityType: TLM_CET.CREATED, handler: this.handleTlmFavoriteCreated },
+        { entityType: TLM_ET.FAVORITE, coreEntityType: TLM_CET.DELETED, handler: this.handleTlmFavoriteDeleted }
       ])
 
       // FIXME - GB - 2021-09-08 - The condition below is needed because appContentFactory is used by
@@ -871,6 +874,20 @@ export function appContentFactory (WrappedComponent) {
       translationState: initialCommentTranslationState
     })
 
+    handleTlmFavoriteCreated = tlm => {
+      const { content_id: contentId } = tlm.fields.favorite
+      if (this.state.content && this.state.content.content_id === contentId) {
+        this.setState({ isCurrentContentFavorite: true })
+      }
+    }
+
+    handleTlmFavoriteDeleted = tlm => {
+      const { content_id: contentId } = tlm.fields.favorite
+      if (this.state.content && this.state.content.content_id === contentId) {
+        this.setState({ isCurrentContentFavorite: false })
+      }
+    }
+
     addContentToFavoriteList = async (content, loggedUser, setState) => {
       const response = await handleFetchResult(await postContentToFavoriteList(
         this.apiUrl,
@@ -882,11 +899,10 @@ export function appContentFactory (WrappedComponent) {
         return
       }
       const newFavorite = response.body
-      setState(previousState => {
-        return {
-          favoriteList: [...previousState.favoriteList, newFavorite]
-        }
-      })
+      setState(previousState => ({
+        favoriteList: [...previousState.favoriteList, newFavorite]
+      }))
+      GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.ADD_CONTENT_TO_FAVORITE_LIST, data: { ...newFavorite, source: 'app' } })
     }
 
     removeContentFromFavoriteList = async (content, loggedUser, setState) => {
@@ -899,13 +915,12 @@ export function appContentFactory (WrappedComponent) {
         sendGlobalFlashMessage(i18n.t('Error while removing content from favorites'))
         return
       }
-      setState(previousState => {
-        return {
-          favoriteList: previousState.favoriteList.filter(
-            favorite => favorite.content_id !== content.content_id
-          )
-        }
-      })
+      setState(previousState => ({
+        favoriteList: previousState.favoriteList.filter(
+          favorite => favorite.content_id !== content.content_id
+        )
+      }))
+      GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REMOVE_CONTENT_FROM_FAVORITE_LIST, data: { content_id: content.content_id, source: 'app' } })
     }
 
     loadFavoriteContentList = async (loggedUser, setState) => {
@@ -913,16 +928,19 @@ export function appContentFactory (WrappedComponent) {
       if (!response.ok) {
         sendGlobalFlashMessage(i18n.t('Error while getting favorites'))
         setState({ favoriteList: [] })
+        this.setState({ isCurrentContentFavorite: false })
         return
       }
       const favorites = response.body
       setState({ favoriteList: favorites.items })
+      const currentContentId = this.state.content && this.state.content.content_id
+      this.setState({
+        isCurrentContentFavorite: favorites.items.some(f => f.content_id === currentContentId)
+      })
     }
 
-    isContentInFavoriteList = (content, state) => {
-      return state.favoriteList && state.favoriteList.some(
-        favorite => favorite.content_id === content.content_id
-      )
+    isContentInFavoriteList = () => {
+      return this.state.isCurrentContentFavorite
     }
 
     buildTimelineItemCommentAsFile = (content, loggedUser) => ({

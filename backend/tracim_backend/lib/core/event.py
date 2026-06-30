@@ -58,6 +58,7 @@ from tracim_backend.models.event import EventTypeDatabaseParameters
 from tracim_backend.models.event import Message
 from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import ReadStatus
+from tracim_backend.models.favorites import FavoriteContent
 from tracim_backend.models.reaction import Reaction
 from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.models.tag import Tag
@@ -66,6 +67,7 @@ from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.models.userconfig import UserConfig
 from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import EventSchema
+from tracim_backend.views.core_api.schemas import FavoriteContentSchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
 from tracim_backend.views.core_api.schemas import MessageCommentSchema
 from tracim_backend.views.core_api.schemas import MessageContentSchema
@@ -104,6 +106,7 @@ class EventApi:
     workspace_subscription_schema = WorkspaceSubscriptionSchema()
     user_call_schema = UserCallSchema()
     user_config_schema = UserConfigSchema()
+    favorite_schema = FavoriteContentSchema()
 
     def __init__(self, current_user: Optional[User], session: TracimSession, config: CFG) -> None:
         self._current_user = current_user
@@ -884,6 +887,36 @@ class EventBuilder:
     def on_user_config_modified(self, user_config: UserConfig, context: TracimContext) -> None:
         self._create_user_config_event(OperationType.MODIFIED, user_config, context)
 
+    @hookimpl
+    def on_favorite_created(self, favorite: FavoriteContent, context: TracimContext) -> None:
+        self._create_favorite_event(OperationType.CREATED, favorite, context)
+
+    @hookimpl
+    def on_favorite_deleted(self, favorite: FavoriteContent, context: TracimContext) -> None:
+        self._create_favorite_event(OperationType.DELETED, favorite, context)
+
+    def _create_favorite_event(
+        self, operation: OperationType, favorite: FavoriteContent, context: TracimContext
+    ) -> None:
+        current_user = context.safe_current_user()
+        user_api = UserApi(current_user, context.dbsession, self._config, show_deleted=True)
+        favorite_user_in_context = user_api.get_user_with_context(favorite.user)
+        content_api = ContentApi(
+            context.dbsession, current_user, self._config, show_deleted=True, show_archived=True
+        )
+        favorite_in_context = content_api.get_one_user_favorite_content_in_context(favorite)
+        fields = {
+            Event.FAVORITE_FIELD: EventApi.favorite_schema.dump(favorite_in_context).data,
+            Event.USER_FIELD: EventApi.user_schema.dump(favorite_user_in_context).data,
+        }
+        event_api = EventApi(current_user, context.dbsession, self._config)
+        event_api.create_event(
+            entity_type=EntityType.FAVORITE,
+            operation=operation,
+            additional_fields=fields,
+            context=context,
+        )
+
     def _create_subscription_event(
         self,
         operation: OperationType,
@@ -1199,6 +1232,13 @@ def _get_user_config_event_receiver_ids(
     return {event.fields["user"]["user_id"]}
 
 
+def _get_favorite_event_receiver_ids(event: Event, session: TracimSession, config: CFG) -> Set[int]:
+    """
+    Favorite events are only visible to the user who owns the favorite.
+    """
+    return {event.fields["user"]["user_id"]}
+
+
 GetReceiverIdsCallable = Callable[[Event, TracimSession, CFG], Iterable[int]]
 
 
@@ -1214,6 +1254,7 @@ class BaseLiveMessageBuilder(abc.ABC):
         EntityType.TAG: _get_workspace_event_receiver_ids,
         EntityType.USER_CALL: _get_user_call_event_receiver_ids,
         EntityType.USER_CONFIG: _get_user_config_event_receiver_ids,
+        EntityType.FAVORITE: _get_favorite_event_receiver_ids,
         EntityType.USER: _get_user_event_receiver_ids,
         EntityType.WORKSPACE_MEMBER: _get_members_and_administrators_ids,
         EntityType.WORKSPACE_SUBSCRIPTION: _get_workspace_subscription_event_receiver_ids,

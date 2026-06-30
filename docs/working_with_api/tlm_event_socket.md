@@ -83,7 +83,7 @@ To identify the action that has happened, a TLM has an `Event type`.
 - Sub type (optional)
 
 **Entity type** is the kind of data object the TLM is about.  
-List of entity type: `user`, `workspace`, `workspace_member`, `content`, `mention`, `reaction`, `workspace_subscription`, `tag`, `content_tag`, `user_call`
+List of entity type: `user`, `workspace`, `workspace_member`, `content`, `mention`, `reaction`, `workspace_subscription`, `tag`, `content_tag`, `user_call`, `favorite`
 
 **Core event type** is the kind of action the TLM is about.  
 List of core event type: `copied`, `created`, `deleted`, `undeleted`, `modified`, `moved`
@@ -292,6 +292,39 @@ Each entry in fields is a subset of the corresponding HTTP API structure.
 }
 ```
 
+#### Field favorite (same as FavoriteContentSchema in API)
+
+`content` is `null` when the favorited content has been deleted or is no longer accessible.
+
+```json
+{
+  "user_id": 3,
+  "content_id": 6,
+  "original_label": "Intervention Report 12",
+  "original_type": "html-document",
+  "content": {
+    "content_id": 6,
+    "label": "Intervention Report 12",
+    "content_type": "html-document",
+    "workspace_id": 23,
+    "status": "open",
+    "modified": "2012-04-23T18:28:43Z",
+    "is_deleted": false,
+    "is_archived": false,
+    "author": {
+      "user_id": 1,
+      "public_name": "John Doe",
+      "username": "jdoe"
+    },
+    "last_modifier": {
+      "user_id": 1,
+      "public_name": "John Doe",
+      "username": "jdoe"
+    }
+  }
+}
+```
+
 #### Fields table
 
 |      Entity type       |                     Core event types                      |                                    Sub type                                     |                           Fields                           |                                             Comment                                              |                                       Received by                                        |
@@ -306,3 +339,4 @@ Each entry in fields is a subset of the corresponding HTTP API structure.
 |          tag           |             created<br/>deleted<br/>modified              |                                                                                 |               author<br />workspace<br />tag               |                                       tag usable in space                                        |                                    same as workspace                                     |
 |      content_tag       |                    created<br/>deleted                    |                                                                                 |        author<br />workspace<br />tag<br />content         |                                   tag associated to a content                                    |                                      space members                                       |
 |       user_call        |             created<br/>deleted<br/>modified              |                                                                                 |              author<br />user_call<br />user               |                           call feature<br /> user is always the callee                           |                                 caller and callee users                                  |
+|     favorite      |                    created<br/>deleted                    |                                                                                 |         author<br />user<br />favorite                |           user added/removed a content from their favorites<br /> author and user are always the same person           |                              the user who owns the favorite                              |

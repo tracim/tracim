@@ -1,5 +1,4 @@
 import {
-  FAVORITE_LIST,
   FAVORITE,
   ADD,
   REMOVE,
@@ -21,6 +20,7 @@ const serializeFavoriteProps = {
 const serializeFavorite = (apiFavorite) => {
   return {
     ...serialize(apiFavorite, serializeFavoriteProps),
+    breadcrumbs: apiFavorite.breadcrumbs || [],
     content: apiFavorite.content
       ? {
         ...serialize(apiFavorite.content, serializeContentProps),
@@ -37,7 +37,7 @@ const favoriteList = (state = [], action) => {
       return action.favoriteList.map(serializeFavorite)
     case UPDATE_FAVORITE_LIST:
       return action.favoriteList
-    case `${ADD}/${FAVORITE_LIST}`:
+    case `${ADD}/${FAVORITE}`:
       return [
         ...state,
         serializeFavorite(action.favorite)

@@ -512,3 +512,50 @@ class TestLiveMessages(object):
         assert result["fields"]["tag"]
         assert result["fields"]["tag"]["tag_name"] == "foo"
         assert result["fields"]["content"]
+
+    @pytest.mark.pushpin
+    def test_api__user_live_messages_endpoint_with_GRIP_proxy__ok__favorite__async(
+        self,
+        small_html_document_a: Content,
+        pushpin,
+        app_config,
+        rq_database_worker,
+    ):
+        with messages_stream_client() as client_events:
+            add_favorite_request = requests.post(
+                "http://localhost:7999/api/users/1/favorite-contents",
+                auth=("admin@admin.admin", "admin@admin.admin"),
+                json={"content_id": small_html_document_a.content_id},
+            )
+            assert add_favorite_request.status_code == 200
+            favorite_created_event = next(client_events)
+
+        assert favorite_created_event.event == "message"
+        result = json.loads(favorite_created_event.data)
+        assert result["event_type"] == "favorite.created"
+        assert result["read"] is None
+        assert result["fields"]
+        assert result["created"]
+        assert result["event_id"]
+        assert result["fields"]["user"]
+        assert result["fields"]["user"]["user_id"] == 1
+        assert result["fields"]["favorite"]
+        assert result["fields"]["favorite"]["content_id"] == small_html_document_a.content_id
+        assert result["fields"]["favorite"]["user_id"] == 1
+
+        with messages_stream_client() as client_events:
+            remove_favorite_request = requests.delete(
+                "http://localhost:7999/api/users/1/favorite-contents/{}".format(
+                    small_html_document_a.content_id
+                ),
+                auth=("admin@admin.admin", "admin@admin.admin"),
+            )
+            assert remove_favorite_request.status_code == 204
+            favorite_deleted_event = next(client_events)
+
+        assert favorite_deleted_event.event == "message"
+        result = json.loads(favorite_deleted_event.data)
+        assert result["event_type"] == "favorite.deleted"
+        assert result["fields"]["favorite"]
+        assert result["fields"]["favorite"]["content_id"] == small_html_document_a.content_id
+        assert result["fields"]["favorite"]["user_id"] == 1

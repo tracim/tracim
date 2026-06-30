@@ -12,6 +12,7 @@ const SHAREDSPACE_SUBSCRIPTION = 'workspace_subscription'
 const TAG = 'tag'
 const USER_CALL = 'user_call'
 const USER_CONFIG = 'user_config'
+const FAVORITE = 'favorite'
 
 // TLM Core Event Type List
 const CREATED = 'created'
@@ -34,7 +35,8 @@ export const TLM_ENTITY_TYPE = {
   SHAREDSPACE_SUBSCRIPTION,
   TAG,
   USER_CALL,
-  USER_CONFIG
+  USER_CONFIG,
+  FAVORITE
 }
 export const TLM_CORE_EVENT_TYPE = {
   CREATED,

@@ -19,6 +19,7 @@ from tracim_backend.tests.utils import UserApiFactory
 from tracim_backend.tests.utils import UserWorkspaceConfigApiFactory
 from tracim_backend.tests.utils import WorkspaceApiFactory
 from tracim_backend.views.core_api.schemas import ContentSchema
+from tracim_backend.views.core_api.schemas import UserConfigSchema
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
@@ -623,6 +624,79 @@ class TestEventReceiver:
         assert admin_user.user_id in receivers_ids
         assert workspace_content_manager.user_id not in receivers_ids
         assert other_user.user_id not in receivers_ids
+
+    def test_unit__get_receiver_ids_user_config_event__nominal_case(
+        self,
+        session,
+        workspace_and_users,
+        admin_user,
+        user_api_factory,
+        app_config,
+    ):
+        (
+            _,
+            same_workspace_user,
+            __,
+            other_user,
+            event_initiator,
+        ) = workspace_and_users
+        user_api = user_api_factory.get()
+        fields = {
+            Event.USER_CONFIG_FIELD: UserConfigSchema().dump({"parameters": {}}).data,
+            Event.USER_FIELD: UserSchema()
+            .dump(user_api.get_user_with_context(event_initiator))
+            .data,
+        }
+        event = Event(
+            entity_type=EntityType.USER_CONFIG,
+            operation=OperationType.MODIFIED,
+            fields=fields,
+        )
+
+        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
+        assert event_initiator.user_id in receivers_ids
+        assert same_workspace_user.user_id not in receivers_ids
+        assert other_user.user_id not in receivers_ids
+        assert admin_user.user_id not in receivers_ids
+
+    def test_unit__get_receiver_ids_user_favorite_event__nominal_case(
+        self,
+        session,
+        workspace_and_users,
+        admin_user,
+        user_api_factory,
+        app_config,
+    ):
+        (
+            _,
+            same_workspace_user,
+            __,
+            other_user,
+            event_initiator,
+        ) = workspace_and_users
+        user_api = user_api_factory.get()
+        fields = {
+            Event.FAVORITE_FIELD: {
+                "user_id": event_initiator.user_id,
+                "content_id": 42,
+                "original_label": "A document",
+                "original_type": "html-document",
+            },
+            Event.USER_FIELD: UserSchema()
+            .dump(user_api.get_user_with_context(event_initiator))
+            .data,
+        }
+        event = Event(
+            entity_type=EntityType.FAVORITE,
+            operation=OperationType.CREATED,
+            fields=fields,
+        )
+
+        receivers_ids = FakeLiveMessageBuilder().get_receiver_ids(event, session, app_config)
+        assert event_initiator.user_id in receivers_ids
+        assert same_workspace_user.user_id not in receivers_ids
+        assert other_user.user_id not in receivers_ids
+        assert admin_user.user_id not in receivers_ids
 
 
 @pytest.mark.usefixtures("base_fixture")

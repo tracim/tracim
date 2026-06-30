@@ -1932,6 +1932,8 @@ class PaginatedContentDigestSchema(BasePaginatedSchemaPage):
 
 
 class FavoriteContentSchema(marshmallow.Schema):
+    """Schema for the API endpoint, containing both user and content"""
+
     user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
     user = marshmallow.fields.Nested(UserDigestSchema())
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)

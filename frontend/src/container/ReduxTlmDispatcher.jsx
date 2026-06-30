@@ -36,7 +36,9 @@ import {
   removeWorkspaceSubscription,
   updateWorkspaceSubscription,
   setKnownMemberList,
-  updateNotificationList
+  updateNotificationList,
+  addFavorite,
+  removeFavorite
 } from '../action-creator.sync.js'
 import { getUser, getMyselfAllKnownMember } from '../action-creator.async.js'
 import { FETCH_CONFIG } from '../util/helper.js'
@@ -118,7 +120,11 @@ export class ReduxTlmDispatcher extends React.Component {
       { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserCallNotification },
 
       // User config
-      { entityType: TLM_ET.USER_CONFIG, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserConfigModified }
+      { entityType: TLM_ET.USER_CONFIG, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserConfigModified },
+
+      // User favorite
+      { entityType: TLM_ET.FAVORITE, coreEntityType: TLM_CET.CREATED, handler: this.handleUserFavoriteCreated },
+      { entityType: TLM_ET.FAVORITE, coreEntityType: TLM_CET.DELETED, handler: this.handleUserFavoriteDeleted }
 
       // FIXME - CH - 2025-09-30 - Once the mark as read is a TLM instead of a custom event,
       // uncomment the declarations bellow and move the handlers to specific function instead of anonymous function
@@ -411,6 +417,14 @@ export class ReduxTlmDispatcher extends React.Component {
         this.handleNotification(data)
       }
     }
+  }
+
+  handleUserFavoriteCreated = data => {
+    this.props.dispatch(addFavorite(data.fields.favorite))
+  }
+
+  handleUserFavoriteDeleted = data => {
+    this.props.dispatch(removeFavorite({ contentId: data.fields.favorite.content_id }))
   }
 
   handleUserConfigModified = async data => {

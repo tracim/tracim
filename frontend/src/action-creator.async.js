@@ -1379,22 +1379,6 @@ export const getFavoriteContentList = (userId) => async dispatch => {
   })
 }
 
-export const postContentToFavoriteList = (userId, contentId) => async dispatch => {
-  return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/favorite-contents`,
-    param: {
-      credentials: 'include',
-      headers: {
-        ...FETCH_CONFIG.headers
-      },
-      method: 'POST',
-      body: { content_id: contentId }
-    },
-    actionName: FAVORITE,
-    dispatch
-  })
-}
-
 export const deleteContentFromFavoriteList = (userId, contentId) => async dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${userId}/favorite-contents/${contentId}`,

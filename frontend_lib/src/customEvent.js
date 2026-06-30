@@ -35,5 +35,7 @@ export const CUSTOM_EVENT = {
   USER_CONNECTED: 'userConnected',
   USER_DISCONNECTED: 'userDisconnected',
   MARK_ALL_NOTIFICATION_AS_READ: 'markAllNotificationAsRead',
-  MARK_NOTIFICATION_LIST_AS_READ: 'markNotificationListAsRead'
+  MARK_NOTIFICATION_LIST_AS_READ: 'markNotificationListAsRead',
+  ADD_CONTENT_TO_FAVORITE_LIST: 'addContentToFavoriteList',
+  REMOVE_CONTENT_FROM_FAVORITE_LIST: 'removeContentFromFavoriteList'
 }
