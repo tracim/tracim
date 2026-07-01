@@ -11,6 +11,7 @@
 
 - Fix multivalued configuration variables with trailing commas crashing Tracim on startup [#6850](https://github.com/tracim/tracim/issues/6850)
 - Add new TLM for favorite creation / deletion [#6835](https://github.com/tracim/tracim/issues/6835)
+- Fix single brackets added to email address in share links [#6857](https://github.com/tracim/tracim/issues/6857)
 
 ### 💥 Breaking/Important changes
 
