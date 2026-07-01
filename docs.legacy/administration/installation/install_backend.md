@@ -1,25 +1,5 @@
 # Install backend
 
-## Compatibility
-
-### OS
-
-OS compatibility (tested with Python >= 3.9.2):
-
-- Debian:
-  - Buster (10)
-  - Bullseye (11)
-- Ubuntu:
-  - Bionic (18.04)
-  - Focal (20.04)
-
-Older versions of Debian (8, 9) and Ubuntu (16.04) should work as long as a python version >= 3.9 is used.
-
-### Database engines
-
-- SQLite 3.22(2018-01-22)+ with JSON1 extension
-- PostgreSQL 9.6+
-
 ## Installation
 
 Use the automated script that will install dependencies and generate default configuration files:
@@ -39,12 +19,20 @@ You can run Tracim WSGI apps with many WSGI servers. We provide examples to run 
 We advise using uWSGI for production and pserve for development.
 For pserve usage documentation, see [manual setup documentation](/docs.legacy/development/backend/setup/manual_setup.md).
 
+> [!NOTE]
+> See Tracim compatibility tables:
+> - on directly compatible OS versions, install uwsgi with apt.
+> - on other OS versions, install uwsgi with pip and omit `--plugin python3` parameter and `plugins = python3` in ini files.
+
 ### Run Tracim with uWSGI command line
 
 Set tracim_conf_file path:
 ```bash
 export TRACIM_CONF_PATH="$(pwd)/development.ini"
 ```
+
+> [!TIP]
+> All commands below should be run inside the Tracim `backend/` directory
 
 Start pyramid webserver:
 ```bash
@@ -130,7 +118,7 @@ Replace <PATH> with the correct absolute path.
 
 Run:
 ```bash
-uwsgi --ini /etc/uwsgi/apps-available/tracim_webdav.ini.ini --http-socket :3030
+uwsgi --ini /etc/uwsgi/apps-available/tracim_webdav.ini --http-socket :3030
 ```
 
 #### CalDAV
@@ -217,15 +205,15 @@ autostart=true
 autorestart=true
 environment=TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
 
-; user connection status monitor (online / offline0)
+; user connection status monitor (online / offline)
 [program:tracim_user_connection_state_monitor]
 directory=<PATH>/tracim/backend/
-command=python3 <PATH>/tracim/backend/daemons/user_connection_state_monitor.py
+command=<PATH>/tracim/backend/env/bin/python <PATH>/tracim/backend/daemons/user_connection_state_monitor.py
 stdout_logfile=/var/tracim/logs/user_connection_state_monitor.log
 redirect_stderr=true
 autostart=true
 autorestart=false
-environment=TRACIM_CONF_PATH=/etc/tracim/development.ini
+environment=TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
 
 ; RQ worker (if async jobs processing is enabled)
 [program:rq_database_worker]
