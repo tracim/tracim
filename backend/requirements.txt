@@ -41,7 +41,7 @@ certifi==2021.5.30
     # via
     #   elasticsearch
     #   requests
-cffi==1.15.0
+cffi==1.17.0
     # via
     #   cryptography
     #   weasyprint
@@ -118,7 +118,7 @@ jsonschema==3.2.0
     # via tracim_backend (setup.py)
 ldap3==2.9
     # via pyramid-ldap3
-lxml==4.9.1
+lxml==5.3.0
     # via
     #   caldav
     #   tracim_backend (setup.py)
@@ -138,13 +138,13 @@ marshmallow==2.21.0
     #   apispec-marshmallow-advanced
     #   hapic
     #   tracim_backend (setup.py)
-multidict==5.2.0
+multidict==6.1.0
     # via hapic
 packaging==22.0
     # via sqlakeyset
 passlib==1.7.4
     # via radicale
-pastedeploy==2.1.1
+pastedeploy==3.1.0
     # via plaster-pastedeploy
 pbr==5.6.0
     # via
@@ -152,7 +152,7 @@ pbr==5.6.0
     #   stevedore
 pika==1.3.2
     # via radicale
-pillow==9.1.1
+pillow==11.1.0
     # via weasyprint
 plaster==1.0
     # via
@@ -188,7 +188,7 @@ pyopenssl==24.0.0
     # via pysaml2
 pypandoc==1.8.1
     # via tracim_backend (setup.py)
-pyparsing==2.4.7
+pyparsing==3.1.2
     # via cliff
 pyperclip==1.8.2
     # via cmd2
@@ -282,7 +282,7 @@ sqlalchemy==1.3.24
     #   sqlakeyset
     #   tracim_backend (setup.py)
     #   zope-sqlalchemy
-stevedore==3.3.0
+stevedore==5.4.0
     # via cliff
 text-unidecode==1.3
     # via python-slugify
@@ -319,14 +319,14 @@ wcwidth==0.2.5
     # via
     #   cmd2
     #   prettytable
-weasyprint==63.0
+weasyprint==63.1
     # via tracim_backend (setup.py)
 webencodings==0.5.1
     # via
     #   cssselect2
     #   tinycss2
     #   tinyhtml5
-webob==1.8.7
+webob==1.8.10
     # via pyramid
 webpreview @ git+https://github.com/algoo/webpreview@v1.6.0+algoo
     # via tracim_backend (setup.py)
@@ -338,7 +338,7 @@ zipp==3.4.1
     # via importlib-metadata
 zope-deprecation==4.4.0
     # via pyramid
-zope-interface==5.4.0
+zope-interface==6.4.post2
     # via
     #   pyramid
     #   transaction
