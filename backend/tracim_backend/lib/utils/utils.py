@@ -457,7 +457,7 @@ def find_all_submodule_path(module: types.ModuleType) -> List[str]:
             module_name=module.__name__, submodule_relative_path=submodule_relative_path
         )
         if is_package:
-            spec = pkgutil._get_spec(importer, submodule_relative_path)
+            spec = importer.find_spec(submodule_relative_path, None)
             importlib._bootstrap._load(spec)
             module_spec_list.append(spec)
         else:
