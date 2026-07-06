@@ -23,45 +23,51 @@ class WopiPutHeaders(object):
 
 class WOPITokenQuerySchema(marshmallow.Schema):
     access_token = marshmallow.fields.String(
-        required=True, description="Access token which uniquely identifies a user"
+        required=True, metadata={"description": "Access token which uniquely identifies a user"}
     )
 
 
 class WOPICheckFileInfoSchema(marshmallow.Schema):
     BaseFileName = marshmallow.fields.String(
         required=True,
-        description="Filename as shown in collabora Online",
+        metadata={"description": "Filename as shown in collabora Online"},
         attribute="base_file_name",
     )
     Size = marshmallow.fields.Int(
-        required=True, description="File length, in bytes", attribute="size"
+        required=True, metadata={"description": "File length, in bytes"}, attribute="size"
     )
     OwnerId = marshmallow.fields.Int(
-        description="Owner's database identifier", attribute="owner_id"
+        metadata={"description": "Owner's database identifier"}, attribute="owner_id"
     )
-    UserId = marshmallow.fields.Int(description="User's database identifier", attribute="user_id")
+    UserId = marshmallow.fields.Int(
+        metadata={"description": "User's database identifier"}, attribute="user_id"
+    )
     UserFriendlyName = marshmallow.fields.String(
-        description="User's display name", attribute="user_friendly_name"
+        metadata={"description": "User's display name"}, attribute="user_friendly_name"
     )
     Version = marshmallow.fields.String(
-        description="Version of the file (the revision_id)", attribute="version"
+        metadata={"description": "Version of the file (the revision_id)"}, attribute="version"
     )
     UserCanWrite = marshmallow.fields.Boolean(
-        description="Whether the user can (or can't) edit the file in libreoffice online",
+        metadata={
+            "description": "Whether the user can (or can't) edit the file in libreoffice online"
+        },
         attribute="user_can_write",
     )
     UserCanNotWriteRelative = marshmallow.fields.Boolean(
         dump_default=True,
-        description="Whether it's possible to save the document as a new name ("
-        "Save As functionality)",
+        metadata={
+            "description": "Whether it's possible to save the document as a new name ("
+            "Save As functionality)"
+        },
         attribute="user_can_not_write_relative",
     )
     LastModifiedTime = marshmallow.fields.DateTime(
-        description="Last time the file was modified", attribute="last_modified_time"
+        metadata={"description": "Last time the file was modified"}, attribute="last_modified_time"
     )
 
 
 class WopiPutResponseSchema(marshmallow.Schema):
     LastModifiedTime = marshmallow.fields.DateTime(
-        description="Last time the file was modified", attribute="last_modified_time"
+        metadata={"description": "Last time the file was modified"}, attribute="last_modified_time"
     )

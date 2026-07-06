@@ -10,8 +10,10 @@ from tracim_backend.views.core_api.schemas import StrippedString
 class CollaborativeDocumentEditionTokenSchema(marshmallow.Schema):
     access_token = marshmallow.fields.String(
         required=True,
-        description="The access token which should be sent to collabora online and "
-        "which uniquely identifies the user",
+        metadata={
+            "description": "The access token which should be sent to collabora online and "
+            "which uniquely identifies the user"
+        },
     )
 
 
@@ -35,9 +37,12 @@ class FileCreateFromTemplate(object):
 
 class FileTemplateSchema(marshmallow.Schema):
     template_name = StrippedString(
-        example="default.odt", description="template name you can use", required=True
+        metadata={"example": "default.odt", "description": "template name you can use"},
+        required=True,
     )
-    category = StrippedString(example="calc", description="category of the template", required=True)
+    category = StrippedString(
+        metadata={"example": "calc", "description": "category of the template"}, required=True
+    )
 
 
 class FileTemplateInfoSchema(marshmallow.Schema):
@@ -46,26 +51,28 @@ class FileTemplateInfoSchema(marshmallow.Schema):
 
 class FileCreateFromTemplateSchema(marshmallow.Schema):
     template = StrippedString(
-        example="default.odt",
-        description="The template of the file you want to create",
+        metadata={
+            "example": "default.odt",
+            "description": "The template of the file you want to create",
+        },
         required=True,
     )
     filename = StrippedString(
         required=True,
-        example="test.odt",
-        description="The file name, as saved in the workspace",
+        metadata={"example": "test.odt", "description": "The file name, as saved in the workspace"},
     )
     parent_id = marshmallow.fields.Int(
-        example=42,
-        description="id of the new parent content id.",
+        metadata={"example": 42, "description": "id of the new parent content id."},
         dump_default=None,
         allow_none=True,
         validate=positive_int_validator,
     )
     template_id = marshmallow.fields.Int(
-        example=1,
-        description="The id of the template you want to create"
-        " the id must be a content id of a file marked as a template",
+        metadata={
+            "example": 1,
+            "description": "The id of the template you want to create"
+            " the id must be a content id of a file marked as a template",
+        },
         dump_default=None,
         allow_none=True,
         validate=positive_int_validator,

@@ -30,8 +30,10 @@ class UploadFileSchema(marshmallow.Schema):
         required=False,
         load_from="file_*",
         dump_to="file_*",
-        description="a file, you can add as file as you want by uploading file_* (* is any number)"
-        " file in the same form.",
+        metadata={
+            "description": "a file, you can add as file as you want by uploading file_* (* is any number)"
+            " file in the same form."
+        },
     )
 
 
@@ -65,7 +67,7 @@ class UploadPermissionPasswordBodySchema(marshmallow.Schema):
     password = marshmallow.fields.String(
         required=False,
         allow_none=True,
-        example="8QLa$<w",
+        metadata={"example": "8QLa$<w"},
         validate=upload_permission_password_validator,
     )
 
@@ -80,7 +82,7 @@ class UploadDataFormSchema(marshmallow.Schema):
         required=True, validate=upload_username_length_validator, allow_none=False
     )
     password = marshmallow.fields.String(
-        example="8QLa$<w",
+        metadata={"example": "8QLa$<w"},
         required=False,
         validate=upload_permission_password_validator,
         allow_none=True,
@@ -98,9 +100,12 @@ class UploadPermissionListQuery(object):
 
 class UploadPermissionListQuerySchema(marshmallow.Schema):
     show_disabled = marshmallow.fields.Int(
-        example=0,
         dump_default=0,
-        description="if set to 1, then show disabled share." " Default is 0 - hide disabled share",
+        metadata={
+            "example": 0,
+            "description": "if set to 1, then show disabled share."
+            " Default is 0 - hide disabled share",
+        },
         validate=bool_as_int_validator,
     )
 
@@ -116,7 +121,7 @@ class UploadPermissionToken(object):
 
 class UploadPermissionTokenPath(marshmallow.Schema):
     upload_permission_token = marshmallow.fields.String(
-        required=True, description="valid share token"
+        required=True, metadata={"description": "valid share token"}
     )
 
     @post_load
@@ -132,9 +137,8 @@ class UploadPermissionIdPath(object):
 
 class UploadPermissionIdPathSchema(WorkspaceIdPathSchema):
     upload_permission_id = marshmallow.fields.Int(
-        example=6,
         required=True,
-        description="id of a valid share id",
+        metadata={"example": 6, "description": "id of a valid share id"},
         validate=strictly_positive_int_validator,
     )
 
@@ -156,7 +160,7 @@ class UploadPermissionCreationBodySchema(marshmallow.Schema):
         required=True,
     )
     password = marshmallow.fields.String(
-        example="8QLa$<w",
+        metadata={"example": "8QLa$<w"},
         required=False,
         allow_none=True,
         validate=upload_permission_password_validator,
@@ -173,42 +177,42 @@ class UploadPermissionPublicInfoSchema(marshmallow.Schema):
 
 class UploadPermissionSchema(marshmallow.Schema):
     email = RFCEmail(
-        example="hello@tracim.fr",
+        metadata={"example": "hello@tracim.fr"},
         required=True,
         validate=upload_permission_email_validator,
     )
     has_password = marshmallow.fields.Boolean(required=True)
     upload_permission_group_uuid = marshmallow.fields.String(required=True)
     upload_permission_id = marshmallow.fields.Int(
-        example=4,
         required=True,
-        description="id of this upload permission",
+        metadata={"example": 4, "description": "id of this upload permission"},
         validate=strictly_positive_int_validator,
     )
     workspace_id = marshmallow.fields.Integer(
-        example=6,
         validate=strictly_positive_int_validator,
-        description="workspace id of workspace on which upload is permitted",
+        metadata={
+            "example": 6,
+            "description": "workspace id of workspace on which upload is permitted",
+        },
     )
     token = marshmallow.fields.String(required=True)
     created = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT, description="Upload permission creation date"
+        format=DATETIME_FORMAT, metadata={"description": "Upload permission creation date"}
     )
     disabled = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT,
-        description="Upload permission disabled date",
+        metadata={"description": "Upload permission disabled date"},
         allow_none=True,
     )
     is_disabled = marshmallow.fields.Boolean(
-        required=True, description="is this upload permission disabled ?"
+        required=True, metadata={"description": "is this upload permission disabled ?"}
     )
-    url = marshmallow.fields.URL(example="/ui/guest-upload/<token>")
+    url = marshmallow.fields.URL(metadata={"example": "/ui/guest-upload/<token>"})
     author_id = marshmallow.fields.Integer(
-        example=3, validate=strictly_positive_int_validator, required=True
+        metadata={"example": 3}, validate=strictly_positive_int_validator, required=True
     )
     author = marshmallow.fields.Nested(UserDigestSchema)
     type = marshmallow.fields.String(
         validate=OneOf([share_type.value for share_type in UploadPermissionType]),
-        example=UploadPermissionType.EMAIL.value,
-        description="type of sharing",
+        metadata={"example": UploadPermissionType.EMAIL.value, "description": "type of sharing"},
     )
