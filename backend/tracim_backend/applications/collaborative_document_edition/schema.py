@@ -58,7 +58,7 @@ class FileCreateFromTemplateSchema(marshmallow.Schema):
     parent_id = marshmallow.fields.Int(
         example=42,
         description="id of the new parent content id.",
-        default=None,
+        dump_default=None,
         allow_none=True,
         validate=positive_int_validator,
     )
@@ -66,7 +66,7 @@ class FileCreateFromTemplateSchema(marshmallow.Schema):
         example=1,
         description="The id of the template you want to create"
         " the id must be a content id of a file marked as a template",
-        default=None,
+        dump_default=None,
         allow_none=True,
         validate=positive_int_validator,
     )

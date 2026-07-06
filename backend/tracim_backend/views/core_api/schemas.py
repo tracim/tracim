@@ -240,7 +240,7 @@ class EventTypeListField(StrippedString):
 
 ExcludeAuthorIdsField = StrippedString(
     required=False,
-    default=None,
+    dump_default=None,
     allow_none=True,
     validate=regex_string_as_list_of_int,
     example="1,5",
@@ -299,14 +299,14 @@ class BasePaginatedQuerySchema(marshmallow.Schema):
     count = marshmallow.fields.Int(
         example=10,
         validate=strictly_positive_int_validator,
-        missing=DEFAULT_NB_ITEM_PAGINATION,
-        default=DEFAULT_NB_ITEM_PAGINATION,
+        load_default=DEFAULT_NB_ITEM_PAGINATION,
+        dump_default=DEFAULT_NB_ITEM_PAGINATION,
         allow_none=False,
     )
     page_token = marshmallow.fields.String(
         description="token of the page wanted, if not provided get first" "elements",
         validate=page_token_validator,
-        missing=None,
+        load_default=None,
     )
 
 
@@ -317,16 +317,16 @@ class BaseOptionalPaginatedQuerySchema(marshmallow.Schema):
     count = marshmallow.fields.Int(
         example=10,
         validate=positive_int_validator,
-        missing=0,
-        default=0,
+        load_default=0,
+        dump_default=0,
         allow_none=False,
         description="Allows to paginate the results in combination with page_token, by default all results are returned",
     )
     page_token = marshmallow.fields.String(
         description="token of the page wanted, if not provided get first elements",
         validate=page_token_validator,
-        missing=None,
-        default=None,
+        load_default=None,
+        dump_default=None,
     )
 
 
@@ -374,16 +374,16 @@ class SimpleFileSchema(marshmallow.Schema):
 
 class FileCreationFormSchema(marshmallow.Schema):
     parent_id = marshmallow.fields.Int(
-        example=2, default=0, validate=positive_int_validator, allow_none=True
+        example=2, dump_default=0, validate=positive_int_validator, allow_none=True
     )
     content_namespace = EnumField(
-        ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
+        ContentNamespaces, load_default=ContentNamespaces.CONTENT, example="content"
     )
     content_type = marshmallow.fields.String(
-        missing=ContentTypeSlug.FILE.value, example=ContentTypeSlug.FILE.value
+        load_default=ContentTypeSlug.FILE.value, example=ContentTypeSlug.FILE.value
     )
     template_id = marshmallow.fields.Int(
-        example=2, default=0, validate=positive_int_validator, allow_none=True
+        example=2, dump_default=0, validate=positive_int_validator, allow_none=True
     )
 
     @post_load
@@ -405,7 +405,7 @@ class UserDigestSchema(marshmallow.Schema):
     )
     public_name = StrippedString(example="John Doe")
     username = StrippedString(
-        example="My-Power_User99", required=False, default=None, allow_none=True
+        example="My-Power_User99", required=False, dump_default=None, allow_none=True
     )
     workspace_ids = marshmallow.fields.List(marshmallow.fields.Int(example=3))
     is_active = marshmallow.fields.Bool()
@@ -534,7 +534,7 @@ class UserSchema(UserDigestSchema):
         required=False,
         validate=user_lang_validator,
         allow_none=True,
-        default=None,
+        dump_default=None,
     )
     auth_type = marshmallow.fields.String(
         validate=OneOf([auth_type_en.value for auth_type_en in AuthType]),
@@ -626,7 +626,7 @@ class SetUserInfoSchema(marshmallow.Schema):
         example="John Doe",
         required=False,
         validate=user_public_name_validator,
-        default=None,
+        dump_default=None,
     )
     lang = StrippedString(
         description=FIELD_LANG_DESC,
@@ -634,7 +634,7 @@ class SetUserInfoSchema(marshmallow.Schema):
         required=True,
         validate=user_lang_validator,
         allow_none=True,
-        default=None,
+        dump_default=None,
     )
 
     @post_load
@@ -696,19 +696,19 @@ class UserRegistrationSchema(marshmallow.Schema):
         required=True,
         validate=user_password_validator,
         allow_none=True,
-        default=None,
+        dump_default=None,
     )
     timezone = StrippedString(
         description=FIELD_TIMEZONE_DESC,
         example="Europe/Paris",
         required=False,
-        default="",
+        dump_default="",
         validate=user_timezone_validator,
     )
     public_name = StrippedString(
         example="John Doe",
         required=True,
-        default=None,
+        dump_default=None,
         validate=user_public_name_validator,
     )
     lang = StrippedString(
@@ -717,7 +717,7 @@ class UserRegistrationSchema(marshmallow.Schema):
         required=False,
         validate=user_lang_validator,
         allow_none=True,
-        default=None,
+        dump_default=None,
     )
 
     @post_load
@@ -743,7 +743,7 @@ class UserCreationSchema(marshmallow.Schema):
         required=False,
         validate=user_password_validator,
         allow_none=True,
-        default=None,
+        dump_default=None,
     )
     profile = StrippedString(
         attribute="profile",
@@ -757,13 +757,13 @@ class UserCreationSchema(marshmallow.Schema):
         description=FIELD_TIMEZONE_DESC,
         example="Europe/Paris",
         required=False,
-        default="",
+        dump_default="",
         validate=user_timezone_validator,
     )
     public_name = StrippedString(
         example="John Doe",
         required=False,
-        default=None,
+        dump_default=None,
         validate=user_public_name_validator,
     )
     lang = StrippedString(
@@ -772,9 +772,9 @@ class UserCreationSchema(marshmallow.Schema):
         required=False,
         validate=user_lang_validator,
         allow_none=True,
-        default=None,
+        dump_default=None,
     )
-    email_notification = marshmallow.fields.Bool(example=True, required=False, default=True)
+    email_notification = marshmallow.fields.Bool(example=True, required=False, dump_default=True)
     allowed_space = marshmallow.fields.Integer(
         validate=positive_int_validator,
         allow_none=True,
@@ -856,7 +856,7 @@ class WorkspaceFilterQuerySchema(marshmallow.Schema):
         " If set to another value, return all direct subworkspaces"
         " If multiple value of parent_ids separated by comma,"
         " return mix of all workspaces of all theses parent_ids",
-        default="0",
+        dump_default="0",
     )
 
     @post_load
@@ -867,14 +867,14 @@ class WorkspaceFilterQuerySchema(marshmallow.Schema):
 class UserWorkspaceFilterQuerySchema(WorkspaceFilterQuerySchema):
     show_owned_workspace = marshmallow.fields.Int(
         example=1,
-        default=1,
+        dump_default=1,
         description="if set to 1, then show owned workspace in list"
         " Default is 1, else do no show them",
         validate=bool_as_int_validator,
     )
     show_workspace_with_role = marshmallow.fields.Int(
         example=1,
-        default=1,
+        dump_default=1,
         description="if set to 1, then show workspace were user has a role in list"
         " Default is 1, else do no show them",
         validate=bool_as_int_validator,
@@ -893,7 +893,7 @@ class WorkspaceMemberFilterQuery(object):
 class WorkspaceMemberFilterQuerySchema(marshmallow.Schema):
     show_disabled_user = marshmallow.fields.Int(
         exemple=0,
-        default=0,
+        dump_default=0,
         description="if set to 1, then show also user which is disabled"
         " Default is 0, else show them",
         validate=bool_as_int_validator,
@@ -929,7 +929,7 @@ class RadicaleUserResourceUserSubItemPathSchema(UserIdPathSchema):
     type = marshmallow.fields.Str(
         required=True,
     )
-    sub_item = marshmallow.fields.String(default="", allow_none=True)
+    sub_item = marshmallow.fields.String(dump_default="", allow_none=True)
     trailing_slash = marshmallow.fields.String()
 
     @post_load
@@ -1156,7 +1156,7 @@ class KnownMembersQuerySchema(marshmallow.Schema):
 
     limit = marshmallow.fields.Int(
         example=15,
-        default=0,
+        dump_default=0,
         description="limit the number of results to this value, if not 0",
         validate=strictly_positive_int_validator,
     )
@@ -1171,7 +1171,7 @@ class KnownContentsQuerySchema(marshmallow.Schema):
 
     limit = marshmallow.fields.Int(
         example=15,
-        default=DEFAULT_KNOWN_CONTENT_NB_LIMIT,
+        dump_default=DEFAULT_KNOWN_CONTENT_NB_LIMIT,
         description="limit the number of results to this value, if not 0",
         validate=strictly_positive_int_validator,
     )
@@ -1184,7 +1184,7 @@ class KnownContentsQuerySchema(marshmallow.Schema):
 class FileQuerySchema(marshmallow.Schema):
     force_download = marshmallow.fields.Int(
         example=1,
-        default=0,
+        dump_default=0,
         description="force download of file or let browser decide if"
         "file can be read directly from browser",
         validate=bool_as_int_validator,
@@ -1198,7 +1198,7 @@ class FileQuerySchema(marshmallow.Schema):
 class PageQuerySchema(FileQuerySchema):
     page = marshmallow.fields.Int(
         example=2,
-        default=1,
+        dump_default=1,
         description="allow to show a specific page of a pdf file",
         validate=strictly_positive_int_validator,
     )
@@ -1220,13 +1220,13 @@ class FilterContentQuerySchema(BaseOptionalPaginatedQuerySchema):
         " content of this folder"
         " If multiple value of parent_ids separated by comma,"
         " return mix of all content of all theses parent_ids",
-        default="0",
+        dump_default="0",
     )
     namespaces_filter = StrippedString(
         validate=regex_string_as_list_of_string,
         example="content,upload",
         description="comma list of namespaces allowed",
-        default=None,
+        dump_default=None,
         allow_none=True,
     )
     complete_path_to_id = marshmallow.fields.Int(
@@ -1237,26 +1237,26 @@ class FilterContentQuerySchema(BaseOptionalPaginatedQuerySchema):
         " workspace root included. This param help to get "
         " content needed to show a complete folder tree "
         " from root to content.",
-        default=None,
+        dump_default=None,
         allow_none=True,
     )
     show_archived = marshmallow.fields.Int(
         example=0,
-        default=0,
+        dump_default=0,
         description="if set to 1, then show archived contents."
         " Default is 0 - hide archived content",
         validate=bool_as_int_validator,
     )
     show_deleted = marshmallow.fields.Int(
         example=0,
-        default=0,
+        dump_default=0,
         description="if set to 1, then show deleted contents."
         " Default is 0 - hide deleted content",
         validate=bool_as_int_validator,
     )
     show_active = marshmallow.fields.Int(
         example=1,
-        default=1,
+        dump_default=1,
         description="if set to 1, then show active contents. "
         "Default is 1 - show active content."
         " Note: active content are content "
@@ -1267,18 +1267,18 @@ class FilterContentQuerySchema(BaseOptionalPaginatedQuerySchema):
     )
     content_type = StrippedString(
         example=ContentTypeSlug.ANY.value,
-        default=ContentTypeSlug.ANY.value,
+        dump_default=ContentTypeSlug.ANY.value,
         validate=all_content_types_validator,
     )
     label = StrippedString(
         example="myfilename",
-        default=None,
+        dump_default=None,
         allow_none=True,
         description="Filter by content label",
     )
     sort = EnumField(
         ContentSortOrder,
-        missing=ContentSortOrder.LABEL_ASC,
+        load_default=ContentSortOrder.LABEL_ASC,
         description="Order of the returned contents, default is to sort by labels",
     )
 
@@ -1312,16 +1312,16 @@ class RoleUpdateSchema(marshmallow.Schema):
 
 class WorkspaceMemberInviteSchema(marshmallow.Schema):
     role = StrippedString(example="contributor", validate=user_role_validator, required=True)
-    user_id = marshmallow.fields.Int(example=5, default=None, allow_none=True)
+    user_id = marshmallow.fields.Int(example=5, dump_default=None, allow_none=True)
     user_email = RFCEmail(
         example="suri@cate.fr",
-        default=None,
+        dump_default=None,
         allow_none=True,
         validate=user_email_validator,
     )
     user_username = StrippedString(
         example="The-John_Doe42",
-        default=None,
+        dump_default=None,
         allow_none=True,
         validate=user_username_validator,
     )
@@ -1343,14 +1343,14 @@ class WorkspaceMemberInviteSchema(marshmallow.Schema):
 class ResetPasswordRequestSchema(marshmallow.Schema):
     email = TracimEmail(
         example="hello@tracim.fr",
-        default=None,
+        dump_default=None,
         allow_none=True,
         validate=user_email_validator,
     )
 
     username = StrippedString(
         example="The-John_Doe42",
-        default=None,
+        dump_default=None,
         allow_none=True,
         validate=user_username_validator,
     )
@@ -1432,18 +1432,18 @@ class WorkspaceModifySchema(marshmallow.Schema):
         required=False,
         example="My Workspace",
         validate=workspace_label_length_validator,
-        default=None,
+        dump_default=None,
         allow_none=True,
     )
     description = StrippedString(
         required=False,
         example="A super description of my workspace.",
-        default=None,
+        dump_default=None,
         allow_none=True,
     )
     agenda_enabled = marshmallow.fields.Bool(
         required=False,
-        default=None,
+        dump_default=None,
         description="has workspace has an associated agenda ?",
         allow_none=True,
     )
@@ -1451,14 +1451,14 @@ class WorkspaceModifySchema(marshmallow.Schema):
         required=False,
         description="is workspace allowing manager to give access external user"
         "to upload file into it ?",
-        default=None,
+        dump_default=None,
         allow_none=True,
     )
     public_download_enabled = marshmallow.fields.Bool(
         required=False,
         description="is workspace allowing manager to give access external user"
         "to some file into it ?",
-        default=None,
+        dump_default=None,
         allow_none=True,
     )
     default_user_role = StrippedString(
@@ -1467,12 +1467,12 @@ class WorkspaceModifySchema(marshmallow.Schema):
         validate=user_role_validator,
         required=False,
         allow_none=True,
-        default=None,
+        dump_default=None,
     )
     publication_enabled = marshmallow.fields.Bool(
         required=False,
         description="define whether a user can create and view publications in this workspace",
-        default=None,
+        dump_default=None,
         allow_none=True,
     )
 
@@ -1489,7 +1489,7 @@ class WorkspaceCreationSchema(marshmallow.Schema):
     agenda_enabled = marshmallow.fields.Bool(
         required=False,
         description="has workspace has an associated agenda ?",
-        default=True,
+        dump_default=True,
     )
     access_type = StrippedString(
         example=WorkspaceAccessType.CONFIDENTIAL.value,
@@ -1506,26 +1506,26 @@ class WorkspaceCreationSchema(marshmallow.Schema):
         required=False,
         description="is workspace allowing manager to give access external user"
         "to upload file into it ?",
-        default=True,
+        dump_default=True,
     )
     public_download_enabled = marshmallow.fields.Bool(
         required=False,
         description="is workspace allowing manager to give access external user"
         "to some file into it ?",
-        default=True,
+        dump_default=True,
     )
     parent_id = marshmallow.fields.Int(
         example=42,
         description="id of the parent workspace id.",
         allow_none=True,
-        default=None,
+        dump_default=None,
         required=False,
         validate=positive_int_validator,
     )
     publication_enabled = marshmallow.fields.Bool(
         required=False,
         description="define whether a user can create and view publications in this workspace",
-        default=None,
+        dump_default=None,
         allow_none=True,
     )
 
@@ -1585,17 +1585,17 @@ class WorkspaceWithoutDescriptionSchema(WorkspaceDigestSchema):
     )
     owner = marshmallow.fields.Nested(UserDigestSchema(), allow_none=True)
     sidebar_entries = marshmallow.fields.Nested(WorkspaceMenuEntrySchema, many=True)
-    is_deleted = marshmallow.fields.Bool(example=False, default=False)
-    agenda_enabled = marshmallow.fields.Bool(example=True, default=True)
+    is_deleted = marshmallow.fields.Bool(example=False, dump_default=False)
+    agenda_enabled = marshmallow.fields.Bool(example=True, dump_default=True)
     public_upload_enabled = marshmallow.fields.Bool(
         description="is workspace allowing manager to give access external user"
         "to upload file into it ?",
-        default=True,
+        dump_default=True,
     )
     public_download_enabled = marshmallow.fields.Bool(
         description="is workspace allowing manager to give access external user"
         "to some file into it ?",
-        default=True,
+        dump_default=True,
     )
     parent_id = marshmallow.fields.Int(
         example=42,
@@ -1605,7 +1605,7 @@ class WorkspaceWithoutDescriptionSchema(WorkspaceDigestSchema):
         validate=positive_int_validator,
     )
     publication_enabled = marshmallow.fields.Bool(
-        default=True,
+        dump_default=True,
         description="define whether a user can create and view publications in this workspace",
     )
     number_of_members = marshmallow.fields.Int(
@@ -1833,14 +1833,14 @@ class ContentCreationSchema(marshmallow.Schema):
         required=True, example="html-document", validate=all_content_types_validator
     )
     content_namespace = EnumField(
-        ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
+        ContentNamespaces, load_default=ContentNamespaces.CONTENT, example="content"
     )
     parent_id = marshmallow.fields.Integer(
         example=35,
         description="content_id of parent content, if content should be placed "
         "in a folder, this should be folder content_id.",
         allow_none=True,
-        default=None,
+        dump_default=None,
         validate=strictly_positive_int_validator,
     )
     template_id = marshmallow.fields.Integer(
@@ -1848,7 +1848,7 @@ class ContentCreationSchema(marshmallow.Schema):
         description="content_id of template content, if content should be created "
         "from a template, this should be template content_id.",
         allow_none=True,
-        default=None,
+        dump_default=None,
         validate=strictly_positive_int_validator,
     )
 
@@ -1873,7 +1873,7 @@ class ContentDigestSchema(UserInfoContentAbstractSchema):
     assignee_id = marshmallow.fields.Int(
         example=42,
         allow_none=True,
-        default=None,
+        dump_default=None,
         validate=strictly_positive_int_validator,
     )
     content_namespace = EnumField(ContentNamespaces, example="content")
@@ -1884,7 +1884,7 @@ class ContentDigestSchema(UserInfoContentAbstractSchema):
     )
     slug = StrippedString(example="intervention-report-12")
     parent_id = marshmallow.fields.Int(
-        example=34, allow_none=True, default=None, validate=positive_int_validator
+        example=34, allow_none=True, dump_default=None, validate=positive_int_validator
     )
     workspace_id = marshmallow.fields.Int(example=19, validate=strictly_positive_int_validator)
     label = StrippedString(example="Intervention Report 12")
@@ -1899,12 +1899,12 @@ class ContentDigestSchema(UserInfoContentAbstractSchema):
         example="closed-deprecated",
         validate=content_status_validator,
         description="this slug is found in content_type available statuses",
-        default=open_status,
+        dump_default=open_status,
     )
-    is_archived = marshmallow.fields.Bool(example=False, default=False)
-    is_deleted = marshmallow.fields.Bool(example=False, default=False)
-    is_editable = marshmallow.fields.Bool(example=True, default=True)
-    is_template = marshmallow.fields.Bool(example=False, default=False)
+    is_archived = marshmallow.fields.Bool(example=False, dump_default=False)
+    is_deleted = marshmallow.fields.Bool(example=False, dump_default=False)
+    is_editable = marshmallow.fields.Bool(example=True, dump_default=True)
+    is_template = marshmallow.fields.Bool(example=False, dump_default=False)
     show_in_ui = marshmallow.fields.Bool(
         example=True,
         description="if false, then do not show content in the treeview. "
@@ -1948,7 +1948,7 @@ class PaginatedFavoriteContentSchema(BasePaginatedSchemaPage):
 
 class ReadStatusSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
-    read_by_user = marshmallow.fields.Bool(example=False, default=False)
+    read_by_user = marshmallow.fields.Bool(example=False, dump_default=False)
 
 
 #####
@@ -1988,7 +1988,7 @@ class ToDoSchema(marshmallow.Schema):
         example="closed-deprecated",
         validate=content_status_validator,
         description="this slug is found in content_type available statuses",
-        default=open_status,
+        dump_default=open_status,
     )
 
 
@@ -2110,7 +2110,7 @@ class MessageCommentSchema(marshmallow.Schema):
     content_type = StrippedString(example="html-document", validate=all_content_types_validator)
     description = StrippedString(example="This is a description")
     parent_content_namespace = EnumField(
-        ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
+        ContentNamespaces, load_default=ContentNamespaces.CONTENT, example="content"
     )
     parent_content_type = String(example="html-document", validate=all_content_types_validator)
     parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
@@ -2209,7 +2209,7 @@ class SetContentStatusSchema(marshmallow.Schema):
         example="closed-deprecated",
         validate=content_status_validator,
         description="this slug is found in content_type available statuses",
-        default=open_status,
+        dump_default=open_status,
         required=True,
     )
 
@@ -2219,7 +2219,9 @@ class SetContentStatusSchema(marshmallow.Schema):
 
 
 class SetContentIsTemplateSchema(marshmallow.Schema):
-    is_template = marshmallow.fields.Boolean(description="set content as a template", default=False)
+    is_template = marshmallow.fields.Boolean(
+        description="set content as a template", dump_default=False
+    )
 
     @post_load
     def set_marked_as_template(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -2353,8 +2355,8 @@ class TranslationQuerySchema(FileQuerySchema):
     source_language_code = marshmallow.fields.String(
         description="source language of translation, by default set to auto",
         example="fr",
-        missing=AUTODETECT_LANG,
-        default=AUTODETECT_LANG,
+        load_default=AUTODETECT_LANG,
+        dump_default=AUTODETECT_LANG,
         allow_none=False,
     )
     target_language_code = marshmallow.fields.String(
@@ -2372,13 +2374,15 @@ class TranslationQuerySchema(FileQuerySchema):
 class GetLiveMessageQuerySchema(BasePaginatedQuerySchema):
     """Possible query parameters for the GET messages endpoint."""
 
-    read_status = StrippedString(missing=ReadStatus.ALL.value, validator=OneOf(ReadStatus.values()))
+    read_status = StrippedString(
+        load_default=ReadStatus.ALL.value, validator=OneOf(ReadStatus.values())
+    )
     include_event_types = EventTypeListField()
     exclude_event_types = EventTypeListField()
     exclude_author_ids = ExcludeAuthorIdsField
     include_not_sent = marshmallow.fields.Int(
         example=0,
-        default=0,
+        dump_default=0,
         description="if set to 1, then show not sent message."
         " Default is 0 - hide not sent message content",
         validate=bool_as_int_validator,
@@ -2408,7 +2412,7 @@ class TracimLiveEventHeaderSchema(marshmallow.Schema):
 
 class TracimLiveEventQuerySchema(marshmallow.Schema):
     after_event_id = marshmallow.fields.Int(
-        required=False, missing=0, example=42, validator=positive_int_validator
+        required=False, load_default=0, example=42, validator=positive_int_validator
     )
 
 
@@ -2417,7 +2421,7 @@ class PathSuffixSchema(marshmallow.Schema):
     path_suffix = marshmallow.fields.Str(
         required=False,
         description='any path, could include "/"',
-        default="",
+        dump_default="",
         example="/workspaces/1/email_notification_type",
     )
 
@@ -2461,7 +2465,7 @@ class UserMessagesSummaryQuerySchema(marshmallow.Schema):
     include_event_types = EventTypeListField()
     include_not_sent = marshmallow.fields.Int(
         example=0,
-        default=0,
+        dump_default=0,
         description="if set to 1, then show not sent message."
         " Default is 0 - hide not sent message content",
         validate=bool_as_int_validator,
@@ -2524,7 +2528,7 @@ class GetUserFollowQuerySchema(BasePaginatedQuerySchema):
         example=42,
         validate=strictly_positive_int_validator,
         allow_none=True,
-        default=None,
+        dump_default=None,
     )
 
     @post_load
@@ -2578,7 +2582,7 @@ class AboutUserSchema(UserDigestSchema):
 class CommentsPageQuerySchema(BaseOptionalPaginatedQuerySchema):
     sort = EnumField(
         ContentSortOrder,
-        missing=ContentSortOrder.CREATED_ASC,
+        load_default=ContentSortOrder.CREATED_ASC,
         description="Order of the returned contents, default is to sort by creation date, older first",
     )
 
@@ -2590,7 +2594,7 @@ class CommentsPageSchema(BasePaginatedSchemaPage):
 class ContentRevisionsPageQuerySchema(BaseOptionalPaginatedQuerySchema):
     sort = EnumField(
         ContentSortOrder,
-        missing=ContentSortOrder.MODIFIED_ASC,
+        load_default=ContentSortOrder.MODIFIED_ASC,
         description="Order of the returned revisions, default is to sort by modification (e.g. creation of the revision) date, older first",
     )
 
@@ -2627,8 +2631,8 @@ class UserIdCallIdPathSchema(UserIdPathSchema):
 class GetUserCallsQuerySchema(marshmallow.Schema):
     state = EnumField(
         UserCallState,
-        missing=None,
-        default=None,
+        load_default=None,
+        dump_default=None,
         required=False,
         description="If given, only return calls with the given state",
     )

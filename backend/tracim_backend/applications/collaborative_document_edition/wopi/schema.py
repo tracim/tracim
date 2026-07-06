@@ -51,7 +51,7 @@ class WOPICheckFileInfoSchema(marshmallow.Schema):
         attribute="user_can_write",
     )
     UserCanNotWriteRelative = marshmallow.fields.Boolean(
-        default=True,
+        dump_default=True,
         description="Whether it's possible to save the document as a new name ("
         "Save As functionality)",
         attribute="user_can_not_write_relative",

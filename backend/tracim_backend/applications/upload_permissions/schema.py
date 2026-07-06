@@ -99,7 +99,7 @@ class UploadPermissionListQuery(object):
 class UploadPermissionListQuerySchema(marshmallow.Schema):
     show_disabled = marshmallow.fields.Int(
         example=0,
-        default=0,
+        dump_default=0,
         description="if set to 1, then show disabled share." " Default is 0 - hide disabled share",
         validate=bool_as_int_validator,
     )

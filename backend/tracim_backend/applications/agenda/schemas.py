@@ -24,7 +24,7 @@ class AgendaSchema(marshmallow.Schema):
     workspace_id = marshmallow.fields.Int(
         example=4,
         description="Workspace id if agenda is link to a workspace",
-        default=None,
+        dump_default=None,
         allow_none=True,
     )
     resource_type = StrippedString(
@@ -44,7 +44,7 @@ class AgendaFilterQuerySchema(marshmallow.Schema):
         description="comma separated list of included workspace ids, "
         "setting this parameters will disable"
         "showing of user personals agenda",
-        default="",
+        dump_default="",
         allow_none=True,
     )
     agenda_types = StrippedString(
@@ -60,8 +60,8 @@ class AgendaFilterQuerySchema(marshmallow.Schema):
         description="comma separated list of resource type, can contain any value in {}".format(
             [resource_type.value for resource_type in AgendaResourceType]
         ),
-        default="calendar",
-        missing=None,
+        dump_default="calendar",
+        load_default=None,
     )
 
     @post_load
