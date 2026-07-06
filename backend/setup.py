@@ -22,7 +22,7 @@ requires = [
     # and hapic==0.73 aren't compatible
     "apispec-marshmallow-advanced>=0.4",
     "apispec==2.0.2",
-    "marshmallow <3.0.0a1,>=2.21.0",
+    "marshmallow>=3.26.2,<4.0.0",
     # CLI
     "cliff",
     # Webdav
