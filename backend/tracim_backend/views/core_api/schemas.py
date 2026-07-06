@@ -5,7 +5,6 @@ from marshmallow import post_load
 from marshmallow.fields import Email
 from marshmallow.fields import Field
 from marshmallow.fields import String
-from marshmallow.fields import ValidatedField
 from marshmallow.validate import OneOf
 import typing
 
@@ -256,17 +255,12 @@ class TracimEmail(Email):
             self.validators
         )
 
-    def _validated(self, value):
-        if value is None:
-            return None
-        return TracimEmailValidator(error=self.error_messages["invalid"])(value)
-
     def _deserialize(self, value, attr, data, **kwargs):
         value = super()._deserialize(value, attr, data, **kwargs)
         return value.strip()
 
 
-class RFCEmail(ValidatedField, String):
+class RFCEmail(String):
     """A validated email rfc style "john <john@john.ndd>" field.
     Validation occurs during both serialization and
     deserialization.
@@ -282,11 +276,6 @@ class RFCEmail(ValidatedField, String):
         # Insert validation into self.validators so that multiple errors can be
         # stored.
         self.validators.insert(0, RFCEmailValidator(error=self.error_messages["invalid"]))
-
-    def _validated(self, value):
-        if value is None:
-            return None
-        return RFCEmailValidator(error=self.error_messages["invalid"])(value)
 
     def _deserialize(self, value, attr, data, **kwargs):
         value = super()._deserialize(value, attr, data, **kwargs)
