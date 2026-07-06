@@ -96,7 +96,7 @@ gitpython==3.1.18
     # via tracim_backend (setup.py)
 gripcontrol==4.1.0
     # via tracim_backend (setup.py)
-hapic[marshmallow]==0.95
+hapic[marshmallow] @ git+https://github.com/algoo/hapic.git@develop
     # via tracim_backend (setup.py)
 html2text==2020.1.16
     # via tracim_backend (setup.py)
@@ -133,7 +133,7 @@ markupsafe==2.0.1
     # via
     #   jinja2
     #   mako
-marshmallow==2.21.0
+marshmallow==3.26.2
     # via
     #   apispec-marshmallow-advanced
     #   hapic
