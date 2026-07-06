@@ -2,6 +2,7 @@ from hapic import MarshmallowProcessor
 from hapic.exception import OutputValidationException
 from hapic.exception import ValidationException
 from hapic.processor.main import ProcessValidationError
+from marshmallow import ValidationError as MarshmallowValidationError
 import typing
 
 
@@ -19,15 +20,11 @@ class TracimProcessor(MarshmallowProcessor):
         :return: dumped data
         """
         clean_data = self.clean_data(data)
-        dump = self.schema.dump(clean_data)
-        dump_data = dump.data
-        errors = dump.errors
-        if not errors:
-            # Re-validate with dumped data
-            errors = self.schema.load(dump_data).errors
-        if errors:
-            raise ValidationException("Error when dumping: {}".format(str(errors)))
-
+        dump_data = self.schema.dump(clean_data)
+        try:
+            self.schema.load(dump_data)
+        except MarshmallowValidationError as e:
+            raise ValidationException("Error when dumping: {}".format(str(e.messages)))
         return dump_data
 
     def dump_output(self, output_data: typing.Any) -> typing.Union[typing.Dict, typing.List]:
@@ -37,15 +34,11 @@ class TracimProcessor(MarshmallowProcessor):
         :return: given data
         """
         clean_data = self.clean_data(output_data)
-        dump = self.schema.dump(clean_data)
-        dump_data = dump.data
-        errors = dump.errors
-        if not errors:
-            # Re-validate with dumped data
-            errors = self.schema.load(dump_data).errors
-        if errors:
-            raise OutputValidationException("Error when validate input: {}".format(str(errors)))
-
+        dump_data = self.schema.dump(clean_data)
+        try:
+            self.schema.load(dump_data)
+        except MarshmallowValidationError as e:
+            raise OutputValidationException("Error when validate input: {}".format(str(e.messages)))
         return dump_data
 
     def get_output_validation_error(self, data_to_validate: typing.Any) -> ProcessValidationError:
@@ -55,10 +48,10 @@ class TracimProcessor(MarshmallowProcessor):
         :return: ProcessValidationError instance for given output data
         """
         clean_data = self.clean_data(data_to_validate)
-        dump = self.schema.dump(clean_data)
-        dump_data = dump.data
-        errors = dump.errors
-        if not errors:
-            # Re-validate with dumped data
-            errors = self.schema.load(dump_data).errors
+        dump_data = self.schema.dump(clean_data)
+        errors = {}
+        try:
+            self.schema.load(dump_data)
+        except MarshmallowValidationError as e:
+            errors = e.messages
         return ProcessValidationError(message="Validation error of output data", details=errors)

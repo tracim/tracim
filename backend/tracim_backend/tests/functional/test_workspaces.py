@@ -173,7 +173,7 @@ class TestWorkspaceCreationEndpointWorkspaceAccessTypeChecks(object):
         (user_role_created, workspace_created) = event_helper.last_events(2)
         assert workspace_created.event_type == "workspace.created"
         author = web_testapp.get("/api/users/1", status=200).json_body
-        assert workspace_created.author == UserDigestSchema().dump(author).data
+        assert workspace_created.author == UserDigestSchema().dump(author)
         assert workspace_created.workspace == workspace
         assert user_role_created.event_type == "workspace_member.created"
         assert workspace_created.author["user_id"] == workspace["owner"]["user_id"]
@@ -227,7 +227,7 @@ class TestWorkspaceCreationEndpointWorkspaceAccessTypeChecks(object):
         (workspace_created, user_role_created) = event_helper.last_events(2)
         assert workspace_created.event_type == "workspace.created"
         author = web_testapp.get("/api/users/1", status=200).json_body
-        assert workspace_created.author == UserDigestSchema().dump(author).data
+        assert workspace_created.author == UserDigestSchema().dump(author)
         assert workspace_created.workspace == workspace
         assert user_role_created.event_type == "workspace_member.created"
         assert workspace_created.author["user_id"] == workspace["owner"]["user_id"]
@@ -805,7 +805,7 @@ class TestWorkspaceEndpoint(object):
         (user_role_created, workspace_created) = event_helper.last_events(2)
         assert workspace_created.event_type == "workspace.created"
         author = web_testapp.get("/api/users/1", status=200).json_body
-        assert workspace_created.author == UserDigestSchema().dump(author).data
+        assert workspace_created.author == UserDigestSchema().dump(author)
         assert workspace_created.workspace == workspace
         assert user_role_created.event_type == "workspace_member.created"
         assert workspace_created.author["user_id"] == workspace["owner"]["user_id"]
@@ -860,7 +860,7 @@ class TestWorkspaceEndpoint(object):
         (workspace_created, user_role_created) = event_helper.last_events(2)
         assert workspace_created.event_type == "workspace.created"
         author = web_testapp.get("/api/users/1", status=200).json_body
-        assert workspace_created.author == UserDigestSchema().dump(author).data
+        assert workspace_created.author == UserDigestSchema().dump(author)
         assert workspace_created.workspace == workspace
         assert user_role_created.event_type == "workspace_member.created"
         assert workspace_created.author["user_id"] == workspace["owner"]["user_id"]
@@ -1958,9 +1958,9 @@ class TestWorkspaceMembersEndpoint(object):
         workspace = web_testapp.get("/api/workspaces/1", status=200).json_body
         assert last_event.workspace == {k: v for k, v in workspace.items() if k != "description"}
         author = web_testapp.get("/api/users/1", status=200).json_body
-        assert last_event.author == user_schema.dump(author).data
+        assert last_event.author == user_schema.dump(author)
         user = web_testapp.get("/api/users/2", status=200).json_body
-        assert last_event.user == user_schema.dump(user).data
+        assert last_event.user == user_schema.dump(user)
         assert last_event.client_token is None
         assert last_event.workspace["number_of_members"] == 2
 
@@ -2371,14 +2371,14 @@ class TestWorkspaceMembersEndpoint(object):
             k: v for k, v in workspace_dict.items() if k != "description"
         }
         author = web_testapp.get("/api/users/{}".format(user.user_id), status=200).json_body
-        assert last_event.author == user_schema.dump(author).data
+        assert last_event.author == user_schema.dump(author)
 
         web_testapp.authorization = (
             "Basic",
             ("admin@admin.admin", "admin@admin.admin"),
         )
         user = web_testapp.get("/api/users/{}".format(user2.user_id), status=200).json_body
-        assert last_event.user == user_schema.dump(user).data
+        assert last_event.user == user_schema.dump(user)
 
         # after
         res = web_testapp.get(
@@ -2974,9 +2974,9 @@ class TestWorkspaceMembersEndpoint(object):
             k: v for k, v in workspace_dict.items() if k != "description"
         }
         author = web_testapp.get("/api/users/1", status=200).json_body
-        assert last_event.author == user_schema.dump(author).data
+        assert last_event.author == user_schema.dump(author)
         user_dict = web_testapp.get("/api/users/{}".format(user.user_id), status=200).json_body
-        assert last_event.user == user_schema.dump(user_dict).data
+        assert last_event.user == user_schema.dump(user_dict)
         assert last_event.client_token is None
 
         # after

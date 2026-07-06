@@ -3015,10 +3015,10 @@ class TestUserEndpoint(object):
 
         last_event = event_helper.last_event
         assert last_event.event_type == "user.created"
-        assert last_event.fields["user"] == UserDigestSchema().dump(res).data
+        assert last_event.fields["user"] == UserDigestSchema().dump(res)
         assert last_event.fields["client_token"] is None
         author = web_testapp.get("/api/users/1", status=200).json_body
-        assert last_event.fields["author"] == UserDigestSchema().dump(author).data
+        assert last_event.fields["author"] == UserDigestSchema().dump(author)
 
     def test_api__create_user__ok_200__minimal_rfc_email(
         self, web_testapp, user_api_factory, event_helper
@@ -3041,10 +3041,10 @@ class TestUserEndpoint(object):
 
         last_event = event_helper.last_event
         assert last_event.event_type == "user.created"
-        assert last_event.fields["user"] == UserDigestSchema().dump(res).data
+        assert last_event.fields["user"] == UserDigestSchema().dump(res)
         assert last_event.fields["client_token"] is None
         author = web_testapp.get("/api/users/1", status=200).json_body
-        assert last_event.fields["author"] == UserDigestSchema().dump(author).data
+        assert last_event.fields["author"] == UserDigestSchema().dump(author)
 
     @pytest.mark.parametrize("public_name_value", ("🐻‍❄👨‍👨‍👧‍👧️ Emoji Lover",))
     def test_api__create_user__ok_200__with_emoji_as_public_name(

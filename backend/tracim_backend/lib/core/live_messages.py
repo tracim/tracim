@@ -85,7 +85,7 @@ class LiveMessagesLib(object):
 
     @classmethod
     def message_as_dict(cls, message: Message):
-        return cls._message_schema.dump(message).data
+        return cls._message_schema.dump(message)
 
     @classmethod
     def get_server_side_event_string(

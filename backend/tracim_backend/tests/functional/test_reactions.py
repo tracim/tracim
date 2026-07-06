@@ -186,7 +186,7 @@ class TestReactionsEndpoint(object):
         last_event = event_helper.last_event
         assert last_event.event_type == "reaction.created"
         author = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200).json_body
-        assert last_event.author == UserDigestSchema().dump(author).data
+        assert last_event.author == UserDigestSchema().dump(author)
         web_testapp.authorization = (
             "Basic",
             ("admin@admin.admin", "admin@admin.admin"),
@@ -195,7 +195,7 @@ class TestReactionsEndpoint(object):
             "/api/workspaces/{}".format(test_workspace.workspace_id), status=200
         ).json_body
         assert last_event.workspace == {k: v for k, v in workspace.items() if k != "description"}
-        assert last_event.reaction["author"] == UserDigestSchema().dump(author).data
+        assert last_event.reaction["author"] == UserDigestSchema().dump(author)
         assert last_event.reaction["content_id"] == folder.content_id
         assert last_event.reaction["reaction_id"] == reaction_id
         assert last_event.reaction["created"]
@@ -318,7 +318,7 @@ class TestReactionsEndpoint(object):
         last_event = event_helper.last_event
         assert last_event.event_type == "reaction.deleted"
         author = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200).json_body
-        assert last_event.author == UserDigestSchema().dump(author).data
+        assert last_event.author == UserDigestSchema().dump(author)
         web_testapp.authorization = (
             "Basic",
             ("admin@admin.admin", "admin@admin.admin"),
@@ -327,7 +327,7 @@ class TestReactionsEndpoint(object):
             "/api/workspaces/{}".format(test_workspace.workspace_id), status=200
         ).json_body
         assert last_event.workspace == {k: v for k, v in workspace.items() if k != "description"}
-        assert last_event.reaction["author"] == UserDigestSchema().dump(author).data
+        assert last_event.reaction["author"] == UserDigestSchema().dump(author)
         assert last_event.reaction["content_id"] == folder.content_id
         assert last_event.reaction["reaction_id"] == reaction_id
         assert last_event.reaction["created"]

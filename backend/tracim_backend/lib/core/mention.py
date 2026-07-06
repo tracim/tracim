@@ -262,10 +262,10 @@ class MentionBuilder:
             workspace_api.get_one(content_in_context.workspace.workspace_id)
         )
         content_schema = EventApi.get_content_schema_for_type(content.type)
-        content_dict = content_schema.dump(content_in_context).data
+        content_dict = content_schema.dump(content_in_context)
         common_fields = {
             Event.CONTENT_FIELD: content_dict,
-            Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data,
+            Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context),
         }
 
         event_api = EventApi(current_user, context.dbsession, context.app_config)
