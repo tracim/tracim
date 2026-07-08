@@ -185,13 +185,9 @@ class TestEventReceiver:
         ) = workspace_and_users
         user_api = user_api_factory.get()
         fields = {
-            Event.AUTHOR_FIELD: UserSchema()
-            .dump(user_api.get_user_with_context(event_initiator))
-            .data,
+            Event.AUTHOR_FIELD: UserSchema().dump(user_api.get_user_with_context(event_initiator)),
             Event.CLIENT_TOKEN_FIELD: "test",
-            Event.USER_FIELD: UserSchema()
-            .dump(user_api.get_user_with_context(event_initiator))
-            .data,
+            Event.USER_FIELD: UserSchema().dump(user_api.get_user_with_context(event_initiator)),
         }
         event = Event(entity_type=EntityType.USER, operation=OperationType.MODIFIED, fields=fields)
 
@@ -221,9 +217,7 @@ class TestEventReceiver:
         workspace_in_context = workspace_api.get_workspace_with_context(my_workspace)
         user_api = user_api_factory.get()
         fields = {
-            Event.AUTHOR_FIELD: UserSchema()
-            .dump(user_api.get_user_with_context(event_initiator))
-            .data,
+            Event.AUTHOR_FIELD: UserSchema().dump(user_api.get_user_with_context(event_initiator)),
             Event.CLIENT_TOKEN_FIELD: "test",
             Event.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context),
         }
@@ -260,9 +254,7 @@ class TestEventReceiver:
         workspace_in_context = workspace_api.get_workspace_with_context(my_workspace)
         user_api = user_api_factory.get()
         fields = {
-            Event.AUTHOR_FIELD: UserSchema()
-            .dump(user_api.get_user_with_context(event_initiator))
-            .data,
+            Event.AUTHOR_FIELD: UserSchema().dump(user_api.get_user_with_context(event_initiator)),
             Event.CLIENT_TOKEN_FIELD: "test",
             Event.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context),
         }
@@ -300,9 +292,7 @@ class TestEventReceiver:
         user_api = user_api_factory.get()
         workspace_dict = WorkspaceSchema(exclude=("access_type",)).dump(workspace_in_context)
         fields = {
-            Event.AUTHOR_FIELD: UserSchema()
-            .dump(user_api.get_user_with_context(event_initiator))
-            .data,
+            Event.AUTHOR_FIELD: UserSchema().dump(user_api.get_user_with_context(event_initiator)),
             Event.CLIENT_TOKEN_FIELD: "test",
             Event.WORKSPACE_FIELD: workspace_dict,
         }
@@ -342,12 +332,8 @@ class TestEventReceiver:
         user_api = user_api_factory.get()
         config_in_context = user_workspace_config_api.get_user_workspace_config_with_context(role)
         fields = {
-            Event.AUTHOR_FIELD: UserSchema()
-            .dump(user_api.get_user_with_context(event_initiator))
-            .data,
-            Event.USER_FIELD: UserSchema()
-            .dump(user_api.get_user_with_context(event_initiator))
-            .data,
+            Event.AUTHOR_FIELD: UserSchema().dump(user_api.get_user_with_context(event_initiator)),
+            Event.USER_FIELD: UserSchema().dump(user_api.get_user_with_context(event_initiator)),
             Event.CLIENT_TOKEN_FIELD: "test",
             Event.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context),
             Event.MEMBER_FIELD: WorkspaceMemberDigestSchema().dump(config_in_context),
@@ -388,12 +374,8 @@ class TestEventReceiver:
         user_api = user_api_factory.get()
         config_in_context = user_workspace_config_api.get_user_workspace_config_with_context(role)
         fields = {
-            Event.AUTHOR_FIELD: UserSchema()
-            .dump(user_api.get_user_with_context(event_initiator))
-            .data,
-            Event.USER_FIELD: UserSchema()
-            .dump(user_api.get_user_with_context(event_initiator))
-            .data,
+            Event.AUTHOR_FIELD: UserSchema().dump(user_api.get_user_with_context(event_initiator)),
+            Event.USER_FIELD: UserSchema().dump(user_api.get_user_with_context(event_initiator)),
             Event.CLIENT_TOKEN_FIELD: "test",
             Event.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context),
             Event.MEMBER_FIELD: WorkspaceMemberDigestSchema().dump(config_in_context),
@@ -444,9 +426,7 @@ class TestEventReceiver:
         transaction.commit()
         content_in_context = content_api.get_content_in_context(folder)
         fields = {
-            Event.AUTHOR_FIELD: UserSchema()
-            .dump(user_api.get_user_with_context(event_initiator))
-            .data,
+            Event.AUTHOR_FIELD: UserSchema().dump(user_api.get_user_with_context(event_initiator)),
             Event.CONTENT_FIELD: ContentSchema().dump(content_in_context),
             Event.CLIENT_TOKEN_FIELD: "test",
             Event.WORKSPACE_FIELD: WorkspaceSchema().dump(workspace_in_context),
@@ -643,9 +623,7 @@ class TestEventReceiver:
         user_api = user_api_factory.get()
         fields = {
             Event.USER_CONFIG_FIELD: UserConfigSchema().dump({"parameters": {}}),
-            Event.USER_FIELD: UserSchema()
-            .dump(user_api.get_user_with_context(event_initiator))
-            .data,
+            Event.USER_FIELD: UserSchema().dump(user_api.get_user_with_context(event_initiator)),
         }
         event = Event(
             entity_type=EntityType.USER_CONFIG,
@@ -682,9 +660,7 @@ class TestEventReceiver:
                 "original_label": "A document",
                 "original_type": "html-document",
             },
-            Event.USER_FIELD: UserSchema()
-            .dump(user_api.get_user_with_context(event_initiator))
-            .data,
+            Event.USER_FIELD: UserSchema().dump(user_api.get_user_with_context(event_initiator)),
         }
         event = Event(
             entity_type=EntityType.FAVORITE,
