@@ -70,7 +70,7 @@ defusedxml==0.7.1
     #   pysaml2
     #   radicale
     #   wsgidav
-elasticsearch==7.13.1
+elasticsearch==7.17.12
     # via
     #   elasticsearch-dsl
     #   tracim_backend (setup.py)
