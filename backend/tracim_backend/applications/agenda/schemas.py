@@ -36,7 +36,7 @@ class AgendaSchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_query_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return Agenda(**data)
 
 
@@ -74,7 +74,7 @@ class AgendaFilterQuerySchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_query_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return AgendaFilterQuery(**data)
 
 

@@ -364,7 +364,7 @@ class SimpleFileSchema(marshmallow.Schema):
     files = marshmallow.fields.Raw(required=False, metadata={"description": "a file"})
 
     @post_load
-    def create_file(self, data: typing.Dict[str, typing.Any]) -> object:
+    def create_file(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return SimpleFile(**data)
 
 
@@ -383,7 +383,7 @@ class FileCreationFormSchema(marshmallow.Schema):
     )
 
     @post_load
-    def file_creation_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def file_creation_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return FileCreation(**data)
 
 
@@ -624,7 +624,7 @@ class SetEmailSchema(LoggedInUserPasswordSchema):
     )
 
     @post_load
-    def create_set_email_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def create_set_email_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return SetEmail(**data)
 
 
@@ -634,7 +634,7 @@ class SetUsernameSchema(LoggedInUserPasswordSchema):
     )
 
     @post_load
-    def create_set_username_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def create_set_username_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return SetUsername(**data)
 
 
@@ -647,7 +647,7 @@ class SetPasswordSchema(LoggedInUserPasswordSchema):
     )
 
     @post_load
-    def create_set_password_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def create_set_password_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return SetPassword(**data)
 
 
@@ -675,7 +675,7 @@ class SetUserInfoSchema(marshmallow.Schema):
     )
 
     @post_load
-    def create_user_info_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def create_user_info_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return UserInfos(**data)
 
 
@@ -692,7 +692,7 @@ class SetUserProfileSchema(marshmallow.Schema):
     )
 
     @post_load
-    def create_user_profile(self, data: typing.Dict[str, typing.Any]) -> object:
+    def create_user_profile(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return UserProfile(**data)
 
 
@@ -712,7 +712,7 @@ class SetUserAllowedSpaceSchema(marshmallow.Schema):
     )
 
     @post_load
-    def create_user_allowed_space(self, data: typing.Dict[str, typing.Any]) -> object:
+    def create_user_allowed_space(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return UserAllowedSpace(**data)
 
 
@@ -757,7 +757,7 @@ class UserRegistrationSchema(marshmallow.Schema):
     )
 
     @post_load
-    def register_user(self, data: typing.Dict[str, typing.Any]) -> object:
+    def register_user(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return UserCreation(**data)
 
 
@@ -826,7 +826,7 @@ class UserCreationSchema(marshmallow.Schema):
             raise marshmallow.ValidationError("email or username required")
 
     @post_load
-    def create_user(self, data: typing.Dict[str, typing.Any]) -> object:
+    def create_user(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return UserCreation(**data)
 
 
@@ -853,7 +853,7 @@ class EventIdPathSchema(marshmallow.Schema):
 
 class MessageIdsPathSchema(UserIdPathSchema, EventIdPathSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs):
         return MessageIdsPath(**data)
 
 
@@ -897,7 +897,7 @@ class WorkspaceFilterQuerySchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs):
         return WorkspaceFilterQuery(**data)
 
 
@@ -922,7 +922,7 @@ class UserWorkspaceFilterQuerySchema(WorkspaceFilterQuerySchema):
     )
 
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs):
         return UserWorkspaceFilterQuery(**data)
 
 
@@ -943,7 +943,7 @@ class WorkspaceMemberFilterQuerySchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs):
         return WorkspaceMemberFilterQuery(**data)
 
 
@@ -957,7 +957,7 @@ class WorkspaceIdSchema(marshmallow.Schema):
 
 class WorkspaceIdPathSchema(WorkspaceIdSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs):
         return WorkspacePath(**data)
 
 
@@ -974,7 +974,7 @@ class RadicaleUserResourceUserSubItemPathSchema(UserIdPathSchema):
     trailing_slash = marshmallow.fields.String()
 
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs):
         return RadicaleUserResourceUserSubitemsPath(**data)
 
 
@@ -986,19 +986,19 @@ class RadicaleUserResourceWorkspaceSubItemPathSchema(UserIdPathSchema, Workspace
     trailing_slash = marshmallow.fields.String()
 
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs):
         return RadicaleUserResourceWorkspaceSubitemsPath(**data)
 
 
 class RadicaleUserSubItemPathSchema(RadicaleSubItemPathSchema, UserIdPathSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs):
         return RadicaleUserSubitemsPath(**data)
 
 
 class RadicaleWorkspaceSubItemPathSchema(RadicaleSubItemPathSchema, WorkspaceIdPathSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs):
         return RadicaleWorkspaceSubitemsPath(**data)
 
 
@@ -1024,13 +1024,13 @@ class RevisionIdPathSchema(marshmallow.Schema):
 
 class WorkspaceAndUserIdPathSchema(UserIdPathSchema, WorkspaceIdPathSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return WorkspaceAndUserPath(**data)
 
 
 class WorkspaceAndContentIdPathSchema(WorkspaceIdPathSchema, ContentIdPathSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return WorkspaceAndContentPath(**data)
 
 
@@ -1040,7 +1040,7 @@ class FilenamePathSchema(marshmallow.Schema):
 
 class UserPicturePathSchema(UserIdPathSchema, FilenamePathSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return UserPicturePath(**data)
 
 
@@ -1051,7 +1051,7 @@ class WidthAndHeightPathSchema(marshmallow.Schema):
 
 class UserPreviewPicturePathSchema(UserPicturePathSchema, WidthAndHeightPathSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return UserPreviewPicturePath(**data)
 
 
@@ -1069,19 +1069,19 @@ class WorkspaceAndContentRevisionIdPathSchema(
     WorkspaceIdPathSchema, ContentIdPathSchema, RevisionIdPathSchema
 ):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return WorkspaceAndContentRevisionPath(**data)
 
 
 class FilePathSchema(WorkspaceAndContentIdPathSchema, FilenamePathSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return FilePath(**data)
 
 
 class FileRevisionPathSchema(WorkspaceAndContentRevisionIdPathSchema, FilenamePathSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return FileRevisionPath(**data)
 
 
@@ -1089,7 +1089,7 @@ class FilePreviewSizedPathSchema(
     WorkspaceAndContentIdPathSchema, WidthAndHeightPathSchema, FilenamePathSchema
 ):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return FilePreviewSizedPath(**data)
 
 
@@ -1099,7 +1099,7 @@ class FileRevisionPreviewSizedPathSchema(
     FilenamePathSchema,
 ):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return RevisionPreviewSizedPath(**data)
 
 
@@ -1107,19 +1107,19 @@ class UserWorkspaceAndContentIdPathSchema(
     UserIdPathSchema, WorkspaceIdPathSchema, ContentIdPathSchema
 ):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return UserWorkspaceAndContentPath(**data)
 
 
 class UserWorkspaceIdPathSchema(UserIdPathSchema, WorkspaceIdPathSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return WorkspaceAndUserPath(**data)
 
 
 class UserContentIdPathSchema(UserIdPathSchema, ContentIdPathSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ContentAndUserPath(**data)
 
 
@@ -1134,7 +1134,7 @@ class ReactionPathSchema(WorkspaceAndContentIdPathSchema):
     )
 
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ReactionPath(**data)
 
 
@@ -1146,7 +1146,7 @@ class TagPathSchema(WorkspaceIdPathSchema):
     )
 
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return TagPath(**data)
 
 
@@ -1165,13 +1165,13 @@ class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
     )
 
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return CommentPath(**data)
 
 
 class CommentsPathFilenameSchema(CommentsPathSchema, FilenamePathSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return CommentPathFilename(**data)
 
 
@@ -1211,7 +1211,7 @@ class KnownMembersQuerySchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_query_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return KnownMembersQuery(**data)
 
 
@@ -1230,7 +1230,7 @@ class KnownContentsQuerySchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_query_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return KnownContentsQuery(**data)
 
 
@@ -1246,7 +1246,7 @@ class FileQuerySchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_query(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_query(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return FileQuery(**data)
 
 
@@ -1258,7 +1258,7 @@ class PageQuerySchema(FileQuerySchema):
     )
 
     @post_load
-    def make_query(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_query(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return PageQuery(**data)
 
 
@@ -1345,7 +1345,7 @@ class FilterContentQuerySchema(BaseOptionalPaginatedQuerySchema):
     )
 
     @post_load
-    def make_content_filter(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_content_filter(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ContentFilter(**data)
 
 
@@ -1356,7 +1356,7 @@ class ContentIdsQuerySchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_content_ids(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_content_ids(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ContentIdsQuery(**data)
 
 
@@ -1369,7 +1369,7 @@ class RoleUpdateSchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_role(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_role(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return RoleUpdate(**data)
 
 
@@ -1392,7 +1392,7 @@ class WorkspaceMemberInviteSchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_workspace_member_invite(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_workspace_member_invite(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return WorkspaceMemberInvitation(**data)
 
     @marshmallow.validates_schema(pass_original=True)
@@ -1421,7 +1421,7 @@ class ResetPasswordRequestSchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ResetPasswordRequest(**data)
 
     # TODO 2020-06-11 - RJ: duplicated code across this file
@@ -1440,7 +1440,7 @@ class ResetPasswordCheckTokenSchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ResetPasswordCheckToken(**data)
 
 
@@ -1459,7 +1459,7 @@ class ResetPasswordModifySchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ResetPasswordModify(**data)
 
 
@@ -1492,7 +1492,7 @@ class BasicAuthSchema(marshmallow.Schema):
             raise marshmallow.ValidationError("email or username required")
 
     @post_load
-    def make_login(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_login(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return LoginCredentials(**data)
 
 
@@ -1558,7 +1558,7 @@ class WorkspaceModifySchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_workspace_modifications(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_workspace_modifications(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return WorkspaceUpdate(**data)
 
 
@@ -1622,7 +1622,7 @@ class WorkspaceCreationSchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_workspace_modifications(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_workspace_modifications(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return WorkspaceCreate(**data)
 
 
@@ -1953,7 +1953,7 @@ class ContentMoveSchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_move_params(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_move_params(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return MoveParams(**data)
 
 
@@ -1994,7 +1994,7 @@ class ContentCreationSchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_content_creation(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_content_creation(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ContentCreation(**data)
 
 
@@ -2342,7 +2342,7 @@ class SetCommentSchema(marshmallow.Schema):
     )
 
     @post_load()
-    def create_comment(self, data: typing.Dict[str, typing.Any]) -> object:
+    def create_comment(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return CommentCreation(**data)
 
 
@@ -2354,7 +2354,7 @@ class SetReactionSchema(marshmallow.Schema):
     )
 
     @post_load()
-    def create_reaction(self, data: typing.Dict[str, typing.Any]) -> object:
+    def create_reaction(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ReactionCreation(**data)
 
 
@@ -2364,7 +2364,7 @@ class SetTagByNameSchema(marshmallow.Schema):
     )
 
     @post_load()
-    def create_tag(self, data: typing.Dict[str, typing.Any]) -> object:
+    def create_tag(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return TagCreation(**data)
 
 
@@ -2394,13 +2394,13 @@ class ContentModifyNamespaceAbstractSchema(marshmallow.Schema):
 
 class ContentModifySchema(ContentModifyAbstractSchema):
     @post_load
-    def text_based_content_update(self, data: typing.Dict[str, typing.Any]) -> object:
+    def text_based_content_update(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ContentUpdate(**data)
 
 
 class ContentModifyNamespaceSchema(ContentModifyNamespaceAbstractSchema):
     @post_load
-    def content_namespace_update(self, data: typing.Dict[str, typing.Any]) -> object:
+    def content_namespace_update(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ContentNamespaceUpdate(**data)
 
 
@@ -2412,7 +2412,7 @@ class FolderContentModifySchema(ContentModifyAbstractSchema):
     )
 
     @post_load
-    def folder_content_update(self, data: typing.Dict[str, typing.Any]) -> object:
+    def folder_content_update(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return FolderContentUpdate(**data)
 
 
@@ -2428,7 +2428,7 @@ class SetContentStatusSchema(marshmallow.Schema):
     )
 
     @post_load
-    def set_status(self, data: typing.Dict[str, typing.Any]) -> object:
+    def set_status(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return SetContentStatus(**data)
 
 
@@ -2438,7 +2438,7 @@ class SetContentIsTemplateSchema(marshmallow.Schema):
     )
 
     @post_load
-    def set_marked_as_template(self, data: typing.Dict[str, typing.Any]) -> object:
+    def set_marked_as_template(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return SetContentIsTemplate(**data)
 
 
@@ -2588,7 +2588,7 @@ class TranslationQuerySchema(FileQuerySchema):
     )
 
     @post_load
-    def make_query(self, data: typing.Dict[str, typing.Any]) -> TranslationQuery:
+    def make_query(self, data: typing.Dict[str, typing.Any], **kwargs) -> TranslationQuery:
         return TranslationQuery(**data)
 
 
@@ -2627,7 +2627,7 @@ class GetLiveMessageQuerySchema(BasePaginatedQuerySchema):
     )
 
     @post_load
-    def live_message_query(self, data: typing.Dict[str, typing.Any]) -> LiveMessageQuery:
+    def live_message_query(self, data: typing.Dict[str, typing.Any], **kwargs) -> LiveMessageQuery:
         return LiveMessageQuery(**data)
 
 
@@ -2690,7 +2690,7 @@ class UserMessagesMarkAsReadQuerySchema(marshmallow.Schema):
 
     @post_load
     def user_message_mark_as_read_query(
-        self, data: typing.Dict[str, typing.Any]
+        self, data: typing.Dict[str, typing.Any], **kwargs
     ) -> UserMessagesMarkAsReadQuery:
         return UserMessagesMarkAsReadQuery(**data)
 
@@ -2727,7 +2727,9 @@ class UserMessagesSummaryQuerySchema(marshmallow.Schema):
     )
 
     @post_load
-    def message_summary_query(self, data: typing.Dict[str, typing.Any]) -> UserMessagesSummaryQuery:
+    def message_summary_query(
+        self, data: typing.Dict[str, typing.Any], **kwargs
+    ) -> UserMessagesSummaryQuery:
         return UserMessagesSummaryQuery(**data)
 
 
@@ -2777,7 +2779,7 @@ class GetUserFollowQuerySchema(BasePaginatedQuerySchema):
     )
 
     @post_load
-    def user_follow_query(self, data: typing.Dict[str, typing.Any]) -> UserFollowQuery:
+    def user_follow_query(self, data: typing.Dict[str, typing.Any], **kwargs) -> UserFollowQuery:
         return UserFollowQuery(**data)
 
 

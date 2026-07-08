@@ -72,7 +72,7 @@ class UploadPermissionPasswordBodySchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_body_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_body_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return UploadPermissionPasswordBody(**data)
 
 
@@ -89,7 +89,7 @@ class UploadDataFormSchema(marshmallow.Schema):
     )
 
     @post_load
-    def file_creation_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def file_creation_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return UploadDataForm(**data)
 
 
@@ -110,7 +110,7 @@ class UploadPermissionListQuerySchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_query_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return UploadPermissionListQuery(**data)
 
 
@@ -125,7 +125,7 @@ class UploadPermissionTokenPath(marshmallow.Schema):
     )
 
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return UploadPermissionToken(**data)
 
 
@@ -143,7 +143,7 @@ class UploadPermissionIdPathSchema(WorkspaceIdPathSchema):
     )
 
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return UploadPermissionIdPath(**data)
 
 
@@ -167,7 +167,7 @@ class UploadPermissionCreationBodySchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_body_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_body_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return UploadPermissionCreationBody(**data)
 
 

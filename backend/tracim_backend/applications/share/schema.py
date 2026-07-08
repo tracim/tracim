@@ -31,7 +31,7 @@ class SharePasswordFormSchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_query_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return SharePassword(**data)
 
 
@@ -44,7 +44,7 @@ class SharePasswordBodySchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_query_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return SharePassword(**data)
 
 
@@ -65,7 +65,7 @@ class ShareListQuerySchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_query_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ShareListQuery(**data)
 
 
@@ -84,7 +84,7 @@ class ShareIdPathSchema(WorkspaceIdPathSchema, ContentIdPathSchema):
     )
 
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ShareIdPath(**data)
 
 
@@ -99,7 +99,7 @@ class ShareTokenPathSchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ShareTokenPath(**data)
 
 
@@ -127,7 +127,7 @@ class ShareCreationBodySchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_body_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_body_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ShareCreationBody(**data)
 
 
@@ -138,7 +138,7 @@ class ShareTokenWithFilenamePathSchema(marshmallow.Schema):
     filename = marshmallow.fields.String()
 
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ShareTokenWithFilenamePath(**data)
 
 

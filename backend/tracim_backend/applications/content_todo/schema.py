@@ -32,5 +32,5 @@ class SetTodoSchema(marshmallow.Schema):
 
 class TodoPathSchema(WorkspaceAndContentIdPathSchema, TodoIdSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs):
         return TodoPath(**data)

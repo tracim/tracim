@@ -79,5 +79,5 @@ class FileCreateFromTemplateSchema(marshmallow.Schema):
     )
 
     @post_load
-    def file_create_from_template(self, data: typing.Dict[str, typing.Any]) -> object:
+    def file_create_from_template(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return FileCreateFromTemplate(**data)

@@ -12,7 +12,7 @@ class WopiPutHeadersSchema(marshmallow.Schema):
     )
 
     @post_load
-    def make_wopi_put_headers(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_wopi_put_headers(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return WopiPutHeaders(**data)
 
 
