@@ -2,8 +2,6 @@ from hapic import MarshmallowProcessor
 from hapic.exception import OutputValidationException
 from hapic.exception import ValidationException
 from hapic.processor.main import ProcessValidationError
-from marshmallow import EXCLUDE
-from marshmallow import ValidationError as MarshmallowValidationError
 import typing
 
 
@@ -11,35 +9,34 @@ class TracimProcessor(MarshmallowProcessor):
     """
     Patched hapic processor that returns an error when dump data is not correct.
     See https://github.com/algoo/hapic/issues/211 for more info.
-    """
 
-    def _dump_and_validate(self, data: typing.Any) -> typing.Dict:
-        """Serialize data and round-trip validate the result."""
-        dump_data = self.schema.dump(data)
-        # unknown=EXCLUDE: dump_only fields appear in dump_data but are not
-        # loadable in marshmallow 3, so they must be excluded rather than raised.
-        self.schema.load(dump_data, unknown=EXCLUDE)
-        return dump_data
+    In Tracim 2026.07.00 for Debian 13 we have raiser marshmallow to its v3
+    In marshmallow 2, schema.dump() returned a (data, errors) namedtuple, so errors
+    had to be checked explicitly.
+    In marshmallow 3, dump() simply serializes without
+    raising, so the round-trip load() validation that was used here is no longer needed
+    (and breaks on dump_only fields in nested schemas).
+    """
 
     def dump(self, data: typing.Any) -> typing.Any:
         clean_data = self.clean_data(data)
         try:
-            return self._dump_and_validate(clean_data)
-        except MarshmallowValidationError as e:
-            raise ValidationException("Error when dumping: {}".format(str(e.messages)))
+            return self.schema.dump(clean_data)
+        except Exception as e:
+            raise ValidationException("Error when dumping: {}".format(str(e)))
 
     def dump_output(self, output_data: typing.Any) -> typing.Union[typing.Dict, typing.List]:
         clean_data = self.clean_data(output_data)
         try:
-            return self._dump_and_validate(clean_data)
-        except MarshmallowValidationError as e:
-            raise OutputValidationException("Error when validate input: {}".format(str(e.messages)))
+            return self.schema.dump(clean_data)
+        except Exception as e:
+            raise OutputValidationException("Error when validate input: {}".format(str(e)))
 
     def get_output_validation_error(self, data_to_validate: typing.Any) -> ProcessValidationError:
         clean_data = self.clean_data(data_to_validate)
         errors = {}
         try:
-            self._dump_and_validate(clean_data)
-        except MarshmallowValidationError as e:
-            errors = e.messages
+            self.schema.dump(clean_data)
+        except Exception as e:
+            errors = {"_schema": [str(e)]}
         return ProcessValidationError(message="Validation error of output data", details=errors)
