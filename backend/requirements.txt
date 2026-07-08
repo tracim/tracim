@@ -127,7 +127,7 @@ mako==1.2.2
     #   alembic
     #   pyramid-mako
     #   tracim_backend (setup.py)
-markdown==3.3.4
+markdown==3.10.0
     # via tracim_backend (setup.py)
 markupsafe==2.0.1
     # via
