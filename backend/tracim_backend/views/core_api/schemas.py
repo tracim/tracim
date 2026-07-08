@@ -1035,7 +1035,7 @@ class WorkspaceAndContentIdPathSchema(WorkspaceIdPathSchema, ContentIdPathSchema
 
 
 class FilenamePathSchema(marshmallow.Schema):
-    filename = StrippedString("filename.ext")
+    filename = StrippedString(dump_default="filename.ext")
 
 
 class UserPicturePathSchema(UserIdPathSchema, FilenamePathSchema):
