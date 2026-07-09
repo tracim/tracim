@@ -493,7 +493,6 @@ def get_build_version() -> str:
     Get either tag or commit hash linked to current commit
     :return: tag or commit hash
     """
-    last_commit = os.popen("git rev-parse HEAD 2> /dev/null").read()
     return_value = os.system(f"git describe --exact-match {last_commit} 2> /dev/null")
 
     if return_value:
@@ -501,6 +500,10 @@ def get_build_version() -> str:
         if hash == "":
             return UNKNOWN_BUILD_VERSION
         return hash
+
+    last_commit = (
+        os.popen("git rev-parse HEAD 2> /dev/null").read().strip()
+    )  # strip needed to remove newlines
     return os.popen(f"git describe --exact-match {last_commit} 2> /dev/null").read()
 
 
