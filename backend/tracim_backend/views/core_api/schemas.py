@@ -1341,7 +1341,10 @@ class FilterContentQuerySchema(BaseOptionalPaginatedQuerySchema):
     sort = EnumField(
         ContentSortOrder,
         load_default=ContentSortOrder.LABEL_ASC,
-        metadata={"description": "Order of the returned contents, default is to sort by labels"},
+        metadata={
+            "description": "Sort order of the returned contents. Default is to sort by labels. "
+            f"Possible values are: {', '.join(so.value for so in ContentSortOrder)}"
+        },
     )
 
     @post_load
@@ -1734,7 +1737,8 @@ class EmailNotificationTypeSchema(marshmallow.Schema):
     email_notification_type = StrippedString(
         metadata={
             "example": EmailNotificationType.default().name,
-            "description": "Type of email notification for a specific space",
+            "description": "Type of email notification for a specific space."
+            " Possible values are: {', '.join(v.name for v in EmailNotificationType)}"
         },
     )
 
@@ -1808,15 +1812,15 @@ class WorkspaceDiskSpaceSchema(marshmallow.Schema):
     used_space = marshmallow.fields.Int(
         metadata={
             "description": "used space in the workspace in bytes."
-            "if owner allowed space limit or  workspace allowed_space limit is reach,"
-            "no file can be created/updated in this workspace."
+            " if owner allowed space limit or  workspace allowed_space limit is reach,"
+            " no file can be created/updated in this workspace."
         }
     )
     allowed_space = marshmallow.fields.Int(
         metadata={
             "description": "allowed space in workspace in bytes. "
-            "if limit is reach, no file can be created/updated "
-            "in any user owned workspaces. 0 mean no limit."
+            " if limit is reach, no file can be created/updated "
+            " in any user owned workspaces. 0 mean no limit."
         }
     )
     workspace = marshmallow.fields.Nested(WorkspaceDigestSchema(), attribute="workspace_in_context")
