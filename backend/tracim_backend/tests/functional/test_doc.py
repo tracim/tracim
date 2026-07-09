@@ -16,10 +16,10 @@ class TestDoc(object):
         res = web_testapp.get("/api/doc/favicon-16x16.png", status=200)
         assert res.content_type == "image/png"
         res = web_testapp.get("/api/doc/swagger-ui.js", status=200)
-        assert res.content_type == "application/javascript"
+        assert res.content_type == "text/javascript"
         res = web_testapp.get("/api/doc/swagger-ui-standalone-preset.js", status=200)
-        assert res.content_type == "application/javascript"
+        assert res.content_type == "text/javascript"
         res = web_testapp.get("/api/doc/swagger-ui-bundle.js", status=200)
-        assert res.content_type == "application/javascript"
+        assert res.content_type == "text/javascript"
         res = web_testapp.get("/api/doc/swagger-ui.css", status=200)
         assert res.content_type == "text/css"
