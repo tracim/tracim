@@ -1,6 +1,6 @@
 # This image should be built from the root of tracim repository, e.g.:
 # docker build -f tools_docker/concourse/Dockerfile -t algooci/tracim:latest .
-FROM debian:bullseye AS base_install
+FROM debian:trixie AS base_install
 
 # HOME, used by pyenv scripts
 ENV HOME=/root
