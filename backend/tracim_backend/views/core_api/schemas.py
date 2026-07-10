@@ -1500,6 +1500,9 @@ class BasicAuthSchema(marshmallow.Schema):
 
 
 class LoginOutputHeaders(marshmallow.Schema):
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
     expire_after = StrippedString()
 
 
@@ -1738,7 +1741,7 @@ class EmailNotificationTypeSchema(marshmallow.Schema):
         metadata={
             "example": EmailNotificationType.default().name,
             "description": "Type of email notification for a specific space."
-            " Possible values are: {', '.join(v.name for v in EmailNotificationType)}"
+            " Possible values are: {', '.join(v.name for v in EmailNotificationType)}",
         },
     )
 
@@ -2636,9 +2639,12 @@ class GetLiveMessageQuerySchema(BasePaginatedQuerySchema):
 
 
 class TracimLiveEventHeaderSchema(marshmallow.Schema):
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
     # TODO - G.M - 2020-05-14 - Add Filtering for text/event-stream mimetype with accept header,
     #  see: https://github.com/tracim/tracim/issues/3042
-    accept = marshmallow.fields.String(required=True, load_from="Accept", dump_to="Accept")
+    accept = marshmallow.fields.String(required=True, data_key="Accept")
 
 
 class TracimLiveEventQuerySchema(marshmallow.Schema):
