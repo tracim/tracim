@@ -11,7 +11,7 @@ ARG CONTAINER_TRACIM_DIR="/tracim"
 # Base image for installing some base dependencies
 ####
 
-FROM debian:bullseye AS base
+FROM debian:trixie-slim AS base
 ARG REPO
 ARG PACKAGE_DIR
 ARG BRANCH
@@ -42,7 +42,7 @@ RUN apt-get install -qy --no-install-recommends \
 # - installs optional dependencies
 ####
 FROM base AS build_backend
-ENV SETUPTOOLS_USE_DISTUTILS=stdlib
+ENV PIP_BREAK_SYSTEM_PACKAGES=1
 ARG PACKAGE_DIR
 # required packages for building the backend dependencies
 RUN apt-get install -qy $(cat "${PACKAGE_DIR}/build_backend_packages.list") \
@@ -68,7 +68,7 @@ RUN cp -r /tracim/frontend/dist/assets/font/Nunito/ /usr/share/fonts/nunito
 # - setups backend translation
 # - builds frontend
 ####
-FROM node:16-buster AS build_frontend
+FROM node:16-bookworm AS build_frontend
 COPY --from=base /tracim /tracim
 RUN \
     cd /tracim/backend \
@@ -98,10 +98,7 @@ ENV LANG=C.UTF-8
 ENV LANGUAGE=C.UTF-8
 ENV LC_ALL=C.UTF-8
 ARG PACKAGE_DIR
-# NOTE - 2021-10-21 - S.G. - pin condure (used by pushpin) to a lower priority so that mongrel2 is used instead.
-# This is due to automated tests randomly failing with condure.
-RUN printf "Package: condure\nPin: version *\nPin-Priority: -1" > /etc/apt/preferences.d/pushpin \
-    && apt-get install -qy $(cat "${PACKAGE_DIR}/server_packages.list" "${PACKAGE_DIR}/optional_preview_packages.list") vim wget curl \
+RUN apt-get install -qy $(cat "${PACKAGE_DIR}/server_packages.list" "${PACKAGE_DIR}/optional_preview_packages.list") vim wget curl \
     && apt-get autoremove -qy \
     && rm -rf /var/lib/{apt,dpkg,cache,log}/ /tmp/* /var/tmp/* \
 # Remove default apache2 conf

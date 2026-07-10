@@ -6,7 +6,7 @@ iproute2
 libfile-mimeinfo-perl
 libimage-exiftool-perl
 webp
-libmagic1
+libmagic1t64
 locales
 poppler-utils
 python3
