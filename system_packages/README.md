@@ -8,3 +8,7 @@ This directory contains listing of system packages that can be used by Tracim.
 - `optional_preview_packages.list`: packages of external applications (inkscape, libreoffice…) that Tracim can use to preview contents.
 - `run_backend_packages.list`: minimal packages needed to run Tracim's backend.
 - `server_packages.list`: packages needed to run Tracim's backend with apache2 and uwsgi.
+
+> [!IMPORTANT]
+> The pushpin dependency must be installed manually, as no Debian package exists for now.
+> See https://pushpin.org/docs/install/
