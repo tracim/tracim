@@ -11,7 +11,7 @@ ARG CONTAINER_TRACIM_DIR="/tracim"
 # Base image for installing some base dependencies
 ####
 
-FROM debian:trixie-slim AS base
+FROM debian:trixie AS base
 ARG REPO
 ARG PACKAGE_DIR
 ARG BRANCH
