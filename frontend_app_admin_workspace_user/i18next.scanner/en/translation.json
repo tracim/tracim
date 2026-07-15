@@ -71,7 +71,7 @@
   "No limit to the number spaces a guest user can join": "No limit to the number spaces a guest user can join",
   "The maximum number of users has been reached": "The maximum number of users has been reached",
   "The maximum number of guests has been reached": "The maximum number of guests has been reached",
-  "The user’s role in some space is too high-level to become a guest": "The user’s role in some space is too high-level to become a guest",
+  "The user’s role in some space is too high-level to become a guest": "The user’s role in some space is too high to become a guest",
   "You can' change your own profile": "You can' change your own profile",
   "The user is in more spaces than allowed for a guest": "The user is in more spaces than allowed for a guest",
   "View user limitations": "View user limitations",

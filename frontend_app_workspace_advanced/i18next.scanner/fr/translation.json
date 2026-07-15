@@ -9,7 +9,7 @@
   "Add a member": "Ajouter un membre",
   "Error while loading members list": "Erreur lors du chargement de la liste des membres",
   "Save successful": "Sauvegarde réussie",
-  "Error while saving the new description": "Erreur lors de l'enregistrement d'une nouvelle description",
+  "Error while saving the new description": "Erreur lors de l'enregistrement de la description",
   "Error while saving new role for member": "Erreur lors de la sauvegarde du rôle",
   "Error while fetching known members list": "Erreur lors du chargement de la liste des membres connus",
   "Please set a name, an email or a username": "Veuillez saisir le nom, l'adresse email ou l'identifiant",
@@ -62,6 +62,6 @@
   "Description of the space": "Description de l'espace",
   "This space doesn't have a description yet.": "Cet espace n'a pas encore de description.",
   "Edit": "Modifier",
-  "Guest users are not allowed to be more than contributor. In order to upgrade the role of this guest user, ask your administrator to make it a standard user": "Les utilisateurs invités ne peuvent pas être plus que contributeur. Pour pouvoir améliorer le rôle de cet utilisateur, demandez à votre administrateur de le faire passer utilisateur",
-  "The maximum number of spaces for a guest user has been reached. In order to add this guest user into a new space, ask your administrator to make it a standard user": "Le nombre maximum d'espace pour un invité a été atteint. Pour ajouter cet invitée dans l'espace, demandez à votre administrateur de faire passer cet invité en utilisateur."
+  "Guest users are not allowed to be more than contributor. In order to upgrade the role of this guest user, ask your administrator to make it a standard user": "Le rôle des utilisateurs invités est limité à « contributeur ». Pour passer outre cette limitation, demandez à votre administrateur de passer cet utilisateur en « utilisateur standard »",
+  "The maximum number of spaces for a guest user has been reached. In order to add this guest user into a new space, ask your administrator to make it a standard user": "Le nombre maximum d'espace pour un compte invité a été atteint. Pour permettre à cet utilisateur de rejoindre plus d'espaces, demandez à votre administrateur de le transformer en « utilisateur standard »"
 }
