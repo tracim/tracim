@@ -8,7 +8,7 @@
   "A content with the same name already exists": "Obsah se stejným názvem již existuje",
   "Permanently delete": "Trvale smazat",
   "Yes, delete permanently": "Ano, trvale smazat",
-  "Warning: this operation cannot be rolled back": "Varování: tuto operaci nelze vrátit zpět",
+  "Warning: this operation cannot be rolled back": "Upozornění: tuto operaci nelze vrátit zpět",
   "Are you sure?": "Opravdu?",
   "Cancel": "Zrušit",
   "Validate": "Ověřit",
@@ -53,5 +53,13 @@
   "{{numberCard}} card": "{{numberCard}} karta",
   "{{count}} cards_0": "{{count}} karta",
   "{{count}} cards_1": "{{count}} karty",
-  "{{count}} cards_2": "{{count}} karet"
+  "{{count}} cards_2": "{{count}} karet",
+  "Title": "Název",
+  "No member": "Žádný člen",
+  "Start date:": "Datum zahájení:",
+  "Due date:": "Datum ukončení:",
+  "Start date": "Datum zahájení",
+  "Due date": "Datum ukončení",
+  "Open field": "Otevřené pole",
+  "Assignment": "Přiřazení"
 }
