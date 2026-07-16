@@ -48,10 +48,13 @@ ENV PIP_BREAK_SYSTEM_PACKAGES=1
 ARG PACKAGE_DIR
 # required packages for building the backend dependencies
 RUN apt-get install -qy $(cat "${PACKAGE_DIR}/build_backend_packages.list") \
-    # Go in backend folder
+    # Go in backend folder \
     && cd /tracim/backend \
-    # Install backend
-    && pip install --force-reinstall \
+    #--- pip install section \
+    # With Debian 12 Bullseye we were using `--force-reinstall` to force installing our Python packages instead of the system Python packages \
+    # This is no longer possible with Debian 13 Trixie : apt-installed Python packages are shipped without RECORD files (PEP 668) so pip cannot uninstall them \
+    # instead we are using `--ignore-installed` which writes everything fresh into `/usr/local/ instead`. \
+    && pip install --ignore-installed \
     -r requirements-build.txt \
     -r requirements.txt \
     -r requirements-db-postgres.txt \
