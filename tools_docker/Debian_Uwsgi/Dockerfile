@@ -42,6 +42,8 @@ RUN apt-get install -qy --no-install-recommends \
 # - installs optional dependencies
 ####
 FROM base AS build_backend
+# PIP_BREAK_SYSTEM_PACKAGES env var to workaround "This environment is externally managed" error
+# this would happen since Debian 12, see https://pythonspeed.com/articles/externally-managed-environment-pep-668/
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
 ARG PACKAGE_DIR
 # required packages for building the backend dependencies
