@@ -134,6 +134,8 @@ COPY --from=build_backend /tracim /tracim
 COPY --from=build_backend /usr/local /usr/local
 # backend font to generate avatars
 COPY --from=build_backend /usr/share/fonts/nunito /usr/share/fonts/nunito
+# processing font cache now so we don't get a "Fontconfig error: No writable cache directories" error on start
+RUN fc-cache -f
 # Tracim code: frontend
 COPY --from=build_frontend /tracim/frontend/dist /tracim/frontend/dist
 # backend translation
