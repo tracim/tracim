@@ -81,7 +81,7 @@ RUN apt-get update \
     && apt-get install -qy curl bash \
     && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.5/install.sh | bash \
     && . "$NVM_DIR/nvm.sh" \
-    && nvm install 16
+    && nvm install v16.20.2
 # Add nvm node 16 bin dir to PATH so all node binaries (node, npm, npx, yarn, corepack…) are found
 ENV PATH="$NVM_DIR/versions/node/v16.20.2/bin:$PATH"
 RUN \
@@ -134,8 +134,12 @@ COPY --from=build_backend /tracim /tracim
 COPY --from=build_backend /usr/local /usr/local
 # backend font to generate avatars
 COPY --from=build_backend /usr/share/fonts/nunito /usr/share/fonts/nunito
-# processing font cache now so we don't get a "Fontconfig error: No writable cache directories" error on start
-RUN fc-cache -f
+# Pre-build system font cache and create www-data's per-user cache/config dirs.
+# Without these, fontconfig and inkscape attempt to write to /var/www/.cache and /var/www/.config
+# at runtime as www-data and fail with "No writable cache directories" / "Permission denied".
+RUN fc-cache -f \
+    && mkdir -p /var/www/.cache/fontconfig /var/www/.config/inkscape \
+    && chown -R www-data:www-data /var/www/.cache /var/www/.config
 # Tracim code: frontend
 COPY --from=build_frontend /tracim/frontend/dist /tracim/frontend/dist
 # backend translation
