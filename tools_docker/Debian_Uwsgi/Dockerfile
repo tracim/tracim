@@ -73,10 +73,20 @@ RUN cp -r /tracim/frontend/dist/assets/font/Nunito/ /usr/share/fonts/nunito
 # - setups backend translation
 # - builds frontend
 ####
-FROM node:16-bookworm AS build_frontend
+FROM debian:trixie AS build_frontend
 COPY --from=base /tracim /tracim
+# Install Node.js 16 via nvm (not in Trixie official repos)
+ENV NVM_DIR=/root/.nvm
+RUN apt-get update \
+    && apt-get install -qy curl bash \
+    && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.5/install.sh | bash \
+    && . "$NVM_DIR/nvm.sh" \
+    && nvm install 16
+# Add nvm node 16 bin dir to PATH so all node binaries (node, npm, npx, yarn, corepack…) are found
+ENV PATH="$NVM_DIR/versions/node/v16.20.2/bin:$PATH"
 RUN \
-    cd /tracim/backend \
+    npm install -g yarn \
+    && cd /tracim/backend \
     && npm install "i18next-conv@<8" -g \
     && ./update_i18n_json_file.sh
 # Install frontend
