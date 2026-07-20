@@ -42,7 +42,7 @@ RUN apt-get install -qy --no-install-recommends \
 # - installs optional dependencies
 ####
 FROM base AS build_backend
-# PIP_BREAK_SYSTEM_PACKAGES env var to workaround "This environment is externally managed" error
+# 2026-07-20 - INFO - PGO PIP_BREAK_SYSTEM_PACKAGES env var to workaround "This environment is externally managed" error
 # this would happen since Debian 12, see https://pythonspeed.com/articles/externally-managed-environment-pep-668/
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
 ARG PACKAGE_DIR
@@ -51,6 +51,7 @@ RUN apt-get install -qy $(cat "${PACKAGE_DIR}/build_backend_packages.list") \
     # Go in backend folder \
     && cd /tracim/backend \
     #--- pip install section \
+    # 2026-07-20 - INFO - PGO \
     # With Debian 12 Bullseye we were using `--force-reinstall` to force installing our Python packages instead of the system Python packages \
     # This is no longer possible with Debian 13 Trixie : apt-installed Python packages are shipped without RECORD files (PEP 668) so pip cannot uninstall them \
     # instead we are using `--ignore-installed` which writes everything fresh into `/usr/local/ instead`. \
@@ -75,14 +76,13 @@ RUN cp -r /tracim/frontend/dist/assets/font/Nunito/ /usr/share/fonts/nunito
 ####
 FROM debian:trixie AS build_frontend
 COPY --from=base /tracim /tracim
-# Install Node.js 16 via nvm (not in Trixie official repos)
+# 2026-07-20 - INFO - PGO D.A Install Node.js 16 via nvm (nodejs is available in Trixie but this is not the v16 - which is required for Tracim build)
 ENV NVM_DIR=/root/.nvm
 RUN apt-get update \
     && apt-get install -qy curl bash \
     && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.5/install.sh | bash \
     && . "$NVM_DIR/nvm.sh" \
     && nvm install v16.20.2
-# Add nvm node 16 bin dir to PATH so all node binaries (node, npm, npx, yarn, corepack…) are found
 ENV PATH="$NVM_DIR/versions/node/v16.20.2/bin:$PATH"
 RUN \
     npm install -g yarn \
@@ -134,7 +134,7 @@ COPY --from=build_backend /tracim /tracim
 COPY --from=build_backend /usr/local /usr/local
 # backend font to generate avatars
 COPY --from=build_backend /usr/share/fonts/nunito /usr/share/fonts/nunito
-# Pre-build system font cache and create www-data's per-user cache/config dirs.
+# 2026-07-20 - INFO - PGO Pre-build system font cache and create www-data's per-user cache/config dirs.
 # Without these, fontconfig and inkscape attempt to write to /var/www/.cache and /var/www/.config
 # at runtime as www-data and fail with "No writable cache directories" / "Permission denied".
 RUN fc-cache -f \
