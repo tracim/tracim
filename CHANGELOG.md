@@ -28,6 +28,7 @@
 - FilenameWithBadges React component refactoring [#6838](https://github.com/tracim/tracim/issues/6838)
 - Fix linter issues introduced in 2026.04.00
 - Fix incorrect labels [#6853](https://github.com/tracim/tracim/issues/6853)
+- Redesign the copyright footer section [#6849](https://github.com/tracim/tracim/issues/6849)
 
 
 ## 2026.04.00

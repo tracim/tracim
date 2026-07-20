@@ -395,12 +395,8 @@ export class Sidebar extends React.Component {
 
         <div className='sidebar__footer'>
           <div className='sidebar__footer__text'>
-            {TRACIM_APP_VERSION}
-          </div>
-          <div className='sidebar__footer__text'>
-            Copyright © - 2013 - 2026
             <div className='sidebar__footer__text__link'>
-              <a href='https://www.tracim.fr' target='_blank' rel='noopener noreferrer'>tracim.fr</a>
+              <a href='https://www.tracim-teamwork.com' target='_blank' rel='noopener noreferrer'>Tracim {TRACIM_APP_VERSION}</a> ▫️ © 2013-2026
             </div>
           </div>
         </div>
