@@ -113,7 +113,7 @@ describe('Favorites', function () {
     it('clicking on a favorite button should remove it from the page', () => {
       cy.get('[data-cy=favorites__item]').should('have.length', numberOfFavorites)
       cy.get('[title="TitleFile"][data-cy="favorites__item"] [data-cy=favoriteButton]').click()
-      cy.contains('[data-cy=flashmessage]', 'has been removed from your favourites.').should('be.visible')
+      cy.contains('[data-cy=flashmessage]', 'has been removed from your favorites.').should('be.visible')
       cy.get('[data-cy=favorites__item]').should('have.length', numberOfFavorites - 1)
       cy.get('[title="TitleNote"][data-cy="favorites__item"] > .favoriteTable__row__link').should('be.visible')
       cy.get('[title="TitleFile"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.exist')
