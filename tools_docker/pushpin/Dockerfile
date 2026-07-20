@@ -9,7 +9,7 @@
 # works with mongrel2.
 
 # Pull the base image
-FROM debian:trixie-slim
+FROM debian:trixie
 MAINTAINER Algoo team <contact@algoo.fr>
 
 
