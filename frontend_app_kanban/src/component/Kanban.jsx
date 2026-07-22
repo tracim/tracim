@@ -130,8 +130,14 @@ export class Kanban extends React.Component {
   }
 
   handleEditCard = (card) => {
-    this.setState({
-      editedCardInfos: { card }
+    this.setState(prevState => {
+      const column = prevState.board.columns
+        .find(column => column.cards
+          .find(columnCard => columnCard.id === card.id))
+
+      return {
+        editedCardInfos: { card, column }
+      }
     })
   }
 
@@ -307,6 +313,13 @@ export class Kanban extends React.Component {
     const { props, state } = this
     const changesAllowed = !props.readOnly && state.boardState === BOARD_STATE.LOADED
 
+    const cardsByColumns = Object.fromEntries(
+      state.board.columns.map(({ id, cards }) => ([id, cards]))
+    )
+    const cardsById = Object.fromEntries(
+      state.board.columns.flatMap(({ cards }) => (cards.map((card) => [card.id, card])))
+    )
+
     return (
       <div className={classnames('kanban__contentpage__wrapper', { fullscreen: props.fullscreen })}>
         {props.content.is_deleted && (
@@ -406,6 +419,7 @@ export class Kanban extends React.Component {
                     readOnly={!changesAllowed}
                     hideButtonsWhenReadOnly={props.readOnly}
                     card={card}
+                    cardList={cardsById}
                     onEditCard={this.handleEditCard}
                     onRemoveCard={this.handleRemoveCard}
                   />
@@ -435,6 +449,7 @@ export class Kanban extends React.Component {
                 defaultBackgroundColor={KANBAN_DEFAULT_BACKGROUND_COLOR}
                 language={props.language}
                 memberList={props.config.workspace.memberList}
+                cardList={cardsByColumns[state.editedCardInfos.column.id]}
               />
             </CardPopup>
           )}

@@ -60,6 +60,8 @@
   "Advancement:": "Avancement :",
   "day": "jour",
   "days": "jours",
+  "{{count}} day": "{{count}} jour",
+  "{{count}} days": "{{count}} jours",
   "Dependencies:": "Dépendances :",
   "Duration:": "Durée :",
   "Finished": "Terminée",

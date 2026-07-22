@@ -54,16 +54,34 @@ cardWidth = 280px
           &__avatar
             border-radius 50%
 
-      &__date
+      &__date, &__advancement
         display flex
         flex-direction row
         justify-content space-between
         align-items center
         margin-bottom textSpacing
-        &__kickoff, &__deadline
+        &__kickoff, &__deadline, &__progress, &__duration
           display inline
           & i
             margin-inline-end textSpacing
+
+      &__depends
+        > ul
+          margin 8px 0
+          padding 0
+          > li
+            display flex
+            align-items center
+            gap textSpacing
+            > div
+              border borderStyle
+              border-radius 1em
+              height: 1em
+              min-width: 1em
+            > span
+              overflow hidden
+              text-overflow ellipsis
+              white-space nowrap
 
       &__freeInput
         unicode-bidi plaintext
