@@ -1,6 +1,7 @@
 @import '~tracim_frontend_lib/src/css/Variable.styl'
 
 cardWidth = 280px
+fieldSpacing = 8px
 
 .kanban
   &__contentpage
@@ -156,6 +157,11 @@ cardWidth = 280px
       justify-content flex-start
       align-items center
       gap 5px 25px
+      &__column
+        display flex
+        flex 1
+        flex-direction column
+        gap fieldSpacing
     & .inlineInput
       display flex
       flex-direction row
@@ -244,7 +250,7 @@ cardWidth = 280px
       &__fields
         display flex
         flex-direction column
-        gap 8px
+        gap fieldSpacing
 
         label
           padding-inline-end textSpacing

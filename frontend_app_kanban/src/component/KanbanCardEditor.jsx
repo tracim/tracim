@@ -193,75 +193,77 @@ function KanbanCardEditor (props) {
         </div>
 
         <div className='kanban__KanbanPopup__inline'>
-          <div className='kanban__KanbanPopup__kickoff inlineInput'>
-            <label htmlFor='kanban__KanbanPopup__kickoff'>{props.t('Start date:')}</label>
+          <div className='kanban__KanbanPopup__inline__column'>
+            <div className='kanban__KanbanPopup__kickoff inlineInput'>
+              <label htmlFor='kanban__KanbanPopup__kickoff'>{props.t('Start date:')}</label>
 
-            <DateInput
-              id='kanban__KanbanPopup__kickoff'
-              onChange={(e) => setKickoff(e.target.value)}
-              onValidate={handleValidate}
-              value={kickoff}
-            />
-          </div>
-
-          <div className='kanban__KanbanPopup__duration inlineInput'>
-            <label htmlFor='kanban__KanbanPopup__duration'>{props.t('Duration:')}</label>
-
-            <TextInput
-              id='kanban__KanbanPopup__duration'
-              inputClassName='number'
-              onChange={(e) => setDuration(e.target.value)}
-              value={duration}
-              suffix={duration > 1 ? props.t('days') : props.t('day')}
-            />
-          </div>
-
-          <div className='linebreak' />
-
-          <div className='kanban__KanbanPopup__deadline inlineInput'>
-            <label htmlFor='kanban__KanbanPopup__deadline'>{props.t('Due date:')}</label>
-
-            <DateInput
-              id='kanban__KanbanPopup__deadline'
-              onChange={(e) => setDeadline(e.target.value)}
-              onValidate={handleValidate}
-              value={deadline}
-            />
-          </div>
-
-          <div className='kanban__KanbanPopup__progress inlineInput'>
-            <label htmlFor='kanban__KanbanPopup__progress'>{props.t('Advancement:')}</label>
-
-            <TextInput
-              id='kanban__KanbanPopup__progress'
-              inputClassName='number'
-              onChange={(e) => setProgress(e.target.value)}
-              value={finished ? '100' : progress}
-              disabled={finished}
-              suffix='%'
-            />
-
-            {finished ? (
-              <div className='kanban__KanbanPopup__revert'>
-                <span>{props.t('Reopen')}</span>
-                <IconButton
-                  customClass='kanban__KanbanPopup__revert__button'
-                  color={props.customColor}
-                  icon='fas fa-pen'
-                  onClick={handleFinishedTask}
-                  title={props.t('Reopen the card')}
-                />
-              </div>
-            ) : (
-              <IconButton
-                color={props.customColor}
-                customClass='kanban__KanbanPopup__finished'
-                icon='fas fa-check'
-                onClick={handleFinishedTask}
-                text={props.t('Finished')}
-                title={props.t('Mark the card as finished')}
+              <DateInput
+                id='kanban__KanbanPopup__kickoff'
+                onChange={(e) => setKickoff(e.target.value)}
+                onValidate={handleValidate}
+                value={kickoff}
               />
-            )}
+            </div>
+
+            <div className='kanban__KanbanPopup__deadline inlineInput'>
+              <label htmlFor='kanban__KanbanPopup__deadline'>{props.t('Due date:')}</label>
+
+              <DateInput
+                id='kanban__KanbanPopup__deadline'
+                onChange={(e) => setDeadline(e.target.value)}
+                onValidate={handleValidate}
+                value={deadline}
+              />
+            </div>
+          </div>
+
+          <div className='kanban__KanbanPopup__inline__column'>
+            <div className='kanban__KanbanPopup__duration inlineInput'>
+              <label htmlFor='kanban__KanbanPopup__duration'>{props.t('Duration:')}</label>
+
+              <TextInput
+                id='kanban__KanbanPopup__duration'
+                inputClassName='number'
+                onChange={(e) => setDuration(e.target.value)}
+                value={duration}
+                suffix={duration > 1 ? props.t('days') : props.t('day')}
+              />
+            </div>
+
+            <div className='kanban__KanbanPopup__progress inlineInput'>
+              <label htmlFor='kanban__KanbanPopup__progress'>{props.t('Advancement:')}</label>
+
+              <TextInput
+                id='kanban__KanbanPopup__progress'
+                inputClassName='number'
+                onChange={(e) => setProgress(e.target.value)}
+                value={finished ? '100' : progress}
+                disabled={finished}
+                suffix='%'
+              />
+
+              {finished ? (
+                <div className='kanban__KanbanPopup__revert'>
+                  <span>{props.t('Reopen')}</span>
+                  <IconButton
+                    customClass='kanban__KanbanPopup__revert__button'
+                    color={props.customColor}
+                    icon='fas fa-pen'
+                    onClick={handleFinishedTask}
+                    title={props.t('Reopen the card')}
+                  />
+                </div>
+              ) : (
+                <IconButton
+                  color={props.customColor}
+                  customClass='kanban__KanbanPopup__finished'
+                  icon='fas fa-check'
+                  onClick={handleFinishedTask}
+                  text={props.t('Finished')}
+                  title={props.t('Mark the card as finished')}
+                />
+              )}
+            </div>
           </div>
         </div>
 
