@@ -154,17 +154,19 @@ cardWidth = 280px
       display flex
       flex-wrap wrap
       justify-content flex-start
+      align-items center
       gap 5px 25px
     & .inlineInput
       display flex
       flex-direction row
       align-items baseline
+      gap spacingBetweenListItem
       & label
         min-width 100px
     &__bgColor
       min-width 75px // INFO - CH - 2025-06-06 - label 100px - 25px row gap
-    &__assignment, &__kickoff, &__deadline, &__freeInput
-      flex-grow 1
+    &__assignment, &__kickoff, &__deadline, &__freeInput, &__duration, &__progress
+      flex 1
     &__bgColor, &__deadline
       display flex
       flex-direction column
@@ -204,10 +206,36 @@ cardWidth = 280px
 
     & input
       vertical-align middle
+      &.number
+        text-align right
 
     &__description
       > div
         height 200px
+
+    &__progress
+      & .iconbutton
+        padding 6px
+      > div, button
+        flex 1
+
+    &__revert
+      display flex
+      align-items center
+      padding 0 textSpacing
+      gap textSpacing
+      > span
+        flex-grow 1
+        text-align right
+
+    &__finished, &__revert__button
+      border borderStyle
+    &__finished
+      background-color lightGrey1
+      > i
+        color lightGreen
+    &__revert__button
+      border-color transparent // Hack to avoid a resizing when switching status
 
     &__form
       display flex

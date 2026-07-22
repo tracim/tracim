@@ -56,5 +56,14 @@
   "Due date": "Date limite",
   "Title": "Titre",
   "Open field": "Champ libre",
-  "Assignment": "Affectation"
+  "Assignment": "Affectation",
+  "Advancement:": "Avancement :",
+  "day": "jour",
+  "days": "jours",
+  "Dependencies:": "Dépendances :",
+  "Duration:": "Durée :",
+  "Finished": "Terminée",
+  "Mark the card as finished": "Marquer la carte comme terminée",
+  "No card": "Aucune carte",
+  "Reopen the card": "Réouvrir la carte"
 }
