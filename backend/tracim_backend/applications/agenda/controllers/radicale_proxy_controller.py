@@ -421,11 +421,19 @@ class RadicaleProxyController(Controller):
         # Radicale user resource agenda
         configurator.add_route(
             "radicale_proxy__user_resource",
-            "/dav/user_{user_id:[0-9]+}{trailing_slash:[/]?}",
+            "/dav/user_{user_id:[0-9]+}/",
         )
         configurator.add_view(
             self.radicale_proxy__user_resource,
             route_name="radicale_proxy__user_resource",
+        )
+        configurator.add_route(
+            "radicale_proxy__user_resource_noslash",
+            "/dav/user_{user_id:[0-9]+}",
+        )
+        configurator.add_view(
+            self.radicale_proxy__user_resource,
+            route_name="radicale_proxy__user_resource_noslash",
         )
         configurator.add_route(
             "radicale_proxy__user_resource_user",
@@ -466,48 +474,87 @@ class RadicaleProxyController(Controller):
         # user agenda
         configurator.add_route(
             "radicale_proxy__user_agenda",
-            "/dav/agenda/user/{user_id:[0-9]+}{trailing_slash:[/]?}",
+            "/dav/agenda/user/{user_id:[0-9]+}/",
         )
         configurator.add_view(
             self.radicale_proxy__user_agenda, route_name="radicale_proxy__user_agenda"
         )
+        configurator.add_route(
+            "radicale_proxy__user_agenda_noslash",
+            "/dav/agenda/user/{user_id:[0-9]+}",
+        )
+        configurator.add_view(
+            self.radicale_proxy__user_agenda, route_name="radicale_proxy__user_agenda_noslash"
+        )
 
         configurator.add_route(
             "radicale_proxy__user_agenda_x",
-            "/dav/agenda/user/{user_id:[0-9]+}/{sub_item:[^\/]+\.ics}{trailing_slash:[/]?}",  # noqa: W605
+            "/dav/agenda/user/{user_id:[0-9]+}/{sub_item:[^\/]+\.ics}/",  # noqa: W605
         )
         configurator.add_view(
             self.radicale_proxy__user_agenda_subitems,
             route_name="radicale_proxy__user_agenda_x",
         )
+        configurator.add_route(
+            "radicale_proxy__user_agenda_x_noslash",
+            "/dav/agenda/user/{user_id:[0-9]+}/{sub_item:[^\/]+\.ics}",  # noqa: W605
+        )
+        configurator.add_view(
+            self.radicale_proxy__user_agenda_subitems,
+            route_name="radicale_proxy__user_agenda_x_noslash",
+        )
 
         # user addressbook
         configurator.add_route(
             "radicale_proxy__user_addressbook",
-            "/dav/addressbook/user/{user_id:[0-9]+}{trailing_slash:[/]?}",
+            "/dav/addressbook/user/{user_id:[0-9]+}/",
         )
         configurator.add_view(
             self.radicale_proxy__user_addressbook,
             route_name="radicale_proxy__user_addressbook",
         )
+        configurator.add_route(
+            "radicale_proxy__user_addressbook_noslash",
+            "/dav/addressbook/user/{user_id:[0-9]+}",
+        )
+        configurator.add_view(
+            self.radicale_proxy__user_addressbook,
+            route_name="radicale_proxy__user_addressbook_noslash",
+        )
 
         configurator.add_route(
             "radicale_proxy__user_addressbook_x",
-            "/dav/addressbook/user/{user_id:[0-9]+}/{sub_item:[^\/]+\.vcf}{trailing_slash:[/]?}",  # noqa: W605
+            "/dav/addressbook/user/{user_id:[0-9]+}/{sub_item:[^\/]+\.vcf}/",  # noqa: W605
         )
         configurator.add_view(
             self.radicale_proxy__user_agenda_subitems,
             route_name="radicale_proxy__user_addressbook_x",
         )
+        configurator.add_route(
+            "radicale_proxy__user_addressbook_x_noslash",
+            "/dav/addressbook/user/{user_id:[0-9]+}/{sub_item:[^\/]+\.vcf}",  # noqa: W605
+        )
+        configurator.add_view(
+            self.radicale_proxy__user_agenda_subitems,
+            route_name="radicale_proxy__user_addressbook_x_noslash",
+        )
 
         # workspace agenda
         configurator.add_route(
             "radicale_proxy__agenda_workspace",
-            "/dav/agenda/workspace/{workspace_id:[0-9]+}{trailing_slash:[/]?}",
+            "/dav/agenda/workspace/{workspace_id:[0-9]+}/",
         )
         configurator.add_view(
             self.radicale_proxy__workspace_agenda,
             route_name="radicale_proxy__agenda_workspace",
+        )
+        configurator.add_route(
+            "radicale_proxy__agenda_workspace_noslash",
+            "/dav/agenda/workspace/{workspace_id:[0-9]+}",
+        )
+        configurator.add_view(
+            self.radicale_proxy__workspace_agenda,
+            route_name="radicale_proxy__agenda_workspace_noslash",
         )
 
         configurator.add_route(
@@ -522,11 +569,19 @@ class RadicaleProxyController(Controller):
         # workspace addressbook
         configurator.add_route(
             "radicale_proxy__addressbook_workspace",
-            "/dav/addressbook/workspace/{workspace_id:[0-9]+}{trailing_slash:[/]?}",
+            "/dav/addressbook/workspace/{workspace_id:[0-9]+}/",
         )
         configurator.add_view(
             self.radicale_proxy__workspace_addressbook,
             route_name="radicale_proxy__addressbook_workspace",
+        )
+        configurator.add_route(
+            "radicale_proxy__addressbook_workspace_noslash",
+            "/dav/addressbook/workspace/{workspace_id:[0-9]+}",
+        )
+        configurator.add_view(
+            self.radicale_proxy__workspace_addressbook,
+            route_name="radicale_proxy__addressbook_workspace_noslash",
         )
 
         configurator.add_route(

@@ -244,15 +244,13 @@ class FacetCountSchema(marshmallow.Schema):
 
 class DateRangeSchema(marshmallow.Schema):
     date_from = marshmallow.fields.DateTime(
-        load_from="from",
-        dump_to="from",
+        data_key="from",
         format=DATETIME_FORMAT,
         required=False,
         load_default=None,
     )
     date_to = marshmallow.fields.DateTime(
-        load_from="to",
-        dump_to="to",
+        data_key="to",
         format=DATETIME_FORMAT,
         required=False,
         load_default=None,

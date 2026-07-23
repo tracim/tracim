@@ -4221,7 +4221,7 @@ class TestWorkspaceContentsWithFixture(object):
         """
         set_html_document_slug_to_legacy(session_factory)
         params = {
-            "parent_id": 0,
+            "parent_ids": "0",
             "show_archived": 1,
             "show_deleted": 1,
             "show_active": 1,
@@ -4301,7 +4301,7 @@ class TestWorkspaceContentsWithFixture(object):
         Check obtain workspace all root contents
         """
         params = {
-            "parent_id": 0,
+            "parent_ids": "0",
             "show_archived": 1,
             "show_deleted": 1,
             "show_active": 1,
@@ -4877,7 +4877,7 @@ class TestWorkspaceContentsWithFixture(object):
         Check obtain workspace all root contents
         """
         params = {
-            "parent_id": 0,
+            "parent_ids": "0",
             "show_archived": 1,
             "show_deleted": 1,
             "show_active": 1,
@@ -4916,7 +4916,7 @@ class TestWorkspaceContentsWithFixture(object):
         Check obtain workspace root active contents
         """
         params = {
-            "parent_id": 0,
+            "parent_ids": "0",
             "show_archived": 0,
             "show_deleted": 0,
             "show_active": 1,
@@ -4954,7 +4954,7 @@ class TestWorkspaceContentsWithFixture(object):
         Check obtain workspace root archived contents
         """
         params = {
-            "parent_id": 0,
+            "parent_ids": "0",
             "show_archived": 1,
             "show_deleted": 0,
             "show_active": 0,
@@ -4991,7 +4991,7 @@ class TestWorkspaceContentsWithFixture(object):
         Check obtain workspace root deleted contents
         """
         params = {
-            "parent_id": 0,
+            "parent_ids": "0",
             "show_archived": 0,
             "show_deleted": 1,
             "show_active": 0,
@@ -5031,7 +5031,7 @@ class TestWorkspaceContentsWithFixture(object):
         (archived, deleted, active) result should be empty list.
         """
         params = {
-            "parent_id": 0,
+            "parent_ids": "0",
             "show_archived": 0,
             "show_deleted": 0,
             "show_active": 0,
@@ -5101,7 +5101,7 @@ class TestWorkspaceContentsWithFixture(object):
         transaction.commit()
         # test-itself
         params = {
-            "parent_id": 1,
+            "parent_ids": "1",
             "show_archived": 1,
             "show_deleted": 1,
             "show_active": 1,
@@ -5830,7 +5830,7 @@ class TestWorkspaceContentsWithFixture(object):
         params = {
             "label": "GenericCreatedContent",
             "content_type": "folder",
-            "parent_ids": folder.content_id,
+            "parent_id": folder.content_id,
         }
         res = web_testapp.post_json(
             "/api/workspaces/{workspace_id}/contents".format(

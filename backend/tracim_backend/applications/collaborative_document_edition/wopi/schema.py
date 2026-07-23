@@ -5,10 +5,12 @@ import typing
 
 
 class WopiPutHeadersSchema(marshmallow.Schema):
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
     wopi_lool_timestamp = marshmallow.fields.DateTime(
         required=False,
-        load_from="X-LOOL-WOPI-Timestamp",
-        dump_to="X-LOOL-WOPI-Timestamp",
+        data_key="X-LOOL-WOPI-Timestamp",
     )
 
     @post_load

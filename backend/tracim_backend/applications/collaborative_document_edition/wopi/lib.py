@@ -1,3 +1,4 @@
+import datetime
 from sqlalchemy.orm import Session
 import typing
 
@@ -29,7 +30,7 @@ class WopiLib(object):
             content.workspace.get_user_role(self._user) >= WorkspaceRoles.CONTRIBUTOR.level
         )
         return WopiCheckFileInfo(
-            last_modified_time=content.updated,
+            last_modified_time=content.updated.replace(tzinfo=datetime.timezone.utc),
             base_file_name=content.file_name,
             size=size,
             owner_id=content.owner_id,
@@ -41,4 +42,6 @@ class WopiLib(object):
         )
 
     def last_modified_time(self, content: Content) -> WopiLastModifiedTime:
-        return WopiLastModifiedTime(last_modified_time=content.updated)
+        return WopiLastModifiedTime(
+            last_modified_time=content.updated.replace(tzinfo=datetime.timezone.utc)
+        )

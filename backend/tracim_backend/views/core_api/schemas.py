@@ -2884,7 +2884,7 @@ class UserCallSchema(marshmallow.Schema):
     updated = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT,
         metadata={"description": "date of last modification of the call."},
-        dump_to="modified",
+        data_key="modified",
     )
     url = marshmallow.fields.URL()
 

@@ -26,10 +26,11 @@ from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
 
 
 class UploadFileSchema(marshmallow.Schema):
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
     file_ = marshmallow.fields.Raw(
         required=False,
-        load_from="file_*",
-        dump_to="file_*",
         metadata={
             "description": "a file, you can add as file as you want by uploading file_* (* is any number)"
             " file in the same form."
