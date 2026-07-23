@@ -3,6 +3,7 @@ Plugins Management event hooks
 ==============================
 
 """
+
 import pluggy
 
 from tracim_backend.lib.core.plugins import hookspec

@@ -1,6 +1,7 @@
 """
 Generate special rst file for
 """
+
 from tracim_backend.lib.core.plugins import get_all_hookspec_module_path
 
 HEADER = """
