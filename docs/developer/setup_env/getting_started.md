@@ -2,7 +2,9 @@
 
 ## Development installation
 
-Install basic tracim with the default configuration for development purposes.
+1️⃣ Check [requirements](../../tracim_compatibility.md).
+
+2️⃣ Install basic tracim with the default configuration for development purposes.
 
 ```bash
 ./setup_default_backend.sh
@@ -10,13 +12,13 @@ Install basic tracim with the default configuration for development purposes.
 ./build_full_frontend.sh
 ```
 
-Run Tracim for development
+3️⃣ Run Tracim for development
 
 ```bash
 ./run_dev_backend.sh
 ```
 
-Open `localhost:7999`.
+4️⃣ Open `localhost:7999`.
 Connect using `admin@admin.admin:admin@admin.admin`.
 
 
