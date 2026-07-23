@@ -3,7 +3,7 @@
 ## Python & OS versions
 
 > [!IMPORTANT]
-> We recommend running on Debian 13 with Python 3.11.
+> We recommend running on Debian 13 with Python 3.13.
 > Other OS and Python versions can work but with no guarantee.
 
 
