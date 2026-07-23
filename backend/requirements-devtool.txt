@@ -1,5 +1,4 @@
 # Devtools
-gnureadline==8.2.13
 flake8==6.1.0
 isort==6.0.0
 mypy==1.18.2
