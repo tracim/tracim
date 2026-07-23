@@ -231,7 +231,7 @@ function KanbanCardEditor (props) {
             </div>
 
             <div className='kanban__KanbanPopup__progress inlineInput'>
-              <label htmlFor='kanban__KanbanPopup__progress'>{props.t('Advancement:')}</label>
+              <label htmlFor='kanban__KanbanPopup__progress'>{props.t('Progress:')}</label>
 
               <TextInput
                 id='kanban__KanbanPopup__progress'
