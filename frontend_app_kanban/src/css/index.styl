@@ -171,12 +171,12 @@ fieldSpacing = 8px
         min-width 100px
     &__bgColor
       min-width 75px // INFO - CH - 2025-06-06 - label 100px - 25px row gap
-    &__assignment, &__kickoff, &__deadline, &__freeInput, &__duration, &__progress
+    &__assignment, &__kickoff, &__deadline, &__freeInput, &__duration, &__progress, &__depends
       flex 1
     &__bgColor, &__deadline
       display flex
       flex-direction column
-    & .textInputComponent
+    & .textInputComponent, & .select
       flex-grow 1
     & .linebreak
       flex-basis 100%

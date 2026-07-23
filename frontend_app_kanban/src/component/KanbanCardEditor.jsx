@@ -267,12 +267,14 @@ function KanbanCardEditor (props) {
           </div>
         </div>
 
-        <div className='kanban__KanbanPopup__depends'>
+        <div className='kanban__KanbanPopup__depends inlineInput'>
+          <label htmlFor='kanban__KanbanPopup__depends'>{props.t('Depends on:')}</label>
+
           <Select
             id='kanban__KanbanPopup__depends'
-            className='kanban__KanbanPopup__depends__select'
+            className='kanban__KanbanPopup__depends__select select'
             isSearchable
-            placeholder={props.t('Dependencies')}
+            placeholder={props.t('No card')}
             onChange={handleChangeSelectDepends}
             options={dependsOptionList}
             noOptionsMessage={() => props.t('No card')}

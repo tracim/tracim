@@ -62,7 +62,7 @@
   "days": "jours",
   "{{count}} day": "{{count}} jour",
   "{{count}} days": "{{count}} jours",
-  "Dependencies": "Dépendances",
+  "Depends on:": "Dépend de :",
   "Duration:": "Durée :",
   "Finished": "Terminée",
   "Mark the card as finished": "Marquer la carte comme terminée",

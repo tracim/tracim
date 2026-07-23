@@ -62,7 +62,7 @@
   "days": "days",
   "{{count}} day": "{{count}} day",
   "{{count}} days": "{{count}} days",
-  "Dependencies:": "Dependencies",
+  "Depends on:": "Depends on:",
   "Duration:": "Duration:",
   "Finished": "Finished",
   "Mark the card as finished": "Mark the card as finished",
