@@ -191,7 +191,7 @@ function KanbanCard (props) {
           {props.card.progress?.length > 0 && (
             <div className='kanban__contentpage__wrapper__board__card__options__advancement__progress'>
               <Icon icon='far fa-chart-bar' />
-              {`${props.card.progress}%`}
+              {props.card.finished ? '100%' : `${props.card.progress}%`}
             </div>
           )}
           {props.card.duration?.length > 0 && (
