@@ -15,6 +15,7 @@
 
 ### 💥 Breaking/Important changes
 
+- Debian 13 compatibility (with its embedded Python 3.13): many packages were updated to newer versions
 - As a new property was added in advanced search results, you will need to rebuild the Elastic search index by running the following commands in the backend folder:
 
   ```sh
