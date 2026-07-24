@@ -3,6 +3,7 @@ This script generate many dir, note and comment of note in a new space
 The goal of this script is to produce a "big" space in order to test
 performance issue on it.
 """
+
 import random
 import requests
 import string

@@ -12,6 +12,7 @@ this behavior to make this work.
 
 Workspace descriptions need to always be sent as HTML code from now on.
 """
+
 from alembic import op
 from bs4 import BeautifulSoup
 import html

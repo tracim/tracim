@@ -5,6 +5,7 @@ Revises: 58ae85582ba0
 Create Date: 2021-01-08 15:43:05.918619
 
 """
+
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy import MetaData

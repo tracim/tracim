@@ -11,7 +11,7 @@ ARG CONTAINER_TRACIM_DIR="/tracim"
 # Base image for installing some base dependencies
 ####
 
-FROM debian:bullseye AS base
+FROM debian:trixie AS base
 ARG REPO
 ARG PACKAGE_DIR
 ARG BRANCH
@@ -42,14 +42,20 @@ RUN apt-get install -qy --no-install-recommends \
 # - installs optional dependencies
 ####
 FROM base AS build_backend
-ENV SETUPTOOLS_USE_DISTUTILS=stdlib
+# 2026-07-20 - INFO - PGO PIP_BREAK_SYSTEM_PACKAGES env var to workaround "This environment is externally managed" error
+# this would happen since Debian 12, see https://pythonspeed.com/articles/externally-managed-environment-pep-668/
+ENV PIP_BREAK_SYSTEM_PACKAGES=1
 ARG PACKAGE_DIR
 # required packages for building the backend dependencies
 RUN apt-get install -qy $(cat "${PACKAGE_DIR}/build_backend_packages.list") \
-    # Go in backend folder
+    # Go in backend folder \
     && cd /tracim/backend \
-    # Install backend
-    && pip install --force-reinstall \
+    #--- pip install section \
+    # 2026-07-20 - INFO - PGO \
+    # With Debian 12 Bullseye we were using `--force-reinstall` to force installing our Python packages instead of the system Python packages \
+    # This is no longer possible with Debian 13 Trixie : apt-installed Python packages are shipped without RECORD files (PEP 668) so pip cannot uninstall them \
+    # instead we are using `--ignore-installed` which writes everything fresh into `/usr/local/ instead`. \
+    && pip install --ignore-installed \
     -r requirements-build.txt \
     -r requirements.txt \
     -r requirements-db-postgres.txt \
@@ -68,10 +74,19 @@ RUN cp -r /tracim/frontend/dist/assets/font/Nunito/ /usr/share/fonts/nunito
 # - setups backend translation
 # - builds frontend
 ####
-FROM node:16-buster AS build_frontend
+FROM debian:trixie AS build_frontend
 COPY --from=base /tracim /tracim
+# 2026-07-20 - INFO - PGO D.A Install Node.js 16 via nvm (nodejs is available in Trixie but this is not the v16 - which is required for Tracim build)
+ENV NVM_DIR=/root/.nvm
+RUN apt-get update \
+    && apt-get install -qy curl bash \
+    && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.5/install.sh | bash \
+    && . "$NVM_DIR/nvm.sh" \
+    && nvm install v16.20.2
+ENV PATH="$NVM_DIR/versions/node/v16.20.2/bin:$PATH"
 RUN \
-    cd /tracim/backend \
+    npm install -g yarn \
+    && cd /tracim/backend \
     && npm install "i18next-conv@<8" -g \
     && ./update_i18n_json_file.sh
 # Install frontend
@@ -98,10 +113,13 @@ ENV LANG=C.UTF-8
 ENV LANGUAGE=C.UTF-8
 ENV LC_ALL=C.UTF-8
 ARG PACKAGE_DIR
-# NOTE - 2021-10-21 - S.G. - pin condure (used by pushpin) to a lower priority so that mongrel2 is used instead.
-# This is due to automated tests randomly failing with condure.
-RUN printf "Package: condure\nPin: version *\nPin-Priority: -1" > /etc/apt/preferences.d/pushpin \
-    && apt-get install -qy $(cat "${PACKAGE_DIR}/server_packages.list" "${PACKAGE_DIR}/optional_preview_packages.list") vim wget curl \
+# Install Pushpin from official pushpin.org apt repository (not available in Trixie)
+RUN apt-get install -qy curl gpg \
+    && mkdir -p /etc/apt/keyrings \
+    && curl -fsSL https://pushpin.org/pushpin-package.asc | gpg --dearmor -o /etc/apt/keyrings/pushpin.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/pushpin.gpg] https://packages.pushpin.org/deb pushpin-jammy main" > /etc/apt/sources.list.d/pushpin.list \
+    && apt-get update
+RUN apt-get install -qy $(cat "${PACKAGE_DIR}/server_packages.list" "${PACKAGE_DIR}/optional_preview_packages.list") vim wget curl \
     && apt-get autoremove -qy \
     && rm -rf /var/lib/{apt,dpkg,cache,log}/ /tmp/* /var/tmp/* \
 # Remove default apache2 conf
@@ -116,6 +134,12 @@ COPY --from=build_backend /tracim /tracim
 COPY --from=build_backend /usr/local /usr/local
 # backend font to generate avatars
 COPY --from=build_backend /usr/share/fonts/nunito /usr/share/fonts/nunito
+# 2026-07-20 - INFO - PGO Pre-build system font cache and create www-data's per-user cache/config dirs.
+# Without these, fontconfig and inkscape attempt to write to /var/www/.cache and /var/www/.config
+# at runtime as www-data and fail with "No writable cache directories" / "Permission denied".
+RUN fc-cache -f \
+    && mkdir -p /var/www/.cache/fontconfig /var/www/.config/inkscape \
+    && chown -R www-data:www-data /var/www/.cache /var/www/.config
 # Tracim code: frontend
 COPY --from=build_frontend /tracim/frontend/dist /tracim/frontend/dist
 # backend translation

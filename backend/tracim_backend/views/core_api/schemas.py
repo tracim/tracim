@@ -5,7 +5,6 @@ from marshmallow import post_load
 from marshmallow.fields import Email
 from marshmallow.fields import Field
 from marshmallow.fields import String
-from marshmallow.fields import ValidatedField
 from marshmallow.validate import OneOf
 import typing
 
@@ -240,11 +239,10 @@ class EventTypeListField(StrippedString):
 
 ExcludeAuthorIdsField = StrippedString(
     required=False,
-    default=None,
+    dump_default=None,
     allow_none=True,
     validate=regex_string_as_list_of_int,
-    example="1,5",
-    description="comma separated list of excluded authors",
+    metadata={"example": "1,5", "description": "comma separated list of excluded authors"},
 )
 
 
@@ -256,17 +254,12 @@ class TracimEmail(Email):
             self.validators
         )
 
-    def _validated(self, value):
-        if value is None:
-            return None
-        return TracimEmailValidator(error=self.error_messages["invalid"])(value)
-
     def _deserialize(self, value, attr, data, **kwargs):
         value = super()._deserialize(value, attr, data, **kwargs)
         return value.strip()
 
 
-class RFCEmail(ValidatedField, String):
+class RFCEmail(String):
     """A validated email rfc style "john <john@john.ndd>" field.
     Validation occurs during both serialization and
     deserialization.
@@ -283,11 +276,6 @@ class RFCEmail(ValidatedField, String):
         # stored.
         self.validators.insert(0, RFCEmailValidator(error=self.error_messages["invalid"]))
 
-    def _validated(self, value):
-        if value is None:
-            return None
-        return RFCEmailValidator(error=self.error_messages["invalid"])(value)
-
     def _deserialize(self, value, attr, data, **kwargs):
         value = super()._deserialize(value, attr, data, **kwargs)
         return value.strip()
@@ -297,16 +285,16 @@ class BasePaginatedQuerySchema(marshmallow.Schema):
     """Base query parameters for a paginated query"""
 
     count = marshmallow.fields.Int(
-        example=10,
+        metadata={"example": 10},
         validate=strictly_positive_int_validator,
-        missing=DEFAULT_NB_ITEM_PAGINATION,
-        default=DEFAULT_NB_ITEM_PAGINATION,
+        load_default=DEFAULT_NB_ITEM_PAGINATION,
+        dump_default=DEFAULT_NB_ITEM_PAGINATION,
         allow_none=False,
     )
     page_token = marshmallow.fields.String(
-        description="token of the page wanted, if not provided get first" "elements",
+        metadata={"description": "token of the page wanted, if not provided get first" "elements"},
         validate=page_token_validator,
-        missing=None,
+        load_default=None,
     )
 
 
@@ -315,18 +303,20 @@ class BaseOptionalPaginatedQuerySchema(marshmallow.Schema):
     but returns all the results by default."""
 
     count = marshmallow.fields.Int(
-        example=10,
         validate=positive_int_validator,
-        missing=0,
-        default=0,
+        load_default=0,
+        dump_default=0,
         allow_none=False,
-        description="Allows to paginate the results in combination with page_token, by default all results are returned",
+        metadata={
+            "example": 10,
+            "description": "Allows to paginate the results in combination with page_token, by default all results are returned",
+        },
     )
     page_token = marshmallow.fields.String(
-        description="token of the page wanted, if not provided get first elements",
+        metadata={"description": "token of the page wanted, if not provided get first elements"},
         validate=page_token_validator,
-        missing=None,
-        default=None,
+        load_default=None,
+        dump_default=None,
     )
 
 
@@ -340,20 +330,26 @@ class BasePaginatedSchemaPage(marshmallow.Schema):
 
 class CollaborativeFileTypeSchema(marshmallow.Schema):
     mimetype = marshmallow.fields.String(
-        example="application/vnd.oasis.opendocument.text",
         required=True,
-        description="Collabora Online file mimetype",
+        metadata={
+            "example": "application/vnd.oasis.opendocument.text",
+            "description": "Collabora Online file mimetype",
+        },
     )
     extension = marshmallow.fields.String(
-        example="odt", required=True, description="Collabora Online file extensions"
+        required=True,
+        metadata={"example": "odt", "description": "Collabora Online file extensions"},
     )
     associated_action = marshmallow.fields.String(
-        example="edit", required=True, description="Collabora Online action allowed"
+        required=True,
+        metadata={"example": "edit", "description": "Collabora Online action allowed"},
     )
     url_source = marshmallow.fields.URL(
         required=True,
-        description="URL of the collabora online editor for this type of file",
-        example="http://localhost:9980/loleaflet/305832f/loleaflet.html",
+        metadata={
+            "example": "http://localhost:9980/loleaflet/305832f/loleaflet.html",
+            "description": "URL of the collabora online editor for this type of file",
+        },
     )
 
 
@@ -365,29 +361,29 @@ class SimpleFileSchema(marshmallow.Schema):
     # TODO - G.M - 2018-10-09 - Set required to True, actually disable because
     # activating it make it failed due to "is not iterable issue.
     # see https://github.com/tracim/tracim/issues/2350
-    files = marshmallow.fields.Raw(required=False, description="a file")
+    files = marshmallow.fields.Raw(required=False, metadata={"description": "a file"})
 
     @post_load
-    def create_file(self, data: typing.Dict[str, typing.Any]) -> object:
+    def create_file(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return SimpleFile(**data)
 
 
 class FileCreationFormSchema(marshmallow.Schema):
     parent_id = marshmallow.fields.Int(
-        example=2, default=0, validate=positive_int_validator, allow_none=True
+        metadata={"example": 2}, dump_default=0, validate=positive_int_validator, allow_none=True
     )
     content_namespace = EnumField(
-        ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
+        ContentNamespaces, load_default=ContentNamespaces.CONTENT, metadata={"example": "content"}
     )
     content_type = marshmallow.fields.String(
-        missing=ContentTypeSlug.FILE.value, example=ContentTypeSlug.FILE.value
+        load_default=ContentTypeSlug.FILE.value, metadata={"example": ContentTypeSlug.FILE.value}
     )
     template_id = marshmallow.fields.Int(
-        example=2, default=0, validate=positive_int_validator, allow_none=True
+        metadata={"example": 2}, dump_default=0, validate=positive_int_validator, allow_none=True
     )
 
     @post_load
-    def file_creation_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def file_creation_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return FileCreation(**data)
 
 
@@ -396,103 +392,133 @@ class UserDigestSchema(marshmallow.Schema):
     Simple user schema
     """
 
-    user_id = marshmallow.fields.Int(dump_only=True, example=3)
+    user_id = marshmallow.fields.Int(dump_only=True, metadata={"example": 3})
     has_avatar = marshmallow.fields.Bool(
-        description="Does the user have an avatar? avatar need to be obtain with /avatar endpoint"
+        metadata={
+            "description": "Does the user have an avatar? avatar need to be obtain with /avatar endpoint"
+        }
     )
     has_cover = marshmallow.fields.Bool(
-        description="Does the user have a cover? cover need to be obtain with /cover endpoint"
+        metadata={
+            "description": "Does the user have a cover? cover need to be obtain with /cover endpoint"
+        }
     )
-    public_name = StrippedString(example="John Doe")
+    public_name = StrippedString(metadata={"example": "John Doe"})
     username = StrippedString(
-        example="My-Power_User99", required=False, default=None, allow_none=True
+        metadata={"example": "My-Power_User99"}, required=False, dump_default=None, allow_none=True
     )
-    workspace_ids = marshmallow.fields.List(marshmallow.fields.Int(example=3))
+    workspace_ids = marshmallow.fields.List(marshmallow.fields.Int(metadata={"example": 3}))
     is_active = marshmallow.fields.Bool()
 
 
 class AppCustomActionsSchema(marshmallow.Schema):
     icon_text = marshmallow.fields.String(
         required=True,
-        description="Icon of the custom action. If set, icon_image must be set to empty string.",
-        example="fas fa-pencil-alt",
+        metadata={
+            "example": "fas fa-pencil-alt",
+            "description": "Icon of the custom action. If set, icon_image must be set to empty string.",
+        },
     )
     icon_image = marshmallow.fields.String(
         required=True,
-        description="Image of the custom action. If set, icon_text must be set to empty string.",
-        example="https://www.tracim.fr/static/images/new_tracim/LOGO_TRACIM_RVB_1.png",
+        metadata={
+            "example": "https://www.tracim.fr/static/images/new_tracim/LOGO_TRACIM_RVB_1.png",
+            "description": "Image of the custom action. If set, icon_text must be set to empty string.",
+        },
     )
     label = marshmallow.fields.Dict(
         required=True,
-        description="The visible text displayed in the custom action. Set each labels related to its language key",
-        example='{"fr": "My string"}',
+        metadata={
+            "example": '{"fr": "My string"}',
+            "description": "The visible text displayed in the custom action. Set each labels related to its language key",
+        },
     )
     link = marshmallow.fields.String(
         required=True,
-        description="The action associated with the button",
-        example="https://www.tracim.fr/static/images/new_tracim/LOGO_TRACIM_RVB_1.png",
+        metadata={
+            "example": "https://www.tracim.fr/static/images/new_tracim/LOGO_TRACIM_RVB_1.png",
+            "description": "The action associated with the button",
+        },
     )
     content_type_filter = marshmallow.fields.String(
         required=False,
-        description="A list comma separated of content types on which the custom action will apply",
-        example="file,thread,kanban",
+        metadata={
+            "example": "file,thread,kanban",
+            "description": "A list comma separated of content types on which the custom action will apply",
+        },
     )
     content_extension_filter = marshmallow.fields.String(
         required=False,
-        description="A list comma separated of content extensions on which the custom action will apply",
-        example=".jpg,.png,.gif",
+        metadata={
+            "example": ".jpg,.png,.gif",
+            "description": "A list comma separated of content extensions on which the custom action will apply",
+        },
     )
     content_label_regex_filter = marshmallow.fields.String(
         required=False,
-        description="A regex string for content label pattern matching on which the custom action will apply",
-        example="my_pattern",
+        metadata={
+            "example": "my_pattern",
+            "description": "A regex string for content label pattern matching on which the custom action will apply",
+        },
     )
     user_role_filter = marshmallow.fields.String(
         required=False,
-        description="A list comma separated of user's role for whom the custom action will apply",
-        example="workspace-manager,content-manager,contributor",
+        metadata={
+            "example": "workspace-manager,content-manager,contributor",
+            "description": "A list comma separated of user's role for whom the custom action will apply",
+        },
     )
     user_profile_filter = marshmallow.fields.String(
         required=False,
-        description="A list comma separated of user's profiles for whom the custom action will apply",
-        example="administrators,trusted-users,users",
+        metadata={
+            "example": "administrators,trusted-users,users",
+            "description": "A list comma separated of user's profiles for whom the custom action will apply",
+        },
     )
     workspace_id_filter = marshmallow.fields.String(
         required=False,
-        description="A list comma separated of workspace id on which the custom action will apply",
-        example="1,10,222",
+        metadata={
+            "example": "1,10,222",
+            "description": "A list comma separated of workspace id on which the custom action will apply",
+        },
     )
 
 
 class AppCustomActionLocationSchema(marshmallow.Schema):
     user_sidebar_dropdown = marshmallow.fields.List(
-        marshmallow.fields.Nested(AppCustomActionsSchema), description="NYI"
+        marshmallow.fields.Nested(AppCustomActionsSchema), metadata={"description": "NYI"}
     )
     user_sidebar_shortcuts = marshmallow.fields.List(
-        marshmallow.fields.Nested(AppCustomActionsSchema), description="NYI"
+        marshmallow.fields.Nested(AppCustomActionsSchema), metadata={"description": "NYI"}
     )
     content_in_list_dropdown = marshmallow.fields.List(
         marshmallow.fields.Nested(AppCustomActionsSchema),
-        description="Custom action placed in the dropdown on content in the workspace content list",
+        metadata={
+            "description": "Custom action placed in the dropdown on content in the workspace content list"
+        },
     )
     content_app_dropdown = marshmallow.fields.List(
         marshmallow.fields.Nested(AppCustomActionsSchema),
-        description="Custom action placed in the header dropdown of content apps",
+        metadata={"description": "Custom action placed in the header dropdown of content apps"},
     )
     space_dashboard_action_list = marshmallow.fields.List(
-        marshmallow.fields.Nested(AppCustomActionsSchema), description="NYI"
+        marshmallow.fields.Nested(AppCustomActionsSchema), metadata={"description": "NYI"}
     )
 
 
 class UserDiskSpaceSchema(UserDigestSchema):
-    user_id = marshmallow.fields.Int(dump_only=True, example=3)
+    user_id = marshmallow.fields.Int(dump_only=True, metadata={"example": 3})
     allowed_space = marshmallow.fields.Integer(
-        description="allowed space per user in bytes. this apply on sum of user owned workspace size."
-        "if user_space > allowed_space, no file can be created/updated in any user owned workspaces. 0 mean no limit"
+        metadata={
+            "description": "allowed space per user in bytes. this apply on sum of user owned workspace size."
+            "if user_space > allowed_space, no file can be created/updated in any user owned workspaces. 0 mean no limit"
+        }
     )
     used_space = marshmallow.fields.Integer(
-        description="used space per user in bytes. this apply on sum of user owned workspace size."
-        "if user_space > allowed_space, no file can be created/updated in any user owned workspaces."
+        metadata={
+            "description": "used space per user in bytes. this apply on sum of user owned workspace size."
+            "if user_space > allowed_space, no file can be created/updated in any user owned workspaces."
+        }
     )
     user = marshmallow.fields.Nested(UserDigestSchema(), attribute="user_in_context")
 
@@ -502,51 +528,56 @@ class UserSchema(UserDigestSchema):
     Complete user schema
     """
 
-    email = TracimEmail(required=False, example="hello@tracim.fr", allow_none=True)
+    email = TracimEmail(required=False, metadata={"example": "hello@tracim.fr"}, allow_none=True)
     created = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT, description="Date of creation of the user account"
+        format=DATETIME_FORMAT, metadata={"description": "Date of creation of the user account"}
     )
     is_active = marshmallow.fields.Bool(
-        example=True,
-        description="true if the user is active, "
-        "false if the user has been deactivated"
-        " by an admin. Default is true",
+        metadata={
+            "example": True,
+            "description": "true if the user is active, "
+            "false if the user has been deactivated"
+            " by an admin. Default is true",
+        },
     )
     is_deleted = marshmallow.fields.Bool(
-        example=False,
-        description="true if the user account has been deleted. " "Default is false",
+        metadata={
+            "example": False,
+            "description": "true if the user account has been deleted. " "Default is false",
+        },
     )
     # TODO - G.M - 17-04-2018 - Restrict timezone values
     timezone = StrippedString(
-        description=FIELD_TIMEZONE_DESC,
-        example="Europe/Paris",
+        metadata={"example": "Europe/Paris", "description": FIELD_TIMEZONE_DESC},
         validate=user_timezone_validator,
     )
     profile = StrippedString(
         attribute="profile",
         validate=user_profile_validator_with_nobody,
-        example="trusted-users",
-        description=FIELD_PROFILE_DESC,
+        metadata={"example": "trusted-users", "description": FIELD_PROFILE_DESC},
     )
     lang = StrippedString(
-        description=FIELD_LANG_DESC,
-        example="en",
+        metadata={"example": "en", "description": FIELD_LANG_DESC},
         required=False,
         validate=user_lang_validator,
         allow_none=True,
-        default=None,
+        dump_default=None,
     )
     auth_type = marshmallow.fields.String(
         validate=OneOf([auth_type_en.value for auth_type_en in AuthType]),
-        example=AuthType.INTERNAL.value,
-        description="authentication system of the user",
+        metadata={
+            "example": AuthType.INTERNAL.value,
+            "description": "authentication system of the user",
+        },
     )
     allowed_space = marshmallow.fields.Integer(
         validate=positive_int_validator,
         allow_none=True,
         required=False,
-        description="allowed space per user in bytes. this apply on sum of user owned workspace size."
-        "if limit is reached, no file can be created/updated in any user owned workspaces. 0 mean no limit",
+        metadata={
+            "description": "allowed space per user in bytes. this apply on sum of user owned workspace size."
+            "if limit is reached, no file can be created/updated in any user owned workspaces. 0 mean no limit"
+        },
     )
 
     class Meta:
@@ -564,13 +595,15 @@ class SetConfigSchema(marshmallow.Schema):
 
     parameters = marshmallow.fields.Dict(
         required=True,
-        example={"param1": "value1"},
         validate=user_config_validator,
-        description="A simple json dictionary. "
-        'Valid keys only contain characters in "0-9a-zA-Z-_." and are not empty. '
-        'You can use "." to create a hierarchy in the configuration parameters. '
-        "Valid values only allow primitive types: numbers, bool, null, and do not accept "
-        "complex types such dictionaries or lists.",
+        metadata={
+            "example": {"param1": "value1"},
+            "description": "A simple json dictionary. "
+            'Valid keys only contain characters in "0-9a-zA-Z-_." and are not empty. '
+            'You can use "." to create a hierarchy in the configuration parameters. '
+            "Valid values only allow primitive types: numbers, bool, null, and do not accept "
+            "complex types such dictionaries or lists.",
+        },
     )
 
 
@@ -581,35 +614,40 @@ class SetCustomPropertiesSchema(marshmallow.Schema):
 
     parameters = marshmallow.fields.Dict(
         required=True,
-        example={"param1": "value1"},
-        description="custom_properties schema",
+        metadata={"example": {"param1": "value1"}, "description": "custom_properties schema"},
     )
 
 
 class SetEmailSchema(LoggedInUserPasswordSchema):
-    email = TracimEmail(required=True, example="hello@tracim.fr", validate=user_email_validator)
+    email = TracimEmail(
+        required=True, metadata={"example": "hello@tracim.fr"}, validate=user_email_validator
+    )
 
     @post_load
-    def create_set_email_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def create_set_email_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return SetEmail(**data)
 
 
 class SetUsernameSchema(LoggedInUserPasswordSchema):
     username = StrippedString(
-        required=True, example="The-user_42", validate=user_username_validator
+        required=True, metadata={"example": "The-user_42"}, validate=user_username_validator
     )
 
     @post_load
-    def create_set_username_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def create_set_username_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return SetUsername(**data)
 
 
 class SetPasswordSchema(LoggedInUserPasswordSchema):
-    new_password = String(example="8QLa$<w", required=True, validate=user_password_validator)
-    new_password2 = String(example="8QLa$<w", required=True, validate=user_password_validator)
+    new_password = String(
+        metadata={"example": "8QLa$<w"}, required=True, validate=user_password_validator
+    )
+    new_password2 = String(
+        metadata={"example": "8QLa$<w"}, required=True, validate=user_password_validator
+    )
 
     @post_load
-    def create_set_password_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def create_set_password_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return SetPassword(**data)
 
 
@@ -620,25 +658,24 @@ class SetUserInfoSchema(marshmallow.Schema):
     """
 
     timezone = StrippedString(
-        description=FIELD_TIMEZONE_DESC, example="Europe/Paris", required=True
+        metadata={"example": "Europe/Paris", "description": FIELD_TIMEZONE_DESC}, required=True
     )
     public_name = StrippedString(
-        example="John Doe",
+        metadata={"example": "John Doe"},
         required=False,
         validate=user_public_name_validator,
-        default=None,
+        dump_default=None,
     )
     lang = StrippedString(
-        description=FIELD_LANG_DESC,
-        example="en",
+        metadata={"example": "en", "description": FIELD_LANG_DESC},
         required=True,
         validate=user_lang_validator,
         allow_none=True,
-        default=None,
+        dump_default=None,
     )
 
     @post_load
-    def create_user_info_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def create_user_info_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return UserInfos(**data)
 
 
@@ -650,13 +687,12 @@ class SetUserProfileSchema(marshmallow.Schema):
     profile = StrippedString(
         attribute="profile",
         validate=user_profile_validator,
-        example="trusted-users",
-        description=FIELD_PROFILE_DESC,
+        metadata={"example": "trusted-users", "description": FIELD_PROFILE_DESC},
         required=True,
     )
 
     @post_load
-    def create_user_profile(self, data: typing.Dict[str, typing.Any]) -> object:
+    def create_user_profile(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return UserProfile(**data)
 
 
@@ -669,118 +705,119 @@ class SetUserAllowedSpaceSchema(marshmallow.Schema):
         validate=positive_int_validator,
         allow_none=True,
         required=False,
-        description="allowed space per user in bytes. this apply on sum of user owned workspace size."
-        "if limit is reached, no file can be created/updated in any user owned workspaces. 0 mean no limit.",
+        metadata={
+            "description": "allowed space per user in bytes. this apply on sum of user owned workspace size."
+            "if limit is reached, no file can be created/updated in any user owned workspaces. 0 mean no limit."
+        },
     )
 
     @post_load
-    def create_user_allowed_space(self, data: typing.Dict[str, typing.Any]) -> object:
+    def create_user_allowed_space(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return UserAllowedSpace(**data)
 
 
 class UserRegistrationSchema(marshmallow.Schema):
     email = TracimEmail(
         required=True,
-        example="hello@tracim.fr",
+        metadata={"example": "hello@tracim.fr"},
         validate=user_email_validator,
         allow_none=True,
     )
     username = String(
         required=False,
-        example="My-Power_User99",
+        metadata={"example": "My-Power_User99"},
         validate=user_username_validator,
         allow_none=True,
     )
     password = String(
-        example="8QLa$<w",
+        metadata={"example": "8QLa$<w"},
         required=True,
         validate=user_password_validator,
         allow_none=True,
-        default=None,
+        dump_default=None,
     )
     timezone = StrippedString(
-        description=FIELD_TIMEZONE_DESC,
-        example="Europe/Paris",
+        metadata={"example": "Europe/Paris", "description": FIELD_TIMEZONE_DESC},
         required=False,
-        default="",
+        dump_default="",
         validate=user_timezone_validator,
     )
     public_name = StrippedString(
-        example="John Doe",
+        metadata={"example": "John Doe"},
         required=True,
-        default=None,
+        dump_default=None,
         validate=user_public_name_validator,
     )
     lang = StrippedString(
-        description=FIELD_LANG_DESC,
-        example="en",
+        metadata={"example": "en", "description": FIELD_LANG_DESC},
         required=False,
         validate=user_lang_validator,
         allow_none=True,
-        default=None,
+        dump_default=None,
     )
 
     @post_load
-    def register_user(self, data: typing.Dict[str, typing.Any]) -> object:
+    def register_user(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return UserCreation(**data)
 
 
 class UserCreationSchema(marshmallow.Schema):
     email = RFCEmail(
         required=False,
-        example="hello@tracim.fr",
+        metadata={"example": "hello@tracim.fr"},
         validate=user_email_validator,
         allow_none=True,
     )
     username = String(
         required=False,
-        example="My-Power_User99",
+        metadata={"example": "My-Power_User99"},
         validate=user_username_validator,
         allow_none=True,
     )
     password = String(
-        example="8QLa$<w",
+        metadata={"example": "8QLa$<w"},
         required=False,
         validate=user_password_validator,
         allow_none=True,
-        default=None,
+        dump_default=None,
     )
     profile = StrippedString(
         attribute="profile",
         validate=user_profile_validator,
-        example="trusted-users",
         required=False,
         allow_none=True,
-        description=FIELD_PROFILE_DESC,
+        metadata={"example": "trusted-users", "description": FIELD_PROFILE_DESC},
     )
     timezone = StrippedString(
-        description=FIELD_TIMEZONE_DESC,
-        example="Europe/Paris",
+        metadata={"example": "Europe/Paris", "description": FIELD_TIMEZONE_DESC},
         required=False,
-        default="",
+        dump_default="",
         validate=user_timezone_validator,
     )
     public_name = StrippedString(
-        example="John Doe",
+        metadata={"example": "John Doe"},
         required=False,
-        default=None,
+        dump_default=None,
         validate=user_public_name_validator,
     )
     lang = StrippedString(
-        description=FIELD_LANG_DESC,
-        example="en",
+        metadata={"example": "en", "description": FIELD_LANG_DESC},
         required=False,
         validate=user_lang_validator,
         allow_none=True,
-        default=None,
+        dump_default=None,
     )
-    email_notification = marshmallow.fields.Bool(example=True, required=False, default=True)
+    email_notification = marshmallow.fields.Bool(
+        metadata={"example": True}, required=False, dump_default=True
+    )
     allowed_space = marshmallow.fields.Integer(
         validate=positive_int_validator,
         allow_none=True,
         required=False,
-        description="allowed space per user in bytes. this apply on sum of user owned workspace size."
-        "if limit is reached, no file can be created/updated in any user owned workspaces. 0 mean no limit",
+        metadata={
+            "description": "allowed space per user in bytes. this apply on sum of user owned workspace size."
+            "if limit is reached, no file can be created/updated in any user owned workspaces. 0 mean no limit"
+        },
     )
 
     @marshmallow.validates_schema(pass_original=True)
@@ -789,7 +826,7 @@ class UserCreationSchema(marshmallow.Schema):
             raise marshmallow.ValidationError("email or username required")
 
     @post_load
-    def create_user(self, data: typing.Dict[str, typing.Any]) -> object:
+    def create_user(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return UserCreation(**data)
 
 
@@ -800,25 +837,23 @@ class RadicaleSubItemPathSchema(object):
 
 class UserIdPathSchema(marshmallow.Schema):
     user_id = marshmallow.fields.Int(
-        example=3,
         required=True,
-        description="id of a valid user",
+        metadata={"example": 3, "description": "id of a valid user"},
         validate=strictly_positive_int_validator,
     )
 
 
 class EventIdPathSchema(marshmallow.Schema):
     event_id = marshmallow.fields.Int(
-        example=5,
         required=True,
-        description="id of a valid event",
+        metadata={"example": 5, "description": "id of a valid event"},
         validate=strictly_positive_int_validator,
     )
 
 
 class MessageIdsPathSchema(UserIdPathSchema, EventIdPathSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs):
         return MessageIdsPath(**data)
 
 
@@ -848,40 +883,46 @@ class MessageIdsPath(object):
 class WorkspaceFilterQuerySchema(marshmallow.Schema):
     parent_ids = StrippedString(
         validate=regex_string_as_list_of_int,
-        example="0,4,5",
-        description="comma separated list of parent ids,"
-        " parent_id allow to filter workspaces."
-        " If not parent_ids at all, then return all workspaces."
-        " If one parent_id to 0, then return root workspaces."
-        " If set to another value, return all direct subworkspaces"
-        " If multiple value of parent_ids separated by comma,"
-        " return mix of all workspaces of all theses parent_ids",
-        default="0",
+        metadata={
+            "example": "0,4,5",
+            "description": "comma separated list of parent ids,"
+            " parent_id allow to filter workspaces."
+            " If not parent_ids at all, then return all workspaces."
+            " If one parent_id to 0, then return root workspaces."
+            " If set to another value, return all direct subworkspaces"
+            " If multiple value of parent_ids separated by comma,"
+            " return mix of all workspaces of all theses parent_ids",
+        },
+        dump_default="0",
     )
 
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs):
         return WorkspaceFilterQuery(**data)
 
 
 class UserWorkspaceFilterQuerySchema(WorkspaceFilterQuerySchema):
     show_owned_workspace = marshmallow.fields.Int(
-        example=1,
-        default=1,
-        description="if set to 1, then show owned workspace in list"
-        " Default is 1, else do no show them",
+        dump_default=1,
+        metadata={
+            "example": 1,
+            "description": "if set to 1, then show owned workspace in list"
+            " Default is 1, else do no show them",
+        },
         validate=bool_as_int_validator,
     )
     show_workspace_with_role = marshmallow.fields.Int(
-        example=1,
-        default=1,
-        description="if set to 1, then show workspace were user has a role in list"
-        " Default is 1, else do no show them",
+        dump_default=1,
+        metadata={
+            "example": 1,
+            "description": "if set to 1, then show workspace were user has a role in list"
+            " Default is 1, else do no show them",
+        },
         validate=bool_as_int_validator,
     )
 
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs):
         return UserWorkspaceFilterQuery(**data)
 
 
@@ -893,47 +934,47 @@ class WorkspaceMemberFilterQuery(object):
 class WorkspaceMemberFilterQuerySchema(marshmallow.Schema):
     show_disabled_user = marshmallow.fields.Int(
         exemple=0,
-        default=0,
-        description="if set to 1, then show also user which is disabled"
-        " Default is 0, else show them",
+        dump_default=0,
+        metadata={
+            "description": "if set to 1, then show also user which is disabled"
+            " Default is 0, else show them"
+        },
         validate=bool_as_int_validator,
     )
 
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs):
         return WorkspaceMemberFilterQuery(**data)
 
 
 class WorkspaceIdSchema(marshmallow.Schema):
     workspace_id = marshmallow.fields.Int(
-        example=4,
         required=True,
-        description="id of a valid workspace",
+        metadata={"example": 4, "description": "id of a valid workspace"},
         validate=strictly_positive_int_validator,
     )
 
 
 class WorkspaceIdPathSchema(WorkspaceIdSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs):
         return WorkspacePath(**data)
 
 
 class RadicaleUserResourceUserSubItemPathSchema(UserIdPathSchema):
     dest_user_id = marshmallow.fields.Int(
-        example=3,
         required=True,
-        description="id of a valid user",
+        metadata={"example": 3, "description": "id of a valid user"},
         validate=strictly_positive_int_validator,
     )
     type = marshmallow.fields.Str(
         required=True,
     )
-    sub_item = marshmallow.fields.String(default="", allow_none=True)
+    sub_item = marshmallow.fields.String(dump_default="", allow_none=True)
     trailing_slash = marshmallow.fields.String()
 
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs):
         return RadicaleUserResourceUserSubitemsPath(**data)
 
 
@@ -945,80 +986,78 @@ class RadicaleUserResourceWorkspaceSubItemPathSchema(UserIdPathSchema, Workspace
     trailing_slash = marshmallow.fields.String()
 
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs):
         return RadicaleUserResourceWorkspaceSubitemsPath(**data)
 
 
 class RadicaleUserSubItemPathSchema(RadicaleSubItemPathSchema, UserIdPathSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs):
         return RadicaleUserSubitemsPath(**data)
 
 
 class RadicaleWorkspaceSubItemPathSchema(RadicaleSubItemPathSchema, WorkspaceIdPathSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs):
         return RadicaleWorkspaceSubitemsPath(**data)
 
 
 class ContentIdPathSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(
-        example=6,
         required=True,
-        description="id of a valid content",
+        metadata={"example": 6, "description": "id of a valid content"},
         validate=strictly_positive_int_validator,
     )
 
 
 class ContentIdBodySchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(
-        example=6,
         required=True,
-        description="id of a valid content",
+        metadata={"example": 6, "description": "id of a valid content"},
         validate=strictly_positive_int_validator,
     )
 
 
 class RevisionIdPathSchema(marshmallow.Schema):
-    revision_id = marshmallow.fields.Int(example=6, required=True)
+    revision_id = marshmallow.fields.Int(metadata={"example": 6}, required=True)
 
 
 class WorkspaceAndUserIdPathSchema(UserIdPathSchema, WorkspaceIdPathSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return WorkspaceAndUserPath(**data)
 
 
 class WorkspaceAndContentIdPathSchema(WorkspaceIdPathSchema, ContentIdPathSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return WorkspaceAndContentPath(**data)
 
 
 class FilenamePathSchema(marshmallow.Schema):
-    filename = StrippedString("filename.ext")
+    filename = StrippedString(dump_default="filename.ext")
 
 
 class UserPicturePathSchema(UserIdPathSchema, FilenamePathSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return UserPicturePath(**data)
 
 
 class WidthAndHeightPathSchema(marshmallow.Schema):
-    width = marshmallow.fields.Int(example=256)
-    height = marshmallow.fields.Int(example=256)
+    width = marshmallow.fields.Int(metadata={"example": 256})
+    height = marshmallow.fields.Int(metadata={"example": 256})
 
 
 class UserPreviewPicturePathSchema(UserPicturePathSchema, WidthAndHeightPathSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return UserPreviewPicturePath(**data)
 
 
 class AllowedJpgPreviewSizesSchema(marshmallow.Schema):
-    width = marshmallow.fields.Int(example=256)
-    height = marshmallow.fields.Int(example=256)
+    width = marshmallow.fields.Int(metadata={"example": 256})
+    height = marshmallow.fields.Int(metadata={"example": 256})
 
 
 class AllowedJpgPreviewDimSchema(marshmallow.Schema):
@@ -1030,19 +1069,19 @@ class WorkspaceAndContentRevisionIdPathSchema(
     WorkspaceIdPathSchema, ContentIdPathSchema, RevisionIdPathSchema
 ):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return WorkspaceAndContentRevisionPath(**data)
 
 
 class FilePathSchema(WorkspaceAndContentIdPathSchema, FilenamePathSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return FilePath(**data)
 
 
 class FileRevisionPathSchema(WorkspaceAndContentRevisionIdPathSchema, FilenamePathSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return FileRevisionPath(**data)
 
 
@@ -1050,7 +1089,7 @@ class FilePreviewSizedPathSchema(
     WorkspaceAndContentIdPathSchema, WidthAndHeightPathSchema, FilenamePathSchema
 ):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return FilePreviewSizedPath(**data)
 
 
@@ -1060,7 +1099,7 @@ class FileRevisionPreviewSizedPathSchema(
     FilenamePathSchema,
 ):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return RevisionPreviewSizedPath(**data)
 
 
@@ -1068,45 +1107,46 @@ class UserWorkspaceAndContentIdPathSchema(
     UserIdPathSchema, WorkspaceIdPathSchema, ContentIdPathSchema
 ):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return UserWorkspaceAndContentPath(**data)
 
 
 class UserWorkspaceIdPathSchema(UserIdPathSchema, WorkspaceIdPathSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return WorkspaceAndUserPath(**data)
 
 
 class UserContentIdPathSchema(UserIdPathSchema, ContentIdPathSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ContentAndUserPath(**data)
 
 
 class ReactionPathSchema(WorkspaceAndContentIdPathSchema):
     reaction_id = marshmallow.fields.Int(
-        example=6,
-        description="id of a valid reaction related to content content_id",
+        metadata={
+            "example": 6,
+            "description": "id of a valid reaction related to content content_id",
+        },
         required=True,
         validate=strictly_positive_int_validator,
     )
 
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ReactionPath(**data)
 
 
 class TagPathSchema(WorkspaceIdPathSchema):
     tag_id = marshmallow.fields.Int(
-        example=6,
-        description="id of a valid tag related to content content_id",
+        metadata={"example": 6, "description": "id of a valid tag related to content content_id"},
         required=True,
         validate=strictly_positive_int_validator,
     )
 
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return TagPath(**data)
 
 
@@ -1116,186 +1156,210 @@ class ContentTagPathSchema(ContentIdPathSchema, TagPathSchema):
 
 class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
     comment_id = marshmallow.fields.Int(
-        example=6,
-        description="id of a valid comment related to content content_id",
+        metadata={
+            "example": 6,
+            "description": "id of a valid comment related to content content_id",
+        },
         required=True,
         validate=strictly_positive_int_validator,
     )
 
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return CommentPath(**data)
 
 
 class CommentsPathFilenameSchema(CommentsPathSchema, FilenamePathSchema):
     @post_load
-    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_path_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return CommentPathFilename(**data)
 
 
 class KnownMembersQuerySchema(marshmallow.Schema):
-    acp = StrippedString(example="test", description="search text to query", required=False)
+    acp = StrippedString(
+        metadata={"example": "test", "description": "search text to query"}, required=False
+    )
 
     exclude_user_ids = StrippedString(
         validate=regex_string_as_list_of_int,
-        example="1,5",
-        description="comma separated list of excluded users",
+        metadata={"example": "1,5", "description": "comma separated list of excluded users"},
     )
 
     exclude_workspace_ids = StrippedString(
         validate=regex_string_as_list_of_int,
-        example="3,4",
-        description="comma separated list of excluded workspaces: members of this workspace are excluded from the result; cannot be used with include_workspace_ids",
+        metadata={
+            "example": "3,4",
+            "description": "comma separated list of excluded workspaces: members of this workspace are excluded from the result; cannot be used with include_workspace_ids",
+        },
     )
 
     include_workspace_ids = StrippedString(
         validate=regex_string_as_list_of_int,
-        example="3,4",
-        description="comma separated list of included workspaces: members of this workspace are excluded from the result; cannot be used with exclude_workspace_ids",
+        metadata={
+            "example": "3,4",
+            "description": "comma separated list of included workspaces: members of this workspace are excluded from the result; cannot be used with exclude_workspace_ids",
+        },
     )
 
     limit = marshmallow.fields.Int(
-        example=15,
-        default=0,
-        description="limit the number of results to this value, if not 0",
+        dump_default=0,
+        metadata={
+            "example": 15,
+            "description": "limit the number of results to this value, if not 0",
+        },
         validate=strictly_positive_int_validator,
     )
 
     @post_load
-    def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_query_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return KnownMembersQuery(**data)
 
 
 class KnownContentsQuerySchema(marshmallow.Schema):
-    acp = StrippedString(example="test", description="search text to query", required=True)
+    acp = StrippedString(
+        metadata={"example": "test", "description": "search text to query"}, required=True
+    )
 
     limit = marshmallow.fields.Int(
-        example=15,
-        default=DEFAULT_KNOWN_CONTENT_NB_LIMIT,
-        description="limit the number of results to this value, if not 0",
+        dump_default=DEFAULT_KNOWN_CONTENT_NB_LIMIT,
+        metadata={
+            "example": 15,
+            "description": "limit the number of results to this value, if not 0",
+        },
         validate=strictly_positive_int_validator,
     )
 
     @post_load
-    def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_query_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return KnownContentsQuery(**data)
 
 
 class FileQuerySchema(marshmallow.Schema):
     force_download = marshmallow.fields.Int(
-        example=1,
-        default=0,
-        description="force download of file or let browser decide if"
-        "file can be read directly from browser",
+        dump_default=0,
+        metadata={
+            "example": 1,
+            "description": "force download of file or let browser decide if"
+            "file can be read directly from browser",
+        },
         validate=bool_as_int_validator,
     )
 
     @post_load
-    def make_query(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_query(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return FileQuery(**data)
 
 
 class PageQuerySchema(FileQuerySchema):
     page = marshmallow.fields.Int(
-        example=2,
-        default=1,
-        description="allow to show a specific page of a pdf file",
+        dump_default=1,
+        metadata={"example": 2, "description": "allow to show a specific page of a pdf file"},
         validate=strictly_positive_int_validator,
     )
 
     @post_load
-    def make_query(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_query(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return PageQuery(**data)
 
 
 class FilterContentQuerySchema(BaseOptionalPaginatedQuerySchema):
     parent_ids = StrippedString(
         validate=regex_string_as_list_of_int,
-        example="0,4,5",
-        description="comma separated list of parent ids,"
-        " parent_id allow to filter items in a folder."
-        " If not parent_ids at all, then return all contents."
-        " If one parent_id to 0, then return root contents."
-        " If set to another value, return all direct subcontents"
-        " content of this folder"
-        " If multiple value of parent_ids separated by comma,"
-        " return mix of all content of all theses parent_ids",
-        default="0",
+        metadata={
+            "example": "0,4,5",
+            "description": "comma separated list of parent ids,"
+            " parent_id allow to filter items in a folder."
+            " If not parent_ids at all, then return all contents."
+            " If one parent_id to 0, then return root contents."
+            " If set to another value, return all direct subcontents"
+            " content of this folder"
+            " If multiple value of parent_ids separated by comma,"
+            " return mix of all content of all theses parent_ids",
+        },
+        dump_default="0",
     )
     namespaces_filter = StrippedString(
         validate=regex_string_as_list_of_string,
-        example="content,upload",
-        description="comma list of namespaces allowed",
-        default=None,
+        metadata={"example": "content,upload", "description": "comma list of namespaces allowed"},
+        dump_default=None,
         allow_none=True,
     )
     complete_path_to_id = marshmallow.fields.Int(
-        example=6,
         validate=strictly_positive_int_validator,
-        description="If setted with a correct content_id, this will"
-        " add to parent_ids filter, all parent of given content_id,"
-        " workspace root included. This param help to get "
-        " content needed to show a complete folder tree "
-        " from root to content.",
-        default=None,
+        metadata={
+            "example": 6,
+            "description": "If setted with a correct content_id, this will"
+            " add to parent_ids filter, all parent of given content_id,"
+            " workspace root included. This param help to get "
+            " content needed to show a complete folder tree "
+            " from root to content.",
+        },
+        dump_default=None,
         allow_none=True,
     )
     show_archived = marshmallow.fields.Int(
-        example=0,
-        default=0,
-        description="if set to 1, then show archived contents."
-        " Default is 0 - hide archived content",
+        dump_default=0,
+        metadata={
+            "example": 0,
+            "description": "if set to 1, then show archived contents."
+            " Default is 0 - hide archived content",
+        },
         validate=bool_as_int_validator,
     )
     show_deleted = marshmallow.fields.Int(
-        example=0,
-        default=0,
-        description="if set to 1, then show deleted contents."
-        " Default is 0 - hide deleted content",
+        dump_default=0,
+        metadata={
+            "example": 0,
+            "description": "if set to 1, then show deleted contents."
+            " Default is 0 - hide deleted content",
+        },
         validate=bool_as_int_validator,
     )
     show_active = marshmallow.fields.Int(
-        example=1,
-        default=1,
-        description="if set to 1, then show active contents. "
-        "Default is 1 - show active content."
-        " Note: active content are content "
-        "that is neither archived nor deleted. "
-        "The reason for this parameter to exist is for example "
-        "to allow to show only archived documents",
+        dump_default=1,
+        metadata={
+            "example": 1,
+            "description": "if set to 1, then show active contents. "
+            "Default is 1 - show active content."
+            " Note: active content are content "
+            "that is neither archived nor deleted. "
+            "The reason for this parameter to exist is for example "
+            "to allow to show only archived documents",
+        },
         validate=bool_as_int_validator,
     )
     content_type = StrippedString(
-        example=ContentTypeSlug.ANY.value,
-        default=ContentTypeSlug.ANY.value,
+        metadata={"example": ContentTypeSlug.ANY.value},
+        dump_default=ContentTypeSlug.ANY.value,
         validate=all_content_types_validator,
     )
     label = StrippedString(
-        example="myfilename",
-        default=None,
+        dump_default=None,
         allow_none=True,
-        description="Filter by content label",
+        metadata={"example": "myfilename", "description": "Filter by content label"},
     )
     sort = EnumField(
         ContentSortOrder,
-        missing=ContentSortOrder.LABEL_ASC,
-        description="Order of the returned contents, default is to sort by labels",
+        load_default=ContentSortOrder.LABEL_ASC,
+        metadata={
+            "description": "Sort order of the returned contents. Default is to sort by labels. "
+            f"Possible values are: {', '.join(so.value for so in ContentSortOrder)}"
+        },
     )
 
     @post_load
-    def make_content_filter(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_content_filter(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ContentFilter(**data)
 
 
 class ContentIdsQuerySchema(marshmallow.Schema):
     content_ids = StrippedString(
         validate=regex_string_as_list_of_int,
-        example="1,5",
-        description="comma separated list of contents ids",
+        metadata={"example": "1,5", "description": "comma separated list of contents ids"},
     )
 
     @post_load
-    def make_content_ids(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_content_ids(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ContentIdsQuery(**data)
 
 
@@ -1303,31 +1367,35 @@ class ContentIdsQuerySchema(marshmallow.Schema):
 
 
 class RoleUpdateSchema(marshmallow.Schema):
-    role = StrippedString(required=True, example="contributor", validate=user_role_validator)
+    role = StrippedString(
+        required=True, metadata={"example": "contributor"}, validate=user_role_validator
+    )
 
     @post_load
-    def make_role(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_role(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return RoleUpdate(**data)
 
 
 class WorkspaceMemberInviteSchema(marshmallow.Schema):
-    role = StrippedString(example="contributor", validate=user_role_validator, required=True)
-    user_id = marshmallow.fields.Int(example=5, default=None, allow_none=True)
+    role = StrippedString(
+        metadata={"example": "contributor"}, validate=user_role_validator, required=True
+    )
+    user_id = marshmallow.fields.Int(metadata={"example": 5}, dump_default=None, allow_none=True)
     user_email = RFCEmail(
-        example="suri@cate.fr",
-        default=None,
+        metadata={"example": "suri@cate.fr"},
+        dump_default=None,
         allow_none=True,
         validate=user_email_validator,
     )
     user_username = StrippedString(
-        example="The-John_Doe42",
-        default=None,
+        metadata={"example": "The-John_Doe42"},
+        dump_default=None,
         allow_none=True,
         validate=user_username_validator,
     )
 
     @post_load
-    def make_workspace_member_invite(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_workspace_member_invite(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return WorkspaceMemberInvitation(**data)
 
     @marshmallow.validates_schema(pass_original=True)
@@ -1342,21 +1410,21 @@ class WorkspaceMemberInviteSchema(marshmallow.Schema):
 
 class ResetPasswordRequestSchema(marshmallow.Schema):
     email = TracimEmail(
-        example="hello@tracim.fr",
-        default=None,
+        metadata={"example": "hello@tracim.fr"},
+        dump_default=None,
         allow_none=True,
         validate=user_email_validator,
     )
 
     username = StrippedString(
-        example="The-John_Doe42",
-        default=None,
+        metadata={"example": "The-John_Doe42"},
+        dump_default=None,
         allow_none=True,
         validate=user_username_validator,
     )
 
     @post_load
-    def make_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ResetPasswordRequest(**data)
 
     # TODO 2020-06-11 - RJ: duplicated code across this file
@@ -1367,44 +1435,52 @@ class ResetPasswordRequestSchema(marshmallow.Schema):
 
 
 class ResetPasswordCheckTokenSchema(marshmallow.Schema):
-    email = TracimEmail(required=True, example="hello@tracim.fr", validate=user_email_validator)
+    email = TracimEmail(
+        required=True, metadata={"example": "hello@tracim.fr"}, validate=user_email_validator
+    )
     reset_password_token = String(
-        description="token to reset password of given user", required=True
+        metadata={"description": "token to reset password of given user"}, required=True
     )
 
     @post_load
-    def make_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ResetPasswordCheckToken(**data)
 
 
 class ResetPasswordModifySchema(marshmallow.Schema):
-    email = TracimEmail(required=True, example="hello@tracim.fr", validate=user_email_validator)
-    reset_password_token = String(
-        description="token to reset password of given user", required=True
+    email = TracimEmail(
+        required=True, metadata={"example": "hello@tracim.fr"}, validate=user_email_validator
     )
-    new_password = String(example="8QLa$<w", required=True, validate=user_password_validator)
-    new_password2 = String(example="8QLa$<w", required=True, validate=user_password_validator)
+    reset_password_token = String(
+        metadata={"description": "token to reset password of given user"}, required=True
+    )
+    new_password = String(
+        metadata={"example": "8QLa$<w"}, required=True, validate=user_password_validator
+    )
+    new_password2 = String(
+        metadata={"example": "8QLa$<w"}, required=True, validate=user_password_validator
+    )
 
     @post_load
-    def make_object(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ResetPasswordModify(**data)
 
 
 class BasicAuthSchema(marshmallow.Schema):
     email = TracimEmail(
-        example="hello@tracim.fr",
+        metadata={"example": "hello@tracim.fr"},
         required=False,
         validate=user_email_validator,
         allow_none=True,
     )
     username = String(
-        example="My-Power_User99",
+        metadata={"example": "My-Power_User99"},
         required=False,
         validate=user_username_validator,
         allow_none=True,
     )
     password = String(
-        example="8QLa$<w",
+        metadata={"example": "8QLa$<w"},
         required=True,
         load_only=True,
         validate=user_password_validator,
@@ -1419,118 +1495,140 @@ class BasicAuthSchema(marshmallow.Schema):
             raise marshmallow.ValidationError("email or username required")
 
     @post_load
-    def make_login(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_login(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return LoginCredentials(**data)
 
 
 class LoginOutputHeaders(marshmallow.Schema):
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
     expire_after = StrippedString()
 
 
 class WorkspaceModifySchema(marshmallow.Schema):
     label = StrippedString(
         required=False,
-        example="My Workspace",
+        metadata={"example": "My Workspace"},
         validate=workspace_label_length_validator,
-        default=None,
+        dump_default=None,
         allow_none=True,
     )
     description = StrippedString(
         required=False,
-        example="A super description of my workspace.",
-        default=None,
+        metadata={"example": "A super description of my workspace."},
+        dump_default=None,
         allow_none=True,
     )
     agenda_enabled = marshmallow.fields.Bool(
         required=False,
-        default=None,
-        description="has workspace has an associated agenda ?",
+        dump_default=None,
+        metadata={"description": "has workspace has an associated agenda ?"},
         allow_none=True,
     )
     public_upload_enabled = marshmallow.fields.Bool(
         required=False,
-        description="is workspace allowing manager to give access external user"
-        "to upload file into it ?",
-        default=None,
+        metadata={
+            "description": "is workspace allowing manager to give access external user"
+            "to upload file into it ?"
+        },
+        dump_default=None,
         allow_none=True,
     )
     public_download_enabled = marshmallow.fields.Bool(
         required=False,
-        description="is workspace allowing manager to give access external user"
-        "to some file into it ?",
-        default=None,
+        metadata={
+            "description": "is workspace allowing manager to give access external user"
+            "to some file into it ?"
+        },
+        dump_default=None,
         allow_none=True,
     )
     default_user_role = StrippedString(
-        example=WorkspaceRoles.READER.slug,
-        description="default role for new users in this workspace",
+        metadata={
+            "example": WorkspaceRoles.READER.slug,
+            "description": "default role for new users in this workspace",
+        },
         validate=user_role_validator,
         required=False,
         allow_none=True,
-        default=None,
+        dump_default=None,
     )
     publication_enabled = marshmallow.fields.Bool(
         required=False,
-        description="define whether a user can create and view publications in this workspace",
-        default=None,
+        metadata={
+            "description": "define whether a user can create and view publications in this workspace"
+        },
+        dump_default=None,
         allow_none=True,
     )
 
     @post_load
-    def make_workspace_modifications(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_workspace_modifications(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return WorkspaceUpdate(**data)
 
 
 class WorkspaceCreationSchema(marshmallow.Schema):
     label = StrippedString(
-        required=True, example="My Workspace", validate=workspace_label_length_validator
+        required=True,
+        metadata={"example": "My Workspace"},
+        validate=workspace_label_length_validator,
     )
-    description = StrippedString(required=True, example="A super description of my workspace.")
+    description = StrippedString(
+        required=True, metadata={"example": "A super description of my workspace."}
+    )
     agenda_enabled = marshmallow.fields.Bool(
         required=False,
-        description="has workspace has an associated agenda ?",
-        default=True,
+        metadata={"description": "has workspace has an associated agenda ?"},
+        dump_default=True,
     )
     access_type = StrippedString(
-        example=WorkspaceAccessType.CONFIDENTIAL.value,
+        metadata={"example": WorkspaceAccessType.CONFIDENTIAL.value},
         validate=workspace_access_type_validator,
         required=True,
     )
     default_user_role = StrippedString(
-        description="default role for new users in this workspace",
-        example=WorkspaceRoles.READER.slug,
+        metadata={
+            "example": WorkspaceRoles.READER.slug,
+            "description": "default role for new users in this workspace",
+        },
         validate=user_role_validator,
         required=True,
     )
     public_upload_enabled = marshmallow.fields.Bool(
         required=False,
-        description="is workspace allowing manager to give access external user"
-        "to upload file into it ?",
-        default=True,
+        metadata={
+            "description": "is workspace allowing manager to give access external user"
+            "to upload file into it ?"
+        },
+        dump_default=True,
     )
     public_download_enabled = marshmallow.fields.Bool(
         required=False,
-        description="is workspace allowing manager to give access external user"
-        "to some file into it ?",
-        default=True,
+        metadata={
+            "description": "is workspace allowing manager to give access external user"
+            "to some file into it ?"
+        },
+        dump_default=True,
     )
     parent_id = marshmallow.fields.Int(
-        example=42,
-        description="id of the parent workspace id.",
+        metadata={"example": 42, "description": "id of the parent workspace id."},
         allow_none=True,
-        default=None,
+        dump_default=None,
         required=False,
         validate=positive_int_validator,
     )
     publication_enabled = marshmallow.fields.Bool(
         required=False,
-        description="define whether a user can create and view publications in this workspace",
-        default=None,
+        metadata={
+            "description": "define whether a user can create and view publications in this workspace"
+        },
+        dump_default=None,
         allow_none=True,
     )
 
     @post_load
-    def make_workspace_modifications(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_workspace_modifications(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return WorkspaceCreate(**data)
 
 
@@ -1542,75 +1640,89 @@ class NoContentSchema(marshmallow.Schema):
 
 
 class WorkspaceMenuEntrySchema(marshmallow.Schema):
-    slug = StrippedString(example="markdown-pages")
-    label = StrippedString(example="Markdown Documents")
+    slug = StrippedString(metadata={"example": "markdown-pages"})
+    label = StrippedString(metadata={"example": "Markdown Documents"})
     route = StrippedString(
-        example="/ui/workspaces/{workspace_id}/agenda",
-        description="the route is the frontend route. "
-        "It may include workspace_id "
-        "which must be replaced on backend size "
-        "(the route must be ready-to-use)",
+        metadata={
+            "example": "/ui/workspaces/{workspace_id}/agenda",
+            "description": "the route is the frontend route. "
+            "It may include workspace_id "
+            "which must be replaced on backend size "
+            "(the route must be ready-to-use)",
+        },
     )
     fa_icon = StrippedString(
-        example="far fa-file-alt",
-        description="CSS class of the icon. Example: far fa-file-alt for using Fontawesome far fa-file-alt icon",
+        metadata={
+            "example": "far fa-file-alt",
+            "description": "CSS class of the icon. Example: far fa-file-alt for using Fontawesome far fa-file-alt icon",
+        },
     )
-    hexcolor = StrippedString(example="#F0F9DC", description="Hexadecimal color of the entry.")
+    hexcolor = StrippedString(
+        metadata={"example": "#F0F9DC", "description": "Hexadecimal color of the entry."}
+    )
 
     class Meta:
         description = "Entry element of a workspace menu"
 
 
 class WorkspaceDigestSchema(marshmallow.Schema):
-    workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
-    slug = StrippedString(example="intranet")
-    label = StrippedString(example="Intranet")
+    workspace_id = marshmallow.fields.Int(
+        metadata={"example": 4}, validate=strictly_positive_int_validator
+    )
+    slug = StrippedString(metadata={"example": "intranet"})
+    label = StrippedString(metadata={"example": "Intranet"})
 
 
 # NOTE - SG - 2021-04-29 - Used to avoid transmitting description in all TLMs
 class WorkspaceWithoutDescriptionSchema(WorkspaceDigestSchema):
     access_type = StrippedString(
-        example=WorkspaceAccessType.CONFIDENTIAL.value,
+        metadata={"example": WorkspaceAccessType.CONFIDENTIAL.value},
         validate=workspace_access_type_validator,
         required=True,
     )
     default_user_role = StrippedString(
-        example=WorkspaceRoles.READER.slug,
         validate=user_role_validator,
         required=True,
-        description="default role for new users in this workspace",
+        metadata={
+            "example": WorkspaceRoles.READER.slug,
+            "description": "default role for new users in this workspace",
+        },
     )
     created = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT, description="Workspace creation date"
+        format=DATETIME_FORMAT, metadata={"description": "Workspace creation date"}
     )
     owner = marshmallow.fields.Nested(UserDigestSchema(), allow_none=True)
     sidebar_entries = marshmallow.fields.Nested(WorkspaceMenuEntrySchema, many=True)
-    is_deleted = marshmallow.fields.Bool(example=False, default=False)
-    agenda_enabled = marshmallow.fields.Bool(example=True, default=True)
+    is_deleted = marshmallow.fields.Bool(metadata={"example": False}, dump_default=False)
+    agenda_enabled = marshmallow.fields.Bool(metadata={"example": True}, dump_default=True)
     public_upload_enabled = marshmallow.fields.Bool(
-        description="is workspace allowing manager to give access external user"
-        "to upload file into it ?",
-        default=True,
+        metadata={
+            "description": "is workspace allowing manager to give access external user"
+            "to upload file into it ?"
+        },
+        dump_default=True,
     )
     public_download_enabled = marshmallow.fields.Bool(
-        description="is workspace allowing manager to give access external user"
-        "to some file into it ?",
-        default=True,
+        metadata={
+            "description": "is workspace allowing manager to give access external user"
+            "to some file into it ?"
+        },
+        dump_default=True,
     )
     parent_id = marshmallow.fields.Int(
-        example=42,
-        description="id of the parent workspace id.",
+        metadata={"example": 42, "description": "id of the parent workspace id."},
         allow_none=True,
         required=True,
         validate=positive_int_validator,
     )
     publication_enabled = marshmallow.fields.Bool(
-        default=True,
-        description="define whether a user can create and view publications in this workspace",
+        dump_default=True,
+        metadata={
+            "description": "define whether a user can create and view publications in this workspace"
+        },
     )
     number_of_members = marshmallow.fields.Int(
-        example=42,
-        description="number of members of a space",
+        metadata={"example": 42, "description": "number of members of a space"},
         allow_none=False,
         required=True,
         validate=positive_int_validator,
@@ -1618,7 +1730,7 @@ class WorkspaceWithoutDescriptionSchema(WorkspaceDigestSchema):
 
 
 class WorkspaceSchema(WorkspaceWithoutDescriptionSchema):
-    description = StrippedString(example="All intranet data.")
+    description = StrippedString(metadata={"example": "All intranet data."})
 
     class Meta:
         description = "Full workspace information"
@@ -1626,37 +1738,48 @@ class WorkspaceSchema(WorkspaceWithoutDescriptionSchema):
 
 class EmailNotificationTypeSchema(marshmallow.Schema):
     email_notification_type = StrippedString(
-        example=EmailNotificationType.default().name,
-        description="Type of email notification for a specific space",
+        metadata={
+            "example": EmailNotificationType.default().name,
+            "description": "Type of email notification for a specific space."
+            " Possible values are: {', '.join(v.name for v in EmailNotificationType)}",
+        },
     )
 
 
 class WorkspaceMemberDigestSchema(EmailNotificationTypeSchema):
-    role = StrippedString(example="contributor", validate=user_role_validator)
+    role = StrippedString(metadata={"example": "contributor"}, validate=user_role_validator)
 
 
 class UserWorkspaceConfigSchema(WorkspaceMemberDigestSchema):
-    user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
+    user_id = marshmallow.fields.Int(
+        metadata={"example": 3}, validate=strictly_positive_int_validator
+    )
     is_active = marshmallow.fields.Bool()
     user = marshmallow.fields.Nested(UserDigestSchema())
     workspace = marshmallow.fields.Nested(
         WorkspaceWithoutDescriptionSchema(exclude=("number_of_members",))
     )
-    workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
+    workspace_id = marshmallow.fields.Int(
+        metadata={"example": 4}, validate=strictly_positive_int_validator
+    )
 
     class Meta:
         description = "Workspace Member information"
 
 
 class WorkspaceRoleDigestSchema(marshmallow.Schema):
-    role = StrippedString(example="contributor", validate=user_role_validator)
+    role = StrippedString(metadata={"example": "contributor"}, validate=user_role_validator)
 
 
 class UserWorkspaceRoleSchema(WorkspaceRoleDigestSchema):
-    user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
+    user_id = marshmallow.fields.Int(
+        metadata={"example": 3}, validate=strictly_positive_int_validator
+    )
     is_active = marshmallow.fields.Bool()
     user = marshmallow.fields.Nested(UserDigestSchema())
-    workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
+    workspace_id = marshmallow.fields.Int(
+        metadata={"example": 4}, validate=strictly_positive_int_validator
+    )
 
 
 class WorkspaceWithUserMemberSchema(WorkspaceSchema):
@@ -1665,13 +1788,13 @@ class WorkspaceWithUserMemberSchema(WorkspaceSchema):
 
 class UserConfigSchema(marshmallow.Schema):
     parameters = marshmallow.fields.Dict(
-        description="parameters present in the user's configuration."
+        metadata={"description": "parameters present in the user's configuration."}
     )
 
 
 class UserCustomPropertiesSchema(marshmallow.Schema):
     json_schema = marshmallow.fields.Dict(
-        description="json schema used for user custom properties",
+        metadata={"description": "json schema used for user custom properties"},
         required=True,
         allow_none=False,
     )
@@ -1679,23 +1802,29 @@ class UserCustomPropertiesSchema(marshmallow.Schema):
 
 class UserCustomPropertiesUiSchema(marshmallow.Schema):
     ui_schema = marshmallow.fields.Dict(
-        description="ui schema used for user custom properties",
+        metadata={"description": "ui schema used for user custom properties"},
         required=True,
         allow_none=False,
     )
 
 
 class WorkspaceDiskSpaceSchema(marshmallow.Schema):
-    workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
+    workspace_id = marshmallow.fields.Int(
+        metadata={"example": 4}, validate=strictly_positive_int_validator
+    )
     used_space = marshmallow.fields.Int(
-        description="used space in the workspace in bytes."
-        "if owner allowed space limit or  workspace allowed_space limit is reach,"
-        "no file can be created/updated in this workspace."
+        metadata={
+            "description": "used space in the workspace in bytes."
+            " if owner allowed space limit or  workspace allowed_space limit is reach,"
+            " no file can be created/updated in this workspace."
+        }
     )
     allowed_space = marshmallow.fields.Int(
-        description="allowed space in workspace in bytes. "
-        "if limit is reach, no file can be created/updated "
-        "in any user owned workspaces. 0 mean no limit."
+        metadata={
+            "description": "allowed space in workspace in bytes. "
+            " if limit is reach, no file can be created/updated "
+            " in any user owned workspaces. 0 mean no limit."
+        }
     )
     workspace = marshmallow.fields.Nested(WorkspaceDigestSchema(), attribute="workspace_in_context")
 
@@ -1703,42 +1832,45 @@ class WorkspaceDiskSpaceSchema(marshmallow.Schema):
 class WorkspaceMemberCreationSchema(UserWorkspaceConfigSchema):
     newly_created = marshmallow.fields.Bool(
         exemple=False,
-        description="Is the user completely new " "(and account was just created) or not ?",
+        metadata={
+            "description": "Is the user completely new " "(and account was just created) or not ?"
+        },
     )
 
 
 class TimezoneSchema(marshmallow.Schema):
-    name = StrippedString(example="Europe/London")
+    name = StrippedString(metadata={"example": "Europe/London"})
 
 
 class WorkspaceAccessTypeSchema(marshmallow.Schema):
-    items = marshmallow.fields.List(String(example="confidential"), required=True)
+    items = marshmallow.fields.List(String(metadata={"example": "confidential"}), required=True)
 
 
 class GetUsernameAvailability(marshmallow.Schema):
-    username = StrippedString(example="The-powerUser_42", required=True)
+    username = StrippedString(metadata={"example": "The-powerUser_42"}, required=True)
 
 
 class UsernameAvailability(marshmallow.Schema):
-    username = StrippedString(example="The-powerUser_42", required=True)
+    username = StrippedString(metadata={"example": "The-powerUser_42"}, required=True)
     available = marshmallow.fields.Boolean(required=True)
 
 
 class AboutSchema(marshmallow.Schema):
-    name = StrippedString(example="Tracim", description="Software name")
-    version = StrippedString(example="2.6", description="Version of Tracim")
+    name = StrippedString(metadata={"example": "Tracim", "description": "Software name"})
+    version = StrippedString(metadata={"example": "2.6", "description": "Version of Tracim"})
     build_version = StrippedString(
-        example="release_02.06.00", description="Build Version of Tracim"
+        metadata={"example": "release_02.06.00", "description": "Build Version of Tracim"}
     )
     datetime = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
     website = marshmallow.fields.URL()
     database_schema_version = StrippedString(
-        example="8382e5a19f0d", description="Database schema version", allow_none=True
+        metadata={"example": "8382e5a19f0d", "description": "Database schema version"},
+        allow_none=True,
     )
 
 
 class ReservedUsernamesSchema(marshmallow.Schema):
-    items = marshmallow.fields.List(String(example="all"), required=True)
+    items = marshmallow.fields.List(String(metadata={"example": "all"}), required=True)
 
 
 class ErrorCodeSchema(marshmallow.Schema):
@@ -1747,18 +1879,25 @@ class ErrorCodeSchema(marshmallow.Schema):
 
 
 class ApplicationSchema(marshmallow.Schema):
-    label = StrippedString(example="Agenda")
-    slug = StrippedString(example="agenda")
+    label = StrippedString(metadata={"example": "Agenda"})
+    slug = StrippedString(metadata={"example": "agenda"})
     fa_icon = StrippedString(
-        example="far fa-file",
-        description="CSS class of the icon. Example: far fa-file for using Fontawesome far fa-file icon",
+        metadata={
+            "example": "far fa-file",
+            "description": "CSS class of the icon. Example: far fa-file for using Fontawesome far fa-file icon",
+        },
     )
     hexcolor = StrippedString(
-        example="#FF0000",
-        description="HTML encoded color associated to the application. Example:#FF0000 for red",
+        metadata={
+            "example": "#FF0000",
+            "description": "HTML encoded color associated to the application. Example:#FF0000 for red",
+        },
     )
     is_active = marshmallow.fields.Boolean(
-        example=True, description="if true, the application is in use in the context"
+        metadata={
+            "example": True,
+            "description": "if true, the application is in use in the context",
+        }
     )
     config = marshmallow.fields.Dict()
 
@@ -1768,32 +1907,37 @@ class ApplicationSchema(marshmallow.Schema):
 
 class StatusSchema(marshmallow.Schema):
     slug = StrippedString(
-        example="open",
-        description="the slug represents the type of status. "
-        "Statuses are open, closed-validated, closed-invalidated, closed-deprecated",
+        metadata={
+            "example": "open",
+            "description": "the slug represents the type of status. "
+            "Statuses are open, closed-validated, closed-invalidated, closed-deprecated",
+        },
     )
     global_status = StrippedString(
-        example="open",
-        description="global_status: open, closed",
+        metadata={"example": "open", "description": "global_status: open, closed"},
         validate=content_global_status_validator,
     )
-    label = StrippedString(example="Opened")
-    fa_icon = StrippedString(example="fa-check")
-    hexcolor = StrippedString(example="#0000FF")
+    label = StrippedString(metadata={"example": "Opened"})
+    fa_icon = StrippedString(metadata={"example": "fa-check"})
+    hexcolor = StrippedString(metadata={"example": "#0000FF"})
 
 
 class ContentTypeSchema(marshmallow.Schema):
-    slug = StrippedString(example="pagehtml", validate=all_content_types_validator)
+    slug = StrippedString(metadata={"example": "pagehtml"}, validate=all_content_types_validator)
     fa_icon = StrippedString(
-        example="far fa-file-alt",
-        description="CSS class of the icon. Example: far fa-file for using Fontawesome far fa-file icon",
+        metadata={
+            "example": "far fa-file-alt",
+            "description": "CSS class of the icon. Example: far fa-file for using Fontawesome far fa-file icon",
+        },
     )
     hexcolor = StrippedString(
-        example="#FF0000",
-        description="HTML encoded color associated to the application. Example:#FF0000 for red",
+        metadata={
+            "example": "#FF0000",
+            "description": "HTML encoded color associated to the application. Example:#FF0000 for red",
+        },
     )
-    label = StrippedString(example="Notes")
-    creation_label = StrippedString(example="Write a note")
+    label = StrippedString(metadata={"example": "Notes"})
+    creation_label = StrippedString(metadata={"example": "Write a note"})
     available_statuses = marshmallow.fields.Nested(StatusSchema, many=True)
 
 
@@ -1804,64 +1948,72 @@ class ContentMoveSchema(marshmallow.Schema):
     # must check if the user is allowed to move to this workspace
     # (the user must be content manager of both workspaces)
     new_parent_id = marshmallow.fields.Int(
-        example=42,
-        description="id of the new parent content id.",
+        metadata={"example": 42, "description": "id of the new parent content id."},
         allow_none=True,
         required=True,
         validate=positive_int_validator,
     )
     new_workspace_id = marshmallow.fields.Int(
-        example=2,
-        description="id of the new workspace id.",
+        metadata={"example": 2, "description": "id of the new workspace id."},
         required=True,
         validate=strictly_positive_int_validator,
     )
 
     @post_load
-    def make_move_params(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_move_params(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return MoveParams(**data)
 
 
 class ContentCreationSchema(marshmallow.Schema):
     label = StrippedString(
         required=True,
-        example="contract for client XXX",
-        description="Title of the content to create",
+        metadata={
+            "example": "contract for client XXX",
+            "description": "Title of the content to create",
+        },
         validate=content_label_length_validator,
     )
     content_type = StrippedString(
-        required=True, example="html-document", validate=all_content_types_validator
+        required=True, metadata={"example": "html-document"}, validate=all_content_types_validator
     )
     content_namespace = EnumField(
-        ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
+        ContentNamespaces, load_default=ContentNamespaces.CONTENT, metadata={"example": "content"}
     )
     parent_id = marshmallow.fields.Integer(
-        example=35,
-        description="content_id of parent content, if content should be placed "
-        "in a folder, this should be folder content_id.",
+        metadata={
+            "example": 35,
+            "description": "content_id of parent content, if content should be placed "
+            "in a folder, this should be folder content_id.",
+        },
         allow_none=True,
-        default=None,
+        dump_default=None,
         validate=strictly_positive_int_validator,
     )
     template_id = marshmallow.fields.Integer(
-        example=42,
-        description="content_id of template content, if content should be created "
-        "from a template, this should be template content_id.",
+        metadata={
+            "example": 42,
+            "description": "content_id of template content, if content should be created "
+            "from a template, this should be template content_id.",
+        },
         allow_none=True,
-        default=None,
+        dump_default=None,
         validate=strictly_positive_int_validator,
     )
 
     @post_load
-    def make_content_creation(self, data: typing.Dict[str, typing.Any]) -> object:
+    def make_content_creation(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ContentCreation(**data)
 
 
 class ContentMinimalSchema(marshmallow.Schema):
-    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
-    label = StrippedString(example="Intervention Report 12")
-    slug = StrippedString(example="intervention-report-12")
-    content_type = StrippedString(example="html-document", validate=all_content_types_validator)
+    content_id = marshmallow.fields.Int(
+        metadata={"example": 6}, validate=strictly_positive_int_validator
+    )
+    label = StrippedString(metadata={"example": "Intervention Report 12"})
+    slug = StrippedString(metadata={"example": "intervention-report-12"})
+    content_type = StrippedString(
+        metadata={"example": "html-document"}, validate=all_content_types_validator
+    )
 
 
 class UserInfoContentAbstractSchema(marshmallow.Schema):
@@ -1871,59 +2023,76 @@ class UserInfoContentAbstractSchema(marshmallow.Schema):
 
 class ContentDigestSchema(UserInfoContentAbstractSchema):
     assignee_id = marshmallow.fields.Int(
-        example=42,
+        metadata={"example": 42},
         allow_none=True,
-        default=None,
+        dump_default=None,
         validate=strictly_positive_int_validator,
     )
-    content_namespace = EnumField(ContentNamespaces, example="content")
-    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
-    current_revision_id = marshmallow.fields.Int(example=12)
+    content_namespace = EnumField(ContentNamespaces, metadata={"example": "content"})
+    content_id = marshmallow.fields.Int(
+        metadata={"example": 6}, validate=strictly_positive_int_validator
+    )
+    current_revision_id = marshmallow.fields.Int(metadata={"example": 12})
     current_revision_type = StrippedString(
-        example=ActionDescription.CREATION, validate=action_description_validator
+        metadata={"example": ActionDescription.CREATION}, validate=action_description_validator
     )
-    slug = StrippedString(example="intervention-report-12")
+    slug = StrippedString(metadata={"example": "intervention-report-12"})
     parent_id = marshmallow.fields.Int(
-        example=34, allow_none=True, default=None, validate=positive_int_validator
+        metadata={"example": 34},
+        allow_none=True,
+        dump_default=None,
+        validate=positive_int_validator,
     )
-    workspace_id = marshmallow.fields.Int(example=19, validate=strictly_positive_int_validator)
-    label = StrippedString(example="Intervention Report 12")
-    content_type = StrippedString(example="html-document", validate=all_content_types_validator)
+    workspace_id = marshmallow.fields.Int(
+        metadata={"example": 19}, validate=strictly_positive_int_validator
+    )
+    label = StrippedString(metadata={"example": "Intervention Report 12"})
+    content_type = StrippedString(
+        metadata={"example": "html-document"}, validate=all_content_types_validator
+    )
     sub_content_types = marshmallow.fields.List(
-        StrippedString(example="html-content", validate=all_content_types_validator),
-        description="list of content types allowed as sub contents. "
-        "This field is required for folder contents, "
-        "set it to empty list in other cases",
+        StrippedString(metadata={"example": "html-content"}, validate=all_content_types_validator),
+        metadata={
+            "description": "list of content types allowed as sub contents. "
+            "This field is required for folder contents, "
+            "set it to empty list in other cases"
+        },
     )
     status = StrippedString(
-        example="closed-deprecated",
         validate=content_status_validator,
-        description="this slug is found in content_type available statuses",
-        default=open_status,
+        metadata={
+            "example": "closed-deprecated",
+            "description": "this slug is found in content_type available statuses",
+        },
+        dump_default=open_status,
     )
-    is_archived = marshmallow.fields.Bool(example=False, default=False)
-    is_deleted = marshmallow.fields.Bool(example=False, default=False)
-    is_editable = marshmallow.fields.Bool(example=True, default=True)
-    is_template = marshmallow.fields.Bool(example=False, default=False)
+    is_archived = marshmallow.fields.Bool(metadata={"example": False}, dump_default=False)
+    is_deleted = marshmallow.fields.Bool(metadata={"example": False}, dump_default=False)
+    is_editable = marshmallow.fields.Bool(metadata={"example": True}, dump_default=True)
+    is_template = marshmallow.fields.Bool(metadata={"example": False}, dump_default=False)
     show_in_ui = marshmallow.fields.Bool(
-        example=True,
-        description="if false, then do not show content in the treeview. "
-        "This may his maybe used for specific contents or "
-        "for sub-contents. Default is True. "
-        "In first version of the API, this field is always True",
+        metadata={
+            "example": True,
+            "description": "if false, then do not show content in the treeview. "
+            "This may his maybe used for specific contents or "
+            "for sub-contents. Default is True. "
+            "In first version of the API, this field is always True",
+        },
     )
-    file_extension = StrippedString(example=".txt")
-    filename = StrippedString(example="nameofthefile.txt")
+    file_extension = StrippedString(metadata={"example": ".txt"})
+    filename = StrippedString(metadata={"example": "nameofthefile.txt"})
     modified = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT,
-        description="date of last modification of content."
-        " note: this does not include comments or any subcontents.",
+        metadata={
+            "description": "date of last modification of content."
+            " note: this does not include comments or any subcontents."
+        },
     )
     created = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT, description="Content creation date"
+        format=DATETIME_FORMAT, metadata={"description": "Content creation date"}
     )
     actives_shares = marshmallow.fields.Int(
-        description="number of active share on file", validate=positive_int_validator
+        metadata={"description": "number of active share on file"}, validate=positive_int_validator
     )
 
 
@@ -1934,12 +2103,18 @@ class PaginatedContentDigestSchema(BasePaginatedSchemaPage):
 class FavoriteContentSchema(marshmallow.Schema):
     """Schema for the API endpoint, containing both user and content"""
 
-    user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
+    user_id = marshmallow.fields.Int(
+        metadata={"example": 3}, validate=strictly_positive_int_validator
+    )
     user = marshmallow.fields.Nested(UserDigestSchema())
-    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    content_id = marshmallow.fields.Int(
+        metadata={"example": 6}, validate=strictly_positive_int_validator
+    )
     content = marshmallow.fields.Nested(ContentDigestSchema, allow_none=True)
-    original_label = StrippedString(example="Intervention Report 12")
-    original_type = StrippedString(example="html-document", validate=all_content_types_validator)
+    original_label = StrippedString(metadata={"example": "Intervention Report 12"})
+    original_type = StrippedString(
+        metadata={"example": "html-document"}, validate=all_content_types_validator
+    )
 
 
 class PaginatedFavoriteContentSchema(BasePaginatedSchemaPage):
@@ -1947,8 +2122,10 @@ class PaginatedFavoriteContentSchema(BasePaginatedSchemaPage):
 
 
 class ReadStatusSchema(marshmallow.Schema):
-    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
-    read_by_user = marshmallow.fields.Bool(example=False, default=False)
+    content_id = marshmallow.fields.Int(
+        metadata={"example": 6}, validate=strictly_positive_int_validator
+    )
+    read_by_user = marshmallow.fields.Bool(metadata={"example": False}, dump_default=False)
 
 
 #####
@@ -1956,10 +2133,12 @@ class ReadStatusSchema(marshmallow.Schema):
 #####
 class MessageContentSchema(ContentDigestSchema):
     description = StrippedString(
-        required=True, description="raw text or html description of the content"
+        required=True, metadata={"description": "raw text or html description of the content"}
     )
     version_number = marshmallow.fields.Int(
-        description="Version number of the content, starting at 1 and incremented by 1 for each revision",
+        metadata={
+            "description": "Version number of the content, starting at 1 and incremented by 1 for each revision"
+        },
         validate=strictly_positive_int_validator,
     )
 
@@ -1967,54 +2146,67 @@ class MessageContentSchema(ContentDigestSchema):
 class ContentSchema(MessageContentSchema):
     raw_content = StrippedString(
         required=True,
-        description="Content of the object, may be raw text or <b>html</b> for example",
+        metadata={
+            "description": "Content of the object, may be raw text or <b>html</b> for example"
+        },
     )
 
 
 class ToDoSchema(marshmallow.Schema):
     author = marshmallow.fields.Nested(UserDigestSchema())
     assignee = marshmallow.fields.Nested(UserDigestSchema())
-    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    content_id = marshmallow.fields.Int(
+        metadata={"example": 6}, validate=strictly_positive_int_validator
+    )
     created = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT, description="Content creation date"
+        format=DATETIME_FORMAT, metadata={"description": "Content creation date"}
     )
     parent = marshmallow.fields.Nested(ContentMinimalSchema())
     raw_content = StrippedString(
         required=True,
-        description="Content of the object, may be raw text or <b>html</b> for example",
+        metadata={
+            "description": "Content of the object, may be raw text or <b>html</b> for example"
+        },
     )
     workspace = marshmallow.fields.Nested(WorkspaceDigestSchema())
     status = StrippedString(
-        example="closed-deprecated",
         validate=content_status_validator,
-        description="this slug is found in content_type available statuses",
-        default=open_status,
+        metadata={
+            "example": "closed-deprecated",
+            "description": "this slug is found in content_type available statuses",
+        },
+        dump_default=open_status,
     )
 
 
 class PreviewInfoSchema(marshmallow.Schema):
-    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
-    revision_id = marshmallow.fields.Int(example=12, validate=strictly_positive_int_validator)
+    content_id = marshmallow.fields.Int(
+        metadata={"example": 6}, validate=strictly_positive_int_validator
+    )
+    revision_id = marshmallow.fields.Int(
+        metadata={"example": 12}, validate=strictly_positive_int_validator
+    )
     page_nb = marshmallow.fields.Int(
-        description="number of pages, return null value if unaivalable",
-        example=1,
+        metadata={"example": 1, "description": "number of pages, return null value if unaivalable"},
         allow_none=True,
     )
     has_pdf_preview = marshmallow.fields.Bool(
-        description="true if a pdf preview is available or false", example=True
+        metadata={"example": True, "description": "true if a pdf preview is available or false"}
     )
     has_jpeg_preview = marshmallow.fields.Bool(
-        description="true if a jpeg preview is available or false", example=True
+        metadata={"example": True, "description": "true if a jpeg preview is available or false"}
     )
 
 
 class MessageFileContentSchema(ContentSchema):
     mimetype = StrippedString(
-        description="file content mimetype", example="image/jpeg", required=True
+        metadata={"example": "image/jpeg", "description": "file content mimetype"}, required=True
     )
     size = marshmallow.fields.Int(
-        description="file size in byte, return null value if unavailable",
-        example=1024,
+        metadata={
+            "example": 1024,
+            "description": "file size in byte, return null value if unavailable",
+        },
         allow_none=True,
     )
 
@@ -2022,7 +2214,9 @@ class MessageFileContentSchema(ContentSchema):
 class FileContentSchema(MessageFileContentSchema):
     raw_content = StrippedString(
         required=True,
-        description="Content of the object, may be raw text or <b>html</b> for example",
+        metadata={
+            "description": "Content of the object, may be raw text or <b>html</b> for example"
+        },
     )
 
 
@@ -2032,21 +2226,27 @@ class FileContentSchema(MessageFileContentSchema):
 
 
 class RevisionSchema(ContentDigestSchema):
-    revision_id = marshmallow.fields.Int(example=12, validate=strictly_positive_int_validator)
+    revision_id = marshmallow.fields.Int(
+        metadata={"example": 12}, validate=strictly_positive_int_validator
+    )
     revision_type = StrippedString(
-        example=ActionDescription.CREATION, validate=action_description_validator
+        metadata={"example": ActionDescription.CREATION}, validate=action_description_validator
     )
     description = StrippedString(
-        required=True, description="raw text or html description of the content"
+        required=True, metadata={"description": "raw text or html description of the content"}
     )
     raw_content = StrippedString(
         required=True,
-        description="Content of the object, may be raw text or <b>html</b> for example",
+        metadata={
+            "description": "Content of the object, may be raw text or <b>html</b> for example"
+        },
     )
     version_number = marshmallow.fields.Int(
-        example=123,
         validate=strictly_positive_int_validator,
-        description="version of the revision, starting at 1 and incremented by 1 for each revision",
+        metadata={
+            "example": 123,
+            "description": "version of the revision, starting at 1 and incremented by 1 for each revision",
+        },
         allow_none=True,
     )
 
@@ -2057,11 +2257,13 @@ class RevisionPageSchema(BasePaginatedSchemaPage):
 
 class FileRevisionSchema(RevisionSchema):
     mimetype = StrippedString(
-        description="file content mimetype", example="image/jpeg", required=True
+        metadata={"example": "image/jpeg", "description": "file content mimetype"}, required=True
     )
     size = marshmallow.fields.Int(
-        description="file size in byte, return null value if unaivalable",
-        example=1024,
+        metadata={
+            "example": 1024,
+            "description": "file size in byte, return null value if unaivalable",
+        },
         allow_none=True,
     )
 
@@ -2078,19 +2280,27 @@ class CollaborativeDocumentEditionConfigSchema(marshmallow.Schema):
 
 
 class ReactionSchema(marshmallow.Schema):
-    reaction_id = marshmallow.fields.Int(example=12, validate=strictly_positive_int_validator)
-    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    reaction_id = marshmallow.fields.Int(
+        metadata={"example": 12}, validate=strictly_positive_int_validator
+    )
+    content_id = marshmallow.fields.Int(
+        metadata={"example": 6}, validate=strictly_positive_int_validator
+    )
     author = marshmallow.fields.Nested(UserDigestSchema)
-    value = StrippedString(example="😀")
+    value = StrippedString(metadata={"example": "😀"})
     created = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT, description="reaction creation date"
+        format=DATETIME_FORMAT, metadata={"description": "reaction creation date"}
     )
 
 
 class TagSchema(marshmallow.Schema):
-    tag_id = marshmallow.fields.Int(example=12, validate=strictly_positive_int_validator)
-    workspace_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
-    tag_name = StrippedString(example="todo")
+    tag_id = marshmallow.fields.Int(
+        metadata={"example": 12}, validate=strictly_positive_int_validator
+    )
+    workspace_id = marshmallow.fields.Int(
+        metadata={"example": 6}, validate=strictly_positive_int_validator
+    )
+    tag_name = StrippedString(metadata={"example": "todo"})
 
 
 class MessageCommentSchema(marshmallow.Schema):
@@ -2100,21 +2310,27 @@ class MessageCommentSchema(marshmallow.Schema):
 
     author = marshmallow.fields.Nested(UserDigestSchema)
     created = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT, description="comment creation date"
+        format=DATETIME_FORMAT, metadata={"description": "comment creation date"}
     )
     modified = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT, description="Comment last edition date"
+        format=DATETIME_FORMAT, metadata={"description": "Comment last edition date"}
     )
     last_modifier = marshmallow.fields.Nested(UserDigestSchema)
-    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
-    content_type = StrippedString(example="html-document", validate=all_content_types_validator)
-    description = StrippedString(example="This is a description")
-    parent_content_namespace = EnumField(
-        ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
+    content_id = marshmallow.fields.Int(
+        metadata={"example": 6}, validate=strictly_positive_int_validator
     )
-    parent_content_type = String(example="html-document", validate=all_content_types_validator)
-    parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
-    parent_label = String(example="This is a label")
+    content_type = StrippedString(
+        metadata={"example": "html-document"}, validate=all_content_types_validator
+    )
+    description = StrippedString(metadata={"example": "This is a description"})
+    parent_content_namespace = EnumField(
+        ContentNamespaces, load_default=ContentNamespaces.CONTENT, metadata={"example": "content"}
+    )
+    parent_content_type = String(
+        metadata={"example": "html-document"}, validate=all_content_types_validator
+    )
+    parent_id = marshmallow.fields.Int(metadata={"example": 34}, validate=positive_int_validator)
+    parent_label = String(metadata={"example": "This is a label"})
 
 
 class CommentSchema(MessageCommentSchema):
@@ -2122,129 +2338,136 @@ class CommentSchema(MessageCommentSchema):
     Schema for comments with raw_content
     """
 
-    raw_content = StrippedString(example="<p>This is just an html comment!</p>")
+    raw_content = StrippedString(metadata={"example": "<p>This is just an html comment!</p>"})
 
 
 class SetCommentSchema(marshmallow.Schema):
     raw_content = StrippedString(
-        example="<p>This is just an html comment !</p>",
+        metadata={"example": "<p>This is just an html comment !</p>"},
         validate=not_empty_string_validator,
         required=True,
     )
 
     @post_load()
-    def create_comment(self, data: typing.Dict[str, typing.Any]) -> object:
+    def create_comment(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return CommentCreation(**data)
 
 
 class SetReactionSchema(marshmallow.Schema):
     value = StrippedString(
-        example="😀",
+        metadata={"example": "😀"},
         validate=reaction_value_length_validator,
         required=True,
     )
 
     @post_load()
-    def create_reaction(self, data: typing.Dict[str, typing.Any]) -> object:
+    def create_reaction(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ReactionCreation(**data)
 
 
 class SetTagByNameSchema(marshmallow.Schema):
-    tag_name = StrippedString(example="todo", validate=tag_length_validator, required=True)
+    tag_name = StrippedString(
+        metadata={"example": "todo"}, validate=tag_length_validator, required=True
+    )
 
     @post_load()
-    def create_tag(self, data: typing.Dict[str, typing.Any]) -> object:
+    def create_tag(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return TagCreation(**data)
 
 
 class ContentModifyAbstractSchema(marshmallow.Schema):
     label = StrippedString(
         required=False,
-        example="contract for client XXX",
-        description="New title of the content",
+        metadata={"example": "contract for client XXX", "description": "New title of the content"},
         validate=content_label_length_validator,
     )
     description = StrippedString(
-        required=False, description="raw text or html description of the content"
+        required=False, metadata={"description": "raw text or html description of the content"}
     )
     raw_content = StrippedString(
         required=False,
-        description="Content of the object, may be raw text or <b>html</b> for example",
+        metadata={
+            "description": "Content of the object, may be raw text or <b>html</b> for example"
+        },
     )
 
 
 class ContentModifyNamespaceAbstractSchema(marshmallow.Schema):
     content_namespace = StrippedString(
         required=True,
-        description="Content_namespace of the object, raw text",
+        metadata={"description": "Content_namespace of the object, raw text"},
     )
 
 
 class ContentModifySchema(ContentModifyAbstractSchema):
     @post_load
-    def text_based_content_update(self, data: typing.Dict[str, typing.Any]) -> object:
+    def text_based_content_update(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ContentUpdate(**data)
 
 
 class ContentModifyNamespaceSchema(ContentModifyNamespaceAbstractSchema):
     @post_load
-    def content_namespace_update(self, data: typing.Dict[str, typing.Any]) -> object:
+    def content_namespace_update(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return ContentNamespaceUpdate(**data)
 
 
 class FolderContentModifySchema(ContentModifyAbstractSchema):
     sub_content_types = marshmallow.fields.List(
-        StrippedString(example="html-document", validate=all_content_types_validator),
-        description="list of content types allowed as sub contents.",
+        StrippedString(metadata={"example": "html-document"}, validate=all_content_types_validator),
+        metadata={"description": "list of content types allowed as sub contents."},
         required=False,
     )
 
     @post_load
-    def folder_content_update(self, data: typing.Dict[str, typing.Any]) -> object:
+    def folder_content_update(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return FolderContentUpdate(**data)
 
 
 class SetContentStatusSchema(marshmallow.Schema):
     status = StrippedString(
-        example="closed-deprecated",
         validate=content_status_validator,
-        description="this slug is found in content_type available statuses",
-        default=open_status,
+        metadata={
+            "example": "closed-deprecated",
+            "description": "this slug is found in content_type available statuses",
+        },
+        dump_default=open_status,
         required=True,
     )
 
     @post_load
-    def set_status(self, data: typing.Dict[str, typing.Any]) -> object:
+    def set_status(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return SetContentStatus(**data)
 
 
 class SetContentIsTemplateSchema(marshmallow.Schema):
-    is_template = marshmallow.fields.Boolean(description="set content as a template", default=False)
+    is_template = marshmallow.fields.Boolean(
+        metadata={"description": "set content as a template"}, dump_default=False
+    )
 
     @post_load
-    def set_marked_as_template(self, data: typing.Dict[str, typing.Any]) -> object:
+    def set_marked_as_template(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
         return SetContentIsTemplate(**data)
 
 
 class TemplateQuerySchema(marshmallow.Schema):
     type = StrippedString(
-        example="html-document", validate=all_content_types_validator, required=True
+        metadata={"example": "html-document"}, validate=all_content_types_validator, required=True
     )
 
 
 class TargetLanguageSchema(marshmallow.Schema):
-    code = marshmallow.fields.String(required=True, example="fr")
-    display = marshmallow.fields.String(required=True, example="Français")
+    code = marshmallow.fields.String(required=True, metadata={"example": "fr"})
+    display = marshmallow.fields.String(required=True, metadata={"example": "Français"})
 
 
 class CodeSampleLanguageSchema(marshmallow.Schema):
-    value = marshmallow.fields.String(required=True, example="markup")
-    text = marshmallow.fields.String(required=True, example="Markup")
+    value = marshmallow.fields.String(required=True, metadata={"example": "markup"})
+    text = marshmallow.fields.String(required=True, metadata={"example": "Markup"})
 
 
 class RoleSchema(marshmallow.Schema):
-    level = marshmallow.fields.String(required=True, example="1")
-    label = marshmallow.fields.String(required=True, example="Reader")
+    level = marshmallow.fields.String(required=True, metadata={"example": "1"})
+    label = marshmallow.fields.String(required=True, metadata={"example": "Reader"})
 
 
 class SamLIdPConfigSchema(marshmallow.Schema):
@@ -2307,7 +2530,9 @@ class EventSchema(marshmallow.Schema):
     """Event structure transmitted to workers."""
 
     fields = marshmallow.fields.Dict()
-    event_id = marshmallow.fields.Int(example=42, validate=strictly_positive_int_validator)
+    event_id = marshmallow.fields.Int(
+        metadata={"example": 42}, validate=strictly_positive_int_validator
+    )
     operation = marshmallow.fields.String(validator=OneOf(OperationType.values()))
     entity_type = marshmallow.fields.String(validator=OneOf(EntityType.values()))
     created = marshmallow.fields.DateTime()
@@ -2323,11 +2548,15 @@ class LiveMessageSchema(marshmallow.Schema):
     """Message for the user."""
 
     fields = marshmallow.fields.Dict()
-    event_id = marshmallow.fields.Int(example=42, validate=strictly_positive_int_validator)
-    event_type = marshmallow.fields.String(example="content.modified")
-    created = marshmallow.fields.DateTime(format=DATETIME_FORMAT, description="created date")
+    event_id = marshmallow.fields.Int(
+        metadata={"example": 42}, validate=strictly_positive_int_validator
+    )
+    event_type = marshmallow.fields.String(metadata={"example": "content.modified"})
+    created = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, metadata={"description": "created date"}
+    )
     read = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT, description="read date", allow_none=True
+        format=DATETIME_FORMAT, metadata={"description": "read date"}, allow_none=True
     )
 
 
@@ -2351,64 +2580,76 @@ class UrlPreviewSchema(marshmallow.Schema):
 
 class TranslationQuerySchema(FileQuerySchema):
     source_language_code = marshmallow.fields.String(
-        description="source language of translation, by default set to auto",
-        example="fr",
-        missing=AUTODETECT_LANG,
-        default=AUTODETECT_LANG,
+        metadata={
+            "example": "fr",
+            "description": "source language of translation, by default set to auto",
+        },
+        load_default=AUTODETECT_LANG,
+        dump_default=AUTODETECT_LANG,
         allow_none=False,
     )
     target_language_code = marshmallow.fields.String(
-        description="destination language of translation",
-        example="en",
+        metadata={"example": "en", "description": "destination language of translation"},
         required=True,
         allow_none=False,
     )
 
     @post_load
-    def make_query(self, data: typing.Dict[str, typing.Any]) -> TranslationQuery:
+    def make_query(self, data: typing.Dict[str, typing.Any], **kwargs) -> TranslationQuery:
         return TranslationQuery(**data)
 
 
 class GetLiveMessageQuerySchema(BasePaginatedQuerySchema):
     """Possible query parameters for the GET messages endpoint."""
 
-    read_status = StrippedString(missing=ReadStatus.ALL.value, validator=OneOf(ReadStatus.values()))
+    read_status = StrippedString(
+        load_default=ReadStatus.ALL.value, validator=OneOf(ReadStatus.values())
+    )
     include_event_types = EventTypeListField()
     exclude_event_types = EventTypeListField()
     exclude_author_ids = ExcludeAuthorIdsField
     include_not_sent = marshmallow.fields.Int(
-        example=0,
-        default=0,
-        description="if set to 1, then show not sent message."
-        " Default is 0 - hide not sent message content",
+        dump_default=0,
+        metadata={
+            "example": 0,
+            "description": "if set to 1, then show not sent message."
+            " Default is 0 - hide not sent message content",
+        },
         validate=bool_as_int_validator,
     )
     workspace_ids = StrippedString(
         validate=regex_string_as_list_of_int,
-        example="3,4",
-        description="comma separated list of workspaces ids for event: events unrelated to theses workspaces are not included",
+        metadata={
+            "example": "3,4",
+            "description": "comma separated list of workspaces ids for event: events unrelated to theses workspaces are not included",
+        },
     )
     related_to_content_ids = StrippedString(
         validate=regex_string_as_list_of_int,
-        example="3,4",
-        description="comma separated list of content_ids for event: events unrelated to these content are not included."
-        "event of content itself or of direct children will be provided.",
+        metadata={
+            "example": "3,4",
+            "description": "comma separated list of content_ids for event: events unrelated to these content are not included."
+            "event of content itself or of direct children will be provided.",
+        },
     )
 
     @post_load
-    def live_message_query(self, data: typing.Dict[str, typing.Any]) -> LiveMessageQuery:
+    def live_message_query(self, data: typing.Dict[str, typing.Any], **kwargs) -> LiveMessageQuery:
         return LiveMessageQuery(**data)
 
 
 class TracimLiveEventHeaderSchema(marshmallow.Schema):
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
     # TODO - G.M - 2020-05-14 - Add Filtering for text/event-stream mimetype with accept header,
     #  see: https://github.com/tracim/tracim/issues/3042
-    accept = marshmallow.fields.String(required=True, load_from="Accept", dump_to="Accept")
+    accept = marshmallow.fields.String(required=True, data_key="Accept")
 
 
 class TracimLiveEventQuerySchema(marshmallow.Schema):
     after_event_id = marshmallow.fields.Int(
-        required=False, missing=0, example=42, validator=positive_int_validator
+        required=False, load_default=0, metadata={"example": 42}, validator=positive_int_validator
     )
 
 
@@ -2416,40 +2657,50 @@ class TracimLiveEventQuerySchema(marshmallow.Schema):
 class PathSuffixSchema(marshmallow.Schema):
     path_suffix = marshmallow.fields.Str(
         required=False,
-        description='any path, could include "/"',
-        default="",
-        example="/workspaces/1/email_notification_type",
+        dump_default="",
+        metadata={
+            "example": "/workspaces/1/email_notification_type",
+            "description": 'any path, could include "/"',
+        },
     )
 
 
 class UserMessagesMarkAsReadQuerySchema(marshmallow.Schema):
     content_ids = StrippedString(
         validate=regex_string_as_list_of_int,
-        example="1,4",
-        description="Comma separated list of content ids. Every event related to these contents\
+        metadata={
+            "example": "1,4",
+            "description": "Comma separated list of content ids. Every event related to these contents\
             will be marked as read.",
+        },
     )
     event_ids = StrippedString(
         validate=regex_string_as_list_of_int,
-        example="3,5",
-        description="Comma separated list of event ids. Every event ids will be marked as read.",
+        metadata={
+            "example": "3,5",
+            "description": "Comma separated list of event ids. Every event ids will be marked as read.",
+        },
     )
     parent_ids = StrippedString(
         validate=regex_string_as_list_of_int,
-        example="2,6",
-        description="Comma separated list of parent content ids. Every event related to theses\
+        metadata={
+            "example": "2,6",
+            "description": "Comma separated list of parent content ids. Every event related to theses\
             parents will be marked as read.",
+        },
     )
     space_ids = StrippedString(
         validate=regex_string_as_list_of_int,
-        example="7",
-        description="Comma separated list of space ids. Every event related to theses space\
+        metadata={
+            "example": "7",
+            "description": "Comma separated list of space ids. Every event related to theses space\
             will be marked as read.",
+        },
     )
 
     @post_load
     def user_message_mark_as_read_query(
-        self, data: typing.Dict[str, typing.Any]
+        self, data: typing.Dict[str, typing.Any], **kwargs
     ) -> UserMessagesMarkAsReadQuery:
         return UserMessagesMarkAsReadQuery(**data)
 
@@ -2460,51 +2711,61 @@ class UserMessagesSummaryQuerySchema(marshmallow.Schema):
     exclude_event_types = EventTypeListField()
     include_event_types = EventTypeListField()
     include_not_sent = marshmallow.fields.Int(
-        example=0,
-        default=0,
-        description="if set to 1, then show not sent message."
-        " Default is 0 - hide not sent message content",
+        dump_default=0,
+        metadata={
+            "example": 0,
+            "description": "if set to 1, then show not sent message."
+            " Default is 0 - hide not sent message content",
+        },
         validate=bool_as_int_validator,
     )
     exclude_author_ids = ExcludeAuthorIdsField
     workspace_ids = StrippedString(
         validate=regex_string_as_list_of_int,
-        example="3,4",
-        description="comma separated list of workspaces ids for event: events unrelated to theses workspaces are not included",
+        metadata={
+            "example": "3,4",
+            "description": "comma separated list of workspaces ids for event: events unrelated to theses workspaces are not included",
+        },
     )
     related_to_content_ids = StrippedString(
         validate=regex_string_as_list_of_int,
-        example="3,4",
-        description="comma separated list of content_ids for event: events unrelated to these content are not included."
-        "event of content itself or of direct children will be provided.",
+        metadata={
+            "example": "3,4",
+            "description": "comma separated list of content_ids for event: events unrelated to these content are not included."
+            "event of content itself or of direct children will be provided.",
+        },
     )
 
     @post_load
-    def message_summary_query(self, data: typing.Dict[str, typing.Any]) -> UserMessagesSummaryQuery:
+    def message_summary_query(
+        self, data: typing.Dict[str, typing.Any], **kwargs
+    ) -> UserMessagesSummaryQuery:
         return UserMessagesSummaryQuery(**data)
 
 
 class UserMessagesSummarySchema(marshmallow.Schema):
-    messages_count = marshmallow.fields.Int(example=42)
-    read_messages_count = marshmallow.fields.Int(example=30)
-    unread_messages_count = marshmallow.fields.Int(example=12)
-    user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
+    messages_count = marshmallow.fields.Int(metadata={"example": 42})
+    read_messages_count = marshmallow.fields.Int(metadata={"example": 30})
+    unread_messages_count = marshmallow.fields.Int(metadata={"example": 12})
+    user_id = marshmallow.fields.Int(
+        metadata={"example": 3}, validate=strictly_positive_int_validator
+    )
     user = marshmallow.fields.Nested(UserDigestSchema())
 
 
 class WorkspaceSubscriptionSchema(marshmallow.Schema):
     state = StrippedString(
-        example="pending",
+        metadata={"example": "pending"},
         validate=workspace_subscription_state_validator,
         attribute="state_slug",
     )
     created_date = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT, description="subscription creation date"
+        format=DATETIME_FORMAT, metadata={"description": "subscription creation date"}
     )
     workspace = marshmallow.fields.Nested(WorkspaceDigestSchema())
     author = marshmallow.fields.Nested(UserDigestSchema())
     evaluation_date = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT, description="evaluation date", allow_none=True
+        format=DATETIME_FORMAT, metadata={"description": "evaluation date"}, allow_none=True
     )
     evaluator = marshmallow.fields.Nested(UserDigestSchema(), allow_none=True)
 
@@ -2514,21 +2775,21 @@ class UserIdSchema(marshmallow.Schema):
     Simple user id schema
     """
 
-    user_id = marshmallow.fields.Int(example=3, required=True)
+    user_id = marshmallow.fields.Int(metadata={"example": 3}, required=True)
 
 
 class GetUserFollowQuerySchema(BasePaginatedQuerySchema):
     """Possible query parameters for the GET following and followers endpoint."""
 
     user_id = marshmallow.fields.Int(
-        example=42,
+        metadata={"example": 42},
         validate=strictly_positive_int_validator,
         allow_none=True,
-        default=None,
+        dump_default=None,
     )
 
     @post_load
-    def user_follow_query(self, data: typing.Dict[str, typing.Any]) -> UserFollowQuery:
+    def user_follow_query(self, data: typing.Dict[str, typing.Any], **kwargs) -> UserFollowQuery:
         return UserFollowQuery(**data)
 
 
@@ -2538,39 +2799,37 @@ class FollowedUsersSchemaPage(BasePaginatedSchemaPage):
 
 class DeleteFollowedUserPathSchema(UserIdPathSchema):
     leader_id = marshmallow.fields.Int(
-        example=4,
         required=True,
-        description="id of a valid user",
+        metadata={"example": 4, "description": "id of a valid user"},
         validate=strictly_positive_int_validator,
     )
 
 
 class AboutUserSchema(UserDigestSchema):
     followers_count = marshmallow.fields.Int(
-        example=42,
         required=True,
-        description="count of users following this user",
+        metadata={"example": 42, "description": "count of users following this user"},
         validate=positive_int_validator,
     )
     leaders_count = marshmallow.fields.Int(
-        example=42,
         required=True,
-        description="count of users followed by this user",
+        metadata={"example": 42, "description": "count of users followed by this user"},
         validate=positive_int_validator,
     )
     created = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT, description="User registration date"
+        format=DATETIME_FORMAT, metadata={"description": "User registration date"}
     )
     authored_content_revisions_count = marshmallow.fields.Int(
-        example=23,
         required=True,
-        description="count of revisions whose author is this user",
+        metadata={"example": 23, "description": "count of revisions whose author is this user"},
         validate=positive_int_validator,
     )
     authored_content_revisions_space_count = marshmallow.fields.Int(
-        example=12,
         required=True,
-        description="count of spaces where this user authored at least one content revision",
+        metadata={
+            "example": 12,
+            "description": "count of spaces where this user authored at least one content revision",
+        },
         validate=positive_int_validator,
     )
 
@@ -2578,8 +2837,10 @@ class AboutUserSchema(UserDigestSchema):
 class CommentsPageQuerySchema(BaseOptionalPaginatedQuerySchema):
     sort = EnumField(
         ContentSortOrder,
-        missing=ContentSortOrder.CREATED_ASC,
-        description="Order of the returned contents, default is to sort by creation date, older first",
+        load_default=ContentSortOrder.CREATED_ASC,
+        metadata={
+            "description": "Order of the returned contents, default is to sort by creation date, older first"
+        },
     )
 
 
@@ -2590,8 +2851,10 @@ class CommentsPageSchema(BasePaginatedSchemaPage):
 class ContentRevisionsPageQuerySchema(BaseOptionalPaginatedQuerySchema):
     sort = EnumField(
         ContentSortOrder,
-        missing=ContentSortOrder.MODIFIED_ASC,
-        description="Order of the returned revisions, default is to sort by modification (e.g. creation of the revision) date, older first",
+        load_default=ContentSortOrder.MODIFIED_ASC,
+        metadata={
+            "description": "Order of the returned revisions, default is to sort by modification (e.g. creation of the revision) date, older first"
+        },
     )
 
 
@@ -2601,36 +2864,44 @@ class ContentRevisionsPageQuerySchema(BaseOptionalPaginatedQuerySchema):
 
 
 class CreateUserCallSchema(marshmallow.Schema):
-    callee_id = marshmallow.fields.Integer(description="Id of the user to call", example=42)
+    callee_id = marshmallow.fields.Integer(
+        metadata={"example": 42, "description": "Id of the user to call"}
+    )
 
 
 class UserCallSchema(marshmallow.Schema):
-    call_id = marshmallow.fields.Integer(example=32, description="Id of the call")
-    caller = marshmallow.fields.Nested(UserDigestSchema, description="User who initiated the call")
-    callee = marshmallow.fields.Nested(UserDigestSchema, description="User who has been called")
+    call_id = marshmallow.fields.Integer(metadata={"example": 32, "description": "Id of the call"})
+    caller = marshmallow.fields.Nested(
+        UserDigestSchema, metadata={"description": "User who initiated the call"}
+    )
+    callee = marshmallow.fields.Nested(
+        UserDigestSchema, metadata={"description": "User who has been called"}
+    )
     state = EnumField(UserCallState)
     created = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT, description="Date of creation of the call"
+        format=DATETIME_FORMAT, metadata={"description": "Date of creation of the call"}
     )
     updated = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT,
-        description="date of last modification of the call.",
-        dump_to="modified",
+        metadata={"description": "date of last modification of the call."},
+        data_key="modified",
     )
     url = marshmallow.fields.URL()
 
 
 class UserIdCallIdPathSchema(UserIdPathSchema):
-    call_id = marshmallow.fields.Integer(example=42, description="Id of the call to update")
+    call_id = marshmallow.fields.Integer(
+        metadata={"example": 42, "description": "Id of the call to update"}
+    )
 
 
 class GetUserCallsQuerySchema(marshmallow.Schema):
     state = EnumField(
         UserCallState,
-        missing=None,
-        default=None,
+        load_default=None,
+        dump_default=None,
         required=False,
-        description="If given, only return calls with the given state",
+        metadata={"description": "If given, only return calls with the given state"},
     )
 
 
@@ -2639,4 +2910,4 @@ class UserCallsSchema(marshmallow.Schema):
 
 
 class UpdateUserCallStateSchema(marshmallow.Schema):
-    state = EnumField(UserCallState, description="New call state")
+    state = EnumField(UserCallState, metadata={"description": "New call state"})

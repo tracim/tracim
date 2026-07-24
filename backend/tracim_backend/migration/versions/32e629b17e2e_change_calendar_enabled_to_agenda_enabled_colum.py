@@ -5,6 +5,7 @@ Revises: f889c2b59759
 Create Date: 2019-04-04 17:39:54.241996
 
 """
+
 # revision identifiers, used by Alembic.
 from alembic import op
 from sqlalchemy import Boolean

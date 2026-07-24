@@ -1,5 +1,5 @@
 # Build dependencies, to be installed before installing
 # others packages
-pip==22.2
-setuptools==57.0.0
+pip==25.1.1
+setuptools==66.1.0
 wheel==0.36.2

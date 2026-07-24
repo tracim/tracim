@@ -9,7 +9,6 @@ from tracim_backend.config import CFG
 
 
 class Fixture(object):
-
     """Fixture classes (list) required for this fixtures"""
 
     require = NotImplemented

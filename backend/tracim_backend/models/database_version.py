@@ -1,6 +1,7 @@
 """
 Database version table handled by alembic
 """
+
 from sqlalchemy import Column
 from sqlalchemy import Unicode
 

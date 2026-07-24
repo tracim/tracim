@@ -5,6 +5,7 @@ Revises: 58ae85582ba0
 Create Date: 2021-01-19 12:31:13.031546
 
 """
+
 # revision identifiers, used by Alembic.
 from alembic import op
 from depot.fields.sqlalchemy import UploadedFileField

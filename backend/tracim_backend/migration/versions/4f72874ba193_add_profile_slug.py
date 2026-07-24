@@ -5,6 +5,7 @@ Revises: 3de3e7f2b049
 Create Date: 2020-01-24 16:30:16.365418
 
 """
+
 from alembic import op
 from datetime import datetime
 import enum

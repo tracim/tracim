@@ -95,16 +95,15 @@ class AdvancedContentSearchQuery(ContentSearchQuery):
 
 class ContentSearchQuerySchema(marshmallow.Schema):
     search_string = StrippedString(
-        example="test",
-        description="just a search string",
+        metadata={"example": "test", "description": "just a search string"},
         required=False,
         allow_none=True,
-        missing="",
+        load_default="",
         default_value="",
     )
-    size = marshmallow.fields.Int(required=False, default=10, validate=positive_int_validator)
+    size = marshmallow.fields.Int(required=False, dump_default=10, validate=positive_int_validator)
     page_nb = marshmallow.fields.Int(
-        required=False, default=1, validate=strictly_positive_int_validator
+        required=False, dump_default=1, validate=strictly_positive_int_validator
     )
 
     # RJ - 2020-02-17 - TODO (#4186)
@@ -117,31 +116,37 @@ class ContentSearchQuerySchema(marshmallow.Schema):
     content_types = StringList(
         marshmallow.fields.String(),
         required=False,
-        description="content_types to show",
+        metadata={"description": "content_types to show"},
     )
     show_archived = marshmallow.fields.Int(
-        example=0,
-        default=0,
-        description="if set to 1, then show archived contents."
-        " Default is 0 - hide archived content",
+        dump_default=0,
+        metadata={
+            "example": 0,
+            "description": "if set to 1, then show archived contents."
+            " Default is 0 - hide archived content",
+        },
         validate=bool_as_int_validator,
     )
     show_deleted = marshmallow.fields.Int(
-        example=0,
-        default=0,
-        description="if set to 1, then show deleted contents."
-        " Default is 0 - hide deleted content",
+        dump_default=0,
+        metadata={
+            "example": 0,
+            "description": "if set to 1, then show deleted contents."
+            " Default is 0 - hide deleted content",
+        },
         validate=bool_as_int_validator,
     )
     show_active = marshmallow.fields.Int(
-        example=1,
-        default=1,
-        description="if set to 1, then show active contents. "
-        "Default is 1 - show active content."
-        " Note: active content are content "
-        "that is neither archived nor deleted. "
-        "The reason for this parameter to exist is for example "
-        "to allow to show only archived documents",
+        dump_default=1,
+        metadata={
+            "example": 1,
+            "description": "if set to 1, then show active contents. "
+            "Default is 1 - show active content."
+            " Note: active content are content "
+            "that is neither archived nor deleted. "
+            "The reason for this parameter to exist is for example "
+            "to allow to show only archived documents",
+        },
         validate=bool_as_int_validator,
     )
 
@@ -151,34 +156,34 @@ class AdvancedContentSearchQuerySchema(ContentSearchQuerySchema):
         EnumField(ContentSearchField),
         required=False,
         allow_none=True,
-        missing="",
+        load_default="",
         default_value="",
-        description="search within these fields",
+        metadata={"description": "search within these fields"},
     )
     workspace_names = StringList(
         marshmallow.fields.String(),
         required=False,
-        description="select contents in these workspaces",
+        metadata={"description": "select contents in these workspaces"},
     )
     author__public_names = StringList(
         marshmallow.fields.String(),
         required=False,
-        description="select contents by these authors",
+        metadata={"description": "select contents by these authors"},
     )
     last_modifier__public_names = StringList(
         marshmallow.fields.String(),
         required=False,
-        description="select contents by these authors",
+        metadata={"description": "select contents by these authors"},
     )
     file_extensions = StringList(
         marshmallow.fields.String(),
         required=False,
-        description="select contents with these file extensions",
+        metadata={"description": "select contents with these file extensions"},
     )
     statuses = StringList(
         marshmallow.fields.String(),
         required=False,
-        description="select contents with these statuses",
+        metadata={"description": "select contents with these statuses"},
     )
     created_from = marshmallow.fields.DateTime(
         required=False, format=DATETIME_FORMAT, allow_none=True
@@ -195,14 +200,16 @@ class AdvancedContentSearchQuerySchema(ContentSearchQuerySchema):
     tags = StringList(
         marshmallow.fields.String(),
         required=False,
-        description="select contents matching the given tags",
+        metadata={"description": "select contents matching the given tags"},
     )
 
 
 class WorkspaceSearchSchema(marshmallow.Schema):
-    workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
-    slug = StrippedString(example="intranet")
-    label = StrippedString(example="Intranet")
+    workspace_id = marshmallow.fields.Int(
+        metadata={"example": 4}, validate=strictly_positive_int_validator
+    )
+    slug = StrippedString(metadata={"example": "intranet"})
+    label = StrippedString(metadata={"example": "Intranet"})
 
 
 class ContentSearchSchema(ContentDigestSchema, UserInfoContentAbstractSchema):
@@ -210,11 +217,14 @@ class ContentSearchSchema(ContentDigestSchema, UserInfoContentAbstractSchema):
     workspace = marshmallow.fields.Nested(WorkspaceSearchSchema)
     path = marshmallow.fields.List(marshmallow.fields.Nested(ContentMinimalSchema))
     is_active = marshmallow.fields.Boolean()
-    comment_count = marshmallow.fields.Integer(example=12, validate=positive_int_validator)
-    todo_count = marshmallow.fields.Integer(example=5, validate=positive_int_validator)
+    comment_count = marshmallow.fields.Integer(
+        metadata={"example": 12}, validate=positive_int_validator
+    )
+    todo_count = marshmallow.fields.Integer(
+        metadata={"example": 5}, validate=positive_int_validator
+    )
     content_size = marshmallow.fields.Integer(
-        example=1200,
-        description="Content size in bytes",
+        metadata={"example": 1200, "description": "Content size in bytes"},
         validate=positive_int_validator,
     )
 
@@ -226,24 +236,24 @@ class ContentSearchResultSchema(marshmallow.Schema):
 
 
 class FacetCountSchema(marshmallow.Schema):
-    value = marshmallow.fields.String(description="The value of this field")
-    count = marshmallow.fields.Int(description="The number of results matching this value")
+    value = marshmallow.fields.String(metadata={"description": "The value of this field"})
+    count = marshmallow.fields.Int(
+        metadata={"description": "The number of results matching this value"}
+    )
 
 
 class DateRangeSchema(marshmallow.Schema):
     date_from = marshmallow.fields.DateTime(
-        load_from="from",
-        dump_to="from",
+        data_key="from",
         format=DATETIME_FORMAT,
         required=False,
-        missing=None,
+        load_default=None,
     )
     date_to = marshmallow.fields.DateTime(
-        load_from="to",
-        dump_to="to",
+        data_key="to",
         format=DATETIME_FORMAT,
         required=False,
-        missing=None,
+        load_default=None,
     )
 
 
@@ -251,42 +261,46 @@ class ContentFacetsSchema(marshmallow.Schema):
     workspace_names = marshmallow.fields.List(
         marshmallow.fields.Nested(
             FacetCountSchema(),
-            description="search matches contents in these workspaces",
+            metadata={"description": "search matches contents in these workspaces"},
         )
     )
     author__public_names = marshmallow.fields.List(
         marshmallow.fields.Nested(
             FacetCountSchema(),
-            description="search matches contents which have authors with these public names",
+            metadata={
+                "description": "search matches contents which have authors with these public names"
+            },
         )
     )
     content_types = marshmallow.fields.List(
         marshmallow.fields.Nested(
             FacetCountSchema(),
-            description="search matches contents with these content types",
+            metadata={"description": "search matches contents with these content types"},
         )
     )
     last_modifier__public_names = marshmallow.fields.List(
         marshmallow.fields.Nested(
             FacetCountSchema(),
-            description="search matches contents last modified by authors with these public names",
+            metadata={
+                "description": "search matches contents last modified by authors with these public names"
+            },
         )
     )
     file_extensions = marshmallow.fields.List(
         marshmallow.fields.Nested(
             FacetCountSchema(),
-            description="search matches contents with these file extensions",
+            metadata={"description": "search matches contents with these file extensions"},
         )
     )
     statuses = marshmallow.fields.List(
         marshmallow.fields.Nested(
             FacetCountSchema(),
-            description="search matches contents with these statuses",
+            metadata={"description": "search matches contents with these statuses"},
         )
     )
     tags = marshmallow.fields.List(
         marshmallow.fields.Nested(
-            FacetCountSchema(), description="search matches contents with these tags"
+            FacetCountSchema(), metadata={"description": "search matches contents with these tags"}
         )
     )
 
@@ -294,12 +308,12 @@ class ContentFacetsSchema(marshmallow.Schema):
 class AdvancedContentSearchResultSchema(ContentSearchResultSchema):
     facets = marshmallow.fields.Nested(
         ContentFacetsSchema(),
-        description="search matched content with these characteristics",
+        metadata={"description": "search matched content with these characteristics"},
         required=False,
-        missing=None,
+        load_default=None,
     )
-    created_range = marshmallow.fields.Nested(DateRangeSchema(), required=False, missing=None)
-    modified_range = marshmallow.fields.Nested(DateRangeSchema(), required=False, missing=None)
+    created_range = marshmallow.fields.Nested(DateRangeSchema(), required=False, load_default=None)
+    modified_range = marshmallow.fields.Nested(DateRangeSchema(), required=False, load_default=None)
 
 
 class UserSearchQuerySchema(marshmallow.Schema):
@@ -309,41 +323,47 @@ class UserSearchQuerySchema(marshmallow.Schema):
     workspace_ids = StringList(
         marshmallow.fields.Int(),
         required=False,
-        missing=None,
-        description="if given only users members of the given workspace ids will be searched",
+        load_default=None,
+        metadata={
+            "description": "if given only users members of the given workspace ids will be searched"
+        },
     )
     search_fields = StringList(
         EnumField(UserSearchField),
         required=False,
-        missing=None,
-        description="if given only search in the given user fields",
+        load_default=None,
+        metadata={"description": "if given only search in the given user fields"},
     )
     newest_authored_content_date_from = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT, required=False, missing=None
+        format=DATETIME_FORMAT, required=False, load_default=None
     )
     newest_authored_content_date_to = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT, required=False, missing=None
+        format=DATETIME_FORMAT, required=False, load_default=None
     )
-    size = marshmallow.fields.Int(required=False, default=10, validate=positive_int_validator)
+    size = marshmallow.fields.Int(required=False, dump_default=10, validate=positive_int_validator)
     page_nb = marshmallow.fields.Int(
-        required=False, default=1, validate=strictly_positive_int_validator
+        required=False, dump_default=1, validate=strictly_positive_int_validator
     )
     show_deleted = marshmallow.fields.Int(
-        example=0,
-        default=0,
-        description="if set to 1, then show deleted contents."
-        " Default is 0 - hide deleted content",
+        dump_default=0,
+        metadata={
+            "example": 0,
+            "description": "if set to 1, then show deleted contents."
+            " Default is 0 - hide deleted content",
+        },
         validate=bool_as_int_validator,
     )
     show_active = marshmallow.fields.Int(
-        example=1,
-        default=1,
-        description="if set to 1, then show active contents. "
-        "Default is 1 - show active content."
-        " Note: active content are content "
-        "that is neither archived nor deleted. "
-        "The reason for this parameter to exist is for example "
-        "to allow to show only archived documents",
+        dump_default=1,
+        metadata={
+            "example": 1,
+            "description": "if set to 1, then show active contents. "
+            "Default is 1 - show active content."
+            " Note: active content are content "
+            "that is neither archived nor deleted. "
+            "The reason for this parameter to exist is for example "
+            "to allow to show only archived documents",
+        },
         validate=bool_as_int_validator,
     )
 
@@ -381,30 +401,34 @@ class WorkspaceSearchQuerySchema(marshmallow.Schema):
     member_ids = StringList(
         marshmallow.fields.Int(),
         required=False,
-        missing=None,
-        description="if given only workspace having members in the list will be searched",
+        load_default=None,
+        metadata={
+            "description": "if given only workspace having members in the list will be searched"
+        },
     )
     owner_ids = StringList(
         marshmallow.fields.Int(),
         required=False,
-        missing=None,
-        description="If the workspace has been owned by some users",
+        load_default=None,
+        metadata={"description": "If the workspace has been owned by some users"},
     )
     search_fields = StringList(
         EnumField(WorkspaceSearchField),
         required=False,
-        missing=None,
-        description="if given only search in the given workspace fields",
+        load_default=None,
+        metadata={"description": "if given only search in the given workspace fields"},
     )
-    size = marshmallow.fields.Int(required=False, default=10, validate=positive_int_validator)
+    size = marshmallow.fields.Int(required=False, dump_default=10, validate=positive_int_validator)
     page_nb = marshmallow.fields.Int(
-        required=False, default=1, validate=strictly_positive_int_validator
+        required=False, dump_default=1, validate=strictly_positive_int_validator
     )
     show_deleted = marshmallow.fields.Int(
-        example=0,
-        default=0,
-        description="if set to 1, then show deleted workpaces."
-        " Default is 0 - hide deleted workspaces",
+        dump_default=0,
+        metadata={
+            "example": 0,
+            "description": "if set to 1, then show deleted workpaces."
+            " Default is 0 - hide deleted workspaces",
+        },
         validate=bool_as_int_validator,
     )
 

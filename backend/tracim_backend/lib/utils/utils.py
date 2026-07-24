@@ -457,7 +457,7 @@ def find_all_submodule_path(module: types.ModuleType) -> List[str]:
             module_name=module.__name__, submodule_relative_path=submodule_relative_path
         )
         if is_package:
-            spec = pkgutil._get_spec(importer, submodule_relative_path)
+            spec = importer.find_spec(submodule_relative_path, None)
             importlib._bootstrap._load(spec)
             module_spec_list.append(spec)
         else:
@@ -493,7 +493,7 @@ def get_build_version() -> str:
     Get either tag or commit hash linked to current commit
     :return: tag or commit hash
     """
-    last_commit = os.popen("git rev-parse HEAD 2> /dev/null").read()
+    last_commit = os.popen("git rev-parse HEAD 2> /dev/null").read().strip()
     return_value = os.system(f"git describe --exact-match {last_commit} 2> /dev/null")
 
     if return_value:

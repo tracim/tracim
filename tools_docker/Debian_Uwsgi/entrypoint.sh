@@ -181,9 +181,6 @@ tracimcli_as_user "search index-create"
 log "Starting Puspin service..."
 service pushpin start # tracim live messages (TLMs) sending
 loggood "Pushpin started"
-log "Starting Zurl service..."
-service zurl start # tracim live messages (TLMs) sending
-loggood "Zurl started"
 log "Restarting Apache2 service..."
 service apache2 restart
 loggood "Apache2 restarted"
@@ -209,12 +206,6 @@ if [ $PUSHPIN_SERVICE_RUNNING = 0 ]; then
     logerror "Pushpin service must be running."
     exit 1
 fi
-ZURL_SERVICE_RUNNING=$(ps -ef | grep -v grep|grep "zurl" | wc -l)
-if [ $ZURL_SERVICE_RUNNING = 0 ]; then
-    logerror "Zurl service must be running."
-    exit 1
-fi
-
 
 # Start tracim
 log "start uwsgi"

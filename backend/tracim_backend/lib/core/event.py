@@ -461,7 +461,7 @@ class EventApi:
             show_deleted=True,
         )
         if current_user:
-            author = self.user_schema.dump(user_api.get_user_with_context(current_user)).data
+            author = self.user_schema.dump(user_api.get_user_with_context(current_user))
         else:
             author = None
         fields = {
@@ -649,9 +649,7 @@ class EventBuilder:
             config=self._config,
             show_deleted=True,
         )
-        fields = {
-            Event.USER_FIELD: EventApi.user_schema.dump(user_api.get_user_with_context(user)).data
-        }
+        fields = {Event.USER_FIELD: EventApi.user_schema.dump(user_api.get_user_with_context(user))}
         event_api = EventApi(current_user, context.dbsession, self._config)
         event_api.create_event(
             entity_type=EntityType.USER,
@@ -685,7 +683,7 @@ class EventBuilder:
             show_deleted=True,
         )
         workspace_in_context = api.get_workspace_with_context(workspace)
-        fields = {Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data}
+        fields = {Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context)}
         event_api = EventApi(current_user, context.dbsession, self._config)
         event_api.create_event(
             entity_type=EntityType.WORKSPACE,
@@ -726,7 +724,7 @@ class EventBuilder:
         content_api = ContentApi(context.dbsession, current_user, self._config)
         content_in_context = content_api.get_content_in_context(content)
         content_schema = EventApi.get_content_schema_for_type(content.type)
-        content_dict = content_schema.dump(content_in_context).data
+        content_dict = content_schema.dump(content_in_context)
 
         workspace_api = WorkspaceApi(
             context.dbsession, current_user, self._config, show_deleted=True
@@ -738,7 +736,7 @@ class EventBuilder:
             Event.CONTENT_FIELD: content_dict,
             Event.WORKSPACE_FIELD: EventApi.workspace_without_description_schema.dump(
                 workspace_in_context
-            ).data,
+            ),
         }
         event_api = EventApi(current_user, context.dbsession, self._config)
         event_api.create_event(
@@ -794,7 +792,7 @@ class EventBuilder:
         try:
             user_field = EventApi.user_schema.dump(
                 user_api.get_user_with_context(user_api.get_one(user_workspace_config.user_id))
-            ).data
+            )
         except UserDoesNotExist:
             # It is possible to have an already deleted user when deleting his roles.
             user_field = None
@@ -806,8 +804,8 @@ class EventBuilder:
             Event.USER_FIELD: user_field,
             Event.WORKSPACE_FIELD: EventApi.workspace_without_description_schema.dump(
                 workspace_in_context
-            ).data,
-            Event.MEMBER_FIELD: EventApi.workspace_user_role_schema.dump(config_in_context).data,
+            ),
+            Event.MEMBER_FIELD: EventApi.workspace_user_role_schema.dump(config_in_context),
         }
         event_api = EventApi(current_user, context.dbsession, self._config)
         event_api.create_event(
@@ -906,8 +904,8 @@ class EventBuilder:
         )
         favorite_in_context = content_api.get_one_user_favorite_content_in_context(favorite)
         fields = {
-            Event.FAVORITE_FIELD: EventApi.favorite_schema.dump(favorite_in_context).data,
-            Event.USER_FIELD: EventApi.user_schema.dump(favorite_user_in_context).data,
+            Event.FAVORITE_FIELD: EventApi.favorite_schema.dump(favorite_in_context),
+            Event.USER_FIELD: EventApi.user_schema.dump(favorite_user_in_context),
         }
         event_api = EventApi(current_user, context.dbsession, self._config)
         event_api.create_event(
@@ -937,11 +935,9 @@ class EventBuilder:
         fields = {
             Event.WORKSPACE_FIELD: EventApi.workspace_without_description_schema.dump(
                 workspace_in_context
-            ).data,
-            Event.SUBSCRIPTION_FIELD: EventApi.workspace_subscription_schema.dump(
-                subscription
-            ).data,
-            Event.USER_FIELD: EventApi.user_schema.dump(subscription_author_in_context).data,
+            ),
+            Event.SUBSCRIPTION_FIELD: EventApi.workspace_subscription_schema.dump(subscription),
+            Event.USER_FIELD: EventApi.user_schema.dump(subscription_author_in_context),
         }
         event_api = EventApi(current_user, context.dbsession, self._config)
         event_api.create_event(
@@ -966,16 +962,16 @@ class EventBuilder:
         content_api = ContentApi(context.dbsession, current_user, self._config)
         content_in_context = content_api.get_content_in_context(reaction.content)
         content_schema = EventApi.get_content_schema_for_type(reaction.content.type)
-        content_dict = content_schema.dump(content_in_context).data
+        content_dict = content_schema.dump(content_in_context)
 
         user_api = UserApi(current_user, context.dbsession, self._config, show_deleted=True)
         reaction_author_in_context = user_api.get_user_with_context(reaction.author)
         fields = {
             Event.WORKSPACE_FIELD: EventApi.workspace_without_description_schema.dump(
                 workspace_in_context
-            ).data,
-            Event.REACTION_FIELD: EventApi.reaction_schema.dump(reaction).data,
-            Event.USER_FIELD: EventApi.user_schema.dump(reaction_author_in_context).data,
+            ),
+            Event.REACTION_FIELD: EventApi.reaction_schema.dump(reaction),
+            Event.USER_FIELD: EventApi.user_schema.dump(reaction_author_in_context),
             Event.CONTENT_FIELD: content_dict,
         }
         event_api = EventApi(current_user, context.dbsession, self._config)
@@ -1000,8 +996,8 @@ class EventBuilder:
         fields = {
             Event.WORKSPACE_FIELD: EventApi.workspace_without_description_schema.dump(
                 workspace_in_context
-            ).data,
-            Event.TAG_FIELD: EventApi.tag_schema.dump(tag).data,
+            ),
+            Event.TAG_FIELD: EventApi.tag_schema.dump(tag),
         }
         event_api = EventApi(current_user, context.dbsession, self._config)
         event_api.create_event(
@@ -1030,13 +1026,13 @@ class EventBuilder:
         content_api = ContentApi(context.dbsession, current_user, self._config)
         content_in_context = content_api.get_content_in_context(content_tag.content)
         content_schema = EventApi.get_content_schema_for_type(content_tag.content.type)
-        content_dict = content_schema.dump(content_in_context).data
+        content_dict = content_schema.dump(content_in_context)
         fields = {
             Event.WORKSPACE_FIELD: EventApi.workspace_without_description_schema.dump(
                 workspace_in_context
-            ).data,
+            ),
             Event.CONTENT_FIELD: content_dict,
-            Event.TAG_FIELD: EventApi.tag_schema.dump(content_tag.tag).data,
+            Event.TAG_FIELD: EventApi.tag_schema.dump(content_tag.tag),
         }
         event_api = EventApi(current_user, context.dbsession, self._config)
         event_api.create_event(
@@ -1052,8 +1048,8 @@ class EventBuilder:
         """Create an event for a user call operation (create/update/delete)."""
         current_user = context.safe_current_user()
         fields = {
-            Event.USER_CALL_FIELD: EventApi.user_call_schema.dump(user_call).data,
-            Event.USER_FIELD: EventApi.user_schema.dump(user_call.callee).data,
+            Event.USER_CALL_FIELD: EventApi.user_call_schema.dump(user_call),
+            Event.USER_FIELD: EventApi.user_schema.dump(user_call.callee),
         }
         event_api = EventApi(current_user, context.dbsession, self._config)
         event_api.create_event(
@@ -1073,8 +1069,8 @@ class EventBuilder:
         config_user_in_context = user_api.get_user_with_context(user)
         user_config_fields = {"parameters": user_config.fields}
         fields = {
-            Event.USER_CONFIG_FIELD: EventApi.user_config_schema.dump(user_config_fields).data,
-            Event.USER_FIELD: EventApi.user_schema.dump(config_user_in_context).data,
+            Event.USER_CONFIG_FIELD: EventApi.user_config_schema.dump(user_config_fields),
+            Event.USER_FIELD: EventApi.user_schema.dump(config_user_in_context),
         }
         event_api = EventApi(current_user, context.dbsession, self._config)
         event_api.create_event(

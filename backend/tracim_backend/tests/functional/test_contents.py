@@ -3048,7 +3048,7 @@ class TestFiles(object):
         (created_event, modified_event) = event_helper.last_events(2)
         assert created_event.event_type == "content.created.file"
         author = web_testapp.get("/api/users/1", status=200).json_body
-        assert created_event.author == UserDigestSchema().dump(author).data
+        assert created_event.author == UserDigestSchema().dump(author)
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(business_workspace.workspace_id), status=200
         ).json_body
@@ -3487,7 +3487,7 @@ class TestFiles(object):
         assert last_event.content["sub_content_types"] == res["sub_content_types"]
         assert last_event.content["workspace_id"] == res["workspace_id"]
         author = web_testapp.get("/api/users/1", status=200).json_body
-        assert last_event.author == UserDigestSchema().dump(author).data
+        assert last_event.author == UserDigestSchema().dump(author)
         workspace = web_testapp.get(
             "/api/workspaces/1",
             status=200,

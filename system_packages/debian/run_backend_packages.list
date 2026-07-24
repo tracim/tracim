@@ -1,12 +1,12 @@
 ghostscript
 git
 imagemagick
-libmagickcore-6.q16-6-extra
+libmagickcore-*-extra
 iproute2
 libfile-mimeinfo-perl
 libimage-exiftool-perl
 webp
-libmagic1
+libmagic1t64
 locales
 poppler-utils
 python3

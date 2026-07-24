@@ -14,6 +14,7 @@ Revises: 622464216ab7
 Create Date: 2022-06-24 12:06:28.706447
 
 """
+
 from alembic import op
 import json
 import sqlalchemy as sa

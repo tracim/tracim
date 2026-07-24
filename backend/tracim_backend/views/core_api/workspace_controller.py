@@ -132,7 +132,7 @@ class WorkspaceController(Controller):
     @hapic.output_body(WorkspaceSchema())
     def workspace(self, context, request: TracimRequest, hapic_data=None):
         """
-        Get workspace informations
+        Get a workspace - detailed structure.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         wapi = WorkspaceApi(
@@ -148,7 +148,7 @@ class WorkspaceController(Controller):
     @hapic.output_body(WorkspaceDiskSpaceSchema())
     def workspace_disk_space(self, context, request: TracimRequest, hapic_data=None):
         """
-        Get workspace space info
+        Get workspace storage space information. Values are in bytes.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         wapi = WorkspaceApi(
@@ -164,7 +164,8 @@ class WorkspaceController(Controller):
     @hapic.output_body(WorkspaceSchema(many=True))
     def workspaces(self, context, request: TracimRequest, hapic_data=None):
         """
-        Returns the list of all workspaces. This route is for admin only.
+        Returns the list of all workspaces.
+        Required profile: administrator.
         Standard users must use their own route: /api/users/me/workspaces
         Filtering by parent_ids is possible through this endpoint
         """
@@ -187,7 +188,8 @@ class WorkspaceController(Controller):
     @hapic.output_body(WorkspaceSchema())
     def update_workspace(self, context, request: TracimRequest, hapic_data=None):
         """
-        Update a workspace. This route is for trusted users and administrators.
+        Update a workspace.
+        Required profile/role: administrator or space manager.
         Note : a trusted user can only update spaces on which he/she is space manager
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
@@ -219,7 +221,8 @@ class WorkspaceController(Controller):
     @hapic.output_body(WorkspaceSchema())
     def create_workspace(self, context, request: TracimRequest, hapic_data=None):
         """
-        Create a workspace. This route is for trusted users and administrators.
+        Create a workspace.
+        Required profile: trusted user or administrator.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         wapi = WorkspaceApi(
@@ -251,7 +254,8 @@ class WorkspaceController(Controller):
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def delete_workspace(self, context, request: TracimRequest, hapic_data=None):
         """
-        Delete a workspace. This route is for trusted users and administrators.
+        Delete a workspace.
+        Required profile: trusted user or administrator.
         Note : a trusted user can only delete spaces on which he/she is space manager
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
@@ -271,6 +275,7 @@ class WorkspaceController(Controller):
     def undelete_workspace(self, context, request: TracimRequest, hapic_data=None):
         """
         Restore a deleted space.
+        Required profile: trusted user or administrator.
         Note : a trusted user can only restore spaces on which he/she is space manager
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
@@ -320,8 +325,9 @@ class WorkspaceController(Controller):
         self, context, request: TracimRequest, hapic_data=None
     ) -> typing.List[UserWorkspaceConfigInContext]:
         """
-        Returns the list of space user with their role, avatar, etc.
+        Returns workspace member list with role, avatar, etc.
         """
+        # FIXME - D.A. - 2026-0-09 - rename the route to "members" or at least to "roles" (instead of role)
         app_config = request.registry.settings["CFG"]  # type: CFG
         user_workspace_config_api = UserWorkspaceConfigApi(
             current_user=request.current_user,
@@ -378,7 +384,7 @@ class WorkspaceController(Controller):
     ) -> UserWorkspaceConfigInContext:
         """
         Update role of the given space member.
-        This feature is for workspace managers, trusted users and administrators.
+        Required profile/role: administrator or truster_user who is workspace manager.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         user_workspace_config_api = UserWorkspaceConfigApi(
@@ -403,8 +409,8 @@ class WorkspaceController(Controller):
         self, context, request: TracimRequest, hapic_data=None
     ) -> None:
         """
-        Remove the user from the space.
-        This feature is for workspace managers and administrators.
+        Remove the giver user from the space.
+        Required profile/role: administrator or workspace manager.
         """
 
         app_config = request.registry.settings["CFG"]  # type: CFG
@@ -436,7 +442,7 @@ class WorkspaceController(Controller):
     ) -> UserWorkspaceConfigInContext:
         """
         Add a member to this workspace.
-        This feature is for workspace managers and administrators.
+        Required profile/role: administrator or workspace manager.
         """
         newly_created = False
         app_config = request.registry.settings["CFG"]  # type: CFG
@@ -674,8 +680,8 @@ class WorkspaceController(Controller):
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.FOUND)
     def get_content_from_workspace(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
-        Convenient route allowing to get detail about a content without knowing routes associated to its content type.
-        This route generates a HTTP 302 with the right url
+        Convenient route allowing to get a content without to know its canonical url.
+        This route generates a HTTP 302 which redirects to the canonical url.
         """
         content = request.current_content
         content_type = content_type_list.get_one_by_slug(content.type).slug
@@ -694,8 +700,8 @@ class WorkspaceController(Controller):
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.FOUND)
     def get_content(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
-        Convenient route allowing to get detail about a content without knowing routes associated to its content type.
-        This route generates a HTTP 302 with the right url
+        Convenient route allowing to get a content without to know its canonical url.
+        This route generates a HTTP 302 which redirects to the canonical url.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
@@ -733,7 +739,8 @@ class WorkspaceController(Controller):
     @hapic.output_body(ContentPathInfoSchema())
     def get_content_path(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
-        Get Content Path : return all hierarchy of content from workspace root to content
+        Returns the complete path (breadcrumb) of the given content in the workspace
+        (the path does not includes workspace/ sub-workspaces: only folders and contents)
         """
         content = request.current_content
         app_config = request.registry.settings["CFG"]  # type: CFG
@@ -775,8 +782,8 @@ class WorkspaceController(Controller):
     @hapic.output_body(ContentDigestSchema())
     def move_content(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
         """
-        Move a content to specified new place.
-        This requires to be content manager in both input and output spaces (which may be the same)
+        Move a content to given space and parent content
+        Required role: content manager in both input and output spaces.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         path_data = hapic_data.path
@@ -811,8 +818,8 @@ class WorkspaceController(Controller):
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def delete_content(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
-        Move a content to the trash. After that, the content will be invisible by default.
-        This action requires the user to be a content manager.
+        Trash a content. After operation, the content will be invisible by default.
+        Required role: content manager.
         Note: the content is still accessible but becomes read-only.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
@@ -835,7 +842,8 @@ class WorkspaceController(Controller):
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def undelete_content(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
-        Restore a content from the trash. The content will be visible and editable again.
+        Untrash a content. The content will be visible and editable again.
+        Required role: content manager.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         path_data = hapic_data.path
@@ -953,7 +961,8 @@ class WorkspaceController(Controller):
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def delete_content_permanently(self, context, request: TracimRequest, hapic_data=None):
         """
-        Delete a content permanently. This route is for administrators.
+        Permanent delete of a content permanently. Rollback is not possible.
+        Required role: space manager.
         """
         # INFO - F.S - 2024-02-29 - With sqlite if the content deleted is the last created, the next content created will have the same id
         app_config = request.registry.settings["CFG"]  # type: CFG

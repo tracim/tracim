@@ -5,6 +5,7 @@ Revises: f3852e1349c4
 Create Date: 2018-03-13 14:41:38.590375
 
 """
+
 from alembic import op
 from sqlalchemy import Column
 from sqlalchemy import Unicode

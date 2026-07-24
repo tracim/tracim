@@ -1,8 +1,6 @@
 # Tests
 
-To test [Tracim](https://www.tracim.fr), you first need to be able to
-build the backend and the frontend.
-See [how to build](/docs.legacy/development/backend_build.md).
+To run the [Tracim](https://www.tracim.fr) backend auto tests, you need to have your environment ready, see [setup backend documentation](../../developer/setup_env/setup_backend.md).
 
 ## Table of contents
 

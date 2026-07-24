@@ -9,14 +9,19 @@
 # works with mongrel2.
 
 # Pull the base image
-FROM debian:bullseye
+FROM debian:trixie
 MAINTAINER Algoo team <contact@algoo.fr>
 
 
-# Install Pushpin
+# Install Pushpin from official pushpin.org apt repository
 RUN \
   apt-get update && \
-  apt-get install -y mongrel2-core pushpin
+  apt-get install -y curl gpg && \
+  mkdir -p /etc/apt/keyrings && \
+  curl -fsSL https://pushpin.org/pushpin-package.asc | gpg --dearmor -o /etc/apt/keyrings/pushpin.gpg && \
+  echo "deb [signed-by=/etc/apt/keyrings/pushpin.gpg] https://packages.pushpin.org/deb pushpin-jammy main" > /etc/apt/sources.list.d/pushpin.list && \
+  apt-get update && \
+  apt-get install -y pushpin
 
 # Cleanup
 RUN \

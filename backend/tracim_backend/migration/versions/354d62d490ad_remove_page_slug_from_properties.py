@@ -5,6 +5,7 @@ Revises: 182b9f7aa837
 Create Date: 2019-01-22 15:27:12.462798
 
 """
+
 from alembic import op
 import json
 from sqlalchemy import Column

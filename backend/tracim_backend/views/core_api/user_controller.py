@@ -1456,33 +1456,33 @@ class UserController(Controller):
         # user workspace
         configurator.add_route(
             "get_user_workspace",
-            "/users/{user_id:\d+}/workspaces",  # noqa: W605
-            request_method="GET",  # noqa: W605
+            r"/users/{user_id:\d+}/workspaces",
+            request_method="GET",
         )
         configurator.add_view(self.user_workspace, route_name="get_user_workspace")
         configurator.add_route(
             "post_user_workspace",
-            "/users/{user_id:\d+}/workspaces",  # noqa: W605
-            request_method="POST",  # noqa: W605
+            r"/users/{user_id:\d+}/workspaces",
+            request_method="POST",
         )
         configurator.add_view(self.join_workspace, route_name="post_user_workspace")
 
         # user role
         configurator.add_route(
             "get_user_role_workspace",
-            "/users/{user_id:\d+}/workspaces/all/settings",  # noqa: W605
-            request_method="GET",  # noqa: W605
+            r"/users/{user_id:\d+}/workspaces/all/settings",
+            request_method="GET",
         )
         configurator.add_view(self.user_role_workspace, route_name="get_user_role_workspace")
 
         # user info
-        configurator.add_route("user", "/users/{user_id:\d+}", request_method="GET")  # noqa: W605
+        configurator.add_route("user", r"/users/{user_id:\d+}", request_method="GET")
         configurator.add_view(self.user, route_name="user")
 
         # user space info
         configurator.add_route(
-            "user_disk_space", "/users/{user_id:\d+}/disk_space", request_method="GET"  # noqa: W605
-        )  # noqa: W605
+            "user_disk_space", r"/users/{user_id:\d+}/disk_space", request_method="GET"
+        )
         configurator.add_view(self.user_disk_space, route_name="user_disk_space")
 
         # users lists
@@ -1492,41 +1492,39 @@ class UserController(Controller):
         # known members list
         configurator.add_route(
             "known_members",
-            "/users/{user_id:\d+}/known_members",  # noqa: W605
-            request_method="GET",  # noqa: W605
+            r"/users/{user_id:\d+}/known_members",
+            request_method="GET",
         )
         configurator.add_view(self.known_members, route_name="known_members")
 
         # known contents list
         configurator.add_route(
             "known_contents",
-            "/users/{user_id:\d+}/known_contents",  # noqa: W605
-            request_method="GET",  # noqa: W605
+            r"/users/{user_id:\d+}/known_contents",
+            request_method="GET",
         )
         configurator.add_view(self.known_contents, route_name="known_contents")
 
         # set user email
         configurator.add_route(
-            "set_user_email", "/users/{user_id:\d+}/email", request_method="PUT"  # noqa: W605
-        )  # noqa: W605
+            "set_user_email", r"/users/{user_id:\d+}/email", request_method="PUT"
+        )
         configurator.add_view(self.set_user_email, route_name="set_user_email")
 
         # set user username
         configurator.add_route(
-            "set_user_username", "/users/{user_id:\d+}/username", request_method="PUT"  # noqa: W605
-        )  # noqa: W605
+            "set_user_username", r"/users/{user_id:\d+}/username", request_method="PUT"
+        )
         configurator.add_view(self.set_user_username, route_name="set_user_username")
 
         # set user password
         configurator.add_route(
-            "set_user_password", "/users/{user_id:\d+}/password", request_method="PUT"  # noqa: W605
+            "set_user_password", r"/users/{user_id:\d+}/password", request_method="PUT"
         )
         configurator.add_view(self.set_user_password, route_name="set_user_password")
 
         # set user_info
-        configurator.add_route(
-            "set_user_info", "/users/{user_id:\d+}", request_method="PUT"  # noqa: W605
-        )  # noqa: W605
+        configurator.add_route("set_user_info", r"/users/{user_id:\d+}", request_method="PUT")
         configurator.add_view(self.set_user_infos, route_name="set_user_info")
 
         # create user
@@ -1538,49 +1536,45 @@ class UserController(Controller):
         configurator.add_view(self.register_user, route_name="register_user")
 
         # enable user
-        configurator.add_route(
-            "enable_user", "/users/{user_id:\d+}/enabled", request_method="PUT"  # noqa: W605
-        )  # noqa: W605
+        configurator.add_route("enable_user", r"/users/{user_id:\d+}/enabled", request_method="PUT")
         configurator.add_view(self.enable_user, route_name="enable_user")
 
         # disable user
         configurator.add_route(
-            "disable_user", "/users/{user_id:\d+}/disabled", request_method="PUT"  # noqa: W605
+            "disable_user", r"/users/{user_id:\d+}/disabled", request_method="PUT"
         )
         configurator.add_view(self.disable_user, route_name="disable_user")
 
         # delete user
-        configurator.add_route(
-            "delete_user", "/users/{user_id:\d+}/trashed", request_method="PUT"  # noqa: W605
-        )  # noqa: W605
+        configurator.add_route("delete_user", r"/users/{user_id:\d+}/trashed", request_method="PUT")
         configurator.add_view(self.delete_user, route_name="delete_user")
 
         # undelete user
         configurator.add_route(
             "undelete_user",
-            "/users/{user_id:\d+}/trashed/restore",  # noqa: W605
-            request_method="PUT",  # noqa: W605
+            r"/users/{user_id:\d+}/trashed/restore",
+            request_method="PUT",
         )
         configurator.add_view(self.undelete_user, route_name="undelete_user")
 
         # set user profile
         configurator.add_route(
-            "set_user_profile", "/users/{user_id:\d+}/profile", request_method="PUT"  # noqa: W605
+            "set_user_profile", r"/users/{user_id:\d+}/profile", request_method="PUT"
         )
         configurator.add_view(self.set_profile, route_name="set_user_profile")
 
         # set user allowed_space
         configurator.add_route(
             "set_user_allowed_space",
-            "/users/{user_id:\d+}/allowed_space",  # noqa: W605
-            request_method="PUT",  # noqa: W605
+            r"/users/{user_id:\d+}/allowed_space",
+            request_method="PUT",
         )
         configurator.add_view(self.set_allowed_space, route_name="set_user_allowed_space")
 
         # user content
         configurator.add_route(
             "contents_read_status",
-            "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/read_status",  # noqa: W605
+            r"/users/{user_id:\d+}/workspaces/{workspace_id}/contents/read_status",
             request_method="GET",
         )
         configurator.add_view(self.contents_read_status, route_name="contents_read_status")
@@ -1588,13 +1582,13 @@ class UserController(Controller):
         # set content as read/unread
         configurator.add_route(
             "read_content",
-            "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/{content_id}/read",  # noqa: W605
+            r"/users/{user_id:\d+}/workspaces/{workspace_id}/contents/{content_id}/read",
             request_method="PUT",
         )
         configurator.add_view(self.set_content_as_read, route_name="read_content")
         configurator.add_route(
             "unread_content",
-            "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/{content_id}/unread",  # noqa: W605
+            r"/users/{user_id:\d+}/workspaces/{workspace_id}/contents/{content_id}/unread",
             request_method="PUT",
         )
         configurator.add_view(self.set_content_as_unread, route_name="unread_content")
@@ -1602,7 +1596,7 @@ class UserController(Controller):
         # set workspace as read
         configurator.add_route(
             "read_workspace",
-            "/users/{user_id:\d+}/workspaces/{workspace_id}/read",  # noqa: W605
+            r"/users/{user_id:\d+}/workspaces/{workspace_id}/read",
             request_method="PUT",
         )
         configurator.add_view(self.set_workspace_as_read, route_name="read_workspace")
@@ -1610,7 +1604,7 @@ class UserController(Controller):
         # enable workspace notification
         configurator.add_route(
             "change_space_notification",
-            "/users/{user_id:\d+}/workspaces/{workspace_id}/email_notification_type",  # noqa: W605
+            r"/users/{user_id:\d+}/workspaces/{workspace_id}/email_notification_type",
             request_method="PUT",
         )
         configurator.add_view(
@@ -1620,37 +1614,35 @@ class UserController(Controller):
         # TracimLiveMessages notification
         configurator.add_route(
             "live_messages",
-            "/users/{user_id:\d+}/live_messages",  # noqa: W605
+            r"/users/{user_id:\d+}/live_messages",
             request_method="GET",
         )
         configurator.add_view(self.open_message_stream, route_name="live_messages")
 
         # Tracim user messages
-        configurator.add_route(
-            "messages", "/users/{user_id:\d+}/messages", request_method="GET"  # noqa: W605
-        )
+        configurator.add_route("messages", r"/users/{user_id:\d+}/messages", request_method="GET")
         configurator.add_view(self.get_user_messages, route_name="messages")
 
         configurator.add_route(
             "messages_summary",
-            "/users/{user_id:\d+}/messages/summary",  # noqa: W605
-            request_method="GET",  # noqa: W605
+            r"/users/{user_id:\d+}/messages/summary",
+            request_method="GET",
         )
         configurator.add_view(self.get_user_messages_summary, route_name="messages_summary")
 
         # read a list of messages or every messages for a user
         configurator.add_route(
             "read_messages",
-            "/users/{user_id:\d+}/messages/read",  # noqa: W605
-            request_method="PUT",  # noqa: W605
+            r"/users/{user_id:\d+}/messages/read",
+            request_method="PUT",
         )
         configurator.add_view(self.set_user_messages_as_read, route_name="read_messages")
 
         # unread a list of messages or every messages for a user
         configurator.add_route(
             "unread_messages",
-            "/users/{user_id:\d+}/messages/unread",  # noqa: W605
-            request_method="PUT",  # noqa: W605
+            r"/users/{user_id:\d+}/messages/unread",
+            request_method="PUT",
         )
         configurator.add_view(self.set_user_messages_as_unread, route_name="unread_messages")
 
@@ -1658,8 +1650,8 @@ class UserController(Controller):
         # DEPRECATED - MP - 2022-09-22 - https://github.com/tracim/tracim/issues/5941
         configurator.add_route(
             "read_message",
-            "/users/{user_id:\d+}/messages/{event_id:\d+}/read",  # noqa: W605
-            request_method="PUT",  # noqa: W605
+            r"/users/{user_id:\d+}/messages/{event_id:\d+}/read",
+            request_method="PUT",
         )
         configurator.add_view(self.set_message_as_read, route_name="read_message")
 
@@ -1667,42 +1659,38 @@ class UserController(Controller):
         # DEPRECATED - MP - 2022-09-22 - https://github.com/tracim/tracim/issues/5941
         configurator.add_route(
             "unread_message",
-            "/users/{user_id:\d+}/messages/{event_id:\d+}/unread",  # noqa: W605
-            request_method="PUT",  # noqa: W605
+            r"/users/{user_id:\d+}/messages/{event_id:\d+}/unread",
+            request_method="PUT",
         )
         configurator.add_view(self.set_message_as_unread, route_name="unread_message")
 
         # User configuration
-        configurator.add_route(
-            "config_get", "/users/{user_id:\d+}/config", request_method="GET"  # noqa: W605
-        )
+        configurator.add_route("config_get", r"/users/{user_id:\d+}/config", request_method="GET")
         configurator.add_view(self.get_user_config, route_name="config_get")
 
-        configurator.add_route(
-            "config_post", "/users/{user_id:\d+}/config", request_method="PUT"  # noqa: W605
-        )
+        configurator.add_route("config_post", r"/users/{user_id:\d+}/config", request_method="PUT")
         configurator.add_view(self.set_user_config, route_name="config_post")
 
         # User custom properties
         configurator.add_route(
             "custom_properties_get",
-            "/users/{user_id:\d+}/custom-properties",  # noqa: W605
-            request_method="GET",  # noqa: W605
+            r"/users/{user_id:\d+}/custom-properties",
+            request_method="GET",
         )
         configurator.add_view(self.get_user_custom_properties, route_name="custom_properties_get")
 
         configurator.add_route(
             "custom_properties_post",
-            "/users/{user_id:\d+}/custom-properties",  # noqa: W605
-            request_method="PUT",  # noqa: W605
+            r"/users/{user_id:\d+}/custom-properties",
+            request_method="PUT",
         )
         configurator.add_view(self.set_user_custom_properties, route_name="custom_properties_post")
 
         # User accessible workspaces (not member of, but can see information about them to subscribe)
         configurator.add_route(
             "get_accessible_workspaces",
-            "/users/{user_id:\d+}/accessible_workspaces",  # noqa: W605
-            request_method="GET",  # noqa: W605
+            r"/users/{user_id:\d+}/accessible_workspaces",
+            request_method="GET",
         )
         configurator.add_view(
             self.get_accessible_workspaces, route_name="get_accessible_workspaces"
@@ -1711,102 +1699,98 @@ class UserController(Controller):
         # User subscriptions
         configurator.add_route(
             "subscriptions_get",
-            "/users/{user_id:\d+}/workspace_subscriptions",  # noqa: W605
-            request_method="GET",  # noqa: W605
+            r"/users/{user_id:\d+}/workspace_subscriptions",
+            request_method="GET",
         )
         configurator.add_view(self.user_subscriptions, route_name="subscriptions_get")
 
         configurator.add_route(
             "subscriptions_put",
-            "/users/{user_id:\d+}/workspace_subscriptions",  # noqa: W605
-            request_method="PUT",  # noqa: W605
+            r"/users/{user_id:\d+}/workspace_subscriptions",
+            request_method="PUT",
         )
         configurator.add_view(self.submit_subscription, route_name="subscriptions_put")
 
         # User following/followers
-        configurator.add_route(
-            "following", "/users/{user_id:\d+}/following", request_method="GET"  # noqa: W605
-        )
+        configurator.add_route("following", r"/users/{user_id:\d+}/following", request_method="GET")
         configurator.add_view(self.following, route_name="following")
 
         configurator.add_route(
             "create_following",
-            "/users/{user_id:\d+}/following",  # noqa: W605
-            request_method="POST",  # noqa: W605
+            r"/users/{user_id:\d+}/following",
+            request_method="POST",
         )
         configurator.add_view(self.create_following, route_name="create_following")
 
         configurator.add_route(
             "delete_following",
-            "/users/{user_id:\d+}/following/{leader_id:\d+}",  # noqa: W605
-            request_method="DELETE",  # noqa: W605
+            r"/users/{user_id:\d+}/following/{leader_id:\d+}",
+            request_method="DELETE",
         )
         configurator.add_view(self.delete_following, route_name="delete_following")
 
-        configurator.add_route(
-            "followers", "/users/{user_id:\d+}/followers", request_method="GET"  # noqa: W605
-        )
+        configurator.add_route("followers", r"/users/{user_id:\d+}/followers", request_method="GET")
         configurator.add_view(self.followers, route_name="followers")
 
         configurator.add_route(
             "about_user",
-            "/users/{user_id:\d+}/about",  # noqa: W605
-            request_method="GET",  # noqa: W605
+            r"/users/{user_id:\d+}/about",
+            request_method="GET",
         )
         configurator.add_view(self.about_user, route_name="about_user")
 
         configurator.add_route(
             "sized_preview_avatar",
-            "/users/{user_id:\d+}/avatar/preview/jpg/{width:\d+}x{height:\d+}/{filename:[^/]*}",  # noqa: W605
-            request_method="GET",  # noqa: W605
+            r"/users/{user_id:\d+}/avatar/preview/jpg/{width:\d+}x{height:\d+}/{filename:[^/]*}",
+            request_method="GET",
         )
         configurator.add_view(self.sized_preview_avatar, route_name="sized_preview_avatar")
 
         configurator.add_route(
             "get_preview_avatar",
-            "/users/{user_id:\d+}/avatar/preview/jpg/{filename:[^/]*}",  # noqa: W605
-            request_method="GET",  # noqa: W605
+            r"/users/{user_id:\d+}/avatar/preview/jpg/{filename:[^/]*}",
+            request_method="GET",
         )
         configurator.add_view(self.get_preview_avatar, route_name="get_preview_avatar")
 
         configurator.add_route(
             "get_raw_avatar",
-            "/users/{user_id:\d+}/avatar/raw/{filename:[^/]*}",  # noqa: W605
-            request_method="GET",  # noqa: W605
+            r"/users/{user_id:\d+}/avatar/raw/{filename:[^/]*}",
+            request_method="GET",
         )
         configurator.add_view(self.get_raw_avatar, route_name="get_raw_avatar")
 
         configurator.add_route(
             "put_raw_avatar",
-            "/users/{user_id:\d+}/avatar/raw/{filename:[^/]*}",  # noqa: W605
-            request_method="PUT",  # noqa: W605
+            r"/users/{user_id:\d+}/avatar/raw/{filename:[^/]*}",
+            request_method="PUT",
         )
         configurator.add_view(self.put_raw_avatar, route_name="put_raw_avatar")
 
         configurator.add_route(
             "sized_preview_cover",
-            "/users/{user_id:\d+}/cover/preview/jpg/{width:\d+}x{height:\d+}/{filename:[^/]*}",  # noqa: W605
-            request_method="GET",  # noqa: W605
+            r"/users/{user_id:\d+}/cover/preview/jpg/{width:\d+}x{height:\d+}/{filename:[^/]*}",
+            request_method="GET",
         )
         configurator.add_view(self.sized_preview_cover, route_name="sized_preview_cover")
 
         configurator.add_route(
             "get_preview_cover",
-            "/users/{user_id:\d+}/cover/preview/jpg/{filename:[^/]*}",  # noqa: W605
-            request_method="GET",  # noqa: W605
+            r"/users/{user_id:\d+}/cover/preview/jpg/{filename:[^/]*}",
+            request_method="GET",
         )
         configurator.add_view(self.get_preview_cover, route_name="get_preview_cover")
 
         configurator.add_route(
             "get_raw_cover",
-            "/users/{user_id:\d+}/cover/raw/{filename:[^/]*}",  # noqa: W605
-            request_method="GET",  # noqa: W605
+            r"/users/{user_id:\d+}/cover/raw/{filename:[^/]*}",
+            request_method="GET",
         )
         configurator.add_view(self.get_raw_cover, route_name="get_raw_cover")
 
         configurator.add_route(
             "put_raw_cover",
-            "/users/{user_id:\d+}/cover/raw/{filename:[^/]*}",  # noqa: W605
-            request_method="PUT",  # noqa: W605
+            r"/users/{user_id:\d+}/cover/raw/{filename:[^/]*}",
+            request_method="PUT",
         )
         configurator.add_view(self.put_raw_cover, route_name="put_raw_cover")

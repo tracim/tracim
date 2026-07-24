@@ -9,56 +9,34 @@ class TracimProcessor(MarshmallowProcessor):
     """
     Patched hapic processor that returns an error when dump data is not correct.
     See https://github.com/algoo/hapic/issues/211 for more info.
+
+    In Tracim 2026.07.00 for Debian 13 we have raiser marshmallow to its v3
+    In marshmallow 2, schema.dump() returned a (data, errors) namedtuple, so errors
+    had to be checked explicitly.
+    In marshmallow 3, dump() simply serializes without
+    raising, so the round-trip load() validation that was used here is no longer needed
+    (and breaks on dump_only fields in nested schemas).
     """
 
     def dump(self, data: typing.Any) -> typing.Any:
-        """
-        Use schema to validate given data and return dumped data.
-        If validation fail, raise InputValidationException
-        :param data: data to validate and dump
-        :return: dumped data
-        """
         clean_data = self.clean_data(data)
-        dump = self.schema.dump(clean_data)
-        dump_data = dump.data
-        errors = dump.errors
-        if not errors:
-            # Re-validate with dumped data
-            errors = self.schema.load(dump_data).errors
-        if errors:
-            raise ValidationException("Error when dumping: {}".format(str(errors)))
-
-        return dump_data
+        try:
+            return self.schema.dump(clean_data)
+        except Exception as e:
+            raise ValidationException("Error when dumping: {}".format(str(e)))
 
     def dump_output(self, output_data: typing.Any) -> typing.Union[typing.Dict, typing.List]:
-        """
-        Dump output data and raise OutputValidationException if validation error
-        :param output_data: output data to validate
-        :return: given data
-        """
         clean_data = self.clean_data(output_data)
-        dump = self.schema.dump(clean_data)
-        dump_data = dump.data
-        errors = dump.errors
-        if not errors:
-            # Re-validate with dumped data
-            errors = self.schema.load(dump_data).errors
-        if errors:
-            raise OutputValidationException("Error when validate input: {}".format(str(errors)))
-
-        return dump_data
+        try:
+            return self.schema.dump(clean_data)
+        except Exception as e:
+            raise OutputValidationException("Error when validate input: {}".format(str(e)))
 
     def get_output_validation_error(self, data_to_validate: typing.Any) -> ProcessValidationError:
-        """
-        Return ProcessValidationError for given output data
-        :param data_to_validate: output data to use
-        :return: ProcessValidationError instance for given output data
-        """
         clean_data = self.clean_data(data_to_validate)
-        dump = self.schema.dump(clean_data)
-        dump_data = dump.data
-        errors = dump.errors
-        if not errors:
-            # Re-validate with dumped data
-            errors = self.schema.load(dump_data).errors
+        errors = {}
+        try:
+            self.schema.dump(clean_data)
+        except Exception as e:
+            errors = {"_schema": [str(e)]}
         return ProcessValidationError(message="Validation error of output data", details=errors)
