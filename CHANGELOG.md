@@ -6,6 +6,7 @@
 
 - Show the template badge in search results
 - Show the favorite icon in the content list
+- Kanban: new fields in cards related to future Gantt integration
 
 ### 🐛 Fixed Issues
 
