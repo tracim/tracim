@@ -56,5 +56,16 @@
   "Due date": "Due date",
   "Title": "Title",
   "Open field": "Open field",
-  "Assignment": "Assignment"
+  "Assignment": "Assignment",
+  "Progress:": "Progress:",
+  "day": "day",
+  "days": "days",
+  "{{count}} day": "{{count}} day",
+  "{{count}} days": "{{count}} days",
+  "Depends on:": "Depends on:",
+  "Duration:": "Duration:",
+  "Finished": "Finished",
+  "Mark the card as finished": "Mark the card as finished",
+  "No card": "No card",
+  "Reopen the card": "Reopen the card"
 }

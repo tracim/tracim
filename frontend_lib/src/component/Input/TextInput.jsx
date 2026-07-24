@@ -29,6 +29,9 @@ export class TextInput extends React.Component {
           value={props.value}
           data-cy='textInputComponent__text'
         />
+        {props.suffix && (
+          <span className='textInputComponent__suffix'>{props.suffix}</span>
+        )}
         {props.icon && (
           <i className={`fas fa-fw fa-${props.icon} textInputComponent__icon`} />
         )}
@@ -47,7 +50,8 @@ TextInput.propTypes = {
   disabled: PropTypes.bool,
   placeholder: PropTypes.string,
   customClass: PropTypes.string,
-  icon: PropTypes.string
+  icon: PropTypes.string,
+  suffix: PropTypes.string
 }
 
 TextInput.defaultProps = {
@@ -58,7 +62,8 @@ TextInput.defaultProps = {
   disabled: false,
   placeholder: undefined,
   customClass: '',
-  icon: undefined
+  icon: undefined,
+  suffix: undefined
 }
 
 export default TextInput

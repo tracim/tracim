@@ -56,7 +56,11 @@ function KanbanCardEditor (props) {
       bgColor: null,
       kickoff: null,
       deadline: null,
-      freeInput: null
+      freeInput: null,
+      duration: null,
+      progress: null,
+      depends: null,
+      finished: null
     }
   }, [])
 
@@ -67,10 +71,14 @@ function KanbanCardEditor (props) {
   const [kickoff, setKickoff] = useState(cardFromLocalStorage.kickoff || card.kickoff || '')
   const [deadline, setDeadline] = useState(cardFromLocalStorage.deadline || card.deadline || '')
   const [freeInput, setFreeInput] = useState(cardFromLocalStorage.freeInput || card.freeInput || '')
+  const [duration, setDuration] = useState(cardFromLocalStorage.duration || card.duration || '1')
+  const [progress, setProgress] = useState(cardFromLocalStorage.progress || card.progress || '0')
+  const [depends, setDepends] = useState(cardFromLocalStorage.depends || card.depends || [])
+  const [finished, setFinished] = useState(cardFromLocalStorage.finished || card.finished || false)
 
   useEffect(() => {
     const kanbanCardDataJson = JSON.stringify({
-      title, description, assignmentList, bgColor, kickoff, deadline, freeInput
+      title, description, assignmentList, bgColor, kickoff, deadline, freeInput, duration, progress, depends, finished
     })
 
     setLocalStorageItem(
@@ -80,7 +88,7 @@ function KanbanCardEditor (props) {
       localStorageFieldIdBuilder(props.card.id),
       kanbanCardDataJson
     )
-  }, [title, description, assignmentList, bgColor, kickoff, deadline, freeInput])
+  }, [title, description, assignmentList, bgColor, kickoff, deadline, freeInput, duration, progress, depends, finished])
 
   async function handleValidate (e) {
     e.preventDefault()
@@ -95,12 +103,25 @@ function KanbanCardEditor (props) {
       bgColor,
       kickoff,
       deadline,
-      freeInput
+      freeInput,
+      duration,
+      progress,
+      depends,
+      finished
     })
   }
 
   function handleChangeSelectAssignment (newAssignmentList) {
     setAssignmentList(newAssignmentList?.map(a => a.id) || [])
+  }
+
+  function handleChangeSelectDepends (newDependsList) {
+    setDepends(newDependsList?.map(a => a.id) || [])
+  }
+
+  function handleFinishedTask (e) {
+    e.preventDefault()
+    setFinished(!finished)
   }
 
   const assignmentOptionList = props.memberList.map(m => ({
@@ -112,6 +133,17 @@ function KanbanCardEditor (props) {
 
   const selectedAssignmentOptionList = assignmentOptionList
     .filter(m => assignmentList.some(a => Number(a) === Number(m.id)))
+
+  const dependsOptionList = props.cardList
+    .filter(c => c.id !== card.id)
+    .map(m => ({
+      ...m,
+      value: m.id,
+      label: m.title
+    }))
+
+  const selectedDependsOptionList = dependsOptionList
+    .filter(m => depends.some(a => a === m.id))
 
   return (
     <form className='kanban__KanbanPopup__form' onSubmit={handleValidate}>
@@ -161,30 +193,97 @@ function KanbanCardEditor (props) {
         </div>
 
         <div className='kanban__KanbanPopup__inline'>
-          <div className='kanban__KanbanPopup__kickoff inlineInput'>
-            <label htmlFor='kanban__KanbanPopup__kickoff'>{props.t('Start date:')}</label>
+          <div className='kanban__KanbanPopup__inline__column'>
+            <div className='kanban__KanbanPopup__kickoff inlineInput'>
+              <label htmlFor='kanban__KanbanPopup__kickoff'>{props.t('Start date:')}</label>
 
-            <DateInput
-              id='kanban__KanbanPopup__kickoff'
-              onChange={(e) => setKickoff(e.target.value)}
-              onValidate={handleValidate}
-              value={kickoff}
-            />
+              <DateInput
+                id='kanban__KanbanPopup__kickoff'
+                onChange={(e) => setKickoff(e.target.value)}
+                onValidate={handleValidate}
+                value={kickoff}
+              />
+            </div>
+
+            <div className='kanban__KanbanPopup__deadline inlineInput'>
+              <label htmlFor='kanban__KanbanPopup__deadline'>{props.t('Due date:')}</label>
+
+              <DateInput
+                id='kanban__KanbanPopup__deadline'
+                onChange={(e) => setDeadline(e.target.value)}
+                onValidate={handleValidate}
+                value={deadline}
+              />
+            </div>
           </div>
 
-          <div className='kanban__KanbanPopup__deadline inlineInput'>
-            <label htmlFor='kanban__KanbanPopup__deadline'>{props.t('Due date:')}</label>
+          <div className='kanban__KanbanPopup__inline__column'>
+            <div className='kanban__KanbanPopup__duration inlineInput'>
+              <label htmlFor='kanban__KanbanPopup__duration'>{props.t('Duration:')}</label>
 
-            <DateInput
-              id='kanban__KanbanPopup__deadline'
-              onChange={(e) => setDeadline(e.target.value)}
-              onValidate={handleValidate}
-              value={deadline}
-            />
+              <TextInput
+                id='kanban__KanbanPopup__duration'
+                inputClassName='number'
+                onChange={(e) => setDuration(e.target.value)}
+                value={duration}
+                suffix={duration > 1 ? props.t('days') : props.t('day')}
+              />
+            </div>
+
+            <div className='kanban__KanbanPopup__progress inlineInput'>
+              <label htmlFor='kanban__KanbanPopup__progress'>{props.t('Progress:')}</label>
+
+              <TextInput
+                id='kanban__KanbanPopup__progress'
+                inputClassName='number'
+                onChange={(e) => setProgress(e.target.value)}
+                value={finished ? '100' : progress}
+                disabled={finished}
+                suffix='%'
+              />
+
+              {finished ? (
+                <div className='kanban__KanbanPopup__revert'>
+                  <span>{props.t('Reopen')}</span>
+                  <IconButton
+                    customClass='kanban__KanbanPopup__revert__button'
+                    color={props.customColor}
+                    icon='fas fa-pen'
+                    onClick={handleFinishedTask}
+                    title={props.t('Reopen the card')}
+                  />
+                </div>
+              ) : (
+                <IconButton
+                  color={props.customColor}
+                  customClass='kanban__KanbanPopup__finished'
+                  icon='fas fa-check'
+                  onClick={handleFinishedTask}
+                  text={props.t('Finished')}
+                  title={props.t('Mark the card as finished')}
+                />
+              )}
+            </div>
           </div>
+        </div>
 
-          <div className='linebreak' />
+        <div className='kanban__KanbanPopup__depends inlineInput'>
+          <label htmlFor='kanban__KanbanPopup__depends'>{props.t('Depends on:')}</label>
 
+          <Select
+            id='kanban__KanbanPopup__depends'
+            className='kanban__KanbanPopup__depends__select select'
+            isSearchable
+            placeholder={props.t('No card')}
+            onChange={handleChangeSelectDepends}
+            options={dependsOptionList}
+            noOptionsMessage={() => props.t('No card')}
+            defaultValue={selectedDependsOptionList}
+            isMulti
+          />
+        </div>
+
+        <div className='kanban__KanbanPopup__inline'>
           <div className='kanban__KanbanPopup__bgColor'>
             <input
               id='kanban__KanbanPopup__bgColor'

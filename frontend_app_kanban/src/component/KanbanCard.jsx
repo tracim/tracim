@@ -47,6 +47,11 @@ function KanbanCard (props) {
   const showKickoff = props.card.kickoff && props.card.kickoff !== ''
   const showDeadline = props.card.deadline && props.card.deadline !== ''
 
+  const numberDays = (count) => {
+    if (count > 1) return props.t('{{count}} days', { count })
+    else return props.t('{{count}} day', { count })
+  }
+
   return (
     <div
       style={{ backgroundColor: props.card.bgColor || props.customColor }}
@@ -182,6 +187,37 @@ function KanbanCard (props) {
           </div>
         </div>
 
+        <div className='kanban__contentpage__wrapper__board__card__options__advancement'>
+          {props.card.progress?.length > 0 && (
+            <div className='kanban__contentpage__wrapper__board__card__options__advancement__progress'>
+              <Icon icon='far fa-chart-bar' />
+              {props.card.finished ? '100%' : `${props.card.progress}%`}
+            </div>
+          )}
+          {props.card.duration?.length > 0 && (
+            <div className='kanban__contentpage__wrapper__board__card__options__advancement__duration'>
+              <Icon icon='far fa-calendar-alt' />
+              {numberDays(parseInt(props.card.duration))}
+            </div>
+          )}
+        </div>
+
+        {props.card.depends?.length > 0 && (
+          <div className='kanban__contentpage__wrapper__board__card__options__depends'>
+            <ul>
+              {props.card.depends.map(dependId => {
+                const dependCard = props.cardList[dependId]
+                return (
+                  <li key={dependId} title={dependCard.title}>
+                    <div style={{ backgroundColor: dependCard.bgColor }} />
+                    <span>{dependCard.title}</span>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        )}
+
         <div className='kanban__contentpage__wrapper__board__card__options__freeInput'>
           {props.card.freeInput}
         </div>
@@ -217,11 +253,13 @@ KanbanCard.propTypes = {
   card: PropTypes.object.isRequired,
   onEditCard: PropTypes.func.isRequired,
   onRemoveCard: PropTypes.func.isRequired,
+  cardList: PropTypes.object,
   customColor: PropTypes.string,
   readOnly: PropTypes.bool
 }
 
 KanbanCard.defaultProps = {
+  cardList: {},
   customColor: '',
   readOnly: false
 }
