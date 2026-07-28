@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026.07.01
+
+### 🐛 Fixed Issues
+
+- Fix error when using "Download as PDF" action since 2026.07.00 [#6888](https://github.com/tracim/tracim/issues/6888)
+
+
 ## 2026.07.00
 
 ### ✨ New Features

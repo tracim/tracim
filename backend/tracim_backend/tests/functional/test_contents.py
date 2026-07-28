@@ -1337,7 +1337,7 @@ class TestHtmlDocuments(object):
                 test_html_document, "test_page", new_raw_content=content_raw_data
             )
         transaction.commit()
-        params = {"force_download": 1}
+        params = {"force_download": 1, "revision_id": test_html_document.revision_id}
         web_testapp.authorization = (
             "Basic",
             ("admin@admin.admin", "admin@admin.admin"),
