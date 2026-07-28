@@ -5,7 +5,7 @@
 ### 🐛 Fixed Issues
 
 - Fix error when using "Download as PDF" action since 2026.07.00 [#6888](https://github.com/tracim/tracim/issues/6888)
-- Fix UserConnectionStateMonitor that was failing cause to `Enum.__format__()` change in Python 3.11
+- Fix UserConnectionStateMonitor that was failing cause to `Enum.__format__()` change in Python 3.11 [#6865](https://github.com/tracim/tracim/issues/6865)
 
 
 ## 2026.07.00
