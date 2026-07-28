@@ -607,7 +607,7 @@ class FileQuery(object):
     File query model
     """
 
-    def __init__(self, force_download: int = 0, revision_id: int = None) -> None:
+    def __init__(self, force_download: int = 0, revision_id: int | None = None) -> None:
         self.force_download = force_download
         self.revision_id = revision_id
 
@@ -617,7 +617,9 @@ class PageQuery(object):
     Page query model
     """
 
-    def __init__(self, force_download: int = 0, page: int = 1, revision_id: int = None) -> None:
+    def __init__(
+        self, force_download: int = 0, page: int = 1, revision_id: int | None = None
+    ) -> None:
         self.force_download = force_download
         self.page = page
         self.revision_id = revision_id
@@ -855,7 +857,7 @@ class TranslationQuery:
         source_language_code: str,
         target_language_code: str,
         force_download: int = 0,
-        revision_id: int = None,
+        revision_id: int | None = None,
     ):
         self.source_language_code = source_language_code
         self.target_language_code = target_language_code
