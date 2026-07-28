@@ -6,6 +6,10 @@
 
 - Fix error when using "Download as PDF" action since 2026.07.00 [#6888](https://github.com/tracim/tracim/issues/6888)
 
+### Other changes
+
+- Update setup.py to match requirements*.txt files
+
 
 ## 2026.07.00
 
