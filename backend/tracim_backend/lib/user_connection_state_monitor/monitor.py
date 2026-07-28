@@ -74,7 +74,7 @@ class UserConnectionStateMonitor:
         transaction.commit()
         logger.debug(
             self,
-            "Set connection status of user {} to {}".format(user_id or "*", status),
+            "Set connection status of user {} to {}".format(user_id or "*", status.value),
         )
 
     def add_to_pending_offline_users(self, user_id: int) -> None:
