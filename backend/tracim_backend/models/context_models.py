@@ -607,8 +607,11 @@ class FileQuery(object):
     File query model
     """
 
-    def __init__(self, force_download: int = 0) -> None:
+    def __init__(self, force_download: int = 0, revision_id: int = None) -> None:
         self.force_download = force_download
+        # INFO - revision_id is only used by clients as a cache-busting value, it is not
+        # used server-side.
+        self.revision_id = revision_id
 
 
 class PageQuery(object):
@@ -616,9 +619,12 @@ class PageQuery(object):
     Page query model
     """
 
-    def __init__(self, force_download: int = 0, page: int = 1) -> None:
+    def __init__(self, force_download: int = 0, page: int = 1, revision_id: int = None) -> None:
         self.force_download = force_download
         self.page = page
+        # INFO - revision_id is only used by clients as a cache-busting value, it is not
+        # used server-side.
+        self.revision_id = revision_id
 
 
 class ContentFilter(object):
@@ -853,10 +859,14 @@ class TranslationQuery:
         source_language_code: str,
         target_language_code: str,
         force_download: int = 0,
+        revision_id: int = None,
     ):
         self.source_language_code = source_language_code
         self.target_language_code = target_language_code
         self.force_download = force_download
+        # INFO - revision_id is only used by clients as a cache-busting value, it is not
+        # used server-side.
+        self.revision_id = revision_id
 
 
 class LiveMessageQuery(BasePaginatedQuery):

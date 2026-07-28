@@ -1244,6 +1244,15 @@ class FileQuerySchema(marshmallow.Schema):
         },
         validate=bool_as_int_validator,
     )
+    revision_id = marshmallow.fields.Int(
+        dump_default=None,
+        metadata={
+            "example": 42,
+            "description": "Ignored by the server. Clients may set it to the current "
+            "revision id so the URL changes whenever the revision does, preventing the "
+            "browser from serving a stale cached response.",
+        },
+    )
 
     @post_load
     def make_query(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
