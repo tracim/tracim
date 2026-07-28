@@ -609,8 +609,6 @@ class FileQuery(object):
 
     def __init__(self, force_download: int = 0, revision_id: int = None) -> None:
         self.force_download = force_download
-        # INFO - PGO - 2026-07-28 - clients only use revision_id as a cache-busting value, it is not
-        # used server-side.
         self.revision_id = revision_id
 
 
@@ -622,8 +620,6 @@ class PageQuery(object):
     def __init__(self, force_download: int = 0, page: int = 1, revision_id: int = None) -> None:
         self.force_download = force_download
         self.page = page
-        # INFO - PGO - 2026-07-28 - clients only use revision_id as a cache-busting value, it is not
-        # used server-side.
         self.revision_id = revision_id
 
 
@@ -864,8 +860,6 @@ class TranslationQuery:
         self.source_language_code = source_language_code
         self.target_language_code = target_language_code
         self.force_download = force_download
-        # INFO - PGO - 2026-07-28 - clients only use revision_id as a cache-busting value, it is not
-        # used server-side.
         self.revision_id = revision_id
 
 
