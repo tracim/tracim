@@ -7,7 +7,7 @@ requires = [
     "plaster_pastedeploy",
     "pyramid>=2.0.0",
     "pyramid_debugtoolbar",
-    "waitress>=2.1.1",
+    "waitress>=2.1.2",
     # Database
     "pyramid_tm",
     "SQLAlchemy<1.4.0",
@@ -16,7 +16,7 @@ requires = [
     "alembic",
     "sqlakeyset",
     # API
-    "hapic[marshmallow]>=0.83",
+    "hapic[marshmallow]>=1.0",
     # INFO - G.M - 2019-03-21 - this is needed as there is a requirement issue
     # in hapic, apispec-marshmallow-advanced==0.3
     # and hapic==0.73 aren't compatible
@@ -27,7 +27,7 @@ requires = [
     "cliff",
     # Webdav
     "wsgidav==4.2.0",
-    "Pyyaml>=6.0.1",
+    "Pyyaml>=6.0.2",
     # others
     "filedepot>=0.8.0",
     "babel",
@@ -38,14 +38,14 @@ requires = [
     "gitpython",
     # mail-notifier
     "mako",
-    "lxml>=4.8.0",
+    "lxml>=5.3.0",
     "redis==4.6.0",
     "rq>=1.9.0",
     "html2text",
     # mail-fetcher
     "markdown",
     "email_reply_parser",
-    "filelock<4,>=3.12.2",
+    "filelock<4,>=3.14.0",
     "imapclient",
     "beautifulsoup4",
     # beaker 1.11 is broken: fix does exist but no new release since:
@@ -62,7 +62,7 @@ requires = [
     "Babel",
     "requests",
     # caldav support
-    "radicale>=3.2.0",
+    "radicale>=3.5.7",
     "caldav",
     # search support
     "elasticsearch",
@@ -76,7 +76,7 @@ requires = [
     # live message
     "gripcontrol",
     "tnetstring3",
-    "pyzmq>=25.1.2",
+    "pyzmq>=26.2.0",
     "jsonschema",
     # INFO - G.M - 2022-02-28 - Use algoo fork of webpreview for now:
     "webpreview @ git+https://github.com/algoo/webpreview@v1.6.0+algoo",
@@ -88,7 +88,7 @@ requires = [
 ]
 
 tests_require = [
-    "WebTest >= 1.3.1",  # py3 compat
+    "WebTest >= 2.0.35",  # py3 compat
     "pytest",
     "pytest-dotenv",
     "pytest-pyramid-server",
@@ -97,9 +97,7 @@ tests_require = [
     "responses",
     "mock",
     "Pillow",
-    # INFO - G.M - 2020-01-14 - static version of freezeguh due to regression
-    # with webtest, see https://github.com/spulec/freezegun/issues/326
-    "freezegun==0.3.12",
+    "freezegun>=1.5.2",
     "sseclient-py",
 ]
 
