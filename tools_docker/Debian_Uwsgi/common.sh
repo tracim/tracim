@@ -143,7 +143,7 @@ if [ ! -d /etc/tracim/custom_toolbox ]; then
     mkdir /etc/tracim/custom_toolbox -p
 fi
 
-# Create folder and logs file
+# Create folder and logs file (first install)
 if [ ! -d /var/tracim/logs ]; then
     mkdir /var/tracim/logs -p
     mkdir /var/tracim/logs/redis -p
@@ -159,6 +159,7 @@ if [ ! -d /var/tracim/logs ]; then
     touch /var/tracim/logs/supervisord.log
     touch /var/tracim/logs/redis/redis-server.log
     touch /var/tracim/logs/pushpin/access_7999.log
+    touch /var/tracim/logs/pushpin/connmgr.log
     touch /var/tracim/logs/pushpin/error_7999.log
     touch /var/tracim/logs/pushpin/m2adapter.log
     touch /var/tracim/logs/pushpin/mongrel2_7999.log
@@ -169,17 +170,18 @@ if [ ! -d /var/tracim/logs ]; then
     chmod 775 -R /var/tracim/logs
 fi
 
-# Create log folder for Pushpin (necessary when migrate from Tracim < 3.0.0 )
+# Create log folder for Redis (necessary when migrate from Tracim < 3.0.0 )
 if [ ! -d /var/tracim/logs/redis ]; then
     mkdir /var/tracim/logs/redis -p
     touch /var/tracim/logs/redis/redis-server.log
     chown www-data:www-data -R /var/tracim/logs/redis
     chmod 775 -R /var/tracim/logs/redis
 fi
-# Create log folder for Redis (necessary when migrate from Tracim < 3.0.0 )
+# Create log folder for Pushpin (necessary when migrate from Tracim < 3.0.0 )
 if [ ! -d /var/tracim/logs/pushpin ]; then
     mkdir /var/tracim/logs/pushpin -p
     touch /var/tracim/logs/pushpin/access_7999.log
+    touch /var/tracim/logs/pushpin/connmgr.log
     touch /var/tracim/logs/pushpin/error_7999.log
     touch /var/tracim/logs/pushpin/m2adapter.log
     touch /var/tracim/logs/pushpin/mongrel2_7999.log
@@ -188,7 +190,17 @@ if [ ! -d /var/tracim/logs/pushpin ]; then
     chown www-data:www-data -R /var/tracim/logs/pushpin
     chmod 775 -R /var/tracim/logs/pushpin
 fi
-# Create symbollic link to easy find log in container folder
+# Update new pushpin log file since Tracim 2026.07.00 (#6859)
+# NOTE: checks ownership (not just existence) since containers upgraded from
+# before the connmgr migration may already have this file with the wrong
+# owner/permissions, which silently breaks pushpin-connmgr on startup.
+if [ ! -f /var/tracim/logs/pushpin/connmgr.log ] || [ "$(stat -c '%U:%G' /var/tracim/logs/pushpin/connmgr.log)" != "www-data:www-data" ]; then
+    touch /var/tracim/logs/pushpin/connmgr.log
+    chown www-data:www-data /var/tracim/logs/pushpin/connmgr.log
+    chmod 775 /var/tracim/logs/pushpin/connmgr.log
+fi
+
+# Create symbolic link to easy find log in container folder
 # create_symlink_if_not_exist
 create_log_symlink /var/tracim/logs/tracim_web.log /var/log/uwsgi/app/tracim_web.log
 create_log_symlink /var/tracim/logs/tracim_webdav.log /var/log/uwsgi/app/tracim_webdav.log
