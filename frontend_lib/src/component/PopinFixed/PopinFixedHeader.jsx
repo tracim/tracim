@@ -252,6 +252,19 @@ export const PopinFixedHeader = (props) => {
                   </a>
                 )
               }
+              if (action.to) {
+                return (
+                  <Link
+                    title={action.label}
+                    to={action.to}
+                    key={action.label}
+                    dataCy={action.dataCy}
+                  >
+                    <i className={`fa-fw ${action.icon}`} />
+                    {action.label}
+                  </Link>
+                )
+              }
               return (
                 <IconButton
                   disabled={action.disabled}
