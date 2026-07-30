@@ -4,7 +4,7 @@
 
 ### 🐛 Fixed Issues
 
-- Fix 2026.07.00 regression: "Tracim has a connection problem" error after container restart caused by `/var/tracim/logs/pushpin/connmgr.log` wrong perms & owner
+- Fix 2026.07.00 regression: "Tracim has a connection problem" error after container restart caused by `/var/tracim/logs/pushpin/connmgr.log` wrong perms & owner [#6891](https://github.com/tracim/tracim/issues/6891)
 
 
 ## 2026.07.01
