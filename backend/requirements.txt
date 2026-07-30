@@ -23,7 +23,7 @@ attrs==21.4.0
     #   jsonschema
 babel==2.9.1
     # via tracim_backend (setup.py)
-beaker @ git+https://github.com/algoo/beaker.git
+beaker==1.13.0
     # via
     #   pyramid-beaker
     #   tracim_backend (setup.py)
