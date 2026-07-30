@@ -7475,6 +7475,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"frappe-gantt@npm:^1.0.3":
+  version: 1.2.2
+  resolution: "frappe-gantt@npm:1.2.2"
+  checksum: ea0686501817e97bafb854ec57a41c5325bd64caf5b12c6851fe831b8ae43d46629e17c9ca59faaf64f5d8b75a3fcabf703777c8d5118aa73516e7369b34e82d
+  languageName: node
+  linkType: hard
+
 "fresh@npm:0.5.2":
   version: 0.5.2
   resolution: "fresh@npm:0.5.2"
@@ -15572,6 +15579,7 @@ __metadata:
     eslint: ^6.8.0
     eslint-import-resolver-node: ^0.3.3
     file-loader: ^6.0.0
+    frappe-gantt: ^1.0.3
     i18next: 10.5.0
     i18next-scanner: 4.4.0
     ignore-styles: ^5.0.1
