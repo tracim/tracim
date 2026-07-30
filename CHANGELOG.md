@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026.10.00
+
+### Other changes
+
+- Update to Open Calendar 0.9.5
+
+
 ## 2026.07.02
 
 ### 🐛 Fixed Issues

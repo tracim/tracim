@@ -11314,9 +11314,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"open-dav-calendar@npm:0.9.4":
-  version: 0.9.4
-  resolution: "open-dav-calendar@npm:0.9.4"
+"open-dav-calendar@npm:0.9.5":
+  version: 0.9.5
+  resolution: "open-dav-calendar@npm:0.9.5"
   dependencies:
     "@event-calendar/core": ^4.4.0
     "@fortawesome/fontawesome-svg-core": ^6.7.2
@@ -11329,7 +11329,7 @@ __metadata:
     timezones-ical-library: ^1.10.0
     ts-ics: ^2.1.8
     tsdav: ^2.1.4
-  checksum: 4f8672344562f2d9ae98ba79f64774f7be313995906f75124abf8c3fc19dad95e020824e9d2cd59c5f864dc49a2a3a593a6e442ca77f719af4ffc8dee7e3ae57
+  checksum: 8eea08f90899bbd50c15f8a9a64062d4dbce83026b2c326d32744c9be80ba114e40f33b08273accc6bd8d33fd121ea711b6273736cd569be4056409dfa12bb05
   languageName: node
   linkType: hard
 
@@ -15182,7 +15182,7 @@ __metadata:
     ignore-styles: ^5.0.1
     jsdom: ^15.1.1
     mocha: ^9.2.2
-    open-dav-calendar: 0.9.4
+    open-dav-calendar: 0.9.5
     pnp-webpack-plugin: ^1.6.4
     prop-types: ^15.7.2
     react: ^16.13.1
