@@ -49,7 +49,7 @@ requires = [
     "imapclient",
     "beautifulsoup4",
     # beaker: we need at least a version including Redis cluster support (see #6412)
-    "beaker==1.13.0",
+    "beaker>=1.13.0",
     "pyramid_beaker",
     "pyramid_ldap3",
     # frontend file serve
