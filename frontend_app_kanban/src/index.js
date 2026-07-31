@@ -32,11 +32,11 @@ const appInterface = {
           <Route exact path={PAGE.WORKSPACE.KANBAN()}>
             <Kanban data={data} />
           </Route>
-        {data.config.ganttEnabled && (
-          <Route exact path={PAGE.WORKSPACE.KANBAN_GANTT()}>
-            <KanbanGantt data={data} />
-          </Route>
-        )}
+          {data.config.ganttEnabled && (
+            <Route exact path={PAGE.WORKSPACE.KANBAN_GANTT()}>
+              <KanbanGantt data={data} />
+            </Route>
+          )}
         </div>
       </Router>
       , element
