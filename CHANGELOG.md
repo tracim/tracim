@@ -5,6 +5,7 @@
 ### Other changes
 
 - Update to Open Calendar 0.9.5
+- Switch back beaker Python dependency from Algoo fork to official version 1.14.1 [#6893](https://github.com/tracim/tracim/pull/6893)
 
 
 ## 2026.07.03
