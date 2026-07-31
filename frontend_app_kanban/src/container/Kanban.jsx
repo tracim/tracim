@@ -708,6 +708,12 @@ export class Kanban extends React.Component {
         <PopinFixedContent
           actionList={[
             {
+              icon: 'fas fa-tasks',
+              label: props.t('Show Gantt view'),
+              to: PAGE.WORKSPACE.KANBAN_GANTT(state.content.workspace_id, state.content.content_id),
+              showAction: state.config.ganttEnabled,
+              dataCy: 'popinListItem__ganttView'
+            }, {
               icon: 'fas fa-link',
               label: props.t('Copy content link'),
               onClick: this.handleClickCopyLink,

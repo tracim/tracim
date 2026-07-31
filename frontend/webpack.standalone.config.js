@@ -1,4 +1,6 @@
 const path = require('path')
+const { EnvironmentPlugin } = require('webpack')
+
 const isProduction = process.env.NODE_ENV === 'production'
 
 module.exports = {
@@ -75,10 +77,6 @@ module.exports = {
     extensions: ['.js', '.jsx']
   },
   plugins: [
-    ...[], // generic plugins always present
-    ...(isProduction
-      ? [] // production specific plugins
-      : [] // development specific plugins
-    )
+    new EnvironmentPlugin({'TRACIM_GANTT_ENABLED': false})
   ]
 }

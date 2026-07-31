@@ -3,8 +3,10 @@ import ReactDOM from 'react-dom'
 import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import Kanban from './container/Kanban.jsx'
+import KanbanGantt from './container/KanbanGantt.jsx'
 import PopupCreateKanban from './container/PopupCreateKanban.jsx'
-import { Router } from 'react-router-dom'
+import { PAGE } from 'tracim_frontend_lib'
+import { Router, Route } from 'react-router-dom'
 
 require('./css/index.styl')
 
@@ -26,7 +28,16 @@ const appInterface = {
     }
     return ReactDOM.render(
       <Router history={data.config.history}>
-        <Kanban data={data} />
+        <div>
+          <Route exact path={PAGE.WORKSPACE.KANBAN()}>
+            <Kanban data={data} />
+          </Route>
+        {data.config.ganttEnabled && (
+          <Route exact path={PAGE.WORKSPACE.KANBAN_GANTT()}>
+            <KanbanGantt data={data} />
+          </Route>
+        )}
+        </div>
       </Router>
       , element
     )

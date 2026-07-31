@@ -23,7 +23,8 @@ export function appFactory (WrappedComponent) {
         roleList: ROLE_LIST,
         profileObject: PROFILE,
         history: this.props.history,
-        appCustomActionList: this.props.system.config?.app_custom_actions || []
+        appCustomActionList: this.props.system.config?.app_custom_actions || [],
+        ganttEnabled: FETCH_CONFIG.ganttEnabled
       },
       content
     })
@@ -41,7 +42,8 @@ export function appFactory (WrappedComponent) {
         system: this.props.system,
         roleList: ROLE_LIST,
         profileObject: PROFILE,
-        history: this.props.history
+        history: this.props.history,
+        ganttEnabled: FETCH_CONFIG.ganttEnabled
       },
       content
     })
@@ -58,7 +60,8 @@ export function appFactory (WrappedComponent) {
         roleList: ROLE_LIST,
         profileObject: PROFILE,
         history: this.props.history,
-        PAGE: PAGE
+        PAGE: PAGE,
+        ganttEnabled: FETCH_CONFIG.ganttEnabled
       },
       workspaceId,
       folderId: folderId === 'null' ? null : folderId
