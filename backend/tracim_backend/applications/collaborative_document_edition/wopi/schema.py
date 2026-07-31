@@ -27,6 +27,13 @@ class WOPITokenQuerySchema(marshmallow.Schema):
     access_token = marshmallow.fields.String(
         required=True, metadata={"description": "Access token which uniquely identifies a user"}
     )
+    access_token_ttl = marshmallow.fields.Integer(
+        required=False,
+        metadata={
+            "description": "Expiration of the access token, in milliseconds since January 1, 1970 "
+            "UTC. 0 means the expiration time is unknown."
+        },
+    )
 
 
 class WOPICheckFileInfoSchema(marshmallow.Schema):
