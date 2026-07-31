@@ -7,6 +7,13 @@
 - Update to Open Calendar 0.9.5
 
 
+## 2026.07.03
+
+### 🐛 Fixed Issues
+
+- Fix 2026.07.00 regression: cannot edit office files with Collabora anymore [#6895](https://github.com/tracim/tracim/issues/6895)
+
+
 ## 2026.07.02
 
 ### 🐛 Fixed Issues
