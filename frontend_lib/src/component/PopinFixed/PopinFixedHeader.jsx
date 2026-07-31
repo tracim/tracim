@@ -260,8 +260,9 @@ export const PopinFixedHeader = (props) => {
                     key={action.label}
                     dataCy={action.dataCy}
                   >
-                    <i className={`fa-fw ${action.icon}`} />
-                    {action.label}
+                    <i className={`fa-fw ${action.icon} iconbutton__icon`} />
+                    <span className='iconbutton__text_with_icon iconbutton__label'>{action.label}</span>
+                    <span className='iconbutton__text_with_icon iconbutton__label-mobile'>{action.label}</span>
                   </Link>
                 )
               }
