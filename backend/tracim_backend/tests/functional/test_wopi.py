@@ -59,7 +59,9 @@ class TestWOPI(object):
 
         access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
         transaction.commit()
-        query_param = {"access_token": access_token}
+        # INFO - PGO - 2026-07-31 - Collabora always adds access_token_ttl to its WOPI requests,
+        # even when Tracim does not provide it when building the editor iframe url - see #6895
+        query_param = {"access_token": access_token, "access_token_ttl": "0"}
         url = "/api/collaborative-document-edition/wopi/files/{}/contents".format(
             test_file.content_id
         )
@@ -106,7 +108,9 @@ class TestWOPI(object):
             )
         access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
         transaction.commit()
-        query_param = {"access_token": access_token}
+        # INFO - 2026-07-31 - Collabora always adds access_token_ttl to its WOPI requests,
+        # even when Tracim does not provide it when building the editor iframe url.
+        query_param = {"access_token": access_token, "access_token_ttl": "0"}
         url = "/api/collaborative-document-edition/wopi/files/{}".format(test_file.content_id)
         res = web_testapp.get(url, status=200, params=query_param)
         response = res.json_body
@@ -165,10 +169,8 @@ class TestWOPI(object):
         with freeze_time("2000-01-01 00:00:05"):
             access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
             transaction.commit()
-            url = (
-                "/api/collaborative-document-edition/wopi/files/{}/contents?access_token={}".format(
-                    test_file.content_id, quote(access_token)
-                )
+            url = "/api/collaborative-document-edition/wopi/files/{}/contents?access_token={}&access_token_ttl=0".format(
+                test_file.content_id, quote(access_token)
             )
             updated_at = test_file.updated
             new_content = b"content has been modified"
@@ -231,10 +233,8 @@ class TestWOPI(object):
         with freeze_time("2000-01-01 00:00:05"):
             access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
             transaction.commit()
-            url = (
-                "/api/collaborative-document-edition/wopi/files/{}/contents?access_token={}".format(
-                    test_file.content_id, quote(access_token)
-                )
+            url = "/api/collaborative-document-edition/wopi/files/{}/contents?access_token={}&access_token_ttl=0".format(
+                test_file.content_id, quote(access_token)
             )
             updated_at = test_file.updated
             new_content = b"content has been modified"
@@ -299,7 +299,7 @@ class TestWOPI(object):
             )
         access_token = str(admin_user.ensure_auth_token(app_config.USER__AUTH_TOKEN__VALIDITY))
         transaction.commit()
-        url = "/api/collaborative-document-edition/wopi/files/{}/contents?access_token={}".format(
+        url = "/api/collaborative-document-edition/wopi/files/{}/contents?access_token={}&access_token_ttl=0".format(
             test_file.content_id, quote(access_token)
         )
         new_content = b"content has been modified"
