@@ -1,28 +1,19 @@
 {
-  "root_cause": "Remote-authenticated users are created and authenticated with auth_type=REMOTE and no local password, but the username update flow was built for internal users: SetUsernameSchema requires loggedin_user_password, CardPopupUsername requires and renders a password before enabling confirmation, and UserApi.set_username unconditionally validates the current user's local password. As a result, a remote_auth user whose login is an email has username=null after first authentication and cannot satisfy the password check needed to set it.",
+  "root_cause": "Rendered rich text uses the shared HTMLContent click interceptor to turn same-origin anchors into SPA redirects via CUSTOM_EVENT.REDIRECT/history.push. In the buggy path, that interception treats Ctrl+Click and other modified/non-primary clicks like ordinary left clicks, dispatching an in-tab redirect and preventing the browser's native new-tab behavior even though the anchor itself is valid for the context menu.",
   "target_files": [
-    "backend/tracim_backend/views/core_api/schemas.py",
-    "backend/tracim_backend/models/context_models.py",
-    "backend/tracim_backend/lib/core/user.py",
-    "backend/tracim_backend/tests/functional/test_user.py",
-    "frontend/src/container/CardPopupUsername.jsx"
+    "frontend_lib/src/component/HTMLContent/HTMLContent.jsx",
+    "frontend_lib/test/component/HtmlContent.spec.js"
   ],
   "target_functions": [
-    "SetUsernameSchema",
-    "SetUsername.__init__",
-    "UserApi.set_username",
-    "UserController.set_user_username",
-    "CardPopupUsername.disableConfirmButton",
-    "CardPopupUsername.render",
-    "CardPopupUsername.handleClickConfirmUsernamePopup"
+    "onClickHtmlContentText",
+    "<HTMLContent /> internal link click tests"
   ],
-  "approach": "Make loggedin_user_password optional only for the username update schema/model, then update UserApi.set_username to skip the password validation only when the authenticated current user is the same REMOTE user whose username is being changed. Keep existing password validation for internal users, admins editing other users, and non-remote auth types, and keep check_has_write_rights so configured read-only username rules still win. In CardPopupUsername, detect props.user.authType === 'remote', hide the password prompt for that case, and allow confirmation once the username itself is valid.",
+  "approach": "Constrain the SPA redirect in HTMLContent to unmodified primary-button clicks on same-origin links that target the current browsing context. Let the browser handle Ctrl+Click, Meta+Click, Shift/Alt modified clicks, middle/right clicks, download links, and non-_self targets by returning before dispatching CUSTOM_EVENT.REDIRECT or calling preventDefault. Keep the change local to the shared renderer so comments, notes, descriptions, and HTML documents inherit the fix.",
   "tests_to_add": [
-    "Functional regression test: a REMOTE user with no username can PUT /api/users/{own_id}/username without loggedin_user_password and gets 200 with the new username.",
-    "Functional guard test: an internal user still gets a validation error or 403 when changing username without the password.",
-    "Optional component assertion: CardPopupUsername does not render usernamePopup_password and enables confirmation for a valid remote user username."
+    "HTMLContent dispatches CUSTOM_EVENT.REDIRECT and prevents default for a plain left click on an internal link",
+    "HTMLContent does not dispatch redirect or prevent default for Ctrl+Click on an internal link"
   ],
-  "expected_loc": 85,
-  "risk_notes": "The main risk is accidentally making password optional for admins or internal users; constrain the bypass to current_user.user_id == target user_id and auth_type == REMOTE.",
-  "out_of_scope_observations": "Remote auth could also populate or synchronize username from headers or public_name, but that requires new configuration semantics and is outside the smallest fix for the blocked popup."
+  "expected_loc": 45,
+  "risk_notes": "Some app code may rely on HTMLContent intercepting unusual clicks, but preserving browser defaults for modified/non-primary clicks matches standard anchor behavior.",
+  "out_of_scope_observations": "The existing link formatter for #content references remains regex-based and is not changed for this issue."
 }

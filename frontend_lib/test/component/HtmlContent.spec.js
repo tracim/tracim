@@ -71,5 +71,35 @@ describe('<HTMLContent />', () => {
       expect(global.GLOBAL_dispatchEvent.called).to.equal(false)
       expect(hasPreventedDefault).to.equal(false)
     })
+
+    it('should not dispatch redirect or prevent default on middle click', () => {
+      const wrapper = mountInternalLink()
+      const link = wrapper.getDOMNode().querySelector('a')
+      let hasPreventedDefault = false
+
+      wrapper.find('article').simulate('click', {
+        target: link,
+        button: 1,
+        preventDefault: () => { hasPreventedDefault = true }
+      })
+
+      expect(global.GLOBAL_dispatchEvent.called).to.equal(false)
+      expect(hasPreventedDefault).to.equal(false)
+    })
+
+    it('should not dispatch redirect or prevent default on middle click', () => {
+      const wrapper = mountInternalLink()
+      const link = wrapper.getDOMNode().querySelector('a')
+      let hasPreventedDefault = false
+
+      wrapper.find('article').simulate('click', {
+        target: link,
+        button: 1,
+        preventDefault: () => { hasPreventedDefault = true }
+      })
+
+      expect(global.GLOBAL_dispatchEvent.called).to.equal(false)
+      expect(hasPreventedDefault).to.equal(false)
+    })
   })
 })
