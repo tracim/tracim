@@ -13,9 +13,11 @@ import { sanitizeIframe } from '../../mentionOrLinkOrSanitize.js'
 */
 
 function onClickHtmlContentText (e) {
-  const t = e.target
-  if (t instanceof HTMLAnchorElement && t.href && t.href.startsWith(location.origin + '/')) {
-    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REDIRECT, data: { url: t.href.substr(location.origin.length) } })
+  const link = e.target.closest && e.target.closest('a[href]')
+  const isPlainLeftClick = !e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey && (e.button === undefined || e.button === 0)
+  const hasTarget = link && link.target && link.target !== '_self'
+  if (isPlainLeftClick && link && !hasTarget && !link.hasAttribute('download') && link.href.startsWith(window.location.origin + '/')) {
+    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REDIRECT, data: { url: link.href.substr(window.location.origin.length) } })
     e.preventDefault()
   }
 }
