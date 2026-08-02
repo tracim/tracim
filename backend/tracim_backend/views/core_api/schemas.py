@@ -629,12 +629,14 @@ class SetEmailSchema(LoggedInUserPasswordSchema):
 
 
 class SetUsernameSchema(LoggedInUserPasswordSchema):
+    loggedin_user_password = String(required=False, allow_none=True, validate=user_password_validator)
     username = StrippedString(
         required=True, metadata={"example": "The-user_42"}, validate=user_username_validator
     )
 
     @post_load
     def create_set_username_object(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
+        data.setdefault("loggedin_user_password", None)
         return SetUsername(**data)
 
 

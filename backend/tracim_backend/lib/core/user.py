@@ -977,7 +977,7 @@ need to be in every workspace you include."
     def set_username(
         self,
         user: User,
-        loggedin_user_password: str,
+        loggedin_user_password: typing.Optional[str],
         username: str,
         do_save: bool = True,
     ) -> User:
@@ -993,7 +993,10 @@ need to be in every workspace you include."
         if not self._user:
             raise NoUserSetted("Current User should be set in UserApi to use this method")
 
-        if not self._user.validate_password(loggedin_user_password):
+        is_remote_self_update = (
+            self._user.auth_type == AuthType.REMOTE and self._user.user_id == user.user_id
+        )
+        if not is_remote_self_update and not self._user.validate_password(loggedin_user_password):
             raise WrongUserPassword(
                 "Wrong password for authenticated user {}".format(self._user.user_id)
             )

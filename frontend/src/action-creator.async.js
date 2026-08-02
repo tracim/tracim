@@ -359,6 +359,9 @@ export const putUserPublicName = (user, newName) => dispatch => {
 }
 
 export const putUserUsername = (user, newUsername, checkPassword) => dispatch => {
+  const body = { username: newUsername }
+  if (checkPassword) body.loggedin_user_password = checkPassword
+
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${user.userId}/username`,
     param: {
@@ -367,10 +370,7 @@ export const putUserUsername = (user, newUsername, checkPassword) => dispatch =>
         ...FETCH_CONFIG.headers
       },
       method: 'PUT',
-      body: JSON.stringify({
-        username: newUsername,
-        loggedin_user_password: checkPassword
-      })
+      body: JSON.stringify(body)
     },
     actionName: USER_USERNAME,
     dispatch

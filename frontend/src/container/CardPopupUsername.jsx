@@ -132,9 +132,11 @@ export class CardPopupUsername extends React.Component {
     return (
       (state.newUsername === '' && !state.hidePopupCheckbox) ||
       !state.isUsernameValid ||
-      (state.newUsername !== '' && state.password === '')
+      (state.newUsername !== '' && this.isPasswordRequired() && state.password === '')
     )
   }
+
+  isPasswordRequired = () => this.props.user.authType !== 'remote'
 
   render () {
     const { props, state } = this
@@ -180,7 +182,7 @@ export class CardPopupUsername extends React.Component {
             </div>
           )}
 
-          {state.newUsername !== '' && (
+          {state.newUsername !== '' && this.isPasswordRequired() && (
             <>
               <div className='homepage__usernamePopup__body__msg'>
                 {props.t('Please confirm your password:')}
