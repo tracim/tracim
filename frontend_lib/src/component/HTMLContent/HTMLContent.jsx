@@ -14,7 +14,15 @@ import { sanitizeIframe } from '../../mentionOrLinkOrSanitize.js'
 
 function onClickHtmlContentText (e) {
   const t = e.target
-  if (t instanceof HTMLAnchorElement && t.href && t.href.startsWith(location.origin + '/')) {
+  const isPrimaryClick = e.button === undefined || e.button === 0
+  const isUnmodifiedClick = isPrimaryClick && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey
+  if (
+    isUnmodifiedClick &&
+    t instanceof HTMLAnchorElement &&
+    t.href &&
+    t.href.startsWith(location.origin + '/') &&
+    (!t.target || t.target === '_self')
+  ) {
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REDIRECT, data: { url: t.href.substr(location.origin.length) } })
     e.preventDefault()
   }
