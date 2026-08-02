@@ -12,6 +12,7 @@ import { revisionList as fixtureRevisionList } from './fixture/contentRevisionLi
 import { content } from './fixture/content.js'
 import { defaultDebug } from '../src/debug.js'
 import { baseFetch } from '../src/action.async.js'
+import { TIMELINE_TYPE } from '../src/constant.js'
 import {
   mockGetSpaceMemberList200,
   mockPutContent200,
@@ -482,6 +483,29 @@ describe('appContentFactory.js', () => {
 
     it('should have merged all the comments and revision at depth 0', () => {
       expect(commentAndRevisionMergedList.length).to.equal(commentList.length + revisionList.length)
+    })
+
+    it('should sort a revision from its modified date when created is older than a comment', () => {
+      const comment = {
+        ...commentList[0],
+        content_id: 5580,
+        created: '2026-07-31T06:03:00.325142Z'
+      }
+      const statusUpdateRevision = {
+        ...fixtureRevisionList[0],
+        content_id: 3652,
+        revision_id: 5581,
+        created: '2026-07-17T14:37:07.535904Z',
+        modified: '2026-07-31T06:03:00.601796Z',
+        updated: '2026-07-31T06:03:00.601796Z'
+      }
+
+      const timeline = wrapper.instance().buildTimelineFromCommentAndRevision(
+        [comment], [], [statusUpdateRevision], loggedUser
+      )
+
+      expect(timeline.map(item => item.timelineType)).to.deep.equal([TIMELINE_TYPE.COMMENT, TIMELINE_TYPE.REVISION])
+      expect(timeline[1].revision_id).to.equal(statusUpdateRevision.revision_id)
     })
   })
 
