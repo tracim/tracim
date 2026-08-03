@@ -63,7 +63,7 @@ export class KanbanGantt extends React.Component {
     if (state.gantt !== null) {
       state.gantt.refresh(state.tasks)
 
-      // HACK: Translate the today button since it is not done in Frappe-Gantt
+      // HACK - ALU - 2026-07-31 - Translate the today button since it is not done in Frappe-Gantt
       const button = document.getElementsByClassName('today-button')
       if (button?.length > 0) {
         button[0].textContent = props.t('Today')
@@ -98,9 +98,8 @@ export class KanbanGantt extends React.Component {
     if (minStart !== undefined) minStart.setHours(0, 0, 0)
     if (maxEnd !== undefined) maxEnd.setHours(23, 59, 59)
 
-    // Use today at midnight to compare if a task deadline was late or not.
-    const today = new Date(Date.now())
-    today.setHours(0, 0, 0)
+    const todayMidnight = new Date(Date.now())
+    todayMidnight.setHours(0, 0, 0)
 
     return props.columns.flatMap(({ id, title, bgColor, cards }) => {
       const ganttCards = cards
@@ -119,12 +118,12 @@ export class KanbanGantt extends React.Component {
 
           let colorProgress
           if (card.finished) colorProgress = '#C0DD97'
-          else if (deadline < today) colorProgress = '#F7C1C1'
+          else if (deadline < todayMidnight) colorProgress = '#F7C1C1'
 
           return {
             id: card.id,
             name: card.title,
-            color: deadline < today ? '#FFF1F1' : undefined,
+            color: deadline < todayMidnight ? '#FFF1F1' : undefined,
             color_progress: colorProgress,
             start: card.kickoff,
             end: card.deadline || undefined,
