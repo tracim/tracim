@@ -322,8 +322,7 @@ describe('appContentFactory.js', () => {
           fakeApiUrl,
           fakeContent.workspace_id,
           fakeContent.content_id,
-          newComment,
-          fakeContent.content_namespace
+          newComment
         )
         response = await wrapper.instance().appContentSaveNewCommentText(
           fakeContent, newComment, appContentSlug

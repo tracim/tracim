@@ -32,10 +32,9 @@ export const postNewEmptyContent = (apiUrl, workspaceId, parentId, contentType, 
     label
   })
 
-export const postNewComment = (apiUrl, workspaceId, contentId, newComment, namespace) =>
+export const postNewComment = (apiUrl, workspaceId, contentId, newComment) =>
   baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments`, {
-    raw_content: newComment,
-    content_namespace: namespace
+    raw_content: newComment
   })
 
 export const deleteComment = (apiUrl, workspaceId, contentId, commentId) =>
