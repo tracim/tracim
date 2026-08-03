@@ -873,7 +873,7 @@ class ESSearchApi(SearchApi):
         member_ids: typing.Optional[typing.List[int]] = None,
         owner_ids: typing.Optional[typing.List[int]] = None,
         show_deleted: bool = False,
-        show_active: bool = True,
+        show_active: bool = True,  # INFO - PGO - 2026-08-03 needed for schema validation as frontend always send it whatever search type
         page_nb: int = 1,
         size: int = 10,
     ) -> WorkspaceSearchResponse:
