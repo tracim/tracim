@@ -6,6 +6,5 @@
   "profile": "users",
   "username": "johndoe",
   "public_name": "John Doe",
-  "timezone": "Europe/Paris",
-  "user_id": 2
+  "timezone": "Europe/Paris"
 }
