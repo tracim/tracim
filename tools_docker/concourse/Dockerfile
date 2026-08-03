@@ -13,7 +13,7 @@ COPY . tracim
 WORKDIR /tracim
 RUN \
     ./concourse/scripts/install_backend_packages && \
-    # needed to install different python versions
+    # needed to install different python versions \
     ./concourse/scripts/install_pyenv
 
 FROM base_install AS main
@@ -21,9 +21,9 @@ FROM base_install AS main
 
 RUN \
     ./concourse/scripts/install_backend_python 3.13 && \
-    # frontend dependencies
+    # frontend dependencies \
     ./install_frontend_dependencies.sh root && \
-    # cypress
+    # cypress \
     ./setup_functionnal_tests.sh root && \
-    # docker & docker compose
+    # docker & docker compose \
     ./concourse/scripts/install_docker
