@@ -431,6 +431,15 @@ class WorkspaceSearchQuerySchema(marshmallow.Schema):
         },
         validate=bool_as_int_validator,
     )
+    show_active = marshmallow.fields.Int(
+        dump_default=1,
+        metadata={
+            "example": 1,
+            "description": "There is no active flag on workspace, however frontend always "
+            "send this field so we need to accept it in this schema - see GH#6911",
+        },
+        validate=bool_as_int_validator,
+    )
 
 
 class SearchedWorkspaceSchema(WorkspaceDigestSchema):

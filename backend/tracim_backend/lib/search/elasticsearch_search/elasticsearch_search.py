@@ -873,6 +873,7 @@ class ESSearchApi(SearchApi):
         member_ids: typing.Optional[typing.List[int]] = None,
         owner_ids: typing.Optional[typing.List[int]] = None,
         show_deleted: bool = False,
+        show_active: bool = True,
         page_nb: int = 1,
         size: int = 10,
     ) -> WorkspaceSearchResponse:
