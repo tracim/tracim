@@ -1531,6 +1531,10 @@ class TestElasticSearchWorkspaceSearch:
                 [2, 1],
                 2,
             ),
+            # INFO - PGO - 2026-08-03 - frontend always sends show_active, even for workspace search, which has
+            # no such flag - see GH#6911. It should be accepted and have no effect on results.
+            (("bob", "password"), {"search_string": "bob_only", "show_active": 1}, [1, 2], 2),
+            (("bob", "password"), {"search_string": "bob_only", "show_active": 0}, [1, 2], 2),
         ],
     )
     def test_api__elasticsearch_workspace_search__ok__nominal_cases(
