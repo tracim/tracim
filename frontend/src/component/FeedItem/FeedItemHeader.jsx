@@ -143,12 +143,10 @@ export class FeedItemHeader extends React.Component {
             {props.allowEdition && (
               <IconButton
                 customClass='feedItemHeader__actionMenu__item'
-                disabled={props.editionDisabled}
                 icon='fas fa-pencil-alt'
                 onClick={props.onClickEdit}
                 text={props.t('Edit')}
                 textMobile={props.t('Edit')}
-                title={props.editionDisabled ? props.t('This content has no text yet and cannot be edited') : undefined}
                 key={`edit-${contentId}`}
               />
             )}
@@ -194,7 +192,6 @@ FeedItemHeader.propTypes = {
   onClickCopyLink: PropTypes.func.isRequired,
   workspaceId: PropTypes.number.isRequired,
   allowEdition: PropTypes.bool,
-  editionDisabled: PropTypes.bool,
   breadcrumbsList: PropTypes.array,
   contentType: PropTypes.object,
   eventList: PropTypes.array,
@@ -212,7 +209,6 @@ FeedItemHeader.propTypes = {
 
 FeedItemHeader.defaultProps = {
   allowEdition: false,
-  editionDisabled: false,
   breadcrumbsList: [],
   contentType: {
     label: '',

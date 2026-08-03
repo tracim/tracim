@@ -301,7 +301,6 @@ export class FeedItemWithPreview extends React.Component {
       <div className='feedItem' ref={props.innerRef}>
         <FeedItemHeader
           allowEdition={props.allowEdition}
-          editionDisabled={props.editionDisabled}
           breadcrumbsList={props.breadcrumbsList}
           content={props.content}
           contentAvailable={props.contentAvailable}
@@ -455,7 +454,6 @@ FeedItemWithPreview.propTypes = {
   isPublication: PropTypes.bool.isRequired,
   inRecentActivities: PropTypes.bool.isRequired,
   allowEdition: PropTypes.bool,
-  editionDisabled: PropTypes.bool,
   breadcrumbsList: PropTypes.array,
   commentList: PropTypes.array,
   customColor: PropTypes.string,
@@ -479,7 +477,6 @@ FeedItemWithPreview.propTypes = {
 
 FeedItemWithPreview.defaultProps = {
   allowEdition: false,
-  editionDisabled: false,
   breadcrumbsList: [],
   commentList: [],
   customColor: '',

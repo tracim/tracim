@@ -524,6 +524,7 @@ export class Publications extends React.Component {
 
   isEditionAllowed = (publication, userRoleIdInWorkspace) => {
     return publication.type === CONTENT_TYPE.THREAD &&
+      !!publication.firstComment &&
       (
         userRoleIdInWorkspace === ROLE.workspaceManager.id ||
         this.props.user.userId === publication.author.user_id
@@ -605,7 +606,6 @@ export class Publications extends React.Component {
           <FeedItemWithPreview
             contentAvailable
             allowEdition={this.isEditionAllowed(publication, userRoleIdInWorkspace)}
-            editionDisabled={!publication.firstComment}
             commentList={publication.commentList}
             content={publication}
             key={`publication_${publication.id}`}
