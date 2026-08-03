@@ -1259,8 +1259,7 @@ export const getAdvancedSearchResult = (
   else queryParameterList.push('search_string=*')
   if (pageNumber) queryParameterList.push(`page_nb=${pageNumber}`)
   if (Number.isInteger(pageSize)) queryParameterList.push(`size=${pageSize}`)
-  // show_active is not supported by the space search endpoint (spaces have no archived state)
-  if (showActive && searchType !== ADVANCED_SEARCH_TYPE.SPACE) queryParameterList.push(`show_active=${showActive ? 1 : 0}`)
+  if (showActive) queryParameterList.push(`show_active=${showActive ? 1 : 0}`)
   if (showDeleted) queryParameterList.push(`show_deleted=${showDeleted ? 1 : 0}`)
   if (searchFieldList) queryParameterList.push(`search_fields=${searchFieldList}`)
   if (searchType === ADVANCED_SEARCH_TYPE.CONTENT) {
