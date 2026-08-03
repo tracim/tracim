@@ -3,5 +3,6 @@
     "label": "My ON REQUEST space",
     "access_type": "on_request",
     "default_user_role": "reader",
+    "workspace_id": 3,
     "parent_id": null
 }

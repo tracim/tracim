@@ -3,5 +3,6 @@
     "label": "My OPEN space",
     "access_type": "open",
     "default_user_role": "reader",
+    "workspace_id": 2,
     "parent_id": null
 }
