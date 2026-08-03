@@ -621,8 +621,7 @@ export function appContentFactory (WrappedComponent) {
           this.apiUrl,
           content.workspace_id,
           content.content_id,
-          contentToSend,
-          content.content_namespace
+          contentToSend
         )
       )
 

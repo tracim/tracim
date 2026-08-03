@@ -8,6 +8,14 @@
 - Switch back beaker Python dependency from Algoo fork to official version 1.14.1 [#6893](https://github.com/tracim/tracim/pull/6893)
 
 
+## 2026.07.04
+
+### 🐛 Fixed Issues
+
+- Fix 2026.07.00 regression: cannot create comment and new item [#6909](https://github.com/tracim/tracim/issues/6909)
+- Fix 2026.07.00 regression: error modal displayed on search and workspace search broken [#6911](https://github.com/tracim/tracim/issues/6911)
+
+
 ## 2026.07.03
 
 ### 🐛 Fixed Issues
