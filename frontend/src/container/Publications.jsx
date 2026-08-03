@@ -524,6 +524,7 @@ export class Publications extends React.Component {
 
   isEditionAllowed = (publication, userRoleIdInWorkspace) => {
     return publication.type === CONTENT_TYPE.THREAD &&
+      !!publication.firstComment &&
       (
         userRoleIdInWorkspace === ROLE.workspaceManager.id ||
         this.props.user.userId === publication.author.user_id
@@ -623,7 +624,7 @@ export class Publications extends React.Component {
           />
         )}
 
-        {!state.loading && state.showEditPopup && (
+        {!state.loading && state.showEditPopup && state.commentToEdit && (
           <EditCommentPopup
             apiUrl={FETCH_CONFIG.apiUrl}
             codeLanguageList={props.system.config.ui__notes__code_sample_languages}
