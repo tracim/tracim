@@ -80,9 +80,12 @@ debian_install() {
 
         debian_install_curl
 
+        curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | $SUDO apt-key add -
+        echo "deb https://dl.yarnpkg.com/debian/ stable main" | $SUDO tee /etc/apt/sources.list.d/yarn.list
+
         log "We will install yarn."
         apt_install=true
-        install_yarn_package=yarnpkg
+        install_yarn_package=yarn
     fi
 
     log "Checking whether Node v16+ is installed…"
@@ -116,11 +119,6 @@ debian_install() {
         $SUDO apt-get install -y $install_node_package $install_yarn_package && \
             loggood "Dependencies successfully installed." || \
             logerror "Failed to install some dependencies."
-
-	# Related to the Debian documentation https://wiki.debian.org/Yarn
-	if [ -n "$install_yarn_package" && ! -L /usr/bin/yarn ]; then
-	    ln -sf /usr/bin/yarnpkg /usr/bin/yarn
-	fi
     fi
 }
 
