@@ -72,22 +72,6 @@ debian_install() {
     install_node_package=""
     install_yarn_package=""
 
-    log "Checking whether Yarn is installed…"
-    if which yarn > /dev/null 2>&1; then
-        loggood "Yarn is installed."
-    else
-        log "Yarn is not installed. Adding its repository."
-
-        debian_install_curl
-
-        curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | $SUDO apt-key add -
-        echo "deb https://dl.yarnpkg.com/debian/ stable main" | $SUDO tee /etc/apt/sources.list.d/yarn.list
-
-        log "We will install yarn."
-        apt_install=true
-        install_yarn_package=yarn
-    fi
-
     log "Checking whether Node v16+ is installed…"
     if node -v > /dev/null 2>&1; then
         test_node_version
@@ -101,24 +85,23 @@ debian_install() {
             loggood "The node repository was successfully installed." || \
             logerror "Failed to install node repository. Please install Node v16+ manually."
 
-        log "We will install node."
-        apt_install=true
-        install_node_package=nodejs
+        log "Installing nodejs…"
+        $SUDO apt-get update || logerror "Failed updating the repositories."
+        $SUDO apt-get install -y nodejs && \
+            loggood "Successfully installed." || \
+            logerror "Failed to install nodejs."
     fi
 
-    if [ "$apt_install" != "" ]; then
-        log "Installing $install_node_package $install_yarn_package…"
+    log "Checking whether Yarn is installed…"
+    if which yarn > /dev/null 2>&1; then
+        loggood "Yarn is installed."
+    else
+        log "Yarn is not installed."
 
-        if [ "$install_node_package" = "" ]; then
-            # if install_node_package is not empty,
-            # deb.nodesource.com/setup_16.x already updated the repository
-
-            $SUDO apt-get update || logerror "Failed updating the repositories."
-        fi
-
-        $SUDO apt-get install -y $install_node_package $install_yarn_package && \
-            loggood "Dependencies successfully installed." || \
-            logerror "Failed to install some dependencies."
+        log "Installing yarn…"
+        $SUDO npm install --global yarn@1 && \
+            loggood "Successfully installed." || \
+            logerror "Failed to install yarn."
     fi
 }
 
