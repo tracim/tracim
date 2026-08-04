@@ -99,7 +99,7 @@ export const searchMention = (text) => {
   // Regex explanation: https://regex101.com/r/hHosBa/11
   // Match (@XXX part): '@XXX', ' @XXX ', '@XXX-', ':@XXX:', '(@XXX)', '!@XXX!', ...
   // Don't match: 'XXX@XXX', '@<span>XXX</span>'
-  const mentionRegex = /(?:^|\s|\W)@([a-zA-Z0-9_.-]+)\b/g
+  const mentionRegex = /(?:^|[^\w>])@([a-zA-Z0-9_.-]+)\b/g
   const mentionList = text.match(mentionRegex)
   return mentionList || []
 }
@@ -136,7 +136,7 @@ export const searchMentionAndReplaceWithTag = (userList, html) => {
       // Match (@XXX part): '@XXX', ' @XXX ', '@XXX-', ':@XXX:', '(@XXX)', '!@XXX!', ...
       // Don't match: 'XXX@XXX', '@<span>XXX</span>'
       // ${mentionText} will be replaced with role or user variable
-      const mentionRegex = new RegExp(`(?:^|\\s|\\W)@${mentionText}\\b`, 'g')
+      const mentionRegex = new RegExp(`(?:^|[^\\w>])@${mentionText}\\b`, 'g')
       // NOTE - MP - 2023-04-11 - We use mention[0] because the regex lookahead is included in the
       // match
       newHtml = newHtml.replace(mentionRegex, `${mention[0]}${mentionBalise}`)
