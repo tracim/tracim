@@ -5,9 +5,9 @@ FROM debian:trixie AS base_install
 # HOME, used by pyenv scripts
 ENV HOME=/root
 # Tracim needs UTF-8 to properly work
-ENV LANG C.UTF-8
-ENV LANGUAGE C.UTF-8
-ENV LC_ALL C.UTF-8
+ENV LANG=C.UTF-8
+ENV LANGUAGE=C.UTF-8
+ENV LC_ALL=C.UTF-8
 
 COPY . tracim
 WORKDIR /tracim
