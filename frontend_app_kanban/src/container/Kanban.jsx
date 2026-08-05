@@ -254,10 +254,10 @@ export class Kanban extends React.Component {
     const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
     const newContentObject = { ...state.content, ...data.fields.content }
     this.setState(prev => ({
-      content: clientToken === data.fields.client_token ? newContentObject : prev.content,
+      content: data.fields.content,
       newContent: newContentObject,
       editionAuthor: data.fields.author.public_name,
-      showRefreshWarning: clientToken !== data.fields.client_token
+      currentContentRevisionId: data.fields.content.current_revision_id
     }))
     if (clientToken === data.fields.client_token) {
       this.setHeadTitle(newContentObject.label)
