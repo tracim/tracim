@@ -24,7 +24,6 @@ import {
   CardPopup,
   Loading,
   PromptMessage,
-  RefreshWarningMessage,
   sendGlobalFlashMessage,
   removeLocalStorageItem
 } from 'tracim_frontend_lib'
@@ -342,12 +341,6 @@ export class Kanban extends React.Component {
               onClick={props.onClickLastVersion}
               icon='fas fa-history'
               text={props.t('Last version')}
-            />
-          )}
-          {props.isRefreshNeeded && (
-            <RefreshWarningMessage
-              tooltip={props.t('The content has been modified by {{author}}', { author: props.editionAuthor, interpolation: { escapeValue: false } })}
-              onClickRefresh={props.onClickRefresh}
             />
           )}
         </div>
