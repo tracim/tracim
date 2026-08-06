@@ -65,7 +65,10 @@
   "Depends on:": "Depends on:",
   "Duration:": "Duration:",
   "Finished": "Finished",
+  "Work in progress": "Work in progress",
   "Mark the card as finished": "Mark the card as finished",
   "No card": "No card",
-  "Reopen the card": "Reopen the card"
+  "Reopen the card": "Reopen the card",
+  "Show Gantt view": "Show Gantt view",
+  "Today": "Today"
 }

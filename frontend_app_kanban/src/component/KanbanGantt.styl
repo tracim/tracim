@@ -1,0 +1,47 @@
+@import '~tracim_frontend_lib/src/css/Variable.styl'
+
+barRadius = 3px
+
+// HACK - ALU - 2026-07-31 - Use the full-width with the Gantt container
+// Since the Gantt page do not have the right menu (with the timeline or tasks),
+// the following modification is mandatory to have a full-width content.
+.kanban__gantt__contentpage__content
+  width auto
+  &__left
+    flex 1
+  &__left__top
+    min-height auto
+
+.gantt-container
+  height 100vh !important
+  width 100% !important
+
+  & .popup-wrapper
+    & .title, .subtitle, .details
+      margin-bottom 0
+    & .gantt-popup-date
+      margin textSpacing 0
+    & .gantt-popup-progress
+      font-size small
+      font-weight 600
+      margin-bottom standardSpacing
+
+  .grid-header
+    width 100% !important
+
+  svg
+    g.bar-group
+      & rect.bar, rect.bar-progress
+        border-radius barRadius
+        rx barRadius
+        ry barRadius
+    g.gantt-section
+      & rect.bar
+        x 0
+        rx 0
+        ry 0
+        width 100%
+      & text.bar-label
+        font-weight bold
+        font-size larger
+        text-transform uppercase

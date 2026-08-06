@@ -25,7 +25,9 @@ export const PAGE = {
     RECENT_ACTIVITIES: (idws = ':idws') => `/ui/workspaces/${idws}/recent-activities`,
     PUBLICATION: (idws = ':idws', idcts = ':idcts') => `/ui/workspaces/${idws}/publications/${idcts}`,
     PUBLICATIONS: (idws = ':idws') => `/ui/workspaces/${idws}/publications`,
-    FOLDER_OPEN: (idws = ':idws', folderList) => `/ui/workspaces/${idws}/contents?folder_open=${folderList.toString()}`
+    FOLDER_OPEN: (idws = ':idws', folderList) => `/ui/workspaces/${idws}/contents?folder_open=${folderList.toString()}`,
+    KANBAN: (idws = ':idws', idkb = ':idkb') => `/ui/workspaces/${idws}/contents/kanban/${idkb}`,
+    KANBAN_GANTT: (idws = ':idws', idkb = ':idkb') => `/ui/workspaces/${idws}/contents/kanban/${idkb}/as_gantt`
   },
   LOGIN: '/ui/login',
   FORGOT_PASSWORD: '/ui/forgot-password',

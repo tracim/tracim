@@ -65,7 +65,10 @@
   "Depends on:": "Dépend de :",
   "Duration:": "Durée :",
   "Finished": "Terminée",
+  "Work in progress": "En cours de réalisation",
   "Mark the card as finished": "Marquer la carte comme terminée",
   "No card": "Aucune carte",
-  "Reopen the card": "Réouvrir la carte"
+  "Reopen the card": "Réouvrir la carte",
+  "Show Gantt view": "Afficher le Gantt",
+  "Today": "Aujourd’hui"
 }
