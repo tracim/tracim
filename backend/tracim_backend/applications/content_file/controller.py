@@ -1,5 +1,7 @@
 # coding=utf-8
 from http import HTTPStatus
+from json import load
+from jsonpatch import make_patch
 from pyramid.config import Configurator
 import transaction
 import typing  # noqa: F401
@@ -49,6 +51,8 @@ from tracim_backend.views.core_api.schemas import ContentModifySchema
 from tracim_backend.views.core_api.schemas import ContentRevisionsPageQuerySchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
 from tracim_backend.views.core_api.schemas import FileCreationFormSchema
+from tracim_backend.views.core_api.schemas import FilePatchQuerySchema
+from tracim_backend.views.core_api.schemas import FilePatchSchema
 from tracim_backend.views.core_api.schemas import FilePathSchema
 from tracim_backend.views.core_api.schemas import FilePreviewSizedPathSchema
 from tracim_backend.views.core_api.schemas import FileQuerySchema
@@ -245,6 +249,79 @@ class FileController(Controller):
                     content.cached_revision_id, content.content_id
                 )
             ) from exc
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @check_right(is_reader)
+    @check_right(is_file_content)
+    @hapic.handle_exception(TracimFileNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.input_query(FilePatchQuerySchema())
+    @hapic.input_path(FilePathSchema())
+    @hapic.output_body(FilePatchSchema())
+    def download_patch_file(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Download the patch which reprensent the diff between two revisions of a content.
+        For now, only the JSON format can use this route.
+        """
+        app_config: CFG = request.registry.settings["CFG"]
+        api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+
+        from_revision = api.get_one_revision(
+            hapic_data.query.from_revision_id,
+            content_id=hapic_data.path.content_id,
+        )
+
+        if from_revision.file_mimetype == "application/json":
+            to_revision = api.get_one_revision(
+                hapic_data.query.to_revision_id,
+                content_id=hapic_data.path.content_id,
+            )
+
+            try:
+                from_file = StorageLib(request.app_config).get_raw_file(
+                    depot_file=from_revision.depot_file,
+                    filename=hapic_data.path.filename,
+                    default_filename=(
+                        f"{from_revision.file_name}_r{from_revision.revision_id}"
+                        f"{from_revision.file_extension}"
+                    ),
+                )
+                to_file = StorageLib(request.app_config).get_raw_file(
+                    depot_file=to_revision.depot_file,
+                    filename=hapic_data.path.filename,
+                    default_filename=(
+                        f"{to_revision.file_name}_r{to_revision.revision_id}"
+                        f"{to_revision.file_extension}"
+                    ),
+                )
+
+                with (
+                    open(from_file.file_object._file_path, "rb") as from_buffer,
+                    open(to_file.file_object._file_path, "rb") as to_buffer,
+                ):
+                    patch = make_patch(load(from_buffer), load(to_buffer))
+                    return {
+                        "from_revision": hapic_data.query.from_revision_id,
+                        "to_revision": hapic_data.query.to_revision_id,
+                        "patch_content": patch,
+                    }
+
+            except CannotGetDepotFileDepotCorrupted as exc:
+                raise TracimFileNotFound(
+                    "file related to revision {} of content {} not found in depot.".format(
+                        revision.revision_id, revision.content_id
+                    )
+                ) from exc
+
+        else:
+            raise ContentTypeNotAllowed(
+                f"the content_type {from_revision.file_mimetype} is not available with this route."
+            )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @check_right(is_reader)
@@ -797,6 +874,13 @@ class FileController(Controller):
             request_method="GET",
         )
         configurator.add_view(self.download_file, route_name="download_file")
+        # download the patch between two revisions for the raw file
+        configurator.add_route(
+            "download_patch",
+            "/workspaces/{workspace_id}/files/{content_id}/patch/{filename}",
+            request_method="GET",
+        )
+        configurator.add_view(self.download_patch_file, route_name="download_patch")
         # download raw file of revision
         configurator.add_route(
             "download_revision",
