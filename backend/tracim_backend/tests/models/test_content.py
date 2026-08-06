@@ -232,7 +232,7 @@ class TestContent(object):
         # tests initialized depot file
         assert content.depot_file
         # tests type of initialized depot file
-        assert type(content.depot_file) == UploadedFile
+        assert isinstance(content.depot_file, UploadedFile)
         # tests content of initialized depot file
         # using depot_file.file of type StoredFile to fetch content back
         assert content.depot_file.file.read() == b"test"
@@ -265,7 +265,7 @@ class TestContent(object):
         )
         session.add(children_folder)
         session.flush()
-        assert [type(child) == Content for child in parent_folder.children]
+        assert all(isinstance(child, Content) for child in parent_folder.children)
         assert [child.revision_id for child in parent_folder.children] == [
             children_folder.cached_revision_id
         ]

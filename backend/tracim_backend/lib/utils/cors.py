@@ -52,9 +52,9 @@ def set_cors_headers(request, response):
         "Origin" in request.headers
         and request.headers["Origin"] in app_config.CORS__ACCESS_CONTROL_ALLOWED_ORIGIN
     ):
-        response.headers[
-            "Access-Control-Expose-Headers"
-        ] = "Content-Type,Date,Content-Length,Authorization,X-Request-ID"
+        response.headers["Access-Control-Expose-Headers"] = (
+            "Content-Type,Date,Content-Length,Authorization,X-Request-ID"
+        )
         response.headers["Access-Control-Allow-Origin"] = request.headers["Origin"]
         response.headers["Access-Control-Allow-Credentials"] = "true"
         response.headers["Vary"] = "Origin"
@@ -65,13 +65,13 @@ def cors_options_view(context, request):
     # @TODO Côme - 2018/09/04 - I commented the test below because I can't work with for editing a file in app file.
     # I checked with GM and this test might require some fixes
     # if 'Access-Control-Request-Headers' in request.headers:
-    response.headers[
-        "Access-Control-Allow-Methods"
-    ] = "OPTIONS,HEAD,GET,POST,PUT,DELETE,PROPFIND,PROPPATCH,REPORT,MOVE,LOCK,UNLOCK"
-    response.headers[
-        "Access-Control-Allow-Headers"
-    ] = "Content-Type,Accept,Accept-Language,Authorization,X-Request-ID,X-client,Depth,Prefer,If-None-Match,If-match,{client_token_header}".format(
-        client_token_header=CLIENT_TOKEN_HEADER
+    response.headers["Access-Control-Allow-Methods"] = (
+        "OPTIONS,HEAD,GET,POST,PUT,DELETE,PROPFIND,PROPPATCH,REPORT,MOVE,LOCK,UNLOCK"
+    )
+    response.headers["Access-Control-Allow-Headers"] = (
+        "Content-Type,Accept,Accept-Language,Authorization,X-Request-ID,X-client,Depth,Prefer,If-None-Match,If-match,{client_token_header}".format(
+            client_token_header=CLIENT_TOKEN_HEADER
+        )
     )
     set_cors_headers(request, response)
     return response

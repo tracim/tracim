@@ -12,9 +12,10 @@ repos:
           - id: check-yaml
           - id: debug-statements
           - id: check-merge-conflict
-    # backend specific
-    - repo: https://github.com/ambv/black
-      rev: 23.3.0
+    # backend-specific
+    # INFO - PGO - 2026-08-06 - https://algoo.tracim.fr/ui/workspaces/49/contents/html-document/192530
+    - repo: https://github.com/psf/black
+      rev: 24.10.0
       hooks:
           - id: black
             files: 'backend'
@@ -29,7 +30,7 @@ repos:
           - id: isort
             files: 'backend'
     - repo: https://github.com/pycqa/flake8
-      rev: 6.0.0
+      rev: 6.1.0
       hooks:
           - id: flake8
             entry: bash -c "cd backend"

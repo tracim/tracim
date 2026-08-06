@@ -1,4 +1,6 @@
 # Devtools
+# ⚠️ WARNING : some of those tools are used in pre-commit an MUST be kept in sync
+#    see /.pre-commit-config.yaml
 flake8==6.1.0
 isort==6.0.0
 mypy==1.18.2
