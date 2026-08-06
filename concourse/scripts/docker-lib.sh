@@ -9,13 +9,63 @@ DOCKER_DATA_ROOT=${DOCKER_DATA_ROOT:-/scratch/docker}
 IP_FOR_WAN_INTERFACE=8.8.8.8
 
 sanitize_cgroups() {
-  # cgroup v2 unified hierarchy only (the only mode on Debian 13/Trixie):
-  # dockerd handles it natively, we just need it mounted read-write.
   mkdir -p /sys/fs/cgroup
   mountpoint -q /sys/fs/cgroup || \
-    mount -t cgroup2 -o nsdelegate cgroup2 /sys/fs/cgroup
+    mount -t tmpfs -o uid=0,gid=0,mode=0755 cgroup /sys/fs/cgroup
 
   mount -o remount,rw /sys/fs/cgroup
+
+  # cgroup v2 unified hierarchy (e.g. our Debian 13/Trixie test image, when
+  # the host kernel itself runs v2): dockerd handles it natively, and the
+  # legacy per-controller mounting below doesn't apply -- the kernel refuses
+  # to mount e.g. "cpuset" as its own v1 hierarchy once it's bound to the
+  # unified one ("Unknown subsys name"). Nothing more to do here.
+  #
+  # Otherwise (cgroup v1, or hybrid): this depends on the *host* kernel the
+  # container runs on, not the image's own OS, so both cases show up in
+  # practice (e.g. Concourse workers still on cgroup v1). Re-mount each v1
+  # subsystem read-write in our own mount namespace -- without this, nested
+  # dockerd can fail to write e.g. /sys/fs/cgroup/devices/.../devices.allow.
+  if [ -f /sys/fs/cgroup/cgroup.controllers ]; then
+    return
+  fi
+
+  sed -e 1d /proc/cgroups | while read sys hierarchy num enabled; do
+    if [ "$enabled" != "1" ]; then
+      # subsystem disabled; skip
+      continue
+    fi
+
+    grouping="$(cat /proc/self/cgroup | cut -d: -f2 | grep "\\<$sys\\>")" || true
+    if [ -z "$grouping" ]; then
+      # subsystem not mounted anywhere; mount it on its own
+      grouping="$sys"
+    fi
+
+    mountpoint="/sys/fs/cgroup/$grouping"
+
+    mkdir -p "$mountpoint"
+
+    # clear out existing mount to make sure new one is read-write
+    if mountpoint -q "$mountpoint"; then
+      umount "$mountpoint"
+    fi
+
+    mount -n -t cgroup -o "$grouping" cgroup "$mountpoint"
+
+    if [ "$grouping" != "$sys" ]; then
+      if [ -L "/sys/fs/cgroup/$sys" ]; then
+        rm "/sys/fs/cgroup/$sys"
+      fi
+
+      ln -s "$mountpoint" "/sys/fs/cgroup/$sys"
+    fi
+  done
+
+  if ! test -e /sys/fs/cgroup/systemd ; then
+    mkdir /sys/fs/cgroup/systemd
+    mount -t cgroup -o none,name=systemd none /sys/fs/cgroup/systemd
+  fi
 }
 
 start_docker() {
