@@ -12,7 +12,9 @@ repos:
           - id: check-yaml
           - id: debug-statements
           - id: check-merge-conflict
-    # backend specific
+    # backend-specific
+    # INFO - PGO - 2026-08-06 - following packages are also present in backend/requirements-devtool.txt
+    #   Concourse uses this other file, whereas this one is only used solely for local pre-commit git hook
     - repo: https://github.com/psf/black
       rev: 24.10.0
       hooks:
