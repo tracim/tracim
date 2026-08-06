@@ -40,9 +40,9 @@ class WebdavAppFactory(object):
         if app_config.REMOTE_USER_HEADER:
             config["http_authenticator"]["trusted_auth_header"] = app_config.REMOTE_USER_HEADER
 
-        config[
-            "verbose"
-        ] = 5  # app_config.WEBDAV__VERBOSE__LEVEL  # FIXME - CHECK THIS IS PARAMETERIZED
+        config["verbose"] = (
+            5  # app_config.WEBDAV__VERBOSE__LEVEL  # FIXME - CHECK THIS IS PARAMETERIZED
+        )
         config["dir_browser"]["enable"] = app_config.WEBDAV__DIR_BROWSER__ENABLED
         config["dir_browser"]["response_trailer"] = app_config.WEBDAV__DIR_BROWSER__FOOTER
         config["logging"] = (
