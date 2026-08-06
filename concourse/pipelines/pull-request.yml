@@ -1,7 +1,10 @@
 ## YAML definitions re-used in plans
 definitions:
+  # Concourse pipeline YAML is static (no file/shell interpolation), so this
+  # can't read concourse/PYTHON_VERSION directly — keep it in sync with that
+  # file by hand when bumping the Python version.
   main_python_version: &main_python_version "3.13.14"
-  python_versions: &python_versions ["3.13.14"]
+  python_versions: &python_versions [*main_python_version]
   databases: &databases ["sqlite", "postgresql"]
 
 # plan step to put the current job name as pending in github's PR

@@ -20,6 +20,7 @@ FROM base_install AS main
     # tested python versions
 
 RUN \
+    # Python versions to install in the image. Tested Python version is contained in /concourse/PYTHON_VERSION \
     ./concourse/scripts/install_backend_python 3.13.14 && \
     # frontend dependencies \
     ./install_frontend_dependencies.sh root && \

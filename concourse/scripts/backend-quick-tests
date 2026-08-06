@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
 
-python_version=${1:-3.13.14}
+script_dir="$(realpath $(dirname $0))"
+python_version=${1:-$(cat "$script_dir/../PYTHON_VERSION")}
 docker_registry=${2-""}
 
-script_dir="$(realpath $(dirname $0))"
 source "$script_dir/util-lib.sh"
 skip_if_no_changed_file_match "^(backend|concourse)"
 
