@@ -3,10 +3,11 @@
 #
 # https://github.com/fanout/docker-pushpin
 #
-# NOTE - S.G. - 2021-05-05
-# This dockerfile is based on the official Dockerfile from fanout
-# But changes the configuration zurl changes so that it properly
-# works with mongrel2.
+# NOTE - PGO - 2026-08-06 #6859 Debian 13 support
+# There are no package in Debian 13 repo: https://tracker.debian.org/pkg/pushpin
+# We are using the official Pushpin repository - see https://pushpin.org/docs/install/#debian-and-ubuntu
+#    ⚠️ we often get googleapis http 400 during apt install caused by gpg used by Pushpin :(
+#    We might need to change the install method
 
 # Pull the base image
 FROM debian:trixie

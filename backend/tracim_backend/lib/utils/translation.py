@@ -78,9 +78,9 @@ class Translator(object):
                 raise TranslationConfigurationError(
                     "translation file {} is not readable: {}".format(file, str(exc))
                 ) from exc
-            app_config.TRANSLATIONS[TranslationSource.GLOBAL.name][
-                lang
-            ] = cls._get_translation_from_file(file)
+            app_config.TRANSLATIONS[TranslationSource.GLOBAL.name][lang] = (
+                cls._get_translation_from_file(file)
+            )
             global_backend_langs.append(lang)
         logger.debug(
             cls,
@@ -106,9 +106,9 @@ class Translator(object):
                     raise TranslationConfigurationError(
                         'ERROR: translation file "{}" is not readable: {}'.format(file, str(exc))
                     ) from exc
-                app_config.TRANSLATIONS[TranslationSource.CUSTOM_PROPERTIES.name][
-                    lang
-                ] = cls._get_translation_from_file(file)
+                app_config.TRANSLATIONS[TranslationSource.CUSTOM_PROPERTIES.name][lang] = (
+                    cls._get_translation_from_file(file)
+                )
                 custom_properties_langs.append(lang)
         logger.debug(
             cls,
