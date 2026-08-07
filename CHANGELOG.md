@@ -1,12 +1,12 @@
 # Changelog
 
-## 2026.07.05
+## Next release (maintenance branch)
 
 ### Other changes
 
 - Update Python version in setup.cfg
 - Fix linter behavior difference between pre-commit and CI [#6921](https://github.com/tracim/tracim/issues/6921)
-- Fix for googleapis 400 error during docker image build
+- First fix ix for googleapis 400 error during docker image build [#6924](https://github.com/tracim/tracim/issues/6924)
 
 
 ## 2026.07.04
