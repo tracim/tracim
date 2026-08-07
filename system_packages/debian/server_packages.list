@@ -3,7 +3,6 @@ apt-transport-https
 gnupg
 gnupg2
 postgresql-client
-pushpin
 redis-server
 supervisor
 uwsgi
