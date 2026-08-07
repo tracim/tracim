@@ -12,13 +12,13 @@
 - Switch back beaker Python dependency from Algoo fork to official version 1.14.1 [#6893](https://github.com/tracim/tracim/pull/6893)
 
 
-## 2026.07.05
+## Next release (maintenance branch)
 
 ### Other changes
 
 - Update Python version in setup.cfg
 - Fix linter behavior difference between pre-commit and CI [#6921](https://github.com/tracim/tracim/issues/6921)
-- Fix for googleapis 400 error during docker image build
+- First fix ix for googleapis 400 error during docker image build [#6924](https://github.com/tracim/tracim/issues/6924)
 
 
 ## 2026.07.04
