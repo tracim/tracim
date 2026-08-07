@@ -6,6 +6,7 @@
 
 - Update Python version in setup.cfg
 - Fix linter behavior difference between pre-commit and CI [#6921](https://github.com/tracim/tracim/issues/6921)
+- Fix for googleapis 400 error during docker image build
 
 
 ## 2026.07.04

@@ -118,7 +118,9 @@ RUN apt-get install -qy curl gpg \
     && mkdir -p /etc/apt/keyrings \
     && curl -fsSL https://pushpin.org/pushpin-package.asc | gpg --dearmor -o /etc/apt/keyrings/pushpin.gpg \
     && echo "deb [signed-by=/etc/apt/keyrings/pushpin.gpg] https://packages.pushpin.org/deb pushpin-jammy main" > /etc/apt/sources.list.d/pushpin.list \
-    && apt-get update
+    && apt-get update \
+    # doing pushpin install directly to avoid googleapis 400 bad request error (#6924) \
+    && apt-get install -qy pushpin
 RUN apt-get install -qy $(cat "${PACKAGE_DIR}/server_packages.list" "${PACKAGE_DIR}/optional_preview_packages.list") vim wget curl \
     && apt-get autoremove -qy \
     && rm -rf /var/lib/{apt,dpkg,cache,log}/ /tmp/* /var/tmp/* \
