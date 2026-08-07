@@ -2,6 +2,10 @@
 
 ## 2026.10.00
 
+### ✨ New Features
+
+- Allow to open a Kanban as a Gantt project view
+
 ### Other changes
 
 - Update to Open Calendar 0.9.5 [#6862](https://github.com/tracim/tracim/issues/6862)
