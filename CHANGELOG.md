@@ -8,6 +8,14 @@
 - Switch back beaker Python dependency from Algoo fork to official version 1.14.1 [#6893](https://github.com/tracim/tracim/pull/6893)
 
 
+## 2026.07.05
+
+### Other changes
+
+- Update Python version in setup.cfg
+- Fix linter behavior difference between pre-commit and CI [#6921](https://github.com/tracim/tracim/issues/6921)
+
+
 ## 2026.07.04
 
 ### 🐛 Fixed Issues
