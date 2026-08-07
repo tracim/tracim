@@ -4,6 +4,7 @@ ARG BRANCH=""
 ARG TAG=""
 ARG VERSION="0000.00.00"
 ARG CONTAINER_TRACIM_DIR="/tracim"
+ARG PUSHPIN_VERSION="1.41.0"
 
 ###
 # Base install stages:
@@ -65,6 +66,24 @@ RUN apt-get install -qy $(cat "${PACKAGE_DIR}/build_backend_packages.list") \
     -e "."
 RUN cp -r /tracim/frontend/dist/assets/font/Nunito/ /usr/share/fonts/nunito
 
+###
+# Pushpin build stage
+###
+# Stage which:
+# - download pushpin from Github
+# - extract archive
+# - compile pushpin
+###
+FROM debian:trixie-slim AS build_pushpin
+ARG PUSHPIN_VERSION
+RUN apt-get update && \
+    apt-get -qy install curl bzip2 make pkg-config rustc cargo g++ libzmq3-dev libssl-dev libboost-dev qt6-base-dev
+WORKDIR /srv
+RUN curl -Lo pushpin.tar.bz2 https://github.com/fastly/pushpin/releases/download/v$PUSHPIN_VERSION/pushpin-$PUSHPIN_VERSION.tar.bz2 && \
+    tar axf pushpin.tar.bz2 && \
+    cd pushpin-$PUSHPIN_VERSION && \
+    make && \
+    make install
 
 ###
 # Frontend build stage
@@ -113,13 +132,9 @@ ENV LANG=C.UTF-8
 ENV LANGUAGE=C.UTF-8
 ENV LC_ALL=C.UTF-8
 ARG PACKAGE_DIR
-# Install Pushpin from official pushpin.org apt repository (not available in Trixie)
-RUN apt-get install -qy curl gpg \
-    && mkdir -p /etc/apt/keyrings \
-    && curl -fsSL https://pushpin.org/pushpin-package.asc | gpg --dearmor -o /etc/apt/keyrings/pushpin.gpg \
-    && echo "deb [signed-by=/etc/apt/keyrings/pushpin.gpg] https://packages.pushpin.org/deb pushpin-jammy main" > /etc/apt/sources.list.d/pushpin.list \
-    && apt-get update
-RUN apt-get install -qy $(cat "${PACKAGE_DIR}/server_packages.list" "${PACKAGE_DIR}/optional_preview_packages.list") vim wget curl \
+# Install from the packages list files
+RUN apt-get update && \
+    apt-get install -qy $(cat "${PACKAGE_DIR}/server_packages.list" "${PACKAGE_DIR}/optional_preview_packages.list") vim wget curl \
     && apt-get autoremove -qy \
     && rm -rf /var/lib/{apt,dpkg,cache,log}/ /tmp/* /var/tmp/* \
 # Remove default apache2 conf
@@ -144,6 +159,10 @@ RUN fc-cache -f \
 COPY --from=build_frontend /tracim/frontend/dist /tracim/frontend/dist
 # backend translation
 COPY --from=build_frontend /tracim/backend/tracim_backend/locale /tracim/backend/tracim_backend/locale
+# Pushpin compiled code
+COPY --from=build_pushpin /usr/local/bin /usr/local/bin
+COPY --from=build_pushpin /usr/local/etc /usr/local/etc
+COPY --from=build_pushpin /usr/local/lib /usr/local/lib
 
 VOLUME ["/etc/tracim", "/var/tracim"]
 EXPOSE 80
