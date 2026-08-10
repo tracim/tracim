@@ -163,6 +163,11 @@ COPY --from=build_frontend /tracim/backend/tracim_backend/locale /tracim/backend
 COPY --from=build_pushpin /usr/local/bin /usr/local/bin
 COPY --from=build_pushpin /usr/local/etc /usr/local/etc
 COPY --from=build_pushpin /usr/local/lib /usr/local/lib
+# Pushpin resources
+RUN groupadd -r -g 1001 pushpin && \
+    useradd -r -u 1001 -g pushpin pushpin
+RUN mkdir -p /var/run/pushpin && \
+    chown -R pushpin:pushpin /etc/pushpin /var/run/pushpin
 
 VOLUME ["/etc/tracim", "/var/tracim"]
 EXPOSE 80
