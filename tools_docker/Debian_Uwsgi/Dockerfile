@@ -76,6 +76,7 @@ RUN cp -r /tracim/frontend/dist/assets/font/Nunito/ /usr/share/fonts/nunito
 ####
 FROM debian:trixie AS build_frontend
 COPY --from=base /tracim /tracim
+ARG TRACIM_GANTT_ENABLED
 # 2026-07-20 - INFO - PGO D.A Install Node.js 16 via nvm (nodejs is available in Trixie but this is not the v16 - which is required for Tracim build)
 ENV NVM_DIR=/root/.nvm
 RUN apt-get update \
