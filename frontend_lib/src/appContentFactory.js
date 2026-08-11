@@ -951,8 +951,8 @@ export function appContentFactory (WrappedComponent) {
 
     buildTimelineItemRevision = (revision, loggedUser) => ({
       ...revision,
-      created_raw: revision.created,
-      created: displayDistanceDate(revision.created, loggedUser.lang),
+      created_raw: revision.modified || revision.updated || revision.created,
+      created: displayDistanceDate(revision.modified || revision.updated || revision.created, loggedUser.lang),
       timelineType: TIMELINE_TYPE.REVISION
     })
 
