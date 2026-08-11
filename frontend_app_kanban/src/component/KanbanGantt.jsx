@@ -41,8 +41,7 @@ export class KanbanGantt extends React.Component {
             infinite_padding: false,
             language: props.language,
             popup: this.renderGanttPopup,
-            readonly: true,
-            view_mode_select: false
+            readonly: true
           }
         ),
         isLoaded: false
