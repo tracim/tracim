@@ -20,6 +20,7 @@
 
     <link rel="stylesheet" type="text/css" href="/assets/bootstrap/bootstrap.min.css?token=${cache_token}" nonce="${csp_nonce}">
     <link rel="stylesheet" type="text/css" href="/assets/branding/${website__welcome_page_style}?token=${cache_token}" nonce="${csp_nonce}">
+    <link rel="stylesheet" type="text/css" href="/assets/frappe-gantt-1.2.2/frappe-gantt.css?token=${cache_token}" nonce="${csp_nonce}" />
 
     <style nonce="${csp_nonce}">
       <%
