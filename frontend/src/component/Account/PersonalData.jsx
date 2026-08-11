@@ -52,10 +52,15 @@ export class PersonalData extends React.Component {
 
   handleChangeCheckPassword = e => this.setState({ checkPassword: e.target.value })
 
+  isPasswordRequired = () => {
+    const { props, state } = this
+    return state.newEmail !== '' || (state.newUsername !== '' && (props.isAdmin || props.userAuthType !== 'remote'))
+  }
+
   handleClickSubmit = async () => {
     const { props, state } = this
 
-    if ((state.newEmail !== '' || state.newUsername !== '') && state.checkPassword === '') {
+    if (this.isPasswordRequired() && state.checkPassword === '') {
       props.dispatch(newFlashMessage(props.t('Please type your password in order to change your email and/or username. (For security reasons)'), 'warning'))
       return
     }
@@ -145,7 +150,7 @@ export class PersonalData extends React.Component {
             </div>
           )}
 
-          {(state.newEmail !== '' || state.newUsername !== '') && (
+          {this.isPasswordRequired() && (
             <div>
               <label>
                 {props.isAdmin ? props.t("Administrator's password:") : props.t('Type your password:')}
