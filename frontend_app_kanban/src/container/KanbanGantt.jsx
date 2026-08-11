@@ -65,17 +65,17 @@ export class KanbanGantt extends React.Component {
 
   componentDidMount () {
     console.log('%c<KanbanGantt> did Mount', `color: ${this.state.config.hexcolor}`)
-    this.updateContent()
+    this.loadContent()
   }
 
   componentDidUpdate (prevProps, prevState) {
     const { state } = this
     console.log('%c<KanbanGantt> did Update', `color: ${state.config.hexcolor}`, prevState, state)
 
-    if (!prevState.content || !state.content) return
+    if (!state.content.current_revision_id) return
 
-    if (prevState.content.content_id !== state.content.content_id) {
-      this.updateContent()
+    if (prevState.content.current_revision_id !== state.content.current_revision_id) {
+      this.loadBoardContent()
     }
   }
 
@@ -117,11 +117,6 @@ export class KanbanGantt extends React.Component {
         data: { title: buildHeadTitle([contentName, state.config.workspace.label]) }
       })
     }
-  }
-
-  updateContent = async () => {
-    await this.loadContent()
-    await this.loadBoardContent()
   }
 
   // Events Handlers
@@ -229,6 +224,8 @@ export class KanbanGantt extends React.Component {
 
   render () {
     const { state } = this
+
+    if (!state.content.current_revision_id) return null
 
     return (
       <PopinFixed
