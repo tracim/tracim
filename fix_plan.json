@@ -1,0 +1,19 @@
+{
+  "root_cause": "Rendered rich text uses the shared HTMLContent click interceptor to turn same-origin anchors into SPA redirects via CUSTOM_EVENT.REDIRECT/history.push. In the buggy path, that interception treats Ctrl+Click and other modified/non-primary clicks like ordinary left clicks, dispatching an in-tab redirect and preventing the browser's native new-tab behavior even though the anchor itself is valid for the context menu.",
+  "target_files": [
+    "frontend_lib/src/component/HTMLContent/HTMLContent.jsx",
+    "frontend_lib/test/component/HtmlContent.spec.js"
+  ],
+  "target_functions": [
+    "onClickHtmlContentText",
+    "<HTMLContent /> internal link click tests"
+  ],
+  "approach": "Constrain the SPA redirect in HTMLContent to unmodified primary-button clicks on same-origin links that target the current browsing context. Let the browser handle Ctrl+Click, Meta+Click, Shift/Alt modified clicks, middle/right clicks, download links, and non-_self targets by returning before dispatching CUSTOM_EVENT.REDIRECT or calling preventDefault. Keep the change local to the shared renderer so comments, notes, descriptions, and HTML documents inherit the fix.",
+  "tests_to_add": [
+    "HTMLContent dispatches CUSTOM_EVENT.REDIRECT and prevents default for a plain left click on an internal link",
+    "HTMLContent does not dispatch redirect or prevent default for Ctrl+Click on an internal link"
+  ],
+  "expected_loc": 45,
+  "risk_notes": "Some app code may rely on HTMLContent intercepting unusual clicks, but preserving browser defaults for modified/non-primary clicks matches standard anchor behavior.",
+  "out_of_scope_observations": "The existing link formatter for #content references remains regex-based and is not changed for this issue."
+}
