@@ -558,7 +558,7 @@ website.usage_conditions =
 ; rich_text_preview.template_path =
 # example:
 # rich_text_preview.css_path = /home/user/tracim/rich_text_preview.css
-# rich_text_preview.css_path = /home/user/tracim/rich_text_preview.template
+# rich_text_preview.template_path = /home/user/tracim/rich_text_preview.template
 
 ### Webdav ###
 # webdav url for client
