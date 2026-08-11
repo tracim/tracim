@@ -119,14 +119,14 @@ RUN apt-get install -qy curl gpg \
     && curl -fsSL https://pushpin.org/pushpin-package.asc | gpg --dearmor -o /etc/apt/keyrings/pushpin.gpg \
     && echo "deb [signed-by=/etc/apt/keyrings/pushpin.gpg] https://packages.pushpin.org/deb pushpin-jammy main" > /etc/apt/sources.list.d/pushpin.list \
     && apt-get update \
-    # doing pushpin install directly to avoid googleapis 400 bad request error (#6924) \
+    # HACK - PGO - 2026-08-11 Pushpin is in server_packages.list but doing install directly to avoid googleapis 400 bad request error (#6924) \
     && apt-get install -qy pushpin
 RUN apt-get install -qy $(cat "${PACKAGE_DIR}/server_packages.list" "${PACKAGE_DIR}/optional_preview_packages.list") vim wget curl \
     && apt-get autoremove -qy \
     && rm -rf /var/lib/{apt,dpkg,cache,log}/ /tmp/* /var/tmp/* \
-# Remove default apache2 conf
+    # Remove default apache2 conf \
     && rm /etc/apache2/sites-enabled/000-default.conf \
-# Do not show apache version
+    # Do not show apache version \
     && sed -i "s|ServerTokens OS|ServerTokens Prod|g" /etc/apache2/conf-enabled/security.conf \
     && sed -i "s|ServerSignature On|ServerSignature Off|g" /etc/apache2/conf-enabled/security.conf
 
