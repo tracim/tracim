@@ -1,0 +1,28 @@
+{
+  "root_cause": "Remote-authenticated users are created and authenticated with auth_type=REMOTE and no local password, but the username update flow was built for internal users: SetUsernameSchema requires loggedin_user_password, CardPopupUsername requires and renders a password before enabling confirmation, and UserApi.set_username unconditionally validates the current user's local password. As a result, a remote_auth user whose login is an email has username=null after first authentication and cannot satisfy the password check needed to set it.",
+  "target_files": [
+    "backend/tracim_backend/views/core_api/schemas.py",
+    "backend/tracim_backend/models/context_models.py",
+    "backend/tracim_backend/lib/core/user.py",
+    "backend/tracim_backend/tests/functional/test_user.py",
+    "frontend/src/container/CardPopupUsername.jsx"
+  ],
+  "target_functions": [
+    "SetUsernameSchema",
+    "SetUsername.__init__",
+    "UserApi.set_username",
+    "UserController.set_user_username",
+    "CardPopupUsername.disableConfirmButton",
+    "CardPopupUsername.render",
+    "CardPopupUsername.handleClickConfirmUsernamePopup"
+  ],
+  "approach": "Make loggedin_user_password optional only for the username update schema/model, then update UserApi.set_username to skip the password validation only when the authenticated current user is the same REMOTE user whose username is being changed. Keep existing password validation for internal users, admins editing other users, and non-remote auth types, and keep check_has_write_rights so configured read-only username rules still win. In CardPopupUsername, detect props.user.authType === 'remote', hide the password prompt for that case, and allow confirmation once the username itself is valid.",
+  "tests_to_add": [
+    "Functional regression test: a REMOTE user with no username can PUT /api/users/{own_id}/username without loggedin_user_password and gets 200 with the new username.",
+    "Functional guard test: an internal user still gets a validation error or 403 when changing username without the password.",
+    "Optional component assertion: CardPopupUsername does not render usernamePopup_password and enables confirmation for a valid remote user username."
+  ],
+  "expected_loc": 85,
+  "risk_notes": "The main risk is accidentally making password optional for admins or internal users; constrain the bypass to current_user.user_id == target user_id and auth_type == REMOTE.",
+  "out_of_scope_observations": "Remote auth could also populate or synchronize username from headers or public_name, but that requires new configuration semantics and is outside the smallest fix for the blocked popup."
+}

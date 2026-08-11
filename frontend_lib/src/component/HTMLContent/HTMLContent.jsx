@@ -15,6 +15,11 @@ import { sanitizeIframe } from '../../mentionOrLinkOrSanitize.js'
 function onClickHtmlContentText (e) {
   const t = e.target
   if (t instanceof HTMLAnchorElement && t.href && t.href.startsWith(location.origin + '/')) {
+    const hasModifiedClick = e.ctrlKey || e.metaKey || e.shiftKey || e.altKey
+    const hasNonSelfTarget = t.target && t.target.toLowerCase() !== '_self'
+
+    if (hasModifiedClick || (e.button !== undefined && e.button !== 0) || hasNonSelfTarget || t.hasAttribute('download')) return
+
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REDIRECT, data: { url: t.href.substr(location.origin.length) } })
     e.preventDefault()
   }
