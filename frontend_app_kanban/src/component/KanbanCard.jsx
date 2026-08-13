@@ -104,7 +104,10 @@ function KanbanCard (props) {
         {showConfirmPopup && (
           <ConfirmPopup
             onCancel={() => setShowConfirmPopup(false)}
-            onConfirm={() => props.onRemoveCard(props.card)}
+            onConfirm={() => {
+              setShowConfirmPopup(false)
+              props.onRemoveCard(props.card)
+            }}
             confirmLabel={props.t('Delete')}
             customClass='kanban__KanbanPopup'
             customColor={props.customColor}
