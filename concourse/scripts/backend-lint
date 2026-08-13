@@ -6,8 +6,7 @@ source "$script_dir/util-lib.sh"
 skip_if_no_changed_file_match "^(backend|concourse)"
 
 source "$HOME/.bashrc"
-python_version=${1:-$(cat "$script_dir/../PYTHON_VERSION")}
-pyenv shell "$python_version"
+pyenv shell "$PYTHON_VERSION"
 
 cd backend
 pip install -r requirements-devtool.txt

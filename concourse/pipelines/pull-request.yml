@@ -1,8 +1,7 @@
 ## YAML definitions re-used in plans
 definitions:
-  # Concourse pipeline YAML is static (no file/shell interpolation), so this
-  # can't read concourse/PYTHON_VERSION directly — keep it in sync with that
-  # file by hand when bumping the Python version.
+  # Single source of truth for the pinned Python version: tasks below get it
+  # via a PYTHON_VERSION env var (params:), scripts read it from there.
   main_python_version: &main_python_version "3.13.14"
   python_versions: &python_versions [*main_python_version]
   databases: &databases ["sqlite", "postgresql"]
@@ -122,6 +121,8 @@ jobs:
       platform: linux
       inputs:
         - name: pull-request
+      params:
+        PYTHON_VERSION: *main_python_version
       run:
         dir: pull-request
         path: concourse/scripts/backend-lint
@@ -139,11 +140,12 @@ jobs:
       platform: linux
       inputs:
         - name: pull-request
+      params:
+        PYTHON_VERSION: ((.:python_version))
       run:
         dir: pull-request
         path: concourse/scripts/backend-quick-tests
         args:
-          - ((.:python_version))
           - ((docker-registry))
 
   - across:
@@ -159,11 +161,12 @@ jobs:
       platform: linux
       inputs:
         - name: pull-request
+      params:
+        PYTHON_VERSION: *main_python_version
       run:
         dir: pull-request
         path: concourse/scripts/backend-full-tests
         args:
-          - *main_python_version
           - ((.:database))
           - ((docker-registry))
 
@@ -215,9 +218,10 @@ jobs:
       platform: linux
       inputs:
         - name: pull-request
+      params:
+        PYTHON_VERSION: *main_python_version
       run:
         dir: pull-request
         path: concourse/scripts/end-to-end-cypress-tests
         args:
-          - *main_python_version
           - ((docker-registry))

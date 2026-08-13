@@ -20,7 +20,8 @@ FROM base_install AS main
     # tested python versions
 
 RUN \
-    # Python versions to install in the image. Tested Python version is contained in /concourse/PYTHON_VERSION \
+    # Python versions to install in the image. \
+    # Tested Python version is set via the PYTHON_VERSION env var in concourse/pipelines/pull-request.yml \
     ./concourse/scripts/install_backend_python 3.13.14 && \
     # frontend dependencies \
     ./install_frontend_dependencies.sh root && \
