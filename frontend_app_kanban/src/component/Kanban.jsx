@@ -15,12 +15,15 @@ import Board, {
 } from '@asseinfo/react-kanban'
 import '@asseinfo/react-kanban/dist/styles.css'
 
+import { applyPatch, createPatch } from 'rfc6902'
+
 import {
   APP_FEATURE_MODE,
   IconButton,
   handleFetchResult,
-  putRawFileContent,
   getRawFileContent,
+  getPatchFileContent,
+  patchPatchFileContent,
   CardPopup,
   Loading,
   PromptMessage,
@@ -59,18 +62,22 @@ export class Kanban extends React.Component {
     this.state = {
       autoCompleteCursorPosition: 0,
       autoCompleteItemList: [],
+      initialBoard: { columns: [] },
       board: { columns: [] },
       boardState: justCreated ? BOARD_STATE.LOADED : BOARD_STATE.INIT,
       editedCardInfos: null,
       editedColumnInfos: null,
+      saveInProgress: false,
       saveRequired: false,
       cardIdEdited: null,
+      revisionId: null,
       isAutoCompleteActivated: false
     }
   }
 
   componentDidMount () {
     const { props } = this
+    console.debug('%c<Kanban> component did mount', 'color: gold', props)
     if (props.isNewContentRevision) this.loadBoardContent()
 
     if (props.content.current_revision_type === 'creation') {
@@ -86,22 +93,60 @@ export class Kanban extends React.Component {
 
   async componentDidUpdate (prevProps) {
     const { state, props } = this
-    if (
-      (props.content.current_revision_id !== prevProps.content.current_revision_id) ||
-      (props.isNewContentRevision && prevProps.isNewContentRevision !== props.isNewContentRevision)
-    ) {
-      this.loadBoardContent()
-    }
+    console.debug('%c<Kanban> component did update', 'color: gold', state)
 
     if (state.saveRequired) {
-      this.save(state.board, state.cardIdEdited)
-      this.setState({ saveRequired: false })
+      if (!state.saveInProgress) {
+        this.setState({ saveInProgress: true }, () => {
+          console.debug('%c<Kanban> saving in progress', 'color: gold', state.board, state.cardIdEdited)
+          this.save(state.board, state.cardIdEdited)
+        })
+      }
+    } else if (state.revisionId && state.revisionId !== props.content.current_revision_id) {
+      console.debug('%c<Kanban> updating board from patch', 'color: gold', props.content, state.revisionId)
+      this.loadBoardFromPatch()
+    } else if (!state.revisionId && state.boardState === BOARD_STATE.LOADED) {
+      console.debug('%c<Kanban> reloading board', 'color: gold', state.revisionId, state.boardState)
+      this.loadBoardContent()
+    }
+  }
+
+  async loadBoardFromPatch () {
+    const { props, state } = this
+
+    const fetchPatchFileContent = await handleFetchResult(
+      await getPatchFileContent(
+        props.config.apiUrl,
+        props.content.workspace_id,
+        props.content.content_id,
+        KANBAN_GET_URL_FILENAME,
+        state.revisionId,
+        props.content.current_revision_id
+      ),
+      true
+    )
+    if (fetchPatchFileContent.apiResponse.ok && fetchPatchFileContent.body.patch_content) {
+      const patchContent = fetchPatchFileContent.body.patch_content
+
+      console.debug('%c<Kanban> apply patch', 'color: gold', patchContent)
+      const newBoard = JSON.parse(JSON.stringify(state.board))
+      applyPatch(newBoard, patchContent)
+
+      this.setState({
+        boardState: BOARD_STATE.LOADED,
+        board: newBoard,
+        initialBoard: newBoard,
+        revisionId: props.content.current_revision_id
+      })
+    } else {
+      this.setState({ boardState: BOARD_STATE.ERROR })
     }
   }
 
   async loadBoardContent () {
     this.setState({ boardState: BOARD_STATE.LOADING })
     const { props } = this
+    console.debug('%c<Kanban> load the full board', 'color: gold')
 
     try {
       const fetchRawFileContent = await handleFetchResult(
@@ -115,9 +160,13 @@ export class Kanban extends React.Component {
         true
       )
       if (fetchRawFileContent.apiResponse.ok && fetchRawFileContent.body.columns) {
+        const board = fetchRawFileContent.body || {}
+        console.debug('%c<Kanban> fill the kanban with the board', 'color: gold', board)
         this.setState({
           boardState: BOARD_STATE.LOADED,
-          board: fetchRawFileContent.body || {}
+          board: board,
+          initialBoard: board,
+          revisionId: props.content.current_revision_id
         })
       } else {
         this.setState({ boardState: BOARD_STATE.ERROR })
@@ -217,15 +266,19 @@ export class Kanban extends React.Component {
   }
 
   async save (newBoard, cardIdEdited) {
-    const { props } = this
+    const { props, state } = this
 
+    console.debug('%c<Kanban> generate the patch', 'color: gold')
+    const patchedBoard = createPatch(state.initialBoard, newBoard)
+
+    console.debug('%c<Kanban> send the patch', 'color: gold', patchedBoard)
     const fetchResultSaveKanban = await handleFetchResult(
-      await putRawFileContent(
+      await patchPatchFileContent(
         props.config.apiUrl,
         props.content.workspace_id,
         props.content.content_id,
         props.content.label + KANBAN_FILE_EXTENSION,
-        JSON.stringify(newBoard),
+        JSON.stringify(patchedBoard),
         KANBAN_MIME_TYPE
       )
     )
@@ -241,6 +294,15 @@ export class Kanban extends React.Component {
       }
       return
     }
+
+    console.debug('%c<Kanban> store the new board', 'color: gold')
+    this.setState({
+      boardState: BOARD_STATE.LOADED,
+      initialBoard: newBoard,
+      revisionId: fetchResultSaveKanban.body.new_revision,
+      saveInProgress: false,
+      saveRequired: false
+    })
 
     removeLocalStorageItem(
       props.content.content_type,
@@ -362,6 +424,7 @@ export class Kanban extends React.Component {
               hidden: state.boardState === BOARD_STATE.INIT
             })}
           >
+            {state.boardState === BOARD_STATE.LOADING && <Loading />}
             <Board
               allowAddColumn={!props.readOnly}
               allowRemoveColumn={changesAllowed}
