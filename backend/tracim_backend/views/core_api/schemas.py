@@ -2929,6 +2929,16 @@ class UpdateUserCallStateSchema(marshmallow.Schema):
 ###
 
 
+class FilePatchResponseSchema(marshmallow.Schema):
+    new_revision = marshmallow.fields.Int(
+        metadata={
+            "example": 42,
+            "description": "The new revision id of the patched content.",
+        },
+        required=True,
+    )
+
+
 class FilePatchSchema(marshmallow.Schema):
     from_revision = marshmallow.fields.Int(
         metadata={

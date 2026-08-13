@@ -1,6 +1,8 @@
 # coding=utf-8
 from http import HTTPStatus
+from json import dumps
 from json import load
+from jsonpatch import apply_patch
 from jsonpatch import make_patch
 from pyramid.config import Configurator
 import transaction
@@ -52,6 +54,7 @@ from tracim_backend.views.core_api.schemas import ContentRevisionsPageQuerySchem
 from tracim_backend.views.core_api.schemas import FileContentSchema
 from tracim_backend.views.core_api.schemas import FileCreationFormSchema
 from tracim_backend.views.core_api.schemas import FilePatchQuerySchema
+from tracim_backend.views.core_api.schemas import FilePatchResponseSchema
 from tracim_backend.views.core_api.schemas import FilePatchSchema
 from tracim_backend.views.core_api.schemas import FilePathSchema
 from tracim_backend.views.core_api.schemas import FilePreviewSizedPathSchema
@@ -251,6 +254,77 @@ class FileController(Controller):
             ) from exc
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @check_right(is_contributor)
+    @check_right(is_file_content)
+    @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(FileSizeOverMaxLimitation, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(FileSizeOverWorkspaceEmptySpace, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(FileSizeOverOwnerEmptySpace, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(NoFileValidationError, HTTPStatus.BAD_REQUEST)
+    @hapic.input_path(FilePathSchema())
+    @hapic.input_files(SimpleFileSchema())
+    @hapic.output_body(FilePatchResponseSchema())
+    def upload_patch_file(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Receive a patch to apply to a specific content.
+        For now, only the JSON format can use this route.
+        """
+        if hapic_data.files.files is None:
+            raise NoFileValidationError('No file "files" given at input, validation failed.')
+
+        app_config: CFG = request.registry.settings["CFG"]
+        api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        match content.file_mimetype:
+            case "application/json":
+                patch_file = hapic_data.files.files
+                if patch_file.type != "application/json":
+                    raise UnvalidJsonFile(
+                        "to apply a patch on a JSON content, the specified file "
+                        "must be a valid JSON patch."
+                    )
+
+                content_file = StorageLib(request.app_config).get_raw_file(
+                    depot_file=content.depot_file,
+                    filename=content.file_name,
+                    default_filename=content.file_name,
+                )
+
+                # TODO - A.L. - 2026-08-13 - raise an exception when the patch
+                # cannot be applied
+                with open(content_file.file_object._file_path, "rb") as content_buffer:
+                    patch_content = patch_file.file.read()
+                    new_content = apply_patch(load(content_buffer), patch_content)
+
+                # TODO - A.L. - 2026-08-13 - check if the content was modified
+                # before saving it
+                with new_revision(
+                    session=request.dbsession, tm=transaction.manager, content=content
+                ):
+                    api.update_file_data(
+                        content,
+                        new_content=dumps(new_content).encode(),
+                        new_filename=content.file_name,
+                        new_mimetype=content.file_mimetype,
+                    )
+                    api.save(content)
+
+                return {"new_revision": content.revision_id}
+
+            case _:
+                raise ContentTypeNotAllowed(
+                    f"the content_type {from_revision.file_mimetype} is not "
+                    "available with this route."
+                )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @check_right(is_reader)
     @check_right(is_file_content)
     @hapic.handle_exception(TracimFileNotFound, HTTPStatus.BAD_REQUEST)
@@ -259,7 +333,7 @@ class FileController(Controller):
     @hapic.output_body(FilePatchSchema())
     def download_patch_file(self, context, request: TracimRequest, hapic_data=None):
         """
-        Download the patch which reprensent the diff between two revisions of a content.
+        Download the patch which represent the diff between two revisions of a content.
         For now, only the JSON format can use this route.
         """
         app_config: CFG = request.registry.settings["CFG"]
@@ -874,6 +948,13 @@ class FileController(Controller):
             request_method="GET",
         )
         configurator.add_view(self.download_file, route_name="download_file")
+        # upload a patch
+        configurator.add_route(
+            "upload_patch",
+            "/workspaces/{workspace_id}/files/{content_id}/patch/{filename}",
+            request_method="PATCH",
+        )
+        configurator.add_view(self.upload_patch_file, route_name="upload_patch")
         # download the patch between two revisions for the raw file
         configurator.add_route(
             "download_patch",
