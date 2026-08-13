@@ -53,7 +53,17 @@ export const BOARD_STATE = {
   ERROR: 'error'
 }
 
+export const PATCH_OPERATION = {
+  ADD: 'add',
+  COPY: 'copy',
+  MOVE: 'move',
+  REPLACE: 'replace',
+  REMOVE: 'remove'
+}
+
 export class Kanban extends React.Component {
+  regexMatchId = new RegExp('^/columns/([0-9]+)/cards/([0-9]+)/?')
+
   constructor (props) {
     super(props)
 
@@ -66,6 +76,7 @@ export class Kanban extends React.Component {
       board: { columns: [] },
       boardState: justCreated ? BOARD_STATE.LOADED : BOARD_STATE.INIT,
       editedCardInfos: null,
+      editedCardWasModified: false,
       editedColumnInfos: null,
       saveInProgress: false,
       saveRequired: false,
@@ -128,6 +139,37 @@ export class Kanban extends React.Component {
     if (fetchPatchFileContent.apiResponse.ok && fetchPatchFileContent.body.patch_content) {
       const patchContent = fetchPatchFileContent.body.patch_content
 
+      console.debug('%c<Kanban> check received patch', 'color: gold', patchContent)
+      if (state.editedCardInfos?.card?.id) {
+        patchContent.forEach((item) => {
+          let matched
+
+          switch (item.op) {
+            case PATCH_OPERATION.ADD:
+              break
+            case PATCH_OPERATION.COPY:
+            case PATCH_OPERATION.MOVE:
+              matched = item.from.match(this.regexMatchId)
+              break
+            default:
+              matched = item.path.match(this.regexMatchId)
+          }
+
+          if (matched) {
+            const x = parseInt(matched[1])
+            const y = parseInt(matched[2])
+            if (state.board.columns[x].cards[y].id === state.editedCardInfos.card.id) {
+              console.debug(
+                '%c<Kanban> the modal is open and the edited card was modified',
+                'color: gold',
+                state.editedCardInfos.card.id
+              )
+              this.setState({ editedCardWasModified: true })
+            }
+          }
+        })
+      }
+
       console.debug('%c<Kanban> apply patch', 'color: gold', patchContent)
       const newBoard = JSON.parse(JSON.stringify(state.board))
       applyPatch(newBoard, patchContent)
@@ -184,7 +226,8 @@ export class Kanban extends React.Component {
           .find(columnCard => columnCard.id === card.id))
 
       return {
-        editedCardInfos: { card, column }
+        editedCardInfos: { card, column },
+        editedCardWasModified: false
       }
     })
   }
@@ -226,6 +269,7 @@ export class Kanban extends React.Component {
 
       return {
         editedCardInfos: null,
+        editedCardWasModified: false,
         board: newBoard,
         saveRequired: true,
         cardIdEdited: card.id,
@@ -360,7 +404,10 @@ export class Kanban extends React.Component {
   handleCardEditCancel = (cardId) => {
     const { props } = this
 
-    this.setState({ editedCardInfos: null })
+    this.setState({
+      editedCardInfos: null,
+      editedCardWasModified: false
+    })
 
     removeLocalStorageItem(
       props.content.content_type,
@@ -506,6 +553,7 @@ export class Kanban extends React.Component {
                 language={props.language}
                 memberList={props.config.workspace.memberList}
                 cardList={cardsByColumns[state.editedCardInfos.column.id]}
+                wasModified={state.editedCardWasModified}
               />
             </CardPopup>
           )}

@@ -317,6 +317,7 @@ function KanbanCardEditor (props) {
         <IconButton
           color={props.customColor}
           dataCy='confirm_popup__button_confirm'
+          disabled={props.wasModified}
           icon='fas fa-check'
           intent='primary'
           mode='light'
@@ -340,12 +341,14 @@ KanbanCardEditor.propTypes = {
   codeLanguageList: PropTypes.array,
   customColor: PropTypes.string,
   language: PropTypes.string,
-  memberList: PropTypes.array
+  memberList: PropTypes.array,
+  wasModified: PropTypes.bool,
 }
 
 KanbanCardEditor.defaultProps = {
   codeLanguageList: [],
   customColor: '',
   language: 'en',
-  memberList: []
+  memberList: [],
+  wasModified: false
 }
