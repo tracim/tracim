@@ -18,6 +18,7 @@ describe('<OpenContentApp />', () => {
   const dispatchCustomEventSpy = sinon.spy()
   const onUpdateAppOpenedTypeSpy = sinon.spy()
   const renderAppFeatureSpy = sinon.spy()
+  const dispatchBroadcastChannelCustomEventSpy = sinon.spy()
 
   const dispatchMock = p => {
     if (isFunction(p)) {
@@ -41,6 +42,7 @@ describe('<OpenContentApp />', () => {
     },
     onUpdateAppOpenedType: onUpdateAppOpenedTypeSpy,
     dispatch: dispatchMock,
+    liveMessageManager: { dispatchBroadcastChannelCustomEvent: dispatchBroadcastChannelCustomEventSpy },
     t: s => s
   }
 
