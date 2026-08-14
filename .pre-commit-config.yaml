@@ -19,8 +19,8 @@ repos:
       hooks:
           - id: black
             files: 'backend'
-    - repo: https://github.com/pre-commit/mirrors-isort
-      rev: v5.10.1
+    - repo: https://github.com/PyCQA/isort
+      rev: 6.0.0
       hooks:
           - id: isort
             files: 'backend'
