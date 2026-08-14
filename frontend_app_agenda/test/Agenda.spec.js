@@ -85,7 +85,7 @@ describe('<Agenda />', () => {
               }
             }
           }
-          wrapper.setState({ userWorkspaceList: userWorkspaceList })
+          wrapper.setState({ agendaList: userWorkspaceList })
           wrapper.instance().handleSharedspaceModified(tlmData)
           expect(wrapper.state('content').workspaceLabel).to.equal(tlmData.fields.workspace.label)
         })
