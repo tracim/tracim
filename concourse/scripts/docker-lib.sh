@@ -15,6 +15,21 @@ sanitize_cgroups() {
 
   mount -o remount,rw /sys/fs/cgroup
 
+  # cgroup v2 unified hierarchy (e.g. our Debian 13/Trixie test image, when
+  # the host kernel itself runs v2): dockerd handles it natively, and the
+  # legacy per-controller mounting below doesn't apply -- the kernel refuses
+  # to mount e.g. "cpuset" as its own v1 hierarchy once it's bound to the
+  # unified one ("Unknown subsys name"). Nothing more to do here.
+  #
+  # Otherwise (cgroup v1, or hybrid): this depends on the *host* kernel the
+  # container runs on, not the image's own OS, so both cases show up in
+  # practice (e.g. Concourse workers still on cgroup v1). Re-mount each v1
+  # subsystem read-write in our own mount namespace -- without this, nested
+  # dockerd can fail to write e.g. /sys/fs/cgroup/devices/.../devices.allow.
+  if [ -f /sys/fs/cgroup/cgroup.controllers ]; then
+    return
+  fi
+
   sed -e 1d /proc/cgroups | while read sys hierarchy num enabled; do
     if [ "$enabled" != "1" ]; then
       # subsystem disabled; skip

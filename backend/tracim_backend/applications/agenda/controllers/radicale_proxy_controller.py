@@ -489,7 +489,7 @@ class RadicaleProxyController(Controller):
 
         configurator.add_route(
             "radicale_proxy__user_agenda_x",
-            "/dav/agenda/user/{user_id:[0-9]+}/{sub_item:[^\/]+\.ics}/",  # noqa: W605
+            r"/dav/agenda/user/{user_id:[0-9]+}/{sub_item:[^\/]+\.ics}/",
         )
         configurator.add_view(
             self.radicale_proxy__user_agenda_subitems,
@@ -497,7 +497,7 @@ class RadicaleProxyController(Controller):
         )
         configurator.add_route(
             "radicale_proxy__user_agenda_x_noslash",
-            "/dav/agenda/user/{user_id:[0-9]+}/{sub_item:[^\/]+\.ics}",  # noqa: W605
+            r"/dav/agenda/user/{user_id:[0-9]+}/{sub_item:[^\/]+\.ics}",
         )
         configurator.add_view(
             self.radicale_proxy__user_agenda_subitems,
@@ -524,7 +524,7 @@ class RadicaleProxyController(Controller):
 
         configurator.add_route(
             "radicale_proxy__user_addressbook_x",
-            "/dav/addressbook/user/{user_id:[0-9]+}/{sub_item:[^\/]+\.vcf}/",  # noqa: W605
+            r"/dav/addressbook/user/{user_id:[0-9]+}/{sub_item:[^\/]+\.vcf}/",
         )
         configurator.add_view(
             self.radicale_proxy__user_agenda_subitems,
@@ -532,7 +532,7 @@ class RadicaleProxyController(Controller):
         )
         configurator.add_route(
             "radicale_proxy__user_addressbook_x_noslash",
-            "/dav/addressbook/user/{user_id:[0-9]+}/{sub_item:[^\/]+\.vcf}",  # noqa: W605
+            r"/dav/addressbook/user/{user_id:[0-9]+}/{sub_item:[^\/]+\.vcf}",
         )
         configurator.add_view(
             self.radicale_proxy__user_agenda_subitems,

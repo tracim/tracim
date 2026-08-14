@@ -1,10 +1,9 @@
 #!/bin/bash
 set -e
 
-python_version=${1:-3.9.19}
-docker_registry=${2:-""}
-
 script_dir="$(realpath $(dirname $0))"
+docker_registry=${1:-""}
+
 source "$script_dir/util-lib.sh"
 skip_if_no_changed_file_match "^(frontend|backend|concourse|tools_docker/pushpin)"
 
@@ -15,7 +14,7 @@ start_docker "" "$docker_registry"
 "$script_dir/install_backend_packages"
 "$script_dir/create_backend_dirs" backend
 source "$HOME/.bashrc"
-pyenv shell $python_version
+pyenv shell $PYTHON_VERSION
 cd backend
 pip install -r requirements.txt
 python setup.py develop

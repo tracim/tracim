@@ -1,7 +1,9 @@
 ## YAML definitions re-used in plans
 definitions:
-  main_python_version: &main_python_version "3.9.19"
-  python_versions: &python_versions ["3.9.19", "3.10.14", "3.11.9"]
+  # Single source of truth for the pinned Python version: tasks below get it
+  # via a PYTHON_VERSION env var (params:), scripts read it from there.
+  main_python_version: &main_python_version "3.13.14"
+  python_versions: &python_versions [*main_python_version]
   databases: &databases ["sqlite", "postgresql"]
 
 # plan step to put the current job name as pending in github's PR
@@ -60,7 +62,7 @@ resources:
   type: registry-image
   source:
     repository: algooci/tracim
-    tag: build_154_node_16
+    tag: build_192_node_16
 # resource used to abort the running builds before starting our test jobs
 - name: abort-running-builds
   type: abort-running-builds
@@ -119,6 +121,8 @@ jobs:
       platform: linux
       inputs:
         - name: pull-request
+      params:
+        PYTHON_VERSION: *main_python_version
       run:
         dir: pull-request
         path: concourse/scripts/backend-lint
@@ -136,11 +140,12 @@ jobs:
       platform: linux
       inputs:
         - name: pull-request
+      params:
+        PYTHON_VERSION: ((.:python_version))
       run:
         dir: pull-request
         path: concourse/scripts/backend-quick-tests
         args:
-          - ((.:python_version))
           - ((docker-registry))
 
   - across:
@@ -156,11 +161,12 @@ jobs:
       platform: linux
       inputs:
         - name: pull-request
+      params:
+        PYTHON_VERSION: *main_python_version
       run:
         dir: pull-request
         path: concourse/scripts/backend-full-tests
         args:
-          - *main_python_version
           - ((.:database))
           - ((docker-registry))
 
@@ -212,9 +218,10 @@ jobs:
       platform: linux
       inputs:
         - name: pull-request
+      params:
+        PYTHON_VERSION: *main_python_version
       run:
         dir: pull-request
         path: concourse/scripts/end-to-end-cypress-tests
         args:
-          - *main_python_version
           - ((docker-registry))

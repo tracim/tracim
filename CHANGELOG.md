@@ -11,6 +11,7 @@
 - Update to Open Calendar 0.9.5 [#6862](https://github.com/tracim/tracim/issues/6862)
 - Switch back beaker Python dependency from Algoo fork to official version 1.14.1 [#6893](https://github.com/tracim/tracim/pull/6893)
 - Solve pre-commit issue and remove seed-isort-config [#6926](https://github.com/tracim/tracim/issues/6926)
+- Concourse: switch to Debian 13 [#6878](https://github.com/tracim/tracim/issues/6878)
 
 
 ## Next release (maintenance branch)
