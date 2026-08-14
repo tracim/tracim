@@ -26,6 +26,7 @@ const PromptMessage = props => (
       <button
         className='btn promptMessage__btn link'
         onClick={props.onClickBtn}
+        title={props.tooltip}
       >
         {props.btnLabel}
       </button>
