@@ -6,6 +6,10 @@
 
 - Allow to open a Kanban as a Gantt project view
 
+### 💥 Breaking/Important changes
+
+- update pre-commit version, implying you must re-install your pre-commit (`pre-commit install`) [#6923](https://github.com/tracim/tracim/issues/6923)
+
 ### Other changes
 
 - Update to Open Calendar 0.9.5 [#6862](https://github.com/tracim/tracim/issues/6862)
