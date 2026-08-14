@@ -417,6 +417,33 @@ export class Kanban extends React.Component {
     )
   }
 
+  handleCardEditIgnore = () => {
+    console.debug('%c<Kanban> ignore the change on the card', 'color: gold')
+    this.setState({ editedCardWasModified: false })
+  }
+
+  handleCardEditReload = (cardId) => {
+    const { props, state } = this
+
+    const column = state.board.columns.find(
+      (column) => column.cards.find((card) => card.id === cardId)
+    )
+    const card = column.cards.find((card) => card.id === cardId)
+
+    console.debug('%c<Kanban> reload the card information in the editor', 'color: gold', cardId, column, card)
+    removeLocalStorageItem(
+      props.content.content_type,
+      props.content.content_id,
+      props.content.workspace_id,
+      localStorageFieldIdBuilder(cardId)
+    )
+
+    this.setState({
+      editedCardInfos: { card, column },
+      editedCardWasModified: false
+    })
+  }
+
   render () {
     const { props, state } = this
     const changesAllowed = !props.readOnly && state.boardState === BOARD_STATE.LOADED
@@ -546,6 +573,8 @@ export class Kanban extends React.Component {
                 card={state.editedCardInfos.card}
                 onValidate={this.handleCardEdited}
                 onCancel={() => this.handleCardEditCancel(state.editedCardInfos.card.id)}
+                onClickIgnoreModification={this.handleCardEditIgnore}
+                onClickReloadModification={this.handleCardEditReload}
                 // End of required props ///////////////////////////////////////
                 codeLanguageList={props.config.system.config.ui__notes__code_sample_languages}
                 customColor={props.config.hexcolor}

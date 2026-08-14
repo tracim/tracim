@@ -5,6 +5,7 @@ import Select from 'react-select'
 import {
   DateInput,
   IconButton,
+  PromptMessage,
   TextInput,
   TinyEditor,
   getAvatarBaseUrl,
@@ -145,8 +146,43 @@ function KanbanCardEditor (props) {
   const selectedDependsOptionList = dependsOptionList
     .filter(m => depends.some(a => a === m.id))
 
+  console.debug(
+    '%c<KanbanCardEditor> render the component',
+    'color: gold',
+    cardFromLocalStorage,
+    JSON.stringify({
+      title, description, assignmentList, bgColor, kickoff, deadline, freeInput, duration, progress, depends, finished
+    })
+  )
   return (
     <form className='kanban__KanbanPopup__form' onSubmit={handleValidate}>
+      {props.wasModified && (
+        <PromptMessage
+          btnLabel={<i className='fas fa-times' />}
+          btnType='link'
+          icon='fas fa-exclamation'
+          msg={
+            <span>
+              {props.t('This content has been modified by someone.')}
+              <button
+                className='btn buttonLink'
+                onClick={(e) => {
+                  e.preventDefault()
+                  props.onClickReloadModification(props.card.id)
+                }}
+              >
+                {props.t('Reload it!')}
+              </button>
+            </span>
+          }
+          noInlineMargins={true}
+          onClickBtn={(e) => {
+            e.preventDefault()
+            props.onClickIgnoreModification()
+          }}
+          tooltip={props.t('If you still want to use your current work, simply check the cross and the validation will be restored.')}
+        />
+      )}
       <div className='kanban__KanbanPopup__form__fields'>
         <div className='kanban__KanbanPopup__title'>
           <TextInput
@@ -336,6 +372,8 @@ KanbanCardEditor.propTypes = {
   card: PropTypes.object.isRequired,
   onValidate: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
+  onClickIgnoreModification: PropTypes.func.isRequired,
+  onClickReloadModification: PropTypes.func.isRequired,
   defaultBackgroundColor: PropTypes.string.isRequired,
   // End of required props /////////////////////////////////////////////////////////////////////////
   codeLanguageList: PropTypes.array,
