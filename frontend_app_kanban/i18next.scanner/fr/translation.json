@@ -70,5 +70,8 @@
   "No card": "Aucune carte",
   "Reopen the card": "Réouvrir la carte",
   "Show Gantt view": "Afficher le Gantt",
-  "Today": "Aujourd’hui"
+  "Today": "Aujourd’hui",
+  "This content has been modified by someone.": "Ce contenu a été modifié par quelqu’un.",
+  "Reload it!": "Recharger le contenu !",
+  "If you still want to use your current work, simply check the cross and the validation will be restored.": "Si vous souhaitez tout de même publier vos éditions, cliquez sur l’icône en forme de croix et la validation sera de nouveau possible."
 }
