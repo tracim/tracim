@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import Select from 'react-select'
@@ -14,6 +14,20 @@ import {
   setLocalStorageItem
 } from 'tracim_frontend_lib'
 import { localStorageFieldIdBuilder } from '../helper.js'
+
+const emptyCard = {
+  title: '',
+  description: '',
+  assignmentList: [],
+  bgColor: '',
+  kickoff: '',
+  deadline: '',
+  freeInput: '',
+  duration: 1,
+  progress: '0',
+  depends: [],
+  finished: false
+}
 
 const CustomReactSelectOption = (props) => {
   return (
@@ -39,90 +53,59 @@ const CustomReactSelectOption = (props) => {
 }
 
 function KanbanCardEditor (props) {
-  const { card } = props
+  const [card, setCard] = useState(emptyCard)
 
-  const cardFromLocalStorage = useMemo(() => {
+  useEffect(() => {
     const localStorageCardJson = getLocalStorageItem(
       props.content.content_type,
       props.content.content_id,
       props.content.workspace_id,
       localStorageFieldIdBuilder(props.card.id)
     )
-    if (localStorageCardJson) return JSON.parse(localStorageCardJson)
 
-    return {
-      title: null,
-      description: null,
-      assignmentList: null,
-      bgColor: null,
-      kickoff: null,
-      deadline: null,
-      freeInput: null,
-      duration: null,
-      progress: null,
-      depends: null,
-      finished: null
+    if (localStorageCardJson) {
+      setCard(JSON.parse(localStorageCardJson))
+    } else {
+      updateCard({ ...emptyCard, bgColor: props.defaultBackgroundColor, ...props.card })
     }
-  }, [])
+  }, [props.card])
 
-  const [title, setTitle] = useState(cardFromLocalStorage.title || card.title || '')
-  const [description, setDescription] = useState(cardFromLocalStorage.description || card.description || '')
-  const [assignmentList, setAssignmentList] = useState(cardFromLocalStorage.assignmentList || card.assignmentList || [])
-  const [bgColor, setBgColor] = useState(cardFromLocalStorage.bgColor || card.bgColor || props.defaultBackgroundColor)
-  const [kickoff, setKickoff] = useState(cardFromLocalStorage.kickoff || card.kickoff || '')
-  const [deadline, setDeadline] = useState(cardFromLocalStorage.deadline || card.deadline || '')
-  const [freeInput, setFreeInput] = useState(cardFromLocalStorage.freeInput || card.freeInput || '')
-  const [duration, setDuration] = useState(cardFromLocalStorage.duration || card.duration || '1')
-  const [progress, setProgress] = useState(cardFromLocalStorage.progress || card.progress || '0')
-  const [depends, setDepends] = useState(cardFromLocalStorage.depends || card.depends || [])
-  const [finished, setFinished] = useState(cardFromLocalStorage.finished || card.finished || false)
-
-  useEffect(() => {
-    const kanbanCardDataJson = JSON.stringify({
-      title, description, assignmentList, bgColor, kickoff, deadline, freeInput, duration, progress, depends, finished
-    })
-
+  const updateCard = (newCard) => {
+    setCard(newCard)
     setLocalStorageItem(
       props.content.content_type,
       props.content.content_id,
       props.content.workspace_id,
       localStorageFieldIdBuilder(props.card.id),
-      kanbanCardDataJson
+      JSON.stringify(newCard)
     )
-  }, [title, description, assignmentList, bgColor, kickoff, deadline, freeInput, duration, progress, depends, finished])
+  }
 
   async function handleValidate (e) {
     e.preventDefault()
 
-    const descriptionWithContentLink = await searchContentAndReplaceWithTag(props.apiUrl, description)
+    const descriptionWithContentLink = await searchContentAndReplaceWithTag(props.apiUrl, card.description)
 
+    console.debug('%c<KanbanCardEditor> validate the form', 'color: gold', card)
     props.onValidate({
       ...card,
-      title,
       description: descriptionWithContentLink.html,
-      assignmentList,
-      bgColor,
-      kickoff,
-      deadline,
-      freeInput,
-      duration,
-      progress,
-      depends,
-      finished
+      duration: `${card.duration}`,
+      id: props.card.id
     })
   }
 
   function handleChangeSelectAssignment (newAssignmentList) {
-    setAssignmentList(newAssignmentList?.map(a => a.id) || [])
+    setCard({ ...card, assignmentList: newAssignmentList?.map(a => a.id) || [] })
   }
 
   function handleChangeSelectDepends (newDependsList) {
-    setDepends(newDependsList?.map(a => a.id) || [])
+    setCard({ ...card, depends: newDependsList?.map(a => a.id) || [] })
   }
 
   function handleFinishedTask (e) {
     e.preventDefault()
-    setFinished(!finished)
+    setCard({ ...card, finished: !card.finished })
   }
 
   const assignmentOptionList = props.memberList.map(m => ({
@@ -133,7 +116,7 @@ function KanbanCardEditor (props) {
   }))
 
   const selectedAssignmentOptionList = assignmentOptionList
-    .filter(m => assignmentList.some(a => Number(a) === Number(m.id)))
+    .filter(m => card.assignmentList.some(a => Number(a) === Number(m.id)))
 
   const dependsOptionList = props.cardList
     .filter(c => c.id !== card.id)
@@ -144,16 +127,8 @@ function KanbanCardEditor (props) {
     }))
 
   const selectedDependsOptionList = dependsOptionList
-    .filter(m => depends.some(a => a === m.id))
+    .filter(m => card.depends.some(a => a === m.id))
 
-  console.debug(
-    '%c<KanbanCardEditor> render the component',
-    'color: gold',
-    cardFromLocalStorage,
-    JSON.stringify({
-      title, description, assignmentList, bgColor, kickoff, deadline, freeInput, duration, progress, depends, finished
-    })
-  )
   return (
     <form className='kanban__KanbanPopup__form' onSubmit={handleValidate}>
       {props.wasModified && (
@@ -175,7 +150,7 @@ function KanbanCardEditor (props) {
               </button>
             </span>
           }
-          noInlineMargins={true}
+          noInlineMargins
           onClickBtn={(e) => {
             e.preventDefault()
             props.onClickIgnoreModification()
@@ -188,9 +163,9 @@ function KanbanCardEditor (props) {
           <TextInput
             autoFocus
             id='kanban__KanbanPopup__title'
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => updateCard({ ...card, title: e.target.value })}
             onValidate={handleValidate}
-            value={title}
+            value={card.title}
             placeholder={props.t('Title')}
           />
         </div>
@@ -198,10 +173,10 @@ function KanbanCardEditor (props) {
         <div className='kanban__KanbanPopup__description'>
           <TinyEditor
             apiUrl={props.apiUrl}
-            setContent={setDescription}
+            setContent={(description) => updateCard({ ...card, description })}
             // End of required props ///////////////////////////////////////////////////////////////
             codeLanguageList={props.codeLanguageList}
-            content={description}
+            content={card.description}
             height={300}
             isAdvancedEdition
             isMentionEnabled={false}
@@ -222,7 +197,7 @@ function KanbanCardEditor (props) {
             onChange={handleChangeSelectAssignment}
             options={assignmentOptionList}
             noOptionsMessage={() => props.t('No member')}
-            defaultValue={selectedAssignmentOptionList}
+            value={selectedAssignmentOptionList}
             isMulti
             components={{ Option: CustomReactSelectOption }}
           />
@@ -235,9 +210,9 @@ function KanbanCardEditor (props) {
 
               <DateInput
                 id='kanban__KanbanPopup__kickoff'
-                onChange={(e) => setKickoff(e.target.value)}
+                onChange={(e) => updateCard({ ...card, kickoff: e.target.value })}
                 onValidate={handleValidate}
-                value={kickoff}
+                value={card.kickoff}
               />
             </div>
 
@@ -246,9 +221,9 @@ function KanbanCardEditor (props) {
 
               <DateInput
                 id='kanban__KanbanPopup__deadline'
-                onChange={(e) => setDeadline(e.target.value)}
+                onChange={(e) => updateCard({ ...card, deadline: e.target.value })}
                 onValidate={handleValidate}
-                value={deadline}
+                value={card.deadline}
               />
             </div>
           </div>
@@ -260,9 +235,9 @@ function KanbanCardEditor (props) {
               <TextInput
                 id='kanban__KanbanPopup__duration'
                 inputClassName='number'
-                onChange={(e) => setDuration(e.target.value)}
-                value={duration}
-                suffix={duration > 1 ? props.t('days') : props.t('day')}
+                onChange={(e) => updateCard({ ...card, duration: e.target.value })}
+                value={`${card.duration}`}
+                suffix={card.duration > 1 ? props.t('days') : props.t('day')}
               />
             </div>
 
@@ -272,13 +247,13 @@ function KanbanCardEditor (props) {
               <TextInput
                 id='kanban__KanbanPopup__progress'
                 inputClassName='number'
-                onChange={(e) => setProgress(e.target.value)}
-                value={finished ? '100' : progress}
-                disabled={finished}
+                onChange={(e) => updateCard({ ...card, progress: e.target.value })}
+                value={card.finished ? '100' : card.progress}
+                disabled={card.finished}
                 suffix='%'
               />
 
-              {finished ? (
+              {card.finished ? (
                 <div className='kanban__KanbanPopup__revert'>
                   <span>{props.t('Reopen')}</span>
                   <IconButton
@@ -314,7 +289,7 @@ function KanbanCardEditor (props) {
             onChange={handleChangeSelectDepends}
             options={dependsOptionList}
             noOptionsMessage={() => props.t('No card')}
-            defaultValue={selectedDependsOptionList}
+            value={selectedDependsOptionList}
             isMulti
           />
         </div>
@@ -324,17 +299,17 @@ function KanbanCardEditor (props) {
             <input
               id='kanban__KanbanPopup__bgColor'
               type='color'
-              value={bgColor}
-              onChange={(e) => setBgColor(e.target.value)}
+              value={card.bgColor || props.defaultBackgroundColor}
+              onChange={(e) => updateCard({ ...card, bgColor: e.target.value })}
             />
           </div>
 
           <div className='kanban__KanbanPopup__freeInput'>
             <TextInput
               id='kanban__KanbanPopup__freeInput'
-              onChange={(e) => setFreeInput(e.target.value)}
+              onChange={(e) => updateCard({ ...card, freeInput: e.target.value })}
               onValidate={handleValidate}
-              value={freeInput}
+              value={card.freeInput}
               placeholder={props.t('Open field')}
             />
           </div>
@@ -380,7 +355,7 @@ KanbanCardEditor.propTypes = {
   customColor: PropTypes.string,
   language: PropTypes.string,
   memberList: PropTypes.array,
-  wasModified: PropTypes.bool,
+  wasModified: PropTypes.bool
 }
 
 KanbanCardEditor.defaultProps = {
