@@ -1,9 +1,12 @@
 'use strict'
 
+require('@babel/register')({
+  extensions: ['.js', '.jsx', '.ts', '.tsx']
+})
+
 module.exports = {
   require: [
     'regenerator-runtime',
-    './test/babelRegister',
     'ignore-styles',
     'test/setup',
     'isomorphic-fetch' // INFO - GB - 2020-06-18- Isomorphic-fetch provide the fetch API because Node does not contain it, and unit test run in Node context
