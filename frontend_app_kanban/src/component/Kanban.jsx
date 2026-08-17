@@ -113,7 +113,7 @@ export class Kanban extends React.Component {
           this.save(state.board, state.cardIdEdited)
         })
       }
-    } else if (state.revisionId && state.revisionId !== props.content.current_revision_id) {
+    } else if (state.revisionId && state.revisionId < props.content.current_revision_id) {
       console.debug('%c<Kanban> updating board from patch', 'color: gold', props.content, state.revisionId)
       this.loadBoardFromPatch()
     } else if (!state.revisionId && state.boardState === BOARD_STATE.LOADED) {
