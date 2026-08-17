@@ -93,6 +93,7 @@ class ConfigModel(object):
         limitation__max_non_guest_users: int,
         limitation__max_guest_users: int,
         limitation__max_guest_user_space_nb: int,
+        gantt_view__enabled: bool,
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
@@ -123,6 +124,7 @@ class ConfigModel(object):
         self.limitation__max_non_guest_users = limitation__max_non_guest_users
         self.limitation__max_guest_users = limitation__max_guest_users
         self.limitation__max_guest_user_space_nb = limitation__max_guest_user_space_nb
+        self.gantt_view__enabled = gantt_view__enabled
 
 
 class ErrorCodeModel(object):
