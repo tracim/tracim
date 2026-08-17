@@ -76,7 +76,5 @@ module.exports = {
     },
     extensions: ['.js', '.jsx']
   },
-  plugins: [
-    new EnvironmentPlugin({'TRACIM_GANTT_ENABLED': false})
-  ]
+  plugins: []
 }
