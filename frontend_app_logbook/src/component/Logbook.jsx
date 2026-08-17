@@ -193,8 +193,6 @@ export class Logbook extends React.Component {
   }
 
   handleConfirmRemoveEntry = (entry) => {
-    const { props } = this
-
     const newLogbook = removeEntryFromLogbook(this.state.logbook, entry)
 
     this.save(newLogbook, entry.id)

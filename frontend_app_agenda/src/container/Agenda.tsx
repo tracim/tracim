@@ -165,7 +165,7 @@ export class Agenda extends React.Component<any, any> {
   }
 
   setHeadTitle = (title: string): void => {
-    if (!title) return
+    if (title === '') return
 
     // @ts-expect-error global variable
     GLOBAL_dispatchEvent({
