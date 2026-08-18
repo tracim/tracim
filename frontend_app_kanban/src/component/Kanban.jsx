@@ -78,6 +78,7 @@ export class Kanban extends React.Component {
       editedCardInfos: null,
       editedCardWasModified: false,
       editedColumnInfos: null,
+      patchingInProgress: false,
       saveInProgress: false,
       saveRequired: false,
       cardIdEdited: null,
@@ -114,8 +115,12 @@ export class Kanban extends React.Component {
         })
       }
     } else if (state.revisionId && state.revisionId < props.content.current_revision_id) {
-      console.debug('%c<Kanban> updating board from patch', 'color: gold', props.content, state.revisionId)
-      this.loadBoardFromPatch()
+      if (!state.patchingInProgress) {
+        this.setState({ patchingInProgress: true }, () => {
+          console.debug('%c<Kanban> updating board from patch', 'color: gold', props.content, state.revisionId)
+          this.loadBoardFromPatch()
+        })
+      }
     } else if (!state.revisionId && state.boardState === BOARD_STATE.LOADED) {
       console.debug('%c<Kanban> reloading board', 'color: gold', state.revisionId, state.boardState)
       this.loadBoardContent()
@@ -178,6 +183,7 @@ export class Kanban extends React.Component {
         boardState: BOARD_STATE.LOADED,
         board: newBoard,
         initialBoard: newBoard,
+        patchingInProgress: false,
         revisionId: props.content.current_revision_id
       })
     } else {
@@ -208,6 +214,7 @@ export class Kanban extends React.Component {
           boardState: BOARD_STATE.LOADED,
           board: board,
           initialBoard: board,
+          patchingInProgress: false,
           revisionId: props.content.current_revision_id
         })
       } else {
