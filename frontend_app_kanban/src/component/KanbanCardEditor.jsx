@@ -54,6 +54,7 @@ const CustomReactSelectOption = (props) => {
 
 function KanbanCardEditor (props) {
   const [card, setCard] = useState(emptyCard)
+  const [wasModified, setWasModified] = useState(false)
 
   useEffect(() => {
     const localStorageCardJson = getLocalStorageItem(
@@ -69,6 +70,10 @@ function KanbanCardEditor (props) {
       updateCard({ ...emptyCard, bgColor: props.defaultBackgroundColor, ...props.card })
     }
   }, [props.card])
+
+  useEffect(() => {
+    setWasModified(props.wasModified || wasModified)
+  }, [props.wasModified])
 
   const updateCard = (newCard) => {
     setCard(newCard)
@@ -131,7 +136,7 @@ function KanbanCardEditor (props) {
 
   return (
     <form className='kanban__KanbanPopup__form' onSubmit={handleValidate}>
-      {props.wasModified && (
+      {wasModified && (
         <PromptMessage
           btnLabel={<i className='fas fa-times' />}
           btnType='link'
@@ -144,6 +149,7 @@ function KanbanCardEditor (props) {
                 onClick={(e) => {
                   e.preventDefault()
                   props.onClickReloadModification(props.card.id)
+                  setWasModified(false)
                 }}
               >
                 {props.t('Reload it!')}
@@ -154,6 +160,7 @@ function KanbanCardEditor (props) {
           onClickBtn={(e) => {
             e.preventDefault()
             props.onClickIgnoreModification()
+            setWasModified(false)
           }}
           tooltip={props.t('If you still want to use your current work, simply check the cross and the validation will be restored.')}
         />
@@ -328,7 +335,7 @@ function KanbanCardEditor (props) {
         <IconButton
           color={props.customColor}
           dataCy='confirm_popup__button_confirm'
-          disabled={props.wasModified}
+          disabled={wasModified}
           icon='fas fa-check'
           intent='primary'
           mode='light'
