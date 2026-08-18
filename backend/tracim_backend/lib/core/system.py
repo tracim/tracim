@@ -104,6 +104,7 @@ class SystemApi(object):
             limitation__max_non_guest_users=self._config.LIMITATION__MAX_NON_GUEST_USERS,
             limitation__max_guest_users=self._config.LIMITATION__MAX_GUEST_USERS,
             limitation__max_guest_user_space_nb=self._config.LIMITATION__MAX_GUEST_USER_SPACE_NB,
+            gantt_view__enabled=self._config.GANTT_VIEW__ENABLED,
         )
 
     def get_usage_conditions_files(self) -> typing.List[UsageConditionModel]:

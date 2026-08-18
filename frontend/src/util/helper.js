@@ -18,8 +18,7 @@ export const history = require('history').createBrowserHistory()
 
 export const FETCH_CONFIG = {
   headers: LIB_FETCH_CONFIG.headers,
-  apiUrl: configEnv.apiUrl,
-  ganttEnabled: process.env.TRACIM_GANTT_ENABLED === '1'
+  apiUrl: configEnv.apiUrl
 }
 
 export const SEARCH_TYPE = {

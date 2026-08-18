@@ -739,6 +739,10 @@ class CFG(object):
         except ValueError:
             raise ConfigurationError("The value of ui.notes.code_sample_languages is malformed")
 
+        # INFO - A.L - 2026-08-17 - This variable is temporary and will be removed
+        # in the future when the Gantt feature is fully implemented.
+        self.GANTT_VIEW__ENABLED = asbool(self.get_raw_config("gantt_view.enabled", "False"))
+
     def __load_uploaded_files_config(self) -> None:
         default_depot_storage_path = self.here_macro_replace("%(here)s/depot")
         self.DEPOT_STORAGE_DIR = self.get_raw_config(
