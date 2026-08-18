@@ -158,7 +158,7 @@ export class Kanban extends React.Component {
           if (matched) {
             const x = parseInt(matched[1])
             const y = parseInt(matched[2])
-            if (state.board.columns[x].cards[y].id === state.editedCardInfos.card.id) {
+            if (state.initialBoard.columns[x].cards[y].id === state.editedCardInfos.card.id) {
               console.debug(
                 '%c<Kanban> the modal is open and the edited card was modified',
                 'color: gold',
@@ -171,7 +171,7 @@ export class Kanban extends React.Component {
       }
 
       console.debug('%c<Kanban> apply patch', 'color: gold', patchContent)
-      const newBoard = JSON.parse(JSON.stringify(state.board))
+      const newBoard = JSON.parse(JSON.stringify(state.initialBoard))
       applyPatch(newBoard, patchContent)
 
       this.setState({
@@ -322,6 +322,7 @@ export class Kanban extends React.Component {
         props.content.workspace_id,
         props.content.content_id,
         props.content.label + KANBAN_FILE_EXTENSION,
+        state.revisionId,
         JSON.stringify(patchedBoard),
         KANBAN_MIME_TYPE
       )
@@ -332,10 +333,14 @@ export class Kanban extends React.Component {
         case 2044:
           sendGlobalFlashMessage(props.t('You must change the status or restore this kanban board before any change'))
           break
+        case 3015:
+          sendGlobalFlashMessage(props.t('The board has been modified and your modification cannot be applied'))
+          break
         default:
           sendGlobalFlashMessage(props.t('Error while saving the new version'))
           break
       }
+      this.setState({ boardState: BOARD_STATE.ERROR })
       return
     }
 
