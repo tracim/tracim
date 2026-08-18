@@ -6,6 +6,10 @@ const searchInput = '[data-cy=search__text]'
 const searchButton = '[data-cy=search__btn]'
 const searchText = 'This long sentence will probably never yield any result but I hope it will make the reviewer smile a bit.'
 
+/**
+ * TODO - PGO - 2026-08-18 - Currently this test is working only in simple search, advanced search is not supported
+ */
+
 describe('Search', () => {
   before(function () {
     cy.resetDB()
