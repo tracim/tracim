@@ -624,6 +624,15 @@ class FilePatchQuery(object):
         self.to_revision_id = to_revision_id
 
 
+class FilePatchUploadQuery(object):
+    """
+    File patch upload query model
+    """
+
+    def __init__(self, current_revision_id: int) -> None:
+        self.current_revision_id = current_revision_id
+
+
 class PageQuery(object):
     """
     Page query model

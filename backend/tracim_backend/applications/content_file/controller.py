@@ -12,6 +12,7 @@ from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
+from tracim_backend.exceptions import ConflictingNewerRevWhilePatching
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ContentRevisionNotFound
@@ -56,6 +57,7 @@ from tracim_backend.views.core_api.schemas import FileCreationFormSchema
 from tracim_backend.views.core_api.schemas import FilePatchQuerySchema
 from tracim_backend.views.core_api.schemas import FilePatchResponseSchema
 from tracim_backend.views.core_api.schemas import FilePatchSchema
+from tracim_backend.views.core_api.schemas import FilePatchUploadQuerySchema
 from tracim_backend.views.core_api.schemas import FilePathSchema
 from tracim_backend.views.core_api.schemas import FilePreviewSizedPathSchema
 from tracim_backend.views.core_api.schemas import FileQuerySchema
@@ -256,11 +258,13 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @check_right(is_contributor)
     @check_right(is_file_content)
+    @hapic.handle_exception(ConflictingNewerRevWhilePatching, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(FileSizeOverMaxLimitation, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(FileSizeOverWorkspaceEmptySpace, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(FileSizeOverOwnerEmptySpace, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(NoFileValidationError, HTTPStatus.BAD_REQUEST)
+    @hapic.input_query(FilePatchUploadQuerySchema())
     @hapic.input_path(FilePathSchema())
     @hapic.input_files(SimpleFileSchema())
     @hapic.output_body(FilePatchResponseSchema())
@@ -282,6 +286,14 @@ class FileController(Controller):
         )
 
         content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+
+        if (revision_id := hapic_data.query.current_revision_id) != content.revision_id:
+            raise ConflictingNewerRevWhilePatching(
+                f"the revision sent with the patch ({revision_id}) do not match "
+                f"the current revision of the content ({content.revision_id}). "
+                "This patch will be ignored."
+            )
+
         match content.file_mimetype:
             case "application/json":
                 patch_file = hapic_data.files.files
@@ -303,8 +315,6 @@ class FileController(Controller):
                     patch_content = patch_file.file.read()
                     new_content = apply_patch(load(content_buffer), patch_content)
 
-                # TODO - A.L. - 2026-08-13 - check if the content was modified
-                # before saving it
                 with new_revision(
                     session=request.dbsession, tm=transaction.manager, content=content
                 ):

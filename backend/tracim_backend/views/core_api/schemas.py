@@ -56,6 +56,7 @@ from tracim_backend.models.context_models import ContentNamespaceUpdate
 from tracim_backend.models.context_models import ContentUpdate
 from tracim_backend.models.context_models import FileCreation
 from tracim_backend.models.context_models import FilePatchQuery
+from tracim_backend.models.context_models import FilePatchUploadQuery
 from tracim_backend.models.context_models import FilePath
 from tracim_backend.models.context_models import FilePreviewSizedPath
 from tracim_backend.models.context_models import FileQuery
@@ -2927,6 +2928,21 @@ class UpdateUserCallStateSchema(marshmallow.Schema):
 ###
 # Patch
 ###
+
+
+class FilePatchUploadQuerySchema(marshmallow.Schema):
+    current_revision_id = marshmallow.fields.Int(
+        metadata={
+            "example": 42,
+            "description": "The revision id of the content where the patch " "must be applied.",
+        },
+        required=True,
+        validate=strictly_positive_int_validator,
+    )
+
+    @post_load
+    def make_query(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
+        return FilePatchUploadQuery(**data)
 
 
 class FilePatchResponseSchema(marshmallow.Schema):
