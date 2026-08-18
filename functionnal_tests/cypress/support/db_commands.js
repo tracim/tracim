@@ -85,7 +85,7 @@ Cypress.Commands.add('createRandomUser', (profile = 'users') => {
 Cypress.Commands.add('createUser', (fixturePath = 'baseUser') => {
   return cy
     .fixture(fixturePath)
-    .then(userJSON => cy.request('POST', '/api/users', userJSON))
+    .then(({ user_id, ...userJSON }) => cy.request('POST', '/api/users', userJSON))
     .then(handleUndefinedResponse)
 })
 
@@ -107,7 +107,7 @@ Cypress.Commands.add('createWorkspace', (fixturePath = 'baseWorkspace') => {
   let url = '/api/workspaces'
   return cy
     .fixture(fixturePath)
-    .then(workspaceJSON => cy.request('POST', url, workspaceJSON))
+    .then(({ workspace_id, ...workspaceJSON }) => cy.request('POST', url, workspaceJSON))
     .then(handleUndefinedResponse)
 })
 
