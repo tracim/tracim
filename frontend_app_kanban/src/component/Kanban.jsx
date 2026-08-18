@@ -143,6 +143,7 @@ export class Kanban extends React.Component {
     )
     if (fetchPatchFileContent.apiResponse.ok && fetchPatchFileContent.body.patch_content) {
       const patchContent = fetchPatchFileContent.body.patch_content
+      let editedCardWasModified = false
 
       console.debug('%c<Kanban> check received patch', 'color: gold', patchContent)
       if (state.editedCardInfos?.card?.id) {
@@ -169,7 +170,7 @@ export class Kanban extends React.Component {
                 'color: gold',
                 state.editedCardInfos.card.id
               )
-              this.setState({ editedCardWasModified: true })
+              editedCardWasModified = true
             }
           }
         })
@@ -182,6 +183,7 @@ export class Kanban extends React.Component {
       this.setState({
         boardState: BOARD_STATE.LOADED,
         board: newBoard,
+        editedCardWasModified: editedCardWasModified,
         initialBoard: newBoard,
         patchingInProgress: false,
         revisionId: props.content.current_revision_id
