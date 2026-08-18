@@ -59,7 +59,8 @@ describe('App File', () => {
 
         const contentFile1Getter = formatTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: fileTitle_1 } })
         cy.get(contentFile1Getter)
-          .click()
+          .find('.content__item')
+          .click('left')
 
         cy.get('[data-cy="popinFixed"]')
           .should('be.visible')

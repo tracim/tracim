@@ -22,7 +22,7 @@ describe('Known users as a workspace-manager', function () {
     cy.get('[data-cy=createcontent__form__input]').type(DOCUMENT_TITLE)
     cy.get('[data-cy=popup__createcontent__form__button]').click()
     cy.get('.html-document__contentpage__header__close').click()
-    cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: DOCUMENT_TITLE } }).click()
+    cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: DOCUMENT_TITLE } }).find('.content__item').click('left')
 
     cy.waitForHugeRTELoaded().then(() => {
       cy.assertHugeRTEIsActive()
