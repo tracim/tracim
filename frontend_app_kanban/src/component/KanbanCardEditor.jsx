@@ -138,7 +138,7 @@ function KanbanCardEditor (props) {
           icon='fas fa-exclamation'
           msg={
             <span>
-              {props.t('This content has been modified by someone.')}
+              {props.t('This content has been modified.')}
               <button
                 className='btn buttonLink'
                 onClick={(e) => {
