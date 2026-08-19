@@ -5,6 +5,7 @@ import typing
 
 from tracim_backend.app_models.contents import ContentTypeInContext
 from tracim_backend.app_models.contents import ContentTypeSlug
+from tracim_backend.exceptions import ConflictingNewerRevWhilePatching
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentInNotEditableState
 from tracim_backend.exceptions import ContentTypeNotAllowed
@@ -3580,6 +3581,173 @@ class TestContentApi(object):
         )
         assert len(list(api.get_all_query(user=user))) == 1
         assert len(list(api.get_all_query(user=admin_user))) == 0
+
+    def test_unit__apply_patch__with_json_content(
+        self,
+        session,
+        workspace_api_factory,
+        app_config,
+        user_api_factory,
+        content_type_list,
+        admin_user,
+    ) -> None:
+        uapi = user_api_factory.get()
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.USER, save_now=True)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
+
+        with session.no_autoflush:
+            text_file = api.create(
+                content_type_slug=content_type_list.File.slug,
+                workspace=workspace,
+                parent=None,
+                label="json_file",
+                do_save=False,
+            )
+            api.update_file_data(text_file, "json_file", "application/json", b"[]")
+
+        api.save(text_file, ActionDescription.CREATION)
+        assert text_file.revision_id == 1
+
+        revision_id = api.apply_patch(
+            text_file.revision_id,
+            text_file.content_id,
+            content_type_list.File.slug,
+            b'[{"op": "add", "path": "/0", "value": {"foo": "bar"}}]',
+            "application/json",
+        )
+        assert revision_id == 2
+
+        raw_file = api.get_raw_file(text_file, "json_file", default_filename="json_file")
+        with open(raw_file.file_object._file_path, "rb") as file_buffer:
+            assert file_buffer.read() == b'[{"foo": "bar"}]'
+
+    def test_unit__apply_patch__with_not_latest_revision(
+        self,
+        session,
+        workspace_api_factory,
+        app_config,
+        user_api_factory,
+        content_type_list,
+        admin_user,
+    ) -> None:
+        uapi = user_api_factory.get()
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.USER, save_now=True)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
+
+        with session.no_autoflush:
+            text_file = api.create(
+                content_type_slug=content_type_list.File.slug,
+                workspace=workspace,
+                parent=None,
+                label="json_file",
+                do_save=False,
+            )
+            api.update_file_data(text_file, "json_file", "application/json", b"[]")
+
+        api.save(text_file, ActionDescription.CREATION)
+        assert text_file.revision_id == 1
+
+        with new_revision(session, transaction.manager, content=text_file):
+            api.update_file_data(
+                text_file, text_file.label, text_file.file_mimetype, b'[{"foo": "bar"}]'
+            )
+            api.save(
+                content=text_file,
+                action_description=ActionDescription.EDITION,
+                do_notify=False,
+            )
+            assert text_file.revision_id == 2
+
+        with pytest.raises(ConflictingNewerRevWhilePatching):
+            api.apply_patch(
+                1,
+                text_file.content_id,
+                content_type_list.File.slug,
+                b'[{"op": "add", "path": "/0", "value": {"foo": "bar"}}]',
+                "application/json",
+            )
+
+    def test_unit__apply_patch__with_invalid_content_mimetype(
+        self,
+        session,
+        workspace_api_factory,
+        app_config,
+        user_api_factory,
+        content_type_list,
+        admin_user,
+    ) -> None:
+        uapi = user_api_factory.get()
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.USER, save_now=True)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
+
+        with session.no_autoflush:
+            text_file = api.create(
+                content_type_slug=content_type_list.File.slug,
+                workspace=workspace,
+                parent=None,
+                label="text_file",
+                do_save=False,
+            )
+            api.update_file_data(text_file, "text_file", "text/plain", b"[]")
+
+        api.save(text_file, ActionDescription.CREATION)
+        assert text_file.revision_id == 1
+
+        with pytest.raises(ContentTypeNotAllowed):
+            api.apply_patch(
+                text_file.revision_id,
+                text_file.content_id,
+                content_type_list.File.slug,
+                b'[{"op": "add", "path": "/0", "value": {"foo": "bar"}}]',
+                "application/json",
+            )
+
+    def test_unit__apply_patch__with_invalid_patch_mimetype(
+        self,
+        session,
+        workspace_api_factory,
+        app_config,
+        user_api_factory,
+        content_type_list,
+        admin_user,
+    ) -> None:
+        uapi = user_api_factory.get()
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.USER, save_now=True)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
+
+        with session.no_autoflush:
+            text_file = api.create(
+                content_type_slug=content_type_list.File.slug,
+                workspace=workspace,
+                parent=None,
+                label="json_file",
+                do_save=False,
+            )
+            api.update_file_data(text_file, "json_file", "application/json", b"[]")
+
+        api.save(text_file, ActionDescription.CREATION)
+        assert text_file.revision_id == 1
+
+        with pytest.raises(ContentTypeNotAllowed):
+            api.apply_patch(
+                text_file.revision_id,
+                text_file.content_id,
+                content_type_list.File.slug,
+                b'[{"op": "add", "path": "/0", "value": {"foo": "bar"}}]',
+                "plain/text",
+            )
 
     def test_unit__get_patch__with_json_content(
         self,

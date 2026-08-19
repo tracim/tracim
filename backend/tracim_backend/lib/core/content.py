@@ -5,7 +5,9 @@ from datetime import timezone
 from depot.io.utils import FileIntent
 from hapic.data import HapicFile
 from importlib_metadata import metadata
+from json import dumps
 from json import load
+from jsonpatch import apply_patch
 from jsonpatch import make_patch
 import os
 from preview_generator.exception import UnsupportedMimeType
@@ -33,6 +35,7 @@ from tracim_backend.config import CFG
 from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
 from tracim_backend.exceptions import ConflictingMoveInChild
 from tracim_backend.exceptions import ConflictingMoveInItself
+from tracim_backend.exceptions import ConflictingNewerRevWhilePatching
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentInNotEditableState
 from tracim_backend.exceptions import ContentNamespaceDoNotMatch
@@ -2618,6 +2621,66 @@ class ContentApi(object):
             )
 
         return result
+
+    def apply_patch(
+        self,
+        revision_id: int,
+        content_id: int,
+        content_type: str,
+        patch_file_content: str,
+        patch_mimetype: str,
+    ) -> int:
+        """Applied a patch on a content
+
+        Args:
+            revision_id (int): The revision where the patch will be applied on the content.
+            content_id (int): The identifier of the content.
+            content_type (str): The type of the content.
+            patch_file_content (str): The content of the patch to apply.
+            patch_mimetype (str): The mimetype of the patch.
+
+        Returns:
+            int: The latest revision of the content after the application of the patch.
+
+        Raises:
+            ContentTypeNotAllowed: If the specified content and patch are not JSON files.
+        """
+
+        # INFO - A.L - 2026-08-19 - For now, this method can only be used with JSON files.
+        if patch_mimetype != "application/json":
+            raise ContentTypeNotAllowed(
+                f"Uploaded patch of type '{patch_mimetype}' is not supported."
+            )
+
+        content = self.get_one(content_id, content_type)
+        if revision_id != content.revision_id:
+            raise ConflictingNewerRevWhilePatching(
+                f"the revision sent with the patch ({revision_id}) do not match "
+                f"the current revision of the content ({content.revision_id}). "
+                "This patch will be ignored."
+            )
+
+        if content.file_mimetype != "application/json":
+            raise ContentTypeNotAllowed(f"Content type '{content.file_mimetype}' is not supported.")
+
+        content_file = self.get_raw_file(
+            content, content.file_name, default_filename=content.file_name
+        )
+
+        # TODO - A.L - 2026-08-13 - raise an exception when the patch cannot be applied
+        with open(content_file.file_object._file_path, "rb") as content_buffer:
+            new_content = apply_patch(load(content_buffer), patch_file_content)
+
+        with new_revision(session=self._session, tm=transaction.manager, content=content):
+            self.update_file_data(
+                content,
+                new_content=dumps(new_content).encode(),
+                new_filename=content.file_name,
+                new_mimetype=content.file_mimetype,
+            )
+            self.save(content)
+
+        return content.revision_id
 
     def get_patch(
         self,

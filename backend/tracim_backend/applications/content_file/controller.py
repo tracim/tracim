@@ -1,8 +1,5 @@
 # coding=utf-8
 from http import HTTPStatus
-from json import dumps
-from json import load
-from jsonpatch import apply_patch
 from pyramid.config import Configurator
 import transaction
 import typing  # noqa: F401
@@ -285,54 +282,16 @@ class FileController(Controller):
             config=app_config,
         )
 
-        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
+        patch_file = hapic_data.files.files
+        revision_id = api.apply_patch(
+            hapic_data.query.current_revision_id,
+            hapic_data.path.content_id,
+            content_type=ContentTypeSlug.ANY.value,
+            patch_file_content=patch_file.file.read(),
+            patch_mimetype=patch_file.type,
+        )
 
-        if (revision_id := hapic_data.query.current_revision_id) != content.revision_id:
-            raise ConflictingNewerRevWhilePatching(
-                f"the revision sent with the patch ({revision_id}) do not match "
-                f"the current revision of the content ({content.revision_id}). "
-                "This patch will be ignored."
-            )
-
-        match content.file_mimetype:
-            case "application/json":
-                patch_file = hapic_data.files.files
-                if patch_file.type != "application/json":
-                    raise UnvalidJsonFile(
-                        "to apply a patch on a JSON content, the specified file "
-                        "must be a valid JSON patch."
-                    )
-
-                content_file = StorageLib(request.app_config).get_raw_file(
-                    depot_file=content.depot_file,
-                    filename=content.file_name,
-                    default_filename=content.file_name,
-                )
-
-                # TODO - A.L. - 2026-08-13 - raise an exception when the patch
-                # cannot be applied
-                with open(content_file.file_object._file_path, "rb") as content_buffer:
-                    patch_content = patch_file.file.read()
-                    new_content = apply_patch(load(content_buffer), patch_content)
-
-                with new_revision(
-                    session=request.dbsession, tm=transaction.manager, content=content
-                ):
-                    api.update_file_data(
-                        content,
-                        new_content=dumps(new_content).encode(),
-                        new_filename=content.file_name,
-                        new_mimetype=content.file_mimetype,
-                    )
-                    api.save(content)
-
-                return {"new_revision": content.revision_id}
-
-            case _:
-                raise ContentTypeNotAllowed(
-                    f"the content_type {from_revision.file_mimetype} is not "
-                    "available with this route."
-                )
+        return {"new_revision": revision_id}
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @check_right(is_reader)
