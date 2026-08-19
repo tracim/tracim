@@ -345,7 +345,7 @@ export class Kanban extends React.Component {
           sendGlobalFlashMessage(props.t('You must change the status or restore this kanban board before any change'))
           break
         case 3015:
-          sendGlobalFlashMessage(props.t('The board has been modified and your modification cannot be applied'))
+          sendGlobalFlashMessage(props.t('The board has been modified and your modification cannot be applied'), 'danger')
           break
         default:
           sendGlobalFlashMessage(props.t('Error while saving the new version'))
