@@ -21,23 +21,17 @@ describe('App Agenda', () => {
     cy.cancelXHR()
   })
 
-  // TODO - CH - 2019-06-05 - We need to add tests that check that the agenda loaded is the proper one
-  // Right now, Cypress cannot access or click inside an iframe
-  // One solution would be to add custom events fired by caldavzap that would include the data it is about to display
-  // and assert that it is the right data (eg. the right workspace)
-  // see https://github.com/tracim/tracim/issues/1849
-
   describe('Switching from app agenda of different workspace', () => {
-    it('Should reload the iframe with the proper workspace id', () => {
+    it('Should reload the calendar with the proper workspace id', () => {
+      cy.intercept('PROPFIND', `**/dav/agenda/workspace/${workspace1.workspace_id}/`).as('agenda1')
       cy.visitPage({ pageName: PAGES.AGENDA, params: { workspaceId: workspace1.workspace_id } })
 
       cy.get('[data-cy="layoutPageTitle"]')
         .contains(workspace1.label)
 
-      cy.get('#agendaIframe')
-        .invoke('attr', 'data-config')
-        .should('contain', `agenda/workspace/${workspace1.workspace_id}/`)
+      cy.wait('@agenda1')
 
+      cy.intercept('PROPFIND', `**/dav/agenda/workspace/${workspace2.workspace_id}/`).as('agenda2')
       cy.get(`.sidebar__item__name[title="${workspace2.label}"]`)
         .click()
 
@@ -50,9 +44,7 @@ describe('App Agenda', () => {
       cy.get('[data-cy="layoutPageTitle"]')
         .should('contain', workspace2.label)
 
-      cy.get('#agendaIframe')
-        .invoke('attr', 'data-config')
-        .should('contain', `agenda/workspace/${workspace2.workspace_id}/`)
+      cy.wait('@agenda2')
     })
   })
 })

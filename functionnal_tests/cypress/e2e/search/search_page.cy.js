@@ -9,6 +9,10 @@ const searchButton = '[data-cy=search__btn]'
 
 let workspaceId
 
+/**
+ * TODO - PGO - 2026-08-18 - Currently this test is working only in simple search, advanced search is not supported
+ */
+
 describe('Searching keywords', () => {
   describe('in the input', () => {
     before(function () {

@@ -16,7 +16,7 @@ describe('HugeRte text editor', function () {
     })
 
     it('The input tag should not be visible', function () {
-      cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: fileName } }).click()
+      cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: fileName } }).find('.content__item').click('left')
       cy.waitForHugeRTELoaded().then(() => {
         cy.getTag({ selectorName: s.CONTENT_FRAME })
           .find('.mce-i-image')
@@ -40,7 +40,7 @@ describe('HugeRte text editor', function () {
       beforeEach(() => {
         cy.loginAs('users')
         cy.visitPage({ pageName: p.CONTENTS, params: { workspaceId: 1 } })
-        cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: 'TestNote2' } }).click()
+        cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: 'TestNote2' } }).find('.content__item').click('left')
       })
 
       it('the autocompletion popup should open when typing "@"', function () {
@@ -115,7 +115,7 @@ describe('HugeRte text editor', function () {
     beforeEach(() => {
       cy.loginAs('users')
       cy.visitPage({ pageName: p.CONTENTS, params: { workspaceId: 1 } })
-      cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: 'TestNote3' } }).click()
+      cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: 'TestNote3' } }).find('.content__item').click('left')
     })
     for (const [buttonTitle, domElement] of [['Bullet list', 'ul'], ["Numbered list", 'ol']]) {
       it(`should setup a dir="auto" attribute on ${buttonTitle}s`, function () {
