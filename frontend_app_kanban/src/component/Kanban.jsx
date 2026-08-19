@@ -181,6 +181,18 @@ export class Kanban extends React.Component {
       const newBoard = JSON.parse(JSON.stringify(state.initialBoard))
       applyPatch(newBoard, patchContent)
 
+      // Check if the content of the card was really modified
+      if (editedCardWasModified) {
+        const cardId = state.editedCardInfos.card.id
+        const card = state.board.columns.find(
+          (column) => column.cards.find((card) => card.id === cardId)
+        ).cards.find((card) => card.id === cardId)
+
+        if (card === state.editedCardInfos.card) {
+          editedCardWasModified = false
+        }
+      }
+
       this.setState({
         boardState: BOARD_STATE.LOADED,
         board: newBoard,
