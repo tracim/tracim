@@ -105,6 +105,10 @@ function KanbanCard (props) {
           <ConfirmPopup
             onCancel={() => setShowConfirmPopup(false)}
             onConfirm={() => {
+              /* INFO - A.L - 2026-08-19 - By updating the showConfirmPopup state,
+                 the modal will be closed when the container was updated. Without
+                 this state, the modal will stay open forever, until the user
+                 close/reload the tab. */
               setShowConfirmPopup(false)
               props.onRemoveCard(props.card)
             }}
