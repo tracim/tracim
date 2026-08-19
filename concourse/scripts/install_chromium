@@ -1,0 +1,13 @@
+#!/bin/bash
+set -e
+
+version="$1"
+if [ -z "$version" ]; then
+    echo "Usage: $0 <chromium-version> (e.g. 151.0.7922.137-1~deb13u1)" >&2
+    exit 1
+fi
+
+apt-get update
+apt-get install -y "chromium=${version}"
+# Prevent a later apt-get upgrade/install elsewhere in the image build from silently bumping this pin
+apt-mark hold chromium

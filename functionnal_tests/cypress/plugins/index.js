@@ -20,4 +20,17 @@ module.exports = (on, config) => {
       return null
     }
   })
+
+  // HACK - PGO - 2026-08-19
+  // The whole Concourse CI task tree (this script, Node, Cypress, and any browser it spawns)
+  // runs as root (see tools_docker/concourse/Dockerfile)
+  // A real Chromium binary (unlike Cypress's bundled Electron) refuses to start as root
+  // ("Running as root without --no-sandbox is not supported", https://crbug.com/638180),
+  // so the sandbox has to be explicitly disabled for it here.
+  on('before:browser:launch', (browser, launchOptions) => {
+    if (browser.family === 'chromium' && browser.name !== 'electron') {
+      launchOptions.args.push('--no-sandbox')
+    }
+    return launchOptions
+  })
 }

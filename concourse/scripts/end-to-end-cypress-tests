@@ -27,4 +27,5 @@ cd -
 ./setup_functionnal_tests.sh root
 ./install_frontend_dependencies.sh root
 ./build_full_frontend.sh
-NO_VIRTUAL_ENV=1 ./run_dev_backend.sh cypress run
+# HACK - PGO - 2026-08-19 - Forcing using Chromium to get rid of bundled v118 which is incompatible (#6930)
+NO_VIRTUAL_ENV=1 ./run_dev_backend.sh cypress run --browser chromium
