@@ -43,6 +43,12 @@ Alternatively, under root:
 ./setup_functionnal_tests.sh root
 ```
 
+### Run interactively
+
+> [!IMPORTANT]
+> By default Cypress will use your installed Chromium version.  
+> You can use embedded Electron Chromium version by using the Cypress home screen
+
 Run every functional tests
 ```bash
 ./run_dev_backend.sh cypress run
@@ -53,9 +59,22 @@ Open Cypress UI
 ./run_dev_backend.sh cypress open
 ```
 
-For more advanced usage, refer to the [cypress documentation](https://docs.cypress.io/).
+
+### Run headlessly
+
+```bash
+./run_dev_backend.sh cypress run --spec "cypress/e2e/app_agenda/switching_app_agenda.cy.js"
+```
+
+> [!NOTE]
+> The `--spec` parameter is passed since september 2026 (#6930)
+
 
 ### Information
+
+> [!NOTE]
+> For more advanced usage, refer to the [cypress documentation](https://docs.cypress.io/).
+
 
 Cypress tests run on their own database.
 But it doesn't use their own `depot/` folder.
