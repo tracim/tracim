@@ -10,6 +10,8 @@ $0 cypress open
     Run the Tracim backend for functional tests then launch Cypress in a GUI
 $0 cypress run
     Run the Tracim backend for functional tests then launch the full Cypress test suite in the terminal
+$0 cypress run --spec "cypress/e2e/app_agenda/switching_app_agenda.cy.js"
+    Any extra arguments after 'open'/'run' are passed through to the underlying 'cypress open'/'cypress run' command
 EOF
 }
 
@@ -41,6 +43,7 @@ backend_pid=$(pgrep pserve)
 set -e
 cypress_arg="$2"
 mode="$1"
+cypress_extra_args=("${@:3}")
 export DATABASE_NAME="tracim"
 database_dir="$script_dir/backend"
 database_service=
@@ -153,7 +156,7 @@ if [ "$mode" = "cypress" ]; then
     backend_pid=$!
     popd
     pushd "$script_dir/functionnal_tests"
-    yarn run "cypress-$cypress_arg"
+    yarn run "cypress-$cypress_arg" "${cypress_extra_args[@]}"
     teardown
 else
     # NOTE: by default the mysql/mariadb do save their database in a tmpfs.
