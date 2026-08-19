@@ -41,7 +41,7 @@ describe.skip('Scroll to active content when refreshing the page', () => {
       it('should scroll to file when refreshing the page', () => {
         cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: contentTitle + nbContent } })
           .find('.content__item')
-          .click()
+          .click('left')
 
         cy.reload()
 
@@ -81,7 +81,7 @@ describe.skip('Scroll to active content when refreshing the page', () => {
 
         cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: contentTitle + nbContent } })
           .find('.content__item')
-          .click()
+          .click('left')
 
         cy.reload()
 
