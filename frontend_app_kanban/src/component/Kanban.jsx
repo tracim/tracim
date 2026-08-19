@@ -27,6 +27,7 @@ import {
   CardPopup,
   Loading,
   PromptMessage,
+  RefreshWarningMessage,
   sendGlobalFlashMessage,
   removeLocalStorageItem
 } from 'tracim_frontend_lib'
@@ -457,6 +458,11 @@ export class Kanban extends React.Component {
     })
   }
 
+  handleRefreshBoard = () => {
+    console.debug('%c<Kanban> refresh button clicked, reload the board.', 'color: gold')
+    this.loadBoardContent()
+  }
+
   render () {
     const { props, state } = this
     const changesAllowed = !props.readOnly && state.boardState === BOARD_STATE.LOADED
@@ -492,6 +498,17 @@ export class Kanban extends React.Component {
               text={props.t('Last version')}
             />
           )}
+          {state.boardState === BOARD_STATE.ERROR && (
+            <>
+              <div className='kanban__contentpage__wrapper__options__error'>
+                {props.t('The board was not able to load. Use the refresh button to reload it.')}
+              </div>
+              <RefreshWarningMessage
+                tooltip={props.t('Click on this button to reload the board.')}
+                onClickRefresh={this.handleRefreshBoard}
+              />
+            </>
+          )}
         </div>
 
         <div className='kanban__contentpage__wrapper__toolbar'>
@@ -504,7 +521,6 @@ export class Kanban extends React.Component {
           )}
         </div>
         {state.boardState === BOARD_STATE.INIT && <Loading />}
-        {state.boardState === BOARD_STATE.ERROR && <span> {props.t('Error while loading the board.')} </span>}
         <>
           <div
             className={classnames('kanban__contentpage__wrapper__board', {
