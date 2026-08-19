@@ -43,7 +43,7 @@ Alternatively, under root:
 ./setup_functionnal_tests.sh root
 ```
 
-### Run interactively
+### Run all tests
 
 > [!IMPORTANT]
 > By default Cypress will use your installed Chromium version.  
@@ -54,13 +54,14 @@ Run every functional tests
 ./run_dev_backend.sh cypress run
 ```
 
-Open Cypress UI
+### Run specific tests
+
+Open Cypress UI, allowing the selection of a specific test
 ```bash
 ./run_dev_backend.sh cypress open
 ```
 
-
-### Run headlessly
+Directly launch a specific test:
 
 ```bash
 ./run_dev_backend.sh cypress run --spec "cypress/e2e/app_agenda/switching_app_agenda.cy.js"
@@ -68,6 +69,14 @@ Open Cypress UI
 
 > [!NOTE]
 > The `--spec` parameter is passed since september 2026 (#6930)
+
+> [!NOTE]
+> If run headlessly the embedded Electron browser version will be used, otherwiser installed Chromium version.
+
+> [!TIP]
+> Other available params:
+> - `--headed`: opens up a browser window
+> - `--no-exit`: keep the browser window opened
 
 
 ### Information
