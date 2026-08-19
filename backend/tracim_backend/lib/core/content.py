@@ -5,6 +5,8 @@ from datetime import timezone
 from depot.io.utils import FileIntent
 from hapic.data import HapicFile
 from importlib_metadata import metadata
+from json import load
+from jsonpatch import make_patch
 import os
 from preview_generator.exception import UnsupportedMimeType
 from preview_generator.manager import PreviewManager
@@ -36,6 +38,7 @@ from tracim_backend.exceptions import ContentInNotEditableState
 from tracim_backend.exceptions import ContentNamespaceDoNotMatch
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ContentRevisionNotFound
+from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import EmptyCommentContentNotAllowed
 from tracim_backend.exceptions import EmptyLabelNotAllowed
@@ -922,6 +925,22 @@ class ContentApi(object):
             height=height,
             original_file_extension=revision.file_extension,
             force_download=force_download,
+        )
+
+    def get_raw_file(
+        self,
+        revision: ContentRevisionRO,
+        filename: str,
+        default_filename: str,
+        force_download: bool = None,
+        last_modified: datetime = None,
+    ):
+        return StorageLib(self._config).get_raw_file(
+            depot_file=revision.depot_file,
+            filename=filename,
+            default_filename=default_filename,
+            force_download=force_download,
+            last_modified=last_modified,
         )
 
     def get_all_query(
@@ -2599,3 +2618,63 @@ class ContentApi(object):
             )
 
         return result
+
+    def get_patch(
+        self,
+        from_revision_id: int,
+        to_revision_id: int,
+        content_id: int,
+        filename: str,
+    ) -> list:
+        """Generate a patch between the two specified revisions.
+
+        Args:
+            from_revision_id (int): The revision of the content used as origin.
+            to_revision_id (int): The revision of the content to compare with origin.
+            content_id (int): The identifier of the content.
+            filename (str): The name of the file in the storage.
+
+        Returns:
+            list: The generated patch with the list of operations to apply.
+
+        Raises:
+            ContentTypeNotAllowed: If the files related to the revisions cannot be used to generate a patch.
+        """
+
+        # INFO - A.L - 2026-08-19 - For now, this method can only be used with JSON files.
+        from_revision = self.get_one_revision(from_revision_id, content_id=content_id)
+        if from_revision.file_mimetype != "application/json":
+            raise ContentTypeNotAllowed(
+                f"Content type '{from_revision.file_mimetype}' is not supported."
+            )
+
+        to_revision = self.get_one_revision(to_revision_id, content_id=content_id)
+        if to_revision.file_mimetype != "application/json":
+            raise ContentTypeNotAllowed(
+                f"Content type '{to_revision.file_mimetype}' is not supported."
+            )
+
+        from_file = self.get_raw_file(
+            from_revision,
+            filename,
+            default_filename=(
+                f"{from_revision.file_name}_r{from_revision.revision_id}"
+                f"{from_revision.file_extension}"
+            ),
+        )
+        to_file = self.get_raw_file(
+            to_revision,
+            filename,
+            default_filename=(
+                f"{to_revision.file_name}_r{to_revision.revision_id}"
+                f"{to_revision.file_extension}"
+            ),
+        )
+
+        with (
+            open(from_file.file_object._file_path, "rb") as from_buffer,
+            open(to_file.file_object._file_path, "rb") as to_buffer,
+        ):
+            generated_patch = make_patch(load(from_buffer), load(to_buffer))
+
+        return generated_patch.patch

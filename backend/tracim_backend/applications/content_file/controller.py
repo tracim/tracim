@@ -3,7 +3,6 @@ from http import HTTPStatus
 from json import dumps
 from json import load
 from jsonpatch import apply_patch
-from jsonpatch import make_patch
 from pyramid.config import Configurator
 import transaction
 import typing  # noqa: F401
@@ -17,6 +16,7 @@ from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ContentRevisionNotFound
 from tracim_backend.exceptions import ContentStatusException
+from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import FileSizeOverMaxLimitation
 from tracim_backend.exceptions import FileSizeOverOwnerEmptySpace
@@ -337,6 +337,7 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @check_right(is_reader)
     @check_right(is_file_content)
+    @hapic.handle_exception(ContentTypeNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(TracimFileNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_query(FilePatchQuerySchema())
     @hapic.input_path(FilePathSchema())
@@ -355,57 +356,24 @@ class FileController(Controller):
             config=app_config,
         )
 
-        from_revision = api.get_one_revision(
-            hapic_data.query.from_revision_id,
-            content_id=hapic_data.path.content_id,
-        )
-
-        if from_revision.file_mimetype == "application/json":
-            to_revision = api.get_one_revision(
+        try:
+            patch_content = api.get_patch(
+                hapic_data.query.from_revision_id,
                 hapic_data.query.to_revision_id,
-                content_id=hapic_data.path.content_id,
+                hapic_data.path.content_id,
+                hapic_data.path.filename,
             )
 
-            try:
-                from_file = StorageLib(request.app_config).get_raw_file(
-                    depot_file=from_revision.depot_file,
-                    filename=hapic_data.path.filename,
-                    default_filename=(
-                        f"{from_revision.file_name}_r{from_revision.revision_id}"
-                        f"{from_revision.file_extension}"
-                    ),
-                )
-                to_file = StorageLib(request.app_config).get_raw_file(
-                    depot_file=to_revision.depot_file,
-                    filename=hapic_data.path.filename,
-                    default_filename=(
-                        f"{to_revision.file_name}_r{to_revision.revision_id}"
-                        f"{to_revision.file_extension}"
-                    ),
-                )
+            return {
+                "from_revision": hapic_data.query.from_revision_id,
+                "to_revision": hapic_data.query.to_revision_id,
+                "patch_content": patch_content,
+            }
 
-                with (
-                    open(from_file.file_object._file_path, "rb") as from_buffer,
-                    open(to_file.file_object._file_path, "rb") as to_buffer,
-                ):
-                    patch = make_patch(load(from_buffer), load(to_buffer))
-                    return {
-                        "from_revision": hapic_data.query.from_revision_id,
-                        "to_revision": hapic_data.query.to_revision_id,
-                        "patch_content": patch,
-                    }
-
-            except CannotGetDepotFileDepotCorrupted as exc:
-                raise TracimFileNotFound(
-                    "file related to revision {} of content {} not found in depot.".format(
-                        revision.revision_id, revision.content_id
-                    )
-                ) from exc
-
-        else:
-            raise ContentTypeNotAllowed(
-                f"the content_type {from_revision.file_mimetype} is not available with this route."
-            )
+        except CannotGetDepotFileDepotCorrupted as exc:
+            raise TracimFileNotFound(
+                f"File related to content {hapic_data.path.content_id} was not found in depot."
+            ) from exc
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @check_right(is_reader)
