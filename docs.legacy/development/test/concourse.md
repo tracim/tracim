@@ -47,6 +47,10 @@ fly -t algoo intercept -b build_id
 > See "Access the docker images" above for details
 
 ```bash
+# quick run with interactive prompt to choose build number
+./concourse/utils/fetch-cypress-screenshots.sh
+
+# manual run with specific options
 ./concourse/utils/fetch-cypress-screenshots.sh [build_id] [output_dir] [fly_target]
 ```
 
