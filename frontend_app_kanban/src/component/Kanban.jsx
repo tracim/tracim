@@ -192,7 +192,7 @@ export class Kanban extends React.Component {
           (column) => column.cards.find((card) => card.id === cardId)
         ).cards.find((card) => card.id === cardId)
 
-        if (card === state.editedCardInfos.card) {
+        if (card === state.editedCardInfos.card || JSON.stringify(card) === JSON.stringify(state.editedCardInfos.card)) {
           editedCardWasModified = false
         }
       }
