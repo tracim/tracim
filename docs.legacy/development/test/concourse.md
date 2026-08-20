@@ -35,7 +35,42 @@ Connect to a specific docker image by its id
 fly -t algoo intercept -b build_id
 ```
 
-## Get the screenshot of failing Cypress test
+## Get the screenshot of the failing Cypress tests
+
+### Helper script
+
+`concourse/utils/fetch-cypress-screenshots.sh` allows to get all the screenshots of a build at one time.
+
+> [!IMPORTANT]
+> Requires being logged in already:  
+> `fly --target algoo login`  
+> See "Access the docker images" above for details
+
+```bash
+./concourse/utils/fetch-cypress-screenshots.sh [build_id] [output_dir] [fly_target]
+```
+
+- `build_id`:
+  - first column of `fly -t algoo builds`
+  - if omitted, it lists the 20 most recent **failed** builds and
+  prompts you to pick one (`m` to show 20 more, `a` to toggle showing all
+  statuses). `LIST_BUILD_COUNT` only controls how many are shown per page —
+  under the hood it searches a much larger pool of builds (growing further on
+  `m` if needed), so a failed build isn't missed just because other jobs filled
+  up the most recent history.
+- `output_dir`:
+  - defaults to `./cypress-screenshots-<build_id>`  
+  - if omitted defaults to
+    `./cypress-screenshots-<build_id>-<build_label>`. Characters not safe
+    in a directory name (`/ \ : * ? " < > |`) are replaced with `_`
+- `fly_target`: defaults to `algoo`
+
+> [!NOTE]
+> Only works while the failed build's container still exists — Concourse
+garbage-collects it a while after the build finishes, so run this soon after
+a failure.
+
+### Manually
 
 List the first <number_image> available image from algoo CI
 ```
@@ -52,7 +87,7 @@ Recuperate the image to the file created from it
 ./fly hijack -t <team_name> -b <build_id> -s <step_name> cat <image_location> > <local_file_location>
 ```
 
-### Where
+#### Where
 
 - <number_image>: number of image wanted, by default is 50
 - <team_name>: `algoo`
@@ -65,7 +100,7 @@ Recuperate the image to the file created from it
 - <imgae_location>: failed test in concourse will display the location after "(Screenshots)"
 - <local_file_location>: local file to put the screenshot in
 
-### Example
+#### Example
 
 ```
 touch /tmp/failed_cypress_test.png
