@@ -11,3 +11,13 @@ apt-get update
 apt-get install -y "chromium=${version}"
 # Prevent a later apt-get upgrade/install elsewhere in the image build from silently bumping this pin
 apt-mark hold chromium
+
+# HACK - PGO - 2026-08-20 - Grant clipboard read/write on the Cypress baseUrl without a permission prompt.
+# Unlike Cypress's previously bundled Electron, a real Chromium enforces the Permissions API for
+# navigator.clipboard, which has no one to click "Allow" in headless CI (#6930)
+mkdir -p /etc/chromium/policies/managed
+cat > /etc/chromium/policies/managed/tracim-cypress.json <<'EOF'
+{
+  "ClipboardAllowedForUrls": ["http://localhost:7999"]
+}
+EOF
