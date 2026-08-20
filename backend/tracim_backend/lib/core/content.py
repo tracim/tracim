@@ -2643,7 +2643,7 @@ class ContentApi(object):
             int: The latest revision of the content after the application of the patch.
 
         Raises:
-            ContentTypeNotAllowed: If the specified content and patch are not JSON files.
+            ContentTypeNotAllowed: If the specified content or patch is not a JSON files.
             PatchRevisionOlderThanContentRevision: If the revision is not the latest one of the content.
         """
 
@@ -2654,15 +2654,15 @@ class ContentApi(object):
             )
 
         content = self.get_one(content_id, content_type)
+        if content.file_mimetype != "application/json":
+            raise ContentTypeNotAllowed(f"Content type '{content.file_mimetype}' is not supported.")
+
         if revision_id != content.revision_id:
             raise PatchRevisionOlderThanContentRevision(
                 f"the revision sent with the patch ({revision_id}) do not match "
                 f"the current revision of the content ({content.revision_id}). "
                 "This patch will be ignored."
             )
-
-        if content.file_mimetype != "application/json":
-            raise ContentTypeNotAllowed(f"Content type '{content.file_mimetype}' is not supported.")
 
         content_file = self.get_raw_file(
             content, content.file_name, default_filename=content.file_name
