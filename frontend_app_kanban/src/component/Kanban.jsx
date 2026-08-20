@@ -152,6 +152,10 @@ export class Kanban extends React.Component {
       const patchContent = fetchPatchFileContent.body.patch_content
       let editedCardWasModified = false
 
+      console.debug('%c<Kanban> apply patch', 'color: gold', patchContent)
+      const newBoard = JSON.parse(JSON.stringify(state.initialBoard))
+      applyPatch(newBoard, patchContent)
+
       console.debug('%c<Kanban> check received patch', 'color: gold', patchContent)
       if (state.editedCardInfos?.card?.id) {
         patchContent.forEach((item) => {
@@ -169,7 +173,7 @@ export class Kanban extends React.Component {
           if (matched) {
             const x = parseInt(matched[1])
             const y = parseInt(matched[2])
-            if (state.initialBoard.columns[x].cards[y].id === state.editedCardInfos.card.id) {
+            if (newBoard.columns[x].cards[y] && newBoard.columns[x].cards[y].id === state.editedCardInfos.card.id) {
               console.debug(
                 '%c<Kanban> the modal is open and the edited card was modified',
                 'color: gold',
@@ -180,10 +184,6 @@ export class Kanban extends React.Component {
           }
         })
       }
-
-      console.debug('%c<Kanban> apply patch', 'color: gold', patchContent)
-      const newBoard = JSON.parse(JSON.stringify(state.initialBoard))
-      applyPatch(newBoard, patchContent)
 
       // Check if the content of the card was really modified
       if (editedCardWasModified) {
