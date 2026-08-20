@@ -108,8 +108,10 @@ export class Kanban extends React.Component {
     const { state, props } = this
     console.debug('%c<Kanban> component did update', 'color: gold', state, props, prevProps)
 
-    if (props.mode === APP_FEATURE_MODE.REVISION && prevProps.content.current_revision_id !== props.content.current_revision_id) {
-      this.loadBoardContent()
+    if (props.mode === APP_FEATURE_MODE.REVISION) {
+      if (prevProps.content.current_revision_id !== props.content.current_revision_id) {
+        this.loadBoardContent()
+      }
     } else {
       if (state.saveRequired) {
         if (!state.saveInProgress) {
