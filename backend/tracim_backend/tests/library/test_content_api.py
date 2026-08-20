@@ -5,11 +5,11 @@ import typing
 
 from tracim_backend.app_models.contents import ContentTypeInContext
 from tracim_backend.app_models.contents import ContentTypeSlug
-from tracim_backend.exceptions import ConflictingNewerRevWhilePatching
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentInNotEditableState
 from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import PatchRevisionOlderThanContentRevision
 from tracim_backend.exceptions import SameValueError
 from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.lib.core.content import ContentApi
@@ -3664,7 +3664,7 @@ class TestContentApi(object):
             )
             assert text_file.revision_id == 2
 
-        with pytest.raises(ConflictingNewerRevWhilePatching):
+        with pytest.raises(PatchRevisionOlderThanContentRevision):
             api.apply_patch(
                 1,
                 text_file.content_id,

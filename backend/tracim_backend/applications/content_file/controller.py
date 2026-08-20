@@ -8,7 +8,6 @@ from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG  # noqa: F401
 from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
-from tracim_backend.exceptions import ConflictingNewerRevWhilePatching
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ContentRevisionNotFound
@@ -21,6 +20,7 @@ from tracim_backend.exceptions import FileSizeOverWorkspaceEmptySpace
 from tracim_backend.exceptions import NoFileValidationError
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import ParentNotFound
+from tracim_backend.exceptions import PatchRevisionOlderThanContentRevision
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
 from tracim_backend.exceptions import TracimFileNotFound
@@ -255,7 +255,7 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @check_right(is_contributor)
     @check_right(is_file_content)
-    @hapic.handle_exception(ConflictingNewerRevWhilePatching, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(PatchRevisionOlderThanContentRevision, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(FileSizeOverMaxLimitation, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(FileSizeOverWorkspaceEmptySpace, HTTPStatus.BAD_REQUEST)

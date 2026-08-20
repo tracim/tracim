@@ -35,7 +35,6 @@ from tracim_backend.config import CFG
 from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
 from tracim_backend.exceptions import ConflictingMoveInChild
 from tracim_backend.exceptions import ConflictingMoveInItself
-from tracim_backend.exceptions import ConflictingNewerRevWhilePatching
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentInNotEditableState
 from tracim_backend.exceptions import ContentNamespaceDoNotMatch
@@ -49,6 +48,7 @@ from tracim_backend.exceptions import FavoriteContentNotFound
 from tracim_backend.exceptions import FileSizeOverMaxLimitation
 from tracim_backend.exceptions import FileSizeOverOwnerEmptySpace
 from tracim_backend.exceptions import FileSizeOverWorkspaceEmptySpace
+from tracim_backend.exceptions import PatchRevisionOlderThanContentRevision
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import PropertyNotFound
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
@@ -2644,6 +2644,7 @@ class ContentApi(object):
 
         Raises:
             ContentTypeNotAllowed: If the specified content and patch are not JSON files.
+            PatchRevisionOlderThanContentRevision: If the revision is not the latest one of the content.
         """
 
         # INFO - A.L - 2026-08-19 - For now, this method can only be used with JSON files.
@@ -2654,7 +2655,7 @@ class ContentApi(object):
 
         content = self.get_one(content_id, content_type)
         if revision_id != content.revision_id:
-            raise ConflictingNewerRevWhilePatching(
+            raise PatchRevisionOlderThanContentRevision(
                 f"the revision sent with the patch ({revision_id}) do not match "
                 f"the current revision of the content ({content.revision_id}). "
                 "This patch will be ignored."

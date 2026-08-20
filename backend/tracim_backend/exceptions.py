@@ -74,8 +74,8 @@ class TagAlreadyExistsError(TracimError):
     error_code = ErrorCode.TAG_ALREADY_EXISTS
 
 
-class ConflictingNewerRevWhilePatching(TracimError):
-    error_code = ErrorCode.CONFLICTING_NEWER_REV_WHILE_PATCHING
+class PatchRevisionOlderThanContentRevision(TracimError):
+    error_code = ErrorCode.PATCH_REVISION_OLDER_THAN_CONTENT_REVISION
 
 
 class ForceArgumentNeeded(TracimException):
