@@ -158,8 +158,6 @@ export class Kanban extends React.Component {
           let matched
 
           switch (item.op) {
-            case PATCH_OPERATION.ADD:
-              break
             case PATCH_OPERATION.COPY:
             case PATCH_OPERATION.MOVE:
               matched = item.from.match(this.regexMatchId)
@@ -190,7 +188,7 @@ export class Kanban extends React.Component {
       // Check if the content of the card was really modified
       if (editedCardWasModified) {
         const cardId = state.editedCardInfos.card.id
-        const card = state.board.columns.find(
+        const card = newBoard.columns.find(
           (column) => column.cards.find((card) => card.id === cardId)
         ).cards.find((card) => card.id === cardId)
 
