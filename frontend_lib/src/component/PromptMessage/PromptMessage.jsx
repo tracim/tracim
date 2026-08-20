@@ -1,9 +1,10 @@
+import classnames from 'classnames'
 import React from 'react'
 import PropTypes from 'prop-types'
 
 const PromptMessage = props => (
   <div
-    className='promptMessage'
+    className={classnames('promptMessage', props.noInlineMargins ? 'noInlineMargins' : '')}
     data-cy='promptMessage'
   >
     <div className='promptMessage__msg'>
@@ -26,6 +27,7 @@ const PromptMessage = props => (
       <button
         className='btn promptMessage__btn link'
         onClick={props.onClickBtn}
+        title={props.tooltip}
       >
         {props.btnLabel}
       </button>
@@ -43,6 +45,7 @@ PromptMessage.propTypes = {
   icon: PropTypes.string,
   btnIcon: PropTypes.string,
   btnLabel: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
+  noInlineMargins: PropTypes.bool,
   onClickBtn: PropTypes.func,
   tooltip: PropTypes.string
 }
@@ -52,6 +55,7 @@ PromptMessage.defaultProps = {
   icon: '',
   btnLabel: '',
   btnIcon: '',
+  noInlineMargins: false,
   onClickBtn: () => {},
   tooltip: ''
 }

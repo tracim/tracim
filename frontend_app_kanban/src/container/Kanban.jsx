@@ -83,7 +83,6 @@ export class Kanban extends React.Component {
       newContent: {},
       showInvalidMentionPopupInComment: false,
       showProgress: true,
-      showRefreshWarning: false,
       showPermanentlyDeletePopup: false,
       translationTargetLanguageCode: param.loggedUser.lang,
       toDoList: [],
@@ -254,10 +253,10 @@ export class Kanban extends React.Component {
     const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
     const newContentObject = { ...state.content, ...data.fields.content }
     this.setState(prev => ({
-      content: clientToken === data.fields.client_token ? newContentObject : prev.content,
+      content: data.fields.content,
       newContent: newContentObject,
       editionAuthor: data.fields.author.public_name,
-      showRefreshWarning: clientToken !== data.fields.client_token
+      currentContentRevisionId: data.fields.content.current_revision_id
     }))
     if (clientToken === data.fields.client_token) {
       this.setHeadTitle(newContentObject.label)
@@ -656,26 +655,6 @@ export class Kanban extends React.Component {
     )
   }
 
-  handleClickRefresh = () => {
-    const { state } = this
-
-    const newObjectContent = {
-      ...state.content,
-      ...state.newContent
-    }
-
-    this.setState(prev => ({
-      content: {
-        ...prev.content,
-        ...prev.newContent
-      },
-      currentContentRevisionId: newObjectContent.current_revision_id,
-      showRefreshWarning: false
-    }))
-    this.setHeadTitle(newObjectContent.label)
-    this.buildBreadcrumbs(newObjectContent)
-  }
-
   handleChangeTranslationTargetLanguageCode = (translationTargetLanguageCode) => {
     this.setState({ translationTargetLanguageCode })
   }
@@ -760,7 +739,6 @@ export class Kanban extends React.Component {
           config={state.config}
           customClass={`${state.config.slug}__contentpage`}
           disableChangeTitle={!state.content.is_editable}
-          isRefreshNeeded={state.showRefreshWarning}
           isTemplate={state.isTemplate}
           contentVersionNumber={contentVersionNumber}
           lastVersion={lastVersionNumber}
@@ -797,13 +775,11 @@ export class Kanban extends React.Component {
             editionAuthor={state.editionAuthor}
             fullscreen={state.fullscreen}
             isNewContentRevision={!!state.currentContentRevisionId}
-            isRefreshNeeded={state.showRefreshWarning}
             language={state.loggedUser.lang}
             mode={state.mode}
             filterInput={state.filterInput}
             onClickFullscreen={this.handleClickFullscreen}
             onClickLastVersion={this.handleClickLastVersion}
-            onClickRefresh={this.handleClickRefresh}
             onClickRestoreDeleted={this.handleClickRestoreDelete}
             readOnly={readOnly}
           />

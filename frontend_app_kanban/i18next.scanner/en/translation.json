@@ -70,5 +70,10 @@
   "No card": "No card",
   "Reopen the card": "Reopen the card",
   "Show Gantt view": "Show Gantt view",
-  "Today": "Today"
+  "Today": "Today",
+  "This content has been modified.": "This content has been modified.",
+  "Reload it!": "Reload it!",
+  "If you still want to use your current work, simply check the cross and the validation will be restored.": "If you still want to use your current work, simply check the cross and the validation will be restored.",
+  "The board was not able to load. Use the refresh button to reload it.": "The board was not able to load. Use the refresh button to reload it.",
+  "Click on this button to reload the board.": "Click on this button to reload the board."
 }

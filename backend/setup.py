@@ -17,6 +17,8 @@ requires = [
     "sqlakeyset",
     # API
     "hapic[marshmallow]>=1.0",
+    # API file patching
+    "jsonpatch>=1.33",
     # INFO - G.M - 2019-03-21 - this is needed as there is a requirement issue
     # in hapic, apispec-marshmallow-advanced==0.3
     # and hapic==0.73 aren't compatible

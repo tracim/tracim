@@ -12,6 +12,7 @@ from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ContentRevisionNotFound
 from tracim_backend.exceptions import ContentStatusException
+from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import FileSizeOverMaxLimitation
 from tracim_backend.exceptions import FileSizeOverOwnerEmptySpace
@@ -19,6 +20,7 @@ from tracim_backend.exceptions import FileSizeOverWorkspaceEmptySpace
 from tracim_backend.exceptions import NoFileValidationError
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import ParentNotFound
+from tracim_backend.exceptions import PatchRevisionOlderThanContentRevision
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
 from tracim_backend.exceptions import TracimFileNotFound
@@ -49,6 +51,10 @@ from tracim_backend.views.core_api.schemas import ContentModifySchema
 from tracim_backend.views.core_api.schemas import ContentRevisionsPageQuerySchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
 from tracim_backend.views.core_api.schemas import FileCreationFormSchema
+from tracim_backend.views.core_api.schemas import FilePatchQuerySchema
+from tracim_backend.views.core_api.schemas import FilePatchResponseSchema
+from tracim_backend.views.core_api.schemas import FilePatchSchema
+from tracim_backend.views.core_api.schemas import FilePatchUploadQuerySchema
 from tracim_backend.views.core_api.schemas import FilePathSchema
 from tracim_backend.views.core_api.schemas import FilePreviewSizedPathSchema
 from tracim_backend.views.core_api.schemas import FileQuerySchema
@@ -244,6 +250,89 @@ class FileController(Controller):
                 "file related to revision {} of content {} not found in depot.".format(
                     content.cached_revision_id, content.content_id
                 )
+            ) from exc
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @check_right(is_contributor)
+    @check_right(is_file_content)
+    @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(ContentTypeNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(FileSizeOverMaxLimitation, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(FileSizeOverWorkspaceEmptySpace, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(FileSizeOverOwnerEmptySpace, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(NoFileValidationError, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(PatchRevisionOlderThanContentRevision, HTTPStatus.BAD_REQUEST)
+    @hapic.input_query(FilePatchUploadQuerySchema())
+    @hapic.input_path(FilePathSchema())
+    @hapic.input_files(SimpleFileSchema())
+    @hapic.output_body(FilePatchResponseSchema())
+    def upload_patch_file(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Receive a patch to apply to a specific content.
+        For now, only the JSON format can use this route.
+        """
+        if hapic_data.files.files is None:
+            raise NoFileValidationError('No file "files" given at input, validation failed.')
+
+        app_config: CFG = request.registry.settings["CFG"]
+        api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+
+        patch_file = hapic_data.files.files
+        revision_id = api.apply_patch(
+            hapic_data.query.current_revision_id,
+            hapic_data.path.content_id,
+            content_type=ContentTypeSlug.ANY.value,
+            patch_file_content=patch_file.file.read(),
+            patch_mimetype=patch_file.type,
+        )
+
+        return {"new_revision": revision_id}
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @check_right(is_reader)
+    @check_right(is_file_content)
+    @hapic.handle_exception(ContentTypeNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TracimFileNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.input_query(FilePatchQuerySchema())
+    @hapic.input_path(FilePathSchema())
+    @hapic.output_body(FilePatchSchema())
+    def download_patch_file(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Download the patch which represent the diff between two revisions of a content.
+        For now, only the JSON format can use this route.
+        """
+        app_config: CFG = request.registry.settings["CFG"]
+        api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+
+        try:
+            patch_content = api.get_patch(
+                hapic_data.query.from_revision_id,
+                hapic_data.query.to_revision_id,
+                hapic_data.path.content_id,
+                hapic_data.path.filename,
+            )
+
+            return {
+                "from_revision": hapic_data.query.from_revision_id,
+                "to_revision": hapic_data.query.to_revision_id,
+                "patch_content": patch_content,
+            }
+
+        except CannotGetDepotFileDepotCorrupted as exc:
+            raise TracimFileNotFound(
+                f"File related to content {hapic_data.path.content_id} was not found in depot."
             ) from exc
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
@@ -797,6 +886,20 @@ class FileController(Controller):
             request_method="GET",
         )
         configurator.add_view(self.download_file, route_name="download_file")
+        # upload a patch
+        configurator.add_route(
+            "upload_patch",
+            "/workspaces/{workspace_id}/files/{content_id}/patch/{filename}",
+            request_method="PATCH",
+        )
+        configurator.add_view(self.upload_patch_file, route_name="upload_patch")
+        # download the patch between two revisions for the raw file
+        configurator.add_route(
+            "download_patch",
+            "/workspaces/{workspace_id}/files/{content_id}/patch/{filename}",
+            request_method="GET",
+        )
+        configurator.add_view(self.download_patch_file, route_name="download_patch")
         # download raw file of revision
         configurator.add_route(
             "download_revision",

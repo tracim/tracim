@@ -55,6 +55,8 @@ from tracim_backend.models.context_models import ContentIdsQuery
 from tracim_backend.models.context_models import ContentNamespaceUpdate
 from tracim_backend.models.context_models import ContentUpdate
 from tracim_backend.models.context_models import FileCreation
+from tracim_backend.models.context_models import FilePatchQuery
+from tracim_backend.models.context_models import FilePatchUploadQuery
 from tracim_backend.models.context_models import FilePath
 from tracim_backend.models.context_models import FilePreviewSizedPath
 from tracim_backend.models.context_models import FileQuery
@@ -2921,3 +2923,85 @@ class UserCallsSchema(marshmallow.Schema):
 
 class UpdateUserCallStateSchema(marshmallow.Schema):
     state = EnumField(UserCallState, metadata={"description": "New call state"})
+
+
+###
+# Patch
+###
+
+
+class FilePatchUploadQuerySchema(marshmallow.Schema):
+    current_revision_id = marshmallow.fields.Int(
+        metadata={
+            "example": 42,
+            "description": "The revision id of the content where the patch " "must be applied.",
+        },
+        required=True,
+        validate=strictly_positive_int_validator,
+    )
+
+    @post_load
+    def make_query(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
+        return FilePatchUploadQuery(**data)
+
+
+class FilePatchResponseSchema(marshmallow.Schema):
+    new_revision = marshmallow.fields.Int(
+        metadata={
+            "example": 42,
+            "description": "The new revision id of the patched content.",
+        },
+        required=True,
+    )
+
+
+class FilePatchSchema(marshmallow.Schema):
+    from_revision = marshmallow.fields.Int(
+        metadata={
+            "example": 42,
+            "description": "The revision use to retrieve the original file.",
+        },
+        required=True,
+    )
+    to_revision = marshmallow.fields.Int(
+        metadata={
+            "example": 43,
+            "description": "The revision use to retrieve the final file.",
+        },
+        required=True,
+    )
+    patch_content = marshmallow.fields.List(
+        marshmallow.fields.Dict(),  # FIXME: this type will be different with non-JSON content
+        metadata={
+            "example": {},
+            "description": "The content of the patch.",
+        },
+        required=True,
+    )
+
+
+class FilePatchQuerySchema(marshmallow.Schema):
+    from_revision_id = marshmallow.fields.Int(
+        metadata={
+            "example": 42,
+            "description": "This revision will be used to retrieve the file used "
+            "as the origin of the patch. It will be compared with the file defined "
+            "by the to_revision_id parameter.",
+        },
+        required=True,
+        validate=strictly_positive_int_validator,
+    )
+    to_revision_id = marshmallow.fields.Int(
+        metadata={
+            "example": 43,
+            "description": "This revision will be used to compare with the file "
+            "defined as the origin by the from_revision_id parameter. This revision "
+            "must be greater than the original revision.",
+        },
+        required=True,
+        validate=strictly_positive_int_validator,
+    )
+
+    @post_load
+    def make_query(self, data: typing.Dict[str, typing.Any], **kwargs) -> object:
+        return FilePatchQuery(**data)

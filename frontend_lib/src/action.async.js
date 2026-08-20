@@ -291,6 +291,18 @@ export const putRawFileContent = (apiUrl, workspaceId, contentId, filename, newC
   return baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/raw/${filename}`, formData)
 }
 
+export const getPatchFileContent = (apiUrl, workspaceId, contentId, filename, fromRevisionId, toRevisionId) => {
+  const encodedFilename = encodeURIComponent(filename)
+  return baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/patch/${encodedFilename}?from_revision_id=${fromRevisionId}&to_revision_id=${toRevisionId}`)
+}
+
+export const patchPatchFileContent = (apiUrl, workspaceId, contentId, filename, currentRevision, newContent, type = 'text/plain') => {
+  const formData = new FormData()
+  formData.append('files', new File([newContent], filename, { type }))
+  const encodedFilename = encodeURIComponent(filename)
+  return baseFetch('PATCH', `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/patch/${encodedFilename}?current_revision_id=${currentRevision}`, formData)
+}
+
 export const postRawFileContent = (
   apiUrl,
   workspaceId,

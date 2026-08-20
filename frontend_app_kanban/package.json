@@ -29,6 +29,7 @@
     "react-i18next": "7.4.0",
     "react-router-dom": "^5.2.0",
     "regenerator-runtime": "^0.13.2",
+    "rfc6902": "^5.3.0",
     "tracim_frontend_lib": "^1.1.9"
   },
   "peerDependencies": {
