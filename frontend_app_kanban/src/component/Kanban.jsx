@@ -106,25 +106,29 @@ export class Kanban extends React.Component {
 
   async componentDidUpdate (prevProps) {
     const { state, props } = this
-    console.debug('%c<Kanban> component did update', 'color: gold', state)
+    console.debug('%c<Kanban> component did update', 'color: gold', state, props, prevProps)
 
-    if (state.saveRequired) {
-      if (!state.saveInProgress) {
-        this.setState({ saveInProgress: true }, () => {
-          console.debug('%c<Kanban> saving in progress', 'color: gold', state.board, state.cardIdEdited)
-          this.save(state.board, state.cardIdEdited)
-        })
-      }
-    } else if (state.revisionId && state.revisionId < props.content.current_revision_id) {
-      if (!state.patchingInProgress) {
-        this.setState({ patchingInProgress: true }, () => {
-          console.debug('%c<Kanban> updating board from patch', 'color: gold', props.content, state.revisionId)
-          this.loadBoardFromPatch()
-        })
-      }
-    } else if (!state.revisionId && state.boardState === BOARD_STATE.LOADED) {
-      console.debug('%c<Kanban> reloading board', 'color: gold', state.revisionId, state.boardState)
+    if (props.mode === APP_FEATURE_MODE.REVISION && prevProps.content.current_revision_id !== props.content.current_revision_id) {
       this.loadBoardContent()
+    } else {
+      if (state.saveRequired) {
+        if (!state.saveInProgress) {
+          this.setState({ saveInProgress: true }, () => {
+            console.debug('%c<Kanban> saving in progress', 'color: gold', state.board, state.cardIdEdited)
+            this.save(state.board, state.cardIdEdited)
+          })
+        }
+      } else if (state.revisionId && state.revisionId < props.content.current_revision_id) {
+        if (!state.patchingInProgress) {
+          this.setState({ patchingInProgress: true }, () => {
+            console.debug('%c<Kanban> updating board from patch', 'color: gold', props.content, state.revisionId)
+            this.loadBoardFromPatch()
+          })
+        }
+      } else if (!state.revisionId && state.boardState === BOARD_STATE.LOADED) {
+        console.debug('%c<Kanban> reloading board', 'color: gold', state.revisionId, state.boardState)
+        this.loadBoardContent()
+      }
     }
   }
 
@@ -477,7 +481,9 @@ export class Kanban extends React.Component {
 
   render () {
     const { props, state } = this
-    const changesAllowed = !props.readOnly && state.boardState === BOARD_STATE.LOADED
+    const changesAllowed = (
+      !props.readOnly && state.boardState === BOARD_STATE.LOADED && props.mode !== APP_FEATURE_MODE.REVISION
+    )
 
     const cardsByColumns = Object.fromEntries(
       state.board.columns.map(({ id, cards }) => ([id, cards]))
@@ -652,6 +658,7 @@ export class Kanban extends React.Component {
 Kanban.propTypes = {
   config: PropTypes.object.isRequired,
   content: PropTypes.object.isRequired,
+  mode: PropTypes.string.isRequired,
   // End of required props /////////////////////////////////////////////////////
   language: PropTypes.string,
   readOnly: PropTypes.bool,
