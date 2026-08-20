@@ -68,15 +68,17 @@ Directly launch a specific test:
 ```
 
 > [!NOTE]
-> The `--spec` parameter is passed since september 2026 (#6930)
+> `run_dev_backend.sh` can pass its parameters to Cypress since september 2026 (#6930)
 
-> [!NOTE]
-> If run headlessly the embedded Electron browser version will be used, otherwiser installed Chromium version.
+> [!WARNING]
+> By default, Cypress will use its embedded Electron browser, which can be quite old.  
+> To use a locally installed browser, use the `--browser` parameter (see below)
 
 > [!TIP]
 > Other available params:
 > - `--headed`: opens up a browser window
 > - `--no-exit`: keep the browser window opened
+> - `--browser chromium`: use locally installed Chromium
 
 
 ### Information
