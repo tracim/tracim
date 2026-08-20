@@ -5,6 +5,7 @@
 ### ✨ New Features
 
 - Allow to open a Kanban as a Gantt project view
+- Realtime edition have been added to the Kanban to allow multi-users editing
 
 ### Other changes
 
