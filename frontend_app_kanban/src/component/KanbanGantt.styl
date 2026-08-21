@@ -12,6 +12,9 @@ barRadius = 3px
   &__left__top
     min-height auto
 
+.gantt-wrapper
+  margin standardSpacing
+
 .gantt-container
   height 100vh !important
   width 100% !important
@@ -30,6 +33,7 @@ barRadius = 3px
     width 100% !important
 
   svg
+    background-color var(--g-row-color)
     g.bar-group
       & rect.bar, rect.bar-progress
         border-radius barRadius

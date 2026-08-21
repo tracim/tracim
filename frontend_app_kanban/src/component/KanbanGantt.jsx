@@ -176,7 +176,7 @@ export class KanbanGantt extends React.Component {
     const { props } = this
 
     return (
-      <div className='kanban__contentpage__wrapper'>
+      <div className='kanban__contentpage__wrapper gantt-wrapper'>
         <div className='kanban__contentpage__wrapper__options'>
           {props.isRefreshNeeded && (
             <RefreshWarningMessage
