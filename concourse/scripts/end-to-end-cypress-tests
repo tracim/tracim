@@ -5,7 +5,7 @@ script_dir="$(realpath $(dirname $0))"
 docker_registry=${1:-""}
 
 source "$script_dir/util-lib.sh"
-skip_if_no_changed_file_match "^(frontend|backend|concourse|tools_docker/pushpin)"
+skip_if_no_changed_file_match "^(frontend|backend|concourse|tools_docker/pushpin|functionnal_tests)"
 
 "$script_dir/install_docker"
 source "$script_dir/docker-lib.sh"
@@ -27,4 +27,5 @@ cd -
 ./setup_functionnal_tests.sh root
 ./install_frontend_dependencies.sh root
 ./build_full_frontend.sh
-NO_VIRTUAL_ENV=1 ./run_dev_backend.sh cypress run
+# HACK - PGO - 2026-08-19 - Forcing using Chromium to get rid of bundled v118 which is incompatible (#6930)
+NO_VIRTUAL_ENV=1 ./run_dev_backend.sh cypress run --browser chromium

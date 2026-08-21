@@ -62,7 +62,7 @@ resources:
   type: registry-image
   source:
     repository: algooci/tracim
-    tag: build_192_node_16
+    tag: build_194_node16_chromium151
 # resource used to abort the running builds before starting our test jobs
 - name: abort-running-builds
   type: abort-running-builds

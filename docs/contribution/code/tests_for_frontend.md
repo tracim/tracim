@@ -43,19 +43,49 @@ Alternatively, under root:
 ./setup_functionnal_tests.sh root
 ```
 
+### Run all tests
+
+> [!IMPORTANT]
+> By default Cypress will use your installed Chromium version.  
+> You can use embedded Electron Chromium version by using the Cypress home screen
+
 Run every functional tests
 ```bash
 ./run_dev_backend.sh cypress run
 ```
 
-Open Cypress UI
+### Run specific tests
+
+Open Cypress UI, allowing the selection of a specific test
 ```bash
 ./run_dev_backend.sh cypress open
 ```
 
-For more advanced usage, refer to the [cypress documentation](https://docs.cypress.io/).
+Directly launch a specific test:
+
+```bash
+./run_dev_backend.sh cypress run --spec "cypress/e2e/app_agenda/switching_app_agenda.cy.js"
+```
+
+> [!NOTE]
+> `run_dev_backend.sh` can pass its parameters to Cypress since september 2026 (#6930)
+
+> [!WARNING]
+> By default, Cypress will use its embedded Electron browser, which can be quite old.  
+> To use a locally installed browser, use the `--browser` parameter (see below)
+
+> [!TIP]
+> Other available params:
+> - `--headed`: opens up a browser window
+> - `--no-exit`: keep the browser window opened
+> - `--browser chromium`: use locally installed Chromium
+
 
 ### Information
+
+> [!NOTE]
+> For more advanced usage, refer to the [cypress documentation](https://docs.cypress.io/).
+
 
 Cypress tests run on their own database.
 But it doesn't use their own `depot/` folder.
