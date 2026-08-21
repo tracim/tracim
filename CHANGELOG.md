@@ -15,6 +15,7 @@
 - Concourse: switch to Debian 13 [#6878](https://github.com/tracim/tracim/issues/6878)
 - Update pre-commit version, implying you must re-install the hook (`pre-commit install`) [#6923](https://github.com/tracim/tracim/issues/6923)
 - Fix frontend unit tests [#6931](https://github.com/tracim/tracim/issues/6931)
+- Fix end-to-end tests [#6930](https://github.com/tracim/tracim/issues/6930)
 
 
 ## Next release (maintenance branch)
