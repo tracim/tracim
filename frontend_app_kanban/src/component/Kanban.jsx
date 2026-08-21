@@ -629,6 +629,7 @@ export class Kanban extends React.Component {
                 language={props.language}
                 memberList={props.config.workspace.memberList}
                 cardList={cardsByColumns[state.editedCardInfos.column.id]}
+                cardsById={cardsById}
                 wasModified={state.editedCardWasModified}
               />
             </CardPopup>

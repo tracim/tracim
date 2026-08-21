@@ -131,8 +131,14 @@ function KanbanCardEditor (props) {
       label: m.title
     }))
 
-  const selectedDependsOptionList = dependsOptionList
-    .filter(m => card.depends.some(a => a === m.id))
+  const selectedDependsOptionList = card.depends.map((cardId) => {
+    const cardData = props.cardsById[cardId]
+    return {
+      ...cardData,
+      value: cardId,
+      label: cardData.title
+    }
+  })
 
   return (
     <form className='kanban__KanbanPopup__form' onSubmit={handleValidate}>
@@ -352,6 +358,8 @@ KanbanCardEditor.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   content: PropTypes.object.isRequired,
   card: PropTypes.object.isRequired,
+  cardList: PropTypes.array.isRequired,
+  cardsById: PropTypes.object.isRequired,
   onValidate: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
   onClickIgnoreModification: PropTypes.func.isRequired,
