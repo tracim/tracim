@@ -64,12 +64,16 @@ if [ "${#failed_projects[@]}" -gt 0 ]; then
         #   1) Suite
         #        test name:
         #      AssertionError: ...
-        #       at ...
+        #       at Context.<anonymous> (test/some.spec.js:5:20)
+        #       at ... (internal Mocha/Node frames)
+        #
+        # The first "at" line is the test's own call site (the file we care
+        # about), the rest are internal frames -- keep the first, drop the rest.
         #
         # Warning: colors are stripped first since mocha emits ANSI codes at the start of these lines even when piped.
         sed -E 's/\x1b\[[0-9;]*m//g' "$projectlog" | awk '
             /^  [0-9]+\)/ { inblock=1 }
-            inblock && /^ *at / { inblock=0; next }
+            inblock && /^ *at / { print; inblock=0; next }
             inblock { print; next }
             /:[0-9]+:[0-9]+: / { print }
         '
