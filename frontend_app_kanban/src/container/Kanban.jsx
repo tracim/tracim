@@ -76,11 +76,13 @@ export class Kanban extends React.Component {
       invalidMentionList: [],
       isFileCommentLoading: false,
       isTemplate: false,
+      isSelectedRevision: false,
       isVisible: true,
       lockedToDoList: [],
       loggedUser: param.loggedUser,
       loading: false,
       newContent: {},
+      selectedContentRevisionId: param.content.current_revision_id,
       showInvalidMentionPopupInComment: false,
       showProgress: true,
       showPermanentlyDeletePopup: false,
@@ -172,12 +174,18 @@ export class Kanban extends React.Component {
         is_archived: prev.is_archived,
         is_deleted: prev.is_deleted
       },
-      mode: APP_FEATURE_MODE.REVISION
+      isSelectedRevision: !isLastRevision,
+      mode: APP_FEATURE_MODE.REVISION,
+      selectedContentRevisionId: revision.revision_id
     }))
   }
 
   handleClickLastVersion = () => {
-    this.setState({ mode: APP_FEATURE_MODE.VIEW })
+    this.setState({
+      isSelectedRevision: false,
+      mode: APP_FEATURE_MODE.VIEW,
+      selectedContentRevisionId: null
+    })
     this.loadContent()
   }
 
@@ -668,8 +676,12 @@ export class Kanban extends React.Component {
 
     if (!state.isVisible) return null
 
+    // INFO - A.L - 2026-08-21 - Since the content will be updated each time a TLM was sent
+    // we cannot use anymore the currentContentRevisionId as the revision number.
+    const revisionId = state.isSelectedRevision ? state.selectedContentRevisionId : state.currentContentRevisionId
+
     const revisionList = props.timeline.filter(t => t.timelineType === 'revision')
-    const contentVersionNumber = (revisionList.find(t => t.revision_id === state.content.current_revision_id) || { version_number: 1 }).version_number
+    const contentVersionNumber = (revisionList.find(t => t.revision_id === revisionId) || { version_number: 1 }).version_number
     const lastVersionNumber = (revisionList[revisionList.length - 1] || { version_number: 1 }).version_number
     const readOnly = (
       state.loggedUser.userRoleIdInWorkspace < ROLE.contributor.id ||
@@ -775,12 +787,14 @@ export class Kanban extends React.Component {
             editionAuthor={state.editionAuthor}
             fullscreen={state.fullscreen}
             isNewContentRevision={!!state.currentContentRevisionId}
+            isSelectedRevision={state.isSelectedRevision}
             language={state.loggedUser.lang}
             mode={state.mode}
             filterInput={state.filterInput}
             onClickFullscreen={this.handleClickFullscreen}
             onClickLastVersion={this.handleClickLastVersion}
             onClickRestoreDeleted={this.handleClickRestoreDelete}
+            selectedRevisionId={state.selectedContentRevisionId}
             readOnly={readOnly}
           />
           <PopinFixedRightPart

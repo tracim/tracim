@@ -109,7 +109,7 @@ export class Kanban extends React.Component {
     console.debug('%c<Kanban> component did update', 'color: gold', state, props, prevProps)
 
     if (props.mode === APP_FEATURE_MODE.REVISION) {
-      if (prevProps.content.current_revision_id !== props.content.current_revision_id) {
+      if (props.isSelectedRevision && prevProps.selectedRevisionId !== props.selectedRevisionId) {
         this.loadBoardContent()
       }
     } else {
@@ -660,14 +660,18 @@ Kanban.propTypes = {
   content: PropTypes.object.isRequired,
   mode: PropTypes.string.isRequired,
   // End of required props /////////////////////////////////////////////////////
+  isSelectedRevision: PropTypes.bool,
   language: PropTypes.string,
   readOnly: PropTypes.bool,
+  selectedRevisionId: PropTypes.number,
   filterInput: PropTypes.string
 }
 
 Kanban.defaultProps = {
+  isSelectedRevision: false,
   language: 'en',
   readOnly: false,
+  selectedRevisionId: null,
   filterInput: ''
 }
 
