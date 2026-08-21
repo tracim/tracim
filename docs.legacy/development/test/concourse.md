@@ -56,7 +56,7 @@ Recuperate the image to the file created from it
 
 - `number_image`: number of image wanted, by default is 50
 - `team_name`: `algoo`
-- `build_id`: first column of `./fly builds -t algoo`
+- `build_id`: first column of `./fly -t algoo builds`
 - `step_name`: `end-to-end-cypress-tests`
   - available values are:
     - `end-to-end-cypress-tests`
