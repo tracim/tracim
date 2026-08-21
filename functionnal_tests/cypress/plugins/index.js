@@ -34,12 +34,8 @@ module.exports = (on, config) => {
     return launchOptions
   })
 
-  // Cypress interleaves each spec's own failures with the rest of that
-  // spec's output, so finding every failed test in a big `cypress run` log
-  // means scrolling through all of it. `after:run` fires once, after every
-  // spec has run, with the results of the whole run -- print a single flat
-  // list of the failed tests there so it's easy to find at the end of the
-  // build log.
+  // INFO - PGO - 2026-08-21
+  // Add a summary of failed tests at the end of the log
   on('after:run', (results) => {
     if (!results || !results.totalFailed) return
 
