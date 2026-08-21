@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 
 import Gantt from 'frappe-gantt'
+import { add, format, sub } from 'date-fns'
 
 import {
   formatAbsoluteDate,
@@ -102,7 +103,9 @@ export class KanbanGantt extends React.Component {
 
     return props.columns.flatMap(({ id, title, bgColor, cards }) => {
       const ganttCards = cards
-        .filter((card) => card.kickoff && card.duration?.length > 0)
+        .filter((card) => (
+          (card.kickoff || card.deadline) && card.duration?.length > 0) || (card.kickoff && card.deadline)
+        )
         .sort((first, second) => {
           const firstDate = new Date(first.kickoff)
           const secondDate = new Date(second.kickoff)
@@ -113,7 +116,18 @@ export class KanbanGantt extends React.Component {
           return 0
         })
         .map((card) => {
-          const deadline = new Date(card.deadline)
+          let kickoff = card.kickoff ? new Date(card.kickoff) : null
+          let deadline = card.deadline ? new Date(card.deadline) : null
+
+          // INFO - A.L - 2026-08-21 - If the duration was set with a kickoff or
+          // deadline date, calculate the missing date if not available.
+          // We substract one day to the duration to ensure the bar will take the
+          // exact amount of days in the Gantt view.
+          if (!kickoff && deadline) {
+            kickoff = card.duration > 1 ? sub(deadline, { days: card.duration - 1 }) : deadline
+          } else if (kickoff && !deadline) {
+            deadline = card.duration > 1 ? add(kickoff, { days: card.duration - 1 }) : kickoff
+          }
 
           let colorProgress
           if (card.finished) colorProgress = '#C0DD97'
@@ -124,8 +138,8 @@ export class KanbanGantt extends React.Component {
             name: card.title,
             color: deadline < todayMidnight ? '#FFF1F1' : undefined,
             color_progress: colorProgress,
-            start: card.kickoff,
-            end: card.deadline || undefined,
+            start: format(kickoff, 'yyyy-MM-dd'),
+            end: format(deadline, 'yyyy-MM-dd'),
             duration: `${card.duration}d`,
             dependencies: card.depends,
             progress: card.finished ? 100 : parseInt(card.progress),
