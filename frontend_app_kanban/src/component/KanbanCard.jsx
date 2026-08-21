@@ -9,6 +9,7 @@ import {
   Icon,
   shouldUseLightTextColor,
   HTMLContent,
+  formatAbsoluteDate,
   getAvatarBaseUrl
 } from 'tracim_frontend_lib'
 
@@ -169,7 +170,7 @@ function KanbanCard (props) {
                   icon='far fa-calendar'
                   title={props.card.kickoff}
                 />
-                {props.card.kickoff}
+                {formatAbsoluteDate(props.card.kickoff, props.language, 'P')}
               </>
             )}
           </div>
@@ -188,7 +189,7 @@ function KanbanCard (props) {
                   icon='far fa-calendar'
                   title={props.card.deadline}
                 />
-                {props.card.deadline}
+                {formatAbsoluteDate(props.card.deadline, props.language, 'P')}
               </>
             )}
           </div>
@@ -264,11 +265,13 @@ KanbanCard.propTypes = {
   onRemoveCard: PropTypes.func.isRequired,
   cardList: PropTypes.object,
   customColor: PropTypes.string,
+  language: PropTypes.string,
   readOnly: PropTypes.bool
 }
 
 KanbanCard.defaultProps = {
   cardList: {},
   customColor: '',
+  language: 'en',
   readOnly: false
 }

@@ -3,9 +3,9 @@ import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 
 import Gantt from 'frappe-gantt'
-import { format } from 'date-fns'
 
 import {
+  formatAbsoluteDate,
   getAvatarBaseUrl,
   RefreshWarningMessage
 } from 'tracim_frontend_lib'
@@ -153,8 +153,8 @@ export class KanbanGantt extends React.Component {
     ctx.set_title(ctx.task.name)
 
     if (ctx.task.custom_class === undefined) {
-      const startDate = format(ctx.task._start, 'yyyy-MM-dd')
-      const endDate = format(ctx.task._end, 'yyyy-MM-dd')
+      const startDate = formatAbsoluteDate(ctx.task._start, props.language, 'P')
+      const endDate = formatAbsoluteDate(ctx.task._end, props.language, 'P')
       const status = ctx.task._card.finished ? props.t('Finished') : props.t('Work in progress')
 
       const assignments = ctx.task._card.assignmentList.map((assignmentId) => {

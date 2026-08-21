@@ -597,6 +597,7 @@ export class Kanban extends React.Component {
                     hideButtonsWhenReadOnly={props.readOnly}
                     card={card}
                     cardList={cardsById}
+                    language={props.language}
                     onEditCard={this.handleEditCard}
                     onRemoveCard={this.handleRemoveCard}
                   />
