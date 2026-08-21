@@ -52,18 +52,26 @@ if [ "${#failed_projects[@]}" -gt 0 ]; then
     for project in "${failed_projects[@]}"; do
         projectlog="$logdir/$(basename "$project").log"
         echo -e "\n${RED}$project${NC}"
-        # Mocha prints failures as numbered blocks, e.g.:
+        # `yarn run test` consists of:
+        # - lint (standard)
+        # - mocha
+        # Either can make the build fails, and each one needs to be handled differently
+        #
+        # standard prints one "file:line:col: message" line per violation:
+        #   /path/to/file.js:3:5: 'expect' is not defined.
+        #
+        # mocha prints failures as numbered blocks, e.g.:
         #   1) Suite
         #        test name:
         #      AssertionError: ...
         #       at ...
-        # Keep the numbered header/title lines plus the one-line error, drop
-        # the stack trace lines ("  at ..."). Colors are stripped first since
-        # mocha emits ANSI codes at the start of these lines even when piped.
+        #
+        # Warning: colors are stripped first since mocha emits ANSI codes at the start of these lines even when piped.
         sed -E 's/\x1b\[[0-9;]*m//g' "$projectlog" | awk '
             /^  [0-9]+\)/ { inblock=1 }
             inblock && /^ *at / { inblock=0; next }
-            inblock { print }
+            inblock { print; next }
+            /:[0-9]+:[0-9]+: / { print }
         '
     done
 fi
