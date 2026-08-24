@@ -52,6 +52,21 @@ const CustomReactSelectOption = (props) => {
   )
 }
 
+const DependencySelectOption = (props) => (
+  <div
+    ref={props.innerRef}
+    className='CustomReactSelectOption'
+    key={props.data.id}
+    {...props.innerProps}
+  >
+    <span
+      className='CustomReactSelectOption__dot'
+      style={{ backgroundColor: props.data.bgColor }}
+    />
+    <span>{props.data.title}</span>
+  </div>
+)
+
 function KanbanCardEditor (props) {
   const [card, setCard] = useState(emptyCard)
   const [wasModified, setWasModified] = useState(false)
@@ -299,6 +314,7 @@ function KanbanCardEditor (props) {
           <Select
             id='kanban__KanbanPopup__depends'
             className='kanban__KanbanPopup__depends__select select'
+            components={{ Option: DependencySelectOption }}
             isSearchable
             placeholder={props.t('No card')}
             onChange={handleChangeSelectDepends}

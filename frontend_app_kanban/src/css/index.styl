@@ -328,8 +328,9 @@ fieldSpacing = 8px
 
 .CustomReactSelectOption
   display flex
+  align-items center
   flex-direction row
-  gap 5px
+  gap standardSpacing
   background-color transparent
   color inherit
   cursor default
@@ -342,6 +343,11 @@ fieldSpacing = 8px
     background-color #deebff
   &__avatar__img
     border-radius 50%
+  &__dot
+    border borderStyle
+    border-radius 1em
+    height: 1em
+    min-width: 1em
   &__username
     color darkGrey1
 
