@@ -122,9 +122,7 @@ export class KanbanGantt extends React.Component {
 
     const bars = props.columns.flatMap(({ id, title, bgColor, cards }) => {
       const ganttCards = cards
-        .filter((card) => (
-          (card.kickoff || card.deadline) && card.duration?.length > 0) || (card.kickoff && card.deadline)
-        )
+        .filter((card) => card.kickoff || card.deadline)
         .sort((first, second) => {
           const firstDate = new Date(first.kickoff)
           const secondDate = new Date(second.kickoff)
@@ -137,15 +135,16 @@ export class KanbanGantt extends React.Component {
         .map((card) => {
           let kickoff = card.kickoff ? new Date(card.kickoff) : null
           let deadline = card.deadline ? new Date(card.deadline) : null
+          const duration = card.duration || 1
 
           // INFO - A.L - 2026-08-21 - If the duration was set with a kickoff or
           // deadline date, calculate the missing date if not available.
           // We substract one day to the duration to ensure the bar will take the
           // exact amount of days in the Gantt view.
           if (!kickoff && deadline) {
-            kickoff = card.duration > 1 ? sub(deadline, { days: card.duration - 1 }) : deadline
+            kickoff = sub(deadline, { days: duration - 1 })
           } else if (kickoff && !deadline) {
-            deadline = card.duration > 1 ? add(kickoff, { days: card.duration - 1 }) : kickoff
+            deadline = add(kickoff, { days: duration - 1 })
           }
 
           let colorProgress

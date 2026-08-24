@@ -23,8 +23,8 @@ const emptyCard = {
   kickoff: '',
   deadline: '',
   freeInput: '',
-  duration: 1,
-  progress: '0',
+  duration: undefined,
+  progress: undefined,
   depends: [],
   finished: false
 }
@@ -249,7 +249,8 @@ function KanbanCardEditor (props) {
                 id='kanban__KanbanPopup__duration'
                 inputClassName='number'
                 onChange={(e) => updateCard({ ...card, duration: e.target.value })}
-                value={`${card.duration}`}
+                placeholder='1'
+                value={card.duration ? `${card.duration}` : ''}
                 suffix={card.duration > 1 ? props.t('days') : props.t('day')}
               />
             </div>
@@ -261,7 +262,8 @@ function KanbanCardEditor (props) {
                 id='kanban__KanbanPopup__progress'
                 inputClassName='number'
                 onChange={(e) => updateCard({ ...card, progress: e.target.value })}
-                value={card.finished ? '100' : card.progress}
+                value={card.finished ? '100' : (card.progress || '')}
+                placeholder='0'
                 disabled={card.finished}
                 suffix='%'
               />
