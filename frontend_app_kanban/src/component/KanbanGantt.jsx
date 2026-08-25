@@ -22,8 +22,15 @@ export class KanbanGantt extends React.Component {
   constructor (props) {
     super(props)
 
+    const dependencies = {}
+    props.columns.forEach(({ cards }) => cards.forEach(({ id, depends }) => depends.forEach((dependId) => {
+      if (!dependencies[dependId]) dependencies[dependId] = []
+      if (!dependencies[dependId].includes(id)) dependencies[dependId].push(id)
+    })))
+
     this.state = {
       columns: props.columns,
+      dependencies: dependencies,
       gantt: null,
       isLoaded: false,
       tasks: []
@@ -71,6 +78,18 @@ export class KanbanGantt extends React.Component {
     }
   }
 
+  getAllDepends = (depends, list) => {
+    const { state } = this
+
+    depends.forEach((id) => {
+      if (!list.includes(id)) list.push(id)
+      if (state.dependencies[id]?.length > 0) {
+        return this.getAllDepends(state.dependencies[id], list)
+      }
+    })
+    return list
+  }
+
   getCardsAsGantt = () => {
     const { props } = this
 
@@ -101,7 +120,7 @@ export class KanbanGantt extends React.Component {
     const todayMidnight = new Date(Date.now())
     todayMidnight.setHours(0, 0, 0)
 
-    return props.columns.flatMap(({ id, title, bgColor, cards }) => {
+    const bars = props.columns.flatMap(({ id, title, bgColor, cards }) => {
       const ganttCards = cards
         .filter((card) => (
           (card.kickoff || card.deadline) && card.duration?.length > 0) || (card.kickoff && card.deadline)
@@ -158,6 +177,37 @@ export class KanbanGantt extends React.Component {
         },
         ...ganttCards
       ]
+    })
+
+    const startDates = Object.fromEntries(
+      bars.filter((bar) => bar._card).map(({ id, start }) => [id, start])
+    )
+
+    return bars.map((bar) => {
+      let start = bar.start
+      let end = bar.end
+
+      // INFO - A.L - 2026-08-25 - Compute again the cards without kickoff
+      // since their dependencies do have computed dates from previous map.
+      if (bar.dependencies && bar.dependencies.length > 0 && !bar._card.kickoff) {
+        start = null
+        this.getAllDepends(bar.dependencies, [])
+          .filter((id) => id !== bar.id)
+          .forEach((id) => {
+            const dependStart = new Date(startDates[id])
+            if (!start || dependStart > start) start = dependStart
+          })
+
+        // Add one day to the maximal kickoff date to have the bar shown
+        // just after the last dependency.
+        start = add(start, { days: 1 })
+        end = add(start, { days: (bar._card.duration || 1) - 1 })
+        // Reformat with the date format used by the Gantt component
+        start = format(start, 'yyyy-MM-dd')
+        end = format(end, 'yyyy-MM-dd')
+      }
+
+      return { ...bar, start, end }
     })
   }
 
