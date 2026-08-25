@@ -76,5 +76,6 @@
   "If you still want to use your current work, simply check the cross and the validation will be restored.": "Si vous souhaitez tout de même publier vos éditions, cliquez sur l’icône en forme de croix et la validation sera de nouveau possible.",
   "The board was not able to load. Use the refresh button to reload it.": "Le Kanban n’a pas pu se charger correctement. Utilisez le bouton de rafraîchissement pour le recharger.",
   "Click on this button to reload the board.": "Cliquez sur ce bouton pour recharger le Kanban.",
-  "Gantt view": "Vue Gantt"
+  "Gantt view": "Vue Gantt",
+  "Other columns": "Autres colonnes"
 }

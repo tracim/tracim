@@ -67,6 +67,16 @@ const DependencySelectOption = (props) => (
   </div>
 )
 
+const DependsGroupLabel = (props) => (
+  <div
+    ref={props.innerRef}
+    key={props.label}
+    {...props.innerProps}
+  >
+    <span>{props.label}</span>
+  </div>
+)
+
 function KanbanCardEditor (props) {
   const [card, setCard] = useState(emptyCard)
   const [wasModified, setWasModified] = useState(false)
@@ -138,13 +148,31 @@ function KanbanCardEditor (props) {
   const selectedAssignmentOptionList = assignmentOptionList
     .filter(m => card.assignmentList.some(a => Number(a) === Number(m.id)))
 
-  const dependsOptionList = props.cardList
-    .filter(c => c.id !== card.id)
-    .map(m => ({
-      ...m,
-      value: m.id,
-      label: m.title
-    }))
+  const dependsOptionList = [
+    {
+      label: props.column.title,
+      options: props
+        .cardsByColumns[props.column.id]
+        .filter(c => c.id !== card.id)
+        .map(m => ({
+          ...m,
+          value: m.id,
+          label: m.title
+        }))
+    },
+    {
+      label: props.t('Other columns'),
+      options: Object
+        .entries(props.cardsByColumns)
+        .filter((id) => id !== props.column.id)
+        .flatMap(([id, cards]) => cards.map((card) => ({
+          ...card,
+          value: card.id,
+          label: card.title
+        })))
+        .sort((first, second) => first.title > second.title)
+    }
+  ]
 
   const selectedDependsOptionList = card.depends.map((cardId) => {
     const cardData = props.cardsById[cardId]
@@ -315,6 +343,7 @@ function KanbanCardEditor (props) {
             id='kanban__KanbanPopup__depends'
             className='kanban__KanbanPopup__depends__select select'
             components={{ Option: DependencySelectOption }}
+            formatGroupLabel={DependsGroupLabel}
             isSearchable
             placeholder={props.t('No card')}
             onChange={handleChangeSelectDepends}
@@ -376,8 +405,9 @@ KanbanCardEditor.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   content: PropTypes.object.isRequired,
   card: PropTypes.object.isRequired,
-  cardList: PropTypes.array.isRequired,
+  cardsByColumns: PropTypes.object.isRequired,
   cardsById: PropTypes.object.isRequired,
+  column: PropTypes.object.isRequired,
   onValidate: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
   onClickIgnoreModification: PropTypes.func.isRequired,

@@ -76,5 +76,6 @@
   "If you still want to use your current work, simply check the cross and the validation will be restored.": "If you still want to use your current work, simply check the cross and the validation will be restored.",
   "The board was not able to load. Use the refresh button to reload it.": "The board was not able to load. Use the refresh button to reload it.",
   "Click on this button to reload the board.": "Click on this button to reload the board.",
-  "Gantt view": "Gantt view"
+  "Gantt view": "Gantt view",
+  "Other columns": "Other columns"
 }

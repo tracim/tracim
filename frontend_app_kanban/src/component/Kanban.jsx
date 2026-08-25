@@ -629,8 +629,9 @@ export class Kanban extends React.Component {
                 defaultBackgroundColor={KANBAN_DEFAULT_BACKGROUND_COLOR}
                 language={props.language}
                 memberList={props.config.workspace.memberList}
-                cardList={cardsByColumns[state.editedCardInfos.column.id]}
                 cardsById={cardsById}
+                cardsByColumns={cardsByColumns}
+                column={state.editedCardInfos.column}
                 wasModified={state.editedCardWasModified}
               />
             </CardPopup>
