@@ -16,7 +16,7 @@ cardWidth = 280px
       opacity 70%
     &__title
       display flex
-      align-items center
+      align-items baseline
       margin-bottom textSpacing
 
       & strong
@@ -45,21 +45,28 @@ cardWidth = 280px
       font-weight bold
       font-size metadataFontSize
 
+      &.with-column
+        display flex
+        flex-direction row
+        gap standardSpacing
+        & > div
+          flex 1
+        & > div:last-child
+          text-align right
+      &__column
+        display flex
+        flex-direction column
+
       &__assignment
         display flex
         flex-direction row
         gap 3px
-        margin-bottom textSpacing
+        margin-top textSpacing
         &__member
           &__avatar
             border-radius 50%
 
       &__date, &__advancement
-        display flex
-        flex-direction row
-        justify-content space-between
-        align-items center
-        margin-bottom textSpacing
         &__kickoff, &__deadline, &__progress, &__duration
           display inline
           & i
