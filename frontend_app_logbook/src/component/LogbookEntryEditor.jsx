@@ -7,6 +7,7 @@ import {
   IconButton,
   TextInput,
   TinyEditor,
+  searchContentAndReplaceWithTag,
   sendGlobalFlashMessage,
   getLocalStorageItem,
   setLocalStorageItem
@@ -66,7 +67,7 @@ function LogbookEntryEditor (props) {
     )
   }, [title, description, bgColor, datetime, freeInput])
 
-  function handleValidate (e) {
+  async function handleValidate (e) {
     e.preventDefault()
 
     const descriptionText = description.target ? description.target.value : description
@@ -76,10 +77,15 @@ function LogbookEntryEditor (props) {
       return
     }
 
+    const parsedDescriptionText = await searchContentAndReplaceWithTag(
+      props.apiUrl,
+      descriptionText
+    )
+
     const newEntry = {
       ...entry,
       title: title,
-      description: descriptionText,
+      description: parsedDescriptionText.html,
       bgColor: bgColor,
       datetime: newDate,
       freeInput: freeInput
