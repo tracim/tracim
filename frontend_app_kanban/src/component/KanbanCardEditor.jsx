@@ -164,7 +164,7 @@ function KanbanCardEditor (props) {
       label: props.t('Other columns'),
       options: Object
         .entries(props.cardsByColumns)
-        .filter((id) => id !== props.column.id)
+        .filter(([id, cards]) => id !== props.column.id)
         .flatMap(([id, cards]) => cards.map((card) => ({
           ...card,
           value: card.id,
