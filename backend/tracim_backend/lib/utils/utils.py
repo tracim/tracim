@@ -44,7 +44,7 @@ from tracim_backend.exceptions import UnvalidJsonFile
 if TYPE_CHECKING:
     from tracim_backend.config import CFG
 
-DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 # NOTE - M.L - 2024-03-27 - Not using CFG since this variable used before the config is loaded
 #  This variable is still parsed by CFG to be consistent with other config variables
 DEFAULT_TRACIM_CONFIG_FILE = os.environ.get("TRACIM_CONFIG__FILEPATH", "development.ini")
