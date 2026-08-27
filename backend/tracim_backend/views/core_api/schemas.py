@@ -2342,6 +2342,9 @@ class MessageCommentSchema(marshmallow.Schema):
     )
     parent_id = marshmallow.fields.Int(metadata={"example": 34}, validate=positive_int_validator)
     parent_label = String(metadata={"example": "This is a label"})
+    current_revision_id = marshmallow.fields.Int(
+        metadata={"example": 12}, validate=strictly_positive_int_validator
+    )
 
 
 class CommentSchema(MessageCommentSchema):
