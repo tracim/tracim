@@ -109,6 +109,19 @@ export class Timeline extends React.Component {
       return null
     }
 
+    props.timelineData.sort((first, second) => {
+      const firstCreated = new Date(first.created_raw)
+      const secondCreated = new Date(second.created_raw)
+      if (firstCreated < secondCreated) return -1
+      if (firstCreated > secondCreated) return 1
+
+      const firstRevisionId = first.revision_id || first.current_revision_id
+      const secondRevisionId = second.revision_id || second.current_revision_id
+      if (firstRevisionId < secondRevisionId) return -1
+      if (firstRevisionId > secondRevisionId) return 1
+      return 0
+    })
+
     const timelineDataGrouped = groupTimelineData(props.timelineData)
 
     return (
