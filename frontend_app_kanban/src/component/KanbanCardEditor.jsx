@@ -23,7 +23,7 @@ const emptyCard = {
   kickoff: '',
   deadline: '',
   freeInput: '',
-  duration: undefined,
+  duration: '',
   progress: undefined,
   depends: [],
   finished: false
