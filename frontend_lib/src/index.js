@@ -221,6 +221,7 @@ import ProfileNavigation from './component/ProfileNavigation/ProfileNavigation.j
 import ToDoManagement from './component/ToDo/ToDoManagement.jsx'
 import NewToDo from './component/ToDo/NewToDo.jsx'
 import ToDoItem from './component/ToDo/ToDoItem.jsx'
+import ToDoList from './component/ToDo/ToDoList.jsx'
 
 import ContentType from './component/ContentType/ContentType.jsx'
 
@@ -439,6 +440,7 @@ export {
   TinyEditor,
   TitleListHeader,
   ToDoItem,
+  ToDoList,
   ToDoManagement,
   TracimComponent,
   TranslateButton,
