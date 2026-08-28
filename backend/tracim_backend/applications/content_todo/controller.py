@@ -31,6 +31,7 @@ from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import SetContentStatusSchema
 from tracim_backend.views.core_api.schemas import ToDoSchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
+from tracim_backend.views.core_api.schemas import UserToDoQuerySchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
 
@@ -44,6 +45,7 @@ class TodoController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_TODO_ENDPOINTS])
     @check_right(is_guest)
     @hapic.input_path(UserIdPathSchema())
+    @hapic.input_query(UserToDoQuerySchema())
     @hapic.output_body(ToDoSchema(many=True))
     def get_user_todos(
         self, context, request: TracimRequest, hapic_data=None
@@ -61,8 +63,9 @@ class TodoController(Controller):
             config=app_config,
         )
 
-        todos = content_api.get_all_query(
-            content_type_slug=content_type_list.Todo.slug,
+        todos = content_api.get_todos(
+            hapic_data.query["to"],
+            user=request.current_user,
             assignee_id=hapic_data.path["user_id"],
         )
 

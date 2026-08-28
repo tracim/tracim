@@ -119,6 +119,12 @@ class EmailNotificationType(enum.Enum):
             return translator.get_translation("weekly", lang)
 
 
+class ToDoDispatcherType(enum.StrEnum):
+    BOTH = "both"
+    MYSELF = "myself"
+    OTHERS = "others"
+
+
 class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeBase):
     MAX_WORKSPACE_LABEL_LENGTH = 1024
     MIN_WORKSPACE_LABEL_LENGTH = 1

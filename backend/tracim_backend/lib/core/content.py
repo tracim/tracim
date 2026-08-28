@@ -81,6 +81,7 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import RevisionReadStatus
+from tracim_backend.models.data import ToDoDispatcherType
 from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.event import OperationType
@@ -2742,3 +2743,40 @@ class ContentApi(object):
             generated_patch = make_patch(load(from_buffer), load(to_buffer))
 
         return generated_patch.patch
+
+    def get_todos(
+        self,
+        dispatcher: ToDoDispatcherType,
+        user: User,
+        assignee_id: int = None,
+    ) -> Query:
+        """Retrieve a list of ToDo tasks.
+
+        Args:
+            dispatcher (ToDoDispatcherType): The type of dispatching to use to retrieve the list.
+            user (User): The currently logged user who does the request.
+            assignee_id (int): The identifier of the user assigned to the tasks.
+
+        Returns:
+            Query: The query with all the filters correctly set.
+        """
+
+        query = self._base_query().filter(Content.type == content_type_list.Todo.slug)
+
+        match dispatcher:
+            case ToDoDispatcherType.BOTH:
+                query = query.filter(
+                    or_(Content.owner == user, Content.assignee_id == user.user_id)
+                )
+            case ToDoDispatcherType.MYSELF:
+                query = query.filter(Content.assignee_id == assignee_id)
+
+            case ToDoDispatcherType.OTHERS:
+                query = query.filter(
+                    and_(
+                        Content.owner == user,
+                        Content.assignee_id != user.user_id,
+                    )
+                )
+
+        return query

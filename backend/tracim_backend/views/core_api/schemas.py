@@ -109,6 +109,7 @@ from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentSortOrder
 from tracim_backend.models.data import EmailNotificationType
+from tracim_backend.models.data import ToDoDispatcherType
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import EventTypeDatabaseParameters
@@ -2187,6 +2188,16 @@ class ToDoSchema(marshmallow.Schema):
             "description": "this slug is found in content_type available statuses",
         },
         dump_default=open_status,
+    )
+
+
+class UserToDoQuerySchema(marshmallow.Schema):
+    to = EnumField(
+        ToDoDispatcherType,
+        load_default=ToDoDispatcherType.MYSELF,
+        metadata={
+            "description": "specify the dispatcher to use for retrieving the list of Todo tasks.",
+        },
     )
 
 
