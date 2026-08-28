@@ -52,7 +52,7 @@ const TimedEvent = (props) => {
           : <div>{topContents}</div>
       }
       <div className='timedEvent__bottom'>
-        {props.t('by')}&nbsp;
+        {props.t(props.preposition)}&nbsp;
         <ProfileNavigation user={props.author}>
           <span className='timedEvent__author' title={props.author.publicName}>{props.author.publicName}</span>
         </ProfileNavigation>
@@ -70,14 +70,16 @@ TimedEvent.propTypes = {
   eventList: PropTypes.array,
   onEventClicked: PropTypes.func,
   dataCy: PropTypes.string,
-  isRoot: PropTypes.bool
+  isRoot: PropTypes.bool,
+  preposition: PropTypes.string
 }
 
 TimedEvent.defaultProps = {
   customClass: '',
   operation: '',
   eventList: [],
-  isRoot: true
+  isRoot: true,
+  preposition: 'by'
 }
 
 export default translate()(TimedEvent)
