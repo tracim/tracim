@@ -522,7 +522,7 @@ export class Kanban extends React.Component {
                 {props.t('The board was not able to load. Use the refresh button to reload it.')}
               </div>
               <RefreshWarningMessage
-                tooltip={props.t('Click on this button to reload the board.')}
+                tooltip={props.t('Click to reload the board.')}
                 onClickRefresh={this.handleRefreshBoard}
               />
             </>

@@ -194,7 +194,7 @@ function KanbanCard (props) {
           )}
           {props.card.progress?.length > 0 && (
             <div className='kanban__contentpage__wrapper__board__card__options__advancement__progress'>
-              <span title={props.t('Task progression')}>
+              <span title={props.t('Task progress')}>
                 {props.card.finished ? (
                   <>
                     <Icon icon='fas fa-check-square' />

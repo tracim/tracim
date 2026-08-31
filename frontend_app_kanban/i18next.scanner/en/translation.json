@@ -55,7 +55,7 @@
   "Start date": "Start date",
   "Due date": "Due date",
   "Task duration": "Task duration",
-  "Task progression": "Task progression",
+  "Task progress": "Task progress",
   "Title": "Title",
   "Open field": "Open field",
   "Assignment": "Assignment",
@@ -77,7 +77,7 @@
   "Reload it!": "Reload it!",
   "If you still want to use your current work, simply check the cross and the validation will be restored.": "If you still want to use your current work, simply check the cross and the validation will be restored.",
   "The board was not able to load. Use the refresh button to reload it.": "The board was not able to load. Use the refresh button to reload it.",
-  "Click on this button to reload the board.": "Click on this button to reload the board.",
+  "Click to reload the board.": "Click to reload the board.",
   "Gantt view": "Gantt view",
   "Other columns": "Other columns"
 }
