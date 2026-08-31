@@ -216,6 +216,7 @@ const ToDo = (props) => {
             >
               <ToDoList
                 filterPlaceholder={props.t('Filter my tasks')}
+                title={props.t('My tasks')}
                 lockedToDoList={lockedToDoList}
                 noTaskMessage={props.t('You do not have any assigned tasks')}
                 onClickChangeStatusToDo={handleChangeStatusToDo}

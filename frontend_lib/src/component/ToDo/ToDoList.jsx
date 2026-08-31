@@ -43,7 +43,10 @@ const ToDoList = (props) => {
   }, [filterValue])
 
   return (
-    <>
+    <div>
+      <div className='toDo__list__title'>
+        <span>{props.title}</span>
+      </div>
       {props.tasksList.length === 0 ? (
         <EmptyListMessage>
           {props.noTaskMessage}
@@ -99,7 +102,7 @@ const ToDoList = (props) => {
           )}
         </div>
       )}
-    </>
+    </div>
   )
 }
 
@@ -113,7 +116,8 @@ ToDoList.propTypes = {
   onClickDeleteToDo: PropTypes.func.isRequired,
   spaceRoleList: PropTypes.array.isRequired,
   tasksList: PropTypes.array.isRequired,
-  user: PropTypes.object.isRequired
+  user: PropTypes.object.isRequired,
+  title: PropTypes.string.isRequired
 }
 
 ToDoList.defaultProps = {}
