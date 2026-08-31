@@ -34,6 +34,8 @@ const ToDoItem = props => {
     : (props.memberList.find(member => member.id === props.toDo.assignee.user_id) || { username: '' }).username
   const isToDoChecked = props.toDo.status !== TODO_STATUSES.OPEN
 
+  const isMyTask = props.toDo.assignee.username === props.username
+
   return (
     <div className={classnames('toDoItem', { toDoItemChecked: isToDoChecked })}>
       <div className='toDoItem__checkbox'>
@@ -71,11 +73,12 @@ const ToDoItem = props => {
           <TimedEvent
             date={props.toDo.created}
             author={{
-              userId: props.toDo.author.user_id,
-              publicName: props.toDo.author.public_name
+              userId: isMyTask ? props.toDo.author.user_id : props.toDo.assignee.user_id,
+              publicName: isMyTask ? props.toDo.author.public_name : props.toDo.assignee.public_name
             }}
             lang={props.lang}
-            operation={props.t('created')}
+            operation={isMyTask ? props.t('created') : props.t('assigned')}
+            preposition={isMyTask ? 'by' : 'to'}
             isRoot
           />
         </div>
