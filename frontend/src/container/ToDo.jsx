@@ -31,9 +31,15 @@ import {
 } from '../action-creator.sync.js'
 import { FETCH_CONFIG } from '../util/helper.js'
 
+const isManaged = (task, userId) => {
+  return task.assignee.user_id === userId || task.author.user_id === userId
+}
+
 const ToDo = (props) => {
   const [isLoading, setIsLoading] = useState(true)
   const [toDoList, setToDoList] = useState([])
+  const [assignedToDoList, setAssignedToDoList] = useState([])
+  const [myselfToDoList, setMyselfToDoList] = useState([])
   const [lockedToDoList, setLockedToDoList] = useState([])
   const [spaceRoleList, setSpaceRoleList] = useState([])
 
@@ -51,6 +57,8 @@ const ToDo = (props) => {
     ])
 
     getSpaceRoleListForAnUser(props.user.userId)
+    setAssignedToDoList(toDoList.filter((task) => task.assignee.user_id !== props.user.userId))
+    setMyselfToDoList(toDoList.filter((task) => task.assignee.user_id === props.user.userId))
   }, [toDoList])
 
   const setHeadTitleToDo = () => {
@@ -70,7 +78,8 @@ const ToDo = (props) => {
   const getAllToDosForAnUser = async () => {
     const fetchGetToDo = await handleFetchResult(await getToDoListForUser(
       FETCH_CONFIG.apiUrl,
-      props.user.userId
+      props.user.userId,
+      'both'
     ))
 
     setIsLoading(false)
@@ -106,9 +115,9 @@ const ToDo = (props) => {
   }
 
   const handleToDoCreated = async data => {
-    if (data.fields.content.assignee.user_id !== props.user.userId) return
+    if (!isManaged(data.fields.content, props.user.userId)) return
 
-    const fecthGetToDo = await handleFetchResult(await getToDo(
+    const fetchGetToDo = await handleFetchResult(await getToDo(
       FETCH_CONFIG.apiUrl,
       data.fields.workspace.workspace_id,
       data.fields.content.parent.content_id,
@@ -116,31 +125,36 @@ const ToDo = (props) => {
     ))
 
     setToDoList(sortListByMultipleCriteria(
-      uniqBy([fecthGetToDo.body, ...toDoList], 'content_id'),
+      uniqBy([fetchGetToDo.body, ...toDoList], 'content_id'),
       [SORT_BY.STATUS, SORT_BY.CREATION_DATE, SORT_BY.ID]
     ))
   }
 
   const handleToDoChanged = async data => {
-    if (data.fields.content.assignee.user_id !== props.user.userId) return
+    if (!isManaged(data.fields.content, props.user.userId)) return
 
     // INFO - MP - 2022-07-19 - We fetch the to do data because we don't trust Redux
     // therefore we only update the to do when we fetch a TLM. Gives the impression
     // of lags
-    const fecthGetToDo = await handleFetchResult(await getToDo(
+    const fetchGetToDo = await handleFetchResult(await getToDo(
       FETCH_CONFIG.apiUrl,
       data.fields.workspace.workspace_id,
       data.fields.content.parent.content_id,
       data.fields.content.content_id
     ))
-    setToDoList(uniqBy(
-      toDoList.map(toDo => toDo.content_id === data.fields.content.content_id ? fecthGetToDo.body : toDo)
-    ), 'content_id')
+
+    setToDoList(
+      uniqBy(
+        toDoList.map(toDo => toDo.content_id === data.fields.content.content_id ? fetchGetToDo.body : toDo),
+        'content_id'
+      )
+    )
     setLockedToDoList(lockedToDoList.filter(toDoId => toDoId !== data.fields.content.content_id))
   }
 
   const handleToDoDeleted = data => {
-    if (data.fields.content.assignee.user_id !== props.user.userId) return
+    if (!isManaged(data.fields.content, props.user.userId)) return
+
     setToDoList(toDoList.filter(toDo => toDo.content_id !== data.fields.content.content_id))
     setLockedToDoList(lockedToDoList.filter(toDoId => toDoId !== data.fields.content.content_id))
   }
@@ -215,14 +229,25 @@ const ToDo = (props) => {
               parentClass='toDo__pageContent_on_mytasks'
             >
               <ToDoList
-                filterPlaceholder={props.t('Filter my tasks')}
-                title={props.t('My tasks')}
+                filterPlaceholder={props.t('Filter the tasks')}
                 lockedToDoList={lockedToDoList}
-                noTaskMessage={props.t('You do not have any assigned tasks')}
+                noTaskMessage={props.t('You do not have any assigned task')}
                 onClickChangeStatusToDo={handleChangeStatusToDo}
                 onClickDeleteToDo={handleDeleteToDo}
                 spaceRoleList={spaceRoleList}
-                tasksList={toDoList}
+                tasksList={myselfToDoList}
+                title={props.t('My tasks')}
+                user={props.user}
+              />
+              <ToDoList
+                filterPlaceholder={props.t('Filter the tasks')}
+                lockedToDoList={lockedToDoList}
+                noTaskMessage={props.t('You do not have assigned any task')}
+                onClickChangeStatusToDo={handleChangeStatusToDo}
+                onClickDeleteToDo={handleDeleteToDo}
+                spaceRoleList={spaceRoleList}
+                tasksList={assignedToDoList}
+                title={props.t('Assigned by me')}
                 user={props.user}
               />
             </PageContent>

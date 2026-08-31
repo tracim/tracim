@@ -2,8 +2,23 @@
 
 .toDo
   display flex
-  flex-direction column
   margin standardSpacing
+
+  &Management > .toDo
+    flex-direction column
+
+  &__pageContent_on_mytasks
+    flex-direction row
+    gap standardSpacing
+    & > div
+      flex 1
+      padding standardSpacing
+      margin textSpacing
+      border-radius standardBorderRadius
+      &:first-child
+        background lightBlueOpacity
+      &:last-child
+        background lightOrangeOpacity
 
   &__list
     &__title
@@ -52,9 +67,9 @@
     align-content center
     align-items center
     padding standardSpacing
+    gap standardSpacing
     &__checkbox
       font-size titleFontSize
-      margin-inline-end textSpacing
       &:focus
         outline none
     &__delete:focus
@@ -86,3 +101,9 @@
       background repeating-linear-gradient(25deg, lightGrey2, lightGrey2 5px, white 5px, white 10px)
       & *
         color darkGrey2
+
+// MEDIAQUERIES
+
+@media (max-width: max-lg)
+  .toDo__pageContent_on_mytasks
+    flex-direction column

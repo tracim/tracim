@@ -292,5 +292,7 @@
   "No description": "No description",
   "Change description": "Change description",
   "Error while saving the user configuration": "Error while saving the user configuration",
-  "Error while saving the new description": "Error while saving the new description"
+  "Error while saving the new description": "Error while saving the new description",
+  "Assigned by me": "Assigned by me",
+  "Filter the tasks": "Filter the tasks"
 }
