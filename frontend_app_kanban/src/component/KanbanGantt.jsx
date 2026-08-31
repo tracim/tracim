@@ -193,17 +193,21 @@ export class KanbanGantt extends React.Component {
         this.getAllDepends(bar.dependencies, [])
           .filter((id) => id !== bar.id)
           .forEach((id) => {
-            const dependStart = new Date(startDates[id])
-            if (!start || dependStart > start) start = dependStart
+            if (startDates[id] !== undefined) {
+              const dependStart = new Date(startDates[id])
+              if (dependStart && (!start || dependStart > start)) start = dependStart
+            }
           })
 
-        // Add one day to the maximal kickoff date to have the bar shown
-        // just after the last dependency.
-        start = add(start, { days: 1 })
-        end = add(start, { days: (bar._card.duration || 1) - 1 })
-        // Reformat with the date format used by the Gantt component
-        start = format(start, 'yyyy-MM-dd')
-        end = format(end, 'yyyy-MM-dd')
+        if (start) {
+          // Add one day to the maximal kickoff date to have the bar shown
+          // just after the last dependency.
+          start = add(start, { days: 1 })
+          end = add(start, { days: (bar._card.duration || 1) - 1 })
+          // Reformat with the date format used by the Gantt component
+          start = format(start, 'yyyy-MM-dd')
+          end = format(end, 'yyyy-MM-dd')
+        }
       }
 
       return { ...bar, start, end }
