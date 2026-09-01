@@ -19,6 +19,7 @@ from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import EmailNotificationType
+from tracim_backend.models.data import ToDoDispatcherType
 from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.roles import WorkspaceRoles
@@ -3873,6 +3874,45 @@ class TestContentApi(object):
 
         with pytest.raises(ContentTypeNotAllowed):
             api.get_patch(1, 2, text_file.content_id, "text_file")
+
+    @pytest.mark.parametrize("config_section", [{"name": "base_test_todos"}], indirect=True)
+    def test_unit__get_todos(
+        self,
+        session,
+        workspace_api_factory,
+        app_config,
+        user_api_factory,
+        content_type_list,
+        admin_user,
+    ) -> None:
+        uapi = user_api_factory.get()
+        user_a = uapi.create_minimal_user(email="test.a@user", profile=Profile.USER, save_now=True)
+        user_b = uapi.create_minimal_user(email="test.b@user", profile=Profile.USER, save_now=True)
+
+        workspace_api = workspace_api_factory.get(current_user=user_a)
+        workspace = workspace_api.create_workspace("test", save_now=True)
+
+        api_a = ContentApi(current_user=user_a, session=session, config=app_config)
+        content = api_a.create(
+            content_type_slug=content_type_list.Thread.slug,
+            workspace=workspace,
+            label="document",
+            do_save=True,
+        )
+        api_a.create_todo(parent=content, assignee=user_a, raw_content="test 1")
+        api_a.create_todo(parent=content, assignee=user_b, raw_content="test 2")
+
+        api_b = ContentApi(current_user=user_b, session=session, config=app_config)
+        api_b.create_todo(parent=content, assignee=user_a, raw_content="test 3")
+
+        todos = api_a.get_todos(ToDoDispatcherType.MYSELF, user_a, user_a.user_id)
+        assert len(todos.all()) == 2
+        todos = api_a.get_todos(ToDoDispatcherType.MYSELF, user_a, user_b.user_id)
+        assert len(todos.all()) == 1
+        todos = api_a.get_todos(ToDoDispatcherType.OTHERS, user_a)
+        assert len(todos.all()) == 1
+        todos = api_a.get_todos(ToDoDispatcherType.BOTH, user_a)
+        assert len(todos.all()) == 3
 
 
 @pytest.mark.usefixtures("test_fixture")
