@@ -122,8 +122,10 @@ export class KanbanGantt extends React.Component {
 
     const bars = props.columns.flatMap(({ id, title, bgColor, cards }) => {
       const ganttCards = cards
-        .filter((card) => card.kickoff || card.deadline)
+        .filter((card) => card.kickoff || card.deadline || card.depends?.length > 0)
         .sort((first, second) => {
+          if (!first.kickoff && !second.kickoff) return 0
+
           const firstDate = new Date(first.kickoff)
           const secondDate = new Date(second.kickoff)
 
@@ -156,8 +158,8 @@ export class KanbanGantt extends React.Component {
             name: card.title,
             color: deadline < todayMidnight ? '#FFF1F1' : undefined,
             color_progress: colorProgress,
-            start: format(kickoff, 'yyyy-MM-dd'),
-            end: format(deadline, 'yyyy-MM-dd'),
+            start: kickoff ? format(kickoff, 'yyyy-MM-dd') : null,
+            end: deadline ? format(deadline, 'yyyy-MM-dd') : null,
             duration: `${card.duration}d`,
             dependencies: card.depends,
             progress: card.finished ? 100 : parseInt(card.progress),
