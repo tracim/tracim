@@ -174,14 +174,16 @@ function KanbanCardEditor (props) {
     }
   ]
 
-  const selectedDependsOptionList = card.depends.map((cardId) => {
-    const cardData = props.cardsById[cardId]
-    return {
-      ...cardData,
-      value: cardId,
-      label: cardData.title
-    }
-  })
+  const selectedDependsOptionList = card.depends
+    .filter((cardId) => props.cardsById[cardId])
+    .map((cardId) => {
+      const cardData = props.cardsById[cardId]
+      return {
+        ...cardData,
+        value: cardId,
+        label: cardData.title
+      }
+    })
 
   return (
     <form className='kanban__KanbanPopup__form' onSubmit={handleValidate}>
