@@ -191,6 +191,7 @@ export class KanbanGantt extends React.Component {
       // INFO - A.L - 2026-08-25 - Compute again the cards without kickoff
       // since their dependencies do have computed dates from previous map.
       if (bar.dependencies && bar.dependencies.length > 0 && !bar._card.kickoff) {
+        const previousStart = bar.start
         start = null
         this.getAllDepends(bar.dependencies, [])
           .filter((id) => id !== bar.id)
@@ -209,6 +210,11 @@ export class KanbanGantt extends React.Component {
           // Reformat with the date format used by the Gantt component
           start = format(start, 'yyyy-MM-dd')
           end = format(end, 'yyyy-MM-dd')
+        } else if (previousStart) {
+          // Restore the previous one if the card cannot retrieve the start date
+          // from the dependencies (for example, when a dependency do not exists
+          // anymore)
+          start = previousStart
         }
       }
 
