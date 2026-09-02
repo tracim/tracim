@@ -167,6 +167,11 @@ export class KanbanGantt extends React.Component {
           }
         })
 
+      // INFO - A.L - 2026-09-02 - It is necessary to compute the minStart or
+      // maxEnd value if one of them is missing to have a proper section bar.
+      if (!minStart && maxEnd) minStart = sub(maxEnd, { days: 1 })
+      else if (minStart && !maxEnd) maxEnd = add(minStart, { days: 1 })
+
       return [
         {
           id,
