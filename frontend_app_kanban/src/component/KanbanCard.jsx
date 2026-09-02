@@ -212,15 +212,17 @@ function KanbanCard (props) {
         {props.card.depends?.length > 0 && (
           <div className='kanban__contentpage__wrapper__board__card__options__depends'>
             <ul>
-              {props.card.depends.map(dependId => {
-                const dependCard = props.cardList[dependId]
-                return (
-                  <li key={dependId} title={dependCard.title}>
-                    <div style={{ backgroundColor: dependCard.bgColor }} />
-                    <span>{dependCard.title}</span>
-                  </li>
-                )
-              })}
+              {props.card.depends
+                .filter((dependId) => props.cardList[dependId])
+                .map((dependId) => {
+                  const dependCard = props.cardList[dependId]
+                  return (
+                    <li key={dependId} title={dependCard.title}>
+                      <div style={{ backgroundColor: dependCard.bgColor }} />
+                      <span>{dependCard.title}</span>
+                    </li>
+                  )
+                })}
             </ul>
           </div>
         )}
