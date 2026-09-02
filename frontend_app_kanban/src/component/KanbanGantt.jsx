@@ -160,7 +160,7 @@ export class KanbanGantt extends React.Component {
             color_progress: colorProgress,
             start: kickoff ? format(kickoff, 'yyyy-MM-dd') : null,
             end: deadline ? format(deadline, 'yyyy-MM-dd') : null,
-            duration: `${card.duration}d`,
+            duration: `${duration}d`,
             dependencies: card.depends,
             progress: card.finished ? 100 : parseInt(card.progress),
             _card: card
