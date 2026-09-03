@@ -63,6 +63,59 @@ const retrieveCardsDelta = (columns) => {
   return [minStart, maxEnd]
 }
 
+const nested = (items, id = null) => {
+  return items
+    .filter((item) => item.parent === id)
+    .map((item) => ({ ...item, children: nested(items, item.id) }));
+}
+
+const flatten = (nodeList, data = []) => {
+  nodeList.forEach((node) => {
+    data.push(node.card)
+    flatten(node.children || [], data)
+  });
+  return data
+}
+
+export const walkCards = (cards) => {
+  const data = []
+  cards
+    .sort((first, second) => {
+      if (!first.kickoff && !second.kickoff) return 0
+
+      const firstDate = new Date(first.kickoff)
+      const secondDate = new Date(second.kickoff)
+
+      // Order the tasks by the kickoff date to have correctly aligned bars
+      if (firstDate < secondDate) return -1
+      else if (firstDate > secondDate) return 1
+      return 0
+    })
+    .forEach((card) => {
+      if (card.depends?.length > 0) {
+        card.depends.forEach((depend) => {
+          data.push({ id: card.id, card, parent: depend })
+        })
+      } else {
+        data.push({ id: card.id, card, parent: null })
+      }
+    })
+
+  const cardsById = {}
+  const flatCards = []
+  flatten(nested(data)).forEach((card) => {
+    if (!cardsById[card.id]) {
+      flatCards.push(card)
+      cardsById[card.id] = card
+    } else {
+      flatCards.splice(flatCards.indexOf(card), 1)
+      flatCards.push(card)
+    }
+  })
+
+  return flatCards
+}
+
 const recursiveDependencies = (depends, storedDependencies, list = []) => {
   depends.forEach((id) => {
     if (!list.includes(id)) list.push(id)
@@ -80,19 +133,8 @@ export const generateGanttArrayFromKanban = (columns) => {
   todayMidnight.setHours(0, 0, 0)
 
   const bars = columns.flatMap(({ id, title, bgColor, cards }) => {
-    const ganttCards = cards
+    const ganttCards = walkCards(cards)
       .filter((card) => card.kickoff || card.deadline || card.depends?.length > 0)
-      .sort((first, second) => {
-        if (!first.kickoff && !second.kickoff) return 0
-
-        const firstDate = new Date(first.kickoff)
-        const secondDate = new Date(second.kickoff)
-
-        // Order the tasks by the kickoff date to have correctly aligned bars
-        if (firstDate < secondDate) return -1
-        else if (firstDate > secondDate) return 1
-        return 0
-      })
       .map((card) => {
         let kickoff = card.kickoff ? new Date(card.kickoff) : null
         let deadline = card.deadline ? new Date(card.deadline) : null
@@ -147,7 +189,11 @@ export const generateGanttArrayFromKanban = (columns) => {
   return bars
 }
 
-export const computeDependenciesFromGantt = (bars, dependencies, startDates) => {
+export const computeDependenciesFromGantt = (bars, dependencies) => {
+  const endDates = Object.fromEntries(
+    bars.filter((bar) => bar._card).map(({ id, end }) => [id, end])
+  )
+
   return bars.map((bar) => {
     let start = bar.start
     let end = bar.end
@@ -160,11 +206,19 @@ export const computeDependenciesFromGantt = (bars, dependencies, startDates) => 
       recursiveDependencies(bar.dependencies, dependencies)
         .filter((id) => id !== bar.id)
         .forEach((id) => {
-          if (startDates[id]) {
-            const dependStart = new Date(startDates[id])
-            if (dependStart && (!start || dependStart > start)) {
-              start = dependStart
-              startDates[bar.id] = start
+          if (endDates[id]) {
+            const dependEnd = new Date(endDates[id])
+            if (dependEnd && (!start || dependEnd > start)) {
+              start = dependEnd
+              endDates[bar.id] = add(start, { days: bar._card.duration })
+
+              // Check weekend
+              if (endDates[bar.id].getDay() === 5) {
+                endDates[bar.id] = add(endDates[bar.id], { days: 2 })
+              }
+              if (endDates[bar.id].getDay() === 6) {
+                endDates[bar.id] = add(endDates[bar.id], { days: 1 })
+              }
             }
           }
         })

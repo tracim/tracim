@@ -27,10 +27,14 @@ export class KanbanGantt extends React.Component {
     super(props)
 
     const dependencies = {}
-    props.columns.forEach(({ cards }) => cards.forEach(({ id, depends }) => depends.forEach((dependId) => {
-      if (!dependencies[dependId]) dependencies[dependId] = []
-      if (!dependencies[dependId].includes(id)) dependencies[dependId].push(id)
-    })))
+    props.columns.forEach(({ cards }) => cards.forEach(({ id, depends }) => {
+      if (depends) {
+        depends.forEach((dependId) => {
+          if (!dependencies[dependId]) dependencies[dependId] = []
+          if (!dependencies[dependId].includes(id)) dependencies[dependId].push(id)
+        }
+      )}
+    }))
 
     this.state = {
       columns: props.columns,
@@ -90,12 +94,8 @@ export class KanbanGantt extends React.Component {
     const bars = generateGanttArrayFromKanban(props.columns)
     console.debug('%c<KanbanGantt> end first preprocessing', 'color: chartreuse', bars)
 
-    const startDates = Object.fromEntries(
-      bars.filter((bar) => bar._card).map(({ id, start }) => [id, start])
-    )
-
-    console.debug('%c<KanbanGantt> start second preprocessing', 'color: chartreuse', startDates)
-    const computedBar = computeDependenciesFromGantt(bars, state.dependencies, startDates)
+    console.debug('%c<KanbanGantt> start second preprocessing', 'color: chartreuse')
+    const computedBar = computeDependenciesFromGantt(bars, state.dependencies)
     console.debug('%c<KanbanGantt> end second preprocessing', 'color: chartreuse', computedBar)
 
     // INFO - A.L - 2026-09-03 - Only use the bar with the start and end dates
