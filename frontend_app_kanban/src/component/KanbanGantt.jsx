@@ -201,7 +201,7 @@ export class KanbanGantt extends React.Component {
         this.getAllDepends(bar.dependencies, [])
           .filter((id) => id !== bar.id)
           .forEach((id) => {
-            if (startDates[id] !== undefined) {
+            if (startDates[id]) {
               const dependStart = new Date(startDates[id])
               if (dependStart && (!start || dependStart > start)) start = dependStart
             }
