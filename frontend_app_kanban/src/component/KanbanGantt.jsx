@@ -72,6 +72,7 @@ export class KanbanGantt extends React.Component {
     }
 
     if (state.gantt !== null) {
+      console.debug('%c<KanbanGantt> update data', 'color: chartreuse', state.tasks)
       state.gantt.refresh(state.tasks)
 
       // HACK - ALU - 2026-07-31 - Translate the today button since it is not done in Frappe-Gantt
@@ -85,13 +86,17 @@ export class KanbanGantt extends React.Component {
   getCardsAsGantt = () => {
     const { props, state } = this
 
+    console.debug('%c<KanbanGantt> start first preprocessing', 'color: chartreuse', props.columns)
     const bars = generateGanttArrayFromKanban(props.columns)
+    console.debug('%c<KanbanGantt> end first preprocessing', 'color: chartreuse', bars)
 
     const startDates = Object.fromEntries(
       bars.filter((bar) => bar._card).map(({ id, start }) => [id, start])
     )
 
+    console.debug('%c<KanbanGantt> start second preprocessing', 'color: chartreuse', startDates)
     const computedBar = computeDependenciesFromGantt(bars, state.dependencies, startDates)
+    console.debug('%c<KanbanGantt> end second preprocessing', 'color: chartreuse', computedBar)
 
     // INFO - A.L - 2026-09-03 - Only use the bar with the start and end dates
     // correctly specified to have a working Gantt.
@@ -124,8 +129,9 @@ export class KanbanGantt extends React.Component {
   }
 
   render = () => {
-    const { props } = this
+    const { props, state } = this
 
+    console.debug('%c<KanbanGantt> rendering', 'color: chartreuse', state.tasks)
     return (
       <div className='kanban__contentpage__wrapper gantt-wrapper'>
         <div className='kanban__contentpage__wrapper__options'>
