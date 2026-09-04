@@ -6,6 +6,7 @@
 
 - Allow to open a Kanban as a Gantt project view
 - Realtime edition have been added to the Kanban to allow multi-users editing
+- Allow to show the TODO tasks dispatched by the user
 
 ### Other changes
 
@@ -17,6 +18,12 @@
 - Fix frontend unit tests [#6931](https://github.com/tracim/tracim/issues/6931)
 - Fix end-to-end tests [#6930](https://github.com/tracim/tracim/issues/6930)
 
+### 🐛 Fixed Issues
+
+- Fix 2026.07.04 regression: cannot delete a card with an unknown dependency [#6956](https://github.com/tracim/tracim/pull/6956)
+- Correctly align the text and the button in the PromptMessage component [#6934](https://github.com/tracim/tracim/issues/6934)
+- Correctly sort the Timeline based on the revision [#6894](https://github.com/tracim/tracim/issues/6894)
+- Use the optimized layout for the footer copyright [#6882](https://github.com/tracim/tracim/issues/6882)
 
 ## Next release (maintenance branch)
 
