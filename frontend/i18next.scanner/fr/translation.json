@@ -626,5 +626,7 @@
   "{{count}} comments": "{{count}} commentaire",
   "{{count}} members": "{{count}} membre",
   "You have reached the maximum number of spaces allowed as a guest user. In order to join this space, ask your administrator to make you a standard user or leave another space": "Vous avez atteint le nombre maximal d'espaces que vous pouvez rejoindre en tant qu'invité. Pour rejoindre cet espace, demandez à votre administrateur de vous convertir en « utilisateur standard » ou quittez un de vos espaces",
-  "Mark as read": "Marquer comme lu"
+  "Mark as read": "Marquer comme lu",
+  "No tasks have been assigned to you": "Aucune tâche ne vous a été assignée",
+  "You have not assigned any tasks": "Vous n’avez pas assigné de tâche"
 }
