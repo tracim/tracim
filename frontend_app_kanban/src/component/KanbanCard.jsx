@@ -9,6 +9,7 @@ import {
   Icon,
   shouldUseLightTextColor,
   HTMLContent,
+  formatAbsoluteDate,
   getAvatarBaseUrl
 } from 'tracim_frontend_lib'
 
@@ -155,60 +156,65 @@ function KanbanCard (props) {
       </div>
 
       <div
+        className='kanban__contentpage__wrapper__board__card__options with-column'
+        onClick={props.readOnly ? undefined : () => props.onEditCard(props.card)}
+      >
+        <div className='kanban__contentpage__wrapper__board__card__options__column'>
+          {showKickoff && (
+            <div className='kanban__contentpage__wrapper__board__card__options__date__kickoff'>
+              <span title={props.t('Start date')}>
+                <Icon
+                  icon='fas fa-calendar-day'
+                  title={props.card.kickoff}
+                />
+                {formatAbsoluteDate(props.card.kickoff, props.language, 'P')}
+              </span>
+            </div>
+          )}
+          {showDeadline && (
+            <div className='kanban__contentpage__wrapper__board__card__options__date__deadline'>
+              <span title={props.t('Due date')}>
+                <Icon
+                  icon='fas fa-calendar-week'
+                  title={props.card.deadline}
+                />
+                {formatAbsoluteDate(props.card.deadline, props.language, 'P')}
+              </span>
+            </div>
+          )}
+        </div>
+        <div className='kanban__contentpage__wrapper__board__card__options__column'>
+          {props.card.duration?.length > 0 && (
+            <div className='kanban__contentpage__wrapper__board__card__options__advancement__duration'>
+              <span title={props.t('Task duration')}>
+                <Icon icon='fas fa-stopwatch' />
+                {numberDays(parseInt(props.card.duration))}
+              </span>
+            </div>
+          )}
+          {(props.card.progress?.length > 0 || props.card.finished) && (
+            <div className='kanban__contentpage__wrapper__board__card__options__advancement__progress'>
+              <span title={props.t('Task progress')}>
+                {props.card.finished ? (
+                  <>
+                    <Icon icon='fas fa-check-square' />
+                    {props.t('Finished')}
+                  </>
+                ) : (
+                  <>
+                    <Icon icon='fas fa-edit' />
+                    {props.card.progress}%
+                  </>
+                )}
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+      <div
         className='kanban__contentpage__wrapper__board__card__options'
         onClick={props.readOnly ? undefined : () => props.onEditCard(props.card)}
       >
-        <div className='kanban__contentpage__wrapper__board__card__options__date'>
-          <div
-            className='kanban__contentpage__wrapper__board__card__options__date__kickoff'
-            title={props.t('Start date')}
-          >
-            {showKickoff && (
-              <>
-                <Icon
-                  icon='far fa-calendar'
-                  title={props.card.kickoff}
-                />
-                {props.card.kickoff}
-              </>
-            )}
-          </div>
-
-          {showKickoff && showDeadline && (
-            <Icon icon='fas fa-chevron-right' />
-          )}
-
-          <div
-            className='kanban__contentpage__wrapper__board__card__options__date__deadline'
-            title={props.t('Due date')}
-          >
-            {showDeadline && (
-              <>
-                <Icon
-                  icon='far fa-calendar'
-                  title={props.card.deadline}
-                />
-                {props.card.deadline}
-              </>
-            )}
-          </div>
-        </div>
-
-        <div className='kanban__contentpage__wrapper__board__card__options__advancement'>
-          {props.card.progress?.length > 0 && (
-            <div className='kanban__contentpage__wrapper__board__card__options__advancement__progress'>
-              <Icon icon='far fa-chart-bar' />
-              {props.card.finished ? '100%' : `${props.card.progress}%`}
-            </div>
-          )}
-          {props.card.duration?.length > 0 && (
-            <div className='kanban__contentpage__wrapper__board__card__options__advancement__duration'>
-              <Icon icon='far fa-calendar-alt' />
-              {numberDays(parseInt(props.card.duration))}
-            </div>
-          )}
-        </div>
-
         {props.card.depends?.length > 0 && (
           <div className='kanban__contentpage__wrapper__board__card__options__depends'>
             <ul>
@@ -264,11 +270,13 @@ KanbanCard.propTypes = {
   onRemoveCard: PropTypes.func.isRequired,
   cardList: PropTypes.object,
   customColor: PropTypes.string,
+  language: PropTypes.string,
   readOnly: PropTypes.bool
 }
 
 KanbanCard.defaultProps = {
   cardList: {},
   customColor: '',
+  language: 'en',
   readOnly: false
 }

@@ -23,8 +23,8 @@ const emptyCard = {
   kickoff: '',
   deadline: '',
   freeInput: '',
-  duration: 1,
-  progress: '0',
+  duration: '',
+  progress: undefined,
   depends: [],
   finished: false
 }
@@ -51,6 +51,31 @@ const CustomReactSelectOption = (props) => {
     </div>
   )
 }
+
+const DependencySelectOption = (props) => (
+  <div
+    ref={props.innerRef}
+    className='CustomReactSelectOption'
+    key={props.data.id}
+    {...props.innerProps}
+  >
+    <span
+      className='CustomReactSelectOption__dot'
+      style={{ backgroundColor: props.data.bgColor }}
+    />
+    <span>{props.data.title}</span>
+  </div>
+)
+
+const DependsGroupLabel = (props) => (
+  <div
+    ref={props.innerRef}
+    key={props.label}
+    {...props.innerProps}
+  >
+    <span>{props.label}</span>
+  </div>
+)
 
 function KanbanCardEditor (props) {
   const [card, setCard] = useState(emptyCard)
@@ -123,16 +148,42 @@ function KanbanCardEditor (props) {
   const selectedAssignmentOptionList = assignmentOptionList
     .filter(m => card.assignmentList.some(a => Number(a) === Number(m.id)))
 
-  const dependsOptionList = props.cardList
-    .filter(c => c.id !== card.id)
-    .map(m => ({
-      ...m,
-      value: m.id,
-      label: m.title
-    }))
+  const dependsOptionList = [
+    {
+      label: props.column.title,
+      options: props
+        .cardsByColumns[props.column.id]
+        .filter(c => c.id !== card.id)
+        .map(m => ({
+          ...m,
+          value: m.id,
+          label: m.title
+        }))
+    },
+    {
+      label: props.t('Other columns'),
+      options: Object
+        .entries(props.cardsByColumns)
+        .filter(([id, cards]) => id !== props.column.id)
+        .flatMap(([id, cards]) => cards.map((card) => ({
+          ...card,
+          value: card.id,
+          label: card.title
+        })))
+        .sort((first, second) => first.title > second.title)
+    }
+  ]
 
-  const selectedDependsOptionList = dependsOptionList
-    .filter(m => card.depends.some(a => a === m.id))
+  const selectedDependsOptionList = card.depends
+    .filter((cardId) => props.cardsById[cardId])
+    .map((cardId) => {
+      const cardData = props.cardsById[cardId]
+      return {
+        ...cardData,
+        value: cardId,
+        label: cardData.title
+      }
+    })
 
   return (
     <form className='kanban__KanbanPopup__form' onSubmit={handleValidate}>
@@ -243,7 +294,8 @@ function KanbanCardEditor (props) {
                 id='kanban__KanbanPopup__duration'
                 inputClassName='number'
                 onChange={(e) => updateCard({ ...card, duration: e.target.value })}
-                value={`${card.duration}`}
+                placeholder='1'
+                value={card.duration ? `${card.duration}` : ''}
                 suffix={card.duration > 1 ? props.t('days') : props.t('day')}
               />
             </div>
@@ -255,22 +307,21 @@ function KanbanCardEditor (props) {
                 id='kanban__KanbanPopup__progress'
                 inputClassName='number'
                 onChange={(e) => updateCard({ ...card, progress: e.target.value })}
-                value={card.finished ? '100' : card.progress}
+                value={card.finished ? '100' : (card.progress || '')}
+                placeholder='0'
                 disabled={card.finished}
                 suffix='%'
               />
 
               {card.finished ? (
-                <div className='kanban__KanbanPopup__revert'>
-                  <span>{props.t('Reopen')}</span>
-                  <IconButton
-                    customClass='kanban__KanbanPopup__revert__button'
-                    color={props.customColor}
-                    icon='fas fa-pen'
-                    onClick={handleFinishedTask}
-                    title={props.t('Reopen the card')}
-                  />
-                </div>
+                <IconButton
+                  customClass='kanban__KanbanPopup__revert__button'
+                  color={props.customColor}
+                  icon='fas fa-pen'
+                  onClick={handleFinishedTask}
+                  text={props.t('Reopen')}
+                  title={props.t('Reopen the card')}
+                />
               ) : (
                 <IconButton
                   color={props.customColor}
@@ -291,6 +342,8 @@ function KanbanCardEditor (props) {
           <Select
             id='kanban__KanbanPopup__depends'
             className='kanban__KanbanPopup__depends__select select'
+            components={{ Option: DependencySelectOption }}
+            formatGroupLabel={DependsGroupLabel}
             isSearchable
             placeholder={props.t('No card')}
             onChange={handleChangeSelectDepends}
@@ -352,6 +405,9 @@ KanbanCardEditor.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   content: PropTypes.object.isRequired,
   card: PropTypes.object.isRequired,
+  cardsByColumns: PropTypes.object.isRequired,
+  cardsById: PropTypes.object.isRequired,
+  column: PropTypes.object.isRequired,
   onValidate: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
   onClickIgnoreModification: PropTypes.func.isRequired,

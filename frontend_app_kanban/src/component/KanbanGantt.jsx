@@ -3,12 +3,17 @@ import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 
 import Gantt from 'frappe-gantt'
-import { format } from 'date-fns'
 
 import {
+  formatAbsoluteDate,
   getAvatarBaseUrl,
   RefreshWarningMessage
 } from 'tracim_frontend_lib'
+
+import {
+  computeDependenciesFromGantt,
+  generateGanttArrayFromKanban
+} from '../helper.js'
 
 require('./KanbanGantt.styl')
 
@@ -21,8 +26,19 @@ export class KanbanGantt extends React.Component {
   constructor (props) {
     super(props)
 
+    const dependencies = {}
+    props.columns.forEach(({ cards }) => cards.forEach(({ id, depends }) => {
+      if (depends) {
+        depends.forEach((dependId) => {
+          if (!dependencies[dependId]) dependencies[dependId] = []
+          if (!dependencies[dependId].includes(id)) dependencies[dependId].push(id)
+        })
+      }
+    }))
+
     this.state = {
       columns: props.columns,
+      dependencies: dependencies,
       gantt: null,
       isLoaded: false,
       tasks: []
@@ -60,6 +76,7 @@ export class KanbanGantt extends React.Component {
     }
 
     if (state.gantt !== null) {
+      console.debug('%c<KanbanGantt> update data', 'color: chartreuse', state.tasks)
       state.gantt.refresh(state.tasks)
 
       // HACK - ALU - 2026-07-31 - Translate the today button since it is not done in Frappe-Gantt
@@ -71,80 +88,19 @@ export class KanbanGantt extends React.Component {
   }
 
   getCardsAsGantt = () => {
-    const { props } = this
+    const { props, state } = this
 
-    let minStart, maxEnd
-    props.columns.map(({ cards }) => (
-      cards.map((card) => {
-        if (card.kickoff?.length > 0) {
-          const kickoff = new Date(card.kickoff)
-          if (minStart === undefined || kickoff < minStart) {
-            minStart = kickoff
-          }
-        }
+    console.debug('%c<KanbanGantt> start first preprocessing', 'color: chartreuse', props.columns)
+    const bars = generateGanttArrayFromKanban(props.columns)
+    console.debug('%c<KanbanGantt> end first preprocessing', 'color: chartreuse', bars)
 
-        if (card.deadline?.length > 0) {
-          const deadline = new Date(card.deadline)
-          if (maxEnd === undefined || deadline > maxEnd) {
-            maxEnd = deadline
-          }
-        }
-      })
-    ))
+    console.debug('%c<KanbanGantt> start second preprocessing', 'color: chartreuse')
+    const computedBar = computeDependenciesFromGantt(bars, state.dependencies)
+    console.debug('%c<KanbanGantt> end second preprocessing', 'color: chartreuse', computedBar)
 
-    // Ensure to use the beginning and the end of the day to have section
-    // using the full width of the available tasks.
-    if (minStart !== undefined) minStart.setHours(0, 0, 0)
-    if (maxEnd !== undefined) maxEnd.setHours(23, 59, 59)
-
-    const todayMidnight = new Date(Date.now())
-    todayMidnight.setHours(0, 0, 0)
-
-    return props.columns.flatMap(({ id, title, bgColor, cards }) => {
-      const ganttCards = cards
-        .filter((card) => card.kickoff && card.duration?.length > 0)
-        .sort((first, second) => {
-          const firstDate = new Date(first.kickoff)
-          const secondDate = new Date(second.kickoff)
-
-          // Order the tasks by the kickoff date to have correctly aligned bars
-          if (firstDate < secondDate) return -1
-          else if (firstDate > secondDate) return 1
-          return 0
-        })
-        .map((card) => {
-          const deadline = new Date(card.deadline)
-
-          let colorProgress
-          if (card.finished) colorProgress = '#C0DD97'
-          else if (deadline < todayMidnight) colorProgress = '#F7C1C1'
-
-          return {
-            id: card.id,
-            name: card.title,
-            color: deadline < todayMidnight ? '#FFF1F1' : undefined,
-            color_progress: colorProgress,
-            start: card.kickoff,
-            end: card.deadline || undefined,
-            duration: `${card.duration}d`,
-            dependencies: card.depends,
-            progress: card.finished ? 100 : parseInt(card.progress),
-            _card: card
-          }
-        })
-
-      return [
-        {
-          id,
-          name: title,
-          start: minStart,
-          end: maxEnd,
-          color: bgColor,
-          custom_class: 'gantt-section'
-        },
-        ...ganttCards
-      ]
-    })
+    // INFO - A.L - 2026-09-03 - Only use the bar with the start and end dates
+    // correctly specified to have a working Gantt.
+    return computedBar.filter((bar) => bar.start && bar.end)
   }
 
   renderGanttPopup = (ctx) => {
@@ -153,8 +109,8 @@ export class KanbanGantt extends React.Component {
     ctx.set_title(ctx.task.name)
 
     if (ctx.task.custom_class === undefined) {
-      const startDate = format(ctx.task._start, 'yyyy-MM-dd')
-      const endDate = format(ctx.task._end, 'yyyy-MM-dd')
+      const startDate = formatAbsoluteDate(ctx.task._start, props.language, 'P')
+      const endDate = formatAbsoluteDate(ctx.task._end, props.language, 'P')
       const status = ctx.task._card.finished ? props.t('Finished') : props.t('Work in progress')
 
       const assignments = ctx.task._card.assignmentList.map((assignmentId) => {
@@ -173,10 +129,11 @@ export class KanbanGantt extends React.Component {
   }
 
   render = () => {
-    const { props } = this
+    const { props, state } = this
 
+    console.debug('%c<KanbanGantt> rendering', 'color: chartreuse', state.tasks)
     return (
-      <div className='kanban__contentpage__wrapper'>
+      <div className='kanban__contentpage__wrapper gantt-wrapper'>
         <div className='kanban__contentpage__wrapper__options'>
           {props.isRefreshNeeded && (
             <RefreshWarningMessage

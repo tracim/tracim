@@ -97,7 +97,7 @@ export class KanbanGantt extends React.Component {
       },
       {
         link: PAGE.WORKSPACE.KANBAN_GANTT(state.content.workspace_id, state.content.content_id),
-        label: props.t('Gantt'),
+        label: props.t('Gantt view'),
         type: BREADCRUMBS_TYPE.APP_FEATURE,
         isALink: true
       }

@@ -522,7 +522,7 @@ export class Kanban extends React.Component {
                 {props.t('The board was not able to load. Use the refresh button to reload it.')}
               </div>
               <RefreshWarningMessage
-                tooltip={props.t('Click on this button to reload the board.')}
+                tooltip={props.t('Click to reload the board.')}
                 onClickRefresh={this.handleRefreshBoard}
               />
             </>
@@ -597,6 +597,7 @@ export class Kanban extends React.Component {
                     hideButtonsWhenReadOnly={props.readOnly}
                     card={card}
                     cardList={cardsById}
+                    language={props.language}
                     onEditCard={this.handleEditCard}
                     onRemoveCard={this.handleRemoveCard}
                   />
@@ -628,7 +629,9 @@ export class Kanban extends React.Component {
                 defaultBackgroundColor={KANBAN_DEFAULT_BACKGROUND_COLOR}
                 language={props.language}
                 memberList={props.config.workspace.memberList}
-                cardList={cardsByColumns[state.editedCardInfos.column.id]}
+                cardsById={cardsById}
+                cardsByColumns={cardsByColumns}
+                column={state.editedCardInfos.column}
                 wasModified={state.editedCardWasModified}
               />
             </CardPopup>
