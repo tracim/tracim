@@ -32,8 +32,8 @@ export class KanbanGantt extends React.Component {
         depends.forEach((dependId) => {
           if (!dependencies[dependId]) dependencies[dependId] = []
           if (!dependencies[dependId].includes(id)) dependencies[dependId].push(id)
-        }
-      )}
+        })
+      }
     }))
 
     this.state = {

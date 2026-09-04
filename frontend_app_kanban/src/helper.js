@@ -66,14 +66,14 @@ const retrieveCardsDelta = (columns) => {
 const nested = (items, id = null) => {
   return items
     .filter((item) => item.parent === id)
-    .map((item) => ({ ...item, children: nested(items, item.id) }));
+    .map((item) => ({ ...item, children: nested(items, item.id) }))
 }
 
 const flatten = (nodeList, data = []) => {
   nodeList.forEach((node) => {
     data.push(node.card)
     flatten(node.children || [], data)
-  });
+  })
   return data
 }
 
