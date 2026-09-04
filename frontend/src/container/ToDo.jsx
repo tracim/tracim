@@ -231,7 +231,7 @@ const ToDo = (props) => {
               <ToDoList
                 filterPlaceholder={props.t('Filter the tasks')}
                 lockedToDoList={lockedToDoList}
-                noTaskMessage={props.t('You do not have any assigned task')}
+                noTaskMessage={props.t('No tasks have been assigned to you')}
                 onClickChangeStatusToDo={handleChangeStatusToDo}
                 onClickDeleteToDo={handleDeleteToDo}
                 spaceRoleList={spaceRoleList}
@@ -242,7 +242,7 @@ const ToDo = (props) => {
               <ToDoList
                 filterPlaceholder={props.t('Filter the tasks')}
                 lockedToDoList={lockedToDoList}
-                noTaskMessage={props.t('You do not have assigned any task')}
+                noTaskMessage={props.t('You have not assigned any tasks')}
                 onClickChangeStatusToDo={handleChangeStatusToDo}
                 onClickDeleteToDo={handleDeleteToDo}
                 spaceRoleList={spaceRoleList}

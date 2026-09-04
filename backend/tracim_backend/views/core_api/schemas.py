@@ -2196,7 +2196,10 @@ class UserToDoQuerySchema(marshmallow.Schema):
         ToDoDispatcherType,
         load_default=ToDoDispatcherType.MYSELF,
         metadata={
-            "description": "specify the dispatcher to use for retrieving the list of Todo tasks.",
+            "description": (
+                "specify the dispatcher to use for retrieving the list of Todo tasks. "
+                f"Example: {', '.join([str(item) for item in ToDoDispatcherType])}"
+            ),
         },
     )
 

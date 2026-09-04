@@ -624,5 +624,7 @@
   "Guest users aren't allowed to be more than contributor": "Guest users aren't allowed to be more than contributor",
   "The maximum number of spaces for a guest user has been reached": "The maximum number of spaces for a guest user has been reached",
   "You have reached the maximum number of spaces allowed as a guest user. In order to join this space, ask your administrator to make you a standard user or leave another space": "You have reached the maximum number of spaces allowed as a guest user. In order to join this space, ask your administrator to make you a standard user or leave another space",
-  "Mark as read": "Mark as read"
+  "Mark as read": "Mark as read",
+  "No tasks have been assigned to you": "No tasks have been assigned to you",
+  "You have not assigned any tasks": "You have not assigned any tasks"
 }
