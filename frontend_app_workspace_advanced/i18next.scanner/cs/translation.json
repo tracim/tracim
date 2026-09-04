@@ -61,5 +61,7 @@
   "CalDAV compatible software": "software kompatibilního s CalDAV",
   "Filter users": "Filtrovat uživatele",
   "Description of the space": "Popis prostoru",
-  "This space doesn't have a description yet.": "Tento prostor zatím nemá popis."
+  "This space doesn't have a description yet.": "Tento prostor zatím nemá popis.",
+  "Guest users are not allowed to be more than contributor. In order to upgrade the role of this guest user, ask your administrator to make it a standard user": "Hostující uživatelé nemohou mít vyšší roli než přispěvatel. Chcete-li povýšit roli tohoto hostujícího uživatele, požádejte správce, aby jej změnil na standardního uživatele",
+  "The maximum number of spaces for a guest user has been reached. In order to add this guest user into a new space, ask your administrator to make it a standard user": "Maximální počet prostorů pro hosta byl dosažen. Chcete-li tohoto hosta přidat do nového prostoru, požádejte správce, aby ho nastavil jako standardního uživatele"
 }
