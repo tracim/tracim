@@ -314,16 +314,14 @@ function KanbanCardEditor (props) {
               />
 
               {card.finished ? (
-                <div className='kanban__KanbanPopup__revert'>
-                  <span>{props.t('Reopen')}</span>
-                  <IconButton
-                    customClass='kanban__KanbanPopup__revert__button'
-                    color={props.customColor}
-                    icon='fas fa-pen'
-                    onClick={handleFinishedTask}
-                    title={props.t('Reopen the card')}
-                  />
-                </div>
+                <IconButton
+                  customClass='kanban__KanbanPopup__revert__button'
+                  color={props.customColor}
+                  icon='fas fa-pen'
+                  onClick={handleFinishedTask}
+                  text={props.t('Reopen')}
+                  title={props.t('Reopen the card')}
+                />
               ) : (
                 <IconButton
                   color={props.customColor}
