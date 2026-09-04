@@ -36,7 +36,7 @@ const ToDoList = (props) => {
 
   useEffect(() => {
     setProgress((countValidate / props.tasksList.length) * 100)
-  }, [countValidate])
+  }, [countValidate, props.tasksList])
 
   useEffect(() => {
     setFilteredTasksList(filterToDoList(props.tasksList, filterValue))
