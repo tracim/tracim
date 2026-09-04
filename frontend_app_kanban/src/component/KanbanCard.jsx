@@ -192,7 +192,7 @@ function KanbanCard (props) {
               </span>
             </div>
           )}
-          {props.card.progress?.length > 0 && (
+          {(props.card.progress?.length > 0 || props.card.finished) && (
             <div className='kanban__contentpage__wrapper__board__card__options__advancement__progress'>
               <span title={props.t('Task progress')}>
                 {props.card.finished ? (
