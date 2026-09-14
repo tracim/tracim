@@ -11,9 +11,11 @@ import {
 } from 'tracim_frontend_lib'
 
 import {
-  computeDependenciesFromGantt,
-  generateGanttArrayFromKanban
-} from '../helper.js'
+  applyBusinessRulesToProjects,
+  convertTasksListToGantt,
+  defaultOptions,
+  getTasksListFromKanbanCards
+} from '../gantt.ts'
 
 require('./KanbanGantt.styl')
 
@@ -88,19 +90,9 @@ export class KanbanGantt extends React.Component {
   }
 
   getCardsAsGantt = () => {
-    const { props, state } = this
-
-    console.debug('%c<KanbanGantt> start first preprocessing', 'color: chartreuse', props.columns)
-    const bars = generateGanttArrayFromKanban(props.columns)
-    console.debug('%c<KanbanGantt> end first preprocessing', 'color: chartreuse', bars)
-
-    console.debug('%c<KanbanGantt> start second preprocessing', 'color: chartreuse')
-    const computedBar = computeDependenciesFromGantt(bars, state.dependencies)
-    console.debug('%c<KanbanGantt> end second preprocessing', 'color: chartreuse', computedBar)
-
-    // INFO - A.L - 2026-09-03 - Only use the bar with the start and end dates
-    // correctly specified to have a working Gantt.
-    return computedBar.filter((bar) => bar.start && bar.end)
+    let projects = getTasksListFromKanbanCards(this.props.columns, defaultOptions)
+    projects = applyBusinessRulesToProjects(projects, defaultOptions)
+    return convertTasksListToGantt(projects)
   }
 
   renderGanttPopup = (ctx) => {

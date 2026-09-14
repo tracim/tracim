@@ -12,12 +12,16 @@ barRadius = 3px
   &__left__top
     min-height auto
 
+.kanban__contentpage__wrapper__board
+  & > div
+    height 100% !important
+
 .gantt-wrapper
   margin standardSpacing
 
 .gantt-container
-  height 100vh !important
-  width 100% !important
+  height 100% !important
+  margin 0 auto
 
   & .popup-wrapper
     & .title, .subtitle, .details
@@ -46,3 +50,7 @@ barRadius = 3px
         font-weight bold
         font-size larger
         text-transform uppercase
+
+@media (min-width: max-xs) and (max-width: max-lg)
+  .gantt-wrapper
+    width auto !important
