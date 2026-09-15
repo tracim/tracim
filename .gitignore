@@ -15,6 +15,7 @@ functionnal_tests/cypress.json
 functionnal_tests/node_modules/
 functionnal_tests/cypress/videos
 functionnal_tests/cypress/screenshots
+functionnal_tests/cypress/failed-tests-summary.txt
 
 #ignore preview files as it is by default in backend folder
 previews

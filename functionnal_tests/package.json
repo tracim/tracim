@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "echo 'Functional tests are not linted yet (see issue #3688)'",
-    "cypress-run": "cypress run",
+    "cypress-run": "cypress run \"$@\"; status=$?; cat cypress/failed-tests-summary.txt 2>/dev/null; exit $status",
     "cypress-open": "cypress open --browser chromium",
     "travis-cypress-run": "npm-scripts/travis-cypress-run"
   },
