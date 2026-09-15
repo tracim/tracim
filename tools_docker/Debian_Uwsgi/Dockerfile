@@ -119,6 +119,7 @@ RUN apt-get install -qy curl gpg \
     && mkdir -p /etc/apt/keyrings \
     && curl -fsSL https://pushpin.org/pushpin-package.asc | gpg --dearmor -o /etc/apt/keyrings/pushpin.gpg \
     && echo "deb [signed-by=/etc/apt/keyrings/pushpin.gpg] https://packages.pushpin.org/deb pushpin-jammy main" > /etc/apt/sources.list.d/pushpin.list \
+    && echo "Package: pushpin\nPin: version 1.41.0-2~jammy1\nPin-Priority: 999" > /etc/apt/preferences.d/pushpin.pref \
     && apt-get update \
     # HACK - PGO - 2026-08-11 Pushpin is in server_packages.list but doing install directly to avoid googleapis 400 bad request error (#6924) \
     && apt-get install -qy pushpin
