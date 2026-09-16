@@ -333,10 +333,16 @@ export const sortTasksByDependencies = (tasks: Task[]): Task[] => {
       tasksDependencies.push({ id: task.id, task, parent: dependencyId })
     })
   })
+  console.debug(
+    '<GanttSort> prepare the list for the tree representation', tasksDependencies
+  )
 
   const tasksById: IdentifiedTasks = {}
   const sortedTasks: Task[] = []
-  flatten(nested(tasksDependencies), 'task').forEach((task: Task) => {
+
+  const flattenList = flatten(nested(tasksDependencies), 'task')
+  console.debug('<GanttSort> sort tasks from the tree', flattenList)
+  flattenList.forEach((task: Task) => {
     if (!tasksById[task.id]) {
       sortedTasks.push(task)
       tasksById[task.id] = task
