@@ -94,7 +94,13 @@ export const defaultOptions: Options = {
 
 /* INFO - A.L - 2026-09-15 - These two functions are wrapper around the
    date-fns functions. If we wants to use custom weekend days, these
-   functions must be altered to calc the delta based on these custom days. */
+   functions must be altered to calc the delta based on these custom days.
+   ---
+   The two projects date-fns and frappe-gantt have the saturday/sunday weekend
+   days hard-coded in their sources:
+   - https://github.com/date-fns/date-fns/blob/main/pkgs/core/src/addBusinessDays/index.ts
+   - https://github.com/frappe/gantt/blob/master/src/index.js#L126
+*/
 const add = (date: Date, days: number, excludeWeekendDays: boolean): Date => {
   return excludeWeekendDays ? addBusinessDays(date, days) : addDays(date, days)
 }
