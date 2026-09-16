@@ -1,5 +1,9 @@
 'use strict'
 
+require('@babel/register')({
+  extensions: ['.js', '.jsx', '.ts', '.tsx']
+})
+
 module.exports = {
   require: [
     'regenerator-runtime',

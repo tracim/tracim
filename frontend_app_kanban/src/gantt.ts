@@ -81,7 +81,7 @@ interface Options {
   weekendDays: number[]
 }
 
-const colors = {
+export const colors = {
   FINISHED_TASK: '#C0DD97',
   OVERDUE_TASK: '#FFF1F1',
   OVERDUE_TASK_OVERLAY: '#F7C1C1'
@@ -222,7 +222,7 @@ export const getAllDependencies = (projects: Project[]): Dependencies => {
 }
 
 /* Retrieve the colors based on the status of the specified task */
-const getColorsForTask = (task: Task): string[] => {
+export const getColorsForTask = (task: Task): string[] => {
   if (task.finished || task.progress === 100) {
     return [colors.FINISHED_TASK, colors.FINISHED_TASK]
   } else if (!isToday(task.end) && isPast(task.end)) {
@@ -273,7 +273,7 @@ export const getTasksListFromKanbanCards = (
 }
 
 /* Prepare the start and end dates */
-const prepareDates = (card: KanbanCard, duration: number, excludeWeekendDays: boolean): Date[] => {
+export const prepareDates = (card: KanbanCard, duration: number, excludeWeekendDays: boolean): Date[] => {
   let start = card.kickoff
   let end = card.deadline
 
@@ -305,12 +305,12 @@ const prepareDates = (card: KanbanCard, duration: number, excludeWeekendDays: bo
 }
 
 /* Sort the list of tasks by their dependencies */
-const sortTasksByDependencies = (tasks: Task[]): Task[] => {
+export const sortTasksByDependencies = (tasks: Task[]): Task[] => {
   console.debug(
     '%c<Gantt> sort the list of tasks by their dependencies', 'color: chartreuse', tasks
   )
   const tasksDependencies: IdentifiedDependency[] = []
-  tasks.toSorted((first: Task, second: Task): number => {
+  tasks.sort((first: Task, second: Task): number => {
     if (first.depends.length === 0 && second.depends.length > 0) return -1
     if (second.depends.length === 0 && first.depends.length > 0) return 1
     if (first.depends.includes(second.id)) return 1
