@@ -290,10 +290,30 @@ describe('gantt.ts', () => {
   })
 
   describe('prepare date', () => {
-    it('with dates', () => {
-      const [start, end] = prepareDates({ kickoff: '2026-09-15', deadline: '2026-09-17' }, 1, false)
-      assert.equal(start.toDateString(), 'Tue Sep 15 2026')
-      assert.equal(end.toDateString(), 'Thu Sep 17 2026')
+    describe('with dates', () => {
+      const tests = [
+        {
+          args: [{ kickoff: '2026-09-15', deadline: '2026-09-17' }, 1, false],
+          expected: ['Tue Sep 15 2026', 'Thu Sep 17 2026']
+        },
+        {
+          args: [{ kickoff: '2026-09-18', deadline: '2026-09-13' }, 2, false],
+          expected: ['Fri Sep 18 2026', 'Sat Sep 19 2026']
+        },
+        {
+          args: [{ kickoff: '2026-09-18', deadline: '2026-09-13' }, 2, true],
+          expected: ['Fri Sep 18 2026', 'Mon Sep 21 2026']
+        }
+      ]
+
+      tests.forEach(({ args, expected }) => {
+        const [card, duration, weekend] = args
+        it(`kickoff ${card.kickoff} and deadline ${card.deadline} with duration ${duration} days and exclude weekend as ${weekend}`, () => {
+          const [start, end] = prepareDates(card, duration, weekend)
+          assert.equal(start.toDateString(), expected[0])
+          assert.equal(end.toDateString(), expected[1])
+        })
+      })
     })
 
     describe('without deadline', () => {

@@ -307,6 +307,11 @@ export const prepareDates = (card: KanbanCard, duration: number, excludeWeekendD
     end = new Date(end)
   }
 
+  // Avoid to having an ending date before the starting date
+  if (start > end) {
+    end = add(start, duration - 1, excludeWeekendDays)
+  }
+
   return [start, end]
 }
 
