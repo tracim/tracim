@@ -124,7 +124,7 @@ export const applyBusinessRulesToProjects = (
   sortTasksByDependencies(allTasks).forEach((task: Task) => {
     // INFO - A.L - 2026-08-25 - Compute again the cards without kickoff
     // since their dependencies do have computed dates from previous map.
-    if (task.depends.length > 0 && !task._card.start) {
+    if (task.depends.length > 0 && !task._card.kickoff) {
       let start = null
 
       recursiveDependencies(task.depends, dependencies)
