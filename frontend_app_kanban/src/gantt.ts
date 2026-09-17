@@ -92,15 +92,16 @@ export const defaultOptions: Options = {
   weekendDays: [0, 6] // Sunday, Saturday
 }
 
-/* INFO - A.L - 2026-09-15 - These two functions are wrapper around the
-   date-fns functions. If we wants to use custom weekend days, these
-   functions must be altered to calc the delta based on these custom days.
-   ---
-   The two projects date-fns and frappe-gantt have the saturday/sunday weekend
-   days hard-coded in their sources:
-   - https://github.com/date-fns/date-fns/blob/main/pkgs/core/src/addBusinessDays/index.ts
-   - https://github.com/frappe/gantt/blob/master/src/index.js#L126
-*/
+/**
+ * INFO - A.L - 2026-09-15 - These two functions are wrapper around the
+ * date-fns functions. If we wants to use custom weekend days, these
+ * functions must be altered to calc the delta based on these custom days.
+ * ---
+ * The two projects date-fns and frappe-gantt have the saturday/sunday weekend
+ * days hard-coded in their sources:
+ * - https://github.com/date-fns/date-fns/blob/main/pkgs/core/src/addBusinessDays/index.ts
+ * - https://github.com/frappe/gantt/blob/master/src/index.js#L126
+ */
 const add = (date: Date, days: number, excludeWeekendDays: boolean): Date => {
   return excludeWeekendDays ? addBusinessDays(date, days) : addDays(date, days)
 }
@@ -108,7 +109,9 @@ const sub = (date: Date, days: number, excludeWeekendDays: boolean): Date => {
   return excludeWeekendDays ? subBusinessDays(date, days) : subDays(date, days)
 }
 
-/* Apply the rules used to represent the tasks in the Gantt view */
+/**
+ * Apply the rules used to represent the tasks in the Gantt view
+ */
 export const applyBusinessRulesToProjects = (
   projects: Project[],
   { excludeWeekendDays, weekendDays }: Options = defaultOptions
@@ -135,7 +138,6 @@ export const applyBusinessRulesToProjects = (
             const parentTaskEnd = parentTask.end
             parentTaskEnd.setHours(0, 0, 0, 0)
 
-            // Move the task just after the found parent
             task.start = add(parentTaskEnd, 1, excludeWeekendDays)
             task.end = add(task.start, task.duration - 1, excludeWeekendDays)
             tasksById[task.id] = task
@@ -169,7 +171,9 @@ export const applyBusinessRulesToProjects = (
   return projects
 }
 
-/* Convert all the projects as a structure usable by Frappe-Gantt */
+/**
+ * Convert all the projects as a structure usable by Frappe-Gantt
+ */
 export const convertTasksListToGantt = (projects: Project[]): GanttBar[] => {
   console.debug('%c<Gantt> convert the list of tasks to Gantt', 'color: chartreuse', projects)
   return projects.flatMap((project: Project) => ([
@@ -208,7 +212,9 @@ export const convertTasksListToGantt = (projects: Project[]): GanttBar[] => {
   ]))
 }
 
-/* Retrieve all the dependencies available from the list of projects */
+/**
+ * Retrieve all the dependencies available from the list of projects
+ */
 export const getAllDependencies = (projects: Project[]): Dependencies => {
   const dependencies = {}
 
@@ -227,7 +233,11 @@ export const getAllDependencies = (projects: Project[]): Dependencies => {
   return dependencies
 }
 
-/* Retrieve the colors based on the status of the specified task */
+/**
+ * Retrieve the colors based on the status of the specified task
+ *
+ * @returns {string[]} The background and the progression color values as list
+ */
 export const getColorsForTask = (task: Task): string[] => {
   if (task.finished || task.progress === 100) {
     return [colors.FINISHED_TASK, colors.FINISHED_TASK]
@@ -237,7 +247,9 @@ export const getColorsForTask = (task: Task): string[] => {
   return ['', '']
 }
 
-/* Retrieve all the tasks available from the list of projects */
+/**
+ * Retrieve all the tasks available from the list of projects
+ */
 export const getTasksByIdentifier = (projects: Project[]): IdentifiedTasks => {
   const identifiers = {}
   projects.forEach((project: Project) => project.tasks.forEach((task: Task) => {
@@ -247,7 +259,9 @@ export const getTasksByIdentifier = (projects: Project[]): IdentifiedTasks => {
   return identifiers
 }
 
-/* Convert a structure from react-kanban to a list of projects */
+/**
+ * Convert a structure from react-kanban to a list of projects
+ */
 export const getTasksListFromKanbanCards = (
   kanban: KanbanColumn[],
   { excludeWeekendDays, weekendDays }: Options = defaultOptions
@@ -277,7 +291,9 @@ export const getTasksListFromKanbanCards = (
   }))
 }
 
-/* Prepare the start and end dates */
+/**
+ * Prepare the start and end dates
+ */
 export const prepareDates = (card: KanbanCard, duration: number, excludeWeekendDays: boolean): Date[] => {
   let start = card.kickoff
   let end = card.deadline
@@ -306,7 +322,7 @@ export const prepareDates = (card: KanbanCard, duration: number, excludeWeekendD
     end = new Date(end)
   }
 
-  // Avoid to having an ending date before the starting date
+  // Avoid ending date value before the starting date value
   if (start > end) {
     end = add(start, duration - 1, excludeWeekendDays)
   }
@@ -314,7 +330,9 @@ export const prepareDates = (card: KanbanCard, duration: number, excludeWeekendD
   return [start, end]
 }
 
-/* Sort the list of tasks by their dependencies */
+/**
+ * Sort the list of tasks by their dependencies
+ */
 export const sortTasksByDependencies = (
   tasks: Task[],
   tasksById: IdentifiedTasks
