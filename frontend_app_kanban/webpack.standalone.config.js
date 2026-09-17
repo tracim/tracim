@@ -24,12 +24,13 @@ module.exports = {
       use: 'standard-loader',
       exclude: [/node_modules/, /frontend_lib/]
     }, {
-      test: [/\.js$/, /\.jsx$/],
+      test: [/\.[tj]s$/, /\.[tj]sx$/],
       exclude: [/node_modules/],
       loader: 'babel-loader',
       options: {
         presets: [
           '@babel/preset-env',
+          '@babel/preset-typescript',
           '@babel/preset-react'
         ],
         plugins: [
