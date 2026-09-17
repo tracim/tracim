@@ -131,9 +131,9 @@ export const applyBusinessRulesToProjects = (
         .filter((id) => id !== task.id)
         .forEach((id) => {
           const parentTask = tasksById[id]
-          if (parentTask && (!start || parentTask.end > start)) {
+          if (parentTask && (!start || parentTask.end >= start)) {
             const parentTaskEnd = parentTask.end
-            parentTaskEnd.setHours(0, 0, 0)
+            parentTaskEnd.setHours(0, 0, 0, 0)
 
             // Move the task just after the found parent
             task.start = add(parentTaskEnd, 1, excludeWeekendDays)
@@ -188,9 +188,9 @@ export const convertTasksListToGantt = (projects: Project[]): GanttBar[] => {
       // date and not datetime, the kickoff will start at midnight and the
       // deadline at 23h59.
       const start = task.start
-      start.setHours(0, 0, 0)
+      start.setHours(0, 0, 0, 0)
       const end = task.end
-      end.setHours(23, 59, 59)
+      end.setHours(23, 59, 59, 0)
 
       return {
         id: task.id,
@@ -296,7 +296,7 @@ export const prepareDates = (card: KanbanCard, duration: number, excludeWeekendD
     )
   } else if (!start && !end) {
     start = new Date(Date.now())
-    start.setHours(0, 0, 0)
+    start.setHours(0, 0, 0, 0)
     end = add(start, duration - 1, excludeWeekendDays)
     console.debug(
       '<GanttRule> apply rule on %s “%s”: set dates as today', card.id, card.title
