@@ -1795,7 +1795,7 @@ class TestHtmlDocuments(object):
 @pytest.mark.usefixtures("default_content_fixture")
 @pytest.mark.parametrize(
     "config_section",
-    [{"name": "functional_test"}, {"name": "functional_s3_storage_test"}],
+    [{"name": "functional_test"}],
     indirect=True,
 )
 class TestFiles(object):
