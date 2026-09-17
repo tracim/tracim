@@ -32,32 +32,6 @@ export const localStorageFieldIdBuilder = (entryId) => {
   return `${entryIdSafe}/${LOCAL_STORAGE_FIELD.RAW_CONTENT}`
 }
 
-export const nested = (items, id = null, done = {}) => {
-  return items
-    .filter((item) => item.parent === id)
-    .map((item) => {
-      if (done[item.id]?.includes(item.parent)) {
-        console.debug(
-          '<GanttRule> recursive loop found between %s and %s', item.id, item.parent, item
-        )
-        return item
-      }
-
-      if (!done[item.id]) done[item.id] = []
-      done[item.id].push(item.parent)
-
-      return { ...item, children: nested(items, item.id, done) }
-    })
-}
-
-export const flatten = (nodeList, key = 'card', data = []) => {
-  nodeList.forEach((node) => {
-    data.push(node[key])
-    flatten(node.children || [], key, data)
-  })
-  return data
-}
-
 export const recursiveDependencies = (depends, storedDependencies, list = []) => {
   depends.forEach((id) => {
     if (!list.includes(id)) list.push(id)

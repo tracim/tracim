@@ -189,33 +189,129 @@ describe('gantt.ts', () => {
     }
   ]
 
-  it('apply business rules to projects', () => {
-    const unsortedProjects = getTasksListFromKanbanCards(unsortedBoard)
-    const sortedProjects = applyBusinessRulesToProjects(unsortedProjects)
-    assert.deepEqual(
-      sortedProjects.flatMap((project) => project.tasks.map((task) => task.id)),
-      ['task-1', 'task-2', 'task-3', 'task-5', 'task-4']
-    )
-    assert.deepEqual(
-      sortedProjects.flatMap((project) => project.tasks.map((task) => task.start.toDateString())),
-      [
-        'Mon Sep 07 2026',
-        'Thu Sep 10 2026',
-        'Thu Sep 10 2026',
-        'Mon Sep 14 2026',
-        'Wed Sep 16 2026'
+  const complexeBoard = [
+    {
+      id: 'project-1',
+      title: 'Project 1',
+      bgColor: '',
+      cards: [
+        {
+          id: 'task-11',
+          title: 'Task 11',
+          duration: '1',
+          depends: ['task-22']
+        },
+        {
+          id: 'task-12',
+          title: 'Task 12',
+          kickoff: '2026-09-01',
+          duration: '4',
+          depends: []
+        },
+        {
+          id: 'task-13',
+          title: 'Task 13',
+          duration: '2',
+          depends: ['task-11']
+        },
+        {
+          id: 'task-14',
+          title: 'Task 14',
+          duration: '4',
+          depends: ['task-12', 'task-13']
+        }
       ]
-    )
-    assert.deepEqual(
-      sortedProjects.flatMap((project) => project.tasks.map((task) => task.end.toDateString())),
-      [
-        'Wed Sep 09 2026',
-        'Fri Sep 11 2026',
-        'Wed Sep 16 2026',
-        'Tue Sep 15 2026',
-        'Fri Sep 25 2026'
+    },
+    {
+      id: 'project-2',
+      title: 'Project 2',
+      bgColor: '',
+      cards: [
+        {
+          id: 'task-21',
+          title: 'Task 21',
+          kickoff: '2026-09-01',
+          duration: '1',
+          depends: []
+        },
+        {
+          id: 'task-22',
+          title: 'Task 22',
+          duration: '1',
+          depends: ['task-21']
+        },
+        {
+          id: 'task-23',
+          title: 'Task 23',
+          duration: '1',
+          depends: ['task-22']
+        }
       ]
-    )
+    }
+  ]
+
+  describe('apply business rules to projects', () => {
+    it('simple case', () => {
+      const unsortedProjects = getTasksListFromKanbanCards(unsortedBoard)
+      const sortedProjects = applyBusinessRulesToProjects(unsortedProjects)
+      assert.deepEqual(
+        sortedProjects.flatMap((project) => project.tasks.map((task) => task.id)),
+        ['task-1', 'task-2', 'task-3', 'task-5', 'task-4']
+      )
+      assert.deepEqual(
+        sortedProjects.flatMap((project) => project.tasks.map((task) => task.start.toDateString())),
+        [
+          'Mon Sep 07 2026',
+          'Thu Sep 10 2026',
+          'Thu Sep 10 2026',
+          'Mon Sep 14 2026',
+          'Wed Sep 16 2026'
+        ]
+      )
+      assert.deepEqual(
+        sortedProjects.flatMap((project) => project.tasks.map((task) => task.end.toDateString())),
+        [
+          'Wed Sep 09 2026',
+          'Fri Sep 11 2026',
+          'Wed Sep 16 2026',
+          'Tue Sep 15 2026',
+          'Fri Sep 25 2026'
+        ]
+      )
+    })
+
+    it('complexe case', () => {
+      const unsortedProjects = getTasksListFromKanbanCards(complexeBoard)
+      const sortedProjects = applyBusinessRulesToProjects(unsortedProjects)
+      assert.deepEqual(
+        sortedProjects.flatMap((project) => project.tasks.map((task) => task.id)),
+        ['task-12', 'task-11', 'task-13', 'task-14', 'task-21', 'task-22', 'task-23']
+      )
+      assert.deepEqual(
+        sortedProjects.flatMap((project) => project.tasks.map((task) => task.start.toDateString())),
+        [
+          'Tue Sep 01 2026',
+          'Thu Sep 03 2026',
+          'Fri Sep 04 2026',
+          'Tue Sep 08 2026',
+          'Tue Sep 01 2026',
+          'Wed Sep 02 2026',
+          'Thu Sep 03 2026'
+        ]
+      )
+      assert.deepEqual(
+        sortedProjects.flatMap((project) => project.tasks.map((task) => task.end.toDateString())),
+        [
+          'Fri Sep 04 2026',
+          'Thu Sep 03 2026',
+          'Mon Sep 07 2026',
+          'Fri Sep 11 2026',
+          'Tue Sep 01 2026',
+          'Wed Sep 02 2026',
+          'Thu Sep 03 2026'
+        ]
+      )
+    })
   })
 
   it('convert the list of tasks to Frappe-Gantt format', () => {
@@ -377,24 +473,21 @@ describe('gantt.ts', () => {
   })
 
   describe('sort tasks by dependencies', () => {
+    const tasksById = Object.fromEntries(projects[0].tasks.map((task) => [task.id, task]))
+
     it('no need to sorted', () => {
-      const tasks = sortTasksByDependencies(projects[0].tasks)
-      assert.equal(tasks[0].id, 't1')
-      assert.equal(tasks[1].id, 't2')
-      assert.equal(tasks[2].id, 't3')
+      const tasks = sortTasksByDependencies(projects[0].tasks, tasksById)
+      assert.deepEqual(tasks.map((task) => task.id), ['t1', 't2', 't3'])
     })
 
     it('need to be sorted', () => {
-      const tasks = sortTasksByDependencies(projects[0].tasks.reverse())
-      assert.equal(tasks[0].id, 't1')
-      assert.equal(tasks[1].id, 't2')
-      assert.equal(tasks[2].id, 't3')
+      const tasks = sortTasksByDependencies(projects[0].tasks.reverse(), tasksById)
+      assert.deepEqual(tasks.map((task) => task.id), ['t1', 't2', 't3'])
     })
 
     it('recursive case', () => {
-      const tasks = sortTasksByDependencies(recursiveProjects[0].tasks)
-      assert.equal(tasks[0].id, 't1')
-      assert.equal(tasks[1].id, 't2')
+      const tasks = sortTasksByDependencies(recursiveProjects[0].tasks, tasksById)
+      assert.deepEqual(tasks.map((task) => task.id), ['t2', 't1'])
     })
   })
 })

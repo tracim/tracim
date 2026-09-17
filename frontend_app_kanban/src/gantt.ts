@@ -7,7 +7,7 @@ import {
   subDays
 } from 'date-fns'
 
-import { flatten, nested, recursiveDependencies } from './helper.js'
+import { recursiveDependencies } from './helper.js'
 
 interface Dependencies {
   [id: string]: string
@@ -121,7 +121,7 @@ export const applyBusinessRulesToProjects = (
   // Sort all the tasks by dependencies to manage inter-project relations
   const allTasks: Task[] = projects.flatMap((project: Project) => project.tasks)
 
-  sortTasksByDependencies(allTasks).forEach((task: Task) => {
+  sortTasksByDependencies(allTasks, tasksById).forEach((task: Task) => {
     // INFO - A.L - 2026-08-25 - Compute again the cards without kickoff
     // since their dependencies do have computed dates from previous map.
     if (task.depends.length > 0 && !task._card.kickoff) {
@@ -210,7 +210,6 @@ export const convertTasksListToGantt = (projects: Project[]): GanttBar[] => {
 
 /* Retrieve all the dependencies available from the list of projects */
 export const getAllDependencies = (projects: Project[]): Dependencies => {
-  console.debug('%c<Gantt> retrieve all the dependencies from the list of projects', 'color: chartreuse', projects)
   const dependencies = {}
 
   projects.forEach((project: Project) =>
@@ -224,6 +223,7 @@ export const getAllDependencies = (projects: Project[]): Dependencies => {
         }
       })))
 
+  console.debug('%c<Gantt> retrieve all the dependencies from the list of projects', 'color: chartreuse', dependencies)
   return dependencies
 }
 
@@ -239,11 +239,11 @@ export const getColorsForTask = (task: Task): string[] => {
 
 /* Retrieve all the tasks available from the list of projects */
 export const getTasksByIdentifier = (projects: Project[]): IdentifiedTasks => {
-  console.debug('%c<Gantt> retrieve all the tasks from the list of projects', 'color: chartreuse', projects)
   const identifiers = {}
   projects.forEach((project: Project) => project.tasks.forEach((task: Task) => {
     identifiers[task.id] = task
   }))
+  console.debug('%c<Gantt> retrieve all the tasks from the list of projects', 'color: chartreuse', identifiers)
   return identifiers
 }
 
@@ -257,8 +257,8 @@ export const getTasksListFromKanbanCards = (
     id,
     name: title,
     color: bgColor,
-    tasks: sortTasksByDependencies(
-      cards.map((card: KanbanCard) => {
+    tasks: cards
+      .map((card: KanbanCard) => {
         const duration = parseInt(card.duration) || 1
         const [start, end] = prepareDates(card, duration, excludeWeekendDays)
 
@@ -274,7 +274,6 @@ export const getTasksListFromKanbanCards = (
           _card: card
         }
       })
-    )
   }))
 }
 
@@ -316,7 +315,10 @@ export const prepareDates = (card: KanbanCard, duration: number, excludeWeekendD
 }
 
 /* Sort the list of tasks by their dependencies */
-export const sortTasksByDependencies = (tasks: Task[]): Task[] => {
+export const sortTasksByDependencies = (
+  tasks: Task[],
+  tasksById: IdentifiedTasks
+): Task[] => {
   console.debug(
     '%c<Gantt> sort the list of tasks by their dependencies', 'color: chartreuse', tasks
   )
@@ -328,26 +330,47 @@ export const sortTasksByDependencies = (tasks: Task[]): Task[] => {
     if (second.depends.includes(first.id)) return -1
     return 0
   }).forEach((task: Task) => {
-    tasksDependencies.push({ id: task.id, task, parent: null })
-    task.depends.forEach((dependencyId: string) => {
-      tasksDependencies.push({ id: task.id, task, parent: dependencyId })
-    })
-  })
-  console.debug(
-    '<GanttSort> prepare the list for the tree representation', tasksDependencies
-  )
-
-  const tasksById: IdentifiedTasks = {}
-  const sortedTasks: Task[] = []
-
-  const flattenList = flatten(nested(tasksDependencies), 'task')
-  console.debug('<GanttSort> sort tasks from the tree', flattenList)
-  flattenList.forEach((task: Task) => {
-    if (!tasksById[task.id]) {
-      sortedTasks.push(task)
-      tasksById[task.id] = task
+    if (task.depends.length === 0) {
+      tasksDependencies.push({ id: task.id, task, parent: null })
+    } else {
+      task.depends.forEach((dependencyId: string) => {
+        tasksDependencies.push({ id: task.id, task, parent: dependencyId })
+      })
     }
   })
 
-  return sortedTasks
+  console.debug(
+    '<GanttSort> retrieve the sorted list of identifiers from the dependencies', tasksDependencies
+  )
+  const sortedByIdentifier: string[] = []
+  tasksDependencies
+    .sort((first: IdentifiedDependency, second: IdentifiedDependency): number => {
+      if (first.id === second.parent) return -1
+      if (first.parent === second.id) return 1
+      return 0
+    })
+    .forEach((depend: IdentifiedDependency) => {
+      if (depend.parent === null) {
+          sortedByIdentifier.splice(0, 0, depend.id)
+      } else {
+        const dependIndex = sortedByIdentifier.indexOf(depend.id)
+        const parentIndex = sortedByIdentifier.indexOf(depend.parent)
+
+        if (dependIndex > -1) {
+          sortedByIdentifier.splice(dependIndex, 1)
+        }
+
+        if (parentIndex === -1) {
+          sortedByIdentifier.splice(sortedByIdentifier.length, 0, depend.parent)
+          sortedByIdentifier.splice(sortedByIdentifier.length, 0, depend.id)
+        } else {
+          sortedByIdentifier.splice(parentIndex + 1, 0, depend.id)
+        }
+      }
+    })
+
+  console.debug(
+    '<GanttSort> retrieve information from the sorted list of identifiers', sortedByIdentifier
+  )
+  return sortedByIdentifier.map((id: string) => tasksById[id])
 }
