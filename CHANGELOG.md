@@ -6,7 +6,7 @@
 
 - Allow to open a Kanban as a Gantt project view
 - Realtime edition have been added to the Kanban to allow multi-users editing
-- Kanban view improvements with new 2026.07.00 fields (start/end, dependencies)
+- Kanban view improvements with new 2026.07.00 fields (duration, progress, dependencies)
 - Allow to show the TODO tasks dispatched by the user
 
 ### 🐛 Fixed Issues
