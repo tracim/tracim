@@ -6,32 +6,30 @@
 
 - Allow to open a Kanban as a Gantt project view
 - Realtime edition have been added to the Kanban to allow multi-users editing
+- Kanban  view improvements with new 2026.07.00 fields (start/end, dependencies)
 - Allow to show the TODO tasks dispatched by the user
-
-### Other changes
-
-- Update to Open Calendar 0.9.5 [#6862](https://github.com/tracim/tracim/issues/6862)
-- Switch back beaker Python dependency from Algoo fork to official version 1.14.1 [#6893](https://github.com/tracim/tracim/pull/6893)
-- Solve pre-commit issue and remove seed-isort-config [#6926](https://github.com/tracim/tracim/issues/6926)
-- Concourse: switch to Debian 13 [#6878](https://github.com/tracim/tracim/issues/6878)
-- Update pre-commit version, implying you must re-install the hook (`pre-commit install`) [#6923](https://github.com/tracim/tracim/issues/6923)
-- Fix frontend unit tests [#6931](https://github.com/tracim/tracim/issues/6931)
-- Fix end-to-end tests [#6930](https://github.com/tracim/tracim/issues/6930)
 
 ### 🐛 Fixed Issues
 
 - Fix 2026.07.04 regression: cannot delete a card with an unknown dependency [#6956](https://github.com/tracim/tracim/pull/6956)
-- Correctly align the text and the button in the PromptMessage component [#6934](https://github.com/tracim/tracim/issues/6934)
+- instance contents links aren't showed in logbook [#6934](https://github.com/tracim/tracim/issues/6934)
 - Correctly sort the Timeline based on the revision [#6894](https://github.com/tracim/tracim/issues/6894)
-- Use the optimized layout for the footer copyright [#6882](https://github.com/tracim/tracim/issues/6882)
-
-## Next release (maintenance branch)
+- Copyright footer not optimized in the guest shared link page [#6882](https://github.com/tracim/tracim/issues/6882)
 
 ### Other changes
 
+- Add a dedicated id to kanban cards and columns [#6869](https://github.com/tracim/tracim/issues/6869)
 - Update Python version in setup.cfg
 - Fix linter behavior difference between pre-commit and CI [#6921](https://github.com/tracim/tracim/issues/6921)
-- First fix ix for googleapis 400 error during docker image build [#6924](https://github.com/tracim/tracim/issues/6924)
+- Docker builds: fix googleapis 400 errors on Pushpin install [#6924](https://github.com/tracim/tracim/issues/6924)
+- Pin Pushpin version [#6961](https://github.com/tracim/tracim/issues/6961)
+- Update to Open Calendar 0.9.5 [#6862](https://github.com/tracim/tracim/issues/6862)
+- Switch back beaker Python dependency from Algoo fork to official version 1.14.1 [#6893](https://github.com/tracim/tracim/pull/6893)
+- Solve pre-commit issue and remove seed-isort-config [#6926](https://github.com/tracim/tracim/issues/6926)
+- Update pre-commit isort version to align with requirements-devtool.txt, implying you must re-install the hook (`pre-commit install`) [#6923](https://github.com/tracim/tracim/issues/6923)
+- Switch auto-tests platform to Debian 13 [#6878](https://github.com/tracim/tracim/issues/6878)
+- Fix frontend unit tests [#6931](https://github.com/tracim/tracim/issues/6931)
+- Fix end-to-end tests [#6930](https://github.com/tracim/tracim/issues/6930)
 
 
 ## 2026.07.04
