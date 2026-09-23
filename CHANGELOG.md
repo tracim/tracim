@@ -12,7 +12,7 @@
 ### 🐛 Fixed Issues
 
 - Fix 2026.07.04 regression: cannot delete a card with an unknown dependency [#6956](https://github.com/tracim/tracim/pull/6956)
-- Instance contents links aren't showed in logbook [#6934](https://github.com/tracim/tracim/issues/6934)
+- Internal links aren't showed in logbook [#6934](https://github.com/tracim/tracim/issues/6934)
 - Correctly sort the Timeline based on the revision [#6894](https://github.com/tracim/tracim/issues/6894)
 - Copyright footer not optimized in the guest shared link page [#6882](https://github.com/tracim/tracim/issues/6882)
 - Correctly align the text and the button in the PromptMessage component [#6953](https://github.com/tracim/tracim/pull/6953)
