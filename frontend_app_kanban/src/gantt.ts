@@ -218,6 +218,9 @@ export const convertTasksListToGantt = (projects: Project[]): GanttBar[] => {
 
 /**
  * Retrieve all the dependencies available from the list of projects
+ *
+ * The goal is to have a structure where we can access to the dependencies of
+ * a task from the task identifier.
  */
 export const getAllDependencies = (projects: Project[]): Dependencies => {
   const dependencies = {}
@@ -382,6 +385,7 @@ export const sortTasksByDependencies = (
   console.debug(
     '%c<Gantt> sort the list of tasks by their dependencies', 'color: chartreuse', tasks
   )
+  // Step 1: create dependencies array
   const tasksDependencies: IdentifiedDependency[] = []
   tasks.sort((first: Task, second: Task): number => {
     if (first.depends.length === 0 && second.depends.length > 0) return -1
@@ -402,6 +406,7 @@ export const sortTasksByDependencies = (
   console.debug(
     '<GanttSort> retrieve the sorted list of identifiers from the dependencies', tasksDependencies
   )
+  // Step 2: sort the root tasks first
   const sortedByIdentifier: string[] = tasksDependencies
     .filter((depend: IdentifiedDependency) => depend.parent === null)
     .map((depend: IdentifiedDependency) => ([
@@ -419,6 +424,7 @@ export const sortTasksByDependencies = (
   console.debug(
     '<GanttSort> start the sorting process with the root nodes', sortedByIdentifier
   )
+  // Step 3: add the sorted children next to their parents
   tasksDependencies
     .forEach((depend: IdentifiedDependency) => {
       if (depend.parent !== null) {
@@ -441,6 +447,7 @@ export const sortTasksByDependencies = (
   console.debug(
     '<GanttSort> retrieve information from the sorted list of identifiers', sortedByIdentifier
   )
+  // Step 4: return the list of ordered tasks and exclude unknown one
   return sortedByIdentifier
     .map((id: string) => tasksById[id])
     .filter((task: Task | undefined) => task !== undefined)
