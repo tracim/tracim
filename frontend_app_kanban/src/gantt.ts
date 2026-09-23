@@ -10,7 +10,7 @@ import {
 import { recursiveDependencies } from './helper.js'
 
 interface Dependencies {
-  [id: string]: string
+  [id: string]: string[]
 }
 interface IdentifiedDependency {
   id: string
@@ -221,6 +221,11 @@ export const convertTasksListToGantt = (projects: Project[]): GanttBar[] => {
  *
  * The goal is to have a structure where we can access to the dependencies of
  * a task from the task identifier.
+ *
+ * Example:
+ * `[{id: A, depends: []}, {id: B, depends: [A]}, {id: C, depends: [A, B]}]`
+ * Will become:
+ * `{A: [B, C], B: [C]}`
  */
 export const getAllDependencies = (projects: Project[]): Dependencies => {
   const dependencies = {}
@@ -406,7 +411,7 @@ export const sortTasksByDependencies = (
   console.debug(
     '<GanttSort> retrieve the sorted list of identifiers from the dependencies', tasksDependencies
   )
-  // Step 2: sort the root tasks first
+  // Step 2: retrieve the list of tasks without parent as a list sorted by dependencies weight
   const sortedByIdentifier: string[] = tasksDependencies
     .filter((depend: IdentifiedDependency) => depend.parent === null)
     .map((depend: IdentifiedDependency) => ([

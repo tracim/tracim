@@ -493,6 +493,8 @@ describe('gantt.ts', () => {
   })
 
   // INFO - A.L - 2026-09-23 - This Kanban have three root tasks: t1, t5 and t9.
+  // There tasks must be sorted to ensure the one with highest number of
+  // dependencies is taken first. In this case, the correct order is t1, t9, t5.
   // The issue #6971 occurs because these tasks were not ordered and the tasks
   // from the last project (MARKETING) were not set before the others. This test
   // will reproduce this problem, to ensure the function did not regress.
