@@ -353,6 +353,26 @@ const getDependenciesFromTask = (
 
 /**
  * Sort the list of tasks by their dependencies
+ *
+ * ## How the sorting process was implemented
+ *
+ * There is currently four steps to ensure the tasks are correctly sorted by
+ * their dependencies:
+ *
+ * 1) A first array `tasksDependencies` is generate to have all the tasks from
+ *    the specified tasks as a list of JS objects. For example:
+ *    `[{id: 'x', task: {…}, parent: null}, {id: 'y', task: {…}, parent: 'x'}]`
+ * 2) All the node without parent from the previous array are retrieved and
+ *    sorted by their number of dependencies. The identifier of these sorted
+ *    tasks will be inserted in the `sortedByIdentifier` array.
+ *    The root task with the higher number of dependencies are put at the
+ *    beginning of the list, to ensure these tasks are computed sooner.
+ * 3) The tasks are inserted in the `sortedByIdentifier` array based on the
+ *    parent position in this array. This array will give the final position
+ *    of each identifier based on the dependencies.
+ * 4) The final array will be returned, by fetching the task information from
+ *    the `tasksById` variable. All the unknown task will be ignored during the
+ *    process.
  */
 export const sortTasksByDependencies = (
   tasks: Task[],
