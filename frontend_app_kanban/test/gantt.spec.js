@@ -474,20 +474,21 @@ describe('gantt.ts', () => {
 
   describe('sort tasks by dependencies', () => {
     const tasksById = Object.fromEntries(projects[0].tasks.map((task) => [task.id, task]))
+    const dependencies = { t2: ['t1'], t3: ['t2'] }
 
     it('no need to sorted', () => {
-      const tasks = sortTasksByDependencies(projects[0].tasks, tasksById)
+      const tasks = sortTasksByDependencies(projects[0].tasks, tasksById, dependencies)
       assert.deepEqual(tasks.map((task) => task.id), ['t1', 't2', 't3'])
     })
 
     it('need to be sorted', () => {
-      const tasks = sortTasksByDependencies(projects[0].tasks.reverse(), tasksById)
+      const tasks = sortTasksByDependencies(projects[0].tasks.reverse(), tasksById, dependencies)
       assert.deepEqual(tasks.map((task) => task.id), ['t1', 't2', 't3'])
     })
 
     it('recursive case', () => {
-      const tasks = sortTasksByDependencies(recursiveProjects[0].tasks, tasksById)
-      assert.deepEqual(tasks.map((task) => task.id), ['t2', 't1'])
+      const tasks = sortTasksByDependencies(recursiveProjects[0].tasks, tasksById, dependencies)
+      assert.deepEqual(tasks.map((task) => task.id), ['t1', 't2'])
     })
   })
 })
