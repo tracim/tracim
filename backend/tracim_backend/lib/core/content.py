@@ -2673,6 +2673,17 @@ class ContentApi(object):
         with open(content_file.file_object._file_path, "rb") as content_buffer:
             new_content = apply_patch(load(content_buffer), patch_file_content)
 
+        # INFO - A.L - 2026-09-24 - Add a new check on the revision after the
+        # generation of the patch to ensure a new revision was not registered
+        # at the same moment. This part will be revamp in the future.
+        check_content = self.get_one(content_id, content_type)
+        if revision_id != check_content.revision_id:
+            raise PatchRevisionOlderThanContentRevision(
+                f"The patch sent for the content {content_id} with the revision "
+                f"{revision_id} do not match any longer the current revision id of the "
+                f"content ({check_content.revision_id}). This patch will be ignored."
+            )
+
         with new_revision(session=self._session, tm=transaction.manager, content=content):
             self.update_file_data(
                 content,
