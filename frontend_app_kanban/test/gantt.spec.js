@@ -474,20 +474,160 @@ describe('gantt.ts', () => {
 
   describe('sort tasks by dependencies', () => {
     const tasksById = Object.fromEntries(projects[0].tasks.map((task) => [task.id, task]))
+    const dependencies = { t2: ['t1'], t3: ['t2'] }
 
     it('no need to sorted', () => {
-      const tasks = sortTasksByDependencies(projects[0].tasks, tasksById)
+      const tasks = sortTasksByDependencies(projects[0].tasks, tasksById, dependencies)
       assert.deepEqual(tasks.map((task) => task.id), ['t1', 't2', 't3'])
     })
 
     it('need to be sorted', () => {
-      const tasks = sortTasksByDependencies(projects[0].tasks.reverse(), tasksById)
+      const tasks = sortTasksByDependencies(projects[0].tasks.reverse(), tasksById, dependencies)
       assert.deepEqual(tasks.map((task) => task.id), ['t1', 't2', 't3'])
     })
 
     it('recursive case', () => {
-      const tasks = sortTasksByDependencies(recursiveProjects[0].tasks, tasksById)
-      assert.deepEqual(tasks.map((task) => task.id), ['t2', 't1'])
+      const tasks = sortTasksByDependencies(recursiveProjects[0].tasks, tasksById, dependencies)
+      assert.deepEqual(tasks.map((task) => task.id), ['t1', 't2'])
+    })
+  })
+
+  // INFO - A.L - 2026-09-23 - This Kanban have three root tasks: t1, t5 and t9.
+  // There tasks must be sorted to ensure the one with highest number of
+  // dependencies is taken first. In this case, the correct order is t1, t9, t5.
+  // The issue #6971 occurs because these tasks were not ordered and the tasks
+  // from the last project (MARKETING) were not set before the others. This test
+  // will reproduce this problem, to ensure the function did not regress.
+  it('sorting case from issue #6971 where the root tasks must be ordered', () => {
+    const kanban = {
+      columns: [
+        {
+          title: 'DEV',
+          id: 'c1',
+          cards: [
+            {
+              id: 't1',
+              title: 'poc',
+              assignmentList: [],
+              duration: '10',
+              depends: [],
+              finished: false
+            },
+            {
+              id: 't2',
+              title: 'user tests',
+              assignmentList: [],
+              duration: '5',
+              depends: ['t1'],
+              finished: false
+            },
+            {
+              id: 't3',
+              title: 'fix from user tests',
+              assignmentList: [],
+              duration: '5',
+              depends: ['t2'],
+              finished: false
+            },
+            {
+              id: 't4',
+              title: 'final tests',
+              assignmentList: [],
+              duration: '3',
+              depends: ['t3'],
+              finished: false
+            }
+          ]
+        },
+        {
+          title: 'IT',
+          id: 'c2',
+          cards: [
+            {
+              id: 't5',
+              title: 'prepare infra',
+              assignmentList: [],
+              duration: '2',
+              depends: [],
+              finished: false
+            },
+            {
+              id: 't6',
+              title: 'deploy prod',
+              assignmentList: [],
+              duration: '2',
+              depends: ['t5', 't4'],
+              finished: false
+            },
+            {
+              id: 't7',
+              title: 'improve infra',
+              assignmentList: [],
+              duration: '5',
+              depends: ['t6'],
+              finished: false
+            }
+          ]
+        },
+        {
+          title: 'MARKETING',
+          id: 'c3',
+          cards: [
+            {
+              id: 't8',
+              title: 'launch product',
+              assignmentList: [],
+              depends: ['t6', 't11'],
+              finished: false
+            },
+            {
+              id: 't9',
+              title: 'landing page',
+              assignmentList: [],
+              duration: '1',
+              depends: [],
+              finished: false
+            },
+            {
+              id: 't10',
+              title: 'prepare website - part 1',
+              assignmentList: [],
+              duration: '5',
+              depends: ['t9'],
+              finished: false
+            },
+            {
+              id: 't11',
+              title: 'deploy website',
+              assignmentList: [],
+              depends: ['t12', 't10'],
+              finished: false
+            },
+            {
+              id: 't12',
+              title: 'prepare website - part 2',
+              assignmentList: [],
+              duration: '4',
+              depends: ['t10', 't2'],
+              finished: false
+            }
+          ]
+        }
+      ]
+    }
+
+    let projects = getTasksListFromKanbanCards(kanban.columns)
+    projects = applyBusinessRulesToProjects(projects)
+
+    const tests = [
+      [0, ['t1', 't2', 't3', 't4']],
+      [1, ['t5', 't6', 't7']],
+      [2, ['t9', 't10', 't12', 't11', 't8']]
+    ]
+    tests.forEach(([index, expected]) => {
+      it(`check ${projects[index].name}`, () => {
+        assert.equal(projects[index].tasks.map((task) => task.id), expected)
+      })
     })
   })
 })

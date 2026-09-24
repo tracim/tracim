@@ -10,7 +10,7 @@ import {
 import { recursiveDependencies } from './helper.js'
 
 interface Dependencies {
-  [id: string]: string
+  [id: string]: string[]
 }
 interface IdentifiedDependency {
   id: string
@@ -20,6 +20,10 @@ interface IdentifiedDependency {
 interface IdentifiedTasks {
   [id: string]: Task
 }
+type NodeWithDepends = [
+  identifier: string,
+  depends: string[]
+]
 
 interface GanttBar {
   readonly id: string
@@ -124,7 +128,7 @@ export const applyBusinessRulesToProjects = (
   // Sort all the tasks by dependencies to manage inter-project relations
   const allTasks: Task[] = projects.flatMap((project: Project) => project.tasks)
 
-  sortTasksByDependencies(allTasks, tasksById).forEach((task: Task) => {
+  sortTasksByDependencies(allTasks, tasksById, dependencies).forEach((task: Task) => {
     // INFO - A.L - 2026-08-25 - Compute again the cards without kickoff
     // since their dependencies do have computed dates from previous map.
     if (task.depends.length > 0 && !task._card.kickoff) {
@@ -214,6 +218,14 @@ export const convertTasksListToGantt = (projects: Project[]): GanttBar[] => {
 
 /**
  * Retrieve all the dependencies available from the list of projects
+ *
+ * The goal is to have a structure where we can access to the dependencies of
+ * a task from the task identifier.
+ *
+ * Example:
+ * `[{id: A, depends: []}, {id: B, depends: [A]}, {id: C, depends: [A, B]}]`
+ * Will become:
+ * `{A: [B, C], B: [C]}`
  */
 export const getAllDependencies = (projects: Project[]): Dependencies => {
   const dependencies = {}
@@ -331,15 +343,54 @@ export const prepareDates = (card: KanbanCard, duration: number, excludeWeekendD
 }
 
 /**
+ * Retrieve all the dependencies related to the specified task identifier
+ */
+const getDependenciesFromTask = (
+  identifier: string,
+  dependencies: Dependencies,
+  output: string[] = []
+): string[] => {
+  dependencies[identifier]?.forEach((dependId: string) => {
+    if (!output.includes(dependId)) {
+      output.push(dependId)
+      output = getDependenciesFromTask(dependId, dependencies, output)
+    }
+  })
+  return output
+}
+
+/**
  * Sort the list of tasks by their dependencies
+ *
+ * ## How the sorting process was implemented
+ *
+ * There is currently four steps to ensure the tasks are correctly sorted by
+ * their dependencies:
+ *
+ * 1) A first array `tasksDependencies` is generate to have all the tasks from
+ *    the specified tasks as a list of JS objects. For example:
+ *    `[{id: 'x', task: {…}, parent: null}, {id: 'y', task: {…}, parent: 'x'}]`
+ * 2) All the node without parent from the previous array are retrieved and
+ *    sorted by their number of dependencies. The identifier of these sorted
+ *    tasks will be inserted in the `sortedByIdentifier` array.
+ *    The root task with the higher number of dependencies are put at the
+ *    beginning of the list, to ensure these tasks are computed sooner.
+ * 3) The tasks are inserted in the `sortedByIdentifier` array based on the
+ *    parent position in this array. This array will give the final position
+ *    of each identifier based on the dependencies.
+ * 4) The final array will be returned, by fetching the task information from
+ *    the `tasksById` variable. All the unknown task will be ignored during the
+ *    process.
  */
 export const sortTasksByDependencies = (
   tasks: Task[],
-  tasksById: IdentifiedTasks
+  tasksById: IdentifiedTasks,
+  dependencies: Dependencies
 ): Task[] => {
   console.debug(
     '%c<Gantt> sort the list of tasks by their dependencies', 'color: chartreuse', tasks
   )
+  // Step 1: create dependencies array
   const tasksDependencies: IdentifiedDependency[] = []
   tasks.sort((first: Task, second: Task): number => {
     if (first.depends.length === 0 && second.depends.length > 0) return -1
@@ -360,17 +411,28 @@ export const sortTasksByDependencies = (
   console.debug(
     '<GanttSort> retrieve the sorted list of identifiers from the dependencies', tasksDependencies
   )
-  const sortedByIdentifier: string[] = []
-  tasksDependencies
-    .sort((first: IdentifiedDependency, second: IdentifiedDependency): number => {
-      if (first.id === second.parent) return -1
-      if (first.parent === second.id) return 1
+  // Step 2: retrieve the list of tasks without parent as a list sorted by dependencies weight
+  const sortedByIdentifier: string[] = tasksDependencies
+    .filter((depend: IdentifiedDependency) => depend.parent === null)
+    .map((depend: IdentifiedDependency) => ([
+      depend.id, getDependenciesFromTask(depend.id, dependencies).length
+    ]))
+    .sort((first, second): NodeWithDepends[] => {
+      // Check the number of dependencies related to the node first, to put
+      // the highest number at the beginning of the list.
+      if (first[1] > second[1]) return -1
+      if (first[1] < second[1]) return 1
       return 0
     })
+    .map(([identifier, size]): NodeWithDepends => identifier)
+
+  console.debug(
+    '<GanttSort> start the sorting process with the root nodes', sortedByIdentifier
+  )
+  // Step 3: add the sorted children next to their parents
+  tasksDependencies
     .forEach((depend: IdentifiedDependency) => {
-      if (depend.parent === null) {
-          sortedByIdentifier.splice(0, 0, depend.id)
-      } else {
+      if (depend.parent !== null) {
         const dependIndex = sortedByIdentifier.indexOf(depend.id)
         const parentIndex = sortedByIdentifier.indexOf(depend.parent)
 
@@ -390,5 +452,8 @@ export const sortTasksByDependencies = (
   console.debug(
     '<GanttSort> retrieve information from the sorted list of identifiers', sortedByIdentifier
   )
-  return sortedByIdentifier.map((id: string) => tasksById[id])
+  // Step 4: return the list of ordered tasks and exclude unknown one
+  return sortedByIdentifier
+    .map((id: string) => tasksById[id])
+    .filter((task: Task | undefined) => task !== undefined)
 }
