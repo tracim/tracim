@@ -16,6 +16,18 @@ if typing.TYPE_CHECKING:
 class TracimSession(Session):
     """
     Subclass of Sqlalchemy session to add tracim specific stuff
+
+    Call sequence:
+        - at app startup:
+            - :func:`tracim_backend.web` in tracim_backend/__init__.py calls
+            :func:`tracim_backend.models.setup_models.init_models`
+            - which calls :func:`tracim_backend.models.setup_models.get_session_factory`
+            - which sets TracimSession as the sessionmaker() class
+        - on each http request, on first use of request.dbsession:
+            - :func:`tracim_backend.models.setup_models.create_dbsession_for_context`
+              calls session_factory(), which creates a new TracimSession
+        - outside http requests (WebDAV, RQ workers, CLI...), sessions are created
+          directly from a factory built with get_session_factory()
     """
 
     def __init__(self, *args, **kwargs) -> None:
@@ -120,7 +132,9 @@ class TracimSession(Session):
         )
 
         if lock_file_path in self._content_file_locks:
-            # lock exists and is already ours => OK
+            # The lock is already held by this SQLAlchemy session in its current transaction
+            # (e.g. same http request, rq job or command)
+            # we can go on !
             return True
 
         lock = filelock.FileLock(lock_file_path)
