@@ -123,9 +123,12 @@ class TracimSession(Session):
 
         Locks are released on app transaction end, see  :meth:`TracimSession._release_content_file_locks`
 
+        About Filelock library locking mechanisms:
+            https://py-filelock.readthedocs.io/en/latest/concepts.html#how-file-locking-works
+
         WARNING:
             - only works on a single server
-            - the lock files are NOT removed on Linux (FileLock use flock).
+            - the lock files are NOT removed on Linux (FileLock use flock)
         """
         lock_file_path = os.path.join(
             tempfile.gettempdir(), f"tracim_content_{content_id}_{revision_id}.lock"
