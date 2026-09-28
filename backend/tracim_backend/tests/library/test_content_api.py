@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import pytest
+from sqlalchemy import text
 import transaction
 import typing
 
@@ -3673,6 +3674,78 @@ class TestContentApi(object):
                 b'[{"op": "add", "path": "/0", "value": {"foo": "bar"}}]',
                 "application/json",
             )
+
+    @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+    def test_unit__apply_patch__with_base_revision_locked_by_another_patch(
+        self,
+        session,
+        session_factory,
+        workspace_api_factory,
+        app_config,
+        user_api_factory,
+        content_type_list,
+        admin_user,
+    ) -> None:
+        """
+        Simulate another patch being applied on the same base revision
+        in a concurrent transaction (see #6974).
+
+        Uses functional_test to have Kanban app
+        """
+        if session.get_bind().dialect.name != "postgresql":
+            pytest.skip("Content locks are only supported by PostgreSQL")
+
+        uapi = user_api_factory.get()
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.USER, save_now=True)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
+
+        with session.no_autoflush:
+            kanban = api.create(
+                content_type_slug=ContentTypeSlug.KANBAN.value,
+                workspace=workspace,
+                parent=None,
+                label="board",
+                do_save=False,
+            )
+            api.update_file_data(kanban, "board.kanban", "application/json", b"[]")
+
+        api.save(kanban, ActionDescription.CREATION)
+        transaction.commit()
+        base_revision_id = kanban.revision_id
+        patch_content = b'[{"op": "add", "path": "/0", "value": {"foo": "bar"}}]'
+        patch_mimetype = "application/json"
+
+        other_session = session_factory()
+        try:
+            # getting a lock from other_session
+            assert other_session.try_lock_for_content(kanban.content_id, base_revision_id)
+
+            # cannot apply patch
+            with pytest.raises(PatchRevisionOlderThanContentRevision):
+                api.apply_patch(
+                    base_revision_id,
+                    kanban.content_id,
+                    ContentTypeSlug.KANBAN.value,
+                    patch_content,
+                    patch_mimetype,
+                )
+        finally:
+            # releasing lock from other_session
+            other_session.rollback()
+            other_session.close()
+
+        # now we can apply the patch (same base_revision_id as the lock didn't pushed anything to the Kanban)
+        revision_id = api.apply_patch(
+            base_revision_id,
+            kanban.content_id,
+            ContentTypeSlug.KANBAN.value,
+            patch_content,
+            patch_mimetype,
+        )
+        assert revision_id != base_revision_id
 
     def test_unit__apply_patch__with_invalid_content_mimetype(
         self,
