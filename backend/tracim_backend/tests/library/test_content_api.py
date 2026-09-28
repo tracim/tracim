@@ -3747,6 +3747,71 @@ class TestContentApi(object):
         )
         assert revision_id != base_revision_id
 
+    @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+    def test_unit__apply_patch__with_revision_changed_after_content_load(
+        self,
+        session,
+        workspace_api_factory,
+        app_config,
+        user_api_factory,
+        content_type_list,
+        admin_user,
+    ) -> None:
+        """
+        Check that apply_patch really update content revision.
+        If something in the app lifecycle loads the content before apply_patch starts then we could
+        get a cached revision id (see #6974).
+
+        Uses functional_test to have Kanban app
+        """
+        uapi = user_api_factory.get()
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.USER, save_now=True)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
+
+        with session.no_autoflush:
+            kanban = api.create(
+                content_type_slug=ContentTypeSlug.KANBAN.value,
+                workspace=workspace,
+                parent=None,
+                label="board",
+                do_save=False,
+            )
+            api.update_file_data(kanban, "board.kanban", "application/json", b"[]")
+
+        api.save(kanban, ActionDescription.CREATION)
+        with new_revision(session, transaction.manager, content=kanban):
+            api.update_file_data(kanban, kanban.label, kanban.file_mimetype, b'[{"foo": "bar"}]')
+            api.save(
+                content=kanban,
+                action_description=ActionDescription.EDITION,
+                do_notify=False,
+            )
+        transaction.commit()
+        first_revision_id = kanban.revisions[0].revision_id
+        second_revision_id = kanban.revision_id
+
+        # INFO - P.G - 2026-09-28 - Change the current revision from another connection:
+        # the Content loaded in the session still has the old revision id.
+        with session.get_bind().begin() as other_connection:
+            other_connection.execute(
+                text("UPDATE content SET cached_revision_id = :revision_id WHERE id = :content_id"),
+                revision_id=first_revision_id,
+                content_id=kanban.content_id,
+            )
+        assert kanban.revision_id == second_revision_id
+
+        with pytest.raises(PatchRevisionOlderThanContentRevision):
+            api.apply_patch(
+                second_revision_id,
+                kanban.content_id,
+                ContentTypeSlug.KANBAN.value,
+                b'[{"op": "add", "path": "/0", "value": {"foo": "bar"}}]',
+                "application/json",
+            )
+
     def test_unit__apply_patch__with_invalid_content_mimetype(
         self,
         session,
