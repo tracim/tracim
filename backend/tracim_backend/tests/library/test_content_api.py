@@ -3692,9 +3692,6 @@ class TestContentApi(object):
 
         Uses functional_test to have Kanban app
         """
-        if session.get_bind().dialect.name != "postgresql":
-            pytest.skip("Content locks are only supported by PostgreSQL")
-
         uapi = user_api_factory.get()
         user = uapi.create_minimal_user(email="this.is@user", profile=Profile.USER, save_now=True)
         workspace = workspace_api_factory.get(current_user=user).create_workspace(
