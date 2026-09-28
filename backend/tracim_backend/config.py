@@ -562,6 +562,9 @@ class CFG(object):
         )
         self.KNOWN_MEMBERS__FILTER = asbool(self.get_raw_config("known_members.filter", "True"))
         self.DEBUG = asbool(self.get_raw_config("debug", "False"))
+        # DEBUG - emulate slow prod kanban patch (see #6974), remove before commit
+        self.DEBUG__PATCH_READ_SLEEP = float(self.get_raw_config("debug.patch_read_sleep", "0"))
+        self.DEBUG__PATCH_SAVE_SLEEP = float(self.get_raw_config("debug.patch_save_sleep", "0"))
         self.BUILD_VERSION = self.get_raw_config("build_version", get_build_version())
         self.PREVIEW__JPG__RESTRICTED_DIMS = asbool(
             self.get_raw_config("preview.jpg.restricted_dims", "False")
