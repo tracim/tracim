@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 import typing
 import weakref
@@ -59,6 +60,29 @@ class TracimSession(Session):
 
     def get_allowed_revision_deletion(self) -> bool:
         return self._allow_revision_deletion
+
+    def try_lock_for_content(self, content_id: int, revision_id: int) -> bool:
+        """Try to lock the given revision of a content, without waiting.
+
+        The lock is a PostgreSQL transaction-level advisory lock keyed on
+        (content_id, revision_id): it is released automatically at the end of the
+        current transaction (commit or rollback).
+
+        Args:
+            content_id (int): The identifier of the content.
+            revision_id (int): The identifier of the revision of the content.
+
+        Returns:
+            bool: True if the lock was acquired, False if another transaction holds it.
+            Always True with databases other than PostgreSQL, which do not support
+            advisory locks.
+        """
+        if self.get_bind().dialect.name != "postgresql":
+            return True
+        return self.execute(
+            text("SELECT pg_try_advisory_xact_lock(:content_id, :revision_id)"),
+            {"content_id": content_id, "revision_id": revision_id},
+        ).scalar()
 
     def assert_event_mechanism(self) -> None:
         assert self.info["crud_hook_caller"], (

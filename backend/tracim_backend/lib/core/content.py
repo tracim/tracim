@@ -2646,7 +2646,8 @@ class ContentApi(object):
 
         Raises:
             ContentTypeNotAllowed: If the specified content or patch is not a JSON files.
-            PatchRevisionOlderThanContentRevision: If the revision is not the latest one of the content.
+            PatchRevisionOlderThanContentRevision: If the revision is not the latest one of the content,
+                or if another patch is being applied on the same revision.
         """
 
         # INFO - A.L - 2026-08-19 - For now, this method can only be used with JSON files.
@@ -2655,12 +2656,31 @@ class ContentApi(object):
                 f"Uploaded patch of type '{patch_mimetype}' is not supported."
             )
 
+        # INFO - PGO - 2026-09-28 - Only one patch can be applied on a given base revision
+        # We are doing 2 checks :
+        # 1. lock : in case of parallel processing of multiple patches for the same content with same
+        #       base revision (see #6974)
+        #    A lock is set, if it has already been acquired command is failing
+        #    Lock is released when this api endpoint web session is finished
+        # 2. patch base revision is equal to content current revision
+        # --- check 1️⃣ lock
+        if not self._session.try_lock_for_content(content_id, revision_id):
+            raise PatchRevisionOlderThanContentRevision(
+                f"Another patch on the revision {revision_id} of the content {content_id} "
+                "is being applied. This patch will be ignored."
+            )
+
         content = self.get_one(content_id, content_type)
         # DEBUG - emulate slow prod read (see #6974), remove before commit
         time.sleep(self._config.DEBUG__PATCH_READ_SLEEP)
         if content.file_mimetype != "application/json":
             raise ContentTypeNotAllowed(f"Content type '{content.file_mimetype}' is not supported.")
 
+        # --- check 2️⃣ base revision up-to-date
+        # INFO - PGO - 2026-09-28 - The content may already be loaded in the session
+        # It is not for this route right now, but we should be cautious
+        # will only emit 1 query so this shouldn't take lon
+        self._session.refresh(content, ["cached_revision_id"])
         if revision_id != content.revision_id:
             raise PatchRevisionOlderThanContentRevision(
                 f"the revision sent with the patch ({revision_id}) do not match "
@@ -2675,17 +2695,6 @@ class ContentApi(object):
         # TODO - A.L - 2026-08-13 - raise an exception when the patch cannot be applied
         with open(content_file.file_object._file_path, "rb") as content_buffer:
             new_content = apply_patch(load(content_buffer), patch_file_content)
-
-        # INFO - A.L - 2026-09-24 - Add a new check on the revision after the
-        # generation of the patch to ensure a new revision was not registered
-        # at the same moment. This part will be revamp in the future.
-        check_content = self.get_one(content_id, content_type)
-        if revision_id != check_content.revision_id:
-            raise PatchRevisionOlderThanContentRevision(
-                f"The patch sent for the content {content_id} with the revision "
-                f"{revision_id} do not match any longer the current revision id of the "
-                f"content ({check_content.revision_id}). This patch will be ignored."
-            )
 
         with new_revision(session=self._session, tm=transaction.manager, content=content):
             self.update_file_data(
