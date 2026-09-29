@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import pytest
+from sqlalchemy import text
 import transaction
 import typing
 
@@ -3670,6 +3671,198 @@ class TestContentApi(object):
                 1,
                 text_file.content_id,
                 content_type_list.File.slug,
+                b'[{"op": "add", "path": "/0", "value": {"foo": "bar"}}]',
+                "application/json",
+            )
+
+    @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+    def test_unit__apply_patch__with_base_revision_locked_by_another_patch(
+        self,
+        session,
+        session_factory,
+        workspace_api_factory,
+        app_config,
+        user_api_factory,
+        content_type_list,
+        admin_user,
+    ) -> None:
+        """
+        Simulate another patch being applied on the same base revision
+        in a concurrent transaction (see #6974).
+
+        Uses functional_test to have Kanban app
+        """
+        uapi = user_api_factory.get()
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.USER, save_now=True)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
+
+        with session.no_autoflush:
+            kanban = api.create(
+                content_type_slug=ContentTypeSlug.KANBAN.value,
+                workspace=workspace,
+                parent=None,
+                label="board",
+                do_save=False,
+            )
+            api.update_file_data(kanban, "board.kanban", "application/json", b"[]")
+
+        api.save(kanban, ActionDescription.CREATION)
+        transaction.commit()
+        base_revision_id = kanban.revision_id
+        patch_content = b'[{"op": "add", "path": "/0", "value": {"foo": "bar"}}]'
+        patch_mimetype = "application/json"
+
+        other_session = session_factory()
+        try:
+            # getting a lock from other_session
+            assert other_session.try_lock_for_content(kanban.content_id, base_revision_id)
+
+            # cannot apply patch
+            with pytest.raises(PatchRevisionOlderThanContentRevision):
+                api.apply_patch(
+                    base_revision_id,
+                    kanban.content_id,
+                    ContentTypeSlug.KANBAN.value,
+                    patch_content,
+                    patch_mimetype,
+                )
+        finally:
+            # releasing lock from other_session
+            other_session.rollback()
+            other_session.close()
+
+        # now we can apply the patch (same base_revision_id as the lock didn't pushed anything to the Kanban)
+        revision_id = api.apply_patch(
+            base_revision_id,
+            kanban.content_id,
+            ContentTypeSlug.KANBAN.value,
+            patch_content,
+            patch_mimetype,
+        )
+        assert revision_id != base_revision_id
+
+    @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+    def test_unit__apply_patch__ok__sqlite_content_filelock_disabled(
+        self,
+        session,
+        session_factory,
+        workspace_api_factory,
+        app_config,
+        user_api_factory,
+    ) -> None:
+        """
+        With content_apply_patch.sqlite_filelock.enabled = False, the SQLite file lock is ignored (see #6974).
+
+        Uses functional_test to have Kanban app
+        """
+        if session.get_bind().dialect.name != "sqlite":
+            pytest.skip("content_apply_patch.sqlite_filelock.enabled only applies to SQLite")
+        app_config.CONTENT_APPLY_PATCH__SQLITE_FILELOCK__ENABLED = False
+
+        uapi = user_api_factory.get()
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.USER, save_now=True)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
+
+        with session.no_autoflush:
+            kanban = api.create(
+                content_type_slug=ContentTypeSlug.KANBAN.value,
+                workspace=workspace,
+                parent=None,
+                label="board",
+                do_save=False,
+            )
+            api.update_file_data(kanban, "board.kanban", "application/json", b"[]")
+
+        api.save(kanban, ActionDescription.CREATION)
+        transaction.commit()
+        base_revision_id = kanban.revision_id
+
+        other_session = session_factory()
+        try:
+            # getting a lock from other_session
+            assert other_session.try_lock_for_content(kanban.content_id, base_revision_id)
+
+            # the lock is ignored: the patch is applied
+            revision_id = api.apply_patch(
+                base_revision_id,
+                kanban.content_id,
+                ContentTypeSlug.KANBAN.value,
+                b'[{"op": "add", "path": "/0", "value": {"foo": "bar"}}]',
+                "application/json",
+            )
+            assert revision_id != base_revision_id
+        finally:
+            # releasing lock from other_session
+            other_session.rollback()
+            other_session.close()
+
+    @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+    def test_unit__apply_patch__with_revision_changed_after_content_load(
+        self,
+        session,
+        workspace_api_factory,
+        app_config,
+        user_api_factory,
+        content_type_list,
+        admin_user,
+    ) -> None:
+        """
+        Check that apply_patch really update content revision.
+        If something in the app lifecycle loads the content before apply_patch starts then we could
+        get a cached revision id (see #6974).
+
+        Uses functional_test to have Kanban app
+        """
+        uapi = user_api_factory.get()
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.USER, save_now=True)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
+
+        with session.no_autoflush:
+            kanban = api.create(
+                content_type_slug=ContentTypeSlug.KANBAN.value,
+                workspace=workspace,
+                parent=None,
+                label="board",
+                do_save=False,
+            )
+            api.update_file_data(kanban, "board.kanban", "application/json", b"[]")
+
+        api.save(kanban, ActionDescription.CREATION)
+        with new_revision(session, transaction.manager, content=kanban):
+            api.update_file_data(kanban, kanban.label, kanban.file_mimetype, b'[{"foo": "bar"}]')
+            api.save(
+                content=kanban,
+                action_description=ActionDescription.EDITION,
+                do_notify=False,
+            )
+        transaction.commit()
+        first_revision_id = kanban.revisions[0].revision_id
+        second_revision_id = kanban.revision_id
+
+        # INFO - P.G - 2026-09-28 - Change the current revision from another connection:
+        # the Content loaded in the session still has the old revision id.
+        with session.get_bind().begin() as other_connection:
+            other_connection.execute(
+                text("UPDATE content SET cached_revision_id = :revision_id WHERE id = :content_id"),
+                revision_id=first_revision_id,
+                content_id=kanban.content_id,
+            )
+        assert kanban.revision_id == second_revision_id
+
+        with pytest.raises(PatchRevisionOlderThanContentRevision):
+            api.apply_patch(
+                second_revision_id,
+                kanban.content_id,
+                ContentTypeSlug.KANBAN.value,
                 b'[{"op": "add", "path": "/0", "value": {"foo": "bar"}}]',
                 "application/json",
             )

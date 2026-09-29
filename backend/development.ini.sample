@@ -267,6 +267,10 @@ workspace.join.max_messages_history_count = -1
 # https://docs.sqlalchemy.org/en/latest/core/engines.html#sqlalchemy.create_engine ##
 ; sqlalchemy.url = sqlite:///%(here)s/tracim.sqlite
 sqlalchemy.url = %(basic_setup.sqlalchemy_url)s
+## SQLite only: lock contents with files (in the system temp dir) while a patch is applied,
+## to prevent concurrent patches on the same content (see #6974). Only works on a single server.
+## Could be disabled as on Linux files are never removed
+; content_apply_patch.sqlite_filelock.enabled = True
 
 ### Uploaded files ###
 
