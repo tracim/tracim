@@ -3745,6 +3745,64 @@ class TestContentApi(object):
         assert revision_id != base_revision_id
 
     @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
+    def test_unit__apply_patch__ok__sqlite_content_filelock_disabled(
+        self,
+        session,
+        session_factory,
+        workspace_api_factory,
+        app_config,
+        user_api_factory,
+    ) -> None:
+        """
+        With content_apply_patch.sqlite_filelock.enabled = False, the SQLite file lock is ignored (see #6974).
+
+        Uses functional_test to have Kanban app
+        """
+        if session.get_bind().dialect.name != "sqlite":
+            pytest.skip("content_apply_patch.sqlite_filelock.enabled only applies to SQLite")
+        app_config.CONTENT_APPLY_PATCH__SQLITE_FILELOCK__ENABLED = False
+
+        uapi = user_api_factory.get()
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.USER, save_now=True)
+        workspace = workspace_api_factory.get(current_user=user).create_workspace(
+            "test workspace", save_now=True
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
+
+        with session.no_autoflush:
+            kanban = api.create(
+                content_type_slug=ContentTypeSlug.KANBAN.value,
+                workspace=workspace,
+                parent=None,
+                label="board",
+                do_save=False,
+            )
+            api.update_file_data(kanban, "board.kanban", "application/json", b"[]")
+
+        api.save(kanban, ActionDescription.CREATION)
+        transaction.commit()
+        base_revision_id = kanban.revision_id
+
+        other_session = session_factory()
+        try:
+            # getting a lock from other_session
+            assert other_session.try_lock_for_content(kanban.content_id, base_revision_id)
+
+            # the lock is ignored: the patch is applied
+            revision_id = api.apply_patch(
+                base_revision_id,
+                kanban.content_id,
+                ContentTypeSlug.KANBAN.value,
+                b'[{"op": "add", "path": "/0", "value": {"foo": "bar"}}]',
+                "application/json",
+            )
+            assert revision_id != base_revision_id
+        finally:
+            # releasing lock from other_session
+            other_session.rollback()
+            other_session.close()
+
+    @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
     def test_unit__apply_patch__with_revision_changed_after_content_load(
         self,
         session,

@@ -130,7 +130,16 @@ class TracimSession(Session):
             - the lock files are NOT removed on Linux (FileLock use flock) see #4014
             - in consequence the lock file name is based on content_id solely (no revision_id)
               => a concurrent patch on another revision of the same content is also rejected
+
+        Can be disabled with the content_apply_patch.sqlite_filelock.enabled config option
+        (always enabled for sessions without context).
         """
+        if (
+            self._context
+            and not self.context.app_config.CONTENT_APPLY_PATCH__SQLITE_FILELOCK__ENABLED
+        ):
+            return True
+
         # as files aren't removed on Linux (#4014), to limit the number of lock files created,
         # only content_id is used (not revision_id)
         del revision_id

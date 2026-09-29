@@ -14,6 +14,7 @@ The following table contains:
 |---------------------------------------------------------------------------|----------------------------------------------------------------|--------------------------------------------------------------------|
 | TRACIM_APP__ENABLED                                                       | app.enabled                                                    | APP__ENABLED                                                       |
 | TRACIM_SQLALCHEMY__URL                                                    | sqlalchemy.url                                                 | SQLALCHEMY__URL                                                    |
+| TRACIM_CONTENT_APPLY_PATCH__SQLITE_FILELOCK__ENABLED                      | content_apply_patch.sqlite_filelock.enabled                    | CONTENT_APPLY_PATCH__SQLITE_FILELOCK__ENABLED                      |
 | TRACIM_DEFAULT_LANG                                                       | default_lang                                                   | DEFAULT_LANG                                                       |
 | TRACIM_PREVIEW_CACHE_DIR                                                  | preview_cache_dir                                              | PREVIEW_CACHE_DIR                                                  |
 | TRACIM_AUTH_TYPES                                                         | auth_types                                                     | AUTH_TYPES                                                         |

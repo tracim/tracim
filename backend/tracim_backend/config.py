@@ -416,6 +416,9 @@ class CFG(object):
         ###
         default_sqlalchemy_url = self.here_macro_replace("sqlite:///%(here)s/tracim.sqlite")
         self.SQLALCHEMY__URL = self.get_raw_config("sqlalchemy.url", default_sqlalchemy_url)
+        self.CONTENT_APPLY_PATCH__SQLITE_FILELOCK__ENABLED = asbool(
+            self.get_raw_config("content_apply_patch.sqlite_filelock.enabled", "True")
+        )
         self.DEFAULT_LANG = self.get_raw_config("default_lang", DEFAULT_FALLBACK_LANG)
         backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         tracim_folder = os.path.dirname(backend_folder)
