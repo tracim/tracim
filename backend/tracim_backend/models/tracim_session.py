@@ -84,10 +84,8 @@ class TracimSession(Session):
         return self._allow_revision_deletion
 
     def try_lock_for_content(self, content_id: int, revision_id: int) -> bool:
-        """Try to lock the given revision of a content, without waiting.
-
-        The lock is keyed on (content_id, revision_id) and is released automatically
-        at the end of the current transaction (commit or rollback)
+        """Try to lock the given revision of a content, without waiting
+        Returns False if another transaction holds the lock
 
         Args:
             content_id (int): The identifier of the content.
@@ -106,6 +104,7 @@ class TracimSession(Session):
 
     def _try_lock_for_content_postgresql(self, content_id: int, revision_id: int) -> bool:
         """Uses PostgreSQL advisory lock functions, available since PG 9.1 (2011)
+        Lock is released automatically at the end of the current transaction (commit or rollback)
 
         See:
             - https://www.postgresql.org/docs/13/functions-admin.html#FUNCTIONS-ADVISORY-LOCKS list of
@@ -119,7 +118,7 @@ class TracimSession(Session):
 
     def _try_lock_for_content_filelock(self, content_id: int, revision_id: int) -> bool:
         """Lock implementation for SQLite using Filelock lib
-        Works on Linux and Windows
+        Works on both Linux and Windows
 
         Locks are released on app transaction end, see  :meth:`TracimSession._release_content_file_locks`
 
@@ -128,11 +127,16 @@ class TracimSession(Session):
 
         WARNING:
             - only works on a single server
-            - the lock files are NOT removed on Linux (FileLock use flock)
+            - the lock files are NOT removed on Linux (FileLock use flock) see #4014
+            - in consequence the lock file name is based on content_id solely (no revision_id)
+              => a concurrent patch on another revision of the same content is also rejected
         """
-        lock_file_path = os.path.join(
-            tempfile.gettempdir(), f"tracim_content_{content_id}_{revision_id}.lock"
-        )
+        # as files aren't removed on Linux (#4014), to limit the number of lock files created,
+        # only content_id is used (not revision_id)
+        del revision_id
+        lock_file_name = f"tracim_content_{content_id}.lock"
+
+        lock_file_path = os.path.join(tempfile.gettempdir(), lock_file_name)
 
         if lock_file_path in self._content_file_locks:
             # The lock is already held by this SQLAlchemy session in its current transaction
