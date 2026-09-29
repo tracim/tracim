@@ -25,7 +25,6 @@ from sqlalchemy.orm.attributes import QueryableAttribute
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.elements import and_
-import time
 import transaction
 import typing
 
@@ -2671,8 +2670,6 @@ class ContentApi(object):
             )
 
         content = self.get_one(content_id, content_type)
-        # DEBUG - emulate slow prod read (see #6974), remove before commit
-        time.sleep(self._config.DEBUG__PATCH_READ_SLEEP)
         if content.file_mimetype != "application/json":
             raise ContentTypeNotAllowed(f"Content type '{content.file_mimetype}' is not supported.")
 
@@ -2704,8 +2701,6 @@ class ContentApi(object):
                 new_mimetype=content.file_mimetype,
             )
             self.save(content)
-            # DEBUG - emulate slow prod save (see #6974), remove before commit
-            time.sleep(self._config.DEBUG__PATCH_SAVE_SLEEP)
 
         return content.revision_id
 
