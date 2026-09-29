@@ -142,7 +142,6 @@ class TracimSession(Session):
 
         # as files aren't removed on Linux (#4014), to limit the number of lock files created,
         # only content_id is used (not revision_id)
-        del revision_id
         lock_file_name = f"tracim_content_{content_id}.lock"
 
         lock_file_path = os.path.join(tempfile.gettempdir(), lock_file_name)
