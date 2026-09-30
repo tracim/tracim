@@ -984,10 +984,6 @@ uploaded_files.storage.s3.secret_access_key =
 # uploaded_files.storage.s3.endpoint_url = https://my_s3_storage.mydomain.tld
 ```
 
-If you want to use your own S3 compatible back-end we recommend [minio](https://min.io) as we have tested its usage with Tracim.
-
-You can find an example docker compose file for storing files in minio [here](/tools_docker/docker-compose-minio.yml)
-
 ## Translation Feature
 
 Tracim has a feature allowing translation of notes(html-documents) and comments through external translation service (only systran supported now)
