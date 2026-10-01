@@ -129,6 +129,70 @@ class TestContent(object):
         # Created dates must be equal
         assert revision_1.created == revision_2.created == revision_3.created
 
+    def test_unit__revision_accessors__ok__revisions_not_loaded(
+        self, admin_user, session, content_type_list
+    ):
+        workspace = Workspace(label="TEST_WORKSPACE_1", owner=admin_user)
+        session.add(workspace)
+        session.flush()
+        content = Content(
+            owner=admin_user,
+            workspace=workspace,
+            type=content_type_list.Page.slug,
+            label="TEST_CONTENT_1",
+            description="revision 1",
+            revision_type=ActionDescription.CREATION,
+        )
+        session.add(content)
+        session.flush()
+        with new_revision(session=session, tm=transaction.manager, content=content):
+            content.description = "revision 2"
+        session.flush()
+        transaction.commit()
+        revision_1_id, revision_2_id = [
+            revision_id
+            for (revision_id,) in session.query(ContentRevisionRO.revision_id)
+            .filter(ContentRevisionRO.content_id == content.id)
+            .order_by(ContentRevisionRO.revision_id)
+        ]
+        # INFO - PGO - 2026-10-01 - expire_all() removes the loaded attributes of every object in
+        # the session: content.revisions is no longer in content.__dict__, so the accessors below
+        # use their queries instead of the in-memory collection
+        session.expire_all()
+
+        assert content.first_revision.revision_id == revision_1_id
+        assert content.previous_revision.revision_id == revision_1_id
+        assert content.last_revision.revision_id == revision_2_id
+        assert content.author == admin_user
+
+        with new_revision(session=session, tm=transaction.manager, content=content):
+            content.description = "revision 3"
+            # INFO - PGO - 2026-10-01 - revision 3 is not flushed yet
+            assert content.current_revision.revision_id is None
+            assert content.first_revision.revision_id == revision_1_id
+            assert content.last_revision.description == "revision 3"
+            assert content.last_revision_persisted.revision_id == revision_2_id
+            assert content.previous_revision.revision_id == revision_2_id
+        session.flush()
+        # INFO - PGO - 2026-10-01 - revision 3 is flushed
+        revision_3_id = content.current_revision.revision_id
+        assert revision_3_id is not None
+        assert content.first_revision.revision_id == revision_1_id
+        assert content.last_revision.description == "revision 3"
+        assert content.last_revision_persisted.revision_id == revision_3_id
+        assert content.previous_revision.revision_id == revision_2_id
+        assert "revisions" not in content.__dict__
+
+        # INFO - PGO - 2026-10-01 - outside of new_revision() context manager (which disables
+        # autoflush), reading revisions must not flush the pending revision
+        session.expire_all()
+        pending_revision = content.new_revision()
+        assert content.first_revision.revision_id == revision_1_id
+        assert content.previous_revision.description == "revision 3"
+        assert content.last_revision_persisted.description == "revision 3"
+        assert pending_revision.revision_id is None
+        assert "revisions" not in content.__dict__
+
     def test_unit__update__err__without_prepare(self, admin_user, session, content_type_list):
         # file creation
         workspace = Workspace(label="TEST_WORKSPACE_1", owner=admin_user)
