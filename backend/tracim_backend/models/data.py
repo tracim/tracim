@@ -867,12 +867,16 @@ class Content(DeclarativeBase):
     # So for now, we order by "revision_id" explicitly, but remember to switch
     # to "created" once "updated" removed.
     # https://github.com/tracim/tracim/issues/336
+    #
+    # TRICKY - PGO - 2026-09-30 - Accessing this collection loads every revision of the content !!
+    # We have helper methods to load a single revision: use current_revision, first_revision or
+    # previous_revision instead.
     revisions = relationship(
         "ContentRevisionRO",
         foreign_keys=[ContentRevisionRO.content_id],
         back_populates="node",
         order_by="ContentRevisionRO.revision_id",
-    )
+    )  # type: List[ContentRevisionRO]
     children_revisions = relationship(
         "ContentRevisionRO",
         foreign_keys=[ContentRevisionRO.parent_id],
@@ -1211,11 +1215,11 @@ class Content(DeclarativeBase):
     # Author is the author of the original revision
     @hybrid_property
     def author(self) -> User:
-        return self.revisions[0].owner
+        return self.first_revision.owner
 
     @author.setter
     def author(self, value: User) -> None:
-        self.revisions[0].owner = value
+        self.first_revision.owner = value
 
     @author.expression
     def author(cls) -> InstrumentedAttribute:
@@ -1333,11 +1337,57 @@ class Content(DeclarativeBase):
 
     @property
     def first_revision(self) -> ContentRevisionRO:
-        return self.revisions[0]  # FIXME
+        if self._is_revisions_property_loaded():
+            return self.revisions[0]
+
+        first_revision_id = (
+            object_session(self)
+            .query(sqlalchemy.func.min(ContentRevisionRO.revision_id))
+            .filter(ContentRevisionRO.content_id == self.id)
+            .scalar()
+        )
+        return self._get_revision(first_revision_id)
+
+    @property
+    def previous_revision(self) -> Optional[ContentRevisionRO]:
+        """
+        Return the revision preceding the current one, None if there is only one revision.
+        """
+        if self._is_revisions_property_loaded():
+            return self.revisions[-2] if len(self.revisions) > 1 else None
+
+        previous_revision_id = (
+            object_session(self)
+            .query(sqlalchemy.func.max(ContentRevisionRO.revision_id))
+            .filter(
+                ContentRevisionRO.content_id == self.id,
+                ContentRevisionRO.revision_id < self.cached_revision_id,
+            )
+            .scalar()
+        )
+        return self._get_revision(previous_revision_id) if previous_revision_id else None
+
+    def _is_revisions_property_loaded(self) -> bool:
+        """
+        The revisions relationship is lazy loaded, and can be very costly !
+        This method can be used to make sure that the collection is loaded.
+
+        :return: True if self.revisions is already loaded, or if the content is not attached to a
+            session (new content, revisions only in memory)
+        """
+        return "revisions" in self.__dict__ or object_session(self) is None
+
+    def _get_revision(self, revision_id: int) -> ContentRevisionRO:
+        # TRICKY - PGO - 2026-09-30 - The current revision may be pending in the identity map
+        # (after_flush), so return it directly instead of querying it again
+        if revision_id == self.cached_revision_id:
+            return self.current_revision
+
+        return object_session(self).query(ContentRevisionRO).get(revision_id)
 
     @property
     def last_revision(self) -> ContentRevisionRO:
-        return self.revisions[-1]
+        return self.current_revision
 
     @property
     def is_readonly(self) -> bool:
