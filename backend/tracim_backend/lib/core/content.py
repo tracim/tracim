@@ -16,8 +16,12 @@ from sqlakeyset import Page
 from sqlakeyset import get_page
 from sqlalchemy import Integer
 from sqlalchemy import bindparam
+from sqlalchemy import exists
 from sqlalchemy import func
+from sqlalchemy import literal
+from sqlalchemy import not_
 from sqlalchemy import or_
+from sqlalchemy import select
 from sqlalchemy import text
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import contains_eager
@@ -2104,8 +2108,9 @@ class ContentApi(object):
         recursive: bool = True,
     ) -> Content:
         """
-        Read content for the user.
-        :param read_datetime: date of readigin
+        Read content for the user: every revision of the content (and of its subcontents) gets
+        a read status at read_datetime, created if missing.
+        :param read_datetime: date of reading, now if not given
         :param do_flush: flush database
         :param recursive: mark read subcontent too
         :return: nothing
@@ -2113,66 +2118,48 @@ class ContentApi(object):
         assert self._user
         assert content
 
-        # The algorithm is:
-        # 1. define the read datetime
-        # 2. get all the revision ids that need to be updated
-        # 3. update all read related to the revision of the current Content
-        # 4. insert new read related to the revision of the current Content
-
         if not read_datetime:
             read_datetime = datetime.datetime.now()
 
-        # Get all revision IDs for this content
+        content_ids = [content.id]
         if recursive:
-            content_ids = [content.content_id]
-            for child in content.recursive_children:
-                content_ids.append(child.content_id)
+            content_ids.extend(content.recursive_children_ids)
 
-            revision_ids = (
-                self._session.query(ContentRevisionRO.revision_id)
-                .filter(ContentRevisionRO.content_id.in_(content_ids))
-                .all()
-            )
-        else:
-            revision_ids = (
-                self._session.query(ContentRevisionRO.revision_id)
-                .filter(ContentRevisionRO.content_id == content.content_id)
-                .all()
-            )
+        # INFO - PGO - 2026-10-01 - Revisions are only selected in SQL subqueries: whatever the
+        # number of revisions, nothing is loaded in Python and only 2 statements are executed
+        # (an UPDATE and an INSERT ... SELECT), plus the children ids query if recursive
+        is_revision_of_contents = ContentRevisionRO.content_id.in_(content_ids)
+        revision_ids_query = select([ContentRevisionRO.revision_id]).where(is_revision_of_contents)
 
-        # Convert to flat list
-        revision_ids = [r[0] for r in revision_ids]
-
+        # TRICKY - PGO - 2026-10-01 - This UPDATE must always be executed, even if no read status
+        # exists yet:
+        # - Query.update() autoflushes the session, so a new revision of the content is selected
+        # - it triggers the "after_bulk_update" session event, so zope.sqlalchemy knows the
+        #   session changed. The INSERT below doesn't trigger any session event: without the
+        #   UPDATE the transaction would be rolled back at the end of the request.
         self._session.query(RevisionReadStatus).filter(
             RevisionReadStatus.user_id == self._user.user_id,
-            RevisionReadStatus.revision_id.in_(revision_ids),
+            RevisionReadStatus.revision_id.in_(revision_ids_query),
         ).update({RevisionReadStatus.view_datetime: read_datetime}, synchronize_session=False)
 
-        # For revisions without read status, create new ones
-        existing_read_revision_ids = (
-            self._session.query(RevisionReadStatus.revision_id)
-            .filter(
+        is_already_read = exists().where(
+            and_(
+                RevisionReadStatus.revision_id == ContentRevisionRO.revision_id,
                 RevisionReadStatus.user_id == self._user.user_id,
-                RevisionReadStatus.revision_id.in_(revision_ids),
             )
-            .all()
         )
-        existing_read_revision_ids = [r[0] for r in existing_read_revision_ids]
-
-        # Find revisions that need new read statuses
-        new_read_status_revision_ids = [
-            r_id for r_id in revision_ids if r_id not in existing_read_revision_ids
-        ]
-
-        # Bulk insert new read statuses
-        if new_read_status_revision_ids:
-            new_statuses = [
-                RevisionReadStatus(
-                    user_id=self._user.user_id, revision_id=revision_id, view_datetime=read_datetime
-                )
-                for revision_id in new_read_status_revision_ids
+        unread_revisions_query = select(
+            [
+                ContentRevisionRO.revision_id,
+                literal(self._user.user_id, type_=Integer),
+                literal(read_datetime, type_=RevisionReadStatus.view_datetime.type),
             ]
-            self._session.bulk_save_objects(new_statuses)
+        ).where(and_(is_revision_of_contents, not_(is_already_read)))
+        self._session.execute(
+            RevisionReadStatus.__table__.insert().from_select(
+                ["revision_id", "user_id", "view_datetime"], unread_revisions_query
+            )
+        )
 
         if do_flush:
             self.flush()

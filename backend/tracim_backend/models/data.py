@@ -1270,6 +1270,25 @@ class Content(DeclarativeBase):
         :return: list of children Content
         :rtype Content
         """
+        children_ids = self.recursive_children_ids
+        if children_ids:
+            return (
+                object_session(self)
+                .query(Content)
+                .join(
+                    ContentRevisionRO,
+                    Content.cached_revision_id == ContentRevisionRO.revision_id,
+                )
+                .filter(Content.id.in_(children_ids))
+                .order_by(ContentRevisionRO.content_id)
+            )
+        return []
+
+    @property
+    def recursive_children_ids(self) -> List[int]:
+        """
+        :return: ids of all the children Content (children of children...), without loading them
+        """
         # TODO - G.M - 2020-10-06 - Use SQLAlchemy SQL Expression Language instead of raw sql here,
         # see https://github.com/tracim/tracim/issues/3670
         statement = text(
@@ -1286,21 +1305,9 @@ class Content(DeclarativeBase):
         join children_id c on c.id = content.id;
             """
         )
-        children_ids = [
+        return [
             elem[0] for elem in object_session(self).execute(statement, {"content_id": self.id})
         ]
-        if children_ids:
-            return (
-                object_session(self)
-                .query(Content)
-                .join(
-                    ContentRevisionRO,
-                    Content.cached_revision_id == ContentRevisionRO.revision_id,
-                )
-                .filter(Content.id.in_(children_ids))
-                .order_by(ContentRevisionRO.content_id)
-            )
-        return []
 
     @property
     def recursive_parents(self) -> List["Content"]:
