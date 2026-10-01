@@ -906,7 +906,11 @@ class Content(DeclarativeBase):
 
     @property
     def revision(self) -> ContentRevisionRO:
-        if not self.revisions:
+        # TRICKY - PGO - 2026-09-30 - We don't want to launch lazy loading of all revisions for perf issues
+        # The test made is crucial :
+        #     - `is None` won't load revisions
+        #     - whereas `not self.revisions` would
+        if self.current_revision is None:
             self.current_revision = ContentRevisionRO()
             self.current_revision.node = self
         return self.current_revision
