@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 import pytest
 from sqlalchemy import text
 import transaction
@@ -20,6 +21,7 @@ from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import EmailNotificationType
+from tracim_backend.models.data import RevisionReadStatus
 from tracim_backend.models.data import ToDoDispatcherType
 from tracim_backend.models.data import UserWorkspaceConfig
 from tracim_backend.models.revision_protection import new_revision
@@ -2119,6 +2121,258 @@ class TestContentApi(object):
         read_status_list = cont_api_b.get_read_status(user=user_b, content_ids=[page_1.id])
         for read_status in read_status_list:
             eq_(read_status["read_by_user"] == 1, True)
+
+    def _create_content_tree(
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        user_workspace_config_api_factory,
+    ) -> typing.Dict[str, typing.Any]:
+        """
+        user_a is admin and creates, user_b is content manager of the workspace:
+        folder
+        ├── page (2 revisions: creation + label edit)
+        └── subfolder
+            └── subpage
+
+        :return: dict with keys:
+            - user_a, user_b: the users
+            - content_api_a, content_api_b: a ContentApi for each user
+            - folder, page, subfolder, subpage: the contents
+            - page_first_revision_id: id of the page creation revision (no longer current)
+        """
+        uapi = user_api_factory.get()
+        user_a = uapi.create_minimal_user(
+            email="this.is@user", profile=Profile.ADMIN, save_now=True
+        )
+        user_b = uapi.create_minimal_user(
+            email="this.is@another.user", profile=Profile.ADMIN, save_now=True
+        )
+        workspace = workspace_api_factory.get(current_user=user_a).create_workspace(
+            "test workspace", save_now=True
+        )
+        user_workspace_config_api_factory.get(current_user=user_a).create_one(
+            user=user_b,
+            workspace=workspace,
+            role_level=UserWorkspaceConfig.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        content_api_a = ContentApi(current_user=user_a, session=session, config=app_config)
+        folder = content_api_a.create(
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="folder",
+            do_save=True,
+            do_notify=False,
+        )
+        page = content_api_a.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=folder,
+            label="page",
+            do_save=True,
+            do_notify=False,
+        )
+        page_first_revision_id = page.cached_revision_id
+        with new_revision(session=session, tm=transaction.manager, content=page):
+            content_api_a.update_content(page, new_label="page v2")
+            content_api_a.save(page, do_notify=False)
+        assert page.cached_revision_id != page_first_revision_id
+        subfolder = content_api_a.create(
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            parent=folder,
+            label="subfolder",
+            do_save=True,
+            do_notify=False,
+        )
+        subpage = content_api_a.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=subfolder,
+            label="subpage",
+            do_save=True,
+            do_notify=False,
+        )
+        return {
+            "user_a": user_a,
+            "user_b": user_b,
+            "content_api_a": content_api_a,
+            "content_api_b": ContentApi(current_user=user_b, session=session, config=app_config),
+            "folder": folder,
+            "page": page,
+            "page_first_revision_id": page_first_revision_id,
+            "subfolder": subfolder,
+            "subpage": subpage,
+        }
+
+    @staticmethod
+    def _read_revisions(session, user: User) -> typing.Dict[int, datetime.datetime]:
+        return dict(
+            session.query(RevisionReadStatus.revision_id, RevisionReadStatus.view_datetime).filter(
+                RevisionReadStatus.user_id == user.user_id
+            )
+        )
+
+    def test_unit__mark_read__ok__only_current_revisions_of_content_and_children(
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        user_workspace_config_api_factory,
+    ):
+        """
+        On the tree of _create_content_tree, user_b (who never read anything) reads the folder:
+        1. first read: only the current revisions of the folder and of all its subcontents get
+           a read status (not the page creation revision), the folder is read
+        2. user_a adds a revision to the page: the folder is unread again for user_b
+        3. second read:
+           - existing read statuses get the new read date
+           - the new page revision gets a read status
+           - the page revision read the first time is kept with its first read date
+           - the folder is read again
+        """
+        content_tree = self._create_content_tree(
+            user_api_factory,
+            workspace_api_factory,
+            session,
+            app_config,
+            content_type_list,
+            user_workspace_config_api_factory,
+        )
+        user_b = content_tree["user_b"]
+        folder = content_tree["folder"]
+        assert self._read_revisions(session, user_b) == {}
+
+        first_read_datetime = datetime.datetime(2026, 10, 1, 12, 0)
+        content_tree["content_api_b"].mark_read(folder, read_datetime=first_read_datetime)
+
+        current_revision_ids = {
+            content_tree[name].cached_revision_id
+            for name in ("folder", "page", "subfolder", "subpage")
+        }
+        assert self._read_revisions(session, user_b) == {
+            revision_id: first_read_datetime for revision_id in current_revision_ids
+        }
+        assert content_tree["page_first_revision_id"] not in self._read_revisions(session, user_b)
+        read_status = content_tree["content_api_b"].get_read_status(
+            user=user_b, content_ids=[folder.id]
+        )
+        assert read_status[0]["read_by_user"] == 1
+
+        # INFO - PGO - 2026-10-01 - A new revision of a child makes the folder unread again
+        page = content_tree["page"]
+        page_second_revision_id = page.cached_revision_id
+        with new_revision(session=session, tm=transaction.manager, content=page):
+            content_tree["content_api_a"].update_content(page, new_label="page v3")
+            content_tree["content_api_a"].save(page, do_notify=False)
+        read_status = content_tree["content_api_b"].get_read_status(
+            user=user_b, content_ids=[folder.id]
+        )
+        assert read_status[0]["read_by_user"] == 0
+
+        # INFO - PGO - 2026-10-01 - Existing read statuses are updated, the new revision is added,
+        # the one previously read is kept
+        second_read_datetime = datetime.datetime(2026, 10, 1, 13, 0)
+        content_tree["content_api_b"].mark_read(folder, read_datetime=second_read_datetime)
+
+        assert self._read_revisions(session, user_b) == {
+            **{revision_id: second_read_datetime for revision_id in current_revision_ids},
+            page_second_revision_id: first_read_datetime,
+            page.cached_revision_id: second_read_datetime,
+        }
+        read_status = content_tree["content_api_b"].get_read_status(
+            user=user_b, content_ids=[folder.id]
+        )
+        assert read_status[0]["read_by_user"] == 1
+
+    def test_unit__mark_read__ok__not_recursive(
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        user_workspace_config_api_factory,
+    ):
+        """
+        Reading the folder without recursion only adds a read status on the folder current
+        revision for user_b: every other read status (of user_a, the creator) is unchanged.
+        """
+        content_tree = self._create_content_tree(
+            user_api_factory,
+            workspace_api_factory,
+            session,
+            app_config,
+            content_type_list,
+            user_workspace_config_api_factory,
+        )
+        user_a = content_tree["user_a"]
+        user_b = content_tree["user_b"]
+        user_a_read_revisions_before = self._read_revisions(session, user_a)
+        assert self._read_revisions(session, user_b) == {}
+
+        read_datetime = datetime.datetime(2026, 10, 1, 12, 0)
+        content_tree["content_api_b"].mark_read(
+            content_tree["folder"], read_datetime=read_datetime, recursive=False
+        )
+
+        assert self._read_revisions(session, user_a) == user_a_read_revisions_before
+        assert self._read_revisions(session, user_b) == {
+            content_tree["folder"].cached_revision_id: read_datetime
+        }
+
+    def test_unit__save__ok__author_reads_current_revisions_of_content_and_children(
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        session,
+        app_config,
+        content_type_list,
+        user_workspace_config_api_factory,
+    ):
+        content_tree = self._create_content_tree(
+            user_api_factory,
+            workspace_api_factory,
+            session,
+            app_config,
+            content_type_list,
+            user_workspace_config_api_factory,
+        )
+        user_a = content_tree["user_a"]
+        user_b = content_tree["user_b"]
+        folder = content_tree["folder"]
+        folder_first_revision_id = folder.cached_revision_id
+        user_a_read_revisions_before = self._read_revisions(session, user_a)
+        assert self._read_revisions(session, user_b) == {}
+
+        # INFO - PGO - 2026-10-01 - save() doesn't take a read date, mark_read uses now()
+        save_start = datetime.datetime.now()
+        with new_revision(session=session, tm=transaction.manager, content=folder):
+            content_tree["content_api_b"].update_content(folder, new_label="folder v2")
+            content_tree["content_api_b"].save(folder, do_notify=False)
+        save_end = datetime.datetime.now()
+
+        assert folder.cached_revision_id != folder_first_revision_id
+        # INFO - PGO - 2026-10-01 - save() marks the content as read for its author, recursively:
+        # user_b has read exactly the current revisions of the folder (the new one) and of all its
+        # subcontents, but neither the previous folder revision nor the page creation revision
+        user_b_read_revisions = self._read_revisions(session, user_b)
+        assert set(user_b_read_revisions) == {
+            content_tree[name].cached_revision_id
+            for name in ("folder", "page", "subfolder", "subpage")
+        }
+        assert all(
+            save_start <= read_datetime <= save_end
+            for read_datetime in user_b_read_revisions.values()
+        )
+        # INFO - PGO - 2026-10-01 - read statuses of other users are untouched
+        assert self._read_revisions(session, user_a) == user_a_read_revisions_before
 
     def test_mark_read__all(
         self,

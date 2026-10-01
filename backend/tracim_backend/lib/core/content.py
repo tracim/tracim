@@ -2105,7 +2105,14 @@ class ContentApi(object):
     ) -> Content:
         """
         Read content for the user.
-        :param read_datetime: date of readigin
+
+        Only the current revision of the content (and of its subcontents) is marked as read:
+        read status is only ever checked on the current revision
+        (see Content.has_new_information_for and get_read_status).
+        Before 2026.10 every revision of the content was marked as read, which was VERY costly
+        on contents with a long history (kanban...).
+
+        :param read_datetime: last date of a reading action
         :param do_flush: flush database
         :param recursive: mark read subcontent too
         :return: nothing
@@ -2113,66 +2120,46 @@ class ContentApi(object):
         assert self._user
         assert content
 
-        # The algorithm is:
-        # 1. define the read datetime
-        # 2. get all the revision ids that need to be updated
-        # 3. update all read related to the revision of the current Content
-        # 4. insert new read related to the revision of the current Content
-
         if not read_datetime:
             read_datetime = datetime.datetime.now()
 
-        # Get all revision IDs for this content
+        content_ids = [content.id]
         if recursive:
-            content_ids = [content.content_id]
-            for child in content.recursive_children:
-                content_ids.append(child.content_id)
+            content_ids.extend(child.id for child in content.recursive_children)
 
-            revision_ids = (
-                self._session.query(ContentRevisionRO.revision_id)
-                .filter(ContentRevisionRO.content_id.in_(content_ids))
-                .all()
+        # INFO - PGO - 2026-10-01 - Read cached_revision_id from the database: the query autoflushes
+        # the session, so a new revision of the content is taken into account
+        revision_ids = {
+            revision_id
+            for (revision_id,) in self._session.query(Content.cached_revision_id).filter(
+                Content.id.in_(content_ids)
             )
-        else:
-            revision_ids = (
-                self._session.query(ContentRevisionRO.revision_id)
-                .filter(ContentRevisionRO.content_id == content.content_id)
-                .all()
-            )
+        }
 
-        # Convert to flat list
-        revision_ids = [r[0] for r in revision_ids]
-
-        self._session.query(RevisionReadStatus).filter(
-            RevisionReadStatus.user_id == self._user.user_id,
-            RevisionReadStatus.revision_id.in_(revision_ids),
-        ).update({RevisionReadStatus.view_datetime: read_datetime}, synchronize_session=False)
-
-        # For revisions without read status, create new ones
-        existing_read_revision_ids = (
-            self._session.query(RevisionReadStatus.revision_id)
-            .filter(
+        existing_read_revision_ids = {
+            revision_id
+            for (revision_id,) in self._session.query(RevisionReadStatus.revision_id).filter(
                 RevisionReadStatus.user_id == self._user.user_id,
                 RevisionReadStatus.revision_id.in_(revision_ids),
             )
-            .all()
+        }
+
+        if existing_read_revision_ids:
+            self._session.query(RevisionReadStatus).filter(
+                RevisionReadStatus.user_id == self._user.user_id,
+                RevisionReadStatus.revision_id.in_(existing_read_revision_ids),
+            ).update({RevisionReadStatus.view_datetime: read_datetime}, synchronize_session=False)
+
+        unread_revision_ids = revision_ids - existing_read_revision_ids
+        # TRICKY - PGO - 2026-10-01 - Don't use bulk_save_objects here: it doesn't trigger any
+        # session event, so zope.sqlalchemy wouldn't know the session changed and the transaction
+        # would be rolled back at the end of the request (when no read status was updated above)
+        self._session.add_all(
+            RevisionReadStatus(
+                user_id=self._user.user_id, revision_id=revision_id, view_datetime=read_datetime
+            )
+            for revision_id in unread_revision_ids
         )
-        existing_read_revision_ids = [r[0] for r in existing_read_revision_ids]
-
-        # Find revisions that need new read statuses
-        new_read_status_revision_ids = [
-            r_id for r_id in revision_ids if r_id not in existing_read_revision_ids
-        ]
-
-        # Bulk insert new read statuses
-        if new_read_status_revision_ids:
-            new_statuses = [
-                RevisionReadStatus(
-                    user_id=self._user.user_id, revision_id=revision_id, view_datetime=read_datetime
-                )
-                for revision_id in new_read_status_revision_ids
-            ]
-            self._session.bulk_save_objects(new_statuses)
 
         if do_flush:
             self.flush()
