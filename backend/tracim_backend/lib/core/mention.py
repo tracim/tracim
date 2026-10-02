@@ -202,10 +202,8 @@ class MentionBuilder:
         if not mentions:
             return
 
-        try:
-            old_mentions = parser.get_mentions(content.revisions[-2])
-        except IndexError:
-            old_mentions = set()
+        previous_revision = content.previous_revision
+        old_mentions = parser.get_mentions(previous_revision) if previous_revision else set()
         new_mentions = set(mentions) - set(old_mentions)
 
         if not new_mentions:
