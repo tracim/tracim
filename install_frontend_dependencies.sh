@@ -164,14 +164,7 @@ setup_config() {
 
 yarn_install() {
     log "Running yarn install…"
-    # Some packages download files in their build step (e.g. the Cypress binary):
-    # retry to survive transient network errors, already installed packages are not fetched again.
-    for attempt in 1 2 3; do
-        yarn install && return 0
-        log "yarn install failed (attempt $attempt), retrying…"
-        sleep 15
-    done
-    return 1
+    yarn install
 }
 
 debian_install                && \
