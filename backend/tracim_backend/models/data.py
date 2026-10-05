@@ -874,7 +874,7 @@ class Content(DeclarativeBase):
     #
     # TRICKY - PGO - 2026-09-30 - Accessing this collection loads every revision of the content !!
     # We have helper methods to load a single revision: use current_revision, first_revision or
-    # previous_revision instead.
+    # revision_before_current instead.
     revisions = relationship(
         "ContentRevisionRO",
         foreign_keys=[ContentRevisionRO.content_id],
@@ -1361,7 +1361,7 @@ class Content(DeclarativeBase):
         return first_revision or self.current_revision
 
     @property
-    def previous_revision(self) -> Optional[ContentRevisionRO]:
+    def revision_before_current(self) -> Optional[ContentRevisionRO]:
         """
         Return the revision preceding the current one, None if there is only one revision.
         """

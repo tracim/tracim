@@ -202,7 +202,7 @@ class MentionBuilder:
         if not mentions:
             return
 
-        previous_revision = content.previous_revision
+        previous_revision = content.revision_before_current
         old_mentions = parser.get_mentions(previous_revision) if previous_revision else set()
         new_mentions = set(mentions) - set(old_mentions)
 
