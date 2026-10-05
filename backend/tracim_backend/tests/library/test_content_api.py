@@ -2226,7 +2226,7 @@ class TestContentApi(object):
             )
         }
 
-    def test_unit__mark_read__ok__all_revisions_of_content_and_children(
+    def test_unit__mark_read__ok__current_revisions_updated_missing_ones_created(
         self,
         user_api_factory,
         workspace_api_factory,
@@ -2240,8 +2240,9 @@ class TestContentApi(object):
         1. first read: every revision of the folder and of all its subcontents (including the
            page creation revision) gets a read status, the folder is read
         2. user_a adds a revision to the page: the folder is unread again for user_b
-        3. second read: every revision (the new one included) has the new read date, the folder
-           is read again
+        3. second read: the current revision of each content has the new read date (the new page
+           revision status is created, the others are updated), the 2 older page revisions keep
+           the first read date, the folder is read again
         Read statuses of user_a are never changed.
         """
         content_tree = self._create_content_tree(
@@ -2289,8 +2290,13 @@ class TestContentApi(object):
 
         tree_revision_ids = self._revision_ids(session, *tree_contents)
         assert len(tree_revision_ids) == 6
+        current_revision_ids = {content.cached_revision_id for content in tree_contents}
+        assert len(current_revision_ids) == 4
         assert self._read_revisions(session, user_b) == {
-            revision_id: second_read_datetime for revision_id in tree_revision_ids
+            revision_id: (
+                second_read_datetime if revision_id in current_revision_ids else first_read_datetime
+            )
+            for revision_id in tree_revision_ids
         }
         read_status = content_tree["content_api_b"].get_read_status(
             user=user_b, content_ids=[folder.id]
