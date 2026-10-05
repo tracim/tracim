@@ -1345,14 +1345,20 @@ class Content(DeclarativeBase):
             return self.revisions[0]
 
         session = object_session(self)
+        query = session.query(ContentRevisionRO).filter(ContentRevisionRO.content_id == self.id)
+        # TRICKY - PGO - 2026-10-05 - Never load the current revision with a query: in after_flush
+        # it already has its id, but it isn't registered in the identity map yet
+        # => the query would load it again from database as a duplicate instance, and the session
+        #    would then fail with "another instance with key ... is already present"
+        # See https://docs.sqlalchemy.org/en/13/orm/session_state_management.html#session-object-states
+        # So only older revisions are queried, and the current one is the first if there is none.
+        current_revision_id = self.current_revision.revision_id
+        if current_revision_id is not None:
+            query = query.filter(ContentRevisionRO.revision_id < current_revision_id)
         # INFO - PGO - 2026-10-01 - Reading a revision must not flush (and persist) the session
         with session.no_autoflush:
-            first_revision_id = (
-                session.query(sqlalchemy.func.min(ContentRevisionRO.revision_id))
-                .filter(ContentRevisionRO.content_id == self.id)
-                .scalar()
-            )
-        return self._get_revision(first_revision_id)
+            first_revision = query.order_by(ContentRevisionRO.revision_id).first()
+        return first_revision or self.current_revision
 
     @property
     def previous_revision(self) -> Optional[ContentRevisionRO]:
@@ -1373,15 +1379,15 @@ class Content(DeclarativeBase):
         # INFO - PGO - 2026-10-01 - We are sure current_revision is persisted here (above test)
         # But reading a revision must not flush (and persist) the session
         with session.no_autoflush:
-            previous_revision_id = (
-                session.query(sqlalchemy.func.max(ContentRevisionRO.revision_id))
+            return (
+                session.query(ContentRevisionRO)
                 .filter(
                     ContentRevisionRO.content_id == self.id,
                     ContentRevisionRO.revision_id < current_revision_id,
                 )
-                .scalar()
+                .order_by(ContentRevisionRO.revision_id.desc())
+                .first()
             )
-        return self._get_revision(previous_revision_id) if previous_revision_id else None
 
     def _is_revisions_property_loaded(self) -> bool:
         """
@@ -1392,20 +1398,6 @@ class Content(DeclarativeBase):
             session (new content, revisions only in memory)
         """
         return "revisions" in self.__dict__ or object_session(self) is None
-
-    def _get_revision(self, revision_id: int) -> ContentRevisionRO:
-        # TRICKY - PGO - 2026-09-30 - in after_flush current_revision already has its id, but it
-        # isn't registered in the identity map yet
-        # => .get() wouldn't find it, would load it again from database as a duplicate instance,
-        #    and the session would then fail with "another instance with key ... is already present"
-        # See https://docs.sqlalchemy.org/en/13/orm/session_state_management.html#session-object-states
-        if revision_id == self.current_revision.revision_id:
-            return self.current_revision
-
-        session = object_session(self)
-        # INFO - PGO - 2026-10-01 - Reading a revision must not flush (and persist) the session
-        with session.no_autoflush:
-            return session.query(ContentRevisionRO).get(revision_id)
 
     @property
     def last_revision_persisted(self) -> Optional[ContentRevisionRO]:
@@ -1419,18 +1411,24 @@ class Content(DeclarativeBase):
                 None,
             )
 
+        # INFO - PGO - 2026-10-05 - Revisions are created in id order, so a current revision with an
+        # id is the last persisted one. Returning it also avoids loading it again with a query
+        # (see TRICKY comment in first_revision)
+        if self.current_revision.revision_id is not None:
+            return self.current_revision
+
         session = object_session(self)
-        # TRICKY - PGO - 2026-10-01 - current_revision might not be persisted yet !
-        # `no_autoflush` prevents this query from flushing it: otherwise MAX() would return it
+        # TRICKY - PGO - 2026-10-01 - current_revision is not persisted yet ! (see test just above)
+        # `no_autoflush` prevents this query from flushing it: otherwise the query would return it
         # instead of the last revision already in database
         # current_revision will still be persisted on next flush
         with session.no_autoflush:
-            last_revision_id = (
-                session.query(sqlalchemy.func.max(ContentRevisionRO.revision_id))
+            return (
+                session.query(ContentRevisionRO)
                 .filter(ContentRevisionRO.content_id == self.id)
-                .scalar()
+                .order_by(ContentRevisionRO.revision_id.desc())
+                .first()
             )
-        return self._get_revision(last_revision_id) if last_revision_id else None
 
     @property
     def is_readonly(self) -> bool:
