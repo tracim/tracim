@@ -162,7 +162,7 @@ class TestContent(object):
 
         assert content.first_revision.revision_id == revision_1_id
         assert content.previous_revision.revision_id == revision_1_id
-        assert content.last_revision.revision_id == revision_2_id
+        assert content.current_revision.revision_id == revision_2_id
         assert content.author == admin_user
 
         with new_revision(session=session, tm=transaction.manager, content=content):
@@ -170,7 +170,7 @@ class TestContent(object):
             # INFO - PGO - 2026-10-01 - revision 3 is not flushed yet
             assert content.current_revision.revision_id is None
             assert content.first_revision.revision_id == revision_1_id
-            assert content.last_revision.description == "revision 3"
+            assert content.current_revision.description == "revision 3"
             assert content.last_revision_persisted.revision_id == revision_2_id
             assert content.previous_revision.revision_id == revision_2_id
         session.flush()
@@ -178,7 +178,7 @@ class TestContent(object):
         revision_3_id = content.current_revision.revision_id
         assert revision_3_id is not None
         assert content.first_revision.revision_id == revision_1_id
-        assert content.last_revision.description == "revision 3"
+        assert content.current_revision.description == "revision 3"
         assert content.last_revision_persisted.revision_id == revision_3_id
         assert content.previous_revision.revision_id == revision_2_id
         assert "revisions" not in content.__dict__

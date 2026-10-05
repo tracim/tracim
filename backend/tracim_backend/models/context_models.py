@@ -1550,7 +1550,7 @@ class ContentInContext(object):
         return UserInContext(
             dbsession=self.dbsession,
             config=self.config,
-            user=self.content.last_revision.owner,
+            user=self.content.current_revision.owner,
         )
 
     # Context-related

@@ -854,6 +854,9 @@ class Content(DeclarativeBase):
         Integer, ForeignKey("content_revisions.revision_id", ondelete="RESTRICT")
     )
 
+    # INFO - PGO - 2026-10-01 - The latest revision of the content, even if it is not persisted yet
+    # (a revision created by new_revision() is only inserted in database at the next flush).
+    # See last_revision_persisted to get the latest revision stored in database.
     current_revision = relationship(
         "ContentRevisionRO",
         uselist=False,
@@ -1403,15 +1406,6 @@ class Content(DeclarativeBase):
         # INFO - PGO - 2026-10-01 - Reading a revision must not flush (and persist) the session
         with session.no_autoflush:
             return session.query(ContentRevisionRO).get(revision_id)
-
-    @property
-    def last_revision(self) -> ContentRevisionRO:
-        """
-        Return the latest revision of the content, even if it is not persisted yet (a revision
-        created by new_revision() is only inserted in database at the next flush).
-        See last_revision_persisted to get the latest revision stored in database.
-        """
-        return self.current_revision
 
     @property
     def last_revision_persisted(self) -> Optional[ContentRevisionRO]:
