@@ -16,8 +16,12 @@ from sqlakeyset import Page
 from sqlakeyset import get_page
 from sqlalchemy import Integer
 from sqlalchemy import bindparam
+from sqlalchemy import exists
 from sqlalchemy import func
+from sqlalchemy import literal
+from sqlalchemy import not_
 from sqlalchemy import or_
+from sqlalchemy import select
 from sqlalchemy import text
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import contains_eager
@@ -2104,75 +2108,78 @@ class ContentApi(object):
         recursive: bool = True,
     ) -> Content:
         """
-        Read content for the user.
-        :param read_datetime: date of readigin
+        For the current user, and the passed content (plus its subcontents if recursive):
+            - The RevisionReadStatus of each content's current revision (= latest) is set to
+              read_datetime
+            - A RevisionReadStatus at read_datetime is created for every content/subcontent revision
+              missing one
+            - Other existing RevisionReadStatus are left unchanged (before 2026.10 we were updating
+              dates of every line in the table for the user + content/subcontents : useless and
+              resource consuming !)
+
+        Considering that:
+            - RevisionReadStatus is used to display read status in workspace contents list
+            - Subcontents are any content, but in practice for example: comments in a Kanban,
+              contents in a folder, TODOs, attached files, ...
+            - We have one RevisionReadStatus for each revision to be sure to keep track of all
+              revisions viewed by the user
+
+        See related functions :
+            - Content.has_new_information_for
+            - ContentApi.get_read_status
+
+        :param read_datetime: date of reading, now if not given
         :param do_flush: flush database
-        :param recursive: mark read subcontent too
-        :return: nothing
+        :param recursive: mark read also subcontents
+        :return: the content
         """
         assert self._user
         assert content
 
-        # The algorithm is:
-        # 1. define the read datetime
-        # 2. get all the revision ids that need to be updated
-        # 3. update all read related to the revision of the current Content
-        # 4. insert new read related to the revision of the current Content
-
         if not read_datetime:
             read_datetime = datetime.datetime.now()
 
-        # Get all revision IDs for this content
+        content_ids = [content.id]
         if recursive:
-            content_ids = [content.content_id]
-            for child in content.recursive_children:
-                content_ids.append(child.content_id)
+            content_ids.extend(content.recursive_children_ids)
 
-            revision_ids = (
-                self._session.query(ContentRevisionRO.revision_id)
-                .filter(ContentRevisionRO.content_id.in_(content_ids))
-                .all()
-            )
-        else:
-            revision_ids = (
-                self._session.query(ContentRevisionRO.revision_id)
-                .filter(ContentRevisionRO.content_id == content.content_id)
-                .all()
-            )
+        # INFO - PGO - 2026-10-06 - Prepare a query that we can use as a subquery in our next
+        # operation
+        # => whatever the number of revisions, nothing is loaded in Python !
+        current_revision_ids_query = select([Content.cached_revision_id]).where(
+            Content.id.in_(content_ids)
+        )
 
-        # Convert to flat list
-        revision_ids = [r[0] for r in revision_ids]
-
+        # TRICKY - PGO - 2026-10-01 - This UPDATE must always be executed, even if no read status
+        # exists yet:
+        # - Query.update() autoflushes the session, so a new revision of the content is persisted
+        #   and set as cached_revision_id before being selected
+        # - it triggers the "after_bulk_update" session event, so zope.sqlalchemy knows the
+        #   session changed. The INSERT below doesn't trigger any session event: without the
+        #   UPDATE the transaction would be rolled back at the end of the request.
         self._session.query(RevisionReadStatus).filter(
             RevisionReadStatus.user_id == self._user.user_id,
-            RevisionReadStatus.revision_id.in_(revision_ids),
+            RevisionReadStatus.revision_id.in_(current_revision_ids_query),
         ).update({RevisionReadStatus.view_datetime: read_datetime}, synchronize_session=False)
 
-        # For revisions without read status, create new ones
-        existing_read_revision_ids = (
-            self._session.query(RevisionReadStatus.revision_id)
-            .filter(
+        is_already_read = exists().where(
+            and_(
+                RevisionReadStatus.revision_id == ContentRevisionRO.revision_id,
                 RevisionReadStatus.user_id == self._user.user_id,
-                RevisionReadStatus.revision_id.in_(revision_ids),
             )
-            .all()
         )
-        existing_read_revision_ids = [r[0] for r in existing_read_revision_ids]
-
-        # Find revisions that need new read statuses
-        new_read_status_revision_ids = [
-            r_id for r_id in revision_ids if r_id not in existing_read_revision_ids
-        ]
-
-        # Bulk insert new read statuses
-        if new_read_status_revision_ids:
-            new_statuses = [
-                RevisionReadStatus(
-                    user_id=self._user.user_id, revision_id=revision_id, view_datetime=read_datetime
-                )
-                for revision_id in new_read_status_revision_ids
+        unread_revisions_query = select(
+            [
+                ContentRevisionRO.revision_id,
+                literal(self._user.user_id, type_=Integer),
+                literal(read_datetime, type_=RevisionReadStatus.view_datetime.type),
             ]
-            self._session.bulk_save_objects(new_statuses)
+        ).where(and_(ContentRevisionRO.content_id.in_(content_ids), not_(is_already_read)))
+        self._session.execute(
+            RevisionReadStatus.__table__.insert().from_select(
+                ["revision_id", "user_id", "view_datetime"], unread_revisions_query
+            )
+        )
 
         if do_flush:
             self.flush()
