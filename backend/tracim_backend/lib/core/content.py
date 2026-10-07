@@ -1537,7 +1537,7 @@ class ContentApi(object):
         new_content_namespace: ContentNamespaces = None,
     ) -> Content:
         cpy_rev = ContentRevisionRO.copy(
-            revision=source_content.last_revision,
+            revision=source_content.current_revision,
             parent=new_parent,
             new_content_namespace=new_content_namespace,
             copy_as_template=True,
@@ -1609,7 +1609,7 @@ class ContentApi(object):
         properties = content.properties.copy()
         properties["origin"] = {
             "content": original_content.id,
-            "revision": original_content.last_revision.revision_id,
+            "revision": original_content.current_revision.revision_id,
         }
         content.revision_type = ActionDescription.COPY
         content.properties = properties

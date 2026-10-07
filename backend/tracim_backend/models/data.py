@@ -535,12 +535,13 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
 
     __tablename__ = "content_revisions"
 
+    # INFO - PGO - 2026-10-01 - None until the revision is flushed
     revision_id = Column(
         Integer,
         Sequence("seq__content_revisions__revision_id"),
         autoincrement=True,
         primary_key=True,
-    )
+    )  # type: Optional[int]
     # NOTE - S.G - 2020-05-06: cannot set nullable=False as post_update is used
     # for current_revision in Content.
     content_id = Column(Integer, ForeignKey("content.id", ondelete="CASCADE"))
@@ -853,6 +854,9 @@ class Content(DeclarativeBase):
         Integer, ForeignKey("content_revisions.revision_id", ondelete="RESTRICT")
     )
 
+    # INFO - PGO - 2026-10-01 - The latest revision of the content, even if it is not persisted yet
+    # (a revision created by new_revision() is only inserted in database at the next flush).
+    # See last_persisted_revision to get the latest revision stored in database.
     current_revision = relationship(
         "ContentRevisionRO",
         uselist=False,
@@ -867,12 +871,16 @@ class Content(DeclarativeBase):
     # So for now, we order by "revision_id" explicitly, but remember to switch
     # to "created" once "updated" removed.
     # https://github.com/tracim/tracim/issues/336
+    #
+    # INFO - PGO - 2026-09-30 - Accessing this collection loads every revision of the content !!
+    # We have helper methods to load a single revision: use current_revision, first_revision,
+    # revision_before_current, last_persisted_revision instead
     revisions = relationship(
         "ContentRevisionRO",
         foreign_keys=[ContentRevisionRO.content_id],
         back_populates="node",
         order_by="ContentRevisionRO.revision_id",
-    )
+    )  # type: List[ContentRevisionRO]
     children_revisions = relationship(
         "ContentRevisionRO",
         foreign_keys=[ContentRevisionRO.parent_id],
@@ -906,7 +914,9 @@ class Content(DeclarativeBase):
 
     @property
     def revision(self) -> ContentRevisionRO:
-        if not self.revisions:
+        # TRICKY - PGO - 2026-10-06 - Don't test `not self.revisions` here: it would lazy load
+        # every revision of the content, very costly on contents with many revisions !
+        if self.current_revision is None:
             self.current_revision = ContentRevisionRO()
             self.current_revision.node = self
         return self.current_revision
@@ -1207,11 +1217,11 @@ class Content(DeclarativeBase):
     # Author is the author of the original revision
     @hybrid_property
     def author(self) -> User:
-        return self.revisions[0].owner
+        return self.first_revision.owner
 
     @author.setter
     def author(self, value: User) -> None:
-        self.revisions[0].owner = value
+        self.first_revision.owner = value
 
     @author.expression
     def author(cls) -> InstrumentedAttribute:
@@ -1329,11 +1339,98 @@ class Content(DeclarativeBase):
 
     @property
     def first_revision(self) -> ContentRevisionRO:
-        return self.revisions[0]  # FIXME
+        if self._is_revisions_property_loaded():
+            return self.revisions[0]
+
+        # INFO - PGO - 2026-10-06 - In order to avoid lag on contents involving a lot of revisions,
+        # we do not lazy load all revisions.
+        # Instead, we are loading only the needed revision
+
+        session = object_session(self)
+        query = session.query(ContentRevisionRO).filter(ContentRevisionRO.content_id == self.id)
+        # TRICKY - PGO - 2026-10-05 - Never load the current revision with a query: in after_flush
+        # it already has its id, but it isn't registered in the identity map yet
+        # => the query would load it again from database as a duplicate instance, and the session
+        #    would then fail with "another instance with key ... is already present"
+        # See https://docs.sqlalchemy.org/en/13/orm/session_state_management.html#session-object-states
+        # So only older revisions are queried, and the current one is the first if there is none.
+        current_revision_id = self.current_revision.revision_id
+        if current_revision_id is not None:
+            query = query.filter(ContentRevisionRO.revision_id < current_revision_id)
+        # INFO - PGO - 2026-10-01 - Reading a revision must not flush (and persist) the session
+        with session.no_autoflush:
+            first_revision = query.order_by(ContentRevisionRO.revision_id).first()
+        return first_revision or self.current_revision
 
     @property
-    def last_revision(self) -> ContentRevisionRO:
-        return self.revisions[-1]
+    def revision_before_current(self) -> Optional[ContentRevisionRO]:
+        """
+        Return the revision preceding the current one, None if there is only one revision.
+        """
+        if self._is_revisions_property_loaded():
+            return self.revisions[-2] if len(self.revisions) > 1 else None
+
+        # TRICKY - PGO - 2026-10-01 - Don't use cached_revision_id here: it is only updated
+        # at flush time. If the current revision is not flushed yet (no revision_id), the
+        # previous one is the last revision in database.
+        current_revision_id = self.current_revision.revision_id
+        if current_revision_id is None:
+            return self.last_persisted_revision
+
+        session = object_session(self)
+        # INFO - PGO - 2026-10-01 - We are sure current_revision is persisted here (above test)
+        # But reading a revision must not flush (and persist) the session
+        with session.no_autoflush:
+            return (
+                session.query(ContentRevisionRO)
+                .filter(
+                    ContentRevisionRO.content_id == self.id,
+                    ContentRevisionRO.revision_id < current_revision_id,
+                )
+                .order_by(ContentRevisionRO.revision_id.desc())
+                .first()
+            )
+
+    def _is_revisions_property_loaded(self) -> bool:
+        """
+        The revisions relationship is lazy loaded, and can be very costly !
+        This method can be used to make sure that the collection is loaded.
+
+        :return: True if self.revisions is already loaded, or if the content is not attached to a
+            session (new content, revisions only in memory)
+        """
+        return "revisions" in self.__dict__ or object_session(self) is None
+
+    @property
+    def last_persisted_revision(self) -> Optional[ContentRevisionRO]:
+        """
+        Return the latest revision of the content stored in database, ignoring a current
+        revision not flushed yet. None if no revision of the content was flushed yet.
+        """
+        if self._is_revisions_property_loaded():
+            for revision in reversed(self.revisions):
+                if revision.revision_id is not None:
+                    return revision
+            return None
+
+        # INFO - PGO - 2026-10-05 - Revisions are created in id order, so a current revision with an
+        # id is the last persisted one. Returning it also avoids loading it again with a query
+        # (see TRICKY comment in first_revision)
+        if self.current_revision.revision_id is not None:
+            return self.current_revision
+
+        session = object_session(self)
+        # TRICKY - PGO - 2026-10-01 - current_revision is not persisted yet ! (see test just above)
+        # `no_autoflush` prevents this query from flushing it: otherwise the query would return it
+        # instead of the last revision already in database
+        # current_revision will still be persisted on next flush
+        with session.no_autoflush:
+            return (
+                session.query(ContentRevisionRO)
+                .filter(ContentRevisionRO.content_id == self.id)
+                .order_by(ContentRevisionRO.revision_id.desc())
+                .first()
+            )
 
     @property
     def is_readonly(self) -> bool:
