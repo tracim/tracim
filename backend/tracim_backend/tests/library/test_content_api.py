@@ -2240,9 +2240,12 @@ class TestContentApi(object):
         1. first read: every revision of the folder and of all its subcontents (including the
            page creation revision) gets a read status, the folder is read
         2. user_a adds a revision to the page: the folder is unread again for user_b
-        3. second read: the current revision of each content has the new read date (the new page
-           revision status is created, the others are updated), the 2 older page revisions keep
-           the first read date, the folder is read again
+        3. user_b read status of the page first revision is deleted: an older revision with a
+           missing read status, between revisions having one
+        4. second read: the current revision of each content has the new read date (the new page
+           revision status is created, the others are updated), the missing status of the page
+           first revision is created with the new read date, the page second revision keeps the
+           first read date, the folder is read again
         Read statuses of user_a are never changed.
         """
         content_tree = self._create_content_tree(
@@ -2285,6 +2288,13 @@ class TestContentApi(object):
         # INFO - PGO - 2026-10-01 - user_a saved the page, so their own read statuses changed
         user_a_read_revisions_before = self._read_revisions(session, user_a)
 
+        page_first_revision_id = min(self._revision_ids(session, page))
+        session.query(RevisionReadStatus).filter(
+            RevisionReadStatus.user_id == user_b.user_id,
+            RevisionReadStatus.revision_id == page_first_revision_id,
+        ).delete()
+        assert page_first_revision_id not in self._read_revisions(session, user_b)
+
         second_read_datetime = datetime.datetime(2026, 10, 1, 13, 0)
         content_tree["content_api_b"].mark_read(folder, read_datetime=second_read_datetime)
 
@@ -2292,9 +2302,12 @@ class TestContentApi(object):
         assert len(tree_revision_ids) == 6
         current_revision_ids = {content.cached_revision_id for content in tree_contents}
         assert len(current_revision_ids) == 4
+        second_read_revision_ids = {*current_revision_ids, page_first_revision_id}
         assert self._read_revisions(session, user_b) == {
             revision_id: (
-                second_read_datetime if revision_id in current_revision_ids else first_read_datetime
+                second_read_datetime
+                if revision_id in second_read_revision_ids
+                else first_read_datetime
             )
             for revision_id in tree_revision_ids
         }
