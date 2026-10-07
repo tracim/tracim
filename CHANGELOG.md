@@ -9,6 +9,11 @@
 - Kanban view improvements with new 2026.07.00 fields (duration, progress, dependencies)
 - Allow to show the TODO tasks dispatched by the user
 
+### ⚡️ Performance
+
+- Improved performance when marking content read
+- Improved performance on loading content revision
+
 ### 🐛 Fixed Issues
 
 - Fix 2026.07.04 regression: cannot delete a card with an unknown dependency [#6956](https://github.com/tracim/tracim/pull/6956)
