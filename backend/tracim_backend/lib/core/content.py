@@ -2119,7 +2119,8 @@ class ContentApi(object):
 
         Considering that:
             - RevisionReadStatus is used to display read status in workspace contents list
-            - Subcontents are for example: comments in a Kanban, contents in a folder, ...
+            - Subcontents are any content, but in practice for example: comments in a Kanban,
+              contents in a folder, TODOs, attached files, ...
             - We have one RevisionReadStatus for each revision to be sure to keep track of all
               revisions viewed by the user
 
