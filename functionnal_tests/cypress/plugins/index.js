@@ -11,6 +11,27 @@
 // This function is called when a project is opened or re-opened (e.g. due to
 // the project's config changing)
 
+const fs = require('fs')
+const path = require('path')
+
+const FAILED_TESTS_SUMMARY_PATH = path.join(__dirname, '..', 'failed-tests-summary.txt')
+
+// No dependency on a table-formatting package just for this -- a couple of
+// padded columns is all that's needed.
+const formatFailedTestsTable = (failedTests) => {
+  const columns = ['Spec', 'Test']
+  const widths = columns.map((col) => Math.max(col.length, ...failedTests.map((row) => row[col].length)))
+  const formatRow = (cells) => '| ' + cells.map((cell, i) => cell.padEnd(widths[i])).join(' | ') + ' |'
+  const separator = '+-' + widths.map((w) => '-'.repeat(w)).join('-+-') + '-+'
+  return [
+    separator,
+    formatRow(columns),
+    separator,
+    ...failedTests.map((row) => formatRow(columns.map((col) => row[col]))),
+    separator
+  ].join('\n')
+}
+
 module.exports = (on, config) => {
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
@@ -32,5 +53,33 @@ module.exports = (on, config) => {
       launchOptions.args.push('--no-sandbox')
     }
     return launchOptions
+  })
+
+  // INFO - PGO - 2026-08-21
+  // Add a summary of failed tests at the end of the log. Cypress's own
+  // per-spec results table (Spec/Tests/Passing/Failing/Pending/Skipped) has
+  // no documented way to sort, filter, or append to it, and `after:run`
+  // fires before that table is printed -- so instead of logging here (which
+  // would land *above* that table), write the summary to a file. The
+  // "cypress-run" yarn script cats it once `cypress run` has exited, which
+  // puts it after that table, at the very end of the build log.
+  on('after:run', (results) => {
+    if (!results || !results.totalFailed) {
+      fs.rmSync(FAILED_TESTS_SUMMARY_PATH, { force: true })
+      return
+    }
+
+    const failedTests = []
+    for (const run of results.runs) {
+      for (const test of run.tests) {
+        if (test.state === 'failed') {
+          failedTests.push({ Spec: run.spec.relative, Test: test.title.join(' > ') })
+        }
+      }
+    }
+
+    const summary = `\n===== FAILED TESTS (${results.totalFailed}) =====\n` +
+      formatFailedTestsTable(failedTests) + '\n'
+    fs.writeFileSync(FAILED_TESTS_SUMMARY_PATH, summary)
   })
 }
