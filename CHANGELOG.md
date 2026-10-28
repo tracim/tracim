@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026.10.01
+
+### ⚠️ Vulnerability fixed
+
+- Update certifi lib for compromised emSign CA keys [#6983](https://github.com/tracim/tracim/issues/6983)
+
+
 ## 2026.10.00
 
 ### ✨ New Features
