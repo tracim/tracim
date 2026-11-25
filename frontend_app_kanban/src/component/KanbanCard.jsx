@@ -35,7 +35,7 @@ function KanbanCard (props) {
       ? DESCRIPTION_BUTTON.SEE_MORE
       : DESCRIPTION_BUTTON.HIDDEN
     )
-  }, [props.card.description])
+  }, [refKanbanCard.current?.scrollHeight])
 
   const handleClickSeeDescriptionButton = () => {
     setShowDescriptionPreview(showSeeDescriptionButton !== DESCRIPTION_BUTTON.SEE_MORE)
