@@ -42,6 +42,7 @@ from tracim_backend.exceptions import EmailOrUsernameRequired
 from tracim_backend.exceptions import EmailRequired
 from tracim_backend.exceptions import EmailTemplateError
 from tracim_backend.exceptions import EmailValidationFailed
+from tracim_backend.exceptions import EmptyValueNotAllowed
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import GuestUserNotAllowed
@@ -1801,3 +1802,21 @@ need to be in every workspace you include."
                     self._config.LIMITATION__MAX_NON_GUEST_USERS
                 )
             )
+
+    def get_available_username_from_email(self, email: str) -> str:
+        if len(email.strip()) == 0:
+            raise EmptyValueNotAllowed("The email must be defined")
+
+        splitted_email = email.split("@", maxsplit=1)
+
+        username = splitted_email[0]
+        if not self.check_username_already_in_db(username):
+            return username
+
+        if len(splitted_email) > 1:
+            for part in splitted_email[1].replace("@", ".").split("."):
+                username = f"{username}-{part}"
+                if not self.check_username_already_in_db(username):
+                    return username
+
+        raise UsernameAlreadyExists("Cannot generate a username from this email")
