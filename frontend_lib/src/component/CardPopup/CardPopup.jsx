@@ -5,7 +5,7 @@ import CloseButton from '../Button/CloseButton.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import { translate } from 'react-i18next'
 
-// require('./CardPopup.styl') // see https://github.com/tracim/tracim/issues/1156
+require('./CardPopup.styl')
 
 const CardPopup = props => {
   return (
