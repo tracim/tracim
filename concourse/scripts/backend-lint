@@ -9,6 +9,7 @@ source "$HOME/.bashrc"
 pyenv shell "$PYTHON_VERSION"
 
 cd backend
+pip install --upgrade pip
 pip install -r requirements-devtool.txt
 flake8 --version
 isort --version

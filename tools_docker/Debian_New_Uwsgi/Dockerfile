@@ -41,6 +41,7 @@ RUN apt-get install -qy $(cat "${PACKAGE_DIR}/build_backend_packages.list") \
     # Go in backend folder
     && cd /tracim/backend \
     # Install backend
+    && pip install --upgrade pip \
     && pip install --force-reinstall \
     -r requirements-build.txt \
     -r requirements.txt \

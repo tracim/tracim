@@ -6,6 +6,7 @@ cd backend
 for version in $@; do
   pyenv install "$version"
   pyenv shell "$version"
+  pip install --upgrade pip
   pip install -r requirements-build.txt
   pip install -r requirements.txt
   pip install -r requirements-test.txt

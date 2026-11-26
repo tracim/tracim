@@ -16,6 +16,7 @@ start_docker "" "$docker_registry"
 source "$HOME/.bashrc"
 pyenv shell $PYTHON_VERSION
 cd backend
+pip install --upgrade pip
 pip install -r requirements.txt
 python setup.py develop
 # Update pyenv shims so that tracimcli is found

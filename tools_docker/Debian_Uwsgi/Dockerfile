@@ -55,6 +55,7 @@ RUN apt-get install -qy $(cat "${PACKAGE_DIR}/build_backend_packages.list") \
     # With Debian 12 Bullseye we were using `--force-reinstall` to force installing our Python packages instead of the system Python packages \
     # This is no longer possible with Debian 13 Trixie : apt-installed Python packages are shipped without RECORD files (PEP 668) so pip cannot uninstall them \
     # instead we are using `--ignore-installed` which writes everything fresh into `/usr/local/ instead`. \
+    && pip install --upgrade pip \
     && pip install --ignore-installed \
     -r requirements-build.txt \
     -r requirements.txt \
