@@ -7,6 +7,7 @@ from unittest import mock
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import CannotUseBothIncludeAndExcludeWorkspaceUsers
 from tracim_backend.exceptions import EmailValidationFailed
+from tracim_backend.exceptions import EmptyValueNotAllowed
 from tracim_backend.exceptions import ExternalAuthUserEmailModificationDisallowed
 from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
 from tracim_backend.exceptions import InvalidUsernameFormat
@@ -1070,6 +1071,78 @@ class TestUserApi(object):
 
         with pytest.raises(UserCantDisableHimself):
             api2.disable(user)
+
+    def test_unit__get_available_username__ok__email_left_part(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+
+        username = api.get_available_username_from_email("test@test.test")
+        assert username == "test"
+
+    def test_unit__get_available_username__ok__email_right_part(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+
+        api.create_user(
+            email="foo@bar.tld",
+            username="test",
+            do_save=True,
+            do_notify=False,
+        )
+
+        username = api.get_available_username_from_email("test@test.tld")
+        assert username == "test-test"
+
+        api.create_user(
+            email="bar@bar.tld",
+            username="test-test",
+            do_save=True,
+            do_notify=False,
+        )
+
+        username = api.get_available_username_from_email("test@test.tld")
+        assert username == "test-test-tld"
+
+        api.create_user(
+            email="qaz@bar.tld",
+            username="test-test-tld",
+            do_save=True,
+            do_notify=False,
+        )
+
+        username = api.get_available_username_from_email("test@test.tld.sub")
+        assert username == "test-test-tld-sub"
+
+    def test_unit__get_available_username__err__empty_email(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+
+        with pytest.raises(EmptyValueNotAllowed):
+            api.get_available_username_from_email(" ")
+
+    def test_unit__get_available_username__err__username_exists(self, session, app_config):
+        api = UserApi(current_user=None, session=session, config=app_config)
+
+        api.create_user(
+            email="test1@test.tld",
+            username="foo",
+            do_save=True,
+            do_notify=False,
+        )
+
+        api.create_user(
+            email="test2@test.tld",
+            username="foo-test",
+            do_save=True,
+            do_notify=False,
+        )
+
+        api.create_user(
+            email="test3@test.tld",
+            username="foo-test-tld",
+            do_save=True,
+            do_notify=False,
+        )
+
+        with pytest.raises(UsernameAlreadyExists):
+            api.get_available_username_from_email("foo@test.tld")
 
 
 @pytest.mark.usefixtures("base_fixture")
